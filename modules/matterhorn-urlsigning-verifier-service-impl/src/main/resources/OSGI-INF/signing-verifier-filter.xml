@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
+
+  <scr:component name="org.opencastproject.security.urlsigning.filter.UrlSigningFilter" immediate="true">
+    <implementation class="org.opencastproject.security.urlsigning.filter.UrlSigningFilter" />
+    <property name="service.description" value="Url Signing Filter" />
+    <property name="contextId" value="opencast.httpcontext" />
+    <!-- The CleanSessionsFilter must have the highest service.ranking value. See CleanSessionsFilter.java for details. -->
+    <property name="service.ranking" value="9" />
+    <property name="pattern" value=".*" />
+
+    <service>
+      <provide interface="javax.servlet.Filter" />
+      <provide interface="org.osgi.service.cm.ManagedService" />
+    </service>
+
+    <reference bind="setUrlSigningVerifier"
+             cardinality="1..1"
+             interface="org.opencastproject.security.urlsigning.verifier.UrlSigningVerifier"
+             name="urlSigningVerifier"
+             policy="static" />
+  </scr:component>
+
+</scr:components>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+	name="ch.entwine.security.urlsigning.provider.generic.GenericUrlSigningProvider"
+	immediate="true">
+  <implementation class="ch.entwine.security.urlsigning.provider.generic.GenericUrlSigningProvider" />
+  <property name="service.description" value="Generic Url Signing Provider" />
+  <property name="service.pid" value="ch.entwine.security.urlsigning.provider.generic.GenericUrlSigningProvider" />
+  <service>
+    <provide interface="org.osgi.service.cm.ManagedService" />
+    <provide interface="ch.entwine.security.urlsigning.provider.UrlSigningProvider" />
+  </service>
+</scr:component>

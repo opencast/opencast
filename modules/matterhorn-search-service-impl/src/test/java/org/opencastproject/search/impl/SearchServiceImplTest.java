@@ -22,15 +22,17 @@
 
 package org.opencastproject.search.impl;
 
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.opencastproject.security.api.Permissions.Action.READ;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
 
-import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobBarrier;
+import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
@@ -65,19 +67,14 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
-
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.mchange.v2.c3p0.DataSources;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServer;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -129,23 +126,17 @@ public class SearchServiceImplTest {
   /** A user with permissions. */
   private final User userWithPermissions = new JaxbUser("sample", "test", defaultOrganization, new JaxbRole(
           ROLE_STUDENT, defaultOrganization), new JaxbRole(ROLE_OTHER_STUDENT, defaultOrganization), new JaxbRole(
-          defaultOrganization.getAnonymousRole(), defaultOrganization));
+                  defaultOrganization.getAnonymousRole(), defaultOrganization));
 
   /** A user without permissions. */
   private final User userWithoutPermissions = new JaxbUser("sample", "test", defaultOrganization, new JaxbRole(
           "ROLE_NOTHING", defaultOrganization), new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS,
-          defaultOrganization));
+                  defaultOrganization));
 
   private final User defaultUser = userWithPermissions;
-
   private Responder<User> userResponder;
   private Responder<Organization> organizationResponder;
-
   private SearchServiceDatabaseImpl searchDatabase;
-
-  private ComboPooledDataSource pooledDataSource;
-
-  private String storage;
 
   private static class Responder<A> implements IAnswer<A> {
     private A response;
@@ -193,31 +184,15 @@ public class SearchServiceImplTest {
     Organization organization = new DefaultOrganization();
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
-            .andReturn(organization).anyTimes();
+    .andReturn(organization).anyTimes();
     EasyMock.replay(organizationDirectoryService);
 
     // mpeg7 service
     Mpeg7CatalogService mpeg7CatalogService = new Mpeg7CatalogService();
 
-    long currentTime = System.currentTimeMillis();
-    storage = PathSupport.concat("target", "db" + currentTime + ".h2.db");
-
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + currentTime);
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Collect the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
-
     // Persistence storage
     searchDatabase = new SearchServiceDatabaseImpl();
-    searchDatabase.setPersistenceProvider(new PersistenceProvider());
-    searchDatabase.setPersistenceProperties(props);
+    searchDatabase.setEntityManagerFactory(newTestEntityManagerFactory(SearchServiceDatabaseImpl.PERSISTENCE_UNIT));
     searchDatabase.activate(null);
     searchDatabase.setSecurityService(securityService);
 
@@ -249,7 +224,7 @@ public class SearchServiceImplTest {
     acl = new AccessControlList(new AccessControlEntry(anonymousRole, Permissions.Action.READ.toString(), true));
     authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
     EasyMock.expect(authorizationService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
-            .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
+    .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
     EasyMock.expect(
             authorizationService.hasPermission((MediaPackage) EasyMock.anyObject(), (String) EasyMock.anyObject()))
             .andReturn(true).anyTimes();
@@ -266,9 +241,6 @@ public class SearchServiceImplTest {
   @After
   public void tearDown() throws Exception {
     ((ServiceRegistryInMemoryImpl) serviceRegistry).dispose();
-    searchDatabase.deactivate(null);
-    DataSources.destroy(pooledDataSource);
-    FileUtils.deleteQuietly(new File(storage));
     searchDatabase = null;
     service.deactivate();
     FileUtils.deleteDirectory(new File(solrRoot));
@@ -297,7 +269,7 @@ public class SearchServiceImplTest {
 
     // Add the media package to the search index
     Job job = service.add(mediaPackage);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
 
@@ -314,7 +286,7 @@ public class SearchServiceImplTest {
 
     // Add the media package to the search index
     job = service.add(mediaPackage);
-    barrier = new JobBarrier(serviceRegistry, 1000, job);
+    barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
 
@@ -351,7 +323,7 @@ public class SearchServiceImplTest {
   public void testSearchForEpisodeWithSeriesMetadata() throws Exception {
     MediaPackage mediaPackage = getMediaPackage("/manifest-full.xml");
     Job job = service.add(mediaPackage);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
 
@@ -369,7 +341,7 @@ public class SearchServiceImplTest {
   public void testSearchForPartialStrings() throws Exception {
     MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
     Job job = service.add(mediaPackage);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
 
@@ -401,6 +373,7 @@ public class SearchServiceImplTest {
     assertEquals(1, service.getByQuery(new SearchQuery().withText("nstitute")).size());
     assertEquals(1, service.getByQuery(new SearchQuery().withText("nstitut")).size());
     assertEquals(1, service.getByQuery(new SearchQuery().withText("Institut")).size());
+    assertEquals(1, service.getByQuery(new SearchQuery().withText("2008-03-05")).size());
   }
 
   @Ignore("This test randomly fails. See MH-10573.")
@@ -410,7 +383,7 @@ public class SearchServiceImplTest {
     MediaPackage mediaPackageOlder = getMediaPackage("/manifest-full-older.xml");
     Job job = service.add(mediaPackageNewer);
     Job job2 = service.add(mediaPackageOlder);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job, job2);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job, job2);
     barrier.waitForJobs();
     String olderTitle = "Older Recording";
     String newerTitle = "Land and Vegetation: Key players on the Climate Scene";
@@ -461,7 +434,7 @@ public class SearchServiceImplTest {
 
     // Add the media package to the search index
     Job job = service.add(mediaPackage);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
 
@@ -503,7 +476,7 @@ public class SearchServiceImplTest {
 
     // Add the media package to the search index
     Job job = service.add(mediaPackage);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
 
@@ -530,7 +503,7 @@ public class SearchServiceImplTest {
 
     // Add the media package to the search index
     Job job = service.add(mediaPackage);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
 
     // Now take the role away from the user
@@ -544,7 +517,7 @@ public class SearchServiceImplTest {
 
     // Try to delete it
     job = service.delete(mediaPackage.getIdentifier().toString());
-    barrier = new JobBarrier(serviceRegistry, 1000, job);
+    barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Job to delete mediapackage did not finish", Job.Status.FINISHED, job.getStatus());
     Assert.assertEquals("Unauthorized user was able to delete a mediapackage", Boolean.FALSE.toString(),
@@ -556,7 +529,7 @@ public class SearchServiceImplTest {
     userResponder.setResponse(adminUser);
     Date deletedDate = new Date();
     job = service.delete(mediaPackage.getIdentifier().toString());
-    barrier = new JobBarrier(serviceRegistry, 1000, job);
+    barrier = new JobBarrier(null, serviceRegistry, 1000, job);
     barrier.waitForJobs();
     Assert.assertEquals("Unauthorized user was able to delete a mediapackage", Job.Status.FINISHED, job.getStatus());
 
@@ -617,8 +590,7 @@ public class SearchServiceImplTest {
       mediaPackage.setIdentifier(IdBuilderFactory.newInstance().newIdBuilder().createNew());
       searchDatabase.storeMediaPackage(mediaPackage, acl, new Date());
       String payload = MediaPackageParser.getAsXml(mediaPackage);
-      JaxbJob job = new JaxbJob();
-      job.setId(i);
+      Job job = new JobImpl(i);
       job.setArguments(args);
       job.setPayload(payload);
       job.setStatus(Status.FINISHED);
@@ -629,17 +601,17 @@ public class SearchServiceImplTest {
     EasyMock.expect(
             serviceRegistry.createJob((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (List<String>) EasyMock.anyObject(), (String) EasyMock.anyObject(), EasyMock.anyBoolean()))
-            .andReturn(new JaxbJob()).anyTimes();
-    EasyMock.expect(serviceRegistry.updateJob((Job) EasyMock.anyObject())).andReturn(new JaxbJob()).anyTimes();
+                    .andReturn(new JobImpl()).anyTimes();
+    EasyMock.expect(serviceRegistry.updateJob((Job) EasyMock.anyObject())).andReturn(new JobImpl()).anyTimes();
     EasyMock.expect(serviceRegistry.getJobs((String) EasyMock.anyObject(), (Status) EasyMock.anyObject()))
-            .andReturn(jobs).anyTimes();
+    .andReturn(jobs).anyTimes();
     EasyMock.replay(serviceRegistry);
 
     service.setServiceRegistry(serviceRegistry);
 
     OrganizationDirectoryService orgDirectory = EasyMock.createNiceMock(OrganizationDirectoryService.class);
     EasyMock.expect(orgDirectory.getOrganization((String) EasyMock.anyObject())).andReturn(new DefaultOrganization())
-            .anyTimes();
+    .anyTimes();
     EasyMock.replay(orgDirectory);
 
     service.setOrganizationDirectoryService(orgDirectory);

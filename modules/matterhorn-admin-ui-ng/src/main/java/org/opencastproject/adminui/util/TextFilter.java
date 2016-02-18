@@ -21,7 +21,7 @@
 
 package org.opencastproject.adminui.util;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility class to simplify the implementation of the filter 'text' in case no search index is available.

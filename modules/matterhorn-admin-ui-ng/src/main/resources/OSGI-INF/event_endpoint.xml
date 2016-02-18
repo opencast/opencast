@@ -10,6 +10,7 @@
   <service>
     <!-- expose interface for MH REST publisher! -->
     <provide interface="org.opencastproject.adminui.endpoint.OsgiEventEndpoint" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
   <reference bind="setAdminUIConfiguration"
              cardinality="1..1"
@@ -51,23 +52,8 @@
              cardinality="1..1"
              policy="static"
              bind="setAclServiceFactory" />
-  <reference name="SeriesService"
-             interface="org.opencastproject.series.api.SeriesService"
-             cardinality="1..1"
-             policy="static"
-             bind="setSeriesService" />
-  <reference name="ParticipationPersistence"
-             interface="org.opencastproject.pm.api.persistence.ParticipationManagementDatabase"
-             cardinality="0..1"
-             policy="dynamic"
-             bind="setParticipationPersistence" />
-  <reference name="DublinCoreCatalogServcie"
-             interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"
-             cardinality="1..1"
-             policy="static"
-             bind="setDublinCoreCatalogService" />
   <reference name="EventCommentService"
-             interface="org.opencastproject.comments.events.EventCommentService"
+             interface="org.opencastproject.event.comment.EventCommentService"
              cardinality="1..1"
              policy="static"
              bind="setEventCommentService" />
@@ -117,4 +103,9 @@
              policy="dynamic"
              bind="addCatalogUIAdapter"
              unbind="removeCatalogUIAdapter" />
+ <reference name="UrlSigningService" 
+             interface="org.opencastproject.security.urlsigning.service.UrlSigningService"
+             cardinality="1..1" 
+             policy="static" 
+             bind="setUrlSigningService" />
 </scr:component>

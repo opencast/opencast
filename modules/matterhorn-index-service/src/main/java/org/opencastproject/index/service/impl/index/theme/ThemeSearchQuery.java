@@ -26,7 +26,7 @@ import org.opencastproject.matterhorn.search.SearchTerms;
 import org.opencastproject.matterhorn.search.impl.AbstractSearchQuery;
 import org.opencastproject.security.api.User;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;

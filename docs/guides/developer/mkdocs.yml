@@ -16,9 +16,10 @@ site_dir: 'site'
 pages:
 - Home: 'index.md'
 - Development Process:
-   - Development: 'development.md'
+   - Development: 'development-process.md'
    - Reviewing, Merging and Declining Pull Requests: 'reviewing-and-merging.md'
    - Release Manager: 'release-manager.md'
+- Development Environment: 'development-environment.md'
 - Licenses and Legal Matters: 'license.md'
 - Packaging: 'packaging.md'
 - Proposal Log: 'proposal-log.md'

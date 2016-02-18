@@ -32,6 +32,7 @@ pages:
    - Database: 'configuration/database.md'
    - Message Broker: 'configuration/message-broker.md'
    - Encoding: 'configuration/encoding.md'
+   - Load: 'configuration/load.md'
    - Logging and Privacy: 'configuration/logging.and.privacy.md'
    - Multi Tenancy: 'configuration/multi.tenancy.md'
    - Security:
@@ -81,6 +82,7 @@ pages:
    - Ingest-Download: 'workflowoperationhandlers/ingestdownload-woh.md'
    - Inspect: 'workflowoperationhandlers/inspect-woh.md'
    - Normalize Audio: 'workflowoperationhandlers/normalizeaudio-woh.md'
+   - Partial Import: 'workflowoperationhandlers/partial-import-woh.md'
    - Post Media Package: 'workflowoperationhandlers/postmediapackage-woh.md'
    - Prepare A/V: 'workflowoperationhandlers/prepareav-woh.md'
    - Publish Engage: 'workflowoperationhandlers/publishengage-woh.md'

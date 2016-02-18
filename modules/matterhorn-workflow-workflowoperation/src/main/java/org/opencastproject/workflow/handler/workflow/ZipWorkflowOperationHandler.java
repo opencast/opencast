@@ -48,7 +48,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -321,7 +321,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
       File workspaceFile = workspace.get(element.getURI());
       File linkedFile = FileSupport.link(workspaceFile, new File(elementDir, workspaceFile.getName()), true);
       try {
-        element.setURI(new URI(serializer.encodeURI(linkedFile.toURI())));
+        element.setURI(serializer.encodeURI(linkedFile.toURI()));
       } catch (URISyntaxException e) {
         throw new MediaPackageException("unable to serialize a mediapackage element", e);
       }

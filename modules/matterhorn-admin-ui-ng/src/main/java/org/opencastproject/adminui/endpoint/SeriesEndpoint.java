@@ -35,28 +35,21 @@ import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
-import static org.apache.commons.lang.StringUtils.trimToNull;
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.index.service.util.RestUtils.notFound;
 import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
-import static org.opencastproject.util.Jsons.arr;
-import static org.opencastproject.util.Jsons.obj;
-import static org.opencastproject.util.Jsons.p;
-import static org.opencastproject.util.RestUtil.splitCommaSeparatedParam;
 import static org.opencastproject.util.RestUtil.R.badRequest;
 import static org.opencastproject.util.RestUtil.R.conflict;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.R.serverError;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
-import org.opencastproject.adminui.util.ParticipationUtils;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
@@ -81,21 +74,12 @@ import org.opencastproject.index.service.impl.index.theme.Theme;
 import org.opencastproject.index.service.impl.index.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.util.AccessInformationUtil;
-import org.opencastproject.index.service.util.JSONUtils;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
-import org.opencastproject.pm.api.Course;
-import org.opencastproject.pm.api.Message;
-import org.opencastproject.pm.api.Person;
-import org.opencastproject.pm.api.Recording;
-import org.opencastproject.pm.api.persistence.ParticipationManagementDatabase;
-import org.opencastproject.pm.api.persistence.ParticipationManagementDatabase.SortType;
-import org.opencastproject.pm.api.persistence.ParticipationManagementDatabaseException;
-import org.opencastproject.pm.api.persistence.RecordingQuery;
 import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
@@ -107,13 +91,9 @@ import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.DateTimeSupport;
-import org.opencastproject.util.Jsons;
-import org.opencastproject.util.Jsons.Val;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -130,8 +110,8 @@ import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JField;
 import com.entwinemedia.fn.data.json.JValue;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -142,7 +122,6 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -161,7 +140,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 @Path("/")
 @RestService(name = "SeriesProxyService", title = "UI Series", notes = "These Endpoints deliver informations about the series required for the UI.", abstractText = "This service provides the series data for the UI.")
@@ -177,7 +155,6 @@ public class SeriesEndpoint {
   public static final String THEME_KEY = "theme";
 
   private SeriesService seriesService;
-  private ParticipationManagementDatabase participationManagementDatabase;
   private SecurityService securityService;
   private AclServiceFactory aclServiceFactory;
   private IndexService indexService;
@@ -208,11 +185,6 @@ public class SeriesEndpoint {
   /** OSGi DI. */
   public void setIndexService(IndexService indexService) {
     this.indexService = indexService;
-  }
-
-  /** OSGi callback for the participation management database. */
-  public void setPersistence(ParticipationManagementDatabase persistence) {
-    this.participationManagementDatabase = persistence;
   }
 
   /** OSGi callback for the security service */
@@ -286,45 +258,6 @@ public class SeriesEndpoint {
       return Opt.<Series> none();
     }
     return Opt.some(result.getItems()[0].getSource());
-  }
-
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("{seriesId}/messages")
-  @RestQuery(name = "getseriesmessages", description = "Returns the series messages as JSON", returnDescription = "Returns the series messages as JSON", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, restParameters = { @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any of the following: DATE OR SENDER.  Add '_DESC' to reverse the sort order (e.g. DATE_DESC).", type = STRING) }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "The series messages as JSON."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "The series has not been found"),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Invalid SORT type, it was not DATE, DATE_DESC SENDER or SENDER_DESC"),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
-  public Response getSeriesMessages(@PathParam("seriesId") String series, @QueryParam("sort") String sort)
-          throws UnauthorizedException, NotFoundException {
-    if (participationManagementDatabase == null)
-      return Response.status(Status.SERVICE_UNAVAILABLE).build();
-
-    Option<SortType> sortType = Option.<SortType> none();
-    sortType = ParticipationUtils.getMessagesSortField(sort);
-    if (StringUtils.isNotBlank(sort) && sortType.isNone()) {
-      return Response.status(SC_BAD_REQUEST).build();
-    }
-
-    try {
-      seriesService.getSeries(series);
-    } catch (SeriesException e) {
-      logger.error("Unable to get series {}: {}", series, ExceptionUtils.getStackTrace(e));
-      throw new WebApplicationException(e);
-    }
-
-    try {
-      List<Message> messagesBySeriesId = participationManagementDatabase.getMessagesBySeriesId(series, sortType);
-      List<Val> jsonArr = new ArrayList<Jsons.Val>();
-      for (Message m : messagesBySeriesId) {
-        jsonArr.add(m.toJson());
-      }
-      return Response.ok(arr(jsonArr).toJson()).build();
-    } catch (ParticipationManagementDatabaseException e) {
-      logger.error("Unable to get messages by series {}: {}", series, ExceptionUtils.getStackTrace(e));
-      throw new WebApplicationException(e);
-    }
   }
 
   @GET
@@ -536,41 +469,6 @@ public class SeriesEndpoint {
       if (metadata.isSome() && metadata.get().isUpdated()) {
         adapter.storeFields(seriesId, metadata.get());
       }
-    }
-  }
-
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("series/sendmessage")
-  @RestQuery(name = "getseriesrecordingsandrecipients", description = "Returns the series recordings and recipients as JSON", returnDescription = "Returns the series recordings and recipients as JSON", restParameters = { @RestParameter(name = "seriesIds", isRequired = true, description = "A list of comma separated series IDs", type = STRING), }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "The series recordings and recipients as JSON."),
-          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "At least one series id must be set.") })
-  public Response getSeriesRecordingsAndRecipients(@QueryParam("seriesIds") String seriesIds) {
-    if (participationManagementDatabase == null)
-      return Response.status(Status.SERVICE_UNAVAILABLE).build();
-
-    final Monadics.ListMonadic<String> sIds = splitCommaSeparatedParam(option(seriesIds));
-    if (sIds.value().isEmpty())
-      return badRequest();
-
-    try {
-      List<Recording> recordings = new ArrayList<Recording>();
-      for (String seriesId : sIds.value()) {
-        Course course = getCourseBySeries(seriesId);
-        if (course == null)
-          continue;
-        recordings.addAll(participationManagementDatabase.findRecordings(RecordingQuery.createWithoutDeleted()
-                .withCourse(course)));
-      }
-
-      List<Val> recipientsArr = mlist(new HashSet<Person>(mlist(recordings).flatMap(getRecipients).value())).map(
-              JSONUtils.personToJsonVal).value();
-      List<Val> recordingArr = mlist(recordings).map(JSONUtils.recordingToJsonVal).value();
-      return Response.ok(obj(p("recordings", arr(recordingArr)), p("recipients", arr(recipientsArr))).toJson()).build();
-    } catch (ParticipationManagementDatabaseException e) {
-      logger.error("Unable to get recordings and recipients by series {}: {}", seriesIds,
-              ExceptionUtils.getStackTrace(e));
-      throw new WebApplicationException(e);
     }
   }
 
@@ -1138,7 +1036,7 @@ public class SeriesEndpoint {
 
   /**
    * Check if the series with the given Id has events being currently processed
-   * 
+   *
    * @param seriesId
    *          the series Id
    * @return true if events being part of the series are currently processed
@@ -1162,21 +1060,6 @@ public class SeriesEndpoint {
 
     return elementsCount > 0;
   }
-
-  private Course getCourseBySeries(String sId) throws ParticipationManagementDatabaseException {
-    try {
-      return participationManagementDatabase.findCourseBySeries(sId);
-    } catch (NotFoundException e) {
-      return null;
-    }
-  }
-
-  private final Function<Recording, List<Person>> getRecipients = new Function<Recording, List<Person>>() {
-    @Override
-    public List<Person> apply(Recording a) {
-      return a.getStaff();
-    }
-  };
 
   private void extendEventsStatusOverview(List<JField> fields, Series series) throws SearchIndexException {
     EventSearchQuery query = new EventSearchQuery(securityService.getOrganization().getId(), securityService.getUser())

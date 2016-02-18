@@ -34,7 +34,7 @@ import org.opencastproject.rest.RestServiceTestEnv;
 import com.jayway.restassured.http.ContentType;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -103,17 +103,7 @@ public class CaptureAgentsEndpointTest {
         assertEquals(expected.get("Name"), captureAgentJson.get("Name"));
         assertEquals(expected.get("Status"), captureAgentJson.get("Status"));
         assertEquals(expected.get("Update"), captureAgentJson.get("Update"));
-        assertEquals(expected.get("roomId"), captureAgentJson.get("roomId"));
 
-        // Check blacklist
-        if ("".equals(captureAgentJson.get("blacklist"))) {
-          assertEquals(expected.get("blacklist"), captureAgentJson.get("blacklist"));
-        } else {
-          JSONObject expectedBlacklist = (JSONObject) expected.get("blacklist");
-          JSONObject actualBlacklist = (JSONObject) captureAgentJson.get("blacklist");
-          assertEquals(expectedBlacklist.get("start"), actualBlacklist.get("start"));
-          assertEquals(expectedBlacklist.get("end"), actualBlacklist.get("end"));
-        }
         if (checkInputs) {
           // Check inputs
           JSONObject expectedInputs = (JSONObject) ((JSONArray) expected.get("inputs")).get(0);

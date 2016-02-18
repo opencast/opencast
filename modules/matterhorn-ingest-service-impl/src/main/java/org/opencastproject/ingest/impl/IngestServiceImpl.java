@@ -21,8 +21,6 @@
 
 package org.opencastproject.ingest.impl;
 
-import static java.util.Map.Entry;
-
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
@@ -59,6 +57,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.ProgressInputStream;
 import org.opencastproject.util.jmx.JmxUtil;
@@ -77,8 +76,8 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.jdom.Document;
@@ -88,6 +87,8 @@ import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,10 +105,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -117,7 +120,7 @@ import javax.management.ObjectInstance;
 /**
  * Creates and augments Matterhorn MediaPackages. Stores media into the Working File Repository.
  */
-public class IngestServiceImpl extends AbstractJobProducer implements IngestService {
+public class IngestServiceImpl extends AbstractJobProducer implements IngestService, ManagedService {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(IngestServiceImpl.class);
@@ -153,6 +156,24 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /** Ingest can only occur for a workflow currently in one of these operations. */
   public static final String[] PRE_PROCESSING_OPERATIONS = new String[] { "schedule", "capture", "ingest" };
+
+  /** The approximate load placed on the system by ingesting a file */
+  public static final float DEFAULT_INGEST_FILE_JOB_LOAD = 1.0f;
+
+  /** The approximate load placed on the system by ingesting a zip file */
+  public static final float DEFAULT_INGEST_ZIP_JOB_LOAD = 2.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_INGEST_FILE_JOB_LOAD} */
+  public static final String FILE_JOB_LOAD_KEY = "job.load.ingest.file";
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_INGEST_ZIP_JOB_LOAD} */
+  public static final String ZIP_JOB_LOAD_KEY = "job.load.ingest.zip";
+
+  /** The approximate load placed on the system by ingesting a file */
+  private float ingestFileJobLoad = DEFAULT_INGEST_FILE_JOB_LOAD;
+
+  /** The approximate load placed on the system by ingesting a zip file */
+  private float ingestZipJobLoad = DEFAULT_INGEST_ZIP_JOB_LOAD;
 
   /** The JMX business object for ingest statistics */
   private IngestStatistics ingestStatistics = new IngestStatistics();
@@ -330,7 +351,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       // We don't need anybody to do the dispatching for us. Therefore we need to make sure that the job is never in
       // QUEUED state but set it to INSTANTIATED in the beginning and then manually switch it to RUNNING.
-      job = serviceRegistry.createJob(JOB_TYPE, INGEST_ZIP, null, null, false);
+      job = serviceRegistry.createJob(JOB_TYPE, INGEST_ZIP, null, null, false, ingestZipJobLoad);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
 
@@ -559,7 +580,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               JOB_TYPE,
               INGEST_TRACK_FROM_URI,
               Arrays.asList(uri.toString(), flavor == null ? null : flavor.toString(),
-                      MediaPackageParser.getAsXml(mediaPackage)), null, false);
+                      MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
@@ -598,9 +619,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           MediaPackage mediaPackage) throws IOException, IngestException {
     Job job = null;
     try {
-      job = serviceRegistry.createJob(JOB_TYPE, INGEST_TRACK, null, null, false);
+      job = serviceRegistry.createJob(JOB_TYPE, INGEST_TRACK, null, null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
@@ -636,7 +657,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     Job job = null;
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_CATALOG_FROM_URI,
-              Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false);
+              Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
@@ -724,7 +745,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           MediaPackage mediaPackage) throws IOException, IngestException {
     Job job = null;
     try {
-      job = serviceRegistry.createJob(JOB_TYPE, INGEST_CATALOG, null, null, false);
+      job = serviceRegistry.createJob(JOB_TYPE, INGEST_CATALOG, null, null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
@@ -764,7 +785,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     Job job = null;
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_ATTACHMENT_FROM_URI,
-              Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false);
+              Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
@@ -800,7 +821,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           MediaPackage mediaPackage) throws IOException, IngestException {
     Job job = null;
     try {
-      job = serviceRegistry.createJob(JOB_TYPE, INGEST_ATTACHMENT, null, null, false);
+      job = serviceRegistry.createJob(JOB_TYPE, INGEST_ATTACHMENT, null, null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
       serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
@@ -1402,4 +1423,15 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     return organizationDirectoryService;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
+   */
+  @SuppressWarnings("rawtypes")
+  @Override
+  public void updated(Dictionary properties) throws ConfigurationException {
+    ingestFileJobLoad = LoadUtil.getConfiguredLoadValue(properties, FILE_JOB_LOAD_KEY, DEFAULT_INGEST_FILE_JOB_LOAD, serviceRegistry);
+    ingestZipJobLoad = LoadUtil.getConfiguredLoadValue(properties, ZIP_JOB_LOAD_KEY, DEFAULT_INGEST_ZIP_JOB_LOAD, serviceRegistry);
+  }
 }

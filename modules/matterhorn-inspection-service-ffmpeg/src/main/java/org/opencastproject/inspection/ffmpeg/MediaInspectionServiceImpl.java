@@ -33,9 +33,11 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.LoadUtil;
+import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.tika.parser.Parser;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -50,7 +52,29 @@ import java.util.List;
 
 /** Inspects media via ffprobe. */
 public class MediaInspectionServiceImpl extends AbstractJobProducer implements MediaInspectionService, ManagedService {
+
+  /** The load introduced on the system by creating an inspect job */
+  public static final float DEFAULT_INSPECT_JOB_LOAD = 1.0f;
+
+  /** The load introduced on the system by creating an enrich job */
+  public static final float DEFAULT_ENRICH_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_INSPECT_JOB_LOAD} */
+  public static final String INSPECT_JOB_LOAD_KEY = "job.load.inspect";
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_ENRICH_JOB_LOAD} */
+  public static final String ENRICH_JOB_LOAD_KEY = "job.load.enrich";
+
+  /** The load introduced on the system by creating an inspect job */
+  private float inspectJobLoad = DEFAULT_INSPECT_JOB_LOAD;
+
+  /** The load introduced on the system by creating an enrich job */
+  private float enrichJobLoad = DEFAULT_ENRICH_JOB_LOAD;
+
   private static final Logger logger = LoggerFactory.getLogger(MediaInspectionServiceImpl.class);
+
+  /** The accurate frame count configuration key */
+  private static final String CFG_KEY_ACCURATE_FRAME_COUNT = "accurate_frame_count";
 
   /** List of available operations on jobs */
   private enum Operation {
@@ -68,7 +92,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Sets the Apache Tika parser.
-   * 
+   *
    * @param tikaParser
    */
   public void setTikaParser(Parser tikaParser) {
@@ -91,28 +115,30 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
       logger.debug("FFprobe config binary: {}", path);
       ffprobeBinary = path;
     }
-    inspector = new MediaInspector(workspace, tikaParser, ffprobeBinary);
+    inspector = new MediaInspector(workspace, tikaParser, ffprobeBinary, false);
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
-   */
   @Override
+  @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
     if (properties == null)
       return;
-    final String path = StringUtils.trimToNull((String) properties.get(FFmpegAnalyzer.FFPROBE_BINARY_CONFIG));
-    if (path != null) {
-      logger.info("Setting the path to ffprobe to " + path);
-      inspector = new MediaInspector(workspace, tikaParser, path);
+
+    inspectJobLoad = LoadUtil.getConfiguredLoadValue(properties, INSPECT_JOB_LOAD_KEY, DEFAULT_INSPECT_JOB_LOAD,
+            serviceRegistry);
+    enrichJobLoad = LoadUtil.getConfiguredLoadValue(properties, ENRICH_JOB_LOAD_KEY, DEFAULT_ENRICH_JOB_LOAD,
+            serviceRegistry);
+
+    for (String accurateFrameCountString : OsgiUtil.getOptCfg(properties, CFG_KEY_ACCURATE_FRAME_COUNT).toOpt()) {
+      boolean accurateFrameCount = BooleanUtils.toBoolean(accurateFrameCountString);
+      inspector.setAccurateFrameCount(accurateFrameCount);
+      logger.info("Set accurate frame count to {}", accurateFrameCount);
     }
   }
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override
@@ -148,13 +174,14 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.inspection.api.MediaInspectionService#inspect(java.net.URI)
    */
   @Override
   public Job inspect(URI uri) throws MediaInspectionException {
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Inspect.toString(), Arrays.asList(uri.toString()));
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Inspect.toString(), Arrays.asList(uri.toString()),
+              inspectJobLoad);
     } catch (ServiceRegistryException e) {
       throw new MediaInspectionException(e);
     }
@@ -162,16 +189,16 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.inspection.api.MediaInspectionService#enrich(org.opencastproject.mediapackage.MediaPackageElement,
    *      boolean)
    */
   @Override
-  public Job enrich(final MediaPackageElement element, final boolean override) throws MediaInspectionException,
-          MediaPackageException {
+  public Job enrich(final MediaPackageElement element, final boolean override)
+          throws MediaInspectionException, MediaPackageException {
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Enrich.toString(),
-              Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override)));
+              Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override)), enrichJobLoad);
     } catch (ServiceRegistryException e) {
       throw new MediaInspectionException(e);
     }
@@ -188,7 +215,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -198,7 +225,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -208,7 +235,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -218,7 +245,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -228,7 +255,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -238,7 +265,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -248,7 +275,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override

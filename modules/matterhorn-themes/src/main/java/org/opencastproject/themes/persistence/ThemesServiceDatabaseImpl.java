@@ -40,24 +40,21 @@ import org.opencastproject.themes.ThemesServiceDatabase;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Effect0;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Implements {@link ThemesServiceDatabase}. Defines permanent storage for themes.
@@ -68,12 +65,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
 
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(ThemesServiceDatabaseImpl.class);
-
-  /** Persistence provider set by OSGi */
-  protected PersistenceProvider persistenceProvider;
-
-  /** Persistence properties used to create {@link EntityManagerFactory} */
-  protected Map<String, Object> persistenceProperties;
 
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;
@@ -103,7 +94,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    */
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for themes");
-    emf = persistenceProvider.createEntityManagerFactory(PERSISTENCE_UNIT, persistenceProperties);
     this.cc = cc;
     super.activate();
   }
@@ -115,27 +105,11 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    */
   public void deactivate(ComponentContext cc) {
     super.deactivate();
-    emf.close();
   }
 
-  /**
-   * OSGi callback to set persistence properties.
-   *
-   * @param persistenceProperties
-   *          persistence properties
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
-  }
-
-  /**
-   * OSGi callback to set persistence provider.
-   *
-   * @param persistenceProvider
-   *          {@link PersistenceProvider} object
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
+  /** OSGi DI */
+  public void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
   }
 
   /**
@@ -354,7 +328,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   private SerializableTheme toSerializableTheme(Theme theme) {
     String creator = StringUtils.isNotBlank(theme.getCreator().getName()) ? theme.getCreator().getName() : theme
             .getCreator().getUsername();
-    return new SerializableTheme(theme.getId().getOrElse(org.apache.commons.lang.math.NumberUtils.LONG_MINUS_ONE),
+    return new SerializableTheme(theme.getId().getOrElse(org.apache.commons.lang3.math.NumberUtils.LONG_MINUS_ONE),
             theme.getCreationDate(), theme.isDefault(), creator, theme.getName(), theme.getDescription(),
             theme.isBumperActive(), theme.getBumperFile(), theme.isTrailerActive(), theme.getTrailerFile(),
             theme.isTitleSlideActive(), theme.getTitleSlideMetadata(), theme.getTitleSlideBackground(),

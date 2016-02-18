@@ -34,7 +34,7 @@ Duties
 
 Releases should happen twice a year, usually within a time span of 9.5 months between the cut of the previous release
 branch and the final release. The release manager should create a release schedule as soon as possible.
-For more details about the release schedule, have a look at the [Development Process](development.md)
+For more details about the release schedule, have a look at the [Development Process](development-process.md)
 
 ### Creation of Release Branch
 

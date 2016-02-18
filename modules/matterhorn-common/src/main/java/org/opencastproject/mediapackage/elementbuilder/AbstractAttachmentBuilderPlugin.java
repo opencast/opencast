@@ -33,7 +33,7 @@ import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -175,7 +175,7 @@ public abstract class AbstractAttachmentBuilderPlugin extends AbstractElementBui
       reference = (String) xpath.evaluate("@ref", elementNode, XPathConstants.STRING);
 
       // url
-      uri = serializer.resolvePath(xpath.evaluate("url/text()", elementNode).trim());
+      uri = serializer.decodeURI(new URI(xpath.evaluate("url/text()", elementNode).trim()));
 
       // size
       String attachmentSize = xpath.evaluate("size/text()", elementNode).trim();

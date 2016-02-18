@@ -24,7 +24,7 @@ package org.opencastproject.composer.api;
 
 import org.opencastproject.util.EqualsUtil;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,6 +87,9 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   @XmlElementWrapper(name = "suffixes")
   protected HashMap<String,String> suffixes = new HashMap<String, String>();
+
+  @XmlElement(name = "jobLoad")
+  protected Float jobLoad = 1.0f;
 
   /**
    * Private, since the profile should be created using the static factory method.
@@ -346,6 +349,25 @@ public class EncodingProfileImpl implements EncodingProfile {
   @Override
   public boolean hasExtensions() {
     return extensions != null && extensions.size() > 0;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.composer.api.EncodingProfile#getJobLoad()
+   */
+  @Override
+  public float getJobLoad() {
+    return jobLoad;
+  }
+
+  /**
+   * Sets the job load for this encoding profile
+   *
+   * @param jobLoad the load caused by one instance of this encoding profile running
+   */
+  public void setJobLoad(Float jobLoad) {
+    this.jobLoad = jobLoad;
   }
 
   /**

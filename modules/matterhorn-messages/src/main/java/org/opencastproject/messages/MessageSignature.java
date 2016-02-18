@@ -18,26 +18,20 @@
  * the License.
  *
  */
-
 package org.opencastproject.messages;
 
 import static org.opencastproject.util.RequireUtil.notEmpty;
 import static org.opencastproject.util.RequireUtil.notNull;
-import static org.opencastproject.util.data.Collections.nil;
 import static org.opencastproject.util.data.Option.none;
 
-import org.opencastproject.comments.Comment;
 import org.opencastproject.kernel.mail.EmailAddress;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.EqualsUtil;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.Jsons.Obj;
-import org.opencastproject.util.Jsons.Val;
 import org.opencastproject.util.data.Option;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /** Business object for message signatures. */
 public class MessageSignature {
@@ -49,9 +43,6 @@ public class MessageSignature {
 
   /** The creation date */
   private Date creationDate;
-
-  /** The comment list */
-  private List<Comment> comments = new ArrayList<Comment>();
 
   /** The creator of the signature */
   private User creator;
@@ -78,11 +69,9 @@ public class MessageSignature {
    *          the signature
    * @param creationDate
    *          the creation date
-   * @param comments
-   *          the comment list
    */
   public MessageSignature(Long id, String name, User creator, EmailAddress sender, Option<EmailAddress> replyTo,
-          String signature, Date creationDate, List<Comment> comments) {
+          String signature, Date creationDate) {
     this.id = id;
     this.name = notEmpty(name, "name");
     this.creator = notNull(creator, "creator");
@@ -90,12 +79,10 @@ public class MessageSignature {
     this.replyTo = replyTo;
     this.signature = notNull(signature, "signature");
     this.creationDate = notNull(creationDate, "creationDate");
-    this.comments = new ArrayList<Comment>(notNull(comments, "comments"));
   }
 
   public static MessageSignature messageSignature(String name, User creator, EmailAddress sender, String signature) {
-    return new MessageSignature(null, name, creator, sender, none(EmailAddress.class), signature, new Date(),
-            nil(Comment.class));
+    return new MessageSignature(null, name, creator, sender, none(EmailAddress.class), signature, new Date());
   }
 
   /**
@@ -220,47 +207,6 @@ public class MessageSignature {
     return creationDate;
   }
 
-  /**
-   * Sets the comment list
-   *
-   * @param comments
-   *          the comment list
-   */
-  public void setComments(List<Comment> comments) {
-    this.comments = notNull(comments, "comments");
-  }
-
-  /**
-   * Returns the comment list
-   *
-   * @return the comment list
-   */
-  public List<Comment> getComments() {
-    return comments;
-  }
-
-  /**
-   * Add a comment to the signature
-   *
-   * @param comment
-   *          the comment to add to this signature
-   * @return true if this collection changed as a result of the call
-   */
-  public boolean addComment(Comment comment) {
-    return comments.add(notNull(comment, "comment"));
-  }
-
-  /**
-   * Remove a comment from the signature
-   *
-   * @param comment
-   *          the comment to remove from this signature
-   * @return true if this collection changed as a result of the call
-   */
-  public boolean removeComment(Comment comment) {
-    return comments.remove(notNull(comment, "comment"));
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -270,12 +216,12 @@ public class MessageSignature {
     MessageSignature msgSig = (MessageSignature) o;
     return name.equals(msgSig.getName()) && sender.equals(msgSig.getSender())
             && signature.equals(msgSig.getSignature()) && creationDate.equals(msgSig.getCreationDate())
-            && comments.equals(msgSig.getComments()) && creator.equals(msgSig.getCreator());
+            && creator.equals(msgSig.getCreator());
   }
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(id, name, sender, signature, creationDate, comments, creator);
+    return EqualsUtil.hash(id, name, sender, signature, creationDate, creator);
   }
 
   @Override
@@ -284,10 +230,6 @@ public class MessageSignature {
   }
 
   public Obj toJson() {
-    List<Val> commentsArr = new ArrayList<Val>();
-    for (Comment c : comments) {
-      commentsArr.add(c.toJson());
-    }
 
     Obj replyJson = Jsons.ZERO_OBJ;
     if (replyTo.isSome())
@@ -297,7 +239,7 @@ public class MessageSignature {
             Jsons.p("email", creator.getEmail()));
     return Jsons.obj(Jsons.p("id", id), Jsons.p("name", name), Jsons.p("creationDate", creationDate),
             Jsons.p("creator", creatorObj), Jsons.p("signature", signature), Jsons.p("sender", sender.toJson()),
-            Jsons.p("replyTo", replyJson), Jsons.p("comments", Jsons.arr(commentsArr)));
+            Jsons.p("replyTo", replyJson));
   }
 
 }

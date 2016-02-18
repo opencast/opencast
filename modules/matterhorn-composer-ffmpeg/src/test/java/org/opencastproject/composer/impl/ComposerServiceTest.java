@@ -269,7 +269,7 @@ public class ComposerServiceTest {
     for (int i = 0; i < 10; i++) {
       jobs.add(composerService.image(sourceTrack, "player-preview.http", 1D));
     }
-    boolean success = new JobBarrier(serviceRegistry, jobs.toArray(new Job[jobs.size()])).waitForJobs().isSuccess();
+    boolean success = new JobBarrier(null, serviceRegistry, jobs.toArray(new Job[jobs.size()])).waitForJobs().isSuccess();
     assertTrue(success);
     for (Job j : jobs) {
       // Always check the service registry for the latest version of the job
@@ -415,9 +415,9 @@ public class ComposerServiceTest {
     LaidOutElement<Track> upperLaiedOutElement = new LaidOutElement<Track>(sourceTrack, multiShapeLayout.getShapes()
             .get(1));
 
-    Job composite = composerService.composite(outputDimension, lowerLaidOutElement, upperLaiedOutElement,
+    Job composite = composerService.composite(outputDimension, Option.option(lowerLaidOutElement), upperLaiedOutElement,
             watermarkOption, "composite.work", "black");
-    JobBarrier barrier = new JobBarrier(serviceRegistry, composite);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, composite);
     if (!barrier.waitForJobs().isSuccess()) {
       Assert.fail("Composite job did not success!");
     }
@@ -457,7 +457,7 @@ public class ComposerServiceTest {
     Dimension outputDimension = new Dimension(500, 500);
 
     Job concat = composerService.concat("concat.work", outputDimension, sourceTrack1, sourceTrack2);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, concat);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, concat);
     if (!barrier.waitForJobs().isSuccess()) {
       Assert.fail("Concat job did not success!");
     }
@@ -496,7 +496,7 @@ public class ComposerServiceTest {
     attachement.setIdentifier("test image");
 
     Job imageToVideo = composerService.imageToVideo(attachement, imageToVideoProfile.getIdentifier(), 2L);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, imageToVideo);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, imageToVideo);
     if (!barrier.waitForJobs().isSuccess()) {
       Assert.fail("ImageToVideo job did not success!");
     }

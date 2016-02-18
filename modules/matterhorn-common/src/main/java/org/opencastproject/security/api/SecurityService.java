@@ -43,6 +43,13 @@ public interface SecurityService {
   Organization getOrganization();
 
   /**
+   * Gets the current user's IP or null if unable to determine the User's IP.
+   *
+   * @return The current user's IP.
+   */
+  String getUserIP();
+
+  /**
    * Sets the organization for the calling thread.
    *
    * @param organization
@@ -58,5 +65,13 @@ public interface SecurityService {
    *          the user to set for the current user context
    */
   void setUser(User user);
+
+  /**
+   * Sets the current thread's user's IP address.
+   *
+   * @param userIP
+   *          The IP address of the user.
+   */
+  void setUserIP(String userIP);
 
 }

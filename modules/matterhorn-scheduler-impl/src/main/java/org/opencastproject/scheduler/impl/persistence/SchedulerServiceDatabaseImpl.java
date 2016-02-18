@@ -37,7 +37,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function2;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeFieldType;
@@ -54,7 +54,6 @@ import java.io.StringWriter;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.persistence.EntityManager;
@@ -62,21 +61,16 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Implements {@link SchedulerServiceDatabase}.
  */
 public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
+  public static final String PERSISTENCE_UNIT = "org.opencastproject.scheduler.impl.persistence";
+
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceDatabaseImpl.class);
-
-  /** Persistence provider set by OSGi */
-  protected PersistenceProvider persistenceProvider;
-
-  /** Persistence properties used to create {@link EntityManagerFactory} */
-  protected Map<String, Object> persistenceProperties;
 
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;
@@ -91,37 +85,11 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
    */
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for scheduler");
-    emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.scheduler.impl.persistence",
-            persistenceProperties);
   }
 
-  /**
-   * Closes entity manager factory.
-   *
-   * @param cc
-   */
-  public void deactivate(ComponentContext cc) {
-    emf.close();
-  }
-
-  /**
-   * OSGi callback to set persistence properties.
-   *
-   * @param persistenceProperties
-   *          persistence properties
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
-  }
-
-  /**
-   * OSGi callback to set persistence provider.
-   *
-   * @param persistenceProvider
-   *          {@link PersistenceProvider} object
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
+  /** OSGi DI */
+  public void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
   }
 
   /**
@@ -259,7 +227,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     List<DublinCoreCatalog> eventList = new LinkedList<DublinCoreCatalog>();
     try {
       for (EventEntity entity : eventEntities) {
-        DublinCoreCatalog dc = parseDublinCore(entity.dublinCoreXML);
+        DublinCoreCatalog dc = parseDublinCore(entity.getEventDublinCore());
         eventList.add(dc);
       }
     } catch (Exception e) {

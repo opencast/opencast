@@ -100,7 +100,7 @@ public class MediaInspectionServiceImplTest {
       EasyMock.expect(workspace.get(resource)).andReturn(f);
       EasyMock.expect(workspace.get(resource)).andReturn(f);
       EasyMock.replay(workspace);
-      return some(new MediaInspector(workspace, new AudioParser(), binary));
+      return some(new MediaInspector(workspace, new AudioParser(), binary, true));
     }
     return none();
   }

@@ -21,10 +21,13 @@
 
 package org.opencastproject.workflow.handler.composer;
 
+import static org.opencastproject.util.data.Collections.list;
+
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.api.LaidOutElement;
+import org.opencastproject.composer.layout.AbsolutePositionLayoutSpec;
 import org.opencastproject.composer.layout.Dimension;
 import org.opencastproject.composer.layout.HorizontalCoverageLayoutSpec;
 import org.opencastproject.composer.layout.LayoutManager;
@@ -59,7 +62,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +101,8 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
   private static final String ENCODING_PROFILE = "encoding-profile";
 
   private static final String LAYOUT = "layout";
+  private static final String LAYOUT_MULTIPLE = "layout-multiple";
+  private static final String LAYOUT_SINGLE = "layout-single";
   private static final String LAYOUT_PREFIX = "layout-";
 
   private static final String OUTPUT_RESOLUTION = "output-resolution";
@@ -125,8 +131,11 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
     CONFIG_OPTIONS.put(TARGET_FLAVOR, "The flavor to apply to the compound video track");
 
     CONFIG_OPTIONS
-            .put(LAYOUT,
-                    "The layout name to use or a semi-colon separated JSON layout definition (lower, upper, optional watermark)");
+            .put(LAYOUT_MULTIPLE,
+                    "The layout name to use or a semi-colon separated JSON layout definition (lower, upper, optional watermark) if there are multiple videos");
+    CONFIG_OPTIONS
+            .put(LAYOUT_SINGLE,
+                    "The layout name to use or a semi-colon separated JSON layout definition (video, optional watermark) if there is a single video source");
     CONFIG_OPTIONS.put(LAYOUT_PREFIX,
             "Define semi-colon separated JSON layouts (lower, upper, optional watermark) to provide by name");
 
@@ -177,6 +186,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
+  @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
     logger.debug("Running composite workflow operation on workflow {}", workflowInstance.getId());
@@ -191,79 +201,193 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
   private WorkflowOperationResult composite(MediaPackage src, WorkflowOperationInstance operation)
           throws EncoderException, IOException, NotFoundException, MediaPackageException, WorkflowOperationException {
     MediaPackage mediaPackage = (MediaPackage) src.clone();
-
-    // Check which tags have been configured
-    String sourceTagsUpper = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS_UPPER));
-    String sourceFlavorUpper = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR_UPPER));
-    String sourceTagsLower = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS_LOWER));
-    String sourceFlavorLower = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR_LOWER));
-    String sourceTagsWatermark = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS_WATERMARK));
-    String sourceFlavorWatermark = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR_WATERMARK));
-    String sourceUrlWatermark = StringUtils.trimToNull(operation.getConfiguration(SOURCE_URL_WATERMARK));
-
-    String targetTagsOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS));
-    String targetFlavorOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVOR));
-    String encodingProfile = StringUtils.trimToNull(operation.getConfiguration(ENCODING_PROFILE));
-
-    String layoutString = StringUtils.trimToNull(operation.getConfiguration(LAYOUT));
-
-    String outputResolution = StringUtils.trimToNull(operation.getConfiguration(OUTPUT_RESOLUTION));
-    String outputBackground = StringUtils.trimToNull(operation.getConfiguration(OUTPUT_BACKGROUND));
-
-    AbstractMediaPackageElementSelector<Track> upperTrackSelector = new TrackSelector();
-    AbstractMediaPackageElementSelector<Track> lowerTrackSelector = new TrackSelector();
-    AbstractMediaPackageElementSelector<Attachment> watermarkSelector = new AttachmentSelector();
-
-    String watermarkIdentifier = UUID.randomUUID().toString();
-
+    CompositeSettings compositeSettings;
     try {
-      if (outputBackground == null)
-        outputBackground = DEFAULT_BG_COLOR;
+      compositeSettings = new CompositeSettings(mediaPackage, operation);
+    } catch (IllegalArgumentException e) {
+      logger.warn("Unable to parse composite settings because {}", ExceptionUtils.getStackTrace(e));
+      return createResult(mediaPackage, Action.SKIP);
+    }
+    Option<Attachment> watermarkAttachment = Option.<Attachment> none();
+    Collection<Attachment> watermarkElements = compositeSettings.getWatermarkSelector().select(mediaPackage, false);
+    if (watermarkElements.size() > 1) {
+      logger.warn("More than one watermark attachment has been found for compositing, skipping compositing!: {}",
+              watermarkElements);
+      return createResult(mediaPackage, Action.SKIP);
+    } else if (watermarkElements.size() == 0 && compositeSettings.getSourceUrlWatermark() != null) {
+      logger.info("No watermark found from flavor and tags, take watermark from URL {}",
+              compositeSettings.getSourceUrlWatermark());
+      Attachment urlAttachment = new AttachmentImpl();
+      urlAttachment.setIdentifier(compositeSettings.getWatermarkIdentifier());
 
-      if (layoutString == null)
-        throw new WorkflowOperationException("Layout must be set!");
-
-      if (!layoutString.contains(";")) {
-        layoutString = StringUtils.trimToNull(operation.getConfiguration(LAYOUT_PREFIX + layoutString));
-        if (layoutString == null)
-          throw new WorkflowOperationException("Layout " + layoutString + " not defined!");
-      }
-
-      List<HorizontalCoverageLayoutSpec> layouts = new ArrayList<HorizontalCoverageLayoutSpec>();
-      try {
-        for (String l : StringUtils.split(layoutString, ";")) {
-          layouts.add(Serializer.horizontalCoverageLayoutSpec(JsonObj.jsonObj(l)));
+      if (compositeSettings.getSourceUrlWatermark().startsWith("http")) {
+        urlAttachment.setURI(UrlSupport.uri(compositeSettings.getSourceUrlWatermark()));
+      } else {
+        InputStream in = null;
+        try {
+          in = UrlSupport.url(compositeSettings.getSourceUrlWatermark()).openStream();
+          URI imageUrl = workspace.putInCollection(COLLECTION, compositeSettings.getWatermarkIdentifier() + "."
+                  + FilenameUtils.getExtension(compositeSettings.getSourceUrlWatermark()), in);
+          urlAttachment.setURI(imageUrl);
+        } catch (Exception e) {
+          logger.warn("Unable to read watermark source url {}: {}", compositeSettings.getSourceUrlWatermark(), e);
+          throw new WorkflowOperationException("Unable to read watermark source url "
+                  + compositeSettings.getSourceUrlWatermark(), e);
+        } finally {
+          IOUtils.closeQuietly(in);
         }
-      } catch (Exception e) {
-        throw new WorkflowOperationException("Unable to parse layout!", e);
       }
+      watermarkAttachment = Option.option(urlAttachment);
+    } else if (watermarkElements.size() == 0 && compositeSettings.getSourceUrlWatermark() == null) {
+      logger.info("No watermark to composite");
+    } else {
+      for (Attachment a : watermarkElements)
+        watermarkAttachment = Option.option(a);
+    }
 
-      if (layouts.size() != 3)
-        throw new WorkflowOperationException(
-                "Layout only doesn't contain the required three layouts for (lower, upper, watermark)");
+    Collection<Track> upperElements = compositeSettings.getUpperTrackSelector().select(mediaPackage, false);
+    Collection<Track> lowerElements = compositeSettings.getLowerTrackSelector().select(mediaPackage, false);
 
-      // Make sure either one of tags or flavor for the upper source are provided
-      if (sourceTagsUpper == null && sourceFlavorUpper == null) {
-        logger.warn("No source tags or flavor for the upper video have been specified, not matching anything");
+    // There is only a single track to work with.
+    if ((upperElements.size() == 1 && lowerElements.size() == 0)
+            || (upperElements.size() == 0 && lowerElements.size() == 1)) {
+      for (Track t : upperElements)
+        compositeSettings.setSingleTrack(t);
+      for (Track t : lowerElements)
+        compositeSettings.setSingleTrack(t);
+      return handleSingleTrack(mediaPackage, operation, compositeSettings, watermarkAttachment);
+    } else {
+      // Look for upper elements matching the tags and flavor
+      if (upperElements.size() > 1) {
+        logger.warn("More than one upper track has been found for compositing, skipping compositing!: {}",
+                upperElements);
+        return createResult(mediaPackage, Action.SKIP);
+      } else if (upperElements.size() == 0) {
+        logger.warn("No upper track has been found for compositing, skipping compositing!");
         return createResult(mediaPackage, Action.SKIP);
       }
 
-      // Make sure either one of tags or flavor for the lower source are provided
-      if (sourceTagsLower == null && sourceFlavorLower == null) {
-        logger.warn("No source tags or flavor for the lower video have been specified, not matching anything");
+      for (Track t : upperElements) {
+        compositeSettings.setUpperTrack(t);
+      }
+
+      // Look for lower elements matching the tags and flavor
+      if (lowerElements.size() > 1) {
+        logger.warn("More than one lower track has been found for compositing, skipping compositing!: {}",
+                lowerElements);
         return createResult(mediaPackage, Action.SKIP);
+      } else if (lowerElements.size() == 0) {
+        logger.warn("No lower track has been found for compositing, skipping compositing!");
+        return createResult(mediaPackage, Action.SKIP);
+      }
+
+      for (Track t : lowerElements) {
+        compositeSettings.setLowerTrack(t);
+      }
+
+      return handleMultipleTracks(mediaPackage, operation, compositeSettings, watermarkAttachment);
+    }
+  }
+
+  /**
+   * This class collects and calculates all of the relevant data for doing a composite whether there is a single or two
+   * video tracks.
+   */
+  private class CompositeSettings {
+    private String sourceTagsUpper;
+    private String sourceFlavorUpper;
+    private String sourceTagsLower;
+    private String sourceFlavorLower;
+    private String sourceTagsWatermark;
+    private String sourceFlavorWatermark;
+    private String sourceUrlWatermark;
+    private String targetTagsOption;
+    private String targetFlavorOption;
+    private String encodingProfile;
+    private String layoutMultipleString;
+    private String layoutSingleString;
+    private String outputResolution;
+    private String outputBackground;
+
+    private AbstractMediaPackageElementSelector<Track> upperTrackSelector = new TrackSelector();
+    private AbstractMediaPackageElementSelector<Track> lowerTrackSelector = new TrackSelector();
+    private AbstractMediaPackageElementSelector<Attachment> watermarkSelector = new AttachmentSelector();
+
+    private String watermarkIdentifier;
+    private Option<AbsolutePositionLayoutSpec> watermarkLayout = Option.none();
+
+    private List<HorizontalCoverageLayoutSpec> multiSourceLayouts = new ArrayList<HorizontalCoverageLayoutSpec>();
+    private HorizontalCoverageLayoutSpec singleSourceLayout;
+
+    private Track upperTrack;
+    private Track lowerTrack;
+    private Track singleTrack;
+
+    private Dimension outputDimension;
+
+    private EncodingProfile profile;
+
+    private List<String> targetTags;
+
+    private MediaPackageElementFlavor targetFlavor = null;
+
+    public CompositeSettings(MediaPackage mediaPackage, WorkflowOperationInstance operation)
+            throws WorkflowOperationException {
+      // Check which tags have been configured
+      sourceTagsUpper = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS_UPPER));
+      sourceFlavorUpper = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR_UPPER));
+      sourceTagsLower = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS_LOWER));
+      sourceFlavorLower = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR_LOWER));
+      sourceTagsWatermark = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS_WATERMARK));
+      sourceFlavorWatermark = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR_WATERMARK));
+      sourceUrlWatermark = StringUtils.trimToNull(operation.getConfiguration(SOURCE_URL_WATERMARK));
+
+      targetTagsOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS));
+      targetFlavorOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVOR));
+      encodingProfile = StringUtils.trimToNull(operation.getConfiguration(ENCODING_PROFILE));
+
+      layoutMultipleString = StringUtils.trimToNull(operation.getConfiguration(LAYOUT_MULTIPLE));
+      if (layoutMultipleString == null) {
+        layoutMultipleString = StringUtils.trimToNull(operation.getConfiguration(LAYOUT));
+      }
+
+      if (layoutMultipleString != null && !layoutMultipleString.contains(";")) {
+        layoutMultipleString = StringUtils.trimToNull(operation.getConfiguration(LAYOUT_PREFIX + layoutMultipleString));
+      }
+
+      layoutSingleString = StringUtils.trimToNull(operation.getConfiguration(LAYOUT_SINGLE));
+
+      outputResolution = StringUtils.trimToNull(operation.getConfiguration(OUTPUT_RESOLUTION));
+      outputBackground = StringUtils.trimToNull(operation.getConfiguration(OUTPUT_BACKGROUND));
+
+      watermarkIdentifier = UUID.randomUUID().toString();
+
+      if (outputBackground == null) {
+        outputBackground = DEFAULT_BG_COLOR;
+      }
+
+      if (layoutMultipleString != null) {
+        Tuple<List<HorizontalCoverageLayoutSpec>, Option<AbsolutePositionLayoutSpec>> multipleLayouts = parseMultipleLayouts(layoutMultipleString);
+        multiSourceLayouts.addAll(multipleLayouts.getA());
+        watermarkLayout = multipleLayouts.getB();
+      }
+
+      if (layoutSingleString != null) {
+        Tuple<HorizontalCoverageLayoutSpec, Option<AbsolutePositionLayoutSpec>> singleLayouts = parseSingleLayouts(layoutSingleString);
+        singleSourceLayout = singleLayouts.getA();
+        watermarkLayout = singleLayouts.getB();
       }
 
       // Find the encoding profile
       if (encodingProfile == null)
         throw new WorkflowOperationException("Encoding profile must be set!");
 
-      EncodingProfile profile = composerService.getProfile(encodingProfile);
+      profile = composerService.getProfile(encodingProfile);
       if (profile == null)
         throw new WorkflowOperationException("Encoding profile '" + encodingProfile + "' was not found");
 
       // Target tags
-      List<String> targetTags = asList(targetTagsOption);
+      targetTags = asList(targetTagsOption);
 
       // Target flavor
       if (targetFlavorOption == null)
@@ -273,7 +397,6 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       if (outputResolution == null)
         throw new WorkflowOperationException("Output resolution must be set!");
 
-      Dimension outputDimension;
       try {
         String[] outputResolutionArray = StringUtils.split(outputResolution, "x");
         if (outputResolutionArray.length != 2)
@@ -286,7 +409,18 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
         throw new WorkflowOperationException("Unable to parse output resolution!", e);
       }
 
-      MediaPackageElementFlavor targetFlavor = null;
+      // Make sure either one of tags or flavor for the upper source are provided
+      if (sourceTagsUpper == null && sourceFlavorUpper == null) {
+        throw new IllegalArgumentException(
+                "No source tags or flavor for the upper video have been specified, not matching anything");
+      }
+
+      // Make sure either one of tags or flavor for the lower source are provided
+      if (sourceTagsLower == null && sourceFlavorLower == null) {
+        throw new IllegalArgumentException(
+                "No source tags or flavor for the lower video have been specified, not matching anything");
+      }
+
       try {
         targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
         if ("*".equals(targetFlavor.getType()) || "*".equals(targetFlavor.getSubtype()))
@@ -336,71 +470,247 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       for (String tag : asList(sourceTagsWatermark)) {
         watermarkSelector.addTag(tag);
       }
+    }
 
-      // Look for upper elements matching the tags and flavor
-      Collection<Track> upperElements = upperTrackSelector.select(mediaPackage, false);
-      if (upperElements.size() > 1) {
-        logger.warn("More than one upper track has been found for compositing, skipping compositing!: {}",
-                upperElements);
-        return createResult(mediaPackage, Action.SKIP);
-      } else if (upperElements.size() == 0) {
-        logger.warn("No upper track has been found for compositing, skipping compositing!");
+    private Tuple<List<HorizontalCoverageLayoutSpec>, Option<AbsolutePositionLayoutSpec>> parseMultipleLayouts(
+            String layoutString) throws WorkflowOperationException {
+      try {
+        String[] layouts = StringUtils.split(layoutString, ";");
+        if (layouts.length < 2)
+          throw new WorkflowOperationException(
+                  "Multiple layout doesn't contain the required layouts for (lower, upper, optional watermark)");
+
+        List<HorizontalCoverageLayoutSpec> multipleLayouts = list(
+                Serializer.horizontalCoverageLayoutSpec(JsonObj.jsonObj(layouts[0])),
+                Serializer.horizontalCoverageLayoutSpec(JsonObj.jsonObj(layouts[1])));
+
+        AbsolutePositionLayoutSpec watermarkLayout = null;
+        if (layouts.length > 2)
+          watermarkLayout = Serializer.absolutePositionLayoutSpec(JsonObj.jsonObj(layouts[2]));
+
+        return Tuple.tuple(multipleLayouts, Option.option(watermarkLayout));
+      } catch (Exception e) {
+        throw new WorkflowOperationException("Unable to parse layout!", e);
+      }
+    }
+
+    private Tuple<HorizontalCoverageLayoutSpec, Option<AbsolutePositionLayoutSpec>> parseSingleLayouts(
+            String layoutString) throws WorkflowOperationException {
+      try {
+        String[] layouts = StringUtils.split(layoutString, ";");
+        if (layouts.length < 1)
+          throw new WorkflowOperationException(
+                  "Single layout doesn't contain the required layouts for (video, optional watermark)");
+
+        HorizontalCoverageLayoutSpec singleLayout = Serializer
+                .horizontalCoverageLayoutSpec(JsonObj.jsonObj(layouts[0]));
+
+        AbsolutePositionLayoutSpec watermarkLayout = null;
+        if (layouts.length > 1)
+          watermarkLayout = Serializer.absolutePositionLayoutSpec(JsonObj.jsonObj(layouts[1]));
+
+        return Tuple.tuple(singleLayout, Option.option(watermarkLayout));
+      } catch (Exception e) {
+        throw new WorkflowOperationException("Unable to parse layout!", e);
+      }
+    }
+
+    public String getSourceUrlWatermark() {
+      return sourceUrlWatermark;
+    }
+
+    public MediaPackageElementFlavor getTargetFlavor() {
+      return targetFlavor;
+    }
+
+    public List<String> getTargetTags() {
+      return targetTags;
+    }
+
+    public String getOutputBackground() {
+      return outputBackground;
+    }
+
+    public AbstractMediaPackageElementSelector<Track> getUpperTrackSelector() {
+      return upperTrackSelector;
+    }
+
+    public AbstractMediaPackageElementSelector<Track> getLowerTrackSelector() {
+      return lowerTrackSelector;
+    }
+
+    public AbstractMediaPackageElementSelector<Attachment> getWatermarkSelector() {
+      return watermarkSelector;
+    }
+
+    public String getWatermarkIdentifier() {
+      return watermarkIdentifier;
+    }
+
+    public Option<AbsolutePositionLayoutSpec> getWatermarkLayout() {
+      return watermarkLayout;
+    }
+
+    public List<HorizontalCoverageLayoutSpec> getMultiSourceLayouts() {
+      return multiSourceLayouts;
+    }
+
+    public HorizontalCoverageLayoutSpec getSingleSourceLayout() {
+      return singleSourceLayout;
+    }
+
+    public Track getUpperTrack() {
+      return upperTrack;
+    }
+
+    public void setUpperTrack(Track upperTrack) {
+      this.upperTrack = upperTrack;
+    }
+
+    public Track getLowerTrack() {
+      return lowerTrack;
+    }
+
+    public void setLowerTrack(Track lowerTrack) {
+      this.lowerTrack = lowerTrack;
+    }
+
+    public Track getSingleTrack() {
+      return singleTrack;
+    }
+
+    public void setSingleTrack(Track singleTrack) {
+      this.singleTrack = singleTrack;
+    }
+
+    public Dimension getOutputDimension() {
+      return outputDimension;
+    }
+
+    public EncodingProfile getProfile() {
+      return profile;
+    }
+  }
+
+  private WorkflowOperationResult handleSingleTrack(MediaPackage mediaPackage, WorkflowOperationInstance operation,
+          CompositeSettings compositeSettings, Option<Attachment> watermarkAttachment) throws EncoderException,
+          IOException, NotFoundException, MediaPackageException, WorkflowOperationException {
+
+    if (compositeSettings.getSingleSourceLayout() == null) {
+      throw new WorkflowOperationException("Single video layout must be set! Please verify that you have a "
+              + LAYOUT_SINGLE + " property in your composite operation in your workflow definition.");
+    }
+
+    try {
+      VideoStream[] videoStreams = TrackSupport.byType(compositeSettings.getSingleTrack().getStreams(),
+              VideoStream.class);
+      if (videoStreams.length == 0) {
+        logger.warn("No video stream available to compose! {}", compositeSettings.getSingleTrack());
         return createResult(mediaPackage, Action.SKIP);
       }
 
-      Track upperTrack = null;
-      for (Track t : upperElements)
-        upperTrack = t;
+      // Read the video dimensions from the mediapackage stream information
+      Dimension videoDimension = Dimension.dimension(videoStreams[0].getFrameWidth(), videoStreams[0].getFrameHeight());
 
-      // Look for lower elements matching the tags and flavor
-      Collection<Track> lowerElements = lowerTrackSelector.select(mediaPackage, false);
-      if (lowerElements.size() > 1) {
-        logger.warn("More than one lower track has been found for compositing, skipping compositing!: {}",
-                lowerElements);
-        return createResult(mediaPackage, Action.SKIP);
-      } else if (lowerElements.size() == 0) {
-        logger.warn("No lower track has been found for compositing, skipping compositing!");
-        return createResult(mediaPackage, Action.SKIP);
-      }
+      // Create the video layout definitions
+      List<Tuple<Dimension, HorizontalCoverageLayoutSpec>> shapes = new ArrayList<Tuple<Dimension, HorizontalCoverageLayoutSpec>>();
+      shapes.add(0, Tuple.tuple(videoDimension, compositeSettings.getSingleSourceLayout()));
 
-      Track lowerTrack = null;
-      for (Track t : lowerElements)
-        lowerTrack = t;
+      // Calculate the single layout
+      MultiShapeLayout multiShapeLayout = LayoutManager
+              .multiShapeLayout(compositeSettings.getOutputDimension(), shapes);
 
-      Option<Attachment> watermarkAttachment = Option.<Attachment> none();
-      Collection<Attachment> watermarkElements = watermarkSelector.select(mediaPackage, false);
-      if (watermarkElements.size() > 1) {
-        logger.warn("More than one watermark attachment has been found for compositing, skipping compositing!: {}",
-                watermarkElements);
-        return createResult(mediaPackage, Action.SKIP);
-      } else if (watermarkElements.size() == 0 && sourceUrlWatermark != null) {
-        logger.info("No watermark found from flavor and tags, take watermark from URL {}", sourceUrlWatermark);
-        Attachment urlAttachment = new AttachmentImpl();
-        urlAttachment.setIdentifier(watermarkIdentifier);
+      // Create the laid out element for the videos
+      LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<Track>(compositeSettings.getSingleTrack(),
+              multiShapeLayout.getShapes().get(0));
 
-        if (sourceUrlWatermark.startsWith("http")) {
-          urlAttachment.setURI(UrlSupport.uri(sourceUrlWatermark));
-        } else {
-          InputStream in = null;
-          try {
-            in = UrlSupport.url(sourceUrlWatermark).openStream();
-            URI imageUrl = workspace.putInCollection(COLLECTION,
-                    watermarkIdentifier + "." + FilenameUtils.getExtension(sourceUrlWatermark), in);
-            urlAttachment.setURI(imageUrl);
-          } catch (Exception e) {
-            logger.warn("Unable to read watermark source url {}: {}", sourceUrlWatermark, e);
-            throw new WorkflowOperationException("Unable to read watermark source url " + sourceUrlWatermark, e);
-          } finally {
-            IOUtils.closeQuietly(in);
-          }
+      // Create the optionally laid out element for the watermark
+      Option<LaidOutElement<Attachment>> watermarkOption = createWatermarkLaidOutElement(compositeSettings,
+              watermarkAttachment);
+
+      Job compositeJob = composerService.composite(compositeSettings.getOutputDimension(), Option
+              .<LaidOutElement<Track>> none(), lowerLaidOutElement, watermarkOption, compositeSettings.getProfile()
+              .getIdentifier(), compositeSettings.getOutputBackground());
+
+      // Wait for the jobs to return
+      if (!waitForStatus(compositeJob).isSuccess())
+        throw new WorkflowOperationException("The composite job did not complete successfully");
+
+      if (compositeJob.getPayload().length() > 0) {
+
+        Track compoundTrack = (Track) MediaPackageElementParser.getFromXml(compositeJob.getPayload());
+
+        compoundTrack.setURI(workspace.moveTo(compoundTrack.getURI(), mediaPackage.getIdentifier().toString(),
+                compoundTrack.getIdentifier(),
+                "composite." + FilenameUtils.getExtension(compoundTrack.getURI().toString())));
+
+        // Adjust the target tags
+        for (String tag : compositeSettings.getTargetTags()) {
+          logger.trace("Tagging compound track with '{}'", tag);
+          compoundTrack.addTag(tag);
         }
-        watermarkAttachment = Option.option(urlAttachment);
-      } else if (watermarkElements.size() == 0 && sourceUrlWatermark == null) {
-        logger.info("No watermark to composite");
+
+        // Adjust the target flavor.
+        compoundTrack.setFlavor(compositeSettings.getTargetFlavor());
+        logger.debug("Compound track has flavor '{}'", compoundTrack.getFlavor());
+
+        // store new tracks to mediaPackage
+        mediaPackage.add(compoundTrack);
+        WorkflowOperationResult result = createResult(mediaPackage, Action.CONTINUE, compositeJob.getQueueTime());
+        logger.debug("Composite operation completed");
+        return result;
       } else {
-        for (Attachment a : watermarkElements)
-          watermarkAttachment = Option.option(a);
+        logger.info("Composite operation unsuccessful, no payload returned: {}", compositeJob);
+        return createResult(mediaPackage, Action.SKIP);
       }
+    } finally {
+      if (compositeSettings.getSourceUrlWatermark() != null)
+        workspace.deleteFromCollection(
+                COLLECTION,
+                compositeSettings.getWatermarkIdentifier() + "."
+                        + FilenameUtils.getExtension(compositeSettings.getSourceUrlWatermark()));
+    }
+  }
+
+  private Option<LaidOutElement<Attachment>> createWatermarkLaidOutElement(CompositeSettings compositeSettings,
+          Option<Attachment> watermarkAttachment) throws WorkflowOperationException {
+    Option<LaidOutElement<Attachment>> watermarkOption = Option.<LaidOutElement<Attachment>> none();
+    if (watermarkAttachment.isSome() && compositeSettings.getWatermarkLayout().isSome()) {
+      BufferedImage image;
+      try {
+        File watermarkFile = workspace.get(watermarkAttachment.get().getURI());
+        image = ImageIO.read(watermarkFile);
+      } catch (Exception e) {
+        logger.warn("Unable to read the watermark image attachment {}: {}", watermarkAttachment.get().getURI(), e);
+        throw new WorkflowOperationException("Unable to read the watermark image attachment", e);
+      }
+      Dimension imageDimension = Dimension.dimension(image.getWidth(), image.getHeight());
+      List<Tuple<Dimension, AbsolutePositionLayoutSpec>> watermarkShapes = new ArrayList<Tuple<Dimension, AbsolutePositionLayoutSpec>>();
+      watermarkShapes.add(0, Tuple.tuple(imageDimension, compositeSettings.getWatermarkLayout().get()));
+      MultiShapeLayout watermarkLayout = LayoutManager.absoluteMultiShapeLayout(compositeSettings.getOutputDimension(),
+              watermarkShapes);
+      watermarkOption = Option.some(new LaidOutElement<Attachment>(watermarkAttachment.get(), watermarkLayout
+              .getShapes().get(0)));
+    }
+    return watermarkOption;
+  }
+
+  private WorkflowOperationResult handleMultipleTracks(MediaPackage mediaPackage, WorkflowOperationInstance operation,
+          CompositeSettings compositeSettings, Option<Attachment> watermarkAttachment) throws EncoderException,
+          IOException, NotFoundException, MediaPackageException, WorkflowOperationException {
+    if (compositeSettings.getMultiSourceLayouts() == null || compositeSettings.getMultiSourceLayouts().size() == 0) {
+      throw new WorkflowOperationException(
+              "Multi video layout must be set! Please verify that you have a "
+                      + LAYOUT_MULTIPLE
+                      + " or "
+                      + LAYOUT
+                      + " property in your composite operation in your workflow definition to be able to handle multiple videos");
+    }
+
+    try {
+      Track upperTrack = compositeSettings.getUpperTrack();
+      Track lowerTrack = compositeSettings.getLowerTrack();
+      List<HorizontalCoverageLayoutSpec> layouts = compositeSettings.getMultiSourceLayouts();
 
       VideoStream[] upperVideoStreams = TrackSupport.byType(upperTrack.getStreams(), VideoStream.class);
       if (upperVideoStreams.length == 0) {
@@ -425,38 +735,23 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       shapes.add(0, Tuple.tuple(lowerDimensions, layouts.get(0)));
       shapes.add(1, Tuple.tuple(upperDimensions, layouts.get(1)));
 
-      // Optionally add the watermark layout definitions
-      if (watermarkAttachment.isSome()) {
-        BufferedImage image;
-        try {
-          File watermarkFile = workspace.get(watermarkAttachment.get().getURI());
-          image = ImageIO.read(watermarkFile);
-        } catch (Exception e) {
-          logger.warn("Unable to read the watermark image attachment {}: {}", watermarkAttachment.get().getURI(), e);
-          throw new WorkflowOperationException("Unable to read the watermark image attachment", e);
-        }
-        Dimension imageDimension = Dimension.dimension(image.getWidth(), image.getHeight());
-        shapes.add(2, Tuple.tuple(imageDimension, layouts.get(2)));
-      }
-
       // Calculate the layout
-      MultiShapeLayout multiShapeLayout = LayoutManager.multiShapeLayout(outputDimension, shapes);
+      MultiShapeLayout multiShapeLayout = LayoutManager
+              .multiShapeLayout(compositeSettings.getOutputDimension(), shapes);
 
-      // Create the laied out element for the videos
+      // Create the laid out element for the videos
       LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<Track>(lowerTrack, multiShapeLayout.getShapes()
               .get(0));
       LaidOutElement<Track> upperLaidOutElement = new LaidOutElement<Track>(upperTrack, multiShapeLayout.getShapes()
               .get(1));
 
-      // Create the optionally laied out element for the watermark
-      Option<LaidOutElement<Attachment>> watermarkOption = Option.<LaidOutElement<Attachment>> none();
-      if (watermarkAttachment.isSome() && multiShapeLayout.getShapes().size() == 3) {
-        watermarkOption = Option.some(new LaidOutElement<Attachment>(watermarkAttachment.get(), multiShapeLayout
-                .getShapes().get(2)));
-      }
+      // Create the optionally laid out element for the watermark
+      Option<LaidOutElement<Attachment>> watermarkOption = createWatermarkLaidOutElement(compositeSettings,
+              watermarkAttachment);
 
-      Job compositeJob = composerService.composite(outputDimension, upperLaidOutElement, lowerLaidOutElement,
-              watermarkOption, profile.getIdentifier(), outputBackground);
+      Job compositeJob = composerService.composite(compositeSettings.getOutputDimension(), Option
+              .option(upperLaidOutElement), lowerLaidOutElement, watermarkOption, compositeSettings.getProfile()
+              .getIdentifier(), compositeSettings.getOutputBackground());
 
       // Wait for the jobs to return
       if (!waitForStatus(compositeJob).isSuccess())
@@ -471,13 +766,13 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
                 "composite." + FilenameUtils.getExtension(compoundTrack.getURI().toString())));
 
         // Adjust the target tags
-        for (String tag : targetTags) {
+        for (String tag : compositeSettings.getTargetTags()) {
           logger.trace("Tagging compound track with '{}'", tag);
           compoundTrack.addTag(tag);
         }
 
         // Adjust the target flavor.
-        compoundTrack.setFlavor(targetFlavor);
+        compoundTrack.setFlavor(compositeSettings.getTargetFlavor());
         logger.debug("Compound track has flavor '{}'", compoundTrack.getFlavor());
 
         // store new tracks to mediaPackage
@@ -490,9 +785,11 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
         return createResult(mediaPackage, Action.SKIP);
       }
     } finally {
-      if (sourceUrlWatermark != null)
-        workspace.deleteFromCollection(COLLECTION,
-                watermarkIdentifier + "." + FilenameUtils.getExtension(sourceUrlWatermark));
+      if (compositeSettings.getSourceUrlWatermark() != null)
+        workspace.deleteFromCollection(
+                COLLECTION,
+                compositeSettings.getWatermarkIdentifier() + "."
+                        + FilenameUtils.getExtension(compositeSettings.getSourceUrlWatermark()));
     }
   }
 }

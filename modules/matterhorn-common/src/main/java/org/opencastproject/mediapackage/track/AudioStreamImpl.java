@@ -25,7 +25,7 @@ package org.opencastproject.mediapackage.track;
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.MediaPackageSerializer;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -77,27 +77,10 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
   }
 
   /**
-   * Construct an audio stream from another audio stream
-   *
-   * @param s
-   */
-  public AudioStreamImpl(AudioStreamImpl s) {
-    this.bitdepth = s.bitdepth;
-    this.bitrate = s.bitrate;
-    this.channels = s.channels;
-    this.device = s.device;
-    this.encoder = s.encoder;
-    this.identifier = s.identifier;
-    this.samplingrate = s.samplingrate;
-    this.pkLevDb = s.pkLevDb;
-    this.rmsLevDb = s.rmsLevDb;
-    this.rmsPkDb = s.rmsPkDb;
-  }
-
-  /**
    * @see org.opencastproject.mediapackage.ManifestContributor#toManifest(org.w3c.dom.Document,
    *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */
+  @Override
   public Node toManifest(Document document, MediaPackageSerializer serializer) {
     Element node = document.createElement("audio");
     // Stream ID
@@ -307,30 +290,37 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     return as;
   }
 
+  @Override
   public Integer getBitDepth() {
     return bitdepth;
   }
 
+  @Override
   public Integer getChannels() {
     return channels;
   }
 
+  @Override
   public Integer getSamplingRate() {
     return samplingrate;
   }
 
+  @Override
   public Float getBitRate() {
     return bitrate;
   }
 
+  @Override
   public Float getPkLevDb() {
     return pkLevDb;
   }
 
+  @Override
   public Float getRmsLevDb() {
     return rmsLevDb;
   }
 
+  @Override
   public Float getRmsPkDb() {
     return rmsPkDb;
   }
@@ -365,26 +355,32 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     this.rmsPkDb = rmsPkDb;
   }
 
+  @Override
   public void setCaptureDevice(String captureDevice) {
     this.device.type = captureDevice;
   }
 
+  @Override
   public void setCaptureDeviceVersion(String captureDeviceVersion) {
     this.device.version = captureDeviceVersion;
   }
 
+  @Override
   public void setCaptureDeviceVendor(String captureDeviceVendor) {
     this.device.vendor = captureDeviceVendor;
   }
 
+  @Override
   public void setFormat(String format) {
     this.encoder.type = format;
   }
 
+  @Override
   public void setFormatVersion(String formatVersion) {
     this.encoder.version = formatVersion;
   }
 
+  @Override
   public void setEncoderLibraryVendor(String encoderLibraryVendor) {
     this.encoder.vendor = encoderLibraryVendor;
   }

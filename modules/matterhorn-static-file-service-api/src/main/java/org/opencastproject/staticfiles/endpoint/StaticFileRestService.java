@@ -21,10 +21,9 @@
 
 package org.opencastproject.staticfiles.endpoint;
 
-import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
-
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.security.api.SecurityService;
@@ -47,8 +46,8 @@ import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -83,9 +82,9 @@ import javax.ws.rs.core.Response.Status;
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
                 + "not working and is either restarting or has failed",
-                "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-                        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
+                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class StaticFileRestService {
 
   /** The logging facility */
@@ -161,8 +160,9 @@ public class StaticFileRestService {
     try {
       final InputStream file = staticFileService.getFile(uuid);
       final String filename = staticFileService.getFileName(uuid);
+      final Long length = staticFileService.getContentLength(uuid);
       // It is safe to pass the InputStream without closing it, JAX-RS takes care of that
-      return RestUtil.R.ok(file, getMimeType(filename), Option.none(Long.class), Option.some(filename));
+      return RestUtil.R.ok(file, getMimeType(filename), Option.some(length), Option.some(filename));
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -176,9 +176,9 @@ public class StaticFileRestService {
   @Produces(MediaType.TEXT_PLAIN)
   @Path("")
   @RestQuery(name = "postStaticFile", description = "Post a new static resource", bodyParameter = @RestParameter(description = "The static resource file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
-    @RestResponse(description = "Returns the id of the uploaded static resource", responseCode = HttpServletResponse.SC_CREATED),
-    @RestResponse(description = "No filename or file to upload found", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-    @RestResponse(description = "The upload size is too big", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+          @RestResponse(description = "Returns the id of the uploaded static resource", responseCode = HttpServletResponse.SC_CREATED),
+          @RestResponse(description = "No filename or file to upload found", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The upload size is too big", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response postStaticFile(@Context HttpServletRequest request) {
     if (maxUploadSize > 0 && request.getContentLength() > maxUploadSize) {
       logger.warn("Preventing upload of static file as its size {} is larger than the max size allowed {}",

@@ -22,7 +22,7 @@
 package org.opencastproject.staticfiles.impl;
 
 import static java.lang.String.format;
-import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.RequireUtil.notNull;
 
 import org.opencastproject.security.api.Organization;
@@ -41,8 +41,8 @@ import com.google.common.util.concurrent.Service.Listener;
 import com.google.common.util.concurrent.Service.State;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.ComponentException;
 import org.slf4j.Logger;
@@ -206,6 +206,18 @@ public class StaticFileServiceImpl implements StaticFileService {
     try {
       Path file = getFile(org, uuid);
       return file.getFileName().toString();
+    } catch (IOException e) {
+      logger.warn("Error while reading file: {}", getStackTrace(e));
+      throw new NotFoundException(e);
+    }
+  }
+
+  @Override
+  public Long getContentLength(String uuid) throws NotFoundException {
+    final String org = securityService.getOrganization().getId();
+    try {
+      Path file = getFile(org, uuid);
+      return Files.size(file);
     } catch (IOException e) {
       logger.warn("Error while reading file: {}", getStackTrace(e));
       throw new NotFoundException(e);

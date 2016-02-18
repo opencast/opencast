@@ -21,10 +21,11 @@
 
 package org.opencastproject.workflow.handler.comments;
 
-import org.opencastproject.comments.Comment;
-import org.opencastproject.comments.CommentException;
-import org.opencastproject.comments.events.EventCommentService;
+import org.opencastproject.event.comment.EventComment;
+import org.opencastproject.event.comment.EventCommentException;
+import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -33,11 +34,10 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workflow.api.WorkflowService;
 
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,11 +57,9 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(CommentWorkflowOperationHandler.class);
 
-  /** The event comment service instance */
+  /* service references */
   private EventCommentService eventCommentService;
-
-  /** The workflow service instance */
-  protected WorkflowService workflowService = null;
+  private SecurityService securityService;
 
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
@@ -73,12 +71,10 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
     CONFIG_OPTIONS.put(REASON,
-                    "The optional comment reason's i18n id. You can find the id in etc/listproviders/event.comment.reasons.properties");
+            "The optional comment reason's i18n id. You can find the id in etc/listproviders/event.comment.reasons.properties");
     CONFIG_OPTIONS.put(DESCRIPTION, "The description text to add to the comment.");
-    CONFIG_OPTIONS.put(ACTION,
-                    "Options are "
-                            + StringUtils.join(Operation.values(), ",")
-                            + ". Creates a new comment, marks a comment as resolved or deletes a comment that matches the same description and reason. By default creates.");
+    CONFIG_OPTIONS.put(ACTION, "Options are " + StringUtils.join(Operation.values(), ",")
+            + ". Creates a new comment, marks a comment as resolved or deletes a comment that matches the same description and reason. By default creates.");
   }
 
   @Override
@@ -109,13 +105,13 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @param workflowInstance
    *          The {@link WorkflowInstance} to be handled.
    * @return The result of handling the {@link WorkflowInstance}
-   * @throws CommentException
+   * @throws EventCommentException
    *           Thrown if there is an issue creating, resolving or deleting a comment
    * @throws NotFoundException
    *           Thrown if the comment cannot be found to delete.
    */
-  private WorkflowOperationResult handleCommentOperation(WorkflowInstance workflowInstance) throws CommentException,
-          NotFoundException {
+  private WorkflowOperationResult handleCommentOperation(WorkflowInstance workflowInstance)
+          throws EventCommentException, NotFoundException {
     Date date = new Date();
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     Operation action;
@@ -156,16 +152,17 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    *          The reason for the comment.
    * @param description
    *          The descriptive text of the comment.
-   * @throws CommentException
+   * @throws EventCommentException
    *           Thrown if unable to create the comment.
    */
   private void createComment(WorkflowInstance workflowInstance, String reason, String description)
-          throws CommentException {
-    Opt<Comment> optComment = findComment(workflowInstance.getMediaPackage().getIdentifier().toString(), reason,
+          throws EventCommentException {
+    Opt<EventComment> optComment = findComment(workflowInstance.getMediaPackage().getIdentifier().toString(), reason,
             description);
     if (optComment.isNone()) {
-      Comment comment = Comment.create(Option.<Long> none(), description, workflowInstance.getCreator(), reason, false);
-      eventCommentService.updateComment(workflowInstance.getMediaPackage().getIdentifier().toString(), comment);
+      EventComment comment = EventComment.create(Option.<Long> none(), workflowInstance.getMediaPackage().getIdentifier().toString(),
+              securityService.getOrganization().getId(), description, workflowInstance.getCreator(), reason, false);
+      eventCommentService.updateComment(comment);
     } else {
       logger.warn("Not creating comment with '{}' text and '{}' reason as it already exists for this event.",
               description, reason);
@@ -181,18 +178,19 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    *          The reason for the comment.
    * @param description
    *          The comment's descriptive text.
-   * @throws CommentException
+   * @throws EventCommentException
    *           Thrown if unable to update the comment.
    */
   private void resolveComment(WorkflowInstance workflowInstance, String reason, String description)
-          throws CommentException {
-    Opt<Comment> optComment = findComment(workflowInstance.getMediaPackage().getIdentifier().toString(), reason,
+          throws EventCommentException {
+    Opt<EventComment> optComment = findComment(workflowInstance.getMediaPackage().getIdentifier().toString(), reason,
             description);
     if (optComment.isSome()) {
-      Comment comment = Comment.create(optComment.get().getId(), optComment.get().getText(), optComment.get()
-              .getAuthor(), optComment.get().getReason(), true, optComment.get().getCreationDate(), optComment.get()
-              .getModificationDate(), optComment.get().getReplies());
-      eventCommentService.updateComment(workflowInstance.getMediaPackage().getIdentifier().toString(), comment);
+      EventComment comment = EventComment.create(optComment.get().getId(), workflowInstance.getMediaPackage().getIdentifier().toString(),
+              securityService.getOrganization().getId(), optComment.get().getText(),
+              optComment.get().getAuthor(), optComment.get().getReason(), true, optComment.get().getCreationDate(),
+              optComment.get().getModificationDate(), optComment.get().getReplies());
+      eventCommentService.updateComment(comment);
     } else {
       logger.warn("Not resolving comment with '{}' text and '{}' reason as it doesn't exist.", description, reason);
     }
@@ -207,19 +205,18 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    *          The reason for the comment.
    * @param description
    *          The comment's descriptive text.
-   * @throws CommentException
+   * @throws EventCommentException
    *           Thrown if unable to delete the comment.
    * @throws NotFoundException
    *           Thrown if unable to find the comment.
    */
   private void deleteComment(WorkflowInstance workflowInstance, String reason, String description)
-          throws CommentException, NotFoundException {
-    Opt<Comment> optComment = findComment(workflowInstance.getMediaPackage().getIdentifier().toString(), reason,
+          throws EventCommentException, NotFoundException {
+    Opt<EventComment> optComment = findComment(workflowInstance.getMediaPackage().getIdentifier().toString(), reason,
             description);
     if (optComment.isSome()) {
       try {
-        eventCommentService.deleteComment(workflowInstance.getMediaPackage().getIdentifier().toString(), optComment
-                .get().getId().get());
+        eventCommentService.deleteComment(optComment.get().getId().get());
       } catch (NotFoundException e) {
         logger.warn("Not deleting comment with '{}' text and '{}' reason and id '{}' as it doesn't exist.",
                 new Object[] { description, reason, optComment.get().getId() });
@@ -239,13 +236,13 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @param description
    *          The description for the comment.
    * @return The comment if one is found matching the reason and description.
-   * @throws CommentException
+   * @throws EventCommentException
    *           Thrown if there was a problem finding the comment.
    */
-  private Opt<Comment> findComment(String eventId, String reason, String description) throws CommentException {
-    Opt<Comment> comment = Opt.none();
-    List<Comment> eventComments = eventCommentService.getComments(eventId);
-    for (Comment existingComment : eventComments) {
+  private Opt<EventComment> findComment(String eventId, String reason, String description) throws EventCommentException {
+    Opt<EventComment> comment = Opt.none();
+    List<EventComment> eventComments = eventCommentService.getComments(eventId);
+    for (EventComment existingComment : eventComments) {
       if (isSameComment(existingComment, reason, description)) {
         comment = Opt.some(existingComment);
         break;
@@ -265,9 +262,10 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    *          The description for the comment.
    * @return True if the two properties match.
    */
-  private boolean isSameComment(Comment comment, String reason, String description) {
-    return description == null ? comment.getText() == null : description.equals(comment.getText())
-            && (reason == null ? comment.getReason() == null : reason.equals(comment.getReason()));
+  private boolean isSameComment(EventComment comment, String reason, String description) {
+    return description == null ? comment.getText() == null
+            : description.equals(comment.getText())
+                    && (reason == null ? comment.getReason() == null : reason.equals(comment.getReason()));
   }
 
   /**
@@ -280,14 +278,9 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
     this.eventCommentService = eventCommentService;
   }
 
-  /**
-   * Callback from the OSGi environment that will pass a reference to the workflow service upon component activation.
-   *
-   * @param service
-   *          the workflow service
-   */
-  void setWorkflowService(WorkflowService service) {
-    this.workflowService = service;
+  /** OSGi DI */
+  void setSecurityService(SecurityService service) {
+    this.securityService = service;
   }
 
 }

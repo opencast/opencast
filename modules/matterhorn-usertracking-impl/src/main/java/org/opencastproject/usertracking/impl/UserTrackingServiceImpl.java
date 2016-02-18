@@ -36,7 +36,7 @@ import org.opencastproject.usertracking.endpoint.ReportImpl;
 import org.opencastproject.usertracking.endpoint.ReportItemImpl;
 import org.opencastproject.util.NotFoundException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
@@ -49,15 +49,12 @@ import java.util.Collection;
 import java.util.Dictionary;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Map;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
-import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Implementation of org.opencastproject.usertracking.api.UserTrackingService
@@ -65,6 +62,9 @@ import javax.persistence.spi.PersistenceProvider;
  * @see org.opencastproject.usertracking.api.UserTrackingService
  */
 public class UserTrackingServiceImpl implements UserTrackingService, ManagedService {
+
+  /** JPA persistence unit name */
+  public static final String PERSISTENCE_UNIT = "org.opencastproject.usertracking";
 
   public static final String FOOTPRINT_KEY = "FOOTPRINT";
 
@@ -80,47 +80,21 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
   private boolean logUser = true;
   private boolean logSession = true;
 
-  /**
-   * @param persistenceProvider
-   *          the persistenceProvider to set
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
-  }
-
-  protected Map<String, Object> persistenceProperties;
-
-  /**
-   * @param persistenceProperties
-   *          the persistenceProperties to set
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
-  }
-
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
 
-  /**
-   * The JPA provider
-   */
-  protected PersistenceProvider persistenceProvider;
+  /** OSGi DI */
+
+  /** OSGi DI */
+  void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
+  }
 
   /**
    * Activation callback to be executed once all dependencies are set
    */
   public void activate() {
     logger.debug("activate()");
-    emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.usertracking", persistenceProperties);
-  }
-
-  /**
-   * Deactivation callback
-   */
-  public void destroy() {
-    if (emf != null && emf.isOpen()) {
-      emf.close();
-    }
   }
 
   @Override

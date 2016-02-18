@@ -55,7 +55,7 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.json.simple.JSONObject;
@@ -80,7 +80,6 @@ import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
-import javax.persistence.spi.PersistenceProvider;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -110,6 +109,8 @@ import javax.ws.rs.core.Response.Status;
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
                 + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class IngestRestService extends AbstractJobProducerEndpoint {
+
+  public static final String PERSISTENCE_UNIT = "org.opencastproject.ingest.endpoint";
 
   private static final Logger logger = LoggerFactory.getLogger(IngestRestService.class);
 
@@ -145,9 +146,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   private IngestService ingestService = null;
   private ServiceRegistry serviceRegistry = null;
   private DublinCoreCatalogService dublinCoreService;
-  protected PersistenceProvider persistenceProvider;
-  protected Map<String, Object> persistenceProperties;
-  protected EntityManagerFactory emf = null;
+  private EntityManagerFactory emf = null;
+
   // For the progress bar -1 bug workaround, keeping UploadJobs in memory rather than saving them using JPA
   private HashMap<String, UploadJob> jobs;
   // The number of ingests this service can handle concurrently.
@@ -196,12 +196,6 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
    * Callback for activation of this component.
    */
   public void activate(ComponentContext cc) {
-    try {
-      emf = persistenceProvider
-              .createEntityManagerFactory("org.opencastproject.ingest.endpoint", persistenceProperties);
-    } catch (Exception e) {
-      logger.error("Unable to initialize JPA EntityManager: " + e.getMessage());
-    }
     if (cc != null) {
       defaultWorkflowDefinitionId = StringUtils.trimToNull(cc.getBundleContext().getProperty(
               DEFAULT_WORKFLOW_DEFINITION));
@@ -220,15 +214,6 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           ingestLimit = -1;
         }
       }
-    }
-  }
-
-  /**
-   * Callback for deactivation of this component.
-   */
-  public void deactivate() {
-    if (emf != null && emf.isOpen()) {
-      emf.close();
     }
   }
 
@@ -1362,26 +1347,6 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   }
 
   /**
-   * OSGi Declarative Services callback to set the reference to the persistence provider.
-   *
-   * @param persistenceProvider
-   *          the persistence provider
-   */
-  void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
-  }
-
-  /**
-   * OSGi Declarative Services callback to set the reference to the persistence properties.
-   *
-   * @param persistenceProperties
-   *          the persistence properties
-   */
-  void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
-  }
-
-  /**
    * Sets the trusted http client
    *
    * @param httpClient
@@ -1389,6 +1354,11 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
    */
   public void setHttpClient(TrustedHttpClient httpClient) {
     this.httpClient = httpClient;
+  }
+
+  /** OSGi DI */
+  void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
   }
 
 }

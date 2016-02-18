@@ -21,7 +21,7 @@
 
 package org.opencastproject.capture.admin.impl;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.capture.admin.api.AgentState.KNOWN_STATES;
 import static org.opencastproject.capture.admin.api.AgentState.UNKNOWN;
 
@@ -52,8 +52,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.component.ComponentContext;
@@ -79,7 +79,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.RollbackException;
-import javax.persistence.spi.PersistenceProvider;
 
 /**
  * IMPL for the capture-admin service (MH-1336, MH-1394, MH-1457, MH-1475 and MH-1476).
@@ -93,12 +92,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   /** The delimiter for the CA configuration cache */
   private static final String DELIMITER = ";==;";
-
-  /** The JPA provider */
-  protected PersistenceProvider persistenceProvider;
-
-  /** The persistence properties */
-  protected Map<String, Object> persistenceProperties;
 
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
@@ -127,12 +120,14 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   /** A token to store in the miss cache */
   protected Object nullToken = new Object();
 
-  /**
-   * @param persistenceProvider
-   *          the persistenceProvider to set
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
+  /** OSGi DI */
+  void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
+  }
+
+  /** OSGi DI */
+  void setMessageSender(MessageSender messageSender) {
+    this.messageSender = messageSender;
   }
 
   /**
@@ -163,28 +158,12 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     this.securityService = securityService;
   }
 
-  /**
-   * @param persistenceProperties
-   *          the persistenceProperties to set
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
-  }
-
-  /** OSGi callback for setting the message sender. */
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
-  }
-
   public CaptureAgentStateServiceImpl() {
     logger.info("CaptureAgentStateServiceImpl starting.");
     recordings = new HashMap<String, Recording>();
   }
 
   public void activate(ComponentContext cc) {
-    emf = persistenceProvider.createEntityManagerFactory(
-            "org.opencastproject.capture.admin.impl.CaptureAgentStateServiceImpl", persistenceProperties);
-
     // Setup the agent cache
     agentCache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build(new CacheLoader<String, Object>() {
       @Override
@@ -203,8 +182,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   public void deactivate() {
     agentCache.invalidateAll();
-    if (emf != null)
-      emf.close();
   }
 
   /**

@@ -24,21 +24,15 @@ package org.opencastproject.scheduler.impl.persistence;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.opencastproject.util.persistencefn.PersistenceUtil.mkTestEntityManagerFactory;
 
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.util.NotFoundException;
-
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
-import org.eclipse.persistence.jpa.PersistenceProvider;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -47,7 +41,6 @@ import java.util.Properties;
  */
 public class SchedulerServiceDatabaseImplTest {
 
-  private ComboPooledDataSource pooledDataSource;
   private SchedulerServiceDatabaseImpl schedulerDatabase;
   private DublinCoreCatalogService dcService;
 
@@ -56,22 +49,10 @@ public class SchedulerServiceDatabaseImplTest {
    */
   @Before
   public void setUp() throws Exception {
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + System.currentTimeMillis());
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Collect the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
 
     schedulerDatabase = new SchedulerServiceDatabaseImpl();
-    schedulerDatabase.setPersistenceProvider(new PersistenceProvider());
-    schedulerDatabase.setPersistenceProperties(props);
     dcService = new DublinCoreCatalogService();
+    schedulerDatabase.setEntityManagerFactory(mkTestEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT));
     schedulerDatabase.setDublinCoreService(dcService);
     schedulerDatabase.activate(null);
   }
@@ -124,15 +105,6 @@ public class SchedulerServiceDatabaseImplTest {
       fail("Should fail with not found exception");
     } catch (NotFoundException e) {
     }
-  }
-
-  /**
-   * @throws java.lang.Exception
-   */
-  @After
-  public void tearDown() throws Exception {
-    schedulerDatabase.deactivate(null);
-    pooledDataSource.close();
   }
 
 }

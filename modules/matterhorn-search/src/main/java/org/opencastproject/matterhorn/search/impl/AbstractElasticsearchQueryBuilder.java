@@ -27,7 +27,7 @@ import static org.opencastproject.matterhorn.search.impl.IndexSchema.TEXT_FUZZY;
 import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.util.DateTimeSupport;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.common.bytes.BytesReference;
