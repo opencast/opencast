@@ -63,12 +63,6 @@ public class UploadProgressListener implements ProgressListener {
     if ((rec == 0L) || // persist job on upload start
             (rec - lastSaved >= SAVE_INTERVAL) || // after X Kb
             (rec == total)) { // on upload complete
-      // logger.info("trying to save Progress object - total: " + job.getBytesTotal() + " rec: " +
-      // job.getBytesReceived());
-      /*
-       * EntityManager em = emf.createEntityManager(); try { em.persist(job); } catch (Exception e) {
-       * logger.info(e.getMessage()); } finally { em.close(); }
-       */
       lastSaved = rec;
     }
   }
