@@ -42,11 +42,14 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 @Ignore
 public class BlacklistsEndpointTest {
+  private static final Logger logger = LoggerFactory.getLogger(BlacklistsEndpointTest.class);
   private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestBlacklistEndpoint.class,
           NotFoundExceptionMapper.class);
 
@@ -334,7 +337,7 @@ public class BlacklistsEndpointTest {
             .formParam("type", "person").formParam("blacklistedIds", "[0, 5]").log().all().expect()
             .statusCode(HttpStatus.SC_OK).when().post(rt.host(path)).asString();
 
-    System.out.println(responseString);
+    logger.info(responseString);
 
     JSONObject responseJson = (JSONObject) parser.parse(responseString);
     Assert.assertNotNull(responseJson);

@@ -112,6 +112,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -137,6 +139,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 public class SchedulerServiceImplTest {
+  private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceImplTest.class);
 
   private WorkflowService workflowService;
   private SeriesService seriesService;
@@ -610,7 +613,7 @@ public class SchedulerServiceImplTest {
             properties(tuple("org.opencastproject.workflow.config.archiveOp", "true"),
                     tuple("org.opencastproject.workflow.definition", "full")), tuple(eventId, initalEvent));
     final Properties initalCaProps = schedSvc.getEventCaptureAgentConfiguration(eventId);
-    System.out.println("Added event " + eventId);
+    logger.info("Added event " + eventId);
     checkEvent(eventId, initalCaProps, initialTitle);
     // do single update
     final String updatedTitle1 = "Recording 2";
@@ -638,7 +641,7 @@ public class SchedulerServiceImplTest {
             properties(tuple("org.opencastproject.workflow.config.archiveOp", "true"),
                     tuple("org.opencastproject.workflow.definition", "full")), tuple(eventId, initalEvent));
     final Properties initalCaProps = schedSvc.getEventCaptureAgentConfiguration(eventId);
-    System.out.println("Added event " + eventId);
+    logger.info("Added event " + eventId);
     checkEvent(eventId, initalCaProps, initialTitle);
 
     String mediaPackageId = schedSvc.getMediaPackageId(eventId);
@@ -691,11 +694,11 @@ public class SchedulerServiceImplTest {
                       tuple("org.opencastproject.workflow.definition", "full")), tuple(eventId, initalEvent));
 
     } catch (Exception e) {
-      System.out.println("Exception " + e.getClass().getCanonicalName() + " message " + e.getMessage());
+      logger.info("Exception " + e.getClass().getCanonicalName() + " message " + e.getMessage());
     }
 
     final Properties initalCaProps = schedSvc.getEventCaptureAgentConfiguration(eventId);
-    System.out.println("Added event " + eventId);
+    logger.info("Added event " + eventId);
     checkEvent(eventId, initalCaProps, initialTitle);
 
     // test single update
@@ -708,7 +711,7 @@ public class SchedulerServiceImplTest {
 
       Assert.fail("Schedule should not update a recording that has ended (single)");
     } catch (SchedulerException e) {
-      System.out.println("Expected exception: " + e.getMessage());
+      logger.info("Expected exception: " + e.getMessage());
     }
 
     try { // test bulk update
@@ -721,7 +724,7 @@ public class SchedulerServiceImplTest {
 
       Assert.fail("Schedule should not update a recording that has ended (multi)");
     } catch (SchedulerException e) {
-      System.out.println("Expected exception: " + e.getMessage());
+      logger.info("Expected exception: " + e.getMessage());
     } finally {
       schedSvc2 = null;
     }
@@ -819,7 +822,7 @@ public class SchedulerServiceImplTest {
         schedulerServiceImpl.updateBlacklistStatus(mediaPackageId, blacklisted);
         optedOutEvents.add(eventId);
       } catch (Exception e) {
-        System.out.println("Exception " + e.getClass().getCanonicalName() + " message " + e.getMessage());
+        logger.info("Exception " + e.getClass().getCanonicalName() + " message " + e.getMessage());
       }
     }
     return optedOutEvents;

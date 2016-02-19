@@ -36,6 +36,8 @@ import org.opencastproject.feed.api.Person;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -44,6 +46,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 public class FeedImplTest {
+    private static final Logger logger = LoggerFactory.getLogger(FeedImplTest.class);
 
     private static FeedImpl instance;
 
@@ -104,7 +107,7 @@ public class FeedImplTest {
     @Test
     public void setterGetterTest() {
         instance.setTitle("text");
-        System.out.println(instance.getTitle().getValue());
+        logger.info(instance.getTitle().getValue());
         Assert.assertEquals(instance.getTitle().getValue(), "text");
 
         instance.setLink("http://localhost:8080/feeds/rss/2.0/test");

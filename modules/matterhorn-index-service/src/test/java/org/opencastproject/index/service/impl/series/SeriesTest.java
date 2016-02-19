@@ -36,6 +36,8 @@ import org.json.simple.parser.ParseException;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,6 +48,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 
 public class SeriesTest {
+  private static final Logger logger = LoggerFactory.getLogger(SeriesTest.class);
   private static final String ACCESS_POLICY_KEY = "access_policy";
   private static final String CONTRIBUTORS_JSON_KEY = "contributors";
   private static final String CONTRIBUTOR_JSON_KEY = "contributor";
@@ -155,7 +158,7 @@ public class SeriesTest {
     series.setOrganizers(organizers);
     series.setContributors(contributors);
     series.setOptOut(optOut);
-    System.out.println(series.toJSON());
+    logger.info(series.toJSON());
 
     // Check that generated JSON has proper values
     JSONObject parse = (JSONObject) new JSONParser().parse(series.toJSON());
