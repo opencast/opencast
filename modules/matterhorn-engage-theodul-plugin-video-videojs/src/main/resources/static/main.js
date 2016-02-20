@@ -194,6 +194,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     var class_vjs_control = 'vjs-control';
     var class_vjs_control_text = 'vjs-control-text';
     var class_vjs_mute_control = 'vjs-mute-control';
+    var class_vjs_remaining_time = 'vjs-remaining-time';
     var class_audio_wrapper = 'audio_wrapper';
     var class_audioDisplay = 'audioDisplay';
     var class_audioDisplayError = 'audioDisplayError';
@@ -583,36 +584,33 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     }
 
     // TODO: this is just a temporary solution until the embed player has been designed and implemented
-    function appendEmbedPlayer_switchPlayers() {
-        $('.' + class_vjs_mute_control).after("<div id=\"" + id_btn_switchPlayer + "\" class=\"" + class_vjs_switchPlayer + " " + class_vjs_control + " " + class_vjs_menu_button + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"></div>");
+    function appendEmbedPlayer_switchPlayers(videoDisplays) {
+        $('.' + class_vjs_remaining_time).after("<div id=\"" + id_btn_switchPlayer + "\" class=\"" + class_vjs_switchPlayer + " vjs-menu-button vjs-menu-button-popup vjs-control vjs-button\" tabindex=\"0\" role=\"menuitem\" aria-live=\"polite\" aria-expanded=\"false\" aria-haspopup=\"true\">");
+
+        var uls = '';
+        for (var i = 0; i < videoDisplays.length; ++i) {
+            uls += "<li id=\"btn-video" + (i + 1) + "\" class=\"vjs-menu-item " + class_vjs_menu_item + " " + class_btn_video + "\" tabindex=\"-1\" role=\"menuitem\" aria-live=\"polite\">" + translate("video", "Video") + " " + (i + 1) + "</li>";
+        }
+
         $("#" + id_btn_switchPlayer).append(
-            "<div class=\"vjs-control-content\">" +
-            "<span class=\"" + class_vjs_control_text + "\">" + translate("switchPlayer", "Switch player") + "</span>" +
-            "</div>" +
-            "<div id=\"" + id_switchPlayer_value + "\" class=\"" + class_vjs_switchPlayer_value + "\">" +
-            "Vid. 1" +
-            "</div>" +
-            "<div class=\"" + class_vjs_menu + "\">" +
-            "<ul class=\"" + class_vjs_menu_content + "\">" +
-            "<li id=\"" + id_btn_video1 + "\" aria-selected=\"true\" tabindex=\"0\" aria-live=\"polite\" role=\"button\" class=\"" + class_vjs_menu_item + " " + class_btn_video + "\">" + translate("video", "Video") + " 1</li>" +
-            "<li id=\"" + id_btn_video2 + "\" aria-selected=\"false\" tabindex=\"0\" aria-live=\"polite\" role=\"button\" class=\"" + class_vjs_menu_item + " " + class_btn_video + "\">" + translate("video", "Video") + " 2</li>" +
+            "<div class=\"vjs-menu\" role=\"presentation\">" +
+            "<ul class=\"" + class_vjs_menu_content + "\" role=\"menu\">" +
+            uls +
             "</ul>" +
-            "</div>"
+            "</div>" +
+            "<span class=\"" + class_vjs_control_text + "\">" + translate("switchPlayer", "Switch player") + "</span>" +
+            "<div id=\"" + id_switchPlayer_value + "\" class=\"" + class_vjs_switchPlayer_value + "\">" + "Vid. 1" + "</div>"
         );
-        $('#' + id_btn_video1).click(function() {
-            $('#' + id_switchPlayer_value).html(translate('video_short', 'Vid.') + ' 1');
-            if (currentlySelectedVideodisplay !== 0) {
-                currentlySelectedVideodisplay = 0;
-                videojs(globalVideoSource[0].id).src(globalVideoSource[0].src);
-            }
-        });
-        $('#' + id_btn_video2).click(function() {
-            $('#' + id_switchPlayer_value).html(translate('video_short', 'Vid.') + ' 2');
-            if (currentlySelectedVideodisplay !== 1) {
-                currentlySelectedVideodisplay = 1;
-                videojs(globalVideoSource[1].id).src(globalVideoSource[1].src);
-            }
-        });
+
+        for (var j = 0; j < videoDisplays.length; ++j) {
+            $('#btn-video' + (j + 1)).click(function(k) {
+                return function() {
+                    $('#' + id_switchPlayer_value).html(translate('video_short', 'Vid.') + ' ' + (k + 1));
+                    currentlySelectedVideodisplay = k;
+                    videojs(globalVideoSource[0].id).src(globalVideoSource[k].src);
+                };
+            }(j));
+        }
     }
 
     // TODO: this is just a temporary solution until the mobile player has been designed and implemented
@@ -683,7 +681,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         }
 
         if ((videoDisplays.length > 1) && (globalVideoSource.length > 1)) {
-            appendEmbedPlayer_switchPlayers();
+            appendEmbedPlayer_switchPlayers(videoDisplays);
         }
         appendEmbedPlayer_openInPlayer();
 
