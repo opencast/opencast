@@ -43,6 +43,8 @@ import org.opencastproject.manager.api.PluginManagerConstants;
 import org.opencastproject.manager.core.MetadataDocumentHandler;
 import org.opencastproject.manager.system.workflow.utils.JSONWorkflowBuilder;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.apache.commons.io.FileUtils;
 
@@ -52,6 +54,7 @@ import org.apache.commons.io.FileUtils;
  * @author Leonid Oldenburger
  */
 public class WorkflowManager {
+  private static final Logger logger = LoggerFactory.getLogger(WorkflowManager.class);
 
   /**
    * The bundle context
@@ -172,9 +175,9 @@ public class WorkflowManager {
              inputStream.close();
              outputStream.close();
      } catch (FileNotFoundException e) {
-       System.err.println("FileStreamsTest: " + e);
+       logger.warn("FileStreamsTest: " + e);
      } catch (IOException e) {
-       System.err.println("FileStreamsTest: " + e);
+       logger.warn("FileStreamsTest: " + e);
      }
 
         if (counter == 0) {

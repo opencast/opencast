@@ -39,9 +39,11 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StaticResourceClassloaderTest {
-
+    private static final Logger logger = LoggerFactory.getLogger(StaticResourceClassloaderTest.class);
     private final String overrideDirName = "theodul.override.test";
     private final String resourceFilename = "test.resource";
     private final String genuineResourceName = "other.resource";
@@ -63,7 +65,7 @@ public class StaticResourceClassloaderTest {
             overrideResource = new File(tempPath + File.separator + overrideDirName + File.separator + resourceFilename);
             overrideDir = overrideResource.getParentFile();
             overrideDir.mkdir();
-            System.out.println("Creating " + overrideResource.getAbsolutePath());
+            logger.info("Creating " + overrideResource.getAbsolutePath());
             if (overrideResource.createNewFile()) {
                 // write something to ensure file existence
                 PrintWriter writer = new PrintWriter(overrideResource);

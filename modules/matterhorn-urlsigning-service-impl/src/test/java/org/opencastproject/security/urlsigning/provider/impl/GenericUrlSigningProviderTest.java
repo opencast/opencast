@@ -31,10 +31,13 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import org.osgi.service.cm.ConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
 public class GenericUrlSigningProviderTest {
+  private static final Logger logger = LoggerFactory.getLogger(GenericUrlSigningProviderTest.class);
   private static final String RTMP_MATCHER = "rtmp";
   private static final String KEY = "0123456789abcdef";
   private static final String KEY_ID = "theId";
@@ -106,21 +109,21 @@ public class GenericUrlSigningProviderTest {
     // Handles a policy without query parameters.
     Policy withoutQuery = Policy.mkSimplePolicy(RESOURCE_PATH, before);
     String result = signer.sign(withoutQuery);
-    System.out.println(result);
+    logger.info(result);
     assertEquals(
             "http://www.entwinemedia.com/path/to/resource.mp4?policy=eyJTdGF0ZW1lbnQiOnsiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6MTU4MzAyMzU3NzAwMH0sIlJlc291cmNlIjoiaHR0cDpcL1wvd3d3LmVudHdpbmVtZWRpYS5jb21cL3BhdGhcL3RvXC9yZXNvdXJjZS5tcDQifX0&keyId=theId&signature=a20e1e5891266c9c2f25da99930a821808725971e5dd2ab386e4482de743ecb9",
             result);
     // Handles a policy with additional query parameters.
     Policy withQuery = Policy.mkSimplePolicy("http://www.entwinemedia.com/path/to/resource.mp4?queryparam=this", before);
     result = signer.sign(withQuery);
-    System.out.println(result);
+    logger.info(result);
     assertEquals(
             "http://www.entwinemedia.com/path/to/resource.mp4?queryparam=this&policy=eyJTdGF0ZW1lbnQiOnsiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6MTU4MzAyMzU3NzAwMH0sIlJlc291cmNlIjoiaHR0cDpcL1wvd3d3LmVudHdpbmVtZWRpYS5jb21cL3BhdGhcL3RvXC9yZXNvdXJjZS5tcDQ_cXVlcnlwYXJhbT10aGlzIn19&keyId=theId&signature=e20bdc3c82f167c3b71f71d05d224bc6307ddb9a4ead8e04428e7c60f2959f8e",
             result);
     // Handles rtmp protocol
     Policy withRtmp = Policy.mkSimplePolicy("rtmp://www.entwinemedia.com/path/to/resource.mp4", before);
     result = signer.sign(withRtmp);
-    System.out.println(result);
+    logger.info(result);
     assertEquals(
             "rtmp://www.entwinemedia.com/path/to/resource.mp4?policy=eyJTdGF0ZW1lbnQiOnsiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6MTU4MzAyMzU3NzAwMH0sIlJlc291cmNlIjoicnRtcDpcL1wvd3d3LmVudHdpbmVtZWRpYS5jb21cL3BhdGhcL3RvXC9yZXNvdXJjZS5tcDQifX0&keyId=theId&signature=773bb6c0170a5faba3a1c3bb49a75ad0ce66a6748fc19afdb037d11de654dec5",
             result);
