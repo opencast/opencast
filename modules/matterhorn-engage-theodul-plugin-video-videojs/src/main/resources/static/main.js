@@ -613,6 +613,24 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         }
     }
 
+    // TODO: this is just a temporary solution until the embed player has been designed and implemented
+    function appendEmbedPlayer_openInPlayer() {
+        $('.' + class_vjs_remaining_time).after("<button id=\"" + id_btn_openInPlayer + "\" class=\"" + class_vjs_openInPlayer + " vjs-control vjs-button\" type=\"button\" aria-live=\"polite\"></button>");
+        $('.' + class_vjs_openInPlayer).append("<span class=\"" + class_vjs_control_text + " vjs-control-text\">" + translate("openInPlayer", "Open in player") + "</span>");
+
+        $('#' + id_btn_openInPlayer).click(function(e) {
+            e.preventDefault();
+            var str = window.location.href;
+            if (str.indexOf('mode=embed') == -1) {
+                str += '&mode=embed';
+            } else {
+                str = Utils.replaceAll(str, 'mode=embed', 'mode=desktop');
+            }
+            Engage.trigger(plugin.events.pause.getName(), false);
+            window.open(str, '_blank');
+        });
+    }
+
     // TODO: this is just a temporary solution until the mobile player has been designed and implemented
     function appendMobilePlayer_switchPlayers() {
         $('#' + id_switchPlayers).html(
@@ -642,24 +660,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
                 currentlySelectedVideodisplay = 1;
                 videojs(globalVideoSource[1].id).src(globalVideoSource[1].src);
             }
-        });
-    }
-
-    // TODO: this is just a temporary solution until the embed player has been designed and implemented
-    function appendEmbedPlayer_openInPlayer() {
-        $('.' + class_vjs_mute_control).after("<div id=\"" + id_btn_openInPlayer + "\" class=\"" + class_vjs_openInPlayer + " " + class_vjs_control + "\" role=\"button\" aria-live=\"polite\" tabindex=\"0\"><div><span class=\"" + class_vjs_control_text + "\">" + translate("openInPlayer", "Open in player") + "</span></div></div>");
-        $('.' + class_audio_wrapper).append("<a id=\"" + id_btn_openInPlayer + "\" href=\"#\">" + translate("openInPlayer", "Open in player") + "</a>");
-
-        $('#' + id_btn_openInPlayer).click(function(e) {
-            e.preventDefault();
-            var str = window.location.href;
-            if (str.indexOf('mode=embed') == -1) {
-                str += '&mode=embed';
-            } else {
-                str = Utils.replaceAll(str, 'mode=embed', 'mode=desktop');
-            }
-            Engage.trigger(plugin.events.pause.getName(), false);
-            window.open(str, '_blank');
         });
     }
 
