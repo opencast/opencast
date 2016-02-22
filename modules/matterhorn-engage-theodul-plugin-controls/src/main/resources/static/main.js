@@ -96,8 +96,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         // events for mobile view
         switchVideo: new Engage.Event("Video:switch", "switch the video", "trigger"),
         showControls: new Engage.Event("Controls:show", "show the controls", "both"),
-        hideControls: new Engage.Event("Controls:hide", "hide the controls", "both"),
-        changeSelectedVideo: new Engage.Event("Video:c", "hide the controls", "handler")
+        hideControls: new Engage.Event("Controls:hide", "hide the controls", "both")
     };
 
     var isDesktopMode = false;
@@ -1105,11 +1104,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         switch(ev.type) {
             case 'swipeleft':
                 switchVideoByDirection(1);
+                Engage.log("Switch video by swipeleft");
                 $("#" + id_gestureContainer).data("hammer").stop();
             break;
 
             case 'swiperight':
                 switchVideoByDirection(-1);
+                Engage.log("Switch video by swiperight");
                 $("#" + id_gestureContainer).data("hammer").stop();
             break;
 
@@ -1145,6 +1146,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 if ((Math.abs(ev.gesture.deltaX) > $("#" + id_gestureContainer).width()/2) &&
                     (ev.gesture.offsetDirection === Hammer.DIRECTION_RIGHT || ev.gesture.offsetDirection === Hammer.DIRECTION_LEFT)) {
                     // if video was not switched, transform back to old screen
+                    Engage.log("Switch video by pan");
                     if (!switchVideoByDirection(ev.gesture.offsetDirection === Hammer.DIRECTION_RIGHT ? -1 : 1))
                         transformToVideo(currentDisplay);
                 }

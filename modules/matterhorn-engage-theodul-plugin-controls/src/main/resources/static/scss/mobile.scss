@@ -9,6 +9,7 @@
 @import "compass/css3/text-shadow";
 @import "compass/css3/flexbox";
 @import "compass/css3/transition";
+@import "compass/css3/transform";
 @import "compass/css3/border-radius";
 @import "compass/css3/box-shadow";
 
@@ -61,7 +62,7 @@
 		line-height: 1;
 		color: #333;
 		cursor: pointer;
-		margin: -50px 0 0 -50px;
+		@include transform(translate(-50%,-50%));
 
 		background: rgba(#fff, 0.7);
 		padding: 10px 10px 0 10px;
