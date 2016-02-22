@@ -35,11 +35,14 @@ import org.opencastproject.security.api.Organization;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Map;
 
 public class ListProvidersScannerTest {
-
+  private static final Logger logger = LoggerFactory.getLogger(ListProvidersScannerTest.class);
   @Test
   public void testCanHandle() {
     File wrongDirectory = new File("wrong");
@@ -176,7 +179,10 @@ public class ListProvidersScannerTest {
 
     assertEquals(1, resourceListProvider.getValues().size());
     assertEquals(listName, resourceListProvider.getValue().getListNames()[0]);
-    System.out.println(resourceListProvider.getValue().getList(listName, query, org1));
+    Map<String, Object> stuff = resourceListProvider.getValue().getList(listName, query, org1);
+    for (String key : stuff.keySet()) {
+      logger.info("Key: {}, Value {}.", key, stuff.get(key));
+    }
     assertEquals(3, resourceListProvider.getValue().getList(listName, query, org1).size());
     assertNull(resourceListProvider.getValue().getList(listName, query, org2));
     assertNull(resourceListProvider.getValue().getList(listName, query, null));

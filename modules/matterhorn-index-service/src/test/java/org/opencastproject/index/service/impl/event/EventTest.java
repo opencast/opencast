@@ -36,6 +36,8 @@ import org.json.simple.parser.ParseException;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,6 +47,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 
 public class EventTest {
+  private static final Logger logger = LoggerFactory.getLogger(EventTest.class);
 
   private static final String LOCATION_JSON_KEY = "location";
   private static final String DESCRIPTION_JSON_KEY = "description";
@@ -134,7 +137,7 @@ public class EventTest {
     event.setLocation(location);
     event.setPresenters(presenters);
     event.setContributors(contributors);
-    System.out.println(event.toJSON());
+    logger.info(event.toJSON());
     JSONObject parse = (JSONObject) new JSONParser().parse(event.toJSON());
     if (parse.get(EVENT_JSON_KEY) == null || !(parse.get(EVENT_JSON_KEY) instanceof JSONObject)) {
       fail("There must be an event object returned.");
