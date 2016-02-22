@@ -41,6 +41,7 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.FileSupport;
 
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
@@ -146,6 +147,9 @@ public class DistributionMigrationServiceTest {
     Files.createDirectory(rootPath);
 
     Path file = new File(path(rootPath.toString(), "engage-player", "12345", "67890", "mediapackage.xml")).toPath();
+    Path expectedFile = new File(
+            path(rootPath.toString(), "mh_default_org", "engage-player", "12345", "67890", "mediapackage.xml"))
+                    .toPath();
     FileSupport.copy(mp, file.toFile());
 
     BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
@@ -162,7 +166,13 @@ public class DistributionMigrationServiceTest {
 
     EasyMock.replay(bundleContext, cc);
 
+    Assert.assertTrue(Files.exists(file));
+    Assert.assertFalse(Files.exists(expectedFile));
+
     distributionMigrationService.activate(cc);
+
+    Assert.assertFalse(Files.exists(file));
+    Assert.assertTrue(Files.exists(expectedFile));
   }
 
 }
