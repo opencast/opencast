@@ -484,9 +484,12 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     String orgId = securityService.getOrganization().getId();
     final Path rootPath = new File(path(locations.get().getBaseDir(), orgId)).toPath();
 
+    // Check if root path exists, if not you're file system has not been migrated to the new distribution service yet
+    // and does not support this function
     if (!Files.exists(rootPath))
       return source;
 
+    // Find matching mediapackage directories
     List<Path> mediaPackageDirectories = new ArrayList<>();
     try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(rootPath)) {
       for (Path path : directoryStream) {
@@ -504,33 +507,44 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
     final File[] result = new File[1];
     for (Path p : mediaPackageDirectories) {
+      // Walk through found mediapackage directories to find duplicated element
       Files.walkFileTree(p, new SimpleFileVisitor<Path>() {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+          // Walk through files only
           if (Files.isDirectory(file))
             return FileVisitResult.CONTINUE;
 
+          // Check for same file size
           if (size != attrs.size())
             return FileVisitResult.CONTINUE;
 
+          // If size less than 4096 bytes use readAllBytes method which performs better
           if (size < 4096) {
             if (!Arrays.equals(Files.readAllBytes(source.toPath()), Files.readAllBytes(file)))
               return FileVisitResult.CONTINUE;
 
           } else {
+            // Otherwise compare file input stream
             try (InputStream is1 = Files.newInputStream(source.toPath());
                     InputStream is2 = Files.newInputStream(file)) {
               if (!IOUtils.contentEquals(is1, is2))
                 return FileVisitResult.CONTINUE;
             }
           }
+
+          // File is equal, store file and terminate file walking
           result[0] = file.toFile();
           return FileVisitResult.TERMINATE;
         }
       });
+
+      // A duplicate has already been found, no further file walking is needed
       if (result[0] != null)
         break;
     }
+
+    // Return found duplicate otherwise source
     if (result[0] != null)
       return result[0];
 
@@ -546,7 +560,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   }
 
   public static class Locations {
-    private final String baseUri;
+    private final URI baseUri;
     private final String baseDir;
 
     /** Compatibility mode for nginx and maybe other streaming servers */
@@ -563,7 +577,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       try {
         final String ensureSlash = baseUri.getSchemeSpecificPart().endsWith("/") ? baseUri.getSchemeSpecificPart()
                 : baseUri.getSchemeSpecificPart() + "/";
-        this.baseUri = new URI(baseUri.getScheme(), ensureSlash, null).toString();
+        this.baseUri = new URI(baseUri.getScheme(), ensureSlash, null);
         this.baseDir = baseDir.getAbsolutePath();
       } catch (URISyntaxException e) {
         throw new RuntimeException(e);
@@ -571,7 +585,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     }
 
     public String getBaseUri() {
-      return baseUri;
+      return baseUri.toString();
     }
 
     public String getBaseDir() {
@@ -579,12 +593,12 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     }
 
     public boolean isDistributionUrl(URI mpeUrl) {
-      return mpeUrl.toString().startsWith(baseUri);
+      return mpeUrl.toString().startsWith(getBaseUri());
     }
 
     public Option<URI> dropBase(URI mpeUrl) {
       if (isDistributionUrl(mpeUrl)) {
-        return some(URI.create(mpeUrl.toString().substring(baseUri.length())));
+        return some(baseUri.relativize(mpeUrl));
       } else {
         return none();
       }
@@ -689,7 +703,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
         if (flvCompatibilityMode && "flv:".equals(tag))
           tag = "";
 
-        return URI.create(concat(baseUri, tag + orgId, channelId, mpId, mpeId, fileName));
+        return URI.create(concat(getBaseUri(), tag + orgId, channelId, mpId, mpeId, fileName));
       } else {
         return mpeUri;
       }

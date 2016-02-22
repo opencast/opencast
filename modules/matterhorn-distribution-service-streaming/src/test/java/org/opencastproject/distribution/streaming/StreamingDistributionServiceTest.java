@@ -22,6 +22,7 @@ package org.opencastproject.distribution.streaming;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.opencastproject.util.UrlSupport.concat;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
@@ -58,10 +59,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.net.URI;
 
-/**
- * Created with IntelliJ IDEA. User: ced Date: 23.09.13 Time: 17:11 To change this template use File | Settings | File
- * Templates.
- */
 public class StreamingDistributionServiceTest {
 
   private static final Logger logger = LoggerFactory.getLogger(StreamingDistributionServiceTest.class);
@@ -142,8 +139,8 @@ public class StreamingDistributionServiceTest {
     final String channelId = "engage-player";
     final String mpId = "9f411edb-edf5-4308-8df5-f9b111d9d346";
     final String mpeId = "bed1cdba-2d42-49b1-b78f-6c6745fb064a";
-    final URI mpeUri = URI.create(
-            "http://localhost:8080/files/mediapackage/9f411edb-edf5-4308-8df5-f9b111d9d346/bed1cdba-2d42-49b1-b78f-6c6745fb064a/hans_arp_1m10s.flv");
+    final URI mpeUri = URI
+            .create(concat("http://localhost:8080/files/mediapackage/", mpId, mpeId, "hans_arp_1m10s.flv"));
     //
     final URI distUri = loc.createDistributionUri(defaultOrganization.getId(), channelId, mpId, mpeId, mpeUri);
     logger.info(distUri.toString());
@@ -164,7 +161,7 @@ public class StreamingDistributionServiceTest {
     final String mpId = "9f411edb-edf5-4308-8df5-f9b111d9d346";
     final String mpeId = "bed1cdba-2d42-49b1-b78f-6c6745fb064a";
     final URI mpeUri = URI.create(
-            "rtmp://localhost/matterhorn-engage/mh_default_org/engage-player/9f411edb-edf5-4308-8df5-f9b111d9d346/bed1cdba-2d42-49b1-b78f-6c6745fb064a/Hans_Arp_1m10s");
+            concat("rtmp://localhost/matterhorn-engage/mh_default_org/", channelId, mpId, mpeId, "Hans_Arp_1m10s"));
     //
     final URI distUri = loc.createDistributionUri(defaultOrganization.getId(), channelId, mpId, mpeId, mpeUri);
     logger.info(distUri.toString());
@@ -184,8 +181,8 @@ public class StreamingDistributionServiceTest {
     final String channelId = "engage-player";
     final String mpId = "9f411edb-edf5-4308-8df5-f9b111d9d346";
     final String mpeId = "bed1cdba-2d42-49b1-b78f-6c6745fb064a";
-    final URI mpeUri = URI.create(
-            "http://localhost:8080/files/mediapackage/9f411edb-edf5-4308-8df5-f9b111d9d346/bed1cdba-2d42-49b1-b78f-6c6745fb064a/hans_arp_1m10s.mp4");
+    final URI mpeUri = URI
+            .create(concat("http://localhost:8080/files/mediapackage/", mpId, mpeId, "hans_arp_1m10s.mp4"));
     //
     final URI distUri = loc.createDistributionUri(defaultOrganization.getId(), channelId, mpId, mpeId, mpeUri);
     logger.info(distUri.toString());
@@ -206,7 +203,7 @@ public class StreamingDistributionServiceTest {
     final String mpId = "9f411edb-edf5-4308-8df5-f9b111d9d346";
     final String mpeId = "bed1cdba-2d42-49b1-b78f-6c6745fb064a";
     final URI mpeUri = URI.create(
-            "rtmp://localhost/matterhorn-engage/mp4:mh_default_org/engage-player/9f411edb-edf5-4308-8df5-f9b111d9d346/bd4d5a48-41a8-4362-93dc-be41aaae77f8/Hans_Arp_1m10s");
+            concat("rtmp://localhost/matterhorn-engage/mp4:mh_default_org/", channelId, mpId, mpeId, "Hans_Arp_1m10s"));
     //
     final URI distUri = loc.createDistributionUri(defaultOrganization.getId(), channelId, mpId, mpeId, mpeUri);
     logger.info(distUri.toString());
@@ -225,8 +222,11 @@ public class StreamingDistributionServiceTest {
             URI.create("rtmp://localhost/matterhorn-engage"), new File(System.getProperty("java.io.tmpdir")), false);
     final StreamingDistributionService.Locations loc2 = new StreamingDistributionService.Locations(
             URI.create("rtmp://localhost/matterhorn-engage/"), new File(System.getProperty("java.io.tmpdir")), false);
+    final String channelId = "engage-player";
+    final String mpId = "9f411edb-edf5-4308-8df5-f9b111d9d346";
+    final String mpeId = "bed1cdba-2d42-49b1-b78f-6c6745fb064a";
     final URI distUri = URI.create(
-            "rtmp://localhost/matterhorn-engage/mp4:mh_default_org/engage-player/9f411edb-edf5-4308-8df5-f9b111d9d346/bd4d5a48-41a8-4362-93dc-be41aaae77f8/Hans_Arp_1m10s");
+            concat("rtmp://localhost/matterhorn-engage/mp4:mh_default_org/", channelId, mpId, mpeId, "Hans_Arp_1m10s"));
     //
     final Option<File> retrievedFile1 = loc1.getDistributionFileFrom(distUri);
     final Option<File> retrievedFile2 = loc2.getDistributionFileFrom(distUri);
