@@ -470,7 +470,7 @@ public class IngestServiceImplTest {
    */
   @Test
   public void testVarySeriesOverwriteConfiguration() throws Exception {
-    Boolean isOverwriteSeries;
+    boolean isOverwriteSeries;
     Dictionary<String, String> properties = new Hashtable<String, String>();
 
     // Test with no properties
@@ -497,12 +497,12 @@ public class IngestServiceImplTest {
   private void testSeriesUpdateNewAndExisting(Dictionary<String, String> properties) throws Exception {
 
     // default expectation for series overwrite is True
-    Boolean isExpectSeriesOverwrite = true;
+    boolean isExpectSeriesOverwrite = true;
 
     if (properties != null) {
       service.updated(properties);
       try {
-        Boolean testForValue = Boolean.valueOf(((String) properties.get(IngestServiceImpl.PROPKEY_OVERWRITE_SERIES))
+        boolean testForValue = Boolean.parseBoolean(((String) properties.get(IngestServiceImpl.PROPKEY_OVERWRITE_SERIES))
                 .trim());
         isExpectSeriesOverwrite = testForValue;
       } catch (Exception e) {
@@ -534,7 +534,7 @@ public class IngestServiceImplTest {
 
     // This is true or false depending on the isOverwrite value
     Assert.assertEquals("Desire to update series is " + String.valueOf(isExpectSeriesOverwrite) + ".",
-            isExpectSeriesOverwrite.booleanValue(),
+            isExpectSeriesOverwrite,
             service.updateSeries(urlCatalog2));
 
     // Test with mock not found exception
