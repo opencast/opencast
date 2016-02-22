@@ -718,7 +718,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               Arrays.asList(uri.toString(), flavor == null ? null : flavor.toString(),
                       MediaPackageParser.getAsXml(mediaPackage)), null, false);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding partial track {} from URL {} on mediapackage {}", new Object[] { elementId, uri,
               mediaPackage });
@@ -758,7 +758,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_TRACK, null, null, false);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding partial track {} from input stream on mediapackage {}", new Object[] { elementId,
               mediaPackage });
