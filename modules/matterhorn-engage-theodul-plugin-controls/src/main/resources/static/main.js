@@ -84,7 +84,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         mediaPackageModelError: new Engage.Event("MhConnection:mediaPackageModelError", "", "handler"),
         aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "handler"),
         isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "handler"),
-        videoFormatsFound: new Engage.Event("Video:videoFormatsFound", "", "handler"),
+        videoFormatsFound: new Engage.Event("Video:videoFormatsFound", "", "both"),
         numberOfVideodisplaysSet: new Engage.Event("Video:numberOfVideodisplaysSet", "the number of videodisplays has been set", "trigger"),
         focusVideo: new Engage.Event("Video:focusVideo", "increases the size of one video", "handler"),
         resetLayout: new Engage.Event("Video:resetLayout", "resets the layout of the videodisplays", "handler"),
@@ -519,25 +519,26 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                         calculateEmbedAspectRatios();
                         addEmbedRatioEvents();
                     }
-                    if (tempVars.hasqualities) {
-                        addQualityChangeEvents();
-                    }
+                }
+                if (!isMobileMode) {
                     if (tempVars.hasmultiplevideos) {
                         addLayoutEvents();
                     }
-                    ready();
-                    playPause();
-                    timeUpdate();
+                }
 
-                    // init dropdown menus
-                    $("." + class_dropdown).dropdown();
+                if (tempVars.hasqualities) {
+                    addQualityChangeEvents();
                 }
 
                 // query ready state of video, in case the ready event from
                 // the video plugin was fired before the controls plugin was initialized
                 Engage.trigger(plugin.events.ready.getName(), true);
 
+                // init dropdown menus
+                $("." + class_dropdown).dropdown();
+                
                 ready();
+                playPause();
                 timeUpdate();
                 addNonFlashEvents();
                 checkLoginStatus();
@@ -1177,7 +1178,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             controlsView = new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
             
             Engage.on(plugin.events.videoFormatsFound.getName(), function(formatarr) {
-                if (formatarr) {
+                if (Array.isArray(formatarr)) {
                     resolutions = formatarr;
                     if (controlsViewTopIfBottom) {
                         controlsViewTopIfBottom.render();
@@ -1188,6 +1189,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     addQualityChangeEvents();
                 }
             });
+
+            if (isMobileMode) {
+                // retrigger the event in case the videoFormatsFound event from the video plugin
+                // was fired before the controls plugin was initialized
+                // to make sure the quality dropdown menu is shown
+                Engage.trigger(plugin.events.videoFormatsFound.getName(), true);
+            }
 
             Engage.on(plugin.events.numberOfVideodisplaysSet.getName(), function(number) {
                 numberVideos = number;

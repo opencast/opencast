@@ -1,12 +1,12 @@
 <!-- theodul controls plugin mobile mode -->
 <% if((typeof hasmultiplevideos !== "undefined")
-   && (typeof plugin_path !== "undefined")
-   && (typeof str_playPauseVideo !== "undefined")
-   && (typeof str_playVideo !== "undefined")
-   && (typeof str_pauseVideo !== "undefined")
-   && (typeof str_volumeSlider !== "undefined")
-   && (typeof str_showVolumeBar !== "undefined")
-   && (typeof str_fullscreen !== "undefined")) { %>
+	&& (typeof plugin_path !== "undefined")
+	&& (typeof str_playPauseVideo !== "undefined")
+	&& (typeof str_playVideo !== "undefined")
+	&& (typeof str_pauseVideo !== "undefined")
+	&& (typeof str_volumeSlider !== "undefined")
+	&& (typeof str_showVolumeBar !== "undefined")
+	&& (typeof str_fullscreen !== "undefined")) { %>
 
 <% if(hasmultiplevideos) { %>
 <div id="switchPlayers">
@@ -45,17 +45,40 @@
         <p id="navigation_time_current" role="timer">00:00:00</p>
         <% } %>
     </div>
+    
+    <div class="btn-group">
+        <button id="volume" class="btn btn-default">
+            <div class="volume_icon" id="volumeIcon">
+                <span class="glyphicon glyphicon-volume-up" aria-hidden="true" aria-label="<%= str_showVolumeBar %>" title="<%= str_showVolumeBar %>"></span>
+            </div>
+            <div id="volumeSlider" role="slider" aria-label="<%= str_volumeSlider %>"></div>
+        </button>
 
-    <div id="volume">
-        <div class="volume_icon" id="volumeIcon">
-            <span class="glyphicon glyphicon-volume-up" aria-hidden="true" aria-label="<%= str_showVolumeBar %>" title="<%= str_showVolumeBar %>"></span>
-        </div>
-        <div id="volumeSlider" role="slider" aria-label="<%= str_volumeSlider %>"></div>
-    </div>
+      <% if((typeof hasqualities !== "undefined") && hasqualities
+      && (typeof str_qualityButton !== "undefined")
+      && (typeof str_quality !== "undefined")
+      && (typeof qualities !== "undefined") 
+      && (typeof translatedqualities !== "undefined")) { %>
+      <div class="btn-group dropup">
+          <button id="dropdownMenuQuality" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_qualityButton %>">
+              <span class="glyphicon glyphicon-cog"></span>
+              <span id="qualityIndicator"><%= str_quality %></span>
+              <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu pull-right" role="menu">
+              <li class="disabled" role="presentation"><a id="qualityDescription" role="menuitem" tabindex="-1" href="#"><b><%= str_quality %></b></a></li>
+              <li class="divider"></li>
+              <% for (var i = 0; i < qualities.length; i++) { %>
+              <li role="presentation"><a id="quality<%= qualities[i] %>" role="menuitem" tabindex="-1" href="#"><b><%= translatedqualities[qualities[i]] %></b></a></li>
+              <% } %>
+          </ul>
+      </div>
+      <% } %>
 
-    <button id="fullscreen_button" type="button" class="btn btn-default disabled" role="button" aria-label="<%= str_fullscreen %>">
-        <span class="glyphicon glyphicon-fullscreen"></span>
-    </button>
+      <button id="fullscreen_button" type="button" class="btn btn-default disabled" role="button" aria-label="<%= str_fullscreen %>">
+          <span class="glyphicon glyphicon-fullscreen"></span>
+      </button>
+  </div>
 
 </div> <!-- end #navigation_wrapper -->
 

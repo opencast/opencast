@@ -65,7 +65,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "both"),
         isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "trigger"),
         audioCodecNotSupported: new Engage.Event("Video:audioCodecNotSupported", "when the audio codec seems not to be supported by the browser", "trigger"),
-        videoFormatsFound: new Engage.Event("Video:videoFormatsFound", "", "trigger"),
+        videoFormatsFound: new Engage.Event("Video:videoFormatsFound", "", "both"),
         playPause: new Engage.Event("Video:playPause", "", "handler"),
         plugin_load_done: new Engage.Event("Core:plugin_load_done", "", "handler"),
         fullscreenEnable: new Engage.Event("Video:fullscreenEnable", "go to fullscreen", "handler"),
@@ -247,7 +247,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var fullscreen = false;
     var mappedResolutions = undefined;
     var videoDisplayClass = "videoDisplay";
-
+    var qualities = null;    
     var videoDefaultLayoutClass = "videoDefaultLayout";
     var videoUnfocusedClass = "videoUnfocusedPiP";
     var videoFocusedClass = "videoFocusedPiP";
@@ -480,10 +480,19 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         $(document).trigger(event_sjs_stopBufferChecker);
     }
 
-    function registerQualityChangeEvent() {
-        Engage.on(plugin.events.qualitySet.getName(), function(q) {
-            changeQuality(q);
-        });
+    function initQualities(videoDataView) {
+        qualities = getQualities(videoDataView.model.get("videoSources"));
+
+        if (qualities.length > 1) {
+            Engage.on(plugin.events.qualitySet.getName(), function(q) {
+                changeQuality(q);
+            });
+            Engage.trigger(plugin.events.videoFormatsFound.getName(), qualities);
+            if (isMobileMode) {
+                Engage.model.set("quality", "low");
+            }
+            changeQuality(Engage.model.get("quality"));
+        }
     }
 
     function registerZoomLevelEvents() {
@@ -947,13 +956,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             initVideojsVideo(videoDisplays[i], value, videoDataView.videojs_swf);
         }
 
-        var qualities = getQualities(videoSources);
-
-        if (qualities.length > 1) {
-            registerQualityChangeEvent();
-            Engage.trigger(plugin.events.videoFormatsFound.getName(), qualities);
-            changeQuality(Engage.model.get("quality"));
-        }
+        initQualities(videoDataView);
 
         if ((aspectRatio != null) && (videoDisplays.length > 0)) {
             Engage.log("Video: Aspect ratio: " + aspectRatio[1] + "x" + aspectRatio[2] + " == " + ((aspectRatio[1] / aspectRatio[2]) * 100));
@@ -1133,6 +1136,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             initVideojsVideo(videoDisplays[i], value, videoDataView.videojs_swf);
             globalVideoSource.push([videoDisplays[i], value]);
         }
+
+        initQualities(videoDataView);
 
         if ((aspectRatio != null) && (videoDisplays.length > 0)) {
             aspectRatio[1] = parseInt(aspectRatio[1]);
@@ -2045,8 +2050,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
             // listen on ready event with query argument
             Engage.on(plugin.events.ready.getName(), function(query) {
-                if (query) {
+                if (query === true) {
                     Engage.trigger(plugin.events.ready.getName());
+                }
+            });
+            // listen on videoFormatsFound event with query argument
+            Engage.on(plugin.events.videoFormatsFound.getName(), function(query) {
+                if (query === true) {
+                    Engage.trigger(plugin.events.videoFormatsFound.getName(), qualities);
                 }
             });
         }
