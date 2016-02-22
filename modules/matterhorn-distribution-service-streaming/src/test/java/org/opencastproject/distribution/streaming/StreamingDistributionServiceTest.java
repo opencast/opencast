@@ -52,6 +52,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URI;
@@ -62,6 +64,7 @@ import java.net.URI;
  */
 public class StreamingDistributionServiceTest {
 
+  private static final Logger logger = LoggerFactory.getLogger(StreamingDistributionServiceTest.class);
   private StreamingDistributionService service = null;
   private MediaPackage mp = null;
   private File distributionRoot = null;
@@ -143,12 +146,12 @@ public class StreamingDistributionServiceTest {
             "http://localhost:8080/files/mediapackage/9f411edb-edf5-4308-8df5-f9b111d9d346/bed1cdba-2d42-49b1-b78f-6c6745fb064a/hans_arp_1m10s.flv");
     //
     final URI distUri = loc.createDistributionUri(defaultOrganization.getId(), channelId, mpId, mpeId, mpeUri);
-    System.out.println(distUri);
+    logger.info(distUri.toString());
     assertTrue("original URI and distribution URI are not equal", !distUri.equals(mpeUri));
     final File distFile = loc.createDistributionFile(defaultOrganization.getId(), channelId, mpId, mpeId, mpeUri);
-    System.out.println(distFile);
+    logger.info(distFile.toString());
     final Option<File> retrievedFile = loc.getDistributionFileFrom(distUri);
-    System.out.println(retrievedFile);
+    logger.info(retrievedFile.toString());
     assertTrue("file could be retrieved from distribution URI", retrievedFile.isSome());
     assertEquals("file retrieved from distribution URI and distribution file match", distFile, retrievedFile.get());
   }
@@ -164,12 +167,12 @@ public class StreamingDistributionServiceTest {
             "rtmp://localhost/matterhorn-engage/mh_default_org/engage-player/9f411edb-edf5-4308-8df5-f9b111d9d346/bed1cdba-2d42-49b1-b78f-6c6745fb064a/Hans_Arp_1m10s");
     //
     final URI distUri = loc.createDistributionUri(defaultOrganization.getId(), channelId, mpId, mpeId, mpeUri);
-    System.out.println(distUri);
+    logger.info(distUri.toString());
     assertEquals("original URI and distribution URI are equal", distUri, mpeUri);
     final File distFile = loc.createDistributionFile(defaultOrganization.getId(), channelId, mpId, mpeId, mpeUri);
-    System.out.println(distFile);
+    logger.info(distFile.toString());
     final Option<File> retrievedFile = loc.getDistributionFileFrom(distUri);
-    System.out.println(retrievedFile);
+    logger.info(retrievedFile.toString());
     assertTrue("file could be retrieved from distribution URI", retrievedFile.isSome());
     assertEquals("file retrieved from distribution URI and distribution file match", distFile, retrievedFile.get());
   }
@@ -185,12 +188,12 @@ public class StreamingDistributionServiceTest {
             "http://localhost:8080/files/mediapackage/9f411edb-edf5-4308-8df5-f9b111d9d346/bed1cdba-2d42-49b1-b78f-6c6745fb064a/hans_arp_1m10s.mp4");
     //
     final URI distUri = loc.createDistributionUri(defaultOrganization.getId(), channelId, mpId, mpeId, mpeUri);
-    System.out.println(distUri);
+    logger.info(distUri.toString());
     assertTrue("original URI and distribution URI are not equal", !distUri.equals(mpeUri));
     final File distFile = loc.createDistributionFile(defaultOrganization.getId(), channelId, mpId, mpeId, mpeUri);
-    System.out.println(distFile);
+    logger.info(distFile.toString());
     final Option<File> retrievedFile = loc.getDistributionFileFrom(distUri);
-    System.out.println(retrievedFile);
+    logger.info(retrievedFile.toString());
     assertTrue("file could be retrieved from distribution URI", retrievedFile.isSome());
     assertEquals("file retrieved from distribution URI and distribution file match", distFile, retrievedFile.get());
   }
@@ -206,12 +209,12 @@ public class StreamingDistributionServiceTest {
             "rtmp://localhost/matterhorn-engage/mp4:mh_default_org/engage-player/9f411edb-edf5-4308-8df5-f9b111d9d346/bd4d5a48-41a8-4362-93dc-be41aaae77f8/Hans_Arp_1m10s");
     //
     final URI distUri = loc.createDistributionUri(defaultOrganization.getId(), channelId, mpId, mpeId, mpeUri);
-    System.out.println(distUri);
+    logger.info(distUri.toString());
     assertEquals("original URI and distribution URI are equal", distUri, mpeUri);
     final File distFile = loc.createDistributionFile(defaultOrganization.getId(), channelId, mpId, mpeId, mpeUri);
-    System.out.println(distFile);
+    logger.info(distFile.toString());
     final Option<File> retrievedFile = loc.getDistributionFileFrom(distUri);
-    System.out.println(retrievedFile);
+    logger.info(retrievedFile.toString());
     assertTrue("file could be retrieved from distribution URI", retrievedFile.isSome());
     assertEquals("file retrieved from distribution URI and distribution file match", distFile, retrievedFile.get());
   }
@@ -237,7 +240,7 @@ public class StreamingDistributionServiceTest {
     // Distribute the mediapackage and all of its elements
     Job job1 = service.distribute("engage-player", mp, "track-1");
     Job job2 = service.distribute("oai-pmh", mp, "track-1");
-    JobBarrier jobBarrier = new JobBarrier(serviceRegistry, 500, job1, job2);
+    JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 500, job1, job2);
     jobBarrier.waitForJobs();
 
     // Add the new elements to the mediapackage
