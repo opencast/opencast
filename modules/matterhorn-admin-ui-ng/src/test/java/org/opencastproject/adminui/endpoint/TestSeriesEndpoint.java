@@ -81,6 +81,8 @@ import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Assert;
 import org.junit.Ignore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -97,7 +99,7 @@ import javax.ws.rs.Path;
 @Path("/")
 @Ignore
 public class TestSeriesEndpoint extends SeriesEndpoint {
-
+  private static final Logger logger = LoggerFactory.getLogger(TestSeriesEndpoint.class);
   private SeriesService seriesService;
   private AdminUISearchIndex adminuiSearchIndex;
   private ListProvidersService listProvidersService;
@@ -453,7 +455,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
                   if (!captureEventSearchQuery.hasCaptured()) {
                     Assert.fail("Haven't captured an event search query yet.");
                   } else {
-                    System.out.println("IDs for search query" + captureEventSearchQuery.getValue().getSeriesId());
+                    logger.info("IDs for search query" + captureEventSearchQuery.getValue().getSeriesId());
                     Assert.fail("Tried to get an event collection that doesn't exist.");
                   }
                 }

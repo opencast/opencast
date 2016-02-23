@@ -32,6 +32,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ import java.util.Collection;
 
 @RunWith(Parameterized.class)
 public class QUnitTest {
+  private static final Logger logger = LoggerFactory.getLogger(QUnitTest.class);
 
   private File testFile;
 
@@ -74,12 +77,12 @@ public class QUnitTest {
         break;
       } catch (ElementNotFoundException e) {
         synchronized (page) {
-          System.out.println("Waiting for JavaScript tests...");
+          logger.info("Waiting for JavaScript tests...");
           page.wait(500);
         }
       }
     }
-    System.out.println(element.getTextContent());
+    logger.info(element.getTextContent());
     assertTrue(element.getTextContent().contains(", 0 failed."));
   }
 }

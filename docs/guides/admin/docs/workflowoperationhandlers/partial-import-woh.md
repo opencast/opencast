@@ -4,6 +4,13 @@
 The PartialImportWorkflowOperation processes a set of audio and video files according to a SMIL document describing their relations.
 Its primary use is to post-process audio and video files ingested by capture agents using /ingest/addPartialTrack of the ingest endpoint.
 
+## Prerequisite
+When using the PartialImportWorkflowOperation you must active the accurate frame count setting in the `org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl.cfg` configuration file:
+
+	accurate_frame_count=true
+
+This will be fixed by the ticket: https://opencast.jira.com/browse/MH-11264
+
 ## Parameter Table
 
 |configuration keys|type|description|default value|
