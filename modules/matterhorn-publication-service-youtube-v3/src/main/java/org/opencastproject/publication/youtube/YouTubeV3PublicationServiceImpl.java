@@ -282,7 +282,6 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
 
   @Override
   public Job retract(final MediaPackage mediaPackage) throws PublicationException {
-    System.out.println(org.mortbay.jetty.Handler.class);
     if (mediaPackage == null) {
       throw new IllegalArgumentException("Mediapackage must be specified");
     }

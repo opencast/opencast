@@ -255,6 +255,18 @@
     <module name="MultipleVariableDeclarations">
       <property name="severity" value="error" />
     </module>
+    <module name="Regexp">
+      <property name="format" value="System\.out\.print" />
+      <property name="message" value="Do not use System.out.print(ln). Use the Logger." />
+      <property name="illegalPattern" value="true" />
+      <property name="severity" value="error" />
+    </module>
+    <module name="Regexp">
+      <property name="format" value="System\.err\.print" />
+      <property name="message" value="Do not use System.err.print(ln). Use the Logger." />
+      <property name="illegalPattern" value="true" />
+      <property name="severity" value="error" />
+    </module>
 
     <!-- Checks for class design                         -->
     <!-- See http://checkstyle.sf.net/config_design.html -->
