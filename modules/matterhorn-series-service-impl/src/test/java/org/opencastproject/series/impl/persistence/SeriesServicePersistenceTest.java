@@ -21,6 +21,8 @@
 
 package org.opencastproject.series.impl.persistence;
 
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -39,26 +41,16 @@ import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Tuple;
-
 import com.entwinemedia.fn.data.Opt;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.mchange.v2.c3p0.DataSources;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Tests persistence: storing, merging, retrieving and removing.
@@ -66,9 +58,7 @@ import java.util.Map;
  */
 public class SeriesServicePersistenceTest {
 
-  private ComboPooledDataSource pooledDataSource;
   private SeriesServiceDatabaseImpl seriesDatabase;
-  private String storage;
 
   private static final String ELEMENT_TYPE = "testelement";
   private static final byte[] ELEMENT_DATA_1 = "abcdefghijklmnopqrstuvwxyz".getBytes();
@@ -81,22 +71,6 @@ public class SeriesServicePersistenceTest {
    */
   @Before
   public void setUp() throws Exception {
-
-    long currentTime = System.currentTimeMillis();
-    storage = PathSupport.concat("target", "db" + currentTime + ".h2.db");
-
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + currentTime);
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Collect the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
-
     // Mock up a security service
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     User user = new JaxbUser("admin", "test", new DefaultOrganization(), new JaxbRole(
@@ -106,8 +80,7 @@ public class SeriesServicePersistenceTest {
     EasyMock.replay(securityService);
 
     seriesDatabase = new SeriesServiceDatabaseImpl();
-    seriesDatabase.setPersistenceProvider(new PersistenceProvider());
-    seriesDatabase.setPersistenceProperties(props);
+    seriesDatabase.setEntityManagerFactory(newTestEntityManagerFactory(SeriesServiceDatabaseImpl.PERSISTENCE_UNIT));
     DublinCoreCatalogService dcService = new DublinCoreCatalogService();
     seriesDatabase.setDublinCoreService(dcService);
     seriesDatabase.setSecurityService(securityService);
@@ -120,16 +93,6 @@ public class SeriesServicePersistenceTest {
     } finally {
       IOUtils.closeQuietly(in);
     }
-  }
-
-  /**
-   * @throws java.lang.Exception
-   */
-  @After
-  public void tearDown() throws Exception {
-    seriesDatabase.deactivate(null);
-    DataSources.destroy(pooledDataSource);
-    FileUtils.deleteQuietly(new File(storage));
   }
 
   @Test
@@ -191,10 +154,10 @@ public class SeriesServicePersistenceTest {
     final String seriesId = testCatalog.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER);
 
     assertTrue(seriesDatabase.storeSeriesElement(seriesId, ELEMENT_TYPE, ELEMENT_DATA_1));
-    assertEquals(ELEMENT_DATA_1, seriesDatabase.getSeriesElement(seriesId, ELEMENT_TYPE).get());
+    assertArrayEquals(ELEMENT_DATA_1, seriesDatabase.getSeriesElement(seriesId, ELEMENT_TYPE).get());
 
     assertTrue(seriesDatabase.storeSeriesElement(seriesId, ELEMENT_TYPE, ELEMENT_DATA_2));
-    assertEquals(ELEMENT_DATA_2, seriesDatabase.getSeriesElement(seriesId, ELEMENT_TYPE).get());
+    assertArrayEquals(ELEMENT_DATA_2, seriesDatabase.getSeriesElement(seriesId, ELEMENT_TYPE).get());
 
     assertTrue(seriesDatabase.deleteSeriesElement(seriesId, ELEMENT_TYPE));
     assertFalse(seriesDatabase.deleteSeriesElement(seriesId, ELEMENT_TYPE));

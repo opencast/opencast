@@ -25,7 +25,6 @@ The following table contains the workflow operations that are available in an ou
 |------------------|---------------------------------------------------------------|------------------------------------|
 |analyze-audio     |Analyze first audio stream                                     |[Documentation](analyzeaudio-woh.md)|
 |append            |Hold for user to select workflow to continue with              |[Documentation](append-woh.md)|
-|apply-acl         |Apply ACL rom series to the mediapackage                       |[Documentation](applyacl-woh.md)|
 |archive           |Archive the current state of the mediapackage                  |[Documentation](archive-woh.md)|
 |caption           |Waiting for user to upload captions                            |[Documentation](caption-woh.md)|
 |cleanup           |Cleanup the working file repository                            | |
@@ -43,12 +42,14 @@ The following table contains the workflow operations that are available in an ou
 |ingest-download   |Download files from external URL for ingest                    |[Documentation](ingestdownload-woh.md)|
 |inspect           |Inspect the media (check if it is valid)                       |[Documentation](inspect-woh.md)|
 |normalize-audio   |Normalize first audio stream                                   |[Documentation](normalizeaudio-woh.md)|
+|partial-import    |Import partial tracks and process according to a SMIL document |[Documentation](partial-import-woh.md)|
 |post-mediapackage |Send mediapackage to remote service                            |[Documentation](postmediapackage-woh.md)|
 |prepare-av        |Preparing audio and video work versions                        |[Documentation](prepareav-woh.md)|
 |publish-engage    |Distribute and publish media to the engage player              |[Documentation](publishengage-woh.md)|
 |republish         |Republishes elements to search                                 |[Documentation](republish-woh.md)|
 |segment-video     |Extracting segments from presentation                          |[Documentation](segmentvideo-woh.md)|
 |segmentpreviews   |Extract segment images from a video using FFmpeg               |[Documentation](segmentpreviews-woh.md)|
+|series            |Apply series to the mediapackage                               |[Documentation](series-woh.md)|
 |silence           |Silence detection on audio of the mediapackage                 |[Documentation](silence-woh.md)|
 |tag               |Modify the tag sets of media package elements                  |[Documentation](tag-woh.md)|
 |trim              |Waiting for user to review, then trim the recording            |[Documentation](trim-woh.md)|

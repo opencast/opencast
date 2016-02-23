@@ -200,7 +200,7 @@ public class SeriesUpdatedEventHandler {
 
           // Distribute the updated XACML file
           Job distributionJob = distributionService.distribute(CHANNEL_ID, mp, fileRepoCopy.getIdentifier());
-          JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
+          JobBarrier barrier = new JobBarrier(null, serviceRegistry, distributionJob);
           Result jobResult = barrier.waitForJobs();
           if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
             mp.remove(fileRepoCopy);
@@ -229,7 +229,7 @@ public class SeriesUpdatedEventHandler {
 
             // Distribute the updated series dc
             Job distributionJob = distributionService.distribute(CHANNEL_ID, mp, c.getIdentifier());
-            JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
+            JobBarrier barrier = new JobBarrier(null, serviceRegistry, distributionJob);
             Result jobResult = barrier.waitForJobs();
             if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
               mp.remove(c);
@@ -255,7 +255,7 @@ public class SeriesUpdatedEventHandler {
 
         // Update the search index with the modified mediapackage
         Job searchJob = searchService.add(mp);
-        JobBarrier barrier = new JobBarrier(serviceRegistry, searchJob);
+        JobBarrier barrier = new JobBarrier(null, serviceRegistry, searchJob);
         barrier.waitForJobs();
       }
     } catch (SearchException e) {
@@ -282,7 +282,7 @@ public class SeriesUpdatedEventHandler {
     // Retract the series catalog
     for (Catalog c : mp.getCatalogs(MediaPackageElements.SERIES)) {
       Job retractJob = distributionService.retract(CHANNEL_ID, mp, c.getIdentifier());
-      JobBarrier barrier = new JobBarrier(serviceRegistry, retractJob);
+      JobBarrier barrier = new JobBarrier(null, serviceRegistry, retractJob);
       Result jobResult = barrier.waitForJobs();
       if (jobResult.getStatus().get(retractJob).equals(FINISHED)) {
         mp.remove(c);
@@ -309,7 +309,7 @@ public class SeriesUpdatedEventHandler {
 
       // Distribute the updated episode dublincore
       Job distributionJob = distributionService.distribute(CHANNEL_ID, mp, episodeCatalog.getIdentifier());
-      JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
+      JobBarrier barrier = new JobBarrier(null, serviceRegistry, distributionJob);
       Result jobResult = barrier.waitForJobs();
       if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
         mp.remove(episodeCatalog);

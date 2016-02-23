@@ -50,6 +50,7 @@ Alternatively, edit Apache's httpd.conf to reroute Opencast to port 80:
 |org.opencastproject.security.config|Path to Opencast security configuration file|conf/security.xml|
 |org.opencastproject.security.digest.user|Digest authentication privileged user name|opencast_system_account|
 |org.opencastproject.security.digest.pass|Digest authentication privileged user password|CHANGE_ME|
+|org.opencastproject.server.maxload|Maximum load that this server will accept|Number of CPU cores present in the system|
 |org.opencastproject.anonymous.feedback.url|The project-wide feedback service, used to help the community understand how Opencast is deployed "in the wild.  For more information on this feature, see the Project Feedback Service documentation| No Feedback |
 
 

@@ -42,13 +42,15 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class ThemesEndpointTest {
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
+public class ThemesEndpointTest {
+  private static final Logger logger = LoggerFactory.getLogger(ThemesEndpointTest.class);
   private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestThemesEndpoint.class,
           NotFoundExceptionMapper.class);
   /** A parser for handling JSON documents inside the body of a request. */
@@ -108,8 +110,8 @@ public class ThemesEndpointTest {
     assertTrue(StringUtils.trimToNull(theme.get("creationDate").toString()) != null);
     // Remove it from the results
     theme.remove("creationDate");
-    System.out.println("Expected" + themesString);
-    System.out.println("Result: " + theme.toJSONString());
+    logger.info("Expected" + themesString);
+    logger.info("Result: " + theme.toJSONString());
     assertThat(themesString, SameJSONAs.sameJSONAs(theme.toJSONString()).allowingAnyArrayOrdering());
   }
 
@@ -132,8 +134,8 @@ public class ThemesEndpointTest {
     assertTrue(StringUtils.trimToNull(theme.get("creationDate").toString()) != null);
     // Remove it from the results
     theme.remove("creationDate");
-    System.out.println("Expected" + themesString);
-    System.out.println("Result: " + theme.toJSONString());
+    logger.info("Expected" + themesString);
+    logger.info("Result: " + theme.toJSONString());
     assertThat(themesString, SameJSONAs.sameJSONAs(theme.toJSONString()).allowingAnyArrayOrdering());
   }
 
@@ -141,8 +143,8 @@ public class ThemesEndpointTest {
   public void testGetThemes() throws ParseException, IOException {
     String themesString = IOUtils.toString(getClass().getResource("/themes.json"), "UTF-8");
     String result = given().expect().statusCode(HttpStatus.SC_OK).when().get(rt.host("/themes.json")).asString();
-    System.out.println("Expected" + themesString);
-    System.out.println("Result" + result);
+    logger.info("Expected" + themesString);
+    logger.info("Result" + result);
     assertThat(themesString, SameJSONAs.sameJSONAs(result).allowingAnyArrayOrdering());
   }
 

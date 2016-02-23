@@ -29,7 +29,6 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.http.HttpStatus.SC_CONFLICT;
 
 import org.opencastproject.index.IndexProducer;
-import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.group.GroupItem;
@@ -48,6 +47,9 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserProvider;
+import org.opencastproject.security.impl.jpa.JpaGroup;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
+import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Effect0;
@@ -68,14 +70,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.spi.PersistenceProvider;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -100,16 +100,16 @@ import javax.ws.rs.core.Response.Status;
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
                 + "not working and is either restarting or has failed",
-        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
+                        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+                        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleProvider {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(JpaGroupRoleProvider.class);
 
-  /** The JPA provider */
-  protected PersistenceProvider persistenceProvider = null;
+  /** The JPA persistence unit name */
+  public static final String PERSISTENCE_UNIT = "org.opencastproject.common";
 
   /** The message broker service */
   protected MessageSender messageSender;
@@ -123,14 +123,16 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
 
-  /** The persistence properties */
-  protected Map<String, Object> persistenceProperties;
-
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectoryService;
 
   /** The component context */
   private ComponentContext cc;
+
+  /** OSGi DI */
+  public void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
+  }
 
   /**
    * @param messageSender
@@ -146,22 +148,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
    */
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
-  }
-
-  /**
-   * @param persistenceProvider
-   *          the persistenceProvider to set
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
-  }
-
-  /**
-   * @param persistenceProperties
-   *          the persistenceProperties to set
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
   }
 
   /**
@@ -191,19 +177,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
     this.cc = cc;
 
     // Set up persistence
-    emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.userdirectory", persistenceProperties);
     super.activate();
-  }
-
-  /**
-   * Callback for deactivation of this component.
-   */
-  @Override
-  public void deactivate() {
-    super.deactivate();
-    if (emf != null && emf.isOpen()) {
-      emf.close();
-    }
   }
 
   /**

@@ -21,7 +21,7 @@
 
 package org.opencastproject.composer.impl;
 
-import static java.lang.String.format;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.fun.juc.Immutables.list;
 import static org.opencastproject.serviceregistry.api.Incidents.NO_DETAILS;
 import static org.opencastproject.util.data.Option.none;
@@ -66,6 +66,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.JsonObj;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Collections;
@@ -77,6 +78,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,13 +93,28 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 /** FFMPEG based implementation of the composer service api. */
-public class ComposerServiceImpl extends AbstractJobProducer implements ComposerService {
+public class ComposerServiceImpl extends AbstractJobProducer implements ComposerService, ManagedService {
+  /**
+   * The indexes the composite job uses to create a Job
+   */
+  private static final int BACKGROUND_COLOR_INDEX = 6;
+  private static final int COMPOSITE_TRACK_SIZE_INDEX = 4;
+  private static final int LOWER_TRACK_INDEX = 0;
+  private static final int LOWER_TRACK_LAYOUT_INDEX = 1;
+  private static final int PROFILE_ID_INDEX = 5;
+  private static final int UPPER_TRACK_INDEX = 2;
+  private static final int UPPER_TRACK_LAYOUT_INDEX = 3;
+  private static final int WATERMARK_INDEX = 7;
+  private static final int WATERMARK_LAYOUT_INDEX = 8;
   /**
    * Error codes
    */
@@ -129,6 +147,18 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /** The collection name */
   public static final String COLLECTION = "composer";
+
+  /** Used to mark a track unavailable to composite. */
+  private static final String NOT_AVAILABLE = "n/a";
+
+  /** The load introduced on the system by creating a caption job */
+  public static final float DEFAULT_CAPTION_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_CAPTION_JOB_LOAD} */
+  public static final String CAPTION_JOB_LOAD_KEY = "job.load.caption.embed";
+
+  /** The load introduced on the system by creating a caption job */
+  private float captionJobLoad = DEFAULT_CAPTION_JOB_LOAD;
 
   /** List of available operations on jobs */
   private enum Operation {
@@ -262,14 +292,14 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       final EncoderEngine encoderEngine = getEncoderEngine(job, profile);
 
       if (audioTrack != null && videoTrack != null)
-        logger.info(format("Muxing audio track %s and video track %s into %s", audioTrack.getIdentifier(),
-                videoTrack.getIdentifier(), targetTrackId));
+        logger.info("Muxing audio track {} and video track {} into {}",
+                new Object[] { audioTrack.getIdentifier(), videoTrack.getIdentifier(), targetTrackId });
       else if (audioTrack == null)
-        logger.info(format("Encoding video track %s to %s using profile '%s'", videoTrack.getIdentifier(),
-                targetTrackId, profileId));
+        logger.info("Encoding video track {} to {} using profile '{}'",
+                new Object[] { videoTrack.getIdentifier(), targetTrackId, profileId });
       else if (videoTrack == null)
-        logger.info(format("Encoding audio track %s to %s using profile '%s'", audioTrack.getIdentifier(),
-                targetTrackId, profileId));
+        logger.info("Encoding audio track {} to {} using profile '{}'",
+                new Object[] { audioTrack.getIdentifier(), targetTrackId, profileId });
 
       // Do the work
       Option<File> output;
@@ -372,7 +402,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       }
 
       // List of encoded tracks
-      LinkedList <Track> encodedTracks = new LinkedList<Track>();
+      LinkedList<Track> encodedTracks = new LinkedList<Track>();
       // Do the work
       int i = 0;
       for (File encodingOutput : encoderEngine.parallelEncode(mediaFile, profile, properties)) {
@@ -401,7 +431,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         Job inspectionJob = null;
         try {
           inspectionJob = inspectionService.inspect(returnURL);
-          JobBarrier barrier = new JobBarrier(serviceRegistry, inspectionJob);
+          JobBarrier barrier = new JobBarrier(job, serviceRegistry, inspectionJob);
           if (!barrier.waitForJobs().isSuccess()) {
             throw new EncoderException("Media inspection of " + returnURL + " failed");
           }
@@ -420,9 +450,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           }
         }
 
-// Will the mimetype be provided by the inspect service?
-//        if (profile.getMimeType() != null)
-//          inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
+        // Will the mimetype be provided by the inspect service?
+        // if (profile.getMimeType() != null)
+        // inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
 
         encodedTracks.add(inspectedTrack);
         i++;
@@ -439,7 +469,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     }
   }
 
-    /**
+  /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.composer.api.ComposerService#encode(org.opencastproject.mediapackage.Track,
@@ -448,7 +478,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   @Override
   public Job parallelEncode(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException {
     try {
-logger.info("Starting parallel encode with profile {} ", profileId);
+      logger.info("Starting parallel encode with profile {} ", profileId);
       return serviceRegistry.createJob(JOB_TYPE, Operation.ParallelEncode.toString(),
               Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), profileId));
     } catch (ServiceRegistryException e) {
@@ -606,21 +636,26 @@ logger.info("Starting parallel encode with profile {} ", profileId);
    *      org.opencastproject.util.data.Option, String, String) String, Option)
    */
   @Override
-  public Job composite(Dimension compositeTrackSize, LaidOutElement<Track> upperTrack,
+  public Job composite(Dimension compositeTrackSize, Option<LaidOutElement<Track>> upperTrack,
           LaidOutElement<Track> lowerTrack, Option<LaidOutElement<Attachment>> watermark, String profileId,
           String background) throws EncoderException, MediaPackageException {
     List<String> arguments = new ArrayList<String>();
-    arguments.add(0, MediaPackageElementParser.getAsXml(lowerTrack.getElement()));
-    arguments.add(1, Serializer.json(lowerTrack.getLayout()).toJson());
-    arguments.add(2, MediaPackageElementParser.getAsXml(upperTrack.getElement()));
-    arguments.add(3, Serializer.json(upperTrack.getLayout()).toJson());
-    arguments.add(4, Serializer.json(compositeTrackSize).toJson());
-    arguments.add(5, profileId);
-    arguments.add(6, background);
+    arguments.add(LOWER_TRACK_INDEX, MediaPackageElementParser.getAsXml(lowerTrack.getElement()));
+    arguments.add(LOWER_TRACK_LAYOUT_INDEX, Serializer.json(lowerTrack.getLayout()).toJson());
+    if (upperTrack.isNone()) {
+      arguments.add(UPPER_TRACK_INDEX, NOT_AVAILABLE);
+      arguments.add(UPPER_TRACK_LAYOUT_INDEX, NOT_AVAILABLE);
+    } else {
+      arguments.add(UPPER_TRACK_INDEX, MediaPackageElementParser.getAsXml(upperTrack.get().getElement()));
+      arguments.add(UPPER_TRACK_LAYOUT_INDEX, Serializer.json(upperTrack.get().getLayout()).toJson());
+    }
+    arguments.add(COMPOSITE_TRACK_SIZE_INDEX, Serializer.json(compositeTrackSize).toJson());
+    arguments.add(PROFILE_ID_INDEX, profileId);
+    arguments.add(BACKGROUND_COLOR_INDEX, background);
     if (watermark.isSome()) {
       LaidOutElement<Attachment> watermarkLaidOutElement = watermark.get();
-      arguments.add(7, MediaPackageElementParser.getAsXml(watermarkLaidOutElement.getElement()));
-      arguments.add(8, Serializer.json(watermarkLaidOutElement.getLayout()).toJson());
+      arguments.add(WATERMARK_INDEX, MediaPackageElementParser.getAsXml(watermarkLaidOutElement.getElement()));
+      arguments.add(WATERMARK_LAYOUT_INDEX, Serializer.json(watermarkLaidOutElement.getLayout()).toJson());
     }
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Composite.toString(), arguments);
@@ -630,7 +665,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
   }
 
   protected Option<Track> composite(Job job, Dimension compositeTrackSize, LaidOutElement<Track> lowerLaidOutElement,
-          LaidOutElement<Track> upperLaiedOutElement, Option<LaidOutElement<Attachment>> watermarkOption,
+          Option<LaidOutElement<Track>> upperLaidOutElement, Option<LaidOutElement<Attachment>> watermarkOption,
           String profileId, String backgroundColor) throws EncoderException, MediaPackageException {
     if (job == null)
       throw new EncoderException("The Job parameter must not be null");
@@ -638,7 +673,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
       throw new EncoderException("The composite track size parameter must not be null");
     if (lowerLaidOutElement == null)
       throw new EncoderException("The lower laid out element parameter must not be null");
-    if (upperLaiedOutElement == null)
+    if (upperLaidOutElement == null)
       throw new EncoderException("The upper laid out element parameter must not be null");
     if (watermarkOption == null)
       throw new EncoderException("The optional watermark laid out element parameter must not be null");
@@ -654,6 +689,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
     final EncoderEngine encoderEngine = getEncoderEngine(job, profile);
 
     final String targetTrackId = idBuilder.createNew().toString();
+    Option<File> upperVideoFile = Option.<File> none();
     try {
       // Get the tracks and make sure they exist
       final File lowerVideoFile;
@@ -671,21 +707,28 @@ logger.info("Starting parallel encode with profile {} ", profileId);
         throw new EncoderException("Unable to access lower video track " + lowerLaidOutElement.getElement());
       }
 
-      final File upperVideoFile;
-      try {
-        upperVideoFile = workspace.get(upperLaiedOutElement.getElement().getURI());
-      } catch (NotFoundException e) {
-        incident().recordFailure(job, WORKSPACE_GET_NOT_FOUND, e,
-                getWorkspaceMediapackageParams("upper video", Type.Track, upperLaiedOutElement.getElement().getURI()),
-                NO_DETAILS);
-        throw new EncoderException("Requested upper video track " + upperLaiedOutElement.getElement() + " is not found");
-      } catch (IOException e) {
-        incident().recordFailure(job, WORKSPACE_GET_IO_EXCEPTION, e,
-                getWorkspaceMediapackageParams("upper video", Type.Track, upperLaiedOutElement.getElement().getURI()),
-                NO_DETAILS);
-        throw new EncoderException("Unable to access upper video track " + upperLaiedOutElement.getElement());
+      if (upperLaidOutElement.isSome()) {
+        try {
+          upperVideoFile = Option.option(workspace.get(upperLaidOutElement.get().getElement().getURI()));
+        } catch (NotFoundException e) {
+          incident().recordFailure(
+                  job,
+                  WORKSPACE_GET_NOT_FOUND,
+                  e,
+                  getWorkspaceMediapackageParams("upper video", Type.Track, upperLaidOutElement.get().getElement()
+                          .getURI()), NO_DETAILS);
+          throw new EncoderException("Requested upper video track " + upperLaidOutElement.get().getElement()
+                  + " is not found");
+        } catch (IOException e) {
+          incident().recordFailure(
+                  job,
+                  WORKSPACE_GET_IO_EXCEPTION,
+                  e,
+                  getWorkspaceMediapackageParams("upper video", Type.Track, upperLaidOutElement.get().getElement()
+                          .getURI()), NO_DETAILS);
+          throw new EncoderException("Unable to access upper video track " + upperLaidOutElement.get().getElement());
+        }
       }
-
       File watermarkFile = null;
       if (watermarkOption.isSome()) {
         try {
@@ -708,27 +751,52 @@ logger.info("Starting parallel encode with profile {} ", profileId);
                           .getURI()), NO_DETAILS);
           throw new EncoderException("Unable to access right watermark image " + watermarkOption.get().getElement());
         }
-        logger.info(format("Composing lower video track %s and upper video track %s including watermark %s into %s",
-                lowerLaidOutElement.getElement().getIdentifier(), upperLaiedOutElement.getElement().getIdentifier(),
-                watermarkOption.get().getElement().getIdentifier(), targetTrackId));
+        if (upperLaidOutElement.isSome()) {
+          logger.info("Composing lower video track {} {} and upper video track {} {} including watermark {} {} into {}",
+                  new Object[] { lowerLaidOutElement.getElement().getIdentifier(),
+                          lowerLaidOutElement.getElement().getURI(),
+                          upperLaidOutElement.get().getElement().getIdentifier(),
+                          upperLaidOutElement.get().getElement().getURI(),
+                          watermarkOption.get().getElement().getIdentifier(),
+                          watermarkOption.get().getElement().getURI(), targetTrackId });
+        } else {
+          logger.info("Composing video track {} {} including watermark {} {} into {}",
+                  new Object[] { lowerLaidOutElement.getElement().getIdentifier(),
+                          lowerLaidOutElement.getElement().getURI(), watermarkOption.get().getElement().getIdentifier(),
+                          watermarkOption.get().getElement().getURI(), targetTrackId });
+        }
       } else {
-        logger.info(format("Composing lower video track %s and upper video track %s into %s", lowerLaidOutElement
-                .getElement().getIdentifier(), upperLaiedOutElement.getElement().getIdentifier(), targetTrackId));
+        if (upperLaidOutElement.isSome()) {
+          logger.info("Composing lower video track {} {} and upper video track {} {} into {}",
+                  new Object[] { lowerLaidOutElement.getElement().getIdentifier(),
+                          lowerLaidOutElement.getElement().getURI(),
+                          upperLaidOutElement.get().getElement().getIdentifier(),
+                          upperLaidOutElement.get().getElement().getURI(), targetTrackId });
+        } else {
+          logger.info("Composing video track {} {} into {}",
+                  new Object[] { lowerLaidOutElement.getElement().getIdentifier(),
+                          lowerLaidOutElement.getElement().getURI(), targetTrackId });
+        }
       }
 
       // Creating video filter command
-      String compositeCommand = buildCompositeCommand(compositeTrackSize, lowerLaidOutElement, upperLaiedOutElement,
-              watermarkOption, upperVideoFile, watermarkFile, backgroundColor);
+      final String compositeCommand = buildCompositeCommand(compositeTrackSize, lowerLaidOutElement,
+              upperLaidOutElement, upperVideoFile, watermarkOption, watermarkFile, backgroundColor);
 
       Map<String, String> properties = new HashMap<String, String>();
       properties.put("compositeCommand", compositeCommand);
-
       Option<File> output;
       try {
-        output = encoderEngine.mux(upperVideoFile, lowerVideoFile, profile, properties);
+        if (upperVideoFile.isSome()) {
+          output = encoderEngine.mux(upperVideoFile.get(), lowerVideoFile, profile, properties);
+        } else {
+          output = encoderEngine.mux(null, lowerVideoFile, profile, properties);
+        }
       } catch (EncoderException e) {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("upper", upperLaiedOutElement.getElement().getURI().toString());
+        if (upperLaidOutElement.isSome()) {
+          params.put("upper", upperLaidOutElement.get().getElement().getURI().toString());
+        }
         params.put("lower", lowerLaidOutElement.getElement().getURI().toString());
         if (watermarkFile != null)
           params.put("watermark", watermarkOption.get().getElement().getURI().toString());
@@ -756,8 +824,12 @@ logger.info("Starting parallel encode with profile {} ", profileId);
 
       return some(inspectedTrack);
     } catch (Exception e) {
-      logger.warn("Error composing " + lowerLaidOutElement.getElement() + " and " + upperLaiedOutElement.getElement(),
-              e);
+      if (upperLaidOutElement.isSome()) {
+        logger.warn("Error composing {}  and {}: {}", new Object[] { lowerLaidOutElement.getElement(),
+                upperLaidOutElement.get().getElement(), getStackTrace(e) });
+      } else {
+        logger.warn("Error composing {}: {}", lowerLaidOutElement.getElement(), getStackTrace(e));
+      }
       if (e instanceof EncoderException) {
         throw (EncoderException) e;
       } else {
@@ -836,7 +908,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
           throw new EncoderException("Track has no audio or video stream available: " + track);
         }
         try {
-          trackFiles.add(i++, workspace.get(track.getURI()));
+          trackFiles.add(i++, IoSupport.waitForFile(workspace.get(track.getURI())));
         } catch (NotFoundException e) {
           incident().recordFailure(job, WORKSPACE_GET_NOT_FOUND, e,
                   getWorkspaceMediapackageParams("concat", Type.Track, track.getURI()), NO_DETAILS);
@@ -852,9 +924,9 @@ logger.info("Starting parallel encode with profile {} ", profileId);
       final EncoderEngine encoderEngine = getEncoderEngine(job, profile);
 
       if (onlyAudio) {
-        logger.info(format("Concatenating audio tracks %s into %s", trackFiles, targetTrackId));
+        logger.info("Concatenating audio tracks {} into {}", trackFiles, targetTrackId);
       } else {
-        logger.info(format("Concatenating video tracks %s into %s", trackFiles, targetTrackId));
+        logger.info("Concatenating video tracks {} into {}", trackFiles, targetTrackId);
       }
 
       // Creating video filter command for concat
@@ -952,7 +1024,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
       // Create the engine
       final EncoderEngine encoderEngine = getEncoderEngine(job, profile);
 
-      logger.info(format("Converting image attachment %s into video %s", sourceImage.getIdentifier(), targetTrackId));
+      logger.info("Converting image attachment {} into video {}", sourceImage.getIdentifier(), targetTrackId);
 
       Map<String, String> properties = new HashMap<String, String>();
       if (time == null || time == -1)
@@ -1015,17 +1087,37 @@ logger.info("Starting parallel encode with profile {} ", profileId);
     if (times.length == 0)
       throw new IllegalArgumentException("At least one time argument has to be specified");
 
-    String[] parameters = new String[times.length + 2];
-    parameters[0] = MediaPackageElementParser.getAsXml(sourceTrack);
-    parameters[1] = profileId;
+    List<String> parameters = new ArrayList<>();
+    parameters.add(MediaPackageElementParser.getAsXml(sourceTrack));
+    parameters.add(profileId);
+    parameters.add(Boolean.TRUE.toString());
     for (int i = 0; i < times.length; i++) {
-      parameters[i + 2] = Double.toString(times[i]);
+      parameters.add(Double.toString(times[i]));
     }
 
     // TODO: This is unfortunate, since ffmpeg is slow on single images and it would be nice to be able to start a
     // separate job per image, so extraction can be spread over multiple machines in a cluster.
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Image.toString(), Arrays.asList(parameters));
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Image.toString(), parameters);
+    } catch (ServiceRegistryException e) {
+      throw new EncoderException("Unable to create a job", e);
+    }
+  }
+
+  @Override
+  public Job image(Track sourceTrack, String profileId, Map<String, String> properties) throws EncoderException,
+          MediaPackageException {
+    if (sourceTrack == null)
+      throw new IllegalArgumentException("SourceTrack cannot be null");
+
+    List<String> arguments = new ArrayList<String>();
+    arguments.add(MediaPackageElementParser.getAsXml(sourceTrack));
+    arguments.add(profileId);
+    arguments.add(Boolean.FALSE.toString());
+    arguments.add(getPropertiesAsString(properties));
+
+    try {
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Image.toString(), arguments);
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
@@ -1039,10 +1131,10 @@ logger.info("Starting parallel encode with profile {} ", profileId);
    * @param sourceTrack
    *          the source track
    * @param profileId
-   *          the identifer of the encoding profile to use
+   *          the identifier of the encoding profile to use
    * @param times
    *          (one or more) times in seconds
-   * @return the image as an attachment element
+   * @return the images as an attachment element list
    * @throws EncoderException
    *           if extracting the image fails
    */
@@ -1051,14 +1143,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
     if (sourceTrack == null)
       throw new EncoderException("SourceTrack cannot be null");
 
-    // make sure there is a video stream in the track
-    if (sourceTrack != null && !sourceTrack.hasVideo()) {
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("track-id", sourceTrack.getIdentifier());
-      params.put("track-url", sourceTrack.getURI().toString());
-      incident().recordFailure(job, IMAGE_EXTRACTION_NO_VIDEO, params);
-      throw new EncoderException("Cannot extract an image without a video stream");
-    }
+    validateVideoStream(job, sourceTrack);
 
     // The time should not be outside of the track's duration
     for (double time : times) {
@@ -1081,6 +1166,36 @@ logger.info("Starting parallel encode with profile {} ", profileId);
       }
     }
 
+    return extractImages(job, sourceTrack, profileId, null, times);
+  }
+
+  /**
+   * Extracts an image from <code>sourceTrack</code> by the given properties and the corresponding encoding profile.
+   *
+   * @param job
+   *          the associated job
+   * @param sourceTrack
+   *          the source track
+   * @param profileId
+   *          the identifier of the encoding profile to use
+   * @param properties
+   *          the properties applied to the encoding profile
+   * @return the images as an attachment element list
+   * @throws EncoderException
+   *           if extracting the image fails
+   */
+  protected List<Attachment> image(Job job, Track sourceTrack, String profileId, Map<String, String> properties)
+          throws EncoderException, MediaPackageException {
+    if (sourceTrack == null)
+      throw new EncoderException("SourceTrack cannot be null");
+
+    validateVideoStream(job, sourceTrack);
+
+    return extractImages(job, sourceTrack, profileId, properties);
+  }
+
+  private List<Attachment> extractImages(Job job, Track sourceTrack, String profileId, Map<String, String> properties,
+          double... times) throws EncoderException {
     try {
       logger.info("creating an image using video track {}", sourceTrack.getIdentifier());
 
@@ -1107,7 +1222,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
       // Do the work
       List<File> encodingOutput;
       try {
-        encodingOutput = encoderEngine.extract(videoFile, profile, null, times);
+        encodingOutput = encoderEngine.extract(videoFile, profile, properties, times);
         // check for validity of output
         if (encodingOutput == null || encodingOutput.isEmpty()) {
           logger.error("Image extraction from video {} with profile {} failed: no images were produced",
@@ -1298,7 +1413,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
     }
 
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Caption.toString(), args);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Caption.toString(), args, captionJobLoad);
     } catch (ServiceRegistryException e) {
       throw new EmbedderException("Unable to create a job", e);
     }
@@ -1531,11 +1646,17 @@ logger.info("Starting parallel encode with profile {} ", profileId);
         case Image:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
           encodingProfile = arguments.get(1);
-          double[] times = new double[arguments.size() - 2];
-          for (int i = 2; i < arguments.size(); i++) {
-            times[i - 2] = Double.parseDouble(arguments.get(i));
+          List<Attachment> resultingElements;
+          if (Boolean.parseBoolean(arguments.get(2))) {
+            double[] times = new double[arguments.size() - 3];
+            for (int i = 3; i < arguments.size(); i++) {
+              times[i - 3] = Double.parseDouble(arguments.get(i));
+            }
+            resultingElements = image(job, firstTrack, encodingProfile, times);
+          } else {
+            Map<String, String> properties = parseProperties(arguments.get(3));
+            resultingElements = image(job, firstTrack, encodingProfile, properties);
           }
-          List<Attachment> resultingElements = image(job, firstTrack, encodingProfile, times);
           serialized = MediaPackageElementParser.getArrayAsXml(resultingElements);
           break;
         case ImageConversion:
@@ -1568,25 +1689,30 @@ logger.info("Starting parallel encode with profile {} ", profileId);
           break;
         case Composite:
           Attachment watermarkAttachment = null;
-          firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
-          Layout lowerLayout = Serializer.layout(JsonObj.jsonObj(arguments.get(1)));
+          firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(LOWER_TRACK_INDEX));
+          Layout lowerLayout = Serializer.layout(JsonObj.jsonObj(arguments.get(LOWER_TRACK_LAYOUT_INDEX)));
           LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<Track>(firstTrack, lowerLayout);
-
-          secondTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(2));
-          Layout upperLayout = Serializer.layout(JsonObj.jsonObj(arguments.get(3)));
-          LaidOutElement<Track> upperLaiedOutElement = new LaidOutElement<Track>(secondTrack, upperLayout);
-
-          Dimension compositeTrackSize = Serializer.dimension(JsonObj.jsonObj(arguments.get(4)));
-          encodingProfile = arguments.get(5);
-          String backgroundColor = arguments.get(6);
+          Option<LaidOutElement<Track>> upperLaidOutElement = Option.<LaidOutElement<Track>> none();
+          if (NOT_AVAILABLE.equals(arguments.get(UPPER_TRACK_INDEX))
+                  && NOT_AVAILABLE.equals(arguments.get(UPPER_TRACK_LAYOUT_INDEX))) {
+            logger.trace("This composite action does not use a second track.");
+          } else {
+            secondTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(UPPER_TRACK_INDEX));
+            Layout upperLayout = Serializer.layout(JsonObj.jsonObj(arguments.get(UPPER_TRACK_LAYOUT_INDEX)));
+            upperLaidOutElement = Option.option(new LaidOutElement<Track>(secondTrack, upperLayout));
+          }
+          Dimension compositeTrackSize = Serializer
+                  .dimension(JsonObj.jsonObj(arguments.get(COMPOSITE_TRACK_SIZE_INDEX)));
+          encodingProfile = arguments.get(PROFILE_ID_INDEX);
+          String backgroundColor = arguments.get(BACKGROUND_COLOR_INDEX);
 
           Option<LaidOutElement<Attachment>> watermarkOption = Option.none();
           if (arguments.size() == 9) {
-            watermarkAttachment = (Attachment) MediaPackageElementParser.getFromXml(arguments.get(7));
-            Layout watermarkLayout = Serializer.layout(JsonObj.jsonObj(arguments.get(8)));
+            watermarkAttachment = (Attachment) MediaPackageElementParser.getFromXml(arguments.get(WATERMARK_INDEX));
+            Layout watermarkLayout = Serializer.layout(JsonObj.jsonObj(arguments.get(WATERMARK_LAYOUT_INDEX)));
             watermarkOption = Option.some(new LaidOutElement<Attachment>(watermarkAttachment, watermarkLayout));
           }
-          serialized = composite(job, compositeTrackSize, lowerLaidOutElement, upperLaiedOutElement, watermarkOption,
+          serialized = composite(job, compositeTrackSize, lowerLaidOutElement, upperLaidOutElement, watermarkOption,
                   encodingProfile, backgroundColor).map(MediaPackageElementParser.<Track> getAsXml()).getOrElse("");
           break;
         case Concat:
@@ -1653,7 +1779,7 @@ logger.info("Starting parallel encode with profile {} ", profileId);
       throw new EncoderException("Media inspection of " + workspaceURI + " failed", e);
     }
 
-    JobBarrier barrier = new JobBarrier(serviceRegistry, inspectionJob);
+    JobBarrier barrier = new JobBarrier(job, serviceRegistry, inspectionJob);
     if (!barrier.waitForJobs().isSuccess()) {
       throw new EncoderException("Media inspection of " + workspaceURI + " failed");
     }
@@ -1746,37 +1872,83 @@ logger.info("Starting parallel encode with profile {} ", profileId);
     return params;
   }
 
-  private String buildCompositeCommand(Dimension compositeTrackSize, LaidOutElement<Track> lowerLaidOutElement,
-          LaidOutElement<Track> upperLaiedOutElement, Option<LaidOutElement<Attachment>> watermarkOption,
-          File upperVideoFile, File watermarkFile, String backgroundColor) {
+  /**
+   * Example composite command below. Use with `-filter_complex` option of ffmpeg if upper video is available otherwise
+   * use -filver:v option for a single video.
+   *
+   * Dual video sample: The ffmpeg command needs two source files set with the `-i` option. The first media file is the
+   * `lower`, the second the `upper` one. Example filter: -filter_complex
+   * [0:v]scale=909:682,pad=1280:720:367:4:0x444345FF[lower];[1:v]scale=358:151[upper];[lower][upper]overlay=4:4[out]
+   *
+   * Single video sample: The ffmpeg command needs one source files set with the `-i` option. Example filter: filter:v
+   * [in]scale=909:682,pad=1280:720:367:4:0x444345FF[out]
+   *
+   * @return commandline part with -filter_complex and -map options
+   */
+  protected static String buildCompositeCommand(Dimension compositeTrackSize,
+          LaidOutElement<Track> lowerLaidOutElement, Option<LaidOutElement<Track>> upperLaidOutElement,
+          Option<File> upperFile, Option<LaidOutElement<Attachment>> watermarkOption, File watermarkFile,
+          String backgroundColor) {
+    final StringBuilder cmd = new StringBuilder();
+    final String videoId = watermarkOption.isNone() ? "[out]" : "[video]";
+    if (upperLaidOutElement.isNone()) {
+      // There is only one video track and possibly one watermark.
+      final Layout videoLayout = lowerLaidOutElement.getLayout();
+      final String videoPosition = videoLayout.getOffset().getX() + ":" + videoLayout.getOffset().getY();
+      final String scaleVideo = videoLayout.getDimension().getWidth() + ":" + videoLayout.getDimension().getHeight();
+      final String padLower = compositeTrackSize.getWidth() + ":" + compositeTrackSize.getHeight() + ":"
+              + videoPosition + ":" + backgroundColor;
+      cmd.append("-filter:v [in]scale=").append(scaleVideo).append(",pad=").append(padLower).append(videoId);
+    } else if (upperFile.isSome() && upperLaidOutElement.isSome()) {
+      // There are two video tracks to handle.
+      final Layout lowerLayout = lowerLaidOutElement.getLayout();
+      final Layout upperLayout = upperLaidOutElement.get().getLayout();
 
-    Layout lowerLayout = lowerLaidOutElement.getLayout();
-    Layout upperLayout = upperLaiedOutElement.getLayout();
+      final String upperPosition = upperLayout.getOffset().getX() + ":" + upperLayout.getOffset().getY();
+      final String lowerPosition = lowerLayout.getOffset().getX() + ":" + lowerLayout.getOffset().getY();
 
-    String upperPosition = upperLayout.getOffset().getX() + ":" + upperLayout.getOffset().getY();
-    String lowerPosition = lowerLayout.getOffset().getX() + ":" + lowerLayout.getOffset().getY();
+      final String scaleUpper = upperLayout.getDimension().getWidth() + ":" + upperLayout.getDimension().getHeight();
+      final String scaleLower = lowerLayout.getDimension().getWidth() + ":" + lowerLayout.getDimension().getHeight();
 
-    String scaleUpper = upperLayout.getDimension().getWidth() + ":" + upperLayout.getDimension().getHeight();
-    String scaleLower = lowerLayout.getDimension().getWidth() + ":" + lowerLayout.getDimension().getHeight();
+      final String padLower = compositeTrackSize.getWidth() + ":" + compositeTrackSize.getHeight() + ":"
+              + lowerPosition + ":" + backgroundColor;
 
-    StringBuilder sb = new StringBuilder().append("[in]scale=").append(scaleLower).append(",pad=")
-            .append(compositeTrackSize.getWidth()).append(":").append(compositeTrackSize.getHeight()).append(":")
-            .append(lowerPosition).append(":").append(backgroundColor).append("[lower];movie=")
-            .append(upperVideoFile.getAbsolutePath()).append(",scale=").append(scaleUpper).append("[upper];");
-
-    if (watermarkOption.isSome()) {
-      Layout watermarkLayout = watermarkOption.get().getLayout();
-      String watermarkPosition = watermarkLayout.getOffset().getX() + ":" + watermarkLayout.getOffset().getY();
-      // TODO scaleWatermark
-      String scaleWaterMark = watermarkLayout.getDimension().getWidth() + ":"
-              + watermarkLayout.getDimension().getHeight();
-      sb.append("movie=").append(watermarkFile.getAbsolutePath()).append("[watermark];[lower][upper]overlay=")
-              .append(upperPosition).append("[video];[video][watermark]overlay=main_w-overlay_w-")
-              .append(watermarkPosition).append("[out]");
-    } else {
-      sb.append("[lower][upper]overlay=").append(upperPosition).append("[out]");
+      // Add input file for the upper track
+      cmd.append("-i " + upperFile.get().getAbsolutePath() + " ");
+      // Add filter complex mode
+      cmd.append("-filter_complex").
+      // lower video
+              append(" [0:v]scale=").append(scaleLower).append(",pad=").append(padLower).append("[lower]")
+              // upper video
+              .append(";[1:v]scale=").append(scaleUpper).append("[upper]")
+              // mix
+              .append(";[lower][upper]overlay=").append(upperPosition).append(videoId);
     }
-    return sb.toString();
+
+    for (final LaidOutElement<Attachment> watermarkLayout : watermarkOption) {
+      String watermarkPosition = watermarkLayout.getLayout().getOffset().getX() + ":"
+              + watermarkLayout.getLayout().getOffset().getY();
+      cmd.append(";").append("movie=").append(watermarkFile.getAbsoluteFile()).append("[watermark];").append(videoId)
+              .append("[watermark]overlay=").append(watermarkPosition).append("[out]");
+    }
+
+    if (upperLaidOutElement.isSome()) {
+      // handle audio
+      // if both videos contain audio mix it into a single audio stream
+      final boolean lowerAudio = lowerLaidOutElement.getElement().hasAudio();
+      final boolean upperAudio = upperLaidOutElement.get().getElement().hasAudio();
+      if (lowerAudio && upperAudio) {
+        cmd.append(";[0:a][1:a]amix=inputs=2[aout] -map [out] -map [aout]");
+      } else if (lowerAudio) {
+        cmd.append(" -map [out] -map 0:a");
+      } else if (upperAudio) {
+        cmd.append(" -map [out] -map 1:a");
+      } else {
+        cmd.append(" -map [out]");
+      }
+    }
+
+    return cmd.toString();
   }
 
   private String buildConcatCommand(boolean onlyAudio, Dimension dimension, List<File> files, List<Track> tracks) {
@@ -1888,6 +2060,33 @@ logger.info("Starting parallel encode with profile {} ", profileId);
       d.add(tuple("encoder-commandline", ((CmdlineEncoderException) ex).getCommandLine()));
     }
     return d;
+  }
+
+  private Map<String, String> parseProperties(String serializedProperties) throws IOException {
+    Properties properties = new Properties();
+    InputStream in = null;
+    try {
+      in = IOUtils.toInputStream(serializedProperties, "UTF-8");
+      properties.load(in);
+      Map<String, String> map = new HashMap<String, String>();
+      for (Entry<Object, Object> e : properties.entrySet()) {
+        map.put((String) e.getKey(), (String) e.getValue());
+      }
+      return map;
+    } finally {
+      IOUtils.closeQuietly(in);
+    }
+  }
+
+  private String getPropertiesAsString(Map<String, String> props) {
+    StringBuilder sb = new StringBuilder();
+    for (Entry<String, String> entry : props.entrySet()) {
+      sb.append(entry.getKey());
+      sb.append("=");
+      sb.append(entry.getValue());
+      sb.append("\n");
+    }
+    return sb.toString();
   }
 
   /**
@@ -2018,6 +2217,11 @@ logger.info("Starting parallel encode with profile {} ", profileId);
   @Override
   protected OrganizationDirectoryService getOrganizationDirectoryService() {
     return organizationDirectoryService;
+  }
+
+  @Override
+  public void updated(Dictionary properties) throws ConfigurationException {
+    captionJobLoad = LoadUtil.getConfiguredLoadValue(properties, CAPTION_JOB_LOAD_KEY, DEFAULT_CAPTION_JOB_LOAD, serviceRegistry);
   }
 
 }

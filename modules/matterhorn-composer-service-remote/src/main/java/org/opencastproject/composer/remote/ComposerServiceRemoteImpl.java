@@ -55,6 +55,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Proxies a set of remote composer services for use as a JVM-local service. Remote services are selected at random.
@@ -268,6 +270,42 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   /**
    * {@inheritDoc}
    *
+   * @see org.opencastproject.composer.api.ComposerService#image(Track, String, Map)
+   */
+  @Override
+  public Job image(Track sourceTrack, String profileId, Map<String, String> properties) throws EncoderException,
+          MediaPackageException {
+    HttpPost post = new HttpPost("/image");
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
+      params.add(new BasicNameValuePair("profileId", profileId));
+      if (properties != null)
+        params.add(new BasicNameValuePair("properties", mapToString(properties)));
+      post.setEntity(new UrlEncodedFormEntity(params));
+    } catch (Exception e) {
+      throw new EncoderException(e);
+    }
+    HttpResponse response = null;
+    try {
+      response = getResponse(post);
+      if (response != null) {
+        Job r = JobParser.parseJob(response.getEntity().getContent());
+        logger.info("Image extraction job {} started on a remote composer", r.getId());
+        return r;
+      }
+    } catch (Exception e) {
+      throw new EncoderException(e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new EncoderException("Unable to compose an image from track " + sourceTrack
+            + " using the remote composer service proxy");
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see org.opencastproject.composer.api.ComposerService#convertImage(org.opencastproject.mediapackage.Attachment,
    *      java.lang.String)
    */
@@ -408,7 +446,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   }
 
   @Override
-  public Job composite(Dimension compositeTrackSize, LaidOutElement<Track> upperTrack,
+  public Job composite(Dimension compositeTrackSize, Option<LaidOutElement<Track>> upperTrack,
           LaidOutElement<Track> lowerTrack, Option<LaidOutElement<Attachment>> watermark, String profileId,
           String background) throws EncoderException, MediaPackageException {
     HttpPost post = new HttpPost("/composite");
@@ -417,8 +455,12 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       params.add(new BasicNameValuePair("compositeSize", Serializer.json(compositeTrackSize).toJson()));
       params.add(new BasicNameValuePair("lowerTrack", MediaPackageElementParser.getAsXml(lowerTrack.getElement())));
       params.add(new BasicNameValuePair("lowerLayout", Serializer.json(lowerTrack.getLayout()).toJson()));
-      params.add(new BasicNameValuePair("upperTrack", MediaPackageElementParser.getAsXml(upperTrack.getElement())));
-      params.add(new BasicNameValuePair("upperLayout", Serializer.json(upperTrack.getLayout()).toJson()));
+      if (upperTrack.isSome()) {
+        params.add(new BasicNameValuePair("upperTrack", MediaPackageElementParser.getAsXml(upperTrack.get()
+                .getElement())));
+        params.add(new BasicNameValuePair("upperLayout", Serializer.json(upperTrack.get().getLayout()).toJson()));
+      }
+
       if (watermark.isSome()) {
         params.add(new BasicNameValuePair("watermarkAttachment", MediaPackageElementParser.getAsXml(watermark.get()
                 .getElement())));
@@ -443,8 +485,13 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
     } finally {
       closeConnection(response);
     }
-    throw new EncoderException("Unable to composite video from track " + lowerTrack.getElement() + " and "
-            + upperTrack.getElement() + " using the remote composer service proxy");
+    if (upperTrack.isSome()) {
+      throw new EncoderException("Unable to composite video from track " + lowerTrack.getElement() + " and "
+              + upperTrack.get().getElement() + " using the remote composer service proxy");
+    } else {
+      throw new EncoderException("Unable to composite video from track " + lowerTrack.getElement()
+              + " using the remote composer service proxy");
+    }
   }
 
   @Override
@@ -506,6 +553,25 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
     }
     throw new EncoderException("Unable to convert an image to a video from attachment " + sourceImageAttachment
             + " using the remote composer service proxy");
+  }
+
+  /**
+   * Converts a Map<String, String> to s key=value\n string, suitable for the properties form parameter expected by the
+   * workflow rest endpoint.
+   *
+   * @param props
+   *          The map of strings
+   * @return the string representation
+   */
+  private String mapToString(Map<String, String> props) {
+    StringBuilder sb = new StringBuilder();
+    for (Entry<String, String> entry : props.entrySet()) {
+      sb.append(entry.getKey());
+      sb.append("=");
+      sb.append(entry.getValue());
+      sb.append("\n");
+    }
+    return sb.toString();
   }
 
 }

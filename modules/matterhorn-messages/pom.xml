@@ -26,17 +26,16 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-comments</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-collections</groupId>
@@ -75,7 +74,7 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    
+
     <!-- Testing -->
 
     <!-- REST test environment -->
@@ -118,7 +117,7 @@
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>org.eclipse.persistence.antlr</artifactId>
       <scope>test</scope>
-    </dependency> 
+    </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
@@ -128,7 +127,7 @@
       <groupId>c3p0</groupId>
       <artifactId>c3p0</artifactId>
       <scope>test</scope>
-    </dependency> 
+    </dependency>
     <dependency>
       <groupId>org.xmlmatchers</groupId>
       <artifactId>xml-matchers</artifactId>
@@ -159,6 +158,10 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>de.empulse.eclipselink</groupId>
+        <artifactId>staticweave-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
@@ -166,21 +169,15 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Import-Package>
-              org.opencastproject.comments;version=${project.version},
-              org.opencastproject.comments.persistence;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
-              org.opencastproject.messages;version=${project.version},
-              org.opencastproject.messages.persistence;version=${project.version}
+              org.opencastproject.messages
             </Export-Package>
             <Service-Component>
               OSGI-INF/mail-service.xml
             </Service-Component>
-            <JPA-PersistenceUnits>
-              org.opencastproject.messages
-            </JPA-PersistenceUnits>
+            <Meta-Persistence>
+              META-INF/persistence.xml
+            </Meta-Persistence>
           </instructions>
         </configuration>
       </plugin>

@@ -21,6 +21,8 @@
 
 package org.opencastproject.archive.opencast;
 
+import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
+
 import static org.opencastproject.util.data.Collections.cons;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.functions.Booleans.ne;
@@ -45,14 +47,12 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.solr.SolrServerFactory;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.VCell;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.util.osgi.SimpleServicePublisher;
 import org.opencastproject.util.persistence.PersistenceEnv;
-import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -75,10 +75,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
-import java.util.Map;
-
 import javax.management.ObjectInstance;
-import javax.persistence.spi.PersistenceProvider;
+import javax.persistence.EntityManagerFactory;
 
 public class OpencastArchivePublisher extends SimpleServicePublisher {
 
@@ -86,10 +84,10 @@ public class OpencastArchivePublisher extends SimpleServicePublisher {
   private static final Logger logger = LoggerFactory.getLogger(OpencastArchivePublisher.class);
 
   /** Configuration key for a remote solr server */
-  public static final String CONFIG_SOLR_URL = "org.opencastproject.episode.solr.url";
+  public static final String CONFIG_SOLR_URL = "org.opencastproject.archive.solr.url";
 
   /** Configuration key for an embedded solr configuration and data directory */
-  public static final String CONFIG_SOLR_ROOT = "org.opencastproject.episode.solr.dir";
+  public static final String CONFIG_SOLR_ROOT = "org.opencastproject.archive.solr.dir";
 
   /** File system element store JMX type */
   private static final String JMX_ELEMENT_STORE_TYPE = "ElementStore";
@@ -109,8 +107,7 @@ public class OpencastArchivePublisher extends SimpleServicePublisher {
   private WorkflowService workflowService;
   private ElementStore elementStore;
   private OpencastArchive archive;
-  private Map<String, ?> persistenceProperties;
-  private PersistenceProvider persistenceProvider;
+  private EntityManagerFactory emf;
   private MessageSender messageSender;
   private MessageReceiver messageReceiver;
 
@@ -137,12 +134,9 @@ public class OpencastArchivePublisher extends SimpleServicePublisher {
     this.mpeg7CatalogService = mpeg7CatalogService;
   }
 
-  public void setPersistenceProperties(Map<String, ?> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
-  }
-
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
+  /** OSGi DI */
+  void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
   }
 
   public void setSeriesService(SeriesService seriesService) {
@@ -198,18 +192,8 @@ public class OpencastArchivePublisher extends SimpleServicePublisher {
           } catch (Exception e) {
             throw connectError(solrServerUrlConfig, e);
           }
-        } else if (cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT) != null) {
-          String solrRoot = cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT);
-          try {
-            return setupSolr(new File(solrRoot));
-          } catch (Exception e) {
-            throw connectError(solrServerUrlConfig, e);
-          }
         } else {
-          String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
-          if (storageDir == null)
-            throw new IllegalStateException("Storage dir must be set (org.opencastproject.storage.dir)");
-          String solrRoot = PathSupport.concat(storageDir, "archiveindex");
+          String solrRoot =  SolrServerFactory.getEmbeddedDir(cc, CONFIG_SOLR_ROOT, "archive");
           try {
             return setupSolr(new File(solrRoot));
           } catch (Exception e) {
@@ -226,8 +210,7 @@ public class OpencastArchivePublisher extends SimpleServicePublisher {
     final SolrIndexManager solrIndex = new SolrIndexManager(solrServer, workspace, metadataSvcs, seriesService,
             mpeg7CatalogService, securityService);
     final String systemUserName = cc.getBundleContext().getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
-    final PersistenceEnv penv = PersistenceUtil.newPersistenceEnvironment(persistenceProvider,
-            "org.opencastproject.archive.base.persistence", persistenceProperties);
+    final PersistenceEnv penv = persistenceEnvironment(emf);
     final ArchiveDb persistence = new AbstractArchiveDb() {
       @Override
       protected PersistenceEnv getPenv() {

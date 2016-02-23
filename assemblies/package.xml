@@ -22,6 +22,11 @@
     </fileSet>
 
     <fileSet>
+      <directory>../resources</directory>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+
+    <fileSet>
       <directory>target/classes/etc</directory>
       <outputDirectory>etc</outputDirectory>
       <lineEnding>unix</lineEnding>

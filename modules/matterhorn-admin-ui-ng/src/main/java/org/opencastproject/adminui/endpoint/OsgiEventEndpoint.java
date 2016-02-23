@@ -28,14 +28,13 @@ import org.opencastproject.archive.opencast.OpencastArchive;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.comments.events.EventCommentService;
+import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
-import org.opencastproject.pm.api.persistence.ParticipationManagementDatabase;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
@@ -74,7 +73,6 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   private JobEndpoint jobService;
   private ListProvidersService listProviderService;
   private OpencastArchive archive;
-  private ParticipationManagementDatabase participationManagementDatabase;
   private SchedulerService schedulerService;
   private SecurityService securityService;
   private SeriesService seriesService;
@@ -176,16 +174,6 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   /** OSGi DI. */
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
-  }
-
-  @Override
-  public ParticipationManagementDatabase getPMPersistence() {
-    return participationManagementDatabase;
-  }
-
-  /** OSGi DI. */
-  public void setParticipationPersistence(ParticipationManagementDatabase participationManagementDatabase) {
-    this.participationManagementDatabase = participationManagementDatabase;
   }
 
   @Override
