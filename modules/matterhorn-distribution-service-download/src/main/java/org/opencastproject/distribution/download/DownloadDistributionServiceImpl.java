@@ -443,7 +443,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
       Files.walkFileTree(p, new SimpleFileVisitor<Path>() {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          if (Files.isDirectory(file))
+          if (attrs.isDirectory())
             return FileVisitResult.CONTINUE;
 
           if (size != attrs.size())
