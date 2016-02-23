@@ -90,11 +90,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
         if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
           logger.info("Distributing {} to {}", elementId, distributionChannel);
           try {
-            if (response.getEntity().getContentLength() > 0) {
-              return JobParser.parseJob(response.getEntity().getContent());
-            } else {
-              return null;
-            }
+            return JobParser.parseJob(response.getEntity().getContent());
           } catch (Exception e) {
             throw new DistributionException("Unable to distribute mediapackage '" + elementId
                     + "' using a remote distribution service", e);
