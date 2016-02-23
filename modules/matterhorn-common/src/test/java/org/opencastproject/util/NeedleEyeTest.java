@@ -21,12 +21,17 @@
 
 package org.opencastproject.util;
 
-import org.junit.Test;
-import org.opencastproject.util.data.Function0;
-
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Test;
+import org.opencastproject.util.data.Function0;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class NeedleEyeTest {
+
+  private static final Logger logger = LoggerFactory.getLogger(NeedleEyeTest.class);
+
   @Test
   public void testNeedleEye() throws Exception {
     // test has been run a thousand times, increase the number to see for yourself
@@ -55,7 +60,7 @@ public class NeedleEyeTest {
           result[0] = true;
           return;
         }
-        System.out.println("not executed");
+        logger.info("not executed");
       }
     };
   }
@@ -63,9 +68,9 @@ public class NeedleEyeTest {
   private Function0<Boolean> sleep(final long time) {
     return new Function0.X<Boolean>() {
       @Override public Boolean xapply() throws Exception {
-        System.out.println(this + " is sleeping for " + time + " ms");
+        logger.info(this + " is sleeping for " + time + " ms");
         Thread.sleep(time);
-        System.out.println(this + " awaked");
+        logger.info(this + " awaked");
         return true;
       }
     };
