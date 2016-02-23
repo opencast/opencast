@@ -18,17 +18,14 @@
  * the License.
  *
  */
-
-package org.opencastproject.ingest.endpoint;
+package org.opencastproject.util;
 
 import org.apache.commons.fileupload.ProgressListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.EntityManagerFactory;
-
 /**
- *
+ * Implementation of a {@link ProgressListener} for uploads.
  */
 public class UploadProgressListener implements ProgressListener {
   private static final Logger logger = LoggerFactory.getLogger(UploadProgressListener.class);
@@ -39,13 +36,10 @@ public class UploadProgressListener implements ProgressListener {
   private static final int SAVE_INTERVAL = 50 * 1024;
 
   private UploadJob job;
-  @SuppressWarnings("unused")
-  private EntityManagerFactory emf;
   private long lastSaved = 0L;
 
-  public UploadProgressListener(UploadJob job, EntityManagerFactory emf) {
+  public UploadProgressListener(UploadJob job) {
     this.job = job;
-    this.emf = emf;
   }
 
   /**
@@ -66,4 +60,5 @@ public class UploadProgressListener implements ProgressListener {
       lastSaved = rec;
     }
   }
+
 }

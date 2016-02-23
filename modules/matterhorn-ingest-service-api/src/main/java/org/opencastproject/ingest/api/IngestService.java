@@ -187,6 +187,48 @@ public interface IngestService extends JobProducer {
           MediaPackage mediaPackage) throws MediaPackageException, IOException, IngestException;
 
   /**
+   * Adds a partial media track to the existing MediaPackage in the repository
+   * 
+   * @param uri
+   *          the URL of the file to add
+   * @param flavor
+   *          the flavor of the media that is being added
+   * @param startTime
+   *          the start time
+   * @param mediaPackage
+   *          the mediapackage
+   * @return the updated mediapackage
+   * @throws IOException
+   *           if reading or writing of the partial track fails
+   * @throws IngestException
+   *           if an unexpected error occurs
+   */
+  MediaPackage addPartialTrack(URI uri, MediaPackageElementFlavor flavor, long startTime, MediaPackage mediaPackage)
+          throws IOException, IngestException;
+
+  /**
+   * Adds a partial media track to the existing MediaPackage in the repository
+   *
+   * @param mediaFile
+   *          the media file to add
+   * @param fileName
+   *          the file name
+   * @param flavor
+   *          the flavor of the media that is being added
+   * @param startTime
+   *          the start time
+   * @param mediaPackage
+   *          the mediapackage
+   * @return the updated mediapackage
+   * @throws IOException
+   *           if reading or writing of the partial track fails
+   * @throws IngestException
+   *           if an unexpected error occurs
+   */
+  MediaPackage addPartialTrack(InputStream mediaFile, String fileName, MediaPackageElementFlavor flavor,
+          long startTime, MediaPackage mediaPackage) throws IOException, IngestException;
+
+  /**
    * Add a [metadata catalog] to an existing MediaPackage in the repository
    *
    * @param uri
