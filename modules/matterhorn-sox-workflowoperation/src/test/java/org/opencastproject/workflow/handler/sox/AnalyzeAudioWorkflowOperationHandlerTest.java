@@ -107,11 +107,11 @@ public class AnalyzeAudioWorkflowOperationHandlerTest {
 
     Job analyzeJob = serviceRegistry.createJob(SoxService.JOB_TYPE, "Analyze", null, soxTrackXml, false);
     analyzeJob.setStatus(Status.FINISHED);
-    serviceRegistry.updateJob(analyzeJob);
+    analyzeJob = serviceRegistry.updateJob(analyzeJob);
 
     Job encodeJob = serviceRegistry.createJob(ComposerService.JOB_TYPE, "Encode", null, encodeTrackXml, false);
     encodeJob.setStatus(Status.FINISHED);
-    serviceRegistry.updateJob(encodeJob);
+    encodeJob = serviceRegistry.updateJob(encodeJob);
 
     SoxService sox = EasyMock.createNiceMock(SoxService.class);
     EasyMock.expect(sox.analyze((Track) EasyMock.anyObject())).andReturn(analyzeJob).anyTimes();
