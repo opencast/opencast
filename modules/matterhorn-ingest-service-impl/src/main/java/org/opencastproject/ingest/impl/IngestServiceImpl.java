@@ -406,7 +406,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       // QUEUED state but set it to INSTANTIATED in the beginning and then manually switch it to RUNNING.
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_ZIP, null, null, false, ingestZipJobLoad);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
 
       // Create the working file target collection for this ingest operation
       String wfrCollectionId = Long.toString(job.getId());
@@ -637,7 +637,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               Arrays.asList(uri.toString(), flavor == null ? null : flavor.toString(),
                       MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding track {} from URL {} on mediapackage {}", new Object[] { elementId, uri, mediaPackage });
       URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
@@ -803,7 +803,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_CATALOG_FROM_URI,
               Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding catalog {} from URL {} on mediapackage {}",
               new Object[] { elementId, uri, mediaPackage });
@@ -894,7 +894,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_CATALOG, null, null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding catalog {} from input stream on mediapackage {}", new Object[] { elementId,
               mediaPackage });
@@ -939,7 +939,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_ATTACHMENT_FROM_URI,
               Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding attachment {} from URL {} on mediapackage {}", new Object[] { elementId, uri,
               mediaPackage });
@@ -980,7 +980,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_ATTACHMENT, null, null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding attachment {} from input stream on mediapackage {}", new Object[] { elementId,
               mediaPackage });

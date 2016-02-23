@@ -90,7 +90,8 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
     Configuration config = new Configuration(currentOperation);
 
-    MediaPackage mp = workflowInstance.getMediaPackage();
+    MediaPackage workflowMP = workflowInstance.getMediaPackage();
+    MediaPackage mp = workflowMP;
 
     /* Check if we need to replace the Mediapackage we got with the published
      * Mediapackage from the Search Service */
@@ -171,7 +172,7 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
         throw new WorkflowOperationException(e);
       }
     }
-    return createResult(mp, Action.CONTINUE);
+    return createResult(workflowMP, Action.CONTINUE);
   }
 
   // <editor-fold defaultstate="collapsed" desc="Inner class that wraps around this WorkflowOperations Configuration">
