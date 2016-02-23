@@ -1,4 +1,4 @@
-# Upgrading Matterhorn to 2.2
+# Upgrading Opencast to 2.2
 
 ## Database Migration
 You will find the database migration script in /docs/upgrade/2.1_to_2.2/<vendor>.sql
@@ -8,9 +8,10 @@ With the introduction of stream security, there was the need to be able to preve
 
 To update the distribution artifacts:
 
-1. Shutdown Matterhorn
-2. Build the matterhorn-migration bundle and put it to your presentation node where the search service is running.
-3. Now start Matterhorn and check the logs for errors!
-4. Stop Matterhorn. Migration has been successful, remove the matterhorn-migration bundle.
+1. Install Opencast 2.2
+2. Start Matterhorn
+3. Log-in to the Karaf console on your node where the search service is running (usually presentation node) and install the opencast-migration feature by entering: `feature:install opencast-migration`
+4. Check the logs for errors!
+5. Restart Matterhorn.
 
 ## Configuration changes
