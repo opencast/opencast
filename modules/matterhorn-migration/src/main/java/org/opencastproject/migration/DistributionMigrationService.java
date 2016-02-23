@@ -274,11 +274,11 @@ public class DistributionMigrationService {
     return mediapackages;
   }
 
-  private Boolean lookUpArchive(final String mpId, Organization org) {
+  private Boolean lookUpArchive(final String mpId, final Organization org) {
     return SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(cc, org), new Function0<Boolean>() {
       @Override
       public Boolean apply() {
-        final ResultSet result = archive.findForAdministrativeRead(getQuery(mpId),
+        final ResultSet result = archive.findForAdministrativeRead(getQuery(mpId, org),
                 httpMediaPackageElementProvider.getUriRewriter());
         if (result.size() > 0) {
           return true;
@@ -286,7 +286,7 @@ public class DistributionMigrationService {
         return false;
       }
 
-      private Query getQuery(final String mpId) {
+      private Query getQuery(final String mpId, final Organization org) {
         return new Query() {
           @Override
           public boolean isOnlyLastVersion() {
@@ -305,7 +305,7 @@ public class DistributionMigrationService {
 
           @Override
           public Option<String> getOrganizationId() {
-            return none();
+            return Option.some(org.getId());
           }
 
           @Override
