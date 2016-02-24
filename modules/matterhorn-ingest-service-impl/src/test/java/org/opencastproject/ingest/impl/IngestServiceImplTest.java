@@ -65,7 +65,6 @@ import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workingfilerepository.impl.WorkingFileRepositoryImpl;
-import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;

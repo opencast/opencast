@@ -299,6 +299,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   @SuppressWarnings("rawtypes")
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
+    ingestFileJobLoad = LoadUtil.getConfiguredLoadValue(properties, FILE_JOB_LOAD_KEY, DEFAULT_INGEST_FILE_JOB_LOAD,
+            serviceRegistry);
+    ingestZipJobLoad = LoadUtil.getConfiguredLoadValue(properties, ZIP_JOB_LOAD_KEY, DEFAULT_INGEST_ZIP_JOB_LOAD,
+            serviceRegistry);
     // try to get overwrite series option from config, use default if not configured
     try {
       isOverwriteSeries = Boolean.parseBoolean(((String) properties.get(PROPKEY_OVERWRITE_SERIES)).trim());
@@ -1720,18 +1724,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         return (Track) MediaPackageElementParser.getFromXml(job.getPayload());
       }
     };
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
-   */
-  @SuppressWarnings("rawtypes")
-  @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
-    ingestFileJobLoad = LoadUtil.getConfiguredLoadValue(properties, FILE_JOB_LOAD_KEY, DEFAULT_INGEST_FILE_JOB_LOAD, serviceRegistry);
-    ingestZipJobLoad = LoadUtil.getConfiguredLoadValue(properties, ZIP_JOB_LOAD_KEY, DEFAULT_INGEST_ZIP_JOB_LOAD, serviceRegistry);
   }
 
   /**
