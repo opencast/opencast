@@ -110,8 +110,8 @@ public class ServiceRegistryJpaImplTest {
     undispatchableJob1.setStatus(Status.RUNNING);
     undispatchableJob2.setDateStarted(new Date());
     undispatchableJob2.setStatus(Status.RUNNING);
-    serviceRegistryJpaImpl.updateJob(undispatchableJob1);
-    serviceRegistryJpaImpl.updateJob(undispatchableJob2);
+    undispatchableJob1 = serviceRegistryJpaImpl.updateJob(undispatchableJob1);
+    undispatchableJob2 = serviceRegistryJpaImpl.updateJob(undispatchableJob2);
 
   }
 

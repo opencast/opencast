@@ -155,6 +155,7 @@ public final class JobBarrier {
         for (Job j : jobs) {
           blockedForJobs.add(j.getId());
           j.setBlockingJobId(waiter.getId());
+          // FYI not updating local j in jobs collection
           this.serviceRegistry.updateJob(j);
         }
         waiter.setBlockedJobIds(blockedForJobs);
@@ -177,6 +178,7 @@ public final class JobBarrier {
         for (Job j : jobs) {
           Job updatedJob = this.serviceRegistry.getJob(j.getId());
           updatedJob.removeBlockingJobId();
+          // FYI not updating local j in jobs collection
           this.serviceRegistry.updateJob(updatedJob);
         }
         waiter.removeBlockedJobsIds();

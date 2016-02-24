@@ -751,7 +751,7 @@ public class WorkflowServiceImplTest {
           throws ConfigurationException, MediaPackageException, NotFoundException, ServiceRegistryException {
 
     Job job = new JobImpl(id);
-    serviceRegistry.updateJob(job);
+    job = serviceRegistry.updateJob(job);
 
     MediaPackage mediapackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     mediapackage.setDate(startDate);

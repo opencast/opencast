@@ -548,11 +548,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       for (String filename : collectionFilenames) {
         workingFileRepository.deleteFromCollection(Long.toString(job.getId()), filename);
       }
-      try {
-        serviceRegistry.updateJob(job);
-      } catch (Exception e) {
-        throw new IngestException("Unable to update job", e);
-      }
+      finallyUpdateJob(job);
     }
   }
 
@@ -656,13 +652,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (NotFoundException e) {
       throw new IngestException("Unable to update ingest job", e);
     } finally {
-      try {
-        if (job != null) {
-          serviceRegistry.updateJob(job);
-        }
-      } catch (Exception e) {
-        throw new IngestException("Unable to update ingest job", e);
-      }
+      finallyUpdateJob(job);
     }
   }
 
@@ -699,11 +689,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (NotFoundException e) {
       throw new IngestException("Unable to update ingest job", e);
     } finally {
-      try {
-        serviceRegistry.updateJob(job);
-      } catch (Exception e) {
-        throw new IngestException("Unable to update ingest job", e);
-      }
+      finallyUpdateJob(job);
     }
   }
 
@@ -741,13 +727,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (NotFoundException e) {
       throw new IngestException("Unable to update ingest job", e);
     } finally {
-      try {
-        if (job != null) {
-          serviceRegistry.updateJob(job);
-        }
-      } catch (Exception e) {
-        throw new IngestException("Unable to update ingest job", e);
-      }
+      finallyUpdateJob(job);
     }
   }
 
@@ -781,11 +761,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (NotFoundException e) {
       throw new IngestException("Unable to update ingest job", e);
     } finally {
-      try {
-        serviceRegistry.updateJob(job);
-      } catch (Exception e) {
-        throw new IngestException("Unable to update ingest job", e);
-      }
+      finallyUpdateJob(job);
     }
   }
 
@@ -826,11 +802,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (NotFoundException e) {
       throw new IngestException("Unable to update ingest job", e);
     } finally {
-      try {
-        serviceRegistry.updateJob(job);
-      } catch (Exception e) {
-        throw new IngestException("Unable to update ingest job", e);
-      }
+      finallyUpdateJob(job);
     }
   }
 
@@ -917,11 +889,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (NotFoundException e) {
       throw new IngestException("Unable to update ingest job", e);
     } finally {
-      try {
-        serviceRegistry.updateJob(job);
-      } catch (Exception e) {
-        throw new IngestException("Unable to update ingest job", e);
-      }
+      finallyUpdateJob(job);
     }
   }
 
@@ -959,11 +927,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (NotFoundException e) {
       throw new IngestException("Unable to update ingest job", e);
     } finally {
-      try {
-        serviceRegistry.updateJob(job);
-      } catch (Exception e) {
-        throw new IngestException("Unable to update ingest job", e);
-      }
+      finallyUpdateJob(job);
     }
   }
 
@@ -1000,11 +964,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (NotFoundException e) {
       throw new IngestException("Unable to update ingest job", e);
     } finally {
-      try {
-        serviceRegistry.updateJob(job);
-      } catch (Exception e) {
-        throw new IngestException("Unable to update ingest job", e);
-      }
+      finallyUpdateJob(job);
     }
 
   }
@@ -1736,6 +1696,26 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   public void updated(Dictionary properties) throws ConfigurationException {
     ingestFileJobLoad = LoadUtil.getConfiguredLoadValue(properties, FILE_JOB_LOAD_KEY, DEFAULT_INGEST_FILE_JOB_LOAD, serviceRegistry);
     ingestZipJobLoad = LoadUtil.getConfiguredLoadValue(properties, ZIP_JOB_LOAD_KEY, DEFAULT_INGEST_ZIP_JOB_LOAD, serviceRegistry);
+  }
+
+  /**
+   * Private utility to update Job, called from a finally block.
+   *
+   * @param job
+   *          to be updated, may be null
+   * @throws IngestException
+   *           when unable to update ingest job
+   */
+  private void finallyUpdateJob(Job job) throws IngestException {
+    try {
+      if (job != null) {
+        serviceRegistry.updateJob(job);
+      } else {
+        logger.debug("Not updating null job.");
+      }
+    } catch (Exception e) {
+      throw new IngestException("Unable to update ingest job", e);
+    }
   }
 
 }
