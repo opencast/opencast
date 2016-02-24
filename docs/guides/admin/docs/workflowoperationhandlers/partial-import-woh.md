@@ -23,7 +23,7 @@ This will be fixed by the ticket: https://opencast.jira.com/browse/MH-11264
 |**concat-encoding-profile**\*|String|Encoding profile used for concatenating audio or video files||
 |**trim-encoding-profile**\*|String|Encoding profile using for trimming tracks|
 |force-encoding|Boolean|If set to *true*, all generated target files will be encoded using the encoding profile *force-encoding-profile*|false|
-|force-encoding-profile|String|Encoding profile to be used when *force-encoding* is set to *true*||
+|**force-encoding-profile**\*|String|Encoding profile to be used when *force-encoding* is set to *true* or a given target track has a file extension not included in *required-extensions*||
 |required-extensions|String , { "," , String }|Comma-separated list of file extension names (case insensitive). All generated target files whose file extensions are not in this list will be encoded using the encoding profile *force-encoding-profile*|"mp4"|
 |enforce-divisible-by-two|Boolean|If set, all video targets will have widths and heights divisible by two. This might be necessary depending since some encoder fail when encountering uneven widths or heights.|false|
 
@@ -93,6 +93,7 @@ To achieve this, the PartialImportWorkflowOperation is used to post-process the 
         <configuration key="target-presentation-flavor">presentation/standard</configuration>
         <configuration key="concat-encoding-profile">import.concat</configuration>
         <configuration key="trim-encoding-profile">import.trim</configuration>
+        <configuration key="force-encoding-profile">editor.work</configuration>
       </configurations>
     </operation>
 
@@ -119,4 +120,76 @@ To avoid the necessity to call further workflow operations just for audio muxing
 
 5. **Ensure specific output formats:**
 There may be situations where you want to ensure that the output of this operations comes with a specific file format, e.g. *MP4*.
-The configuration keys *force-encoding* and *required_extensions* can be used to control the behavior of the PartialImportWorkflowOperation: In case the *force-encoding* is set to *true*, the target tracks will be re-encoded using the *force-encoding-profile*. The target tracks will also be re-encoded using that encoding profile in case its file extensions don't match the *required_extensions*. 
+The configuration keys *force-encoding* and *required_extensions* can be used to control the behavior of the PartialImportWorkflowOperation: In case the *force-encoding* is set to *true*, the target tracks will be re-encoded using the *force-encoding-profile*. The target tracks will also be re-encoded using that encoding profile in case its file extensions don't match the *required_extensions*.
+
+##SMIL File Structure
+
+The PartialImportWorkflowOperation expects a specific subset of SMIL that is described in this section.
+The overall structure of the SMIL file is shown by example below:
+
+      <?xml version="1.1" encoding="UTF-8"?>
+      <smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
+        <head/>
+        <body>
+          <par dur="15000ms">
+            <seq>
+              <video begin="400ms" dur="13000ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/5133d85c-5813-4b54-8a43-0cce9ddc1c4a/video_file.mov"/>
+              <video begin="15000ms" dur="70000ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/5133d85c-5813-4b54-8a43-0cce9ddc1c4a/video_file.mov"/>
+              <audio begin="0ms" dur="400ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/72a42596-e1d0-47a5-b9c8-60180b466954/audio_file.mov"/>
+              <audio begin="900ms" dur="13000ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/72a42596-e1d0-47a5-b9c8-60180b466954/audio_file.mov"/>
+            </seq>
+            <seq>
+              <video begin="900ms" dur="30000ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/bf5ea647-b99b-4ec3-a10c-29445fb01eca/video_file.mov"/>
+            </seq>
+          </par>
+        </body>
+      </smil>
+
+The PartialImportWorkflowOperation can handle at most one ***par*** element that is used to describe to overall media duration using the attribute *dur*. The resulting tracks will be trimmed to this duration if necessary.
+In the example above, the overall media duration is set to 15 seconds.
+
+The *par* element has one or two sequence sub elements ***seq***, each describing a track that is to be built from its sub elements - the partial tracks.
+Each sequence (*seq*) has at least one sub element. Sub elements can be either ***video*** elements, ***audio*** elements or both *video* and *audio* elements. Each of those sub elements requires the attributes *begin* (position of partial track in milliseconds relative to start of overall media) and *dur* (duration of partial track in milliseconds)
+The *audio* elements are used to indicate that the media file referred to is an audio-only media file, whereas *video* elements can refer to either video-only or audio-video media files.
+The following combinations result in a defined behavior:
+
+###Supported Combinations of Video and Audio Elements
+
+|video|audio|resulting track|
+|-----|-----|---------------|
+|audio/video track|n/a|audio/video track|
+|video-only track|n/a|video-only track|
+|video-only track|audio-only track|audio/video track|
+|n/a|audio-only track|audio-only track
+
+All other combinations of *video* and *audio* elements result in unspecified behavior of the PartialImportWorkflowOperation.
+
+###Order of Video and Audio Elements
+
+Within a sequence (*seq*), the *video* elements most occur in ascending order considering the values of their attributes *begin*. The same holds for *audio* elements. Note the *video* and *audio* elements are processed individually, so the order of occurrences of *video* and *audio* elements are independent from each other.
+
+**Important:** The PartialImportWorkflowOperation will not process *video* or *audio* elements correctly if the order of appearance in the SMIL file is not correct.
+
+###Overlapping Partial Tracks
+
+The behavior of overlapping partial tracks is unspecified, i.e. for a given element *e* (*video* or *audio*), the value of *begin* for the subsequent element *(e+1)* of the same type (*video* or *audio*) within the same sequence must be equal or greater than *e.begin + e.dur*, i.e. make sure that the following invariant holds: *(e+1).begin >= e.begin + e.dur*
+
+##Encoding Profiles
+The PartialImportWorkflowOperation uses a number of encoding profiles to perform its processing. Some of the encoding profiles can be explicitly configured by the user, others are used implicitly in means of being hard-coded and are not supposed to be changed by the user.
+
+### Hard-coded Encoding Profiles
+
+|encoding profile|description|
+|----------------|-----------|
+|import.preview  |Extract the first frame of a given partial track|
+|import.image-frame|Extract the last frame of a given partial track. Note that this profile is used to extract the *exactly* last frame of a partial track - not just a frame close to the last one. To make this work for video files with headers that don't contain the exact frame count, set *accurate\_frame\_count* to *true* in  etc/org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl.cfg|
+|image-movie.work|Generate video partial tracks based on extracted images used to fill video gaps|
+|import.silent|Generate silent audio tracks used to fill audio gaps|
+
+### Configurable Encoding Profiles
+
+|configuration key|description|
+|-----------------|-----------|
+|concat-encoding-profile|Used to concatenate partial tracks into tracks|
+|trim-encoding-profile|Used to trim the resulting concatenated single tracks if necessary|
+|force-encoding-profile|Used to re-encode target tracks in case the file extension of a given target track is not included in *required-extensions* or the configuration key *force-encoding* is set to *true* |
