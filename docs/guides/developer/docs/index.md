@@ -11,3 +11,5 @@ These guides will help you if you want to participate in Opencast development.
  - [Proposal Log](proposal-log.md)
  - [Licenses and Legal Matters](license.md)
  - [Packaging Guidelines](packaging.md)
+ - [Project Infrastructure](infrastructure/index.md)
+    - [Nexus Maven Repository](infrastructure/nexus.md)
