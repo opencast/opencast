@@ -37,19 +37,23 @@ import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.Jsons.toJson;
 import static org.opencastproject.util.Jsons.v;
 
-import com.jayway.restassured.path.json.JsonPath;
-
-import org.junit.Test;
-
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.jayway.restassured.path.json.JsonPath;
+
 public class JsonsTest {
+  private static final Logger logger = LoggerFactory.getLogger(JsonsTest.class);
+
   @Test
   public void testComposition1() {
     final Jsons.Obj j = append(obj(p("name", "Karl"), p("city", "Paris"), p("remove_me", ZERO_VAL)), obj(p("age", 79)));
     final JsonPath p = JsonPath.from(toJson(j));
-    System.out.println(p.prettyPrint());
+    logger.info(p.prettyPrint());
     assertEquals("Karl", p.get("name"));
     assertEquals("Paris", p.get("city"));
     assertNull(p.get("remove_me"));
@@ -85,7 +89,7 @@ public class JsonsTest {
   public void testZeros() {
     assertNull(JsonPath.from(obj(p("val", ZERO_VAL)).toJson()).get("UNKNOWN"));
     // using ZERO_VAL in properties drops the whole property
-    System.out.println(obj(p("val", ZERO_VAL)).toJson());
+    logger.info(obj(p("val", ZERO_VAL)).toJson());
     assertNull(JsonPath.from(obj(p("val", ZERO_VAL)).toJson()).get("val"));
     {
       final Jsons.Obj j = obj(p("val", ZERO_OBJ));
@@ -101,6 +105,6 @@ public class JsonsTest {
 
   @Test
   public void testNull() {
-    System.out.println(obj(p("val", NULL)).toJson());
+    logger.info(obj(p("val", NULL)).toJson());
   }
 }

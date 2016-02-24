@@ -40,6 +40,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,6 +50,7 @@ import java.io.InputStreamReader;
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class JobEndpointTest {
+  private static final Logger logger = LoggerFactory.getLogger(JobEndpointTest.class);
   private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestJobEndpoint.class);
 
   private JSONParser parser;
@@ -76,7 +79,7 @@ public class JobEndpointTest {
 
     actual = given().queryParam("offset", 1).queryParam("limit", 1).expect().log().all().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).when().get(rt.host("/jobs.json")).asString();
-    System.out.print(actual);
+    logger.info(actual);
 
     assertThat(eventString, SameJSONAs.sameJSONAs(actual));
   }

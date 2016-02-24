@@ -41,6 +41,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,6 +51,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class UsersSettingsEndpointTest {
+  private static final Logger logger = LoggerFactory.getLogger(UsersSettingsEndpointTest.class);
   private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestUserSettingsEndpoint.class);
 
   private JSONParser parser;
@@ -88,7 +91,7 @@ public class UsersSettingsEndpointTest {
             .contentType(ContentType.JSON).body("total", equalTo(10)).body("offset", equalTo(0))
             .body("limit", equalTo(100)).body("results", hasSize(10)).when().get(rt.host("/settings.json")).asString());
 
-    System.out.println(actual.toJSONString());
+    logger.info(actual.toJSONString());
     compareIds("results", expected, actual);
   }
 
@@ -104,7 +107,7 @@ public class UsersSettingsEndpointTest {
             .body("limit", equalTo(100)).body("results", hasSize(10)).when()
             .get(rt.host("/settings.json?limit=100&offset=0")).asString());
 
-    System.out.println(actual.toJSONString());
+    logger.info(actual.toJSONString());
     compareIds("results", expected, actual);
   }
 
@@ -116,7 +119,7 @@ public class UsersSettingsEndpointTest {
     JSONObject actual = (JSONObject) parser.parse(given().formParam("key", key).formParam("value", value).log().all()
             .expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).body("key", equalTo(key))
             .body("value", equalTo(value)).when().post(rt.host("setting")).asString());
-    System.out.println(actual.toJSONString());
+    logger.info(actual.toJSONString());
   }
 
   @Test
