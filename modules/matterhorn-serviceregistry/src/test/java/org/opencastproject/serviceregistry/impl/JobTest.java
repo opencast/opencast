@@ -149,7 +149,7 @@ public class JobTest {
 
     // Simulate starting the job
     job.setStatus(Status.RUNNING);
-    serviceRegistry.updateJob(job);
+    job = serviceRegistry.updateJob(job);
 
     // Finish the job
     job = serviceRegistry.getJob(job.getId());
@@ -158,7 +158,7 @@ public class JobTest {
     t.setIdentifier("track-1");
     job.setPayload(MediaPackageElementParser.getAsXml(t));
     job.setStatus(Status.FINISHED);
-    serviceRegistry.updateJob(job);
+    job = serviceRegistry.updateJob(job);
 
     jobFromDb = serviceRegistry.getJob(job.getId());
     Assert.assertNotNull(jobFromDb.getUri());
@@ -169,7 +169,7 @@ public class JobTest {
   public void testGetJobs() throws Exception {
     Job job = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, null);
     job.setStatus(Status.RUNNING);
-    serviceRegistry.updateJob(job);
+    job = serviceRegistry.updateJob(job);
 
     long id = job.getId();
 
@@ -191,7 +191,7 @@ public class JobTest {
 
     Job receipt = serviceRegistry.getJob(id);
     receipt.setStatus(Status.FINISHED);
-    serviceRegistry.updateJob(receipt);
+    receipt = serviceRegistry.updateJob(receipt);
     long queuedJobs = serviceRegistry.count(JOB_TYPE_1, Status.RUNNING);
     assertEquals(0, queuedJobs);
   }
@@ -205,12 +205,12 @@ public class JobTest {
     Job job4 = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, job3);
     Job job2 = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, job1);
     Job job5 = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, job4);
-    serviceRegistry.updateJob(job);
-    serviceRegistry.updateJob(job1);
-    serviceRegistry.updateJob(job2);
-    serviceRegistry.updateJob(job3);
-    serviceRegistry.updateJob(job4);
-    serviceRegistry.updateJob(job5);
+    job = serviceRegistry.updateJob(job);
+    job1 = serviceRegistry.updateJob(job1);
+    job2 = serviceRegistry.updateJob(job2);
+    job3 = serviceRegistry.updateJob(job3);
+    job4 = serviceRegistry.updateJob(job4);
+    job5 = serviceRegistry.updateJob(job5);
 
     // Search children by root job
     final Stream<Job> rootChildren = $(serviceRegistry.getChildJobs(rootJob.getId()));
@@ -289,31 +289,31 @@ public class JobTest {
     localRunning1.setStatus(Status.RUNNING);
     localRunning1.setJobType(regType1Localhost.getServiceType());
     localRunning1.setProcessingHost(regType1Localhost.getHost());
-    serviceRegistry.updateJob(localRunning1);
+    localRunning1 = serviceRegistry.updateJob(localRunning1);
 
     Job localRunning2 = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false);
     localRunning2.setStatus(Status.RUNNING);
     localRunning2.setJobType(regType1Localhost.getServiceType());
     localRunning2.setProcessingHost(regType1Localhost.getHost());
-    serviceRegistry.updateJob(localRunning2);
+    localRunning2 = serviceRegistry.updateJob(localRunning2);
 
     Job localFinished = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false);
     // Simulate starting the job
     localFinished.setStatus(Status.RUNNING);
     localFinished.setJobType(regType1Localhost.getServiceType());
     localFinished.setProcessingHost(regType1Localhost.getHost());
-    serviceRegistry.updateJob(localFinished);
+    localFinished = serviceRegistry.updateJob(localFinished);
     // Finish the job
     localFinished = serviceRegistry.getJob(localFinished.getId());
     localFinished.setStatus(Status.FINISHED);
-    serviceRegistry.updateJob(localFinished);
+    localFinished = serviceRegistry.updateJob(localFinished);
 
     Job remoteRunning = serviceRegistry.createJob(regType1Remotehost.getHost(),
             regType1Remotehost.getServiceType(), OPERATION_NAME, null, null, false, null);
     remoteRunning.setStatus(Status.RUNNING);
     remoteRunning.setJobType(regType1Remotehost.getServiceType());
     remoteRunning.setProcessingHost(regType1Remotehost.getHost());
-    serviceRegistry.updateJob(remoteRunning);
+    remoteRunning = serviceRegistry.updateJob(remoteRunning);
 
     Job remoteFinished = serviceRegistry.createJob(regType1Remotehost.getHost(),
             regType1Remotehost.getServiceType(), OPERATION_NAME, null, null, false, null);
@@ -321,28 +321,28 @@ public class JobTest {
     remoteFinished.setStatus(Status.RUNNING);
     remoteFinished.setJobType(regType1Remotehost.getServiceType());
     remoteFinished.setProcessingHost(regType1Remotehost.getHost());
-    serviceRegistry.updateJob(remoteFinished);
+    remoteFinished = serviceRegistry.updateJob(remoteFinished);
     // Finish the job
     remoteFinished = serviceRegistry.getJob(remoteFinished.getId());
     remoteFinished.setStatus(Status.FINISHED);
-    serviceRegistry.updateJob(remoteFinished);
+    remoteFinished = serviceRegistry.updateJob(remoteFinished);
 
     Job otherTypeRunning = serviceRegistry.createJob(JOB_TYPE_2, OPERATION_NAME, null, null, false);
     otherTypeRunning.setStatus(Status.RUNNING);
     otherTypeRunning.setJobType(regType2Localhost.getServiceType());
     otherTypeRunning.setProcessingHost(regType2Localhost.getHost());
-    serviceRegistry.updateJob(otherTypeRunning);
+    otherTypeRunning = serviceRegistry.updateJob(otherTypeRunning);
 
     Job otherTypeFinished = serviceRegistry .createJob(JOB_TYPE_2, OPERATION_NAME, null, null, false);
     // Simulate starting the job
     otherTypeFinished.setStatus(Status.RUNNING);
     otherTypeFinished.setJobType(regType2Localhost.getServiceType());
     otherTypeFinished.setProcessingHost(regType2Localhost.getHost());
-    serviceRegistry.updateJob(otherTypeFinished);
+    otherTypeFinished = serviceRegistry.updateJob(otherTypeFinished);
     // Finish the job
     otherTypeFinished = serviceRegistry.getJob(otherTypeFinished.getId());
     otherTypeFinished.setStatus(Status.FINISHED);
-    serviceRegistry.updateJob(otherTypeFinished);
+    otherTypeFinished = serviceRegistry.updateJob(otherTypeFinished);
 
     List<ServiceRegistration> type1Hosts = serviceRegistry.getServiceRegistrationsByLoad(JOB_TYPE_1);
     List<ServiceRegistration> type2Hosts = serviceRegistry.getServiceRegistrationsByLoad(JOB_TYPE_2);
@@ -369,7 +369,7 @@ public class JobTest {
     // Add an additional dispatchable job. This is important as it leaves the processing host field empty.
     Job localRunning1 = serviceRegistry.createJob(JOB_TYPE_2, OPERATION_NAME, null, null, true);
     localRunning1.setStatus(Status.RUNNING);
-    serviceRegistry.updateJob(localRunning1);
+    localRunning1 = serviceRegistry.updateJob(localRunning1);
     //
     final Monadics.ListMonadic<String> jpql = resultToString(new Function.X<EntityManager, List<Object[]>>() {
       @Override
@@ -514,13 +514,13 @@ public class JobTest {
 
     job = serviceRegistry.getJob(job.getId());
     job.setPayload("update1");
-    serviceRegistry.updateJob(job);
+    job = serviceRegistry.updateJob(job);
     job = serviceRegistry.getJob(job.getId());
     assertEquals("Updated job should have a version of 2", 2, job.getVersion());
 
     job = serviceRegistry.getJob(job.getId());
     job.setPayload("update2");
-    serviceRegistry.updateJob(job);
+    job = serviceRegistry.updateJob(job);
     job = serviceRegistry.getJob(job.getId());
     assertEquals("Updated job should have a version of 3", 3, job.getVersion());
   }
@@ -541,7 +541,7 @@ public class JobTest {
 
     // Modify the job and save it
     job.setPayload("something produced by this client");
-    serviceRegistry.updateJob(job);
+    job = serviceRegistry.updateJob(job);
     job = serviceRegistry.getJob(job.getId());
 
     // Ensure that the job version is higher than the snapshot we loaded from the database
@@ -549,7 +549,7 @@ public class JobTest {
 
     // Try to modify and save the outdated reference
     try {
-      serviceRegistry.updateJob(jobFromDb);
+      jobFromDb = serviceRegistry.updateJob(jobFromDb);
       Assert.fail();
     } catch (Exception e) {
       // do nothinng
@@ -566,7 +566,7 @@ public class JobTest {
     job.setDispatchable(true);
     job.setJobType(regType1Localhost.getServiceType());
     job.setProcessingHost(regType1Localhost.getHost());
-    serviceRegistry.updateJob(job);
+    job = serviceRegistry.updateJob(job);
 
     // Ensure that we get the job back from the service in its running state
     assertEquals("Job should be running", Status.RUNNING, serviceRegistry.getJob(job.getId()).getStatus());
@@ -598,7 +598,7 @@ public class JobTest {
     job.setDispatchable(true);
     job.setJobType(regType1Localhost.getServiceType());
     job.setProcessingHost(regType1Localhost.getHost());
-    serviceRegistry.updateJob(job);
+    job = serviceRegistry.updateJob(job);
 
     // Unregister the service
     serviceRegistry.unRegisterService(JOB_TYPE_1, LOCALHOST);
@@ -619,7 +619,7 @@ public class JobTest {
     job.setDispatchable(true);
     job.setJobType(regType1Localhost.getServiceType());
     job.setProcessingHost(regType1Localhost.getHost());
-    serviceRegistry.updateJob(job);
+    job = serviceRegistry.updateJob(job);
 
     // Unregister the host that's running the service responsible for this job
     serviceRegistry.unregisterHost(LOCALHOST);
@@ -634,23 +634,23 @@ public class JobTest {
   public void testRemoveJobsWithoutParent() throws Exception {
     Job jobRunning = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false, 1.0f);
     jobRunning.setStatus(Status.RUNNING);
-    serviceRegistry.updateJob(jobRunning);
+    jobRunning = serviceRegistry.updateJob(jobRunning);
 
     Job jobFinished = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false, 1.0f);
     jobFinished.setStatus(Status.FINISHED);
-    serviceRegistry.updateJob(jobFinished);
+    jobFinished = serviceRegistry.updateJob(jobFinished);
 
     Job jobFailed = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false, 1.0f);
     jobFailed.setStatus(Status.FAILED, FailureReason.NONE);
-    serviceRegistry.updateJob(jobFailed);
+    jobFailed = serviceRegistry.updateJob(jobFailed);
 
     Job parent = serviceRegistry.createJob(JOB_TYPE_1, "START_OPERATION", null, null, false, 1.0f);
     parent.setStatus(Status.FAILED);
-    serviceRegistry.updateJob(parent);
+    parent = serviceRegistry.updateJob(parent);
 
     Job jobWithParent = serviceRegistry.createJob(JOB_TYPE_1, OPERATION_NAME, null, null, false, parent);
     jobWithParent.setStatus(Status.FAILED);
-    serviceRegistry.updateJob(jobWithParent);
+    jobWithParent = serviceRegistry.updateJob(jobWithParent);
 
     List<Job> jobs = serviceRegistry.getJobs(null, null);
     assertEquals(5, jobs.size());
@@ -662,7 +662,7 @@ public class JobTest {
 
     jobRunning = serviceRegistry.getJob(jobRunning.getId());
     jobRunning.setStatus(Status.FINISHED);
-    serviceRegistry.updateJob(jobRunning);
+    jobRunning = serviceRegistry.updateJob(jobRunning);
 
     serviceRegistry.removeParentlessJobs(0);
 

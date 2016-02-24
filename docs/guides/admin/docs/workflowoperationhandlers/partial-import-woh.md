@@ -91,8 +91,8 @@ To achieve this, the PartialImportWorkflowOperation is used to post-process the 
         <configuration key="source-smil-flavor">smil/source+partial</configuration>
         <configuration key="target-presenter-flavor">presenter/standard</configuration>
         <configuration key="target-presentation-flavor">presentation/standard</configuration>
-        <configuration key="concat-encoding-profile">import.concat</configuration>
-        <configuration key="trim-encoding-profile">import.trim</configuration>
+        <configuration key="concat-encoding-profile">concat.work</configuration>
+        <configuration key="trim-encoding-profile">trim.work</configuration>
         <configuration key="force-encoding-profile">editor.work</configuration>
       </configurations>
     </operation>
