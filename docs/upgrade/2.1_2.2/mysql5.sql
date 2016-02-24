@@ -37,3 +37,4 @@ DROP TABLE mh_comment_mh_comment_reply;
 DROP TABLE mh_comment_reply;
 DROP TABLE mh_message_signature_mh_comment;
 DROP TABLE mh_comment;
+DROP TABLE mh_upload;

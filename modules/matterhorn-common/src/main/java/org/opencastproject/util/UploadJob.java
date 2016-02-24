@@ -18,45 +18,21 @@
  * the License.
  *
  */
-
-
-package org.opencastproject.ingest.endpoint;
+package org.opencastproject.util;
 
 import java.util.UUID;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-
 /**
  * Holds information about a file upload.
- *
  */
-@Entity(name = "UploadJob")
-@Access(AccessType.FIELD)
-@Table(name = "mh_upload")
-// FIXME @NamedQueries necessary with only one NamedQuery
-@NamedQueries({ @NamedQuery(name = "UploadJob.getByID", query = "SELECT o FROM UploadJob o WHERE o.id = :id") })
 public class UploadJob {
 
-  @Id
-  @Column(name = "id", length = 128)
   private String id;
 
-  @Lob
-  @Column(name = "filename", nullable = false, length = 65535)
   private String filename = "";
 
-  @Column(name = "total", nullable = false)
   private long bytesTotal = -1L;
 
-  @Column(name = "received", nullable = false)
   private long bytesReceived = -1L;
 
   public UploadJob() {

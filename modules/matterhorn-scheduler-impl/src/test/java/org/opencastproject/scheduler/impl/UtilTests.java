@@ -28,6 +28,8 @@ import net.fortuna.ical4j.model.property.RRule;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -36,7 +38,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 public class UtilTests {
-
+  private static final Logger logger = LoggerFactory.getLogger(UtilTests.class);
   /**
    * Tests for the method calculatePeriods
    */
@@ -110,7 +112,9 @@ public class UtilTests {
     days = "MO,TH,FR,SA,SU";
 
     periods = generatePeriods(cet, start, end, days, durationMillis);
-    System.out.println(periods);
+    for (Period p : periods) {
+      logger.info(p.toString());
+    }
     assertEquals(5, periods.size());
     for (Period d : periods) {
       DateTime dEnd = d.getEnd();
