@@ -15,6 +15,32 @@ signals agreement. Apart from that committers may vote with:
 Passed Proposals
 ----------------
 
+### Documentation Pull Request Merge Order
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Wed, 25 Feb 2016 20:52:00 UTC
+
+    Hi everyone, 
+    as discussed in this weeks technical meeting, I hereby #propose to 
+    allow out-of-order merges of documentation pull requests in the same way 
+    we have this exception for bug-fixes. 
+
+    to be precise, I #propose to change the development process docs for 
+    reviewing and merging [1] in the following way: 
+
+    [old] 
+
+     - Pull requests for bug fixes (t/MH-XXXXX-...) may be reviewed and 
+       merged out of order. 
+
+    [new] 
+
+     - Pull requests for bug fixes or documentation may be reviewed and 
+       merged out of order. 
+
+    Regards, 
+    Lars 
+
+    [1] https://docs.opencast.org/develop/developer/reviewing-and-merging/ 
+
 ### Removing instances of print statements with a style rule #proposal
 Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Wed, 12 Feb 2016 12:00:00 UTC
 
