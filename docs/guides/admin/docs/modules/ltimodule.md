@@ -24,7 +24,7 @@ Configure Opencast
 ------------------------
 
 The integration of Opencast in the LMS through the LTI module has to be configured on both sides: In Opencast and in the LMS.
-To let the LMS access Opencast, the security file etc/security/mh_default_org.org from the opencast folder must be configured. The relevant sections are shown below:
+To let the LMS access Opencast, the security file etc/security/mh_default_org.xml from the opencast folder must be configured. The relevant sections are shown below:
 
 ```
 <sec:custom-filter after="BASIC_AUTH_FILTER" ref="oauthProtectedResourceFilter" />
