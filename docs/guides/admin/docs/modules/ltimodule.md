@@ -61,7 +61,7 @@ They are then required to embed OPENCAST into my LMS.
 Configure the LMS
 -----------------
 
-To connect OPENCAST to the LMS additional configuration parameters besides the LTI endpoint (ENGAGE-URL/LTI), the consumerkey and consumersecret are needed on the LMS side. OPENCAST uses custom LTI tags to pass additional information. These include the kind of interface to present (engage player or media module) and the id of the media to show.
+To connect OPENCAST to the LMS additional configuration parameters besides the LTI endpoint (ENGAGE-URL/lti), the consumerkey and consumersecret are needed on the LMS side. OPENCAST uses custom LTI tags to pass additional information. These include the kind of interface to present (engage player or media module) and the id of the media to show.
 
 The interface is passed using the custom_tool parameter:
 `custom_tool = ltitools/player/index.html  (to show the engage player)`
