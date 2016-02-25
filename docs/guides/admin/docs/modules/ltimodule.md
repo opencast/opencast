@@ -25,11 +25,11 @@ Configure Opencast
 
 The integration of Opencast in the LMS through the LTI module has to be configured on both sides: In Opencast and in the LMS.
 To let the LMS access Opencast, the security file etc/security/mh_default_org.xml from the opencast folder must be configured. The relevant sections are shown below:
-
+Uncomment:
 ```
 <sec:custom-filter after="BASIC_AUTH_FILTER" ref="oauthProtectedResourceFilter" />
 ```
-and
+Set the CONSUMER_KEY and theCONSUMER_SECRET
 
 ```
   <!-- ####################### -->
@@ -42,7 +42,20 @@ and
     <constructor-arg index="3" value="consumerName" />
   </bean>
 ```
-- The two OAuth parameters CONSUMER_KEY and CONSUMER_KEY have to be set with your own values.
+Change trustedKey to:
+```
+<bean class="org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler">
+        <constructor-arg index="0" ref="userDetailsService" />
+        <constructor-arg index="1" ref="securityService" />
+        <constructor-arg index="2">
+          <list>
+            <value>CONSUMER_KEY</value>
+          </list>
+        </constructor-arg>
+      </bean>
+```
+
+- The two OAuth parameters CONSUMER_KEY and CONSUMER_SECRET have to be set with your own values.
 They are then required to embed OPENCAST into my LMS.
 
 Configure the LMS
