@@ -29,7 +29,7 @@ Uncomment:
 ```
 <sec:custom-filter after="BASIC_AUTH_FILTER" ref="oauthProtectedResourceFilter" />
 ```
-Set the CONSUMER_KEY and theCONSUMER_SECRET
+Set the CONSUMER_KEY and the CONSUMER_SECRET
 
 ```
   <!-- ####################### -->
