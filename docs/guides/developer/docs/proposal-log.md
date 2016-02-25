@@ -16,7 +16,7 @@ Passed Proposals
 ----------------
 
 ### Documentation Pull Request Merge Order
-Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Wed, 25 Feb 2016 20:52:00 UTC
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Thu, 25 Feb 2016 20:52:00 UTC
 
     Hi everyone, 
     as discussed in this weeks technical meeting, I hereby #propose to 
