@@ -4,6 +4,7 @@ This is a documentation for modules included in Opencast that do not to be confi
 tweaking. For some modules some more in depth documentation is available too.
 
  - [Media Module](mediamodule.configuration.md)
+ - [LTI Module](ltimodule.md)
  - Player 2.0+
     - [Configuration](player.configuration.md)
     - [URL Parameter](player.url.parameter.md)
