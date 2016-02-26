@@ -36,6 +36,9 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Effect0;
 
+import com.entwinemedia.fn.Fn;
+import com.entwinemedia.fn.Stream;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -255,12 +258,17 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
 
     InputStream rolesIS = null;
     try {
-
       // Load the properties
-      Set<String> roles = new HashSet<String>();
       rolesIS = AdminUserAndGroupLoader.class.getResourceAsStream(propertiesFile);
-      roles = new TreeSet<String>(IOUtils.readLines(rolesIS));
-      return roles;
+      Stream<String> stream = Stream.$(IOUtils.readLines(rolesIS)).filter(new Fn<String, Boolean>() {
+        @Override
+        public Boolean ap(String line) {
+          if (StringUtils.trimToEmpty(line).startsWith("#"))
+            return false;
+          return true;
+        }
+      });
+      return new TreeSet<>(stream.toSet());
     } catch (IOException e) {
       logger.error("Error loading system roles from file {}", propertiesFile);
       throw e;
