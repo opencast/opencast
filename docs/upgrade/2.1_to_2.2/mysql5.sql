@@ -10,3 +10,5 @@ CREATE TABLE mh_blocking_job (
   job_index INTEGER,
   CONSTRAINT FK_blocking_job_id FOREIGN KEY (id) REFERENCES mh_job (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE mh_user ADD COLUMN manageable TINYINT(1) NOT NULL DEFAULT '1';
