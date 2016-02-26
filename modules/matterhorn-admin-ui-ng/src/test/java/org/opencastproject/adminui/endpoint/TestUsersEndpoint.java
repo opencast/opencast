@@ -108,6 +108,11 @@ public class TestUsersEndpoint extends UsersEndpoint {
     }
 
     @Override
+    public long countUsers() {
+      return 0;
+    }
+
+    @Override
     public void invalidate(String userName) {
       return;
     }
