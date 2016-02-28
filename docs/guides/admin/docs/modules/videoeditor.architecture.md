@@ -184,7 +184,7 @@ ${trimHold} variable like in the current workflow definitions with trimming.
 
    `<configuration key="rewrite">true</configuration>`
 
-   `<configuration key="promiscuous-audio-muxing">true</configuration>`
+   `<configuration key="audio-muxing-source-flavors">*/?,*/*<">true</configuration>`
 
 2. The preview videos have to be created. These can be in H.264 (for Safari, IE, Chrome) or WebM (for Firefox, Opera or
    Chrome) codec. Encoding profiles for WebM are provided in the video editor branch and are used in the examples. This
