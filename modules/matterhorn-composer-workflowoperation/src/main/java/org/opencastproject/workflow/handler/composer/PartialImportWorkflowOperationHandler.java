@@ -239,8 +239,8 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     final MediaPackageElementFlavor targetPresentationFlavor = parseTargetFlavor(
             getConfig(operation, TARGET_PRESENTATION_FLAVOR), "presentation");
     final Opt<EncodingProfile> forceProfile = getForceEncodingProfile(operation);
-    final boolean forceEncoding = BooleanUtils.toBoolean(getConfig(operation, FORCE_ENCODING));
-    final boolean forceDivisible = BooleanUtils.toBoolean(getConfig(operation, ENFORCE_DIVISIBLE_BY_TWO));
+    final boolean forceEncoding = BooleanUtils.toBoolean(getOptConfig(operation, FORCE_ENCODING));
+    final boolean forceDivisible = BooleanUtils.toBoolean(getOptConfig(operation, ENFORCE_DIVISIBLE_BY_TWO));
     final List<String> requiredExtensions = getRequiredExtensions(operation);
 
     //
