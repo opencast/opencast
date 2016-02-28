@@ -23,9 +23,9 @@ package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.inspection.api.MediaInspectionService;
-import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
+import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -61,7 +61,7 @@ public class TestJobEndpoint extends JobEndpoint {
     mpBuilder = new MediaPackageBuilderImpl();
     this.serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
     this.workflowService = EasyMock.createNiceMock(WorkflowService.class);
-    JaxbJob job = new JaxbJob(12L);
+    Job job = new JobImpl(12L);
 
     WorkflowDefinition wfD = new WorkflowDefinitionImpl();
     wfD.setTitle("Full");
@@ -109,8 +109,7 @@ public class TestJobEndpoint extends JobEndpoint {
 
   private Job createJob(int id, Status status, String jobType, String operation) throws Exception {
     Date date = new Date(DateTimeSupport.fromUTC("2014-06-05T09:15:56Z"));
-    JaxbJob job = new JaxbJob();
-    job.setId(id);
+    Job job = new JobImpl(id);
     job.setStatus(status);
     job.setJobType(jobType);
     job.setOperation(operation);

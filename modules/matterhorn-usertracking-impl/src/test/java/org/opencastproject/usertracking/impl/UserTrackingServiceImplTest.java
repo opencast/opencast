@@ -21,19 +21,16 @@
 
 package org.opencastproject.usertracking.impl;
 
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+
 import org.opencastproject.usertracking.api.FootprintList;
 import org.opencastproject.usertracking.api.Report;
 import org.opencastproject.usertracking.api.UserAction;
 import org.opencastproject.usertracking.api.UserActionList;
 import org.opencastproject.usertracking.api.UserSession;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
-import junit.framework.Assert;
-
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.persistence.jpa.PersistenceProvider;
-import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,40 +38,17 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 public class UserTrackingServiceImplTest {
-  private ComboPooledDataSource pooledDataSource = null;
   private UserTrackingServiceImpl service = null;
 
   @Before
   public void setUp() throws Exception {
-    // Set up the database
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + System.currentTimeMillis());
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Set up the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
-
     // Set up the annotation service
     service = new UserTrackingServiceImpl();
-    service.setPersistenceProvider(new PersistenceProvider());
-    service.setPersistenceProperties(props);
+    service.setEntityManagerFactory(newTestEntityManagerFactory(UserTrackingServiceImpl.PERSISTENCE_UNIT));
     service.activate();
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    service.destroy();
-    service = null;
   }
 
   /**

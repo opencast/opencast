@@ -31,6 +31,7 @@ import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.IncidentParser;
 import org.opencastproject.job.api.IncidentTree;
+import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.serviceregistry.api.IncidentL10n;
@@ -85,7 +86,7 @@ public class IncidentServiceRemoteImpl extends RemoteBase implements IncidentSer
     HttpPost post = new HttpPost();
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-      params.add(new BasicNameValuePair("job", JobParser.toXml(job)));
+      params.add(new BasicNameValuePair("job", JobParser.toXml(new JaxbJob(job))));
       params.add(new BasicNameValuePair("date", DateTimeSupport.toUTC(timestamp.getTime())));
       params.add(new BasicNameValuePair("code", code));
       params.add(new BasicNameValuePair("severity", severity.name()));

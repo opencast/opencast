@@ -54,7 +54,7 @@ public class JobsStatistics extends NotificationBroadcasterSupport implements Jo
   public void updateJobCount(List<Object[]> perHostServiceCount) {
     jobCounts.clear();
     for (Object[] result : perHostServiceCount) {
-      Status status = (Status) result[2];
+      Status status = Status.values()[((Number) result[2]).intValue()];
       jobCounts.put(Tuple3.tuple3((String) result[0], (String) result[1], status), (Long) result[3]);
     }
     sendNotification(JmxUtil.createUpdateNotification(this, sequenceNumber++, "Job updated"));

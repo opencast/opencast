@@ -21,8 +21,11 @@
 
 package org.opencastproject.userdirectory;
 
-import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.security.api.Role;
+import org.opencastproject.security.impl.jpa.JpaGroup;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
+import org.opencastproject.security.impl.jpa.JpaRole;
+import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.NotFoundException;
 
 import java.util.HashSet;
@@ -119,7 +122,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Persist an user
-   *
+   * 
    * @param user
    *          the user to persist
    * @param emf
@@ -137,9 +140,8 @@ public final class UserDirectoryPersistenceUtil {
       if (u == null) {
         em.persist(user);
       } else {
-        u.password = user.getPassword();
-        u.roles = user.roles;
-        user = em.merge(u);
+        user.setId(u.getId());
+        user = em.merge(user);
       }
       tx.commit();
       return user;
@@ -340,6 +342,28 @@ public final class UserDirectoryPersistenceUtil {
   }
 
   /**
+   * Returns the total of users
+   *
+   * @param organizationId
+   *          the organization id
+   * @param emf
+   *          the entity manager factory
+   * @return the total number of users
+   */
+  public static long countUsers(String organizationId, EntityManagerFactory emf) {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("User.countAll");
+      q.setParameter("org", organizationId);
+      return ((Number) q.getSingleResult()).longValue();
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
    * Returns a list of users by a search query if set or all users if search query is <code>null</code>
    *
    * @param orgId
@@ -452,7 +476,7 @@ public final class UserDirectoryPersistenceUtil {
   }
 
   public static void removeGroup(String groupId, String orgId, EntityManagerFactory emf) throws NotFoundException,
-          Exception {
+  Exception {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
@@ -479,7 +503,7 @@ public final class UserDirectoryPersistenceUtil {
 
   /**
    * Delete the user with given name in the given organization
-   *
+   * 
    * @param username
    *          the name of the user to delete
    * @param orgId
@@ -490,7 +514,7 @@ public final class UserDirectoryPersistenceUtil {
    * @throws Exception
    */
   public static void deleteUser(String username, String orgId, EntityManagerFactory emf) throws NotFoundException,
-          Exception {
+  Exception {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {

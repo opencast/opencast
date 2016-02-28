@@ -137,6 +137,10 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>de.empulse.eclipselink</groupId>
+        <artifactId>staticweave-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
@@ -153,9 +157,9 @@
               OSGI-INF/capture-admin-service.xml,
               OSGI-INF/capture-admin-service-rest.xml
             </Service-Component>
-            <JPA-PersistenceUnits>
-              org.opencastproject.capture.admin.impl.CaptureAgentStateServiceImpl
-            </JPA-PersistenceUnits>
+            <Meta-Persistence>
+              META-INF/persistence.xml
+            </Meta-Persistence>
           </instructions>
         </configuration>
       </plugin>

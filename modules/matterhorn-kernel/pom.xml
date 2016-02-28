@@ -20,6 +20,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-common-jpa-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
@@ -77,7 +82,6 @@
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
-      <version>1.1</version>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
@@ -164,7 +168,7 @@
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>org.eclipse.persistence.core</artifactId>
-      <scope>test</scope>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
@@ -195,6 +199,10 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>de.empulse.eclipselink</groupId>
+        <artifactId>staticweave-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
@@ -224,6 +232,7 @@
               javax.xml.parsers;version=0,
               javax.xml.validation;version=0,
               org.opencastproject.fsresources,
+              org.opencastproject.lti,
               org.springframework.security.core.userdetails.cache,
               org.springframework.security.core.userdetails.memory,
               org.xml.sax;version=0,
@@ -260,6 +269,7 @@
               OSGI-INF/http-context.xml,
               OSGI-INF/https-filter.xml, 
               OSGI-INF/jsonp.xml,
+              OSGI-INF/opencast-lti.xml,
               OSGI-INF/organization-directory-service.xml,
               OSGI-INF/organization-persistence.xml,
               OSGI-INF/organization-filter.xml,
@@ -275,9 +285,9 @@
               OSGI-INF/transparentproxy-filter.xml, 
               OSGI-INF/user-and-role-directory-service.xml
             </Service-Component>
-            <JPA-PersistenceUnits>
-              org.opencastproject.kernel
-            </JPA-PersistenceUnits>
+            <Meta-Persistence>
+              META-INF/persistence.xml
+            </Meta-Persistence>
           </instructions>
         </configuration>
       </plugin>

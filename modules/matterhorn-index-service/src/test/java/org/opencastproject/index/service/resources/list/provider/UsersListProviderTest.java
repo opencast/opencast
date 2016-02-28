@@ -25,7 +25,7 @@ import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.userdirectory.JpaUser;
+import org.opencastproject.security.impl.jpa.JpaUser;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -90,6 +90,11 @@ public class UsersListProviderTest {
           }
         }
         return filteredList.iterator();
+      }
+
+      @Override
+      public long countUsers() {
+        return users.size();
       }
 
       @Override

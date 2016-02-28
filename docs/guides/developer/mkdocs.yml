@@ -23,3 +23,6 @@ pages:
 - Licenses and Legal Matters: 'license.md'
 - Packaging: 'packaging.md'
 - Proposal Log: 'proposal-log.md'
+- Infrastructure:
+   - Overview: 'infrastructure/index.md'
+   - Nexus Maven Repository: 'infrastructure/nexus.md'

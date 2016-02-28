@@ -24,6 +24,7 @@ package org.opencastproject.serviceregistry.api;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
+import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.security.api.Organization;
@@ -43,6 +44,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -339,7 +341,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    * {@inheritDoc}
    *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
-          float)
+          Float)
    */
   @Override
   public Job createJob(String type, String operation, Float jobLoad) throws ServiceRegistryException {
@@ -361,7 +363,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    * {@inheritDoc}
    *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
-          java.util.List, float)
+          java.util.List, Float)
    */
   @Override
   public Job createJob(String type, String operation, List<String> arguments, Float jobLoad)
@@ -385,7 +387,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    * {@inheritDoc}
    *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
-          java.util.List, java.lang.String, float)
+          java.util.List, java.lang.String, Float)
    */
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, Float jobLoad)
@@ -409,7 +411,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    * {@inheritDoc}
    *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
-          java.util.List, java.lang.String, boolean, float)
+          java.util.List, java.lang.String, boolean, Float)
    */
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable,
@@ -433,7 +435,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    * {@inheritDoc}
    *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
-          java.util.List, java.lang.String, boolean, org.opencastproject.job.api.Job, float)
+          java.util.List, java.lang.String, boolean, org.opencastproject.job.api.Job, Float)
    */
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable,
@@ -441,9 +443,9 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     if (getServiceRegistrationsByType(type).size() == 0)
       logger.warn("Service " + type + " not available");
 
-    JaxbJob job = null;
+    Job job = null;
     synchronized (this) {
-      job = new JaxbJob(idCounter.addAndGet(1));
+      job = new JobImpl(idCounter.addAndGet(1));
       if (securityService != null) {
         job.setCreator(securityService.getUser().getUsername());
         job.setOrganization(securityService.getOrganization().getId());
@@ -464,7 +466,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
     synchronized (jobs) {
       try {
-        jobs.put(job.getId(), JobParser.toXml(job));
+        jobs.put(job.getId(), JobParser.toXml(new JaxbJob(job)));
       } catch (IOException e) {
         throw new IllegalStateException("Error serializing job " + job, e);
       }
@@ -560,8 +562,8 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     Job updatedJob = null;
     synchronized (jobs) {
       try {
-        updatedJob = updateInternal((JaxbJob) job);
-        jobs.put(updatedJob.getId(), JobParser.toXml(updatedJob));
+        updatedJob = updateInternal(job);
+        jobs.put(updatedJob.getId(), JobParser.toXml(new JaxbJob(updatedJob)));
       } catch (IOException e) {
         throw new IllegalStateException("Error serializing job", e);
       }
@@ -569,7 +571,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     return updatedJob;
   }
 
-  private Job updateInternal(JaxbJob job) {
+  private Job updateInternal(Job job) {
     Date now = new Date();
     Status status = job.getStatus();
     if (job.getDateCreated() == null) {
@@ -592,6 +594,21 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
       }
       job.setDateCompleted(now);
       job.setRunTime(now.getTime() - job.getDateStarted().getTime());
+
+      // Cleanup local list of jobs assigned to a specific service
+      for (Entry<String, List<ServiceRegistrationInMemoryImpl>> service : services.entrySet()) {
+        for (ServiceRegistrationInMemoryImpl srv : service.getValue()) {
+          Set<Job> jobs = jobHosts.get(srv);
+          if (jobs != null) {
+            Set<Job> updatedJobs = new HashSet<>();
+            for (Job savedJob : jobs) {
+              if (savedJob.getId() != job.getId())
+                updatedJobs.add(savedJob);
+            }
+            jobHosts.put(srv, updatedJobs);
+          }
+        }
+      }
     }
     return job;
   }
@@ -775,7 +792,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countOfAbnormalServices()
    */
   @Override
@@ -890,7 +907,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
             logger.error("Error dispatching job " + job, e);
           } finally {
             try {
-              jobs.put(job.getId(), JobParser.toXml(job));
+              jobs.put(job.getId(), JobParser.toXml(new JaxbJob(job)));
             } catch (IOException e) {
               throw new IllegalStateException("Error unmarshaling job", e);
             }

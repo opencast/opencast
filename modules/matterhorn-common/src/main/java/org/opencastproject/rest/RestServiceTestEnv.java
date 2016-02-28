@@ -21,17 +21,26 @@
 
 package org.opencastproject.rest;
 
+import static org.opencastproject.util.data.Collections.toArray;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
+import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
+
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.net.httpserver.HttpServer;
+
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.opencastproject.util.IoSupport;
-import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,15 +48,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Random;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
-
-import static org.opencastproject.util.data.Collections.toArray;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * Helper environment for creating REST service unit tests.
@@ -98,6 +99,8 @@ public final class RestServiceTestEnv {
   private final URL baseUrl;
   private final Option<? extends ResourceConfig> cfg;
 
+  private static final Logger logger = LoggerFactory.getLogger(RestServiceTestEnv.class);
+
   /**
    * Create an environment for <code>baseUrl</code>.
    * The base URL should be the URL where the service to test is mounted, e.g. http://localhost:8090/test
@@ -105,10 +108,6 @@ public final class RestServiceTestEnv {
   private RestServiceTestEnv(URL baseUrl, Option<? extends ResourceConfig> cfg) {
     this.baseUrl = baseUrl;
     this.cfg = cfg;
-    // configure jersey logger to get some output in case of an error
-    final Logger jerseyLogger = Logger.getLogger(com.sun.jersey.spi.inject.Errors.class.getName());
-    jerseyLogger.addHandler(new ConsoleHandler());
-    jerseyLogger.setLevel(Level.WARNING);
   }
 
   public static RestServiceTestEnv testEnvScanAllPackages(URL baseUrl) {
@@ -173,7 +172,7 @@ public final class RestServiceTestEnv {
     try {
       // cut of any base pathbasestUrl might have
       final URI host = new URL(baseUrl.getProtocol(), baseUrl.getHost(), baseUrl.getPort(), "/").toURI();
-      System.out.println("Start http server at " + host);
+      logger.info("Start http server at " + host);
       if (cfg.isSome()) hs = HttpServerFactory.create(host, cfg.get());
       else hs = HttpServerFactory.create(host);
       hs.start();
@@ -185,7 +184,7 @@ public final class RestServiceTestEnv {
   /** Call in {@link @AfterClass} annotated method. */
   public void tearDownServer() {
     if (hs != null) {
-      System.out.println("Stop http server");
+      logger.info("Stop http server");
       hs.stop(0);
     }
   }

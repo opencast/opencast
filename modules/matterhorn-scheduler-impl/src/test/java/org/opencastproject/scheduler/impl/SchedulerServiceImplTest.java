@@ -49,6 +49,7 @@ import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
+import static org.opencastproject.util.persistencefn.PersistenceUtil.mkTestEntityManagerFactory;
 
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -88,8 +89,6 @@ import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
@@ -105,13 +104,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -137,6 +137,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 public class SchedulerServiceImplTest {
+  private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceImplTest.class);
 
   private WorkflowService workflowService;
   private SeriesService seriesService;
@@ -144,12 +145,9 @@ public class SchedulerServiceImplTest {
   private MessageSender messageSender;
   private MessageReceiver messageReceiver;
 
-  private String persistenceStorage;
   private SchedulerServiceImpl schedSvc;
   private DublinCoreCatalogService dcSvc;
 
-  // persistent properties
-  private ComboPooledDataSource pooledDataSource;
   private SchedulerServiceDatabaseImpl schedulerDatabase;
 
   // index
@@ -177,22 +175,8 @@ public class SchedulerServiceImplTest {
     index.setDublinCoreService(dcSvc);
     index.activate(null);
 
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    persistenceStorage = PathSupport.concat("target", "db" + startTime + ".h2.db");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + startTime);
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Collect the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
-
     schedulerDatabase = new SchedulerServiceDatabaseImpl();
-    schedulerDatabase.setPersistenceProvider(new PersistenceProvider());
-    schedulerDatabase.setPersistenceProperties(props);
+    schedulerDatabase.setEntityManagerFactory(mkTestEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT));
     dcSvc = new DublinCoreCatalogService();
     schedulerDatabase.setDublinCoreService(dcSvc);
     schedulerDatabase.activate(null);
@@ -263,11 +247,7 @@ public class SchedulerServiceImplTest {
     index.deactivate();
     index = null;
     FileUtils.deleteQuietly(new File(indexStorage));
-    schedulerDatabase.deactivate(null);
-    pooledDataSource.close();
     schedulerDatabase = null;
-    pooledDataSource = null;
-    FileUtils.deleteQuietly(new File(persistenceStorage));
   }
 
   protected WorkflowInstance getSampleWorkflowInstance() throws Exception {
@@ -610,7 +590,7 @@ public class SchedulerServiceImplTest {
             properties(tuple("org.opencastproject.workflow.config.archiveOp", "true"),
                     tuple("org.opencastproject.workflow.definition", "full")), tuple(eventId, initalEvent));
     final Properties initalCaProps = schedSvc.getEventCaptureAgentConfiguration(eventId);
-    System.out.println("Added event " + eventId);
+    logger.info("Added event " + eventId);
     checkEvent(eventId, initalCaProps, initialTitle);
     // do single update
     final String updatedTitle1 = "Recording 2";
@@ -638,7 +618,7 @@ public class SchedulerServiceImplTest {
             properties(tuple("org.opencastproject.workflow.config.archiveOp", "true"),
                     tuple("org.opencastproject.workflow.definition", "full")), tuple(eventId, initalEvent));
     final Properties initalCaProps = schedSvc.getEventCaptureAgentConfiguration(eventId);
-    System.out.println("Added event " + eventId);
+    logger.info("Added event " + eventId);
     checkEvent(eventId, initalCaProps, initialTitle);
 
     String mediaPackageId = schedSvc.getMediaPackageId(eventId);
@@ -691,11 +671,11 @@ public class SchedulerServiceImplTest {
                       tuple("org.opencastproject.workflow.definition", "full")), tuple(eventId, initalEvent));
 
     } catch (Exception e) {
-      System.out.println("Exception " + e.getClass().getCanonicalName() + " message " + e.getMessage());
+      logger.info("Exception " + e.getClass().getCanonicalName() + " message " + e.getMessage());
     }
 
     final Properties initalCaProps = schedSvc.getEventCaptureAgentConfiguration(eventId);
-    System.out.println("Added event " + eventId);
+    logger.info("Added event " + eventId);
     checkEvent(eventId, initalCaProps, initialTitle);
 
     // test single update
@@ -708,7 +688,7 @@ public class SchedulerServiceImplTest {
 
       Assert.fail("Schedule should not update a recording that has ended (single)");
     } catch (SchedulerException e) {
-      System.out.println("Expected exception: " + e.getMessage());
+      logger.info("Expected exception: " + e.getMessage());
     }
 
     try { // test bulk update
@@ -721,7 +701,7 @@ public class SchedulerServiceImplTest {
 
       Assert.fail("Schedule should not update a recording that has ended (multi)");
     } catch (SchedulerException e) {
-      System.out.println("Expected exception: " + e.getMessage());
+      logger.info("Expected exception: " + e.getMessage());
     } finally {
       schedSvc2 = null;
     }
@@ -819,7 +799,7 @@ public class SchedulerServiceImplTest {
         schedulerServiceImpl.updateBlacklistStatus(mediaPackageId, blacklisted);
         optedOutEvents.add(eventId);
       } catch (Exception e) {
-        System.out.println("Exception " + e.getClass().getCanonicalName() + " message " + e.getMessage());
+        logger.info("Exception " + e.getClass().getCanonicalName() + " message " + e.getMessage());
       }
     }
     return optedOutEvents;

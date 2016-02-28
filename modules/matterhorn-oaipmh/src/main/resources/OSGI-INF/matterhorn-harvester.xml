@@ -28,14 +28,10 @@
              interface="org.opencastproject.oaipmh.harvester.RecordHandler"
              cardinality="1..1"
              policy="static"/>
-
-  <reference name="persistence"
-             interface="javax.persistence.spi.PersistenceProvider"
-             cardinality="1..1"
-             policy="static"/>
-  <reference name="persistenceProps"
-             interface="java.util.Map"
+  <reference name="entityManagerFactory"
+             interface="javax.persistence.EntityManagerFactory"
+             target="(osgi.unit.name=org.opencastproject.oaipmh.harvester)"
              cardinality="1..1"
              policy="static"
-             target="(type=persistence)"/>
+             bind="setEntityManagerFactory" />  
 </scr:component>

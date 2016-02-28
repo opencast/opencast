@@ -24,10 +24,9 @@ package org.opencastproject.index.service.resources.list.provider;
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
-import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.userdirectory.JpaUser;
+import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.data.Option;
 
 import org.easymock.EasyMock;
@@ -46,7 +45,6 @@ public class ContributorsListProviderTest {
   private AbstractSearchIndex searchIndex;
   private UserDirectoryService userDirectoryService;
   private ContributorsListProvider contributorsListProvider;
-  private SecurityService securityService;
   private ArrayList<User> users;
   private User user1;
   private User user2;
@@ -99,8 +97,13 @@ public class ContributorsListProviderTest {
       }
 
       @Override
+      public long countUsers() {
+        return users.size();
+      }
+
+      @Override
       public void invalidate(String userName) {
-        // TODO Auto-generated method stub
+        return;
       }
     };
 
