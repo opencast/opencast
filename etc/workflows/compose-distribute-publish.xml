@@ -165,7 +165,7 @@
         <configuration key="rewrite">true</configuration>
 	<configuration key="mux-encoding-profile">mux-editor.work</configuration>
         <configuration key="audio-video-encoding-profile">editor.work</configuration>
-        <configuration key="promiscuous-audio-muxing">true</configuration>
+        <configuration key="audio-muxing-source-flavors">*/?,*/*<">true</configuration>
       </configurations>
     </operation>
 
@@ -182,7 +182,7 @@
         <configuration key="rewrite">true</configuration>
 	<configuration key="mux-encoding-profile">mux-editor.work</configuration>
 	<configuration key="audio-video-encoding-profile">editor.work</configuration>
-        <configuration key="promiscuous-audio-muxing">true</configuration>
+        <configuration key="audio-muxing-source-flavors">*/?,*/*<">true</configuration>
       </configurations>
     </operation>
 

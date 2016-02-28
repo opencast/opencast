@@ -29,7 +29,7 @@
         <configuration key="target-flavor">presenter/work</configuration>
         <configuration key="target-tags">-archive</configuration>
         <configuration key="rewrite">false</configuration>
-        <configuration key="promiscuous-audio-muxing">true</configuration>
+        <configuration key="audio-muxing-source-flavors">*/?,*/*<">true</configuration>
       </configurations>
     </operation>
 
@@ -44,7 +44,7 @@
         <configuration key="target-flavor">presentation/work</configuration>
         <configuration key="target-tags">-archive</configuration>
         <configuration key="rewrite">false</configuration>
-        <configuration key="promiscuous-audio-muxing">true</configuration>
+        <configuration key="audio-muxing-source-flavors">*/?,*/*<">true</configuration>
       </configurations>
     </operation>
 
