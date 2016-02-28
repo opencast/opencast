@@ -23,6 +23,8 @@ package org.opencastproject.runtimeinfo;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -37,6 +39,8 @@ import java.util.Set;
  * Parses a text dump of components.json reports
  */
 public final class ComponentsJsonParser {
+
+  private static final Logger logger = LoggerFactory.getLogger(ComponentsJsonParser.class);
 
   /** Matches IPv4 addresses */
   public static final String IP_REGEX = "(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
@@ -84,13 +88,13 @@ public final class ComponentsJsonParser {
       }
       in.close();
 
-      System.out.println("Admin Servers (" + adminServers.size() + ") :");
+      logger.info("Admin Servers (" + adminServers.size() + ") :");
       for (String admin : adminServers) {
-        System.out.println("\t" + admin);
+        logger.info("\t" + admin);
       }
 
     } catch (Exception e) {
-      System.out.println(e);
+      logger.info("Exception", e);
     }
 
   }

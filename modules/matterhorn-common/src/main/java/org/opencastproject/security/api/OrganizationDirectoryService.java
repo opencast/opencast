@@ -55,4 +55,21 @@ public interface OrganizationDirectoryService {
    * @return the organizations
    */
   List<Organization> getOrganizations();
+
+  /**
+   * Adds <code>listener</code> to the list of organization listeners.
+   *
+   * @param listener
+   *          the organization listener
+   */
+  void addOrganizationDirectoryListener(OrganizationDirectoryListener listener);
+
+  /**
+   * Removes <code>listener</code> from the list of organization listeners.
+   *
+   * @param listener
+   *          the organization listener
+   */
+  void removeOrganizationDirectoryListener(OrganizationDirectoryListener listener);
+
 }

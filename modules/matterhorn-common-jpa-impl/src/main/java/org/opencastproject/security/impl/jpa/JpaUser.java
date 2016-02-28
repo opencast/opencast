@@ -306,4 +306,9 @@ public class JpaUser implements User {
   public boolean isManageable() {
     return manageable;
   }
+
+  public void setManageable(boolean isManageable) {
+    this.manageable = isManageable;
+  }
+
 }

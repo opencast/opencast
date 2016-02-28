@@ -30,10 +30,10 @@ import static org.opencastproject.index.service.resources.list.provider.TestServ
 import static org.opencastproject.index.service.resources.list.provider.TestServiceStatistics.RUNNING_JOBS;
 import static org.opencastproject.index.service.resources.list.provider.TestServiceStatistics.SERVICE_TYPE;
 
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.resources.list.api.Service;
-import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.serviceregistry.api.ServiceState;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -42,14 +42,15 @@ import org.json.simple.parser.ParseException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.opencastproject.index.service.exception.ListProviderException;
+import org.opencastproject.index.service.resources.list.api.Service;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.api.ServiceState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServicesListProviderTest {
-
+  private static final Logger logger = LoggerFactory.getLogger(ServicesListProviderTest.class);
   private ServicesListProvider servicesListProvider;
   private Map<String, Object> resultList;
 
@@ -90,7 +91,7 @@ public class ServicesListProviderTest {
     o.put("test", s);
     o.put("results", a);
     JSONObject jsonObject = a.toJSONObject(a);
-    System.out.println(jsonObject.toString());
+    logger.info(jsonObject.toString());
   }
 
   @SuppressWarnings("unchecked")

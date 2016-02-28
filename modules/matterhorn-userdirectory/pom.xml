@@ -121,6 +121,7 @@
               org.opencastproject.userdirectory;version=${project.version},
             </Export-Package>
             <Service-Component>
+              OSGI-INF/admin-user-and-group-loader.xml,
               OSGI-INF/userdirectory-service.xml,
               OSGI-INF/group-role-provider.xml,
               OSGI-INF/user-reference-provider.xml,

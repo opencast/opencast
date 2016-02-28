@@ -266,14 +266,6 @@ CREATE TABLE mh_series (
   CONSTRAINT FK_mh_series_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE mh_upload (
-  id VARCHAR(255) NOT NULL,
-  total BIGINT NOT NULL,
-  received BIGINT NOT NULL,
-  filename TEXT(65535) NOT NULL,
-  PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE mh_user_session (
   session_id VARCHAR(50) NOT NULL,
   user_ip VARCHAR(255),
@@ -437,6 +429,7 @@ CREATE TABLE mh_user (
   name varchar(256) DEFAULT NULL,
   email varchar(256) DEFAULT NULL,
   organization varchar(128) DEFAULT NULL,
+  manageable TINYINT(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (id),
   CONSTRAINT UNQ_mh_user UNIQUE (username, organization),
   CONSTRAINT FK_mh_user_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE

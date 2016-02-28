@@ -264,9 +264,9 @@ public abstract class AbstractJobProducer implements JobProducer {
       if (t instanceof JobCanceledException) {
         logger.info(t.getMessage());
       } else {
-        final Job jobAfterProcessing = getServiceRegistry().getJob(jobId);
+        Job jobAfterProcessing = getServiceRegistry().getJob(jobId);
         jobAfterProcessing.setStatus(Status.FAILED);
-        getServiceRegistry().updateJob(jobAfterProcessing);
+        jobAfterProcessing = getServiceRegistry().updateJob(jobAfterProcessing);
         getServiceRegistry().incident().unhandledException(jobAfterProcessing, Severity.FAILURE, t);
         logger.error("Error handling operation '{}': {}", jobAfterProcessing.getOperation(), ExceptionUtils.getStackTrace(t));
         if (t instanceof ServiceRegistryException)

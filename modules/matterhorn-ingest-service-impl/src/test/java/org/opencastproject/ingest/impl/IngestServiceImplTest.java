@@ -22,8 +22,18 @@
 package org.opencastproject.ingest.impl;
 
 import org.opencastproject.capture.CaptureParameters;
+import org.opencastproject.inspection.api.MediaInspectionService;
+import org.opencastproject.job.api.Job;
+import org.opencastproject.job.api.Job.Status;
+import org.opencastproject.job.api.JobImpl;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.mediapackage.track.AudioStreamImpl;
+import org.opencastproject.mediapackage.track.TrackImpl;
+import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AccessControlList;
@@ -40,6 +50,10 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
+import org.opencastproject.util.MimeTypes;
+import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.XmlUtil;
+import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
@@ -47,22 +61,28 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
+import org.opencastproject.workingfilerepository.impl.WorkingFileRepositoryImpl;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -86,6 +106,7 @@ public class IngestServiceImplTest {
   private static URI urlAttachment;
   private static URI urlPackage;
   private static URI urlPackageOld;
+  private static URI urlTrackNoFilename;
 
   private static File ingestTempDir;
   private static File packageFile;
@@ -104,6 +125,7 @@ public class IngestServiceImplTest {
     urlAttachment = IngestServiceImplTest.class.getResource("/cover.png").toURI();
     urlPackage = IngestServiceImplTest.class.getResource("/data.zip").toURI();
     urlPackageOld = IngestServiceImplTest.class.getResource("/data.old.zip").toURI();
+    urlTrackNoFilename = IngestServiceImplTest.class.getResource("/av").toURI();
 
     ingestTempDir = new File(new File(baseDir), "ingest-temp");
     packageFile = new File(ingestTempDir, baseDir.relativize(urlPackage).toString());
@@ -224,8 +246,13 @@ public class IngestServiceImplTest {
     EasyMock.expect(statusLine.getStatusCode()).andReturn(200).anyTimes();
     EasyMock.replay(statusLine);
 
+    Header contentDispositionHeader = EasyMock.createMock(Header.class);
+    EasyMock.expect(contentDispositionHeader.getValue()).andReturn("attachment; filename=fname.mp4").anyTimes();
+    EasyMock.replay(contentDispositionHeader);
+
     HttpResponse httpResponse = EasyMock.createMock(HttpResponse.class);
     EasyMock.expect(httpResponse.getStatusLine()).andReturn(statusLine).anyTimes();
+    EasyMock.expect(httpResponse.getFirstHeader("Content-Disposition")).andReturn(contentDispositionHeader).anyTimes();
     EasyMock.expect(httpResponse.getEntity()).andReturn(entity).anyTimes();
     EasyMock.replay(httpResponse);
 
@@ -238,6 +265,29 @@ public class IngestServiceImplTest {
             .andReturn(Tuple.tuple(new AccessControlList(), AclScope.Series)).anyTimes();
     EasyMock.replay(authorizationService);
 
+    MediaInspectionService mediaInspectionService = EasyMock.createNiceMock(MediaInspectionService.class);
+    EasyMock.expect(mediaInspectionService.enrich(EasyMock.anyObject(MediaPackageElement.class), EasyMock.anyBoolean()))
+            .andAnswer(new IAnswer<Job>() {
+              private int i = 0;
+
+              @Override
+              public Job answer() throws Throwable {
+                TrackImpl element = (TrackImpl) EasyMock.getCurrentArguments()[0];
+                element.setDuration(20000L);
+                if (i % 2 == 0) {
+                  element.addStream(new VideoStreamImpl());
+                } else {
+                  element.addStream(new AudioStreamImpl());
+                }
+                i++;
+                JobImpl succeededJob = new JobImpl();
+                succeededJob.setStatus(Status.FINISHED);
+                succeededJob.setPayload(MediaPackageElementParser.getAsXml(element));
+                return succeededJob;
+              }
+            }).anyTimes();
+    EasyMock.replay(mediaInspectionService);
+
     service = new IngestServiceImpl();
     service.setHttpClient(httpClient);
     service.setAuthorizationService(authorizationService);
@@ -245,6 +295,7 @@ public class IngestServiceImplTest {
     service.setWorkflowService(workflowService);
     service.setSecurityService(securityService);
     service.setSchedulerService(schedulerService);
+    service.setMediaInspectionService(mediaInspectionService);
     ServiceRegistryInMemoryImpl serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService,
             userDirectoryService, organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
     serviceRegistry.registerService(service);
@@ -332,4 +383,74 @@ public class IngestServiceImplTest {
     Assert.assertEquals(1, mediaPackage.getAttachments().length);
   }
 
+  @Test
+  public void testContentDisposition() throws Exception {
+    MediaPackage mediaPackage = null;
+
+    mediaPackage = service.createMediaPackage();
+    try {
+      mediaPackage = service.addTrack(URI.create("http://www.test.com/testfile"), null, mediaPackage);
+    } catch (Exception e) {
+      Assert.fail("Unable to read content dispostion filename!");
+    }
+
+    try {
+      mediaPackage = service.addTrack(urlTrackNoFilename, null, mediaPackage);
+      Assert.fail("Allowed adding content without filename!");
+    } catch (Exception e) {
+      Assert.assertNotNull(e);
+    }
+  }
+
+  @Test
+  public void testSmilCreation() throws Exception {
+    service.setWorkingFileRepository(new WorkingFileRepositoryImpl() {
+      @Override
+      public URI put(String mediaPackageID, String mediaPackageElementID, String filename, InputStream in)
+              throws IOException {
+        File file = new File(FileUtils.getTempDirectory(), mediaPackageElementID);
+        file.deleteOnExit();
+        FileUtils.write(file, IOUtils.toString(in), "UTF-8");
+        return file.toURI();
+      }
+
+      @Override
+      public InputStream get(String mediaPackageID, String mediaPackageElementID) throws NotFoundException, IOException {
+        File file = new File(FileUtils.getTempDirectory(), mediaPackageElementID);
+        return new FileInputStream(file);
+      }
+    });
+
+    URI presenterUri = URI.create("http://localhost:8080/presenter.mp4");
+    URI presenterUri2 = URI.create("http://localhost:8080/presenter2.mp4");
+    URI presentationUri = URI.create("http://localhost:8080/presentation.mp4");
+
+    MediaPackage mediaPackage = service.createMediaPackage();
+    Catalog[] catalogs = mediaPackage.getCatalogs(MediaPackageElements.SMIL);
+    Assert.assertEquals(0, catalogs.length);
+
+    mediaPackage = service.addPartialTrack(presenterUri, MediaPackageElements.PRESENTER_SOURCE_PARTIAL, 60000L,
+            mediaPackage);
+    mediaPackage = service.addPartialTrack(presenterUri2, MediaPackageElements.PRESENTER_SOURCE_PARTIAL, 120000L,
+            mediaPackage);
+    mediaPackage = service.addPartialTrack(presentationUri, MediaPackageElements.PRESENTATION_SOURCE_PARTIAL, 0L,
+            mediaPackage);
+
+    catalogs = mediaPackage.getCatalogs(MediaPackageElements.SMIL);
+    Assert.assertEquals(0, catalogs.length);
+
+    service.ingest(mediaPackage);
+    catalogs = mediaPackage.getCatalogs(MediaPackageElements.SMIL);
+    Assert.assertEquals(1, catalogs.length);
+
+    Assert.assertEquals(MimeTypes.SMIL, catalogs[0].getMimeType());
+    Either<Exception, Document> eitherDoc = XmlUtil.parseNs(new InputSource(catalogs[0].getURI().toURL().openStream()));
+    Assert.assertTrue(eitherDoc.isRight());
+    Document document = eitherDoc.right().value();
+    Assert.assertEquals(1, document.getElementsByTagName("par").getLength());
+    Assert.assertEquals(2, document.getElementsByTagName("seq").getLength());
+    Assert.assertEquals(2, document.getElementsByTagName("video").getLength());
+    Assert.assertEquals(1, document.getElementsByTagName("audio").getLength());
+
+  }
 }
