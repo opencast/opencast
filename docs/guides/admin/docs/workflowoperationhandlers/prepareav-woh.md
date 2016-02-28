@@ -18,7 +18,7 @@ If it there is one track with a certain flavor, the "encode" method is called wh
 |video-encoding-profile	|video-only.work	|The encoding profile to use for media that is only video and needs to be re-encodend (default is video-only.work)	 |
 |audio-encoding-profile	|audio-only.work	|The encoding profile to use for media that is only audio and needs to be re-encodend (default is audio-only.work)	 |
 |rewrite	|true	|Should files be rewritten	 |
-|promiscuous-audio-muxing	|true	|If there is no matching flavor to mux, try other flavors as well	 |
+|audio-muxing-source-flavors|presentation/source,presentation/\*,\*/\*	|If there is no matching flavor to mux, search for a track with audio that can be muxed by going from left to right through this comma-separated list of source flavors|
  	 	 	 
  
 ## Operation Example
@@ -32,6 +32,41 @@ If it there is one track with a certain flavor, the "encode" method is called wh
         <configuration key="source-flavor">presenter/source</configuration>
         <configuration key="target-flavor">presenter/work</configuration>
         <configuration key="rewrite">false</configuration>
-        <configuration key="promiscuous-audio-muxing">true</configuration>
+        <configuration key="audio-muxing-source-flavors">*/?,*/*<">true</configuration>
       </configurations>
     </operation>
+
+## Audio Muxing
+The PrepareAVWorkflowOperation can be used for audio muxing in case a matching source video track has no audio. Audio muxing is performed as described below:
+
+In case the *source-flavor* matches to exactly two tracks whereas one track is a video-only track and the other is an audio-only track, those tracks will be merged into a single audio-video track.
+
+If there is no such matching flavor to mux, additional audio muxing facilities can be controlled by the use of the configuration key *audio-muxing-source-flavors*. That configuration key contains a comma-separated list of flavors that defines the search order of how to find an audio track.
+
+The following two wildcard characters can be used in flavors in that list:
+
+* '*' will match to any type or subtype
+* '?' will match to the type or subtype of the matching *source-flavor*
+
+Note: In case that a flavor used with *audio-muxing-source-flavors* matches to multiple tracks within the media package resulting in a list of matching tracks, the search order within that list is undefined, i.e. PrepareAVWorkflowOperation will just pick any of those tracks that has audio.
+
+### Example
+
+    [...]
+    <configuration key="source-flavor">presenter/*</configuration>
+    <configuration key="audio-muxing-source-flavors">presenter-audio/?, presentation/?,presentation/*,?/audio,*/*</configuration>
+    [...]
+
+Let's assume that exactly one video-only track of flavor presenter/source in the media package and another track of flavor audio/track that has audio.
+
+
+In this example, the PrepareAVWorkflowOperation would perform the following steps:
+
+1. Search tracks of flavor presenter-audio/source (presenter-audio/?)
+2. Search tracks of flavor presentation/source (presentation/?)
+3. Search tracks of flavor presentation/*
+4. Search tracks of flavor presenter/audio (?/audio)
+5. Search tracks of flavor \*/\*
+
+
+
