@@ -47,12 +47,12 @@
     </div>
     
     <div class="btn-group">
-        <button id="volume" class="btn btn-default">
-            <div class="volume_icon" id="volumeIcon">
+        <div id="volume" class="btn btn-default">
+            <button class="volume_icon" id="volumeIcon">
                 <span class="glyphicon glyphicon-volume-up" aria-hidden="true" aria-label="<%= str_showVolumeBar %>" title="<%= str_showVolumeBar %>"></span>
-            </div>
+            </button>
             <div id="volumeSlider" role="slider" aria-label="<%= str_volumeSlider %>"></div>
-        </button>
+        </div>
 
       <% if((typeof hasqualities !== "undefined") && hasqualities
       && (typeof str_qualityButton !== "undefined")

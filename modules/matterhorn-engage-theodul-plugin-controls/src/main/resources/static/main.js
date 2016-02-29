@@ -818,9 +818,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 value: 100
             });
 
-            $("#" + id_volumeIcon).click(function() {
-                // use as mute button in desktop mode
-                if (isDesktopMode) {
+            // use as mute button in desktop mode
+            if (isDesktopMode) {
+                $("#" + id_volumeIcon).click(function() {
                     var isMute = Basil.get(storage_muted);
                     if (isMute == "true") {
                         Engage.trigger(plugin.events.unmute.getName());
@@ -829,17 +829,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                         Engage.trigger(plugin.events.mute.getName());
                         Basil.set(storage_muted, "true");
                     }
-                } else {
-                    // toggle volume slider in mobile/embed mode
-                    $(this).parent().toggleClass("active");
-                }
-
-            });
-
-            if (isMobileMode) {
-                $("#" + id_big_play_button).click(function(e) {
-                    e.stopPropagation();
-                    Engage.trigger(plugin.events.play.getName(), false);
                 });
             }
 
@@ -924,6 +913,16 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                         var id = (+this.id.replace('videoDisplay','')) - 1;
                         switchVideoById(id);
                     }
+                });
+
+                $("#" + id_big_play_button).click(function(e) {
+                    e.stopPropagation();
+                    Engage.trigger(plugin.events.play.getName(), false);
+                });
+
+                $("#" + id_volumeIcon).hammer().bind("tap", function(e) {
+                    // toggle volume slider in mobile/embed mode
+                    $(this).parent().toggleClass("active");
                 });
 
                 // create a simple hammer.js jquery plugin instance for touch gesture support

@@ -158,11 +158,18 @@
 
 			#volumeIcon {
 				cursor: pointer;
-				width: 24px;
+				width: 47px;
 				font-size: 24px;
 				position: absolute;
-				top: 1px;
-				left: 12px;
+				top: 0;
+				left: 0;
+				height: 100%;
+				background: none;
+				border: none;
+				outline: none;
+				span {
+					display: block;
+				}
 			}
 
 			#volumeSlider {
