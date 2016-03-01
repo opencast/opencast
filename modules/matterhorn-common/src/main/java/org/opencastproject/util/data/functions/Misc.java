@@ -21,14 +21,13 @@
 
 package org.opencastproject.util.data.functions;
 
-import org.opencastproject.util.data.Effect;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function0;
-import org.opencastproject.util.data.Option;
+import static org.opencastproject.util.EqualsUtil.eq;
 
 import java.util.List;
 
-import static org.opencastproject.util.EqualsUtil.eq;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Function0;
+import org.opencastproject.util.data.Option;
 
 /** Various functions not directly bound to any type. */
 public final class Misc {
@@ -130,16 +129,6 @@ public final class Misc {
       @Override
       public A xapply() throws Exception {
         return cls.getConstructor(String.class).newInstance(msg);
-      }
-    };
-  }
-
-  /** Print an object. */
-  public static <A> Effect<A> println() {
-    return new Effect<A>() {
-      @Override
-      protected void run(A a) {
-        System.out.println(a);
       }
     };
   }

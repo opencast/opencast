@@ -26,6 +26,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,8 @@ import javax.servlet.http.HttpServletResponse;
  * Inspects request URLs and sets the organization for the request.
  */
 public class OrganizationFilter implements Filter {
+
+  private static final String APACHE_HTTPD_MOD_PROXY_FORWARD_HEADER = "X-Forwarded-For";
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(OrganizationFilter.class);
@@ -114,6 +117,15 @@ public class OrganizationFilter implements Filter {
         }
       }
 
+      // Set the client's IP address
+      if (StringUtils.isNotBlank(httpRequest.getHeader(APACHE_HTTPD_MOD_PROXY_FORWARD_HEADER))) {
+        logger.trace("Found '{}' header for client IP '{}'", APACHE_HTTPD_MOD_PROXY_FORWARD_HEADER, httpRequest.getHeader(APACHE_HTTPD_MOD_PROXY_FORWARD_HEADER));
+        securityService.setUserIP(httpRequest.getHeader(APACHE_HTTPD_MOD_PROXY_FORWARD_HEADER));
+      } else {
+        logger.trace("Using client IP from request '{}'", httpRequest.getRemoteAddr());
+        securityService.setUserIP(httpRequest.getRemoteAddr());
+      }
+
       // If an organization was found, move on. Otherwise return a 404
       if (org != null) {
         securityService.setOrganization(org);
@@ -125,6 +137,7 @@ public class OrganizationFilter implements Filter {
     } finally {
       securityService.setOrganization(null);
       securityService.setUser(null);
+      securityService.setUserIP(null);
     }
   }
 

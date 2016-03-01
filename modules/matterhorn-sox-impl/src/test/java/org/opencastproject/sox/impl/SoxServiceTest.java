@@ -180,7 +180,7 @@ public class SoxServiceTest {
     for (int i = 0; i < 10; i++) {
       jobs.add(soxService.analyze(sourceTrack));
     }
-    boolean success = new JobBarrier(serviceRegistry, jobs.toArray(new Job[jobs.size()])).waitForJobs().isSuccess();
+    boolean success = new JobBarrier(null, serviceRegistry, jobs.toArray(new Job[jobs.size()])).waitForJobs().isSuccess();
     assertTrue(success);
     for (Job j : jobs) {
       // Always check the service registry for the latest version of the job
@@ -211,7 +211,7 @@ public class SoxServiceTest {
     for (int i = 0; i < 10; i++) {
       jobs.add(soxService.normalize(sourceTrack, -25f));
     }
-    boolean success = new JobBarrier(serviceRegistry, jobs.toArray(new Job[jobs.size()])).waitForJobs().isSuccess();
+    boolean success = new JobBarrier(null, serviceRegistry, jobs.toArray(new Job[jobs.size()])).waitForJobs().isSuccess();
     assertTrue(success);
     for (Job j : jobs) {
       // Always check the service registry for the latest version of the job
@@ -240,7 +240,7 @@ public class SoxServiceTest {
     for (int i = 0; i < 10; i++) {
       jobs.add(soxService.normalize(sourceTrack, -30f));
     }
-    boolean success = new JobBarrier(serviceRegistry, jobs.toArray(new Job[jobs.size()])).waitForJobs().isSuccess();
+    boolean success = new JobBarrier(null, serviceRegistry, jobs.toArray(new Job[jobs.size()])).waitForJobs().isSuccess();
     assertTrue(success);
     for (Job j : jobs) {
       // Always check the service registry for the latest version of the job

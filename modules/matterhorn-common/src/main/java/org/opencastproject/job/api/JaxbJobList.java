@@ -21,6 +21,8 @@
 
 package org.opencastproject.job.api;
 
+import com.entwinemedia.fn.Stream;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -49,10 +51,10 @@ public class JaxbJobList {
     this.jobs.add(job);
   }
 
-  public JaxbJobList(Collection<Job> jobs) {
+  public JaxbJobList(Collection<? extends Job> jobs) {
     if (jobs != null) {
       for (Job job : jobs) {
-        this.jobs.add((JaxbJob) job);
+        add(new JaxbJob(job));
       }
     }
   }
@@ -68,15 +70,11 @@ public class JaxbJobList {
    * @param jobs
    *          the jobs to set
    */
-  public void setJobs(List<JaxbJob> jobs) {
-    this.jobs = jobs;
+  public void setJobs(List<Job> jobs) {
+    this.jobs = Stream.$(jobs).map(JaxbJob.fnFromJob()).toList();
   }
 
-  public void add(Job job) {
-    if (job instanceof JaxbJob) {
-      jobs.add((JaxbJob) job);
-    } else {
-      throw new IllegalArgumentException("Jobs must be an instance of JaxbJob");
-    }
+  public void add(JaxbJob job) {
+    jobs.add(job);
   }
 }

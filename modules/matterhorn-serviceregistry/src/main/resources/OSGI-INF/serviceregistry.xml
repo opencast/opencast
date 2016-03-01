@@ -7,10 +7,8 @@
   	<provide interface="org.osgi.service.cm.ManagedService" />
     <provide interface="org.opencastproject.serviceregistry.api.ServiceRegistry" />
   </service>
-  <reference name="persistence" interface="javax.persistence.spi.PersistenceProvider"
-    cardinality="1..1" policy="static" bind="setPersistenceProvider" />
-  <reference name="props" interface="java.util.Map"
-    cardinality="1..1" policy="static" target="(type=persistence)" bind="setPersistenceProperties" />
+  <reference name="entityManagerFactory" interface="javax.persistence.EntityManagerFactory"
+    target="(osgi.unit.name=org.opencastproject.common)" cardinality="1..1" policy="static" bind="setEntityManagerFactory" />
   <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
     cardinality="1..1" policy="static" bind="setTrustedHttpClient" />
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"

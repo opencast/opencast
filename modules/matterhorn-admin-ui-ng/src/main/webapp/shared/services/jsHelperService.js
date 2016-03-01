@@ -220,7 +220,7 @@ angular.module('adminNg.services')
              * given user input.
              */
             assembleRrule: function (data) {
-                var date, 
+                var date,
                     weekdays = '',
                     weekdaysOffset = 0,
                     indexWeekdays = {},
@@ -237,7 +237,7 @@ angular.module('adminNg.services')
 
                     // Check if the weekdays need to be shifted because of timezone change
                     if (date.getUTCDate() > dateParts.day) {
-                        weekdaysOffset = +1; 
+                        weekdaysOffset = +1;
                     } else if (date.getUTCDate() < dateParts.day) {
                         weekdaysOffset = -1;
                     }
@@ -249,7 +249,7 @@ angular.module('adminNg.services')
                             }
                             var idx = indexWeekdays[weekday.length > 2 ? weekday.substr(-2) : weekday] + weekdaysOffset;
 
-                            // Check Sunday to Monday, Monday to Sunday 
+                            // Check Sunday to Monday, Monday to Sunday
                             idx = (idx > 6 ? 0 : (idx < 0 ? 6 : idx));
 
                             weekdays += weekdaysList[idx].key.substr(-2);

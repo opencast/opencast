@@ -42,7 +42,6 @@
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
-      <version>${json-simple.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -140,6 +139,10 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>de.empulse.eclipselink</groupId>
+        <artifactId>staticweave-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
@@ -159,7 +162,9 @@
               OSGI-INF/series-service.xml,
               OSGI-INF/series-service-rest.xml
             </Service-Component>
-            <JPA-PersistenceUnits>org.opencastproject.series.impl.persistence</JPA-PersistenceUnits>
+            <Meta-Persistence>
+              META-INF/persistence.xml
+            </Meta-Persistence>
           </instructions>
         </configuration>
       </plugin>

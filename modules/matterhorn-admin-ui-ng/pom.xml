@@ -116,13 +116,9 @@
         </dependency>
         <dependency>
             <groupId>org.opencastproject</groupId>
-            <artifactId>matterhorn-comments</artifactId>
+            <artifactId>matterhorn-event-comment</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.opencastproject</groupId>
-            <artifactId>matterhorn-messages</artifactId>
-            <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.opencastproject</groupId>
@@ -156,11 +152,6 @@
         </dependency>
         <dependency>
             <groupId>org.opencastproject</groupId>
-            <artifactId>matterhorn-participation-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.opencastproject</groupId>
             <artifactId>matterhorn-search-api</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -177,6 +168,11 @@
         <dependency>
             <groupId>org.opencastproject</groupId>
             <artifactId>matterhorn-smil-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opencastproject</groupId>
+            <artifactId>matterhorn-messages</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -275,7 +271,7 @@
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>org.eclipse.persistence.core</artifactId>
-            <scope>test</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
@@ -360,6 +356,10 @@
     <build>
         <plugins>
             <plugin>
+              <groupId>de.empulse.eclipselink</groupId>
+              <artifactId>staticweave-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <extensions>true</extensions>
@@ -389,16 +389,14 @@
                             org.opencastproject.adminui.endpoint,
                             org.opencastproject.adminui.impl,
                             org.opencastproject.adminui.impl.index,
-                            org.opencastproject.adminui.userdirectory,                          
+                            org.opencastproject.adminui.userdirectory,
                             org.opencastproject.adminui.usersettings,
                             org.opencastproject.adminui.usersettings.persistence
                         </Export-Package>
                         <Service-Component>
                             OSGI-INF/acl_endpoint.xml,
                             OSGI-INF/adminui_configuration.xml,
-                            OSGI-INF/blacklist_endpoint.xml,
                             OSGI-INF/captureagents_endpoint.xml,
-                            OSGI-INF/email_endpoint.xml,
                             OSGI-INF/event_endpoint.xml,
                             OSGI-INF/groups_endpoint.xml,
                             OSGI-INF/index_endpoint.xml,
@@ -428,9 +426,9 @@
                             OSGI-INF/users_endpoint.xml,
                             OSGI-INF/list_providers_endpoint.xml
                         </Service-Component>
-                        <JPA-PersistenceUnits>
-                            org.opencastproject.adminui
-                        </JPA-PersistenceUnits>
+                        <Meta-Persistence>
+                            META-INF/persistence.xml
+                        </Meta-Persistence>
                     </instructions>
                 </configuration>
             </plugin>

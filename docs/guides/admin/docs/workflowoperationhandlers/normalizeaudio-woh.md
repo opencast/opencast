@@ -1,7 +1,7 @@
 # NormalizeAudioWorkflowOperationHandler
 
 ## Description
-The NormalizeAudioiWorkflowOperationHandler normalizes the first audio stream of a video or audio track through SoX (http://sox.sourceforge.net/), it creates a new track with a reference to the original track which can be flavored and tagged.
+The NormalizeAudioWorkflowOperationHandler normalizes the first audio stream of a video or audio track through SoX (http://sox.sourceforge.net/), it creates a new track with a reference to the original track which can be flavored and tagged.
 This workflow operation handler can be used with audio and/or video files, at least one audio stream must be available otherwise nothing happens. Here are the internal steps done by the different inputs:
 
 ### Used with Audio only file (forceTranscode is deactivated):

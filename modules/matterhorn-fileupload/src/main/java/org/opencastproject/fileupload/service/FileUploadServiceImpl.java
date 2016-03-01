@@ -72,10 +72,10 @@ import javax.xml.bind.Unmarshaller;
 public class FileUploadServiceImpl implements FileUploadService, ManagedService {
 
   private static final Logger logger = LoggerFactory.getLogger(FileUploadServiceImpl.class);
-  final String PROPKEY_STORAGE_DIR = "org.opencastproject.storage.dir";
+  final String PROPKEY_KARAF_DATA = "karaf.data";
   final String PROPKEY_CLEANER_MAXTTL = "org.opencastproject.upload.cleaner.maxttl";
   final String PROPKEY_UPLOAD_WORKDIR = "org.opencastproject.upload.workdir";
-  final String DEFAULT_UPLOAD_WORKDIR = "fileupload-tmp"; /* The default location is the storage dir */
+  final String DEFAULT_UPLOAD_WORKDIR = "tmp/fileupload"; /* The default location is the storage dir */
   final String UPLOAD_COLLECTION = "uploaded";
   final String FILEEXT_DATAFILE = ".payload";
   final String FILENAME_CHUNKFILE = "chunk.part";
@@ -89,7 +89,6 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   private Marshaller jobMarshaller;
   private Unmarshaller jobUnmarshaller;
   private HashMap<String, FileUploadJob> jobCache = new HashMap<String, FileUploadJob>();
-  private byte[] readBuffer = new byte[READ_BUFFER_LENGTH];
   private FileUploadServiceCleaner cleaner;
   private int jobMaxTTL = DEFAULT_CLEANER_MAXTTL;
 
@@ -97,15 +96,12 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   protected synchronized void activate(ComponentContext cc) throws Exception {
     /* Ensure a working directory is set */
     if (workRoot == null) {
-      /* Use the default location: STORAGE_DIR / DEFAULT_UPLOAD_WORKDIR */
-      String dir = cc.getBundleContext().getProperty(PROPKEY_STORAGE_DIR);
+      String dir = cc.getBundleContext().getProperty(PROPKEY_KARAF_DATA);
       if (dir == null) {
-        throw new RuntimeException("Storage directory not defined. " + "Use " + PROPKEY_STORAGE_DIR
-                + " to set the property.");
+        throw new RuntimeException("Storage directory not defined.");
       }
-      dir += File.separator + DEFAULT_UPLOAD_WORKDIR;
-      workRoot = new File(dir);
-      log.info("Storage directory set to {}.", workRoot.getAbsolutePath());
+      workRoot = new File(dir, DEFAULT_UPLOAD_WORKDIR);
+      log.info("Chunk file upload directory set to {}.", workRoot.getAbsolutePath());
     }
 
     // set up de-/serialization
@@ -132,7 +128,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     String dir = (String) properties.get(PROPKEY_UPLOAD_WORKDIR);
     if (dir != null) {
       workRoot = new File(dir);
-      log.info("Configuration updated. Upload working directory set to {}.", dir);
+      log.info("Configuration updated. Upload working directory set to `{}`.", dir);
     }
     try {
       jobMaxTTL = Integer.parseInt(((String) properties.get(PROPKEY_CLEANER_MAXTTL)).trim());
@@ -335,6 +331,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     }
     OutputStream out = null;
     try {
+      byte[] readBuffer = new byte[READ_BUFFER_LENGTH];
       out = new FileOutputStream(chunkFile, false);
       int bytesRead = 0;
       long bytesReadTotal = 0l;

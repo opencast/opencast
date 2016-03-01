@@ -16,6 +16,11 @@
   <dependencies>
     <!-- Matterhorn -->
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-urlsigning-service-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.entwinemedia.common</groupId>
       <artifactId>functional</artifactId>
     </dependency>
@@ -47,7 +52,6 @@
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
-      <version>${json-simple.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -322,6 +326,9 @@
               org.opencastproject.systems;version=${project.version},
               org.opencastproject.security.util;version=${project.version}
             </Export-Package>
+            <Service-Component>
+              OSGI-INF/chaining-mp-serializer.xml
+            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

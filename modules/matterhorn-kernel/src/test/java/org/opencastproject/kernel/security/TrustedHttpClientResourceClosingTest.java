@@ -26,11 +26,15 @@ import static org.junit.Assert.assertEquals;
 import org.opencastproject.kernel.http.api.HttpClient;
 import org.opencastproject.kernel.http.impl.HttpClientFactory;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.urlsigning.exception.UrlSigningException;
+import org.opencastproject.security.urlsigning.service.UrlSigningService;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 import java.net.ServerSocket;
@@ -42,13 +46,23 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class TrustedHttpClientResourceClosingTest {
+  private static final Logger logger = LoggerFactory.getLogger(TrustedHttpClientResourceClosingTest.class);
   private static final int PORT = 8952;
 
   private static final class TestHttpClient extends TrustedHttpClientImpl {
-    TestHttpClient() {
+    TestHttpClient() throws UrlSigningException {
       super("user", "pass");
       setHttpClientFactory(new HttpClientFactory());
       setSecurityService(EasyMock.createNiceMock(SecurityService.class));
+      // Setup signing service
+      UrlSigningService urlSigningService = EasyMock.createMock(UrlSigningService.class);
+      EasyMock.expect(urlSigningService.accepts(EasyMock.anyString())).andReturn(true).anyTimes();
+      EasyMock.expect(
+              urlSigningService.sign(EasyMock.anyString(), EasyMock.anyLong(), EasyMock.anyLong(), EasyMock.anyString()))
+              .andReturn("http://ok.com");
+      EasyMock.replay(urlSigningService);
+
+      setUrlSigningService(urlSigningService);
     }
 
     Map<HttpResponse, HttpClient> getResponseMap() {
@@ -75,9 +89,9 @@ public class TrustedHttpClientResourceClosingTest {
       @Override public Void call() throws Exception {
         // notify that the server is ready
         barrier.countDown();
-        System.out.println("Waiting for incoming connection");
+        logger.info("Waiting for incoming connection");
         final Socket s = socket.accept();
-        System.out.println("Connected");
+        logger.info("Connected");
         final PrintStream out = new PrintStream(s.getOutputStream());
         out.println("HTTP/1.1 200 OK\n\n");
         out.flush();
@@ -85,12 +99,12 @@ public class TrustedHttpClientResourceClosingTest {
         s.getInputStream().close();
         s.close();
         es.shutdown();
-        System.out.println("Terminate server");
+        logger.info("Terminate server");
         return null;
       }
     };
     es.submit(server);
-    System.out.println("Waiting for server...");
+    logger.info("Waiting for server...");
     barrier.await();
   }
 }

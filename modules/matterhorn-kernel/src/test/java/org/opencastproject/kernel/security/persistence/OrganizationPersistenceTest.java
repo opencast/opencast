@@ -21,6 +21,9 @@
 
 package org.opencastproject.kernel.security.persistence;
 
+import static org.opencastproject.kernel.security.persistence.OrganizationDatabaseImpl.PERSISTENCE_UNIT;
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -28,22 +31,14 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.mchange.v2.c3p0.DataSources;
-
-import junit.framework.Assert;
-
-import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
-import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,9 +48,7 @@ import java.util.Map;
  */
 public class OrganizationPersistenceTest {
 
-  private ComboPooledDataSource pooledDataSource;
   private OrganizationDatabaseImpl organizationDatabase;
-  private String storage;
 
   private SecurityService securityService;
 
@@ -64,21 +57,6 @@ public class OrganizationPersistenceTest {
    */
   @Before
   public void setUp() throws Exception {
-    long currentTime = System.currentTimeMillis();
-    storage = PathSupport.concat("target", "db" + currentTime + ".h2.db");
-
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + currentTime);
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Collect the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
-
     securityService = EasyMock.createNiceMock(SecurityService.class);
     User user = new JaxbUser("admin", "test", new DefaultOrganization(), new JaxbRole(
             SecurityConstants.GLOBAL_ADMIN_ROLE, new DefaultOrganization()));
@@ -87,8 +65,7 @@ public class OrganizationPersistenceTest {
     EasyMock.replay(securityService);
 
     organizationDatabase = new OrganizationDatabaseImpl();
-    organizationDatabase.setPersistenceProvider(new PersistenceProvider());
-    organizationDatabase.setPersistenceProperties(props);
+    organizationDatabase.setEntityManagerFactory(newTestEntityManagerFactory(PERSISTENCE_UNIT));
     organizationDatabase.setSecurityService(securityService);
     organizationDatabase.activate(null);
   }
@@ -105,6 +82,12 @@ public class OrganizationPersistenceTest {
     Assert.assertTrue(organizationDatabase.containsOrganization("newOrg"));
 
     Organization orgById = organizationDatabase.getOrganization("newOrg");
+    try {
+      organizationDatabase.getOrganizationByHost("test.org", 8081);
+      Assert.fail();
+    } catch (NotFoundException e) {
+      Assert.assertNotNull(e);
+    }
     Organization orgByHost = organizationDatabase.getOrganizationByHost("test.org", 8080);
     Assert.assertEquals(orgById, orgByHost);
 
@@ -174,16 +157,6 @@ public class OrganizationPersistenceTest {
     } catch (NotFoundException e) {
       Assert.assertNotNull(e);
     }
-  }
-
-  /**
-   * @throws java.lang.Exception
-   */
-  @After
-  public void tearDown() throws Exception {
-    organizationDatabase.deactivate(null);
-    DataSources.destroy(pooledDataSource);
-    FileUtils.deleteQuietly(new File(storage));
   }
 
 }

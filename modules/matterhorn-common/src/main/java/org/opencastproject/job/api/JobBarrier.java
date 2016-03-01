@@ -21,6 +21,8 @@
 
 package org.opencastproject.job.api;
 
+import com.entwinemedia.fn.data.Opt;
+
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -33,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +60,9 @@ public final class JobBarrier {
   /** Time in milliseconds between two pools for the job status */
   private final long pollingInterval;
 
+  /** The job that's waiting */
+  private final Opt<Long> waiterJobId;
+
   /** The jobs to wait on */
   private final List<Job> jobs;
 
@@ -68,42 +74,52 @@ public final class JobBarrier {
 
   /**
    * Creates a barrier without any jobs, using <code>registry</code> to poll for the outcome of the monitored jobs using
-   * the default polling interval {@link #DEFAULT_POLLING_INTERVAL}. Use {@link #addJob(Job)} to add jobs to monitor.
+   * the default polling interval {@link #DEFAULT_POLLING_INTERVAL}. The <code>waiter</code> is the job which is waiting
+   * for the other jobs to finish. Use {@link #addJob(Job)} to add jobs to monitor.
    *
    * @param registry
    *          the registry
+   * @param waiter
+   *          the job waiting for the other jobs to finish
    */
-  public JobBarrier(ServiceRegistry registry) {
-    this(registry, DEFAULT_POLLING_INTERVAL, new Job[] {});
+  public JobBarrier(Job waiter, ServiceRegistry registry) {
+    this(waiter, registry, DEFAULT_POLLING_INTERVAL, new Job[] {});
   }
 
   /**
    * Creates a barrier for <code>jobs</code>, using <code>registry</code> to poll for the outcome of the monitored jobs
-   * using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}.
+   * using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}. The <code>waiter</code> is the job which is
+   * waiting for the other jobs to finish.
    *
    * @param registry
    *          the registry
    * @param jobs
    *          the jobs to monitor
+   * @param waiter
+   *          the job waiting for the other jobs to finish
    */
-  public JobBarrier(ServiceRegistry registry, Job... jobs) {
-    this(registry, DEFAULT_POLLING_INTERVAL, jobs);
+  public JobBarrier(Job waiter, ServiceRegistry registry, Job... jobs) {
+    this(waiter, registry, DEFAULT_POLLING_INTERVAL, jobs);
   }
 
   /**
-   * Creates a wrapper for <code>job</code>, using <code>registry</code> to poll for the job outcome.
+   * Creates a wrapper for <code>job</code>, using <code>registry</code> to poll for the job outcome. The
+   * <code>waiter</code> is the job which is waiting for the other jobs to finish.
    *
    * @param registry
    *          the registry
    * @param pollingInterval
    *          the time in miliseconds between two polling operations
+   * @param waiter
+   *          the job waiting for the other jobs to finish
    */
-  public JobBarrier(ServiceRegistry registry, long pollingInterval) {
-    this(registry, pollingInterval, new Job[] {});
+  public JobBarrier(Job waiter, ServiceRegistry registry, long pollingInterval) {
+    this(waiter, registry, pollingInterval, new Job[] {});
   }
 
   /**
-   * Creates a wrapper for <code>job</code>, using <code>registry</code> to poll for the job outcome.
+   * Creates a wrapper for <code>job</code>, using <code>registry</code> to poll for the job outcome. The
+   * <code>waiter</code> is the job which is waiting for the other jobs to finish.
    *
    * @param jobs
    *          the job to poll
@@ -111,8 +127,10 @@ public final class JobBarrier {
    *          the registry
    * @param pollingInterval
    *          the time in miliseconds between two polling operations
+   * @param waiter
+   *          the job waiting for the other jobs to finish
    */
-  public JobBarrier(ServiceRegistry registry, long pollingInterval, Job... jobs) {
+  public JobBarrier(Job waiter, ServiceRegistry registry, long pollingInterval, Job... jobs) {
     if (registry == null)
       throw new IllegalArgumentException("Service registry must not be null");
     if (jobs == null)
@@ -121,7 +139,58 @@ public final class JobBarrier {
       throw new IllegalArgumentException("Polling interval must be a positive number");
     this.serviceRegistry = registry;
     this.pollingInterval = pollingInterval;
+    if (waiter != null)
+      this.waiterJobId = Opt.some(waiter.getId());
+    else
+      this.waiterJobId = Opt.none();
     this.jobs = new ArrayList<Job>(Arrays.asList(jobs));
+  }
+
+  private void suspendWaiterJob() {
+    if (this.waiterJobId.isSome()) {
+      try {
+        final Job waiter = serviceRegistry.getJob(waiterJobId.get());
+        waiter.setStatus(Job.Status.WAITING);
+        List<Long> blockedForJobs = new LinkedList<Long>();
+        for (Job j : jobs) {
+          blockedForJobs.add(j.getId());
+          j.setBlockingJobId(waiter.getId());
+          // FYI not updating local j in jobs collection
+          this.serviceRegistry.updateJob(j);
+        }
+        waiter.setBlockedJobIds(blockedForJobs);
+        this.serviceRegistry.updateJob(waiter);
+      } catch (ServiceRegistryException e) {
+        logger.warn("Unable to put {} into a waiting state, this may cause a deadlock: {}", waiterJobId, e.getMessage());
+      } catch (NotFoundException e) {
+        logger.warn("Unable to put {} into a waiting state, job not found by the service registry.  This may cause a deadlock: {}", waiterJobId, e.getMessage());
+      }
+    } else {
+      logger.debug("No waiting job set, unable to put waiting job into waiting state");
+    }
+  }
+
+  private void wakeWaiterJob() {
+    if (this.waiterJobId.isSome()) {
+      try {
+        final Job waiter = serviceRegistry.getJob(waiterJobId.get());
+        waiter.setStatus(Job.Status.RUNNING);
+        for (Job j : jobs) {
+          Job updatedJob = this.serviceRegistry.getJob(j.getId());
+          updatedJob.removeBlockingJobId();
+          // FYI not updating local j in jobs collection
+          this.serviceRegistry.updateJob(updatedJob);
+        }
+        waiter.removeBlockedJobsIds();
+        this.serviceRegistry.updateJob(waiter);
+      } catch (ServiceRegistryException e) {
+        logger.warn("Unable to put {} into a waiting state, this may cause a deadlock: {}", waiterJobId, e.getMessage());
+      } catch (NotFoundException e) {
+        logger.warn("Unable to put {} into a waiting state, job not found by the service registry.  This may cause a deadlock: {}", waiterJobId, e.getMessage());
+      }
+    } else {
+      logger.debug("No waiting job set, unable to put waiting job into waiting state");
+    }
   }
 
   /**
@@ -148,6 +217,7 @@ public final class JobBarrier {
   public Result waitForJobs(long timeout) throws JobCanceledException, IllegalStateException {
     if (jobs.size() == 0)
       return new Result(new HashMap<Job, Status>());
+    this.suspendWaiterJob();
     synchronized (this) {
       JobStatusUpdater updater = new JobStatusUpdater(timeout);
       try {
@@ -162,6 +232,7 @@ public final class JobBarrier {
         throw (JobCanceledException) pollingException;
       throw new IllegalStateException(pollingException);
     }
+    this.wakeWaiterJob();
     return getStatus();
   }
 
@@ -254,6 +325,9 @@ public final class JobBarrier {
                 case INSTANTIATED:
                 case RUNNING:
                   logger.trace("{} is still in the works", job);
+                  break;
+                case WAITING:
+                  logger.trace("{} is waiting", job);
                   break;
                 default:
                   logger.error("Unhandled job status '{}' found", jobStatus);

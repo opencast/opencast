@@ -27,44 +27,23 @@ import static com.entwinemedia.fn.data.json.Jsons.j;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
-import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-import static org.opencastproject.index.service.util.JSONUtils.blacklistToJSON;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
-
-import org.opencastproject.capture.CaptureParameters;
-import org.opencastproject.capture.admin.api.Agent;
-import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.index.service.resources.list.query.AgentsListQuery;
-import org.opencastproject.index.service.util.RestUtils;
-import org.opencastproject.matterhorn.search.SearchQuery.Order;
-import org.opencastproject.matterhorn.search.SortCriterion;
-import org.opencastproject.pm.api.Blacklist;
-import org.opencastproject.pm.api.CaptureAgent;
-import org.opencastproject.pm.api.Room;
-import org.opencastproject.pm.api.persistence.ParticipationManagementDatabase;
-import org.opencastproject.pm.api.persistence.ParticipationManagementDatabase.SortType;
-import org.opencastproject.pm.api.persistence.ParticipationManagementDatabaseException;
-import org.opencastproject.util.DateTimeSupport;
-import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.SmartIterator;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.doc.rest.RestParameter;
-import org.opencastproject.util.doc.rest.RestQuery;
-import org.opencastproject.util.doc.rest.RestResponse;
-import org.opencastproject.util.doc.rest.RestService;
 
 import com.entwinemedia.fn.data.json.JField;
 import com.entwinemedia.fn.data.json.JValue;
 
 import org.apache.commons.lang3.StringUtils;
+import org.opencastproject.adminui.util.TextFilter;
+import org.opencastproject.capture.CaptureParameters;
+import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.SmartIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -79,6 +58,18 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.opencastproject.capture.admin.api.Agent;
+import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.index.service.resources.list.query.AgentsListQuery;
+import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.matterhorn.search.SearchQuery.Order;
+import org.opencastproject.matterhorn.search.SortCriterion;
+import org.opencastproject.util.data.Option;
+import org.opencastproject.util.doc.rest.RestParameter;
+import org.opencastproject.util.doc.rest.RestQuery;
+import org.opencastproject.util.doc.rest.RestResponse;
+import org.opencastproject.util.doc.rest.RestService;
+
 @Path("/")
 @RestService(name = "captureAgents", title = "Capture agents façade service", notes = "This service offers the default capture agents CRUD Operations for the admin UI.", abstractText = "Provides operations for the capture agents")
 public class CaptureAgentsEndpoint {
@@ -91,9 +82,6 @@ public class CaptureAgentsEndpoint {
   /** The capture agent service */
   private CaptureAgentStateService service;
 
-  /** The participation persistence */
-  private ParticipationManagementDatabase participationPersistence;
-
   /**
    * Sets the capture agent service
    *
@@ -102,11 +90,6 @@ public class CaptureAgentsEndpoint {
    */
   public void setCaptureAgentService(CaptureAgentStateService service) {
     this.service = service;
-  }
-
-  /** OSGi callback for participation persistence. */
-  public void setParticipationPersistence(ParticipationManagementDatabase participationPersistence) {
-    this.participationPersistence = participationPersistence;
   }
 
   @GET
@@ -123,6 +106,7 @@ public class CaptureAgentsEndpoint {
     Option<String> filterName = Option.none();
     Option<String> filterStatus = Option.none();
     Option<Long> filterLastUpdated = Option.none();
+    Option<String> filterText = Option.none();
     Option<String> optSort = Option.option(trimToNull(sort));
 
     Map<String, String> filters = RestUtils.parseFilter(filter);
@@ -139,19 +123,8 @@ public class CaptureAgentsEndpoint {
           return Response.status(Status.BAD_REQUEST).build();
         }
       }
-    }
-
-    // Get list of agents from the PM
-    Map<String, CaptureAgent> captureAgents = new HashMap<String, CaptureAgent>();
-    if (participationPersistence != null) {
-      try {
-        for (CaptureAgent agent : participationPersistence.getCaptureAgents()) {
-          captureAgents.put(agent.getMhAgent(), agent);
-        }
-      } catch (ParticipationManagementDatabaseException e) {
-        logger.warn("Not able to get the capture agents from the participation management persistence service: {}", e);
-        return Response.status(SC_INTERNAL_SERVER_ERROR).build();
-      }
+      if (AgentsListQuery.FILTER_TEXT_NAME.equals(name) && StringUtils.isNotBlank(filters.get(name)))
+        filterText = Option.some(filters.get(name));
     }
 
     // Filter agents by filter criteria
@@ -162,7 +135,8 @@ public class CaptureAgentsEndpoint {
       // Filter list
       if ((filterName.isSome() && !filterName.get().equals(agent.getName()))
               || (filterStatus.isSome() && !filterStatus.get().equals(agent.getState()))
-              || (filterLastUpdated.isSome() && filterLastUpdated.get() != agent.getLastHeardFrom()))
+              || (filterLastUpdated.isSome() && filterLastUpdated.get() != agent.getLastHeardFrom())
+              || (filterText.isSome() && !TextFilter.match(filterText.get(), agent.getName(), agent.getState())))
         continue;
       filteredAgents.add(agent);
     }
@@ -190,7 +164,7 @@ public class CaptureAgentsEndpoint {
                   return agent2.getLastHeardFrom().compareTo(agent1.getLastHeardFrom());
                 return agent1.getLastHeardFrom().compareTo(agent2.getLastHeardFrom());
               default:
-                logger.info("Unkown sort type: {}", criterion.getFieldName());
+                logger.info("Unknown sort type: {}", criterion.getFieldName());
                 return 0;
             }
           }
@@ -205,53 +179,18 @@ public class CaptureAgentsEndpoint {
     // Run through and build a map of updates (rather than states)
     List<JValue> agentsJSON = new ArrayList<JValue>();
     for (Agent agent : filteredAgents) {
-      List<Blacklist> blacklist = new ArrayList<Blacklist>();
-
-      Room room = null;
-      CaptureAgent captureAgent = captureAgents.get(agent.getName());
-      try {
-        if (captureAgent != null) {
-          room = participationPersistence.getRoom(captureAgent.getRoom().getId());
-          blacklist.addAll(participationPersistence.findBlacklists(room));
-        }
-      } catch (ParticipationManagementDatabaseException e) {
-        logger.warn("Not able to find the blacklist for the agent {} {}:", agent.getName(), e);
-        return Response.status(SC_INTERNAL_SERVER_ERROR).build();
-      } catch (NotFoundException e) {
-        logger.debug("Not able to find the capture agent in the room {}.", captureAgent.getRoom());
-      }
-      agentsJSON.add(generateJsonAgent(agent, Option.option(room), blacklist, inputs));
+      agentsJSON.add(generateJsonAgent(agent, inputs));
     }
 
     return okJsonList(agentsJSON, offset, limit, total);
   }
 
-  /**
-   * Generate a JSON Object for the given capture agent with its related blacklist periods
-   *
-   * @param agent
-   *          The target capture agent
-   * @param room
-   *          the participation room
-   * @param blacklist
-   *          The blacklist periods related to the capture agent
-   * @param withInputs
-   *          Whether the agent has inputs
-   * @return A {@link JValue} representing the capture agent
-   */
-  private JValue generateJsonAgent(Agent agent, Option<Room> room, List<Blacklist> blacklist, boolean withInputs) {
-    JValue blacklistJSON = blacklistToJSON(blacklist);
+  private JValue generateJsonAgent(Agent agent, boolean withInputs) {
 
     List<JField> fields = new ArrayList<JField>();
     fields.add(f("Status", vN(agent.getState())));
     fields.add(f("Name", v(agent.getName())));
     fields.add(f("Update", vN(DateTimeSupport.toUTC(agent.getLastHeardFrom()))));
-    if (room.isSome()) {
-      fields.add(f("roomId", v(room.get().getId())));
-    } else {
-      fields.add(f("roomId", v(-1)));
-    }
-    fields.add(f("blacklist", blacklistJSON));
 
     if (withInputs) {
       String devices = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_NAMES);
@@ -261,33 +200,12 @@ public class CaptureAgentsEndpoint {
     return j(fields);
   }
 
-  /**
-   * Generate a JSON devices list
-   *
-   * @param devices
-   *          an array of devices String
-   * @return A {@link JValue} representing the devices
-   */
   private JValue generateJsonDevice(String[] devices) {
     List<JValue> jsonDevices = new ArrayList<JValue>();
     for (String device : devices) {
       jsonDevices.add(j(f("id", v(device)), f("value", v(TRANSLATION_KEY_PREFIX + device.toUpperCase()))));
     }
     return a(jsonDevices);
-  }
-
-  private Option<SortType> getAgentSortField(String input) {
-    if (StringUtils.isNotBlank(input)) {
-      String upperCase = input.toUpperCase();
-      SortType sortType = null;
-      try {
-        sortType = SortType.valueOf(upperCase);
-      } catch (IllegalArgumentException e) {
-        return Option.<SortType> none();
-      }
-      return Option.option(sortType);
-    }
-    return Option.<SortType> none();
   }
 
 }

@@ -37,7 +37,6 @@
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
-      <version>${json-simple.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -243,10 +242,10 @@
               org.opencastproject.rest;version=${project.version},
               *;resolution:=optional
             </Import-Package>
+            <Export-Package>
+              org.opencastproject.lti;version=${project.version}
+            </Export-Package>
             <Private-Package>tools.*</Private-Package>
-            <Service-Component>
-              OSGI-INF/opencast-lti.xml
-            </Service-Component>
             <Http-Alias>/ltitools</Http-Alias>
             <Http-Classpath>/tools</Http-Classpath>
             <Http-Welcome>index.html</Http-Welcome>

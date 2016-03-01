@@ -21,11 +21,10 @@
 
 package org.opencastproject.serviceregistry.impl;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
 import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.fun.juc.Mutables;
 import org.opencastproject.job.api.Incident;
@@ -35,7 +34,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.persistence.PersistenceEnv;
 import org.opencastproject.util.persistence.PersistenceEnvs;
 import org.opencastproject.util.persistence.PersistenceUtil;
-import org.opencastproject.util.persistence.Queries;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import org.easymock.EasyMock;
@@ -58,7 +56,7 @@ public class OsgiIncidentServiceTest {
 
   private AbstractIncidentService incidentService;
   private PersistenceEnv penv;
-  private Map<Long, JobJpaImpl> jobs = Mutables.map();
+  private Map<Long, Job> jobs = Mutables.map();
   private Incidents incidents;
 
   /** @throws java.lang.Exception */
@@ -69,26 +67,27 @@ public class OsgiIncidentServiceTest {
     penv = PersistenceEnvs.persistenceEnvironment(emf);
 
     // Mock up a job
-    JobJpaImpl job = new JobJpaImpl();
-    job.setProcessingHost(PROCESSING_HOST);
-    job.setJobType(JOB_TYPE);
-    job.setCreator("creator");
-    job.setOrganization("organization");
+    Job job = createNiceMock(Job.class);
+    expect(job.getProcessingHost()).andStubReturn(PROCESSING_HOST);
+    expect(job.getJobType()).andStubReturn(JOB_TYPE);
+    expect(job.getCreator()).andStubReturn("creator");
+    expect(job.getOrganization()).andStubReturn("organization");
+    replay(job);
 
     // Mock up a service registry
-    final ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
-    EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andAnswer(new IAnswer<Job>() {
+    final ServiceRegistry serviceRegistry = createNiceMock(ServiceRegistry.class);
+    expect(serviceRegistry.getJob(EasyMock.anyLong())).andAnswer(new IAnswer<Job>() {
       @Override
       public Job answer() throws Throwable {
         final Long jobId = (Long) EasyMock.getCurrentArguments()[0];
         return jobs.get(jobId);
       }
     }).anyTimes();
-    EasyMock.replay(serviceRegistry);
+    replay(serviceRegistry);
 
     // Mock up a workflow service
-    final WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
-    EasyMock.replay(workflowService);
+    final WorkflowService workflowService = createNiceMock(WorkflowService.class);
+    replay(workflowService);
 
     incidentService = new AbstractIncidentService() {
       @Override
@@ -119,17 +118,21 @@ public class OsgiIncidentServiceTest {
   public void testRetrieving() throws Exception {
     // manually create and store a job bypassing the service registry because the JPA implementation of the registry
     // is not very test friendly
-    final JobJpaImpl job = new JobJpaImpl();
-    job.setCreator("creator");
-    job.setOrganization("organization");
-    job.setProcessingHost("localhost");
-    job.setJobType("org.opencastproject.service");
-    final JobJpaImpl pjob = penv.tx(Queries.persist(job));
-    jobs.put(pjob.getId(), pjob);
-    assertThat(pjob.getId(), is(not(0L)));
-    incidents.record(pjob, Incident.Severity.FAILURE, 1511);
+
+
+    // Mock up a job
+    Job job = createNiceMock(Job.class);
+    expect(job.getId()).andStubReturn(1L);
+    expect(job.getProcessingHost()).andStubReturn("localhost");
+    expect(job.getJobType()).andStubReturn("org.opencastproject.service");
+    expect(job.getCreator()).andStubReturn("creator");
+    expect(job.getOrganization()).andStubReturn("organization");
+    replay(job);
+
+    jobs.put(job.getId(), job);
+    incidents.record(job, Incident.Severity.FAILURE, 1511);
     // retrieve the job incident
-    final List<Incident> incidents = incidentService.getIncidentsOfJob(Immutables.list(pjob.getId()));
+    final List<Incident> incidents = incidentService.getIncidentsOfJob(Immutables.list(job.getId()));
     assertEquals(1, incidents.size());
     assertEquals(Incident.Severity.FAILURE, incidents.get(0).getSeverity());
     assertEquals("localhost", incidents.get(0).getProcessingHost());

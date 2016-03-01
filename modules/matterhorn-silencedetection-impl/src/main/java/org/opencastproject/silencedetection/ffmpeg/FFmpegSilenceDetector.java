@@ -22,6 +22,7 @@
 package org.opencastproject.silencedetection.ffmpeg;
 
 import com.google.common.io.LineReader;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +35,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.osgi.framework.BundleContext;
 import org.apache.commons.lang3.StringUtils;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
@@ -56,15 +58,38 @@ public class FFmpegSilenceDetector {
   public static final String FFMPEG_BINARY_CONFIG = "org.opencastproject.composer.ffmpeg.path";
   public static final String FFMPEG_BINARY_DEFAULT = "ffmpeg";
 
-  private static final String DEFAULT_SILENCE_MIN_LENGTH = "5000";
-  private static final String DEFAULT_SILENCE_PRE_LENGTH = "2000";
+  private static final Long DEFAULT_SILENCE_MIN_LENGTH = 5000L;
+  private static final Long DEFAULT_SILENCE_PRE_LENGTH = 2000L;
   private static final String DEFAULT_THRESHOLD_DB = "-40dB";
-  private static final String DEFAULT_VOICE_MIN_LENGTH = "60000";
+  private static final Long DEFAULT_VOICE_MIN_LENGTH = 60000L;
 
+  private static String binary = FFMPEG_BINARY_DEFAULT;
   private String filePath;
   private String trackId;
 
   private List<MediaSegment> segments = null;
+
+  /**
+   * Update FFMPEG binary path if set in configuration.
+   *
+   * @param bundleContext
+   */
+  public static void init(BundleContext bundleContext) {
+    String binaryPath = bundleContext.getProperty(FFMPEG_BINARY_CONFIG);
+    try {
+      if (StringUtils.isNotBlank(binaryPath)) {
+        File binaryFile = new File(StringUtils.trim(binaryPath));
+        if (binaryFile.exists()) {
+          binary = binaryFile.getAbsolutePath();
+        } else {
+          logger.warn("FFMPEG binary file {} does not exist", StringUtils.trim(binaryPath));
+        }
+      }
+    } catch (Exception ex) {
+      logger.error("Failed to set ffmpeg binary path", ex);
+    }
+  }
+
 
   /**
    * Create nonsilent sequences detection pipeline.
@@ -76,15 +101,20 @@ public class FFmpegSilenceDetector {
   public FFmpegSilenceDetector(Properties properties, Track track, Workspace workspace)
     throws SilenceDetectionFailedException, MediaPackageException, IOException {
 
-    long minSilenceLength = Long.parseLong(properties.getProperty(SilenceDetectionProperties.SILENCE_MIN_LENGTH,
-          DEFAULT_SILENCE_MIN_LENGTH));
-    long minVoiceLength = Long.parseLong(properties.getProperty(SilenceDetectionProperties.VOICE_MIN_LENGTH,
-          DEFAULT_VOICE_MIN_LENGTH));
-    long preSilenceLength = Long.parseLong(properties.getProperty(SilenceDetectionProperties.SILENCE_PRE_LENGTH,
-          DEFAULT_SILENCE_PRE_LENGTH));
-    String thresholdDB = properties.getProperty(SilenceDetectionProperties.SILENCE_THRESHOLD_DB, DEFAULT_THRESHOLD_DB);
+    long minSilenceLength;
+    long minVoiceLength;
+    long preSilenceLength;
+    String thresholdDB;
 
-    String binary = properties.getProperty(FFMPEG_BINARY_CONFIG, FFMPEG_BINARY_DEFAULT);
+    //Ensure properties is not null, avoids null checks later
+    if (null == properties) {
+      properties = new Properties();
+    }
+
+    minSilenceLength = parseLong(properties, SilenceDetectionProperties.SILENCE_MIN_LENGTH, DEFAULT_SILENCE_MIN_LENGTH);
+    minVoiceLength = parseLong(properties, SilenceDetectionProperties.VOICE_MIN_LENGTH, DEFAULT_VOICE_MIN_LENGTH);
+    preSilenceLength = parseLong(properties, SilenceDetectionProperties.SILENCE_PRE_LENGTH, DEFAULT_SILENCE_PRE_LENGTH);
+    thresholdDB = properties.getProperty(SilenceDetectionProperties.SILENCE_THRESHOLD_DB, DEFAULT_THRESHOLD_DB);
 
     trackId = track.getIdentifier();
 
@@ -208,6 +238,14 @@ public class FFmpegSilenceDetector {
 
   }
 
+  private Long parseLong(Properties properties, String key, Long defaultValue) {
+    try {
+      return Long.parseLong(properties.getProperty(key, defaultValue.toString()));
+    } catch (NumberFormatException e) {
+      logger.warn("Configuration value for {} is invalid, using default value of {} instead", key, defaultValue);
+      return defaultValue;
+    }
+  }
 
   /**
    * Returns found media segments.

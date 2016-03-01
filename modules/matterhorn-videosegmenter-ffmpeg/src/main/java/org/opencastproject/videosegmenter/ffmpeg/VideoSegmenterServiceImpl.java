@@ -21,20 +21,6 @@
 
 package org.opencastproject.videosegmenter.ffmpeg;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Catalog;
@@ -56,17 +42,33 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.videosegmenter.api.VideoSegmenterException;
 import org.opencastproject.videosegmenter.api.VideoSegmenterService;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.google.common.io.LineReader;
+
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.io.LineReader;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Media analysis plugin that takes a video stream and extracts video segments
@@ -106,6 +108,15 @@ VideoSegmenterService, ManagedService {
 
   /** Default value for the number of pixels that may change between two frames without considering them different */
   public static final float DEFAULT_CHANGES_THRESHOLD = 0.05f; // 5% change
+
+  /** The load introduced on the system by creating a caption job */
+  public static final float DEFAULT_SEGMENTER_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_CAPTION_JOB_LOAD} */
+  public static final String SEGMENTER_JOB_LOAD_KEY = "job.load.videosegmenter";
+
+  /** The load introduced on the system by creating a caption job */
+  private float segmenterJobLoad = DEFAULT_SEGMENTER_JOB_LOAD;
 
   /** The logging facility */
   protected static final Logger logger = LoggerFactory
@@ -186,6 +197,7 @@ VideoSegmenterService, ManagedService {
       }
     }
 
+    segmenterJobLoad = LoadUtil.getConfiguredLoadValue(properties, SEGMENTER_JOB_LOAD_KEY, DEFAULT_SEGMENTER_JOB_LOAD, serviceRegistry);
   }
 
   /**
@@ -198,7 +210,7 @@ VideoSegmenterService, ManagedService {
     try {
       return serviceRegistry.createJob(JOB_TYPE,
           Operation.Segment.toString(),
-          Arrays.asList(MediaPackageElementParser.getAsXml(track)));
+          Arrays.asList(MediaPackageElementParser.getAsXml(track)), segmenterJobLoad);
     } catch (ServiceRegistryException e) {
       throw new VideoSegmenterException("Unable to create a job", e);
     }

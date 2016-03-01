@@ -51,20 +51,6 @@
       </configurations>
     </operation>
 
-    <!-- Update recording metadata -->
-
-    <operation
-      id="publish-engage"
-      max-attempts="2"
-      fail-on-error="false"
-      description="Download and Publish to Engage">
-      <configurations>
-        <configuration key="download-source-flavors">dublincore/*</configuration>
-        <configuration key="merge-only">true</configuration>
-        <configuration key="check-availability">false</configuration>
-      </configurations>
-    </operation>
-
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Publish to publication channels                                   -->
     <!--                                                                   -->
@@ -79,7 +65,7 @@
       exception-handler-workflow="ng-partial-error"
       description="Update recording in Opencast Media Module">
       <configurations>
-        <configuration key="download-source-flavors">dublincore/*</configuration>
+        <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
         <configuration key="merge-only">true</configuration>
         <configuration key="check-availability">false</configuration>
       </configurations>

@@ -1,7 +1,7 @@
 #HttpNotificationWorkflowOperation
 
 ##Description
-Matterhorn can through this operation notify any HTTP endpoint about the process of the workflow.
+Opencast can through this operation notify any HTTP endpoint about the process of the workflow.
 
 ##Parameter Table
 A parameter that is always posted is the workflow instance identifier in the parameter named **workflowInstanceId** containing the current workflow’s identifier.
@@ -16,7 +16,7 @@ A parameter that is always posted is the workflow instance identifier in the par
 |timeout	|false	|The timeout in seconds for the notification request: The default value is 10|10|
 
 ##Operation Example
- 
+
     <operation
       id="http-notify"
       fail-on-error="false"

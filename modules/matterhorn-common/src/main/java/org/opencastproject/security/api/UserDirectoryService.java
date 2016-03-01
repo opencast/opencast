@@ -63,6 +63,13 @@ public interface UserDirectoryService {
   Iterator<User> findUsers(String query, int offset, int limit);
 
   /**
+   * Returns the total number of users
+   *
+   * @return the count of users
+   */
+  long countUsers();
+
+  /**
    * Discards any cached value for given user name.
    *
    * @param userName

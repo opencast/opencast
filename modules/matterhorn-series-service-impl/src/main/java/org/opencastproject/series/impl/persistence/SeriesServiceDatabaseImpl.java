@@ -59,7 +59,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Implements {@link SeriesServiceDatabase}. Defines permanent storage for series.
@@ -69,11 +68,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(SeriesServiceDatabaseImpl.class);
 
-  /** Persistence provider set by OSGi */
-  protected PersistenceProvider persistenceProvider;
-
-  /** Persistence properties used to create {@link EntityManagerFactory} */
-  protected Map<String, Object> persistenceProperties;
+  /** JPA persistence unit name */
+  public static final String PERSISTENCE_UNIT = "org.opencastproject.series.impl.persistence";
 
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;
@@ -84,6 +80,11 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   /** The security service */
   protected SecurityService securityService;
 
+  /** OSGi DI */
+  public void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
+  }
+
   /**
    * Creates {@link EntityManagerFactory} using persistence provider and properties passed via OSGi.
    *
@@ -91,37 +92,6 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    */
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for series");
-    emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.series.impl.persistence",
-            persistenceProperties);
-  }
-
-  /**
-   * Closes entity manager factory.
-   *
-   * @param cc
-   */
-  public void deactivate(ComponentContext cc) {
-    emf.close();
-  }
-
-  /**
-   * OSGi callback to set persistence properties.
-   *
-   * @param persistenceProperties
-   *          persistence properties
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
-  }
-
-  /**
-   * OSGi callback to set persistence provider.
-   *
-   * @param persistenceProvider
-   *          {@link PersistenceProvider} object
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
   }
 
   /**
@@ -223,7 +193,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    */
   @Override
   public void deleteSeriesProperty(String seriesId, String propertyName) throws SeriesServiceDatabaseException,
-          NotFoundException {
+  NotFoundException {
     EntityManager em = emf.createEntityManager();
     EntityTransaction tx = em.getTransaction();
     try {
@@ -300,7 +270,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    */
   @Override
   public AccessControlList getAccessControlList(String seriesId) throws NotFoundException,
-          SeriesServiceDatabaseException {
+  SeriesServiceDatabaseException {
     EntityManager em = emf.createEntityManager();
     try {
       SeriesEntity entity = getSeriesEntity(seriesId, em);
@@ -330,7 +300,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    */
   @Override
   public DublinCoreCatalog storeSeries(DublinCoreCatalog dc) throws SeriesServiceDatabaseException,
-          UnauthorizedException {
+  UnauthorizedException {
     if (dc == null) {
       throw new SeriesServiceDatabaseException("Invalid value for Dublin core catalog: null");
     }
@@ -409,7 +379,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
         if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.READ.toString())
                 && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg,
                         Permissions.Action.CONTRIBUTE.toString())
-                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
+                        && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
           throw new UnauthorizedException(currentUser + " is not authorized to see series " + seriesId);
         }
       }
@@ -434,7 +404,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    */
   @Override
   public Map<String, String> getSeriesProperties(String seriesId) throws NotFoundException,
-          SeriesServiceDatabaseException {
+  SeriesServiceDatabaseException {
     EntityManager em = emf.createEntityManager();
     EntityTransaction tx = em.getTransaction();
     try {
@@ -468,7 +438,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    */
   @Override
   public String getSeriesProperty(String seriesId, String propertyName) throws NotFoundException,
-          SeriesServiceDatabaseException {
+  SeriesServiceDatabaseException {
     EntityManager em = emf.createEntityManager();
     EntityTransaction tx = em.getTransaction();
     try {
@@ -523,7 +493,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       // There are several reasons a user may need to load a series: to read content, to edit it, or add content
       if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.READ.toString())
               && !AccessControlUtil
-                      .isAuthorized(acl, currentUser, currentOrg, Permissions.Action.CONTRIBUTE.toString())
+              .isAuthorized(acl, currentUser, currentOrg, Permissions.Action.CONTRIBUTE.toString())
               && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
         return false;
       }
@@ -539,7 +509,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    */
   @Override
   public boolean storeSeriesAccessControl(String seriesId, AccessControlList accessControl) throws NotFoundException,
-          SeriesServiceDatabaseException {
+  SeriesServiceDatabaseException {
     if (accessControl == null) {
       logger.error("Access control parameter is <null> for series '{}'", seriesId);
       throw new IllegalArgumentException("Argument for updating ACL for series " + seriesId + " is null");
@@ -675,7 +645,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    */
   @Override
   public void updateOptOutStatus(String seriesId, boolean optOut) throws NotFoundException,
-          SeriesServiceDatabaseException {
+  SeriesServiceDatabaseException {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {

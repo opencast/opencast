@@ -326,20 +326,20 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * After that, the method returns with the actual outcomes of the jobs.
    *
    * @param timeout
-   *          the maximum amount of time in miliseconds to wait
+   *          the maximum amount of time in milliseconds to wait
    * @param jobs
    *          the jobs
    * @return the jobs and their outcomes
    * @throws IllegalStateException
    *           if the service registry has not been set
    * @throws IllegalArgumentException
-   *           if the jobs collecion is either <code>null</code> or empty
+   *           if the jobs collection is either <code>null</code> or empty
    */
   protected JobBarrier.Result waitForStatus(long timeout, Job... jobs) throws IllegalStateException,
           IllegalArgumentException {
     if (serviceRegistry == null)
       throw new IllegalStateException("Can't wait for job status without providing a service registry first");
-    JobBarrier barrier = new JobBarrier(serviceRegistry, jobs);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, jobs);
     return barrier.waitForJobs(timeout);
   }
 

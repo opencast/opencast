@@ -102,7 +102,7 @@ CREATE TABLE mh_host_registration (
   maintenance TINYINT(1) DEFAULT 0 NOT NULL,
   online TINYINT(1) DEFAULT 1 NOT NULL,
   active TINYINT(1) DEFAULT 1 NOT NULL,
-  max_jobs INTEGER NOT NULL,
+  max_load INTEGER NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT UNQ_mh_host_registration UNIQUE (host)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -151,6 +151,8 @@ CREATE TABLE mh_job (
   processor_service BIGINT,
   parent BIGINT,
   root BIGINT,
+  job_load FLOAT NOT NULL DEFAULT 1.0,
+  blocking_job BIGINT,
   PRIMARY KEY (id),
   CONSTRAINT FK_mh_job_creator_service FOREIGN KEY (creator_service) REFERENCES mh_service_registration (id) ON DELETE CASCADE,
   CONSTRAINT FK_mh_job_processor_service FOREIGN KEY (processor_service) REFERENCES mh_service_registration (id) ON DELETE CASCADE,
@@ -178,6 +180,13 @@ CREATE TABLE mh_job_argument (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_mh_job_argument_id ON mh_job_argument (id);
+
+CREATE TABLE mh_blocking_job (
+  id BIGINT NOT NULL,
+  blocking_job_list BIGINT,
+  job_index INTEGER,
+  CONSTRAINT FK_blocking_job_id FOREIGN KEY (id) REFERENCES mh_job (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_job_context (
   id BIGINT NOT NULL,
@@ -255,14 +264,6 @@ CREATE TABLE mh_series (
   opt_out   tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (id, organization),
   CONSTRAINT FK_mh_series_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE mh_upload (
-  id VARCHAR(255) NOT NULL,
-  total BIGINT NOT NULL,
-  received BIGINT NOT NULL,
-  filename TEXT(65535) NOT NULL,
-  PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_user_session (
@@ -344,6 +345,9 @@ CREATE TABLE mh_archive_version_claim (
 CREATE INDEX IX_mh_archive_version_claim_mediapackage on mh_archive_version_claim (mediapackage);
 CREATE INDEX IX_mh_archive_version_claim_last_claimed on mh_archive_version_claim (last_claimed);
 
+--
+-- ACL manager
+--
 CREATE TABLE mh_acl_managed_acl (
   pk BIGINT(20) NOT NULL,
   acl TEXT NOT NULL,
@@ -425,6 +429,7 @@ CREATE TABLE mh_user (
   name varchar(256) DEFAULT NULL,
   email varchar(256) DEFAULT NULL,
   organization varchar(128) DEFAULT NULL,
+  manageable TINYINT(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (id),
   CONSTRAINT UNQ_mh_user UNIQUE (username, organization),
   CONSTRAINT FK_mh_user_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE

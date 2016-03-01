@@ -1,7 +1,7 @@
 <section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="series-details-modal" ng-controller="SerieCtrl">
     <header>
         <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2>Series Details {{resourceId}}</h2>
+        <h2><span translate="EVENTS.SERIES.DETAILS.HEADER" translate-values="{ resourceId: '{{ title | limitAppend : 70 }}' }"></h2>
     </header>
 
     <nav class="modal-nav" id="modal-nav">
@@ -99,6 +99,10 @@
 
             <div data-admin-ng-notifications="" context="series-acl"></div>
             <div data-admin-ng-notifications="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> develop
             <div data-admin-ng-notifications="" type="warning" context="series-acl-{{resourceId}}"></div>
 
             <div class="full-col">

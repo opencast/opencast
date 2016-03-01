@@ -33,14 +33,16 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.UploadJob;
+import org.opencastproject.util.UploadProgressListener;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -50,12 +52,14 @@ import org.opencastproject.workflow.api.WorkflowParser;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.json.simple.JSONObject;
@@ -77,10 +81,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
-import javax.persistence.spi.PersistenceProvider;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -145,9 +146,6 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   private IngestService ingestService = null;
   private ServiceRegistry serviceRegistry = null;
   private DublinCoreCatalogService dublinCoreService;
-  protected PersistenceProvider persistenceProvider;
-  protected Map<String, Object> persistenceProperties;
-  protected EntityManagerFactory emf = null;
   // For the progress bar -1 bug workaround, keeping UploadJobs in memory rather than saving them using JPA
   private HashMap<String, UploadJob> jobs;
   // The number of ingests this service can handle concurrently.
@@ -196,12 +194,6 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
    * Callback for activation of this component.
    */
   public void activate(ComponentContext cc) {
-    try {
-      emf = persistenceProvider
-              .createEntityManagerFactory("org.opencastproject.ingest.endpoint", persistenceProperties);
-    } catch (Exception e) {
-      logger.error("Unable to initialize JPA EntityManager: " + e.getMessage());
-    }
     if (cc != null) {
       defaultWorkflowDefinitionId = StringUtils.trimToNull(cc.getBundleContext().getProperty(
               DEFAULT_WORKFLOW_DEFINITION));
@@ -220,15 +212,6 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           ingestLimit = -1;
         }
       }
-    }
-  }
-
-  /**
-   * Callback for deactivation of this component.
-   */
-  public void deactivate() {
-    if (emf != null && emf.isOpen()) {
-      emf.close();
     }
   }
 
@@ -308,6 +291,47 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
     returnDescription = "")
   public Response addMediaPackageTrack(@Context HttpServletRequest request) {
+    return addMediaPackageElement(request, MediaPackageElement.Type.Track);
+  }
+
+  @POST
+  @Produces(MediaType.TEXT_XML)
+  @Path("addPartialTrack")
+  @RestQuery(name = "addPartialTrackURL", description = "Add a partial media track to a given media package using an URL", restParameters = {
+          @RestParameter(description = "The location of the media", isRequired = true, name = "url", type = RestParameter.Type.STRING),
+          @RestParameter(description = "The kind of media", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "The start time in milliseconds", isRequired = true, name = "startTime", type = RestParameter.Type.INTEGER),
+          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, reponses = {
+          @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+  public Response addMediaPackagePartialTrack(@FormParam("url") String url, @FormParam("flavor") String flavor,
+          @FormParam("startTime") Long startTime, @FormParam("mediaPackage") String mpx) {
+    try {
+      MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
+      if (MediaPackageSupport.sanityCheck(mp).isSome())
+        return Response.serverError().status(Status.BAD_REQUEST).build();
+
+      mp = ingestService.addPartialTrack(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), startTime, mp);
+      return Response.ok(mp).build();
+    } catch (Exception e) {
+      logger.warn(e.getMessage(), e);
+      return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @POST
+  @Produces(MediaType.TEXT_XML)
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @Path("addPartialTrack")
+  @RestQuery(name = "addPartialTrackInputStream", description = "Add a partial media track to a given media package using an input stream", restParameters = {
+          @RestParameter(description = "The kind of media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "The start time in milliseconds", isRequired = true, name = "startTime", type = RestParameter.Type.INTEGER),
+          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
+          @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+  public Response addMediaPackagePartialTrack(@Context HttpServletRequest request) {
     return addMediaPackageElement(request, MediaPackageElement.Type.Track);
   }
 
@@ -394,6 +418,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     try {
       String fileName = null;
       MediaPackage mp = null;
+      Long startTime = null;
       /* Only accept multipart/form-data */
       if (!ServletFileUpload.isMultipartContent(request)) {
         return Response.serverError().status(Status.BAD_REQUEST).build();
@@ -414,6 +439,13 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             } catch (MediaPackageException e) {
               return Response.serverError().status(Status.BAD_REQUEST).build();
             }
+          } else if ("startTime".equals(fieldName)) {
+            try {
+              startTime = Long.parseLong(IOUtils.toString(item.openStream()));
+            } catch (Exception e) {
+              logger.info("Unable to parse the 'startTime' parameter: {}", ExceptionUtils.getMessage(e));
+              return Response.serverError().status(Status.BAD_REQUEST).build();
+            }
           }
         } else {
           if (flavor == null) {
@@ -428,8 +460,10 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           break;
         }
       }
-      /* Check if we actually got a valid request including a message body and
-       * a valid mediapackage to attach the element to */
+      /*
+       * Check if we actually got a valid request including a message body and a valid mediapackage to attach the
+       * element to
+       */
       if (in == null || mp == null || MediaPackageSupport.sanityCheck(mp).isSome()) {
         return Response.serverError().status(Status.BAD_REQUEST).build();
       }
@@ -441,7 +475,11 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           mp = ingestService.addCatalog(in, fileName, flavor, mp);
           break;
         case Track:
-          mp = ingestService.addTrack(in, fileName, flavor, mp);
+          if (startTime == null) {
+            mp = ingestService.addTrack(in, fileName, flavor, mp);
+          } else {
+            mp = ingestService.addPartialTrack(in, fileName, flavor, startTime, mp);
+          }
           break;
         default:
           throw new IllegalStateException("Type must be one of track, catalog, or attachment");
@@ -797,6 +835,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "addZippedMediaPackage", description = "Create media package from a compressed file containing a manifest.xml document and all media tracks, metadata catalogs and attachments", pathParameters = { @RestParameter(description = "Workflow definition id", isRequired = true, name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING) }, restParameters = { @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) }, bodyParameter = @RestParameter(description = "The compressed (application/zip) media package file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_NOT_FOUND),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
   public Response addZippedMediaPackage(@Context HttpServletRequest request,
           @PathParam("workflowDefinitionId") String wdID, @QueryParam("id") String wiID) {
@@ -821,6 +860,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
                   + "(This parameter is deprecated. Please use /addZippedMediaPackage/{workflowDefinitionId} with a path parameter instead)", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) }, bodyParameter = @RestParameter(description = "The compressed (application/zip) media package file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_NOT_FOUND),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
   public Response addZippedMediaPackage(@Context HttpServletRequest request) {
     logger.debug("addZippedMediaPackage(HttpRequest)");
@@ -895,6 +935,9 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       WorkflowInstance workflow = ingestService.addZippedMediaPackage(in, workflowDefinitionId, workflowConfig,
               workflowInstanceIdAsLong);
       return Response.ok(WorkflowParser.toXml(workflow)).build();
+    } catch (NotFoundException e) {
+      logger.info(e.getMessage());
+      return Response.status(Status.NOT_FOUND).build();
     } catch (MediaPackageException e) {
       logger.warn(e.getMessage());
       return Response.serverError().status(Status.BAD_REQUEST).build();
@@ -1029,11 +1072,6 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   }
 
   protected UploadJob createUploadJob() {
-    /*
-     * EntityManager em = emf.createEntityManager(); EntityTransaction tx = em.getTransaction(); try { UploadJob job =
-     * new UploadJob(); tx.begin(); em.persist(job); tx.commit(); return job; } catch (RollbackException ex) {
-     * logger.error(ex.getMessage(), ex); tx.rollback(); throw new RuntimeException(ex); } finally { em.close(); }
-     */
     UploadJob job = new UploadJob();
     jobs.put(job.getId(), job);
     return job;
@@ -1134,11 +1172,9 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     String fileName = null;
     MediaPackageElementFlavor flavor = null;
     String elementType = "track";
-    EntityManager em = null;
     try {
-      em = emf.createEntityManager();
-      try { // try to get UploadJob, responde 404 if not successful
-        // job = em.find(UploadJob.class, jobId);
+      try {
+        // try to get UploadJob
         if (jobs.containsKey(jobId)) {
           job = jobs.get(jobId);
         } else {
@@ -1150,7 +1186,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       }
       if (ServletFileUpload.isMultipartContent(request)) {
         ServletFileUpload upload = new ServletFileUpload();
-        UploadProgressListener listener = new UploadProgressListener(job, this.emf);
+        UploadProgressListener listener = new UploadProgressListener(job);
         upload.setProgressListener(listener);
         for (FileItemIterator iter = upload.getItemIterator(request); iter.hasNext();) {
           FileItemStream item = iter.next();
@@ -1198,9 +1234,6 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     } catch (Exception ex) {
       logger.error(ex.getMessage());
       return buildUploadFailedRepsonse(job);
-    } finally {
-      if (em != null)
-        em.close();
     }
   }
 
@@ -1362,28 +1395,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   }
 
   /**
-   * OSGi Declarative Services callback to set the reference to the persistence provider.
-   *
-   * @param persistenceProvider
-   *          the persistence provider
-   */
-  void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
-  }
-
-  /**
-   * OSGi Declarative Services callback to set the reference to the persistence properties.
-   *
-   * @param persistenceProperties
-   *          the persistence properties
-   */
-  void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
-  }
-
-  /**
    * Sets the trusted http client
-   *
+   * 
    * @param httpClient
    *          the http client
    */

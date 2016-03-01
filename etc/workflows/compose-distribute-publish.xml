@@ -40,7 +40,7 @@
         <li class="ui-helper-clearfix">
           <label class="scheduler-label"><span class="color-red">* </span><span id="i18n_dist_label">Distribution Channel(s)</span>:</label>
           <span id="dist">
-            <input id="distribution" name="distribution" type="checkbox" checked="checked" disabled="disabled" class="configField" value="Matterhorn Media Module" />
+            <input id="distribution" name="distribution" type="checkbox" checked="checked" disabled="disabled" class="configField" value="Opencast Media Module" />
             <span id="i18n_dist_mmm">&nbsp;Matterhorn Media Module</span>
             <input id="youtube" name="youtube" type="checkbox" class="configField" value="Youtube" />
             <span id="i18n_dist_mmm">&nbsp;Youtube</span>
@@ -108,10 +108,13 @@
     <!-- Apply ACL from series to the mediapackage -->
 
     <operation
-      id="apply-acl"
+      id="series"
       fail-on-error="true"
       exception-handler-workflow="error"
       description="Applying access control entries">
+      <configurations>
+        <configuration key="apply-acl">true</configuration>
+      </configurations>
     </operation>
 
     <!-- Tag the incoming source material for archival -->
@@ -495,6 +498,7 @@
       exception-handler-workflow="error"
       description="Publishing to Engage">
       <configurations>
+        <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
         <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
         <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="check-availability">true</configuration>

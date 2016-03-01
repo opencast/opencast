@@ -25,10 +25,10 @@ import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 
 import java.util.Date;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
@@ -44,6 +44,7 @@ import javax.persistence.UniqueConstraint;
  *
  */
 @Entity(name = "EventEntity")
+@Access(AccessType.FIELD)
 @NamedQueries({
         // Job queries
         @NamedQuery(name = "Event.findAll", query = "SELECT e FROM EventEntity e "),
@@ -61,43 +62,42 @@ public class EventEntity {
   /** Event ID, primary key */
   @Id
   @Column(name = "id")
-  protected Long eventId;
+  private Long eventId;
 
   /** Mediapackage ID */
   @Column(name = "mediapackage_id")
-  protected String mediaPackageId;
+  private String mediaPackageId;
 
   /** Serialized Dublin core */
   @Lob
   @Column(name = "dublin_core", length = 65535)
-  protected String dublinCoreXML;
+  private String dublinCoreXML;
 
   /** Serialized Capture agent metadata */
   @Lob
   @Column(name = "capture_agent_metadata", length = 65535)
-  protected String captureAgentMetadata;
+  private String captureAgentMetadata;
 
   /** Serialized access control */
   @Lob
   @Column(name = "access_control", length = 65535)
-  protected String accessControl;
+  private String accessControl;
 
   /** Opt-out status */
   @Column(name = "opt_out")
-  protected boolean optOut = false;
+  private boolean optOut = false;
 
   /** Review status */
   @Column(name = "review_status")
-  @Enumerated(EnumType.STRING)
-  protected ReviewStatus reviewStatus = ReviewStatus.UNSENT;
+  private String reviewStatus = ReviewStatus.UNSENT.toString();
 
   @Column(name = "review_date")
   @Temporal(TemporalType.TIMESTAMP)
-  protected Date reviewDate;
+  private Date reviewDate;
 
   /** Opt-out status */
   @Column(name = "blacklisted")
-  protected boolean blacklisted = false;
+  private boolean blacklisted = false;
 
   /**
    * Default constructor without any import.
@@ -224,7 +224,7 @@ public class EventEntity {
    * @return the review status
    */
   public ReviewStatus getReviewStatus() {
-    return reviewStatus;
+    return ReviewStatus.valueOf(reviewStatus);
   }
 
   /**
@@ -234,7 +234,7 @@ public class EventEntity {
    *          the review status
    */
   public void setReviewStatus(ReviewStatus reviewStatus) {
-    this.reviewStatus = reviewStatus;
+    this.reviewStatus = reviewStatus.toString();
   }
 
   /**

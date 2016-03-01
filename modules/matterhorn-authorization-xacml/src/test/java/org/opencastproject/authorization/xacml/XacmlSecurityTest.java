@@ -103,6 +103,15 @@ public class XacmlSecurityTest {
       public void setOrganization(Organization organization) {
         throw new UnsupportedOperationException();
       }
+
+      @Override
+      public String getUserIP() {
+        return null;
+      }
+
+      @Override
+      public void setUserIP(String userIP) {
+      }
     };
     authzService = new XACMLAuthorizationService();
     authzService.setWorkspace(new WorkspaceStub());
@@ -282,7 +291,7 @@ public class XacmlSecurityTest {
     }
 
     @Override
-    public void cleanup(Option<Integer> maxAge) {
+    public void cleanup(int maxAge) {
       // TODO Auto-generated method stub
     }
 

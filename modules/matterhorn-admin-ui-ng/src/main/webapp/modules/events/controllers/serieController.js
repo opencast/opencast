@@ -99,6 +99,9 @@ angular.module('adminNg.controllers')
                     $scope.seriesCatalog = catalog;
                     seriesCatalogIndex = index;
                     angular.forEach(catalog.fields, function (entry) {
+                        if (entry.id === 'title') {
+                            $scope.title = entry.value;
+                        }
                         if (keepGoing && entry.locked) {
                             metadata.locked = entry.locked;
                             keepGoing = false;
@@ -236,15 +239,26 @@ angular.module('adminNg.controllers')
                     }
                 }
             });
+<<<<<<< HEAD
 
             me.unvalidRule = !rulesValid;
             me.hasRights = hasRights;
 
+=======
+
+            me.unvalidRule = !rulesValid;
+            me.hasRights = hasRights;
+
+>>>>>>> develop
             if (me.unvalidRule) {
                 if (!angular.isUndefined(me.notificationRules)) {
                     Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);
                 }
+<<<<<<< HEAD
                 me.notificationRules = Notifications.add('warning', 'INVALID_ACL_RULES', NOTIFICATION_CONTEXT);
+=======
+                me.notificationRules = Notifications.add('warning', 'INVALID_ACL_RULES', NOTIFICATION_CONTEXT);  
+>>>>>>> develop
             } else if (!angular.isUndefined(me.notificationRules)) {
                 Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);
                 me.notificationRules = undefined;
@@ -254,7 +268,11 @@ angular.module('adminNg.controllers')
                 if (!angular.isUndefined(me.notificationRights)) {
                     Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
                 }
+<<<<<<< HEAD
                 me.notificationRights = Notifications.add('warning', 'MISSING_ACL_RULES', NOTIFICATION_CONTEXT);
+=======
+                me.notificationRights = Notifications.add('warning', 'MISSING_ACL_RULES', NOTIFICATION_CONTEXT);  
+>>>>>>> develop
             } else if (!angular.isUndefined(me.notificationRights)) {
                 Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
                 me.notificationRights = undefined;
@@ -266,9 +284,15 @@ angular.module('adminNg.controllers')
                         ace: ace
                     },
                     override: true
+<<<<<<< HEAD
                 });
 
                 Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 1200);
+=======
+                });  
+
+                Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 1200);              
+>>>>>>> develop
             }
     };
 

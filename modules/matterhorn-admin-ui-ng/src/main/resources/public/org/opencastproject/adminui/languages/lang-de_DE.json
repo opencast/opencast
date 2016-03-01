@@ -5,9 +5,34 @@
   "SUBMIT":"Speichern",
   "UPDATE":"Aktualisieren",
   "CANCEL":"Abbrechen",
+  "CONFIRM":"Bestätigen",
   "SAVE":"Speichern",
   "LOGOUT":"Ausloggen",
   "RESET":"Zurücksetzen",
+  "LANGUAGES":{
+    "ARABIC":"Arabisch",
+    "DANISH":"Dänisch",
+    "GERMAN":"Deutsch",
+    "GERMAN_CH":"Schweizerdeutsch",
+    "FINNISH":"Finnisch",
+    "HINDI":"Hindi",
+    "ITALIAN":"Italienisch",
+    "JAPANESE":"Japanisch",
+    "DUTCH":"Holländisch",
+    "NORWEGIAN":"Norwegisch",
+    "FRENCH":"Französisch",
+    "ENGLISH":"English",
+    "SPANISH":"Spanische",
+    "ROMANSH":"Rätoromanisch",
+    "POLISH":"Polnisch",
+    "PORTUGESE":"Portugiesisch",
+    "SLOVENIAN":"Slowenisch",
+    "SWEDISH":"Schwedisch",
+    "RUSSIAN":"Russisch",
+    "TURKISH":"Türkisch",
+    "UKRAINIAN":"Ukrainische",
+    "CHINESE":"Chinesisch"
+  },
   "PREFERENCES":{
     "CAPTION":"Einstellungen",
     "PROFILE":"Profil",
@@ -22,6 +47,16 @@
       "FOOTER_TEXT":"Die Reihenfolge und Auswahl werden automatisch gespeichert. Drücken Sie \"{{resetTranslation}}\", um die Standardansicht wiederherzustellen."
     }
   },
+  "CONFIRMATIONS":{
+    "CONTINUE_ACTION":"Sind Sie sicher, dass Sie fortfahren möchten?",
+    "ACTIONS":{
+      "CONFIRMATION":"Bestätigung erforderlich"
+    }
+  },
+  "HELP":{
+    "DOCUMENTATION":"Dokumentation",
+    "REST_DOC":"REST-API Docs"
+  },
   "NOTIFICATIONS":{
     "ACL_ADDED":"Die Zugriffsrichtlinie wurde erstellt",
     "ACL_NOT_SAVED":"Die Zugriffsrichtlinie konnte nicht gespeichert werden",
@@ -35,6 +70,7 @@
     "USER_NOT_DELETED":"Der Nutzer konnte nicht gelöscht werden",
     "USER_NOT_MANAGEABLE":"Dieser Nutzer kann nicht geändert werden",
     "GROUP_ADDED":"Die Gruppe wurde angelegt",
+    "GROUP_CONFLICT":"Der generierte Gruppenname ist bereits vorhanden",
     "GROUP_UPDATED":"Die Gruppe wurde aktualisiert",
     "GROUP_NOT_SAVED":"Die Gruppe konnte nicht gespeichert werden",
     "GROUP_DELETED":"Die Gruppe wurde gelöscht",
@@ -71,6 +107,9 @@
     "EMAIL_SENT":"Die Nachricht wurde gesendet",
     "EMAIL_NOT_SENT":"Die Nachricht konnte nicht gesendet werden",
     "CONFLICT_DETECTED":"Konflikt: Die neue Aufzeichnung überlappt zeitlich mit einer bestehenden. Bitte ändern Sie Ort oder Zeit.",
+    "INVALID_ACL_RULES":"Regeln müssen eine gültige Rolle und Lese- und \/ oder Schreibrechte enthalten.",
+    "MISSING_ACL_RULES":"Es ist mindestens eine Rolle mit Lese- und Schreibberechtigungen erforderlich!",
+    "SAVED_ACL_RULES":"Die Zugriffsregeln wurden gespeichert.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Die vorhandenen Aufzeichnungen in dieser Serie müssen neu verarbeitet werden",
     "SERIES_ACL_MISSING_READWRITE_ROLE":"Der Zugriffsrichtlinie erfordert mindestens eine Rolle mit Lese- und Schreibberechtigungen.",
     "EVENT_ACL_MISSING_READWRITE_ROLE":"Der Zugriffsrichtlinie erfordert mindestens eine Rolle mit Lese- und Schreibberechtigungen.",
@@ -98,6 +137,7 @@
   "BULK_ACTIONS":{
     "CAPTION":"Aktionen",
     "SEND_MESSAGE":"Nachricht senden",
+    "WARNING":"Achtung",
     "EDIT_STATUS":{
       "CAPTION":"Status bearbeiten",
       "READY_FOR_RECORDING":"Bereit für die Aufnahme",
@@ -105,10 +145,12 @@
     },
     "DELETE":{
       "SERIES":{
-        "CAPTION":"Löschen"
+        "CAPTION":"Löschen",
+        "BUTTON":"Löschen"
       },
       "EVENTS":{
-        "CAPTION":"Löschen"
+        "CAPTION":"Löschen",
+        "BUTTON":"Löschen"
       }
     },
     "DELETE_EVENTS_WARNING_LINE1":"Sobald alle Metadaten gelöscht sind, werden die Audio- und Video-Dateien gelöscht und können nicht wiederhergestellt werden.",
@@ -163,7 +205,7 @@
   },
   "NAV":{
     "DASHBOARD":{
-      "TITLE":"Dashboard"
+      "TITLE":"Überblick"
     },
     "EVENTS":{
       "TITLE":"Aufnahmen"
@@ -186,6 +228,14 @@
   },
   "EVENTS":{
     "LICENSE":{
+      "ALLRIGHTS":"Alle Rechte vorbehalten",
+      "CCBY":"CC BY",
+      "CCBYSA":"CC BY-SA",
+      "CCBYND":"CC BY-ND",
+      "CCBYNC":"CC BY-NC",
+      "CCBYNCSA":"CC BY-NC-SA",
+      "CCBYNCND":"CC BY-NC-ND",
+      "CC0":"CC0",
       "BSD":"BSD",
       "CCND":"CCND",
       "GPL":"GPL"
@@ -346,13 +396,13 @@
         "PROCESSING_CANCELED":"Verarbeitung abgebrochen"
       },
       "DETAILS":{
-        "HEADER":"Aufzeichnungs-Details {{resourceId}}",
+        "HEADER":"Aufzeichnungs-Details - {{resourceId}}",
         "TABS":{
           "GENERAL":"Allgemein",
           "METADATA":"Metadaten",
           "EXTENDED-METADATA":"Metadaten-II",
           "MEDIA":"Medien",
-          "ATTACHMENTS":"Anhänge",
+          "ASSETS":"Anlagen",
           "WORKFLOWS":"Arbeitsabläufe",
           "ACCESS":"Zugriffsrechte",
           "COMMENTS":"Kommentare"
@@ -384,6 +434,111 @@
           "MIMETYPE":"MIME-Type",
           "TAGS":"Stichwörter",
           "LINK":"Verknüpfung"
+        },
+        "ASSETS":{
+          "CAPTION":"Anlagen",
+          "TYPE":"Typ",
+          "SIZE":"Größe",
+          "DETAILS":"Details",
+          "ATTACHMENTS":{
+            "TITLE":"Anhänge",
+            "CAPTION":"Anhänge",
+            "ID":"ID",
+            "TYPE":"Typ",
+            "MIMETYPE":"MIME-Type",
+            "TAGS":"Stichwörter",
+            "LINK":"Verknüpfung",
+            "DETAILS":{
+              "TITLE":"Anhang-Informationen",
+              "CAPTION":"Anhang-Informationen",
+              "ID":"ID",
+              "TYPE":"Typ",
+              "MIMETYPE":"MIME-Type",
+              "TAGS":"Stichwörter",
+              "URL":"URL",
+              "SIZE":"Größe",
+              "CHECKSUM":"Prüfsumme",
+              "REFERENCE":"Referenz"
+            }
+          },
+          "CATALOGS":{
+            "TITLE":"Kataloge",
+            "CAPTION":"Kataloge",
+            "ID":"ID",
+            "TYPE":"Typ",
+            "MIMETYPE":"MIME-Type",
+            "TAGS":"Stichwörter",
+            "LINK":"Verknüpfung",
+            "DETAILS":{
+              "TITLE":"Katalogdetails",
+              "CAPTION":"Katalogdetails",
+              "ID":"ID",
+              "TYPE":"Typ",
+              "MIMETYPE":"MIME-Type",
+              "TAGS":"Stichwörter",
+              "URL":"URL",
+              "SIZE":"Größe",
+              "CHECKSUM":"Prüfsumme",
+              "REFERENCE":"Referenz"
+            }
+          },
+          "MEDIA":{
+            "TITLE":"Medien",
+            "CAPTION":"Medien",
+            "ID":"ID",
+            "TYPE":"Typ",
+            "MIMETYPE":"MIME-Type",
+            "TAGS":"Stichwörter",
+            "LINK":"Verknüpfung",
+            "DETAILS":{
+              "TITLE":"Medien-Details",
+              "ID":"ID",
+              "TYPE":"Typ",
+              "MIMETYPE":"MIME-Type",
+              "URL":"URL",
+              "RECORDING_DATE":"Aufnahmedatum",
+              "FLAVOR":"Flavor",
+              "TAGS":"Stichwörter",
+              "DURATION":"Dauer",
+              "STREAM_AUDIO":"Audiospuren",
+              "STREAM_VIDEO":"Videospuren",
+              "CHANNELS":"Kanäle",
+              "BITRATE":"Bitrate",
+              "BITDEPTH":"Bittiefe",
+              "SAMPLINGRATE":"Samplingrate",
+              "FRAMECOUNT":"Frame Anzahl",
+              "PEAKLEVELDB":"Spitzenpegel (dB)",
+              "RMSLEVELDB":"RMS-Pegel (dB)",
+              "RMSPEAKDB":"RMS-Spitzenpegel (dB)",
+              "FRAMERATE":"Bildfrequenz",
+              "RESOLUTION":"Auflösung",
+              "SIZE":"Größe",
+              "SCANTYPE":"Scan-Typ",
+              "SCANORDER":"Scan-Folge"
+            }
+          },
+          "PUBLICATIONS":{
+            "TITLE":"Veröffentlichungen",
+            "CAPTION":"Veröffentlichungen",
+            "CHANNEL":"Kanal",
+            "ID":"ID",
+            "TYPE":"Typ",
+            "MIMETYPE":"MIME-Type",
+            "TAGS":"Stichwörter",
+            "LINK":"Verknüpfung",
+            "DETAILS":{
+              "TITLE":"Publication details",
+              "CAPTION":"Publication details",
+              "ID":"ID",
+              "TYPE":"Typ",
+              "MIMETYPE":"MIME-Type",
+              "TAGS":"Stichwörter",
+              "URL":"URL",
+              "SIZE":"Größe",
+              "CHANNEL":"Kanal",
+              "REFERENCE":"Referenz"
+            }
+          }
         },
         "ACCESS":{
           "CAPTION":"Zugriffsrechte",
@@ -454,13 +609,14 @@
           "TITLE":"Titel",
           "STATE":"Status",
           "STARTED":"Gestartet",
-          "SERIES":"Series",
+          "SERIES":"Serien",
           "SUBMITTED":"Übermittelt",
           "MIMETYPE":"MIME-Type",
           "URL":"URL"
         },
         "WORKFLOW_DETAILS":{
-          "TITLE":"Workflow-Details"
+          "TITLE":"Workflow-Details",
+          "CONFIGURATION":"Workflow configuration"
         },
         "WORKFLOW_OPERATIONS":{
           "TITLE":"Workflow-Operationen"
@@ -478,14 +634,13 @@
           "MIMETYPE":"MIME-Type",
           "URL":"URL",
           "RECORDING_DATE":"Aufnahmedatum",
-          "FLAVOR":"Flavor",
           "TAGS":"Stichwörter",
           "DURATION":"Dauer",
           "STREAM_AUDIO":"Audiospuren",
           "STREAM_VIDEO":"Videospuren",
           "CHANNELS":"Kanäle",
           "BITRATE":"Bitrate",
-          "FRAMERATE":"Framerate",
+          "FRAMERATE":"Bildfrequenz",
           "RESOLUTION":"Auflösung"
         },
         "ERRORS_AND_WARNINGS":{
@@ -541,7 +696,7 @@
             "WRITE":"Schreiben",
             "READ":"Lesen",
             "ACTION":"Aktionen",
-            "NEW":"New policy",
+            "NEW":"Neue Richtlinie",
             "DETAILS":"Details"
           },
           "ROLES":{
@@ -571,6 +726,7 @@
         "ACTION":"Aktionen"
       },
       "DETAILS":{
+        "HEADER":"Serien-Details - {{resourceId}}",
         "TABS":{
           "METADATA":"Metadaten",
           "EXTENDED_METADATA":"Metadaten II",
@@ -819,7 +975,8 @@
             "READ":"Lesen",
             "ACTION":"Aktionen",
             "NEW":"Neue Richtlinie",
-            "DETAILS":"Details"
+            "DETAILS":"Details",
+            "DESCRIPTION":"Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu"
           },
           "ROLES":{
             "LABEL":"Rolle auswählen",
@@ -855,7 +1012,8 @@
             "READ":"Lesen",
             "ACTION":"Aktionen",
             "NEW":"Neue Richtlinie",
-            "DETAILS":"Details"
+            "DETAILS":"Details",
+            "DESCRIPTION":"Bitte wählen Sie eine vordefinierten Richtlinie aus oder fügen Sie eine neue Richtlinie hinzu"
           },
           "ROLES":{
             "LABEL":"Rolle auswählen",
@@ -1176,6 +1334,14 @@
     }
   },
   "FILTERS":{
+    "AGENTS":{
+      "NAME":{
+        "LABEL":"Name"
+      },
+      "STATUS":{
+        "LABEL":"Status"
+      }
+    },
     "EVENTS":{
       "STATUS":{
         "LABEL":"Status",
@@ -1290,6 +1456,12 @@
       }
     },
     "USERS":{
+      "PROVIDER":{
+        "LABEL":"Anbieter"
+      },
+      "ROLE":{
+        "LABEL":"Rolle"
+      },
       "USERNAME":{
         "LABEL":"Benutzername"
       },
@@ -1313,6 +1485,17 @@
         "CONSTRUCTION":"Umbau"
       }
     }
+  },
+  "DASHBOARD":{
+    "RUNNING":"In Verarbeitung",
+    "FINISHED":"Verarbeitet",
+    "FAILED":"Fehlgeschlagen",
+    "FINISHED_WITH_COMMENTS":"Abgeschlossen mit Kommentaren",
+    "SCHEDULED":"Geplant"
   }
+<<<<<<< HEAD
 }
 
+=======
+}
+>>>>>>> develop

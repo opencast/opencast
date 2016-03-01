@@ -12,8 +12,8 @@
             <select ng-model="selectedFilter" ng-change="filter = filters.filters[selectedFilter]"
                 ng-show="showFilterSelector">
                 <option ng-repeat="(name, filter) in filters.filters"
-                    value="{{ name }}">
-                    {{ filter.label | translate }}
+                    value="{{ name | limitAppend : 70 }}">
+                    {{ filter.label | translate | limitAppend : 70 }}
                 </option>
             </select>
 
@@ -23,9 +23,15 @@
                     <select ng-model="filter.value"
                         ng-change="selectFilterSelectValue(selectedFilter, filter)">
                         <option></option>
+<<<<<<< HEAD
                         <option ng-repeat="(label, value) in filters.filters[selectedFilter].options"
                             value="{{ value }}">
                             {{ label | translate }}
+=======
+                        <option ng-repeat="(value, label) in filters.filters[selectedFilter].options"
+                            value="{{ value | limitAppend : 70 }}">
+                            {{ label | translate | limitAppend : 70 }}
+>>>>>>> develop
                         </option>
                     </select>
                 </div>
@@ -42,7 +48,11 @@
                 class="ng-multi-value" ng-show="filter.value">
                 <span ng-switch on="filter.type">
                     <span ng-switch-when="select">
+<<<<<<< HEAD
                         {{ filter.label | translate }}: {{ getOptionLabel(filter) | translate }}
+=======
+                        {{ filter.label | translate | limitAppend : 70 }}: {{ filter.options[filter.value] | translate | limitAppend : 70 }}
+>>>>>>> develop
                     </span>
                     <span ng-switch-when="period">
                         {{ filter.label | translate }}: {{ formatDateRange('short', filter.value) }}
@@ -58,11 +68,12 @@
             title="{{ 'TABLE_FILTERS.CLEAR' | translate }}"
             class="clear fa fa-times"></i>
 
-        <div class="btn-dd filter-settings-dd">
-            <i ng-click="mode = mode ? 0:1"></i>
+        <i ng-click="toggleFilterSettings()" class="settings fa fa-cog fa-times"></i>
 
+        <div class="btn-dd filter-settings-dd df-profile-filters">
             <div ng-show="mode == 1" class="filters-list">
                 <header>
+                    <a class="icon close" ng-click="closeProfile()"></a>
                     <h4 translate="TABLE_FILTERS.PROFILES.FILTERS_HEADER"><!--Saved Filter Sets--></h4>
                 </header>
                 <ul>
@@ -70,10 +81,10 @@
                         <a title="{{ profile.description }}"
                             ng-click="loadFilterProfile($index)"
                             ng-class="{ active: $index === activeProfile }">
-                            {{ profile.name }}
+                            {{ profile.name | limitAppend : 70 }}
                         </a>
-                        <a ng-click="removeFilterProfile($index)" class="icon remove"></a>
                         <a ng-click="editFilterProfile($index)" class="icon edit"></a>
+                        <a ng-click="removeFilterProfile($index)" class="icon remove"></a>
                     </li>
                     <li ng-show="profiles.length == 0"
                     translate="TABLE_FILTERS.PROFILES.EMPTY"><!--No saved filters yet--></li>
@@ -82,7 +93,7 @@
                 <div class="input-container">
                     <div class="btn-container">
                         <a class="save" ng-click="mode = 2">
-                            {{ 'TABLE_FILTERS.PROFILES.SAVE_FILTERS' | translate }}
+                            {{ 'TABLE_FILTERS.PROFILES.SAVE_FILTERS' | translate | limitAppend : 70 }}
                         </a>
                     </div>
                 </div>
@@ -90,6 +101,7 @@
 
             <div ng-show="mode == 2" class="filter-details">
                 <header>
+                    <a class="icon close" ng-click="cancelProfileEditing()"></a>
                     <h4 translate="TABLE_FILTERS.PROFILES.FILTER_HEADER"><!--Save Filter Set--></h4>
                 </header>
                 <div ng-form="profileForm" ng-model="profile" class="input-container">
@@ -102,7 +114,8 @@
                     <label translate="TABLE_FILTERS.PROFILES.DESCRIPTION"><!--Description--></label>
                     <textarea ng-model="profile.description"
                         placeholder="{{ 'TABLE_FILTERS.PROFILES.DESCRIPTION_PLACEHOLDER' | translate }}"></textarea>
-
+                </div>
+                <div class="input-container">
                     <div class="btn-container">
                         <a ng-click="cancelProfileEditing()" class="cancel"
                             translate="CANCEL"><!--Cancel--></a>

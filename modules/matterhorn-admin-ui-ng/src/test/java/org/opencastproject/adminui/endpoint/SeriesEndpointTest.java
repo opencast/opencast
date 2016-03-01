@@ -26,7 +26,6 @@ import static org.junit.Assert.assertEquals;
 import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
 
-import org.opencastproject.pm.api.persistence.ParticipationManagementDatabase.SortType;
 import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.rest.RestServiceTestEnv;
 
@@ -34,7 +33,6 @@ import com.jayway.restassured.http.ContentType;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;

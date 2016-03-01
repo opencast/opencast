@@ -26,21 +26,13 @@ import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.j;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static com.entwinemedia.fn.data.json.Jsons.vN;
-import static org.opencastproject.util.Jsons.obj;
-import static org.opencastproject.util.Jsons.p;
 
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.pm.api.Blacklist;
-import org.opencastproject.pm.api.Period;
-import org.opencastproject.pm.api.Person;
-import org.opencastproject.pm.api.Recording;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.DateTimeSupport;
-import org.opencastproject.util.Jsons.Val;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
 import com.entwinemedia.fn.data.json.JField;
@@ -131,64 +123,6 @@ public final class JSONUtils {
     if (date == null)
       throw new IllegalArgumentException("The given date must not be null.");
     return DateTimeSupport.toUTC(date.getTime());
-  }
-
-  // CHECKSTYLE:OFF These functions are seen as variables by checkstyles
-  public static Function<Person, Val> personToJsonVal = new Function<Person, Val>() {
-    @Override
-    public Val apply(Person a) {
-      return obj(p("id", a.getId()), p("email", a.getEmail()), p("name", a.getName()));
-    }
-  };
-
-  public static Function<Recording, Val> recordingToJsonVal = new Function<Recording, Val>() {
-    @Override
-    public Val apply(Recording a) {
-      return obj(p("id", a.getId().get()), p("title", a.getTitle()));
-    }
-  };
-
-  // CHECKSTYLE:ON
-
-  /**
-   * Wrap the given blacklists in a JSON object. Only the current period or the next upcoming will be added in the
-   * object and formatted using the method {@link #formatPeriod}.
-   *
-   * @param blacklist
-   *          The blacklists to wrap in a JSON object
-   * @return a {@link JValue} containing all the blacklist
-   * @throws IllegalArgumentException
-   *           If the given list is null
-   */
-  public static JValue blacklistToJSON(List<Blacklist> blacklist) {
-    if (blacklist == null)
-      throw new IllegalArgumentException("The blacklist must not be null!");
-
-    JValue blacklistJSON = v("");
-    Date now = new Date();
-    Date blacklistStart = null;
-    Date blacklistEnd = null;
-
-    for (Blacklist item : blacklist) {
-      List<Period> periods = item.getPeriods();
-      for (Period p : periods) {
-        Date start = p.getStart();
-        Date end = p.getEnd();
-        // Set this period as current/next period if
-        if ((now.after(start) && now.before(end)) // the period already started but is not finished
-                // or if the period is the next one
-                || (now.before(end) && (blacklistStart == null || blacklistStart.after(start)))) {
-          blacklistStart = start;
-          blacklistEnd = end;
-        }
-      }
-    }
-
-    // If the blacklist contains periods, we format the current or next one to JSON
-    if (blacklistStart != null && blacklistEnd != null)
-      blacklistJSON = formatPeriod(blacklistStart, blacklistEnd);
-
-    return blacklistJSON;
   }
 
   /**

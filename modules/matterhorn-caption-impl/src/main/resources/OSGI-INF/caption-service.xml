@@ -4,8 +4,10 @@
   <scr:component name="org.opencastproject.caption.impl.CaptionServiceImpl" immediate="true" activate="activate">
     <implementation class="org.opencastproject.caption.impl.CaptionServiceImpl" />
     <property name="service.description" value="Caption Converter Service" />
+    <property name="service.pid" value="org.opencastproject.caption.impl.CaptionServiceImpl" />
     <service>
       <provide interface="org.opencastproject.caption.api.CaptionService" />
+      <provide interface="org.osgi.service.cm.ManagedService" />
     </service>
     <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace" cardinality="1..1"
       policy="static" bind="setWorkspace" />

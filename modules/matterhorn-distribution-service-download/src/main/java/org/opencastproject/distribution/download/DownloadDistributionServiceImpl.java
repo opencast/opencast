@@ -42,6 +42,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.FileSupport;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workspace.api.Workspace;
@@ -50,6 +51,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpHead;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +62,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -67,7 +71,7 @@ import javax.servlet.http.HttpServletResponse;
  * Distributes media to the local media delivery directory.
  */
 public class DownloadDistributionServiceImpl extends AbstractJobProducer implements DistributionService,
-        DownloadDistributionService {
+        DownloadDistributionService, ManagedService {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(DownloadDistributionServiceImpl.class);
@@ -85,6 +89,24 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
 
   /** Timeout in millis for checking distributed file request */
   private static final long TIMEOUT = 10000L;
+
+  /** The load on the system introduced by creating a distribute job */
+  public static final float DEFAULT_DISTRIBUTE_JOB_LOAD = 0.1f;
+
+  /** The load on the system introduced by creating a retract job */
+  public static final float DEFAULT_RETRACT_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_DISTRIBUTE_JOB_LOAD} */
+  public static final String DISTRIBUTE_JOB_LOAD_KEY = "job.load.download.distribute";
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_RETRACT_JOB_LOAD} */
+  public static final String RETRACT_JOB_LOAD_KEY = "job.load.download.retract";
+
+  /** The load on the system introduced by creating a distribute job */
+  private float distributeJobLoad = DEFAULT_DISTRIBUTE_JOB_LOAD;
+
+  /** The load on the system introduced by creating a retract job */
+  private float retractJobLoad = DEFAULT_RETRACT_JOB_LOAD;
 
   /** Interval time in millis for checking distributed file request */
   private static final long INTERVAL = 300L;
@@ -155,7 +177,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
               JOB_TYPE,
               Operation.Distribute.toString(),
               Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), elementId,
-                      Boolean.toString(checkAvailability)));
+                      Boolean.toString(checkAvailability)), distributeJobLoad);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -306,7 +328,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
     notNull(channelId, "channelId");
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(),
-              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), elementId));
+              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), elementId), retractJobLoad);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -415,7 +437,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
    * @return The file to copy the content to
    */
   protected File getDistributionFile(String channelId, MediaPackage mp, MediaPackageElement element) {
-    final String uriString = element.getURI().toString();
+    final String uriString = element.getURI().toString().split("\\?")[0];
     final String directoryName = distributionDirectory.getAbsolutePath();
     if (uriString.startsWith(serviceUrl)) {
       String[] splitUrl = uriString.substring(serviceUrl.length() + 1).split("/");
@@ -558,6 +580,12 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer impleme
   @Override
   protected OrganizationDirectoryService getOrganizationDirectoryService() {
     return organizationDirectoryService;
+  }
+
+  @Override
+  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+    distributeJobLoad = LoadUtil.getConfiguredLoadValue(properties, DISTRIBUTE_JOB_LOAD_KEY, DEFAULT_DISTRIBUTE_JOB_LOAD, serviceRegistry);
+    retractJobLoad = LoadUtil.getConfiguredLoadValue(properties, RETRACT_JOB_LOAD_KEY, DEFAULT_RETRACT_JOB_LOAD, serviceRegistry);
   }
 
 }

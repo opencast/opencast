@@ -5,6 +5,7 @@
    "SUBMIT":       "Submit",
    "UPDATE":       "Update",
    "CANCEL":       "Cancel",
+   "CONFIRM":      "Confirm",
    "SAVE":         "Save",
    "LOGOUT":       "Logout",
    "RESET":        "Reset",
@@ -47,9 +48,21 @@
         "FOOTER_TEXT": "The order and selection will be saved automatically. Press \"{{resetTranslation}}\" to restore the default view."
       }
    },
+<<<<<<< HEAD
    "HELP":{
      "REST_DOC":            "REST API Doc",
      "USERS_GUIDE":         "User's Guide"
+=======
+   "CONFIRMATIONS": {
+     "CONTINUE_ACTION" : "Are you sure you want to continue?",
+     "ACTIONS": {
+       "CONFIRMATION" : "Confirmation required"
+     }
+   },
+   "HELP":{
+     "DOCUMENTATION": "Documentation",
+     "REST_DOC": "REST API Docs"
+>>>>>>> develop
    },
    "NOTIFICATIONS": {
      "ACL_ADDED":           "The access policy has been created",
@@ -64,6 +77,7 @@
      "USER_NOT_DELETED":    "The user could not be deleted",
      "USER_NOT_MANAGEABLE": "The user is not manageable",
      "GROUP_ADDED":          "The group has been created",
+     "GROUP_CONFLICT":       "The generated group name already exists",
      "GROUP_UPDATED":        "The group has been updated",
      "GROUP_NOT_SAVED":      "The group could not be saved",
      "GROUP_DELETED":        "The group has been deleted",
@@ -99,8 +113,13 @@
      "EMAIL_TEMPLATE_NAME_TAKEN": "This name is already in use",
      "EMAIL_SENT": "The message has been sent",
      "EMAIL_NOT_SENT": "The message could not be sent",
+<<<<<<< HEAD
      "CONFLICT_DETECTED":   "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
      "INVALID_ACL_RULES":   "Rules have to contain a valid role and read or/and write right(s).",
+=======
+     "CONFLICT_DETECTED":   "Scheduling conflict: this new event overlaps with an existing event. Please change the room, dates or times.",
+     "INVALID_ACL_RULES":   "Rules have to contain a valid role and Read or/and Write right(s).",
+>>>>>>> develop
      "MISSING_ACL_RULES":   "At least one role with Read and Write permissions is required!",
      "SAVED_ACL_RULES":   "The access rules have been saved.",
      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "The existing events in this series will need to be reprocessed",
@@ -132,6 +151,7 @@
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
       "SEND_MESSAGE": "Send message",
+      "WARNING":"Warning",
       "EDIT_STATUS": {
           "CAPTION": "Edit Status",
           "READY_FOR_RECORDING": "Ready for recording",
@@ -139,10 +159,12 @@
       },
       "DELETE": {
           "SERIES": {
-            "CAPTION": "Delete"
+            "CAPTION": "Delete",
+            "BUTTON": "Delete"
           },
           "EVENTS": {
-            "CAPTION": "Delete"
+            "CAPTION": "Delete",
+            "BUTTON": "Delete"
           }
       },
 
@@ -228,7 +250,10 @@
         "CCBYNC": "CC BY-NC",
         "CCBYNCSA": "CC BY-NC-SA",
         "CCBYNCND": "CC BY-NC-ND",
-        "CC0": "CC0"
+        "CC0": "CC0",
+        "BSD":"BSD",
+        "CCND":"CCND",
+        "GPL":"GPL"
       },
      "SEND_MESSAGE": {
        "CAPTION": "Send message",
@@ -385,7 +410,7 @@
          "PROCESSING_CANCELED": "Processing canceled"
        },
        "DETAILS": {
-         "HEADER": "Event details {{resourceId}}",
+         "HEADER": "Event details - {{resourceId}}",
          "TABS": {
            "GENERAL":     "General",
            "METADATA":    "Metadata",
@@ -492,18 +517,18 @@
                       "STREAM_AUDIO": "Audio streams",
                       "STREAM_VIDEO": "Video streams",
                       "CHANNELS": "Channels",
-                      "BITRATE": "Bitrate",
-                      "BITDEPTH": "Bitdepth",
-                      "SAMPLINGRATE": "Samplingrate",
-                      "FRAMECOUNT": "Framecount",
-                      "PEAKLEVELDB": "Peak level DB",
-                      "RMSLEVELDB": "RMS level DB",
-                      "RMSPEAKDB": "RMS speak DB",
-                      "FRAMERATE": "Framerate",
+                      "BITRATE": "Bit rate",
+                      "BITDEPTH": "Bit depth",
+                      "SAMPLINGRATE": "Sample rate",
+                      "FRAMECOUNT": "Frame count",
+                      "PEAKLEVELDB": "Peak level (dB)",
+                      "RMSLEVELDB": "RMS level (dB)",
+                      "RMSPEAKDB": "RMS peak (dB)",
+                      "FRAMERATE": "Frame rate",
                       "RESOLUTION": "Resolution",
                       "SIZE": "Size",
-                      "SCANTYPE": "Scantype",
-                      "SCANORDER": "Scanorder"
+                      "SCANTYPE": "Scan type",
+                      "SCANORDER": "Scan order"
                   }
                },
               "PUBLICATIONS": {
@@ -623,14 +648,13 @@
            "MIMETYPE": "Mimetype",
            "URL": "URL",
            "RECORDING_DATE": "Recording date",
-           "FLAVOR": "Flavor",
            "TAGS": "Tags",
            "DURATION": "Duration",
            "STREAM_AUDIO": "Audio streams",
            "STREAM_VIDEO": "Video streams",
            "CHANNELS": "Channels",
-           "BITRATE": "Bitrate",
-           "FRAMERATE": "Framerate",
+           "BITRATE": "Bit rate",
+           "FRAMERATE": "Frame rate",
            "RESOLUTION": "Resolution"
          },
          "ERRORS_AND_WARNINGS": {
@@ -698,7 +722,6 @@
            "CAPTION": "Theme",
            "DESCRIPTION": "",
            "TITLE": "Theme",
-           "DESCRIPTION": "",
            "LABEL": "No theme",
            "EMPTY": "No theme found"
          },
@@ -717,7 +740,8 @@
          "ACTION":       "Actions"
        },
        "DETAILS": {
-         "TABS": {
+          "HEADER": "Series details - {{resourceId}}",
+          "TABS": {
            "METADATA":    "Metadata",
            "EXTENDED_METADATA":    "Metadata II",
            "EVENTS":      "Events",
@@ -965,7 +989,8 @@
              "READ"        : "Read",
              "ACTION"      : "Actions",
              "NEW"         : "New policy",
-             "DETAILS"     : "Details"
+             "DETAILS"     : "Details",
+             "DESCRIPTION" : "Please choose a pre-configured set of policies or add custom policies below"
            },
            "ROLES": {
               "LABEL": "Select a role",
@@ -1001,7 +1026,8 @@
              "READ"        : "Read",
              "ACTION"      : "Actions",
              "NEW"         : "New policy",
-             "DETAILS"     : "Details"
+             "DETAILS"     : "Details",
+             "DESCRIPTION" : "Please choose a pre-configured set of policies or add custom policies below"
            },
            "ROLES": {
               "LABEL": "Select a role",
@@ -1322,6 +1348,14 @@
      }
    },
    "FILTERS": {
+     "AGENTS": {
+       "NAME": {
+         "LABEL": "Name"
+       },
+       "STATUS": {
+         "LABEL": "Status"
+       }
+     },
      "EVENTS": {
        "STATUS": {
          "LABEL":      "Status",
@@ -1442,6 +1476,12 @@
       }
      },
      "USERS": {
+       "PROVIDER": {
+         "LABEL": "Provider"
+       },
+       "ROLE": {
+         "LABEL": "Role"
+       },
        "USERNAME": {
          "LABEL": "Username"
        },
@@ -1465,5 +1505,12 @@
          "CONSTRUCTION":     "Construction"
        }
      }
+   },
+   "DASHBOARD":{
+       "RUNNING":   "Running",
+       "FINISHED":  "Finished",
+       "FAILED" :   "Failed",
+       "FINISHED_WITH_COMMENTS": "Finished with open comments",
+       "SCHEDULED" : "Scheduled"
    }
 }

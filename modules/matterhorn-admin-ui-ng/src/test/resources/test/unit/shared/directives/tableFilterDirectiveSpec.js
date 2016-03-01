@@ -257,7 +257,7 @@ describe('adminNg.directives.adminNgTableFilter', function () {
 
     describe('#loadFilterProfile', function () {
         beforeEach(function () {
-            spyOn(Storage, 'put');
+            spyOn(Storage, 'replace');
             element.find('div').scope().profiles = angular.copy(profilesStub);
         });
 
@@ -267,7 +267,7 @@ describe('adminNg.directives.adminNgTableFilter', function () {
             });
 
             it('does nothin', function () {
-                expect(Storage.put).not.toHaveBeenCalled();
+                expect(Storage.replace).not.toHaveBeenCalled();
             });
         });
 
@@ -278,7 +278,7 @@ describe('adminNg.directives.adminNgTableFilter', function () {
             });
 
             it('stores the loaded filter', function () {
-                expect(Storage.put).toHaveBeenCalledWith('filter', 'furniture', 'type', 'chair');
+                expect(Storage.replace).toHaveBeenCalledWith([ { namespace : 'furniture', key : 'type', value : 'chair' } ], 'filter');
             });
         });
     });

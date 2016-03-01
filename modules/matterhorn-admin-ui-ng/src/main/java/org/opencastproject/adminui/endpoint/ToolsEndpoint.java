@@ -29,14 +29,12 @@ import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
-import org.opencastproject.archive.api.Archive;
-import org.opencastproject.archive.api.ArchiveException;
-import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.api.IndexService.Source;
 import org.opencastproject.index.service.impl.index.event.Event;
@@ -46,11 +44,14 @@ import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.urlsigning.exception.UrlSigningException;
+import org.opencastproject.security.urlsigning.service.UrlSigningService;
+import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
@@ -110,10 +111,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
+
+import de.schlichtherle.io.ArchiveException;
 
 @Path("/")
 @RestService(name = "toolsService", title = "Tools API Service", notes = "", abstractText = "Provides a location for the tools API.")
@@ -142,6 +146,10 @@ public class ToolsEndpoint implements ManagedService {
   /** Tag that marks workflow for being used from the editor tool */
   private static final String EDITOR_WORKFLOW_TAG = "editor";
 
+  private long expireSeconds = UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
+
+  private Boolean signWithClientIP = UrlSigningServiceOsgiUtil.DEFAULT_SIGN_WITH_CLIENT_IP;
+
   /** A parser for handling JSON documents inside the body of a request. **/
   private final JSONParser parser = new JSONParser();
 
@@ -151,7 +159,9 @@ public class ToolsEndpoint implements ManagedService {
   private Archive<?> archive;
   private HttpMediaPackageElementProvider mpElementProvider;
   private IndexService index;
+  private SecurityService securityService;
   private SmilService smilService;
+  private UrlSigningService urlSigningService;
   private WorkflowService workflowService;
   private Workspace workspace;
 
@@ -181,8 +191,18 @@ public class ToolsEndpoint implements ManagedService {
   }
 
   /** OSGi DI */
+  void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
+  /** OSGi DI */
   void setSmilService(SmilService smilService) {
     this.smilService = smilService;
+  }
+
+  /** OSGi DI */
+  void setUrlSigningService(UrlSigningService urlSigningService) {
+    this.urlSigningService = urlSigningService;
   }
 
   /** OSGi DI */
@@ -199,12 +219,16 @@ public class ToolsEndpoint implements ManagedService {
   @SuppressWarnings("rawtypes")
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
-
+    expireSeconds = UrlSigningServiceOsgiUtil.getUpdatedSigningExpiration(properties, this.getClass().getSimpleName());
+    signWithClientIP = UrlSigningServiceOsgiUtil.getUpdatedSignWithClientIP(properties,
+            this.getClass().getSimpleName());
   }
 
   @GET
   @Path("{mediapackageid}.json")
-  @RestQuery(name = "getAvailableTools", description = "Returns a list of tools which are currently available for the given media package.", returnDescription = "A JSON array with tools identifiers", pathParameters = { @RestParameter(name = "mediapackageid", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING) }, reponses = { @RestResponse(description = "Available tools evaluated", responseCode = HttpServletResponse.SC_OK) })
+  @RestQuery(name = "getAvailableTools", description = "Returns a list of tools which are currently available for the given media package.", returnDescription = "A JSON array with tools identifiers", pathParameters = {
+          @RestParameter(name = "mediapackageid", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+                  @RestResponse(description = "Available tools evaluated", responseCode = HttpServletResponse.SC_OK) })
   public Response getAvailableTools(@PathParam("mediapackageid") final String mediaPackageId) {
     final List<JValue> jTools = new ArrayList<JValue>();
     if (isEditorAvailable(mediaPackageId))
@@ -243,9 +267,10 @@ public class ToolsEndpoint implements ManagedService {
   @GET
   @Path("{mediapackageid}/editor.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getVideoEditor", description = "Returns all the information required to get the editor tool started", returnDescription = "JSON object", pathParameters = { @RestParameter(name = "mediapackageid", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
-          @RestResponse(description = "Media package found", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Media package not found", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(name = "getVideoEditor", description = "Returns all the information required to get the editor tool started", returnDescription = "JSON object", pathParameters = {
+          @RestParameter(name = "mediapackageid", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+                  @RestResponse(description = "Media package found", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "Media package not found", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getVideoEditor(@PathParam("mediapackageid") final String mediaPackageId) {
     if (!isEditorAvailable(mediaPackageId)) {
       return R.notFound();
@@ -259,19 +284,42 @@ public class ToolsEndpoint implements ManagedService {
         // Collect previews and tracks
         List<JValue> jPreviews = new ArrayList<JValue>();
         List<JValue> jTracks = new ArrayList<JValue>();
-        for (MediaPackageElement element : previewPublications) {
-          final URI elementUri = element.getURI();
-          jPreviews.add(j(f("uri", v(elementUri.toString()))));
-
-          if (!Type.Track.equals(element.getElementType()))
-            continue;
+        for (Publication pub : previewPublications) {
+          String publicationUri;
+          if (urlSigningService.accepts(pub.getURI().toString())) {
+            try {
+              String clientIP = null;
+              if (signWithClientIP) {
+                clientIP = securityService.getUserIP();
+              }
+              publicationUri = urlSigningService.sign(pub.getURI().toString(), expireSeconds, null, clientIP);
+            } catch (UrlSigningException e) {
+              logger.error("Error while trying to sign the preview urls because: {}", ExceptionUtils.getStackTrace(e));
+              throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+            }
+          } else {
+            publicationUri = pub.getURI().toString();
+          }
+          jPreviews.add(j(f("uri", v(publicationUri))));
 
           JObjectWrite jTrack = j(f("id", v(element.getIdentifier())), f("flavor", v(element.getFlavor().getType())));
           // Check if there's a waveform for the current track
           Opt<Attachment> optWaveform = getWaveformForTrack(mp, element);
           if (optWaveform.isSome()) {
-            final URI waveformUri = optWaveform.get().getURI();
-            jTracks.add(jTrack.merge(j(f("waveform", v(waveformUri.toString())))));
+            String waveformUri;
+            if (urlSigningService.accepts(optWaveform.get().getURI().toString())) {
+              try {
+                waveformUri = urlSigningService.sign(optWaveform.get().getURI().toString(), expireSeconds, null, null);
+              } catch (UrlSigningException e) {
+                logger.error("Error while trying to sign the waveform urls because: {}",
+                        ExceptionUtils.getStackTrace(e));
+                throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+              }
+            } else {
+              waveformUri = optWaveform.get().getURI().toString();
+            }
+
+            jTracks.add(jTrack.merge(j(f("waveform", v(waveformUri)))));
           } else {
             jTracks.add(jTrack);
           }
@@ -301,10 +349,11 @@ public class ToolsEndpoint implements ManagedService {
   @POST
   @Path("{mediapackageid}/editor.json")
   @Consumes(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "editVideo", description = "Takes editing information from the client side and processes it", returnDescription = "", pathParameters = { @RestParameter(name = "mediapackageid", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
-          @RestResponse(description = "Editing information saved and processed", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Media package not found", responseCode = HttpServletResponse.SC_NOT_FOUND),
-          @RestResponse(description = "The editing information cannot be parsed", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
+  @RestQuery(name = "editVideo", description = "Takes editing information from the client side and processes it", returnDescription = "", pathParameters = {
+          @RestParameter(name = "mediapackageid", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+                  @RestResponse(description = "Editing information saved and processed", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "Media package not found", responseCode = HttpServletResponse.SC_NOT_FOUND),
+                  @RestResponse(description = "The editing information cannot be parsed", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
   public Response editVideo(@PathParam("mediapackageid") final String mediaPackageId,
           @Context HttpServletRequest request) {
     String details;
@@ -350,8 +399,8 @@ public class ToolsEndpoint implements ManagedService {
           archive.applyWorkflow(ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId)),
                   mpElementProvider.getUriRewriter(), Stream.$(mediaPackage.getIdentifier().toString()).toList());
         } catch (ArchiveException e) {
-          logger.warn("Unable to start workflow '{}' on archived media package '{}': {}", new Object[] { workflowId,
-                  mediaPackage, getStackTrace(e) });
+          logger.warn("Unable to start workflow '{}' on archived media package '{}': {}",
+                  new Object[] { workflowId, mediaPackage, getStackTrace(e) });
           return R.serverError();
         } catch (WorkflowDatabaseException e) {
           logger.warn("Unable to load workflow '{}' from workflow service: {}", workflowId, getStackTrace(e));
@@ -402,8 +451,8 @@ public class ToolsEndpoint implements ManagedService {
           }
         }).head();
         if (trackOpt.isNone())
-          throw new IllegalStateException(format("The track '%s' doesn't exist in media package '%s'", trackId,
-                  mediaPackage));
+          throw new IllegalStateException(
+                  format("The track '%s' doesn't exist in media package '%s'", trackId, mediaPackage));
 
         track = trackOpt.get();
       }
@@ -467,8 +516,8 @@ public class ToolsEndpoint implements ManagedService {
       // FIXME SWITCHP-333: Start in new thread
       archive.add(mediaPackage);
     } catch (ArchiveException e) {
-      logger.error("Error while adding the updated media package ({}) to the archive: {}",
-              mediaPackage.getIdentifier(), e.getMessage());
+      logger.error("Error while adding the updated media package ({}) to the archive: {}", mediaPackage.getIdentifier(),
+              e.getMessage());
       throw new IOException(e);
     }
 
@@ -712,8 +761,8 @@ public class ToolsEndpoint implements ManagedService {
               segments.add(Tuple.tuple(videoElem.getClipBeginMS(), videoElem.getClipEndMS()));
               break;
             } catch (SmilException e) {
-              logger.warn("Media element '{}' of SMIL catalog '{}' seems to be invalid: {}", new Object[] { videoElem,
-                      smil, e });
+              logger.warn("Media element '{}' of SMIL catalog '{}' seems to be invalid: {}",
+                      new Object[] { videoElem, smil, e });
             }
           }
         }

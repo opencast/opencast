@@ -5,10 +5,16 @@
     </header>
 
     <div class="modal-content">
+<<<<<<< HEAD
 
         <div class="modal-body">
 
             <div class="modal-alert danger">
+=======
+        <div class="important-message danger">
+            <div class="message-header" translate="BULK_ACTIONS.WARNING">Warning</div>
+            <div class="message-body">
+>>>>>>> develop
                 <p translate="BULK_ACTIONS.DELETE_SERIES_WARNING_LINE1">You have chosen to delete a series. Once deleted all metadata will be deleted and can not be retrieved.</p>
                 <p translate="BULK_ACTIONS.DELETE_SERIES_WARNING_LINE2">By pressing delete you understand that this metadata in unrecoverable.</p>
             </div>
@@ -41,7 +47,7 @@
     </div>
 
     <footer>
-        <a ng-class="{danger: valid(), inactive: !valid()}" ng-click="submit()">Delete</a>
-        <a ng-click="close()" class="cancel">Cancel</a>
+        <a translate="BULK_ACTIONS.DELETE.SERIES.BUTTON" ng-class="{danger: valid(), inactive: !valid()}" ng-click="submit()">Delete</a>
+        <a translate="CANCEL" ng-click="close()" class="cancel">Cancel</a>
     </footer>
 </section>

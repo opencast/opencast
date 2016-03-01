@@ -1,3 +1,107 @@
+Opencast 2.1: Release Notes
+===========================
+
+*A feature rich, flexible Opencast*
+
+In the spirit of moving forward from 2.0, Opencast 2.1 provides, amongst other features, a more stable and flexible
+backend infrastructure courtesy of Karaf - “the next generation OSGI framework”.
+
+The new version provides a lot of User Interface (UI) improvements and fixes some Admin UI issues. It also provides
+additional internationalization support, as well as a Dashboard that provides a quick overview of processing states.
+
+Opencast 2.1 also introduces a way to access the REST-endpoint documentation from within the Admin UI, which paves the
+way to allowing us to remove the legacy (1.x-style) Admin UI in upcoming versions. Although the legacy UI is still
+usable for some tasks, some areas feel broken and should be removed as the underlying logic has changed (in the
+transition from Opencast 1.x to 2.x).
+
+New Features and Improvements
+-----------------------------
+
+ - **Switch from Apache Felix to Apache Karaf** - 2.1 sees the move from an OSGI runtime (Felix) to a flexible OSGI
+   Environment (Karaf). This is the most prominent feature in 2.1. It ensures that going forward Opencast will have a
+   solid, flexible backend infrastructure.
+
+ - **Addition of a new "Assets" tab** - The Event details has a new tab, “Assets”, that gives additional information
+   about all the media, meta-data catalogues and publications.
+
+ - **New service health endpoint** - Monitoring tools like Nagios or New Relic can mostly be configured to check the
+   health status of the software. This service health endpoint provides the information to indicate to Monitoring tools
+   that Opencast works as it is supposed to.
+
+ - **Rewritten workspace** - This is the first step to addressing NFS latency issues. In the past the following scenario
+   was observed: “A file has been written to the workspace. The write call returns, then another service tries to access
+   the previously written file but gets a "not found" error. Then, some time later the file appears.” This rewrite
+   ensures that all workspaces on all nodes are able to see a file after it is written.
+
+
+ - **A dashboard for the new Admin UI** - The dashboard shows the number of jobs for different filter sets. This only
+   works with the events module for now.
+
+ - **i18n : Introduction of Chinese Translation to Opencast** - The introduction of Chinese Traditional as a new
+   Translation brings Opencast to the position of being fully translated into 5 languages (English, French, German,
+   Spanish and Chinese). The Translation has also been moved to Crowdin which allows a greater Community to help with
+   the translation efforts, also enabling people who do not write source-code to contribute to the internationalization
+   of Opencast.
+
+Important Administrative Notes
+------------------------------
+
+ - **Apache Karaf** : The move from Apache Felix to Apache Karaf resulted in some changes in the way Opencast is built
+   and run. The build infrastructure has changed, and the result is a simpler build. When you build opencast you now
+   just run maven with much fewer parameters i.e.
+
+        `mvn clean install`
+
+    This creates all the files necessary to run Opencast either in an all-in-one or distributed setup. The outputs of
+    the build are now stored in the  `build` folder.
+
+    There you will find `.tar.gz` packages for:
+
+     | filename                                  | installation            |
+     | ----------------------------------------- | ----------------------- |
+     | `opencast-dist-admin-2.1.1.tar.gz`        | admin node              |
+     | `opencast-dist-presentation-2.1.1.tar.gz` | presentation node       |
+     | `opencast-dist-worker-2.1.1.tar.gz`       | worker node             |
+     | `opencast-dist-allinone-2.1.1.tar.gz`     | all-in-one installation |
+
+    For your convenience the all-in-one installation is automatically extracted to the `build` folder.
+
+ - **New Configuration File Structure** :
+    - Main config is now `custom.properties` this contains all the configuration keys that have previously been in
+      `config.properties`. There is still a `config.properties` file which is automatically generated during the build
+      process and should not be changed.
+    - Remember to adjust the bind address for public installations.
+
+- **New start scripts** :
+    - `start-opencast` now runs an interactive shell by default.
+    - Use `log:tail` to tail the logs.
+
+
+How to Upgrade
+--------------
+
+Note that backing up your Opencast instance before doing a major update is strongly recommended.
+
+1. Check out/download Opencast 2.1
+2. Stop your current Opencast instance
+3. Back up Opencast files and database (optional)
+4. Run the appropriate database upgrade script(s)
+     - `docs/upgrade/1.6_2.0.0` -> `docs/upgrade/2.0.1_2.0.2`
+5. Review the configuration changes and adjust your configuration accordingly
+6. Update the third party tools as documented
+7. Build Opencast 2.1
+8. Start Opencast
+
+
+Additional Notes About 2.1.1
+----------------------------
+
+Opencast 2.1.1 is a bug fix release that fixes some major issues of Opencast 2.1.0. 
+In Opencast 2.1.0 the distributed setup had a problem with the worker-node not starting properly.
+This is now fixed. 
+
+---
+
 Opencast 2.0: Release Notes
 ===========================
 
@@ -53,6 +157,8 @@ Important Administrative Notes
    has been deprecated for years and is slowly disappearing from all major operating systems. Upgrading GStreamer proved
    nearly impossible since there are no Java bindings for the newer versions. Therefore, we decided to get rid of
    GStreamer, mainly by replacing it with FFmpeg.
+ - **Hold State** –
+   The new admin UI does not support hold-states anymore.
 
 Removed Components
 ------------------
@@ -75,8 +181,15 @@ Note that backing up your Opencast instance before doing a major update is stron
 1. Check out/download Opencast 2.0
 2. Stop your current Opencast instance
 3. Back up Opencast files and database (optional)
-4. Run the appropriate database upgrade script (docs/upgrade/1.6_to_2.0)
+4. Run the appropriate database upgrade script (`docs/upgrade/1.6_to_2.0`)
 5. Review the configuration changes and adjust your configuration accordingly
 6. Update the third party tools as documented
-7. Build Opencast 2.0
-8. Start Opencast
+7. Rebuild the search indexes
+    - Delete (or move) your search indices
+        - `${org.opencastproject.storage.dir}/searchindex`
+        - `${org.opencastproject.storage.dir}/seriesindex`
+        - `${org.opencastproject.storage.dir}/schedulerindex`
+    - The indexes will be rebuild automatically when re-starting Opencast. Rebuilding the indices can take quite a while
+      depending on the number of recordings in your system.
+8. Build Opencast 2.0
+9. Start Opencast
