@@ -20,10 +20,7 @@
  */
 package org.opencastproject.index.service.impl.index.event;
 
-import org.opencastproject.index.service.catalog.adapter.AbstractMetadataCollection;
-import org.opencastproject.index.service.catalog.adapter.MetadataField;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
-import org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.util.RequestUtils;
 import org.opencastproject.ingest.api.IngestException;
@@ -32,6 +29,10 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.util.NotFoundException;
@@ -43,7 +44,7 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.json.simple.JSONArray;
@@ -81,21 +82,26 @@ public class EventHttpServletRequest {
   private Opt<MediaPackage> mediaPackage = Opt.none();
   private Opt<MetadataList> metadataList = Opt.none();
   private Opt<JSONObject> processing = Opt.none();
+  private Opt<JSONObject> source = Opt.none();
 
-  private void setAcl(AccessControlList acl) {
+  public void setAcl(AccessControlList acl) {
     this.acl = Opt.some(acl);
   }
 
-  private void setMediaPackage(MediaPackage mediaPackage) {
+  public void setMediaPackage(MediaPackage mediaPackage) {
     this.mediaPackage = Opt.some(mediaPackage);
   }
 
-  private void setMetadataList(MetadataList metadataList) {
+  public void setMetadataList(MetadataList metadataList) {
     this.metadataList = Opt.some(metadataList);
   }
 
-  private void setProcessing(JSONObject processing) {
+  public void setProcessing(JSONObject processing) {
     this.processing = Opt.some(processing);
+  }
+
+  public void setSource(JSONObject source) {
+    this.source = Opt.some(source);
   }
 
   public Opt<AccessControlList> getAcl() {
@@ -114,6 +120,10 @@ public class EventHttpServletRequest {
     return processing;
   }
 
+  public Opt<JSONObject> getSource() {
+    return source;
+  }
+
   /**
    * Create a {@link EventHttpServletRequest} from a {@link HttpServletRequest} to create a new {@link Event}.
    *
@@ -129,8 +139,11 @@ public class EventHttpServletRequest {
    * @throws IllegalArgumentException
    *           Thrown if the multi part request doesn't have the necessary data.
    */
-  public static EventHttpServletRequest createFromHttpServletRequest(HttpServletRequest request, IngestService ingestService, List<EventCatalogUIAdapter> eventCatalogUIAdapters) throws IndexServiceException {
+  public static EventHttpServletRequest createFromHttpServletRequest(HttpServletRequest request,
+          IngestService ingestService, List<EventCatalogUIAdapter> eventCatalogUIAdapters, JSONObject source)
+                  throws IndexServiceException {
     EventHttpServletRequest eventHttpServletRequest = new EventHttpServletRequest();
+    eventHttpServletRequest.setSource(source);
     try {
       if (ServletFileUpload.isMultipartContent(request)) {
         eventHttpServletRequest.setMediaPackage(ingestService.createMediaPackage());
@@ -144,7 +157,7 @@ public class EventHttpServletRequest {
           if (item.isFormField()) {
             setFormField(eventCatalogUIAdapters, eventHttpServletRequest, item, fieldName);
           } else {
-            ingestFile(ingestService, eventHttpServletRequest,item);
+            ingestFile(ingestService, eventHttpServletRequest, item);
           }
         }
       } else {
@@ -178,11 +191,11 @@ public class EventHttpServletRequest {
           FileItemStream item) throws MediaPackageException, IOException, IngestException {
     MediaPackage mp = eventHttpServletRequest.getMediaPackage().get();
     if ("presenter".equals(item.getFieldName())) {
-      eventHttpServletRequest.setMediaPackage(ingestService.addTrack(item.openStream(), item.getName(),
-              MediaPackageElements.PRESENTER_SOURCE, mp));
+      eventHttpServletRequest.setMediaPackage(
+              ingestService.addTrack(item.openStream(), item.getName(), MediaPackageElements.PRESENTER_SOURCE, mp));
     } else if ("presentation".equals(item.getFieldName())) {
-      eventHttpServletRequest.setMediaPackage(ingestService.addTrack(item.openStream(), item.getName(),
-              MediaPackageElements.PRESENTATION_SOURCE, mp));
+      eventHttpServletRequest.setMediaPackage(
+              ingestService.addTrack(item.openStream(), item.getName(), MediaPackageElements.PRESENTATION_SOURCE, mp));
     } else if ("audio".equals(item.getFieldName())) {
       eventHttpServletRequest.setMediaPackage(ingestService.addTrack(item.openStream(), item.getName(),
               new MediaPackageElementFlavor("presenter-audio", "source"), mp));
@@ -208,7 +221,8 @@ public class EventHttpServletRequest {
    *           Thrown if unable to find a metadata catalog or field that matches an input catalog or field.
    */
   private static void setFormField(List<EventCatalogUIAdapter> eventCatalogUIAdapters,
-          EventHttpServletRequest eventHttpServletRequest, FileItemStream item, String fieldName) throws IOException, NotFoundException {
+          EventHttpServletRequest eventHttpServletRequest, FileItemStream item, String fieldName)
+                  throws IOException, NotFoundException {
     if (METADATA_JSON_KEY.equals(fieldName)) {
       String metadata = Streams.asString(item.openStream());
       try {
@@ -259,8 +273,8 @@ public class EventHttpServletRequest {
    *           Thrown if unable to find a metadata catalog or field that matches an input catalog or field.
    */
   public static EventHttpServletRequest updateFromHttpServletRequest(Event event, HttpServletRequest request,
-          List<EventCatalogUIAdapter> eventCatalogUIAdapters) throws IllegalArgumentException,
-          IndexServiceException, NotFoundException {
+          List<EventCatalogUIAdapter> eventCatalogUIAdapters)
+                  throws IllegalArgumentException, IndexServiceException, NotFoundException {
     EventHttpServletRequest eventHttpServletRequest = new EventHttpServletRequest();
     if (ServletFileUpload.isMultipartContent(request)) {
       try {
@@ -313,10 +327,9 @@ public class EventHttpServletRequest {
         AccessControlEntry ace = new AccessControlEntry(role, action, Boolean.parseBoolean(allow));
         entries.add(ace);
       } else {
-        throw new IllegalArgumentException(
-                String.format(
-                        "One of the access control elements is missing a property. The action was '%s', allow was '%s' and the role was '%s'",
-                        action, allow, role));
+        throw new IllegalArgumentException(String.format(
+                "One of the access control elements is missing a property. The action was '%s', allow was '%s' and the role was '%s'",
+                action, allow, role));
       }
     }
     return new AccessControlList(entries);
@@ -346,7 +359,7 @@ public class EventHttpServletRequest {
       String flavorString = catalog.get("flavor").toString();
       MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
 
-      AbstractMetadataCollection collection = null;
+      MetadataCollection collection = null;
       EventCatalogUIAdapter adapter = null;
       for (EventCatalogUIAdapter eventCatalogUIAdapter : catalogAdapters) {
         if (eventCatalogUIAdapter.getFlavor().equals(flavor)) {
@@ -356,8 +369,8 @@ public class EventHttpServletRequest {
       }
 
       if (collection == null) {
-        throw new IllegalArgumentException(String.format("Unable to find an EventCatalogUIAdapter with Flavor '%s'",
-                flavorString));
+        throw new IllegalArgumentException(
+                String.format("Unable to find an EventCatalogUIAdapter with Flavor '%s'", flavorString));
       }
 
       String fieldsJson = catalog.get("fields").toString();
@@ -366,7 +379,7 @@ public class EventHttpServletRequest {
         for (String key : fields.keySet()) {
           if ("subjects".equals(key)) {
             // Handle the special case of allowing subjects to be an array.
-            MetadataField<?> field = collection.getOutputFields().get("subject");
+            MetadataField<?> field = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
             if (field == null) {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id 'subject' from Catalog with Flavor '%s'.", flavorString));
@@ -374,11 +387,11 @@ public class EventHttpServletRequest {
             collection.removeField(field);
             try {
               JSONArray subjects = (JSONArray) parser.parse(fields.get(key));
-              collection.addField(MetadataField.copyMetadataFieldWithValue(field,
-                      StringUtils.join(subjects.iterator(), ",")));
+              collection.addField(
+                      MetadataField.copyMetadataFieldWithValue(field, StringUtils.join(subjects.iterator(), ",")));
             } catch (ParseException e) {
-              throw new IllegalArgumentException(String.format(
-                      "Unable to parse the 'subjects' metadata array field because: %s", e.toString()));
+              throw new IllegalArgumentException(
+                      String.format("Unable to parse the 'subjects' metadata array field because: %s", e.toString()));
             }
           } else {
             MetadataField<?> field = collection.getOutputFields().get(key);
@@ -404,10 +417,10 @@ public class EventHttpServletRequest {
    *          The metadata list created from the json request to create a new event
    */
   private static void setStartDateAndTimeIfUnset(MetadataList metadataList) {
-    Opt<AbstractMetadataCollection> optCommonEventCollection = metadataList
+    Opt<MetadataCollection> optCommonEventCollection = metadataList
             .getMetadataByFlavor(MediaPackageElements.EPISODE.toString());
     if (optCommonEventCollection.isSome()) {
-      AbstractMetadataCollection commonEventCollection = optCommonEventCollection.get();
+      MetadataCollection commonEventCollection = optCommonEventCollection.get();
 
       MetadataField<?> startDate = commonEventCollection.getOutputFields().get("startDate");
       if (!startDate.isUpdated()) {

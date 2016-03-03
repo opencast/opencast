@@ -49,7 +49,7 @@
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
-
+    
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-event-comment</artifactId>
@@ -60,6 +60,13 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-messages</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-participation-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -88,6 +95,28 @@
     <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.entwinemedia.common</groupId>
+      <artifactId>functional</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.jettison</groupId>
+      <artifactId>jettison</artifactId>
+      <version>1.3.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>stax</groupId>
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Logging -->
@@ -135,8 +164,8 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
-              org.opencastproject.message.broker.api.index;version=${project.version},
-              *;resolution:=optional
+              net.fortuna.ical4j.*,
+              *
             </Import-Package>
             <Export-Package>
               org.opencastproject.index.service.api,
@@ -160,6 +189,7 @@
             <Service-Component>
               OSGI-INF/catalog-ui-adapter-factory.xml,
               OSGI-INF/index_service.xml,
+              OSGI-INF/message-receiver-lock-service.xml,
               OSGI-INF/list_providers_scanner.xml,
               OSGI-INF/list_providers_service.xml,
               OSGI-INF/list-providers/acl.xml,

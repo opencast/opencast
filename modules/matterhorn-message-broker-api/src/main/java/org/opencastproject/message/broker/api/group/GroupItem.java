@@ -21,6 +21,7 @@
 
 package org.opencastproject.message.broker.api.group;
 
+import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.GroupParser;
 import org.opencastproject.security.api.JaxbGroup;
@@ -31,7 +32,7 @@ import java.io.Serializable;
 /**
  * {@link Serializable} class that represents all of the possible messages sent through an Acl queue.
  */
-public class GroupItem implements Serializable {
+public class GroupItem implements MessageItem, Serializable {
 
   private static final long serialVersionUID = 6332696075634123068L;
 
@@ -85,6 +86,11 @@ public class GroupItem implements Serializable {
     this.groupId = groupId;
     this.group = null;
     this.type = type;
+  }
+
+  @Override
+  public String getId() {
+    return groupId;
   }
 
   public String getGroupId() {

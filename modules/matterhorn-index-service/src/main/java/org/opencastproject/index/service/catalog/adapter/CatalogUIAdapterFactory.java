@@ -27,11 +27,11 @@ import static org.opencastproject.util.OsgiUtil.getOptCfg;
 
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.events.ConfigurableEventDCCatalogUIAdapter;
-import org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.series.ConfigurableSeriesDCCatalogUIAdapter;
-import org.opencastproject.index.service.catalog.adapter.series.SeriesCatalogUIAdapter;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
+import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
+import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
@@ -109,8 +109,8 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
 
     // Check for valid configuration values
     if (!(CATALOG_TYPE_EVENTS.equalsIgnoreCase(type) || CATALOG_TYPE_SERIES.equalsIgnoreCase(type))) {
-      throw new ConfigurationException(CONF_TYPE_KEY, format("The type must either be '%s' or '%s'",
-              CATALOG_TYPE_EVENTS, CATALOG_TYPE_SERIES));
+      throw new ConfigurationException(CONF_TYPE_KEY,
+              format("The type must either be '%s' or '%s'", CATALOG_TYPE_EVENTS, CATALOG_TYPE_SERIES));
     }
 
     switch (type) {

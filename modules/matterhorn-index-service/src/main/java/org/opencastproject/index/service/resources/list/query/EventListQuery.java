@@ -23,6 +23,8 @@ package org.opencastproject.index.service.resources.list.query;
 
 import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
 import org.opencastproject.index.service.resources.list.api.ResourceListFilter.SourceType;
+import org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl;
+import org.opencastproject.index.service.resources.list.provider.AgentsListProvider;
 import org.opencastproject.index.service.resources.list.provider.ContributorsListProvider;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider;
 import org.opencastproject.index.service.resources.list.provider.SeriesListProvider;
@@ -39,9 +41,12 @@ import java.util.Date;
  * <ul>
  * <li>series</li>
  * <li>presenters</li>
+ * <li>presenter's usernames</li>
  * <li>contributors</li>
  * <li>location</li>
+ * <li>agent</li>
  * <li>language</li>
+ * <li>reviewStatus</li>
  * <li>startDate</li>
  * <li>status</li>
  * </ul>
@@ -51,14 +56,20 @@ public class EventListQuery extends ResourceListQueryImpl {
   public static final String FILTER_SERIES_NAME = "series";
   private static final String FILTER_SERIES_LABEL = "FILTERS.EVENTS.SERIES.LABEL";
 
-  public static final String FILTER_PRESENTERS_NAME = "presenters";
-  private static final String FILTER_PRESENTERS_LABEL = "FILTERS.EVENTS.PRESENTERS.LABEL";
+  public static final String FILTER_PRESENTERS_BIBLIOGRAPHIC_NAME = "presentersBibliographic";
+  private static final String FILTER_PRESENTERS_BIBLIOGRAPHIC_LABEL = "FILTERS.EVENTS.PRESENTERS_BIBLIOGRAPHIC.LABEL";
+
+  public static final String FILTER_PRESENTERS_TECHNICAL_NAME = "presentersTechnical";
+  private static final String FILTER_PRESENTERS_TECHNICAL_LABEL = "FILTERS.EVENTS.PRESENTERS_TECHNICAL.LABEL";
 
   public static final String FILTER_CONTRIBUTORS_NAME = "contributors";
   private static final String FILTER_CONTRIBUTORS_LABEL = "FILTERS.EVENTS.CONTRIBUTORS.LABEL";
 
   public static final String FILTER_LOCATION_NAME = "location";
   private static final String FILTER_LOCATION_LABEL = "FILTERS.EVENTS.LOCATION.LABEL";
+
+  public static final String FILTER_AGENT_NAME = "agent";
+  private static final String FILTER_AGENT_LABEL = "FILTERS.EVENTS.AGENT_ID.LABEL";
 
   public static final String FILTER_LANGUAGE_NAME = "language";
   private static final String FILTER_LANGUAGE_LABEL = "FILTERS.EVENTS.LANGUAGE.LABEL";
@@ -72,17 +83,27 @@ public class EventListQuery extends ResourceListQueryImpl {
   public static final String FILTER_COMMENTS_NAME = "comments";
   private static final String FILTER_COMMENTS_LABEL = "FILTERS.EVENTS.COMMENTS.LABEL";
 
+  public static final String FILTER_OPTEDOUT_NAME = "optedOut";
+  private static final String FILTER_OPTEDOUT_LABEL = "FILTERS.EVENTS.OPTEDOUT.LABEL";
+
+  public static final String FILTER_REVIEW_STATUS_NAME = "reviewStatus";
+  private static final String FILTER_REVIEW_STATUS_LABEL = "FILTERS.EVENTS.REVIEW_STATUS.LABEL";
+
   public static final String FILTER_TEXT_NAME = "textFilter";
 
   public EventListQuery() {
     super();
     this.availableFilters.add(createSeriesFilter(Option.<String> none()));
     this.availableFilters.add(createPresentersFilter(Option.<String> none()));
+    this.availableFilters.add(createTechnicalPresentersFilter(Option.<String> none()));
     this.availableFilters.add(createContributorsFilter(Option.<String> none()));
     this.availableFilters.add(createLocationFilter(Option.<String> none()));
+    this.availableFilters.add(createAgentFilter(Option.<String> none()));
     this.availableFilters.add(createStartDateFilter(Option.<Tuple<Date, Date>> none()));
     this.availableFilters.add(createStatusFilter(Option.<String> none()));
     this.availableFilters.add(createCommentsFilter(Option.<String> none()));
+    this.availableFilters.add(createOptedoutFilter(Option.<Boolean> none()));
+    this.availableFilters.add(createReviewStatusFilter(Option.<String> none()));
   }
 
   /**
@@ -105,6 +126,44 @@ public class EventListQuery extends ResourceListQueryImpl {
   }
 
   /**
+   * Add a {@link ResourceListFilter} filter to the query with the given opted-out status
+   *
+   * @param optedout
+   *          the opted-out status to filter with
+   */
+  public void withOptedOut(Boolean optedout) {
+    this.addFilter(createOptedoutFilter(Option.option(optedout)));
+  }
+
+  /**
+   * Returns an {@link Option} containing the opted-out status used to filter if set
+   *
+   * @return an {@link Option} containing the opted-out status or none.
+   */
+  public Option<Boolean> getOptedOut() {
+    return this.getFilterValue(FILTER_OPTEDOUT_NAME);
+  }
+
+  /**
+   * Add a {@link ResourceListFilter} filter to the query with the given review status
+   *
+   * @param optedout
+   *          the review status to filter with
+   */
+  public void withReviewStatus(String reviewStatus) {
+    this.addFilter(createReviewStatusFilter(Option.option(reviewStatus)));
+  }
+
+  /**
+   * Returns an {@link Option} containing the review status used to filter if set
+   *
+   * @return an {@link Option} containing the review status or none.
+   */
+  public Option<Boolean> getReviewStatus() {
+    return this.getFilterValue(FILTER_REVIEW_STATUS_LABEL);
+  }
+
+  /**
    * Add a {@link ResourceListFilter} filter to the query with the given presenter
    *
    * @param presenter
@@ -120,7 +179,26 @@ public class EventListQuery extends ResourceListQueryImpl {
    * @return an {@link Option} containing the presenter or none.
    */
   public Option<String> getPresenter() {
-    return this.getFilterValue(FILTER_PRESENTERS_NAME);
+    return this.getFilterValue(FILTER_PRESENTERS_BIBLIOGRAPHIC_NAME);
+  }
+
+  /**
+   * Add a {@link ResourceListFilter} filter to the query with the given technical presenter's username
+   *
+   * @param technical
+   *          presenter's username the presenter's username to filter for
+   */
+  public void withTechnicalPresenter(String presenter) {
+    this.addFilter(createTechnicalPresentersFilter(Option.option(presenter)));
+  }
+
+  /**
+   * Returns an {@link Option} containing the technical presenter's username used to filter if set
+   *
+   * @return an {@link Option} containing the presenter or none.
+   */
+  public Option<String> getTechnicalPresenter() {
+    return this.getFilterValue(FILTER_PRESENTERS_TECHNICAL_NAME);
   }
 
   /**
@@ -159,6 +237,25 @@ public class EventListQuery extends ResourceListQueryImpl {
    */
   public Option<String> getLocation() {
     return this.getFilterValue(FILTER_LOCATION_NAME);
+  }
+
+  /**
+   * Add a {@link ResourceListFilter} filter to the query with the given subject
+   *
+   * @param agent
+   *          the agent to filter for
+   */
+  public void withAgent(String agent) {
+    this.addFilter(createAgentFilter(Option.option(agent)));
+  }
+
+  /**
+   * Returns an {@link Option} containing the agent used to filter if set
+   *
+   * @return an {@link Option} containing the agent or none.
+   */
+  public Option<String> getAgent() {
+    return this.getFilterValue(FILTER_AGENT_NAME);
   }
 
   /**
@@ -250,15 +347,27 @@ public class EventListQuery extends ResourceListQueryImpl {
   }
 
   /**
-   * Create a new {@link ResourceListFilter} based on a presenter
+   * Create a new {@link ResourceListFilter} based on a presenter's full name
+   *
+   * @param presenter's
+   *          name the presenters to filter on wrapped in an {@link Option} or {@link Option#none()}
+   * @return a new {@link ResourceListFilter} for a presenters based query
+   */
+  public static ResourceListFilter<String> createPresentersFilter(Option<String> presenter) {
+    return FiltersUtils.generateFilter(presenter, FILTER_PRESENTERS_BIBLIOGRAPHIC_NAME,
+            FILTER_PRESENTERS_BIBLIOGRAPHIC_LABEL, SourceType.SELECT, Option.some(ContributorsListProvider.DEFAULT));
+  }
+
+  /**
+   * Create a new {@link ResourceListFilter} based on a presenter's user name
    *
    * @param presenter
    *          the presenters to filter on wrapped in an {@link Option} or {@link Option#none()}
    * @return a new {@link ResourceListFilter} for a presenters based query
    */
-  public static ResourceListFilter<String> createPresentersFilter(Option<String> presenter) {
-    return FiltersUtils.generateFilter(presenter, FILTER_PRESENTERS_NAME, FILTER_PRESENTERS_LABEL, SourceType.SELECT,
-            Option.some(ContributorsListProvider.DEFAULT));
+  public static ResourceListFilter<String> createTechnicalPresentersFilter(Option<String> presenter) {
+    return FiltersUtils.generateFilter(presenter, FILTER_PRESENTERS_TECHNICAL_NAME, FILTER_PRESENTERS_TECHNICAL_LABEL,
+            SourceType.SELECT, Option.some(ContributorsListProvider.USERNAMES));
   }
 
   /**
@@ -283,6 +392,18 @@ public class EventListQuery extends ResourceListQueryImpl {
   public static ResourceListFilter<String> createLocationFilter(Option<String> location) {
     return FiltersUtils.generateFilter(location, FILTER_LOCATION_NAME, FILTER_LOCATION_LABEL, SourceType.SELECT,
             Option.some(EventsListProvider.LOCATION));
+  }
+
+  /**
+   * Create a new {@link ResourceListFilter} based on an agent
+   *
+   * @param agent
+   *          the agent to filter on wrapped in an {@link Option} or {@link Option#none()}
+   * @return a new {@link ResourceListFilter} for a location based query
+   */
+  public static ResourceListFilter<String> createAgentFilter(Option<String> agent) {
+    return FiltersUtils.generateFilter(agent, FILTER_AGENT_NAME, FILTER_AGENT_LABEL, SourceType.SELECT,
+            Option.some(AgentsListProvider.NAME));
   }
 
   /**
@@ -333,4 +454,27 @@ public class EventListQuery extends ResourceListQueryImpl {
             Option.some(EventsListProvider.COMMENTS));
   }
 
+  /**
+   * Create a new {@link ResourceListFilter} based on the opted-out status
+   *
+   * @param opted
+   *          -out the opted-out to filter on wrapped in an {@link Option} or {@link Option#none()}
+   * @return a new {@link ResourceListFilter} for progress based query
+   */
+  public static ResourceListFilter<Boolean> createOptedoutFilter(Option<Boolean> optedout) {
+    return FiltersUtils.generateFilter(optedout, FILTER_OPTEDOUT_NAME, FILTER_OPTEDOUT_LABEL, SourceType.BOOLEAN,
+            Option.<String> none());
+  }
+
+  /**
+   * Create a new {@link ResourceListFilter} based on the opted-out status
+   *
+   * @param opted
+   *          -out the opted-out to filter on wrapped in an {@link Option} or {@link Option#none()}
+   * @return a new {@link ResourceListFilter} for progress based query
+   */
+  public static ResourceListFilter<String> createReviewStatusFilter(Option<String> reviewStatus) {
+    return FiltersUtils.generateFilter(reviewStatus, FILTER_REVIEW_STATUS_NAME, FILTER_REVIEW_STATUS_LABEL,
+            SourceType.SELECT, Option.some(ListProvidersServiceImpl.REVIEW_STATUS));
+  }
 }

@@ -27,6 +27,7 @@ import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.query.StringListFilter;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
@@ -38,6 +39,8 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +54,7 @@ public class SeriesListProvider implements ResourceListProvider {
   public static final String CONTRIBUTORS = PROVIDER_PREFIX + ".CONTRIBUTORS";
   public static final String SUBJECT = PROVIDER_PREFIX + ".SUBJECT";
   public static final String TITLE = PROVIDER_PREFIX + ".TITLE";
+  public static final String TITLE_EXTENDED = PROVIDER_PREFIX + ".TITLE_EXTENDED";
   public static final String LANGUAGE = PROVIDER_PREFIX + ".LANGUAGE";
   public static final String CREATOR = PROVIDER_PREFIX + ".CREATOR";
   public static final String ORGANIZERS = PROVIDER_PREFIX + ".ORGANIZERS";
@@ -58,7 +62,7 @@ public class SeriesListProvider implements ResourceListProvider {
   public static final String ACCESS_POLICY = PROVIDER_PREFIX + ".ACCESS_POLICY";
   public static final String CREATION_DATE = PROVIDER_PREFIX + ".CREATION_DATE";
 
-  private static final String[] NAMES = { PROVIDER_PREFIX, CONTRIBUTORS, ORGANIZERS };
+  private static final String[] NAMES = { PROVIDER_PREFIX, CONTRIBUTORS, ORGANIZERS, TITLE_EXTENDED };
 
   private SeriesService seriesService;
 
@@ -119,6 +123,22 @@ public class SeriesListProvider implements ResourceListProvider {
         String organizer = dc.getFirst(DublinCore.PROPERTY_CREATOR);
         if (StringUtils.isNotBlank(organizer))
           series.put(organizer, organizer);
+      } else if (TITLE_EXTENDED.equals(listName)) {
+        String created = dc.getFirst(DublinCoreCatalog.PROPERTY_CREATED);
+        String organizer = dc.getFirst(DublinCore.PROPERTY_CREATOR);
+        StringBuilder sb = new StringBuilder(dc.getFirst(DublinCoreCatalog.PROPERTY_TITLE));
+        if (StringUtils.isNotBlank(created) && StringUtils.isNotBlank(organizer)) {
+          List<String> extendedTitleData = new ArrayList<>();
+          if (StringUtils.isNotBlank(created)) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(EncodingSchemeUtils.decodeDate(created));
+            extendedTitleData.add(Integer.toString(calendar.get(Calendar.YEAR)));
+          }
+          if (StringUtils.isNotBlank(organizer))
+            extendedTitleData.add(organizer);
+          sb.append(" (").append(StringUtils.join(extendedTitleData, ", ")).append(")");
+        }
+        series.put(dc.getFirst(DublinCore.PROPERTY_IDENTIFIER), sb.toString());
       } else {
         series.put(dc.getFirst(DublinCore.PROPERTY_IDENTIFIER), dc.getFirst(DublinCoreCatalog.PROPERTY_TITLE));
       }

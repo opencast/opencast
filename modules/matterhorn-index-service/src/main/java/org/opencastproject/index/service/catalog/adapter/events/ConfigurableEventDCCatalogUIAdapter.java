@@ -25,11 +25,9 @@ import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapter
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_ORGANIZATION_KEY;
 import static org.opencastproject.util.OsgiUtil.getCfg;
 
-import org.opencastproject.index.service.catalog.adapter.AbstractMetadataCollection;
 import org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterConfiguration;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataCollection;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
-import org.opencastproject.index.service.catalog.adapter.MetadataField;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
@@ -41,6 +39,9 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -118,7 +119,7 @@ public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapte
   }
 
   @Override
-  public AbstractMetadataCollection getFields(MediaPackage mediapackage) {
+  public MetadataCollection getFields(MediaPackage mediapackage) {
     DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
     Set<String> emptyFields = new TreeSet<String>(dublinCoreProperties.keySet());
     if (mediapackage != null) {
@@ -163,7 +164,7 @@ public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapte
   }
 
   @Override
-  public Catalog storeFields(MediaPackage mediaPackage, AbstractMetadataCollection abstractMetadata) {
+  public Catalog storeFields(MediaPackage mediaPackage, MetadataCollection abstractMetadata) {
     Catalog[] catalogs = mediaPackage.getCatalogs(getFlavor());
     final Catalog catalog;
     final DublinCoreCatalog dc;

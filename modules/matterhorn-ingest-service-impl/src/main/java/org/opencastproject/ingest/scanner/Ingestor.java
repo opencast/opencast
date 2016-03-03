@@ -136,7 +136,7 @@ public class Ingestor {
                 logger.info("Added track to mediapackage for ingest from inbox");
 
                 /* Add title */
-                DublinCoreCatalog dcc = DublinCores.mkOpencast();
+                DublinCoreCatalog dcc = DublinCores.mkOpencastEpisode().getCatalog();
                 dcc.add(DublinCore.PROPERTY_TITLE, artifact.getName());
                 ByteArrayOutputStream dcout = new ByteArrayOutputStream();
                 dcc.toXml(dcout, true);

@@ -47,7 +47,7 @@ public class BlacklistsListProvider implements ResourceListProvider {
   public static final String PROVIDER_PREFIX = "blacklists";
 
   /** The list of filter criteria for this provider */
-  public static enum BLACKLISTS_FILTER_LIST {
+  public enum BlacklistFilterList {
     PERSON_NAME, ROOM_NAME, PERSON_PURPOSE, ROOM_PURPOSE;
   };
 
@@ -58,7 +58,7 @@ public class BlacklistsListProvider implements ResourceListProvider {
 
   protected void activate(BundleContext bundleContext) {
     // Fill the list names
-    for (BLACKLISTS_FILTER_LIST value : BLACKLISTS_FILTER_LIST.values()) {
+    for (BlacklistFilterList value : BlacklistFilterList.values()) {
       listNames.add(getListNameFromFilter(value));
     }
 
@@ -80,7 +80,7 @@ public class BlacklistsListProvider implements ResourceListProvider {
           throws ListProviderException {
     Map<String, String> result = new HashMap<String, String>();
 
-    if (getListNameFromFilter(BLACKLISTS_FILTER_LIST.PERSON_NAME).equals(listName)) {
+    if (getListNameFromFilter(BlacklistFilterList.PERSON_NAME).equals(listName)) {
       List<Person> personList;
       try {
         personList = database.getPersons();
@@ -92,7 +92,7 @@ public class BlacklistsListProvider implements ResourceListProvider {
       for (Person p : personList) {
         result.put(p.getName(), p.getName());
       }
-    } else if (getListNameFromFilter(BLACKLISTS_FILTER_LIST.ROOM_NAME).equals(listName)) {
+    } else if (getListNameFromFilter(BlacklistFilterList.ROOM_NAME).equals(listName)) {
       List<Room> roomList;
       try {
         roomList = database.getRooms();
@@ -104,7 +104,7 @@ public class BlacklistsListProvider implements ResourceListProvider {
       for (Room r : roomList) {
         result.put(Long.toString(r.getId()), r.getName());
       }
-    } else if (getListNameFromFilter(BLACKLISTS_FILTER_LIST.PERSON_PURPOSE).equals(listName)) {
+    } else if (getListNameFromFilter(BlacklistFilterList.PERSON_PURPOSE).equals(listName)) {
       List<String> purposeList;
       try {
         purposeList = database.getPurposesByType(Person.TYPE);
@@ -116,7 +116,7 @@ public class BlacklistsListProvider implements ResourceListProvider {
       for (String purpose : purposeList) {
         result.put(purpose, purpose);
       }
-    } else if (getListNameFromFilter(BLACKLISTS_FILTER_LIST.ROOM_PURPOSE).equals(listName)) {
+    } else if (getListNameFromFilter(BlacklistFilterList.ROOM_PURPOSE).equals(listName)) {
       List<String> purposeList;
       try {
         purposeList = database.getPurposesByType(Room.TYPE);
@@ -143,7 +143,7 @@ public class BlacklistsListProvider implements ResourceListProvider {
    *          the filter from which the list name is needed
    * @return the list name related to the given filter
    */
-  public static String getListNameFromFilter(BLACKLISTS_FILTER_LIST filter) {
+  public static String getListNameFromFilter(BlacklistFilterList filter) {
     return PROVIDER_PREFIX.toLowerCase() + "_" + filter.toString().toLowerCase();
   }
 }

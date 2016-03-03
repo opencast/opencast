@@ -27,11 +27,11 @@ import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-import org.opencastproject.index.service.catalog.adapter.MetadataField.TYPE;
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.security.api.Organization;
 
 import com.entwinemedia.fn.data.Opt;
@@ -118,7 +118,7 @@ public class MetadataFieldTest {
     SimpleDateFormat dateFormat = new SimpleDateFormat();
     dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     String expectedJSON = RestUtils.getJsonString(j(f("readOnly", v(readOnly)), f("id", v(defaultInputID)),
-            f("label", v(label)), f("type", v(TYPE.DATE.toString().toLowerCase())),
+            f("label", v(label)), f("type", v(MetadataField.Type.DATE.toString().toLowerCase())),
             f("value", v(dateFormat.format(testDate))), f("required", v(required))));
 
     assertThat(expectedJSON, SameJSONAs.sameJSONAs(RestUtils.getJsonString(dateField.toJSON())));

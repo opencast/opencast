@@ -278,6 +278,31 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
       and(EventIndexSchema.ARCHIVE_VERSION, query.getArchiveVersion(), true);
     }
 
+    // Technical agent identifier
+    if (query.getAgentId() != null) {
+      and(EventIndexSchema.AGENT_ID, query.getAgentId(), true);
+    }
+
+    // Technical start date period
+    if (query.getTechnicalStartFrom() != null && query.getTechnicalStartTo() != null) {
+      and(EventIndexSchema.TECHNICAL_START, query.getTechnicalStartFrom(), query.getTechnicalStartTo());
+    }
+
+    // Technical start date
+    if (query.getTechnicalStartTime() != null) {
+      and(EventIndexSchema.TECHNICAL_START, query.getTechnicalStartTime(), true);
+    }
+
+    // Technical end date
+    if (query.getTechnicalEndTime() != null) {
+      and(EventIndexSchema.TECHNICAL_END, query.getTechnicalEndTime(), true);
+    }
+
+    // Technical presenters
+    if (query.getTechnicalPresenters().length > 0) {
+      and(EventIndexSchema.TECHNICAL_PRESENTERS, query.getTechnicalPresenters(), true);
+    }
+
     // Text
     if (query.getTerms() != null) {
       for (SearchTerms<String> terms : query.getTerms()) {

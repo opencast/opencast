@@ -42,7 +42,7 @@ public class ParticipationListProvider implements ResourceListProvider {
   public static final String PROVIDER_PREFIX = "participation";
 
   /** The list of filter criteria for this provider */
-  public static enum PARTICIPATION_FILTER_LIST {
+  public enum ParticipationFilterList {
     RECORDING_STATUS;
   };
 
@@ -51,7 +51,7 @@ public class ParticipationListProvider implements ResourceListProvider {
 
   protected void activate(BundleContext bundleContext) {
     // Fill the list names
-    for (PARTICIPATION_FILTER_LIST value : PARTICIPATION_FILTER_LIST.values()) {
+    for (ParticipationFilterList value : ParticipationFilterList.values()) {
       listNames.add(getListNameFromFilter(value));
     }
 
@@ -67,7 +67,7 @@ public class ParticipationListProvider implements ResourceListProvider {
   public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException {
     Map<String, String> result = new HashMap<String, String>();
-    if (PARTICIPATION_FILTER_LIST.RECORDING_STATUS.equals(listName)) {
+    if (ParticipationFilterList.RECORDING_STATUS.equals(listName)) {
       result.put("READY", "READY");
       result.put("OPTED_OUT", "OPTED_OUT");
       result.put("BLACKLISTED", "BLACKLISTED");
@@ -85,7 +85,7 @@ public class ParticipationListProvider implements ResourceListProvider {
    *          the filter from which the list name is needed
    * @return the list name related to the given filter
    */
-  public static String getListNameFromFilter(PARTICIPATION_FILTER_LIST filter) {
+  public static String getListNameFromFilter(ParticipationFilterList filter) {
     return PROVIDER_PREFIX.toLowerCase() + "_" + filter.toString().toLowerCase();
   }
 }

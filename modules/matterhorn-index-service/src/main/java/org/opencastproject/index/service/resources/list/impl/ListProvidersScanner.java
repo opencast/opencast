@@ -95,7 +95,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
      * @param list
      *          The list of properties to expose.
      */
-    public SingleResourceListProviderImpl(String listName, Map<String, String> list) {
+    SingleResourceListProviderImpl(String listName, Map<String, String> list) {
       this.listName = listName;
       this.list = list;
     }

@@ -171,6 +171,24 @@ public interface EventIndexSchema extends IndexSchema {
   String RECORDING_STATUS = "recording_status";
 
   /*
+   * Technical Metadata
+   */
+  /** Id of the agent that will record. */
+  String AGENT_ID = "agent_id";
+
+  /** The configuration settings for the agent when recording. */
+  String AGENT_CONFIGURATION = "agent_configuration";
+
+  /** The ending time of the recording. */
+  String TECHNICAL_END = "technical_end";
+
+  /** The start time of the recording. */
+  String TECHNICAL_START = "technical_start";
+
+  /** The technical presenters of the recording. */
+  String TECHNICAL_PRESENTERS = "technical_presenters";
+
+  /*
    * Archive specific fields
    */
 

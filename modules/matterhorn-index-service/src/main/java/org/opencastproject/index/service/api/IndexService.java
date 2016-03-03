@@ -21,13 +21,12 @@
 
 package org.opencastproject.index.service.api;
 
-import org.opencastproject.comments.Comment;
+import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
-import org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter;
-import org.opencastproject.index.service.catalog.adapter.series.SeriesCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;
+import org.opencastproject.index.service.impl.index.event.EventHttpServletRequest;
 import org.opencastproject.index.service.impl.index.group.Group;
 import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.ingest.api.IngestException;
@@ -36,12 +35,13 @@ import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
+import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
@@ -59,11 +59,11 @@ import javax.ws.rs.core.Response;
 
 public interface IndexService {
 
-  public enum Source {
+  enum Source {
     ARCHIVE, WORKFLOW, SCHEDULE
   };
 
-  public enum SourceType {
+  enum SourceType {
     UPLOAD, UPLOAD_LATER, SCHEDULE_SINGLE, SCHEDULE_MULTIPLE
   }
 
@@ -165,6 +165,30 @@ public interface IndexService {
           MediaPackageException, IngestException, NotFoundException, SchedulerException, UnauthorizedException;
 
   /**
+   * Create a new event using a {@link EventHttpServletRequest}.
+   *
+   * @param eventHttpServletRequest
+   *          The {@link EventHttpServletRequest} containing all of the necessary information to create a new event.
+   * @return The id or ids created by the {@link EventHttpServletRequest}.
+   * @throws ParseException
+   *           Thrown if unable to parse the start and end UTC date and time.
+   * @throws IOException
+   *           Thrown if unable to update the event's {@link DublinCoreCatalog}
+   * @throws MediaPackageException
+   *           Thrown if unable to update the event's {@link MediaPackage}
+   * @throws IngestException
+   *           Thrown if unable to update the ingest service with the new Event.
+   * @throws NotFoundException
+   *           Thrown if the specified workflow definition cannot be found.
+   * @throws SchedulerException
+   *           Thrown if unable to schedule the new event.
+   * @throws UnauthorizedException
+   *           Thrown if the current user is unable to create the new event.
+   */
+  String createEvent(EventHttpServletRequest eventHttpServletRequest) throws ParseException, IOException,
+          MediaPackageException, IngestException, NotFoundException, SchedulerException, UnauthorizedException;
+
+  /**
    * Removes an event.
    *
    * @param id
@@ -173,9 +197,27 @@ public interface IndexService {
    */
   boolean removeEvent(String id) throws NotFoundException, UnauthorizedException;
 
+  /**
+   * Update an event's metadata using a {@link MetadataList}
+   *
+   * @param id
+   *          The id of the event.
+   * @param metadataList
+   *          The {@link MetadataList} with the new metadata.
+   * @param index
+   *          The index used to process this update.
+   * @return The {@link MetadataList} with the updated fields.
+   * @throws IndexServiceException
+   *           Thrown if unable to update the event with the index.
+   * @throws SearchIndexException
+   *           Thrown if there was a problem getting the event.
+   * @throws NotFoundException
+   *           Thrown if unable to find the event.
+   * @throws UnauthorizedException
+   *           Thrown if the current user is unable to edit the event.
+   */
   MetadataList updateEventMetadata(String id, MetadataList metadataList, AbstractSearchIndex index)
-          throws IllegalArgumentException, WorkflowDatabaseException, IndexServiceException, SearchIndexException,
-          NotFoundException, UnauthorizedException;
+          throws IndexServiceException, SearchIndexException, NotFoundException, UnauthorizedException;
 
   /**
    * Update only the common default event metadata.
@@ -197,8 +239,8 @@ public interface IndexService {
    *           Thrown if the current user is unable to update the event.
    */
   MetadataList updateCommonEventMetadata(String id, String metadataJSON, AbstractSearchIndex index)
-          throws IllegalArgumentException, WorkflowDatabaseException, IndexServiceException, SearchIndexException,
-          NotFoundException, UnauthorizedException;
+          throws IllegalArgumentException, IndexServiceException, SearchIndexException, NotFoundException,
+          UnauthorizedException;
 
   /**
    * Update the event metadata in all available catalogs.
@@ -220,8 +262,8 @@ public interface IndexService {
    *           Thrown if the current user is unable to update the event.
    */
   MetadataList updateAllEventMetadata(String id, String metadataJSON, AbstractSearchIndex index)
-          throws IllegalArgumentException, WorkflowDatabaseException, IndexServiceException, SearchIndexException,
-          NotFoundException, UnauthorizedException;
+          throws IllegalArgumentException, IndexServiceException, SearchIndexException, NotFoundException,
+          UnauthorizedException;
 
   /**
    * Remove catalogs from the event with the given flavor.
@@ -235,8 +277,8 @@ public interface IndexService {
    * @throws NotFoundException
    *           Thrown if unable to find a catalog that matches the flavor.
    */
-  void removeCatalogByFlavor(Event event, MediaPackageElementFlavor flavor) throws WorkflowDatabaseException,
-          IndexServiceException, NotFoundException, UnauthorizedException;
+  void removeCatalogByFlavor(Event event, MediaPackageElementFlavor flavor)
+          throws IndexServiceException, NotFoundException, UnauthorizedException;
 
   /**
    * Update the event's {@link AccessControlList}.
@@ -257,22 +299,22 @@ public interface IndexService {
    *           Thrown if the event cannot be found to update.
    */
   AccessControlList updateEventAcl(String id, AccessControlList acl, AbstractSearchIndex index)
-          throws IllegalArgumentException, WorkflowDatabaseException, IndexServiceException, SearchIndexException,
-          NotFoundException;
+          throws IllegalArgumentException, IndexServiceException, SearchIndexException, NotFoundException,
+          UnauthorizedException;
 
   // TODO remove when it is no longer needed by AbstractEventEndpoint.
-  Opt<MediaPackage> getEventMediapackage(Event event) throws WorkflowDatabaseException;
+  Opt<MediaPackage> getEventMediapackage(Event event) throws IndexServiceException;
 
   // TODO remove when it is no longer needed by AbstractEventEndpoint
   Source getEventSource(Event event);
 
   // TODO remove when it is no longer needed by AbstractEventEndpoint
-  WorkflowInstance getCurrentWorkflowInstance(String mpId) throws WorkflowDatabaseException;
+  Opt<WorkflowInstance> getCurrentWorkflowInstance(String mpId) throws IndexServiceException;
 
   // TODO remove when it is no longer needed by AbstractEventEndpoint
   void updateWorkflowInstance(WorkflowInstance workflowInstance) throws WorkflowException, UnauthorizedException;
 
-  void updateCommentCatalog(Event event, List<Comment> comments) throws Exception;
+  void updateCommentCatalog(Event event, List<EventComment> comments) throws Exception;
 
   MetadataList getMetadataListWithAllSeriesCatalogUIAdapters();
 
@@ -346,8 +388,8 @@ public interface IndexService {
    * @param index
    *          The index to update the event in.
    */
-  void changeOptOutStatus(String eventId, boolean optout, AbstractSearchIndex index) throws NotFoundException,
-          SchedulerException, SearchIndexException;
+  void changeOptOutStatus(String eventId, boolean optout, AbstractSearchIndex index)
+          throws NotFoundException, SchedulerException, SearchIndexException, UnauthorizedException;
 
   /**
    * Update only the common default series metadata.
@@ -394,6 +436,26 @@ public interface IndexService {
           throws IllegalArgumentException, IndexServiceException, NotFoundException, UnauthorizedException;
 
   /**
+   * Update the series metadata in all available catalogs by providing a complete {@link MetadataList}
+   *
+   * @param id
+   *          The id of the series
+   * @param metadataList
+   *          The complete {@link MetadataList}
+   * @param index
+   *          The index that will be used to find the series.
+   * @return The updated {@link MetadataList}
+   * @throws IndexServiceException
+   *           Thrown if unable to query the index for the series.
+   * @throws NotFoundException
+   *           Thrown if unable to find the series to update the metadata for.
+   * @throws UnauthorizedException
+   *           Thrown if the user is unable to update the series.
+   */
+  MetadataList updateAllSeriesMetadata(String id, MetadataList metadataList, AbstractSearchIndex index)
+          throws IndexServiceException, NotFoundException, UnauthorizedException;
+
+  /**
    * Remove a catalog from the series that matches the given flavor.
    *
    * @param series
@@ -405,7 +467,22 @@ public interface IndexService {
    * @throws IllegalArgumentException
    *           Thrown if the series or flavor is null.
    */
-  void removeCatalogByFlavor(Series series, MediaPackageElementFlavor flavor) throws IndexServiceException,
-          NotFoundException;
+  void removeCatalogByFlavor(Series series, MediaPackageElementFlavor flavor)
+          throws IndexServiceException, NotFoundException;
+
+  /**
+   * Checks if the given event as an active transaction
+   *
+   * @param eventId
+   *          the event to check
+   * @return Whether the event has an active transaction or not
+   * @throws NotFoundException
+   *           Thrown if the {@link Event} could not be found.
+   * @throws UnauthorizedException
+   *           Thrown if the current user is unable to access the given event.
+   * @throws IndexServiceException
+   *           Thrown if there was an error reading the given event.
+   */
+  boolean hasActiveTransaction(String eventId) throws NotFoundException, UnauthorizedException, IndexServiceException;
 
 }

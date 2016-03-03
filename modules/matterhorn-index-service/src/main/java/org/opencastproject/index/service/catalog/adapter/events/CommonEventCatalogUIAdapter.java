@@ -21,13 +21,16 @@
 
 package org.opencastproject.index.service.catalog.adapter.events;
 
-import org.opencastproject.index.service.catalog.adapter.AbstractMetadataCollection;
-import org.opencastproject.index.service.catalog.adapter.MetadataField;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import org.opencastproject.index.service.catalog.adapter.MetadataUtils;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -58,11 +61,11 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
   }
 
   @Override
-  public Catalog storeFields(MediaPackage mediaPackage, AbstractMetadataCollection abstractMetadata) {
+  public Catalog storeFields(MediaPackage mediaPackage, MetadataCollection abstractMetadata) {
     Catalog storeFields = super.storeFields(mediaPackage, abstractMetadata);
 
     // Update the metadata stored in the mediapackage
-    MetadataField<?> presenters = abstractMetadata.getOutputFields().get("creator");
+    MetadataField<?> presenters = abstractMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName());
     if (presenters != null && presenters.isUpdated() && presenters.getValue() instanceof Iterable<?>) {
       String[] creators = mediaPackage.getCreators();
       for (String creator : creators) {
@@ -73,16 +76,16 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
       }
     }
 
-    MetadataField<?> series = abstractMetadata.getOutputFields().get("series");
-    if (series != null && series.isUpdated())
-      mediaPackage.setSeries(series.getValue().toString());
+    MetadataField<?> series = abstractMetadata.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
+    if (series != null && series.isUpdated() && isNotBlank(series.getValue().get().toString()))
+      mediaPackage.setSeries(series.getValue().get().toString());
 
     Opt<Date> startDate = MetadataUtils.getUpdatedDateMetadata(abstractMetadata, "startDate");
     if (startDate != null && startDate.isSome())
       mediaPackage.setDate(startDate.get());
 
     // Update all the metadata related to the episode dublin core catalog
-    MetadataField<?> title = abstractMetadata.getOutputFields().get("title");
+    MetadataField<?> title = abstractMetadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());
     if (title != null && title.isUpdated()) {
       mediaPackage.setTitle(title.getValue().get().toString());
     }

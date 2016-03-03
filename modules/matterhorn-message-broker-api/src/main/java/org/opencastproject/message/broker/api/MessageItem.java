@@ -18,33 +18,15 @@
  * the License.
  *
  */
+package org.opencastproject.message.broker.api;
 
-package org.opencastproject.index.service.exception;
+import java.io.Serializable;
 
 /**
- * An exception which indicates that the given JSON for the EventMetada can not be parsed correctly
+ * Defines a serializable message having a unique identifier
  */
-public class MetadataParsingException extends Exception {
+public interface MessageItem extends Serializable {
 
-  private static final long serialVersionUID = 4133872609543242983L;
+  String getId();
 
-  /**
-   * Constructor without cause.
-   * 
-   * @param message
-   * @param cause
-   */
-  public MetadataParsingException(String message) {
-    super(message);
-  }
-
-  /**
-   * Full fledged constructor.
-   * 
-   * @param message
-   * @param cause
-   */
-  public MetadataParsingException(String message, Throwable cause) {
-    super(message, cause);
-  }
 }

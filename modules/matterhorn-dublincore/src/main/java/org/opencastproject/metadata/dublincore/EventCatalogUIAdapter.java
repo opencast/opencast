@@ -18,16 +18,14 @@
  * the License.
  *
  */
+package org.opencastproject.metadata.dublincore;
 
-package org.opencastproject.index.service.catalog.adapter.events;
-
-import org.opencastproject.index.service.catalog.adapter.AbstractMetadataCollection;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
 /**
- * An interface class to support the creation of data providers for the adminui.
+ * An interface class to support the creation of data providers.
  */
 public interface EventCatalogUIAdapter {
 
@@ -49,22 +47,22 @@ public interface EventCatalogUIAdapter {
   /**
    * @return All of the fields with empty values for populating a new object.
    */
-  AbstractMetadataCollection getRawFields();
+  MetadataCollection getRawFields();
 
   /**
    * @return Get the field names and values for this catalog.
    */
-  AbstractMetadataCollection getFields(MediaPackage mediapackage);
+  MetadataCollection getFields(MediaPackage mediapackage);
 
   /**
    * Store a change in the metadata into the mediapackage as a {@link Catalog}
    *
    * @param mediapackage
    *          The mediapackage to update
-   * @param abstractMetadata
+   * @param metadataCollection
    *          The new metadata to update the mediapackage with
    * @return the stored catalog
    */
-  Catalog storeFields(MediaPackage mediapackage, AbstractMetadataCollection abstractMetadata);
+  Catalog storeFields(MediaPackage mediapackage, MetadataCollection metadataCollection);
 
 }

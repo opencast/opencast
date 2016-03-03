@@ -21,6 +21,7 @@
 
 package org.opencastproject.message.broker.api.series;
 
+import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
@@ -33,7 +34,7 @@ import java.io.Serializable;
 /**
  * {@link Serializable} class that represents all of the possible messages sent through a SeriesService queue.
  */
-public class SeriesItem implements Serializable {
+public class SeriesItem implements MessageItem, Serializable {
 
   private static final long serialVersionUID = 3275142857854793612L;
 
@@ -207,6 +208,11 @@ public class SeriesItem implements Serializable {
     this.propertyName = null;
     this.propertyValue = null;
     this.type = Type.Delete;
+  }
+
+  @Override
+  public String getId() {
+    return seriesId;
   }
 
   public String getSeriesId() {

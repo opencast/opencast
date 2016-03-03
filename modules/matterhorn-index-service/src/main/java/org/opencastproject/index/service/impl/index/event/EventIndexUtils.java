@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.index.service.impl.index.event;
 
 import static org.opencastproject.index.service.util.ListProviderUtil.splitStringList;
@@ -109,8 +108,8 @@ public final class EventIndexUtils {
    *           if marshalling fails
    */
   public static SearchMetadataCollection toSearchMetadata(Event event) {
-    SearchMetadataCollection metadata = new SearchMetadataCollection(event.getIdentifier().concat(
-            event.getOrganization()), Event.DOCUMENT_TYPE);
+    SearchMetadataCollection metadata = new SearchMetadataCollection(
+            event.getIdentifier().concat(event.getOrganization()), Event.DOCUMENT_TYPE);
     metadata.addField(EventIndexSchema.UID, event.getIdentifier(), true);
     metadata.addField(EventIndexSchema.ORGANIZATION, event.getOrganization(), false);
     metadata.addField(EventIndexSchema.OBJECT, event.toXML(), false);
@@ -231,6 +230,27 @@ public final class EventIndexUtils {
     if (StringUtils.isNotBlank(event.getAccessPolicy())) {
       metadata.addField(EventIndexSchema.ACCESS_POLICY, event.getAccessPolicy(), true);
       addAuthorization(metadata, event.getAccessPolicy());
+    }
+
+    if (StringUtils.isNotBlank(event.getAgentId())) {
+      metadata.addField(EventIndexSchema.AGENT_ID, event.getAgentId(), true);
+    }
+
+    if (StringUtils.isNotBlank(event.getTechnicalStartTime())) {
+      metadata.addField(EventIndexSchema.TECHNICAL_START, event.getTechnicalStartTime(), true);
+    }
+
+    if (StringUtils.isNotBlank(event.getTechnicalEndTime())) {
+      metadata.addField(EventIndexSchema.TECHNICAL_END, event.getTechnicalEndTime(), true);
+    }
+
+    if (event.getTechnicalPresenters() != null) {
+      metadata.addField(EventIndexSchema.TECHNICAL_PRESENTERS,
+              event.getTechnicalPresenters().toArray(new String[event.getTechnicalPresenters().size()]), true);
+    }
+
+    if (event.getAgentConfiguration() != null) {
+      metadata.addField(EventIndexSchema.AGENT_CONFIGURATION, event.getAgentConfiguration(), false);
     }
 
     return metadata;
@@ -373,8 +393,8 @@ public final class EventIndexUtils {
     } else if (searchResult.getDocumentCount() == 1) {
       return searchResult.getItems()[0].getSource();
     } else {
-      throw new IllegalStateException("Multiple recording events with identifier " + mediapackageId
-              + " found in search index");
+      throw new IllegalStateException(
+              "Multiple recording events with identifier " + mediapackageId + " found in search index");
     }
   }
 
@@ -404,8 +424,8 @@ public final class EventIndexUtils {
     } else if (searchResult.getDocumentCount() == 1) {
       return searchResult.getItems()[0].getSource();
     } else {
-      throw new IllegalStateException("Multiple recording events with identifier " + mediapackageId
-              + " found in search index");
+      throw new IllegalStateException(
+              "Multiple recording events with identifier " + mediapackageId + " found in search index");
     }
   }
 
@@ -446,9 +466,26 @@ public final class EventIndexUtils {
       event.setRecordingStartDate(DateTimeSupport.toUTC(created.getTime()));
     }
 
+    updateTechnicalDate(event);
+
     // TODO: Add support for language
     event.setContributors(splitStringList(dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_ANY)));
     event.setPresenters(splitStringList(dc.get(DublinCore.PROPERTY_CREATOR, DublinCore.LANGUAGE_ANY)));
+    return event;
+  }
+
+  public static Event updateTechnicalDate(Event event) {
+    if (event.hasRecordingStarted()) {
+      // Override technical dates from recording if already started
+      event.setTechnicalStartTime(event.getRecordingStartDate());
+      event.setTechnicalEndTime(event.getRecordingEndDate());
+    } else {
+      // If this is an upload where the start time is not set, set the start time to same as dublin core
+      if (StringUtils.isBlank(event.getTechnicalStartTime()))
+        event.setTechnicalStartTime(event.getRecordingStartDate());
+      if (StringUtils.isBlank(event.getTechnicalEndTime()))
+        event.setTechnicalEndTime(event.getRecordingEndDate());
+    }
     return event;
   }
 
@@ -548,10 +585,10 @@ public final class EventIndexUtils {
    */
   public static void updateSeriesName(Event event, String organization, User user, AbstractSearchIndex searchIndex,
           int tries, long sleep) throws SearchIndexException {
-    if (event.getSeriesId() != null && event.getSeriesName() == null) {
+    if (event.getSeriesId() != null) {
       for (int i = 1; i <= tries; i++) {
-        SearchResult<Series> result = searchIndex.getByQuery(new SeriesSearchQuery(organization, user).withoutActions()
-                .withIdentifier(event.getSeriesId()));
+        SearchResult<Series> result = searchIndex.getByQuery(
+                new SeriesSearchQuery(organization, user).withoutActions().withIdentifier(event.getSeriesId()));
         if (result.getHitCount() > 0) {
           event.setSeriesName(result.getItems()[0].getSource().getTitle());
           break;
@@ -628,8 +665,8 @@ public final class EventIndexUtils {
           User user, AbstractSearchIndex searchIndex) {
     SearchResult<Event> result = null;
     try {
-      result = searchIndex.getByQuery(new EventSearchQuery(organization, user).withoutActions().withManagedAcl(
-              currentManagedAcl));
+      result = searchIndex
+              .getByQuery(new EventSearchQuery(organization, user).withoutActions().withManagedAcl(currentManagedAcl));
     } catch (SearchIndexException e) {
       logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event because {}",
               new Object[] { organization, currentManagedAcl, ExceptionUtils.getStackTrace(e) });
@@ -661,11 +698,12 @@ public final class EventIndexUtils {
    * @param searchIndex
    *          The search index to remove the managed acl from.
    */
-  public static void deleteManagedAcl(String managedAcl, String organization, User user, AbstractSearchIndex searchIndex) {
+  public static void deleteManagedAcl(String managedAcl, String organization, User user,
+          AbstractSearchIndex searchIndex) {
     SearchResult<Event> result = null;
     try {
-      result = searchIndex.getByQuery(new EventSearchQuery(organization, user).withoutActions().withManagedAcl(
-              managedAcl));
+      result = searchIndex
+              .getByQuery(new EventSearchQuery(organization, user).withoutActions().withManagedAcl(managedAcl));
     } catch (SearchIndexException e) {
       logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event because {}",
               new Object[] { organization, managedAcl, ExceptionUtils.getStackTrace(e) });
@@ -677,8 +715,8 @@ public final class EventIndexUtils {
         try {
           searchIndex.addOrUpdate(event);
         } catch (SearchIndexException e) {
-          logger.warn("Unable to update event '{}' to remove managed acl '{}' because {}", new Object[] { event,
-                  managedAcl, ExceptionUtils.getStackTrace(e) });
+          logger.warn("Unable to update event '{}' to remove managed acl '{}' because {}",
+                  new Object[] { event, managedAcl, ExceptionUtils.getStackTrace(e) });
         }
       }
     }

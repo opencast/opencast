@@ -26,11 +26,20 @@ package org.opencastproject.systems;
  */
 public interface MatterhornConstants {
 
-  /**
-   * The property key for the current machine's hostname defined in the config.properties
-   */
+  /** The property key for the current machine's hostname defined in the config.properties */
   String SERVER_URL_PROPERTY = "org.opencastproject.server.url";
 
+  /** The property key for the streaming server defined in the config.properties */
+  String STREAMING_URL_PROPERTY = "org.opencastproject.streaming.url";
+
+  /** The property key for the Admin UI URL defined in the organization properties */
+  String ADMIN_URL_ORG_PROPERTY = "org.opencastproject.admin.ui.url";
+
+  /** The property key for the AssetManager URL in the organization properties */
+  String ARCHIVE_URL_ORG_PROPERTY = "org.opencastproject.archiv.url";
+
+  /** The property key for the feeds URL in the organization properties */
+  String FEED_URL_ORG_PROPERTY = "org.opencastproject.feed.url";
 
   /** The property key for the Admin UI documentation URL in the organization properties */
   String ADMIN_DOC_URL_ORG_PROPERTY = "org.opencastproject.admin.documentation.url";

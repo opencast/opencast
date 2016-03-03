@@ -21,6 +21,7 @@
 
 package org.opencastproject.message.broker.api.workflow;
 
+import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowParser;
@@ -31,13 +32,15 @@ import java.io.Serializable;
 /**
  * {@link Serializable} class that represents all of the possible messages sent through a WorkflowService queue.
  */
-public class WorkflowItem implements Serializable {
+public class WorkflowItem implements MessageItem, Serializable {
 
   private static final long serialVersionUID = -202811055899495045L;
 
   public static final String WORKFLOW_QUEUE_PREFIX = "WORKFLOW.";
 
   public static final String WORKFLOW_QUEUE = WORKFLOW_QUEUE_PREFIX + "QUEUE";
+
+  private final String id;
 
   private final String workflowDefinitionId;
   private final String workflowDefinition;
@@ -96,12 +99,13 @@ public class WorkflowItem implements Serializable {
    *          The workflow definition to add.
    */
   public WorkflowItem(WorkflowDefinition workflowDefinition) {
+    this.id = workflowDefinition.getId();
     this.workflowDefinitionId = null;
     try {
       this.workflowDefinition = WorkflowParser.toXml(workflowDefinition);
     } catch (WorkflowParsingException e) {
-      throw new IllegalStateException(String.format("Not able to serialize the given workflow definition %s.",
-              workflowDefinition), e);
+      throw new IllegalStateException(
+              String.format("Not able to serialize the given workflow definition %s.", workflowDefinition), e);
     }
     this.workflowInstanceId = -1;
     this.workflowInstance = null;
@@ -115,14 +119,15 @@ public class WorkflowItem implements Serializable {
    *          The workflow instance to update.
    */
   public WorkflowItem(WorkflowInstance workflowInstance) {
+    this.id = workflowInstance.getMediaPackage().getIdentifier().compact();
     this.workflowDefinitionId = null;
     this.workflowDefinition = null;
     this.workflowInstanceId = -1;
     try {
       this.workflowInstance = WorkflowParser.toXml(workflowInstance);
     } catch (WorkflowParsingException e) {
-      throw new IllegalStateException(String.format("Not able to serialize the given workflow instance %s.",
-              workflowInstance), e);
+      throw new IllegalStateException(
+              String.format("Not able to serialize the given workflow instance %s.", workflowInstance), e);
     }
     this.type = Type.UpdateInstance;
   }
@@ -134,6 +139,7 @@ public class WorkflowItem implements Serializable {
    *          The id of the workflow definition to delete.
    */
   public WorkflowItem(String workflowDefinitionId) {
+    this.id = workflowDefinitionId;
     this.workflowDefinitionId = workflowDefinitionId;
     this.workflowDefinition = null;
     this.workflowInstanceId = -1;
@@ -150,16 +156,22 @@ public class WorkflowItem implements Serializable {
    *          The workflow instance to update.
    */
   public WorkflowItem(long workflowInstanceId, WorkflowInstance workflowInstance) {
+    this.id = workflowInstance.getMediaPackage().getIdentifier().compact();
     this.workflowDefinitionId = null;
     this.workflowDefinition = null;
     this.workflowInstanceId = workflowInstanceId;
     try {
       this.workflowInstance = WorkflowParser.toXml(workflowInstance);
     } catch (WorkflowParsingException e) {
-      throw new IllegalStateException(String.format("Not able to serialize the given workflow instance %s.",
-              workflowInstance), e);
+      throw new IllegalStateException(
+              String.format("Not able to serialize the given workflow instance %s.", workflowInstance), e);
     }
     this.type = Type.DeleteInstance;
+  }
+
+  @Override
+  public String getId() {
+    return id;
   }
 
   public String getWorkflowDefinitionId() {
@@ -170,8 +182,8 @@ public class WorkflowItem implements Serializable {
     try {
       return WorkflowParser.parseWorkflowDefinition(workflowDefinition);
     } catch (WorkflowParsingException e) {
-      throw new IllegalStateException(String.format("Not able to serialize the workflow definition %s.",
-              workflowDefinition), e);
+      throw new IllegalStateException(
+              String.format("Not able to serialize the workflow definition %s.", workflowDefinition), e);
     }
   }
 

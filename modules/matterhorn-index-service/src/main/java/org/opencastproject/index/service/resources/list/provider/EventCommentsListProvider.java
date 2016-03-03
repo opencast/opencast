@@ -45,7 +45,7 @@ public class EventCommentsListProvider implements ResourceListProvider {
   public static final String PROVIDER_PREFIX = "comments";
 
   /** The list of filter criteria for this provider */
-  public static enum COMMENTS_FILTER_LIST {
+  public enum CommentsFilterList {
     REASON, RESOLUTION;
   };
 
@@ -61,7 +61,7 @@ public class EventCommentsListProvider implements ResourceListProvider {
 
   protected void activate(BundleContext bundleContext) {
     // Fill the list names
-    for (COMMENTS_FILTER_LIST value : COMMENTS_FILTER_LIST.values()) {
+    for (CommentsFilterList value : CommentsFilterList.values()) {
       listNames.add(getListNameFromFilter(value));
     }
 
@@ -83,7 +83,7 @@ public class EventCommentsListProvider implements ResourceListProvider {
           throws ListProviderException {
     Map<String, String> result = new HashMap<String, String>();
 
-    if (COMMENTS_FILTER_LIST.REASON.equals(listName)) {
+    if (CommentsFilterList.REASON.equals(listName)) {
       List<String> reasons;
       try {
         reasons = eventCommentService.getReasons();
@@ -95,7 +95,7 @@ public class EventCommentsListProvider implements ResourceListProvider {
       for (String reason : reasons) {
         result.put(reason, reason);
       }
-    } else if (COMMENTS_FILTER_LIST.RESOLUTION.equals(listName)) {
+    } else if (CommentsFilterList.RESOLUTION.equals(listName)) {
       for (RESOLUTION value : RESOLUTION.values()) {
         result.put(value.toString(), value.toString());
       }
@@ -114,7 +114,7 @@ public class EventCommentsListProvider implements ResourceListProvider {
    *          the filter from which the list name is needed
    * @return the list name related to the given filter
    */
-  public static String getListNameFromFilter(COMMENTS_FILTER_LIST filter) {
+  public static String getListNameFromFilter(CommentsFilterList filter) {
     return PROVIDER_PREFIX.toLowerCase() + "_" + filter.toString().toLowerCase();
   }
 }

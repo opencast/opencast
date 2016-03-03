@@ -36,7 +36,7 @@ public final class CatalogAdapterUtil {
 
   /**
    * Get the catalog properties from the given file
-   *
+   * 
    * @param sourceClass
    *          Source from where the the method is called
    * @param sourceFile

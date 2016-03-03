@@ -43,6 +43,8 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
@@ -244,7 +246,7 @@ public class DublinCoreCatalogUIAdapterTest {
     List<MetadataField<?>> metadataFields = new ArrayList<MetadataField<?>>(dublinCoreProperties.values());
     assertEquals(title, metadataFields.get(0).getInputID());
     assertEquals(label, metadataFields.get(0).getLabel());
-    assertEquals(MetadataField.TYPE.TEXT, metadataFields.get(0).getType());
+    assertEquals(MetadataField.Type.TEXT, metadataFields.get(0).getType());
     assertEquals(true, metadataFields.get(0).isReadOnly());
     assertEquals(true, metadataFields.get(0).isRequired());
     assertEquals(listProvider, metadataFields.get(0).getListprovider().get());
@@ -260,7 +262,7 @@ public class DublinCoreCatalogUIAdapterTest {
     configurationDublinCoreCatalogUIAdapter.setWorkspace(workspace);
     configurationDublinCoreCatalogUIAdapter.updated(eventProperties);
 
-    AbstractMetadataCollection abstractMetadata = configurationDublinCoreCatalogUIAdapter.getFields(mediapackage);
+    MetadataCollection abstractMetadata = configurationDublinCoreCatalogUIAdapter.getFields(mediapackage);
     assertThat(eventJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(abstractMetadata.toJSON()))
             .allowingAnyArrayOrdering());
   }

@@ -25,6 +25,7 @@ import org.opencastproject.archive.api.Version;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 
@@ -34,7 +35,7 @@ import java.util.Date;
 /**
  * {@link Serializable} class that represents all of the possible messages sent through an Archive queue.
  */
-public class ArchiveItem implements Serializable {
+public class ArchiveItem implements MessageItem, Serializable {
 
   private static final long serialVersionUID = 1838486668816386129L;
 
@@ -115,6 +116,11 @@ public class ArchiveItem implements Serializable {
     this.version = -1;
     this.date = date;
     this.type = Type.Delete;
+  }
+
+  @Override
+  public String getId() {
+    return mediapackageId != null ? mediapackageId : getMediapackage().getIdentifier().compact();
   }
 
   public String getMediapackageId() {

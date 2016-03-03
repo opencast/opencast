@@ -163,7 +163,7 @@ public final class RestUtils {
       public void write(OutputStream s) throws IOException, WebApplicationException {
         final Writer writer = new BufferedWriter(new OutputStreamWriter(s));
         out.ap(writer);
-        writer.flush();
+        writer.close();
       }
     };
   }

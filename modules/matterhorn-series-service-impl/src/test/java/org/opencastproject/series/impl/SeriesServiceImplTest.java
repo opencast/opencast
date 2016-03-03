@@ -33,10 +33,12 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -73,7 +75,6 @@ import java.util.List;
 public class SeriesServiceImplTest {
 
   private SeriesServiceDatabaseImpl seriesDatabase;
-
   private SeriesServiceSolrIndex index;
   private DublinCoreCatalogService dcService;
   private String root;
@@ -271,30 +272,30 @@ public class SeriesServiceImplTest {
 
   @Test
   public void testDublinCoreCatalogEquality1() {
-    DublinCoreCatalog a = DublinCores.mkOpencast();
-    DublinCoreCatalog b = DublinCores.mkOpencast();
+    DublinCoreCatalog a = DublinCores.mkOpencast().getCatalog();
+    DublinCoreCatalog b = DublinCores.mkOpencast().getCatalog();
     a.set(DublinCore.PROPERTY_IDENTIFIER, "123");
-    assertFalse(SeriesServiceImpl.equals(a, b));
+    assertFalse(DublinCoreUtil.equals(a, b));
     b.set(DublinCore.PROPERTY_IDENTIFIER, "123");
-    assertTrue(SeriesServiceImpl.equals(a, b));
+    assertTrue(DublinCoreUtil.equals(a, b));
     a.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
     b.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Paul"), DublinCoreValue.mk("Peter")));
-    assertFalse(SeriesServiceImpl.equals(a, b));
+    assertFalse(DublinCoreUtil.equals(a, b));
     //
     b.set(DublinCore.PROPERTY_CONTRIBUTOR, list(DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Paul")));
-    assertTrue(SeriesServiceImpl.equals(a, b));
+    assertTrue(DublinCoreUtil.equals(a, b));
     //
     a.set(DublinCore.PROPERTY_SPATIAL, "room1");
     a.set(DublinCore.PROPERTY_DESCRIPTION, "this is a test lecture");
     b.set(DublinCore.PROPERTY_DESCRIPTION, "this is a test lecture");
     b.set(DublinCore.PROPERTY_SPATIAL, "room1");
-    assertTrue(SeriesServiceImpl.equals(a, b));
+    assertTrue(DublinCoreUtil.equals(a, b));
   }
 
   @Test
   public void testDublinCoreCatalogEquality2() {
-    DublinCoreCatalog a = DublinCores.mkOpencast();
-    DublinCoreCatalog b = DublinCores.mkOpencast();
+    DublinCoreCatalog a = DublinCores.mkOpencast().getCatalog();
+    DublinCoreCatalog b = DublinCores.mkOpencast().getCatalog();
     a.set(DublinCore.PROPERTY_DESCRIPTION, "this is a test lecture");
     a.set(DublinCore.PROPERTY_SPATIAL, "room1");
     a.set(DublinCore.PROPERTY_IDENTIFIER, "123");
@@ -303,49 +304,49 @@ public class SeriesServiceImplTest {
     b.set(DublinCore.PROPERTY_DESCRIPTION, "this is a test lecture");
     b.set(DublinCore.PROPERTY_SPATIAL, "room1");
     b.set(DublinCore.PROPERTY_IDENTIFIER, "123");
-    assertTrue(SeriesServiceImpl.equals(a, b));
+    assertTrue(DublinCoreUtil.equals(a, b));
   }
 
   @Test
   public void testDublinCoreCatalogPreservation() throws Exception {
     seriesService.updateSeries(testCatalog2);
     DublinCoreCatalog dc = seriesService.getSeries("10.0000/5820");
-    assertTrue(SeriesServiceImpl.equals(testCatalog2, testCatalog2));
-    assertTrue(SeriesServiceImpl.equals(dc, dc));
-    assertTrue(SeriesServiceImpl.equals(testCatalog2, dc));
+    assertTrue(DublinCoreUtil.equals(testCatalog2, testCatalog2));
+    assertTrue(DublinCoreUtil.equals(dc, dc));
+    assertTrue(DublinCoreUtil.equals(testCatalog2, dc));
   }
 
   @Test
   public void testACLEquality1() {
     AccessControlList a = new AccessControlList(new AccessControlEntry("a", Permissions.Action.READ.toString(), true),
             new AccessControlEntry("b", Permissions.Action.WRITE.toString(), false));
-    AccessControlList b = new AccessControlList(
-            new AccessControlEntry("b", Permissions.Action.WRITE.toString(), false), new AccessControlEntry("a",
-                    Permissions.Action.READ.toString(), true));
-    assertTrue(SeriesServiceImpl.equals(a, b));
+    AccessControlList b = new AccessControlList(new AccessControlEntry("b", Permissions.Action.WRITE.toString(), false),
+            new AccessControlEntry("a", Permissions.Action.READ.toString(), true));
+    assertTrue(AccessControlUtil.equals(a, b));
   }
 
   @Test
   public void testACLEquality2() {
     AccessControlList a = new AccessControlList();
     AccessControlList b = new AccessControlList();
-    assertTrue(SeriesServiceImpl.equals(a, b));
+    assertTrue(AccessControlUtil.equals(a, b));
   }
 
   @Test
   public void testACLEquality3() {
     AccessControlList a = new AccessControlList();
-    AccessControlList b = new AccessControlList(new AccessControlEntry("b", Permissions.Action.WRITE.toString(), false));
-    assertFalse(SeriesServiceImpl.equals(a, b));
+    AccessControlList b = new AccessControlList(
+            new AccessControlEntry("b", Permissions.Action.WRITE.toString(), false));
+    assertFalse(AccessControlUtil.equals(a, b));
   }
 
   @Test
   public void testACLEquality4() {
-    AccessControlList a = new AccessControlList(new AccessControlEntry("b", Permissions.Action.WRITE.toString(), false));
-    AccessControlList b = new AccessControlList(
-            new AccessControlEntry("b", Permissions.Action.WRITE.toString(), false), new AccessControlEntry("b",
-                    Permissions.Action.READ.toString(), false));
-    assertFalse(SeriesServiceImpl.equals(a, b));
+    AccessControlList a = new AccessControlList(
+            new AccessControlEntry("b", Permissions.Action.WRITE.toString(), false));
+    AccessControlList b = new AccessControlList(new AccessControlEntry("b", Permissions.Action.WRITE.toString(), false),
+            new AccessControlEntry("b", Permissions.Action.READ.toString(), false));
+    assertFalse(AccessControlUtil.equals(a, b));
   }
 
   @Test

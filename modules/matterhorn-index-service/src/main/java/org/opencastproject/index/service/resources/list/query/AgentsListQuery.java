@@ -46,8 +46,6 @@ public class AgentsListQuery extends ResourceListQueryImpl {
 
   public static final String FILTER_LAST_UPDATED = "LastUpdated";
 
-  public static final String FILTER_TEXT_NAME = "textFilter";
-
   public AgentsListQuery() {
     super();
     this.availableFilters.add(createNameFilter(Option.<String> none()));

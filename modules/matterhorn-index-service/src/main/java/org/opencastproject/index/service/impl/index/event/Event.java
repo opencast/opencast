@@ -36,6 +36,7 @@ import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
 import org.codehaus.jettison.mapped.MappedXMLStreamReader;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
+import org.joda.time.DateTime;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -43,6 +44,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +73,8 @@ import javax.xml.transform.stream.StreamSource;
         "workflowId", "workflowDefinitionId", "recordingStartTime", "recordingEndTime", "duration", "trackMimetypes",
         "trackStreamResolutions", "trackFlavors", "metadataFlavors", "metadataMimetypes", "attachmentFlavors",
         "reviewStatus", "reviewDate", "optedOut", "blacklisted", "hasComments", "hasOpenComments", "hasPreview",
-        "publications", "workflowScheduledDate", "archiveVersion", "schedulingStatus", "recordingStatus", "eventStatus" })
+        "publications", "workflowScheduledDate", "archiveVersion", "schedulingStatus", "recordingStatus", "eventStatus",
+        "agentId", "agentConfigurations", "technicalStartTime", "technicalEndTime", "technicalPresenters" })
 @XmlRootElement(name = "event", namespace = IndexObject.INDEX_XML_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
 public class Event implements IndexObject {
@@ -292,6 +295,26 @@ public class Event implements IndexObject {
   /** The archive version of the event */
   @XmlElement(name = "archive_version")
   private Long archiveVersion = null;
+
+  /** The id of the capture agent */
+  @XmlElement(name = "agent_id")
+  private String agentId = null;
+
+  /** The configuration of the capture agent */
+  @XmlElementWrapper(name = "agent_configuration")
+  private Map<String, String> agentConfigurations = new HashMap<String, String>();
+
+  /** The technical end time of the recording */
+  @XmlElement(name = "technical_end_time")
+  private String technicalEndTime = null;
+
+  /** The technical start time of the recording */
+  @XmlElement(name = "technical_start_time")
+  private String technicalStartTime = null;
+
+  @XmlElementWrapper(name = "technical_presenters")
+  @XmlElement(name = "technical_presenter")
+  private List<String> technicalPresenters = null;
 
   /** Context for serializing and deserializing */
   private static JAXBContext context = null;
@@ -1120,12 +1143,21 @@ public class Event implements IndexObject {
       return;
     }
 
-    if (StringUtils.isNotBlank(getSchedulingStatus())) {
+    if (StringUtils.isNotBlank(getSchedulingStatus()) && (this.archiveVersion == null || this.archiveVersion <= 0)) {
       eventStatus = "EVENTS.EVENTS.STATUS.SCHEDULED";
       return;
     }
 
     eventStatus = "EVENTS.EVENTS.STATUS.PROCESSED";
+  }
+
+  public boolean hasRecordingStarted() {
+    if (getSchedulingStatus() == null)
+      return true;
+
+    Date startDate = new DateTime(getTechnicalStartTime()).toDate();
+    Date now = new DateTime().toDate();
+    return startDate.before(now);
   }
 
   /**
@@ -1165,6 +1197,101 @@ public class Event implements IndexObject {
   public String getEventStatus() {
     updateEventStatus();
     return eventStatus;
+  }
+
+  /**
+   * Returns the agent id
+   *
+   * @return the agent id
+   */
+  public String getAgentId() {
+    return agentId;
+  }
+
+  /**
+   * Sets the agent id
+   *
+   * @param agentId
+   *          the agent id
+   */
+  public void setAgentId(String agentId) {
+    this.agentId = agentId;
+  }
+
+  /**
+   * Returns the agent configuration
+   *
+   * @return the agent configuration
+   */
+  public Map<String, String> getAgentConfiguration() {
+    return agentConfigurations;
+  }
+
+  /**
+   * Sets the agent configuration
+   *
+   * @param agentConfigurations
+   *          the agent configuration
+   */
+  public void setAgentConfiguration(Map<String, String> agentConfigurations) {
+    this.agentConfigurations = agentConfigurations;
+  }
+
+  /**
+   * Returns the technical end time
+   *
+   * @return the technical end time
+   */
+  public String getTechnicalEndTime() {
+    return technicalEndTime;
+  }
+
+  /**
+   * Sets the technical end time
+   *
+   * @param technicalEndTime
+   *          the technical end time
+   */
+  public void setTechnicalEndTime(String technicalEndTime) {
+    this.technicalEndTime = technicalEndTime;
+  }
+
+  /**
+   * Returns the technical start time
+   *
+   * @return the technical start time
+   */
+  public String getTechnicalStartTime() {
+    return technicalStartTime;
+  }
+
+  /**
+   * Sets the technical start time
+   *
+   * @param technicalStartTime
+   *          the technical start time
+   */
+  public void setTechnicalStartTime(String technicalStartTime) {
+    this.technicalStartTime = technicalStartTime;
+  }
+
+  /**
+   * Returns the technical presenters
+   *
+   * @return the technical presenters
+   */
+  public List<String> getTechnicalPresenters() {
+    return technicalPresenters;
+  }
+
+  /**
+   * Sets the technical presenters
+   *
+   * @param technicalPresenters
+   *          the technical presenters
+   */
+  public void setTechnicalPresenters(List<String> technicalPresenters) {
+    this.technicalPresenters = technicalPresenters;
   }
 
   /**

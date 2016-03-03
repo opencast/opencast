@@ -31,6 +31,9 @@ public final class IndexRecreateObject implements Serializable {
     Start, Update, End, Error
   }
 
+  /**
+   * New services may be added in arbitrary order since the elements are identified by name, not their ordinal.
+   */
   public enum Service {
     Acl, Archive, Comments, Groups, Scheduler, Series, Themes, Workflow
   }

@@ -52,6 +52,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Utility class providing helpers for all operation related to JSON.
@@ -84,6 +85,24 @@ public final class JSONUtils {
       fields.add(f(item.getKey(), vN(item.getValue())));
     }
     return j(fields);
+  }
+
+  /**
+   * Turn a set into a {@link JObjectWrite} object
+   *
+   * @param set
+   *          the source set
+   * @return a new {@link JObjectWrite} generated with the map values
+   */
+  public static JValue setToJSON(Set<String> set) {
+    if (set == null) {
+      return a();
+    }
+    List<JValue> arrEntries = new ArrayList<JValue>();
+    for (String item : set) {
+      arrEntries.add(vN(item));
+    }
+    return a(arrEntries);
   }
 
   /**

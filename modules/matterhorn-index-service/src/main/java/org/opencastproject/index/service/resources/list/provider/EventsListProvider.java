@@ -41,7 +41,8 @@ public class EventsListProvider implements ResourceListProvider {
   private static final String PROVIDER_PREFIX = "EVENTS";
 
   public static final String CONTRIBUTORS = PROVIDER_PREFIX + ".CONTRIBUTORS";
-  public static final String PRESENTERS = PROVIDER_PREFIX + ".PRESENTERS";
+  public static final String PRESENTERS_BIBLIOGRAPHIC = PROVIDER_PREFIX + ".PRESENTERS_BIBLIOGRAPHIC";
+  public static final String PRESENTERS_TECHNICAL = PROVIDER_PREFIX + ".PRESENTERS_TECHNICAL";
   public static final String SUBJECT = PROVIDER_PREFIX + ".SUBJECT";
   public static final String LOCATION = PROVIDER_PREFIX + ".LOCATION";
   public static final String START_DATE = PROVIDER_PREFIX + ".START_DATE";
@@ -54,8 +55,8 @@ public class EventsListProvider implements ResourceListProvider {
     NONE, OPEN, RESOLVED;
   }
 
-  private static final String[] NAMES = { PROVIDER_PREFIX, CONTRIBUTORS, PRESENTERS, SUBJECT, LOCATION, PROGRESS,
-          STATUS, REVIEW_STATUS, COMMENTS };
+  private static final String[] NAMES = { PROVIDER_PREFIX, CONTRIBUTORS, PRESENTERS_BIBLIOGRAPHIC, PRESENTERS_TECHNICAL,
+          SUBJECT, LOCATION, PROGRESS, STATUS, REVIEW_STATUS, COMMENTS };
 
   private static final Logger logger = LoggerFactory.getLogger(EventsListProvider.class);
 
@@ -82,8 +83,11 @@ public class EventsListProvider implements ResourceListProvider {
     if (CONTRIBUTORS.equals(listName)) {
       for (String contributor : index.getEventContributors())
         list.put(contributor, contributor);
-    } else if (PRESENTERS.equals(listName)) {
+    } else if (PRESENTERS_BIBLIOGRAPHIC.equals(listName)) {
       for (String presenter : index.getEventPresenters())
+        list.put(presenter, presenter);
+    } else if (PRESENTERS_TECHNICAL.equals(listName)) {
+      for (String presenter : index.getEventTechnicalPresenters())
         list.put(presenter, presenter);
     } else if (LOCATION.equals(listName)) {
       for (String location : index.getEventLocations())

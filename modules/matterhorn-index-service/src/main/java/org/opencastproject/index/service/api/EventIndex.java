@@ -54,6 +54,13 @@ public interface EventIndex {
   List<String> getEventPresenters();
 
   /**
+   * Returns all the known event presenters usernames
+   *
+   * @return a list of presenters' usernames
+   */
+  List<String> getEventTechnicalPresenters();
+
+  /**
    * Returns all the known theme names
    *
    * @return a list of names

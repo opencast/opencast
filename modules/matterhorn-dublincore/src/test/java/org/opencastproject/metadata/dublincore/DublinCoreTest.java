@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.metadata.dublincore;
 
 import static org.junit.Assert.assertEquals;
@@ -44,7 +43,6 @@ import static org.opencastproject.metadata.dublincore.DublinCore.TERMS_NS_URI;
 import static org.opencastproject.metadata.dublincore.DublinCores.OC_PROPERTY_PROMOTED;
 import static org.opencastproject.util.UrlSupport.uri;
 
-import com.entwinemedia.fn.data.Opt;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -59,6 +57,7 @@ import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.entwinemedia.fn.data.Opt;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -240,7 +239,7 @@ public class DublinCoreTest {
       IOUtils.closeQuietly(in);
 
       // Create a new catalog and fill it with a few fields
-      DublinCoreCatalog dcNew = DublinCores.mkOpencast();
+      DublinCoreCatalog dcNew = DublinCores.mkOpencastEpisode().getCatalog();
       dcTempFile1 = new File(FileSupport.getTempDirectory(), Long.toString(System.currentTimeMillis()));
 
       // Add the required fields
@@ -263,12 +262,10 @@ public class DublinCoreTest {
               DublinCore.LANGUAGE_UNDEFINED, ENC_SCHEME_URI));
       // Don't forget to bind the namespace...
       dcNew.addBindings(XmlNamespaceContext.mk("octest", "http://www.opencastproject.org/octest"));
-      dcNew.add(OC_PROPERTY_PROMOTED, DublinCoreValue.mk("true", DublinCore.LANGUAGE_UNDEFINED, new EName(
-              "http://www.opencastproject.org/octest", "Boolean")));
+      dcNew.add(OC_PROPERTY_PROMOTED, DublinCoreValue.mk("true", DublinCore.LANGUAGE_UNDEFINED,
+              new EName("http://www.opencastproject.org/octest", "Boolean")));
       try {
-        dcNew.add(OC_PROPERTY_PROMOTED, DublinCoreValue.mk(
-                "true",
-                DublinCore.LANGUAGE_UNDEFINED,
+        dcNew.add(OC_PROPERTY_PROMOTED, DublinCoreValue.mk("true", DublinCore.LANGUAGE_UNDEFINED,
                 EName.mk("http://www.opencastproject.org/enc-scheme", "Boolean")));
         fail();
       } catch (NamespaceBindingException e) {
@@ -307,7 +304,7 @@ public class DublinCoreTest {
   public void testOverwriting() {
     // Create a new catalog and fill it with a few fields
     DublinCoreCatalog dcNew = null;
-    dcNew = DublinCores.mkOpencast();
+    dcNew = DublinCores.mkOpencastEpisode().getCatalog();
     dcNew.set(PROPERTY_TITLE, "Title 1");
     assertEquals("Title 1", dcNew.getFirst(PROPERTY_TITLE));
 
@@ -322,7 +319,7 @@ public class DublinCoreTest {
 
   @Test
   public void testVarious() throws NoSuchAlgorithmException, IOException, UnknownFileTypeException {
-    DublinCoreCatalog dc = DublinCores.mkOpencast();
+    DublinCoreCatalog dc = DublinCores.mkOpencastEpisode().getCatalog();
     // Add a title
     dc.add(PROPERTY_TITLE, "Der alte Mann und das Meer");
     assertEquals("Der alte Mann und das Meer", dc.getFirst(PROPERTY_TITLE));
@@ -370,7 +367,7 @@ public class DublinCoreTest {
 
   @Test
   public void testVarious2() throws NoSuchAlgorithmException, IOException, UnknownFileTypeException {
-    DublinCoreCatalog dc = DublinCores.mkOpencast();
+    DublinCoreCatalog dc = DublinCores.mkOpencastEpisode().getCatalog();
     dc.add(PROPERTY_TITLE, "The Lord of the Rings");
     dc.add(PROPERTY_TITLE, "Der Herr der Ringe", "de");
     assertEquals(2, dc.getLanguages(PROPERTY_TITLE).size());
@@ -388,7 +385,7 @@ public class DublinCoreTest {
 
   @Test
   public void testVarious3() throws NoSuchAlgorithmException, IOException, UnknownFileTypeException {
-    DublinCoreCatalog dc = DublinCores.mkOpencast();
+    DublinCoreCatalog dc = DublinCores.mkOpencastEpisode().getCatalog();
     dc.add(PROPERTY_CONTRIBUTOR, "Heinz Strunk");
     dc.add(PROPERTY_CONTRIBUTOR, "Rocko Schamoni");
     dc.add(PROPERTY_CONTRIBUTOR, "Jacques Palminger");
@@ -411,7 +408,7 @@ public class DublinCoreTest {
 
   @Test
   public void testVarious4() throws NoSuchAlgorithmException, IOException, UnknownFileTypeException {
-    DublinCoreCatalog dc = DublinCores.mkOpencast();
+    DublinCoreCatalog dc = DublinCores.mkOpencastEpisode().getCatalog();
     dc.add(PROPERTY_TITLE, "deutsch", "de");
     dc.add(PROPERTY_TITLE, "english", "en");
     assertNull(dc.getFirst(PROPERTY_TITLE, LANGUAGE_UNDEFINED));
@@ -426,9 +423,9 @@ public class DublinCoreTest {
 
   @Test
   public void testSet() {
-    DublinCoreCatalog dc = DublinCores.mkOpencast();
-    dc.set(PROPERTY_CREATOR, Arrays.asList(DublinCoreValue.mk("Klaus"), DublinCoreValue.mk("Peter"),
-                                           DublinCoreValue.mk("Carl", "en")));
+    DublinCoreCatalog dc = DublinCores.mkOpencastEpisode().getCatalog();
+    dc.set(PROPERTY_CREATOR,
+            Arrays.asList(DublinCoreValue.mk("Klaus"), DublinCoreValue.mk("Peter"), DublinCoreValue.mk("Carl", "en")));
     assertEquals(2, dc.get(PROPERTY_CREATOR, LANGUAGE_UNDEFINED).size());
     assertEquals(3, dc.get(PROPERTY_CREATOR).size());
     assertEquals("Klaus", dc.get(PROPERTY_CREATOR, LANGUAGE_UNDEFINED).get(0));
@@ -449,6 +446,7 @@ public class DublinCoreTest {
     // Create a mediapackage containing the DC catalog
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     mp.add(catalogFile.toURI(), Catalog.TYPE, MediaPackageElements.EPISODE);
+    mp.add(catalogFile2.toURI(), Catalog.TYPE, MediaPackageElements.SERIES);
     MediaPackageMetadata metadata = service.getMetadata(mp);
 
     assertEquals("Mediapackage metadata title not extracted from DC properly",
@@ -459,7 +457,7 @@ public class DublinCoreTest {
   @Ignore
   @Test
   public void testPreserveEncodingScheme() {
-    DublinCoreCatalog dc = DublinCores.mkOpencast();
+    DublinCoreCatalog dc = DublinCores.mkOpencastEpisode().getCatalog();
     DublinCoreValue val = DublinCoreValue.mk("http://www.opencastproject.org/license", "en", ENC_SCHEME_URI);
     dc.add(PROPERTY_LICENSE, val);
     assertEquals(1, dc.get(PROPERTY_LICENSE).size());
@@ -520,7 +518,7 @@ public class DublinCoreTest {
   // this test should verify serialization/deserialization works for a fairly minimal case
   // waiting on https://opencast.jira.com/browse/MH-9733
   public void testSerializationDeserializationOfCatalogs() throws Exception {
-    DublinCoreCatalog impl = DublinCores.mkOpencast();
+    DublinCoreCatalog impl = DublinCores.mkOpencastEpisode().getCatalog();
     impl.addTag("bob");
     impl.set(impl.PROPERTY_PUBLISHER, "test");
     DublinCoreCatalogService service = new DublinCoreCatalogService();
@@ -532,7 +530,7 @@ public class DublinCoreTest {
   // test for null values on various methods on the DublinCoreCatalog, they should
   // generally return an exception
   public void testForNullsInDublinCoreCatalogImpl() throws Exception {
-    DublinCoreCatalog dc = DublinCores.mkOpencast();
+    DublinCoreCatalog dc = DublinCores.mkOpencastEpisode().getCatalog();
     try {
       DublinCoreValue val = null;
       dc.add(EasyMock.createNiceMock(org.opencastproject.mediapackage.EName.class), val);
@@ -583,7 +581,7 @@ public class DublinCoreTest {
 
   @Test
   public void testClone() {
-    final DublinCoreCatalog dc = DublinCores.mkOpencast();
+    final DublinCoreCatalog dc = DublinCores.mkOpencastEpisode().getCatalog();
     final MimeType mimeType = MimeType.mimeType("text", "xml");
     dc.setMimeType(MimeType.mimeType("text", "xml"));
     dc.setReference(new MediaPackageReferenceImpl("type", "identifier"));

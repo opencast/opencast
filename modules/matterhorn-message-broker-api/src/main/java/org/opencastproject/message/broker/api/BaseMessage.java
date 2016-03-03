@@ -28,6 +28,8 @@ import org.opencastproject.security.api.OrganizationParser;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserParser;
 
+import com.entwinemedia.fn.data.Opt;
+
 import java.io.Serializable;
 
 public class BaseMessage implements Serializable {
@@ -42,6 +44,13 @@ public class BaseMessage implements Serializable {
     this.organization = OrganizationParser.toXml(JaxbOrganization.fromOrganization(organization));
     this.user = UserParser.toXml(JaxbUser.fromUser(user));
     this.object = object;
+  }
+
+  public Opt<String> getId() {
+    if (object instanceof MessageItem)
+      return Opt.some(((MessageItem) object).getId());
+
+    return Opt.none();
   }
 
   public Organization getOrganization() {

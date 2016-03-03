@@ -27,21 +27,26 @@ import static org.opencastproject.metadata.dublincore.DublinCore.TERMS_NS_PREFIX
 import static org.opencastproject.metadata.dublincore.DublinCore.TERMS_NS_URI;
 
 import org.opencastproject.mediapackage.EName;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.metadata.dublincore.OpencastDctermsDublinCore.Episode;
+import org.opencastproject.metadata.dublincore.OpencastDctermsDublinCore.Series;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
 
+import com.entwinemedia.fn.data.Opt;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.xml.XMLConstants;
 
 /**
- * Factory for DublinCore catalogs.
+ * Factory for metadata catalogs following the DublinCore standard.
  */
 @ParametersAreNonnullByDefault
 public final class DublinCores {
@@ -79,34 +84,127 @@ public final class DublinCores {
   }
 
   /**
-   * Create a new empty Opencast DublinCore metadata catalog with
-   * {@link org.opencastproject.mediapackage.MediaPackageElements#EPISODE} flavor. Register all necessary namespaces and
-   * set the root tag to {@link #OC_DC_CATALOG_ROOT_ELEMENT}.
+   * Create a new Opencast DublinCore metadata catalog for episodes.
+   * <ul>
+   * <li>Set flavor to {@link org.opencastproject.mediapackage.MediaPackageElements#EPISODE}.
+   * <li>Register all necessary namespaces and set the root tag to {@link #OC_DC_CATALOG_ROOT_ELEMENT}.
+   * <li>The catalog does not have an {@linkplain DublinCoreCatalog#getIdentifier() identifier} and the
+   *   {@link DublinCore#PROPERTY_IDENTIFIER identifier} property is not set.
+   * </ul>
+   *
+   * @deprecated use {@link #mkOpencastEpisode()} instead
    */
   @Nonnull
-  public static DublinCoreCatalog mkOpencast() {
-    final DublinCoreCatalog dc = new DublinCoreCatalog();
-    dc.setFlavor(MediaPackageElements.EPISODE);
-    dc.addBindings(XmlNamespaceContext.mk(XmlNamespaceBinding.mk(ELEMENTS_1_1_NS_PREFIX, ELEMENTS_1_1_NS_URI),
-            XmlNamespaceBinding.mk(TERMS_NS_PREFIX, TERMS_NS_URI),
-            // Opencast property namespace
-            XmlNamespaceBinding.mk(OC_PROPERTY_NS_PREFIX, OC_PROPERTY_NS_URI),
-            // Opencast root tag
-            XmlNamespaceBinding.mk(XMLConstants.DEFAULT_NS_PREFIX, OC_DC_CATALOG_NS_URI)));
-    dc.setRootTag(OC_DC_CATALOG_ROOT_ELEMENT);
+  @Deprecated
+  public static Episode mkOpencast() {
+    return mkOpencastEpisode();
+  }
+
+  /**
+   * Create a new Opencast DublinCore metadata catalog for episodes.
+   * <ul>
+   * <li>Set flavor to {@link org.opencastproject.mediapackage.MediaPackageElements#EPISODE}.
+   * <li>Register all necessary namespaces and set the root tag to {@link #OC_DC_CATALOG_ROOT_ELEMENT}.
+   * <li>The catalog does not have an {@linkplain DublinCoreCatalog#getIdentifier() identifier} and the
+   *   {@link DublinCore#PROPERTY_IDENTIFIER identifier} property is not set.
+   * </ul>
+   */
+  @Nonnull
+  public static Episode mkOpencastEpisode() {
+    return new Episode(mkOpencast(MediaPackageElements.EPISODE));
+  }
+
+  /**
+   * Create a new Opencast DublinCore metadata catalog for episodes.
+   * <ul>
+   * <li>Set flavor to {@link org.opencastproject.mediapackage.MediaPackageElements#EPISODE}.
+   * <li>Register all necessary namespaces and set the root tag to {@link #OC_DC_CATALOG_ROOT_ELEMENT}.
+   * <li>Set the {@link DublinCore#PROPERTY_IDENTIFIER dcterms:identifier} to {@code id}
+   * <li>The catalog does not have an {@linkplain DublinCoreCatalog#getIdentifier() identifier}
+   * </ul>
+   */
+  @Nonnull
+  public static Episode mkOpencastEpisode(String id) {
+    final Episode dc = mkOpencastEpisode();
+    dc.setDcIdentifier(id);
     return dc;
   }
 
   /**
-   * Create a new empty catalog suitable to take properties from the standard DublinCore namespaces
-   * {@link DublinCore#ELEMENTS_1_1_NS_URI} and {@link DublinCore#TERMS_NS_URI}.
+   * Create a new Opencast DublinCore metadata catalog for episodes.
+   * <ul>
+   * <li>Set flavor to {@link org.opencastproject.mediapackage.MediaPackageElements#EPISODE}.
+   * <li>Register all necessary namespaces and set the root tag to {@link #OC_DC_CATALOG_ROOT_ELEMENT}.
+   * <li>Set the {@link DublinCore#PROPERTY_IDENTIFIER dcterms:identifier} to {@code id} if some, or create a random
+   *   UUID otherwise
+   * <li>The catalog does not have an {@linkplain DublinCoreCatalog#getIdentifier() identifier}
+   * </ul>
+   */
+  @Nonnull
+  public static Episode mkOpencastEpisode(Opt<String> id) {
+    final Episode dc = mkOpencastEpisode();
+    dc.setDcIdentifier(id.or(UUID.randomUUID().toString()));
+    return dc;
+  }
+
+  /**
+   * Create a new Opencast DublinCore metadata catalog for episodes.
+   * <ul>
+   * <li>Set flavor to {@link org.opencastproject.mediapackage.MediaPackageElements#EPISODE}.
+   * <li>Register all necessary namespaces and set the root tag to {@link #OC_DC_CATALOG_ROOT_ELEMENT}.
+   * <li>Set the {@link DublinCore#PROPERTY_IDENTIFIER dcterms:identifier} to {@code id}
+   * <li>Link to series {@code seriesId} setting the {@link DublinCore#PROPERTY_IS_PART_OF} property.
+   * <li>The catalog does not have an {@linkplain DublinCoreCatalog#getIdentifier() identifier}
+   * </ul>
+   */
+  @Nonnull
+  public static Episode mkOpencastEpisode(String id, String seriesId) {
+    final Episode dc = mkOpencastEpisode(id);
+    dc.setIsPartOf(seriesId);
+    return dc;
+  }
+
+  /**
+   * Create a new Opencast DublinCore metadata catalog for series.
+   * <ul>
+   * <li>Set flavor to {@link org.opencastproject.mediapackage.MediaPackageElements#SERIES}.
+   * <li>Register all necessary namespaces and set the root tag to {@link #OC_DC_CATALOG_ROOT_ELEMENT}.
+   * <li>The catalog does not have an {@linkplain DublinCoreCatalog#getIdentifier() identifier} and the
+   *   {@link DublinCore#PROPERTY_IDENTIFIER identifier} property is not set.
+   * </ul>
+   */
+  @Nonnull
+  public static Series mkOpencastSeries() {
+    return new Series(mkOpencast(MediaPackageElements.SERIES));
+  }
+
+  /**
+   * Create a new Opencast DublinCore metadata catalog for series.
+   * <ul>
+   * <li>Set flavor to {@link org.opencastproject.mediapackage.MediaPackageElements#SERIES}.
+   * <li>Register all necessary namespaces and set the root tag to {@link #OC_DC_CATALOG_ROOT_ELEMENT}.
+   * <li>Set the {@link DublinCore#PROPERTY_IDENTIFIER dcterms:identifier} to {@code id}
+   * <li>The catalog does not have an {@linkplain DublinCoreCatalog#getIdentifier() identifier}
+   * </ul>
+   */
+  @Nonnull
+  public static Series mkOpencastSeries(String id) {
+    final Series dc = mkOpencastSeries();
+    dc.setDcIdentifier(id);
+    return dc;
+  }
+
+  /**
+   * Create a new empty catalog suitable to take properties from the standard DublinCore
+   * namespaces {@link DublinCore#ELEMENTS_1_1_NS_URI} and {@link DublinCore#TERMS_NS_URI}.
    * <p/>
    * Please note that neither a flavor nor a root tag is set.
    */
   @Nonnull
   public static DublinCoreCatalog mkStandard() {
     final DublinCoreCatalog dc = new DublinCoreCatalog();
-    dc.addBindings(XmlNamespaceContext.mk(XmlNamespaceBinding.mk(ELEMENTS_1_1_NS_PREFIX, ELEMENTS_1_1_NS_URI),
+    dc.addBindings(XmlNamespaceContext.mk(
+            XmlNamespaceBinding.mk(ELEMENTS_1_1_NS_PREFIX, ELEMENTS_1_1_NS_URI),
             XmlNamespaceBinding.mk(TERMS_NS_PREFIX, TERMS_NS_URI)));
     return dc;
   }
@@ -118,13 +216,14 @@ public final class DublinCores {
   }
 
   /**
-   * Read a DublinCore catalog from a stream containing either JSON or XML. The method is capable of detecting the used
-   * format.
+   * Read a DublinCore catalog from a stream containing either JSON or XML. The method is
+   * capable of detecting the used format.
    * <p/>
-   * <strong>Implementation note:</strong> In order to detect the format the whole stream is read into memory first. If
-   * you know upfront whether JSON or XML is used you may want to choose
-   * {@link DublinCoreJsonFormat#read(java.io.InputStream)} or {@link DublinCoreXmlFormat#read(java.io.InputStream)} for
-   * performance reasons.
+   * The reader is not capable of determining the catalog's flavor.
+   * <p/>
+   * <strong>Implementation note:</strong> In order to detect the format the whole stream is read into memory first. If you
+   * know upfront whether JSON or XML is used you may want to choose {@link DublinCoreJsonFormat#read(java.io.InputStream)}
+   * or {@link DublinCoreXmlFormat#read(java.io.InputStream)} for performance reasons.
    */
   @Nonnull
   public static DublinCoreCatalog read(InputStream in) {
@@ -149,4 +248,17 @@ public final class DublinCores {
     }
   }
 
+  private static DublinCoreCatalog mkOpencast(MediaPackageElementFlavor flavor) {
+    final DublinCoreCatalog dc = new DublinCoreCatalog();
+    dc.setFlavor(flavor);
+    dc.addBindings(XmlNamespaceContext.mk(
+        XmlNamespaceBinding.mk(ELEMENTS_1_1_NS_PREFIX, ELEMENTS_1_1_NS_URI),
+        XmlNamespaceBinding.mk(TERMS_NS_PREFIX, TERMS_NS_URI),
+        // Opencast property namespace
+        XmlNamespaceBinding.mk(OC_PROPERTY_NS_PREFIX, OC_PROPERTY_NS_URI),
+        // Opencast root tag
+        XmlNamespaceBinding.mk(XMLConstants.DEFAULT_NS_PREFIX, OC_DC_CATALOG_NS_URI)));
+    dc.setRootTag(OC_DC_CATALOG_ROOT_ELEMENT);
+    return dc;
+  }
 }

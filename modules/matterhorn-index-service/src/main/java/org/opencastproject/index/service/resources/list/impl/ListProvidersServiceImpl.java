@@ -28,6 +28,8 @@ import org.opencastproject.index.service.resources.list.api.ListProvidersService
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.util.ListProviderUtil;
+import org.opencastproject.scheduler.api.SchedulerService;
+import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
@@ -46,6 +48,8 @@ public class ListProvidersServiceImpl implements ListProvidersService {
 
   private static final Logger logger = LoggerFactory.getLogger(ListProvidersServiceImpl.class);
   private static final String FILTER_SUFFIX = "Filter";
+
+  public static final String REVIEW_STATUS = "review_status";
 
   private Map<String, ResourceListProvider> providers = new HashMap<String, ResourceListProvider>();
 
@@ -66,6 +70,7 @@ public class ListProvidersServiceImpl implements ListProvidersService {
   public void activate(BundleContext bundleContext) {
     addCountries();
     addWorkflowStatus();
+    addReviewStatus();
 
     // TODO create a file for each resource and made it dynamic
 
@@ -139,6 +144,35 @@ public class ListProvidersServiceImpl implements ListProvidersService {
 
     for (WorkflowState s : WorkflowInstance.WorkflowState.values()) {
       workflowStatus.put(s.name(), "EVENTS.EVENT.TABLE.FILTER.STATUS." + s.name());
+    }
+
+    providers.put(title[0], new ResourceListProvider() {
+
+      @Override
+      public String[] getListNames() {
+        return title;
+      }
+
+      @Override
+      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+        return ListProviderUtil.filterMap(workflowStatus, query);
+
+      }
+
+    });
+  }
+
+  // ====================================
+  // Event review status
+  // ====================================
+
+  private void addReviewStatus() {
+
+    final String[] title = new String[] { REVIEW_STATUS };
+    final Map<String, String> workflowStatus = new HashMap<String, String>();
+
+    for (ReviewStatus s : SchedulerService.ReviewStatus.values()) {
+      workflowStatus.put(s.name(), "FILTERS.EVENTS.REVIEW_STATUS." + s.name());
     }
 
     providers.put(title[0], new ResourceListProvider() {

@@ -144,7 +144,7 @@ public class UserAndSeriesLoader {
 
       for (int i = 1; i <= NUM_SERIES; i++) {
         String seriesId = SERIES_PREFIX + i;
-        DublinCoreCatalog dc = DublinCores.mkOpencast();
+        DublinCoreCatalog dc = DublinCores.mkOpencastEpisode().getCatalog();
         AccessControlList acl = new AccessControlList();
 
         // Add read permissions for viewing the series content in engage
