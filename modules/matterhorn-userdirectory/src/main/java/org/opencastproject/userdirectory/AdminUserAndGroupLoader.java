@@ -260,6 +260,9 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
     try {
       // Load the properties
       rolesIS = AdminUserAndGroupLoader.class.getResourceAsStream(propertiesFile);
+      if (null == rolesIS) {
+        return new TreeSet<>(); // if file doesn't exits assume it's empty
+      }
       Stream<String> stream = Stream.$(IOUtils.readLines(rolesIS)).filter(new Fn<String, Boolean>() {
         @Override
         public Boolean ap(String line) {
