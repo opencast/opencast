@@ -1,169 +1,201 @@
 angular.module('adminNg.services')
-.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', '$translate',
-    function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate) {
-    var Source = function () {
-        var me = this,
-            NOTIFICATION_CONTEXT = 'events-form';
+.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', '$translate', 'underscore',
+    function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate, _) {
 
+    // -- constants ------------------------------------------------------------------------------------------------- --
 
-        /* Get the current client timezone */
-        var tzOffset = (new Date()).getTimezoneOffset() / -60;
-        me.tz = 'UTC' + (tzOffset < 0 ? '' : '+') + tzOffset;
-
-        CaptureAgentsResource.query({inputs: true}).$promise.then(function (data) {
-            me.captureAgents = data.rows;
-        });
-
-        this.ud = {
+    var NOTIFICATION_CONTEXT = 'events-form';
+    var SCHEDULE_SINGLE = 'SCHEDULE_SINGLE';
+    var SCHEDULE_MULTIPLE = 'SCHEDULE_MULTIPLE';
+    var WEEKDAY_PREFIX = 'EVENTS.EVENTS.NEW.WEEKDAYS.';
+    var UPLOAD = 'UPLOAD';
+    var EMPTY_UD  = {
             upload: {},
-            
+
             SCHEDULE_SINGLE: {
-                device: {
-                    inputMethods: {}
-                }
+               device: {
+                   inputMethods: {}
+               }
             },
-            
+
             SCHEDULE_MULTIPLE: {
-                device: {
-                    inputMethods: {}
-                },
-                weekdays: {},
-                presentableWeekdays: ''
+               device: {
+                   inputMethods: {}
+               },
+               weekdays: {},
+               presentableWeekdays: ''
             }
         };
 
-        this.weekdays = {
-            'MO': 'EVENTS.EVENTS.NEW.WEEKDAYS.MO',
-            'TU': 'EVENTS.EVENTS.NEW.WEEKDAYS.TU',
-            'WE': 'EVENTS.EVENTS.NEW.WEEKDAYS.WE',
-            'TH': 'EVENTS.EVENTS.NEW.WEEKDAYS.TH',
-            'FR': 'EVENTS.EVENTS.NEW.WEEKDAYS.FR',
-            'SA': 'EVENTS.EVENTS.NEW.WEEKDAYS.SA',
-            'SU': 'EVENTS.EVENTS.NEW.WEEKDAYS.SU'
+    var WEEKDAYS = {
+        'MO': WEEKDAY_PREFIX + 'MO',
+        'TU': WEEKDAY_PREFIX + 'TU',
+        'WE': WEEKDAY_PREFIX + 'WE',
+        'TH': WEEKDAY_PREFIX + 'TH',
+        'FR': WEEKDAY_PREFIX + 'FR',
+        'SA': WEEKDAY_PREFIX + 'SA',
+        'SU': WEEKDAY_PREFIX + 'SU'
+    };
+
+    // -- instance -------------------------------------------------------------------------------------------------- --
+
+    var Source = function () {
+        var self = this;
+
+        this.checkingConflicts = false;
+        this.hasConflicts = false;
+        this.hasConflictingSettings = function () {
+            return self.hasConflicts;
         };
 
-        this.sortedWeekdays = [];
+        /* Get the current client timezone */
+        var tzOffset = (new Date()).getTimezoneOffset() / -60;
+        self.tz = 'UTC' + (tzOffset < 0 ? '-' : '+') + tzOffset;
 
-        angular.forEach(me.weekdays, function (day, index) {
-            me.sortedWeekdays.push({
-                key: index,
-                translation: day
-            });
+        CaptureAgentsResource.query({inputs: true}).$promise.then(function (data) {
+            self.captureAgents = data.rows;
         });
 
-        this.conflicts = [];
+        this.ud = _.clone(EMPTY_UD);
+        this.weekdays = _.clone(WEEKDAYS);
+
+        this.sortedWeekdays = _.map(self.weekdays, function(day, index) {
+            return { key: index, translation: day };
+        });
 
         this.hours = JsHelper.initArray(24);
         this.minutes = JsHelper.initArray(60);
 
         this.roomChanged = function () {
-            me.ud[me.ud.type].device.inputMethods = {};
+            self.ud[self.ud.type].device.inputMethods = {};
         };
 
         this.toggleWeekday = function (weekday) {
-            var wds = me.ud.SCHEDULE_MULTIPLE.weekdays;
-            if (wds[weekday]) {
-                wds[weekday] = false;
-            } else {
-                wds[weekday] = true;
+            var weekdays = self.ud[SCHEDULE_MULTIPLE].weekdays;
+            if (_.has(weekdays, weekday)) {
+                weekdays[weekday] = !weekdays[weekday];
             }
         };
 
         /*
          * Some internal utilities.
          */
-        this.isSingleSectionValid = function () {
-            var required = ['SCHEDULE_SINGLE.start.date', 'SCHEDULE_SINGLE.start.hour', 'SCHEDULE_SINGLE.start.minute',
-                'SCHEDULE_SINGLE.duration.hour', 'SCHEDULE_SINGLE.duration.minute', 'SCHEDULE_SINGLE.device.name'];
-            if (me.userdataHasAllValues(required)) {
-                return true;
+         var fields = [
+             'start.date',
+             'start.hour',
+             'start.minute',
+             'duration.hour',
+             'duration.minute',
+             'device.name'];
+
+        var getType = function() { return self.ud.type; };
+        var isDefined = function(value) { return !(_.isUndefined(value) || _.isNull(value)); };
+        var validators = {
+            later: function() { return true; },
+            UPLOAD: function() {
+                return isDefined(self.ud.upload.segmentable) || isDefined(self.ud.upload.nonSegmentable) || isDefined(self.ud.upload.audioOnly);
+            },
+            SCHEDULE_SINGLE: function () {
+                return !self.hasConflicts && _.every(fields, function(field) {
+                    var fieldValue = JsHelper.getNested(self.ud[SCHEDULE_SINGLE], field);
+                    return isDefined(fieldValue);
+                });
+            },
+            SCHEDULE_MULTIPLE: function() {
+                var isAllFieldsDefined = _.every(fields, function(field) {
+                    var fieldValue = JsHelper.getNested(self.ud[SCHEDULE_MULTIPLE], field);
+                    return isDefined(fieldValue);
+                });
+
+                return !self.hasConflicts && isAllFieldsDefined && self.atLeastOneRepetitionDayMarked();
             }
-            return false;
         };
-        this.isMultipleSectionValid = function () {
-            var required = ['SCHEDULE_MULTIPLE.start.date', 'SCHEDULE_MULTIPLE.start.hour', 'SCHEDULE_MULTIPLE.start.minute',
-                'SCHEDULE_MULTIPLE.duration.hour', 'SCHEDULE_MULTIPLE.duration.minute', 'SCHEDULE_MULTIPLE.device.name'];
-            if (me.userdataHasAllValues(required) &&
-                    me.atLeastOneRepetitionDayMarked()) {
-                return true;
-            }
-            return false;
-        };
-        this.userdataHasAllValues = function (required) {
-            var result = true;
-            angular.forEach(required, function (item) {
-                var nestedObject = JsHelper.getNested(me.ud, item);
-                if (nestedObject === null || angular.isUndefined(nestedObject)) {
-                    result = false;
-                }
-            });
-            return result;
-        };
+
+        this.isScheduleSingle = function() { return getType() === SCHEDULE_SINGLE; };
+        this.isScheduleMultiple = function() { return getType() === SCHEDULE_MULTIPLE; };
+        this.isUpload = function() { return getType() === UPLOAD; };
+
         this.atLeastOneInputMethodDefined = function () {
-            var result = false, inputMethods;
-            inputMethods = me.ud.type === 'SCHEDULE_SINGLE' ? me.ud.SCHEDULE_SINGLE.device.inputMethods : me.ud.SCHEDULE_MULTIPLE.device.inputMethods;
-            angular.forEach(inputMethods, function (value) {
-                if (value === true) {
-                    result = true;
-                    return;
-                }
-            });
-            return result;
+            var inputMethods = self.ud[getType()].device.inputMethods;
+            return isDefined(_.find(inputMethods, function(inputMethod) { return inputMethod; }));
         };
+
         this.atLeastOneRepetitionDayMarked = function () {
-            var result = false;
-            angular.forEach(me.ud.SCHEDULE_MULTIPLE.weekdays, function (weekday) {
-                if (weekday) {
-                    result = true;
-                }
-            });
-            return result;
+            return isDefined(_.find(self.ud[SCHEDULE_MULTIPLE].weekdays, function(weekday) { return weekday; }));
         };
 
-        this.readyToPollConflicts = function () {
-            var data = me.ud[me.ud.type], result;
-            result = angular.isDefined(data) && angular.isDefined(data.start) &&
-                angular.isDefined(data.start.date) && data.start.date.length > 0 &&
-                angular.isDefined(data.device) &&
-                angular.isDefined(data.device.id) && data.device.id.length > 0;
+        this.canPollConflicts = function () {
+            var data = self.ud[getType()];
 
-            if (me.ud.type === 'SCHEDULE_MULTIPLE' && result) {
-                result = angular.isDefined(data.end) &&
+            var result = isDefined(data) && isDefined(data.start) &&
+                isDefined(data.start.date) && data.start.date.length > 0 &&
+                isDefined(data.device) &&
+                isDefined(data.device.id) && data.device.id.length > 0;
+
+            if (self.isScheduleMultiple() && result) {
+                return angular.isDefined(data.end) &&
                     data.end.length > 0 && angular.isDefined(data.duration) &&
                     angular.isDefined(data.duration.hour) && angular.isDefined(data.duration.minute) &&
-                    me.atLeastOneRepetitionDayMarked();
+                    self.atLeastOneRepetitionDayMarked();
+            } else {
+                return result;
             }
-
-            return result;
         };
 
         this.checkConflicts = function () {
-            me.checkingConflicts = true;
-            if (me.readyToPollConflicts()) {
-                ConflictCheckResource.check(me.ud[me.ud.type], me.noConflictsDetected, me.conflictsDetected);
-                me.updateWeekdays();
+
+            // -- semaphore ----------------------------------------------------------------------------------------- --
+
+            var acquire = function() { return !self.checkingConflicts && self.canPollConflicts(); };
+
+            var release = function(conflicts) {
+                self.hasConflicts = _.size(conflicts) > 0;
+                self.updateWeekdays();
+            };
+
+            // -- ajax ---------------------------------------------------------------------------------------------- --
+
+            if (acquire()) {
+                Notifications.remove(self.notification, NOTIFICATION_CONTEXT);
+
+                var onSuccess = function () {release(); };
+                var onError = function (response) {
+
+                    if (response.status === 409) {
+                        if (!self.notification) {
+                            self.notification = Notifications.add('error', 'CONFLICT_DETECTED', NOTIFICATION_CONTEXT);
+                        }
+
+                        release(response.data);
+                    } else {
+                        // todo show general error
+                        release();
+                    }
+                };
+
+                var settings = self.ud[getType()];
+                ConflictCheckResource.check(settings, onSuccess, onError);
             }
-            me.checkingConflicts = false;
         };
 
         /**
          * Update the presentation fo the weekdays for the summary
          */
         this.updateWeekdays = function () {
-            var keyWeekdays = [],
-                keysOrder = [],
-                sortDay = function (day1, day2) {
+            var keyWeekdays = [];
+            var keysOrder = [];
+            var sortDay = function (day1, day2) {
                     return keysOrder[day1] - keysOrder[day2];
                 };
 
-            angular.forEach(me.sortedWeekdays, function (day, idx) {
+            angular.forEach(self.sortedWeekdays, function (day, idx) {
                 keysOrder[day.translation] = idx;
             });
             
-            if (me.ud.type === 'SCHEDULE_MULTIPLE') {
-                angular.forEach(me.ud.SCHEDULE_MULTIPLE.weekdays, function (weekday, index) {
+            if (self.isScheduleMultiple()) {
+                angular.forEach(self.ud.SCHEDULE_MULTIPLE.weekdays, function (weekday, index) {
                     if (weekday) {
-                        keyWeekdays.push(me.weekdays[index]);                    
+                        keyWeekdays.push(self.weekdays[index]);
                     }
                  });
             }
@@ -177,46 +209,16 @@ angular.module('adminNg.services')
                     translatedWeekdays.push(t);
                 });
 
-                me.ud.SCHEDULE_MULTIPLE.presentableWeekdays = translatedWeekdays.join(',');
+                self.ud[SCHEDULE_MULTIPLE].presentableWeekdays = translatedWeekdays.join(',');
             });
         };
 
-        this.changeType = function () {
-            me.reset();
-        };
-
-        this.noConflictsDetected = function () {
-            while (me.conflicts.length > 0) {
-                me.conflicts.pop();
-            }
-        };
-
-        this.conflictsDetected = function (response) {
-            if (response.status === 409) {
-                if (me.notification) {
-                    Notifications.remove(me.notification, NOTIFICATION_CONTEXT);
-                }
-                me.notification = Notifications.add('error', 'CONFLICT_DETECTED', NOTIFICATION_CONTEXT);
-                var data = response.data;
-                angular.forEach(data, function (d) {
-                    var timeArr = d.time.trim().split(';');
-                    me.conflicts.push({
-                        title: d.title,
-                        start: Language.toLocalTime(timeArr[0].substr(6, timeArr[0].length)),
-                        end: Language.toLocalTime(timeArr[1].substr(5, timeArr[1].length))
-                    });
-                });
-            }
-        };
-
         this.getFormatedStartTime = function () {
-            var time,
-                hour,
-                minute;
+            var time;
 
-            if (me.ud.type !== 'UPLOAD') {
-                hour = me.ud[me.ud.type].start.hour;
-                minute = me.ud[me.ud.type].start.minute;
+            if (!self.isUpload()) {
+                var hour = self.ud[getType()].start.hour;
+                var minute = self.ud[getType()].start.minute;
                 if (angular.isDefined(hour) && angular.isDefined(minute)) {
                     time = JsHelper.humanizeTime(hour, minute);
                 }
@@ -226,13 +228,11 @@ angular.module('adminNg.services')
         };        
 
         this.getFormatedDuration = function () {
-            var time,
-                hour,
-                minute;
+            var time;
 
-            if (me.ud.type !== 'UPLOAD') {
-                hour = me.ud[me.ud.type].duration.hour;
-                minute = me.ud[me.ud.type].duration.minute;
+            if (!self.isUpload()) {
+                var hour = self.ud[getType()].duration.hour;
+                var minute = self.ud[getType()].duration.minute;
                 if (angular.isDefined(hour) && angular.isDefined(minute)) {
                     time = JsHelper.secondsToTime(((hour * 60) + minute) * 60);
                 }
@@ -241,45 +241,23 @@ angular.module('adminNg.services')
             return time;
         };
 
-        this.isValid = function () {
+        var getValidatorByType = function() {
+            if (_.has(validators, getType())) {
+                return validators[getType()];
+            }
+        };
 
-            if (me.ud.type === 'later') {
-                return true; // no validation needed
+        this.isValid = function () {
+            var validator = getValidatorByType();
+            if(isDefined(validator)) {
+                return validator();
             }
-            else if (me.ud.type === 'UPLOAD') {
-                return (angular.isDefined(me.ud.upload.segmentable) || angular.isDefined(me.ud.upload.nonSegmentable) || angular.isDefined(me.ud.upload.audioOnly));
-            }
-            else if (me.conflicts.length === 0) {
-                if (me.ud.type === 'SCHEDULE_SINGLE') {
-                    return me.isSingleSectionValid();
-                }
-                if (me.ud.type === 'SCHEDULE_MULTIPLE') {
-                    return me.isMultipleSectionValid();
-                }
-            }
+
             return false;
         };
 
-        this.reset = function () {
-            me.ud.upload = {},
-                
-            me.ud.SCHEDULE_SINGLE = {
-                device: {
-                    inputMethods: {}
-                }
-            };
-                
-            me.ud.SCHEDULE_MULTIPLE = {
-                device: {
-                    inputMethods: {}
-                },
-                weekdays: {},
-                presentableWeekdays: ''
-            };
-        };
-
         this.getUserEntries = function () {
-            return me.ud;
+            return self.ud;
         };
     };
     return new Source();

@@ -19,6 +19,7 @@ function ($scope, BulkMessageStates, EmailResource, Table, Notifications, Modal,
 
         EmailResource.save({ templateId: userdata.message.email_template.id }, userdata, function () {
             Table.fetch();
+            Table.deselectAll();
             Notifications.add('success', 'EMAIL_SENT');
             Modal.$scope.close();
         }, function () {

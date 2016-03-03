@@ -21,6 +21,7 @@
     "expr"            : true,
     "globals"         : {
         "console"         : true,
+        "helpers"         : true,
         "window"          : true,
         "Backbone"        : true,
         "moment"          : true,
@@ -37,9 +38,11 @@
         "navigator"       : true,
         "beforeEach"      : false,
         "describe"        : false,
+        "fdescribe"       : false,
         "xdescribe"       : false,
         "inject"          : false,
         "it"              : false,
+        "fit"              : false,
         "xit"             : false,
         "spyOn"           : false,
         "sinon"           : false,
@@ -64,5 +67,6 @@
         "$location"       : true,
         "$window"         : true
     },
-    "ignores": ["src/main/webapp/lib/**/*"]
+    "ignores": ["src/main/webapp/lib/**/*"],
+    "reporter": "node_modules/jshint-stylish/index.js"
 }

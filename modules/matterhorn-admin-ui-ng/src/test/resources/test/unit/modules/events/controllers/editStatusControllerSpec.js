@@ -1,5 +1,5 @@
 describe('Edit Status controller', function () {
-    var $scope, optoutsResource, _Notifications, successfulSubmit, table, modal;
+    var $scope, optoutsResource, _Notifications, successfulSubmit, table, modal, rows;
 
     beforeEach(module('adminNg'));
 
@@ -7,7 +7,10 @@ describe('Edit Status controller', function () {
         optoutsResource = {
             save: function (what, success, failure) {
                 if (successfulSubmit) {
-                    success();
+                    success({
+                        error: [],
+                        ok: ['1234']
+                    });
                 } else {
                     failure();
                 }
@@ -15,12 +18,20 @@ describe('Edit Status controller', function () {
         };
         $provide.value('OptoutsResource', optoutsResource);
 
+        rows = [
+            {id: 1, selected: true},
+            {id: 2, selected: true}
+        ];
         table = {
             resource: 'events',
             getSelected: function () {
-                return [{id: 1}, {id: 2}];
+                return rows;
             },
-            toggleAllSelectionFlags: function () {}
+            copySelected: function () {
+                return rows;
+            },
+            allSelectedChanged: function () {},
+            deselectAll: function () {}
         };
         $provide.value('Table', table);
 
@@ -34,6 +45,9 @@ describe('Edit Status controller', function () {
 
     beforeEach(inject(function ($rootScope, $controller, Notifications) {
         $scope = $rootScope.$new();
+        $scope.TableForm = {
+            $valid: true
+        };
         $controller('EditStatusCtrl', {$scope: $scope});
         $scope.changeStatus(true);
         _Notifications = Notifications;
@@ -45,20 +59,14 @@ describe('Edit Status controller', function () {
         expect($scope.changeStatus).toBeDefined();
         expect($scope.valid).toBeDefined();
         expect($scope.submit).toBeDefined();
-        expect($scope.toggleSelectAll).toBeDefined();
+        expect($scope.allSelectedChanged).toBeDefined();
     });
 
     it('toggles the optout status', function () {
         $scope.changeStatus(true);
         expect($scope.status).toBeTruthy();
         $scope.changeStatus(false);
-        expect($scope.status).toBeFalsy();
-    });
-
-    it('toggles the table selection', function () {
-        spyOn(table, 'toggleAllSelectionFlags').and.callThrough();
-        $scope.toggleSelectAll();
-        expect(table.toggleAllSelectionFlags).toHaveBeenCalled();
+        expect($scope.status).toBe('false');
     });
 
     it('checks the validity of the request', function () {
@@ -74,7 +82,7 @@ describe('Edit Status controller', function () {
 
 
     it('submits bulk edit requests', function () {
-        successfulSubmit = true;
+        successfulSubmit = 'true';
         spyOn(optoutsResource, 'save').and.callThrough();
         $scope.submit();
         var expectedArgument = {
@@ -89,7 +97,7 @@ describe('Edit Status controller', function () {
         successfulSubmit = true;
         spyOn(_Notifications, 'add').and.returnValue(true);
         $scope.submit();
-        expect(_Notifications.add).toHaveBeenCalledWith('success', 'EVENTS_UPDATED');
+        expect(_Notifications.add).toHaveBeenCalledWith('success', 'EVENTS_UPDATED_ALL');
     });
 
 
@@ -97,9 +105,8 @@ describe('Edit Status controller', function () {
         successfulSubmit = false;
         spyOn(_Notifications, 'add').and.returnValue(true);
         $scope.submit();
-        expect(_Notifications.add).toHaveBeenCalledWith('error', 'EVENTS_NOT_UPDATED');
+        expect(_Notifications.add).toHaveBeenCalledWith('error', 'EVENTS_NOT_UPDATED_ALL');
     });
-
 
     it('closes the modal window after success', function () {
         spyOn(modal.$scope, 'close');
@@ -113,5 +120,12 @@ describe('Edit Status controller', function () {
         successfulSubmit = false;
         $scope.submit();
         expect(modal.$scope.close).toHaveBeenCalled();
+    });
+
+    it('deselects all table rows after success', function () {
+        spyOn(table, 'deselectAll');
+        successfulSubmit = true;
+        $scope.submit();
+        expect(table.deselectAll).toHaveBeenCalled();
     });
 });

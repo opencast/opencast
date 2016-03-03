@@ -23,10 +23,10 @@ package org.opencastproject.adminui.endpoint;
 
 import static org.junit.Assert.assertThat;
 
-import org.opencastproject.index.service.catalog.adapter.AbstractMetadataCollection;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.MetadataList.Locked;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.util.IoSupport;
 
 import com.entwinemedia.fn.data.json.SimpleSerializer;
@@ -37,14 +37,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.osgi.service.component.ComponentException;
 
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
 import javax.ws.rs.WebApplicationException;
-
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class MetadataListTest {
   private CommonEventCatalogUIAdapter episodeDublinCoreCatalogUIAdapter;
@@ -72,7 +72,7 @@ public class MetadataListTest {
     InputStreamReader reader = new InputStreamReader(stream);
     JSONArray inputJson = (JSONArray) new JSONParser().parse(reader);
 
-    AbstractMetadataCollection abstractMetadataCollection = episodeDublinCoreCatalogUIAdapter.getRawFields();
+    MetadataCollection abstractMetadataCollection = episodeDublinCoreCatalogUIAdapter.getRawFields();
 
     MetadataList metadataList = new MetadataList();
     metadataList.add(episodeDublinCoreCatalogUIAdapter, abstractMetadataCollection);
@@ -89,8 +89,8 @@ public class MetadataListTest {
     metadataList.add(episodeDublinCoreCatalogUIAdapter, episodeDublinCoreCatalogUIAdapter.getRawFields());
     metadataList.setLocked(Locked.WORKFLOW_RUNNING);
 
-    assertThat(inputJson.toJSONString(),
-            SameJSONAs.sameJSONAs(new SimpleSerializer().toJson(metadataList.toJSON())).allowingAnyArrayOrdering());
+    assertThat(inputJson.toJSONString(), SameJSONAs.sameJSONAs(new SimpleSerializer().toJson(metadataList.toJSON()))
+            .allowingAnyArrayOrdering());
   }
 
 }

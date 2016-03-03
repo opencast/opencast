@@ -185,6 +185,27 @@ angular.module('adminNg.services')
             },
 
             /**
+             * Opposite as method toZuluTimeString
+             * @param  {String} date as iso string
+             * @return {object}      Date object with date, hour, minute:
+             *                            { 
+             *                              date: '2014-07-08',
+             *                              hour: '11',
+             *                              minute: '33'
+             *                            }
+             */
+            zuluTimeToDateObject: function (date) {
+                    var hour = date.getHours(),
+                        minute = date.getMinutes();
+
+                    return {
+                        date: $.datepicker.formatDate('yy-mm-dd', date),
+                        minute: minute.length === 1 ? '0' + minute : minute,
+                        hour: hour.length === 1 ? '0' + hour : hour
+                    };
+            },
+
+            /**
              * Splits a string or object with a date member into its year, month and day parts.
              * Months lose 1 to keep it consistent with Javascript date object.
              *

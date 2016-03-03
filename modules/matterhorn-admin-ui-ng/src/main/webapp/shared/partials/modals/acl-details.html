@@ -68,7 +68,7 @@
                                             <td>
                                                 <div class="obj-container padded">
                                                     <p translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.DESCRIPTION"></p>
-                                                    <select chosen
+                                                    <select chosen pre-select-from="acls"
                                                         data-width="'200px'"
                                                         data-disable-search-threshold="8"
                                                         data-search_contains="true"
@@ -97,13 +97,14 @@
                                                 <th translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.ROLE"><!-- Role --></th>
                                                 <th translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.READ" class="fit"><!-- Read --></th>
                                                 <th translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.WRITE" class="fit"><!-- Write --></th>
+                                                <th translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="hasActions"><!--Additional Actions--></th>
                                                 <th translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.ACTION" class="fit"><!-- Action --></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr ng-repeat="policy in policies">
                                                 <td>
-                                                    <select chosen
+                                                    <select chosen pre-select-from="roles"
                                                         ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"
                                                         data-width="'200px'"
                                                         data-disable-search-threshold="8"
@@ -117,11 +118,15 @@
                                                 </td>
                                                 <td class="fit"><input type="checkbox" ng-model="policy.read" ng-change="save(policy)"/></td>
                                                 <td class="fit"><input type="checkbox" ng-model="policy.write" ng-change="save(policy)"/></td>
+                                                <td class="fit editable" ng-if="hasActions">
+                                                    <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')" save="save" admin-ng-editable-multi-select mixed="false" params="policy.actions" collection="actions"></div>
+                                                    <div ng-if="(!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT'))" ng-repeat="customAction in policy.actions.value">{{ customAction }}</div>
+                                                </td>
                                                 <td class="fit" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"><a ng-click="deletePolicy(policy)" class="remove"></a>
                                                 </td>
                                             </tr>
                                             <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')" >
-                                                <td colspan="4"><a ng-click="addPolicy()">+ {{ 'USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
+                                                <td colspan="5"><a ng-click="addPolicy()">+ {{ 'USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
                                             <tr>
                                             </tr>
                                         </tbody>

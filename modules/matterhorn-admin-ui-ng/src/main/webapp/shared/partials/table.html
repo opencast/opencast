@@ -9,7 +9,7 @@
     <thead>
         <tr>
             <th ng-if="table.multiSelect" class="small">
-                <input type="checkbox" ng-change="table.toggleAllSelectionFlags()" ng-model="table.all"/>
+                <input type="checkbox" ng-change="table.allSelectedChanged()" ng-model="table.allSelected"/>
             </th>
 
             <th ng-init="calculateStyles()"
@@ -28,7 +28,7 @@
     </thead>
     <tbody>
         <tr ng-repeat="row in table.rows track by $index" data-row-id="{{ row.id }}" >
-            <td ng-if="table.multiSelect"><input type="checkbox" ng-model="row.selected"></td>
+            <td ng-if="table.multiSelect"><input type="checkbox" ng-model="row.selected" ng-change="table.rowSelectionChanged($index)"></td>
             <td ng-repeat-start="column in table.columns" ng-if="!column.template && !column.translate && !column.deactivated">
                 {{ row[column.name] }}
             </td>

@@ -32,31 +32,24 @@ import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.archive.opencast.OpencastArchive;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.capture.admin.api.Recording;
+import org.opencastproject.capture.admin.api.RecordingState;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
-<<<<<<< HEAD
-import org.opencastproject.pm.api.persistence.ParticipationManagementDatabase;
-=======
-import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
-import org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.ingest.api.IngestService;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
->>>>>>> develop
+import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.rest.NotFoundExceptionMapper;
 import org.opencastproject.rest.RestServiceTestEnv;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
-<<<<<<< HEAD
-=======
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
-import org.opencastproject.series.api.SeriesService;
->>>>>>> develop
 import org.opencastproject.workflow.api.WorkflowService;
+
+import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
+import org.easymock.EasyMock;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -66,12 +59,10 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-<<<<<<< HEAD
-=======
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
 
->>>>>>> develop
+import javax.ws.rs.WebApplicationException;
+
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 // TODO re-ignore tests
@@ -345,17 +336,17 @@ public class AbstractEventEndpointTest {
   public void testGetEventOperation() throws Exception {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventOperation.json"));
 
-    given().pathParam("eventId", "asdasd").pathParam("workflowId", "asdasd").pathParam("operationId", "asdasd")
+    given().pathParam("eventId", "asdasd").pathParam("workflowId", "asdasd").pathParam("operationPosition", "asdasd")
             .expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
-            .get(rt.host("{eventId}/workflows/{workflowId}/operations/{operationId}"));
+            .get(rt.host("{eventId}/workflows/{workflowId}/operations/{operationPosition}"));
 
-    given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).pathParam("operationId", "asdasd").expect()
+    given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).pathParam("operationPosition", "asdasd").expect()
             .statusCode(HttpStatus.SC_BAD_REQUEST).when()
-            .get(rt.host("{eventId}/workflows/{workflowId}/operations/{operationId}"));
+            .get(rt.host("{eventId}/workflows/{workflowId}/operations/{operationPosition}"));
 
-    String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).pathParam("operationId", 5)
+    String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).pathParam("operationPosition", 3)
             .expect().statusCode(HttpStatus.SC_OK).when()
-            .get(rt.host("{eventId}/workflows/{workflowId}/operations/{operationId}")).asString();
+            .get(rt.host("{eventId}/workflows/{workflowId}/operations/{operationPosition}")).asString();
 
     assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
   }
@@ -517,6 +508,35 @@ public class AbstractEventEndpointTest {
     assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
   }
 
+  private Recording createRecording(String id, long checkin, String state) {
+    Recording recording = EasyMock.createMock(Recording.class);
+    EasyMock.expect(recording.getID()).andStubReturn(id);
+    EasyMock.expect(recording.getLastCheckinTime()).andStubReturn(checkin);
+    EasyMock.expect(recording.getState()).andStubReturn(state);
+    EasyMock.replay(recording);
+    return recording;
+  }
+
+  @Test
+  public void testRecordingToJson() throws WebApplicationException, IOException {
+    String id = "rec-id";
+    // 09/17/2015 @ 8:46pm UTC
+    long lastCheckinTime = 1442522772000L;
+    Recording recording = createRecording(id, lastCheckinTime, RecordingState.CAPTURING);
+    String result = RestUtils.getJsonString(AbstractEventEndpoint.recordingToJson.ap(Opt.some(recording)));
+    String expected = "{\"lastCheckInTimeUTC\":\"2015-09-17T20:46:12Z\",\"id\":\"rec-id\",\"state\":\"capturing\",\"lastCheckInTime\":\"1442522772000\"}";
+    assertThat(expected, SameJSONAs.sameJSONAs(result));
+
+    recording = createRecording(null, 0L, null);
+    result = RestUtils.getJsonString(AbstractEventEndpoint.recordingToJson.ap(Opt.some(recording)));
+    expected = "{\"lastCheckInTimeUTC\":\"1970-01-01T00:00:00Z\",\"id\":\"\",\"state\":\"\",\"lastCheckInTime\":\"0\"}";
+    assertThat(expected, SameJSONAs.sameJSONAs(result));
+
+    result = RestUtils.getJsonString(AbstractEventEndpoint.recordingToJson.ap(Opt.<Recording> none()));
+    expected = "{}";
+    assertThat(expected, SameJSONAs.sameJSONAs(result));
+  }
+
   @BeforeClass
   public static void oneTimeSetUp() {
     rt.setUpServer();
@@ -534,12 +554,6 @@ public class AbstractEventEndpointTest {
     private HttpMediaPackageElementProvider httpMediaPackageElementProvider;
     private JobEndpoint jobService;
     private AclService aclService;
-<<<<<<< HEAD
-    private ParticipationManagementDatabase participationManagementDatabase;
-=======
-    private SeriesService seriesService;
-    private DublinCoreCatalogService dublinCoreCatalogService;
->>>>>>> develop
     private EventCommentService eventCommentService;
     private SecurityService securityService;
     private IndexService indexService;
@@ -547,20 +561,7 @@ public class AbstractEventEndpointTest {
     private SchedulerService schedulerService;
     private CaptureAgentStateService captureAgentStateService;
     private AdminUISearchIndex index;
-<<<<<<< HEAD
-=======
     private UrlSigningService urlSigningService;
-    private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<EventCatalogUIAdapter>();
-    private CommonEventCatalogUIAdapter episodeCatalogUIAdapter;
-
-    public Workspace getWorkspace() {
-      return workspace;
-    }
-
-    public void setWorkspace(Workspace workspace) {
-      this.workspace = workspace;
-    }
->>>>>>> develop
 
     public WorkflowService getWorkflowService() {
       return workflowService;
@@ -600,31 +601,6 @@ public class AbstractEventEndpointTest {
 
     public void setAclService(AclService aclService) {
       this.aclService = aclService;
-    }
-
-<<<<<<< HEAD
-    public ParticipationManagementDatabase getPmPersistence() {
-      return participationManagementDatabase;
-    }
-
-    public void setParticipationManagementDatabase(ParticipationManagementDatabase participationManagementDatabase) {
-      this.participationManagementDatabase = participationManagementDatabase;
-=======
-    public SeriesService getSeriesService() {
-      return seriesService;
-    }
-
-    public void setSeriesService(SeriesService seriesService) {
-      this.seriesService = seriesService;
-    }
-
-    public DublinCoreCatalogService getDublinCoreService() {
-      return dublinCoreCatalogService;
-    }
-
-    public void setDublinCoreCatalogService(DublinCoreCatalogService dublinCoreCatalogService) {
-      this.dublinCoreCatalogService = dublinCoreCatalogService;
->>>>>>> develop
     }
 
     public EventCommentService getEventCommentService() {
@@ -691,24 +667,6 @@ public class AbstractEventEndpointTest {
       return adminUIConfiguration;
     }
 
-<<<<<<< HEAD
-=======
-    public EventCatalogUIAdapter getEpisodeCatalogUIAdapter() {
-      return episodeCatalogUIAdapter;
-    }
-
-    public void setEpisodeCatalogUIAdapter(CommonEventCatalogUIAdapter episodeCatalogUIAdapter) {
-      this.episodeCatalogUIAdapter = episodeCatalogUIAdapter;
-    }
-
-    public List<EventCatalogUIAdapter> getCatalogUIAdapters() {
-      return catalogUIAdapters;
-    }
-
-    public void setCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
-      catalogUIAdapters.add(catalogUIAdapter);
-    }
-
     public void setUrlSigningService(UrlSigningService urlSigningService) {
       this.urlSigningService = urlSigningService;
     }
@@ -717,10 +675,5 @@ public class AbstractEventEndpointTest {
       return urlSigningService;
     }
 
-    public void unsetCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
-      catalogUIAdapters.remove(catalogUIAdapter);
-    }
-
->>>>>>> develop
   }
 }

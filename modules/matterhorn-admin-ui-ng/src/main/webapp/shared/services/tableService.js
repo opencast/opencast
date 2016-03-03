@@ -1,6 +1,6 @@
 angular.module('adminNg.services')
-.factory('Table', ['$rootScope', '$filter', 'Storage', '$location', '$timeout',
-    function ($rootScope, $filter, Storage, $location, $timeout) {
+.factory('Table', ['$rootScope', '$filter', 'Storage', '$location', '$interval', 'decorateWithTableRowSelection',
+    function ($rootScope, $filter, Storage, $location, $interval, decorateWithTableRowSelection) {
     var TableService = function () {
         var me = this,
             ASC = 'ASC',
@@ -8,6 +8,7 @@ angular.module('adminNg.services')
             DEFAULT_REFRESH_DELAY = 5000;
 
         this.rows = [];
+        this.allSelected = false;
         this.sorters = [];
         this.loading = true;
 
@@ -33,18 +34,45 @@ angular.module('adminNg.services')
         };
 
         this.refreshColumns = function () {
-            var currentTable, currentPath, localStorageColumnConfig;
-            currentPath = $location.path();
-            currentTable = currentPath.substring(currentPath.lastIndexOf('/') + 1, currentPath.length);
-            localStorageColumnConfig = Storage.get('table_column_visibility', currentTable, currentPath);
-            if (!$.isEmptyObject(localStorageColumnConfig)) {
-                me.columns = localStorageColumnConfig.columns;
-                me.columnsConfiguredFromLocalStorage = true;
-            } else {
-                me.columnsConfiguredFromLocalStorage = false;
-            }
+            var storedColumnConfig = Storage.get('table_column_visibility', this.getTableName());
+            me.columns = this.mergeColumns(storedColumnConfig.columns, me.options.columns);
         };
 
+        this.getTableName = function(){
+            var currentPath = $location.path();
+            return currentPath.substring(currentPath.lastIndexOf('/') + 1, currentPath.length);
+        };
+
+        this.mergeColumns = function(oldConf, newConf){
+            var merged = [];
+
+            // find valid properties in old conf
+            _.each(oldConf, function (item) {
+                var hitsInNewConf = _.filter(newConf, function (ref) {
+                    return ref.name === item.name;
+                });
+
+                if (hitsInNewConf.length > 0) {
+                    // still valid
+                    merged.push(hitsInNewConf[0]);
+                } // else it's obsolete
+            });
+
+            // add missing new properties
+            _.each(newConf, function (item) {
+                var hitsInConf = _.filter(merged, function (ref) {
+                    return ref.name === item.name;
+                });
+
+                if (hitsInConf.length === 0) {
+                    // missing
+                    item.deactivated = false;
+                    merged.push(item);
+                }
+            });
+
+           return merged;
+        };
 
         this.getDirectAccessiblePages = function () {
             var startIndex = me.pagination.offset - me.pagination.directAccessibleNo,
@@ -94,6 +122,7 @@ angular.module('adminNg.services')
         };
 
         this.goToPage = function (page) {
+            me.allSelected = false;
             me.pagination.pages[me.pagination.offset].active = false;
             me.pagination.offset = page;
             me.pagination.pages[me.pagination.offset].active = true;
@@ -144,17 +173,10 @@ angular.module('adminNg.services')
 
         this.configure = function (options) {
             var pagination;
-            me.all = false;
+            me.allSelected = false;
+            me.options = options;
             me.refreshColumns();
 
-            if (!me.columnsConfiguredFromLocalStorage) {
-                // The user has not configured the columns before, hence we will
-                // configure them from scratch
-                me.columns = options.columns;
-                angular.forEach(me.columns, function (column) {
-                    column.deactivated = false;
-                });
-            }
             me.caption = options.caption;
             me.resource = options.resource;
             me.category = options.category;
@@ -296,6 +318,7 @@ angular.module('adminNg.services')
                 }
 
                 me.updatePagination();
+                me.updateAllSelected();
             });
 
             if (me.refreshScheduler.on) {
@@ -310,29 +333,13 @@ angular.module('adminNg.services')
             on: true,
             newSchedule: function () {
                 me.refreshScheduler.cancel();
-                me.refreshScheduler.nextTimeout = $timeout(me.fetch, me.refreshDelay);
+                me.refreshScheduler.nextTimeout = $interval(me.fetch, me.refreshDelay);
             },
             cancel: function () {
                 if (me.refreshScheduler.nextTimeout) {
-                    $timeout.cancel(me.refreshScheduler.nextTimeout);
+                    $interval.cancel(me.refreshScheduler.nextTimeout);
                 }
             }
-        };
-
-        this.toggleAllSelectionFlags = function () {
-            angular.forEach(me.rows, function (row) {
-                row.selected = me.all;
-            });
-        };
-
-        this.getSelected = function () {
-            var result = [];
-            angular.forEach(me.rows, function (row) {
-                if (row.selected) {
-                    result.push(row);
-                }
-            });
-            return result;
         };
 
         // Reload the table if the language is changed
@@ -341,7 +348,7 @@ angular.module('adminNg.services')
                 me.fetch();
             }
         });
-
     };
-    return new TableService();
+    var tableService = new TableService();
+    return decorateWithTableRowSelection(tableService);
 }]);

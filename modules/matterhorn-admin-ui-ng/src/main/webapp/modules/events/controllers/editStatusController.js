@@ -23,23 +23,21 @@
 // Controller for all event screens.
 angular.module('adminNg.controllers')
 .controller('EditStatusCtrl', ['$scope', 'Modal', 'Table', 'OptoutsResource', 'Notifications',
-        function ($scope, Modal, Table, OptoutsResource, Notifications) {
-    var getSelectedIds = function () {
-        var result = [];
-        angular.forEach(Table.getSelected(), function (selected) {
-            result.push(selected.id);
-        });
-        return result;
-    };
+    'decorateWithTableRowSelection',
+    function ($scope, Modal, Table, OptoutsResource, Notifications, decorateWithTableRowSelection) {
 
-    $scope.rows = Table.getSelected();
-    $scope.all = true; // by default, all records are selected
+    $scope.rows = Table.copySelected();
+    $scope.allSelected = true; // by default, all records are selected
+
     $scope.changeStatus = function (newStatus) {
         $scope.status = newStatus;
+        if (angular.isDefined($scope.status)) {
+            $scope.status += '';            
+        }
     };
 
     $scope.valid = function () {
-        return Table.getSelected().length > 0 && angular.isDefined($scope.status);
+        return $scope.TableForm.$valid && angular.isDefined($scope.status);
     };
 
     $scope.submit = function () {
@@ -47,21 +45,51 @@ angular.module('adminNg.controllers')
         if ($scope.valid()) {
             OptoutsResource.save({
                 resource: resource,
-                eventIds: getSelectedIds(),
-                optout: $scope.status
-            }, function () {
-                Notifications.add('success', 'EVENTS_UPDATED');
+                eventIds: $scope.getSelectedIds(),
+                optout: $scope.status === 'true'
+            }, function (data) {
+                var nbErrors = data.error ? data.error.length : 0,
+                    nbOK = data.ok ? data.ok.length : 0,
+                    nbNotFound = data.notFound ? data.notFound.length : 0,
+                    nbBadRequest = data.badRequest ? data.badRequest.length : 0,
+                    sourceNotification = resource === 'series' ? 'SERIES' : 'EVENTS'; 
+                Table.deselectAll();
                 Modal.$scope.close();
+                if (nbErrors === 0 && nbBadRequest === 0 && nbNotFound === 0) {
+                    Notifications.add('success', sourceNotification + '_UPDATED_ALL');
+                } else {
+                    if (nbOK > 0) {
+                        Notifications.addWithParams('success', sourceNotification + '_UPDATED_NB', {number : nbOK});
+                    }
+
+                    var errors = [];
+
+                    if (data.error) {
+                        errors = errors.concat(data.err);
+                    }
+
+                    if (data.notFound) {
+                        errors = errors.concat(data.notFound);
+                    }                    
+
+                    if (data.badRequest) {
+                        errors = errors.concat(data.badRequest);
+                    }                    
+
+                    if (data.forbidden) {
+                        errors = errors.concat(data.forbidden);
+                    }                 
+
+                    angular.forEach(errors, function (error) {
+                        Notifications.addWithParams('error', sourceNotification + '_NOT_UPDATED_ID', {id: error});
+                    });
+
+                }
             }, function () {
-                Notifications.add('error', 'EVENTS_NOT_UPDATED');
                 Modal.$scope.close();
+                Notifications.add('error', 'EVENTS_NOT_UPDATED_ALL');
             });
         }
     };
-
-    $scope.toggleSelectAll = function () {
-        Table.all = !Table.all;
-        Table.toggleAllSelectionFlags();
-    };
-
+    decorateWithTableRowSelection($scope);
 }]);

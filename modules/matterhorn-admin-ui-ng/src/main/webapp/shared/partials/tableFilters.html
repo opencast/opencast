@@ -23,15 +23,9 @@
                     <select ng-model="filter.value"
                         ng-change="selectFilterSelectValue(selectedFilter, filter)">
                         <option></option>
-<<<<<<< HEAD
-                        <option ng-repeat="(label, value) in filters.filters[selectedFilter].options"
-                            value="{{ value }}">
-                            {{ label | translate }}
-=======
                         <option ng-repeat="(value, label) in filters.filters[selectedFilter].options"
                             value="{{ value | limitAppend : 70 }}">
                             {{ label | translate | limitAppend : 70 }}
->>>>>>> develop
                         </option>
                     </select>
                 </div>
@@ -48,11 +42,7 @@
                 class="ng-multi-value" ng-show="filter.value">
                 <span ng-switch on="filter.type">
                     <span ng-switch-when="select">
-<<<<<<< HEAD
-                        {{ filter.label | translate }}: {{ getOptionLabel(filter) | translate }}
-=======
                         {{ filter.label | translate | limitAppend : 70 }}: {{ filter.options[filter.value] | translate | limitAppend : 70 }}
->>>>>>> develop
                     </span>
                     <span ng-switch-when="period">
                         {{ filter.label | translate }}: {{ formatDateRange('short', filter.value) }}

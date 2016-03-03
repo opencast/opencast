@@ -23,6 +23,7 @@ angular.module('adminNg.resources')
                 row.id = r.id;
                 row.title = r.title;
                 row.presenter = r.presenters.join(', ');
+                row.technical_presenter = r.technical_presenters.join(', ');
                 if (angular.isDefined(r.series)) {
                     row.series_name = r.series.title;
                 }
@@ -37,13 +38,17 @@ angular.module('adminNg.resources')
                 });
                 row.workflow_state = r.workflow_state;
                 row.date = Language.formatDate('short', r.start_date);
+                row.technical_date = Language.formatDate('short', r.technical_start);
                 row.publications = r.publications;
                 row.start_date = Language.formatTime('short', r.start_date);
+                row.technical_start = Language.formatTime('short', r.technical_start);
                 row.end_date = Language.formatTime('short', r.end_date);
+                row.technical_end = Language.formatTime('short', r.technical_end);
                 row.has_comments = r.has_comments;
                 row.has_open_comments = r.has_open_comments;
                 row.has_preview = r.has_preview;
                 row.location = r.location;
+                row.agent_id = r.agent_id;
                 row.managed_acl = r.managedAcl;
                 return row;
             });

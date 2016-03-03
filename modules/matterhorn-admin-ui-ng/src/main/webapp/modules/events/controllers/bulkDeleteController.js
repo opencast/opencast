@@ -22,20 +22,65 @@
 
 // Controller for all event screens.
 angular.module('adminNg.controllers')
-.controller('BulkDeleteCtrl', ['$scope', 'Modal', 'Table', 'Notifications', 'BulkDeleteResource',
-        function ($scope, Modal, Table, Notifications, BulkDeleteResource) {
-    Notifications;
-    // make a shallow copy of selected main Table rows for our own use
-    $scope.rows = [];
-    angular.forEach(Table.getSelected(), function (row) {
-        $scope.rows.push($.extend({}, row ));
-    });
-    $scope.all = true; // by default, all records are selected
+.controller('BulkDeleteCtrl', ['$scope', 'Modal', 'FormNavigatorService', 'Table', 'Notifications',
+    'BulkDeleteResource', 'NewEventProcessing', 'TaskResource', 'decorateWithTableRowSelection',
+        function ($scope, Modal, FormNavigatorService, Table, Notifications, BulkDeleteResource, NewEventProcessing,
+                  TaskResource, decorateWithTableRowSelection) {
 
-    var getSelectedIds = function () {
+    var hasPublishedElements = function (currentEvent) {
+        var publicationCount = 0;
+        angular.forEach(currentEvent.publications, function() {
+            publicationCount++;
+        });
+
+        if (publicationCount > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    },
+    tableByPublicationStatus = function(isPublished) {
+        var result = {
+            allSelected: true,
+            rows: (function () {
+                var result = [];
+                angular.forEach($scope.rows, function (row){
+                    if (hasPublishedElements(row) === isPublished && row.selected) {
+                        result.push(row);
+                    }
+                });
+                return result;
+            })()
+        };
+        decorateWithTableRowSelection(result);
+        return result;
+    },
+    getSelected = function (rows) {
+        var result = [];
+        angular.forEach(rows, function(row) {
+            if (row.selected) {
+                result.push(row);
+            }
+        });
+        return result;
+    },
+    countSelected = function (rows) {
+        return getSelected(rows).length;
+    };
+    $scope.rows = Table.copySelected();
+    $scope.allSelected = true; // by default, all records are selected
+    $scope.currentForm = 'deleteForm'; // By default start on the delete form
+    $scope.processing = NewEventProcessing.get('delete-event');
+    $scope.published = tableByPublicationStatus(true);
+    $scope.unpublished = tableByPublicationStatus(false);
+    $scope.navigateTo = function (targetForm, currentForm, requiredForms) {
+        $scope.currentForm = FormNavigatorService.navigateTo(targetForm, currentForm, requiredForms);
+    };
+
+    var getSelectedSeriesIds = function () {
         var result = [];
         angular.forEach($scope.rows, function (row) {
-            if(row.selected) {
+            if (row.selected) {
                 result.push(row.id);
             }
         });
@@ -43,38 +88,102 @@ angular.module('adminNg.controllers')
     };
 
     $scope.valid = function () {
-        return getSelectedIds().length > 0;
+        var selectedCount;
+        if (Table.resource.indexOf('series') >= 0) {
+            selectedCount = 0;
+            angular.forEach($scope.rows, function (row) {
+                if (row.selected) {
+                    selectedCount++;
+                }
+            });
+            return selectedCount > 0;
+        } else {
+            selectedCount = countSelected($scope.unpublished.rows) + countSelected($scope.published.rows);
+            if (countSelected($scope.published.rows) > 0) {
+                return angular.isDefined($scope.processing.ud.workflow.id) && selectedCount > 0;
+            } else {
+                return selectedCount > 0;
+            }
+        }
     };
 
     $scope.submit = function () {
         if ($scope.valid()) {
-            var selecteds = getSelectedIds(),
+            var deleteIds = [],
             resource = Table.resource.indexOf('series') >= 0 ? 'series' : 'event',
             endpoint = Table.resource.indexOf('series') >= 0 ? 'deleteSeries' : 'deleteEvents';
-            BulkDeleteResource.delete({}, {
-                resource: resource,
-                endpoint: endpoint,
-                eventIds: selecteds
-            }, function () {
-                Notifications.add('success', 'EVENTS_DELETED');
-                Modal.$scope.close();
-            }, function () {
-                Notifications.add('error', 'EVENTS_NOT_DELETED');
-                Modal.$scope.close();
-            });
+
+            if (Table.resource.indexOf('series') >= 0) {
+                deleteIds = getSelectedSeriesIds();
+            } else {
+                angular.forEach(getSelected($scope.unpublished.rows), function (row) {
+                    deleteIds.push(row.id);
+                });
+            }
+            if (deleteIds.length > 0) {
+                BulkDeleteResource.delete({}, {
+                    resource: resource,
+                    endpoint: endpoint,
+                    eventIds: deleteIds
+                }, function () {
+                    Table.deselectAll();
+                    Notifications.add('success', 'EVENTS_DELETED');
+                    Modal.$scope.close();
+                }, function () {
+                    Notifications.add('error', 'EVENTS_NOT_DELETED');
+                    Modal.$scope.close();
+                });
+            }
+            if (Table.resource.indexOf('series') < 0 && countSelected($scope.published.rows) > 0) {
+                var retractEventIds = [], payload;
+                angular.forEach($scope.getPublishedEvents(), function (row) {
+                    retractEventIds.push(row.id);
+                });
+                if (retractEventIds.length > 0) {
+                    payload = {
+                        workflows: $scope.processing.ud.workflow.id,
+                        configuration: $scope.processing.ud.workflow.selection.configuration,
+                        eventIds: retractEventIds
+                    };
+                    TaskResource.save(payload, $scope.onSuccess, $scope.onFailure);
+                }
+            }
         }
     };
 
-    $scope.toggleSelectAll = function () {
-        if ($scope.all) {
-            angular.forEach($scope.rows, function (row) {
-                row.selected = true;
-            });
-        } else {
-            angular.forEach($scope.rows, function (row) {
-                row.selected = false;
-            });
-        }
+    $scope.onSuccess = function () {
+        $scope.close();
+        Notifications.add('success', 'TASK_CREATED');
     };
 
+    $scope.onFailure = function () {
+        $scope.close();
+        Notifications.add('error', 'TASK_NOT_CREATED', 'global', -1);
+    };
+
+    $scope.getPublishedEvents = function () {
+        return getSelected($scope.published.rows);
+    };
+
+    $scope.getUnpublishedEvents = function () {
+        return getSelected($scope.unpublished.rows);
+    };
+
+    $scope.toggleAllUnpublishedEvents = function () {
+        angular.forEach($scope.rows, function (row) {
+            if (!$scope.hasPublishedElements(row)) {
+                row.selected = $scope.events.unpublished.selected;
+            }
+        });
+    };
+
+    if (Table.resource.indexOf('series') < 0) {
+        $scope.events = {};
+        $scope.events.published = {};
+        $scope.events.published.has = $scope.published.rows.length > 0;
+        $scope.events.published.selected = true;
+        $scope.events.unpublished = {};
+        $scope.events.unpublished.has = $scope.unpublished.rows.length > 0;
+        $scope.events.unpublished.selected = true;
+    }
 }]);

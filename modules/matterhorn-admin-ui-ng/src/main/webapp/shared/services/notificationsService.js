@@ -42,7 +42,11 @@ angular.module('adminNg.services')
             }
         };
 
-        scope.add = function (type, key, context, duration) {
+        scope.addWithParams = function (type, key, messageParams, context, duration) {
+            scope.add(type, key, context, duration, messageParams);
+        };
+
+        scope.add = function (type, key, context, duration, messageParams) {
             if (angular.isUndefined(duration)) {
                 switch (type) {
                     case 'error':
@@ -59,6 +63,10 @@ angular.module('adminNg.services')
                 context = 'global';
             }
 
+            if (!messageParams) {
+                messageParams = {};
+            }
+
             initContext(context);
 
             if(keyList[context].indexOf(key) < 0) {
@@ -68,11 +76,12 @@ angular.module('adminNg.services')
                 keyList[context].push(key);
 
                 notifications[context][++uniqueId] = {
-                    type: type,
-                    key: key,
-                    message: 'NOTIFICATIONS.' + key,
-                    duration: duration,
-                    id: uniqueId
+                    type       : type,
+                    key        : key,
+                    message    : 'NOTIFICATIONS.' + key,
+                    parameters : messageParams,
+                    duration   : duration,
+                    id         : uniqueId
                 };
 
                 scope.$emit('added', context);

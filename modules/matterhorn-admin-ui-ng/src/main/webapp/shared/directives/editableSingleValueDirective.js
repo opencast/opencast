@@ -108,12 +108,14 @@ angular.module('adminNg.directives')
                 scope.presentableValue = present(scope.params);
                 scope.editMode = false;
 
-                scope.save(scope.params.id, function () {
-                    scope.original = scope.params.value;
-                    if (scope.params.type === 'time') {
-                        parseTime(scope.params.value);
-                    }
-                });
+                if (!_.isUndefined(scope.params)) {
+                    scope.save(scope.params.id, function () {
+                        scope.original = scope.params.value;
+                        if (scope.params.type === 'time') {
+                            parseTime(scope.params.value);
+                        }
+                    });
+                }
             };
 
             scope.$on('$destroy', function () {

@@ -37,6 +37,35 @@ public final class ParticipationUtils {
 
   private ParticipationUtils() {
   }
+
+//  /**
+//   * Return the list of recordings by the given event identifiers.
+//   *
+//   * @param schedulerService
+//   *          the scheduler service
+//   * @param participationDatabase
+//   *          the participation database
+//   * @param eventIds
+//   *          the event identifiers
+//   * @return the list of recordings
+//   */
+//  public static List<Recording> getRecordingsByEventId(SchedulerService schedulerService,
+//          ParticipationManagementDatabase participationDatabase, List<String> eventIds) {
+//    List<Recording> recordings = new ArrayList<Recording>();
+//    for (String eventId : eventIds) {
+//      try {
+//        recordings.add(participationDatabase.getRecordingByEvent(eventId));
+//      } catch (ParticipationManagementDatabaseException e) {
+//        logger.error("Unable to get recordings by event {}: {}", eventId, ExceptionUtils.getStackTrace(e));
+//        throw new WebApplicationException(e);
+//      } catch (NotFoundException e) {
+//        logger.info("Didn't find any recorings for event {}", eventId);
+//        continue;
+//      }
+//    }
+//    return recordings;
+//  }
+
   /**
    * @param input
    *          The input text from the endpoint.

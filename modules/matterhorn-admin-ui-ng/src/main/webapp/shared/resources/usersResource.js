@@ -1,5 +1,5 @@
 angular.module('adminNg.resources')
-.factory('UsersResource', ['$resource', function ($resource) {
+.factory('UsersResource', ['$resource', 'Language', function ($resource, Language) {
     return $resource('/admin-ng/users/:target', {}, {
         query: {
             method: 'GET',
@@ -18,7 +18,10 @@ angular.module('adminNg.resources')
                     row.roles = r.roles.join(', ');
                     row.provider = r.provider;
                     row.email = r.email;
-
+                    if (!angular.isUndefined(r.blacklist)) {
+                        row.blacklist_from = Language.formatDateTime('short', r.blacklist.start);
+                        row.blacklist_to   = Language.formatDateTime('short', r.blacklist.end);
+                    }
                     return row;
                 };
 

@@ -23,7 +23,9 @@
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
 .controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource', 'SeriesThemeResource', 'ResourcesListResource', 'Notifications',
-        function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, ResourcesListResource, Notifications) {
+        'OptoutSingleResource', 'SeriesParticipationResource',
+        function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, ResourcesListResource, Notifications, 
+            OptoutSingleResource, SeriesParticipationResource) {
 
     var saveFns = {}, aclNotification,
         me = this,
@@ -33,7 +35,11 @@ angular.module('adminNg.controllers')
             return {
                 role  : role,
                 read  : false,
-                write : false
+                write : false,
+                actions : {
+                    name : 'series-acl-actions',
+                    value : []
+                }
             };
         },
         changePolicies = function (access, loading) {
@@ -44,7 +50,11 @@ angular.module('adminNg.controllers')
                 if (angular.isUndefined(policy)) {
                     newPolicies[acl.role] = createPolicy(acl.role);
                 }
-                newPolicies[acl.role][acl.action] = acl.allow;
+                if (acl.action === 'read' || acl.action === 'write') {
+                    newPolicies[acl.role][acl.action] = acl.allow;
+                } else if (acl.allow === true || acl.allow === 'true'){
+                    newPolicies[acl.role].actions.value.push(acl.action);
+                }
             });
 
             $scope.policies = [];
@@ -90,6 +100,19 @@ angular.module('adminNg.controllers')
         $scope.accessSave();
     };
 
+    $scope.updateOptout = function (newBoolean) {
+
+        OptoutSingleResource.save({
+            resource: 'series',
+            id: $scope.resourceId,
+            optout: newBoolean
+        }, function () {
+            Notifications.add('success', 'SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS', 'series-participation');
+        }, function () {
+            Notifications.add('error', 'SERIES_PARTICIPATION_STATUS_UPDATE_ERROR', 'series-participation');
+        });
+    };
+
 
     fetchChildResources = function (id) {
         $scope.metadata = SeriesMetadataResource.get({ id: id }, function (metadata) {
@@ -132,7 +155,18 @@ angular.module('adminNg.controllers')
 
         });
 
+        $scope.participation = SeriesParticipationResource.get({ id: id });
         $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
+        $scope.actions = {};
+        $scope.hasActions = false;
+        ResourcesListResource.get({ resource: 'ACL.ACTIONS'}, function(data) {
+            angular.forEach(data, function (value, key) {
+                if (key.charAt(0) !== '$') {
+                    $scope.actions[key] = value;
+                    $scope.hasActions = true;
+                }
+            });
+        });
         $scope.roles = ResourcesListResource.get({ resource: 'ROLES' });
 
         $scope.theme = {};
@@ -219,7 +253,7 @@ angular.module('adminNg.controllers')
                     hasRights = true;
                 }
 
-                if ((policy.read || policy.write) && !angular.isUndefined(policy.role)) {
+                if ((policy.read || policy.write || policy.actions.value.length > 0) && !angular.isUndefined(policy.role)) {
                     rulesValid = true;
 
                     if (policy.read) {
@@ -237,28 +271,25 @@ angular.module('adminNg.controllers')
                             'role'   : policy.role
                         });
                     }
+
+                    angular.forEach(policy.actions.value, function(customAction){
+                           ace.push({
+                                'action' : customAction,
+                                'allow'  : true,
+                                'role'   : policy.role
+                           });
+                    });
                 }
             });
-<<<<<<< HEAD
 
             me.unvalidRule = !rulesValid;
             me.hasRights = hasRights;
 
-=======
-
-            me.unvalidRule = !rulesValid;
-            me.hasRights = hasRights;
-
->>>>>>> develop
             if (me.unvalidRule) {
                 if (!angular.isUndefined(me.notificationRules)) {
                     Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);
                 }
-<<<<<<< HEAD
-                me.notificationRules = Notifications.add('warning', 'INVALID_ACL_RULES', NOTIFICATION_CONTEXT);
-=======
                 me.notificationRules = Notifications.add('warning', 'INVALID_ACL_RULES', NOTIFICATION_CONTEXT);  
->>>>>>> develop
             } else if (!angular.isUndefined(me.notificationRules)) {
                 Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);
                 me.notificationRules = undefined;
@@ -268,11 +299,7 @@ angular.module('adminNg.controllers')
                 if (!angular.isUndefined(me.notificationRights)) {
                     Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
                 }
-<<<<<<< HEAD
-                me.notificationRights = Notifications.add('warning', 'MISSING_ACL_RULES', NOTIFICATION_CONTEXT);
-=======
                 me.notificationRights = Notifications.add('warning', 'MISSING_ACL_RULES', NOTIFICATION_CONTEXT);  
->>>>>>> develop
             } else if (!angular.isUndefined(me.notificationRights)) {
                 Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
                 me.notificationRights = undefined;
@@ -284,15 +311,9 @@ angular.module('adminNg.controllers')
                         ace: ace
                     },
                     override: true
-<<<<<<< HEAD
-                });
-
-                Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 1200);
-=======
                 });  
 
                 Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 1200);              
->>>>>>> develop
             }
     };
 

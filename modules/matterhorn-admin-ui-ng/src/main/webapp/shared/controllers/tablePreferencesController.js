@@ -22,8 +22,8 @@
 
 // A controller for global page navigation
 angular.module('adminNg.controllers')
-.controller('TablePreferencesCtrl', ['$scope', '$timeout', 'Table', 'Modal', 'Storage', '$translate',
-    function ($scope, $timeout, Table, Modal, Storage, $translate) {
+.controller('TablePreferencesCtrl', ['$scope', 'Table', 'Modal', 'Storage', '$translate',
+    function ($scope, Table, Modal, Storage, $translate) {
         var filteredColumns, cloneColumns;
 
         cloneColumns = function () {

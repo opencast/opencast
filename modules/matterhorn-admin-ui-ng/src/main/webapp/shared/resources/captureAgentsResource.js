@@ -10,7 +10,7 @@ angular.module('adminNg.resources')
                 row.id = r.Name;
                 row.status = r.Status;
                 row.name = r.Name;
-                row.updated = Language.formatTime('short', r.Update);
+                row.updated = Language.formatDateTime('short', r.Update);
                 row.inputs = r.inputs;
                 row.roomId = r.roomId;
                 row.blacklist_from = Language.formatDateTime('short', r.blacklist.start);

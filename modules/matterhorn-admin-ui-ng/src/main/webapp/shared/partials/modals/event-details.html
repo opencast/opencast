@@ -11,6 +11,7 @@
         <a ng-if="metadata.entries.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.EXTENDED-METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT">Ext-Metadata</a>
 <!--         <a ng-click="openTab('media')" data-modal-tab="media" ng-class="{ active: tab == 'media' }" translate="EVENTS.EVENTS.DETAILS.TABS.MEDIA" with-role="ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW">Media</a> -->
         <a ng-click="openTab('assets')" data-modal-tab="assets" ng-class="{ active: tab == 'assets' }" translate="EVENTS.EVENTS.DETAILS.TABS.ASSETS" with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW">Assets</a>
+<!--        <a ng-click="openTab('scheduling')" data-modal-tab="scheduling" ng-class="{ active: tab == 'scheduling' }" translate="EVENTS.EVENTS.DETAILS.TABS.SCHEDULING" with-role="ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW">Scheduling</a> -->
         <a ng-click="openTab('workflows')" data-modal-tab="workflows" ng-class="{ active: tab == 'workflows' }" translate="EVENTS.EVENTS.DETAILS.TABS.WORKFLOWS" with-role="ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW">Workflows</a>
         <a ng-click="openTab('access')" data-modal-tab="access" ng-class="{ active: tab == 'access' }" translate="EVENTS.EVENTS.DETAILS.TABS.ACCESS" with-role="ROLE_UI_EVENTS_DETAILS_ACL_VIEW">Access</a>
         <a ng-click="openTab('comments')" data-modal-tab="comments" ng-class="{ active: tab == 'comments' }" translate="EVENTS.EVENTS.DETAILS.TABS.COMMENTS" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW">Comments</a>
@@ -23,6 +24,7 @@
 
     <div class="modal-content" data-modal-tab-content="general">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
                 <div class="obj list-obj">
                     <header translate="EVENTS.EVENTS.DETAILS.GENERAL.PUBLICATION_STATUS">Publication Status</header>
@@ -32,8 +34,8 @@
                         <ul ng-repeat="publication in general.publications track by $index">
 
                             <li>
-                                <div class="icon-container"><i class="video-icon"></i></div>
-                                <span translate="{{ publication.name }}">{{ publication.name }}</span>
+                            <div class="icon-container"><i custom-icon="{{ publication.icon }}" class="video-icon"></i></div>
+                                <span translate="{{ publication.label }}">{{ publication.label }}</span>
                                 <a href="{{ publication.url }}" class="play"></a>
                             </li>
                         </ul>
@@ -45,6 +47,7 @@
 
     <div class="modal-content" data-modal-tab-content="metadata">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div data-admin-ng-notification="" data-type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
             <div class="full-col">
                 <div class="obj tbl-details">
@@ -67,6 +70,7 @@
 
     <div class="modal-content" data-modal-tab-content="extended-metadata" ng-if="metadata.entries.length > 0">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
             <div class="full-col">
                 <div class="obj tbl-details" ng-repeat="catalog in metadata.entries">
@@ -88,6 +92,7 @@
 
     <div class="modal-content" data-modal-tab-content="assets">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CAPTION">Assets</header>
@@ -129,34 +134,239 @@
         </div>
     </div>
 
-    <div class="modal-content" data-modal-tab-content="workflows">
+    <div class="modal-content" data-modal-tab-content="scheduling">
         <div class="modal-body">
+            <div data-admin-ng-notifications="" context="event-scheduling"></div>
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
-                <div class="obj tbl-container">
-                    <header>Workflow Instances</header>
+
+                <!-- Scheduling configuration -->
+                <div class="obj tbl-details" ng-if="scheduling.hasProperties">
+                    <header><span tranlsate="EVENTS.EVENTS.DETAILS.HEADER">Scheduling configuration</span></header>
+                  
                     <div class="obj-container">
                         <table class="main-tbl">
-                            <thead>
-                                <tr>
-                                    <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ID">ID</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TYPE">Type</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STATE">State</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTED">Submitted</th>
-                                    <th class="medium"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="item in workflows.entries|orderBy:'submitted':true track by $index">
-                                    <td>{{ item.id }}</td>
-                                    <td>{{ item.workflow }}</td>
-                                    <td>{{ item.status }}</td>
-                                    <td>{{ item.submitted | localizeDate : 'dateTime' : 'medium' }}</td>
-                                    <td><a class="details-link" ng-click="openSubTab('workflow-details', 'EventWorkflowDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">Details</a></td>
-                                </tr>
-                            </tbody>
+                            <tr>
+                                <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.TIMEZONE' | translate }}</td>
+                                <td>{{ tz }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_DATE' | translate }}</td>
+                                <td>
+                                    <input datepicker
+                                        type="text"
+                                        ng-disabled="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')"
+                                        placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.START_DATE' | translate }}"
+                                        ng-model="source.start.date"
+                                        ng-change="saveScheduling()" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_TIME' | translate }}</td>
+                                <td ng-if="!checkingConflicts && $root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                    <select chosen
+                                        data-width="'100px'"
+                                        data-disable-search-threshold="8"
+                                        ng-model="source.start.hour" ng-change="saveScheduling()"
+                                        data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                        ng-options="h.index as h.value for h in hours"
+                                    />
+                                    <select chosen
+                                        data-width="'100px'"
+                                        data-disable-search-threshold="8"
+                                        ng-model="source.start.minute" ng-change="saveScheduling()"
+                                        data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                        ng-options="m.index as m.value for m in minutes"
+                                    />
+                                </td>
+                                <td ng-if="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                    {{ source.start.hour | addLeadingZeros : 2 }} : {{ source.start.minute | addLeadingZeros : 2}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.DURATION' | translate }}</td>
+                                <td ng-if="!checkingConflicts && $root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                    <select chosen
+                                        data-width="'100px'"
+                                        data-disable-search-threshold="8"
+                                        ng-model="source.duration.hour" ng-change="saveScheduling()"
+                                        data-placeholder="{{ 'WIZARD.DURATION.HOURS' | translate }}"
+                                        ng-options="h.index as h.value for h in hours"
+                                    />
+
+                                    <select chosen
+                                        data-width="'100px'"
+                                        data-disable-search-threshold="8"
+                                        ng-model="source.duration.minute" ng-change="saveScheduling()"
+                                        data-placeholder="{{ 'WIZARD.DURATION.MINUTES' | translate }}"
+                                        ng-options="m.index as m.value for m in minutes"
+                                    />
+                                </td>
+                                <td ng-if="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                    {{ source.duration.hour | addLeadingZeros : 2 }} : {{ source.duration.minute | addLeadingZeros : 2}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{{ 'EVENTS.EVENTS.DETAILS.SCHEDULING.PLACEHOLDER.PRESENTERS' | translate }}</td>
+                                <td>{{ source.presenters }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}</td>
+                                <td ng-if="!checkingConflicts && $root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                <select chosen pre-select-from="captureAgents"
+                                    data-width="'200px'"
+                                    ng-change="roomChanged(); saveScheduling()"
+                                    data-disable-search-threshold="8"
+                                    ng-model="source.device"
+                                    ng-options="value.name for (id, value) in captureAgents"
+                                    data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}"
+                                />
+                                </td>
+                                <td ng-if="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                    {{ source.device.name }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.INPUTS' | translate }}</td>
+                                <td>
+                                    <label ng-repeat="inputMethod in source.device.inputs">
+                                        <input type="checkbox" 
+                                            ng-change="saveScheduling()"
+                                            ng-model="source.device.inputMethods[inputMethod.id]"
+                                            ng-disabled="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')"> {{ inputMethod.value | translate }}
+                                        <br>
+                                    </label>
+                                </td>
+                            </tr>
                         </table>
                     </div>
+
                 </div>
+
+                <!-- Participation status -->
+                <div class="obj">   
+                    <header  translate="EVENTS.EVENTS.DETAILS.SCHEDULING.CAPTION">Participation Status</header>
+
+                    <div class="obj-container padded">
+                        <p><span translate="EVENTS.EVENTS.DETAILS.SCHEDULING.REVIEW_STATUS.CAPTION">Review status</span>: {{ participation.review_status }}</p>
+                        
+                        <div class="form-container">
+                            <div class="row">
+                                <input type="radio" name="execute-toggle" id="executeNow-toggle" ng-disabled="participation.read_only || transactions.read_only" ng-model="participation.opt_out" ng-change="updateOptout(false)" value="false" >
+                                <label translate="EVENTS.EVENTS.DETAILS.SCHEDULING.OPTEDOUT.READY" for="executeNow-toggle">Ready for recording</label>
+                            </div>
+                            <div class="row">
+                                <input type="radio" name="execute-toggle" id="executeLater-toggle" ng-disabled="participation.read_only || transactions.read_only" ng-model="participation.opt_out" ng-change="updateOptout(true)" value="true" >
+                                <label translate="EVENTS.EVENTS.DETAILS.SCHEDULING.OPTEDOUT.OPTEDOUT" for="executeLater-toggle">Opted out</label>
+                            </div>
+                        </div>
+                    </div>  
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-content" data-modal-tab-content="workflows">
+        <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div class="full-col">
+                <ul>
+                    <li>
+                        <div class="obj tbl-container" ng-if="!workflows.scheduling">
+                            <header>Workflow Instances</header>
+                            <div class="obj-container">
+                                <table class="main-tbl">
+                                    <thead>
+                                        <tr>
+                                            <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ID">ID</th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TYPE">Type</th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STATE">State</th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTED">Submitted</th>
+                                            <th class="medium"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in workflows.entries|orderBy:'submitted':true track by $index">
+                                            <td>{{ item.id }}</td>
+                                            <td>{{ item.workflow }}</td>
+                                            <td>{{ item.status }}</td>
+                                            <td>{{ item.submitted | localizeDate : 'dateTime' : 'medium' }}</td>
+                                            <td><a class="details-link" ng-click="openSubTab('workflow-details', 'EventWorkflowDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">Details</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="obj list-obj" ng-if="workflows.scheduling">
+                            <header>Workflow configuration</header>
+                            <div class="obj-container">
+                                <div class="obj list-obj quick-actions">
+
+                                    <table class="main-tbl">
+                                        <thead>
+                                            <tr>
+                                                <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.WORKFLOW"><!--Select Workflow--></th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <div class="obj-container padded">
+                                                        <select chosen pre-select-from="workflowDefinitions"
+                                                            data-width="'100%'"
+                                                            ng-model="workflow.id"
+                                                            ng-change="changeWorkflow(false)"
+                                                            data-disable-search-threshold="8"
+                                                            data-search_contains="true"
+                                                            ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')"
+                                                            ng-options="w.id as w.title for w in workflowDefinitions"
+                                                            data-placeholder="{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW' | translate }}"
+                                                            no-results-text="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW_EMPTY' | translate }}'"
+                                                        />
+                                                        <div class="obj-container padded">{{ workflows.workflow.description }}</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>                            
+                                </div>
+
+                                <div class="obj list-obj quick-actions">
+
+                                    <table class="main-tbl">
+                                        <thead>
+                                            <tr>
+                                                <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.CONFIGURATION"><!--Select Configuration--></th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <div class="obj-container padded">
+                                                        <div id="event-workflow-configuration"
+                                                             class="checkbox-container"
+                                                             ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')"
+                                                             ng-bind-html="workflowConfiguration"
+                                                             class="obj-container">
+                                                        </div>
+                                                        <div ng-if="!workflowConfiguration" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.NO_CONFIGURATION"><!-- No config --></div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -164,7 +374,7 @@
     <div class="modal-content" data-modal-tab-content="access">
         <p class="tab-desc"></p>
         <div class="modal-body">
-
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div data-admin-ng-notification="" type="warning" show="access.episode_access.locked" message="{{ metadata.locked }}"></div>
             <div data-admin-ng-notifications="" type="error" context="event-acl"></div>
             <div data-admin-ng-notifications="" context="events-access"></div>
@@ -187,17 +397,20 @@
                                             <td>
                                                 <div class="obj-container padded">
                                                     <p translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.DESCRIPTION"></p>
-                                                    <select chosen
-                                                        ng-disabled="(tab == 'access') && !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"
-                                                        data-width="'200px'"
-                                                        data-disable-search-threshold="8"
-                                                        data-search_contains="true"
-                                                        ng-change="changeBaseAcl()"
-                                                        ng-model="baseAclId"
-                                                        ng-options="id as name for (id, name) in acls"
-                                                        data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
-                                                        no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
-                                                    />
+                                                    <div ng-show="!transactions.read_only">
+                                                        <select chosen pre-select-from="acls"
+                                                            data-width="'200px'"
+                                                            data-disable-search-threshold="8"
+                                                            data-search_contains="true"
+                                                            ng-disabled="((tab == 'access') && !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT'))"
+                                                            ng-change="changeBaseAcl()"
+                                                            ng-model="baseAclId"
+                                                            ng-options="id as name for (id, name) in acls"
+                                                            data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
+                                                            no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
+                                                        />
+                                                    </div>
+                                                    <p ng-show="transactions.read_only">{{baseAclId}}</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -217,17 +430,18 @@
                                                 <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ROLE">Role</th>
                                                 <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.READ" class="fit">Read</th>
                                                 <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.WRITE" class="fit">Write</th>
+                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="hasActions"><!--Additional Actions--></th>
                                                 <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ACTION" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')" class="fit">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr ng-repeat="policy in policies track by $index">
-                                                <td>
-                                                    <select chosen
-                                                        ng-disabled="(tab == 'access') && !$root.userIs('ROLE_UI_EVENT_DETAILS_ACL_EDIT')"
+                                                <td ng-show="!transactions.read_only">
+                                                    <select chosen pre-select-from="roles"
                                                         data-width="'200px'"
                                                         data-disable-search-threshold="8"
                                                         data-search_contains="true"
+                                                        ng-disabled="((tab == 'access') && !$root.userIs('ROLE_UI_EVENT_DETAILS_ACL_EDIT'))"
                                                         ng-model="policy.role"
                                                         ng-change="accessSave(policy)"
                                                         ng-options="id as name for (id, name) in roles"
@@ -235,13 +449,20 @@
                                                         no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
                                                     />
                                                 </td>
-                                                <td class="fit"><input type="checkbox" ng-model="policy.read" ng-change="accessSave(policy)" ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"/></td>
-                                                <td class="fit"><input type="checkbox" ng-model="policy.write" ng-change="accessSave(policy)" ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"/></td>
-                                                <td ng-if="$root.userIs('ROLE_UI_EVENT_DETAILS_ACL_EDIT')" class="fit"><a ng-click="deletePolicy(policy)" class="remove"></a>
+                                                <td ng-show="transactions.read_only">
+                                                    <p>{{policy.role}}</p>
+                                                </td>
+                                                <td class="fit"><input type="checkbox" ng-model="policy.read" ng-change="accessSave(policy)" ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"/></td>
+                                                <td class="fit"><input type="checkbox" ng-model="policy.write" ng-change="accessSave(policy)" ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"/></td>
+                                                <td class="fit editable" ng-if="hasActions">
+                                                    <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked" save="accessSave" admin-ng-editable-multi-select mixed="false" params="policy.actions" collection="actions"></div>
+                                                    <div ng-if="((!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')) || aclLocked)" ng-repeat="customAction in policy.actions.value">{{ customAction }}</div>
+                                                </td>
+                                                <td ng-if="$root.userIs('ROLE_UI_EVENT_DETAILS_ACL_EDIT')" class="fit"><a ng-show="!transactions.read_only" ng-click="deletePolicy(policy)" class="remove"></a>
                                                 </td>
                                             </tr>
                                             <tr ng-if="$root.userIs('ROLE_UI_EVENT_DETAILS_ACL_EDIT')" >
-                                                <td colspan="4"><a ng-click="addPolicy()">+ {{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
+                                                <td colspan="5"><a ng-show="!transactions.read_only" ng-click="addPolicy()">+ {{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
                                             <tr>
                                             </tr>
                                         </tbody>
@@ -258,6 +479,7 @@
 
     <div class="modal-content" data-modal-tab-content="comments">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
 
                 <!--
@@ -310,7 +532,7 @@
                                     <p>
                                       <span>@{{ comment.author.name }}</span> {{ reply.text }}
                                     </p>
-                                    <a ng-click="deleteCommentReply(comment.id, reply.id)" class="delete" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE">
+                                    <a ng-show="!transactions.read_only" ng-click="deleteCommentReply(comment.id, reply.id)" class="delete" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE">
                                       <i class="fa fa-times-circle"></i> {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.DELETE' | translate }}
                                     </a>
                                 </div>
@@ -319,7 +541,8 @@
                         <form class="add-comment" ng-if="replyToId === null" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE">
                           <textarea ng-model="myComment.text" placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.PLACEHOLDER' | translate }}"></textarea>
                           <div>
-                              <select chosen
+                              <select chosen pre-select-from="components.eventCommentReasons"
+                                  ng-disabled="!transactions.read_only"
                                   data-width="'200px'"
                                   data-disable-search-threshold="8"
                                   ng-model="myComment.reason"
@@ -349,6 +572,7 @@
 
     <div class="modal-content" data-modal-tab-content="quick-actions-details" data-level="2" data-label="EVENTS.EVENTS.DETAILS.QUICKACTION_WORKFLOW_DETAILS.TITLE">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
                 <div class="obj workflow-options">
                     <header translate="EVENTS.EVENTS.DETAILS.QUICKACTION_WORKFLOW_DETAILS.TITLE">Workflow Details</header>
@@ -361,7 +585,7 @@
                         </div>
                         <div class="btn-container">
                             <a href="javascript:;" class="cancel-btn">Cancel</a>
-                            <a href="javascript:;" class="add-btn">Add</a>
+                            <a href="javascript:;" ng-show="!transactions.read_only" class="add-btn">Add</a>
                         </div>
                     </div>
                 </div>
@@ -371,6 +595,7 @@
 
     <div class="modal-content" data-modal-tab-content="errors-and-warnings" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
                 <div class="obj tbl-container">
                     <header translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.HEADER">Errors &amp; Warnings</header>
@@ -406,6 +631,7 @@
 
     <div class="modal-content" data-modal-tab-content="error-details" data-level="4" data-label="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.HEADER">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
            <div class="full-col">
                <div class="obj tbl-details">
                    <header translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.HEADER">Error Details</header>
@@ -444,7 +670,9 @@
                                <td>
                                  <div ng-repeat="item in subNavData.details track by $index">
                                    <h3>{{ item.name }}</h3>
-                                   <pre>{{ item.value }}</pre>
+                                     <div style="overflow: auto; width: 750px;">
+                                         <pre >{{ item.value }}</pre>
+                                     </div>
                                  </div>
                                </td>
                            </tr>
@@ -457,6 +685,7 @@
 
     <div class="modal-content" data-modal-tab-content="attachments" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.TITLE">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.CAPTION">Attachments</header>
@@ -489,6 +718,7 @@
 
     <div class="modal-content" data-modal-tab-content="catalogs" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.TITLE">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.CAPTION">Catalogs</header>
@@ -521,6 +751,7 @@
 
     <div class="modal-content" data-modal-tab-content="media" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.TITLE">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.CAPTION">Media</header>
@@ -553,6 +784,7 @@
 
     <div class="modal-content" data-modal-tab-content="publications" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.TITLE">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.CAPTION">Publications</header>
@@ -583,6 +815,7 @@
 
     <div class="modal-content" data-modal-tab-content="attachment-details" data-parent="attachments" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.TITLE">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.CAPTION">Attachment</header>
@@ -602,7 +835,7 @@
                             </tr>
                             <tr ng-if="subNavData.size > 0">
                                 <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.SIZE">Size</td>
-                                <td>{{ subNavData.size }}</td>
+                                <td>{{ subNavData.size | humanBytes }}</td>
                             </tr>
                             <tr>
                                 <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.CHECKSUM">Checksum</td>
@@ -629,6 +862,7 @@
 
     <div class="modal-content" data-modal-tab-content="catalog-details" data-parent="catalogs" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.TITLE">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.CAPTION">Catalogs</header>
@@ -648,7 +882,7 @@
                             </tr>
                             <tr ng-if="subNavData.size > 0">
                                 <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.SIZE">Size</td>
-                                <td>{{ subNavData.size }}</td>
+                                <td>{{ subNavData.size | humanBytes }}</td>
                             </tr>
                             <tr>
                                 <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.CHECKSUM">Checksum</td>
@@ -675,6 +909,7 @@
 
     <div class="modal-content" data-modal-tab-content="media-details" data-parent="media" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TITLE">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
                 <div class="obj tbl-details">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TITLE">Media Details</header>
@@ -698,15 +933,15 @@
                             </tr>
                             <tr>
                                 <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.DURATION">Duration</td>
-                                <td>{{ subNavData.duration }}</td>
+                                <td>{{ subNavData.duration | humanDuration }}</td>
                             </tr>
                             <tr ng-if="subNavData.size > 0">
                                 <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.SIZE">Size</td>
-                                <td>{{ subNavData.size }}</td>
+                                <td>{{ subNavData.size | humanBytes }}</td>
                             </tr>
                             <tr>
                                 <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.URL">URL</td>
-                                <td>{{ subNavData.url }}</td>
+                                <td><a href="{{ subNavData.url }}">{{ subNavData.url | removeQueryParams }}</a></td>
                             </tr>
                         </table>
                     </div>
@@ -798,6 +1033,7 @@
 
     <div class="modal-content" data-modal-tab-content="publications-details" data-parent="publications" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.TITLE">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.CAPTION">Publications</header>
@@ -817,7 +1053,7 @@
                             </tr>
                             <tr ng-if="subNavData.size > 0">
                                 <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.SIZE">Size</td>
-                                <td>{{ subNavData.size }}</td>
+                                <td>{{ subNavData.size | humanBytes }}</td>
                             </tr>
                             <tr>
                                 <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.CHANNEL">Channel</td>
@@ -845,6 +1081,7 @@
 
     <div class="modal-content" data-modal-tab-content="workflow-details" data-parent="workflows" data-level="2" data-label="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
                 <div class="obj tbl-details">
                     <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE">Workflow Details</header>
@@ -901,6 +1138,7 @@
 
     <div class="modal-content" data-modal-tab-content="workflow-operations" data-parent="workflows" data-level="3" data-label="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TITLE">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
                 <div class="obj tbl-container">
                     <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TITLE">Workflow Operations</header>
@@ -931,6 +1169,7 @@
 
     <div class="modal-content" data-modal-tab-content="operation-details" data-parent="workflows" data-level="4" data-label="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TITLE">
         <div class="modal-body">
+            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div class="full-col">
                 <div class="obj tbl-details">
                     <header translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TITLE">Operation Details</header>

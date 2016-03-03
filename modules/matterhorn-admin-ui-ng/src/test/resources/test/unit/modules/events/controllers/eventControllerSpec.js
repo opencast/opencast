@@ -7,7 +7,8 @@ describe('Event controller', function () {
         var service = {
             configureFromServer: function () {},
             formatDate: function (val, date) { return date; },
-            formatTime: function (val, date) { return date; }
+            formatTime: function (val, date) { return date; },
+            formatDateTime: function (val, date) { return date; }
         };
         $provide.value('Language', service);
     }));
@@ -37,9 +38,17 @@ describe('Event controller', function () {
         $httpBackend.whenGET('/admin-ng/event/40518/asset/assets.json').respond({});
         $httpBackend.whenGET('/admin-ng/event/40518/workflows.json').respond({});
         $httpBackend.whenGET('/admin-ng/event/40518/access.json').respond({});
+        $httpBackend.whenGET('/admin-ng/event/40518/participation.json').respond({});
         $httpBackend.whenGET('/admin-ng/resources/components.json').respond({});
         $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond({});
+        $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond({});
+        $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNEL.LABELS.json').respond({});
+        $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNEL.ICONS.json').respond({});
         $httpBackend.whenGET('/admin-ng/resources/ROLES.json').respond({});
+        $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNEL.LABELS.json').respond({});
+        $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNEL.ICONS.json').respond({});
+        $httpBackend.whenGET('/admin-ng/event/new/processing?tags=schedule-ng').respond({});
+        $httpBackend.whenGET('/admin-ng/event/40518/hasActiveTransaction').respond('false');
 
         $controller('EventCtrl', {$scope: $scope});
     });
@@ -125,7 +134,6 @@ describe('Event controller', function () {
                     return false;
                 }
             }).respond({});
-
             $scope.reply();
             $httpBackend.flush();
         });
@@ -249,7 +257,10 @@ describe('Event controller', function () {
             $scope.policies[0] = {
                 role  : 'admin',
                 read  : true,
-                write : true
+                write : true,
+                actions : {
+                    value : []
+                }
             };
 
             spyOn(EventAccessResource, 'save');

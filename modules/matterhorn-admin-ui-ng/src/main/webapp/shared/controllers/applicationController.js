@@ -13,13 +13,8 @@ angular.module('adminNg.controllers')
 
         $scope.currentUser  = null;
         $scope.feedbackUrl = undefined;
-<<<<<<< HEAD
         $scope.documentationUrl = undefined;
         $scope.restdocsUrl = undefined;
-=======
-        $scope.documentationUrl = 'http://docs.opencast.org';
-        $scope.restdocsUrl = '/rest_docs.html';
->>>>>>> develop
 
         AuthService.getUser().$promise.then(function (user) {
             $scope.currentUser = user;
@@ -31,7 +26,6 @@ angular.module('adminNg.controllers')
             if (angular.isDefined(user.org.properties[DOCUMENTATION_URL_PROPERTY])) {
                 $scope.documentationUrl = user.org.properties[DOCUMENTATION_URL_PROPERTY];
             }
-<<<<<<< HEAD
 
             if (angular.isDefined(user.org.properties[RESTDOCS_URL_PROPERTY])) {
                 $scope.restdocsUrl = user.org.properties[RESTDOCS_URL_PROPERTY];
@@ -43,16 +37,7 @@ angular.module('adminNg.controllers')
                 $window.open ($scope.documentationUrl);
             } else {
                 console.warn('Documentation Url is not set.');
-=======
-
-            if (angular.isDefined(user.org.properties[RESTDOCS_URL_PROPERTY])) {
-                $scope.restdocsUrl = user.org.properties[RESTDOCS_URL_PROPERTY];
->>>>>>> develop
             }
-        });
-
-        $scope.toURL = function (url) {
-            $window.location.href = url;
         };
 
         $scope.toRestDoc = function () {
@@ -74,6 +59,9 @@ angular.module('adminNg.controllers')
         if (angular.isUndefined($rootScope.version)) {
             VersionResource.query(function(response) {
                 $rootScope.version = response.version ? response : (angular.isArray(response.versions)?response.versions[0]:{});
+                if (!response.consistent || angular.isUndefined($rootScope.version.buildNumber)) {
+                    $rootScope.version.buildNumber = 'inconsistent';
+                }
             });
         }
     }

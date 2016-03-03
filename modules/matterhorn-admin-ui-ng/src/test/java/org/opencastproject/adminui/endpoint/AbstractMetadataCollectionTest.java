@@ -25,7 +25,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.index.service.catalog.adapter.AbstractMetadataCollection;
-import org.opencastproject.index.service.catalog.adapter.MetadataField;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
 
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JValue;
@@ -50,8 +51,8 @@ public class AbstractMetadataCollectionTest {
   private MetadataField<String> unorderedTwo;
   private MetadataField<String> unorderedThree;
 
-  private AbstractMetadataCollection getAbstractMetadataCollection() {
-    AbstractMetadataCollection collection = new AbstractMetadataCollection() {
+  private MetadataCollection getAbstractMetadataCollection() {
+    MetadataCollection collection = new AbstractMetadataCollection() {
 
       @Override
       public JValue toJSON() {
@@ -83,7 +84,7 @@ public class AbstractMetadataCollectionTest {
 
   @Test
   public void testOrderOfFields() {
-    AbstractMetadataCollection collection = getAbstractMetadataCollection();
+    MetadataCollection collection = getAbstractMetadataCollection();
     // Add a single field that has an index greater than 0.
     collection.addField(third);
     assertEquals(1, collection.getFields().size());
@@ -92,7 +93,7 @@ public class AbstractMetadataCollectionTest {
 
   @Test
   public void testOrderOfFieldsInputFieldOrderZeroExpectsAtFront() {
-    AbstractMetadataCollection collection = getAbstractMetadataCollection();
+    MetadataCollection collection = getAbstractMetadataCollection();
     collection.addField(unorderedOne);
     collection.addField(unorderedTwo);
     collection.addField(unorderedThree);
@@ -125,7 +126,7 @@ public class AbstractMetadataCollectionTest {
 
   @Test
   public void testOrderOfFieldsInputFieldOrderTwoExpectsInMiddle() {
-    AbstractMetadataCollection collection = getAbstractMetadataCollection();
+    MetadataCollection collection = getAbstractMetadataCollection();
     collection.addField(unorderedOne);
     collection.addField(unorderedTwo);
     collection.addField(unorderedThree);
@@ -158,7 +159,7 @@ public class AbstractMetadataCollectionTest {
 
   @Test
   public void testOrderOfFieldsInputMultipleOrderedFieldsExpectsInCorrectPositions() {
-    AbstractMetadataCollection collection = getAbstractMetadataCollection();
+    MetadataCollection collection = getAbstractMetadataCollection();
     collection.addField(unorderedOne);
     collection.addField(unorderedTwo);
     collection.addField(unorderedThree);
@@ -209,7 +210,7 @@ public class AbstractMetadataCollectionTest {
 
   @Test
   public void testOrderOfFieldsInputDuplicateOrderValueExpectsBothInserted() {
-    AbstractMetadataCollection collection = getAbstractMetadataCollection();
+    MetadataCollection collection = getAbstractMetadataCollection();
     collection.addField(unorderedOne);
     collection.addField(unorderedTwo);
     collection.addField(unorderedThree);
@@ -236,7 +237,7 @@ public class AbstractMetadataCollectionTest {
 
   @Test
   public void testAddExistingFieldInputAlreadyExistingFieldExpectsOnlyOneFieldFromGetFields() {
-    AbstractMetadataCollection collection = getAbstractMetadataCollection();
+    MetadataCollection collection = getAbstractMetadataCollection();
     collection.addField(unorderedOne);
     collection.addField(unorderedTwo);
     collection.addField(unorderedThree);

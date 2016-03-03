@@ -7,7 +7,7 @@
 @mixin filter-dd-content-mixin ($width) {
     // Base styles
     position: absolute;
-    top: 52px; left: -($width / 2 - 20);
+    top: 52px; left: 0;
     z-index: $max-z;
     visibility: hidden;
     opacity: 0;

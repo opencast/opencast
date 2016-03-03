@@ -77,17 +77,6 @@
              cardinality="1..1" 
              policy="static" 
              bind="setIndex" />
- <reference name="CommonEventCatalogUIAdapter" 
-             interface="org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter"
-             cardinality="1..1" 
-             policy="static" 
-             bind="setCommonEventCatalogUIAdapter" />
- <reference name="EventCatalogUIAdapter" 
-             interface="org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter"
-             cardinality="0..n" 
-             policy="dynamic"
-             bind="addCatalogUIAdapter"
-             unbind="removeCatalogUIAdapter" />
  <reference name="UrlSigningService" 
              interface="org.opencastproject.security.urlsigning.service.UrlSigningService"
              cardinality="1..1" 

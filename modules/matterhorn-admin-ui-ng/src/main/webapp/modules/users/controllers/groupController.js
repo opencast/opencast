@@ -2,46 +2,61 @@ angular.module('adminNg.controllers')
 .controller('GroupCtrl', ['$scope', 'UserRolesResource', 'ResourcesListResource', 'GroupResource', 'GroupsResource', 'Notifications', 'Modal',
     function ($scope, UserRolesResource, ResourcesListResource, GroupResource, GroupsResources, Notifications, Modal) {
 
+        var reloadSelectedUsers = function () {
+            $scope.group.$promise.then(function() {
+                $scope.user.available.$promise.then(function() {
+                    // Now that we have the user users and the available users populate the selected and available
+                    angular.forEach($scope.group.users, function (user) {
+                        $scope.user.selected.push({name: user.name, value: user.username});
+                    });
+                    // Filter the selected from the available list
+                    $scope.user.available = _.filter($scope.user.available, function(user) {
+                        return !_.findWhere($scope.user.selected, {name: user.name});
+                    });
+                });
+            });
+        };
+
+        var reloadSelectedRoles = function () {
+            $scope.group.$promise.then(function() {
+                $scope.role.available.$promise.then(function() {
+                    // Now that we have the user roles and the available roles populate the selected and available
+                    angular.forEach($scope.group.roles, function (role) {
+                        $scope.role.selected.push({name: role, value: role});
+                    });
+                    // Filter the selected from the available list
+                    $scope.role.available = _.filter($scope.role.available, function(role) {
+                        return !_.findWhere($scope.role.selected, {name: role.name});
+                    });
+                });
+            });
+        };
+
         var reloadRoles = function () {
-              $scope.role = {
-                  available: ResourcesListResource.query({ resource: 'ROLES'}),
-                  selected:  [],
-                  i18n: 'USERS.GROUPS.DETAILS.ROLES',
-                  searchable: true
-              };
-            },
-            reloadUsers = function () {
-              $scope.user = {
-                  available: ResourcesListResource.query({ resource: 'USERS.INVERSE'}),
-                  selected:  [],
-                  i18n: 'USERS.GROUPS.DETAILS.USERS',
-                  searchable: true
-              };
-            };
+          $scope.role = {
+              available: ResourcesListResource.query({ resource: 'ROLES'}),
+              selected:  [],
+              i18n: 'USERS.GROUPS.DETAILS.ROLES',
+              searchable: true
+          };
+          reloadSelectedRoles();
+        };
+
+        var reloadUsers = function () {
+          $scope.user = {
+              available: ResourcesListResource.query({ resource: 'USERS.INVERSE'}),
+              selected:  [],
+              i18n: 'USERS.GROUPS.DETAILS.USERS',
+              searchable: true
+          };
+          reloadSelectedUsers();
+        };
 
         if ($scope.action === 'edit') {
             $scope.caption = 'USERS.GROUPS.DETAILS.EDITCAPTION';
-            $scope.group = GroupResource.get({ id: $scope.resourceId }, function (group) {
-
-              $scope.role.available.$promise.then(function() {
-                  // Now that we have the user roles and the available roles populate the selected and available
-                  angular.forEach(group.roles, function (role) {
-                      $scope.role.selected.push({name: role, value: role});
-                  });
-                  // Filter the selected from the available list
-                  $scope.role.available = _.filter($scope.role.available, function(role){ return !_.findWhere($scope.role.selected, {name: role.name}); });
-              });
-
-              $scope.user.available.$promise.then(function() {
-                  // Now that we have the user users and the available users populate the selected and available
-                  angular.forEach(group.users, function (user) {
-                      $scope.user.selected.push({name: user.name, value: user.username});
-                  });
-                  // Filter the selected from the available list
-                  $scope.user.available = _.filter($scope.user.available, function(user) { 
-                      return !_.findWhere($scope.user.selected, {name: user.name}); 
-                  });
-              });
+            $scope.group = GroupResource.get({ id: $scope.resourceId }, function () {
+                reloadSelectedRoles();
+                reloadSelectedUsers();
             });
         } else {
             $scope.caption = 'USERS.GROUPS.DETAILS.NEWCAPTION';

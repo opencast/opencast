@@ -68,6 +68,14 @@ angular.module('adminNg.controllers')
                         'role'   : policy.role
                     });   
                 }
+
+                angular.forEach(policy.actions.value, function(customAction){
+                    ace.push({
+                        'action' : customAction,
+                        'allow'  : true,
+                        'role'   : policy.role
+                    });
+                });
             }
 
         });

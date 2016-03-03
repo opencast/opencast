@@ -46,7 +46,7 @@
                                         <td>
                                             <div class="obj-container padded">
                                                 <p translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION"></p>
-                                                <select chosen
+                                                <select chosen pre-select-from="wizard.step.acls"
                                                     data-width="'200px'"
                                                     data-disable-search-threshold="8"
                                                     data-search_contains="true"
@@ -74,13 +74,14 @@
                                             <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ROLE"><!--Role--></th>
                                             <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.READ" class="fit"><!--Read--></th>
                                             <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit"><!--Write--></th>
+                                            <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="wizard.step.hasActions"><!--Additional Actions--></th>
                                             <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ACTION" class="fit"><!--Action--></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr ng-repeat="policy in wizard.step.ud.policies">
                                             <td>
-                                                <select chosen
+                                                <select chosen pre-select-from="wizard.step.roles"
                                                     data-width="'200px'"
                                                     data-disable-search-threshold="8"
                                                     data-search_contains="true"
@@ -92,11 +93,12 @@
                                             </td>
                                             <td class="fit"><input type="checkbox"  ng-model="policy.read"/></td>
                                             <td class="fit"><input type="checkbox"  ng-model="policy.write"/></td>
+                                            <td class="fit editable" ng-if="wizard.step.hasActions"><div admin-ng-editable-multi-select mixed="false" params="policy.actions" collection="wizard.step.actions"> </div></td>
                                             <td class="fit"><a ng-click="wizard.step.deletePolicy(policy)" class="remove"></a>
                                             </td>
                                         </tr>
                                         <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')">
-                                            <td colspan="4"><a ng-click="wizard.step.addPolicy()">+ {{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
+                                            <td colspan="5"><a ng-click="wizard.step.addPolicy()">+ {{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
                                         <tr>
                                         </tr>
                                     </tbody>
@@ -136,12 +138,14 @@
                                 <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ROLE" class="fit"><!--Role--></th>
                                 <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.READ" class="fit"><!--Read--></th>
                                 <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit"><!--Write--></th>
+                                <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="wizard.getStateControllerByName('access').hasActions"><!--Additional Actions--></th>
                             </tr>
                         </thead>
                         <tr ng-repeat="policy in wizard.getStateControllerByName('access').ud.policies">
                             <td>{{ policy.role }}</td>
                             <td class="fit"><input type="checkbox" disabled ng-model="policy.read"/></td>
                             <td class="fit"><input type="checkbox" disabled ng-model="policy.write"/></td>
+                            <td class="fit" ng-if="wizard.getStateControllerByName('access').hasActions"><div ng-repeat="customAction in policy.actions.value">{{ customAction }}</div></td>
                         </tr>
                     </table>
             </div>

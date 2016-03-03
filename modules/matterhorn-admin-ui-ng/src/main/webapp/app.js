@@ -33,6 +33,7 @@ angular.module('adminNg', [
     'ngResource',
     'ngAnimate',
     'ngMessages',
+    'angular-md5',
     'adminNg.controllers',
     'adminNg.services',
     'adminNg.filters',
@@ -40,7 +41,8 @@ angular.module('adminNg', [
     'adminNg.services.language',
     'adminNg.services.table',
     'adminNg.services.modal',
-    'adminNg.directives'
+    'adminNg.directives',
+    'mgo-angular-wizard'
 ]).config(['$routeProvider', function ($routeProvider) {
     var firstCharToUpper = function (string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -105,4 +107,8 @@ angular.module('adminNg', [
     // Define wrappers around non-mockable native functions.
     $rootScope.location = {};
     $rootScope.location.reload = window.location.reload;
+
+    $rootScope.toURL = function ( path ) {
+        location.href = path;
+    };
 }]);

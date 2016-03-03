@@ -3,7 +3,7 @@
         <div class="form-container">
             <div class="row">
                 <label translate="RECORDINGS.BLACKLISTS.DETAILS.LOCATIONS.ADD_LOCATION">Add Location</label>
-                <select chosen
+                <select chosen pre-select-from="wizard.step.items"
                     ng-disabled="wizard.step.ud.items.length"
                     data-width="'200px'"
                     data-disable-search-threshold="8"
@@ -82,7 +82,7 @@
         <div class="form-container">
             <div class="row">
                 <label translate="RECORDINGS.BLACKLISTS.DETAILS.REASON.REASON">Reason</label>
-                <select chosen
+                <select chosen pre-select-from="wizard.step.reasons"
                     data-width="'200px'"
                     data-disable-search-threshold="8"
                     ng-model="wizard.step.ud.reason"

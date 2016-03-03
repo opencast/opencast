@@ -7,7 +7,11 @@ angular.module('adminNg.services')
                 return {
                     role  : role,
                     read  : false,
-                    write : false
+                    write : false,
+                    actions : {
+                        name : 'new-acl-actions',
+                        value : []
+                    }
                 };
             };
 
@@ -26,7 +30,11 @@ angular.module('adminNg.services')
                     if (angular.isUndefined(policy)) {
                         newPolicies[acl.role] = createPolicy(acl.role);
                     }
-                    newPolicies[acl.role][acl.action] = acl.allow;
+                    if (acl.action === 'read' || acl.action === 'write') {
+                        newPolicies[acl.role][acl.action] = acl.allow;
+                    } else if (acl.allow === true || acl.allow === 'true'){
+                        newPolicies[acl.role].actions.value.push(acl.action);
+                    }
                 });
 
                 me.ud.policies = [];
@@ -64,6 +72,16 @@ angular.module('adminNg.services')
         };
         
         me.acls  = ResourcesListResource.get({ resource: 'ACL' });
+        me.actions = {};
+        me.hasActions = false;
+        ResourcesListResource.get({ resource: 'ACL.ACTIONS'}, function(data) {
+            angular.forEach(data, function (value, key) {
+                if (key.charAt(0) !== '$') {
+                    me.actions[key] = value;
+                    me.hasActions = true;
+                }
+            });
+        });
         me.roles = ResourcesListResource.get({ resource: 'ROLES' }); 
 
         this.reset = function () {

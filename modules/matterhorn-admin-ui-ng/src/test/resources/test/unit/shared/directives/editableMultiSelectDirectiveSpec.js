@@ -51,7 +51,7 @@ describe('adminNg.directives.adminNgEditableMultiSelect', function () {
         element.find('input').trigger(enter);
 
         expect($rootScope.save).toHaveBeenCalled();
-        expect(element.scope().params.value).toContain('item2');
+        expect(element.scope().params.value).toContain('Item 2');
     });
 
     it('saves when removing values', function () {

@@ -20,6 +20,9 @@ module.exports = function (config) {
             '../../main/webapp/lib/underscore-1.5.2.js',
             '../../main/webapp/lib/video-js/video.js',
             '../../main/webapp/lib/moment.min.js',
+            '../../main/webapp/lib/javascript-md5/js/md5.min.js',
+            '../../main/webapp/lib/angular-md5/angular-md5.min.js',
+            '../../main/webapp/lib/angular-wizard/dist/angular-wizard.min.js',
 
             '../../main/webapp/app.js',
             '../../main/webapp/shared/filters/filters.js',

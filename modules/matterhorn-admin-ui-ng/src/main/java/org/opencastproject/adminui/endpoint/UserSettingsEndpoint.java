@@ -42,7 +42,6 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -64,7 +63,7 @@ import javax.ws.rs.core.Response;
 public class UserSettingsEndpoint {
 
   /** The logging facility */
-  private static final Log logger = new Log(LoggerFactory.getLogger(ServerEndpoint.class));
+  private static final Log logger = Log.mk(ServerEndpoint.class);
 
   /** Base url of this endpoint */
   private String endpointBaseUrl;
@@ -84,6 +83,20 @@ public class UserSettingsEndpoint {
     final Tuple<String, String> endpointUrl = getEndpointUrl(cc);
     endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
   }
+
+//  @GET
+//  @Path("/signature")
+//  @Produces(MediaType.APPLICATION_JSON)
+//  @RestQuery(name = "getSignature", description = "Returns the email signatures for the current user", returnDescription = "Returns a JSON representation of the current user's signatures", reponses = { @RestResponse(responseCode = SC_OK, description = "The email signatures.") })
+//  public Response getSignature() throws IOException, NotFoundException {
+//    try {
+//      MessageSignature messageSignature = mailService.getCurrentUsersSignature();
+//      return Response.ok(messageSignature.toJson().toJson()).build();
+//    } catch (MailServiceException e) {
+//      logger.error("Unable to get user settings:", e);
+//      return (Response.serverError().build());
+//    }
+//  }
 
   @GET
   @Path("/settings.json")
@@ -107,6 +120,36 @@ public class UserSettingsEndpoint {
     return Response.ok(userSettings.toJson().toJson()).build();
   }
 
+//  @POST
+//  @Path("/signature")
+//  @Produces(MediaType.APPLICATION_JSON)
+//  @RestQuery(name = "createemailsignature", description = "Returns the created email signature as JSON", returnDescription = "The created email signature as JSON", restParameters = {
+//          @RestParameter(name = "name", description = "The signature name", isRequired = true, type = RestParameter.Type.STRING),
+//          @RestParameter(name = "from_name", description = "The name to show as the sender of the email", isRequired = true, type = RestParameter.Type.STRING),
+//          @RestParameter(name = "from_address", description = "The email address to use to send the email", isRequired = true, type = RestParameter.Type.STRING),
+//          @RestParameter(name = "reply_name", description = "The name to put who they are replying to", isRequired = false, type = RestParameter.Type.STRING),
+//          @RestParameter(name = "reply_address", description = "The email address they are replying to", isRequired = false, type = RestParameter.Type.STRING),
+//          @RestParameter(name = "text", description = "The signature text", isRequired = true, type = RestParameter.Type.STRING) }, reponses = { @RestResponse(description = "Returns the created email template as JSON", responseCode = HttpServletResponse.SC_OK) })
+//  public Response createEmailSignature(@FormParam("name") String name, @FormParam("from_name") String emailName,
+//          @FormParam("from_address") String address, @FormParam("reply_name") String replyName,
+//          @FormParam("reply_address") String replyAddress, @FormParam("text") String text) throws NotFoundException {
+//    User currentUser = securityService.getUser();
+//    Option<EmailAddress> reply = Option.<EmailAddress> none();
+//    if (StringUtils.isNotBlank(replyAddress) && StringUtils.isNotBlank(replyName)) {
+//      reply = Option.some(EmailAddress.emailAddress(replyAddress, replyName));
+//    }
+//    EmailAddress emailAddress = EmailAddress.emailAddress(address, emailName);
+//    MessageSignature messageSignature = new MessageSignature(null, name, currentUser, emailAddress, reply, text,
+//            new Date(), nil(Comment.class));
+//    try {
+//      MessageSignature updatedMessageSignature = mailService.updateMessageSignature(messageSignature);
+//      return Response.ok(updatedMessageSignature.toJson().toJson()).build();
+//    } catch (Exception e) {
+//      logger.error("Could not create the email signature: %s", ExceptionUtils.getStackTrace(e));
+//      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+//    }
+//  }
+
   @POST
   @Path("/setting")
   @Produces(MediaType.APPLICATION_JSON)
@@ -122,6 +165,44 @@ public class UserSettingsEndpoint {
       return Response.serverError().build();
     }
   }
+
+//  @PUT
+//  @Path("/signature/{signatureId}")
+//  @Produces(MediaType.APPLICATION_JSON)
+//  @RestQuery(name = "updateemailsignature", description = "Returns the updated email signature by the given id as JSON", returnDescription = "The updated email signature as JSON", pathParameters = { @RestParameter(name = "signatureId", description = "The signature id", isRequired = true, type = RestParameter.Type.INTEGER) }, restParameters = {
+//          @RestParameter(name = "name", description = "The signature name", isRequired = true, type = RestParameter.Type.STRING),
+//          @RestParameter(name = "from_name", description = "The name to show as the sender of the email", isRequired = true, type = RestParameter.Type.STRING),
+//          @RestParameter(name = "from_address", description = "The email address to use to send the email", isRequired = true, type = RestParameter.Type.STRING),
+//          @RestParameter(name = "reply_name", description = "The name to put who they are replying to", isRequired = false, type = RestParameter.Type.STRING),
+//          @RestParameter(name = "reply_address", description = "The email address they are replying to", isRequired = false, type = RestParameter.Type.STRING),
+//          @RestParameter(name = "text", description = "The signature text", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+//          @RestResponse(description = "Returns the email signature as JSON", responseCode = HttpServletResponse.SC_OK),
+//          @RestResponse(description = "The signature has not been found", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+//  public Response updateEmailSignature(@PathParam("signatureId") long signatureId, @FormParam("name") String name,
+//          @FormParam("from_name") String emailName, @FormParam("from_address") String address,
+//          @FormParam("reply_name") String replyName, @FormParam("reply_address") String replyAddress,
+//          @FormParam("text") String text) throws NotFoundException {
+//
+//    Option<EmailAddress> reply = Option.<EmailAddress> none();
+//    if (StringUtils.isNotBlank(replyAddress) && StringUtils.isNotBlank(replyName))
+//      reply = Option.some(EmailAddress.emailAddress(replyAddress, replyName));
+//
+//    try {
+//      MessageSignature messageSignature = mailService.getMessageSignature(signatureId);
+//      messageSignature.setName(name);
+//      messageSignature.setSender(EmailAddress.emailAddress(address, emailName));
+//      messageSignature.setReplyTo(reply);
+//      messageSignature.setSignature(text);
+//
+//      MessageSignature updatedMessageSignature = mailService.updateMessageSignature(messageSignature);
+//      return Response.ok(updatedMessageSignature.toJson().toJson()).build();
+//    } catch (NotFoundException e) {
+//      throw e;
+//    } catch (Exception e) {
+//      logger.error("Could not update the email signature {}: {}", signatureId, ExceptionUtils.getStackTrace(e));
+//      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+//    }
+//  }
 
   @PUT
   @Path("/setting/{settingId}")
@@ -139,6 +220,22 @@ public class UserSettingsEndpoint {
       return Response.serverError().build();
     }
   }
+
+//  @DELETE
+//  @Path("/signature/{signatureId}")
+//  @RestQuery(name = "deleteSignature", description = "Delete a user's signature", returnDescription = "Status ok", pathParameters = @RestParameter(name = "signatureId", type = INTEGER, isRequired = true, description = "The id of the user's signature."), reponses = {
+//          @RestResponse(responseCode = SC_OK, description = "User's signature has been deleted."),
+//          @RestResponse(responseCode = SC_NOT_FOUND, description = "User's signature not found.") })
+//  public Response deleteSignature(@PathParam("signatureId") long id) throws NotFoundException {
+//    try {
+//      mailService.deleteMessageSignature(id);
+//    } catch (MailServiceException e) {
+//      logger.error("Unable to delete message signature", e);
+//      return Response.serverError().build();
+//    }
+//    logger.debug("User setting with id %d removed.", id);
+//    return Response.status(SC_OK).build();
+//  }
 
   @DELETE
   @Path("/setting/{settingId}")

@@ -2,6 +2,7 @@ node_modules
 www
 .jshintrc
 deploy.sh
+proxy.sh
 *.swo
 bin
 coverage
@@ -9,3 +10,4 @@ src/test/resources/*.jar
 src/test/resources/chromedriver
 .agignore
 adi_deploy.sh
+selenium-server-standalone.jar

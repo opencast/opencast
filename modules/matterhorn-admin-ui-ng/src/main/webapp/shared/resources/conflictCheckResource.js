@@ -19,6 +19,10 @@ angular.module('adminNg.resources')
         } else {
             result.end = JsHelper.toZuluTimeString(data.start, data.duration);
         }
+        
+        if (data.eventId) {
+        	result.id = data.eventId;
+        }
 
         return $.param({metadata: angular.toJson(result)});
     };

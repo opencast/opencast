@@ -22,11 +22,15 @@ angular.module('adminNg.services')
         // Object used for the workflow configurations
         window.ocWorkflowPanel = {};
 
-        // Load all the worklfows definitions
+        // Load all the workflows definitions
         if (use === 'tasks') {
             queryParams = {
                     tags: 'archive-ng'
                 };
+        } else if (use === 'delete-event') {
+            queryParams = {
+                    tags: 'delete-ng'
+            };
         } else {
             queryParams = {
                 tags: 'upload-ng,schedule-ng'

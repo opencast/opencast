@@ -1,10 +1,12 @@
-module.exports = function (grunt) {
+var proxyPort = 9000;
+var proxyMiddleware = require("./lib/proxyMiddleware");
 
-    require('load-grunt-tasks')(grunt);
+module.exports = function (grunt) {
+    require("load-grunt-tasks")(grunt);
     
     // Project configuration.
     grunt.initConfig({
-        
+
 
         /**===================================
          * Configuration variables
@@ -21,12 +23,15 @@ module.exports = function (grunt) {
         i18nDir: "src/main/resources/public",
         unitTestDir: "src/test/resources/test/unit",
         mockDir: "src/test/resources/mock",
+        proxyPort: 9000,
+
 
         /** The current target file for the watch tasks */
         currentWatchFile: "",
 
         /** Local directory for the dev server */
         serverDir: "target/grunt/webapp",
+        reportsDir: "target/grunt/reports",
 
         /** Paths for the different types of ressource */
         srcPath: {
@@ -126,32 +131,32 @@ module.exports = function (grunt) {
                     style: 'expanded',
                     trace: true
                 },
-                  files: {                         
+                files: {
                     "<%= serverDir %>/css/main.css": "<%= baseDir %>/css/stylesheets/override.scss"
-                  }
+                }
             },
             production: {
                 options: {
-                    style: 'compact',
+                    style: 'compact'
                 },
-                files: {                         
+                files: {
                     "<%= serverDir %>/css/main.css": "<%= baseDir %>/css/stylesheets/override.scss"
                 }
-            }                              
+            }
         },
 
         /** Combine CSS files */
         cssmin: {
-          options: {
-            shorthandCompacting: true,
-            roundingPrecision: -1,
-            processImport: true
-          },
-          target: {
-            files: {
-              '<%= serverDir %>/css/main.css': ['<%= baseDir %>/css/vendor/chosen.css', '<%= baseDir %>/css/vendor/animate/animate.css', '<%= serverDir %>/css/main.css']
+            options: {
+                shorthandCompacting: true,
+                roundingPrecision: -1,
+                processImport: true
+            },
+            target: {
+                files: {
+                    '<%= serverDir %>/css/main.css': ['<%= baseDir %>/css/vendor/chosen.css', '<%= baseDir %>/css/vendor/animate/animate.css', '<%= serverDir %>/css/main.css']
+                }
             }
-          }
         },
 
         /** Copy .. */
@@ -184,7 +189,7 @@ module.exports = function (grunt) {
                 src  : ["css/*.css"],
                 dest : "<%= serverDir %>/"
             },
-         // ... all assets
+            // ... all assets
             prod: {
                 files   : [{
                     cwd     : "<%= baseDir %>",
@@ -242,7 +247,7 @@ module.exports = function (grunt) {
 
         clean: ["<%= serverDir %>"],
 
-        /** Task to run tasks in parrallel */
+        /** Task to run tasks in parallel */
         concurrent: {
             dev: {
                 tasks: ["watch:js", "watch:i18n", "watch:sass", "watch:html", "watch:mocks", "watch:www", "watch:grunt", "connect:server", "karma:devCoverage"],
@@ -260,10 +265,10 @@ module.exports = function (grunt) {
                     port       : 9001,
                     base       : "<%= serverDir %>",
                     keepalive  : true,
-                    livereload : false,
+                    livereload : true,
                     debug      : false,
                     hostname   : "*",
-                    middleware: function(connect, options, middlwares) {
+                    middleware: function(connect, options, middlewares) {
 
                         var responseHeaders = {
                             "POST": {
@@ -287,17 +292,15 @@ module.exports = function (grunt) {
                             return headers;
                         };
 
-                        return [
-                            connect.static(options.base[0]),
-
-                            /*
+                        middlewares.unshift(
+                             /*
                              * This function serves POST / PUT / DELETE mock requests by getting the file content from src/test/resources/app/<method>/<url>.
                              */
                             function (req, res, next) {
 
-                                var path = "src/test/resources/app/" + req.method + req.url;
+                                    var path = "src/test/resources/app/" + req.method + req.url;
 
-                                if ((req.method === "POST" || req.method==="PUT" || req.method==="DELETE") &&
+                                    if ((req.method === "POST" || req.method==="PUT" || req.method==="DELETE") &&
                                         grunt.file.exists(path)) {
                                         setTimeout(function () {
                                             if (req.method === "POST") {
@@ -305,12 +308,40 @@ module.exports = function (grunt) {
                                             }
                                             res.end(grunt.file.read(path));
                                         }, 1000);
-                                } else {
-                                    next();
-                                }
+                                    } else {
+                                        next();
+                                    }
                             }
-                        ];
+                        );
+                        return middlewares;
                     }
+                }
+            },
+            proxies: [
+                {
+                    context: "/admin-ng",
+                    host: "localhost",
+                    port: "<%= proxyPort %>",
+                    https: false,
+                    changeOrigin: true
+                },
+                {
+                    context: '/acl-manager',
+                    host: 'localhost',
+                    port: "<%= proxyPort %>",
+                    https: false,
+                    changeOrigin: true
+                }
+            ],
+            proxy: {
+                options: {
+                    port: 9001,
+                    base: "<%= serverDir %>",
+                    keepalive: true,
+                    livereload: true,
+                    debug: false,
+                    proxyPort: "<%= proxyPort %>",
+                    middleware: proxyMiddleware(grunt)
                 }
             },
             test: {
@@ -381,6 +412,11 @@ module.exports = function (grunt) {
 
     // Base task for the development
     grunt.registerTask("dev", ["clean", "sass:dev", "cssmin", "jshint:all", "copy:all", "concurrent:dev"]);
+
+    // Base task for the development with proxy to a real backend
+    grunt.registerTask("proxy", [
+        "clean", "sass:dev", "cssmin", "jshint:all", "copy:all", "configureProxies:proxy", "connect:proxy", "concurrent:dev"
+    ]);
 
     // Base task for production
     var buildWithoutTests = ["clean", "sass:production", "cssmin", "copy:prod" ] ;

@@ -30,40 +30,17 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
-<<<<<<< HEAD
-import org.opencastproject.pm.api.persistence.ParticipationManagementDatabase;
-import org.opencastproject.scheduler.api.SchedulerService;
-import org.opencastproject.security.api.AuthorizationService;
-import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.util.Log;
-import org.opencastproject.util.OsgiUtil;
-=======
-import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
-import org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.ingest.api.IngestService;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
-import org.opencastproject.series.api.SeriesService;
->>>>>>> develop
 import org.opencastproject.workflow.api.WorkflowService;
-
-import com.entwinemedia.fn.data.Opt;
 
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 
-<<<<<<< HEAD
 import java.util.Dictionary;
-=======
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.List;
->>>>>>> develop
 
 import javax.ws.rs.Path;
 
@@ -82,21 +59,12 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   private OpencastArchive archive;
   private SchedulerService schedulerService;
   private SecurityService securityService;
-<<<<<<< HEAD
-=======
-  private SeriesService seriesService;
   private UrlSigningService urlSigningService;
->>>>>>> develop
   private WorkflowService workflowService;
   private AdminUIConfiguration adminUIConfiguration;
 
-<<<<<<< HEAD
-  private long expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
-=======
-  private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<EventCatalogUIAdapter>();
   private long expireSeconds = UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
   private Boolean signWithClientIP = UrlSigningServiceOsgiUtil.DEFAULT_SIGN_WITH_CLIENT_IP;
->>>>>>> develop
 
   @Override
   public AdminUIConfiguration getAdminUIConfiguration() {
@@ -107,7 +75,6 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   public void setAdminUIConfiguration(AdminUIConfiguration adminUIConfiguration) {
     this.adminUIConfiguration = adminUIConfiguration;
   }
-
 
   @Override
   public OpencastArchive getArchive() {
@@ -157,36 +124,6 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   /** OSGi DI. */
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
-  }
-
-  @Override
-<<<<<<< HEAD
-  public ParticipationManagementDatabase getPMPersistence() {
-    return participationManagementDatabase;
-  }
-
-  /** OSGi DI. */
-  public void setParticipationPersistence(ParticipationManagementDatabase participationManagementDatabase) {
-    this.participationManagementDatabase = participationManagementDatabase;
-=======
-  public SeriesService getSeriesService() {
-    return this.seriesService;
-  }
-
-  /** OSGi DI. */
-  public void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
-  }
-
-  @Override
-  public DublinCoreCatalogService getDublinCoreService() {
-    return dublinCoreCatalogService;
-  }
-
-  /** OSGi DI. */
-  public void setDublinCoreCatalogService(DublinCoreCatalogService dublineCoreCatalogService) {
-    this.dublinCoreCatalogService = dublineCoreCatalogService;
->>>>>>> develop
   }
 
   @Override
@@ -260,40 +197,6 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   @Override
-<<<<<<< HEAD
-  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
-    Opt<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY).toOpt()
-            .map(com.entwinemedia.fn.fns.Strings.toLongF);
-    if (expiration.isSome()) {
-      expireSeconds = expiration.get();
-      logger.info("The property {} has been configured to expire signed URLs in {}.",
-              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
-    } else {
-      expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
-      logger.info(
-              "The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
-              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
-=======
-  public EventCatalogUIAdapter getEpisodeCatalogUIAdapter() {
-    return eventCatalogUIAdapter;
-  }
-
-  /** OSGi DI. */
-  public void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
-    catalogUIAdapters.add(catalogUIAdapter);
-  }
-
-  /** OSGi DI. */
-  public void removeCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
-    catalogUIAdapters.remove(catalogUIAdapter);
-  }
-
-  @Override
-  public List<EventCatalogUIAdapter> getEventCatalogUIAdapters(String organization) {
-    return Stream.$(catalogUIAdapters).filter(organizationFilter._2(organization)).toList();
-  }
-
-  @Override
   public UrlSigningService getUrlSigningService() {
     return urlSigningService;
   }
@@ -303,16 +206,8 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
     this.urlSigningService = urlSigningService;
   }
 
-  private static final Fn2<EventCatalogUIAdapter, String, Boolean> organizationFilter = new Fn2<EventCatalogUIAdapter, String, Boolean>() {
-    @Override
-    public Boolean ap(EventCatalogUIAdapter catalogUIAdapter, String organization) {
-      return organization.equals(catalogUIAdapter.getOrganization());
->>>>>>> develop
-    }
-  }
-
   @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
+  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
     expireSeconds = UrlSigningServiceOsgiUtil.getUpdatedSigningExpiration(properties, this.getClass().getSimpleName());
     signWithClientIP = UrlSigningServiceOsgiUtil.getUpdatedSignWithClientIP(properties,
             this.getClass().getSimpleName());
@@ -320,12 +215,12 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
 
   @Override
   public long getUrlSigningExpireDuration() {
-   return expireSeconds;
+    return expireSeconds;
   }
 
   @Override
   public Boolean signWithClientIP() {
-   return signWithClientIP;
+    return signWithClientIP;
   }
 
 }

@@ -22,41 +22,27 @@
 
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
-.controller('ScheduleTaskCtrl', ['$scope', 'Table', 'FormNavigatorService', 'NewEventProcessing', 'TaskResource', 'Notifications',
-function ($scope, Table, FormNavigatorService, NewEventProcessing, TaskResource, Notifications) {
-    var onSuccess, onFailure;
-    // make a shallow copy of selected main Table rows for our own use
-    $scope.rows = [];
-    angular.forEach(Table.getSelected(), function (row) {
-        $scope.rows.push($.extend({}, row ));
-    });
-    $scope.navigateTo = function (targetForm, currentForm, requiredForms) {
-        $scope.currentForm = FormNavigatorService.navigateTo(targetForm, currentForm, requiredForms);
-    };
+.controller('ScheduleTaskCtrl', ['$scope', 'Table', 'NewEventProcessing', 'TaskResource',
+    'Notifications', 'decorateWithTableRowSelection',
+function ($scope, Table, NewEventProcessing, TaskResource, Notifications, decorateWithTableRowSelection) {
+    $scope.rows = Table.copySelected();
+    $scope.allSelected = true; // by default, all rows are selected
+    $scope.test = false;
     $scope.currentForm = 'generalForm';
     $scope.processing = NewEventProcessing.get('tasks');
 
-    var getSelectedIds = function () {
-        var result = [];
-        angular.forEach($scope.rows, function (row) {
-            if(row.selected) {
-                result.push(row.id);
-            }
-        });
-        return result;
-    };
-
     $scope.valid = function () {
-        return getSelectedIds().length > 0;
+        return $scope.getSelectedIds().length > 0;
     };
     
-    onSuccess = function () {
+    var onSuccess = function () {
         $scope.submitButton = false;
         $scope.close();
         Notifications.add('success', 'TASK_CREATED');
+        Table.deselectAll();
     };
 
-    onFailure = function () {
+    var onFailure = function () {
         $scope.submitButton = false;
         $scope.close();
         Notifications.add('error', 'TASK_NOT_CREATED', 'global', -1);
@@ -66,7 +52,7 @@ function ($scope, Table, FormNavigatorService, NewEventProcessing, TaskResource,
     $scope.submit = function () {
         $scope.submitButton = true;
         if ($scope.valid()) {
-            var eventIds = getSelectedIds(), payload;
+            var eventIds = $scope.getSelectedIds(), payload;
             payload = {
                 workflows: $scope.processing.ud.workflow.id,
                 configuration: $scope.processing.ud.workflow.selection.configuration,
@@ -75,20 +61,5 @@ function ($scope, Table, FormNavigatorService, NewEventProcessing, TaskResource,
             TaskResource.save(payload, onSuccess, onFailure);
         }
     };
-    
-    $scope.toggleSelectAll = function () {
-        if ($scope.all) {
-            angular.forEach($scope.rows, function (row) {
-                row.selected = true;
-            });
-        } else {
-            angular.forEach($scope.rows, function (row) {
-                row.selected = false;
-            });
-        }
-    };
-    
-    $scope.numSelected = function () {
-        return getSelectedIds().length;
-    };
+    decorateWithTableRowSelection($scope);
 }]);

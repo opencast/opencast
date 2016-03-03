@@ -34,7 +34,16 @@ angular.module('adminNg.directives')
             save:       '='
         },
         link: function (scope, element) {
+            scope.data = {};
+            scope.data.list = {};
+            if (scope.params.id) {
+                scope.data.list.id = scope.params.id;
+            } else {
+                scope.data.list.id = scope.params.name;
+            }
+
             scope.enterEditMode = function () {
+                scope.parseValues();
                 scope.editMode = true;
                 scope.focusTimer = $timeout(function () {
                     element.find('input').focus();
@@ -61,10 +70,15 @@ angular.module('adminNg.directives')
 
             scope.keyUp = function (event) {
                 var value = event.target.value;
+                if (angular.isDefined(scope.value)) {
+                    scope.value = scope.value.trim();
+                }
                 if (event.keyCode === 13) {
                     // ENTER
+                    scope.parseValues();
                     if (scope.mixed || scope.collection[scope.value]) {
-                        scope.addValue(scope.params.value, scope.value);
+                        var newValue = angular.isDefined(scope.collection[scope.value]) ? scope.collection[scope.value] : scope.value;
+                        scope.addValue(scope.params.value, newValue);
                     }
                 } else if (event.keyCode === 27) {
                     // ESC
@@ -84,8 +98,39 @@ angular.module('adminNg.directives')
                 }
             };
 
+            /**
+             * This function parses the current values by removing extra whitespace and replacing values with those in the collection.
+             */
+            scope.parseValues = function () {
+                scope.trimValues();
+                scope.findCollectionValue();
+            };
+
+            /**
+             * This function trims the whitespace from all of the values.
+             */
+            scope.trimValues = function () {
+               angular.forEach(scope.params.value, function(value) {
+                   scope.params.value[scope.params.value.indexOf(value)] = scope.params.value[scope.params.value.indexOf(value)].trim();
+               });
+            };
+
+            /**
+             * This function replaces all of the current values with those in the collection.
+             */
+            scope.findCollectionValue = function() {
+                angular.forEach(scope.params.value, function(value) {
+                    if (angular.isDefined(scope.collection[value])) {
+                        scope.params.value[scope.params.value.indexOf(value)] = scope.collection[value];
+                    }
+                });
+            };
+
             scope.submit = function () {
-                scope.save(scope.params.id);
+                scope.parseValues();
+                if (angular.isDefined(scope.save)) {
+                    scope.save(scope.params.id);
+                }
                 scope.editMode = false;
             };
 

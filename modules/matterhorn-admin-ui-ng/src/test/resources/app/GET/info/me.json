@@ -113,6 +113,7 @@
       "engageui.link_mobile_redirect.enable": "false"
     }
   },
+  "userRole": "ROLE_USER_ADMIN",
   "user": {
     "username": "oliver.queen",
     "email": "admin@opencast.org",

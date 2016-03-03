@@ -285,7 +285,9 @@
             "MINUTE":"Minuto",
             "REPEATS":"Repetir",
             "START_DATE":"aaaa-mm-dd",
-            "END_DATE":"aaaa-mm-dd"
+            "START_DATE_FORMAT":"yyyy-mm-dd",
+            "END_DATE":"aaaa-mm-dd",
+            "END_DATE_FORMAT":"yyyy-mm-dd"
           },
           "UPLOAD":{
             "CAPTION":"Subir archivos",

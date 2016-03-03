@@ -5,7 +5,18 @@ angular.module('adminNg.resources')
         try {
             workflows = JSON.parse(data);
         } catch (e) { }
-        return { entries: workflows.results };
+
+        if (angular.isDefined(workflows.results)) {
+            return {
+                        entries: workflows.results,
+                        scheduling: false
+                    };
+        } else {
+            return {
+                        workflow: workflows,
+                        scheduling: true
+            };
+        }
     };
 
     return $resource('/admin-ng/event/:id/workflows:ext', { id: '@id' }, {
@@ -14,8 +25,13 @@ angular.module('adminNg.resources')
           method: 'GET',
           transformResponse: transform
         },
-        save: { method: 'POST', transformRequest: function (data) {
-            return JSON.stringify(data.entries);
-        }, transformResponse: transform }
+        save: { 
+            method: 'PUT',
+            responseType: 'text',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            transformRequest: function (data) {
+                return $.param({configuration: angular.toJson(data.entries)});   
+            }
+        }
     });
 }]);

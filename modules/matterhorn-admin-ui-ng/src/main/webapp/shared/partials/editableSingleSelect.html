@@ -6,21 +6,14 @@
 
     <div ng-show="editMode">
 
-        <select chosen
+        <select chosen pre-select-from="collection"
                 ng-model="params.value"
                 name="{{ params.name }}"
-<<<<<<< HEAD
                 ng-change="submit()"
                 ng-required="params.required"
                 data-width="'250px'"
                 ng-options="value as label|translate for (label, value) in collection">
-                <option value="" ng-selected="params.value === ''" ng-if="!params.required">-- {{ 'SELECT_NO_OPTIONS' | translate }} --</option>
-=======
-                ng-selected="item === params.value"
-                value="{{ item }}">
-                {{ label | translate | limitAppend : 70 }}
-            </option>
->>>>>>> develop
+                <option value="" ng-selected="params.value === ''" ng-if="!params.required">-- {{ 'SELECT_NO_OPTIONS' | translate | limitAppend : 70 }} --</option>
         </select>
     </div>
 </div>

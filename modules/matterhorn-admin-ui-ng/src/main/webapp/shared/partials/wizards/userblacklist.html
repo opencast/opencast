@@ -4,7 +4,7 @@
             <div class="form-container" ng-show="!wizard.step.isEditing()">
                 <div class="row">
                     <label translate="USERS.BLACKLISTS.DETAILS.USERS.ADD_USER">Add User</label>
-                    <select chosen
+                    <select chosen pre-select-from="wizard.step.items"
                         ng-disabled="wizard.step.ud.items.length"
                         data-width="'200px'"
                         data-disable-search-threshold="8"
@@ -87,7 +87,7 @@
             <div class="form-container">
                 <div class="row">
                     <label translate="USERS.BLACKLISTS.DETAILS.REASON.REASON">Reason</label>
-                    <select chosen
+                    <select chosen pre-select-from="wizard.step.reasons"
                         data-width="'200px'"
                         data-disable-search-threshold="8"
                         ng-model="wizard.step.ud.reason"

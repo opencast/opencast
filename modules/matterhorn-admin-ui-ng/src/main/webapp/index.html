@@ -6,6 +6,7 @@
         <link type="text/css" href="lib/datepicker/themes/smoothness/jquery-ui-1.10.3.min.css" rel="stylesheet">
         <link type="text/css" href="css/main.css" rel="stylesheet">
         <link type="text/css" href="lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+        <link rel="shortcut icon" href="img/favicon.ico">
         <script>
             window.jQuery || document.write('<script src="lib/jquery-1.10.2.js"><\/script>')
         </script>
@@ -21,8 +22,7 @@
     <body ng-cloak ng-controller="ApplicationCtrl" ng-click="bodyClicked()">
         <header ng-controller="NavCtrl" class="primary-header">
             <div class="header-branding">
-                <div class="text-logo">Opencast</div>
-                <div class="logo-tag">Beta</div>
+                <img src="img/opencast_logo_white.png" width="100px" height="20px" alt="Opencast logo" />
             </div>
             <nav class="header-nav nav-dd-container" id="nav-dd-container">
                 <div class="nav-dd lang-dd" id="lang-dd" old-admin-ng-dropdown="">
@@ -99,11 +99,15 @@
         <script src="lib/chosen.js"></script>
         <script src="lib/angular-sortable.js"></script>
         <script src="lib/video-js/video.js"></script>
+        <script src="lib/angular-wizard/dist/angular-wizard.js"></script>
+        <script src="lib/javascript-md5/js/md5.min.js"></script>
+        <script src="lib/angular-md5/angular-md5.min.js"></script>
 
         <script src="app.js"></script>
         <script src="shared/services/services.js"></script>
         <script src="shared/services/resourceHelperService.js"></script>
         <script src="shared/services/authService.js"></script>
+        <script src="shared/services/cryptService.js"></script>
         <script src="shared/services/jsHelperService.js"></script>
         <script src="shared/services/languageService.js"></script>
         <script src="shared/services/storageService.js"></script>
@@ -112,18 +116,22 @@
         <script src="shared/services/filterProfilesService.js"></script>
         <script src="shared/services/notificationsService.js"></script>
         <script src="shared/services/tableService.js"></script>
+        <script src="shared/services/decorateWithTableRowSelection.js"></script>
         <script src="shared/services/statsService.js"></script>
         <script src="shared/services/underscoreService.js"></script>
         <script src="shared/services/formNavigatorService.js"></script>
         <script src="shared/services/videoService.js"></script>
+        <script src="shared/services/regexService.js"></script>
         <script src="shared/resources/resources.js"></script>
         <script src="shared/resources/identityResource.js"></script>
         <script src="shared/resources/versionResource.js"></script>
         <script src="shared/resources/eventsResource.js"></script>
         <script src="shared/resources/optoutsResource.js"></script>
+        <script src="shared/resources/optoutSingleResource.js"></script>
         <script src="shared/resources/seriesResource.js"></script>
         <script src="shared/resources/seriesAccessResource.js"></script>
         <script src="shared/resources/seriesMetadataResource.js"></script>
+        <script src="shared/resources/seriesParticipationResource.js"></script>
         <script src="shared/resources/seriesEventsResource.js"></script>
         <script src="shared/resources/seriesThemeResource.js"></script>
         <script src="shared/resources/eventMetadataResource.js"></script>
@@ -138,9 +146,12 @@
         <script src="shared/resources/eventAttachmentDetailsResource.js"></script>
         <script src="shared/resources/eventMediaDetailsResource.js"></script>
         <script src="shared/resources/eventCatalogDetailsResource.js"></script>
+        <script src="shared/resources/eventParticipationResource.js"></script>
         <script src="shared/resources/eventPublicationDetailsResource.js"></script>
         <script src="shared/resources/eventPublicationsResource.js"></script>
+        <script src="shared/resources/eventSchedulingResource.js"></script>
         <script src="shared/resources/eventWorkflowsResource.js"></script>
+        <script src="shared/resources/eventTransactionResource.js"></script>
         <script src="shared/resources/eventErrorsResource.js"></script>
         <script src="shared/resources/eventErrorDetailsResource.js"></script>
         <script src="shared/resources/eventWorkflowDetailsResource.js"></script>
@@ -181,7 +192,6 @@
         <script src="shared/services/wizards/new-event/metadataExtended.js"></script>
         <script src="shared/services/wizards/new-event/processing.js"></script>
         <script src="shared/services/wizards/new-event/source.js"></script>
-        <script src="shared/services/wizards/new-event/states.js"></script>
         <script src="shared/services/wizards/new-event/summary.js"></script>
         <script src="shared/services/wizards/new-group/summary.js"></script>
         <script src="shared/services/wizards/new-group/users.js"></script>
@@ -223,12 +233,17 @@
         <script src="shared/services/httpInterceptor.js"></script>
         <script src="shared/filters/filters.js"></script>
         <script src="shared/filters/localizeDateFilter.js"></script>
+        <script src="shared/filters/addLeadingZerosFilter.js"></script>
         <script src="shared/filters/limitAndAppendFilter.js"></script>
+        <script src="shared/filters/humanByteSizeFilter.js"></script>
+        <script src="shared/filters/humanDurationFilter.js"></script>
         <script src="shared/filters/arrayFilter.js"></script>
-        <script src="shared/filters/sortMapByValue.js"></script>
         <script src="shared/filters/presentValue.js"></script>
+        <script src="shared/filters/removeQueryParams.js"></script>
+        <script src="shared/filters/sortMapByValue.js"></script>
         <script src="shared/filters/trustedResourceUrlFilter.js"></script>
         <script src="shared/directives/directives.js"></script>
+        <script src="shared/directives/customIcon.js"></script>
         <script src="shared/directives/datepickerDirective.js"></script>
         <script src="shared/directives/oldDropdownDirective.js"></script>
         <script src="shared/directives/passwordCheckDirective.js"></script>
@@ -255,6 +270,8 @@
         <script src="shared/directives/wizardDirective.js"></script>
         <script src="shared/directives/withRoleDirective.js"></script>
         <script src="shared/directives/fileuploadDirective.js"></script>
+        <script src="shared/directives/popOverDirective.js"></script>
+        <script src="shared/directives/preSelectFromDirective.js"></script>
         <script src="shared/services/resourceModalService.js"></script>
         <script src="shared/services/confirmationModalService.js"></script>
         <script src="shared/controllers/controllers.js"></script>
@@ -272,6 +289,7 @@
         <script src="modules/events/controllers/serieController.js"></script>
         <script src="modules/events/controllers/bulkMessageController.js"></script>
         <script src="modules/events/controllers/bulkDeleteController.js"></script>
+        <script src="modules/events/controllers/retractEventController.js"></script>
         <script src="modules/events/controllers/scheduleTaskController.js"></script>
         <script src="modules/events/subresources/controllers/toolsController.js"></script>
         <script src="modules/events/subresources/controllers/video/editController.js"></script>

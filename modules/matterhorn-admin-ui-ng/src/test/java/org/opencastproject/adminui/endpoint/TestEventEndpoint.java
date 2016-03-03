@@ -32,6 +32,21 @@ import static org.opencastproject.util.data.Tuple.tuple;
 import org.opencastproject.adminui.endpoint.AbstractEventEndpointTest.TestEnv;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
+import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
+import org.opencastproject.archive.api.UriRewriter;
+import org.opencastproject.archive.api.Version;
+import org.opencastproject.archive.base.StoragePath;
+import org.opencastproject.archive.base.persistence.AbstractArchiveDb;
+import org.opencastproject.archive.base.persistence.ArchiveDb;
+import org.opencastproject.archive.base.storage.DeletionSelector;
+import org.opencastproject.archive.base.storage.ElementStore;
+import org.opencastproject.archive.opencast.OpencastArchive;
+import org.opencastproject.archive.opencast.OpencastArchivePublisher;
+import org.opencastproject.archive.opencast.OpencastQuery;
+import org.opencastproject.archive.opencast.OpencastResultItem;
+import org.opencastproject.archive.opencast.OpencastResultSet;
+import org.opencastproject.archive.opencast.solr.SolrIndexManager;
+import org.opencastproject.archive.opencast.solr.SolrRequester;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
@@ -49,7 +64,6 @@ import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
-import org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter;
 import org.opencastproject.index.service.impl.IndexServiceImpl;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
@@ -69,11 +83,13 @@ import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.scheduler.api.SchedulerService;
+import org.opencastproject.schema.OcDublinCore;
+import org.opencastproject.schema.OcDublinCoreUtil;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -88,8 +104,6 @@ import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
-import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
-import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.series.impl.SeriesServiceDatabaseException;
 import org.opencastproject.series.impl.SeriesServiceImpl;
 import org.opencastproject.series.impl.solr.SeriesServiceSolrIndex;
@@ -114,6 +128,8 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Ignore;
@@ -251,7 +267,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     // service registry
     final ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
-    Job job = new JobImpl(12L);
+    JobImpl job = new JobImpl(12L);
     Date dateCreated = new Date(DateTimeSupport.fromUTC("2014-06-05T15:00:00Z"));
     Date dateCompleted = new Date(DateTimeSupport.fromUTC("2014-06-05T16:00:00Z"));
     job.setDateCreated(dateCreated);
@@ -486,8 +502,6 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
             messageSender, messageReceiver);
     env.setArchive(archive);
 
-    DublinCoreCatalogService dublinCoreCatalogService = EasyMock.createNiceMock(DublinCoreCatalogService.class);
-    env.setDublinCoreCatalogService(dublinCoreCatalogService);
 
     Date now = new Date(DateTimeSupport.fromUTC("2014-06-05T09:15:56Z"));
     EventComment comment = EventComment.create(Option.some(65L), "abc123", "mh_default_org", "Comment 1",
@@ -822,16 +836,6 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
-  public SeriesService getSeriesService() {
-    return env.getSeriesService();
-  }
-
-  @Override
-  public DublinCoreCatalogService getDublinCoreService() {
-    return env.getDublinCoreService();
-  }
-
-  @Override
   public EventCommentService getEventCommentService() {
     return env.getEventCommentService();
   }
@@ -867,18 +871,18 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
+  public UrlSigningService getUrlSigningService() {
+    return env.getUrlSigningService();
+  }
+
+  @Override
   public AdminUIConfiguration getAdminUIConfiguration() {
     return env.getAdminUIConfiguration();
   }
 
   @Override
   public long getUrlSigningExpireDuration() {
-    return UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
-  }
-
-  @Override
-  public UrlSigningService getUrlSigningService() {
-    return env.getUrlSigningService();
+    return DEFAULT_URL_SIGNING_EXPIRE_DURATION;
   }
 
   @Override

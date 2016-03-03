@@ -21,6 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.json.Jsons.a;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.j;
@@ -35,8 +36,12 @@ import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
+import org.opencastproject.archive.api.Archive;
+import org.opencastproject.archive.api.ArchiveException;
+import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.api.IndexService.Source;
+import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.matterhorn.search.SearchIndexException;
@@ -44,6 +49,7 @@ import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.Publication;
@@ -75,7 +81,6 @@ import org.opencastproject.workflow.handler.distribution.InternalPublicationChan
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JObjectWrite;
 import com.entwinemedia.fn.data.json.JValue;
@@ -94,6 +99,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -116,8 +122,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
-
-import de.schlichtherle.io.ArchiveException;
 
 @Path("/")
 @RestService(name = "toolsService", title = "Tools API Service", notes = "", abstractText = "Provides a location for the tools API.")
@@ -271,79 +275,84 @@ public class ToolsEndpoint implements ManagedService {
           @RestParameter(name = "mediapackageid", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
                   @RestResponse(description = "Media package found", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "Media package not found", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response getVideoEditor(@PathParam("mediapackageid") final String mediaPackageId) {
-    if (!isEditorAvailable(mediaPackageId)) {
+  public Response getVideoEditor(@PathParam("mediapackageid") final String mediaPackageId)
+          throws IndexServiceException, NotFoundException {
+    if (!isEditorAvailable(mediaPackageId))
       return R.notFound();
-    } else {
-      // Select tracks
-      final Opt<MediaPackage> optMP = getMediaPackage(mediaPackageId);
-      if (optMP.isSome()) {
-        final MediaPackage mp = optMP.get();
-        List<MediaPackageElement> previewPublications = getPreviewElementsFromPublication(getInternalPublication(mp));
 
-        // Collect previews and tracks
-        List<JValue> jPreviews = new ArrayList<JValue>();
-        List<JValue> jTracks = new ArrayList<JValue>();
-        for (Publication pub : previewPublications) {
-          String publicationUri;
-          if (urlSigningService.accepts(pub.getURI().toString())) {
-            try {
-              String clientIP = null;
-              if (signWithClientIP) {
-                clientIP = securityService.getUserIP();
-              }
-              publicationUri = urlSigningService.sign(pub.getURI().toString(), expireSeconds, null, clientIP);
-            } catch (UrlSigningException e) {
-              logger.error("Error while trying to sign the preview urls because: {}", ExceptionUtils.getStackTrace(e));
-              throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-            }
-          } else {
-            publicationUri = pub.getURI().toString();
+    // Select tracks
+    final MediaPackage mp = index.getEventMediapackage(getEvent(mediaPackageId).get()).orError(new NotFoundException())
+            .get();
+    List<MediaPackageElement> previewPublications = getPreviewElementsFromPublication(getInternalPublication(mp));
+
+    // Collect previews and tracks
+    List<JValue> jPreviews = new ArrayList<JValue>();
+    List<JValue> jTracks = new ArrayList<JValue>();
+    for (MediaPackageElement element : previewPublications) {
+      final URI elementUri;
+      if (urlSigningService.accepts(element.getURI().toString())) {
+        try {
+          String clientIP = null;
+          if (signWithClientIP) {
+            clientIP = securityService.getUserIP();
           }
-          jPreviews.add(j(f("uri", v(publicationUri))));
-
-          JObjectWrite jTrack = j(f("id", v(element.getIdentifier())), f("flavor", v(element.getFlavor().getType())));
-          // Check if there's a waveform for the current track
-          Opt<Attachment> optWaveform = getWaveformForTrack(mp, element);
-          if (optWaveform.isSome()) {
-            String waveformUri;
-            if (urlSigningService.accepts(optWaveform.get().getURI().toString())) {
-              try {
-                waveformUri = urlSigningService.sign(optWaveform.get().getURI().toString(), expireSeconds, null, null);
-              } catch (UrlSigningException e) {
-                logger.error("Error while trying to sign the waveform urls because: {}",
-                        ExceptionUtils.getStackTrace(e));
-                throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-              }
-            } else {
-              waveformUri = optWaveform.get().getURI().toString();
-            }
-
-            jTracks.add(jTrack.merge(j(f("waveform", v(waveformUri)))));
-          } else {
-            jTracks.add(jTrack);
-          }
-
+          elementUri = new URI(urlSigningService.sign(element.getURI().toString(), expireSeconds, null, clientIP));
+        } catch (URISyntaxException e) {
+          logger.error("Error while trying to sign the preview urls because: {}", ExceptionUtils.getStackTrace(e));
+          throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+        } catch (UrlSigningException e) {
+          logger.error("Error while trying to sign the preview urls because: {}", ExceptionUtils.getStackTrace(e));
+          throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
         }
-
-        // Get existing segments
-        List<JValue> jSegments = new ArrayList<JValue>();
-        for (Tuple<Long, Long> segment : getSegments(mediaPackageId)) {
-          jSegments.add(j(f(START_KEY, v(segment.getA())), f(END_KEY, v(segment.getB()))));
-        }
-
-        // Get workflows
-        List<JValue> jWorkflows = new ArrayList<JValue>();
-        for (WorkflowDefinition workflow : getEditingWorkflows()) {
-          jWorkflows.add(j(f("id", v(workflow.getId())), f("name", vN(workflow.getTitle()))));
-        }
-
-        return RestUtils.okJson(j(f("previews", a(jPreviews)), f(TRACKS_KEY, a(jTracks)),
-                f("duration", v(mp.getDuration())), f(SEGMENTS_KEY, a(jSegments)), f("workflows", a(jWorkflows))));
       } else {
-        return R.notFound();
+        elementUri = element.getURI();
       }
+      jPreviews.add(j(f("uri", v(elementUri.toString()))));
+
+      if (!Type.Track.equals(element.getElementType()))
+        continue;
+
+      JObjectWrite jTrack = j(f("id", v(element.getIdentifier())), f("flavor", v(element.getFlavor().getType())));
+      // Check if there's a waveform for the current track
+      Opt<Attachment> optWaveform = getWaveformForTrack(mp, element);
+      if (optWaveform.isSome()) {
+        final URI waveformUri;
+        if (urlSigningService.accepts(element.getURI().toString())) {
+          try {
+            waveformUri = new URI(
+                    urlSigningService.sign(optWaveform.get().getURI().toString(), expireSeconds, null, null));
+          } catch (URISyntaxException e) {
+            logger.error("Error while trying to serialize the waveform urls because: {}",
+                    ExceptionUtils.getStackTrace(e));
+            throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+          } catch (UrlSigningException e) {
+            logger.error("Error while trying to sign the preview urls because: {}", ExceptionUtils.getStackTrace(e));
+            throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+          }
+        } else {
+          waveformUri = optWaveform.get().getURI();
+        }
+        jTracks.add(jTrack.merge(j(f("waveform", v(waveformUri.toString())))));
+      } else {
+        jTracks.add(jTrack);
+      }
+
     }
+
+    // Get existing segments
+    List<JValue> jSegments = new ArrayList<JValue>();
+    for (Tuple<Long, Long> segment : getSegments(mp)) {
+      jSegments.add(j(f(START_KEY, v(segment.getA())), f(END_KEY, v(segment.getB()))));
+    }
+
+    // Get workflows
+    List<JValue> jWorkflows = new ArrayList<JValue>();
+    for (WorkflowDefinition workflow : getEditingWorkflows()) {
+      jWorkflows.add(j(f("id", v(workflow.getId())), f("name", vN(workflow.getTitle()))));
+    }
+
+    return RestUtils.okJson(j(f("previews", a(jPreviews)), f(TRACKS_KEY, a(jTracks)),
+            f("duration", v(mp.getDuration())), f(SEGMENTS_KEY, a(jSegments)), f("workflows", a(jWorkflows))));
   }
 
   @POST
@@ -355,7 +364,7 @@ public class ToolsEndpoint implements ManagedService {
                   @RestResponse(description = "Media package not found", responseCode = HttpServletResponse.SC_NOT_FOUND),
                   @RestResponse(description = "The editing information cannot be parsed", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
   public Response editVideo(@PathParam("mediapackageid") final String mediaPackageId,
-          @Context HttpServletRequest request) {
+          @Context HttpServletRequest request) throws IndexServiceException, NotFoundException {
     String details;
     try (InputStream is = request.getInputStream()) {
       details = IOUtils.toString(is);
@@ -373,11 +382,11 @@ public class ToolsEndpoint implements ManagedService {
       return R.badRequest("Unable to parse details");
     }
 
-    Opt<MediaPackage> optMediaPackage = getMediaPackage(mediaPackageId);
-    if (optMediaPackage.isNone()) {
+    final Opt<Event> optEvent = getEvent(mediaPackageId);
+    if (optEvent.isNone()) {
       return R.notFound();
     } else {
-      MediaPackage mediaPackage = optMediaPackage.get();
+      MediaPackage mediaPackage = index.getEventMediapackage(optEvent.get()).orError(new NotFoundException()).get();
       Smil smil;
       try {
         smil = createSmilCuttingCatalog(editingInfo, mediaPackage);
@@ -397,7 +406,7 @@ public class ToolsEndpoint implements ManagedService {
         final String workflowId = editingInfo.getPostProcessingWorkflow().get();
         try {
           archive.applyWorkflow(ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId)),
-                  mpElementProvider.getUriRewriter(), Stream.$(mediaPackage.getIdentifier().toString()).toList());
+                  mpElementProvider.getUriRewriter(), $(mediaPackage.getIdentifier().toString()).toList());
         } catch (ArchiveException e) {
           logger.warn("Unable to start workflow '{}' on archived media package '{}': {}",
                   new Object[] { workflowId, mediaPackage, getStackTrace(e) });
@@ -445,9 +454,7 @@ public class ToolsEndpoint implements ManagedService {
         }).filter(new Fn<Track, Boolean>() {
           @Override
           public Boolean ap(Track a) {
-            if (trackId.equals(a.getIdentifier()))
-              return true;
-            return false;
+            return trackId.equals(a.getIdentifier());
           }
         }).head();
         if (trackOpt.isNone())
@@ -525,12 +532,10 @@ public class ToolsEndpoint implements ManagedService {
   }
 
   private Opt<Publication> getInternalPublication(MediaPackage mp) {
-    return Stream.$(mp.getPublications()).filter(new Fn<Publication, Boolean>() {
+    return $(mp.getPublications()).filter(new Fn<Publication, Boolean>() {
       @Override
       public Boolean ap(Publication a) {
-        if (InternalPublicationChannel.CHANNEL_ID.equals(a.getChannel()))
-          return true;
-        return false;
+        return InternalPublicationChannel.CHANNEL_ID.equals(a.getChannel());
       }
     }).head();
   }
@@ -569,27 +574,6 @@ public class ToolsEndpoint implements ManagedService {
   }
 
   /**
-   * Get the {@link MediaPackage} to be used in this cutting operation.
-   *
-   * @param mediaPackageId
-   *          The UUID of the mediapackage.
-   * @return The {@link MediaPackage} if it is available.
-   */
-  private Opt<MediaPackage> getMediaPackage(final String mediaPackageId) {
-    final Opt<Event> optEvent = getEvent(mediaPackageId);
-    if (optEvent.isSome()) {
-      try {
-        return index.getEventMediapackage(optEvent.get());
-      } catch (WorkflowDatabaseException e) {
-        logger.error("Error while retrieving media package '{}': {}", mediaPackageId, getStackTrace(e));
-        return Opt.none();
-      }
-    } else {
-      return Opt.none();
-    }
-  }
-
-  /**
    * Tries to find a waveform for a given track in the media package. If a waveform is found the corresponding
    * {@link Publication} is returned, {@link Opt#none()} otherwise.
    *
@@ -599,7 +583,7 @@ public class ToolsEndpoint implements ManagedService {
    *          the track
    */
   private Opt<Attachment> getWaveformForTrack(final MediaPackage mp, final MediaPackageElement track) {
-    return Stream.$(getInternalPublication(mp)).bind(new Fn<Publication, List<Attachment>>() {
+    return $(getInternalPublication(mp)).bind(new Fn<Publication, List<Attachment>>() {
       @Override
       public List<Attachment> ap(Publication a) {
         return Arrays.asList(a.getAttachments());
@@ -631,7 +615,7 @@ public class ToolsEndpoint implements ManagedService {
       return emptyList();
     }
 
-    return Stream.$(workflows).filter(new Fn<WorkflowDefinition, Boolean>() {
+    return $(workflows).filter(new Fn<WorkflowDefinition, Boolean>() {
       @Override
       public Boolean ap(WorkflowDefinition a) {
         return a.containsTag(EDITOR_WORKFLOW_TAG);
@@ -642,59 +626,50 @@ public class ToolsEndpoint implements ManagedService {
   /**
    * Analyzes the media package and tries to get information about segments out of it.
    *
-   * @param mediaPackageId
-   *          the media package identifier
+   * @param mediaPackage
+   *          the media package
    * @return a list of segments or an empty list if no segments could be found.
    */
-  private List<Tuple<Long, Long>> getSegments(final String mediaPackageId) {
-    final Opt<MediaPackage> optMP = getMediaPackage(mediaPackageId);
-
-    if (optMP.isSome()) {
-      MediaPackage mp = optMP.get();
-      List<Tuple<Long, Long>> segments = new ArrayList<>();
-      for (Catalog smilCatalog : mp.getCatalogs(adminUIConfiguration.getSmilCatalogFlavor())) {
-        try {
-          Smil smil = smilService.fromXml(workspace.get(smilCatalog.getURI())).getSmil();
-          segments = mergeSegments(segments, getSegmentsFromSmil(smil));
-        } catch (NotFoundException e) {
-          logger.warn("File '{}' could not be loaded by workspace service: {}", smilCatalog.getURI(), getStackTrace(e));
-        } catch (IOException e) {
-          logger.warn("Reading file '{}' from workspace service failed: {}", smilCatalog.getURI(), getStackTrace(e));
-        } catch (SmilException e) {
-          logger.warn("Error while parsing SMIL catalog '{}': {}", smilCatalog.getURI(), getStackTrace(e));
-        }
+  private List<Tuple<Long, Long>> getSegments(final MediaPackage mediaPackage) {
+    List<Tuple<Long, Long>> segments = new ArrayList<>();
+    for (Catalog smilCatalog : mediaPackage.getCatalogs(adminUIConfiguration.getSmilCatalogFlavor())) {
+      try {
+        Smil smil = smilService.fromXml(workspace.get(smilCatalog.getURI())).getSmil();
+        segments = mergeSegments(segments, getSegmentsFromSmil(smil));
+      } catch (NotFoundException e) {
+        logger.warn("File '{}' could not be loaded by workspace service: {}", smilCatalog.getURI(), getStackTrace(e));
+      } catch (IOException e) {
+        logger.warn("Reading file '{}' from workspace service failed: {}", smilCatalog.getURI(), getStackTrace(e));
+      } catch (SmilException e) {
+        logger.warn("Error while parsing SMIL catalog '{}': {}", smilCatalog.getURI(), getStackTrace(e));
       }
-
-      if (!segments.isEmpty())
-        return segments;
-
-      // Read from silence detection flavors
-      for (Catalog smilCatalog : mp.getCatalogs(adminUIConfiguration.getSmilSilenceFlavor())) {
-        try {
-          Smil smil = smilService.fromXml(workspace.get(smilCatalog.getURI())).getSmil();
-          segments = mergeSegments(segments, getSegmentsFromSmil(smil));
-        } catch (NotFoundException e) {
-          logger.warn("File '{}' could not be loaded by workspace service: {}", smilCatalog.getURI(), getStackTrace(e));
-        } catch (IOException e) {
-          logger.warn("Reading file '{}' from workspace service failed: {}", smilCatalog.getURI(), getStackTrace(e));
-        } catch (SmilException e) {
-          logger.warn("Error while parsing SMIL catalog '{}': {}", smilCatalog.getURI(), getStackTrace(e));
-        }
-      }
-
-      // Check for single segment to ignore
-      if (segments.size() == 1) {
-        Tuple<Long, Long> singleSegment = segments.get(0);
-        if (singleSegment.getA() == 0 && singleSegment.getB() >= mp.getDuration())
-          segments.remove(0);
-      }
-
-      if (!segments.isEmpty())
-        return segments;
     }
 
-    // Return an empty list if no segments could be found
-    return Collections.emptyList();
+    if (!segments.isEmpty())
+      return segments;
+
+    // Read from silence detection flavors
+    for (Catalog smilCatalog : mediaPackage.getCatalogs(adminUIConfiguration.getSmilSilenceFlavor())) {
+      try {
+        Smil smil = smilService.fromXml(workspace.get(smilCatalog.getURI())).getSmil();
+        segments = mergeSegments(segments, getSegmentsFromSmil(smil));
+      } catch (NotFoundException e) {
+        logger.warn("File '{}' could not be loaded by workspace service: {}", smilCatalog.getURI(), getStackTrace(e));
+      } catch (IOException e) {
+        logger.warn("Reading file '{}' from workspace service failed: {}", smilCatalog.getURI(), getStackTrace(e));
+      } catch (SmilException e) {
+        logger.warn("Error while parsing SMIL catalog '{}': {}", smilCatalog.getURI(), getStackTrace(e));
+      }
+    }
+
+    // Check for single segment to ignore
+    if (segments.size() == 1) {
+      Tuple<Long, Long> singleSegment = segments.get(0);
+      if (singleSegment.getA() == 0 && singleSegment.getB() >= mediaPackage.getDuration())
+        segments.remove(0);
+    }
+
+    return segments;
   }
 
   protected List<Tuple<Long, Long>> mergeSegments(List<Tuple<Long, Long>> segments, List<Tuple<Long, Long>> segments2) {

@@ -186,9 +186,7 @@ public class TasksEndpoint {
     Map<String, String> optionsMap = options.filter(new Fn<Map.Entry<String, String>, Boolean>() {
       @Override
       public Boolean ap(Entry<String, String> a) {
-        if ("eventIds".equalsIgnoreCase(a.getKey()))
-          return false;
-        return true;
+        return !"eventIds".equalsIgnoreCase(a.getKey());
       }
     }).foldl(new HashMap<String, String>(), TasksEndpoint.<String, String> mapFold());
 
@@ -214,7 +212,7 @@ public class TasksEndpoint {
         return sum;
       }
     };
-  };
+  }
 
   private static final Fn<WorkflowInstance, String> getWorkflowIds = new Fn<WorkflowInstance, String>() {
     @Override

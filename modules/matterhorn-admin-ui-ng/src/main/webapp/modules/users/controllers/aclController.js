@@ -29,7 +29,11 @@ angular.module('adminNg.controllers')
             return {
                 role  : role,
                 read  : false,
-                write : false
+                write : false,
+                actions : {
+                    name : 'edit-acl-actions',
+                    value : []
+                }
             };
         },
         fetchChildResources,
@@ -41,7 +45,11 @@ angular.module('adminNg.controllers')
                 if (angular.isUndefined(policy)) {
                     newPolicies[acl.role] = createPolicy(acl.role);
                 }
-                newPolicies[acl.role][acl.action] = acl.allow;
+                if (acl.action === 'read' || acl.action === 'write') {
+                    newPolicies[acl.role][acl.action] = acl.allow;
+                } else if (acl.allow === true || acl.allow === 'true'){
+                    newPolicies[acl.role].actions.value.push(acl.action);
+                }
             });
 
             $scope.policies = [];
@@ -99,6 +107,16 @@ angular.module('adminNg.controllers')
         });
 
         $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
+        $scope.actions = {};
+        $scope.hasActions = false;
+        ResourcesListResource.get({ resource: 'ACL.ACTIONS'}, function(data) {
+            angular.forEach(data, function (value, key) {
+                if (key.charAt(0) !== '$') {
+                    $scope.actions[key] = value;
+                    $scope.hasActions = true;
+                }
+            });
+        });
         $scope.roles = ResourcesListResource.get({ resource: 'ROLES' });
     };
 
@@ -133,6 +151,14 @@ angular.module('adminNg.controllers')
                         'role'   : policy.role
                     });   
                 }
+
+                angular.forEach(policy.actions.value, function(customAction){
+                    ace.push({
+                        'action' : customAction,
+                        'allow'  : true,
+                        'role'   : policy.role
+                   });
+                });
             }
 
         });

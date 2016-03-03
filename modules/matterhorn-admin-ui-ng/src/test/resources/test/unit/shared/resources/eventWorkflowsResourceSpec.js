@@ -27,10 +27,9 @@ describe('Event Workflows API Resource', function () {
 
     describe('#save', function () {
         it('sends an array of workflows', function () {
-            var workflowsRequest = {
-                entries: [{ id: 'title' }, { id: 'series' }]
-            };
-            $httpBackend.expectPOST('/admin-ng/event/40518/workflows', workflowsRequest.entries).respond(200);
+            var workflowsRequest = { id: 'title', configuration: {}};
+
+            $httpBackend.expectPUT('/admin-ng/event/40518/workflows').respond(200);
             EventWorkflowsResource.save({ id: '40518' }, workflowsRequest);
             $httpBackend.flush();
         });

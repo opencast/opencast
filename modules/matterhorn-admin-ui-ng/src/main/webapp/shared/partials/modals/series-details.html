@@ -7,6 +7,7 @@
     <nav class="modal-nav" id="modal-nav">
         <a ng-click="openTab('metadata')" data-modal-tab="metadata" ng-class="{ active: tab == 'metadata' }" translate="EVENTS.SERIES.DETAILS.TABS.METADATA" with-role="ROLE_UI_SERIES_DETAILS_METADATA_VIEW">Metadata</a>
         <a ng-if="metadata.entries.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.SERIES.DETAILS.TABS.EXTENDED_METADATA" with-role="ROLE_UI_SERIES_DETAILS_EXTMETADATA_VIEW">Metadata</a>
+        <a ng-click="openTab('participation')" data-modal-tab="participation" ng-class="{ active: tab == 'participation' }" translate="EVENTS.SERIES.DETAILS.TABS.PARTICIPATION" with-role="ROLE_UI_SERIES_DETAILS_EXTMETADATA_VIEW">Participation</a>
 <!--         <a ng-click="openTab('events')" data-modal-tab="events" ng-class="{ active: tab == 'events' }" translate="EVENTS.SERIES.DETAILS.TABS.EVENTS">Events</a> -->
         <a ng-click="openTab('permissions')" data-modal-tab="permissions" ng-class="{ active: tab == 'permissions' }" translate="EVENTS.SERIES.DETAILS.TABS.PERMISSIONS" with-role="ROLE_UI_SERIES_DETAILS_ACL_VIEW">Access Policy</a>
         <a ng-click="openTab('theme')" data-modal-tab="theme" ng-class="{ active: tab == 'theme' }" translate="EVENTS.SERIES.DETAILS.TABS.THEME" with-role="ROLE_UI_SERIES_DETAILS_THEMES_VIEW">Theme</a>
@@ -58,6 +59,66 @@
         </div>
     </div>
 
+    <div class="modal-content" data-modal-tab-content="participation">
+        <div class="modal-body">
+            <div data-admin-ng-notifications="" context="series-participation"></div>
+            <div class="full-col">
+
+                <div class="warning alert sticky">
+                    <a class="autonomous fa fa-times close"></a>
+                    <p translate="EVENTS.SERIES.DETAILS.PARTICIPATION.WARNING_TEMPLATE"></p>
+                </div>
+
+                <!-- Participation status -->
+                <div class="obj">   
+                    <header  translate="EVENTS.SERIES.DETAILS.PARTICIPATION.CAPTION">Participation Status</header>
+
+                    <div class="obj-container padded">
+                        <!-- <p><span translate="EVENTS.SERIES.DETAILS.PARTICIPATION.REVIEW_STATUS.CAPTION">Review status</span>: {{ participation.review_status }}</p> -->
+                        
+                        <div class="form-container">
+                            <div class="row">
+                                <input type="radio" name="execute-toggle" id="executeNow-toggle" ng-model="participation.opt_out" ng-change="updateOptout(false)" value="false" >
+                                <label translate="EVENTS.SERIES.DETAILS.PARTICIPATION.OPTEDOUT.READY" for="executeNow-toggle">Ready for recording</label>
+                            </div>
+                            <div class="row">
+                                <input type="radio" name="execute-toggle" id="executeLater-toggle" ng-model="participation.opt_out" ng-change="updateOptout(true)" value="true" >
+                                <label translate="EVENTS.SERIES.DETAILS.PARTICIPATION.OPTEDOUT.OPTEDOUT" for="executeLater-toggle">Opted out</label>
+                            </div>
+                        </div>
+                    </div>   
+                </div>
+
+
+                <!-- Messages -->
+<!--                 <div class="obj tbl-container">
+                    <header translate="EVENTS.SERIES.DETAILS.PARTICIPATION.MESSAGES.CAPTION">Participation</header>
+                    <div class="obj-container">
+                        <table class="main-tbl">
+                            <thead>
+                                <tr>
+                                    <th translate="EVENTS.SERIES.DETAILS.PARTICIPATION.MESSAGES.CREATION_DATE">Creation date</th>
+                                    <th translate="EVENTS.SERIES.DETAILS.PARTICIPATION.MESSAGES.SENDER">Sender</th>
+                                    <th translate="EVENTS.SERIES.DETAILS.PARTICIPATION.MESSAGES.SUBJECT">Subject</th>
+                                    <th class="medium"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in participation.messages">
+                                    <td>{{ item.creation_date }}</td>
+                                    <td>{{ item.creator }}</td>
+                                    <td>{{ item.subject }}</td>
+                                    <td><a class="details-link" ng-click="openSubTab('workflow-details', 'EventWorkflowDetailsResource', item.id)" translate="EVENTS.SERIES.DETAILS.MEDIA.DETAILS">Details</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div> -->
+
+            </div>
+        </div>
+    </div>
+
 <!--     <div class="modal-content" data-modal-tab-content="events">
         <p class="tab-desc"></p>
         <div class="full-col">
@@ -99,10 +160,6 @@
 
             <div data-admin-ng-notifications="" context="series-acl"></div>
             <div data-admin-ng-notifications="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
-<<<<<<< HEAD
-=======
-
->>>>>>> develop
             <div data-admin-ng-notifications="" type="warning" context="series-acl-{{resourceId}}"></div>
 
             <div class="full-col">
@@ -123,7 +180,7 @@
                                             <td>
                                                 <div class="obj-container padded">
                                                     <p translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION"></p>
-                                                    <select chosen
+                                                    <select chosen pre-select-from="acls"
                                                         ng-disabled="(tab == 'permissions') && (!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked)"
                                                         data-width="'200px'"
                                                         data-disable-search-threshold="8"
@@ -153,13 +210,14 @@
                                                 <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ROLE">Role</th>
                                                 <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.READ" class="fit">Read</th>
                                                 <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.WRITE" class="fit">Write</th>
+                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="hasActions"><!--Additional Actions--></th>
                                                 <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ACTION" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked" class="fit">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr ng-repeat="policy in policies">
                                                 <td>
-                                                    <select chosen
+                                                    <select chosen pre-select-from="roles"
                                                         ng-disabled="(tab == 'permissions') && (!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked)"
                                                         data-width="'200px'"
                                                         data-disable-search-threshold="8"
@@ -173,11 +231,14 @@
                                                 </td>
                                                 <td class="fit"><input type="checkbox" ng-disabled="aclLocked" ng-model="policy.read" ng-change="accessSave(policy)" ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/></td>
                                                 <td class="fit"><input type="checkbox" ng-disabled="aclLocked" ng-model="policy.write" ng-change="accessSave(policy)" ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/></td>
-                                                <td class="fit" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked"><a ng-click="deletePolicy(policy)" class="remove"></a>
+                                                <td class="fit editable" ng-if="hasActions">
+                                                    <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked" save="accessSave" admin-ng-editable-multi-select mixed="false" params="policy.actions" collection="actions"></div>
+                                                    <div ng-if="(!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')) || aclLocked" ng-repeat="customAction in policy.actions.value">{{ customAction }}</div>
                                                 </td>
+                                                <td class="fit" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked"><a ng-click="deletePolicy(policy)" class="remove"></a></td>
                                             </tr>
                                             <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked">
-                                                <td colspan="4"><a ng-click="addPolicy()">+ {{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
+                                                <td colspan="5"><a ng-click="addPolicy()">+ {{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
                                             <tr>
                                             </tr>
                                         </tbody>
@@ -200,7 +261,7 @@
                 <div class="obj quick-actions">
                     <header>Theme</header>
                     <div class="obj-container padded">
-                        <select chosen
+                        <select chosen pre-select-from="themes"
                                 allow-single-deselect="true"
                                 ng-disabled="(tab == 'theme') && !$root.userIs('ROLE_UI_SERIES_DETAILS_THEMES_EDIT')"
                                 data-width="'200px'"

@@ -1,6 +1,6 @@
 angular.module('adminNg.services')
-.factory('NewSeriesAccess', ['ResourcesListResource', 'SeriesAccessResource', 'Notifications', '$timeout',
-    function (ResourcesListResource, SeriesAccessResource, Notifications, $timeout) {
+.factory('NewSeriesAccess', ['ResourcesListResource', 'SeriesAccessResource', 'AuthService', 'Notifications', '$timeout',
+    function (ResourcesListResource, SeriesAccessResource, AuthService, Notifications, $timeout) {
     var Access = function () {
 
         var me = this,
@@ -10,7 +10,11 @@ angular.module('adminNg.services')
                 return {
                     role  : role,
                     read  : false,
-                    write : false
+                    write : false,
+                    actions : {
+                        name : 'new-series-acl-actions',
+                        value : []
+                    }
                 };
             },
             checkNotification = function () {
@@ -18,7 +22,7 @@ angular.module('adminNg.services')
                     if (!angular.isUndefined(me.notificationRules)) {
                         Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);
                     }
-                    me.notificationRules = Notifications.add('warning', 'INVALID_ACL_RULES', NOTIFICATION_CONTEXT);
+                    me.notificationRules = Notifications.add('warning', 'INVALID_ACL_RULES', NOTIFICATION_CONTEXT);  
                 } else if (!angular.isUndefined(me.notificationRules)) {
                     Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);
                     me.notificationRules = undefined;
@@ -28,7 +32,7 @@ angular.module('adminNg.services')
                     if (!angular.isUndefined(me.notificationRights)) {
                         Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
                     }
-                    me.notificationRights = Notifications.add('warning', 'MISSING_ACL_RULES', NOTIFICATION_CONTEXT);
+                    me.notificationRights = Notifications.add('warning', 'MISSING_ACL_RULES', NOTIFICATION_CONTEXT);  
                 } else if (!angular.isUndefined(me.notificationRights)) {
                     Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
                     me.notificationRights = undefined;
@@ -37,11 +41,22 @@ angular.module('adminNg.services')
                 $timeout(function () {
                     checkNotification();
                  }, 200);
+            },
+            addUserRolePolicy = function (policies) {
+                if (angular.isDefined(AuthService.getUserRole())) {
+                    var currentUserPolicy = createPolicy(AuthService.getUserRole());
+                    currentUserPolicy.read = true;
+                    currentUserPolicy.write = true;
+                    policies.push(currentUserPolicy);
+                }
+                return policies;
             };
 
         me.ud = {};
         me.ud.id = {};
         me.ud.policies = [];
+        // Add the current user's role to the ACL upon the first startup
+        me.ud.policies = addUserRolePolicy(me.ud.policies);
         me.ud.baseAcl = {};
 
         this.changeBaseAcl = function () {
@@ -53,10 +68,19 @@ angular.module('adminNg.services')
                     if (angular.isUndefined(policy)) {
                         newPolicies[acl.role] = createPolicy(acl.role);
                     }
-                    newPolicies[acl.role][acl.action] = acl.allow;
+                    if (acl.action === 'read' || acl.action === 'write') {
+                        newPolicies[acl.role][acl.action] = acl.allow;
+                    } else if (acl.allow === true || acl.allow === 'true'){
+                        newPolicies[acl.role].actions.value.push(acl.action);
+                    }
                 });
 
                 me.ud.policies = [];
+                // After loading an ACL template add the user's role to the top of the ACL list if it isn't included
+                if (angular.isDefined(AuthService.getUserRole()) && !angular.isDefined(newPolicies[AuthService.getUserRole()])) {
+                    me.ud.policies = addUserRolePolicy(me.ud.policies);
+                }
+
                 angular.forEach(newPolicies, function (policy) {
                     me.ud.policies.push(policy);
                 });
@@ -96,7 +120,7 @@ angular.module('adminNg.services')
                     hasRights = true;
                 }
 
-                if ((policy.read || policy.write) && !angular.isUndefined(policy.role)) {
+                if ((policy.read || policy.write || policy.actions.value.length > 0) && !angular.isUndefined(policy.role)) {
                     rulesValid = true;
                 }
              });
@@ -118,6 +142,16 @@ angular.module('adminNg.services')
         checkNotification();
         
         me.acls  = ResourcesListResource.get({ resource: 'ACL' });
+        me.actions = {};
+        me.hasActions = false;
+        ResourcesListResource.get({ resource: 'ACL.ACTIONS'}, function(data) {
+            angular.forEach(data, function (value, key) {
+                if (key.charAt(0) !== '$') {
+                    me.actions[key] = value;
+                    me.hasActions = true;
+                }
+            });
+        });
         me.roles = ResourcesListResource.get({ resource: 'ROLES' }); 
 
         this.reset = function () {
@@ -125,6 +159,8 @@ angular.module('adminNg.services')
                 id: {},
                 policies: []
             };
+            // Add the user's role upon resetting
+            me.ud.policies = addUserRolePolicy(me.ud.policies);
         };
 
         this.reload = function () {

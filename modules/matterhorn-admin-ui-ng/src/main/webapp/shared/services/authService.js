@@ -6,6 +6,7 @@ angular.module('adminNg.services')
             isUserLoaded = false,
             callbacks = [],
             identity,
+            userRole,
             isAuthorizedAs = function (role) {
                 if (angular.isUndefined(me.user.roles)) {
                     return false;
@@ -23,6 +24,9 @@ angular.module('adminNg.services')
                 var adminRole = user.org.adminRole;
                 me.user = user;
                 isAdmin = angular.isDefined(adminRole) && user.roles.indexOf(adminRole) > -1;
+                if (angular.isDefined(user.userRole)) {
+                    userRole = user.userRole;
+                }
                 isUserLoaded = true;
                 angular.forEach(callbacks, function (item) {
                     isAuthorizedAs(item.role) ? item.success() : item.error();
@@ -32,6 +36,10 @@ angular.module('adminNg.services')
 
         this.getUser = function () {
             return identity;
+        };
+
+        this.getUserRole = function () {
+            return userRole;
         };
 
         this.userIsAuthorizedAs = function (role, success, error) {

@@ -16,7 +16,7 @@ angular.module('adminNg.resources')
                     name: key,
                     value: value
                   });
-
+                  
                 });
               }
 

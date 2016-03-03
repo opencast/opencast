@@ -9,11 +9,9 @@ angular.module('adminNg.services')
                 }
             });
             if (valid) {
-                console.log('proceeding to ', targetForm);
                 return targetForm;
             }
             else {
-                console.log('staying at ', currentForm);
                 return currentForm;
             }
         };

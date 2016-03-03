@@ -277,6 +277,7 @@ div.table-filter {
   border: 1px solid #c9d0d3;
   border-radius: 4px;
   margin-left: 10px;
+  position: inherit;
 
   .filters {
     border: 0;
@@ -286,7 +287,7 @@ div.table-filter {
     background: #fff;
     background-color: #fafafa;
     min-height: 23px;
-    min-width: 100px;
+    min-width: 150px;
     padding: 7px;
 
     &>i {

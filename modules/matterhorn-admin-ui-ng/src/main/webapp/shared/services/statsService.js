@@ -1,6 +1,6 @@
 angular.module('adminNg.services')
-.factory('Stats', ['$rootScope', '$filter', 'Storage', '$location', '$timeout',
-    function ($rootScope, $filter, Storage, $location, $timeout) {
+.factory('Stats', ['$rootScope', '$filter', 'Storage', '$location', '$interval',
+    function ($rootScope, $filter, Storage, $location, $interval) {
     var StatsService = function () {
         var me = this,
             DEFAULT_REFRESH_DELAY = 5000;
@@ -62,11 +62,11 @@ angular.module('adminNg.services')
             on: true,
             newSchedule: function () {
                 me.refreshScheduler.cancel();
-                me.refreshScheduler.nextTimeout = $timeout(me.fetch, me.refreshDelay);
+                me.refreshScheduler.nextTimeout = $interval(me.fetch, me.refreshDelay);
             },
             cancel: function () {
                 if (me.refreshScheduler.nextTimeout) {
-                    $timeout.cancel(me.refreshScheduler.nextTimeout);
+                    $interval.cancel(me.refreshScheduler.nextTimeout);
                 }
             }
         };

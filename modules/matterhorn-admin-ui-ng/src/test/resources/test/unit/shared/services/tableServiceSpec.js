@@ -85,6 +85,64 @@ describe('Table', function () {
         });
     });
 
+    describe('#mergeColumns', function(){
+        var availableColumns;
+
+        beforeEach(function(){
+            availableColumns = [{
+                name: 'status'
+            }, {
+                name: 'title',
+                deactivated: false
+            }, {
+                name: 'color',
+                deactivated: false
+            }];
+        });
+
+        it('returns only available columns', function(){
+            var storedColumns = [{
+                name: 'color',
+                deactivated: false
+            }, {
+                name: 'title',
+                deactivated: false
+            }, {
+                name: 'group',
+                deactivated: false
+            }];
+
+            var columns = Table.mergeColumns(storedColumns, availableColumns);
+
+            expect(columns).toEqual([{
+                name: 'color',
+                deactivated: false
+            }, {
+                name: 'title',
+                deactivated: false
+            }, {
+                name: 'status',
+                deactivated: false
+            }]);
+        });
+
+        it('returns the default columns when no stored columns are available', function(){
+            var columns = Table.mergeColumns(undefined, availableColumns);
+            expect(columns).toEqual(availableColumns);
+        });
+
+        it('returns empty columns without any columns given', function(){
+            expect(Table.mergeColumns(undefined, undefined)).toEqual([]);
+        });
+    });
+
+    describe('#getTableName', function(){
+        it('extracts the table name from the current url', function(){
+            spyOn($location, 'path').and.returnValue('/module/events');
+            expect(Table.getTableName()).toEqual('events');
+        });
+    });
+
     describe('#fetch', function () {
         beforeEach(function () {
             Table.resource = 'users';
@@ -154,6 +212,28 @@ describe('Table', function () {
             Table.sortBy({ name: 'email' });
             $httpBackend.flush();
             expect(Table.rows[0].email).toEqual('admin@example.com');
+        });
+
+        it ('getSelectedCopy returns clones of the selected rows', function () {
+            Table.rows[0].selected = true;
+            var copy = Table.copySelected(), originalTitle = Table.rows[0].title;
+            copy.title = 'new title';
+            expect(Table.rows[0].title).toEqual(originalTitle);
+        });
+
+        describe('#getSelected', function () {
+            it ('returns all selected rows', function () {
+                Table.rows[0].selected = true;
+                Table.rows[5].selected = true;
+                expect(Table.getSelected().length).toEqual(2);
+            });
+
+            it ('returns the " rows', function () {
+                Table.rows[0].selected = true;
+                var selected = Table.getSelected(), newTitle = 'new title';
+                selected[0].title = newTitle;
+                expect(Table.rows[0].title).toEqual(newTitle);
+            });
         });
     });
 
@@ -230,6 +310,7 @@ describe('Table', function () {
                     page(4, '5'), page(5, '..'), page(7, '8')]);
             });
         });
+
     });
 
 });

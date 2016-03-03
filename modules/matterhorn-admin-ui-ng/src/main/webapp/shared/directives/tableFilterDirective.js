@@ -37,6 +37,9 @@ angular.module('adminNg.directives')
                 angular.forEach(scope.filters.filters, function (filter) {
                     delete filter.value;
                 });
+
+                scope.selectedFilter = null;
+                scope.showFilterSelector = false;
                 Storage.remove('filter');
             };
 
@@ -82,7 +85,7 @@ angular.module('adminNg.directives')
                     return profile.name;
                 });
                 scope.profileForm.name.$setValidity('uniqueness',
-                        profileNames.indexOf(scope.profile.name) > -1 ? false:true);
+                        profileNames.indexOf(scope.profile.name) <= -1);
             };
 
             scope.saveProfile = function () {

@@ -64,7 +64,7 @@ angular.module('adminNg.controllers')
                 name:  'presenter',
                 label: 'EVENTS.EVENTS.TABLE.PRESENTERS'
             }, {
-                name: 'series_name',
+                name:  'series_name',
                 label: 'EVENTS.EVENTS.TABLE.SERIES'
             }, {
                 name:  'date',
@@ -79,7 +79,12 @@ angular.module('adminNg.controllers')
                 name:  'location',
                 label: 'EVENTS.EVENTS.TABLE.LOCATION'
             }, {
-                name: 'event_status',
+                name:  'published',
+                label: 'EVENTS.EVENTS.TABLE.PUBLISHED',
+                template: 'modules/events/partials/publishedCell.html',
+                dontSort: true
+            }, {
+                name:  'event_status',
                 label: 'EVENTS.EVENTS.TABLE.SCHEDULING_STATUS'
             }, {
                 template: 'modules/events/partials/eventActionsCell.html',
