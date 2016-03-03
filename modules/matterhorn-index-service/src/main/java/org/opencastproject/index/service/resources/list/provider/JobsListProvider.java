@@ -25,7 +25,7 @@ import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.query.JobsListQueryImpl;
-import org.opencastproject.index.service.resources.list.query.JobsListQueryImpl.FILTERS;
+import org.opencastproject.index.service.resources.list.query.JobsListQueryImpl.Filters;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -61,7 +61,7 @@ public class JobsListProvider implements ResourceListProvider {
   public static final String WORKFLOW = PROVIDER_PREFIX + ".WORKFLOW";
 
   /** The list of filter criteria for this provider */
-  public static enum JobFilter {
+  public enum JobFilter {
     CONTRIBUTOR, CREATOR, LANGUAGE, OPERATION, SERIES, STATUS, SUBJECT, TITLE, WORKFLOW;
   };
 
@@ -127,7 +127,7 @@ public class JobsListProvider implements ResourceListProvider {
     wQuery.withCount(limit);
 
     // Add filters
-    if (query != null && query.hasFilter(FILTERS.TEXT.toString()))
+    if (query != null && query.hasFilter(Filters.TEXT.toString()))
       wQuery.withText(jobsQuery.getText().get());
 
     try {

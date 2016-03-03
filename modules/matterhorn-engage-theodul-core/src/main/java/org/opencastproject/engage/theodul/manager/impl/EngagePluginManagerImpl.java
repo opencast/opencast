@@ -241,7 +241,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
 
     private Bundle bundle;
 
-    public BundleDelegatingClassLoader(Bundle bundle) {
+    BundleDelegatingClassLoader(Bundle bundle) {
       super();
       this.bundle = bundle;
     }

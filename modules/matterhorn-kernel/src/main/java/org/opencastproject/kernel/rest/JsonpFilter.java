@@ -145,7 +145,7 @@ public class JsonpFilter implements Filter {
      * @param callbackValue
      *          the jsonp callback value
      */
-    public HttpServletResponseContentWrapper(HttpServletResponse response, String callbackValue) {
+    HttpServletResponseContentWrapper(HttpServletResponse response, String callbackValue) {
       super(response);
       this.preWrapper = callbackValue + OPEN_PARENS;
       this.buffer = new ByteArrayServletOutputStream();
@@ -344,7 +344,7 @@ public class JsonpFilter implements Filter {
     /**
      * Creates a new buffered stream with the default size (32).
      */
-    public ByteArrayServletOutputStream() {
+    ByteArrayServletOutputStream() {
       this(32);
     }
 
@@ -354,7 +354,7 @@ public class JsonpFilter implements Filter {
      * @param size
      *          the buffer size
      */
-    public ByteArrayServletOutputStream(int size) {
+    ByteArrayServletOutputStream(int size) {
       if (size < 0) {
         throw new IllegalArgumentException("Negative initial size: " + size);
       }

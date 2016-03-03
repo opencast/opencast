@@ -21,14 +21,19 @@
 
 package org.opencastproject.workflow.handler.notification;
 
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.search.api.SearchQuery;
+import org.opencastproject.search.api.SearchResult;
+import org.opencastproject.search.api.SearchService;
+import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationInstance;
+import org.opencastproject.workflow.api.WorkflowOperationResult;
+import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
@@ -37,20 +42,17 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.opencastproject.job.api.JobContext;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageParser;
-import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
-import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowOperationException;
-import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.opencastproject.search.api.SearchService;
-import org.opencastproject.search.api.SearchQuery;
-import org.opencastproject.search.api.SearchResult;
+
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Workflow Operation for POSTing a MediaPackage via HTTP
@@ -178,7 +180,7 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
   // <editor-fold defaultstate="collapsed" desc="Inner class that wraps around this WorkflowOperations Configuration">
   private static class Configuration {
 
-    public static enum Format {
+    public enum Format {
       XML, JSON
     };
 
@@ -223,7 +225,7 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
     private boolean debug = false;
     private boolean mpFromSearch = true;
 
-    public Configuration(WorkflowOperationInstance operation) throws WorkflowOperationException {
+    Configuration(WorkflowOperationInstance operation) throws WorkflowOperationException {
       try {
         Set<String> keys = operation.getConfigurationKeys();
 

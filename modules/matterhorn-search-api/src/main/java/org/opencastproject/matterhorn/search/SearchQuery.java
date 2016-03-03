@@ -33,7 +33,7 @@ public interface SearchQuery {
   /**
    * Sort order definitions.
    */
-  public enum Order {
+  enum Order {
     None, Ascending, Descending
   }
 

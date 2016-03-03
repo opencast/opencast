@@ -26,7 +26,7 @@ package org.opencastproject.security.api;
  */
 public interface Permissions {
 
-  public enum Action {
+  enum Action {
 
     /** Identifier for read permissions */
     READ("read"),

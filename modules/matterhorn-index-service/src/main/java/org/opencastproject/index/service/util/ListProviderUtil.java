@@ -44,7 +44,7 @@ public final class ListProviderUtil {
    *
    * @param map
    *          The map to sort
-   * @param ascending
+   * @param asc
    *          If the sorting should be done ascendantly (true) or not
    * @return a sorted map
    */
@@ -67,7 +67,7 @@ public final class ListProviderUtil {
      * @param ascending
      *          If the sorting should be done ascendantly (true) or not
      */
-    public ValueComparer(Map<String, Object> data, boolean ascending) {
+    ValueComparer(Map<String, Object> data, boolean ascending) {
       super();
       this.baseMap = data;
       this.ascending = ascending;

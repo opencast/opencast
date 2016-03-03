@@ -55,7 +55,7 @@ public class EmailListProvider implements ResourceListProvider {
   public static final String STARTS_WITH_TEXT = "startsWith";
 
   /** The list of filter criteria for this provider */
-  public static enum EMAIL_FILTER_LIST {
+  public enum EmailFilterList {
     TEMPLATE_NAMES;
   };
 
@@ -66,7 +66,7 @@ public class EmailListProvider implements ResourceListProvider {
 
   protected void activate(BundleContext bundleContext) {
     // Fill the list names
-    for (EMAIL_FILTER_LIST value : EMAIL_FILTER_LIST.values()) {
+    for (EmailFilterList value : EmailFilterList.values()) {
       listNames.add(getListNameFromFilter(value));
     }
 
@@ -87,7 +87,7 @@ public class EmailListProvider implements ResourceListProvider {
   public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException {
     Map<String, Object> result = new HashMap<String, Object>();
-    if (getListNameFromFilter(EMAIL_FILTER_LIST.TEMPLATE_NAMES).equals(listName)) {
+    if (getListNameFromFilter(EmailFilterList.TEMPLATE_NAMES).equals(listName)) {
       String nameText = null;
       if (query.hasFilter(NAME) && query.getFilter(NAME).getValue().isSome()
               && query.getFilter(NAME).getValue().get() instanceof String) {
@@ -132,7 +132,7 @@ public class EmailListProvider implements ResourceListProvider {
    *          the filter from which the list name is needed
    * @return the list name related to the given filter
    */
-  public static String getListNameFromFilter(EMAIL_FILTER_LIST filter) {
+  public static String getListNameFromFilter(EmailFilterList filter) {
     return PROVIDER_PREFIX.toUpperCase() + "_" + filter.toString().toUpperCase();
   }
 }

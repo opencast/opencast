@@ -72,7 +72,7 @@ public class WebConsole extends OsgiManager {
     protected String serverUrl = null;
 
     /** Constructs the branding plugin using the local server's base URL */
-    public MatterhornBrandingPlugin(String serverUrl) {
+    MatterhornBrandingPlugin(String serverUrl) {
       this.serverUrl = serverUrl;
     }
 

@@ -76,7 +76,7 @@ public class WildcardQueryParserPlugin extends QParserPlugin {
      * @param req
      *          the query request
      */
-    public WildcardQueryParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req) {
+    WildcardQueryParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req) {
       super(qstr, localParams, params, req);
     }
 

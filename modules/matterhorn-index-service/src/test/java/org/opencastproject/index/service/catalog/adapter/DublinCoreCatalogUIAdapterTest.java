@@ -239,7 +239,7 @@ public class DublinCoreCatalogUIAdapterTest {
     List<MetadataField<?>> metadataFields = new ArrayList<MetadataField<?>>(dublinCoreProperties.values());
     assertEquals(title, metadataFields.get(0).getInputID());
     assertEquals(label, metadataFields.get(0).getLabel());
-    assertEquals(MetadataField.TYPE.TEXT, metadataFields.get(0).getType());
+    assertEquals(MetadataField.Type.TEXT, metadataFields.get(0).getType());
     assertEquals(true, metadataFields.get(0).isReadOnly());
     assertEquals(true, metadataFields.get(0).isRequired());
     assertEquals(listProvider, metadataFields.get(0).getListprovider().get());

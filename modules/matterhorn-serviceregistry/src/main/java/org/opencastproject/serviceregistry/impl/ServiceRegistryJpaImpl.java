@@ -2988,7 +2988,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
      * @param loadByHost
      *          the current work load by host
      */
-    public LoadComparator(SystemLoad loadByHost) {
+    LoadComparator(SystemLoad loadByHost) {
       this.loadByHost = loadByHost;
     }
 

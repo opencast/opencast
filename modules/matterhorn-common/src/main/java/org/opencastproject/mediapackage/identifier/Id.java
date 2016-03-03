@@ -43,7 +43,7 @@ public interface Id {
    */
   String compact();
 
-  static class Adapter extends XmlAdapter<IdImpl, Id> {
+  class Adapter extends XmlAdapter<IdImpl, Id> {
     public IdImpl marshal(Id id) throws Exception {
       if (id instanceof IdImpl) {
         return (IdImpl) id;

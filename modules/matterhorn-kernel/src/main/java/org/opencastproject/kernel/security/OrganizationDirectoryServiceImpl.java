@@ -262,7 +262,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
 
     private final OrganizationDatabase persistence;
 
-    public OrgCache(long refreshInterval, OrganizationDatabase persistence) {
+    OrgCache(long refreshInterval, OrganizationDatabase persistence) {
       this.refreshInterval = refreshInterval;
       this.persistence = persistence;
       invalidate();

@@ -32,7 +32,6 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
-import org.opencastproject.workflow.api.WorkflowQuery.Sort;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
@@ -62,7 +61,7 @@ import javax.ws.rs.core.Response;
 @RestService(name = "ServerProxyService", title = "UI Servers", notes = "These Endpoints deliver informations about the server required for the UI.", abstractText = "This service provides the server data for the UI.")
 public class ServerEndpoint {
 
-  private static enum SORT {
+  private enum Sort {
     STATUS, HOSTNAME, CORES, COMPLETED, MAINTENANCE, RUNNING, QUEUED, QUEUETIME, RUNTIME
   }
 
@@ -82,10 +81,10 @@ public class ServerEndpoint {
    */
   private class ServerComparator implements Comparator<JSONObject> {
 
-    private SORT sortType;
+    private Sort sortType;
     private Boolean ascending = true;
 
-    public ServerComparator(SORT sortType, Boolean ascending) {
+    ServerComparator(Sort sortType, Boolean ascending) {
       this.sortType = sortType;
       this.ascending = ascending;
     }
@@ -259,22 +258,22 @@ public class ServerEndpoint {
     }
 
     // Sorting
-    SORT sortKey = SORT.HOSTNAME;
+    Sort sortKey = Sort.HOSTNAME;
     Boolean ascending = true;
     if (StringUtils.isNotBlank(sort)) {
       // Parse the sort field and direction
-      Sort sortField = null;
+      org.opencastproject.workflow.api.WorkflowQuery.Sort sortField = null;
       if (sort.endsWith(DESCENDING_SUFFIX)) {
         ascending = false;
         String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
         try {
-          sortKey = SORT.valueOf(enumKey);
+          sortKey = Sort.valueOf(enumKey);
         } catch (IllegalArgumentException e) {
           logger.warn("No sort enum matches '{}'", enumKey);
         }
       } else {
         try {
-          sortKey = SORT.valueOf(sort);
+          sortKey = Sort.valueOf(sort);
         } catch (IllegalArgumentException e) {
           logger.warn("No sort enum matches '{}'", sort);
         }

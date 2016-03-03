@@ -21,25 +21,6 @@
 
 package org.opencastproject.workflow.handler.videoeditor;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.Collection;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.UUID;
-import javax.imageio.ImageIO;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -57,9 +38,31 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.handler.videoeditor.WaveformWorkflowOperationHandler.WaveUtils.WaveException;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Collection;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.UUID;
+
+import javax.imageio.ImageIO;
 
 public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
@@ -346,7 +349,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
        * @throws WaveException if wave file has invalid or unsupported header
        * format
        */
-      public Wave(String filename) throws IOException, WaveException {
+      Wave(String filename) throws IOException, WaveException {
         this(new File(filename));
       }
 
@@ -358,7 +361,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
        * @throws WaveException if wave file has invalid or unsupported header
        * format
        */
-      public Wave(File f) throws IOException, WaveException {
+      Wave(File f) throws IOException, WaveException {
         this(new FileInputStream(f));
       }
 
@@ -490,7 +493,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
        * @param inputStream wave file input stream
        * @throws IOException if an I/O error occurs.
        */
-      public WaveHeader(InputStream inputStream) throws IOException {
+      WaveHeader(InputStream inputStream) throws IOException {
         valid = loadHeader(inputStream);
       }
 

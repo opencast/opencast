@@ -29,7 +29,7 @@ import java.util.Map;
 
 /** Describes an incident relating to a {@link Job}. */
 public interface Incident {
-  public enum Severity {
+  enum Severity {
     INFO,
     WARNING,
 

@@ -70,7 +70,7 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
     private final String keyId;
     private final String key;
 
-    public KeyEntry(String keyId, String key) {
+    KeyEntry(String keyId, String key) {
       this.keyId = keyId;
       this.key = key;
     }

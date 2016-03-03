@@ -32,11 +32,11 @@ import java.util.Vector;
 @Deprecated
 public class RestEndpoint {
 
-  public static enum Type {
+  public enum Type {
     WRITE, READ
   };
 
-  public static enum Method {
+  public enum Method {
     GET, POST, PUT, DELETE, ANY
   };
 

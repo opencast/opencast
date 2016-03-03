@@ -36,7 +36,7 @@ public interface SearchResultItem {
    * A search result item can either represent an episode ({@link SearchResultItemType#AudioVisual}) or a series (
    * {@link SearchResultItemType#Series})
    */
-  public enum SearchResultItemType {
+  enum SearchResultItemType {
     AudioVisual, Series
   };
 

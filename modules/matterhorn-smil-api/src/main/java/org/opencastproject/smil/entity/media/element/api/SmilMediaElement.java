@@ -35,7 +35,7 @@ public interface SmilMediaElement extends SmilMediaObject {
   /**
    * SMIL media element type.
    */
-  public enum MediaType {
+  enum MediaType {
     AUDIO, VIDEO, IMAGE, REF
   }
 

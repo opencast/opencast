@@ -60,7 +60,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
   /** Serial version UID */
   private static final long serialVersionUID = -1092781733885994038L;
 
-  public static enum StreamingProtocol {
+  public enum StreamingProtocol {
     DOWNLOAD,HLS,DASH,HDS,SMOOTH,MMS,RTP,RTSP,RTMP,RTMPE,PNM,PNA,ICY,BITTORENTLIVE,FILE,UNKNOWN
   }
 

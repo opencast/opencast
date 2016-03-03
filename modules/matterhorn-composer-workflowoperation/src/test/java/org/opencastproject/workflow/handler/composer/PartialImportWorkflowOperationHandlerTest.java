@@ -322,11 +322,11 @@ public class PartialImportWorkflowOperationHandlerTest {
     private Track expectedVideo = null;
     private Track expectedAudio = null;
 
-    public TestPartialImportWorkflowOperationHandler() {
+    TestPartialImportWorkflowOperationHandler() {
       super();
     }
 
-    public TestPartialImportWorkflowOperationHandler(Track expectedVideo, Track expectedAudio) {
+    TestPartialImportWorkflowOperationHandler(Track expectedVideo, Track expectedAudio) {
       this.expectedVideo = expectedVideo;
       this.expectedAudio = expectedAudio;
     }

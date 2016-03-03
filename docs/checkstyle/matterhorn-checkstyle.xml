@@ -243,9 +243,6 @@
     <module name="PackageDeclaration">
       <property name="severity" value="error" />
     </module>
-    <module name="JUnitTestCase">
-      <property name="severity" value="error" />
-    </module>
     <module name="DefaultComesLast">
       <property name="severity" value="error" />
     </module>

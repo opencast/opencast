@@ -23,7 +23,7 @@ package org.opencastproject.index.service.resources.list.provider;
 
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.index.service.resources.list.provider.ServersListProvider.SERVERS_FILTER_LIST;
+import org.opencastproject.index.service.resources.list.provider.ServersListProvider.ServersFilterList;
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.JaxbHostRegistration;
@@ -89,7 +89,7 @@ public class ServersListProviderTest {
 
     org.junit.Assert.assertEquals(
             4,
-            serverListProvider.getList(ServersListProvider.getListNameFromFilter(SERVERS_FILTER_LIST.HOSTNAME), query,
+            serverListProvider.getList(ServersListProvider.getListNameFromFilter(ServersFilterList.HOSTNAME), query,
                     null).size());
 
     org.junit.Assert.assertEquals(4, serverListProvider.getList("servers", query, null).size());
@@ -97,23 +97,23 @@ public class ServersListProviderTest {
 
     org.junit.Assert.assertEquals(
             3,
-            serverListProvider.getList(ServersListProvider.getListNameFromFilter(SERVERS_FILTER_LIST.CORES), query,
+            serverListProvider.getList(ServersListProvider.getListNameFromFilter(ServersFilterList.CORES), query,
                     null).size());
 
     org.junit.Assert.assertEquals(
             1,
-            serverListProvider.getList(ServersListProvider.getListNameFromFilter(SERVERS_FILTER_LIST.MAXJOBS), query,
+            serverListProvider.getList(ServersListProvider.getListNameFromFilter(ServersFilterList.MAXJOBS), query,
                     null).size());
     org.junit.Assert.assertEquals(
             2,
-            serverListProvider.getList(ServersListProvider.getListNameFromFilter(SERVERS_FILTER_LIST.MEMORY), query,
+            serverListProvider.getList(ServersListProvider.getListNameFromFilter(ServersFilterList.MEMORY), query,
                     null).size());
     org.junit.Assert.assertEquals(4,
             serverListProvider
-                    .getList(ServersListProvider.getListNameFromFilter(SERVERS_FILTER_LIST.PATH), query, null).size());
+                    .getList(ServersListProvider.getListNameFromFilter(ServersFilterList.PATH), query, null).size());
     org.junit.Assert.assertEquals(
             1,
-            serverListProvider.getList(ServersListProvider.getListNameFromFilter(SERVERS_FILTER_LIST.SERVICE), query,
+            serverListProvider.getList(ServersListProvider.getListNameFromFilter(ServersFilterList.SERVICE), query,
                     null).size());
   }
 

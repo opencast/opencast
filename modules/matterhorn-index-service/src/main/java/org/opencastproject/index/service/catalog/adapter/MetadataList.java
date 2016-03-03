@@ -59,7 +59,7 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
 
     private String languageConstant;
 
-    private Locked(String languageConstant) {
+    Locked(String languageConstant) {
       this.languageConstant = languageConstant;
     }
 

@@ -77,7 +77,7 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
     private String url;
     private Long time;
 
-    public TestAgent(String name, String state, String url, Long time) {
+    TestAgent(String name, String state, String url, Long time) {
       this.name = name;
       this.state = state;
       this.url = url;

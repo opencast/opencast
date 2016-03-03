@@ -104,11 +104,11 @@ public class MetadataField<A> {
    * Possible types for the metadata field. The types are used in the frontend and backend to know how the metadata
    * fields should be formatted (if needed).
    */
-  public enum TYPE {
+  public enum Type {
     BOOLEAN, DATE, DURATION, ITERABLE_TEXT, MIXED_TEXT, LONG, START_DATE, START_TIME, TEXT, TEXT_LONG
   }
 
-  public enum JSON_TYPE {
+  public enum JsonType {
     BOOLEAN, DATE, NUMBER, TEXT, MIXED_TEXT, TEXT_LONG, TIME
   }
 
@@ -136,9 +136,9 @@ public class MetadataField<A> {
   /** Whether the property is required to update the metadata. */
   private boolean required;
   /** The type of the metadata for example text, date etc. */
-  private TYPE type;
+  private Type type;
   /** The type of the metadata for the json to use example text, date, time, number etc. */
-  private JSON_TYPE jsonType;
+  private JsonType jsonType;
 
   private Opt<A> value = Opt.none();
   private boolean updated = false;
@@ -153,7 +153,7 @@ public class MetadataField<A> {
   /**
    * Metadata field constructor
    *
-   * @param id
+   * @param inputID
    *          The identifier of the new metadata field
    * @param label
    *          the label of the field. The string displayed next to the field value on the frontend. This is usually be a
@@ -165,7 +165,7 @@ public class MetadataField<A> {
    * @param value
    *          The metadata field value
    * @param type
-   *          The metadata field type @ EventMetadata.TYPE}
+   *          The metadata field type @ EventMetadata.Type}
    * @param collection
    *          If the field has a limited list of possible value, the option should contain this one. Otherwise it should
    *          be none. This is also possible to use the collectionId parameter for that.
@@ -179,7 +179,7 @@ public class MetadataField<A> {
    *           if the id, label, type, valueToJSON or/and jsonToValue parameters is/are null
    */
   private MetadataField(String inputID, Opt<String> outputID, String label, boolean readOnly, boolean required,
-          A value, TYPE type, JSON_TYPE jsonType, Opt<Map<String, Object>> collection, Opt<String> collectionID,
+          A value, Type type, JsonType jsonType, Opt<Map<String, Object>> collection, Opt<String> collectionID,
           Fn<Opt<A>, JValue> valueToJSON, Fn<Object, A> jsonToValue, Opt<Integer> order, Opt<String> namespace)
           throws IllegalArgumentException {
     if (valueToJSON == null)
@@ -322,8 +322,8 @@ public class MetadataField<A> {
       }
     };
 
-    return new MetadataField<Boolean>(inputID, outputID, label, readOnly, required, null, TYPE.BOOLEAN,
-            JSON_TYPE.BOOLEAN, Opt.<Map<String, Object>> none(), Opt.<String> none(), booleanToJson, jsonToBoolean,
+    return new MetadataField<Boolean>(inputID, outputID, label, readOnly, required, null, Type.BOOLEAN,
+            JsonType.BOOLEAN, Opt.<Map<String, Object>> none(), Opt.<String> none(), booleanToJson, jsonToBoolean,
             order, namespace);
   }
 
@@ -339,7 +339,7 @@ public class MetadataField<A> {
    * @param required
    *          Define if the new metadata field is or not required
    * @param type
-   *          The {@link TYPE} for the new field.
+   *          The {@link Type} for the new field.
    * @param pattern
    *          The date pattern for {@link SimpleDateFormat}.
    * @param order
@@ -380,7 +380,7 @@ public class MetadataField<A> {
     };
 
     MetadataField<Date> dateField = new MetadataField<Date>(inputID, outputID, label, readOnly, required, null,
-            TYPE.DATE, JSON_TYPE.DATE, Opt.<Map<String, Object>> none(), Opt.<String> none(), dateToJSON, jsonToDate,
+            Type.DATE, JsonType.DATE, Opt.<Map<String, Object>> none(), Opt.<String> none(), dateToJSON, jsonToDate,
             order, namespace);
     if (StringUtils.isNotBlank(pattern)) {
       dateField.setPattern(Opt.some(pattern));
@@ -437,7 +437,7 @@ public class MetadataField<A> {
         return returnValue.toString();
       }
     };
-    return new MetadataField<String>(inputID, outputID, label, readOnly, required, "", TYPE.DURATION, JSON_TYPE.TEXT,
+    return new MetadataField<String>(inputID, outputID, label, readOnly, required, "", Type.DURATION, JsonType.TEXT,
             collection, collectionId, periodToJSON, jsonToPeriod, order, namespace);
   }
 
@@ -505,7 +505,7 @@ public class MetadataField<A> {
     };
 
     return new MetadataField<Iterable<String>>(inputID, outputID, label, readOnly, required, new ArrayList<String>(),
-            TYPE.MIXED_TEXT, JSON_TYPE.MIXED_TEXT, collection, collectionId, iterableToJSON, jsonToIterable, order,
+            Type.MIXED_TEXT, JsonType.MIXED_TEXT, collection, collectionId, iterableToJSON, jsonToIterable, order,
             namespace);
   }
 
@@ -572,7 +572,7 @@ public class MetadataField<A> {
     };
 
     return new MetadataField<Iterable<String>>(inputID, outputID, label, readOnly, required, new ArrayList<String>(),
-            TYPE.ITERABLE_TEXT, JSON_TYPE.TEXT, collection, collectionId, iterableToJSON, jsonToIterable, order,
+            Type.ITERABLE_TEXT, JsonType.TEXT, collection, collectionId, iterableToJSON, jsonToIterable, order,
             namespace);
   }
 
@@ -602,7 +602,7 @@ public class MetadataField<A> {
       }
     };
 
-    return new MetadataField<Long>(inputID, outputID, label, readOnly, required, 0L, TYPE.TEXT, JSON_TYPE.NUMBER,
+    return new MetadataField<Long>(inputID, outputID, label, readOnly, required, 0L, Type.TEXT, JsonType.NUMBER,
             collection, collectionId, longToJSON, jsonToLong, order, namespace);
   }
 
@@ -626,7 +626,7 @@ public class MetadataField<A> {
   }
 
   private static MetadataField<String> createTemporalMetadata(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, final String pattern, final TYPE type, final JSON_TYPE jsonType,
+          boolean readOnly, boolean required, final String pattern, final Type type, final JsonType jsonType,
           Opt<Integer> order, Opt<String> namespace) {
     if (StringUtils.isBlank(pattern)) {
       throw new IllegalArgumentException("For temporal metadata field " + inputID + " of type " + type
@@ -682,15 +682,15 @@ public class MetadataField<A> {
   public static MetadataField<String> createTemporalStartDateMetadata(String inputID, Opt<String> outputID,
           String label, boolean readOnly, boolean required, final String pattern, Opt<Integer> order,
           Opt<String> namespace) {
-    return createTemporalMetadata(inputID, outputID, label, readOnly, required, pattern, TYPE.START_DATE,
-            JSON_TYPE.DATE, order, namespace);
+    return createTemporalMetadata(inputID, outputID, label, readOnly, required, pattern, Type.START_DATE,
+            JsonType.DATE, order, namespace);
   }
 
   public static MetadataField<String> createTemporalStartTimeMetadata(String inputID, Opt<String> outputID,
           String label, boolean readOnly, boolean required, final String pattern, Opt<Integer> order,
           Opt<String> namespace) {
-    return createTemporalMetadata(inputID, outputID, label, readOnly, required, pattern, TYPE.START_TIME,
-            JSON_TYPE.TIME, order, namespace);
+    return createTemporalMetadata(inputID, outputID, label, readOnly, required, pattern, Type.START_TIME,
+            JsonType.TIME, order, namespace);
   }
 
   /**
@@ -782,7 +782,7 @@ public class MetadataField<A> {
           boolean readOnly, boolean required, Opt<Map<String, Object>> collection, Opt<String> collectionId,
           Opt<Integer> order, Opt<String> namespace) {
     return createTextLongMetadataField(inputID, outputID, label, readOnly, required, collection, collectionId, order,
-            JSON_TYPE.TEXT, namespace);
+            JsonType.TEXT, namespace);
   }
 
   /**
@@ -807,7 +807,7 @@ public class MetadataField<A> {
           boolean readOnly, boolean required, Opt<Map<String, Object>> collection, Opt<String> collectionId,
           Opt<Integer> order, Opt<String> namespace) {
     return createTextLongMetadataField(inputID, outputID, label, readOnly, required, collection, collectionId, order,
-            JSON_TYPE.TEXT_LONG, namespace);
+            JsonType.TEXT_LONG, namespace);
   }
 
   /**
@@ -830,7 +830,7 @@ public class MetadataField<A> {
    */
   private static MetadataField<String> createTextLongMetadataField(String inputID, Opt<String> outputID, String label,
           boolean readOnly, boolean required, Opt<Map<String, Object>> collection, Opt<String> collectionId,
-          Opt<Integer> order, JSON_TYPE jsonType, Opt<String> namespace) {
+          Opt<Integer> order, JsonType jsonType, Opt<String> namespace) {
 
     Fn<Opt<String>, JValue> stringToJSON = new Fn<Opt<String>, JValue>() {
       @Override
@@ -852,7 +852,7 @@ public class MetadataField<A> {
       }
     };
 
-    return new MetadataField<String>(inputID, outputID, label, readOnly, required, "", TYPE.TEXT, jsonType, collection,
+    return new MetadataField<String>(inputID, outputID, label, readOnly, required, "", Type.TEXT, jsonType, collection,
             collectionId, stringToJSON, jsonToString, order, namespace);
   }
 
@@ -904,7 +904,7 @@ public class MetadataField<A> {
         this.required = Boolean.valueOf(value);
         break;
       case CONFIG_TYPE_KEY:
-        this.type = TYPE.valueOf(value.toUpperCase());
+        this.type = Type.valueOf(value.toUpperCase());
         break;
       default:
         throw new IllegalArgumentException("Unknown Dublin Core Property Key " + key);
@@ -998,19 +998,19 @@ public class MetadataField<A> {
     this.required = required;
   }
 
-  public TYPE getType() {
+  public Type getType() {
     return type;
   }
 
-  public void setType(TYPE type) {
+  public void setType(Type type) {
     this.type = type;
   }
 
-  public JSON_TYPE getJsonType() {
+  public JsonType getJsonType() {
     return jsonType;
   }
 
-  public void setJsonType(JSON_TYPE jsonType) {
+  public void setJsonType(JsonType jsonType) {
     this.jsonType = jsonType;
   }
 

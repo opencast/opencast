@@ -21,7 +21,7 @@
 
 package org.opencastproject.index.service.catalog.adapter;
 
-import org.opencastproject.index.service.catalog.adapter.MetadataField.TYPE;
+import org.opencastproject.index.service.catalog.adapter.MetadataField.Type;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
@@ -73,15 +73,15 @@ public final class DublinCoreMetadataUtil {
       if (field.isUpdated() && field.getValue().isSome()) {
         final String namespace = field.getNamespace().or(DublinCore.TERMS_NS_URI);
         final EName ename = new EName(namespace, field.getInputID());
-        if (field.getType() == TYPE.START_DATE) {
+        if (field.getType() == MetadataField.Type.START_DATE) {
           setTemporalStartDate(dc, field, ename);
-        } else if (field.getType() == TYPE.START_TIME) {
+        } else if (field.getType() == MetadataField.Type.START_TIME) {
           setTemporalStartTime(dc, field, ename);
-        } else if (field.getType() == TYPE.DURATION) {
+        } else if (field.getType() == MetadataField.Type.DURATION) {
           setDuration(dc, field, ename);
-        } else if (field.getType() == TYPE.DATE) {
+        } else if (field.getType() == Type.DATE) {
           setDate(dc, field, ename);
-        } else if (field.getType() == TYPE.MIXED_TEXT || field.getType() == TYPE.ITERABLE_TEXT) {
+        } else if (field.getType() == MetadataField.Type.MIXED_TEXT || field.getType() == MetadataField.Type.ITERABLE_TEXT) {
           setIterableString(dc, field, ename);
         } else {
           dc.set(ename, field.getValue().get().toString());
