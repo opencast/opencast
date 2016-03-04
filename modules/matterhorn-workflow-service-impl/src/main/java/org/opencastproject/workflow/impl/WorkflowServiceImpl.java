@@ -2606,7 +2606,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     List<Job> jobs = null;
     try {
       jobs = serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null);
-      Iterator<Job> ji = jobs.iterator();
+      Iterator<Job> ji = new ArrayList<>(jobs).iterator();
       while (ji.hasNext()) {
         Job job = ji.next();
         if (!WorkflowServiceImpl.Operation.START_WORKFLOW.toString().equals(job.getOperation())) {
