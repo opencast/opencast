@@ -44,6 +44,7 @@ import com.entwinemedia.fn.StreamOp;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -54,12 +55,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -75,10 +76,10 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   private static final String DEFAULT_PASSWORD = "4b3e4b30-718c-11e2-bcfd-0800200c9a66";
 
   /** The list of user providers */
-  protected List<UserProvider> userProviders = new ArrayList<UserProvider>();
+  protected List<UserProvider> userProviders = new CopyOnWriteArrayList<UserProvider>();
 
   /** The list of role providers */
-  protected List<RoleProvider> roleProviders = new ArrayList<RoleProvider>();
+  protected List<RoleProvider> roleProviders = new CopyOnWriteArrayList<RoleProvider>();
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -359,7 +360,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
         continue;
       users = users.append(IteratorUtils.toList(userProvider.findUsers(query, 0, 0))).sort(userComparator);
     }
-    return users.drop(offset).apply(limit > 0 ? StreamOp.<User>id().take(limit) : StreamOp.<User>id()).iterator();
+    return users.drop(offset).apply(limit > 0 ? StreamOp.<User> id().take(limit) : StreamOp.<User> id()).iterator();
   }
 
   @Override
@@ -379,7 +380,16 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
         continue;
       roles = roles.append(IteratorUtils.toList(roleProvider.findRoles(query, 0, 0))).sort(roleComparator);
     }
-    return roles.drop(offset).apply(limit > 0 ? StreamOp.<Role>id().take(limit) : StreamOp.<Role>id()).iterator();
+    return roles.drop(offset).apply(limit > 0 ? StreamOp.<Role> id().take(limit) : StreamOp.<Role> id()).iterator();
+  }
+
+  @Override
+  public long countUsers() {
+    long sum = 0;
+    for (UserProvider userProvider : userProviders) {
+      sum += userProvider.countUsers();
+    }
+    return sum;
   }
 
   @Override

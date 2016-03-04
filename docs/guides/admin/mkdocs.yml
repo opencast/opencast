@@ -41,6 +41,7 @@ pages:
    - Workflow: 'configuration/workflow.md'
 - Modules:
    - Overview: 'modules/index.md'
+   - LTI Module: 'modules/ltimodule.md'
    - Media Module: 'modules/mediamodule.configuration.md'
    - Player:
       - Architecture: 'modules/player.architecture.md'
@@ -61,6 +62,8 @@ pages:
       - Architecture: 'modules/videoeditor.architecture.md'
    - Video Segmentation: 'modules/videosegmentation.md'
    - YouTube Publication: 'modules/youtubepublication.md'
+- Upgrade:
+   - Upgrading Home: 'upgrade/index.md'
 - Workflow Operation Handler:
    - Overview: 'workflowoperationhandlers/index.md'
    - Analyze Audio: 'workflowoperationhandlers/analyzeaudio-woh.md'

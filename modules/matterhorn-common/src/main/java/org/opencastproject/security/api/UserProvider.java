@@ -55,6 +55,13 @@ public interface UserProvider {
   User loadUser(String userName);
 
   /**
+   * Returns the number of users in the provider
+   *
+   * @return the count of users in the provider
+   */
+  long countUsers();
+
+  /**
    * Returns the identifier for the organization that is associated with this user provider. If equal to
    * {@link #ALL_ORGANIZATIONS}, this provider will always be consulted, regardless of the organization.
    *

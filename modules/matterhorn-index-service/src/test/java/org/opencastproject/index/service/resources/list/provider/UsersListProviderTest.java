@@ -93,6 +93,11 @@ public class UsersListProviderTest {
       }
 
       @Override
+      public long countUsers() {
+        return users.size();
+      }
+
+      @Override
       public void invalidate(String userName) {
         return;
       }
