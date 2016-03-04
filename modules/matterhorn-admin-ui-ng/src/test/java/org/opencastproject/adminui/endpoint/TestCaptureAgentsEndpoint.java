@@ -44,7 +44,6 @@ import javax.ws.rs.Path;
 @Ignore
 public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
 
-//  private final ParticipationManagementDatabase pmService;
   private final CaptureAgentStateService captureAgentService;
   private ArrayList<User> users;
   private User user1;
@@ -54,7 +53,6 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
 
   public TestCaptureAgentsEndpoint() throws Exception {
 
-//    pmService = EasyMock.createNiceMock(ParticipationManagementDatabase.class);
     captureAgentService = EasyMock.createNiceMock(CaptureAgentStateService.class);
 
     Map<String, Agent> agents = new HashMap<String, Agent>();
@@ -70,30 +68,6 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
     expect(captureAgentService.getKnownAgents()).andStubReturn(agents);
     replay(captureAgentService);
 
-//    Room room1 = new Room("Test");
-//    room1.setId(12L);
-//    List<Period> periods = new ArrayList<Period>();
-//    periods.add(new Period(Option.some(12L), new Date(DateTimeSupport.fromUTC("2025-12-12T12:12:12Z")), new Date(
-//            DateTimeSupport.fromUTC("2025-12-24T12:12:12Z")), Option.<String> none(), Option.<String> none()));
-//    periods.add(new Period(Option.some(14L), new Date(DateTimeSupport.fromUTC("2026-12-12T12:12:12Z")), new Date(
-//            DateTimeSupport.fromUTC("2026-12-12T12:12:12Z")), Option.<String> none(), Option.<String> none()));
-//
-//    List<CaptureAgent> caAgents = new ArrayList<CaptureAgent>();
-//    caAgents.add(new CaptureAgent(room1, "agent1"));
-//
-//    List<Blacklist> blacklist = new ArrayList<Blacklist>();
-//    blacklist.add(new Blacklist(room1, periods));
-//
-//    EasyMock.expect(pmService.getCaptureAgents()).andReturn(caAgents).anyTimes();
-//    EasyMock.expect(pmService.getRoom(EasyMock.anyLong())).andReturn(room1).anyTimes();
-//    EasyMock.expect(pmService.findBlacklists(EasyMock.anyObject(Blacklistable.class))).andReturn(blacklist).anyTimes();
-//
-//    EasyMock.expect(captureAgentService.getKnownAgents()).andReturn(agents).anyTimes();
-//
-//    EasyMock.replay(pmService);
-//    EasyMock.replay(captureAgentService);
-//
-//    this.setParticipationPersistence(pmService);
     this.setCaptureAgentService(captureAgentService);
   }
 

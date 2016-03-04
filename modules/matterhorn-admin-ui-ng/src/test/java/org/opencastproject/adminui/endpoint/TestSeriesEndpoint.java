@@ -103,12 +103,7 @@ import javax.ws.rs.Path;
 public class TestSeriesEndpoint extends SeriesEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(TestSeriesEndpoint.class);
 
-//  private ParticipationManagementDatabase persistence;
   private SeriesService seriesService;
-//  private List<Message> messages = new ArrayList<>();
-//  private List<Message> messagesAsc = new ArrayList<>();
-//  private List<Message> messagesDesc = new ArrayList<>();
-//  private Capture<Option<SortType>> captureMessageSortType = new Capture<>();
   private AdminUISearchIndex adminuiSearchIndex;
   private ListProvidersService listProvidersService;
 
@@ -153,7 +148,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     this.listProvidersService = createListProviderService(users);
 
     this.seriesService = EasyMock.createNiceMock(SeriesService.class);
-//    this.persistence = EasyMock.createNiceMock(ParticipationManagementDatabase.class);
 
     DublinCoreCatalog catalog1 = DublinCoreXmlFormat.read(getClass().getResourceAsStream("/dublincore.xml"));
     DublinCoreCatalog catalog2 = DublinCoreXmlFormat.read(getClass().getResourceAsStream("/dublincore2.xml"));
@@ -204,76 +198,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     EasyMock.expectLastCall().andThrow(new NotFoundException());
     EasyMock.replay(seriesService);
 
-//    Course course = new Course("23");
-//    Course course2 = new Course("24");
-//
-//    List<Recording> recordings = new ArrayList<>();
-//    recordings.add(createRecording(course, false));
-//    recordings.add(createRecording(course, false));
-//    recordings.add(createRecording(course, true));
-//
-//    List<Recording> recordings2 = new ArrayList<>();
-//    recordings2.add(createRecording(course2, false));
-//    recordings2.add(createRecording(course2, false));
-//    recordings2.add(createRecording(course2, true));
-//
-//    Person person = Person.fromUser(user1);
-//    Person person2 = Person.fromUser(user2);
-//    Person person3 = Person.fromUser(user3);
-
-//    MessageTemplate tmplInvitation = new MessageTemplate("Invitation", user1, "test", "test");
-
-//    MessageSignature msgSignature1 = messageSignature("test", user1, emailAddress("test@email.com", "Mrs. Test"),
-//            "test");
-//    MessageSignature msgSignature2 = messageSignature("test", user2, emailAddress("test@email.com", "Mrs. Test"),
-//            "test");
-//    MessageSignature msgSignature3 = messageSignature("test", user3, emailAddress("test@email.com", "Mrs. Test"),
-//            "test");
-
-//    DateTime creationDate = new DateTime();
-
-//    Message message = new Message(person, tmplInvitation, msgSignature1);
-//    message.addError(new Error("test", "description", "source"));
-//    message.addError(new Error("test2", "description2", "source"));
-//    creationDate.withDate(2012, 01, 01);
-//    message.setCreationDate(creationDate.toDate());
-//
-//    Message message2 = new Message(person2, tmplInvitation, msgSignature2);
-//    message2.addError(new Error("test", "description", "source"));
-//    message2.addError(new Error("test2", "description2", "source"));
-//    creationDate.withDate(2013, 01, 01);
-//    message2.setCreationDate(creationDate.toDate());
-//
-//    Message message3 = new Message(person3, tmplInvitation, msgSignature3);
-//    message3.addError(new Error("test", "description", "source"));
-//    message3.addError(new Error("test2", "description2", "source"));
-//    creationDate.withDate(2014, 01, 01);
-//    message3.setCreationDate(creationDate.toDate());
-//
-//    messages.add(message3);
-//    messages.add(message);
-//    messages.add(message2);
-//
-//    messagesAsc.add(message);
-//    messagesAsc.add(message2);
-//    messagesAsc.add(message3);
-//
-//    messagesDesc.add(message3);
-//    messagesDesc.add(message2);
-//    messagesDesc.add(message);
-//
-//    Capture<String> seriesID = new Capture<String>();
-//
-//    EasyMock.expect(persistence.findCourseBySeries("1")).andReturn(course).once();
-//    EasyMock.expect(persistence.findCourseBySeries("2")).andThrow(new NotFoundException()).once();
-//    EasyMock.expect(persistence.findCourseBySeries("3")).andReturn(course2).once();
-//    EasyMock.expect(persistence.findRecordings(EasyMock.anyObject(RecordingQuery.class))).andReturn(recordings);
-//    EasyMock.expect(persistence.findRecordings(EasyMock.anyObject(RecordingQuery.class))).andReturn(recordings2);
-//    EasyMock.expect(
-//            persistence.getMessagesBySeriesId(EasyMock.capture(seriesID), EasyMock.capture(captureMessageSortType)))
-//            .andAnswer(new AnswerWithMessages());
-//    EasyMock.replay(persistence, seriesService);
-
     List<ManagedAcl> managedAcls = new ArrayList<>();
     ManagedAcl managedAcl1 = new ManagedAclImpl(43L, "Public", defaultOrganization.getId(), acl);
     managedAcls.add(managedAcl1);
@@ -316,7 +240,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
     this.setIndex(adminuiSearchIndex);
     this.setSeriesService(seriesService);
-//    this.setPersistence(persistence);
     this.setSecurityService(securityService);
     this.setAclServiceFactory(aclServiceFactory);
     this.setIndexService(indexServiceImpl);
@@ -564,30 +487,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     EasyMock.replay(adminuiSearchIndex, item1, item2, item3, themeItem1, ascSeriesSearchResult, descSeriesSearchResult,
             emptySearchResult, oneSearchResult, twoSearchResult);
   }
-
-//  private class AnswerWithMessages implements IAnswer<List<Message>> {
-//    @Override
-//    public List<Message> answer() throws Throwable {
-//      if (captureMessageSortType.hasCaptured() && captureMessageSortType.getValue().isSome()) {
-//        if (captureMessageSortType.getValue().get().equals(SortType.DATE)) {
-//          return messagesAsc;
-//        } else if (captureMessageSortType.getValue().get().equals(SortType.SENDER)) {
-//          return messagesAsc;
-//        } else if (captureMessageSortType.getValue().get().equals(SortType.DATE_DESC)) {
-//          return messagesDesc;
-//        } else if (captureMessageSortType.getValue().get().equals(SortType.SENDER_DESC)) {
-//          return messagesDesc;
-//        }
-//      }
-//      return messages;
-//    }
-//  }
-//
-//  private Recording createRecording(Course course, boolean blacklisted) {
-//    return new Recording(Option.<Long> none(), "1", Option.<String> none(), "Test", Collections.EMPTY_LIST,
-//            Option.some(course), null, new Date(), false, new Date(), new Date(), Collections.EMPTY_LIST,
-//            Collections.EMPTY_LIST, null, Collections.EMPTY_LIST, Option.<String> none(), true);
-//  }
 
   private TransitionResult getTransitionResult(final ManagedAcl macl, final Date now) {
     return new TransitionResultImpl(

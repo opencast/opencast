@@ -21,6 +21,6 @@
    <reference name="SecurityService" interface="org.opencastproject.security.api.SecurityService"
           cardinality="1..1" policy="static" bind="setSecurityService" />
    <reference name="seriesService" interface="org.opencastproject.series.api.SeriesService"
-          cardinality="1..1" policy="static" bind="setSeriesService"/>   
+          cardinality="1..1" policy="static" bind="setSeriesService"/>
 
 </scr:component>
