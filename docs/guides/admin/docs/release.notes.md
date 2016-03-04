@@ -1,3 +1,22 @@
+Opencast 2.2: Release Notes
+===========================
+
+Release Schedule
+----------------
+
+|Date                         |Phase
+|-----------------------------|---------------------------------------------
+|April 4th                    |Feature Freeze  *(Cutting of release branch)*
+|April 4th - 24th             |Internal QA and bug fixing phase
+|&nbsp; *April 11th - 17th*   |Review Test Cases *(Dedicated team)*
+|&nbsp; *April 18th - 24th*   |Documentation Review
+|April 25th - May 15th        |Public QA phase *(Ask for help)*
+|May 15th - June 1st          |Additional bug fixing phase
+|&nbsp; *May 25th - June 1st* |Translation week *(Ask for help)*
+|June 2nd - June 12th         |Final QA phase *(Check release readiness)*
+|June 15th                    |Release of Opencast 2.2
+
+
 Opencast 2.1: Release Notes
 ===========================
 
