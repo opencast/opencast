@@ -69,6 +69,7 @@ import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.api.IndexService.Source;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
+import org.opencastproject.index.service.catalog.adapter.MetadataList.Locked;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventIndexSchema;
@@ -128,6 +129,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
@@ -830,6 +832,38 @@ public abstract class AbstractEventEndpoint {
 
     return okJson(j(f("opt_out", v(optedOut != null ? optedOut : false)),
             f("review_status", vN(event.getReviewStatus())), f("read_only", v(readOnly))));
+  }
+
+  @GET
+  @Path("{eventId}/metadata.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "geteventmetadata", description = "Returns all the data related to the metadata tab in the event details modal as JSON", returnDescription = "All the data related to the event metadata tab as JSON", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+                  @RestResponse(description = "Returns all the data related to the event metadata tab as JSON", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  public Response getEventMetadata(@PathParam("eventId") String eventId) throws Exception {
+    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isNone())
+      return notFound("Cannot find an event with id '%s'.", eventId);
+
+    MetadataList metadataList = new MetadataList();
+    List<EventCatalogUIAdapter> catalogUIAdapters = getIndexService().getEventCatalogUIAdapters();
+    catalogUIAdapters.remove(getIndexService().getCommonEventCatalogUIAdapter());
+    Opt<MediaPackage> optMediaPackage = getIndexService().getEventMediapackage(optEvent.get());
+    if (catalogUIAdapters.size() > 0) {
+      if (optMediaPackage.isSome()) {
+        for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
+          metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(optMediaPackage.get()));
+        }
+      }
+    }
+    metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(),
+            EventUtils.getEventMetadata(optEvent.get(), getIndexService().getCommonEventCatalogUIAdapter()));
+
+    if (WorkflowInstance.WorkflowState.RUNNING.toString().equals(optEvent.get().getWorkflowState()))
+      metadataList.setLocked(Locked.WORKFLOW_RUNNING);
+
+    return okJson(metadataList.toJSON());
   }
 
   @PUT
