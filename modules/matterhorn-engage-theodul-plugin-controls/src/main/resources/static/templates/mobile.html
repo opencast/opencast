@@ -45,6 +45,15 @@
         <p id="navigation_time_current" role="timer">00:00:00</p>
         <% } %>
     </div>
+
+    <% if(hasmultiplevideos) { %>
+    <div id="current_video">
+        <%= str_video %><br>
+        <span id="current_video_id">1</span>
+        <em><%= str_of %></em>
+        <span><%= numberofvideos %></span>
+    </div>
+    <% } %>
     
     <div class="btn-group">
         <div id="volume" class="btn btn-default">

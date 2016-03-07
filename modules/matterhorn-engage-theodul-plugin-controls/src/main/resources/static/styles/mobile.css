@@ -89,21 +89,23 @@
   border-top: 1px solid #2a6496;
   display: -webkit-flex;
   display: flex;
+  -webkit-align-items: center;
+  align-items: center;
 }
-/* line 91, ../scss/mobile.scss */
+/* line 92, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper > .btn-group {
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
 }
-/* line 95, ../scss/mobile.scss */
+/* line 96, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper .btn-default {
   background-color: rgba(255, 255, 255, 0.5);
 }
-/* line 97, ../scss/mobile.scss */
+/* line 98, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper .btn-default:hover {
   background-color: rgba(230, 230, 230, 0.5);
 }
-/* line 102, ../scss/mobile.scss */
+/* line 103, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper .ui-slider-handle {
   position: absolute;
   z-index: 2;
@@ -118,18 +120,17 @@
   top: -10px !important;
   margin-left: -12px;
 }
-/* line 117, ../scss/mobile.scss */
+/* line 118, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_control {
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
   font-size: 27px;
   cursor: pointer;
 }
-/* line 123, ../scss/mobile.scss */
+/* line 124, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #navigation_time {
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
-  margin-top: 4px;
   margin-right: 12px;
   font-size: 12px;
 }
@@ -143,10 +144,23 @@
   line-height: 1.2;
 }
 /* line 137, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper #current_video {
+  -webkit-flex: 0 0 auto;
+  flex: 0 0 auto;
+  font-size: 12px;
+  line-height: 1.2;
+  margin-right: 12px;
+  color: #666;
+}
+/* line 143, ../scss/mobile.scss */
+#engage_controls #navigation_wrapper #current_video span {
+  color: #333;
+}
+/* line 148, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #slider {
   -webkit-flex: 1 0 30px;
   flex: 1 0 30px;
-  margin: 14px 17px 0px;
+  margin: 0 17px;
   border-width: 1px;
   border-style: solid;
   border-color: #333 #333 #777 #333;
@@ -156,7 +170,7 @@
   background: url("../images/bg-track.png") repeat top left;
   box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, 0.5), 0 1px 0 0px rgba(250, 250, 250, 0.5);
 }
-/* line 151, ../scss/mobile.scss */
+/* line 162, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume {
   position: relative;
   width: 47px;
@@ -167,7 +181,7 @@
   transition: width 0.5s;
   overflow: hidden;
 }
-/* line 159, ../scss/mobile.scss */
+/* line 170, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeIcon {
   cursor: pointer;
   width: 47px;
@@ -180,11 +194,11 @@
   border: none;
   outline: none;
 }
-/* line 170, ../scss/mobile.scss */
+/* line 181, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeIcon span {
   display: block;
 }
-/* line 175, ../scss/mobile.scss */
+/* line 186, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume #volumeSlider {
   position: absolute;
   top: 14px;
@@ -199,11 +213,11 @@
   background: url("../images/bg-track.png") repeat top left;
   box-shadow: inset 0 1px 5px 0px rgba(0, 0, 0, 0.5), 0 1px 0 0px rgba(250, 250, 250, 0.5);
 }
-/* line 190, ../scss/mobile.scss */
+/* line 201, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper #volume.active {
   width: 143px;
 }
-/* line 195, ../scss/mobile.scss */
+/* line 206, ../scss/mobile.scss */
 #engage_controls #navigation_wrapper .ui-slider-range {
   background: #ffffff;
   /* Old browsers */

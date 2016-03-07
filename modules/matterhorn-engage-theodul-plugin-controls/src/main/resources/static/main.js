@@ -504,6 +504,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     str_zoomlevel: "100%",
                     flash: usingFlash,
                     // for mobile view
+                    numberofvideos: Engage.model.get("videoDataModel").get("ids").length,
+                    str_video: translate("video", "Video"),
+                    str_of: translate("of", "of"),
                     str_prevVideo: translate("prevVideo", "Previous Video"),
                     str_nextVideo: translate("nextVideo", "Next Video"),
                     str_switchPlayer: translate("switchPlayer", "Switch player"),
@@ -1089,6 +1092,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             $("#" + id_engage_controls).addClass("first");
         if (currentDisplay === (n-1))
             $("#" + id_engage_controls).addClass("last");
+
+        $("#current_video_id").text(currentDisplay+1);
 
         // transform to new display
         $("#" + id_gestureContainer).addClass("animate");
