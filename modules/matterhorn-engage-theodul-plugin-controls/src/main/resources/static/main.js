@@ -1280,6 +1280,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     loadStoredInitialValues();
 
                     if (isMobileMode) {
+                        Engage.trigger(plugin.events.fullscreenEnable.getName());
                         Engage.trigger(plugin.events.hideControls.getName());
                     }
                 }
@@ -1288,6 +1289,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 if (!mediapackageError && videosReady) {
                     isPlaying = false;
                     playPause();
+                    if (isMobileMode) {
+                        var isInFullScreen = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
+                        if (isInFullScreen) {
+                            Engage.trigger(plugin.events.fullscreenCancel.getName());
+                        }
+                    }
                 }
             });
             Engage.on(plugin.events.mute.getName(), function() {
@@ -1308,6 +1315,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     } else {
                         Engage.trigger(plugin.events.mute.getName());
                     }
+                }
+            });
+            Engage.on(plugin.events.fullscreenCancel.getName(), function() {
+                if (isMobileMode && isPlaying) {
+                    Engage.trigger(plugin.events.pause.getName());
                 }
             });
             Engage.on(plugin.events.fullscreenChange.getName(), function() {

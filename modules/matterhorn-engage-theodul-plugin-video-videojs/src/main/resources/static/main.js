@@ -1643,11 +1643,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     videodisplayMaster.requestFullscreen();
                     $('#' + videoDisplay).css("padding-top", "0px");
                 } else if (!fullscreen) {
-                    // use video wrapper as fullscreen viewer in mobile mode
-                    if (isMobileMode)
-                        var viewer = document.getElementById(id_video_wrapper);
-                    else
-                        var viewer = document.getElementById(id_engage_video_fullsceen_wrapper);
+                    var viewer = document.getElementById(id_engage_video_fullsceen_wrapper);
                     if (viewer.mozRequestFullScreen) {
                         viewer.mozRequestFullScreen();
                     } else if (viewer.webkitRequestFullscreen) {
@@ -1694,7 +1690,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                         fullscreen = false;
                     }
                 }
-                $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
+                if(!isMobileMode) {
+                    $("#" + videoDisplay).removeClass("vjs-controls-enabled").addClass("vjs-controls-disabled");
+                }
                 $("." + id_videoDisplayClass).css("max-width", "");
                 checkVideoDisplaySize();
             });
