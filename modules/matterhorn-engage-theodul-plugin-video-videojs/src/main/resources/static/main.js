@@ -1643,7 +1643,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     videodisplayMaster.requestFullscreen();
                     $('#' + videoDisplay).css("padding-top", "0px");
                 } else if (!fullscreen) {
-                    var viewer = document.getElementById(id_engage_video_fullsceen_wrapper);
+                    if (!isMobileMode) {
+                        var viewer = document.getElementById(id_engage_video_fullsceen_wrapper);
+                    } else {
+                        var viewer = document.getElementById(id_video_wrapper);
+                    }
                     if (viewer.mozRequestFullScreen) {
                         viewer.mozRequestFullScreen();
                     } else if (viewer.webkitRequestFullscreen) {

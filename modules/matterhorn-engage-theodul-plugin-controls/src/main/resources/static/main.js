@@ -62,7 +62,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         segmentMouseout: new Engage.Event("Segment:mouseOut", "the mouse is off a segment", "both"),
         volumeSet: new Engage.Event("Video:volumeSet", "", "both"),
         playbackRateChanged: new Engage.Event("Video:playbackRateChanged", "The video playback rate changed", "both"),
-        fullscreenCancel: new Engage.Event("Video:fullscreenCancel", "", "trigger"),
+        fullscreenCancel: new Engage.Event("Video:fullscreenCancel", "", "both"),
         sliderStart: new Engage.Event("Slider:start", "", "trigger"),
         sliderStop: new Engage.Event("Slider:stop", "", "trigger"),
         sliderMousein: new Engage.Event("Slider:mouseIn", "the mouse entered the slider", "trigger"),
@@ -1324,6 +1324,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             Engage.on(plugin.events.fullscreenCancel.getName(), function() {
                 if (isMobileMode && isPlaying) {
                     Engage.trigger(plugin.events.pause.getName());
+                    Engage.trigger(plugin.events.showControls.getName());
                 }
             });
             Engage.on(plugin.events.fullscreenChange.getName(), function() {
