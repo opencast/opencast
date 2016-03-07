@@ -507,10 +507,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     numberofvideos: Engage.model.get("videoDataModel").get("ids").length,
                     str_video: translate("video", "Video"),
                     str_of: translate("of", "of"),
-                    str_prevVideo: translate("prevVideo", "Previous Video"),
-                    str_nextVideo: translate("nextVideo", "Next Video"),
-                    str_switchPlayer: translate("switchPlayer", "Switch player"),
-                    str_showVolumeBar: translate("showVolumeBar", "Show volume bar")
+                    str_showVolumeBar: translate("showVolumeBar", "Show volume bar"),
+                    str_swipeHint: translate("swipeHint", "Swipe for additional view")
                 };
 
                 // compile template and load it
@@ -1287,6 +1285,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     if (isMobileMode) {
                         Engage.trigger(plugin.events.fullscreenEnable.getName());
                         Engage.trigger(plugin.events.hideControls.getName());
+                        $("#swipe_hint").fadeOut();
                     }
                 }
             });

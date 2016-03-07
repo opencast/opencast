@@ -6,19 +6,16 @@
 	&& (typeof str_pauseVideo !== "undefined")
 	&& (typeof str_volumeSlider !== "undefined")
 	&& (typeof str_showVolumeBar !== "undefined")
+	&& (typeof str_video !== "undefined")
+	&& (typeof str_of !== "undefined")
+	&& (typeof str_swipeHint !== "undefined")
 	&& (typeof str_fullscreen !== "undefined")) { %>
 
 <% if(hasmultiplevideos) { %>
-<div id="switchPlayers">
-    <a class="switchButton" id="prevVideo">
-        <span class="sr-only"><%= str_prevVideo %></span>
-        <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
-    </a>
-    <span class="sr-only"><%= str_switchPlayer %></span>
-    <a class="switchButton" id="nextVideo">
-        <span class="sr-only"><%= str_nextVideo %></span>
-        <span class="glyphicon glyphicon-step-forward" aria-hidden="true"></span>
-    </a>
+<div id="swipe_hint">
+    <span class="glyphicon glyphicon-chevron-left left" aria-hidden="true"></span>
+    <span><%= str_swipeHint %></span>
+    <span class="glyphicon glyphicon-chevron-right right" aria-hidden="true"></span>
 </div>
 <% } %>
 

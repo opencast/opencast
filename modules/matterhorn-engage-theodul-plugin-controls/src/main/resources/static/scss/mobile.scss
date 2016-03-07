@@ -14,45 +14,24 @@
 @import "compass/css3/box-shadow";
 
 #engage_controls {
-  #switchPlayers {
-    .switchButton {
-      position: absolute;
-      z-index: 1;
-      top: 46%;
-
-      visibility: visible;
-      opacity: 0.8;
-      @include transition(visibility 0s, opacity 0.7s ease-in-out 0.5s);
-      
-      display: block;
-      background-repeat: no-repeat;
-      border: 0;
-      font-size: 40px;
-      text-decoration: none;
-      cursor: pointer;
-      &:focus, &:hover {
-        @include single-text-shadow(-2px, 2px, 2px, 1px, #333);
-      }
-    }
-
-    #prevVideo {
-      left: 0;
-      text-align: left;
-    }
-    #nextVideo {
-      right: 0;
-      text-align: right;
-    }
+  #swipe_hint {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 9px;
+    font-style: italic;
+    text-align: center;
+    background: rgba(#fff, 0.8);
+    border-bottom: 1px solid #555;
+  }
+  &.first #swipe_hint .left {
+    display: none;
+  }
+  &.last #swipe_hint .right {
+    display: none;
   }
 
-  /* hide prevVideo / nextVideo controls if it's the first / last video, respectively */
-  &.first #prevVideo, &.last #nextVideo {
-    visibility: hidden !important;
-    opacity: 0 !important;
-  }
-}
-
-#engage_controls {
   #big_play_button {
     position: absolute;
     top: 50%;
@@ -84,7 +63,7 @@
     width: 100%;
     padding: 5px 5px 2px;
     background: rgba(#fff, 0.8);
-    border-top: 1px solid #2a6496;
+    border-top: 1px solid #555;
 
     @include display-flex;
     @include align-items(center);
