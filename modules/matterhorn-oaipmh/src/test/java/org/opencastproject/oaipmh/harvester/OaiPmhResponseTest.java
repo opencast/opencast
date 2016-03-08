@@ -22,13 +22,14 @@
 
 package org.opencastproject.oaipmh.harvester;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+
 import org.opencastproject.oaipmh.Granularity;
+
+import org.junit.Test;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-
-import static org.junit.Assert.assertEquals;
 
 public class OaiPmhResponseTest {
 

@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+
 import javax.jms.BytesMessage;
 import javax.jms.Connection;
 import javax.jms.JMSException;

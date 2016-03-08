@@ -21,8 +21,8 @@
 
 package org.opencastproject.presets.impl;
 
-import static org.junit.Assert.fail;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;

@@ -21,14 +21,15 @@
 
 package org.opencastproject.schema;
 
-import org.junit.Test;
-import org.opencastproject.util.data.Option;
-
-import java.util.Date;
-
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.schema.test.TestUtil.randomDc;
 import static org.opencastproject.util.ReflectionUtil.run;
+
+import org.opencastproject.util.data.Option;
+
+import org.junit.Test;
+
+import java.util.Date;
 
 public class OcDublinCoreBuilderTest {
   @Test

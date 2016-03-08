@@ -24,8 +24,6 @@ package org.opencastproject.caption.converters;
 
 import org.opencastproject.caption.api.Caption;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -35,6 +33,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+
+import junit.framework.Assert;
 
 /**
  *

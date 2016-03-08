@@ -21,8 +21,9 @@
 
 package org.opencastproject.smil.entity.api;
 
-import java.util.List;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
+
+import java.util.List;
 
 /**
  * Represent a SMIL head element.

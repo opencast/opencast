@@ -21,11 +21,11 @@
 
 package org.opencastproject.mediapackage;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.mediapackage.MediaPackageElementFlavor.flavor;
+
+import org.junit.Test;
 
 public class MediaPackageElementFlavorTest {
   @Test

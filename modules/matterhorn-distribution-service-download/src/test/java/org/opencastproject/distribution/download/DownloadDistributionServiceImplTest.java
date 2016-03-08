@@ -48,7 +48,6 @@ import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.workspace.api.Workspace;
 
-import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -65,6 +64,8 @@ import java.io.InputStream;
 import java.net.URI;
 
 import javax.servlet.http.HttpServletResponse;
+
+import junit.framework.Assert;
 
 public class DownloadDistributionServiceImplTest {
 

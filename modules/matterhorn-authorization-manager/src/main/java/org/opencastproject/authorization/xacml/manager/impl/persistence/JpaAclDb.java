@@ -21,6 +21,11 @@
 
 package org.opencastproject.authorization.xacml.manager.impl.persistence;
 
+import static org.opencastproject.authorization.xacml.manager.impl.persistence.ManagedAclEntity.findByIdAndOrg;
+import static org.opencastproject.util.data.functions.Misc.chuck;
+import static org.opencastproject.util.persistence.PersistenceUtil.equip2;
+import static org.opencastproject.util.persistence.PersistenceUtil.persist;
+
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.impl.AclDb;
 import org.opencastproject.security.api.AccessControlList;
@@ -32,14 +37,10 @@ import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.util.persistence.PersistenceEnv;
 import org.opencastproject.util.persistence.PersistenceEnv2;
 
-import javax.persistence.EntityManager;
-import javax.persistence.RollbackException;
 import java.util.List;
 
-import static org.opencastproject.authorization.xacml.manager.impl.persistence.ManagedAclEntity.findByIdAndOrg;
-import static org.opencastproject.util.data.functions.Misc.chuck;
-import static org.opencastproject.util.persistence.PersistenceUtil.equip2;
-import static org.opencastproject.util.persistence.PersistenceUtil.persist;
+import javax.persistence.EntityManager;
+import javax.persistence.RollbackException;
 
 /** JPA based impl of an {@link org.opencastproject.authorization.xacml.manager.impl.AclDb}. */
 public final class JpaAclDb implements AclDb {

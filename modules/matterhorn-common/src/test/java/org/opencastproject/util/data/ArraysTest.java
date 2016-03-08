@@ -21,11 +21,11 @@
 
 package org.opencastproject.util.data;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.data.Arrays.cons;
 import static org.opencastproject.util.data.Arrays.singleton;
+
+import org.junit.Test;
 
 public class ArraysTest {
   @Test

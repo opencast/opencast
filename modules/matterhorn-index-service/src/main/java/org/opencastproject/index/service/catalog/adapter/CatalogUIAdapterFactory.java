@@ -24,7 +24,6 @@ package org.opencastproject.index.service.catalog.adapter;
 import static java.lang.String.format;
 import static org.opencastproject.util.OsgiUtil.getCfg;
 
-import com.entwinemedia.fn.Prelude;
 import org.opencastproject.index.service.catalog.adapter.events.ConfigurableEventDCCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.series.ConfigurableSeriesDCCatalogUIAdapter;
@@ -32,6 +31,8 @@ import org.opencastproject.index.service.catalog.adapter.series.SeriesCatalogUIA
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.entwinemedia.fn.Prelude;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;

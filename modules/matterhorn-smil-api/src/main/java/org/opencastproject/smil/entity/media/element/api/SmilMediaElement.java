@@ -21,11 +21,12 @@
 
 package org.opencastproject.smil.entity.media.element.api;
 
-import java.net.URI;
-import java.util.List;
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.entity.media.api.SmilMediaObject;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
+
+import java.net.URI;
+import java.util.List;
 
 /**
  * Represent a media element like {@code audio}, {@code video},...

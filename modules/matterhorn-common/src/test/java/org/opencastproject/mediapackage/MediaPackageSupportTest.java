@@ -21,11 +21,11 @@
 
 package org.opencastproject.mediapackage;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.mediapackage.MediaPackageSupport.loadFromClassPath;
 import static org.opencastproject.mediapackage.MediaPackageSupport.sanityCheck;
+
+import org.junit.Test;
 
 public class MediaPackageSupportTest {
   @Test

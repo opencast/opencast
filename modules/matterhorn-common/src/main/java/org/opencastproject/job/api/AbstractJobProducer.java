@@ -24,8 +24,6 @@ package org.opencastproject.job.api;
 import static com.entwinemedia.fn.data.Opt.none;
 import static com.entwinemedia.fn.data.Opt.some;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.security.api.Organization;
@@ -41,6 +39,8 @@ import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.util.NotFoundException;
+
+import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;

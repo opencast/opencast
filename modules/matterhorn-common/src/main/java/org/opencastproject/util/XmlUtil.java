@@ -25,8 +25,9 @@ import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
-import com.entwinemedia.fn.data.ImmutableIteratorBase;
 import org.opencastproject.util.data.Either;
+
+import com.entwinemedia.fn.data.ImmutableIteratorBase;
 
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;

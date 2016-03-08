@@ -21,10 +21,11 @@
 
 package org.opencastproject.util;
 
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
+
 import org.opencastproject.util.data.Function0;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public class NeedleEyeTest {
   @Test

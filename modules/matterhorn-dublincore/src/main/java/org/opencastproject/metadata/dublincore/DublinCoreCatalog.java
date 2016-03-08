@@ -26,8 +26,6 @@ import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.data.Monadics.mlist;
 
-import com.entwinemedia.fn.Fns;
-import com.entwinemedia.fn.data.ImmutableSetWrapper;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.XMLCatalogImpl;
@@ -36,6 +34,9 @@ import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
+
+import com.entwinemedia.fn.Fns;
+import com.entwinemedia.fn.data.ImmutableSetWrapper;
 
 import org.apache.commons.collections.Closure;
 import org.apache.commons.collections.CollectionUtils;

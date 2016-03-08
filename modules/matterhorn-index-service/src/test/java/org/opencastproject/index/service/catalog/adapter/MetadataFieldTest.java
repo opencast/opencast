@@ -21,13 +21,12 @@
 
 package org.opencastproject.index.service.catalog.adapter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.j;
 import static com.entwinemedia.fn.data.json.Jsons.v;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
-import com.entwinemedia.fn.data.Opt;
 import org.opencastproject.index.service.catalog.adapter.MetadataField.Type;
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
@@ -35,18 +34,20 @@ import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.security.api.Organization;
 
+import com.entwinemedia.fn.data.Opt;
+
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
+
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class MetadataFieldTest {
   private String defaultInputID = "TestInputID";

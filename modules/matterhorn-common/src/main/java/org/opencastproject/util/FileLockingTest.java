@@ -21,6 +21,9 @@
 
 package org.opencastproject.util;
 
+import static org.opencastproject.util.IoSupport.locked;
+import static org.opencastproject.util.IoSupport.withResource;
+
 import org.opencastproject.util.data.Effect;
 
 import java.io.BufferedReader;
@@ -29,9 +32,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.UUID;
-
-import static org.opencastproject.util.IoSupport.locked;
-import static org.opencastproject.util.IoSupport.withResource;
 
 /**
  * Run this program in two separate JVMs.

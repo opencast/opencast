@@ -21,9 +21,9 @@
 
 package org.opencastproject.index.service.util;
 
+import static org.junit.Assert.assertEquals;
 import static org.opencastproject.index.service.util.ListProviderUtil.filterMap;
 import static org.opencastproject.index.service.util.ListProviderUtil.sortMapByValue;
-import static org.junit.Assert.assertEquals;
 
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 

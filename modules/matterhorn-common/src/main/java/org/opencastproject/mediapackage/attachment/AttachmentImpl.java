@@ -27,10 +27,11 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeType;
 
+import java.net.URI;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import java.net.URI;
 
 /**
  * Basic implementation of an attachment.

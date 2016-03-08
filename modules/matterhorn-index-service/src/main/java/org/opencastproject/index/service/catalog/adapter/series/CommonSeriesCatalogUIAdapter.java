@@ -23,7 +23,6 @@ package org.opencastproject.index.service.catalog.adapter.series;
 
 import static java.util.Objects.requireNonNull;
 
-import com.entwinemedia.fn.data.Opt;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.security.api.SecurityService;
@@ -31,6 +30,8 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
+
+import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;

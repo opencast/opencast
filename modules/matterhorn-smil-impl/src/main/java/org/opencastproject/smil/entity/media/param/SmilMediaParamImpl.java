@@ -21,12 +21,14 @@
 
 package org.opencastproject.smil.entity.media.param;
 
-import java.util.List;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
 import org.opencastproject.smil.entity.SmilObjectImpl;
 import org.opencastproject.smil.entity.api.SmilObject;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
+
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * {@link SmilMediaParam} implementation.

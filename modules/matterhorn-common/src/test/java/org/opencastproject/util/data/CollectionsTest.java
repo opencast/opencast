@@ -22,14 +22,6 @@
 
 package org.opencastproject.util.data;
 
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
-
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -50,6 +42,14 @@ import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Collections.repeat;
 import static org.opencastproject.util.data.Collections.toArray;
 import static org.opencastproject.util.data.Collections.toList;
+
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 public class CollectionsTest {
 

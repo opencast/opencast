@@ -21,7 +21,6 @@
 
 package org.opencastproject.userdirectory;
 
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -29,6 +28,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.opencastproject.util.data.Collections.set;
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;

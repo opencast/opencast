@@ -31,6 +31,7 @@ import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
+
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;

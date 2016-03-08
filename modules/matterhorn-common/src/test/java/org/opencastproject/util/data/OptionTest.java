@@ -22,11 +22,6 @@
 
 package org.opencastproject.util.data;
 
-import org.junit.Test;
-
-import java.util.HashSet;
-import java.util.Set;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -34,6 +29,11 @@ import static org.junit.Assert.fail;
 import static org.opencastproject.util.data.Option.Match;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
+
+import org.junit.Test;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class OptionTest {
 

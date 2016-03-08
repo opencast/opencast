@@ -21,14 +21,15 @@
 
 package org.opencastproject.util.data.functions;
 
-import org.junit.Test;
-import org.opencastproject.util.data.Either;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.functions.Eithers.flatten;
+
+import org.opencastproject.util.data.Either;
+
+import org.junit.Test;
 
 public class EithersTest {
   @Test

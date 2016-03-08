@@ -21,14 +21,14 @@
 
 package org.opencastproject.util.data.functions;
 
+import static org.opencastproject.util.EqualsUtil.eq;
+
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 
 import java.util.List;
-
-import static org.opencastproject.util.EqualsUtil.eq;
 
 /** Various functions not directly bound to any type. */
 public final class Misc {

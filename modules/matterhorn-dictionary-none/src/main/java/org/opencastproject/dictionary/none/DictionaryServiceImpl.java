@@ -22,14 +22,16 @@
 package org.opencastproject.dictionary.none;
 
 import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
-import org.opencastproject.util.ReadinessIndicator;
-import org.osgi.framework.BundleContext;
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 import org.opencastproject.dictionary.api.DictionaryService;
 import org.opencastproject.metadata.mpeg7.Textual;
 import org.opencastproject.metadata.mpeg7.TextualImpl;
+import org.opencastproject.util.ReadinessIndicator;
+
+import org.osgi.framework.BundleContext;
+
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 /**
  * This dictionary implementation is a dummy implementation which which will

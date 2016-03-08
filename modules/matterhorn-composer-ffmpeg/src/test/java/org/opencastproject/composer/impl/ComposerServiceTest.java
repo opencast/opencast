@@ -61,8 +61,6 @@ import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.easymock.EasyMock;
@@ -81,6 +79,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
+import junit.framework.Assert;
 
 /**
  * Tests the {@link ComposerServiceImpl}.

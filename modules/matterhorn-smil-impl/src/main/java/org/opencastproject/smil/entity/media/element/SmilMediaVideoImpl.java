@@ -22,6 +22,7 @@
 package org.opencastproject.smil.entity.media.element;
 
 import java.net.URI;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**

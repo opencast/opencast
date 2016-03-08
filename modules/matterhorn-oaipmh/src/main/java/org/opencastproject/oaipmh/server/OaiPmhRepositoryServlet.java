@@ -22,12 +22,19 @@
 
 package org.opencastproject.oaipmh.server;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.collections.map.LRUMap;
+import static org.opencastproject.oaipmh.util.OsgiUtil.checkDictionary;
+import static org.opencastproject.oaipmh.util.OsgiUtil.getCfg;
+import static org.opencastproject.oaipmh.util.OsgiUtil.getCfgAsInt;
+import static org.opencastproject.oaipmh.util.OsgiUtil.getContextProperty;
+import static org.opencastproject.util.data.Option.option;
+
 import org.opencastproject.oaipmh.Granularity;
 import org.opencastproject.oaipmh.util.XmlGen;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.util.data.Option;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections.map.LRUMap;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -35,10 +42,6 @@ import org.osgi.service.http.HttpService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -46,11 +49,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static org.opencastproject.oaipmh.util.OsgiUtil.checkDictionary;
-import static org.opencastproject.oaipmh.util.OsgiUtil.getCfg;
-import static org.opencastproject.oaipmh.util.OsgiUtil.getCfgAsInt;
-import static org.opencastproject.oaipmh.util.OsgiUtil.getContextProperty;
-import static org.opencastproject.util.data.Option.option;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * The OAI-PMH server. Backed by an OAI-PMH repository.

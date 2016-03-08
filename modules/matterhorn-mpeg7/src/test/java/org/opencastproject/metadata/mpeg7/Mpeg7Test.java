@@ -29,8 +29,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.util.FileSupport;
 
-import de.schlichtherle.io.FileOutputStream;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -41,6 +39,8 @@ import java.awt.Rectangle;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+
+import de.schlichtherle.io.FileOutputStream;
 
 /**
  * Test class for the Mpeg-7 catalog implementation.

@@ -43,8 +43,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import com.entwinemedia.fn.data.Opt;
 
-import junit.framework.Assert;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.ProtocolVersion;
@@ -67,6 +65,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
 import java.io.IOException;
+
+import junit.framework.Assert;
 
 public class TrustedHttpClientImplTest {
 

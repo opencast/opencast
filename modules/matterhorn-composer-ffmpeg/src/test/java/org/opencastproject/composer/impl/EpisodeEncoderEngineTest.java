@@ -27,9 +27,8 @@ import static org.junit.Assert.assertTrue;
 import org.opencastproject.composer.api.EncoderEngine;
 import org.opencastproject.composer.impl.episode.EpisodeEncoderEngine;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;

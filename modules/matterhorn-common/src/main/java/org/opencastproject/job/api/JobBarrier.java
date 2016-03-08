@@ -21,13 +21,13 @@
 
 package org.opencastproject.job.api;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.util.NotFoundException;
+
+import com.entwinemedia.fn.data.Opt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

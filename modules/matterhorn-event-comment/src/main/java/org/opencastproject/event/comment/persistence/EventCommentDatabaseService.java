@@ -20,10 +20,10 @@
  */
 package org.opencastproject.event.comment.persistence;
 
-import java.util.List;
-
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.util.NotFoundException;
+
+import java.util.List;
 
 public interface EventCommentDatabaseService {
   /**

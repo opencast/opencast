@@ -22,6 +22,8 @@
 
 package org.opencastproject.workflow.handler.speechrecognition;
 
+import static org.opencastproject.util.data.Monadics.mlist;
+
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.job.api.JobContext;
@@ -39,13 +41,12 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.opencastproject.util.data.Monadics.mlist;
 
 /**
  * {@link org.opencastproject.workflow.api.WorkflowOperationHandler} to let a service like <a

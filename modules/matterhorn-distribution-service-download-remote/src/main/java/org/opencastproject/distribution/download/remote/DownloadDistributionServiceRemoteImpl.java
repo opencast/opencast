@@ -21,18 +21,6 @@
 
 package org.opencastproject.distribution.download.remote;
 
-import org.apache.http.client.methods.HttpPost;
-import org.opencastproject.distribution.api.DistributionException;
-import org.opencastproject.distribution.api.DistributionService;
-import org.opencastproject.distribution.api.DownloadDistributionService;
-import org.opencastproject.job.api.Job;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageParser;
-import org.opencastproject.serviceregistry.api.RemoteBase;
-import org.osgi.service.component.ComponentContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static java.lang.String.format;
 import static org.opencastproject.util.HttpUtil.param;
 import static org.opencastproject.util.HttpUtil.post;
@@ -40,6 +28,19 @@ import static org.opencastproject.util.JobUtil.jobFromHttpResponse;
 import static org.opencastproject.util.data.Arrays.array;
 import static org.opencastproject.util.data.Arrays.mkString;
 import static org.opencastproject.util.data.functions.Options.join;
+
+import org.opencastproject.distribution.api.DistributionException;
+import org.opencastproject.distribution.api.DistributionService;
+import org.opencastproject.distribution.api.DownloadDistributionService;
+import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.serviceregistry.api.RemoteBase;
+
+import org.apache.http.client.methods.HttpPost;
+import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** A remote distribution service invoker. */
 public class DownloadDistributionServiceRemoteImpl extends RemoteBase

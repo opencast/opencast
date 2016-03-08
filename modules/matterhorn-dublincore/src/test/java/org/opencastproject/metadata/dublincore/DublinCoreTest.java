@@ -44,7 +44,6 @@ import static org.opencastproject.metadata.dublincore.DublinCore.TERMS_NS_URI;
 import static org.opencastproject.metadata.dublincore.DublinCores.OC_PROPERTY_PROMOTED;
 import static org.opencastproject.util.UrlSupport.uri;
 
-import com.entwinemedia.fn.data.Opt;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -58,6 +57,8 @@ import org.opencastproject.util.MimeType;
 import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;

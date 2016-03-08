@@ -21,10 +21,10 @@
 
 package org.opencastproject.index.service.catalog.adapter;
 
+import static org.junit.Assert.assertThat;
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_FLAVOR_KEY;
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_ORGANIZATION_KEY;
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_TITLE_KEY;
-import static org.junit.Assert.assertThat;
 
 import org.opencastproject.index.service.catalog.adapter.events.ConfigurableEventDCCatalogUIAdapter;
 import org.opencastproject.index.service.exception.ListProviderException;
@@ -45,8 +45,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +54,8 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.TreeMap;
+
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class EventCatalogUIAdapterTest {
   private static final String label = "The Label";

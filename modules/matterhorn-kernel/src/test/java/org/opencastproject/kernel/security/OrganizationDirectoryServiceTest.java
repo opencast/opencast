@@ -26,8 +26,6 @@ import org.opencastproject.kernel.security.persistence.OrganizationDatabaseExcep
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.NotFoundException;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.service.cm.ConfigurationException;
@@ -35,6 +33,8 @@ import org.osgi.service.cm.ConfigurationException;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+
+import junit.framework.Assert;
 
 /**
  * Test class for {@link OrganizationDirectoryServiceImpl}

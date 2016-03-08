@@ -34,7 +34,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

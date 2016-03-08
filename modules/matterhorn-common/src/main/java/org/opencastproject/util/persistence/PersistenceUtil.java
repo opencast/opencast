@@ -22,22 +22,22 @@
 
 package org.opencastproject.util.persistence;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.Tuple.tuple;
+
 import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
+
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+
 import org.osgi.service.component.ComponentContext;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
-import javax.persistence.Query;
-import javax.persistence.TemporalType;
-import javax.persistence.spi.PersistenceProvider;
-import javax.sql.DataSource;
 import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -47,11 +47,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.Tuple.tuple;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
+import javax.persistence.Query;
+import javax.persistence.TemporalType;
+import javax.persistence.spi.PersistenceProvider;
+import javax.sql.DataSource;
 /** Functions supporting persistence. */
 
 /**

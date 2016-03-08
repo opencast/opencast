@@ -30,14 +30,26 @@ import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.adminui.util.TextFilter;
+import org.opencastproject.capture.CaptureParameters;
+import org.opencastproject.capture.admin.api.Agent;
+import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.index.service.resources.list.query.AgentsListQuery;
+import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.matterhorn.search.SearchQuery.Order;
+import org.opencastproject.matterhorn.search.SortCriterion;
+import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.SmartIterator;
+import org.opencastproject.util.data.Option;
+import org.opencastproject.util.doc.rest.RestParameter;
+import org.opencastproject.util.doc.rest.RestQuery;
+import org.opencastproject.util.doc.rest.RestResponse;
+import org.opencastproject.util.doc.rest.RestService;
+
 import com.entwinemedia.fn.data.json.JField;
 import com.entwinemedia.fn.data.json.JValue;
 
 import org.apache.commons.lang3.StringUtils;
-import org.opencastproject.adminui.util.TextFilter;
-import org.opencastproject.capture.CaptureParameters;
-import org.opencastproject.util.DateTimeSupport;
-import org.opencastproject.util.SmartIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,18 +69,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
-import org.opencastproject.capture.admin.api.Agent;
-import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.index.service.resources.list.query.AgentsListQuery;
-import org.opencastproject.index.service.util.RestUtils;
-import org.opencastproject.matterhorn.search.SearchQuery.Order;
-import org.opencastproject.matterhorn.search.SortCriterion;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.doc.rest.RestParameter;
-import org.opencastproject.util.doc.rest.RestQuery;
-import org.opencastproject.util.doc.rest.RestResponse;
-import org.opencastproject.util.doc.rest.RestService;
 
 @Path("/")
 @RestService(name = "captureAgents", title = "Capture agents façade service", notes = "This service offers the default capture agents CRUD Operations for the admin UI.", abstractText = "Provides operations for the capture agents")

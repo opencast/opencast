@@ -22,8 +22,8 @@
 package org.opencastproject.authorization.xacml.manager.endpoint;
 
 import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.opencastproject.rest.RestServiceTestEnv.testEnvForCustomConfig;

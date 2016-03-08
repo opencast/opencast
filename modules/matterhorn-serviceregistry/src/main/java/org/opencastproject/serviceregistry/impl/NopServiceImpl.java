@@ -21,13 +21,13 @@
 
 package org.opencastproject.serviceregistry.impl;
 
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.OsgiAbstractJobProducer;
 import org.opencastproject.serviceregistry.api.NopService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.Log;
-
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * No operation service.

@@ -32,8 +32,6 @@ import static org.opencastproject.serviceregistry.api.ServiceState.ERROR;
 import static org.opencastproject.serviceregistry.api.ServiceState.NORMAL;
 import static org.opencastproject.serviceregistry.api.ServiceState.WARNING;
 
-import com.entwinemedia.fn.Fn;
-
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -66,6 +64,8 @@ import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.jmx.JmxUtil;
+
+import com.entwinemedia.fn.Fn;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;

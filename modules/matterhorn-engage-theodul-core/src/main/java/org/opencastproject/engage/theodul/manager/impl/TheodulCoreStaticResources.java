@@ -23,23 +23,22 @@ package org.opencastproject.engage.theodul.manager.impl;
 
 import static org.joda.time.DateTimeConstants.MILLIS_PER_SECOND;
 
-import java.io.File;
-import java.util.Dictionary;
-import java.util.Hashtable;
-
-import javax.servlet.Servlet;
-
-import org.apache.commons.lang.StringUtils;
-
 import org.opencastproject.kernel.rest.RestPublisher;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.rest.StaticResource;
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.Dictionary;
+import java.util.Hashtable;
+
+import javax.servlet.Servlet;
 
 /**
  * Service that registers the static resources required by the Theodul player with an optional local override directory.

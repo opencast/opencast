@@ -30,10 +30,11 @@ import static javax.xml.XMLConstants.XML_NS_URI;
 import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.EqualsUtil.hash;
 
-import com.entwinemedia.fn.data.ImmutableMapWrapper;
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
+
+import com.entwinemedia.fn.data.ImmutableMapWrapper;
 
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;

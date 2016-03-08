@@ -21,12 +21,12 @@
 
 package org.opencastproject.util.data;
 
-import java.util.Iterator;
-import java.util.List;
-
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.opencastproject.util.data.Option.some;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * An algebraic data type representing a disjoint union. By convention left is considered to represent an error while

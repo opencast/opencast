@@ -21,8 +21,9 @@
 
 package org.opencastproject.index.service.catalog.adapter.series;
 
-import com.entwinemedia.fn.data.Opt;
 import org.opencastproject.index.service.catalog.adapter.AbstractMetadataCollection;
+
+import com.entwinemedia.fn.data.Opt;
 
 /**
  * A {@link SeriesCatalogUIAdapter} converts between a concrete {@link MetadataCatalog} implementation and a

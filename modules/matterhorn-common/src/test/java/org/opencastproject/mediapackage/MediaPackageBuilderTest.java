@@ -22,15 +22,17 @@
 
 package org.opencastproject.mediapackage;
 
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
-import org.w3c.dom.Document;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
+import org.w3c.dom.Document;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,9 +41,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * Test case used to make sure the media package builder works as expected.

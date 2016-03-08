@@ -33,6 +33,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -60,8 +61,6 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.List;
-
-import org.opencastproject.mediapackage.track.TrackImpl;
 
 /**
  * Distributes media to the local media delivery directory.

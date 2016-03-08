@@ -21,17 +21,24 @@
 
 package org.opencastproject.rest;
 
+import static org.opencastproject.util.data.Collections.toArray;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
+import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
+
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.net.httpserver.HttpServer;
+
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.opencastproject.util.IoSupport;
-import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,11 +50,6 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-
-import static org.opencastproject.util.data.Collections.toArray;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * Helper environment for creating REST service unit tests.

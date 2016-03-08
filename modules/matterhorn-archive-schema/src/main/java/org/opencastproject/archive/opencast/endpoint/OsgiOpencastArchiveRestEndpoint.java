@@ -21,20 +21,21 @@
 
 package org.opencastproject.archive.opencast.endpoint;
 
+import static org.opencastproject.util.OsgiUtil.getComponentContextProperty;
+import static org.opencastproject.util.OsgiUtil.getContextProperty;
+
 import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.archive.opencast.OpencastArchive;
 import org.opencastproject.kernel.rest.RestEndpoint;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.osgi.SimpleServicePublisher;
 import org.opencastproject.workflow.api.WorkflowService;
+
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Path;
-
-import static org.opencastproject.util.OsgiUtil.getComponentContextProperty;
-import static org.opencastproject.util.OsgiUtil.getContextProperty;
 
 /** OSGi bound implementation. */
 @Path("/")

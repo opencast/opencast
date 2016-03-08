@@ -48,6 +48,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
@@ -58,7 +59,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -73,6 +73,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
+
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class DublinCoreCatalogUIAdapterTest {
   private static final String TEMPORAL_DUBLIN_CORE_KEY = "temporal";

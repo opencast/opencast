@@ -33,6 +33,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;

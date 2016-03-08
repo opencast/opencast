@@ -22,19 +22,20 @@
 
 package org.opencastproject.util;
 
-import org.apache.commons.lang3.StringUtils;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.option;
+
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Strings;
+
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 
 import java.util.Dictionary;
-
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.option;
 
 /** Contains general purpose OSGi utility functions. */
 public final class OsgiUtil {

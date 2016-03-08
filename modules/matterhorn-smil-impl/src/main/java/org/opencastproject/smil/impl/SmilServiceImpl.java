@@ -21,10 +21,6 @@
 
 package org.opencastproject.smil.impl;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import javax.xml.bind.JAXBException;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.smil.api.SmilException;
@@ -47,6 +43,12 @@ import org.opencastproject.smil.entity.media.element.SmilMediaVideoImpl;
 import org.opencastproject.smil.entity.media.param.SmilMediaParamGroupImpl;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.bind.JAXBException;
 
 /**
  * Implement {@link SmilService} interface.

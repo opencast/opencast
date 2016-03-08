@@ -22,24 +22,26 @@
 
 package org.opencastproject.util;
 
+import static org.opencastproject.util.EqualsUtil.eqObj;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.io.Serializable;
-import java.util.List;
-
-import static org.opencastproject.util.EqualsUtil.eqObj;
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
 
 /**
  * This class implements the mime type. Note that mime types should not be instantiated directly but be retreived from

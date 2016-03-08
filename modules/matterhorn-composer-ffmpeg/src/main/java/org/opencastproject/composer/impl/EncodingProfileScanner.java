@@ -44,14 +44,13 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
-import java.util.Set;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * This manager class tries to read encoding profiles from the classpath.
@@ -330,7 +329,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
     logger.info("Registering encoding profiles from {}", artifact);
     try {
       Map<String, EncodingProfile> profileMap = loadFromProperties(artifact);
-      for (Entry<String, EncodingProfile> entry : profileMap.entrySet()) {
+      for (Map.Entry<String, EncodingProfile> entry : profileMap.entrySet()) {
         logger.info("Installed profile {}", entry.getValue().getIdentifier());
         profiles.put(entry.getKey(), entry.getValue());
       }

@@ -83,8 +83,6 @@ import org.opencastproject.workflow.handler.workflow.ErrorResolutionWorkflowOper
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -105,6 +103,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import junit.framework.Assert;
 
 public class WorkflowServiceImplTest {
 

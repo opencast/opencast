@@ -22,26 +22,22 @@
 
 package org.opencastproject.manager.system;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-
+import org.opencastproject.manager.servlet.MHConfigurationsServlet;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.rest.StaticResource;
 
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.http.HttpService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
 
 import javax.servlet.Servlet;
-
-import org.osgi.service.http.HttpService;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.opencastproject.manager.servlet.MHConfigurationsServlet;
 
 /**
  * This class activate the module.
