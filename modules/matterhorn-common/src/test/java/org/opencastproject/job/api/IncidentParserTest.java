@@ -35,17 +35,22 @@ import org.opencastproject.job.api.Incident.Severity;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
 public class IncidentParserTest {
+
+  private static final Logger logger = LoggerFactory.getLogger(IncidentParserTest.class);
+
   @Test
   public void testSerializationOfJaxbIncident() throws Exception {
     final Incident incident = new IncidentImpl(1, 2, "service", "localhost", new Date(0), Severity.FAILURE, "code",
             list(tuple("title", "content"), tuple("Another title", "...and even more content")), map(tuple("key",
                     "value")));
     final String marshaled = IncidentParser.I.toXml(new JaxbIncident(incident));
-    System.out.println(marshaled);
+    logger.info(marshaled);
     assertThat(the(marshaled),
             similarTo(the(loadFileFromClassPathAsString("/org/opencastproject/job/api/expected-incident-1.xml").get())));
     final Incident unmarshaled = IncidentParser.I.parseIncidentFromXml(IOUtils.toInputStream(marshaled)).toIncident();
@@ -59,7 +64,7 @@ public class IncidentParserTest {
                     .<IncidentTree> list(new IncidentTreeImpl(list(incident(4), incident(5)), Immutables
                             .<IncidentTree> nil())))));
     final String marshaled = IncidentParser.I.toXml(new JaxbIncidentTree(tree));
-    System.out.println(marshaled);
+    logger.info(marshaled);
     assertThat(the(marshaled),
             similarTo(the(loadFileFromClassPathAsString("/org/opencastproject/job/api/expected-incident-tree-1.xml")
                     .get())));

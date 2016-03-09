@@ -74,6 +74,9 @@
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
         <configuration>
+          <installedFeatures>
+            <feature>opencast-migration</feature>
+          </installedFeatures>
           <bootFeatures>
             <feature>standard</feature>
             <feature>opencast-presentation</feature>

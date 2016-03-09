@@ -26,6 +26,9 @@ import static org.opencastproject.util.IoSupport.withResource;
 
 import org.opencastproject.util.data.Effect;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -51,23 +54,25 @@ import java.util.UUID;
  * The passes if not errors are thrown.
  */
 public final class FileLockingTest {
+  private static final Logger logger = LoggerFactory.getLogger(FileLockingTest.class);
+
   private FileLockingTest() {
   }
 
   public static void main(String[] args) throws Exception {
     final File file = new File("FILE_LOCKING_TEST_9139134.txt");
     final String myId = UUID.randomUUID().toString();
-    System.out.println(myId + ": Starting ");
+    logger.info(myId + ": Starting ");
     try {
     locked(file, new Effect.X<File>() {
       @Override public void xrun(File file) throws Exception {
         withResource(new PrintWriter(new FileOutputStream(file)), new Effect.X<PrintWriter>() {
           @Override public void xrun(PrintWriter out) throws Exception {
-            System.out.println(myId + ": Writing to file");
+            logger.info(myId + ": Writing to file");
             out.println(myId);
-            System.out.println(myId + ": Sleeping 7 sec...");
+            logger.info(myId + ": Sleeping 7 sec...");
             Thread.sleep(7000);
-            System.out.println(myId + ": Writing to file");
+            logger.info(myId + ": Writing to file");
             out.println(myId);
           }
         });
@@ -84,7 +89,7 @@ public final class FileLockingTest {
       }
     });
     } finally {
-      System.out.println(myId + ": Stopping " + myId);
+      logger.info(myId + ": Stopping " + myId);
     }
   }
 }

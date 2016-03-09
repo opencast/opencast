@@ -1,15 +1,34 @@
-Opencast 2.1.0: Release Notes
-=============================
+Opencast 2.2: Release Notes
+===========================
+
+Release Schedule
+----------------
+
+|Date                         |Phase
+|-----------------------------|---------------------------------------------
+|April 4th                    |Feature Freeze  *(Cutting of release branch)*
+|April 4th - 24th             |Internal QA and bug fixing phase
+|&nbsp; *April 11th - 17th*   |Review Test Cases *(Dedicated team)*
+|&nbsp; *April 18th - 24th*   |Documentation Review
+|April 25th - May 15th        |Public QA phase *(Ask for help)*
+|May 15th - June 1st          |Additional bug fixing phase
+|&nbsp; *May 25th - June 1st* |Translation week *(Ask for help)*
+|June 2nd - June 12th         |Final QA phase *(Check release readiness)*
+|June 15th                    |Release of Opencast 2.2
+
+
+Opencast 2.1: Release Notes
+===========================
 
 *A feature rich, flexible Opencast*
 
-In the spirit of moving forward from 2.0, Opencast 2.1.0 provides, amongst other features, a more stable and flexible
+In the spirit of moving forward from 2.0, Opencast 2.1 provides, amongst other features, a more stable and flexible
 backend infrastructure courtesy of Karaf - “the next generation OSGI framework”.
 
 The new version provides a lot of User Interface (UI) improvements and fixes some Admin UI issues. It also provides
 additional internationalization support, as well as a Dashboard that provides a quick overview of processing states.
 
-Opencast 2.1.0 also introduces a way to access the REST-endpoint documentation from within the Admin UI, which paves the
+Opencast 2.1 also introduces a way to access the REST-endpoint documentation from within the Admin UI, which paves the
 way to allowing us to remove the legacy (1.x-style) Admin UI in upcoming versions. Although the legacy UI is still
 usable for some tasks, some areas feel broken and should be removed as the underlying logic has changed (in the
 transition from Opencast 1.x to 2.x).
@@ -17,8 +36,8 @@ transition from Opencast 1.x to 2.x).
 New Features and Improvements
 -----------------------------
 
- - **Switch from Apache Felix to Apache Karaf** - 2.1.0 sees the move from an OSGI runtime (Felix) to a flexible OSGI
-   Environment (Karaf). This is the most prominent feature in 2.1.0. It ensures that going forward Opencast will have a
+ - **Switch from Apache Felix to Apache Karaf** - 2.1 sees the move from an OSGI runtime (Felix) to a flexible OSGI
+   Environment (Karaf). This is the most prominent feature in 2.1. It ensures that going forward Opencast will have a
    solid, flexible backend infrastructure.
 
  - **Addition of a new "Assets" tab** - The Event details has a new tab, “Assets”, that gives additional information
@@ -59,10 +78,10 @@ Important Administrative Notes
 
      | filename                                  | installation            |
      | ----------------------------------------- | ----------------------- |
-     | `opencast-dist-admin-2.1.0.tar.gz`        | admin node              |
-     | `opencast-dist-presentation-2.1.0.tar.gz` | presentation node       |
-     | `opencast-dist-worker-2.1.0.tar.gz`       | worker node             |
-     | `opencast-dist-allinone-2.1.0.tar.gz`     | all-in-one installation |
+     | `opencast-dist-admin-2.1.1.tar.gz`        | admin node              |
+     | `opencast-dist-presentation-2.1.1.tar.gz` | presentation node       |
+     | `opencast-dist-worker-2.1.1.tar.gz`       | worker node             |
+     | `opencast-dist-allinone-2.1.1.tar.gz`     | all-in-one installation |
 
     For your convenience the all-in-one installation is automatically extracted to the `build` folder.
 
@@ -82,15 +101,23 @@ How to Upgrade
 
 Note that backing up your Opencast instance before doing a major update is strongly recommended.
 
-1. Check out/download Opencast 2.1.0
+1. Check out/download Opencast 2.1
 2. Stop your current Opencast instance
 3. Back up Opencast files and database (optional)
 4. Run the appropriate database upgrade script(s)
      - `docs/upgrade/1.6_2.0.0` -> `docs/upgrade/2.0.1_2.0.2`
 5. Review the configuration changes and adjust your configuration accordingly
 6. Update the third party tools as documented
-7. Build Opencast 2.1.0
+7. Build Opencast 2.1
 8. Start Opencast
+
+
+Additional Notes About 2.1.1
+----------------------------
+
+Opencast 2.1.1 is a bug fix release that fixes some major issues of Opencast 2.1.0. 
+In Opencast 2.1.0 the distributed setup had a problem with the worker-node not starting properly.
+This is now fixed. 
 
 ---
 

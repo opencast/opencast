@@ -30,6 +30,8 @@ import com.entwinemedia.fn.Fn;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +47,7 @@ public class MultiResourceLockTest {
   private HashMap<Long, Double> data;
   private volatile boolean multipleIdsInParallel;
   private MultiResourceLock lock;
+  private static final Logger logger = LoggerFactory.getLogger(MultiResourceLockTest.class);
 
   @Before
   public void setUp() {
@@ -101,7 +104,7 @@ public class MultiResourceLockTest {
         final Map<Long, Double> dataCopy = new HashMap<>(data);
         sleep((long) (Math.random() * (maxSleep - minSleep) + minSleep));
         long seconds = TimeUnit.NANOSECONDS.toSeconds(System.nanoTime());
-        System.out.println(format("%s, id: %s, time %s", taskName, id, seconds));
+        logger.info(format("%s, id: %s, time %s", taskName, id, seconds));
         assertEquals("Concurrent modification of data for id " + id, value, data.get(id));
         taskCounter.decrementAndGet();
         multipleIdsInParallel = multipleIdsInParallel || !dataCopy.equals(data);

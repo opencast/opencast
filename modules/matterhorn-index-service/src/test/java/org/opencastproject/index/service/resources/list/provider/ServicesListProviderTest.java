@@ -42,6 +42,8 @@ import org.json.simple.parser.ParseException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,7 +51,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ServicesListProviderTest {
-
+  private static final Logger logger = LoggerFactory.getLogger(ServicesListProviderTest.class);
   private ServicesListProvider servicesListProvider;
   private Map<String, Object> resultList;
 
@@ -90,7 +92,7 @@ public class ServicesListProviderTest {
     o.put("test", s);
     o.put("results", a);
     JSONObject jsonObject = a.toJSONObject(a);
-    System.out.println(jsonObject.toString());
+    logger.info(jsonObject.toString());
   }
 
   @SuppressWarnings("unchecked")

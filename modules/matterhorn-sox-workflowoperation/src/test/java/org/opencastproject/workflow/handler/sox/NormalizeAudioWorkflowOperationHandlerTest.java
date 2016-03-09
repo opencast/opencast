@@ -111,19 +111,19 @@ public class NormalizeAudioWorkflowOperationHandlerTest {
 
     Job analyzeJob = serviceRegistry.createJob(SoxService.JOB_TYPE, "Analyze", null, soxTrackXml, false);
     analyzeJob.setStatus(Status.FINISHED);
-    serviceRegistry.updateJob(analyzeJob);
+    analyzeJob = serviceRegistry.updateJob(analyzeJob);
 
     Job normalizeJob = serviceRegistry.createJob(SoxService.JOB_TYPE, "Normalize", null, normalizedTrackXml, false);
     normalizeJob.setStatus(Status.FINISHED);
-    serviceRegistry.updateJob(normalizeJob);
+    normalizeJob = serviceRegistry.updateJob(normalizeJob);
 
     Job encodeJob = serviceRegistry.createJob(ComposerService.JOB_TYPE, "Encode", null, encodeTrackXml, false);
     encodeJob.setStatus(Status.FINISHED);
-    serviceRegistry.updateJob(encodeJob);
+    encodeJob = serviceRegistry.updateJob(encodeJob);
 
     Job muxJob = serviceRegistry.createJob(ComposerService.JOB_TYPE, "Mux", null, muxedTrackXml, false);
     muxJob.setStatus(Status.FINISHED);
-    serviceRegistry.updateJob(muxJob);
+    muxJob = serviceRegistry.updateJob(muxJob);
 
     SoxService sox = EasyMock.createNiceMock(SoxService.class);
     EasyMock.expect(sox.analyze((Track) EasyMock.anyObject())).andReturn(analyzeJob).anyTimes();

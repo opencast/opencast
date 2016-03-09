@@ -36,6 +36,8 @@ import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.util.ConfigurationException;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -57,6 +59,7 @@ import javax.xml.xpath.XPathFactory;
  * Test cases for the media package.
  */
 public class MediaPackageTest extends AbstractMediaPackageTest {
+  private static final Logger logger = LoggerFactory.getLogger(AbstractMediaPackageTest.class);
 
   @Test
   public void testEmptyMediaPackage() {
@@ -137,7 +140,7 @@ public class MediaPackageTest extends AbstractMediaPackageTest {
     mp.add(publication("1", "engage", new URI("http://localhost/1.html"), mimeType("text", "html")));
     assertEquals("Number of media package elements", 1, mp.getElements().length);
     final String xml = MediaPackageParser.getAsXml(mp);
-    System.out.println(xml);
+    logger.info(xml);
     assertEquals("Media package identifier", mp.getIdentifier().toString(), from(xml).get("mediapackage.@id"));
     assertEquals("Publication channel name", "engage", from(xml).get("mediapackage.publications.publication.@channel"));
   }

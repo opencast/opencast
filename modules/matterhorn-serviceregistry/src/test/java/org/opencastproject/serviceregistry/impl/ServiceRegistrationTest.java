@@ -128,7 +128,7 @@ public class ServiceRegistrationTest {
     Job job = serviceRegistry.createJob(regType1Localhost.getHost(), regType1Localhost.getServiceType(), OPERATION_NAME_1, null,
             null, false, null);
     job.setStatus(Job.Status.RUNNING);
-    serviceRegistry.updateJob(job);
+    job = serviceRegistry.updateJob(job);
 
     // Recalculate the number of available services
     hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager(), true);
@@ -152,7 +152,7 @@ public class ServiceRegistrationTest {
     jobTry1.setStatus(Status.FAILED);
     jobTry1.setJobType(regType1Localhost.getServiceType());
     jobTry1.setProcessingHost(regType1Localhost.getHost());
-    serviceRegistry.updateJob(jobTry1);
+    jobTry1 = serviceRegistry.updateJob(jobTry1);
     updatedService = getUpdatedService(regType1Localhost);
     Assert.assertEquals(ServiceState.WARNING, updatedService.getServiceState());
     Assert.assertEquals(0, updatedService.getErrorStateTrigger());
@@ -161,7 +161,7 @@ public class ServiceRegistrationTest {
     jobTry2.setStatus(Status.FAILED);
     jobTry2.setJobType(regType1Localhost.getServiceType());
     jobTry2.setProcessingHost(regType1Localhost.getHost());
-    serviceRegistry.updateJob(jobTry2);
+    jobTry2 = serviceRegistry.updateJob(jobTry2);
     updatedService = getUpdatedService(regType1Localhost);
     Assert.assertEquals(ServiceState.WARNING, updatedService.getServiceState());
     Assert.assertEquals(0, updatedService.getErrorStateTrigger());
@@ -170,7 +170,7 @@ public class ServiceRegistrationTest {
     jobTry3.setStatus(Status.FINISHED);
     jobTry3.setJobType(regType1Localhost.getServiceType());
     jobTry3.setProcessingHost(regType1Localhost.getHost());
-    serviceRegistry.updateJob(jobTry3);
+    jobTry3 = serviceRegistry.updateJob(jobTry3);
     updatedService = getUpdatedService(regType1Localhost);
     Assert.assertEquals(ServiceState.NORMAL, updatedService.getServiceState());
     Assert.assertEquals(0, updatedService.getErrorStateTrigger());
@@ -203,7 +203,7 @@ public class ServiceRegistrationTest {
     job1Try1.setStatus(Status.FAILED);
     job1Try1.setJobType(regType1Localhost.getServiceType());
     job1Try1.setProcessingHost(regType1Localhost.getHost());
-    serviceRegistry.updateJob(job1Try1);
+    job1Try1 = serviceRegistry.updateJob(job1Try1);
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
@@ -309,7 +309,7 @@ public class ServiceRegistrationTest {
     jobTry1.setStatus(Status.FAILED);
     jobTry1.setJobType(regType1Localhost.getServiceType());
     jobTry1.setProcessingHost(regType1Localhost.getHost());
-    serviceRegistry.updateJob(jobTry1);
+    jobTry1 = serviceRegistry.updateJob(jobTry1);
     updatedService1 = (ServiceRegistrationJpaImpl) serviceRegistry.getServiceRegistration(JOB_TYPE_1,
             regType1Localhost.getHost());
     Assert.assertEquals(ServiceState.WARNING, updatedService1.getServiceState());
@@ -319,7 +319,7 @@ public class ServiceRegistrationTest {
     jobTry2.setStatus(Status.FAILED);
     jobTry2.setJobType(regType1Remotehost1.getServiceType());
     jobTry2.setProcessingHost(regType1Remotehost1.getHost());
-    serviceRegistry.updateJob(jobTry2);
+    jobTry2 = serviceRegistry.updateJob(jobTry2);
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     Assert.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
@@ -331,7 +331,7 @@ public class ServiceRegistrationTest {
     jobTry3.setStatus(Status.FAILED);
     jobTry3.setJobType(regType1Remotehost2.getServiceType());
     jobTry3.setProcessingHost(regType1Remotehost2.getHost());
-    serviceRegistry.updateJob(jobTry3);
+    jobTry3 = serviceRegistry.updateJob(jobTry3);
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);
@@ -344,7 +344,7 @@ public class ServiceRegistrationTest {
     jobTry4.setStatus(Status.FINISHED);
     jobTry4.setJobType(regType1Localhost.getServiceType());
     jobTry4.setProcessingHost(regType1Localhost.getHost());
-    serviceRegistry.updateJob(jobTry4);
+    jobTry4 = serviceRegistry.updateJob(jobTry4);
     updatedService1 = getUpdatedService(regType1Localhost);
     updatedService2 = getUpdatedService(regType1Remotehost1);
     updatedService3 = getUpdatedService(regType1Remotehost2);

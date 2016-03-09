@@ -15,6 +15,22 @@ signals agreement. Apart from that committers may vote with:
 Passed Proposals
 ----------------
 
+### Removing instances of print statements with a style rule #proposal
+Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Wed, 12 Feb 2016 12:00:00 UTC
+
+    Hi folks,
+
+    I noticed in a recently review that there are still System.out.println 
+    statements in use in our codebase.  I was surprised, because thought we had
+    previously implemented a checkstyle rule which would have banned those 
+    statements!  I hereby #propose that we implement the changes outlined in 
+    https://opencast.jira.com/browse/MH-11222, and remove these statements in 
+    favour of logger statements.  I also propose that we add this rule to the 
+    checkstyle ruleset so that we don't have to deal with this again going 
+    forward.  Proposal closes EOD 2016-02-03.
+
+    G
+
 ### How to release a new Opencast version…
 Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Fri, 14 Aug 2015 12:54:51 UTC
 

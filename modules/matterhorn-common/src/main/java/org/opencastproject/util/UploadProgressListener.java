@@ -21,11 +21,14 @@
 package org.opencastproject.util;
 
 import org.apache.commons.fileupload.ProgressListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of a {@link ProgressListener} for uploads.
  */
 public class UploadProgressListener implements ProgressListener {
+  private static final Logger logger = LoggerFactory.getLogger(UploadProgressListener.class);
 
   // ProgressListeners can happen to be called with a high frequency, depending
   // on the ServeletEngine (see fileupload doc). So we save the job object only

@@ -97,8 +97,13 @@ public class ContributorsListProviderTest {
       }
 
       @Override
+      public long countUsers() {
+        return users.size();
+      }
+
+      @Override
       public void invalidate(String userName) {
-        // TODO Auto-generated method stub
+        return;
       }
     };
 

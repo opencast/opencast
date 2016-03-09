@@ -962,7 +962,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
             update(workflow);
             job.setStatus(Status.QUEUED);
             job.setDispatchable(true);
-            serviceRegistry.updateJob(job);
+            job = serviceRegistry.updateJob(job);
           } catch (ServiceRegistryException e) {
             throw new WorkflowDatabaseException(e);
           } catch (NotFoundException e) {
@@ -1206,7 +1206,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         // Now set this job to be queued so it can be dispatched
         operationJob.setStatus(Status.QUEUED);
         operationJob.setDispatchable(true);
-        serviceRegistry.updateJob(operationJob);
+        operationJob = serviceRegistry.updateJob(operationJob);
 
         return workflowInstance;
       } catch (ServiceRegistryException e) {
@@ -1224,7 +1224,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       workflowJob = serviceRegistry.getJob(workflowInstanceId);
       workflowJob.setStatus(Status.RUNNING);
       workflowJob.setPayload(WorkflowParser.toXml(workflowInstance));
-      serviceRegistry.updateJob(workflowJob);
+      workflowJob = serviceRegistry.updateJob(workflowJob);
 
       Job operationJob = serviceRegistry.getJob(operationJobId);
       operationJob.setStatus(Status.QUEUED);
@@ -1238,7 +1238,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         newArguments.add(new String(out.toByteArray(), "UTF-8"));
         operationJob.setArguments(newArguments);
       }
-      serviceRegistry.updateJob(operationJob);
+      operationJob = serviceRegistry.updateJob(operationJob);
     } catch (ServiceRegistryException e) {
       throw new WorkflowDatabaseException(e);
     } catch (IOException e) {
@@ -1379,7 +1379,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
         // Update both workflow and workflow job
         try {
-          serviceRegistry.updateJob(job);
+          job = serviceRegistry.updateJob(job);
           messageSender.sendObjectMessage(WorkflowItem.WORKFLOW_QUEUE, MessageSender.DestinationType.Queue,
                   WorkflowItem.updateInstance(workflowInstance));
           index(workflowInstance);
@@ -1868,7 +1868,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       User user = userDirectoryService.loadUser(job.getCreator());
       securityService.setUser(user);
       job.setStatus(Job.Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
 
       // Check if this workflow was initially delayed
       if (delayedWorkflows.contains(job.getId())) {

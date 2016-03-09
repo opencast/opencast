@@ -158,6 +158,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   public static final String JOB_TYPE = "org.opencastproject.ingest";
 
+  /** Managed Property key to overwrite existing series */
+  public static final String PROPKEY_OVERWRITE_SERIES = "org.opencastproject.series.overwrite";
+
   /** Methods that ingest zips create jobs with this operation type */
   public static final String INGEST_ZIP = "zip";
 
@@ -248,6 +251,11 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The partial track start time map */
   private Cache<String, Long> partialTrackStartTimes = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.DAYS)
           .build();
+  /** The default is to overwrite series catalog on ingest */
+  protected boolean defaultIsOverWriteSeries = true;
+
+  /** Option to overwrite series on ingest */
+  protected boolean isOverwriteSeries = defaultIsOverWriteSeries;
 
   /**
    * Creates a new ingest service instance.
@@ -280,6 +288,30 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   public void deactivate() {
     JmxUtil.unregisterMXBean(registerMXBean);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
+   * Retrieve ManagedService configuration, including option to overwrite series
+   */
+  @SuppressWarnings("rawtypes")
+  @Override
+  public void updated(Dictionary properties) throws ConfigurationException {
+    ingestFileJobLoad = LoadUtil.getConfiguredLoadValue(properties, FILE_JOB_LOAD_KEY, DEFAULT_INGEST_FILE_JOB_LOAD,
+            serviceRegistry);
+    ingestZipJobLoad = LoadUtil.getConfiguredLoadValue(properties, ZIP_JOB_LOAD_KEY, DEFAULT_INGEST_ZIP_JOB_LOAD,
+            serviceRegistry);
+    // try to get overwrite series option from config, use default if not configured
+    try {
+      isOverwriteSeries = Boolean.parseBoolean(((String) properties.get(PROPKEY_OVERWRITE_SERIES)).trim());
+    } catch (Exception e) {
+      isOverwriteSeries = defaultIsOverWriteSeries;
+      logger.warn("Unable to update configuration. {}", e.getMessage());
+    }
+    logger.info("Configuration updated. It is {} that existing series will be overwritten during ingest.",
+            isOverwriteSeries);
   }
 
   /**
@@ -406,7 +438,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       // QUEUED state but set it to INSTANTIATED in the beginning and then manually switch it to RUNNING.
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_ZIP, null, null, false, ingestZipJobLoad);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
 
       // Create the working file target collection for this ingest operation
       String wfrCollectionId = Long.toString(job.getId());
@@ -548,11 +580,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       for (String filename : collectionFilenames) {
         workingFileRepository.deleteFromCollection(Long.toString(job.getId()), filename);
       }
-      try {
-        serviceRegistry.updateJob(job);
-      } catch (Exception e) {
-        throw new IngestException("Unable to update job", e);
-      }
+      finallyUpdateJob(job);
     }
   }
 
@@ -637,7 +665,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               Arrays.asList(uri.toString(), flavor == null ? null : flavor.toString(),
                       MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding track {} from URL {} on mediapackage {}", new Object[] { elementId, uri, mediaPackage });
       URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
@@ -656,13 +684,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (NotFoundException e) {
       throw new IngestException("Unable to update ingest job", e);
     } finally {
-      try {
-        if (job != null) {
-          serviceRegistry.updateJob(job);
-        }
-      } catch (Exception e) {
-        throw new IngestException("Unable to update ingest job", e);
-      }
+      finallyUpdateJob(job);
     }
   }
 
@@ -699,11 +721,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (NotFoundException e) {
       throw new IngestException("Unable to update ingest job", e);
     } finally {
-      try {
-        serviceRegistry.updateJob(job);
-      } catch (Exception e) {
-        throw new IngestException("Unable to update ingest job", e);
-      }
+      finallyUpdateJob(job);
     }
   }
 
@@ -718,7 +736,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               Arrays.asList(uri.toString(), flavor == null ? null : flavor.toString(),
                       MediaPackageParser.getAsXml(mediaPackage)), null, false);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding partial track {} from URL {} on mediapackage {}", new Object[] { elementId, uri,
               mediaPackage });
@@ -741,13 +759,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (NotFoundException e) {
       throw new IngestException("Unable to update ingest job", e);
     } finally {
-      try {
-        if (job != null) {
-          serviceRegistry.updateJob(job);
-        }
-      } catch (Exception e) {
-        throw new IngestException("Unable to update ingest job", e);
-      }
+      finallyUpdateJob(job);
     }
   }
 
@@ -781,11 +793,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (NotFoundException e) {
       throw new IngestException("Unable to update ingest job", e);
     } finally {
-      try {
-        serviceRegistry.updateJob(job);
-      } catch (Exception e) {
-        throw new IngestException("Unable to update ingest job", e);
-      }
+      finallyUpdateJob(job);
     }
   }
 
@@ -803,7 +811,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_CATALOG_FROM_URI,
               Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding catalog {} from URL {} on mediapackage {}",
               new Object[] { elementId, uri, mediaPackage });
@@ -826,11 +834,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (NotFoundException e) {
       throw new IngestException("Unable to update ingest job", e);
     } finally {
-      try {
-        serviceRegistry.updateJob(job);
-      } catch (Exception e) {
-        throw new IngestException("Unable to update ingest job", e);
-      }
+      finallyUpdateJob(job);
     }
   }
 
@@ -839,10 +843,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    *
    * @param uri
    *          the URI to the dublin core document containing series metadata.
+   * @return
+   *          true, if the series is created or overwritten, false if the existing series remains intact.
    */
-  protected void updateSeries(URI uri) throws IOException, IngestException {
+  protected boolean updateSeries(URI uri) throws IOException, IngestException {
     HttpResponse response = null;
     InputStream in = null;
+    boolean isUpdated = false;
     try {
       HttpGet getDc = new HttpGet(uri);
       response = httpClient.execute(getDc);
@@ -850,19 +857,23 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       DublinCoreCatalog dc = dublinCoreService.load(in);
       String id = dc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
       if (id == null) {
-        logger.warn("Series dublin core document contains no identifier");
+        logger.warn("Series dublin core document contains no identifier, rejecting ingested series cagtalog.");
       } else {
         try {
-          Boolean isNew = false;
           try {
             seriesService.getSeries(id);
+            if (isOverwriteSeries) {
+              // Update existing series
+              seriesService.updateSeries(dc);
+              isUpdated = true;
+              logger.debug("Ingest is overwriting the existing series {} with the ingested series", id);
+            } else {
+              logger.debug("Series {} already exists. Ignoring series catalog from ingest.", id);
+            }
           } catch (NotFoundException e) {
             logger.info("Creating new series {} with default ACL", id);
-            isNew = true;
-          }
-          seriesService.updateSeries(dc);
-
-          if (isNew) {
+            seriesService.updateSeries(dc);
+            isUpdated = true;
             String anonymousRole = securityService.getOrganization().getAnonymousRole();
             AccessControlList acl = new AccessControlList(new AccessControlEntry(anonymousRole, "read", true));
             seriesService.updateAccessControl(id, acl);
@@ -879,6 +890,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       IOUtils.closeQuietly(in);
       httpClient.close(response);
     }
+    return isUpdated;
   }
 
   /**
@@ -894,7 +906,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_CATALOG, null, null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding catalog {} from input stream on mediapackage {}", new Object[] { elementId,
               mediaPackage });
@@ -917,11 +929,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (NotFoundException e) {
       throw new IngestException("Unable to update ingest job", e);
     } finally {
-      try {
-        serviceRegistry.updateJob(job);
-      } catch (Exception e) {
-        throw new IngestException("Unable to update ingest job", e);
-      }
+      finallyUpdateJob(job);
     }
   }
 
@@ -939,7 +947,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_ATTACHMENT_FROM_URI,
               Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding attachment {} from URL {} on mediapackage {}", new Object[] { elementId, uri,
               mediaPackage });
@@ -959,11 +967,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (NotFoundException e) {
       throw new IngestException("Unable to update ingest job", e);
     } finally {
-      try {
-        serviceRegistry.updateJob(job);
-      } catch (Exception e) {
-        throw new IngestException("Unable to update ingest job", e);
-      }
+      finallyUpdateJob(job);
     }
   }
 
@@ -980,7 +984,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_ATTACHMENT, null, null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
-      serviceRegistry.updateJob(job);
+      job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding attachment {} from input stream on mediapackage {}", new Object[] { elementId,
               mediaPackage });
@@ -1000,11 +1004,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (NotFoundException e) {
       throw new IngestException("Unable to update ingest job", e);
     } finally {
-      try {
-        serviceRegistry.updateJob(job);
-      } catch (Exception e) {
-        throw new IngestException("Unable to update ingest job", e);
-      }
+      finallyUpdateJob(job);
     }
 
   }
@@ -1727,15 +1727,23 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   }
 
   /**
-   * {@inheritDoc}
+   * Private utility to update Job, called from a finally block.
    *
-   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
+   * @param job
+   *          to be updated, may be null
+   * @throws IngestException
+   *           when unable to update ingest job
    */
-  @SuppressWarnings("rawtypes")
-  @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
-    ingestFileJobLoad = LoadUtil.getConfiguredLoadValue(properties, FILE_JOB_LOAD_KEY, DEFAULT_INGEST_FILE_JOB_LOAD, serviceRegistry);
-    ingestZipJobLoad = LoadUtil.getConfiguredLoadValue(properties, ZIP_JOB_LOAD_KEY, DEFAULT_INGEST_ZIP_JOB_LOAD, serviceRegistry);
+  private void finallyUpdateJob(Job job) throws IngestException {
+    try {
+      if (job != null) {
+        serviceRegistry.updateJob(job);
+      } else {
+        logger.debug("Not updating null job.");
+      }
+    } catch (Exception e) {
+      throw new IngestException("Unable to update ingest job", e);
+    }
   }
 
 }

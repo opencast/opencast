@@ -41,12 +41,16 @@ import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
 import com.jayway.restassured.path.json.JsonPath;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public final class JsonConvTest {
+  private static final Logger logger = LoggerFactory.getLogger(JsonConvTest.class);
+
   private static final ManagedAcl macl = new ManagedAcl() {
     @Override public Long getId() {
       return 1L;
@@ -139,7 +143,7 @@ public final class JsonConvTest {
   @Test
   public void testManagedAclFull() {
     String json = JsonConv.full(macl).toJson();
-    System.out.println(json);
+    logger.info(json);
     JsonPath jp = from(json);
     assertEquals(4, ((Map) jp.get()).size());
     assertEquals(1, jp.get("id"));
@@ -152,7 +156,7 @@ public final class JsonConvTest {
   public void testManagedAclDigest() {
     String json = JsonConv.digest(macl).toJson();
     JsonPath jp = from(json);
-    System.out.println(json);
+    logger.info(json);
     assertEquals(2, ((Map) jp.get()).size());
     assertEquals(1, jp.get("id"));
     assertEquals("Public", jp.get("name"));
@@ -161,7 +165,7 @@ public final class JsonConvTest {
   @Test
   public void testTransitionResultDigest() {
     String json = JsonConv.digest(tresult).toJson();
-    System.out.println(json);
+    logger.info(json);
     JsonPath jp = from(json);
   }
 }

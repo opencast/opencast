@@ -239,8 +239,8 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     final MediaPackageElementFlavor targetPresentationFlavor = parseTargetFlavor(
             getConfig(operation, TARGET_PRESENTATION_FLAVOR), "presentation");
     final Opt<EncodingProfile> forceProfile = getForceEncodingProfile(operation);
-    final boolean forceEncoding = BooleanUtils.toBoolean(getConfig(operation, FORCE_ENCODING));
-    final boolean forceDivisible = BooleanUtils.toBoolean(getConfig(operation, ENFORCE_DIVISIBLE_BY_TWO));
+    final boolean forceEncoding = BooleanUtils.toBoolean(getOptConfig(operation, FORCE_ENCODING).or("false"));
+    final boolean forceDivisible = BooleanUtils.toBoolean(getOptConfig(operation, ENFORCE_DIVISIBLE_BY_TWO).or("false"));
     final List<String> requiredExtensions = getRequiredExtensions(operation);
 
     //
@@ -319,13 +319,20 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
         }
 
         if (tracks.size() < 2) {
-          logger.debug("There was less than 2 tracks.");
+          logger.debug("There were less than 2 tracks, copying track...");
+          if (sourceType.get().startsWith(PRESENTER_KEY)) {
+            createCopyOfTrack(mediaPackage, tracks.get(0), targetPresenterFlavor);
+          } else if (sourceType.get().startsWith(PRESENTATION_KEY)) {
+            createCopyOfTrack(mediaPackage, tracks.get(0), targetPresentationFlavor);
+          } else {
+            logger.warn("Can't handle unkown source type '{}' for unprocessed track", sourceType.get());
+          }
           continue;
         }
 
         for (final Track t : tracks) {
           if (!t.hasVideo() && !t.hasAudio()) {
-            logger.warn("No audio or video stream available in the track with flavor {}! {}", t.getFlavor(), t);
+            logger.error("No audio or video stream available in the track with flavor {}! {}", t.getFlavor(), t);
             throw new WorkflowOperationException("No audio or video stream available in the track " + t.toString());
           }
         }
@@ -372,7 +379,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
           // Adjust the target flavor.
           if (job.getKey().startsWith(PRESENTER_KEY)) {
             if (!concatTrack.hasVideo()) {
-              fileName = PRESENTATION_KEY.concat(FLAVOR_AUDIO_SUFFIX);
+              fileName = PRESENTER_KEY.concat(FLAVOR_AUDIO_SUFFIX);
               adjustedTargetPresenterFlavor = deriveAudioFlavor(targetPresenterFlavor);
             } else {
               fileName = PRESENTER_KEY;
@@ -419,8 +426,8 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     queueTime += checkForTrimming(mediaPackage, trimProfile, deriveAudioFlavor(targetPresenterFlavor),
             trackDurationInSeconds, elementsToClean);
 
-    applyAppropriateFlavours(mediaPackage, presenterFlavor, presentationFlavor, targetPresenterFlavor,
-            targetPresentationFlavor);
+    adjustAudioTrackTargetFlavor(mediaPackage, targetPresenterFlavor);
+    adjustAudioTrackTargetFlavor(mediaPackage, targetPresentationFlavor);
 
     queueTime += checkForMuxing(mediaPackage, targetPresenterFlavor, targetPresentationFlavor, false, elementsToClean);
 
@@ -467,105 +474,48 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
   }
 
   /**
-   * This function makes sure that all available target tracks are available including source tracks that were not
-   * processed
+   * This function creates a copy of a given track in the media package
    *
    * @param mediaPackage
-   *          The media package to look for tracks.
-   * @param sourcePresenter
-   *          The flavor string for the presenter source tracks.
-   * @param sourcePresentation
-   *          The flavor string for the presentation source tracks.
-   * @param targetPresenterFlavor
-   *          The flavor for the presenter target.
-   * @param targetPresentationFlavor
-   *          The flavor for the presentation target.
+   *          The media package being processed.
+   * @param track
+   *          The track we want to create a copy from.
+   * @param targetFlavor
+   *          The target flavor for the copy of the track.
    */
-  private void applyAppropriateFlavours(MediaPackage mediaPackage, Opt<String> sourcePresenter,
-          Opt<String> sourcePresentation, MediaPackageElementFlavor targetPresenterFlavor,
-          MediaPackageElementFlavor targetPresentationFlavor) throws IllegalArgumentException, NotFoundException,
-          IOException {
-    MediaPackageElementFlavor sourcePresenterFlavor = null;
-    MediaPackageElementFlavor sourcePresentationFlavor = null;
+  private void createCopyOfTrack(MediaPackage mediaPackage, Track track, MediaPackageElementFlavor targetFlavor)
+             throws IllegalArgumentException, NotFoundException,IOException {
 
-    if (sourcePresenter.isSome()) {
-      sourcePresenterFlavor = MediaPackageElementFlavor.parseFlavor(sourcePresenter.get());
+    MediaPackageElementFlavor targetCopyFlavor = null;
+    if (track.hasVideo()) {
+      targetCopyFlavor = targetFlavor;
     } else {
-      logger.debug("Source presenter is not set.");
+      targetCopyFlavor = deriveAudioFlavor(targetFlavor);
     }
-
-    if (sourcePresentation.isSome()) {
-      sourcePresentationFlavor = MediaPackageElementFlavor.parseFlavor(sourcePresentation.get());
-    } else {
-      logger.debug("Source presentation is not set.");
-    }
-
-    // Get all presenter video tracks and audio tracks. Check for equivalent target Tracks. If they don't exist. Copy
-    // them.
-    if (sourcePresenter.isSome()) {
-      logger.debug("Processing presenter source flavor {} to target flavor {}", sourcePresenterFlavor,
-              targetPresenterFlavor);
-      handleUnprocessedAndAudioSuffixes(mediaPackage, targetPresenterFlavor, sourcePresenterFlavor);
-    }
-
-    if (sourcePresentation.isSome()) {
-      logger.debug("Processing presentation source flavor {} to target flavor {}", sourcePresentationFlavor,
-              targetPresentationFlavor);
-      handleUnprocessedAndAudioSuffixes(mediaPackage, targetPresentationFlavor, sourcePresentationFlavor);
-    }
+    logger.debug("Copying track {} with flavor {} using target flavor {}", new Object[] { track.getURI(), track.getFlavor(), targetCopyFlavor });
+    copyPartialToSource(mediaPackage, targetCopyFlavor, track);
   }
 
-  private void handleUnprocessedAndAudioSuffixes(MediaPackage mediaPackage, MediaPackageElementFlavor targetFlavor,
-          MediaPackageElementFlavor sourceFlavor) throws NotFoundException, IOException {
-    // Copy source videos that have not been processed.
-    Track[] targetVideoTracks = mediaPackage.getTracks(targetFlavor);
-    if (targetVideoTracks.length == 0) {
-      for (Track sourceVideoTrack : mediaPackage.getTracks(sourceFlavor)) {
-        copyPartialToSource(mediaPackage, targetFlavor, sourceVideoTrack);
-      }
-    }
-    // Check to see if there is an audio track already rendered.
+  /**
+   * This functions adjusts the target flavor for audio tracks.
+   * While processing audio tracks, an audio suffix is appended to the type of the audio tracks target flavor.
+   * This functions essentially removes that suffix again and therefore ensures that the target flavor of
+   * audio tracks is set correctly.
+   *
+   * @param mediaPackage
+   *          The media package to look for audio tracks.
+   * @param targetFlavor
+   *          The target flavor for the audio tracks.
+   */
+  private void adjustAudioTrackTargetFlavor(MediaPackage mediaPackage, MediaPackageElementFlavor targetFlavor)
+             throws IllegalArgumentException, NotFoundException,IOException {
+
     Track[] targetAudioTracks = mediaPackage.getTracks(deriveAudioFlavor(targetFlavor));
-    if (targetAudioTracks.length > 0) {
-      for (Track targetTrack : targetAudioTracks) {
-        logger.debug("Adding {} to finished audio tracks.", targetTrack.getURI());
-        mediaPackage.remove(targetTrack);
-        targetTrack.setFlavor(targetFlavor);
-        mediaPackage.add(targetTrack);
-      }
-    } else {
-      Opt<Track> sourceAudioTrack = Opt.<Track> none();
-      Opt<Track> sourceVideoTrack = Opt.<Track> none();
-      boolean foundAudio = false;
-      for (Track track : mediaPackage.getTracks(deriveAudioFlavor(sourceFlavor))) {
-        sourceAudioTrack = Opt.some(track);
-      }
-      for (Track track : mediaPackage.getTracks(sourceFlavor)) {
-        sourceVideoTrack = Opt.some(track);
-      }
-      if (sourceAudioTrack.isSome()) {
-        for (Track track : mediaPackage.getTracks(targetFlavor)) {
-          if (track.hasAudio() && sourceVideoTrack.isNone()) {
-            // No video track so this must be the audio track.
-            foundAudio = true;
-            logger.debug("Found the audio track because there is no video available '{}'", track.getURI());
-            break;
-          } else if (track.hasAudio() && sourceVideoTrack.isSome() && !sourceVideoTrack.get().hasAudio()) {
-            // The source video track doesn't have audio so we found the audio track.
-            foundAudio = true;
-            logger.debug("Found the audio track because the video had no audio '{}'", track.getURI());
-            break;
-          } else if (track.hasAudio() && !track.hasVideo()) {
-            // This must be the audio track if it doesn't have video.
-            foundAudio = true;
-            logger.debug("Found the audio track because it has no video. '{}'", track.getURI());
-            break;
-          }
-        }
-        if (!foundAudio) {
-          copyPartialToSource(mediaPackage, targetFlavor, sourceAudioTrack.get());
-        }
-      }
+    for (Track track : targetAudioTracks) {
+      logger.debug("Adding {} to finished audio tracks.", track.getURI());
+      mediaPackage.remove(track);
+      track.setFlavor(targetFlavor);
+      mediaPackage.add(track);
     }
   }
 
@@ -695,7 +645,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     if (smilCatalog.size() == 1) {
       return getSmilDocument(smilCatalog.iterator().next());
     } else {
-      logger.warn("More or less than one smil catalog found: {}", smilCatalog);
+      logger.error("More or less than one smil catalog found: {}", smilCatalog);
       throw new WorkflowOperationException("More or less than one smil catalog found!");
     }
   }
@@ -709,7 +659,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
       in = new FileInputStream(smilXmlFile);
       return smilParser.parse(in);
     } catch (Exception e) {
-      logger.warn("Unable to parse smil catalog {}! {}", smilCatalog.getURI(), e);
+      logger.error("Unable to parse smil catalog {}! {}", smilCatalog.getURI(), e);
       throw new WorkflowOperationException(e);
     } finally {
       IOUtils.closeQuietly(in);
