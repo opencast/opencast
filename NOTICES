@@ -82,6 +82,13 @@ modules/matterhorn-admin-ui-ng/src/main/webapp/lib/google-fonts/*
   https://www.google.com/fonts/specimen/Open+Sans
   Apache License, version 2.0
 
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/javascript-md5/*
+  JavaScript MD5
+  https://github.com/blueimp/JavaScript-MD5
+  Copyright 2011, Sebastian Tschan https://blueimp.net
+  Licensed under the MIT license:
+  http://www.opensource.org/licenses/MIT
+
 modules/matterhorn-admin-ui-ng/src/main/webapp/lib/jquery-1.10.2.js
   jQuery JavaScript Library v1.10.2
   http://jquery.com/
@@ -173,9 +180,9 @@ modules/matterhorn-engage-player/src/main/flex/com/osmf/MediaContainerUIComponen
 
 modules/matterhorn-engage-theodul-core/src/main/resources/ui/css/bootstrap/*
 modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/bootstrap.js
-  Bootstrap v3.2.0 (http://getbootstrap.com)
-  Copyright 2011-2014 Twitter, Inc.
-  Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  Bootstrap v3.3.4 (http://getbootstrap.com)
+  Copyright 2011-2015 Twitter, Inc.
+  Licensed under MIT (https://github.com/twbs/bootstrap/blob/v3.3.4/LICENSE)
 
 modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/jquery-ui.js
   jQuery UI - v1.10.2 - 2013-03-14
@@ -437,6 +444,11 @@ modules/matterhorn-engage-theodul-plugin-video-videojs/src/test/resources/js/lib
 modules/matterhorn-engage-ui/src/main/resources/ui/css/bootstrap.*
   Bootstrap v3.3.2 (http://getbootstrap.com)
   Copyright 2011-2015 Twitter, Inc.
+  Licensed under MIT
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-wizard/.*
+  angular-wizard 0.6.1 (https://github.com/mgonto/angular-wizard)
+  Copyright (c) 2013-2014 Martin Gontovnikas http://www.gon.to/
   Licensed under MIT
 
 modules/matterhorn-engage-ui/src/main/resources/ui/js/alertify/alertify.js
