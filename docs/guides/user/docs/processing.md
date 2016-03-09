@@ -10,8 +10,8 @@ A Task is essentially applying a workflow on an Event. A Task can be started on 
 
 * **INSTANTIATED**: The task on the event is being prepared
 * **RUNNING**: The task is currently running
-* **STOPPED**: The task has stopped. Note. Stopping a task can only be achieved using the REST endpoint
-* **PAUSED**: The task is paused and requires manual action (such as cutting for example) to proceed further
+* **STOPPED**: The task has stopped. Note: Stopping a task can only be achieved using the REST endpoint
+* **PAUSED**: The task is paused and requires manual action (for example cutting) to proceed
 * **SUCCEEDED**: The task has been run successfully
 * **FAILED**: The task has failed. See the Event’s details for more information
 * **FAILING**: The current task is about to fail and processing artifacts are being cleaned up

@@ -33,23 +33,23 @@ See also the [Access Policies section](accesspolicies.md#apply-access-policies-t
 
 ## Events Statuses
 
-The Progress column shows in which state the Event is. These are the possible values and their meaning:
+The progress column shows in which state the event is. These are the possible values and their meaning:
 
 * **Scheduled**: The Event is scheduled for recording
 * **Recording**: The Event is currently being recorded
 * **Ingesting**: The recorded files are being ingested by Opencast
 * **Pending**: The Event is in the processing queue and waiting to be processed
 * **Processing**: The Event is currently being processed
-* **Paused**: The task is paused and requires manual action (such as cutting for example) to proceed further
-* **Processing canceled**: The processing of the Event has been stopped
+* **Paused**: The task is paused and requires manual action (for example cutting) to proceed
+* **Processing canceled**: The processing of the event has been stopped
 * **Processed**: The Event has been successfully processed
 
 Errors:
 
 * **Recording failure**: An error occurred while Recording
-* **Processing failure**: An error occurred while Processing
+* **Processing failure**: An error occurred while processing
 
-## How to edit Events
+## How to Edit Events
 
 Use the edit icon ( ![icon_hamburger][] ) on the Actions column to open the Event’s details and start editing.
 
