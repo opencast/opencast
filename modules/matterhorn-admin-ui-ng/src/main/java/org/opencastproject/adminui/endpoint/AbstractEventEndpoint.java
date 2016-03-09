@@ -814,12 +814,6 @@ public abstract class AbstractEventEndpoint {
   public Response getEventParticipation(@PathParam("eventId") String eventId) throws Exception {
     final Event event = getEventOrThrowNotFoundException(eventId);
 
-    // if (getPMPersistence() == null)
-    // return Response.status(Status.SERVICE_UNAVAILABLE).build();
-    //
-    // final List<JValue> jsonMessages =
-    // $(getEventPMMessagesSortByDateDesc(eventId)).map(messageToSimpleJson()).toList();
-
     Date startDate = new DateTime(event.getTechnicalStartTime()).toDateTime(DateTimeZone.UTC).toDate();
     Date currentDate = new DateTime().toDateTime(DateTimeZone.UTC).toDate();
     boolean readOnly = false;
