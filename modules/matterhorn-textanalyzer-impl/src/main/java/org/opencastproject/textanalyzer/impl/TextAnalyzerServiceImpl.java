@@ -21,13 +21,9 @@
 
 package org.opencastproject.textanalyzer.impl;
 
-import org.opencastproject.composer.api.ComposerService;
-import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.dictionary.api.DictionaryService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
-import org.opencastproject.job.api.JobBarrier;
-import org.opencastproject.job.api.JobBarrier.Result;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
@@ -91,9 +87,6 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   /** Resulting collection in the working file repository */
   public static final String COLLECTION_ID = "ocrtext";
 
-  /** Name of encoding profile used to create tiff images */
-  public static final String TIFF_CONVERSION_PROFILE = "image-conversion.http";
-
   /** The approximate load placed on the system by creating a text analysis job */
   public static final float DEFAULT_ANALYSIS_JOB_LOAD = 1.0f;
 
@@ -108,9 +101,6 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   /** Reference to the receipt service */
   private ServiceRegistry serviceRegistry = null;
-
-  /** The composer service */
-  protected ComposerService composerService = null;
 
   /** The workspace to ue when retrieving remote media files */
   private Workspace workspace = null;
@@ -173,45 +163,16 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @return a receipt containing the resulting mpeg-7 catalog
    * @throws TextAnalyzerException
    */
-  @SuppressWarnings("unchecked")
   private Catalog extract(Job job, Attachment image) throws TextAnalyzerException, MediaPackageException {
 
-    final Attachment attachment;
-    final URI imageUrl;
-
-    // Make sure the attachment is a tiff
-
-    // Make sure this image is of type tif
-    if (!image.getURI().getPath().endsWith(".tif")) {
-      try {
-        logger.info("Converting " + image + " to tif format");
-        Job conversionJob = composerService.convertImage(image, TIFF_CONVERSION_PROFILE);
-        JobBarrier barrier = new JobBarrier(job, serviceRegistry, conversionJob);
-        Result result = barrier.waitForJobs();
-        if (!result.isSuccess()) {
-          throw new TextAnalyzerException("Unable to convert " + image + " to tiff");
-        }
-        conversionJob = serviceRegistry.getJob(conversionJob.getId()); // get the latest copy
-        attachment = (Attachment) MediaPackageElementParser.getFromXml(conversionJob.getPayload());
-        imageUrl = attachment.getURI();
-      } catch (EncoderException e) {
-        throw new TextAnalyzerException(e);
-      } catch (NotFoundException e) {
-        throw new TextAnalyzerException(e);
-      } catch (ServiceRegistryException e) {
-        throw new TextAnalyzerException(e);
-      }
-    } else {
-      attachment = image;
-      imageUrl = attachment.getURI();
-    }
+    final Attachment attachment = image;
+    final URI imageUrl = attachment.getURI();
 
     File imageFile = null;
     try {
       Mpeg7CatalogImpl mpeg7 = Mpeg7CatalogImpl.newInstance();
 
       logger.info("Starting text extraction from {}", imageUrl);
-
       try {
         imageFile = workspace.get(imageUrl);
       } catch (NotFoundException e) {
@@ -407,16 +368,6 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    */
   protected void setDictionaryService(DictionaryService dictionaryService) {
     this.dictionaryService = dictionaryService;
-  }
-
-  /**
-   * OSGi callback to set the composer service.
-   *
-   * @param composer
-   *          the composer
-   */
-  protected void setComposerService(ComposerService composer) {
-    this.composerService = composer;
   }
 
   /**
