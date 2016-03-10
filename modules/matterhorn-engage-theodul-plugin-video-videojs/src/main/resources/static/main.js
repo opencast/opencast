@@ -538,9 +538,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
                 ctx.fillRect(minimapWidth / 2 - mapWidth / 2, (minimapWidth * ratio) / 2 - mapHeight / 2, mapWidth, mapHeight);
 
-                //ctx.strokeStyle="red";
-                //ctx.stroke();
-
                 minimapVisible = true;
                 updateMinimap();
             }
@@ -593,8 +590,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             var x = (minimapWidth / 2 - mapWidth / 2) - ((minimapWidth / 2 - mapWidth / 2) * relWDiff);
             var y = (minimapWidth * ratio) / 2 - mapHeight / 2 - (((minimapWidth * ratio) / 2 - mapHeight / 2) * relHDiff);
             ctx.fillRect(x, y, mapWidth, mapHeight);
-            //ctx.strokeStyle="red";
-            //ctx.stroke();
         }
 
         function isFocused() {
@@ -764,8 +759,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 offset = offset.replace("px", "");
                 offset = Number(offset);
 
-                //(step > 0) ? Engage.log("Shift right: " + step) : Engage.log("Shift left: " + step);
-
                 if (step > 0 && Math.abs($(selector).position().left) < step) {
                     // Shift right, but too far
                     step = Math.abs($(selector).position().left);
@@ -790,8 +783,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
                 offset = offset.replace("px", "");
                 offset = Number(offset);
-
-                //(step > 0) ? Engage.log("Shift down: " + step) : Engage.log("Shift up: " + step);
 
                 if (step > 0 && (Math.abs($(selector).position().top) < step)) {
                     step = Math.abs($(selector).position().top)
@@ -1853,13 +1844,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             videodisplayMaster.on(event_html5player_fullscreenchange, function() {
                 Engage.trigger(plugin.events.fullscreenChange.getName());
             });
-
-            if (numberOfVideodisplays > 1) {
-                // Currently in registerZoomLevelEvents
-                //$("." + videoDisplayClass).on("click", function() {
-                //    Engage.trigger(plugin.events.focusVideo.getName(), Utils.getFlavorForVideoDisplay(this));
-                //});
-            }
 
             Engage.on(plugin.events.focusVideo.getName(), function(display) {
                 Engage.log("Video: received focusing video " + display);

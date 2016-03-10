@@ -137,7 +137,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 
     function browserSupported() {
         if ((Basil.get("overrideBrowser") != null) && Basil.get("overrideBrowser")) {
-            // console.log("Core: User setting - Support unsupported browser: " + Basil.get("overrideBrowser"));
             return true;
         }
         return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) ||
@@ -185,12 +184,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         }
         return ((translationData != null) && (translationData[str] != undefined)) ? translationData[str] : strIfNotFound;
     }
-
-    /*
-    if (window.console) {
-        console.log("Core: Init");
-    }
-    */
 
     function login() {
         if (!askedForLogin) {
@@ -388,25 +381,21 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     break;
                 case shortcut_moveLeft:
                     Mousetrap.bind(val.key, function() {
-                        //engageCore.trigger(events.moveLeft.getName(), true);
                         engageCore.trigger(events.moveHorizontal.getName(), zoom_wasd_step_size);
                     });
                     break;
                 case shortcut_moveRight:
                     Mousetrap.bind(val.key, function() {
-                        //engageCore.trigger(events.moveRight.getName(), true);
                         engageCore.trigger(events.moveHorizontal.getName(), -zoom_wasd_step_size);
                     });
                     break;
                 case shortcut_moveUp:
                     Mousetrap.bind(val.key, function() {
-                        //engageCore.trigger(events.moveUp.getName(), true);
                         engageCore.trigger(events.moveVertical.getName(), zoom_wasd_step_size);
                     });
                     break;
                 case shortcut_moveDown:
                     Mousetrap.bind(val.key, function() {
-                        //engageCore.trigger(events.moveDown.getName(), true);
                         engageCore.trigger(events.moveVertical.getName(), -zoom_wasd_step_size);
                     });
                     break;
