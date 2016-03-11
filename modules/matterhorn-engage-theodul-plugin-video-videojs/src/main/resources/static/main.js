@@ -2022,7 +2022,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 delayedCalculateVideoAreaAspectRatio();
             });
 
-            // event used to switch between videos in single player (e.g. mobile) mode
+            // event used to switch between videos in single video display (e.g. mobile) mode
             Engage.on(plugin.events.switchVideo.getName(), function(id) {
                 // check if current video is paused
                 var isPaused = videodisplayMaster.paused();

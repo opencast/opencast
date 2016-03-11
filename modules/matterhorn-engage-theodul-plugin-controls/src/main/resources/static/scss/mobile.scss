@@ -16,6 +16,7 @@
 #engage_controls {
   #swipe_hint {
     position: absolute;
+    z-index: 9;
     top: 0;
     left: 0;
     width: 100%;
@@ -34,23 +35,28 @@
 
   #big_play_button {
     position: absolute;
+    z-index: 1;
     top: 50%;
     left: 50%;
     font-size: 100px;
-    font-size: 20vmin;
+    font-size: 19vmin;
     line-height: 1;
     color: #333;
     cursor: pointer;
     @include transform(translate(-50%,-50%));
 
     background: rgba(#fff, 0.7);
-    padding: 10px 10px 0 10px;
+    padding: 10px;
     @include border-radius(10px);
     @include box-shadow(1px 1px 9px rgba(20, 20, 20, 0.4));
 
     &:focus, &:hover {
       color: #111;
       @include box-shadow(1px 1px 9px rgba(20, 20, 20, 0.6), inset 1px 1px 3px rgba(20, 20, 20, 0.6));
+    }
+
+    span {
+      display: block;
     }
   }
 
