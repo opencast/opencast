@@ -279,7 +279,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var id_gestureContainer = "engage_video";
     var controlsVisible = true;
     var controlsTimer = null;
-    var currentDisplay = 0;
+    var carousel = null;
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginControls").replace(/(\.\.\/)/g, "");
@@ -912,7 +912,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 $(".videoDisplay").hammer().bind("tap", function(e) {
                     if (!$(this).hasClass("active")) {
                         var id = (+this.id.replace('videoDisplay','')) - 1;
-                        switchVideoById(id);
+                        carousel.show(id);
                     }
                 });
 
@@ -926,9 +926,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     $(this).parent().toggleClass("active");
                 });
 
-                // create a simple hammer.js jquery plugin instance for touch gesture support
-                // by default, it only adds horizontal recognizers
-                $("#" + id_gestureContainer).hammer().bind("panstart panleft panright panend swipeleft swiperight", handleGestures);
+                // create a VideoCarousel hammer.js instance for touch gesture support
+                carousel = new VideoCarousel($("#" + id_gestureContainer));
             }
         }
     }
@@ -1054,119 +1053,74 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         }
     }
 
-    /**
-     * Switch screen to display the next or previous video, as specified in direction.
-     * @param  {int} direction either -1 for prev or +1 for next video
-     * @return {boolean} true if video was switched, false if direction was out of bounds
-     */
-    function switchVideoByDirection(direction) {
-        // number of video streams
-        var n = Engage.model.get("videoDataModel").get("ids").length;
-        var x = currentDisplay + direction;
-        var newSelectedDisplay = Math.max(0, Math.min(x, n-1));
+    function VideoCarousel(container) {
+        this.container = container;
+        this.width = container.width();
 
-        if (currentDisplay !== newSelectedDisplay) {
-            switchVideoById(newSelectedDisplay);
-            return true;
-        }
-        return false;
+        this.currentIndex = 0;
+        this.length = Engage.model.get("videoDataModel").get("ids").length;
+
+        this.hammer = new Hammer.Manager(this.container.get(0));
+        this.hammer.add(new Hammer.Pan({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 10 }));
+        this.hammer.on("panstart panmove panend pancancel", Hammer.bindFn(this.onPan, this));
     }
 
-    /**
-     * Switch screen to display the specified video.
-     * @param  {int} id video id, with 0 being the first
-     */
-    function switchVideoById(id) {
-        currentDisplay = id;
+    VideoCarousel.prototype = {
+        onPan: function(ev) {
+            // remove animation class to stop css transitions from interfering with user input
+            if (ev.type == "panstart") {
+                this.container.removeClass("animate");
+            }
 
-        // number of video streams
-        var n = Engage.model.get("videoDataModel").get("ids").length;
+            // stick to the finger
+            var delta = ev.deltaX;
 
-        // remove old classes from wrapper
-        $("#" + id_engage_controls).removeClass("first last");
+            // slow down at the first and last pane
+            if((this.currentIndex === 0  && ev.offsetDirection === Hammer.DIRECTION_RIGHT) ||
+               (this.currentIndex === this.length - 1 && ev.offsetDirection === Hammer.DIRECTION_LEFT)) {
+                delta *= .3;
+            }
 
-        // add "first" or "last" class to wrapper if it's the first or last video showing
-        if (currentDisplay === 0)
-            $("#" + id_engage_controls).addClass("first");
-        if (currentDisplay === (n-1))
-            $("#" + id_engage_controls).addClass("last");
+            this.width = this.container.width();
+            var percent = (100 / this.width) * delta;
+            var showIndex = this.currentIndex;
 
-        $("#current_video_id").text(currentDisplay+1);
-
-        // transform to new display
-        $("#" + id_gestureContainer).addClass("animate");
-        transformToVideo(currentDisplay);
-
-        Engage.trigger(plugin.events.switchVideo.getName(), currentDisplay);
-    }
-
-    /**
-     * Handles gesture events, fired by hammer.js
-     */
-    function handleGestures(ev) {
-        switch(ev.type) {
-            case 'swipeleft':
-                switchVideoByDirection(1);
-                Engage.log("Switch video by swipeleft");
-                $("#" + id_gestureContainer).data("hammer").stop();
-            break;
-
-            case 'swiperight':
-                switchVideoByDirection(-1);
-                Engage.log("Switch video by swiperight");
-                $("#" + id_gestureContainer).data("hammer").stop();
-            break;
-
-            case 'panstart':
-                // remove animation class to stop css transitions
-                // from interfering with user input
-                $("#" + id_gestureContainer).removeClass("animate");
-            break;
-
-            case 'panleft':
-            case 'panright':
-                // prevent scrolling
-                ev.preventDefault();
-
-                // stick to the finger
-                var displayOffset = currentDisplay * 100;
-                var dragOffset = ev.gesture.deltaX;
-
-                // slow down at the first and last pane
-                if((currentDisplay === 0  && ev.gesture.offsetDirection === Hammer.DIRECTION_RIGHT) ||
-                   (currentDisplay === Engage.model.get("videoDataModel").get("ids").length - 1 && ev.gesture.offsetDirection === Hammer.DIRECTION_LEFT)) {
-                    dragOffset *= .3;
-                }
-
-                $("#" + id_gestureContainer).css({"transform": "translateX(calc(-" + displayOffset + "% + " + dragOffset + "px))"});
-            break;
-
-            case 'panend':
-                // turn css transitions back on
-                $("#" + id_gestureContainer).addClass("animate");
-
-                // if user panned more than 50% to left or right, switch video
-                if ((Math.abs(ev.gesture.deltaX) > $("#" + id_gestureContainer).width()/2) &&
-                    (ev.gesture.offsetDirection === Hammer.DIRECTION_RIGHT || ev.gesture.offsetDirection === Hammer.DIRECTION_LEFT)) {
-                    // if video was not switched, transform back to old screen
+            if (ev.type == "panend" || ev.type == "pancancel") {
+                if (Math.abs(percent) > 20 && ev.type == "panend") {
                     Engage.log("Switch video by pan");
-                    if (!switchVideoByDirection(ev.gesture.offsetDirection === Hammer.DIRECTION_RIGHT ? -1 : 1))
-                        transformToVideo(currentDisplay);
+                    showIndex += (percent < 0) ? 1 : -1;
                 }
-                else {
-                    transformToVideo(currentDisplay);
-                }
-            break;
-        }
-    }
+                percent = 0;
+                this.container.addClass("animate");
+            }
 
-    /**
-     * Transform to the specified video screen in single screen (e.g. mobile) mode.
-     * @param  {int} id video id
-     */
-    function transformToVideo(id) {
-        $("#" + id_gestureContainer).css({"transform": "translateX(-" + id*100 + "%)"});
-    }
+            this.show(showIndex, percent);
+        },
+
+        show: function(showIndex, percent) {
+            showIndex = Math.max(0, Math.min(showIndex, this.length - 1));
+            percent = percent || 0;
+
+            var pos = -(showIndex * 100) + percent;
+            this.container.css({"transform": "translateX(" + pos + "%)"});
+
+            // if the pane should actually be switched
+            if (showIndex !== this.currentIndex) {
+                // remove old classes
+                $("#" + id_engage_controls).removeClass("first last");
+
+                // add "first" or "last" class to wrapper if it's the first or last video showing
+                if (showIndex === 0 || showIndex === (this.length-1))
+                    $("#" + id_engage_controls).addClass((showIndex === 0) ? "first" : "last");
+
+                $("#current_video_id").text(showIndex+1);
+
+                Engage.trigger(plugin.events.switchVideo.getName(), showIndex);
+            }
+
+            this.currentIndex = showIndex;
+        }
+    };
 
     /**
      * Initializes the plugin

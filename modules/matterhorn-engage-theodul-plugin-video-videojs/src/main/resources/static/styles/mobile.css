@@ -28,24 +28,23 @@
     text-transform: none !important;
 }
 
-#engage_video {
-    position: relative;
-}
-#engage_video.animate {
-    -webkit-transition: transform 1s;
-    transition: transform 1s;
-}
-
 .vjs-poster {
     cursor: default;
 }
 
+#engage_video {
+    position: relative;
+}
+#engage_video.animate {
+    -webkit-transition: transform 0.8s linear;
+    transition: transform 0.8s linear;
+}
 
 .videoDisplay {
     /* absolutly positon all video displays.. */
     position: absolute;
     top: 0;
-    opacity: 0.4;
+    opacity: 0.3;
     -webkit-transition: opacity 1s;
     transition: opacity 1s;
 }
