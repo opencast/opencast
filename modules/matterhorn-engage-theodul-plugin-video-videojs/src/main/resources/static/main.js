@@ -1667,9 +1667,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                         fullscreen = true;
                     }
                 }
-                if (isDesktopMode)
+                if (!isMobileMode) {
                     $("#" + videoDisplay).removeClass("vjs-controls-disabled").addClass("vjs-controls-enabled");
-                $("." + id_videoDisplayClass).css("max-width", $(window).height() * videoAreaAspectRatio);
+                    $("." + id_videoDisplayClass).css("max-width", $(window).height() * videoAreaAspectRatio);
+                }
             });
             Engage.on(plugin.events.fullscreenCancel.getName(), function() {
                 if (numberOfVideodisplays == 1) {
