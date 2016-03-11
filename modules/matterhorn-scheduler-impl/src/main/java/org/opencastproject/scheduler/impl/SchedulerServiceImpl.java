@@ -714,7 +714,7 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     updateEvent(setEventIdentifierImmutable(eventId, eventCatalog), wfProperties);
   }
 
-  /** Internal impl of an event update. The event DC _must_ have the identfier set. */
+  /** Internal impl of an event update. The event DC _must_ have the identifier set. */
   private void updateEvent(final DublinCoreCatalog event, Map<String, String> wfProperties) throws NotFoundException,
           SchedulerException, UnauthorizedException {
     final DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(event.getFirst(DublinCore.PROPERTY_TEMPORAL));
@@ -724,6 +724,13 @@ public class SchedulerServiceImpl implements SchedulerService, ManagedService {
     }
     final Date startDate = period.getStart();
     final Date endDate = period.getEnd();
+
+    // MH-11330 if present, created must equal start date as it will be used by
+    // WorkflowService.update() to update the MP
+    if (event.hasValue(DublinCore.PROPERTY_CREATED)) {
+      event.set(DublinCore.PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(startDate, Precision.Second));
+    }
+
     final long eventId = getEventIdentifier(event);
     try {
       verifyActive(eventId);
