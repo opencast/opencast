@@ -5,7 +5,7 @@ var serveStatic = require('serve-static');
 var httpModule = require('http');
 var urlParser = require('url-parse');
 
-module.exports = function (grunt) {
+module.exports = function (grunt, appPath) {
   var username = grunt.option('proxy.username'),
       password = grunt.option('proxy.password'),
       host = grunt.option('proxy.host');
@@ -18,7 +18,40 @@ module.exports = function (grunt) {
       serverOptions.base = [serverOptions.base];
     }
 
-    var middlewares = [];
+    var middlewares = [
+      connect().use(
+        '/bower_components',
+        serveStatic('./bower_components')
+      ),
+      connect().use(
+        '/styles',
+        serveStatic('./.tmp/styles')
+      ),
+      connect().use(
+        '/modules',
+        serveStatic('src/main/webapp/scripts/modules')
+      ),
+      connect().use(
+        '/shared',
+        serveStatic('src/main/webapp/scripts/shared')
+      ),
+      connect().use(
+        '/public',
+        serveStatic('src/main/resources/public/')
+      ),
+      connect().use(
+        '/img',
+        serveStatic('src/main/webapp/img/')
+      ),
+      connect().use(
+        '/lib',
+        serveStatic('src/main/webapp/scripts/lib')
+      ),
+      connect().use(
+        '/info',
+        serveStatic('./src/test/resources/app/GET/info')
+      )
+    ];
 
     // Validate settings
     var params = ['proxy.host', 'proxy.username', 'proxy.password'];
@@ -35,7 +68,6 @@ module.exports = function (grunt) {
     // wraps every proxy request with digest authentication
     httpModule.createServer(function (req, res) {
       console.log('Proxy ' + req.method + ' ' + req.url + ' -> ' + host + req.url);
-
 
       var onReadFromBackend = function (error, response, body) {
         if (error) {
@@ -79,10 +111,7 @@ module.exports = function (grunt) {
     //Setup the proxy routes
     middlewares.push(proxySnippet);
 
-    //Serve static files
-    serverOptions.base.forEach(function (base) {
-      middlewares.push(serveStatic(base));
-    });
+    middlewares.push(serveStatic(appPath));
 
     return middlewares;
   }

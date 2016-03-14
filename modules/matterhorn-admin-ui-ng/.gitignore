@@ -1,4 +1,8 @@
-node_modules
+/node_modules
+/dist
+/.tmp
+/.sass-cache
+/bower_components
 www
 .jshintrc
 deploy.sh
@@ -11,3 +15,4 @@ src/test/resources/chromedriver
 .agignore
 adi_deploy.sh
 selenium-server-standalone.jar
+testresults

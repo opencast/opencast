@@ -3,40 +3,44 @@ module.exports = function (config) {
         basePath : './',
 
         files : [
-            '../../main/webapp/lib/jquery-1.10.2.js',
-            '../../main/webapp/lib/jquery-ui.js',
-            '../../main/webapp/lib/angular/angular.js',
-            '../../main/webapp/lib/angular/angular-translate.js',
-            '../../main/webapp/lib/angular/angular-translate-loader-static-files.js',
-            '../../main/webapp/lib/angular/angular-route.js',
-            '../../main/webapp/lib/angular/angular-resource.js',
-            '../../main/webapp/lib/angular/angular-local-storage.js',
-            '../../main/webapp/lib/angular-file-upload/angular-file-upload.js',
-            '../../main/webapp/lib/angular/angular-*.js',
-            {pattern: '../../main/webapp/lib/angular/angular-*.map', watched: false, served: true, included: false},
-            '../../main/webapp/lib/chosen.jquery.min.js',
-            '../../main/webapp/lib/chosen.js',
-            '../../main/webapp/lib/angular-sortable.js',
-            '../../main/webapp/lib/underscore-1.5.2.js',
-            '../../main/webapp/lib/video-js/video.js',
-            '../../main/webapp/lib/moment.min.js',
-            '../../main/webapp/lib/javascript-md5/js/md5.min.js',
-            '../../main/webapp/lib/angular-md5/angular-md5.min.js',
-            '../../main/webapp/lib/angular-wizard/dist/angular-wizard.min.js',
+            '../../main/webapp/scripts/lib/jquery-1.10.2.js',
+            '../../main/webapp/scripts/lib/jquery-ui.js',
+            // bower:js
+            '../../../bower_components/angular/angular.js',
+            '../../../bower_components/angular-md5/angular-md5.js',
+            '../../../bower_components/angular-translate/angular-translate.js',
+            '../../../bower_components/angular-route/angular-route.js',
+            '../../../bower_components/angular-resource/angular-resource.js',
+            '../../../bower_components/angular-animate/angular-animate.js',
+            '../../../bower_components/angular-messages/angular-messages.js',
+            '../../../bower_components/angular-wizard/dist/angular-wizard.js',
+            // endbower
+            '../../main/webapp/scripts/lib/angular/angular-translate-loader-static-files.js',
+            '../../main/webapp/scripts/lib/angular/angular-local-storage.js',
+            '../../main/webapp/scripts/lib/angular-file-upload/angular-file-upload.js',
+            '../../main/webapp/scripts/lib/chosen.jquery.min.js',
+            '../../main/webapp/scripts/lib/chosen.js',
+            '../../main/webapp/scripts/lib/angular/angular-*.js',
+            '../../main/webapp/scripts/lib/angular-sortable.js',
+            '../../main/webapp/scripts/lib/underscore-1.5.2.js',
+            '../../main/webapp/scripts/lib/video-js/video.js',
+            '../../main/webapp/scripts/lib/moment.min.js',
+            '../../main/webapp/scripts/lib/javascript-md5/js/md5.min.js',
 
-            '../../main/webapp/app.js',
-            '../../main/webapp/shared/filters/filters.js',
-            '../../main/webapp/shared/resources/resources.js',
-            '../../main/webapp/shared/directives/directives.js',
-            '../../main/webapp/shared/controllers/controllers.js',
-            '../../main/webapp/shared/services/services.js',
-            '../../main/webapp/modules/**/*.js',
-            '../../main/webapp/shared/**/*.js',
+            '../../main/webapp/scripts/app.js',
+            '../../main/webapp/scripts/shared/filters/filters.js',
+            '../../main/webapp/scripts/shared/resources/resources.js',
+            '../../main/webapp/scripts/shared/directives/directives.js',
+            '../../main/webapp/scripts/shared/controllers/controllers.js',
+            '../../main/webapp/scripts/shared/services/services.js',
+            '../../main/webapp/scripts/modules/**/*.js',
+            '../../main/webapp/scripts/shared/**/*.js',
             '../../main/webapp/**/*.html',
 
             'test/lib/jasmine-jquery.js',
             'test/lib/jquery-deparam.js',
 
+            {pattern: '../../main/webapp/scripts/lib/angular/angular-*.map', watched: false, served: true, included: false},
             // fixtures
             {pattern: '../../main/resources/public/**/*.json', watched: true, served: true, included: false},
             {pattern: 'test/unit/fixtures/**/*.json', watched: true, served: true, included: false},
@@ -46,16 +50,16 @@ module.exports = function (config) {
         ],
 
         exclude : [
-            '../../main/webapp/lib/angular/angular-loader.js',
-            '../../main/webapp/lib/angular/*.min.js',
-            '../../main/webapp/lib/angular/angular-scenario.js'
+            '../../main/webapp/scripts/lib/angular/angular-loader.js',
+            '../../main/webapp/scripts/lib/angular/*.min.js',
+            '../../main/webapp/scripts/lib/angular/angular-scenario.js'
         ],
 
         autoWatch : true,
 
         frameworks: ['jasmine'],
 
-        browsers : ['Chrome'],
+        browsers : ['PhantomJS'],
 
         plugins : [
             'karma-chrome-launcher',
@@ -66,9 +70,14 @@ module.exports = function (config) {
             'karma-ng-html2js-preprocessor'
         ],
 
+        captureTimeout: 60000,
+        browserDisconnectTimeout : 10000,
+        browserDisconnectTolerance : 1,
+        browserNoActivityTimeout : 60000, // by default 10000
+
         preprocessors: {
-            '../../main/webapp/shared/**/*.js': ['coverage'],
-            '../../main/webapp/modules/**/*.js': ['coverage'],
+            '../../main/webapp/scripts/shared/**/*.js': ['coverage'],
+            '../../main/webapp/scripts/modules/**/*.js': ['coverage'],
             '../../main/webapp/**/*.html': ['ng-html2js']
         },
 
@@ -81,7 +90,12 @@ module.exports = function (config) {
 
         ngHtml2JsPreprocessor: {
             cacheIdFromPath: function (filepath) {
-                return filepath.match(/.*src\/main\/webapp\/(.*)/)[1];
+                var match = filepath.match(/.*src\/main\/webapp\/scripts\/(.*)/);
+                if (match !== null) {
+                    return match[1];
+                } else {
+                    console.log('no match');
+                }
             }
         }
     });
