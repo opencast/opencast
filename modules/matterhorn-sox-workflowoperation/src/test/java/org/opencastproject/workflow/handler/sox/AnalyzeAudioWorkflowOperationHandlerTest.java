@@ -126,6 +126,7 @@ public class AnalyzeAudioWorkflowOperationHandlerTest {
 
     // set up the handler
     operationHandler = new AnalyzeAudioWorkflowOperationHandler();
+    operationHandler.setJobBarrierPollingInterval(0);
     operationHandler.setComposerService(composer);
     operationHandler.setSoxService(sox);
     operationHandler.setWorkspace(workspace);

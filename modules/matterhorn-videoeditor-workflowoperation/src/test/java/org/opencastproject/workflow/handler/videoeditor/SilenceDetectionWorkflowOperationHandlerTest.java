@@ -94,6 +94,7 @@ public class SilenceDetectionWorkflowOperationHandlerTest {
     workspaceMock = EasyMock.createNiceMock(Workspace.class);
     // setup SilenceDetectionWorkflowOperationHandler
     silenceDetectionOperationHandler = new SilenceDetectionWorkflowOperationHandler();
+    silenceDetectionOperationHandler.setJobBarrierPollingInterval(0);
     silenceDetectionOperationHandler.setDetectionService(silenceDetectionServiceMock);
     silenceDetectionOperationHandler.setSmilService(smilService);
     silenceDetectionOperationHandler.setWorkspace(workspaceMock);
