@@ -270,7 +270,7 @@ public class SearchServiceImplTest {
   }
 
   private DublinCoreCatalog getSeriesDublinCoreCatalog(String path) {
-    // Load the simple media package
+    // marshal the local series catalog
     DublinCoreCatalog seriesDc = null;
     InputStream is = null;
     try {
