@@ -2,7 +2,6 @@
 /dist
 /.tmp
 /.sass-cache
-/bower_components
 www
 .jshintrc
 deploy.sh
