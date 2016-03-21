@@ -113,11 +113,11 @@
                     match="^KARAF_SCRIPT=.*$"
                     replace="KARAF_SCRIPT='start-opencast'"
                     byline="true" />
-                  <!-- Remove SSHd and JMX from default start -->
+                  <!-- Remove unnecessary services from default start -->
                   <replaceregexp
                     file="target/assembly/etc/org.apache.karaf.features.cfg"
-                    match="^(featuresBoot = .*),ssh,management(.*)$"
-                    replace="#\0${line.separator}\1\2"
+                    match="^(featuresBoot = ).*(,opencast-.*)$"
+                    replace="#\0${line.separator}\1standard\2"
                     byline="true" />
                   <!-- Make sure bundle cache gets cleared by default -->
                   <replaceregexp
@@ -125,6 +125,13 @@
                     match="^karaf.clean.cache .*=.*$"
                     replace="karaf.clean.cache = true"
                     byline="true" />
+                  <!-- Prevent some libs from phoning home -->
+                  <echo file="target/assembly/etc/system.properties" append="true"
+                    >${line.separator}# Prevent certain libraries from phoning home</echo>
+                  <echo file="target/assembly/etc/system.properties" append="true"
+                    >${line.separator}net.sf.ehcache.skipUpdateCheck=true</echo>
+                  <echo file="target/assembly/etc/system.properties" append="true"
+                    >${line.separator}org.terracotta.quartz.skipUpdateCheck=true</echo>
                   <!-- Special configuration for development -->
                   <replaceregexp
                     file="target/classes/package.xml"
