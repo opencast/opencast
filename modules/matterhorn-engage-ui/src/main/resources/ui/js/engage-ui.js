@@ -11,8 +11,8 @@ $(document).ready(function() {
     var stack = new Array();
     var visited = 1;
     var tabIndexNumber = 100;
-    var seriesRgbMax = new Array(220, 220, 220); //color range. 
-    var seriesRgbOffset = new Array(20, 20, 20); //darkest possible color 
+    var seriesRgbMax = new Array(220, 220, 220); //color range.
+    var seriesRgbOffset = new Array(20, 20, 20); //darkest possible color
     var title_enterUsernamePassword = "Login with your Opencast account";
     var placeholder_username = "Username";
     var placeholder_password = "Password";
@@ -53,11 +53,46 @@ $(document).ready(function() {
     var $name_loginlogout = "#name-loginlogout";
     var $glyph_loginlogout = "#glyph-loginlogout";
 
+    $("[data-localize]").localize("language/media-module", {language :  "de"});
+
     function log(args) {
         if (debug && window.console) {
             console.log(args);
         }
     }
+
+    function detectLanguage() {
+      var language = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+      return language.replace(/\-.*/,'');
+    }
+
+    var lang = detectLanguage();
+    var jsonstr = window.location.origin + "/engage/ui/language/media-module-de.json";
+    $.ajax({
+        url: jsonstr,
+        dataType: "json",
+        success: function(data) {
+          console.log(data);
+          console.log(data.username);
+          title_enterUsernamePassword = data.login_title;
+          placeholder_username = data.username;
+          placeholder_password = data.password;
+          placeholder_rememberMe = data.remember_me;
+          msg_enterUsernamePassword = data.login_request;
+          msg_html_sthWentWrong = "<h2>"+data.sthWentWrong+"<h2>";
+          msg_html_noepisodes = "<h2>"+data.no_episodes+"</h2>";
+          msg_html_noseries = "<h2>"+data.no_series+"</h2>";
+          msg_html_loading = "<h2>"+data.loading+"</h2>";
+          msg_html_mediapackageempty = "<h2>"+data.no_episodes+"</h2>";
+          msg_html_nodata = "<h2>"+data.no_data+"</h2>";
+          msg_loginSuccessful = data.login_success;
+          msg_loginFailed = data.login_failed;
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.log("Failed to localize. Using default.");
+        }
+    });
+
 
     String.prototype.endsWith = function(suffix) {
         return this.indexOf(suffix, this.length - suffix.length) !== -1;
@@ -87,7 +122,6 @@ $(document).ready(function() {
         active = "episodes";
         loadEpisodes(true);
         endlessScrolling();
-
     }
 
     function endlessScrolling() {
@@ -358,7 +392,7 @@ $(document).ready(function() {
             }
             $(".navbar-collapse").collapse('hide');
         });
-        
+
         $($nav_switch_li).on("keypress", function(ev) {
             if (ev.which == 13 || ev.which == 32) {
                 $($nav_switch_li).removeClass("active");
@@ -383,9 +417,9 @@ $(document).ready(function() {
                     default:
                         break;
                 }
-                $(".navbar-collapse").collapse('hide');                
+                $(".navbar-collapse").collapse('hide');
             }
-        });      
+        });
 
         /* pagination */
         $($next).on("click", function() {
@@ -412,7 +446,7 @@ $(document).ready(function() {
             };
 
         });
-        
+
         $($next).on("keypress", function(ev) {
             if (ev.which == 13 || ev.which == 32) {
                 if ($(this).hasClass("disabled")) {
@@ -435,8 +469,8 @@ $(document).ready(function() {
                 } else if (active == "episodes") {
                     pushHistory(page, "episodes", restData);
                     loadEpisodes(true);
-                };                
-            }   
+                };
+            }
         });
 
         $($previous).on("click", function() {
@@ -487,7 +521,7 @@ $(document).ready(function() {
                     loadEpisodes(true);
                 };
             }
-        });        
+        });
 
         /* handle search input */
         $($oc_search_form).submit(function(event) {
@@ -668,7 +702,7 @@ $(document).ready(function() {
                     if (ev.which == 13 || ev.which == 32) {
                         $(location).attr("href", playerEndpoint + "?id=" + data["id"]);
                     }
-                });                
+                });
 
                 if (data.mediapackage.seriestitle) {
                     var color = generateSeriesColor(data.mediapackage.series);
@@ -723,7 +757,7 @@ $(document).ready(function() {
                 pushHistory(1, "episodes", restData);
                 loadEpisodes(true);
             });
-            
+
             $("#" + data.id).on("keypress", function(ev) {
                 if (ev.which == 13 || ev.which == 32) {
                     restData = "sid=" + data.id;
@@ -734,7 +768,7 @@ $(document).ready(function() {
                     pushHistory(1, "episodes", restData);
                     loadEpisodes(true);
                 }
-            });            
+            });
 
             $("." + seriesClass).css({
                 'background': color
