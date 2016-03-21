@@ -276,7 +276,7 @@ public class SchedulerServiceImplTest {
     dc.set(PROPERTY_SUBJECT, "demo");
     dc.set(PROPERTY_TEMPORAL, EncodingSchemeUtils.encodePeriod(new DCMIPeriod(startTime, endTime), Precision.Second));
     dc.set(PROPERTY_SPATIAL, captureDeviceID);
-    dc.set(PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(new Date(), Precision.Minute));
+    dc.set(PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(startTime, Precision.Second)); // Secs so can be compared with starttime
     dc.set(PROPERTY_LANGUAGE, "demo");
     dc.set(PROPERTY_CONTRIBUTOR, "demo");
     dc.set(PROPERTY_DESCRIPTION, "demo");
@@ -638,9 +638,16 @@ public class SchedulerServiceImplTest {
   private void checkEvent(long eventId, Properties initialCaProps, String title) throws Exception {
     final Properties updatedCaProps = (Properties) initialCaProps.clone();
     updatedCaProps.setProperty("event.title", title);
+    DublinCoreCatalog dc = schedSvc.getEventDublinCore(eventId);
     assertTrue("CA properties", eqMap(updatedCaProps, schedSvc.getEventCaptureAgentConfiguration(eventId)));
-    assertEquals(Long.toString(eventId), schedSvc.getEventDublinCore(eventId).getFirst(PROPERTY_IDENTIFIER));
-    assertEquals("DublinCore title", title, schedSvc.getEventDublinCore(eventId).getFirst(PROPERTY_TITLE));
+    assertEquals(Long.toString(eventId), dc.getFirst(PROPERTY_IDENTIFIER));
+    assertEquals("DublinCore title", title, dc.getFirst(PROPERTY_TITLE));
+    if (dc.hasValue(PROPERTY_CREATED) && dc.hasValue(PROPERTY_TEMPORAL)) {
+      final DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(dc.getFirst(PROPERTY_TEMPORAL));
+      final Date startDate = period.getStart();
+      final Date createdDate = EncodingSchemeUtils.decodeMandatoryDate(dc.getFirst(PROPERTY_CREATED));
+      assertEquals("Created matches start time", startDate, createdDate);
+    }
     checkIcalFeed(updatedCaProps, title);
   }
 
