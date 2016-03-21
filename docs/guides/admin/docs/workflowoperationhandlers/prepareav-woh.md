@@ -32,7 +32,7 @@ If it there is one track with a certain flavor, the "encode" method is called wh
         <configuration key="source-flavor">presenter/source</configuration>
         <configuration key="target-flavor">presenter/work</configuration>
         <configuration key="rewrite">false</configuration>
-        <configuration key="audio-muxing-source-flavors">*/?,*/*<">true</configuration>
+        <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
       </configurations>
     </operation>
 
