@@ -39,6 +39,8 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
 import org.opencastproject.metadata.api.StaticMetadataService;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.search.api.SearchQuery;
@@ -81,7 +83,6 @@ import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -230,6 +231,11 @@ public class SearchServiceImplTest {
     StaticMetadataService mdService = newStaticMetadataService(workspace);
 
     SeriesService seriesService = EasyMock.createNiceMock(SeriesService.class);
+    DublinCoreCatalog seriesCatalog = getSeriesDublinCoreCatalog("/series-dublincore.xml");
+    AccessControlList seriesAcl = new AccessControlList();
+    EasyMock.expect(seriesService.getSeries((String) EasyMock.anyObject())).andReturn(seriesCatalog).anyTimes();
+    EasyMock.expect(seriesService.getSeriesAccessControl((String) EasyMock.anyObject())).andReturn(seriesAcl)
+            .anyTimes();
     EasyMock.replay(seriesService);
 
     service.setStaticMetadataService(mdService);
@@ -261,6 +267,19 @@ public class SearchServiceImplTest {
     StaticMetadataServiceDublinCoreImpl service = new StaticMetadataServiceDublinCoreImpl();
     service.setWorkspace(workspace);
     return service;
+  }
+
+  private DublinCoreCatalog getSeriesDublinCoreCatalog(String path) {
+    // Load the simple media package
+    DublinCoreCatalog seriesDc = null;
+    InputStream is = null;
+    try {
+      is = SearchServiceImplTest.class.getResourceAsStream(path);
+      seriesDc = DublinCores.read(is);
+    } finally {
+      IOUtils.closeQuietly(is);
+    }
+    return seriesDc;
   }
 
   @After
@@ -403,15 +422,18 @@ public class SearchServiceImplTest {
     assertEquals(1, service.getByQuery(new SearchQuery().withText("Institut")).size());
   }
 
-  @Ignore("This test randomly fails. See MH-10573.")
   @Test
   public void testSorting() throws Exception {
     MediaPackage mediaPackageNewer = getMediaPackage("/manifest-full.xml");
     MediaPackage mediaPackageOlder = getMediaPackage("/manifest-full-older.xml");
+    // MH-10573, ensure first job finishes publishing before job2
     Job job = service.add(mediaPackageNewer);
-    Job job2 = service.add(mediaPackageOlder);
-    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job, job2);
+    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job);
     barrier.waitForJobs();
+    Job job2 = service.add(mediaPackageOlder);
+    JobBarrier barrier2 = new JobBarrier(serviceRegistry, 1000, job2);
+    barrier2.waitForJobs();
+
     String olderTitle = "Older Recording";
     String newerTitle = "Land and Vegetation: Key players on the Climate Scene";
 
@@ -421,7 +443,7 @@ public class SearchServiceImplTest {
     assertEquals(olderTitle, service.getByQuery(query).getItems()[0].getDcTitle());
     query.withSort(SearchQuery.Sort.DATE_CREATED, false);
     assertEquals(newerTitle, service.getByQuery(query).getItems()[0].getDcTitle());
-    // reverse sequence as demo-data has inverse publication dates
+    // FYI: DATE_PUBLISHED is the time of Search update, not DC modified (MH-10573)
     query.withSort(SearchQuery.Sort.DATE_PUBLISHED);
     assertEquals(newerTitle, service.getByQuery(query).getItems()[0].getDcTitle());
     query.withSort(SearchQuery.Sort.DATE_PUBLISHED, false);
@@ -578,21 +600,25 @@ public class SearchServiceImplTest {
   }
 
   /**
-   * Ads a media package with one dublin core for the episode and one for the series.
+   * Adds a media package with a dublin core catalog for episode and series. Verifies series catalog can be retrieved
+   * via search service.
    *
-   * todo media package needs to return a series id for this test to work
    */
   @Test
-  @Ignore
   public void testAddSeriesMediaPackage() throws Exception {
-    MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
-
-    // Make sure our mocked ACL has the read and write permission
-    acl.getEntries().add(new AccessControlEntry(ROLE_STUDENT, READ.toString(), true));
-    acl.getEntries().add(new AccessControlEntry(ROLE_STUDENT, WRITE.toString(), true));
+    String seriesId = "foobar-series";
+    MediaPackage mediaPackage = getMediaPackage("/manifest-full.xml");
+    mediaPackage.setSeries(seriesId);
 
     // Add the media package to the search index
-    service.add(mediaPackage);
+    Job job = service.add(mediaPackage);
+    JobBarrier barrier = new JobBarrier(serviceRegistry, 1000, job);
+    barrier.waitForJobs();
+    Assert.assertEquals("Job to add mediapckage did not finish", Job.Status.FINISHED, job.getStatus());
+
+    User adminUser = new JaxbUser("admin", "test", defaultOrganization,
+            new JaxbRole(defaultOrganization.getAdminRole(), defaultOrganization));
+    userResponder.setResponse(adminUser);
 
     // Make sure it's properly indexed and returned
     SearchQuery q = new SearchQuery();
@@ -601,7 +627,7 @@ public class SearchServiceImplTest {
 
     SearchResult result = service.getByQuery(q);
     assertEquals(1, result.size());
-    assertEquals("foobar-serie", result.getItems()[0].getId());
+    Assert.assertEquals(seriesId, result.getItems()[0].getId());
   }
 
   @SuppressWarnings("unchecked")
