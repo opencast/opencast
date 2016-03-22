@@ -77,6 +77,7 @@ pages:
    - Defaults: 'workflowoperationhandlers/defaults-woh.md'
    - Editor: 'workflowoperationhandlers/editor-woh.md'
    - Email: 'workflowoperationhandlers/email-woh.md'
+   - Encode: 'workflowoperationhandlers/encode-woh.md'
    - Extract Text: 'workflowoperationhandlers/extracttext-woh.md'
    - HTTP Notify: 'workflowoperationhandlers/httpnotify-woh.md'
    - Image: 'workflowoperationhandlers/image-woh.md'
