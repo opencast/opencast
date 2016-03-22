@@ -62,7 +62,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         fullscreenChange: new Engage.Event("Video:fullscreenChange", "fullscreen change happened", "trigger"),
         usingFlash: new Engage.Event("Video:usingFlash", "flash is being used", "trigger"),
         numberOfVideodisplaysSet: new Engage.Event("Video:numberOfVideodisplaysSet", "the number of videodisplays has been set", "trigger"),
-        aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "trigger"),
+        aspectRatioSet: new Engage.Event("Video:aspectRatioSet", "the aspect ratio has been calculated", "both"),
         isAudioOnly: new Engage.Event("Video:isAudioOnly", "whether it's audio only or not", "trigger"),
         audioCodecNotSupported: new Engage.Event("Video:audioCodecNotSupported", "when the audio codec seems not to be supported by the browser", "trigger"),
         videoFormatsFound: new Engage.Event("Video:videoFormatsFound", "", "trigger"),
@@ -87,7 +87,18 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         movePiP: new Engage.Event("Video:movePiP", "moves the smaller picture over the larger to the different corners", "handler"),
         togglePiP: new Engage.Event("Video:togglePiP", "switches between PiP and next to each other layout", "handler"),
         closeVideo: new Engage.Event("Video:closeVideo", "closes one videostream", "handler"),
-        openVideo: new Engage.Event("Video:openVideo", "opens a new videostream", "handler")
+        openVideo: new Engage.Event("Video:openVideo", "opens a new videostream", "handler"),
+        moveUp: new Engage.Event("Video:moveUp", "moves video up", "handler"),
+        moveDown: new Engage.Event("Video:moveDown", "moves video down", "handler"),
+        moveLeft: new Engage.Event("Video:moveLeft", "moves video left", "handler"),
+        moveRight: new Engage.Event("Video:moveRight", "moves video right", "handler"),
+        setZoomLevel: new Engage.Event("Video:setZoomLevel", "sets the zoom level", "both"),
+        zoomReset: new Engage.Event("Video:resetZoom", "resets position and zoom level", "handler"),
+        moveHorizontal: new Engage.Event("Video:moveHorizontal", "move video horizontal", "handler"),
+        moveVertical: new Engage.Event("Video:moveVertical", "move video vertical", "handler"),
+        zoomIn: new Engage.Event("Video:zoomIn", "zooms in video", "handler"),
+        zoomOut: new Engage.Event("Video:zoomOut", "zooms out video", "handler"),
+        zoomChange: new Engage.Event("Video:zoomChange", "zoom level has changed", "trigger")
     };
 
     var isDesktopMode = false;
@@ -152,6 +163,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var interval_initialSeek_ms = 1000;
     var timeout_initialSeek_ms = 250;
     var timer_qualitychange = 1000;
+    var zoom_step_size = 0.05;
+    var decimal_places = 3;
 
     /* don't change these variables */
     var currentTime = 0;
@@ -232,7 +245,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var fullscreen = false;
     var mappedResolutions = undefined;
     var videoDisplayClass = "videoDisplay";
-    
+
     var videoDefaultLayoutClass = "videoDefaultLayout";
     var videoUnfocusedClass = "videoUnfocusedPiP";
     var videoFocusedClass = "videoFocusedPiP";
@@ -242,8 +255,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var focusedClass = "videoFocused";
     var isPiP = true;
     var pipPos = "left";
-    
     var foundQualities = undefined;
+
+    var zoomTimeout = 500;
+    var zoomMiniMapWidth = 0.2;
+    var minimapStrokeColor = "black";
 
     function initTranslate(language, funcSuccess, funcError) {
         var path = Engage.getPluginPath("EngagePluginVideoVideoJS").replace(/(\.\.\/)/g, "");
@@ -296,14 +312,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         }
         return true;
     }
-    
+
     function filterTracksByTag(tracks, filterTags) {
         if (filterTags == undefined) {
             return tracks;
         }
         var filterTagsArray = filterTags.split(",");
         var newTracksArray = new Array();
-        
+
         for (var i = 0; i < tracks.length; i++) {
             var found = false;
             for (var j = 0; j < tracks[i].tags.tag.length; j++) {
@@ -317,14 +333,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 if (found) break;
             }
         }
-        
+
         //avoid filtering to an empty list, better play something than nothing
-        if (newTracksArray.length < 1 ) {
+        if (newTracksArray.length < 1) {
             return tracks;
         }
         return newTracksArray;
     }
-    
+
     /**
      * Lookup all tags that are in use
      * @param {type} videoSources, List of still used tracks
@@ -336,7 +352,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             return;
         }
         var tagList = new Set();
-        
+
         for (var v in videoSources) {
             for (var i = 0; i < videoSources[v].length; i++) {
                 for (var j = 0; j < videoSources[v][i].tags.tag.length; j++) {
@@ -347,18 +363,18 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     } else {
                         tagList.add(videoSources[v][i].tags.tag[j]);
                     }
-                } 
+                }
             }
         }
-        
+
         return tagList;
-    }    
-    
+    }
+
     /**
      * Find the different video qualities
      * @param {type} videoSources videoSources that are still in use
      * @returns {undefined}
-     * 
+     *
      */
     function getQualities(videoSources) {
         // using a cache for qualities, as they probably do not change
@@ -375,22 +391,22 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             if (videoSources[source] !== undefined) {
                 tracks = videoSources[source];
                 break;
-            }            
+            }
         }
         var sortedResolutionsList = new Array();
-        for (var i = 0; i< qualitesList.length; i++){
+        for (var i = 0; i < qualitesList.length; i++) {
             var currentTrack = filterTracksByTag(tracks, qualitesList[i] + "-quality")[0];
             sortedResolutionsList.push([qualitesList[i], currentTrack.resolution.substring(0, currentTrack.resolution.indexOf("x"))]);
         }
         sortedResolutionsList.sort(compareQuality);
         foundQualities = new Array();
-        for (var i = 0; i < sortedResolutionsList.length; i++){
+        for (var i = 0; i < sortedResolutionsList.length; i++) {
             foundQualities.push(sortedResolutionsList[i][0]);
         }
         return foundQualities;
     }
-    
-    function compareQuality (a, b) {
+
+    function compareQuality(a, b) {
         if (a && b) {
             if (parseInt(a[1]) == parseInt(b[1])) {
                 return 0;
@@ -399,14 +415,14 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         }
         return 0;
     }
-    
+
     function filterTracksByFormat(tracks, filterFormats) {
         if (filterFormats == undefined) {
             return tracks;
         }
         var filterFormatsArray = filterFormats.split(",");
         var newTracksArray = new Array();
-        
+
         for (var i = 0; i < tracks.length; i++) {
             for (var j = 0; j < filterFormatsArray.length; j++) {
                 var formatMimeType = Utils.preferredFormat(filterFormatsArray[j].trim());
@@ -417,7 +433,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 }
             }
         }
-        
+
         return newTracksArray;
     }
 
@@ -468,6 +484,425 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         });
     }
 
+    function registerZoomLevelEvents() {
+
+        if (isUsingFlash) {
+            Engage.log("Video: Zoom for Flash is not supported");
+            return;
+        }
+
+        Engage.group("registerZoomLevelEvents");
+
+        var selector = "video"
+        var lastEvent = null;
+        var wheelEvent = null;
+        var videoFocused = true;
+        var singleVideo = true;
+        var mapSelector = "#fullscreen_video_wrapper";
+        var minimapVisible = false;
+        var zoomLevels = [];
+        var ratio = aspectRatio[2] / aspectRatio[1];
+        var id = Engage.model.get("urlParameters").id;
+        var flag = 0;
+
+        /* Hides Minimap, e.g. when zoom < 1 */
+        function hideMinimap() {
+            $("#indicator").remove();
+            minimapVisible = false;
+        }
+
+        /* Shows Minimap when its not already displayed */
+        function showMinimap() {
+
+            var zoom = $(selector)[0].style.transform.replace(/[a-z]*/, "");
+            zoom = zoom.replace("(", "");
+            zoom = zoom.replace(")", "");
+
+            if (Number(zoom) <= 1) {
+                return;
+            }
+
+            if ($(selector).length == 1) {
+                var h = $(mapSelector).height();
+                var w = $(mapSelector).width();
+                $(mapSelector).children().first().append("<canvas id='indicator'></canvas>");
+                var minimapWidth = $("#indicator").width();
+
+                var c = document.getElementById("indicator");
+                var ctx = c.getContext("2d");
+
+                var mapWidth = minimapWidth / zoom;
+                var mapHeight = (minimapWidth * ratio) / zoom;
+
+                ctx.fillStyle = "#FFFFFF";
+
+                ctx.fillRect(minimapWidth / 2 - mapWidth / 2, (minimapWidth * ratio) / 2 - mapHeight / 2, mapWidth, mapHeight);
+
+                minimapVisible = true;
+                updateMinimap();
+            }
+        }
+
+        /* Redraws Minimap, e.g. when other display is focused */
+        function redrawMinimap() {
+            hideMinimap();
+            showMinimap();
+        }
+
+        /* Updates Minimap, e.g. when moving video */
+        function updateMinimap() {
+            var zoom = $(selector)[0].style.transform.replace(/[a-z]*/, "");
+            zoom = zoom.replace("(", "");
+            zoom = zoom.replace(")", "");
+
+            if (Number(zoom) <= 1) {
+                return;
+            }
+            var h = $(mapSelector).height();
+            var w = $(mapSelector).width();
+            var minimapWidth = $("#indicator").width();
+
+            var left = $(selector).css("left").replace("px", "");
+            var top = $(selector).css("top").replace("px", "");
+
+            var hDiff = (h * zoom - h) / 2;
+            var wDiff = (w * zoom - w) / 2;
+
+            var relHDiff = top / hDiff;
+            var relWDiff = left / wDiff;
+
+            var mapWidth = minimapWidth / zoom;
+            var mapHeight = (minimapWidth * ratio) / zoom;
+
+            var c = document.getElementById("indicator");
+
+            if (c == undefined) {
+                return;
+            }
+            // reset drawings
+            c.width = $("#indicator").width();
+            c.height = $("#indicator").height();
+            c.width = c.width;
+
+            var ctx = c.getContext("2d");
+            ctx.fillStyle = "#FFFFFF";
+            // calculate Position and draw it onto indicator
+            var x = (minimapWidth / 2 - mapWidth / 2) - ((minimapWidth / 2 - mapWidth / 2) * relWDiff);
+            var y = (minimapWidth * ratio) / 2 - mapHeight / 2 - (((minimapWidth * ratio) / 2 - mapHeight / 2) * relHDiff);
+            ctx.fillRect(x, y, mapWidth, mapHeight);
+        }
+
+        function isFocused() {
+            return Basil.get("focusvideo") != "focus.none1";
+        }
+
+        Engage.on(plugin.events.numberOfVideodisplaysSet.getName(), function(number) {
+            if (number > 1) {
+                selector = ".videoFocused video";
+                videoFocused = false;
+                singleVideo = false;
+                $("." + videoDisplayClass).on("click", function() {
+                    if (flag == 0) {
+                        Engage.trigger(plugin.events.focusVideo.getName(), Utils.getFlavorForVideoDisplay(this));
+                    }
+                });
+            }
+        })
+
+        Engage.on(plugin.events.togglePiP.getName(), function(pip) {
+
+            if (pip && videoFocused) {
+                selector = ".videoFocusedPiP video";
+                mapSelector = ".videoFocusedPiP"
+                setTimeout(redrawMinimap, zoomTimeout);
+            } else if (!pip && videoFocused) {
+                selector = ".videoFocused video";
+                mapSelector = ".videoFocused";
+                setTimeout(redrawMinimap, zoomTimeout);
+            } else {
+                selector = "video";
+            }
+        })
+
+        Engage.on(plugin.events.resetLayout.getName(), function(v) {
+            videoFocused = false;
+            selector = "video";
+            if (!singleVideo) {
+                hideMinimap();
+            }
+        })
+
+        Engage.on(plugin.events.focusVideo.getName(), function(v) {
+
+            if (isPiP && !videoFocused) {
+                videoFocused = true;
+                selector = ".videoFocusedPiP video";
+                mapSelector = ".videoFocusedPiP";
+                if (isFocused()) {
+                    setTimeout(showMinimap, zoomTimeout);
+                }
+            } else if (!isPiP && !videoFocused) {
+                selector = ".videoFocused video";
+                videoFocused = true;
+                mapSelector = ".videoFocused";
+
+                if (isFocused()) {
+                    setTimeout(showMinimap, zoomTimeout);
+                }
+            } else if (!isPiP && videoFocused) {
+                // Toggle nonPiP Displays or leave focused mode while nonPiP
+                if (singleVideo) {
+                    // While Video with one Display loaded this could occur
+                    videoFocused = false;
+                    selector = "video"
+                    mapSelector = ".videoDisplay"
+                    setTimeout(showMinimap, zoomTimeout);
+                } else {
+                    Engage.trigger(plugin.events.setZoomLevel.getName(), [1.0, true]);
+                    selector = ".videoFocused video";
+                    setTimeout(redrawMinimap, zoomTimeout);
+                }
+            } else if (isPiP && videoFocused) {
+                // Toggle PiP Displays or leave focused mode while PiP
+                if (singleVideo) {
+                    // While Video with one Display loaded this could occur
+                    videoFocused = false;
+                    selector = "video"
+                    mapSelector = ".videoDisplay"
+                    setTimeout(showMinimap, zoomTimeout);
+                } else {
+                    // Reset before unfocus
+                    Engage.trigger(plugin.events.setZoomLevel.getName(), [1.0, true]);
+                    selector = ".videoFocusedPiP video";
+                    setTimeout(redrawMinimap, zoomTimeout);
+                }
+            } else {
+                selector = "video"
+                hideMinimap();
+            }
+            // move display
+            Engage.trigger(plugin.events.setZoomLevel.getName(), [1.0, true, true]);
+        })
+
+        $(selector).on('mousewheel', function(event) {
+            if (wheelEvent != null) {
+                if (event.timeStamp - wheelEvent.timeStamp < 30) {
+                    event.preventDefault();
+                    return;
+                }
+            }
+            // scrolling stays avaiable
+            if (selector == "video" && !singleVideo) {
+                return;
+            }
+            // calculate mouse position
+            var parentOffset = $(this).parent().offset();
+            var relX = event.pageX - parentOffset.left;
+            var relY = event.pageY - parentOffset.top;
+
+            var vX = ($(this).width() / 2);
+            var vY = ($(this).height() / 2);
+
+            var xdiff = relX - vX;
+            var ydiff = relY - vY;
+
+            event.preventDefault();
+            // zoom in
+            if (event.deltaY > 0) {
+                Engage.trigger(events.setZoomLevel.getName(), [zoom_step_size]);
+                // move towards mouse position
+                var z = zoomLevels[zoomLevels.indexOf($(selector)[0].id) + 1]
+
+                moveHorizontal(-((xdiff / 5) / z));
+                moveVertical(-((ydiff / 5) / z));
+            };
+            // zoom out
+            if (event.deltaY < 0) {
+                Engage.trigger(events.setZoomLevel.getName(), [-zoom_step_size]);
+            };
+
+            wheelEvent = event;
+        });
+
+        $(selector).mousedown(function() {
+            flag = 0;
+            $(selector).mousemove(function(event) {
+                if (lastEvent != null) {
+                    flag = 1;
+                    // Movement
+                    var x_move = lastEvent.pageX - event.pageX;
+                    var y_move = lastEvent.pageY - event.pageY;
+                    Engage.trigger(plugin.events.moveHorizontal.getName(), -x_move);
+                    Engage.trigger(plugin.events.moveVertical.getName(), -y_move);
+                };
+                lastEvent = event;
+            });
+            $("body").mouseup(function(event) {
+                $(selector).off("mousemove");
+                lastEvent = null;
+            });
+        });
+
+        Engage.on(plugin.events.moveHorizontal.getName(), function(step) {
+            moveHorizontal(step);
+        });
+
+        Engage.on(plugin.events.moveVertical.getName(), function(step) {
+            moveVertical(step);
+        });
+
+        function moveHorizontal(step) {
+            if (videoFocused || singleVideo) {
+                var offset = $(selector).css("left");
+                var left = $(selector).position().left / 2;
+
+                offset = offset.replace("px", "");
+                offset = Number(offset);
+
+                if (step > 0 && Math.abs($(selector).position().left) < step) {
+                    // Shift right, but too far
+                    step = Math.abs($(selector).position().left);
+                }
+
+                if (step < 0 && (offset + step < left)) {
+                    // Shift left but too far
+                    step = (left - offset);
+                }
+
+                if (!(($(selector).position().left + step) > 0) && !((offset + step) < left)) {
+                    $(selector).css("left", (offset + step) + "px");
+                };
+                updateMinimap();
+            }
+        }
+
+        function moveVertical(step) {
+            if (videoFocused || singleVideo) {
+                var top = $(selector).position().top / 2;
+                var offset = $(selector).css("top");
+
+                offset = offset.replace("px", "");
+                offset = Number(offset);
+
+                if (step > 0 && (Math.abs($(selector).position().top) < step)) {
+                    step = Math.abs($(selector).position().top)
+                }
+
+                if (step < 0 && (offset + step < top)) {
+                    step = (top - offset);
+                }
+
+                if (!((offset + step) < top) && !(($(selector).position().top + step) > 0)) {
+                    $(selector).css("top", (offset + step) + "px");
+                };
+                updateMinimap();
+            }
+        }
+
+        Engage.on(plugin.events.setZoomLevel.getName(), function(data) {
+            var level = data[0];
+            var fixed = data[1];
+            var moveOnly = data[2];
+
+            fixed = typeof fixed !== 'undefined' ? fixed : false;
+            moveOnly = typeof moveOnly !== 'undefined' ? moveOnly : false;
+
+            if ($(selector)[0] === undefined || level === undefined) {
+                return;
+            }
+
+            if (zoomLevels.indexOf($(selector)[0].id) == -1) {
+                if (1.0 + level >= 1.0) {
+                    if (!fixed) {
+                        level = (1.0 + level);
+                    }
+                    zoomLevels.push($(selector)[0].id, Math.abs(level));
+                }
+            } else {
+                var before = parseFloat(zoomLevels[(zoomLevels.indexOf($(selector)[0].id) + 1)]);
+                if ((before + level) >= 1.0) {
+                    if (!fixed) {
+                        level = (before + level);
+                    }
+                }
+            }
+
+            if (Number(level).toFixed(decimal_places) == Number(1).toFixed(decimal_places) && minimapVisible) {
+                hideMinimap();
+            }
+
+            if (Number(level).toFixed(decimal_places) >= Number(1).toFixed(decimal_places) && (videoFocused || singleVideo)) {
+                var topTrans = Number($(selector).css("top").replace("px", ""));
+                var leftTrans = Number($(selector).css("left").replace("px", ""));
+
+                var biggerThenOne = Number(level).toFixed(decimal_places) > Number(1).toFixed(decimal_places);
+
+                var leftOffset = ($(selector).width() * level - $(selector).width()) / 2
+                leftOffset = leftOffset - Math.abs(leftTrans);
+                if (leftOffset < 0) {
+                    /* Links/Rechts überschritten beim zoomen */
+                    if (leftTrans > 0) {
+                        Engage.trigger(plugin.events.moveHorizontal.getName(), leftOffset)
+                    }
+                    if (leftTrans < 0) {
+                        Engage.trigger(plugin.events.moveHorizontal.getName(), -leftOffset)
+                    }
+                }
+
+                var topOffset = ($(selector).height() * level - $(selector).height()) / 2;
+                topOffset = topOffset - Math.abs(topTrans);
+                if (topOffset < 0) {
+                    /* Oben/Unten überschritten beim zoomen */
+                    if (topTrans > 0) {
+                        Engage.trigger(plugin.events.moveVertical.getName(), topOffset)
+                    }
+                    if (topTrans < 0) {
+                        Engage.trigger(plugin.events.moveVertical.getName(), -topOffset)
+                    }
+                }
+
+                var zoomLevel = Number(level).toFixed(decimal_places);
+
+                if (!moveOnly) {
+                    $(selector)[0].style.transform = "scale(" + zoomLevel + ")";
+                    zoomLevels[(zoomLevels.indexOf($(selector)[0].id) + 1)] = parseFloat(Number(level).toFixed(decimal_places));
+                    Engage.trigger(plugin.events.zoomChange.getName(), zoomLevel);
+
+                    if (!minimapVisible && biggerThenOne) {
+                        showMinimap();
+                    } else if (minimapVisible && biggerThenOne) {
+                        updateMinimap();
+                    }
+                }
+            };
+        });
+
+        Engage.on(plugin.events.zoomReset.getName(), function() {
+            var tmpSelector = selector;
+            for (var i = 0; i < zoomLevels.length; i++) {
+                selector = $("#" + zoomLevels[i])[0];
+                Engage.trigger(plugin.events.setZoomLevel.getName(), [1.0, true]);
+                i++;
+            }
+            selector = tmpSelector;
+        });
+
+        Engage.on(plugin.events.zoomIn.getName(), function() {
+            Engage.trigger(plugin.events.setZoomLevel.getName(), [zoom_step_size]);
+        });
+
+        Engage.on(plugin.events.zoomOut.getName(), function() {
+            Engage.trigger(plugin.events.setZoomLevel.getName(), [-zoom_step_size]);
+        });
+
+        $(window).resize(function() {
+            Engage.trigger(plugin.events.setZoomLevel.getName(), [1.0, true, true]);
+            showMinimap();
+        });
+
+        Engage.groupEnd();
+    }
+
     function changeQuality(q) {
         if (q) {
             var isPaused = videojs(globalVideoSource[0][0]).paused();
@@ -490,11 +925,11 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 window.setTimeout(function() {
                     initSynchronize(false);
                     Engage.trigger(plugin.events.seek.getName(), currentTime);
-                    if (! isPaused) {
+                    if (!isPaused) {
                         Engage.trigger(plugin.events.play.getName());
                     }
                 }, timer_qualitychange);
-            } 
+            }
         }
     }
 
@@ -511,7 +946,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         }
 
         var qualities = getQualities(videoSources);
-        
+
         if (qualities.length > 1) {
             registerQualityChangeEvent();
             Engage.trigger(plugin.events.videoFormatsFound.getName(), qualities);
@@ -537,6 +972,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
         // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
         $("." + class_vjsposter).show();
+
+        registerZoomLevelEvents();
 
         Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
 
@@ -570,7 +1007,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 $(window).resize(function(event, el) {
                     checkVideoDisplaySize();
                 });
-            } 
+            }
         }
     }
 
@@ -830,7 +1267,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     renderDesktop(videoDataView, videoSources, videoDisplays, aspectRatio);
                 }
                 if (videoDataView.model.get("type") != "audio") {
-                   delayedCalculateVideoAreaAspectRatio();
+                    delayedCalculateVideoAreaAspectRatio();
                 }
             }
         }
@@ -911,7 +1348,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             $("#" + id_videojs_wrapper).html("No video available.");
         }
     }
-    
+
     function delayedCalculateVideoAreaAspectRatio() {
         calculateVideoAreaAspectRatio();
         window.setTimeout(calculateVideoAreaAspectRatio, checkVideoDisplaySizeTimeout);
@@ -924,18 +1361,18 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             numberDisplays = $("." + videoDisplayClass).length;
         }
         videoAreaAspectRatio = 1.7 * numberDisplays;
-        
+
         // Calculate real aspect ratio if possible
-        
+
         var videoHeight = $("#" + id_engage_video).height();
         var videoWidth = $("#" + id_engage_video).width();
-        if (! isDefaultLayout()) {
+        if (!isDefaultLayout()) {
             videoHeight = $("." + videoFocusedClass).height();
             if (isPiP) {
                 videoWidth = $("." + videoFocusedClass).width();
             }
         }
-        if (videoWidth !== undefined && videoHeight !== undefined && 
+        if (videoWidth !== undefined && videoHeight !== undefined &&
             videoWidth > 0 && videoHeight > 0) {
             videoAreaAspectRatio = videoWidth / videoHeight;
         }
@@ -949,16 +1386,16 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         if (controlsHeight <= 0) {
             controlsHeight = $("#" + id_engageControls).height() + 30;
         }
-         
+
         var maxVideoAreaHeight = $(window).height() - controlsHeight;
-        
+
         if (videoAreaAspectRatio === undefined) {
             calculateVideoAreaAspectRatio();
         }
-        
+
         var maxVideoAreaWidth = parseInt(maxVideoAreaHeight * videoAreaAspectRatio);
         var minVideoAreaHeight = parseInt(parseInt($("#" + id_engage_video).css("min-width")) / videoAreaAspectRatio);
-        
+
         var minWidth = parseInt($("#" + id_engage_video).css("min-width"));
         if (maxVideoAreaWidth > minWidth) {
             if (maxVideoAreaWidth > $(window).width()) {
@@ -968,15 +1405,15 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             }
         } else {
             $("#" + id_engage_video).css("max-width", minWidth + "px");
-        }        
+        }
         $("#" + id_engage_video).css("min-height", minVideoAreaHeight + "px");
         if (maxVideoAreaHeight > minVideoAreaHeight) {
             $("#" + id_engage_video).css("max-height", maxVideoAreaHeight + "px");
         } else {
             $("#" + id_engage_video).css("max-height", minVideoAreaHeight + "px");
         }
-        
-        if (! isDefaultLayout()) {
+
+        if (!isDefaultLayout()) {
             if (isPiP) {
                 var distance = 0;
                 $("." + videoUnfocusedClass).each(function() {
@@ -1023,8 +1460,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         if (pressedPlayOnce) {
             var rate = videodisplayMaster.playbackRate();
             Engage.trigger(plugin.events.playbackRateChanged.getName(), (rate + value));
-        }        
-        
+        }
     }
 
     function registerEvents(videoDisplay, numberOfVideodisplays) {
@@ -1408,87 +1844,168 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             videodisplayMaster.on(event_html5player_fullscreenchange, function() {
                 Engage.trigger(plugin.events.fullscreenChange.getName());
             });
-            
-            var numberDisplays = $("." + videoDisplayClass).length;
-            if (numberDisplays > 1) {
-                $("." + videoDisplayClass).on("click", function () {
-                    Engage.trigger(plugin.events.focusVideo.getName(), Utils.getFlavorForVideoDisplay(this));
-                });
 
-                Engage.on(plugin.events.focusVideo.getName(), function(display) {
-                    Engage.log("Video: received focusing video " + display);
+            Engage.on(plugin.events.focusVideo.getName(), function(display) {
+                Engage.log("Video: received focusing video " + display);
+                var videoDiv;
 
-                    var videoDiv;
+                if (display === undefined || display === "focus.none") {
+                    Engage.trigger(plugin.events.resetLayout.getName());
+                    return;
+                }
 
-                    if (display === undefined || display === "focus.none") {
+
+                if (display === "focus.next" || display === "focus.prev") {
+                    if (isDefaultLayout()) {
+                        if (display === "focus.next") {
+                            Engage.trigger(plugin.events.focusVideo.getName(),
+                                Utils.getFlavorForVideoDisplay($("." + videoDisplayClass).first()));
+                            return;
+                        } else {
+                            Engage.trigger(plugin.events.focusVideo.getName(),
+                                Utils.getFlavorForVideoDisplay($("." + videoDisplayClass).last()));
+                            return;
+                        }
+                    } else {
+                        var vidDisp = $("." + videoDisplayClass);
+                        var selectNext = false;
+                        var last;
+                        var i = 0;
+                        for (var elem in vidDisp) {
+                            if (selectNext) {
+                                Engage.trigger(plugin.events.focusVideo.getName(),
+                                    Utils.getFlavorForVideoDisplay($(vidDisp[elem])));
+                                return;
+                            } else if ($(vidDisp[elem]).hasClass(videoFocusedClass)) {
+                                if ((display === "focus.prev" && last === undefined) ||
+                                    (display === "focus.next" && i === vidDisp.length - 1)) {
+                                    Engage.log("Resetting videodisplay layout");
+                                    Engage.trigger(plugin.events.resetLayout.getName());
+                                    return;
+                                } else if (display === "focus.next") {
+                                    selectNext = true;
+                                } else {
+                                    Engage.trigger(plugin.events.focusVideo.getName(),
+                                        Utils.getFlavorForVideoDisplay(last));
+                                    return;
+                                }
+                            }
+                            last = $(vidDisp[elem]);
+                            i++;
+                        }
+                    }
+                } else {
+                    videoDiv = getDivForFlavor(display);
+                    if (videoDiv === undefined) {
                         Engage.trigger(plugin.events.resetLayout.getName());
                         return;
                     }
+                    if ($(videoDiv).hasClass(videoFocusedClass)) {
+                        Engage.log("Resetting videodisplay layout");
+                        Engage.trigger(plugin.events.resetLayout.getName());
+                        return;
+                    }
+                }
+                $("." + id_videoDisplayClass).css("width", "");
+                $("." + id_videoDisplayClass).css("left", "");
+                $("." + id_videoDisplayClass).css("top", "");
+                $("." + id_videoDisplayClass).css("margin-left", "");
+                $("#engage_video").css("height", "");
+                $("." + videoDisplayClass).removeClass(videoDefaultLayoutClass).addClass(videoUnfocusedClass);
+                $("." + videoUnfocusedClass).removeClass(videoFocusedClass);
+                $(videoDiv).addClass(videoFocusedClass).removeClass(videoUnfocusedClass);
 
 
-                    if (display === "focus.next" || display === "focus.prev") {
-                        if (isDefaultLayout()) {
-                            if (display === "focus.next") {
-                                Engage.trigger(plugin.events.focusVideo.getName(), 
-                                                Utils.getFlavorForVideoDisplay($("." + videoDisplayClass).first()));
-                                return;
-                            } else {
-                                Engage.trigger(plugin.events.focusVideo.getName(), 
-                                                Utils.getFlavorForVideoDisplay($("." + videoDisplayClass).last()));
-                                return;
-                            }
-                        } else {
-                            var vidDisp = $("." + videoDisplayClass);
-                            var selectNext = false;
-                            var last;
-                            var i = 0;
-                            for (var elem in vidDisp) {
-                                if (selectNext) {
-                                    Engage.trigger(plugin.events.focusVideo.getName(), 
-                                                Utils.getFlavorForVideoDisplay($(vidDisp[elem])));
-                                    return;
-                                } else if ($(vidDisp[elem]).hasClass(videoFocusedClass)) {
-                                    if ((display === "focus.prev" && last === undefined) || 
-                                         (display === "focus.next" &&  i === vidDisp.length -1)) {
-                                        Engage.log("Resetting videodisplay layout");
-                                        Engage.trigger(plugin.events.resetLayout.getName());
-                                        return;
-                                    } else if (display === "focus.next") {
-                                        selectNext = true;
-                                    } else {
-                                        Engage.trigger(plugin.events.focusVideo.getName(), 
-                                                Utils.getFlavorForVideoDisplay(last));
-                                        return;
-                                    }
-                                }
-                                last = $(vidDisp[elem]);
-                                i++;
-                            }
-                        }
-
+                if (isPiP) {
+                    var distance = 0;
+                    $("." + videoUnfocusedClass).each(function() {
+                        var width = $(this).width();
+                        var height = $(this).height();
+                        $(this).css("left", 0 - (width / 2) + "px");
+                        $(this).css("top", distance - (height / 2) + "px");
+                        distance = distance + height + 10;
+                    });
+                    var marginLeft;
+                    if (pipPos === "left") {
+                        marginLeft = 12;
                     } else {
-                        videoDiv = getDivForFlavor(display);
-                        if (videoDiv === undefined) {
-                            Engage.trigger(plugin.events.resetLayout.getName());
-                            return;
-                        }
-                        if ($(videoDiv).hasClass(videoFocusedClass)) {
-                            Engage.log("Resetting videodisplay layout");
-                            Engage.trigger(plugin.events.resetLayout.getName());
-                            return;
-                        }
-                    }                
-                    $("." + id_videoDisplayClass).css("width", "");
-                    $("." + id_videoDisplayClass).css("left", "");
-                    $("." + id_videoDisplayClass).css("top", "");
-                    $("." + id_videoDisplayClass).css("margin-left", "");
-                    $("#engage_video").css("height", "");
-                    $("." + videoDisplayClass).removeClass(videoDefaultLayoutClass).addClass(videoUnfocusedClass);
-                    $("." + videoUnfocusedClass).removeClass(videoFocusedClass);
-                    $(videoDiv).addClass(videoFocusedClass).removeClass(videoUnfocusedClass);
-                    
+                        marginLeft = 88;
+                    }
+                    $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");
+                } else {
+                    var height = $("." + videoFocusedClass).height();
+                    $("#engage_video").height(height + 10);
+                }
+                delayedCalculateVideoAreaAspectRatio();
+            });
 
-                    if (isPiP) {
+            Engage.on(plugin.events.resetLayout.getName(), function() {
+                Engage.log("Video: received resetting layout");
+                $("#engage_video").css("height", "");
+                $("." + id_videoDisplayClass).css("margin-left", "");
+                $("." + id_videoDisplayClass).css("width", "");
+                $("." + id_videoDisplayClass).css("left", "");
+                $("." + id_videoDisplayClass).css("top", "");
+                $("." + id_videoDisplayClass).css("margin-left", "");
+                $("." + videoDisplayClass).removeClass(videoFocusedClass).removeClass(videoUnfocusedClass).addClass(videoDefaultLayoutClass);
+                var numberDisplays = $("." + videoDisplayClass).length;
+                $("." + id_videoDisplayClass).css("width", (((1 / numberDisplays) * 100) - 0.5) + "%");
+                delayedCalculateVideoAreaAspectRatio();
+            });
+
+
+            Engage.on(plugin.events.movePiP.getName(), function(pos) {
+                var numberDisplays = $("." + videoDisplayClass).length;
+                if (numberDisplays <= 1) return;
+                if (pos !== undefined) {
+                    pipPos = pos;
+                }
+                if (!isPiP) {
+                    return;
+                }
+                Engage.log("Video: moving PiP");
+                var marginLeft;
+                if (pipPos === "right") {
+                    marginLeft = 88;
+                    pipPos = "right";
+                } else {
+                    marginLeft = 12;
+                    pipPos = "left";
+                }
+                $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");
+                delayedCalculateVideoAreaAspectRatio();
+            });
+
+            Engage.on(plugin.events.togglePiP.getName(), function(pip) {
+                var numberDisplays = $("." + videoDisplayClass).length;
+                if (numberDisplays <= 1) return;
+
+                Engage.log("Video: setting PiP to " + pip);
+                if ((pip && isPiP) || (!pip && !isPiP)) {
+                    return;
+                }
+                if (!pip) {
+                    videoUnfocusedClass = unfocusedClass;
+                    videoFocusedClass = focusedClass;
+                    isPiP = false;
+                    if (!isDefaultLayout()) {
+                        $("." + id_videoDisplayClass).css("margin-left", "");
+                        $("." + id_videoDisplayClass).css("width", "");
+                        $("." + id_videoDisplayClass).css("left", "");
+                        $("." + id_videoDisplayClass).css("top", "");
+                        $("." + unfocusedPiPClass).addClass(videoUnfocusedClass).removeClass(unfocusedPiPClass);
+                        $("." + focusedPiPClass).addClass(videoFocusedClass).removeClass(focusedPiPClass);
+                        var height = $("." + videoFocusedClass).height();
+                        $("#engage_video").height(height + 10);
+                    }
+                } else {
+                    videoUnfocusedClass = unfocusedPiPClass;
+                    videoFocusedClass = focusedPiPClass;
+                    isPiP = true;
+                    if (!isDefaultLayout()) {
+                        $("." + unfocusedClass).addClass(videoUnfocusedClass).removeClass(unfocusedClass);
+                        $("." + focusedClass).addClass(videoFocusedClass).removeClass(focusedClass);
+                        $("#engage_video").css("height", "");
                         var distance = 0;
                         $("." + videoUnfocusedClass).each(function() {
                             var width = $(this).width();
@@ -1503,114 +2020,25 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                         } else {
                             marginLeft = 88;
                         }
-                        $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");                        
-                    } else {
-                        var height = $("." + videoFocusedClass).height();
-                        $("#engage_video").height(height + 10);
-                    }
-                    delayedCalculateVideoAreaAspectRatio();
-                });
+                        $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");
 
-                Engage.on(plugin.events.resetLayout.getName(), function() {
-                    Engage.log("Video: received resetting layout");
-                    $("#engage_video").css("height", "");
-                    $("." + id_videoDisplayClass).css("margin-left", "");
-                    $("." + id_videoDisplayClass).css("width", "");
-                    $("." + id_videoDisplayClass).css("left", "");
-                    $("." + id_videoDisplayClass).css("top", "");
-                    $("." + id_videoDisplayClass).css("margin-left", "");                
-                    $("." + videoDisplayClass).removeClass(videoFocusedClass).removeClass(videoUnfocusedClass).addClass(videoDefaultLayoutClass);
-                    var numberDisplays = $("." + videoDisplayClass).length;
-                    $("." + id_videoDisplayClass).css("width", (((1 / numberDisplays) * 100) - 0.5) + "%");
-                    delayedCalculateVideoAreaAspectRatio();
-                }); 
-
-                Engage.on(plugin.events.movePiP.getName(), function(pos) {
-                    var numberDisplays = $("." + videoDisplayClass).length;
-                    if (numberDisplays <= 1) return;
-                    if (pos !== undefined) {
-                        pipPos = pos;
-                    } 
-                    if (! isPiP) {
-                        return;
                     }
-                    Engage.log("Video: moving PiP");
-                    var marginLeft;
-                    if (pipPos === "right") {
-                        marginLeft = 88;
-                        pipPos = "right";
-                    } else {
-                        marginLeft = 12;
-                        pipPos = "left";
-                    }
-                    $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");
-                    delayedCalculateVideoAreaAspectRatio();
-                });  
-
-                Engage.on(plugin.events.togglePiP.getName(), function(pip) {
-                    var numberDisplays = $("." + videoDisplayClass).length;
-                    if (numberDisplays <= 1) return;
-
-                    Engage.log("Video: setting PiP to " + pip);
-                    if ((pip && isPiP) || (! pip && ! isPiP)) {
-                        return;
-                    }
-                    if (! pip) {
-                        videoUnfocusedClass = unfocusedClass;
-                        videoFocusedClass = focusedClass;
-                        isPiP = false;
-                        if (! isDefaultLayout()) {
-                            $("." + id_videoDisplayClass).css("margin-left", "");
-                            $("." + id_videoDisplayClass).css("width", "");
-                            $("." + id_videoDisplayClass).css("left", "");
-                            $("." + id_videoDisplayClass).css("top", "");
-                            $("." + unfocusedPiPClass).addClass(videoUnfocusedClass).removeClass(unfocusedPiPClass);
-                            $("." + focusedPiPClass).addClass(videoFocusedClass).removeClass(focusedPiPClass);
-                            var height = $("." + videoFocusedClass).height();
-                            $("#engage_video").height(height + 10);
-                        }
-                    } else {
-                        videoUnfocusedClass = unfocusedPiPClass;
-                        videoFocusedClass = focusedPiPClass;
-                        isPiP = true;
-                        if (! isDefaultLayout()) {
-                            $("." + unfocusedClass).addClass(videoUnfocusedClass).removeClass(unfocusedClass);
-                            $("." + focusedClass).addClass(videoFocusedClass).removeClass(focusedClass);
-                            $("#engage_video").css("height", "");
-                            var distance = 0;
-                            $("." + videoUnfocusedClass).each(function() {
-                                var width = $(this).width();
-                                var height = $(this).height();
-                                $(this).css("left", 0 - (width / 2) + "px");
-                                $(this).css("top", distance - (height / 2) + "px");
-                                distance = distance + height + 10;
-                            });
-                            var marginLeft;
-                            if (pipPos === "left") {
-                                marginLeft = 12;
-                            } else {
-                                marginLeft = 88;
-                            }
-                            $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");
-
-                        }
-                    }
-                    delayedCalculateVideoAreaAspectRatio();
-                });
-            }
+                }
+                delayedCalculateVideoAreaAspectRatio();
+            });
         }
     }
-    
+
     function isDefaultLayout() {
-       if ($("." + videoDefaultLayoutClass).length > 0) {
-           return true;
-       } 
-       return false;
+        if ($("." + videoDefaultLayoutClass).length > 0) {
+            return true;
+        }
+        return false;
     }
-    
+
     function getDivForFlavor(flavor) {
         var found;
-        $("." + videoDisplayClass).each(function (){
+        $("." + videoDisplayClass).each(function() {
             if (Utils.getFlavorForVideoDisplay(this) === flavor) {
                 found = this;
                 return;
@@ -1618,7 +2046,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         });
         return found;
     }
-    
+
     function setupStreams(tracks, attachments) {
         Engage.log("Video: Setting up streams");
 
@@ -1635,7 +2063,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     flavors += mediaInfo.tracks[i].type + ",";
                 }
 
-                // rtmp is treated differently for video.js. Mimetype and URL have to be changed                      
+                // rtmp is treated differently for video.js. Mimetype and URL have to be changed
                 if ((mediaInfo.tracks[i].mimetype == "video/mp4") &&
                     (mediaInfo.tracks[i].url.toLowerCase().indexOf("rtmp://") > -1)) {
                     mediaInfo.tracks[i].mimetype = "rtmp/mp4";
@@ -1756,8 +2184,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     }
 
     function compareVideoSources(a, b) {
-        if (a === undefined || b === undefined || a [1][0] === undefined ||
-                b[1][0] === undefined) {
+        if (a === undefined || b === undefined || a[1][0] === undefined ||
+            b[1][0] === undefined) {
             return 0;
         }
         var s1 = a[1][0].typemh;

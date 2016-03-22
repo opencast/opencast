@@ -20,7 +20,7 @@
  */
 /*jslint browser: true, nomen: true*/
 /*global define, CustomEvent*/
-define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "bootbox", "engage/models/engage", "engage/event"], function(require, $, _, Backbone, Mousetrap, Bowser, Basil, Bootbox, EngageModel, EngageEvent) {
+define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "basil", "bootbox", "mousewheel", "engage/models/engage", "engage/event"], function(require, $, _, Backbone, Mousetrap, Bowser, Basil, Bootbox, Mousewheel, EngageModel, EngageEvent) {
     "use strict";
 
     var events = {
@@ -46,7 +46,15 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         mediaPackageModelError: new EngageEvent("MhConnection:mediaPackageModelError", "", "handler"),
         focusVideo: new EngageEvent("Video:focusVideo", "increases the size of one video", "handler"),
         movePiP: new EngageEvent("Video:movePiP", "moves the smaller picture over the larger to the different corners", "handler"),
-        togglePiP: new EngageEvent("Video:togglePiP", "switches between PiP and next to each other layout", "handler")
+        togglePiP: new EngageEvent("Video:togglePiP", "switches between PiP and next to each other layout", "handler"),
+        moveUp: new EngageEvent("Video:moveUp", "moves video up", "trigger"),
+        moveDown: new EngageEvent("Video:moveDown", "moves video down", "trigger"),
+        moveLeft: new EngageEvent("Video:moveLeft", "moves video left", "trigger"),
+        moveRight: new EngageEvent("Video:moveRight", "moves video right", "trigger"),
+        moveHorizontal: new EngageEvent("Video:moveHorizontal", "move video horizontal", "trigger"),
+        moveVertical: new EngageEvent("Video:moveVertical", "move video vertical", "trigger"),
+        zoomIn: new EngageEvent("Video:zoomIn", "zooms in video", "trigger"),
+        zoomOut: new EngageEvent("Video:zoomOut", "zooms out video", "trigger"),
     };
 
     /* change these variables */
@@ -55,6 +63,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var browser_minVersion_opera = 20;
     var browser_minVersion_safari = 7;
     var browser_minVersion_msie = 9;
+    var zoom_wasd_step_size = 15;
     var path_language_de = "language/de.json";
     var path_language_en = "language/en.json";
 
@@ -114,6 +123,12 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
     var shortcut_nextFocus = "focusNext";
     var shortcut_movePiP = "movePiP";
     var shortcut_togglePiP = "togglePiP";
+    var shortcut_moveLeft = "moveLeft";
+    var shortcut_moveRight = "moveRight";
+    var shortcut_moveUp = "moveUp";
+    var shortcut_moveDown = "moveDown";
+    var shortcut_zoomIn = "zoomIn";
+    var shortcut_zoomOut = "zoomOut";
 
     var basilOptions = {
         namespace: "mhStorage"
@@ -122,7 +137,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 
     function browserSupported() {
         if ((Basil.get("overrideBrowser") != null) && Basil.get("overrideBrowser")) {
-            // console.log("Core: User setting - Support unsupported browser: " + Basil.get("overrideBrowser"));
             return true;
         }
         return (Bowser.firefox && Bowser.version >= browser_minVersion_firefox) ||
@@ -170,12 +184,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         }
         return ((translationData != null) && (translationData[str] != undefined)) ? translationData[str] : strIfNotFound;
     }
-
-    /*
-    if (window.console) {
-        console.log("Core: Init");
-    }
-    */
 
     function login() {
         if (!askedForLogin) {
@@ -269,6 +277,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 
     // binds configured shortcuts (see MH org config) to corresponding events
     function bindShortcutsToEvents() {
+
         // disable scrolling when pressing the space bar
         $(document).keydown(function(e) {
             // space = 32, backspace = 8, page up = 73, page down = 33, enter = 13
@@ -369,7 +378,37 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                         pip = ! pip;
                         engageCore.trigger(events.togglePiP.getName(), pip);
                     });
-                    break;                
+                    break;
+                case shortcut_moveLeft:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.moveHorizontal.getName(), zoom_wasd_step_size);
+                    });
+                    break;
+                case shortcut_moveRight:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.moveHorizontal.getName(), -zoom_wasd_step_size);
+                    });
+                    break;
+                case shortcut_moveUp:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.moveVertical.getName(), zoom_wasd_step_size);
+                    });
+                    break;
+                case shortcut_moveDown:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.moveVertical.getName(), -zoom_wasd_step_size);
+                    });
+                    break;
+                case shortcut_zoomIn:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.zoomIn.getName(), true);
+                    });
+                    break;
+                case shortcut_zoomOut:
+                    Mousetrap.bind(val.key, function() {
+                        engageCore.trigger(events.zoomOut.getName(), true);
+                    });
+                    break;
                 default:
                     break;
             }
@@ -527,6 +566,16 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         log: function(data) {
             if (this.model.get("isDebug") && window.console) {
                 console.log(data);
+            }
+        },
+        group: function(block) {
+            if (this.model.get("isDebug") && window.console) {
+                console.group(block);
+            }
+        },
+        groupEnd: function() {
+            if (this.model.get("isDebug") && window.console) {
+                console.groupEnd();
             }
         },
         getPluginPath: function(pluginName) {
@@ -752,13 +801,13 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
                     }, loadingDelay2);
                 }, loadingDelay1);
             });
-            
+
             this.dispatcher.on(events.movePiP.getName(), function(pos) {
                 pipPos = pos;
-            }); 
+            });
             this.dispatcher.on(events.togglePiP.getName(), function(status) {
                 pip = status;
-            }); 
+            });
         }
     });
 
