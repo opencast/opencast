@@ -294,6 +294,7 @@
               org.springframework.security.core.userdetails.memory,
               org.springframework.security.ldap,
               org.springframework.security.ldap.authentication,
+              org.springframework.security.ldap.search,
               org.springframework.security.web,
               org.springframework.security.web.authentication,
               org.springframework.security.web.authentication.www,
