@@ -869,6 +869,7 @@
          "CAPTION":  "Users",
          "NAME":     "Name",
          "USERNAME": "Username",
+         "EMAIL":    "Email",
          "ROLES":    "Roles",
          "TYPE":     "Type",
          "BLACKLIST_FROM": "Blacklisted from",

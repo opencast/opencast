@@ -11,6 +11,9 @@ angular.module('adminNg.controllers')
                 name:  'username',
                 label: 'USERS.USERS.TABLE.USERNAME'
             }, {
+                name:  'email',
+                label: 'USERS.USERS.TABLE.EMAIL'
+            }, {
                 name:  'roles',
                 label: 'USERS.USERS.TABLE.ROLES'
             }, {

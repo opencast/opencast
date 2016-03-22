@@ -868,6 +868,7 @@
         "CAPTION":"Benutzer",
         "NAME":"Name",
         "USERNAME":"Benutzername",
+        "EMAIL": "E-Mail",
         "ROLES":"Rollen",
         "TYPE":"Typ",
         "BLACKLIST_FROM":"Gesperrt von",
