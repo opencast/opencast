@@ -232,6 +232,7 @@
               org.springframework.security.core.userdetails.memory,
               org.springframework.security.ldap,
               org.springframework.security.ldap.authentication,
+              org.springframework.security.ldap.search,
               org.xml.sax;version=0,
               META-INF.cxf,
               META-INF.cxf.osgi,
