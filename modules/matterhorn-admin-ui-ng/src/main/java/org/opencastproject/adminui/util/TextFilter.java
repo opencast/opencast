@@ -24,9 +24,9 @@ package org.opencastproject.adminui.util;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Utility class to simplify the implementation of the filter 'text' in case no search index is available. This is a no
- * trick implementation, please feel free to optimize. Normally, the final solution would be, however, to use the filter
- * facilities of a search index
+ * Utility class to simplify the implementation of the filter 'text' in case no search index is available.
+ * This is a no trick implementation, please feel free to optimize. Normally, the final solution would be,
+ * however, to use the filter facilities of a search index
  */
 public final class TextFilter {
 
@@ -35,14 +35,18 @@ public final class TextFilter {
   }
 
   /**
-   * Check whether at least one of the search strings is contained in one of the text strings Notes: - caseinsensitive -
-   * using union in case of multiple search strings
+   * Check whether at least one of the search strings is contained in one of the text strings
+   * Notes:
+   *   - caseinsensitive
+   *   - using union in case of multiple search strings
    *
    * @param searchStrings
    *          whitespace-separated list of search strings
    * @param text
    *          open array of strings to be matched against
-   * @return true, if at least one of the search strings occurs in at least one of the text strings false, otherwise
+   * @return
+   *        true, if at least one of the search strings occurs in at least one of the text strings
+   *        false, otherwise
    */
   public static boolean match(String searchStrings, String... text) {
 
