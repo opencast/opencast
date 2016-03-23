@@ -15,7 +15,7 @@ function (Notifications, $timeout) {
         },
         link: function (scope, element) {
 
-            if (angular.isNumber(scope.duration) && parseInt(scope.duration) !== -1) {
+        	if (angular.isNumber(parseInt(scope.duration)) && parseInt(scope.duration) !== -1) {
                 // we fade out the notification if it is not -1 -> therefore -1 means 'stay forever'
                 var fadeOutTimer = $timeout(function () {
                     element.fadeOut(function () {
