@@ -285,7 +285,9 @@
             "MINUTE":"Minute",
             "REPEATS":"Wiederholt sich",
             "START_DATE":"jjjj-mm-tt",
-            "END_DATE":"jjjj-mm-tt"
+            "START_DATE_FORMAT":"yyyy-mm-dd",
+            "END_DATE":"jjjj-mm-tt",
+            "END_DATE_FORMAT":"yyyy-mm-dd"
           },
           "UPLOAD":{
             "CAPTION":"Hochladen",

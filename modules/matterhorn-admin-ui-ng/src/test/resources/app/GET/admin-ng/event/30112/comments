@@ -1,0 +1,62 @@
+[{
+  "id": 1,
+  "author": {
+    "name": "Andy Wasklewicz",
+    "username": "andywasklewicz",
+    "email": null
+  },
+  "creationDate": "2010-09-29T15:59:00Z",
+  "modificationDate": "2014-06-17T13:00:04Z",
+  "text": "My first comment, mocked by the service",
+  "reason": "EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.ONE",
+  "resolvedStatus": true,
+  "replies": [{
+    "id": 2,
+    "author": {
+      "name": "Mike Busby",
+      "username": "mikebusby",
+      "email": null
+    },
+    "creationDate": "2010-10-01T12:01:00Z",
+    "modificationDate": "2014-06-18T18:39:04Z",
+    "text": "My first reply to Andy",
+    "reason": "EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.ONE"
+  },{
+    "id": 3,
+    "author": {
+      "name": "Mike Mueller",
+      "username": "mikemueller",
+      "email": null
+    },
+    "creationDate": "2010-09-29T15:59:00Z",
+    "modificationDate": "2010-09-29T15:59:00Z",
+    "text": "Alright, closing this thread",
+    "reason": "EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.ONE"
+  }]
+},{
+  "id": 4,
+  "author": {
+    "name": "Adi De Masi",
+    "username": "adidemasi",
+    "email": null
+  },
+  "creationDate": "2010-09-29T15:59:00Z",
+  "modificationDate": "2010-09-29T15:59:00Z",
+  "text": "My millionth comment, mocked by the service",
+  "reason": "EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.ONE",
+  "resolvedStatus": false,
+  "replies": []
+},{
+  "id": 5,
+  "author": {
+    "name": "Adi De Masi",
+    "username": "adidemasi",
+    "email": null
+  },
+  "creationDate": "2010-09-29T15:59:00Z",
+  "modificationDate": "2010-09-29T15:59:00Z",
+  "text": "My millionth comment, mocked by the service",
+  "reason": "EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.ONE",
+  "resolvedStatus": false,
+  "replies": []
+}]

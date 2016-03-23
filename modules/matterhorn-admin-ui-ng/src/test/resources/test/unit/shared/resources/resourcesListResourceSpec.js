@@ -3,6 +3,7 @@ describe('Resource List API Resource', function () {
 
     beforeEach(module('adminNg.resources'));
     beforeEach(module('ngResource'));
+    beforeEach(module('pascalprecht.translate'));
 
     beforeEach(inject(function (_$httpBackend_, _ResourcesListResource_) {
         $httpBackend  = _$httpBackend_;

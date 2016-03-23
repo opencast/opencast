@@ -260,7 +260,7 @@ public class EventsLoader {
       // Test if the series already exist, it does not create it.
       seriesService.getSeries(event.getSeries().get());
     } catch (NotFoundException e) {
-      DublinCoreCatalog catalog = DublinCores.mkOpencast();
+      DublinCoreCatalog catalog = DublinCores.mkOpencastSeries().getCatalog();
       catalog.set(DublinCore.PROPERTY_IDENTIFIER, event.getSeries().get());
       if (event.getSeriesName().isSome())
         catalog.set(DublinCore.PROPERTY_TITLE, event.getSeriesName().get());
@@ -272,7 +272,7 @@ public class EventsLoader {
   }
 
   private DublinCoreCatalog getBasicEpisodeDublinCore(EventEntry event) throws IOException {
-    DublinCoreCatalog catalog = DublinCores.mkOpencast();
+    DublinCoreCatalog catalog = DublinCores.mkOpencastEpisode().getCatalog();
     catalog.set(DublinCore.PROPERTY_IDENTIFIER, UUID.randomUUID().toString());
     catalog.set(DublinCore.PROPERTY_TITLE, event.getTitle());
     catalog.set(DublinCore.PROPERTY_SPATIAL, event.getCaptureAgent());

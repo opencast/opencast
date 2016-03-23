@@ -18,10 +18,9 @@ describe('display language', function () {
     });
 
     it('should allow the user to choose a language', function () {
-        expect(page.languageDropDown.getText()).toContain('English');
-        expect(page.languageDropDown.getText()).toContain('Deutsch');
-        expect(page.languageDropDown.getText()).toContain('日本語');
-        expect(page.languageDropDown.getText()).toContain('Français');
+        expect(page.languageDropDown.getText()).toContain('German');
+        expect(page.languageDropDown.getText()).toContain('Japanese');
+        expect(page.languageDropDown.getText()).toContain('French');
         expect(page.languageDropDown.getText()).toContain('Norsk');
     });
 

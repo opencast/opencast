@@ -21,10 +21,10 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
+import org.easymock.EasyMock;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
@@ -53,6 +53,8 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
 
   public TestCaptureAgentsEndpoint() throws Exception {
 
+    captureAgentService = EasyMock.createNiceMock(CaptureAgentStateService.class);
+
     Map<String, Agent> agents = new HashMap<String, Agent>();
     agents.put("agent1",
             new TestAgent("agent1", "ok", "http://agent1", DateTimeSupport.fromUTC("2014-05-26T15:37:02Z")));
@@ -63,7 +65,6 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
     agents.put("agent4",
             new TestAgent("agent4", "ok", "http://agent4", DateTimeSupport.fromUTC("2014-05-26T15:37:02Z")));
 
-    captureAgentService = createNiceMock(CaptureAgentStateService.class);
     expect(captureAgentService.getKnownAgents()).andStubReturn(agents);
     replay(captureAgentService);
 
@@ -72,16 +73,18 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
 
   private class TestAgent implements Agent {
 
-    private String name;
+    private final String name;
     private String state;
     private String url;
     private Long time;
+    private final boolean isManaged;
 
-    public TestAgent(String name, String state, String url, Long time) {
+    TestAgent(String name, String state, String url, Long time) {
       this.name = name;
       this.state = state;
       this.url = url;
       this.time = time;
+      this.isManaged = true;
     }
 
     @Override

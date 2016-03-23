@@ -32,7 +32,6 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
-import org.opencastproject.workflow.api.WorkflowQuery.Sort;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
@@ -62,7 +61,7 @@ import javax.ws.rs.core.Response;
 @RestService(name = "ServerProxyService", title = "UI Servers", notes = "These Endpoints deliver informations about the server required for the UI.", abstractText = "This service provides the server data for the UI.")
 public class ServerEndpoint {
 
-  private static enum SORT {
+  private enum Sort {
     STATUS, HOSTNAME, CORES, COMPLETED, MAINTENANCE, RUNNING, QUEUED, QUEUETIME, RUNTIME
   }
 
@@ -82,10 +81,10 @@ public class ServerEndpoint {
    */
   private class ServerComparator implements Comparator<JSONObject> {
 
-    private SORT sortType;
+    private Sort sortType;
     private Boolean ascending = true;
 
-    public ServerComparator(SORT sortType, Boolean ascending) {
+    ServerComparator(Sort sortType, Boolean ascending) {
       this.sortType = sortType;
       this.ascending = ascending;
     }
@@ -201,6 +200,8 @@ public class ServerEndpoint {
         int sumMeanRuntime = 0;
         int sumMeanQueueTime = 0;
         int totalServiceOnHost = 0;
+        int offlineJobProducerServices = 0;
+        int totalJobProducerServices = 0;
         Set<String> serviceTypes = new HashSet<String>();
         for (ServiceStatistics serviceStat : servicesStatistics) {
           if (server.getBaseUrl().equals(serviceStat.getServiceRegistration().getHost())) {
@@ -210,6 +211,13 @@ public class ServerEndpoint {
             jobsQueued += serviceStat.getQueuedJobs();
             sumMeanRuntime += serviceStat.getMeanRunTime();
             sumMeanQueueTime += serviceStat.getQueuedJobs();
+            if (!serviceStat.getServiceRegistration().isOnline()
+                    && serviceStat.getServiceRegistration().isJobProducer()) {
+              offlineJobProducerServices++;
+              totalJobProducerServices++;
+            } else if (serviceStat.getServiceRegistration().isJobProducer()) {
+              totalJobProducerServices++;
+            }
             serviceTypes.add(serviceStat.getServiceRegistration().getServiceType());
           }
         }
@@ -245,7 +253,7 @@ public class ServerEndpoint {
         }
 
         JSONObject jsonServer = new JSONObject();
-        jsonServer.put(KEY_ONLINE, server.isOnline());
+        jsonServer.put(KEY_ONLINE, server.isOnline() && offlineJobProducerServices <= totalJobProducerServices / 2);
         jsonServer.put(KEY_MAINTENANCE, server.isMaintenanceMode());
         jsonServer.put(KEY_NAME, server.getBaseUrl());
         jsonServer.put(KEY_CORES, server.getCores());
@@ -259,22 +267,22 @@ public class ServerEndpoint {
     }
 
     // Sorting
-    SORT sortKey = SORT.HOSTNAME;
+    Sort sortKey = Sort.HOSTNAME;
     Boolean ascending = true;
     if (StringUtils.isNotBlank(sort)) {
       // Parse the sort field and direction
-      Sort sortField = null;
+      org.opencastproject.workflow.api.WorkflowQuery.Sort sortField = null;
       if (sort.endsWith(DESCENDING_SUFFIX)) {
         ascending = false;
         String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
         try {
-          sortKey = SORT.valueOf(enumKey);
+          sortKey = Sort.valueOf(enumKey);
         } catch (IllegalArgumentException e) {
           logger.warn("No sort enum matches '{}'", enumKey);
         }
       } else {
         try {
-          sortKey = SORT.valueOf(sort);
+          sortKey = Sort.valueOf(sort);
         } catch (IllegalArgumentException e) {
           logger.warn("No sort enum matches '{}'", sort);
         }

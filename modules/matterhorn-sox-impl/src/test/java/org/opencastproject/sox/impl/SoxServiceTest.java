@@ -169,7 +169,7 @@ public class SoxServiceTest {
       return;
 
     assertTrue(source.isFile());
-    String sourceTrackXml = "<track id=\"track-1\" type=\"presentation/source\"><mimetype>audio/flac</mimetype>"
+    String sourceTrackXml = "<track xmlns=\"http://mediapackage.opencastproject.org\" id=\"track-1\" type=\"presentation/source\"><mimetype>audio/flac</mimetype>"
             + "<url>http://localhost:8080/workflow/samples/camera.mpg</url>"
             + "<checksum type=\"md5\">43b7d843b02c4a429b2f547a4f230d31</checksum><duration>14546</duration>"
             + "<audio><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
@@ -200,7 +200,7 @@ public class SoxServiceTest {
       return;
 
     assertTrue(source.isFile());
-    String sourceTrackXml = "<track id=\"track-1\" type=\"presentation/source\"><mimetype>audio/flac</mimetype>"
+    String sourceTrackXml = "<track xmlns=\"http://mediapackage.opencastproject.org\" id=\"track-1\" type=\"presentation/source\"><mimetype>audio/flac</mimetype>"
             + "<url>http://localhost:8080/workflow/samples/camera.mpg</url>"
             + "<checksum type=\"md5\">43b7d843b02c4a429b2f547a4f230d31</checksum><duration>14546</duration>"
             + "<audio><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
@@ -229,7 +229,7 @@ public class SoxServiceTest {
       return;
 
     assertTrue(source.isFile());
-    String sourceTrackXml = "<track id=\"track-1\" type=\"presentation/source\"><mimetype>audio/flac</mimetype>"
+    String sourceTrackXml = "<track xmlns=\"http://mediapackage.opencastproject.org\" id=\"track-1\" type=\"presentation/source\"><mimetype>audio/flac</mimetype>"
             + "<url>http://localhost:8080/workflow/samples/camera.mpg</url>"
             + "<checksum type=\"md5\">43b7d843b02c4a429b2f547a4f230d31</checksum><duration>14546</duration>"
             + "<audio><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"

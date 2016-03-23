@@ -57,13 +57,9 @@ import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.TransitionQuery;
 import org.opencastproject.index.service.api.IndexService;
-import org.opencastproject.index.service.catalog.adapter.AbstractMetadataCollection;
-import org.opencastproject.index.service.catalog.adapter.MetadataField;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.MetadataUtils;
-import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
-import org.opencastproject.index.service.catalog.adapter.series.SeriesCatalogUIAdapter;
-import org.opencastproject.index.service.exception.InternalServerErrorException;
+import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.Event.SchedulingStatus;
 import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
@@ -79,7 +75,10 @@ import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.matterhorn.search.SortCriterion;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
+import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
@@ -87,7 +86,6 @@ import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
-import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.DateTimeSupport;
@@ -104,8 +102,6 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JField;
 import com.entwinemedia.fn.data.json.JValue;
@@ -140,6 +136,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 @Path("/")
 @RestService(name = "SeriesProxyService", title = "UI Series", notes = "These Endpoints deliver informations about the series required for the UI.", abstractText = "This service provides the series data for the UI.")
@@ -159,8 +156,6 @@ public class SeriesEndpoint {
   private AclServiceFactory aclServiceFactory;
   private IndexService indexService;
   private AdminUISearchIndex searchIndex;
-  private final List<SeriesCatalogUIAdapter> seriesCatalogUIAdapters = new ArrayList<SeriesCatalogUIAdapter>();
-  private SeriesCatalogUIAdapter commonSeriesCatalogUIAdapter;
 
   /** Default server URL */
   private String serverUrl = "http://localhost:8080";
@@ -176,10 +171,6 @@ public class SeriesEndpoint {
   /** OSGi callback for the search index. */
   public void setIndex(AdminUISearchIndex index) {
     this.searchIndex = index;
-  }
-
-  public IndexService getIndexService() {
-    return indexService;
   }
 
   /** OSGi DI. */
@@ -201,37 +192,6 @@ public class SeriesEndpoint {
     return aclServiceFactory.serviceFor(securityService.getOrganization());
   }
 
-  /** OSGi callback to add the series dublincore {@link SeriesCatalogUIAdapter} instance. */
-  public void setCommonSeriesCatalogUIAdapter(CommonSeriesCatalogUIAdapter commonSeriesCatalogUIAdapter) {
-    this.commonSeriesCatalogUIAdapter = commonSeriesCatalogUIAdapter;
-  }
-
-  /** OSGi callback to add {@link SeriesCatalogUIAdapter} instance. */
-  public void addCatalogUIAdapter(SeriesCatalogUIAdapter catalogUIAdapter) {
-    seriesCatalogUIAdapters.add(catalogUIAdapter);
-  }
-
-  /** OSGi callback to remove {@link SeriesCatalogUIAdapter} instance. */
-  public void removeCatalogUIAdapter(SeriesCatalogUIAdapter catalogUIAdapter) {
-    seriesCatalogUIAdapters.remove(catalogUIAdapter);
-  }
-
-  /**
-   * @param organization
-   *          The organization to filter the results with.
-   * @return A {@link List} of {@link SeriesCatalogUIAdapter} that provide the metadata to the front end.
-   */
-  public List<SeriesCatalogUIAdapter> getSeriesCatalogUIAdapters(String organization) {
-    return Stream.$(seriesCatalogUIAdapters).filter(organizationFilter._2(organization)).toList();
-  }
-
-  private static final Fn2<SeriesCatalogUIAdapter, String, Boolean> organizationFilter = new Fn2<SeriesCatalogUIAdapter, String, Boolean>() {
-    @Override
-    public Boolean ap(SeriesCatalogUIAdapter catalogUIAdapter, String organization) {
-      return catalogUIAdapter.getOrganization().equals(organization);
-    }
-  };
-
   protected void activate(ComponentContext cc) {
     if (cc != null) {
       String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
@@ -240,24 +200,6 @@ public class SeriesEndpoint {
         this.serverUrl = ccServerUrl;
     }
     logger.info("Activate series endpoint");
-  }
-
-  /**
-   * Get a single series
-   *
-   * @param seriesId
-   *          the series id
-   * @return a series or none if not found wrapped in an option
-   * @throws SearchIndexException
-   */
-  public Opt<Series> getSeries(String seriesId) throws SearchIndexException {
-    SearchResult<Series> result = searchIndex.getByQuery(new SeriesSearchQuery(securityService.getOrganization()
-            .getId(), securityService.getUser()).withIdentifier(seriesId));
-    if (result.getPageSize() == 0) {
-      logger.debug("Didn't find series with id {}", seriesId);
-      return Opt.<Series> none();
-    }
-    return Opt.some(result.getItems()[0].getSource());
   }
 
   @GET
@@ -318,6 +260,88 @@ public class SeriesEndpoint {
   }
 
   @GET
+  @Path("{seriesId}/participation.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getseriesparticipationinformation", description = "Get the particition information of a series", returnDescription = "The participation information", pathParameters = {
+          @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
+                  @RestResponse(responseCode = SC_NOT_FOUND, description = "If the series has not been found."),
+                  @RestResponse(responseCode = SC_OK, description = "The access information ") })
+  public Response getSeriesParticipationInformation(@PathParam("seriesId") String seriesId) throws Exception {
+    if (StringUtils.isBlank(seriesId))
+      return RestUtil.R.badRequest("Path parameter series ID is missing");
+
+    Opt<Series> optSeries = indexService.getSeries(seriesId, searchIndex);
+
+    if (optSeries.isNone()) {
+      logger.warn("Unable to find the series '{}'", seriesId);
+      return notFound();
+    }
+
+    Series series = optSeries.get();
+
+    return okJson(j(f("opt_out", v(series.isOptedOut()))));
+  }
+
+  @PUT
+  @Path("{seriesId}/optout/{optout}")
+  @RestQuery(name = "updateSeriesOptoutStatus", description = "Updates a series opt out status.", returnDescription = "The method doesn't return any content", pathParameters = {
+          @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = RestParameter.Type.STRING),
+          @RestParameter(name = "optout", isRequired = true, description = "True or false, true to opt out of this series.", type = RestParameter.Type.BOOLEAN) }, restParameters = {}, reponses = {
+                  @RestResponse(responseCode = SC_NOT_FOUND, description = "The series has not been found"),
+                  @RestResponse(responseCode = SC_NO_CONTENT, description = "The method doesn't return any content") })
+  public Response updateSeriesOptOut(@PathParam("seriesId") String seriesId, @PathParam("optout") boolean optout)
+          throws NotFoundException {
+    try {
+      seriesService.updateOptOutStatus(seriesId, optout);
+      return Response.noContent().build();
+    } catch (SeriesException e) {
+      logger.error("Unable to updated opt out status for series with id {}", seriesId);
+      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @POST
+  @Path("optouts")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "changeOptOuts", description = "Change the opt out status of many series", returnDescription = "A JSON array listing which series were or were not opted out.", restParameters = {
+          @RestParameter(name = "seriesIds", description = "A JSON array of ids of the series to opt out or in", defaultValue = "[]", isRequired = true, type = RestParameter.Type.STRING),
+          @RestParameter(name = "optout", description = "Whether to opt out or not either true or false.", defaultValue = "false", isRequired = true, type = RestParameter.Type.BOOLEAN), }, reponses = {
+                  @RestResponse(description = "Returns a JSON object with the results for the different opted out or in elements such as ok, notFound or error.", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "Unable to parse boolean value to opt out, or parse JSON array of opt out series", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
+  public Response changeOptOuts(@FormParam("optout") boolean optout, @FormParam("seriesIds") String seriesIds) {
+    JSONArray seriesIdsArray;
+    try {
+      seriesIdsArray = (JSONArray) parser.parse(seriesIds);
+    } catch (org.json.simple.parser.ParseException e) {
+      logger.warn("Unable to parse series ids {} : {}", seriesIds, ExceptionUtils.getStackTrace(e));
+      return Response.status(Status.BAD_REQUEST).build();
+    } catch (NullPointerException e) {
+      logger.warn("Unable to parse series ids because it was null {}", seriesIds);
+      return Response.status(Status.BAD_REQUEST).build();
+    } catch (ClassCastException e) {
+      logger.warn("Unable to parse series ids because it was the wrong class {} : {}", seriesIds,
+              ExceptionUtils.getStackTrace(e));
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+
+    BulkOperationResult result = new BulkOperationResult();
+    for (Object seriesId : seriesIdsArray) {
+      try {
+        seriesService.updateOptOutStatus(seriesId.toString(), optout);
+        result.addOk(seriesId.toString());
+      } catch (NotFoundException e) {
+        result.addNotFound(seriesId.toString());
+      } catch (Exception e) {
+        logger.error("Could not update opt out status of series {}: {}", seriesId.toString(),
+                ExceptionUtils.getStackTrace(e));
+        result.addServerError(seriesId.toString());
+      }
+    }
+    return Response.ok(result.toJson()).build();
+  }
+
+  @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{seriesId}/metadata.json")
   @RestQuery(name = "getseriesmetadata", description = "Returns the series metadata as JSON", returnDescription = "Returns the series metadata as JSON", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, reponses = {
@@ -326,20 +350,20 @@ public class SeriesEndpoint {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   public Response getSeriesMetadata(@PathParam("seriesId") String series) throws UnauthorizedException,
           NotFoundException, SearchIndexException {
-    Opt<Series> optSeries = getSeries(series);
+    Opt<Series> optSeries = indexService.getSeries(series, searchIndex);
     if (optSeries.isNone())
       return notFound("Cannot find a series with id '%s'.", series);
 
     MetadataList metadataList = new MetadataList();
-    List<SeriesCatalogUIAdapter> catalogUIAdapters = new ArrayList<SeriesCatalogUIAdapter>(seriesCatalogUIAdapters);
-    catalogUIAdapters.remove(commonSeriesCatalogUIAdapter);
+    List<SeriesCatalogUIAdapter> catalogUIAdapters = indexService.getSeriesCatalogUIAdapters();
+    catalogUIAdapters.remove(indexService.getCommonSeriesCatalogUIAdapter());
     for (SeriesCatalogUIAdapter adapter : catalogUIAdapters) {
-      final Opt<AbstractMetadataCollection> optSeriesMetadata = adapter.getFields(series);
+      final Opt<MetadataCollection> optSeriesMetadata = adapter.getFields(series);
       if (optSeriesMetadata.isSome()) {
         metadataList.add(adapter.getFlavor(), adapter.getUITitle(), optSeriesMetadata.get());
       }
     }
-    metadataList.add(commonSeriesCatalogUIAdapter, getSeriesMetadata(optSeries.get()));
+    metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), getSeriesMetadata(optSeries.get()));
     return okJson(metadataList.toJSON());
   }
 
@@ -348,61 +372,61 @@ public class SeriesEndpoint {
    *
    * @param series
    *          the source {@link Series}
-   * @return a {@link AbstractMetadataCollection} instance with all the series metadata
+   * @return a {@link MetadataCollection} instance with all the series metadata
    */
   @SuppressWarnings("unchecked")
-  private AbstractMetadataCollection getSeriesMetadata(Series series) {
-    AbstractMetadataCollection metadata = commonSeriesCatalogUIAdapter.getRawFields();
+  private MetadataCollection getSeriesMetadata(Series series) {
+    MetadataCollection metadata = indexService.getCommonSeriesCatalogUIAdapter().getRawFields();
 
-    MetadataField<?> title = metadata.getOutputFields().get("title");
+    MetadataField<?> title = metadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());
     metadata.removeField(title);
     MetadataField<String> newTitle = MetadataUtils.copyMetadataField(title);
     newTitle.setValue(series.getTitle());
     metadata.addField(newTitle);
 
-    MetadataField<?> subject = metadata.getOutputFields().get("subject");
+    MetadataField<?> subject = metadata.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
     metadata.removeField(subject);
     MetadataField<String> newSubject = MetadataUtils.copyMetadataField(subject);
     newSubject.setValue(series.getSubject());
     metadata.addField(newSubject);
 
-    MetadataField<?> description = metadata.getOutputFields().get("description");
+    MetadataField<?> description = metadata.getOutputFields().get(DublinCore.PROPERTY_DESCRIPTION.getLocalName());
     metadata.removeField(description);
     MetadataField<String> newDescription = MetadataUtils.copyMetadataField(description);
     newDescription.setValue(series.getDescription());
     metadata.addField(newDescription);
 
-    MetadataField<?> language = metadata.getOutputFields().get("language");
+    MetadataField<?> language = metadata.getOutputFields().get(DublinCore.PROPERTY_LANGUAGE.getLocalName());
     metadata.removeField(language);
     MetadataField<String> newLanguage = MetadataUtils.copyMetadataField(language);
     newLanguage.setValue(series.getLanguage());
     metadata.addField(newLanguage);
 
-    MetadataField<?> rightsHolder = metadata.getOutputFields().get("rightsHolder");
+    MetadataField<?> rightsHolder = metadata.getOutputFields().get(DublinCore.PROPERTY_RIGHTS_HOLDER.getLocalName());
     metadata.removeField(rightsHolder);
     MetadataField<String> newRightsHolder = MetadataUtils.copyMetadataField(rightsHolder);
     newRightsHolder.setValue(series.getRightsHolder());
     metadata.addField(newRightsHolder);
 
-    MetadataField<?> license = metadata.getOutputFields().get("license");
+    MetadataField<?> license = metadata.getOutputFields().get(DublinCore.PROPERTY_LICENSE.getLocalName());
     metadata.removeField(license);
     MetadataField<String> newLicense = MetadataUtils.copyMetadataField(license);
     newLicense.setValue(series.getLicense());
     metadata.addField(newLicense);
 
-    MetadataField<?> organizers = metadata.getOutputFields().get("creator");
+    MetadataField<?> organizers = metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName());
     metadata.removeField(organizers);
     MetadataField<String> newOrganizers = MetadataUtils.copyMetadataField(organizers);
     newOrganizers.setValue(StringUtils.join(series.getOrganizers(), ", "));
     metadata.addField(newOrganizers);
 
-    MetadataField<?> contributors = metadata.getOutputFields().get("contributor");
+    MetadataField<?> contributors = metadata.getOutputFields().get(DublinCore.PROPERTY_CONTRIBUTOR.getLocalName());
     metadata.removeField(contributors);
     MetadataField<String> newContributors = MetadataUtils.copyMetadataField(contributors);
     newContributors.setValue(StringUtils.join(series.getContributors(), ", "));
     metadata.addField(newContributors);
 
-    MetadataField<?> publishers = metadata.getOutputFields().get("publisher");
+    MetadataField<?> publishers = metadata.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
     metadata.removeField(publishers);
     MetadataField<String> newPublishers = MetadataUtils.copyMetadataField(publishers);
     newPublishers.setValue(StringUtils.join(series.getPublishers(), ", "));
@@ -410,30 +434,18 @@ public class SeriesEndpoint {
 
     // Admin UI only field
     MetadataField<String> createdBy = MetadataField.createTextMetadataField("createdBy", Opt.<String> none(),
-            "EVENTS.SERIES.DETAILS.METADATA.CREATED_BY", true, false, Opt.<Map<String, Object>> none(),
+            "EVENTS.SERIES.DETAILS.METADATA.CREATED_BY", true, false, Opt.<Map<String, String>> none(),
             Opt.<String> none(), Opt.some(CREATED_BY_UI_ORDER), Opt.<String> none());
     createdBy.setValue(series.getCreator());
     metadata.addField(createdBy);
 
-    MetadataField<?> uid = metadata.getOutputFields().get("uid");
+    MetadataField<?> uid = metadata.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName());
     metadata.removeField(uid);
     MetadataField<String> newUID = MetadataUtils.copyMetadataField(uid);
     newUID.setValue(series.getIdentifier());
     metadata.addField(newUID);
 
     return metadata;
-  }
-
-  /**
-   * @return A {@link MetadataList} with all of the available CatalogUIAdapters empty {@link AbstractMetadataCollection}
-   *         available
-   */
-  private MetadataList getMetadatListWithAllSeriesCatalogUIAdapters() {
-    MetadataList metadataList = new MetadataList();
-    for (SeriesCatalogUIAdapter adapter : getSeriesCatalogUIAdapters(securityService.getOrganization().getId())) {
-      metadataList.add(adapter.getFlavor(), adapter.getUITitle(), adapter.getRawFields());
-    }
-    return metadataList;
   }
 
   @PUT
@@ -446,29 +458,12 @@ public class SeriesEndpoint {
           @FormParam("metadata") String metadataJSON) throws UnauthorizedException, NotFoundException,
           SearchIndexException {
     try {
-      MetadataList metadataList = getIndexService().updateAllSeriesMetadata(seriesID, metadataJSON, searchIndex);
+      MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, searchIndex);
       return okJson(metadataList.toJSON());
     } catch (IllegalArgumentException e) {
       return RestUtil.R.badRequest(e.getMessage());
-    } catch (InternalServerErrorException e) {
+    } catch (IndexServiceException e) {
       return RestUtil.R.serverError();
-    }
-  }
-
-  /**
-   * Checks the list of metadata for updated fields and stores/updates them in the respective metadata catalog.
-   *
-   * @param seriesId
-   *          The series identifier
-   * @param metadataList
-   *          The metadata list
-   */
-  private void updateSeriesMetadata(String seriesId, MetadataList metadataList) {
-    for (SeriesCatalogUIAdapter adapter : seriesCatalogUIAdapters) {
-      Opt<AbstractMetadataCollection> metadata = metadataList.getMetadataByFlavor(adapter.getFlavor());
-      if (metadata.isSome() && metadata.get().isUpdated()) {
-        adapter.storeFields(seriesId, metadata.get());
-      }
     }
   }
 
@@ -476,17 +471,18 @@ public class SeriesEndpoint {
   @Path("new/metadata")
   @RestQuery(name = "getNewMetadata", description = "Returns all the data related to the metadata tab in the new series modal as JSON", returnDescription = "All the data related to the series metadata tab as JSON", reponses = { @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the series metadata tab as JSON") })
   public Response getNewMetadata() {
-    MetadataList metadataList = getMetadatListWithAllSeriesCatalogUIAdapters();
-    Opt<AbstractMetadataCollection> metadataByAdapter = metadataList.getMetadataByAdapter(commonSeriesCatalogUIAdapter);
+    MetadataList metadataList = indexService.getMetadataListWithAllSeriesCatalogUIAdapters();
+    Opt<MetadataCollection> metadataByAdapter = metadataList
+            .getMetadataByAdapter(indexService.getCommonSeriesCatalogUIAdapter());
     if (metadataByAdapter.isSome()) {
-      AbstractMetadataCollection collection = metadataByAdapter.get();
-      safelyRemoveField(collection, "uid");
-      metadataList.add(commonSeriesCatalogUIAdapter, collection);
+      MetadataCollection collection = metadataByAdapter.get();
+      safelyRemoveField(collection, "identifier");
+      metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), collection);
     }
     return okJson(metadataList.toJSON());
   }
 
-  private void safelyRemoveField(AbstractMetadataCollection collection, String fieldName) {
+  private void safelyRemoveField(MetadataCollection collection, String fieldName) {
     MetadataField<?> metadataField = collection.getOutputFields().get(fieldName);
     if (metadataField != null) {
       collection.removeField(metadataField);
@@ -524,29 +520,14 @@ public class SeriesEndpoint {
   public Response createNewSeries(@FormParam("metadata") String metadata) throws UnauthorizedException {
     String seriesId;
     try {
-      seriesId = getIndexService().createSeries(metadata);
-      return Response.created(getSeriesMetadataUrl(seriesId)).entity(seriesId).build();
+      seriesId = indexService.createSeries(metadata);
+      return Response.created(URI.create(UrlSupport.concat(serverUrl, "admin-ng/series/", seriesId, "metadata.json")))
+              .entity(seriesId).build();
     } catch (IllegalArgumentException e) {
       return RestUtil.R.badRequest(e.getMessage());
-    } catch (InternalServerErrorException e) {
+    } catch (IndexServiceException e) {
       return RestUtil.R.serverError();
     }
-  }
-
-  /**
-   * Remove a series.
-   *
-   * @param id
-   *          The id of the series to remove.
-   */
-  private void removeSeries(String id) throws NotFoundException, SeriesException, UnauthorizedException {
-    SeriesQuery seriesQuery = new SeriesQuery();
-    seriesQuery.setSeriesId(id);
-    DublinCoreCatalogList dublinCoreCatalogList = seriesService.getSeries(seriesQuery);
-    if (dublinCoreCatalogList.size() == 0) {
-      throw new NotFoundException();
-    }
-    seriesService.deleteSeries(id);
   }
 
   @DELETE
@@ -557,7 +538,7 @@ public class SeriesEndpoint {
           @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "The series could not be found.") })
   public Response deleteSeries(@PathParam("seriesId") String id) throws NotFoundException {
     try {
-      removeSeries(id);
+      indexService.removeSeries(id);
       return Response.ok().build();
     } catch (NotFoundException e) {
       throw e;
@@ -575,7 +556,7 @@ public class SeriesEndpoint {
           @RestResponse(description = "The list of ids could not be parsed into a json list.", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
   public Response deleteMultipleSeries(String seriesIdsContent) throws NotFoundException {
     if (StringUtils.isBlank(seriesIdsContent)) {
-      return Response.status(Response.Status.BAD_REQUEST).build();
+      return Response.status(Status.BAD_REQUEST).build();
     }
 
     JSONArray seriesIdsArray;
@@ -583,54 +564,16 @@ public class SeriesEndpoint {
       seriesIdsArray = (JSONArray) parser.parse(seriesIdsContent);
     } catch (org.json.simple.parser.ParseException e) {
       logger.error("Unable to parse '{}' because: {}", seriesIdsContent, ExceptionUtils.getStackTrace(e));
-      return Response.status(Response.Status.BAD_REQUEST).build();
+      return Response.status(Status.BAD_REQUEST).build();
     } catch (ClassCastException e) {
       logger.error("Unable to cast '{}' to a JSON array because: {}", seriesIdsContent, ExceptionUtils.getMessage(e));
-      return Response.status(Response.Status.BAD_REQUEST).build();
+      return Response.status(Status.BAD_REQUEST).build();
     }
 
     BulkOperationResult result = new BulkOperationResult();
     for (Object seriesId : seriesIdsArray) {
       try {
-        removeSeries(seriesId.toString());
-        result.addOk(seriesId.toString());
-      } catch (NotFoundException e) {
-        result.addNotFound(seriesId.toString());
-      } catch (Exception e) {
-        logger.error("Unable to remove the series '{}': {}", seriesId.toString(), ExceptionUtils.getStackTrace(e));
-        result.addServerError(seriesId.toString());
-      }
-    }
-    return Response.ok(result.toJson()).build();
-  }
-
-  @POST
-  @Path("optOutSeries/{optout}")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "optOutSeries", description = "Changes the opt out status of a json list of series by their given ids e.g. [\"Series-1\", \"Series-2\"]", returnDescription = "A JSON object with arrays that show whether a series' opt out status was updated, was not found or there was an error in changing it.", pathParameters = { @RestParameter(name = "optout", description = "True to opt out the series, false if not.", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
-          @RestResponse(description = "Series have been updated", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The list of ids could not be parsed into a json list.", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
-  public Response optOutMultipleSeries(String seriesIdsContent, @PathParam("optout") boolean optout)
-          throws NotFoundException {
-    if (StringUtils.isBlank(seriesIdsContent)) {
-      return Response.status(Response.Status.BAD_REQUEST).build();
-    }
-
-    JSONArray seriesIdsArray;
-    try {
-      seriesIdsArray = (JSONArray) parser.parse(seriesIdsContent);
-    } catch (org.json.simple.parser.ParseException e) {
-      logger.error("Unable to parse '{}' because: {}", seriesIdsContent, ExceptionUtils.getStackTrace(e));
-      return Response.status(Response.Status.BAD_REQUEST).build();
-    } catch (ClassCastException e) {
-      logger.error("Unable to cast '{}' to a JSON array because: {}", seriesIdsContent, ExceptionUtils.getStackTrace(e));
-      return Response.status(Response.Status.BAD_REQUEST).build();
-    }
-
-    BulkOperationResult result = new BulkOperationResult();
-    for (Object seriesId : seriesIdsArray) {
-      try {
-        seriesService.updateOptOutStatus(seriesId.toString(), optout);
+        indexService.removeSeries(seriesId.toString());
         result.addOk(seriesId.toString());
       } catch (NotFoundException e) {
         result.addNotFound(seriesId.toString());
@@ -769,7 +712,7 @@ public class SeriesEndpoint {
       return okJsonList(series, offset, limit, result.getHitCount());
     } catch (Exception e) {
       logger.warn("Could not perform search query: {}", ExceptionUtils.getStackTrace(e));
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -802,7 +745,7 @@ public class SeriesEndpoint {
     } catch (Exception e) {
       logger.warn("Could not perform search query: {}", e.getMessage());
     }
-    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
   }
 
   @GET
@@ -833,7 +776,7 @@ public class SeriesEndpoint {
     } catch (Exception e) {
       logger.warn("Could not perform search query: {}", ExceptionUtils.getStackTrace(e));
     }
-    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
   }
 
   @POST
@@ -868,7 +811,7 @@ public class SeriesEndpoint {
       logger.warn("Could not update series property for series {} property {}:{} : {}", new Object[] { seriesId, name,
               value, ExceptionUtils.getStackTrace(e) });
     }
-    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
   }
 
   @DELETE
@@ -900,7 +843,7 @@ public class SeriesEndpoint {
       logger.warn("Could not delete series '{}' property '{}' query: {}", new Object[] { seriesId, propertyName,
               ExceptionUtils.getStackTrace(e) });
     }
-    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
   }
 
   /**
@@ -923,7 +866,7 @@ public class SeriesEndpoint {
   public Response getSeriesTheme(@PathParam("seriesId") String seriesId) {
     Long themeId;
     try {
-      Opt<Series> series = getSeries(seriesId);
+      Opt<Series> series = indexService.getSeries(seriesId, searchIndex);
       if (series.isNone())
         return notFound("Cannot find a series with id {}", seriesId);
 
@@ -1010,7 +953,7 @@ public class SeriesEndpoint {
       return badRequest();
     }
 
-    Opt<Series> series = getSeries(seriesId);
+    Opt<Series> series = indexService.getSeries(seriesId, searchIndex);
     if (series.isNone())
       return notFound("Cannot find a series with id {}", seriesId);
 
@@ -1055,7 +998,7 @@ public class SeriesEndpoint {
       elementsCount += events.getHitCount();
     } catch (SearchIndexException e) {
       logger.warn("Could not perform search query: {}", ExceptionUtils.getStackTrace(e));
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 
     return elementsCount > 0;
@@ -1105,10 +1048,6 @@ public class SeriesEndpoint {
       return Opt.<Theme> none();
     }
     return Opt.some(result.getItems()[0].getSource());
-  }
-
-  private URI getSeriesMetadataUrl(String seriesId) {
-    return URI.create(UrlSupport.concat(serverUrl, "admin-ng/series-details", "metadata", seriesId));
   }
 
 }

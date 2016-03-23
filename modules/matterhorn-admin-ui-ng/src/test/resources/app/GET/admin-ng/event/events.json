@@ -3,10 +3,11 @@
     "source": "ARCHIVE",
     "id": "40518",
     "title": "•mock• A Test Title",
+    "technical_presenters": [],
     "presenters": ["Matt Smith", "Chuck Norris"],
     "series": {
       "id": "78753d04-18a4-4327-9a61-b6d93816a7d2",
-      "title": "Physics325"
+      "title": "Physics semester 2 by professor Norton and Wyatt"
     },
     "location": "Room 2",
     "start_date": "2012-12-01T08:30:00Z",
@@ -21,17 +22,20 @@
       "resolved": 0,
       "unresolved": 2
     },
-    "publications": {
-      "Engage": "http://localhost:8080/Engage/play.html?id=32423445354"
-    }
+    "publications": [{
+      "id": "engage",
+      "name": "Engage",
+      "url": "http://localhost:8080/Engage/play.html?id=32423445354"
+    }]
   }, {
     "source":"ARCHIVE",
     "id": "30112",
     "title": "•mock• Another Title",
+    "technical_presenters": [],
     "presenters": ["Chuck Norris"],
     "series": {
       "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics325"
+      "title": "Physics semester 2 by professor Norton and Wyatt"
     },
     "location": "Room 1",
     "start_date": "2012-16-01T10:00:00Z",
@@ -45,16 +49,16 @@
       "resolved": 1,
       "unresolved": 2
     },
-    "publications": {
-    }
+    "publications": []
   }, {
     "source": "ARCHIVE",
     "id": "80201",
     "title": "•mock• No Comments",
+    "technical_presenters": [],
     "presenters": ["John Doe"],
     "series": {
       "id": "11113d04-18a4-4327-9a61-b6d93816a7d2",
-      "title": "Physics325"
+      "title": "Physics semester 2 by professor Norton and Wyatt"
     },
     "location": "Auditorium",
     "start_date": "2012-11-01T14:30:00Z",
@@ -66,17 +70,20 @@
       "resolved": 3,
       "unresolved": 0
     },
-    "publications": {
-      "Engage": "http://localhost:8080/Engage/play.html?id=32423445354"
-    }
+    "publications": [{
+      "id": "engage",
+      "name": "Engage",
+      "url": "http://localhost:8080/Engage/play.html?id=32423445354"
+    }]
   }, {
     "source": "ARCHIVE",
     "id": "1",
     "title": "•mock• Pagination 1",
+    "technical_presenters": [],
     "presenters": ["Chuck Norris"],
     "series": {
       "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics325"
+      "title": "Physics semester 2 by professor Norton and Wyatt"
     },
     "location": "Room 1",
     "start_date": "2012-12-01T08:30:00Z",
@@ -89,17 +96,20 @@
       "resolved": 1,
       "unresolved": 2
     },
-    "publications": {
-      "Engage": "http://localhost:8080/Engage/play.html?id=32423445354"
-    }
+    "publications": [{
+      "id": "engage",
+      "name": "Engage",
+      "url": "http://localhost:8080/Engage/play.html?id=32423445354"
+    }]
   }, {
     "source": "ARCHIVE",
     "id": "2",
     "title": "•mock• Pagination 2",
+    "technical_presenters": [],
     "presenters": ["Chuck Norris"],
     "series": {
       "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics325"
+      "title": "Physics semester 2 by professor Norton and Wyatt"
     },
     "location": "Room 1",
     "start_date": "2012-12-01T08:30:00Z",
@@ -112,17 +122,20 @@
       "resolved": 1,
       "unresolved": 2
     },
-    "publications": {
-      "Engage": "http://localhost:8080/Engage/play.html?id=32423445354"
-    }
+    "publications": [{
+      "id": "engage",
+      "name": "Engage",
+      "url": "http://localhost:8080/Engage/play.html?id=32423445354"
+    }]
   }, {
     "source": "ARCHIVE",
     "id": "3",
     "title": "•mock• Pagination 3",
+    "technical_presenters": [],
     "presenters": ["Chuck Norris"],
     "series": {
       "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics325"
+      "title": "Physics semester 2 by professor Norton and Wyatt"
     },
     "location": "Room 1",
     "start_date": "2012-12-01T08:30:00Z",
@@ -135,16 +148,16 @@
       "resolved": 1,
       "unresolved": 2
     },
-    "publications": {
-    }
+    "publications": []
   }, {
     "source": "ARCHIVE",
     "id": "4",
     "title": "•mock• Pagination 4",
+    "technical_presenters": [],
     "presenters": ["Chuck Norris"],
     "series": {
       "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics325"
+      "title": "Physics semester 2 by professor Norton and Wyatt"
     },
     "location": "Room 1",
     "start_date": "2012-12-01T08:30:00Z",
@@ -156,16 +169,16 @@
       "resolved": 1,
       "unresolved": 2
     },
-    "publications": {
-    }
+    "publications": []
   }, {
     "source": "ARCHIVE",
     "id": "5",
     "title": "•mock• Pagination 5",
+    "technical_presenters": [],
     "presenters": ["Chuck Norris"],
     "series": {
       "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics325"
+      "title": "Physics semester 2 by professor Norton and Wyatt"
     },
     "location": "Room 1",
     "start_date": "2012-12-01T08:30:00Z",
@@ -178,16 +191,16 @@
       "resolved": 1,
       "unresolved": 2
     },
-    "publications": {
-    }
+    "publications": []
   }, {
     "source": "ARCHIVE",
     "id": "6",
     "title": "•mock• Pagination 6",
+    "technical_presenters": [],
     "presenters": ["Chuck Norris"],
     "series": {
       "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics325"
+      "title": "Physics semester 2 by professor Norton and Wyatt"
     },
     "location": "Room 1",
     "start_date": "2012-12-01T08:30:00Z",
@@ -200,17 +213,20 @@
       "resolved": 1,
       "unresolved": 2
     },
-    "publications": {
-      "Engage": "http://localhost:8080/Engage/play.html?id=32423445354"
-    }
+    "publications": [{
+      "id": "engage",
+      "name": "Engage",
+      "url": "http://localhost:8080/Engage/play.html?id=32423445354"
+    }]
   }, {
     "source": "WORKFLOW",
     "id": "7",
     "title": "•mock• Pagination 7",
+    "technical_presenters": [],
     "presenters": ["Chuck Norris"],
     "series": {
       "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics325"
+      "title": "Physics semester 2 by professor Norton and Wyatt"
     },
     "location": "Room 1",
     "start_date": "2012-12-01T08:30:00Z",
@@ -223,8 +239,7 @@
       "resolved": 1,
       "unresolved": 2
     },
-    "publications": {
-    }
+    "publications": []
   }],
   "offset": 0,
   "total": 199,

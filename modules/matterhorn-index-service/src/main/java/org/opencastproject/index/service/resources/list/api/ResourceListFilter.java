@@ -31,7 +31,7 @@ import org.opencastproject.util.data.Option;
  */
 public interface ResourceListFilter<A> {
 
-  public static enum SourceType {
+  enum SourceType {
     BOOLEAN, DATE, FREETEXT, LIST, SELECT, PERIOD
   }
 

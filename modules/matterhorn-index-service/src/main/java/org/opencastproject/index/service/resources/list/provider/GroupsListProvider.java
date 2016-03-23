@@ -63,8 +63,8 @@ public class GroupsListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
-    Map<String, Object> groupsList = new HashMap<String, Object>();
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+    Map<String, String> groupsList = new HashMap<String, String>();
     List<JaxbGroup> groups = null;
     int limit = 0;
     int offset = 0;

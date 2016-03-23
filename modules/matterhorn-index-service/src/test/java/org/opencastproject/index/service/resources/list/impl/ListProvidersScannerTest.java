@@ -179,7 +179,7 @@ public class ListProvidersScannerTest {
 
     assertEquals(1, resourceListProvider.getValues().size());
     assertEquals(listName, resourceListProvider.getValue().getListNames()[0]);
-    Map<String, Object> stuff = resourceListProvider.getValue().getList(listName, query, org1);
+    Map<String, String> stuff = resourceListProvider.getValue().getList(listName, query, org1);
     for (String key : stuff.keySet()) {
       logger.info("Key: {}, Value {}.", key, stuff.get(key));
     }

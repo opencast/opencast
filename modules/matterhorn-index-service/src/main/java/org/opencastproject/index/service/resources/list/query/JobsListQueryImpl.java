@@ -35,12 +35,12 @@ public class JobsListQueryImpl extends ResourceListQueryImpl {
   private static final Logger logger = LoggerFactory.getLogger(JobsListQueryImpl.class);
 
   /** The sort criteria for the jobs */
-  public static enum SORT {
+  public enum Sort {
     DATE_CREATED, TITLE, SERIES_TITLE, SERIES_ID, MEDIA_PACKAGE_ID, WORKFLOW_DEFINITION_ID, CREATOR, CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT
   }
 
   /** The filter criteria for the jobs */
-  public static enum FILTERS {
+  public enum Filters {
     STATUS, SERIESID, SERIESTITLE, CREATOR, CONTRIBUTOR, FROMDATE, TODATE, LANGUAGE, TEXT
   }
 
@@ -51,7 +51,7 @@ public class JobsListQueryImpl extends ResourceListQueryImpl {
    *          Sort criteria
    * @return the query object
    */
-  public ResourceListQueryImpl setSortedBy(SORT sortedBy) {
+  public ResourceListQueryImpl setSortedBy(Sort sortedBy) {
     if (sortedBy != null) {
       String value = sortedBy.toString().toLowerCase();
       this.sortBy = Option.option(value);
@@ -68,7 +68,7 @@ public class JobsListQueryImpl extends ResourceListQueryImpl {
    */
   public ResourceListQueryImpl withStatus(WorkflowState status) {
     if (status != null) {
-      this.addFilter(new StringListFilter(FILTERS.STATUS.toString(), status.toString()));
+      this.addFilter(new StringListFilter(Filters.STATUS.toString(), status.toString()));
     }
     return this;
   }
@@ -79,7 +79,7 @@ public class JobsListQueryImpl extends ResourceListQueryImpl {
    * @return the workflow state wrapped in an Option object
    */
   public Option<WorkflowState> getStatus() {
-    String filterName = FILTERS.STATUS.toString();
+    String filterName = Filters.STATUS.toString();
 
     if (this.hasFilter(filterName)) {
       StringListFilter filter = (StringListFilter) this.getFilter(filterName);
@@ -99,7 +99,7 @@ public class JobsListQueryImpl extends ResourceListQueryImpl {
    */
   public ResourceListQueryImpl withText(String text) {
     if (text != null) {
-      this.addFilter(new StringListFilter(FILTERS.TEXT.toString(), text));
+      this.addFilter(new StringListFilter(Filters.TEXT.toString(), text));
     }
     return this;
   }
@@ -110,7 +110,7 @@ public class JobsListQueryImpl extends ResourceListQueryImpl {
    * @return the free-text term
    */
   public Option<String> getText() {
-    String filterName = FILTERS.TEXT.toString();
+    String filterName = Filters.TEXT.toString();
     if (this.hasFilter(filterName)) {
       StringListFilter filter = (StringListFilter) this.getFilter(filterName);
       return filter.getValue();

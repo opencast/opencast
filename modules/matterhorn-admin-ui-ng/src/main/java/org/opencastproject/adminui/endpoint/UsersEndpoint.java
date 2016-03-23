@@ -190,16 +190,15 @@ public class UsersEndpoint {
 
       // Filter list
       if (filterName.isSome() && !filterName.get().equals(user.getName())
-          || (filterRole.isSome()
-              && !Stream.$(user.getRoles()).map(getRoleName).toSet().contains(filterRole.get()))
-          || (filterProvider.isSome()
-              && !filterProvider.get().equals(user.getProvider()))
-          || (filterText.isSome()
-              && !TextFilter.match(filterText.get(), user.getUsername(), user.getName(), user.getEmail(), user.getProvider())
-              && !TextFilter.match(filterText.get(), Stream.$(user.getRoles()).map(getRoleName).mkString(" ")))) {
+              || (filterRole.isSome()
+                  && !Stream.$(user.getRoles()).map(getRoleName).toSet().contains(filterRole.get()))
+              || (filterProvider.isSome()
+                  && !filterProvider.get().equals(user.getProvider()))
+              || (filterText.isSome()
+                  && !TextFilter.match(filterText.get(), user.getUsername(), user.getName(), user.getEmail(), user.getProvider())
+                  && !TextFilter.match(filterText.get(), Stream.$(user.getRoles()).map(getRoleName).mkString(" ")))) {
         continue;
       }
-
       filteredUsers.add(user);
     }
     int total = filteredUsers.size();

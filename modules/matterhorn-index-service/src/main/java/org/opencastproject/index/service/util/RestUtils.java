@@ -35,6 +35,7 @@ import org.opencastproject.util.data.Tuple;
 import com.entwinemedia.fn.Fx;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.SimpleSerializer;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,7 +163,7 @@ public final class RestUtils {
       public void write(OutputStream s) throws IOException, WebApplicationException {
         final Writer writer = new BufferedWriter(new OutputStreamWriter(s));
         out.ap(writer);
-        writer.flush();
+        writer.close();
       }
     };
   }
@@ -242,7 +243,7 @@ public final class RestUtils {
       for (String f : filter.split(",")) {
         String[] filterTuple = f.split(":");
         if (filterTuple.length < 2) {
-          logger.info("No value for filter {} in filters list: {}", filterTuple[0], filter);
+          logger.debug("No value for filter '{}' in filters list: {}", filterTuple[0], filter);
           continue;
         }
         filters.put(filterTuple[0], f.substring(filterTuple[0].length() + 1));
@@ -269,5 +270,20 @@ public final class RestUtils {
     stream(serializer.toJsonFx(json)).write(output);
 
     return output.toString();
+  }
+
+  /**
+   * Get a {@link String} value from a {@link JValue} ignoring errors.
+   *
+   * @param json
+   *          The {@link JValue} to convert to a {@link String}
+   * @return The {@link String} representation of the {@link JValue} or an empty string if there was an error.
+   */
+  public static String getJsonStringSilent(JValue json) {
+    try {
+      return getJsonString(json);
+    } catch (Exception e) {
+      return "";
+    }
   }
 }

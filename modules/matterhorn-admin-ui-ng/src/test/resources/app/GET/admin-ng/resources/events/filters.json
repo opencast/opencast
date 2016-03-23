@@ -21,13 +21,13 @@
     "label": "FILTERS.EVENTS.STATUS.LABEL",
     "type": "select",
     "options": {
-      "scheduled":  "FILTERS.EVENTS.STATUS.SCHEDULED",
-      "recording":  "FILTERS.EVENTS.STATUS.RECORDING",
-      "ingesting":  "FILTERS.EVENTS.STATUS.INGESTING",
-      "processing": "FILTERS.EVENTS.STATUS.PROCESSING",
-      "archive":    "FILTERS.EVENTS.STATUS.ARCHIVE",
-      "upload":     "FILTERS.EVENTS.STATUS.UPLOAD",
-      "on_hold":    "FILTERS.EVENTS.STATUS.ONHOLD"
+      "FILTERS.EVENTS.STATUS.SCHEDULED": "scheduled",
+      "FILTERS.EVENTS.STATUS.RECORDING": "recording",
+      "FILTERS.EVENTS.STATUS.INGESTING": "ingesting",
+      "FILTERS.EVENTS.STATUS.PROCESSING": "processing",
+      "FILTERS.EVENTS.STATUS.ARCHIVE": "archive",
+      "FILTERS.EVENTS.STATUS.UPLOAD": "upload",
+      "FILTERS.EVENTS.STATUS.ONHOLD": "on_hold"
     }
   },
   "period": {

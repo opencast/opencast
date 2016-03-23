@@ -21,8 +21,6 @@
 
 package org.opencastproject.metadata.dublincore;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -32,21 +30,24 @@ import org.opencastproject.metadata.api.MediaPackageMetadata;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.metadata.api.MediapackageMetadataImpl;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.entwinemedia.fn.Stream;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Parses {@link DublinCoreCatalog}s from serialized DC representations.
@@ -104,21 +105,8 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
   @Override
   public MediaPackageMetadata getMetadata(MediaPackage mp) {
     MediapackageMetadataImpl metadata = new MediapackageMetadataImpl();
-
-    Catalog[] dcs = mp.getCatalogs(DublinCoreCatalog.ANY_DUBLINCORE);
-    for (Catalog catalog : dcs) {
-      DublinCoreCatalog dc;
-      InputStream in = null;
-      try {
-        File f = workspace.get(catalog.getURI());
-        in = new FileInputStream(f);
-        dc = load(in);
-      } catch (Exception e) {
-        logger.warn("Unable to load metadata from catalog '{}'", catalog);
-        continue;
-      } finally {
-        IOUtils.closeQuietly(in);
-      }
+    for (Catalog catalog : Stream.$(mp.getCatalogs(DublinCoreCatalog.ANY_DUBLINCORE)).sort(COMPARE_BY_FLAVOR)) {
+      DublinCoreCatalog dc = DublinCoreUtil.loadDublinCore(workspace, catalog);
       if (MediaPackageElements.EPISODE.equals(catalog.getFlavor())) {
         // Title
         metadata.setTitle(dc.getFirst(DublinCore.PROPERTY_TITLE));
@@ -176,6 +164,15 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
     return metadata;
   }
 
+  public static final Comparator<Catalog> COMPARE_BY_FLAVOR = new Comparator<Catalog>() {
+    @Override
+    public int compare(Catalog c1, Catalog c2) {
+      if (MediaPackageElements.EPISODE.equals(c1.getFlavor()))
+        return 1;
+      return -1;
+    }
+  };
+
   /**
    *
    * {@inheritDoc}
@@ -209,7 +206,7 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
    */
   @Override
   public DublinCoreCatalog newInstance() {
-    return DublinCores.mkOpencast();
+    return DublinCores.mkOpencastEpisode().getCatalog();
   }
 
   /**

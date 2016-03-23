@@ -54,23 +54,29 @@ public abstract class AbstractIndexProducer implements IndexProducer {
   /** Single thread executor */
   private final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
 
+  /**
+   * Initialize the index producer.
+   */
   public void activate() {
     messageWatcher = new MessageWatcher();
     singleThreadExecutor.execute(messageWatcher);
   }
 
+  /**
+   * Clean-up resources at shutdown.
+   */
   public void deactivate() {
-    if (messageWatcher != null)
+    if (messageWatcher != null) {
       messageWatcher.stopListening();
-
+    }
     singleThreadExecutor.shutdown();
   }
 
   private class MessageWatcher implements Runnable {
 
     private final Logger logger = LoggerFactory.getLogger(MessageWatcher.class);
-    private boolean listening = true;
-    private FutureTask<Serializable> future;
+    private volatile boolean listening = true;
+    private volatile FutureTask<Serializable> future;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public void stopListening() {
@@ -78,6 +84,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
       if (future != null) {
         future.cancel(true);
       }
+      executor.shutdown();
     }
 
     @Override
@@ -117,7 +124,5 @@ public abstract class AbstractIndexProducer implements IndexProducer {
       }
       logger.info("Stopping listening for {} Messages", getClassName());
     }
-
   }
-
 }

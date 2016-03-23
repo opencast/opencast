@@ -31,6 +31,7 @@ import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject.Status;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.OsgiUtil;
+import org.opencastproject.util.data.Effect2;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
@@ -55,6 +56,7 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
   private MessageReceiver messageReceiver;
   private MessageWatcher messageWatcher;
   private AbstractSearchIndex index;
+  private MessageReceiverLockService lockService;
   private String destinationId;
   private MessageSender.DestinationType destinationType;
 
@@ -66,7 +68,7 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
     logger.info("Activating {}", this.getClass().getName());
     destinationId = OsgiUtil.getComponentContextProperty(cc, DESTINATION_ID_KEY);
     logger.info("The {} for this message receiver is '{}'", DESTINATION_ID_KEY, destinationId);
-    messageWatcher = new MessageWatcher();
+    messageWatcher = new MessageWatcher(lockService);
     singleThreadExecutor.execute(messageWatcher);
   }
 
@@ -104,13 +106,17 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
     private FutureTask<Serializable> future;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final String clazzName = BaseMessageReceiverImpl.this.getClass().getName();
+    private final MessageReceiverLockService lockService;
+
+    MessageWatcher(MessageReceiverLockService lockService) {
+      this.lockService = lockService;
+    }
 
     public void stopListening() {
       this.listening = false;
       future.cancel(true);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void run() {
       logger.info("Starting to listen for {} Messages", clazzName);
@@ -127,7 +133,7 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
               messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                       IndexRecreateObject.end(obj.getIndexName(), obj.getService()));
           } else {
-            execute((T) baseMessage.getObject());
+            lockService.synchronize(baseMessage.getId().get(), execute.curry(baseMessage.getObject()).toFn());
           }
         } catch (InterruptedException e) {
           logger.error("Problem while getting {} message events {}", clazzName, ExceptionUtils.getStackTrace(e));
@@ -146,6 +152,14 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
     }
   }
 
+  private final Effect2<Serializable, String> execute = new Effect2<Serializable, String>() {
+    @Override
+    @SuppressWarnings("unchecked")
+    protected void run(Serializable message, String mpId) {
+      execute((T) message);
+    }
+  };
+
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -160,6 +174,10 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
 
   public void setSearchIndex(AbstractSearchIndex index) {
     this.index = index;
+  }
+
+  public void setMessageReceiverLockService(MessageReceiverLockService lockService) {
+    this.lockService = lockService;
   }
 
 }

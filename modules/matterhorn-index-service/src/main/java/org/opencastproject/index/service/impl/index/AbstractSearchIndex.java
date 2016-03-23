@@ -25,7 +25,7 @@ import static java.lang.String.format;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.index.IndexProducer;
-import org.opencastproject.index.service.exception.InternalServerErrorException;
+import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventIndexUtils;
 import org.opencastproject.index.service.impl.index.event.EventQueryBuilder;
@@ -122,11 +122,11 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    *           Thrown if there is a problem executing the process.
    * @throws IOException
    *           Thrown if the index cannot be cleared.
-   * @throws InternalServerErrorException
+   * @throws IndexServiceException
    *           Thrown if there was a problem adding some of the data back into the index.
    */
-  public synchronized void recreateIndex() throws InterruptedException, CancellationException, ExecutionException,
-          IOException, InternalServerErrorException {
+  public synchronized void recreateIndex()
+          throws InterruptedException, CancellationException, ExecutionException, IOException, IndexServiceException {
     // Clear index first
     clear();
     recreateService(IndexRecreateObject.Service.Groups);
@@ -144,7 +144,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    *
    * @param service
    *          The {@link IndexRecreateObject.Service} representing the service to start re-sending the data from.
-   * @throws InternalServerErrorException
+   * @throws IndexServiceException
    *           Thrown if there is a problem re-sending the data from the service.
    * @throws InterruptedException
    *           Thrown if the process of re-sending the data is interupted.
@@ -153,8 +153,8 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws ExecutionException
    *           Thrown if the process of re-sending the data has an error.
    */
-  private void recreateService(IndexRecreateObject.Service service) throws InternalServerErrorException,
-          InterruptedException, CancellationException, ExecutionException {
+  private void recreateService(IndexRecreateObject.Service service)
+          throws IndexServiceException, InterruptedException, CancellationException, ExecutionException {
     logger.info("Starting to recreate index for service {}", service);
     messageSender.sendObjectMessage(IndexProducer.RECEIVER_QUEUE + "." + service, MessageSender.DestinationType.Queue,
             IndexRecreateObject.start(getIndexName(), service));
@@ -181,8 +181,9 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
             logger.error("Error updating service '{}' with {}/{} finished.",
                     new Object[] { indexRecreateObject.getService(), indexRecreateObject.getCurrent(),
                             indexRecreateObject.getTotal() });
-            throw new InternalServerErrorException(format("Error updating service '%s' with %s/%s finished.",
-                    indexRecreateObject.getService(), indexRecreateObject.getCurrent(), indexRecreateObject.getTotal()));
+            throw new IndexServiceException(
+                    format("Error updating service '%s' with %s/%s finished.", indexRecreateObject.getService(),
+                            indexRecreateObject.getCurrent(), indexRecreateObject.getTotal()));
           default:
             logger.error("Unable to handle the status '{}' for service '{}'", indexRecreateObject.getStatus(),
                     indexRecreateObject.getService());
@@ -385,8 +386,8 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws NotFoundException
    *           Thrown if the event cannot be found.
    */
-  public void deleteScheduling(String organization, User user, String uid) throws SearchIndexException,
-          NotFoundException {
+  public void deleteScheduling(String organization, User user, String uid)
+          throws SearchIndexException, NotFoundException {
     Event event = EventIndexUtils.getEvent(uid, organization, user, this);
     if (event == null)
       throw new NotFoundException("No event with id " + uid + " found.");
@@ -419,7 +420,8 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws NotFoundException
    *           Thrown if the event cannot be found.
    */
-  public void deleteWorkflow(String organization, User user, String uid) throws SearchIndexException, NotFoundException {
+  public void deleteWorkflow(String organization, User user, String uid)
+          throws SearchIndexException, NotFoundException {
     Event event = EventIndexUtils.getEvent(uid, organization, user, this);
     if (event == null)
       throw new NotFoundException("No event with id " + uid + " found.");

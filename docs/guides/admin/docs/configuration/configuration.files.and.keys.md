@@ -122,6 +122,9 @@ Alternatively, edit Apache's httpd.conf to reroute Opencast to port 80:
 |----|-----------|-------|
 |prop.org.opencastproject.admin.ui.url|The URL to the administrative tools.  This sets the URL for the "Adminstrative Tools" link on the Opencast welcome page.|The local server URL, or ${org.opencastproject.server.url}|
 |prop.org.opencastproject.engage.ui.url|The URL to the engage tools.  This sets the URL for the "Engage Tools" link on the Opencast welcome page.|The local server URL, or ${org.opencastproject.server.url}|
+prop.org.opencastproject.admin.documentation.url|Link to the documentation for the Admin UI.|http://docs.opencast.org|
+prop.org.opencastproject.admin.restdocs.url|Link to the REST docs for the Admin UI.|/docs.html?path=/admin-ng/event|
+prop.org.opencastproject.admin.feedback.url|Link to a JIRA feedback widget collector.|https://opencast.jira.com/s/a0032526a8f357b57efab3e70564e063-T/en_UStcnuie/64011/68/1.4.20/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?locale=en-US&collectorId=6526c0f9|
 
 
 ## Security

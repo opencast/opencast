@@ -225,6 +225,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
    *
    * @see org.opencastproject.mediapackage.Track#getDescription()
    */
+  @Override
   public String getDescription() {
     StringBuffer buf = new StringBuffer("");
     /*
@@ -264,10 +265,12 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
   // }
 
   public static class Adapter extends XmlAdapter<TrackImpl, Track> {
+    @Override
     public TrackImpl marshal(Track mp) throws Exception {
       return (TrackImpl) mp;
     }
 
+    @Override
     public Track unmarshal(TrackImpl mp) throws Exception {
       return mp;
     }

@@ -121,7 +121,7 @@ public class MediaPackageJaxbSerializationTest {
             .loadFromXml(IOUtils.toInputStream(xml, "UTF-8"));
     assertEquals(2, deserialized.getElements().length);
 
-    String elementXml = "<track id=\"track-1\" type=\"presentation/source\"><mimetype>video/mpeg</mimetype>"
+    String elementXml = "<track xmlns=\"http://mediapackage.opencastproject.org\" id=\"track-1\" type=\"presentation/source\"><mimetype>video/mpeg</mimetype>"
             + "<url>http://localhost:8080/workflow/samples/screen.mpg</url></track>";
     MediaPackageElement element = MediaPackageElementParser.getFromXml(elementXml);
     assertEquals("track-1", element.getIdentifier());

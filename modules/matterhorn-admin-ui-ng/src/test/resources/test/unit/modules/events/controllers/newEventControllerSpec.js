@@ -1,5 +1,5 @@
 describe('New Event Controller', function () {
-    var $scope, $parentScope, $httpBackend, Modal, Table, Notifications, EVENT_TAB_CHANGE;
+    var $scope, $parentScope, $httpBackend, Modal, Table, Notifications;
 
     beforeEach(module('adminNg'));
     beforeEach(module(function ($provide) {
@@ -11,12 +11,11 @@ describe('New Event Controller', function () {
         });
     }));
 
-    beforeEach(inject(function ($rootScope, $controller, _$httpBackend_, _Modal_, _Table_, _Notifications_, _EVENT_TAB_CHANGE_) {
+    beforeEach(inject(function ($rootScope, $controller, _$httpBackend_, _Modal_, _Table_, _Notifications_) {
         $httpBackend = _$httpBackend_;
         Modal = _Modal_;
         Table = _Table_;
         Notifications = _Notifications_;
-        EVENT_TAB_CHANGE = _EVENT_TAB_CHANGE_;
 
         $parentScope = $rootScope.$new();
         $scope = $parentScope.$new();
@@ -31,47 +30,15 @@ describe('New Event Controller', function () {
         expect($scope.submit).toBeDefined();
     });
 
-    describe('on EVENT_TAB_CHANGE', function () {
-        function prepareScope(isProcessingState) {
-            return {
-                name: 'myState',
-                stateController: {
-                    save: jasmine.createSpy(),
-                    isProcessingState: isProcessingState
-                }
-            };
-        }
-
-        it('reacts when the previous state is processing', function () {
-            var oldState = prepareScope(true);
-            $scope.$emit(EVENT_TAB_CHANGE, {
-                old: oldState,
-                current: {
-                    stateController: {}
-                }
-            });
-            expect(oldState.stateController.save).toHaveBeenCalled();
-        });
-
-        it('does not react otherwise', function () {
-            var oldState = prepareScope(false);
-            $scope.$emit(EVENT_TAB_CHANGE, {
-                old: oldState,
-                current: {
-                    stateController: {}
-                }
-            });
-            expect(oldState.stateController.save).not.toHaveBeenCalled();
-        });
-    });
-
     describe('#submit', function () {
         beforeEach(function () {
             $httpBackend.whenGET('/admin-ng/event/new/metadata').respond('{}');
             $httpBackend.whenGET('/admin-ng/capture-agents/agents.json?inputs=true')
                 .respond(JSON.stringify(getJSONFixture('admin-ng/capture-agents/agents.json')));
             $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');
+            $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond('{}');
             $httpBackend.whenGET('/admin-ng/resources/ROLES.json').respond('{}');
+            $httpBackend.whenGET('/info/me.json').respond(getJSONFixture('info/me.json'));
             $httpBackend.whenGET('/workflow/definitions.json').respond('{}');
 
             Modal.$scope = { close: jasmine.createSpy() };

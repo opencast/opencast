@@ -71,10 +71,10 @@ public class MessageSenderImpl extends MessageBaseFacility implements MessageSen
 
     logger.info("MessageSender is configured to connect with URL {}", url);
     try {
-        disconnectMessageBroker();
-        connectMessageBroker(url, username, password);
+      disconnectMessageBroker();
+      connectMessageBroker(url, username, password);
     } catch (JMSException e) {
-        throw new ConfigurationException(ACTIVEMQ_BROKER_URL_KEY, url, e);
+      throw new ConfigurationException(ACTIVEMQ_BROKER_URL_KEY, url, e);
     }
     logger.info("MessageSender service successfully started");
   }

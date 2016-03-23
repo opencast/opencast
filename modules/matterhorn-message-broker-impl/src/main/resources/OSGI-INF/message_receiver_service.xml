@@ -5,6 +5,7 @@
   <implementation
     class="org.opencastproject.message.broker.impl.MessageReceiverImpl" />
   <property name="service.description" value="Message Broker Receiver" />
+  <property name="service.pid" value="org.opencastproject.message.broker.impl.MessageReceiverImpl" />
   <service>
     <provide interface="org.opencastproject.message.broker.api.MessageReceiver" />
   </service>

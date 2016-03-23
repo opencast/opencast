@@ -1,0 +1,19 @@
+<div ng-form="innerForm">
+    <span ng-show="!editMode" ng-click="editMode = true">{{ ((params.value === '' || params.value === null || angular.isUndefined(params.value)) ? 'SELECT_NO_OPTIONS' : getLabel(params.value)) | translate }}</span>
+
+    <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-click="editMode = true"></i>
+    <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
+
+    <div ng-show="editMode">
+
+        <select chosen pre-select-from="collection"
+                ng-model="params.value"
+                name="{{ params.name }}"
+                ng-change="submit()"
+                ng-required="params.required"
+                data-width="'250px'"
+                ng-options="value as label|translate for (label, value) in collection">
+                <option value="" ng-selected="params.value === ''" ng-if="!params.required">-- {{ 'SELECT_NO_OPTIONS' | translate | limitTo : 70 }} --</option>
+        </select>
+    </div>
+</div>

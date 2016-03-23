@@ -43,11 +43,14 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
@@ -137,7 +140,7 @@ public class DublinCoreCatalogUIAdapterTest {
             Opt.<String> none());
     durationMetadataField = MetadataField.createDurationMetadataField(TEMPORAL_DUBLIN_CORE_KEY, Opt.some("duration"),
             "DURATION_LABEL", false, false, Opt.<Integer> none(), Opt.<String> none());
-    TreeMap<String, Object> collection = new TreeMap<String, Object>();
+    TreeMap<String, String> collection = new TreeMap<String, String>();
     collection.put("Entry 1", "Value 1");
     collection.put("Entry 2", "Value 2");
     collection.put("Entry 3", "Value 3");
@@ -148,7 +151,7 @@ public class DublinCoreCatalogUIAdapterTest {
     listProvidersService = EasyMock.createMock(ListProvidersService.class);
     EasyMock.expect(
             listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQueryImpl.class),
-                    EasyMock.anyObject(Organization.class))).andReturn(collection).anyTimes();
+                    EasyMock.anyObject(Organization.class), EasyMock.anyBoolean())).andReturn(collection).anyTimes();
     EasyMock.replay(listProvidersService);
 
     eventProperties = new Properties();
@@ -243,7 +246,7 @@ public class DublinCoreCatalogUIAdapterTest {
     List<MetadataField<?>> metadataFields = new ArrayList<MetadataField<?>>(dublinCoreProperties.values());
     assertEquals(title, metadataFields.get(0).getInputID());
     assertEquals(label, metadataFields.get(0).getLabel());
-    assertEquals(MetadataField.TYPE.TEXT, metadataFields.get(0).getType());
+    assertEquals(MetadataField.Type.TEXT, metadataFields.get(0).getType());
     assertEquals(true, metadataFields.get(0).isReadOnly());
     assertEquals(true, metadataFields.get(0).isRequired());
     assertEquals(listProvider, metadataFields.get(0).getListprovider().get());
@@ -259,7 +262,7 @@ public class DublinCoreCatalogUIAdapterTest {
     configurationDublinCoreCatalogUIAdapter.setWorkspace(workspace);
     configurationDublinCoreCatalogUIAdapter.updated(eventProperties);
 
-    AbstractMetadataCollection abstractMetadata = configurationDublinCoreCatalogUIAdapter.getFields(mediapackage);
+    MetadataCollection abstractMetadata = configurationDublinCoreCatalogUIAdapter.getFields(mediapackage);
     assertThat(eventJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(abstractMetadata.toJSON()))
             .allowingAnyArrayOrdering());
   }
@@ -279,12 +282,12 @@ public class DublinCoreCatalogUIAdapterTest {
     DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
 
     MetadataField<String> titleField = MetadataField.createTextMetadataField(title, Opt.some(title),
-            "New Label for Title", true, false, Opt.<Map<String, Object>> none(), Opt.<String> none(),
+            "New Label for Title", true, false, Opt.<Map<String, String>> none(), Opt.<String> none(),
             Opt.<Integer> none(), Opt.<String> none());
     dublinCoreMetadata.addField(titleField, expectedTitle, listProvidersService);
 
     MetadataField<String> missingField = MetadataField.createTextMetadataField("missing", Opt.<String> none(),
-            "The Missing's Label", false, false, Opt.<Map<String, Object>> none(), Opt.<String> none(),
+            "The Missing's Label", false, false, Opt.<Map<String, String>> none(), Opt.<String> none(),
             Opt.<Integer> none(), Opt.<String> none());
     dublinCoreMetadata.addField(missingField, expectedMissing, listProvidersService);
 

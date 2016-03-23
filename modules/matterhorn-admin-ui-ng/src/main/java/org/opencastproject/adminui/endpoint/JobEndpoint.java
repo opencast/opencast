@@ -382,7 +382,8 @@ public class JobEndpoint {
 
     return j(f("start", vN(DateTimeSupport.toUTC(mp.getDate().getTime()))), f("state", vN(instance.getState())),
             f("description", vN(instance.getDescription())), f("duration", vN(duration)),
-            f("id", vN(instance.getId())), f("workflow", vN(instance.getTitle())), f("title", vN(mp.getTitle())),
+            f("id", vN(instance.getId())), f("workflow", vN(instance.getTitle())),
+            f("workflowId", vN(instance.getTemplate())), f("title", vN(mp.getTitle())),
             f("series", vN(mp.getSeries())), f("series_title", vN(mp.getSeriesTitle())),
             f("license", vN(mp.getLicense())), f("configuration", j(fields)));
   }

@@ -38,6 +38,7 @@ import java.net.URI;
  * <strong>Implementation note:</strong> Builder plugins may be stateful. They are intended to be used as throw-away
  * objects.
  */
+@Deprecated
 public interface MediaPackageElementBuilderPlugin {
 
   /**
