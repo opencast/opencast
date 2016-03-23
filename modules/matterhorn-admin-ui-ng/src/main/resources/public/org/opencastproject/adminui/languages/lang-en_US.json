@@ -1124,7 +1124,7 @@
          }
         },
         "DETAILS": {
-          "HEADER": "Access Policy Details ",
+          "HEADER": "Access Policy Details  - {{resourceId}}",
           "TABS": {
             "SUMMARY"  : "Summary",
             "METADATA" : "Metadata",

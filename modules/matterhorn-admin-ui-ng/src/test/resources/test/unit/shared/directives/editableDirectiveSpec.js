@@ -28,6 +28,7 @@ describe('adminNg.directives.adminNgEditable', function () {
     }));
 
     beforeEach(function () {
+        jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
     });
 

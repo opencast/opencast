@@ -2,9 +2,9 @@
     "contributors": {
         "label": "FILTERS.SERIES.CONTRIBUTORS.LABEL",
         "options": {
-            "My first contributor": "contributor1",
-            "My second contributor": "contributor2",
-            "My third contributor": "contributor3"
+            "contributor1": "My first contributor",
+            "contributor2": "My second contributor",
+            "contributor3": "My third contributor"
         },
         "type": "select"
     },
