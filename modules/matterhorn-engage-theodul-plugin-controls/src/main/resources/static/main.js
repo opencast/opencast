@@ -54,6 +54,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var events = {
         play: new Engage.Event("Video:play", "plays the video", "both"),
         pause: new Engage.Event("Video:pause", "pauses the video", "both"),
+        playPause: new Engage.Event("Video:playPause", "", "trigger"),
         fullscreenEnable: new Engage.Event("Video:fullscreenEnable", "", "both"),
         mute: new Engage.Event("Video:mute", "", "both"),
         unmute: new Engage.Event("Video:unmute", "", "both"),
@@ -835,11 +836,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
             $("#" + id_playpause_controls).click(function(e) {
                 e.stopPropagation();
-                if (isPlaying) {
-                    Engage.trigger(plugin.events.pause.getName(), false);
-                } else {
-                    Engage.trigger(plugin.events.play.getName(), false);
-                }
+                Engage.trigger(plugin.events.playPause.getName());
             });
 
             $("#" + id_fullscreen_button).click(function(e) {
@@ -1243,16 +1240,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     }
                 }
             });
-            Engage.on(plugin.events.pause.getName(), function() {
+            Engage.on(plugin.events.pause.getName(), function(triggeredByMaster) {
                 if (!mediapackageError && videosReady) {
                     isPlaying = false;
                     playPause();
-                    if (isMobileMode) {
-                        var isInFullScreen = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
-                        if (isInFullScreen) {
-                            Engage.trigger(plugin.events.fullscreenCancel.getName());
-                        }
-                    }
                 }
             });
             Engage.on(plugin.events.mute.getName(), function() {

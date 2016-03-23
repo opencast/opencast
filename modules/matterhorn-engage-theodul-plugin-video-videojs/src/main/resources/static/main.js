@@ -247,7 +247,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
     var fullscreen = false;
     var mappedResolutions = undefined;
     var videoDisplayClass = "videoDisplay";
-    var qualities = null;    
+    var qualities = null;
+    var videodisplayMaster = null;    
     var videoDefaultLayoutClass = "videoDefaultLayout";
     var videoUnfocusedClass = "videoUnfocusedPiP";
     var videoFocusedClass = "videoFocusedPiP";
@@ -916,7 +917,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
 
     function changeQuality(q) {
         if (q) {
-            var isPaused = videojs(globalVideoSource[0][0]).paused();
+            var isPaused = videodisplayMaster.paused();
             Engage.trigger(plugin.events.pause.getName(), false);
             var quality = q + "-quality";
             Engage.model.set("quality", q);
@@ -956,6 +957,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             initVideojsVideo(videoDisplays[i], value, videoDataView.videojs_swf);
         }
 
+        // set first videoDisplay as master
+        var videoDisplay = isAudioOnly ? id_audioDisplay : videoDisplays[0];
+        videodisplayMaster = videojs(videoDisplay);
+
         initQualities(videoDataView);
 
         if ((aspectRatio != null) && (videoDisplays.length > 0)) {
@@ -985,8 +990,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         if (videoDisplays.length > 0) {
             var nr = tuples.length;
 
-            // set first videoDisplay as master
-            registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
+            registerEvents(videoDisplay, videoDisplays.length);
 
             if (nr >= 2) {
                 registerSynchronizeEvents();
@@ -1087,6 +1091,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             });
         }
 
+        // set first videoDisplay as master
+        var videoDisplay = isAudioOnly ? id_audioDisplay : videoDisplays[0];
+        videodisplayMaster = videojs(videoDisplay);
+
         if ((videoDisplays.length > 1) && (globalVideoSource.length > 1)) {
             appendEmbedPlayer_switchPlayers();
         }
@@ -1110,10 +1118,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
 
         if (videoDisplays.length > 0) {
-            // set first videoDisplay as master
-            registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], 1);
+            registerEvents(videoDisplay, 1);
 
-            
             videosReady = true;
             Engage.trigger(plugin.events.ready.getName());
 
@@ -1137,6 +1143,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
             globalVideoSource.push([videoDisplays[i], value]);
         }
 
+        // set first videoDisplay as master
+        var videoDisplay = isAudioOnly ? id_audioDisplay : videoDisplays[0];
+        videodisplayMaster = videojs(videoDisplay);
+
         initQualities(videoDataView);
 
         if ((aspectRatio != null) && (videoDisplays.length > 0)) {
@@ -1157,8 +1167,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
         Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
 
         if (videoDisplays.length > 0) {
-            // set first videoDisplay as master
-            registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
+            registerEvents(videoDisplay, videoDisplays.length);
 
             videosReady = true;
             Engage.trigger(plugin.events.ready.getName());
@@ -1599,8 +1608,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                 }
             });
 
-            var videodisplayMaster = videojs(videoDisplay);
-
             if (numberOfVideodisplays == 1) {
                 videodisplayMaster.on("play", function() {
                     Engage.trigger(plugin.events.play.getName(), true);
@@ -1749,6 +1756,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     Engage.trigger(plugin.events.play.getName());
                 } else {
                     Engage.trigger(plugin.events.pause.getName());
+                    if (isMobileMode && fullscreen) {
+                        Engage.trigger(plugin.events.fullscreenCancel.getName());
+                    }
                 }
             });
             Engage.on(plugin.events.seekLeft.getName(), function() {
@@ -1831,6 +1841,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                     videodisplayMaster.pause();
                     Engage.trigger(plugin.events.pause.getName());
                     videodisplayMaster.currentTime(0);
+                    if (isMobileMode) {
+                        Engage.trigger(plugin.events.fullscreenCancel.getName());
+                    }
                     // videodisplayMaster.currentTime(videodisplayMaster.duration());
                     // Engage.trigger(plugin.events.seek.getName(), 0);
                 }
