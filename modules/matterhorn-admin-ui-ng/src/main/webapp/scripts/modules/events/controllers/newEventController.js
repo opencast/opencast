@@ -42,6 +42,16 @@ angular.module('adminNg.controllers')
          $scope.accessStep.setMetadata($scope.metadataStep);
      }
 
+     $scope.$on('wizard:stepChanged', function (old, current) {
+       if (old.targetScope.selectedStep.title !== current.step.title && old.targetScope.selectedStep.title === 'Processing') {
+         $scope.processingStep.save();
+       }
+
+       if (current.step.title === 'Access Policy') {
+         $scope.accessStep.loadSeriesAcl();
+       }
+     });
+
      $scope.states = [
          {name: 'metadata', stateController: $scope.metadataStep},
          {name: 'source', stateController: $scope.sourceStep},
@@ -79,7 +89,7 @@ angular.module('adminNg.controllers')
             (e || window.event).returnValue = confirmationMessage;     //Gecko + IE
             return confirmationMessage;                                //Webkit, Safari, Chrome etc.
         };
-        
+
         angular.forEach($scope.states, function (state) {
 
             if (state.stateController.isMetadataState) {
