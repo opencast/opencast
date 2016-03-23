@@ -64,7 +64,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   public static final String PERSISTENCE_UNIT = "org.opencastproject.common";
 
   /** The user provider name */
-  public static final String PROVIDER_NAME = "matterhorn";
+  public static final String PROVIDER_NAME = "opencast";
 
   /** Username constant used in JSON formatted users */
   public static final String USERNAME = "username";

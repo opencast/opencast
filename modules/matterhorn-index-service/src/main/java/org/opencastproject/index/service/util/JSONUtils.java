@@ -178,7 +178,7 @@ public final class JSONUtils {
         if (!listProvidersService.hasProvider(listProviderName.get()))
           values = new HashMap<String, String>();
         else
-          values = listProvidersService.getList(listProviderName.get(), query, org, true);
+          values = listProvidersService.getList(listProviderName.get(), query, org, false);
 
         List<JField> valuesJSON = new ArrayList<JField>();
         for (Entry<String, String> entry : values.entrySet()) {
