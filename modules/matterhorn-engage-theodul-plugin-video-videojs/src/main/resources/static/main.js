@@ -1292,6 +1292,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bowser", "engag
                         "width": "100%",
                         "height": "100%"
                     };
+                    if (isEmbedMode) {
+                        videoOptions.controls = true;
+                    }
 
                     // init video.js
                     videojs(id, videoOptions, function() {
