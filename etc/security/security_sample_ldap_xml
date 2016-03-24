@@ -292,16 +292,6 @@
 	  </set>
 	</property> -->
       </bean>
-
-      <!-- The bean below obtains the user authorities (roles) based on the groups the user belongs to -->
-      <!-- You must uncomment/delete the previous one in order to use this -->
-      <!-- bean class="org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator">
-        <constructor-arg ref="contextSource"/>
-        <!- - Root DN of the search, relative to the root of the context source (defined above) - ->
-        <constructor-arg value="ou=groups"/>
-        <!- - Attribute name used to store the groups the user belongs to (that will be mapped to roles) - ->
-        <property name="groupRoleAttribute" value="ou"/>
-      </bean -->
     </constructor-arg>
   </bean>
 
