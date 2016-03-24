@@ -1125,11 +1125,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if (plugin.inserted) {
-            if (!Engage.controls_top && plugin.template_topIfBottom && (plugin.template_topIfBottom != "none")) {
-                controlsViewTopIfBottom = new ControlsViewTop_ifBottom(Engage.model.get("videoDataModel"), plugin.template_topIfBottom, plugin.pluginPath_topIfBottom);
-            }
-            controlsView = new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
-            
             Engage.on(plugin.events.videoFormatsFound.getName(), function(formatarr) {
                 if (Array.isArray(formatarr)) {
                     resolutions = formatarr;
@@ -1302,43 +1297,47 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     $("#" + id_segmentNo + no).removeClass("segmentHover");
                 }
             });
-            Engage.on(plugin.events.togglePiP.getName(), function(pip) {
-                if (pip !== undefined) {
-                    Basil.set(storage_pip, pip);
-                    if (! pip) {
-                        $("#" + id_pipIndicator).html(translate("beside", "beside"));
-                    } else {
-                        if (pipPos === "left") {
+
+            // no pip in mobile mode
+            if (!isMobileMode) { 
+                Engage.on(plugin.events.togglePiP.getName(), function(pip) {
+                    if (pip !== undefined) {
+                        Basil.set(storage_pip, pip);
+                        if (! pip) {
+                            $("#" + id_pipIndicator).html(translate("beside", "beside"));
+                        } else {
+                            if (pipPos === "left") {
+                                $("#" + id_pipIndicator).html(translate("left", "left"));
+                            } else {
+                                $("#" + id_pipIndicator).html(translate("right", "right"));
+                            }
+                        }
+                        pipStatus = pip;
+                    }
+                });
+                Engage.on(plugin.events.focusVideo.getName(), function(flavor) {
+                    if (flavor !== undefined && flavor !== null && flavor.indexOf("focus.") < 1) {
+                        Basil.set(storage_focus_video, flavor);
+                        currentFocusFlavor = flavor;
+                    }
+                });
+                Engage.on(plugin.events.resetLayout.getName(), function() {
+                    Basil.set(storage_focus_video, "focus.none");
+                    currentFocusFlavor = "focus.none";
+                });
+
+                Engage.on(plugin.events.movePiP.getName(), function(pos) {
+                    if (pos !== undefined) {
+                        Basil.set(storage_pip_pos, pos);
+                        if (pos === "left") {
                             $("#" + id_pipIndicator).html(translate("left", "left"));
                         } else {
                             $("#" + id_pipIndicator).html(translate("right", "right"));
                         }
+                        pipPos = pos;
                     }
-                    pipStatus = pip;
-                }
-            });
-            Engage.on(plugin.events.focusVideo.getName(), function(flavor) {
-                if (flavor !== undefined && flavor !== null && flavor.indexOf("focus.") < 1) {
-                    Basil.set(storage_focus_video, flavor);
-                    currentFocusFlavor = flavor;
-                }
-            });
-            Engage.on(plugin.events.resetLayout.getName(), function() {
-                Basil.set(storage_focus_video, "focus.none");
-                currentFocusFlavor = "focus.none";
-            });
-
-            Engage.on(plugin.events.movePiP.getName(), function(pos) {
-                if (pos !== undefined) {
-                    Basil.set(storage_pip_pos, pos);
-                    if (pos === "left") {
-                        $("#" + id_pipIndicator).html(translate("left", "left"));
-                    } else {
-                        $("#" + id_pipIndicator).html(translate("right", "right"));
-                    }
-                    pipPos = pos;
-                }
-            });
+                });
+            }
 
             if (isMobileMode) {
                 // register showControls event in mobile mode
@@ -1365,6 +1364,12 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 // add first class to video wrapper
                 $("#" + id_engage_controls).addClass("first");
             }
+
+
+            if (!Engage.controls_top && plugin.template_topIfBottom && (plugin.template_topIfBottom != "none")) {
+                controlsViewTopIfBottom = new ControlsViewTop_ifBottom(Engage.model.get("videoDataModel"), plugin.template_topIfBottom, plugin.pluginPath_topIfBottom);
+            }
+            controlsView = new ControlsView(Engage.model.get("videoDataModel"), plugin.template, plugin.pluginPath);
 
             loadStoredInitialValues();
         }
