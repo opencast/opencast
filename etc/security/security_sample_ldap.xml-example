@@ -402,14 +402,32 @@
           <!-- List of attribute names in the user from which roles will be created -->
           <!-- The specified attributes must meet few requirements:
                  * They may be single-valued or multivalued
-                 * They may contain single roles or role lists
-                 * In lists, roles may be separated with spaces, commas or both
-          -->
+                 * They may contain single roles or comma-separated role lists
+
+	       The attributes read will be processed in the following way:
+                 * Whitespace will converted to underscores ("_")
+		 * Sequences of underscores ("_") will be collapsed into a single one.
+	  -->
           <list>
             <value>attributeName1</value>
             <value>attributeName2</value>
           </list>
         </constructor-arg>
+	<!-- Whether or not to make all the extracted roles uppercase. 'true' by default. -->
+	<!-- <property name="convertToUpperCase" value="true"/> -->
+
+	<!-- Define a prefix to be appended to every role extracted from the LDAP. -->
+	<!-- The convertToUpperCase property also affects the prefix -->
+	<!-- <property name="rolePrefix" value=""/> -->
+
+	<!-- Additional roles that will be added to those obtained from the attributes above -->
+	<!-- The convertToUpperCase and rolePrefix properties also affect the roles indicated here-->
+	<!-- <property name="additionalAuthorities">
+	  <set>
+	    <value>additional_authority_1</value>
+	    <value>additional_authority_2</value>
+	  </set>
+	</property> -->
       </bean>
 
       <!-- The bean below obtains the user authorities (roles) based on the groups the user belongs to -->
