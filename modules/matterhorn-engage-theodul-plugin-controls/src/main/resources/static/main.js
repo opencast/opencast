@@ -1423,7 +1423,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
         // load jquery-ui touch-punch lib in mobile mode
         if (isMobileMode) {
-            require([relative_plugin_path + "lib/jqueryui/jquery.ui.touch-punch.min"], function() {
+            require([relative_plugin_path + "lib/jquery.ui.touch-punch.min"], function() {
                 Engage.log("Controls: Lib jQuery UI Touch Punch loaded");
                 initCount -= 1;
                 if (initCount <= 0) {
