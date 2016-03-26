@@ -30,14 +30,26 @@ import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.capture.CaptureParameters;
+import org.opencastproject.capture.admin.api.Agent;
+import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.index.service.resources.list.query.AgentsListQuery;
+import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.matterhorn.search.SearchQuery.Order;
+import org.opencastproject.matterhorn.search.SortCriterion;
+import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.SmartIterator;
+import org.opencastproject.util.data.Option;
+import org.opencastproject.util.doc.rest.RestParameter;
+import org.opencastproject.util.doc.rest.RestQuery;
+import org.opencastproject.util.doc.rest.RestResponse;
+import org.opencastproject.util.doc.rest.RestService;
+
 import com.entwinemedia.fn.data.json.JField;
 import com.entwinemedia.fn.data.json.JValue;
 
 import org.apache.commons.lang3.StringUtils;
 import org.opencastproject.adminui.util.TextFilter;
-import org.opencastproject.capture.CaptureParameters;
-import org.opencastproject.util.DateTimeSupport;
-import org.opencastproject.util.SmartIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,18 +69,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
-import org.opencastproject.capture.admin.api.Agent;
-import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.index.service.resources.list.query.AgentsListQuery;
-import org.opencastproject.index.service.util.RestUtils;
-import org.opencastproject.matterhorn.search.SearchQuery.Order;
-import org.opencastproject.matterhorn.search.SortCriterion;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.doc.rest.RestParameter;
-import org.opencastproject.util.doc.rest.RestQuery;
-import org.opencastproject.util.doc.rest.RestResponse;
-import org.opencastproject.util.doc.rest.RestService;
 
 @Path("/")
 @RestService(name = "captureAgents", title = "Capture agents façade service", notes = "This service offers the default capture agents CRUD Operations for the admin UI.", abstractText = "Provides operations for the capture agents")
@@ -179,14 +179,13 @@ public class CaptureAgentsEndpoint {
     // Run through and build a map of updates (rather than states)
     List<JValue> agentsJSON = new ArrayList<JValue>();
     for (Agent agent : filteredAgents) {
-      agentsJSON.add(generateJsonAgent(agent, inputs));
+      agentsJSON.add(generateJsonAgent(agent, /* Option.option(room), blacklist, */ inputs));
     }
 
     return okJsonList(agentsJSON, offset, limit, total);
   }
 
   private JValue generateJsonAgent(Agent agent, boolean withInputs) {
-
     List<JField> fields = new ArrayList<JField>();
     fields.add(f("Status", vN(agent.getState())));
     fields.add(f("Name", v(agent.getName())));
@@ -200,6 +199,13 @@ public class CaptureAgentsEndpoint {
     return j(fields);
   }
 
+  /**
+   * Generate a JSON devices list
+   *
+   * @param devices
+   *          an array of devices String
+   * @return A {@link JValue} representing the devices
+   */
   private JValue generateJsonDevice(String[] devices) {
     List<JValue> jsonDevices = new ArrayList<JValue>();
     for (String device : devices) {

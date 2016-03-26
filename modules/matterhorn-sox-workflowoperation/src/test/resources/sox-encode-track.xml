@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:track type="presentation/audio" id="293958c3-972b-4408-9c5a-c5714762a489">
+<ns2:track xmlns:ns2="http://mediapackage.opencastproject.org" type="presentation/audio" id="293958c3-972b-4408-9c5a-c5714762a489">
 	<ns2:mimetype>video/x-flac</ns2:mimetype>
 	<ns2:tags />
 	<ns2:url>fooVideo.flac</ns2:url>

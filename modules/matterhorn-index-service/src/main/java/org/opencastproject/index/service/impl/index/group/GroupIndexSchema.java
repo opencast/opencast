@@ -35,9 +35,6 @@ public interface GroupIndexSchema extends IndexSchema {
   /** The serialized version of this group in xml format. */
   String OBJECT = "object";
 
-  /** Boost values for ranking */
-  double TITLE_BOOST = 6.0;
-
   /** The name of the group */
   String NAME = "name";
 
@@ -46,6 +43,9 @@ public interface GroupIndexSchema extends IndexSchema {
 
   /** The organization for the group */
   String ORGANIZATION = "organization";
+
+  /** The role of the group */
+  String ROLE = "role";
 
   /** The roles for the group */
   String ROLES = "roles";

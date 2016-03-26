@@ -29,7 +29,7 @@
              policy="static" 
              bind="setCommonEventCatalogUIAdapter" />
   <reference name="EventCatalogUIAdapter" 
-             interface="org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter"
+             interface="org.opencastproject.metadata.dublincore.EventCatalogUIAdapter"
              cardinality="0..n" 
              policy="dynamic"
              bind="addCatalogUIAdapter"
@@ -39,7 +39,7 @@
              cardinality="1..1"
              policy="static"
              bind="setHttpMediaPackageElementProvider" />
-  <reference name="IngestService" 
+  <reference name="IngestService"
              interface="org.opencastproject.ingest.api.IngestService"
              cardinality="1..1" 
              policy="static" 
@@ -65,7 +65,7 @@
              policy="static"
              bind="setCommonSeriesCatalogUIAdapter" />
   <reference name="SeriesCatalogUIAdapter"
-             interface="org.opencastproject.index.service.catalog.adapter.series.SeriesCatalogUIAdapter"
+             interface="org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter"
              cardinality="0..n"
              policy="dynamic"
              bind="addCatalogUIAdapter"
@@ -85,5 +85,15 @@
              interface="org.opencastproject.workspace.api.Workspace"
              name="workspace"
              policy="static" />
- 
+  <reference name="groupRoleProvider"
+             cardinality="1..1"
+             interface="org.opencastproject.userdirectory.JpaGroupRoleProvider"
+             bind="setGroupRoleProvider"
+             policy="static"  />
+  <reference name="userDirectoryService"
+			interface="org.opencastproject.security.api.UserDirectoryService"
+			cardinality="1..1"
+			policy="static"
+			bind="setUserDirectoryService" />
+
 </scr:component>

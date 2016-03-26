@@ -1,0 +1,13 @@
+{
+  "description": "\n \u00a0\u00a0\u00a0A simple workflow that transcodes the media into distribution formats, then sends the resulting distribution files,\n \u00a0\u00a0\u00a0along with their associated metadata, to the distribution channels.\n \u00a0",
+  "duration": "472089",
+  "id": "8695",
+  "license": "Creative Commons 3.0: Attribution-NonCommercial-NoDerivs",
+  "series": "",
+  "series_title": "",
+  "start": "Tue Apr 22 15:18:00 CEST 2014",
+  "state": "SUCCEEDED",
+  "title": "Test video",
+  "workflow": "Encode, Analyze, and Distribute",
+  "start": "2014-09-28T00:00:00Z"
+}

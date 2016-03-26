@@ -24,8 +24,10 @@ package org.opencastproject.index.service.resources.list.provider;
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.data.Option;
 
@@ -42,24 +44,29 @@ import java.util.Map;
 
 public class ContributorsListProviderTest {
 
+  private static final String ORG_ID = "org-id";
   private AbstractSearchIndex searchIndex;
   private UserDirectoryService userDirectoryService;
   private ContributorsListProvider contributorsListProvider;
+  private SecurityService securityService;
   private ArrayList<User> users;
   private User user1;
   private User user2;
   private User user3;
   private User user4;
+  private JpaOrganization organization;
 
   @Before
   public void setUp() throws Exception {
+    String expectedFormat = "{\"organization\":\"mh_default\",\"username\":\"akm220\",\"presentation\":\"Adam McKenzie\"}";
 
+    organization = new JpaOrganization(ORG_ID, "name", null, null, null, null);
     users = new ArrayList<User>();
 
-    user1 = new JpaUser("user1", "pass", null, "user1", "email1", "provider1", true);
-    user2 = new JpaUser("user2", "pass", null, "user2", "email1", "provider1", true);
-    user3 = new JpaUser("user3", "pass", null, "user3", "email1", "provider1", true);
-    user4 = new JpaUser("user4", "pass", null, "user1", "email3", "provider1", true);
+    user1 = new JpaUser("user1", "pass", organization, "User 1", "email1", "provider1", true);
+    user2 = new JpaUser("user2", "pass", organization, "User 2", "email1", "provider1", true);
+    user3 = new JpaUser("user3", "pass", organization, null, "email1", "provider1", true);
+    user4 = new JpaUser("user4", "pass", organization, "User 1", "email3", "provider1", true);
 
     users.add(user1);
     users.add(user2);
@@ -97,14 +104,19 @@ public class ContributorsListProviderTest {
       }
 
       @Override
+      public long countUsers() {
+        return users.size();
+      }
+
+      @Override
       public void invalidate(String userName) {
-        // TODO Auto-generated method stub
+        return;
       }
     };
 
     List<String> contributors = new ArrayList<String>();
-    contributors.add("user1");
-    contributors.add("user5");
+    contributors.add("User 1");
+    contributors.add("User 5");
 
     searchIndex = EasyMock.createNiceMock(AbstractSearchIndex.class);
     EasyMock.expect(searchIndex.getTermsForField(EasyMock.anyString(), EasyMock.anyObject(Option.class)))
@@ -122,12 +134,37 @@ public class ContributorsListProviderTest {
   }
 
   @Test
+  public void testUsernamesList() {
+    Map<String, String> list = contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, null, null);
+
+    Assert.assertTrue(list.containsKey(user1.getUsername()));
+    Assert.assertTrue(list.containsKey(user2.getUsername()));
+    Assert.assertTrue(list.containsKey(user3.getUsername()));
+
+    Assert.assertTrue(list.containsValue(user1.getName()));
+    Assert.assertTrue(list.containsValue(user2.getName()));
+    Assert.assertTrue(list.containsValue(user3.getUsername()));
+
+    Assert.assertTrue(list.containsKey("User 5"));
+    Assert.assertTrue(list.containsValue("User 5"));
+
+    Assert.assertEquals(5, list.size());
+  }
+
+  @Test
   public void testListSimple() throws ListProviderException {
-    Map<String, Object> list = contributorsListProvider.getList(ContributorsListProvider.DEFAULT, null, null);
+    Map<String, String> list = contributorsListProvider.getList(ContributorsListProvider.DEFAULT, null, null);
+
     Assert.assertTrue(list.containsKey(user1.getName()));
     Assert.assertTrue(list.containsKey(user2.getName()));
-    Assert.assertTrue(list.containsKey(user3.getName()));
-    Assert.assertEquals(4, list.size());
+
+    Assert.assertTrue(list.containsValue(user1.getName()));
+    Assert.assertTrue(list.containsValue(user2.getName()));
+
+    Assert.assertTrue(list.containsKey("User 5"));
+    Assert.assertTrue(list.containsValue("User 5"));
+
+    Assert.assertEquals(3, list.size());
   }
 
   @Test
@@ -135,11 +172,11 @@ public class ContributorsListProviderTest {
     ResourceListQueryImpl query = new ResourceListQueryImpl();
     query.setLimit(0);
     query.setOffset(0);
-    Assert.assertEquals(4, contributorsListProvider.getList(ContributorsListProvider.DEFAULT, query, null).size());
+    Assert.assertEquals(5, contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, query, null).size());
     query.setOffset(3);
-    Assert.assertEquals(1, contributorsListProvider.getList(ContributorsListProvider.DEFAULT, query, null).size());
+    Assert.assertEquals(2, contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, query, null).size());
     query.setOffset(0);
     query.setLimit(1);
-    Assert.assertEquals(1, contributorsListProvider.getList(ContributorsListProvider.DEFAULT, query, null).size());
+    Assert.assertEquals(1, contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, query, null).size());
   }
 }

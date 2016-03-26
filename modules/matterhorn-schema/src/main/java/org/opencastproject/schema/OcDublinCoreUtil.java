@@ -125,7 +125,7 @@ public final class OcDublinCoreUtil {
    */
   public static DublinCoreCatalog toCatalog(final OcDublinCore source) {
     // completeness assured by unit test
-    final DublinCoreCatalog target = DublinCores.mkOpencast();
+    final DublinCoreCatalog target = DublinCores.mkOpencastEpisode().getCatalog();
     for (String a : source.getAbstract()) target.set(DublinCore.PROPERTY_ABSTRACT, a);
     for (String a : source.getAccessRights()) target.set(DublinCore.PROPERTY_ACCESS_RIGHTS, a);
     for (String a : source.getAccrualMethod()) target.set(DublinCore.PROPERTY_ACCRUAL_METHOD, a);

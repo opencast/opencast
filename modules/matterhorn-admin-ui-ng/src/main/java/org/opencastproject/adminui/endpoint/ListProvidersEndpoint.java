@@ -21,6 +21,9 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static org.opencastproject.adminui.endpoint.EndpointUtil.addRequestFiltersToQuery;
+import static org.opencastproject.adminui.endpoint.EndpointUtil.generateJSONObject;
+
 import org.opencastproject.adminui.exception.JsonCreationException;
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
@@ -30,7 +33,6 @@ import org.opencastproject.index.service.resources.list.query.EventListQuery;
 import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
-import org.opencastproject.index.service.resources.list.query.StringListFilter;
 import org.opencastproject.index.service.resources.list.query.ThemesListQuery;
 import org.opencastproject.index.service.resources.list.query.UsersListQuery;
 import org.opencastproject.index.service.util.JSONUtils;
@@ -47,10 +49,8 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -106,9 +106,10 @@ public class ListProvidersEndpoint {
       query.setLimit(limit);
       query.setOffset(offset);
       addRequestFiltersToQuery(filter, query);
-      Map<String, Object> autocompleteList;
+      Map<String, String> autocompleteList;
       try {
-        autocompleteList = listProvidersService.getList(source, query, securityService.getOrganization());
+        autocompleteList = new TreeMap<String, String>(listProvidersService.getList(source, query,
+                securityService.getOrganization(), false));
       } catch (ListProviderException e) {
         logger.error("Not able to get list from provider {}: {}", source, e);
         return SERVER_ERROR;
@@ -128,20 +129,6 @@ public class ListProvidersEndpoint {
     return NOT_FOUND;
   }
 
-  private void addRequestFiltersToQuery(final String filterString, ResourceListQueryImpl query) {
-    if (filterString != null) {
-      String[] filters = filterString.split(",");
-      for (String filter : filters) {
-        String[] splitFilter = filter.split("=");
-        if (splitFilter != null && splitFilter.length == 2) {
-          String key = splitFilter[0];
-          String value = splitFilter[1];
-          query.addFilter(new StringListFilter(key, value));
-        }
-      }
-    }
-  }
-
   @GET
   @Path("components.json")
   @Produces(MediaType.APPLICATION_JSON)
@@ -156,7 +143,8 @@ public class ListProvidersEndpoint {
       if (listProvidersService.hasProvider(source)) {
         JSONObject subList;
         try {
-          subList = generateJSONObject(listProvidersService.getList(source, query, securityService.getOrganization()));
+          subList = generateJSONObject(listProvidersService.getList(source, query, securityService.getOrganization(),
+                  true));
           list.put(source, subList);
         } catch (JsonCreationException e) {
           logger.error("Not able to generate resources list JSON from source {}: {}", source, e);
@@ -217,36 +205,6 @@ public class ListProvidersEndpoint {
       logger.error("Not able to get list of options for the filters for the page {}: {}", page, e);
       return SERVER_ERROR;
     }
-  }
-
-  /**
-   * Returns a generated JSON object with key-value from given list
-   *
-   * @param list
-   *          The source list for the JSON object
-   * @return a JSON object containing the all the key-value as parameter
-   * @throws JSONException
-   */
-  private JSONObject generateJSONObject(Map<String, Object> list) throws JsonCreationException {
-    JSONObject jsonList = new JSONObject();
-
-    for (Entry<String, Object> entry : list.entrySet()) {
-      Object value = entry.getValue();
-      if (value instanceof String) {
-        jsonList.put(entry.getKey(), value);
-      } else if (value instanceof JSONObject) {
-        jsonList.put(entry.getKey(), value);
-      } else if (value instanceof List) {
-        Collection collection = (Collection) value;
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.addAll(collection);
-        jsonList.put(entry.getKey(), jsonArray);
-      } else {
-        throw new JsonCreationException("could not deal with " + value);
-      }
-    }
-
-    return jsonList;
   }
 
 }

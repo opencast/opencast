@@ -26,6 +26,12 @@
               </li>
               <li>
                 <span>
+                  <input id="retractPreview" type="checkbox" checked="checked" class="configField" value="true" />
+                  <span>&nbsp;Preview and Editing Media</span>
+                </span>
+              </li>
+              <li>
+                <span>
                   <input id="retractFromYouTube" type="checkbox" class="configField" value="true" />
                   <span>&nbsp;YouTube</span>
                 </span>
@@ -44,6 +50,7 @@
       description="Applying default configuration values">
       <configurations>
         <configuration key="retractFromEngage">true</configuration>
+        <configuration key="retractPreview">true</configuration>
         <configuration key="retractFromYouTube">false</configuration>
       </configurations>
     </operation>
@@ -56,6 +63,17 @@
       exception-handler-workflow="ng-partial-error"
       if="${retractFromEngage}"
       description="Retract recording from Engage">
+    </operation>
+
+    <!-- Remove the internal publication if the mediapackage is being deleted. -->
+    <operation
+      id="retract-configure"
+      if="${retractPreview}"
+      exception-handler-workflow="ng-partial-error"
+      description="Retract from internal publication channel">
+      <configurations>
+        <configuration key="channel-id">internal</configuration>
+      </configurations>
     </operation>
 
     <!-- Retract from YouTube -->

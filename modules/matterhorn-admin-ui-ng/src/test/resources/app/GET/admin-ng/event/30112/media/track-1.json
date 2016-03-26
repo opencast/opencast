@@ -1,0 +1,24 @@
+{
+    "id": "370597b6-35ec-45de-9101-ccb87b873ee7",
+    "description": "",
+    "flavor": "presenter\/work",
+    "mimetype": "video\/mp4",
+    "tags": "archive",
+    "type": "Track",
+    "url": "http:\/\/localhost:8080\/archive\/archive\/mediapackage\/8564f058-43ac-48e2-a5bc-f00d771bc2e0\/370597b6-35ec-45de-9101-ccb87b873ee7\/0\/track.mp4",
+    "streams": {
+        "audio": [{
+            "id": "audio-1",
+            "bitrate": "126694.0",
+            "channels": "2",
+            "type": "AAC"
+        }],
+        "video": [{
+            "id": "video-1",
+            "bitrate": 2108424.0,
+            "resolution": "1920x1080",
+            "type": "AVC",
+            "framerate": "24.0"
+        }]
+    }
+}

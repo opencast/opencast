@@ -21,12 +21,14 @@
 
 package org.opencastproject.message.broker.api.comments;
 
+import org.opencastproject.message.broker.api.MessageItem;
+
 import java.io.Serializable;
 
 /**
  * {@link Serializable} class that represents all of the possible messages sent through a comment queue.
  */
-public class CommentItem implements Serializable {
+public class CommentItem implements MessageItem, Serializable {
 
   private static final long serialVersionUID = -3946543513879987169L;
 
@@ -64,6 +66,11 @@ public class CommentItem implements Serializable {
     this.hasComments = hasComments;
     this.hasOpenComments = hasOpenComments;
     this.type = Type.Update;
+  }
+
+  @Override
+  public String getId() {
+    return eventId;
   }
 
   public String getEventId() {

@@ -64,6 +64,10 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
         try {
           event = getOrCreateEvent(schedulerItem.getMediaPackageId(), organization, user, getSearchIndex());
           event.setCreator(getSecurityService().getUser().getName());
+          if (event.getBlacklisted() == null)
+            event.setBlacklisted(false);
+          if (event.getOptedOut() == null)
+            event.setOptedOut(false);
 
           if (dc != null)
             EventIndexUtils.updateEvent(event, dc);

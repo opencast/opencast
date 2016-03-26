@@ -30,6 +30,7 @@ import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.index.service.impl.index.series.SeriesIndexSchema;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
+import org.opencastproject.index.service.util.ListProviderUtil;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -40,10 +41,17 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -52,8 +60,10 @@ public class ContributorsListProvider implements ResourceListProvider {
   private static final String PROVIDER_PREFIX = "CONTRIBUTORS";
 
   public static final String DEFAULT = PROVIDER_PREFIX;
+  public static final String NAMES_TO_USERNAMES = PROVIDER_PREFIX + ".NAMES.TO.USERNAMES";
+  public static final String USERNAMES = PROVIDER_PREFIX + ".USERNAMES";
 
-  protected static final String[] NAMES = { PROVIDER_PREFIX };
+  protected static final String[] NAMES = { PROVIDER_PREFIX, USERNAMES, NAMES_TO_USERNAMES };
 
   private static final Logger logger = LoggerFactory.getLogger(ContributorsListProvider.class);
 
@@ -80,8 +90,25 @@ public class ContributorsListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
-    Map<String, Object> usersList = new HashMap<String, Object>();
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+    if (listName.equalsIgnoreCase(USERNAMES)) {
+      return getListWithUserNames(query);
+    } else if (listName.equalsIgnoreCase(NAMES_TO_USERNAMES)) {
+      return getListWithTechnicalPresenters(query);
+    } else {
+      return getList(query);
+    }
+  }
+
+  /**
+   * Get all of the contributors with friendly printable names.
+   *
+   * @param query
+   *          The query for the list including limit and offset.
+   * @return The {@link Map<String, String>} including all of the contributors.
+   */
+  protected Map<String, String> getList(ResourceListQuery query) {
+    Map<String, String> usersList = new HashMap<String, String>();
     int offset = 0;
     int limit = 0;
     SortedSet<String> contributorsList = new TreeSet<String>(new Comparator<String>() {
@@ -127,5 +154,142 @@ public class ContributorsListProvider implements ResourceListProvider {
     }
 
     return usersList;
+  }
+
+  /**
+   * Get the contributors list including usernames and organizations for the users available.
+   *
+   * @param query
+   *          The query for the list including limit and offset.
+   * @return The {@link Map<String, String>} including all of the contributors.
+   */
+  protected Map<String, String> getListWithTechnicalPresenters(ResourceListQuery query) {
+    int offset = 0;
+    int limit = 0;
+
+    List<Contributor> contributorsList = new ArrayList<Contributor>();
+
+    HashSet<String> labels = new HashSet<String>();
+
+    Iterator<User> users = userDirectoryService.findUsers("%", offset, limit);
+    while (users.hasNext()) {
+      User u = users.next();
+      if (StringUtils.isNotBlank(u.getName())) {
+        contributorsList.add(new Contributor(u.getUsername(), u.getName()));
+        labels.add(u.getName());
+      } else {
+        contributorsList.add(new Contributor(u.getUsername(), u.getUsername()));
+        labels.add(u.getUsername());
+      }
+    }
+
+    addIndexNamesToMap(labels, contributorsList, splitStringList(searchIndex
+            .getTermsForField(EventIndexSchema.PRESENTER, Option.some(new String[] { Event.DOCUMENT_TYPE }))));
+    addIndexNamesToMap(labels, contributorsList, splitStringList(searchIndex
+            .getTermsForField(EventIndexSchema.CONTRIBUTOR, Option.some(new String[] { Event.DOCUMENT_TYPE }))));
+    addIndexNamesToMap(labels, contributorsList, splitStringList(searchIndex
+            .getTermsForField(SeriesIndexSchema.CONTRIBUTORS, Option.some(new String[] { Event.DOCUMENT_TYPE }))));
+    addIndexNamesToMap(labels, contributorsList, splitStringList(searchIndex
+            .getTermsForField(SeriesIndexSchema.ORGANIZERS, Option.some(new String[] { Event.DOCUMENT_TYPE }))));
+    addIndexNamesToMap(labels, contributorsList, splitStringList(searchIndex
+            .getTermsForField(SeriesIndexSchema.PUBLISHERS, Option.some(new String[] { Event.DOCUMENT_TYPE }))));
+
+    Collections.sort(contributorsList, new Comparator<Contributor>() {
+      @Override
+      public int compare(Contributor contributor1, Contributor contributor2) {
+        return contributor1.getLabel().compareTo(contributor2.getLabel());
+      }
+    });
+
+    Map<String, String> contributorMap = new LinkedHashMap<>();
+    for (Contributor contributor : contributorsList) {
+      contributorMap.put(contributor.getKey(), contributor.getLabel());
+    }
+
+    return ListProviderUtil.filterMap(contributorMap, query);
+  }
+
+  /**
+   * Get the contributors list including usernames and organizations for the users available.
+   *
+   * @param query
+   *          The query for the list including limit and offset.
+   * @return The {@link Map<String, String>} including all of the contributors.
+   */
+  protected Map<String, String> getListWithUserNames(ResourceListQuery query) {
+    int offset = 0;
+    int limit = 0;
+
+    List<Contributor> contributorsList = new ArrayList<Contributor>();
+
+    HashSet<String> labels = new HashSet<String>();
+
+    Iterator<User> users = userDirectoryService.findUsers("%", offset, limit);
+    while (users.hasNext()) {
+      User u = users.next();
+      if (StringUtils.isNotBlank(u.getName())) {
+        contributorsList.add(new Contributor(u.getUsername(), u.getName()));
+        labels.add(u.getName());
+      } else {
+        contributorsList.add(new Contributor(u.getUsername(), u.getUsername()));
+        labels.add(u.getUsername());
+      }
+    }
+
+    Collections.sort(contributorsList, new Comparator<Contributor>() {
+      @Override
+      public int compare(Contributor contributor1, Contributor contributor2) {
+        return contributor1.getLabel().compareTo(contributor2.getLabel());
+      }
+    });
+
+    Map<String, String> contributorMap = new LinkedHashMap<>();
+    for (Contributor contributor : contributorsList) {
+      contributorMap.put(contributor.getKey(), contributor.getLabel());
+    }
+
+    return ListProviderUtil.filterMap(contributorMap, query);
+  }
+
+  /**
+   * Add all names in the index to the map if they aren't already present as a user.
+   *
+   * @param userLabels
+   *          The collection of user labels, the full names of the users.
+   * @param contributors
+   *          The collection of all contributors including the index names that will be added.
+   * @param indexNames
+   *          The list of new names from the index.
+   */
+  protected void addIndexNamesToMap(Set<String> userLabels, Collection<Contributor> contributors,
+          List<String> indexNames) {
+    for (String indexName : indexNames) {
+      if (!userLabels.contains(indexName)) {
+        contributors.add(new Contributor(indexName, indexName));
+      }
+    }
+  }
+
+  private class Contributor {
+    public String getKey() {
+      return key;
+    }
+
+    public String getLabel() {
+      return label;
+    }
+
+    private String key;
+    private String label;
+
+    Contributor(String key, String label) {
+      this.key = key;
+      this.label = label;
+    }
+
+    @Override
+    public String toString() {
+      return key + ":" + label;
+    }
   }
 }

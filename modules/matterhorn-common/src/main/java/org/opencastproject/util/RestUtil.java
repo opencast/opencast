@@ -41,6 +41,7 @@ import org.osgi.service.component.ComponentContext;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.core.MediaType;
@@ -251,8 +252,8 @@ public final class RestUtil {
       return b.build();
     }
 
-    public static Response created() {
-      return Response.status(Response.Status.CREATED).build();
+    public static Response created(URI location) {
+      return Response.created(location).build();
     }
 
     public static Response notFound() {

@@ -64,7 +64,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   public static final String PERSISTENCE_UNIT = "org.opencastproject.common";
 
   /** The user provider name */
-  public static final String PROVIDER_NAME = "matterhorn";
+  public static final String PROVIDER_NAME = "opencast";
 
   /** Username constant used in JSON formatted users */
   public static final String USERNAME = "username";
@@ -263,7 +263,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganization(
             (JpaOrganization) user.getOrganization(), emf);
     user = new JpaUser(user.getUsername(), encodedPassword, organization, user.getName(), user.getEmail(),
-            user.getProvider(), true, roles);
+            user.getProvider(), user.isManageable(), roles);
 
     // Then save the user
     EntityManager em = null;
@@ -348,6 +348,12 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
       return a;
     }
   };
+
+  @Override
+  public long countUsers() {
+    String orgId = securityService.getOrganization().getId();
+    return UserDirectoryPersistenceUtil.countUsers(orgId, emf);
+  }
 
   @Override
   public void invalidate(String userName) {

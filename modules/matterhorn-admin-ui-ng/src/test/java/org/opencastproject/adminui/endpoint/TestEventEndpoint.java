@@ -21,6 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
 import static org.opencastproject.util.IoSupport.withResource;
 import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.data.Collections.map;
@@ -63,10 +64,9 @@ import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
-import org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter;
+import org.opencastproject.index.service.impl.IndexServiceImpl;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.IncidentImpl;
@@ -83,8 +83,8 @@ import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.scheduler.api.SchedulerService;
@@ -104,8 +104,6 @@ import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
-import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
-import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.series.impl.SeriesServiceDatabaseException;
 import org.opencastproject.series.impl.SeriesServiceImpl;
 import org.opencastproject.series.impl.solr.SeriesServiceSolrIndex;
@@ -169,23 +167,24 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
   /** A user with permissions. */
   private final User userWithPermissions = new JaxbUser("sample", null, "WithPermissions", "with@permissions.com",
-          "test", defaultOrganization, new HashSet<JaxbRole>(Arrays.asList(new JaxbRole("ROLE_STUDENT",
-                  defaultOrganization), new JaxbRole("ROLE_OTHERSTUDENT", defaultOrganization), new JaxbRole(
-                  defaultOrganization.getAnonymousRole(), defaultOrganization))));
+          "test", defaultOrganization,
+          new HashSet<JaxbRole>(Arrays.asList(new JaxbRole("ROLE_STUDENT", defaultOrganization),
+                  new JaxbRole("ROLE_OTHERSTUDENT", defaultOrganization),
+                  new JaxbRole(defaultOrganization.getAnonymousRole(), defaultOrganization))));
 
   /** A user without permissions. */
   private final User userWithoutPermissions = new JaxbUser("sample", null, "WithoutPermissions",
-          "without@permissions.com", "test", opencastOrganization, new HashSet<JaxbRole>(Arrays.asList(new JaxbRole(
-                  "ROLE_NOTHING", opencastOrganization))));
+          "without@permissions.com", "test", opencastOrganization,
+          new HashSet<JaxbRole>(Arrays.asList(new JaxbRole("ROLE_NOTHING", opencastOrganization))));
 
   private final User defaultUser = userWithPermissions;
 
   private final UriRewriter rewriter = new UriRewriter() {
     @Override
     public URI apply(Version version, MediaPackageElement mpe) {
-      return uri("http://episodes", mpe.getMediaPackage().getIdentifier(), mpe.getIdentifier(), version, mpe
-              .getElementType().toString().toLowerCase()
-              + "." + mpe.getMimeType().getSuffix().getOrElse(".unknown"));
+      return uri("http://episodes", mpe.getMediaPackage().getIdentifier(), mpe.getIdentifier(), version,
+              mpe.getElementType().toString().toLowerCase() + "."
+                      + mpe.getMimeType().getSuffix().getOrElse(".unknown"));
 
     }
   };
@@ -239,8 +238,8 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     // acl
     final String anonymousRole = securityService.getOrganization().getAnonymousRole();
-    final AccessControlList acl = new AccessControlList(new AccessControlEntry(anonymousRole,
-            Permissions.Action.READ.toString(), true));
+    final AccessControlList acl = new AccessControlList(
+            new AccessControlEntry(anonymousRole, Permissions.Action.READ.toString(), true));
     /* The authorization service */
     final AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
     EasyMock.expect(authorizationService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
@@ -268,15 +267,14 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     // service registry
     final ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
-    Job job = new JobImpl(12L);
+    JobImpl job = new JobImpl(12L);
     Date dateCreated = new Date(DateTimeSupport.fromUTC("2014-06-05T15:00:00Z"));
     Date dateCompleted = new Date(DateTimeSupport.fromUTC("2014-06-05T16:00:00Z"));
     job.setDateCreated(dateCreated);
     job.setDateCompleted(dateCompleted);
     EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job).anyTimes();
-    EasyMock.expect(
-            serviceRegistry.createJob((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (List<String>) EasyMock.anyObject(), (String) EasyMock.anyObject(), EasyMock.anyBoolean()))
+    EasyMock.expect(serviceRegistry.createJob((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (List<String>) EasyMock.anyObject(), (String) EasyMock.anyObject(), EasyMock.anyBoolean()))
             .andReturn(new JobImpl()).anyTimes();
     EasyMock.expect(serviceRegistry.updateJob((Job) EasyMock.anyObject())).andReturn(new JobImpl()).anyTimes();
     EasyMock.expect(serviceRegistry.getJobs((String) EasyMock.anyObject(), (Job.Status) EasyMock.anyObject()))
@@ -305,7 +303,6 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
       }
     }).anyTimes();
     EasyMock.replay(workspace);
-    env.setWorkspace(workspace);
 
     // workflow service
     WorkflowSetImpl workflowSet = new WorkflowSetImpl();
@@ -478,20 +475,20 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
       }
 
       @Override
-      public AccessControlList getAccessControl(String seriesID) throws NotFoundException,
-              SeriesServiceDatabaseException {
+      public AccessControlList getAccessControl(String seriesID)
+              throws NotFoundException, SeriesServiceDatabaseException {
         return acl;
       }
 
     };
     seriesService.setIndex(seriesServiceSolrIndex);
-    env.setSeriesService(seriesService);
 
     StaticMetadataServiceDublinCoreImpl metadataSvcs = new StaticMetadataServiceDublinCoreImpl();
     metadataSvcs.setWorkspace(workspace);
 
-    final SolrIndexManager solrIndex = new SolrIndexManager(solrServer, workspace, VCell.cell(Arrays
-            .asList((StaticMetadataService) metadataSvcs)), seriesService, mpeg7CatalogService, securityService);
+    final SolrIndexManager solrIndex = new SolrIndexManager(solrServer, workspace,
+            VCell.cell(Arrays.asList((StaticMetadataService) metadataSvcs)), seriesService, mpeg7CatalogService,
+            securityService);
 
     // Org directory
     MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
@@ -505,21 +502,21 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
             messageSender, messageReceiver);
     env.setArchive(archive);
 
-    DublinCoreCatalogService dublinCoreCatalogService = EasyMock.createNiceMock(DublinCoreCatalogService.class);
-    env.setDublinCoreCatalogService(dublinCoreCatalogService);
 
     Date now = new Date(DateTimeSupport.fromUTC("2014-06-05T09:15:56Z"));
-    EventComment comment = EventComment.create(Option.some(65L), "abc123", "mh_default_org", "Comment 1", userWithPermissions, "Sick", true, now, now);
-    EventComment comment2 = EventComment.create(Option.some(65L), "abc123", "mh_default_org", "Comment 2", userWithPermissions, "Defect", false, now, now);
-    EventCommentReply reply = EventCommentReply.create(Option.some(78L), "Cant reproduce", userWithoutPermissions, now, now);
+    EventComment comment = EventComment.create(Option.some(65L), "abc123", "mh_default_org", "Comment 1",
+            userWithPermissions, "Sick", true, now, now);
+    EventComment comment2 = EventComment.create(Option.some(65L), "abc123", "mh_default_org", "Comment 2",
+            userWithPermissions, "Defect", false, now, now);
+    EventCommentReply reply = EventCommentReply.create(Option.some(78L), "Cant reproduce", userWithoutPermissions, now,
+            now);
     comment2.addReply(reply);
 
     EventCommentService eventCommentService = EasyMock.createNiceMock(EventCommentService.class);
     EasyMock.expect(eventCommentService.getComments(EasyMock.anyString())).andReturn(Arrays.asList(comment, comment2))
             .anyTimes();
     EasyMock.expect(eventCommentService.getComment(EasyMock.anyLong())).andReturn(comment2);
-    EasyMock.expect(eventCommentService.updateComment(EasyMock.anyObject(EventComment.class)))
-            .andReturn(comment2);
+    EasyMock.expect(eventCommentService.updateComment(EasyMock.anyObject(EventComment.class))).andReturn(comment2);
     EasyMock.replay(eventCommentService);
     env.setEventCommentService(eventCommentService);
 
@@ -530,22 +527,30 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     env.setHttpMediaPackageElementProvider(httpMediaPackageElementProvider);
 
-    Map<String, Object> licences = new HashMap<>();
+    Map<String, String> licences = new HashMap<>();
     licences.put("uuid-series1", "Series 1");
     licences.put("uuid-series2", "Series 2");
 
     ListProvidersService listProvidersService = EasyMock.createNiceMock(ListProvidersService.class);
-    EasyMock.expect(
-            listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQuery.class),
-                    EasyMock.anyObject(Organization.class))).andReturn(licences).anyTimes();
+    EasyMock.expect(listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQuery.class),
+            EasyMock.anyObject(Organization.class), false)).andReturn(licences).anyTimes();
     EasyMock.replay(listProvidersService);
-    env.setListProviderService(listProvidersService);
 
-    final IncidentTree r = new IncidentTreeImpl(Immutables.list(mkIncident(Severity.INFO), mkIncident(Severity.INFO),
-            mkIncident(Severity.INFO)), Immutables.<IncidentTree> list(new IncidentTreeImpl(Immutables.list(
-            mkIncident(Severity.INFO), mkIncident(Severity.WARNING)), Immutables
-            .<IncidentTree> list(new IncidentTreeImpl(Immutables.list(mkIncident(Severity.WARNING),
-                    mkIncident(Severity.INFO)), Immutables.<IncidentTree> nil())))));
+    final IncidentTree r = new IncidentTreeImpl(
+            Immutables
+                    .list(mkIncident(Severity.INFO), mkIncident(Severity.INFO),
+                            mkIncident(
+                                    Severity.INFO)),
+            Immutables
+                    .<IncidentTree> list(
+                            new IncidentTreeImpl(
+                                    Immutables
+                                            .list(mkIncident(Severity.INFO),
+                                                    mkIncident(
+                                                            Severity.WARNING)),
+                                    Immutables.<IncidentTree> list(new IncidentTreeImpl(
+                                            Immutables.list(mkIncident(Severity.WARNING), mkIncident(Severity.INFO)),
+                                            Immutables.<IncidentTree> nil())))));
 
     IncidentService incidentService = EasyMock.createNiceMock(IncidentService.class);
     EasyMock.expect(incidentService.getIncident(EasyMock.anyLong())).andReturn(mkIncident(Severity.INFO)).anyTimes();
@@ -565,13 +570,11 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     catalogs.add(DublinCores.read(TestEventEndpoint.class.getResourceAsStream("/dublincore2.xml")));
     DublinCoreCatalogList dublinCoreCatalogList = new DublinCoreCatalogList(catalogs, 1);
     SchedulerService schedulerService = EasyMock.createNiceMock(SchedulerService.class);
-    EasyMock.expect(
-            schedulerService.findConflictingEvents(EasyMock.anyString(), EasyMock.anyObject(Date.class),
-                    EasyMock.anyObject(Date.class))).andReturn(dublinCoreCatalogList).anyTimes();
-    EasyMock.expect(
-            schedulerService.findConflictingEvents(EasyMock.anyString(), EasyMock.anyString(),
-                    EasyMock.anyObject(Date.class), EasyMock.anyObject(Date.class), EasyMock.anyLong(),
-                    EasyMock.anyString())).andReturn(dublinCoreCatalogList).anyTimes();
+    EasyMock.expect(schedulerService.findConflictingEvents(EasyMock.anyString(), EasyMock.anyObject(Date.class),
+            EasyMock.anyObject(Date.class))).andReturn(dublinCoreCatalogList).anyTimes();
+    EasyMock.expect(schedulerService.findConflictingEvents(EasyMock.anyString(), EasyMock.anyString(),
+            EasyMock.anyObject(Date.class), EasyMock.anyObject(Date.class), EasyMock.anyLong(), EasyMock.anyString()))
+            .andReturn(dublinCoreCatalogList).anyTimes();
     EasyMock.replay(schedulerService);
     env.setSchedulerService(schedulerService);
 
@@ -582,13 +585,21 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     EventCatalogUIAdapter catalogUIAdapter = EasyMock.createNiceMock(EventCatalogUIAdapter.class);
     EasyMock.replay(catalogUIAdapter);
-    env.setCatalogUIAdapter(catalogUIAdapter);
 
     CommonEventCatalogUIAdapter episodeDublinCoreCatalogUIAdapter = new CommonEventCatalogUIAdapter();
-    episodeDublinCoreCatalogUIAdapter.activate();
-    env.setEpisodeCatalogUIAdapter(episodeDublinCoreCatalogUIAdapter);
 
-    // TODO ingest service
+    Properties episodeCatalogProperties = getCatalogProperties(getClass(), "/episode-catalog.properties");
+
+    episodeDublinCoreCatalogUIAdapter.updated(episodeCatalogProperties);
+
+    IndexServiceImpl indexService = new IndexServiceImpl();
+    indexService.addCatalogUIAdapter(catalogUIAdapter);
+    indexService.setCommonEventCatalogUIAdapter(episodeDublinCoreCatalogUIAdapter);
+    indexService.setSecurityService(securityService);
+    indexService.setSeriesService(seriesService);
+    indexService.setWorkspace(workspace);
+    env.setIndexService(indexService);
+
     // TODO authorization service
   }
 
@@ -744,8 +755,9 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
       @Override
       public Option<OcDublinCore> getSeriesDublinCore() {
-        return Option.some(OcDublinCoreUtil.create(
-                DublinCores.read(TestEventEndpoint.class.getResourceAsStream("/dublincore2.xml"))).getDublinCore());
+        return Option.some(OcDublinCoreUtil
+                .create(DublinCores.read(TestEventEndpoint.class.getResourceAsStream("/dublincore2.xml")))
+                .getDublinCore());
       }
 
       @Override
@@ -775,8 +787,9 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
       @Override
       public OcDublinCore getDublinCore() {
-        return OcDublinCoreUtil.create(
-                DublinCores.read(TestEventEndpoint.class.getResourceAsStream("/dublincore3.xml"))).getDublinCore();
+        return OcDublinCoreUtil
+                .create(DublinCores.read(TestEventEndpoint.class.getResourceAsStream("/dublincore3.xml")))
+                .getDublinCore();
       }
 
       @Override
@@ -808,11 +821,6 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
-  public Workspace getWorkspace() {
-    return env.getWorkspace();
-  }
-
-  @Override
   public HttpMediaPackageElementProvider getHttpMediaPackageElementProvider() {
     return env.getHttpMediaPackageElementProvider();
   }
@@ -823,23 +831,8 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
-  public ListProvidersService getListProviderService() {
-    return env.getListProviderService();
-  }
-
-  @Override
   public AclService getAclService() {
     return env.getAclService();
-  }
-
-  @Override
-  public SeriesService getSeriesService() {
-    return env.getSeriesService();
-  }
-
-  @Override
-  public DublinCoreCatalogService getDublinCoreService() {
-    return env.getDublinCoreService();
   }
 
   @Override
@@ -858,11 +851,6 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
-  public IngestService getIngestService() {
-    return env.getIngestService();
-  }
-
-  @Override
   public AuthorizationService getAuthorizationService() {
     return env.getAuthorizationService();
   }
@@ -878,18 +866,13 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
-  public EventCatalogUIAdapter getEpisodeCatalogUIAdapter() {
-    return env.getEpisodeCatalogUIAdapter();
-  }
-
-  @Override
-  public List<EventCatalogUIAdapter> getEventCatalogUIAdapters(String organization) {
-    return env.getCatalogUIAdapters();
-  }
-
-  @Override
   public AdminUISearchIndex getIndex() {
     return env.getIndex();
+  }
+
+  @Override
+  public UrlSigningService getUrlSigningService() {
+    return env.getUrlSigningService();
   }
 
   @Override
@@ -899,11 +882,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
   @Override
   public long getUrlSigningExpireDuration() {
-    return UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
-  }
-  @Override
-  public UrlSigningService getUrlSigningService() {
-    return env.getUrlSigningService();
+    return DEFAULT_URL_SIGNING_EXPIRE_DURATION;
   }
 
   @Override

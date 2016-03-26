@@ -28,9 +28,11 @@ describe('New Series Controller', function () {
             $httpBackend.whenGET('/admin-ng/resources/THEMES.NAME.json').respond('{}');
             $httpBackend.whenGET('/admin-ng/series/new/metadata').respond('{}');
             $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');
+            $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond('{}');
             $httpBackend.whenGET('/admin-ng/resources/ROLES.json').respond('{}');
             $httpBackend.whenGET('/admin-ng/resources/components.json').respond('{}');
             $httpBackend.whenGET('/admin-ng/series/new/themes').respond('{}');
+            $httpBackend.whenGET('/info/me.json').respond(getJSONFixture('info/me.json'));
 
             Modal.$scope = { close: jasmine.createSpy() };
             spyOn(Table, 'fetch');

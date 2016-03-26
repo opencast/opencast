@@ -13,6 +13,12 @@ describe('Group controller', function () {
 
     beforeEach(inject(function ($rootScope, _$controller_, _GroupResource_, _GroupsResource_) {
         $scope = $rootScope.$new();
+        $scope.group = {
+            $promise : {
+                then : function() {
+                }
+            }
+        };
         $controller = _$controller_;
         GroupResource = _GroupResource_;
         GroupsResource = _GroupsResource_;

@@ -25,7 +25,7 @@ import org.opencastproject.adminui.util.TestServiceRegistryFactory;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl;
-import org.opencastproject.index.service.resources.list.provider.ServicesListProvider;
+import org.opencastproject.index.service.resources.list.provider.ServersListProvider;
 import org.opencastproject.index.service.util.ListProviderUtil;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
@@ -44,7 +44,7 @@ public class TestListProvidersEndpoint extends ListProvidersEndpoint {
 
   public static final String PROVIDER_NAME = "test";
   public static final String[] PROVIDER_VALUES = { "x", "a", "c", "z", "t", "h" };
-  private final Map<String, Object> baseMap = new HashMap<String, Object>();
+  private final Map<String, String> baseMap = new HashMap<String, String>();
 
   private ListProvidersServiceImpl listProvidersService = new ListProvidersServiceImpl();
   private SecurityService securityService;
@@ -64,7 +64,7 @@ public class TestListProvidersEndpoint extends ListProvidersEndpoint {
       }
 
       @Override
-      public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
+      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
         return ListProviderUtil.filterMap(baseMap, query);
       }
     });
@@ -77,8 +77,8 @@ public class TestListProvidersEndpoint extends ListProvidersEndpoint {
   }
 
   private ResourceListProvider makeServicesListProvider() {
-    ServicesListProvider servicesListProvider = new ServicesListProvider();
-    servicesListProvider.setServiceRegistry(TestServiceRegistryFactory.getStub());
-    return servicesListProvider;
+    ServersListProvider serversListProvider = new ServersListProvider();
+    serversListProvider.setServiceRegistry(TestServiceRegistryFactory.getStub());
+    return serversListProvider;
   }
 }

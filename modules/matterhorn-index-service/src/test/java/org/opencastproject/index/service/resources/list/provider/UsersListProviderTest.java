@@ -93,6 +93,11 @@ public class UsersListProviderTest {
       }
 
       @Override
+      public long countUsers() {
+        return users.size();
+      }
+
+      @Override
       public void invalidate(String userName) {
         return;
       }
@@ -109,7 +114,7 @@ public class UsersListProviderTest {
 
   @Test
   public void testListSimple() throws ListProviderException {
-    Map<String, Object> list = usersListProvider.getList(UsersListProvider.NAME, null, null);
+    Map<String, String> list = usersListProvider.getList(UsersListProvider.NAME, null, null);
     Assert.assertTrue(list.containsKey(user1.getName()));
     Assert.assertTrue(list.containsKey(user2.getName()));
     Assert.assertTrue(list.containsKey(user3.getName()));

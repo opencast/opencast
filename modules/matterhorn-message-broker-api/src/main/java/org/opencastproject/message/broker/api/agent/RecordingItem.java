@@ -21,12 +21,14 @@
 
 package org.opencastproject.message.broker.api.agent;
 
+import org.opencastproject.message.broker.api.MessageItem;
+
 import java.io.Serializable;
 
 /**
  * {@link Serializable} class that represents all of the possible messages sent through a recording queue.
  */
-public class RecordingItem implements Serializable {
+public class RecordingItem implements MessageItem, Serializable {
 
   private static final long serialVersionUID = -3213675986929522484L;
 
@@ -93,6 +95,11 @@ public class RecordingItem implements Serializable {
     this.state = null;
     this.lastHeardFrom = null;
     this.type = Type.Delete;
+  }
+
+  @Override
+  public String getId() {
+    return eventId;
   }
 
   public String getEventId() {

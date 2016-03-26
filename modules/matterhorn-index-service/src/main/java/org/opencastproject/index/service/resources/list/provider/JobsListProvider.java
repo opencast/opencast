@@ -25,7 +25,6 @@ import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.query.JobsListQueryImpl;
-import org.opencastproject.index.service.resources.list.query.JobsListQueryImpl.FILTERS;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -61,7 +60,7 @@ public class JobsListProvider implements ResourceListProvider {
   public static final String WORKFLOW = PROVIDER_PREFIX + ".WORKFLOW";
 
   /** The list of filter criteria for this provider */
-  public static enum JobFilter {
+  public enum JobFilter {
     CONTRIBUTOR, CREATOR, LANGUAGE, OPERATION, SERIES, STATUS, SUBJECT, TITLE, WORKFLOW;
   };
 
@@ -105,11 +104,11 @@ public class JobsListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException {
 
     JobsListQueryImpl jobsQuery = (JobsListQueryImpl) query;
-    Map<String, Object> jobList = new HashMap<String, Object>();
+    Map<String, String> jobList = new HashMap<String, String>();
     int offset = 0;
     int limit = 0;
 
@@ -127,7 +126,7 @@ public class JobsListProvider implements ResourceListProvider {
     wQuery.withCount(limit);
 
     // Add filters
-    if (query != null && query.hasFilter(FILTERS.TEXT.toString()))
+    if (query != null && query.hasFilter(JobsListQueryImpl.Filters.TEXT.toString()))
       wQuery.withText(jobsQuery.getText().get());
 
     try {

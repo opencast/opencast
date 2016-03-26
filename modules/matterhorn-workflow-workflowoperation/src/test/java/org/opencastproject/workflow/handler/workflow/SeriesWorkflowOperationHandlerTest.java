@@ -20,13 +20,13 @@
  */
 package org.opencastproject.workflow.handler.workflow;
 
-import org.opencastproject.index.service.catalog.adapter.series.SeriesCatalogUIAdapter;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -69,7 +69,7 @@ public class SeriesWorkflowOperationHandlerTest {
     URI uri = getClass().getResource("/dublincore.xml").toURI();
     File file = new File(uri);
 
-    DublinCoreCatalog seriesCatalog = DublinCores.mkOpencast();
+    DublinCoreCatalog seriesCatalog = DublinCores.mkOpencast().getCatalog();
     seriesCatalog.set(DublinCore.PROPERTY_TITLE, "Series 1");
 
     SeriesService seriesService = EasyMock.createNiceMock(SeriesService.class);

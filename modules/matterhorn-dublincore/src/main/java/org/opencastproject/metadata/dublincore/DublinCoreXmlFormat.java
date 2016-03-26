@@ -38,6 +38,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -87,6 +89,27 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
   }
 
   /**
+   * Read an XML encoded catalog from a file.
+   *
+   * @param xml
+   *         the file containing the DublinCore catalog
+   * @return the catalog representation
+   * @throws javax.xml.parsers.ParserConfigurationException
+   *         if setting up the parser failed
+   * @throws org.xml.sax.SAXException
+   *         if an error occurred while parsing the document
+   * @throws java.io.IOException
+   *         if the stream cannot be accessed in a proper way
+   */
+  @Nonnull
+  public static DublinCoreCatalog read(File xml)
+          throws IOException, SAXException, ParserConfigurationException {
+    try (FileInputStream in = new FileInputStream(xml)) {
+      return new DublinCoreXmlFormat().readImpl(new InputSource(in));
+    }
+  }
+
+  /**
    * Read an XML encoded catalog from a string.
    *
    * @param xml
@@ -123,10 +146,8 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
     if (dc.getRootTag() != null) {
       final Element rootElement = doc.createElementNS(dc.getRootTag().getNamespaceURI(), dc.toQName(dc.getRootTag()));
       doc.appendChild(rootElement);
-      for (EName property : dc.getProperties()) {
-        for (CatalogEntry element : dc.getValues(property)) {
-          rootElement.appendChild(element.toXml(doc));
-        }
+      for (CatalogEntry element : DublinCoreUtil.getPropertiesSorted(dc)) {
+        rootElement.appendChild(element.toXml(doc));
       }
       return doc;
     } else {

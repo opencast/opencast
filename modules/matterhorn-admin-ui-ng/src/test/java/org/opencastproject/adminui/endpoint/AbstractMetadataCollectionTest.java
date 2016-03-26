@@ -25,7 +25,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.index.service.catalog.adapter.AbstractMetadataCollection;
-import org.opencastproject.index.service.catalog.adapter.MetadataField;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
 
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JValue;
@@ -50,8 +51,8 @@ public class AbstractMetadataCollectionTest {
   private MetadataField<String> unorderedTwo;
   private MetadataField<String> unorderedThree;
 
-  private AbstractMetadataCollection getAbstractMetadataCollection() {
-    AbstractMetadataCollection collection = new AbstractMetadataCollection() {
+  private MetadataCollection getAbstractMetadataCollection() {
+    MetadataCollection collection = new AbstractMetadataCollection() {
 
       @Override
       public JValue toJSON() {
@@ -64,23 +65,26 @@ public class AbstractMetadataCollectionTest {
   @Before
   public void setUp() {
     first = MetadataField.createTextMetadataField(FIRST_ID, Opt.<String> none(), FIRST_ID, false, false,
-            Opt.<Map<String, Object>> none(), Opt.<String> none(), Opt.some(0), Opt.<String> none());
+            Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(0), Opt.<String> none());
     third = MetadataField.createTextMetadataField(THIRD_ID, Opt.<String> none(), THIRD_ID, false, false,
-            Opt.<Map<String, Object>> none(), Opt.<String> none(), Opt.some(2), Opt.<String> none());
+            Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(2), Opt.<String> none());
     seventh = MetadataField.createTextMetadataField(SEVENTH_ID, Opt.<String> none(), SEVENTH_ID, false, false,
-            Opt.<Map<String, Object>> none(), Opt.<String> none(), Opt.some(6), Opt.<String> none());
+            Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(6), Opt.<String> none());
 
     unorderedOne = MetadataField.createTextMetadataField(UNORDERED_ONE_ID, Opt.<String> none(), UNORDERED_ONE_ID,
-            false, false, Opt.<Map<String, Object>> none(), Opt.<String> none(), Opt.<Integer> none(), Opt.<String> none());
+            false, false, Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.<Integer> none(),
+            Opt.<String> none());
     unorderedTwo = MetadataField.createTextMetadataField(UNORDERED_TWO_ID, Opt.<String> none(), UNORDERED_TWO_ID,
-            false, false, Opt.<Map<String, Object>> none(), Opt.<String> none(), Opt.<Integer> none(), Opt.<String> none());
+            false, false, Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.<Integer> none(),
+            Opt.<String> none());
     unorderedThree = MetadataField.createTextMetadataField(UNORDERED_THREE_ID, Opt.<String> none(), UNORDERED_THREE_ID,
-            false, false, Opt.<Map<String, Object>> none(), Opt.<String> none(), Opt.<Integer> none(), Opt.<String> none());
+            false, false, Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.<Integer> none(),
+            Opt.<String> none());
   }
 
   @Test
   public void testOrderOfFields() {
-    AbstractMetadataCollection collection = getAbstractMetadataCollection();
+    MetadataCollection collection = getAbstractMetadataCollection();
     // Add a single field that has an index greater than 0.
     collection.addField(third);
     assertEquals(1, collection.getFields().size());
@@ -89,7 +93,7 @@ public class AbstractMetadataCollectionTest {
 
   @Test
   public void testOrderOfFieldsInputFieldOrderZeroExpectsAtFront() {
-    AbstractMetadataCollection collection = getAbstractMetadataCollection();
+    MetadataCollection collection = getAbstractMetadataCollection();
     collection.addField(unorderedOne);
     collection.addField(unorderedTwo);
     collection.addField(unorderedThree);
@@ -122,7 +126,7 @@ public class AbstractMetadataCollectionTest {
 
   @Test
   public void testOrderOfFieldsInputFieldOrderTwoExpectsInMiddle() {
-    AbstractMetadataCollection collection = getAbstractMetadataCollection();
+    MetadataCollection collection = getAbstractMetadataCollection();
     collection.addField(unorderedOne);
     collection.addField(unorderedTwo);
     collection.addField(unorderedThree);
@@ -155,7 +159,7 @@ public class AbstractMetadataCollectionTest {
 
   @Test
   public void testOrderOfFieldsInputMultipleOrderedFieldsExpectsInCorrectPositions() {
-    AbstractMetadataCollection collection = getAbstractMetadataCollection();
+    MetadataCollection collection = getAbstractMetadataCollection();
     collection.addField(unorderedOne);
     collection.addField(unorderedTwo);
     collection.addField(unorderedThree);
@@ -206,7 +210,7 @@ public class AbstractMetadataCollectionTest {
 
   @Test
   public void testOrderOfFieldsInputDuplicateOrderValueExpectsBothInserted() {
-    AbstractMetadataCollection collection = getAbstractMetadataCollection();
+    MetadataCollection collection = getAbstractMetadataCollection();
     collection.addField(unorderedOne);
     collection.addField(unorderedTwo);
     collection.addField(unorderedThree);
@@ -214,8 +218,9 @@ public class AbstractMetadataCollectionTest {
     collection.addField(third);
     collection.addField(seventh);
 
-    MetadataField<String> newFirst = MetadataField.createTextMetadataField("New first", Opt.<String> none(), "New first",
-            false, false, Opt.<Map<String, Object>> none(), Opt.<String> none(), Opt.some(0), Opt.<String> none());
+    MetadataField<String> newFirst = MetadataField.createTextMetadataField("New first", Opt.<String> none(),
+            "New first", false, false, Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(0),
+            Opt.<String> none());
 
     collection.addField(newFirst);
 
@@ -232,7 +237,7 @@ public class AbstractMetadataCollectionTest {
 
   @Test
   public void testAddExistingFieldInputAlreadyExistingFieldExpectsOnlyOneFieldFromGetFields() {
-    AbstractMetadataCollection collection = getAbstractMetadataCollection();
+    MetadataCollection collection = getAbstractMetadataCollection();
     collection.addField(unorderedOne);
     collection.addField(unorderedTwo);
     collection.addField(unorderedThree);
@@ -241,7 +246,7 @@ public class AbstractMetadataCollectionTest {
     collection.addField(seventh);
 
     MetadataField<String> newFirst = MetadataField.createTextMetadataField("first", Opt.<String> none(), "first",
-            false, false, Opt.<Map<String, Object>> none(), Opt.<String> none(), Opt.some(0), Opt.<String> none());
+            false, false, Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(0), Opt.<String> none());
     String value = "Hello";
     newFirst.setValue(value);
     collection.addField(newFirst);
@@ -252,7 +257,7 @@ public class AbstractMetadataCollectionTest {
       if (field.getInputID().equals(FIRST_ID)) {
         numberOfFirsts++;
         if (field.getValue().isSome() && field.getValue().get() instanceof String) {
-          valueFound = Opt.some((String)field.getValue().get());
+          valueFound = Opt.some((String) field.getValue().get());
         }
       }
     }

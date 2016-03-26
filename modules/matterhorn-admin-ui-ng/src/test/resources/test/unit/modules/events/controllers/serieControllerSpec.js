@@ -32,9 +32,11 @@ describe('Serie controller', function () {
         $httpBackend.whenGET('/admin-ng/series/4581/access.json').respond(200);
         $httpBackend.whenGET('/admin-ng/themes/themes.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/series/4581/theme.json').respond(getJSONFixture('admin-ng/series/4581/theme.json'));
+        $httpBackend.whenGET('/admin-ng/series/4581/participation.json').respond(getJSONFixture('admin-ng/series/4581/participation.json'));
         $httpBackend.whenPUT('/admin-ng/series/4581/theme').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/THEMES.NAME.json').respond({1001: 'Heinz das Pferd', 1002: 'Full Fledged', 401: 'Doc Test'});
         $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/ROLES.json').respond('{}');
 
 
@@ -137,7 +139,10 @@ describe('Serie controller', function () {
             $scope.policies[0] = {
                 role  : 'admin',
                 read  : true,
-                write : true
+                write : true,
+                actions : {
+                    value : []
+                }
             };
             
             spyOn(SeriesAccessResource, 'save');

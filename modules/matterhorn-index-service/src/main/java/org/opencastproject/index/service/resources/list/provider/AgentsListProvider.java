@@ -32,8 +32,8 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class AgentsListProvider implements ResourceListProvider {
 
@@ -62,8 +62,8 @@ public class AgentsListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
-    Map<String, Object> result = new HashMap<String, Object>();
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+    Map<String, String> result = new TreeMap<String, String>();
 
     if (STATUS.equals(listName)) {
       for (String state : AgentState.KNOWN_STATES) {
@@ -74,6 +74,7 @@ public class AgentsListProvider implements ResourceListProvider {
       for (Agent agent : knownAgents.values()) {
         result.put(agent.getName(), agent.getName());
       }
+
     }
 
     return result;

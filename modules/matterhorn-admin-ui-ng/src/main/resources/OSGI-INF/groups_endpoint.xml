@@ -11,12 +11,12 @@
 		<provide interface="org.opencastproject.adminui.endpoint.GroupsEndpoint" />
 	</service>
 	
-   <reference name="JpaGroupRoleProvider" 
-   		      interface="org.opencastproject.userdirectory.JpaGroupRoleProvider"
-              cardinality="1..1" policy="static" bind="setJpaGroupRoleProvider" />
   <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
     cardinality="1..1" policy="static" bind="setSecurityService" />
-    
   <reference name="userDirectoryService" interface="org.opencastproject.security.api.UserDirectoryService"
       cardinality="1..1" policy="static" bind="setUserDirectoryService"/>
+  <reference name="IndexService" interface="org.opencastproject.index.service.api.IndexService"
+      cardinality="1..1" policy="static" bind="setIndexService"/>
+  <reference name="AdminUISearchIndex" interface="org.opencastproject.adminui.impl.index.AdminUISearchIndex"
+      cardinality="1..1" policy="static" bind="setSearchIndex"/>
 </scr:component>

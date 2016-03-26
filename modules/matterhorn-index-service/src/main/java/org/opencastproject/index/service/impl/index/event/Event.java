@@ -23,23 +23,28 @@ package org.opencastproject.index.service.impl.index.event;
 
 import org.opencastproject.capture.admin.api.RecordingState;
 import org.opencastproject.index.service.impl.index.IndexObject;
+import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
 import org.codehaus.jettison.mapped.MappedXMLStreamReader;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
+import org.joda.time.DateTime;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,8 +73,8 @@ import javax.xml.transform.stream.StreamSource;
         "workflowId", "workflowDefinitionId", "recordingStartTime", "recordingEndTime", "duration", "trackMimetypes",
         "trackStreamResolutions", "trackFlavors", "metadataFlavors", "metadataMimetypes", "attachmentFlavors",
         "reviewStatus", "reviewDate", "optedOut", "blacklisted", "hasComments", "hasOpenComments", "hasPreview",
-        "publications", "publicationFlavors", "workflowScheduledDate", "archiveVersion", "schedulingStatus",
-        "recordingStatus", "eventStatus" })
+        "publications", "workflowScheduledDate", "archiveVersion", "schedulingStatus", "recordingStatus", "eventStatus",
+        "agentId", "agentConfigurations", "technicalStartTime", "technicalEndTime", "technicalPresenters" })
 @XmlRootElement(name = "event", namespace = IndexObject.INDEX_XML_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
 public class Event implements IndexObject {
@@ -105,9 +110,9 @@ public class Event implements IndexObject {
     recordingStatusMapping.put(RecordingState.UPLOAD_ERROR, "EVENTS.EVENTS.STATUS.RECORDING_FAILURE");
     workflowStatusMapping.put(WorkflowState.INSTANTIATED.toString(), "EVENTS.EVENTS.STATUS.PENDING");
     workflowStatusMapping.put(WorkflowState.RUNNING.toString(), "EVENTS.EVENTS.STATUS.PROCESSING");
+    workflowStatusMapping.put(WorkflowState.FAILING.toString(), "EVENTS.EVENTS.STATUS.PROCESSING");
     workflowStatusMapping.put(WorkflowState.PAUSED.toString(), "EVENTS.EVENTS.STATUS.PAUSED");
     workflowStatusMapping.put(WorkflowState.SUCCEEDED.toString(), "EVENTS.EVENTS.STATUS.PROCESSED");
-    workflowStatusMapping.put(WorkflowState.FAILING.toString(), "EVENTS.EVENTS.STATUS.PROCESSED");
     workflowStatusMapping.put(WorkflowState.FAILED.toString(), "EVENTS.EVENTS.STATUS.PROCESSING_FAILURE");
     workflowStatusMapping.put(WorkflowState.STOPPED.toString(), "EVENTS.EVENTS.STATUS.PROCESSING_CANCELED");
   }
@@ -273,12 +278,7 @@ public class Event implements IndexObject {
   /** The list of publications from this event */
   @XmlElementWrapper(name = "publications")
   @XmlElement(name = "publication")
-  private List<String> publications = null;
-
-  /** The list of publication flavors from this event */
-  @XmlElementWrapper(name = "publication_flavors")
-  @XmlElement(name = "publication_flavor")
-  private List<String> publicationFlavors = null;
+  private List<Publication> publications = new ArrayList<>();
 
   /** The workflow scheduled date of the event */
   @XmlElement(name = "workflow_scheduled_date")
@@ -295,6 +295,26 @@ public class Event implements IndexObject {
   /** The archive version of the event */
   @XmlElement(name = "archive_version")
   private Long archiveVersion = null;
+
+  /** The id of the capture agent */
+  @XmlElement(name = "agent_id")
+  private String agentId = null;
+
+  /** The configuration of the capture agent */
+  @XmlElementWrapper(name = "agent_configuration")
+  private Map<String, String> agentConfigurations = new HashMap<String, String>();
+
+  /** The technical end time of the recording */
+  @XmlElement(name = "technical_end_time")
+  private String technicalEndTime = null;
+
+  /** The technical start time of the recording */
+  @XmlElement(name = "technical_start_time")
+  private String technicalStartTime = null;
+
+  @XmlElementWrapper(name = "technical_presenters")
+  @XmlElement(name = "technical_presenter")
+  private List<String> technicalPresenters = null;
 
   /** Context for serializing and deserializing */
   private static JAXBContext context = null;
@@ -1017,7 +1037,7 @@ public class Event implements IndexObject {
    *          the subtype
    */
   public void updatePreview(String previewSubtype) {
-    hasPreview = EventIndexUtils.subflavorMatches(publicationFlavors, previewSubtype);
+    hasPreview = EventIndexUtils.subflavorMatches(publications, previewSubtype);
   }
 
   /**
@@ -1026,7 +1046,7 @@ public class Event implements IndexObject {
    * @param publications
    *          the publications for this event
    */
-  public void setPublications(List<String> publications) {
+  public void setPublications(List<Publication> publications) {
     this.publications = publications;
   }
 
@@ -1035,27 +1055,8 @@ public class Event implements IndexObject {
    *
    * @return the publications
    */
-  public List<String> getPublications() {
+  public List<Publication> getPublications() {
     return publications;
-  }
-
-  /**
-   * Sets the list of application flavors.
-   *
-   * @param publicationFlavors
-   *          the publication flavors
-   */
-  public void setPublicationFlavors(List<String> publicationFlavors) {
-    this.publicationFlavors = publicationFlavors;
-  }
-
-  /**
-   * Returns the list of publication flavors.
-   *
-   * @return the list of publication flavors
-   */
-  public List<String> getPublicationFlavors() {
-    return this.publicationFlavors;
   }
 
   /**
@@ -1142,7 +1143,21 @@ public class Event implements IndexObject {
       return;
     }
 
-    eventStatus = "EVENTS.EVENTS.STATUS.SCHEDULED";
+    if (StringUtils.isNotBlank(getSchedulingStatus()) && (this.archiveVersion == null || this.archiveVersion <= 0)) {
+      eventStatus = "EVENTS.EVENTS.STATUS.SCHEDULED";
+      return;
+    }
+
+    eventStatus = "EVENTS.EVENTS.STATUS.PROCESSED";
+  }
+
+  public boolean hasRecordingStarted() {
+    if (getSchedulingStatus() == null)
+      return true;
+
+    Date startDate = new DateTime(getTechnicalStartTime()).toDate();
+    Date now = new DateTime().toDate();
+    return startDate.before(now);
   }
 
   /**
@@ -1185,6 +1200,101 @@ public class Event implements IndexObject {
   }
 
   /**
+   * Returns the agent id
+   *
+   * @return the agent id
+   */
+  public String getAgentId() {
+    return agentId;
+  }
+
+  /**
+   * Sets the agent id
+   *
+   * @param agentId
+   *          the agent id
+   */
+  public void setAgentId(String agentId) {
+    this.agentId = agentId;
+  }
+
+  /**
+   * Returns the agent configuration
+   *
+   * @return the agent configuration
+   */
+  public Map<String, String> getAgentConfiguration() {
+    return agentConfigurations;
+  }
+
+  /**
+   * Sets the agent configuration
+   *
+   * @param agentConfigurations
+   *          the agent configuration
+   */
+  public void setAgentConfiguration(Map<String, String> agentConfigurations) {
+    this.agentConfigurations = agentConfigurations;
+  }
+
+  /**
+   * Returns the technical end time
+   *
+   * @return the technical end time
+   */
+  public String getTechnicalEndTime() {
+    return technicalEndTime;
+  }
+
+  /**
+   * Sets the technical end time
+   *
+   * @param technicalEndTime
+   *          the technical end time
+   */
+  public void setTechnicalEndTime(String technicalEndTime) {
+    this.technicalEndTime = technicalEndTime;
+  }
+
+  /**
+   * Returns the technical start time
+   *
+   * @return the technical start time
+   */
+  public String getTechnicalStartTime() {
+    return technicalStartTime;
+  }
+
+  /**
+   * Sets the technical start time
+   *
+   * @param technicalStartTime
+   *          the technical start time
+   */
+  public void setTechnicalStartTime(String technicalStartTime) {
+    this.technicalStartTime = technicalStartTime;
+  }
+
+  /**
+   * Returns the technical presenters
+   *
+   * @return the technical presenters
+   */
+  public List<String> getTechnicalPresenters() {
+    return technicalPresenters;
+  }
+
+  /**
+   * Sets the technical presenters
+   *
+   * @param technicalPresenters
+   *          the technical presenters
+   */
+  public void setTechnicalPresenters(List<String> technicalPresenters) {
+    this.technicalPresenters = technicalPresenters;
+  }
+
+  /**
    * Reads the recording event from the input stream.
    *
    * @param xml
@@ -1218,8 +1328,8 @@ public class Event implements IndexObject {
    * @throws XMLStreamException
    * @throws JAXBException
    */
-  public static Event valueOfJson(InputStream json) throws IOException, JSONException, XMLStreamException,
-          JAXBException {
+  public static Event valueOfJson(InputStream json)
+          throws IOException, JSONException, XMLStreamException, JAXBException {
     // TODO Get this to work, it is currently returning null properties for all properties.
     if (context == null) {
       createJAXBContext();

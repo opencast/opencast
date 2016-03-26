@@ -74,9 +74,9 @@ public class ThemesListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException {
-    Map<String, Object> list = new HashMap<String, Object>();
+    Map<String, String> list = new HashMap<String, String>();
 
     if (NAME.equals(listName)) {
       ThemeSearchQuery themeQuery = new ThemeSearchQuery(securityService.getOrganization().getId(),

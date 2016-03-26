@@ -21,6 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 
@@ -93,6 +94,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.ws.rs.Path;
 
@@ -100,6 +102,7 @@ import javax.ws.rs.Path;
 @Ignore
 public class TestSeriesEndpoint extends SeriesEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(TestSeriesEndpoint.class);
+
   private SeriesService seriesService;
   private AdminUISearchIndex adminuiSearchIndex;
   private ListProvidersService listProvidersService;
@@ -122,8 +125,8 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
       }
 
       @Override
-      public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
-        return new HashMap<String, Object>();
+      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+        return new HashMap<String, String>();
       }
     });
     listProvidersServiceImpl.activate(null);
@@ -156,7 +159,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
     Map<String, String> optionsMap = new HashMap<>();
     optionsMap.put("annotations", "true");
-    DublinCoreCatalog dc = DublinCores.mkOpencast();
+    DublinCoreCatalog dc = DublinCores.mkOpencastEpisode().getCatalog();
     Date date = new Date(DateTimeSupport.fromUTC("2014-06-05T09:15:56Z"));
     dc.set(DublinCore.PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(date, Precision.Second));
     dc.set(DublinCore.PROPERTY_IDENTIFIER, "23");
@@ -173,8 +176,8 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     EasyMock.replay(securityService);
 
     String anonymousRole = securityService.getOrganization().getAnonymousRole();
-    final AccessControlList acl = new AccessControlList(new AccessControlEntry(anonymousRole,
-            Permissions.Action.READ.toString(), true));
+    final AccessControlList acl = new AccessControlList(
+            new AccessControlEntry(anonymousRole, Permissions.Action.READ.toString(), true));
 
     EasyMock.expect(seriesService.getSeries(EasyMock.anyObject(SeriesQuery.class)))
             .andReturn(new DublinCoreCatalogList(catalogs, catalogs.size())).anyTimes();
@@ -207,9 +210,8 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     EasyMock.expect(aclService.getAcls()).andReturn(managedAcls).anyTimes();
     EasyMock.expect(aclService.getAcl(EasyMock.anyLong())).andReturn(Option.some(managedAcl1)).anyTimes();
     Option<ConfiguredWorkflowRef> anyWorkflowOption = EasyMock.anyObject();
-    EasyMock.expect(
-            aclService.applyAclToSeries(EasyMock.anyString(), EasyMock.anyObject(AccessControlList.class),
-                    EasyMock.anyBoolean(), anyWorkflowOption)).andReturn(true).anyTimes();
+    EasyMock.expect(aclService.applyAclToSeries(EasyMock.anyString(), EasyMock.anyObject(AccessControlList.class),
+            EasyMock.anyBoolean(), anyWorkflowOption)).andReturn(true).anyTimes();
     EasyMock.expect(aclService.getTransitions(EasyMock.anyObject(TransitionQuery.class))).andReturn(transitionResult)
             .anyTimes();
     EasyMock.replay(aclService);
@@ -221,6 +223,10 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     setupIndex();
 
     CommonSeriesCatalogUIAdapter dublinCoreAdapter = new CommonSeriesCatalogUIAdapter();
+    Properties seriesCatalogProperties = getCatalogProperties(getClass(), "/series-catalog.properties");
+
+    dublinCoreAdapter.updated(seriesCatalogProperties);
+
     dublinCoreAdapter.setSeriesService(seriesService);
     dublinCoreAdapter.setListProvidersService(listProvidersService);
     dublinCoreAdapter.setSecurityService(securityService);
@@ -232,8 +238,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     indexServiceImpl.setAclServiceFactory(aclServiceFactory);
     indexServiceImpl.setSeriesService(seriesService);
 
-    this.addCatalogUIAdapter(dublinCoreAdapter);
-    this.setCommonSeriesCatalogUIAdapter(dublinCoreAdapter);
     this.setIndex(adminuiSearchIndex);
     this.setSeriesService(seriesService);
     this.setSecurityService(securityService);
@@ -364,8 +368,8 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     final Capture<EventSearchQuery> captureEventSearchQuery = new Capture<>();
     final Capture<ThemeSearchQuery> captureThemeSearchQuery = new Capture<>();
 
-    EasyMock.expect(adminuiSearchIndex.getByQuery(EasyMock.capture(captureSeriesSearchQuery))).andAnswer(
-            new IAnswer<SearchResult<Series>>() {
+    EasyMock.expect(adminuiSearchIndex.getByQuery(EasyMock.capture(captureSeriesSearchQuery)))
+            .andAnswer(new IAnswer<SearchResult<Series>>() {
 
               @Override
               public SearchResult<Series> answer() throws Throwable {

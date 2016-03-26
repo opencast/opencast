@@ -70,9 +70,9 @@ public final class FileSupport {
    * <code>targetDirectory</code> does not exist, it will be created.
    *
    * @param sourceLocation
-   *         the source file or directory
+   *          the source file or directory
    * @param targetDirectory
-   *         the target directory
+   *          the target directory
    * @return the moved file
    */
   public static File move(File sourceLocation, File targetDirectory) throws IOException {
@@ -105,12 +105,12 @@ public final class FileSupport {
    * copied.
    *
    * @param sourceLocation
-   *         the source file or directory
+   *          the source file or directory
    * @param targetLocation
-   *         the directory to copy the source file or directory to
+   *          the directory to copy the source file or directory to
    * @return the created copy
    * @throws IOException
-   *         if copying of the file or directory failed
+   *           if copying of the file or directory failed
    */
   public static File copy(File sourceLocation, File targetLocation) throws IOException {
     return copy(sourceLocation, targetLocation, true);
@@ -129,21 +129,23 @@ public final class FileSupport {
    * Note that if <code>targetLocation</code> is a directory than the directory itself, not only its content is copied.
    *
    * @param sourceFile
-   *         the source file or directory
+   *          the source file or directory
    * @param targetFile
-   *         the directory to copy the source file or directory to
+   *          the directory to copy the source file or directory to
    * @param overwrite
-   *         <code>true</code> to overwrite existing files
+   *          <code>true</code> to overwrite existing files
    * @return the created copy
    * @throws IOException
-   *         if copying of the file or directory failed
+   *           if copying of the file or directory failed
    */
   public static File copy(File sourceFile, File targetFile, boolean overwrite) throws IOException {
 
-    // This variable is used when the channel copy files, and stores the maximum size of the file parts copied from source to target
+    // This variable is used when the channel copy files, and stores the maximum size of the file parts copied from
+    // source to target
     final int chunk = 1024 * 1024 * 512; // 512 MB
 
-    // This variable is used when the cannel copy fails completely, as the size of the memory buffer used to copy the data from one stream to the other.
+    // This variable is used when the cannel copy fails completely, as the size of the memory buffer used to copy the
+    // data from one stream to the other.
     final int bufferSize = 1024 * 1024; // 1 MB
 
     File dest = determineDestination(targetFile, sourceFile, overwrite);
@@ -182,7 +184,8 @@ public final class FileSupport {
         } catch (IOException ioe) {
           logger.warn("Got IOException using Channels for copying.");
         } finally {
-          // This has to be in "finally", because in 64-bit machines the channel copy may fail to copy the whole file without causing a exception
+          // This has to be in "finally", because in 64-bit machines the channel copy may fail to copy the whole file
+          // without causing a exception
           if ((sourceChannel != null) && (targetChannel != null) && (size < sourceFile.length())) {
             // Failing back to using FileChannels *but* with chunks and not altogether
             logger.info("Trying to copy the file in chunks using Channels");
@@ -228,13 +231,13 @@ public final class FileSupport {
    * file already exists.
    *
    * @param sourceDirectory
-   *         the source directory
+   *          the source directory
    * @param targetDirectory
-   *         the target directory to copy the content of the source directory to
+   *          the target directory to copy the content of the source directory to
    * @param overwrite
-   *         <code>true</code> to overwrite existing files
+   *          <code>true</code> to overwrite existing files
    * @throws IOException
-   *         if copying fails
+   *           if copying fails
    */
   public static void copyContent(File sourceDirectory, File targetDirectory, boolean overwrite) throws IOException {
     if (sourceDirectory == null)
@@ -258,11 +261,11 @@ public final class FileSupport {
    * Note that existing files and directories will be overwritten.
    *
    * @param sourceDirectory
-   *         the source directory
+   *          the source directory
    * @param targetDirectory
-   *         the target directory to copy the content of the source directory to
+   *          the target directory to copy the content of the source directory to
    * @throws IOException
-   *         if copying fails
+   *           if copying fails
    */
   public static void copyContent(File sourceDirectory, File targetDirectory) throws IOException {
     copyContent(sourceDirectory, targetDirectory, false);
@@ -277,12 +280,12 @@ public final class FileSupport {
    * </p>
    *
    * @param sourceLocation
-   *         the source file or directory
+   *          the source file or directory
    * @param targetLocation
-   *         the targetLocation
+   *          the targetLocation
    * @return the created link
    * @throws IOException
-   *         if linking of the file or directory failed
+   *           if linking of the file or directory failed
    */
   public static File link(File sourceLocation, File targetLocation) throws IOException {
     return link(sourceLocation, targetLocation, false);
@@ -298,14 +301,14 @@ public final class FileSupport {
    * file already exists.
    *
    * @param sourceLocation
-   *         the source file or directory
+   *          the source file or directory
    * @param targetLocation
-   *         the targetLocation
+   *          the targetLocation
    * @param overwrite
-   *         <code>true</code> to overwrite existing files
+   *          <code>true</code> to overwrite existing files
    * @return the created link
    * @throws IOException
-   *         if linking of the file or directory failed
+   *           if linking of the file or directory failed
    */
   public static File link(final File sourceLocation, final File targetLocation, final boolean overwrite)
           throws IOException {
@@ -345,12 +348,12 @@ public final class FileSupport {
    * will overwrite any existing file that might already be present at the destination.
    *
    * @param sourceLocation
-   *         the source file
+   *          the source file
    * @param targetLocation
-   *         the target file
+   *          the target file
    * @return <code>true</code> if the link was created, <code>false</code> otherwhise
    * @throws IOException
-   *         if linking of the file failed
+   *           if linking of the file failed
    */
   public static boolean supportsLinking(File sourceLocation, File targetLocation) {
     final Path sourcePath = requireNonNull(sourceLocation).toPath();
@@ -422,18 +425,16 @@ public final class FileSupport {
   }
 
   /**
-   * Delete all directories from <code>start</code> up to directory <code>limit</code> if they are empty.
-   * Directory <code>limit</code> is <em>exclusive</em> and will not be deleted.
+   * Delete all directories from <code>start</code> up to directory <code>limit</code> if they are empty. Directory
+   * <code>limit</code> is <em>exclusive</em> and will not be deleted.
    *
    * @return true if the <em>complete</em> hierarchy has been deleted. false in any other case.
    */
   public static boolean deleteHierarchyIfEmpty(File limit, File start) {
-    return limit.isDirectory() && start.isDirectory()
-            &&
-            (isEqual(limit, start)
-                    ||
-                    (isParent(limit, start) && start.list().length == 0
-                            && start.delete() && deleteHierarchyIfEmpty(limit, start.getParentFile())));
+    return limit.isDirectory()
+            && start.isDirectory()
+            && (isEqual(limit, start) || (isParent(limit, start) && start.list().length == 0 && start.delete() && deleteHierarchyIfEmpty(
+                    limit, start.getParentFile())));
   }
 
   /** Compare two files by their canonical paths. */
@@ -446,9 +447,8 @@ public final class FileSupport {
   }
 
   /**
-   * Check if <code>a</code> is a parent of <code>b</code>.
-   * This can only be the case if <code>a</code> is a directory and a sub path of <code>b</code>.
-   * <code>isParent(a, a) == true</code>.
+   * Check if <code>a</code> is a parent of <code>b</code>. This can only be the case if <code>a</code> is a directory
+   * and a sub path of <code>b</code>. <code>isParent(a, a) == true</code>.
    */
   public static boolean isParent(File a, File b) {
     try {
@@ -467,7 +467,7 @@ public final class FileSupport {
    * do a recursive delete, you may use {@link #delete(File, boolean)}.
    *
    * @param f
-   *         the file or directory
+   *          the file or directory
    * @see #delete(File, boolean)
    */
   public static boolean delete(File f) {
@@ -482,9 +482,9 @@ public final class FileSupport {
    * </p>
    *
    * @param f
-   *         the file or directory
+   *          the file or directory
    * @param recurse
-   *         <code>true</code> to do a recursive deletes for directories
+   *          <code>true</code> to do a recursive deletes for directories
    */
   public static boolean delete(File f, boolean recurse) {
     if (f == null)
@@ -543,11 +543,11 @@ public final class FileSupport {
    * Sets the webapp's temporary directory. Make sure that directory exists and has write permissions turned on.
    *
    * @param tmpDir
-   *         the new temporary directory
+   *          the new temporary directory
    * @throws IllegalArgumentException
-   *         if the file object doesn't represent a directory
+   *           if the file object doesn't represent a directory
    * @throws IllegalStateException
-   *         if the directory is write protected
+   *           if the directory is write protected
    */
   public static void setTempDirectory(File tmpDir) throws IllegalArgumentException, IllegalStateException {
     if (tmpDir == null || !tmpDir.isDirectory())
@@ -573,7 +573,7 @@ public final class FileSupport {
    * Returns a directory <code>subdir</code> inside the webapp's temporary work directory.
    *
    * @param subdir
-   *         name of the subdirectory
+   *          name of the subdirectory
    * @return the ready to use temp directory
    */
   public static File getTempDirectory(String subdir) {
@@ -593,9 +593,9 @@ public final class FileSupport {
    * Returns true if both canonical file paths are equal.
    *
    * @param a
-   *         the first file or null
+   *          the first file or null
    * @param b
-   *         the second file or null
+   *          the second file or null
    */
   public static boolean equals(File a, File b) {
     try {

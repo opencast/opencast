@@ -30,7 +30,7 @@ public interface MessageSender {
   /**
    * The types of message destinations there are to send to.
    */
-  public static enum DestinationType {
+  enum DestinationType {
     Queue, Topic
   };
 
@@ -57,7 +57,6 @@ public interface MessageSender {
    *          The text to send.
    */
   void sendTextMessage(String destinationId, DestinationType type, String messageText);
-
 
   /**
    * Send a message asynchronously with a payload of a byte array.
@@ -94,12 +93,8 @@ public interface MessageSender {
    *          The id of the destination location.
    * @param type
    *          The type of the destination.
-   * @param bytes
-   *          The bytes to send.
-   * @param offset
-   *          The offset to start sending the bytes.
-   * @param length
-   *          The length of the bytes to send.
+   * @param object
+   *          The serializable object to send.
    */
   void sendObjectMessage(String destinationId, DestinationType type, Serializable object);
 }

@@ -35,11 +35,6 @@
       <artifactId>matterhorn-workspace-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-composer-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <!--  Thirdparty dependencies -->
     <dependency>
       <groupId>commons-io</groupId>

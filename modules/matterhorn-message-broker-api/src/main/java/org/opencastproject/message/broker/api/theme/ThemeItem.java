@@ -21,12 +21,14 @@
 
 package org.opencastproject.message.broker.api.theme;
 
+import org.opencastproject.message.broker.api.MessageItem;
+
 import java.io.Serializable;
 
 /**
  * {@link Serializable} class that represents all of the possible messages sent through a ThemeService queue.
  */
-public class ThemeItem implements Serializable {
+public class ThemeItem implements MessageItem, Serializable {
 
   private static final long serialVersionUID = 3318918491810662792L;
 
@@ -84,6 +86,11 @@ public class ThemeItem implements Serializable {
     this.id = themeId;
     this.theme = null;
     this.type = Type.Delete;
+  }
+
+  @Override
+  public String getId() {
+    return Long.toString(id);
   }
 
   public Long getThemeId() {

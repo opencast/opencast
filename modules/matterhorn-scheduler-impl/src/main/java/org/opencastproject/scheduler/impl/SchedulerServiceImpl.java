@@ -78,8 +78,8 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
-import com.google.common.cache.Cache;
 
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import net.fortuna.ical4j.model.Period;
@@ -88,10 +88,10 @@ import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -782,7 +782,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       try {
         persistence.updateEventWithMetadata(eventId, properties);
         messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
-                SchedulerItem.updateProperties(persistence.getMediaPackageId(eventId), properties));
+                SchedulerItem.updateProperties(persistence.getMediaPackageId(eventId),
+                        new HashMap<String, String>((Map) properties)));
       } catch (SchedulerServiceDatabaseException ex) {
         logger.error("Failed to update capture agent configuration for event '{}': {}", eventId, ex.getMessage());
         throw new SchedulerException(ex);
@@ -1476,7 +1477,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       }
       persistence.updateEventWithMetadata(eventId, eventMetadata);
       messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
-              SchedulerItem.updateProperties(mediapackageId, eventMetadata));
+              SchedulerItem.updateProperties(mediapackageId, new HashMap<String, String>((Map) eventMetadata)));
     } catch (SchedulerServiceDatabaseException e) {
       logger.error("Failed to add workflow configs to the event with mediapackage '{}': {}", mediapackageId,
               ExceptionUtils.getStackTrace(e));
@@ -1535,7 +1536,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                     SchedulerItem.updateCatalog(eventId, event));
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                    SchedulerItem.updateProperties(eventId, properties));
+                    SchedulerItem.updateProperties(eventId, new HashMap<String, String>((Map) properties)));
             if (accessControlList != null)
               messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                       SchedulerItem.updateAcl(eventId, accessControlList));

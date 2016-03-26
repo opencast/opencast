@@ -111,8 +111,8 @@ public class TestThemesEndpoint extends ThemesEndpoint {
     // Create AdminUI Search Index
     AdminUISearchIndex adminUISearchIndex = EasyMock.createMock(AdminUISearchIndex.class);
     final Capture<ThemeSearchQuery> themeQueryCapture = new Capture<ThemeSearchQuery>();
-    EasyMock.expect(adminUISearchIndex.getByQuery(EasyMock.capture(themeQueryCapture))).andAnswer(
-            new IAnswer<SearchResult<org.opencastproject.index.service.impl.index.theme.Theme>>() {
+    EasyMock.expect(adminUISearchIndex.getByQuery(EasyMock.capture(themeQueryCapture)))
+            .andAnswer(new IAnswer<SearchResult<org.opencastproject.index.service.impl.index.theme.Theme>>() {
 
               @Override
               public SearchResult<org.opencastproject.index.service.impl.index.theme.Theme> answer() throws Throwable {
@@ -120,8 +120,8 @@ public class TestThemesEndpoint extends ThemesEndpoint {
               }
             });
     final Capture<SeriesSearchQuery> seriesQueryCapture = new Capture<SeriesSearchQuery>();
-    EasyMock.expect(adminUISearchIndex.getByQuery(EasyMock.capture(seriesQueryCapture))).andAnswer(
-            new IAnswer<SearchResult<Series>>() {
+    EasyMock.expect(adminUISearchIndex.getByQuery(EasyMock.capture(seriesQueryCapture)))
+            .andAnswer(new IAnswer<SearchResult<Series>>() {
 
               @Override
               public SearchResult<Series> answer() throws Throwable {
@@ -140,18 +140,18 @@ public class TestThemesEndpoint extends ThemesEndpoint {
 
     StaticFileService staticFileService = EasyMock.createNiceMock(StaticFileService.class);
     EasyMock.expect(staticFileService.getFile(EasyMock.anyString()))
-    .andReturn(new ByteArrayInputStream("test".getBytes("utf-8"))).anyTimes();
+            .andReturn(new ByteArrayInputStream("test".getBytes("utf-8"))).anyTimes();
     EasyMock.expect(staticFileService.getFileName(EasyMock.anyString())).andStubReturn("test.mp4");
     EasyMock.replay(staticFileService);
 
     BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
     EasyMock.expect(bundleContext.getProperty("org.opencastproject.server.url")).andReturn("http://localhost:8080")
-    .anyTimes();
+            .anyTimes();
     EasyMock.replay(bundleContext);
 
     ComponentContext componentContext = EasyMock.createNiceMock(ComponentContext.class);
     EasyMock.expect(componentContext.getBundleContext()).andReturn(bundleContext).anyTimes();
-    EasyMock.expect(componentContext.getProperties()).andReturn(new Hashtable<>()).anyTimes();
+    EasyMock.expect(componentContext.getProperties()).andReturn(new Hashtable<String, Object>()).anyTimes();
     EasyMock.replay(componentContext);
 
     StaticFileRestService staticFileRestService = new StaticFileRestService();

@@ -63,28 +63,29 @@ public class ServersListProvider implements ResourceListProvider {
   public static final String LIST_TEXT = PROVIDER_PREFIX + "." + FILTER_PATH;
 
   /** The list of filter criteria for this provider */
-  public static enum SERVERS_FILTER_LIST {
+  public enum ServersFilterList {
     CORES, MAXJOBS, MEMORY, PATH, SERVICE, HOSTNAME;
   };
 
   /** The names of the different list available through this provider */
-  private List<String> listNames;
+  private List<String> listNames = new ArrayList<String>();
 
   private ServiceRegistry serviceRegistry;
 
   private static final Logger logger = LoggerFactory.getLogger(ServersListProvider.class);
 
-  protected void activate(BundleContext bundleContext) {
-    logger.info("Servers list provider activated!");
-    listNames = new ArrayList<String>();
-
+  public ServersListProvider() {
     // Fill the list names
-    for (SERVERS_FILTER_LIST value : SERVERS_FILTER_LIST.values()) {
+    for (ServersFilterList value : ServersFilterList.values()) {
       listNames.add(getListNameFromFilter(value));
     }
 
     // Standard list
     listNames.add(PROVIDER_PREFIX);
+  }
+
+  protected void activate(BundleContext bundleContext) {
+    logger.info("Servers list provider activated!");
   }
 
   /** OSGi callback for the service registry. */
@@ -98,20 +99,20 @@ public class ServersListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException {
-    Map<String, Object> list = new HashMap<String, Object>();
+    Map<String, String> list = new HashMap<String, String>();
 
     // Get list name
-    SERVERS_FILTER_LIST listValue;
+    ServersFilterList listValue;
     if (PROVIDER_PREFIX.equals(listName)) {
-      listValue = SERVERS_FILTER_LIST.HOSTNAME;
+      listValue = ServersFilterList.HOSTNAME;
     } else {
       try {
-        listValue = SERVERS_FILTER_LIST.valueOf(listName.replace(PROVIDER_PREFIX + ".", "").toUpperCase());
+        listValue = ServersFilterList.valueOf(listName.replace(PROVIDER_PREFIX + ".", "").toUpperCase());
       } catch (IllegalArgumentException e) {
         logger.warn("List name '{}' unavailable for jobs list provider: {}", listName, e);
-        listValue = SERVERS_FILTER_LIST.HOSTNAME;
+        listValue = ServersFilterList.HOSTNAME;
       }
     }
 
@@ -161,7 +162,7 @@ public class ServersListProvider implements ResourceListProvider {
         } catch (ServiceRegistryException e) {
           throw new ListProviderException("Not able to get the list of the hosts from the services registry");
         }
-        Map<String, Object> services = new HashMap<String, Object>();
+        Map<String, String> services = new HashMap<String, String>();
         for (ServiceStatistics serviceStat : servicesStatistics) {
           if (server.getBaseUrl().equals(serviceStat.getServiceRegistration().getHost())) {
             String service = serviceStat.getServiceRegistration().getServiceType();
@@ -229,7 +230,7 @@ public class ServersListProvider implements ResourceListProvider {
    *          the filter from which the list name is needed
    * @return the list name related to the givne filter
    */
-  public static String getListNameFromFilter(SERVERS_FILTER_LIST filter) {
+  public static String getListNameFromFilter(ServersFilterList filter) {
     return PROVIDER_PREFIX + "." + filter.toString();
   }
 
@@ -239,9 +240,9 @@ public class ServersListProvider implements ResourceListProvider {
    * @return an string array containing the list names
    */
   public static String[] getAvailableFilters() {
-    String[] list = new String[SERVERS_FILTER_LIST.values().length];
+    String[] list = new String[ServersFilterList.values().length];
     int i = 0;
-    for (SERVERS_FILTER_LIST value : SERVERS_FILTER_LIST.values()) {
+    for (ServersFilterList value : ServersFilterList.values()) {
       list[i++] = getListNameFromFilter(value);
     }
     return list;

@@ -31,20 +31,25 @@ An Event can either be a single, standalone Event or one of many Events that bel
 
 See also the [Access Policies section](accesspolicies.md#apply-access-policies-to-events) to find out more about applying Access Policies to Events
 
-## Events Progress Status
+## Events Statuses
 
-The Progress column shows in which state the Task running on the Event is. These are the possible values and their meaning:
+The progress column shows in which state the event is. These are the possible values and their meaning:
 
-* **INSTANTIATED**: The task on the event is being prepared
-* **RUNNING**: The task is currently running
-* **STOPPED**: The task has stopped. Note. Stopping a task can only be achieved using the REST endpoint
-* **PAUSED**: The task is paused and requires manual action (such as cutting for example) to proceed further
-* **SUCCEEDED**: The task has been run successfully
-* **FAILED**: The task has failed. See the Event’s details for more information
-* **FAILING**: The current task is about to fail and processing artifacts are being cleaned up
+* **Scheduled**: The Event is scheduled for recording
+* **Recording**: The Event is currently being recorded
+* **Ingesting**: The recorded files are being ingested by Opencast
+* **Pending**: The Event is in the processing queue and waiting to be processed
+* **Processing**: The Event is currently being processed
+* **Paused**: The task is paused and requires manual action (for example cutting) to proceed
+* **Processing canceled**: The processing of the event has been stopped
+* **Processed**: The Event has been successfully processed
 
+Errors:
 
-## How to edit Events
+* **Recording failure**: An error occurred while Recording
+* **Processing failure**: An error occurred while processing
+
+## How to Edit Events
 
 Use the edit icon ( ![icon_hamburger][] ) on the Actions column to open the Event’s details and start editing.
 
