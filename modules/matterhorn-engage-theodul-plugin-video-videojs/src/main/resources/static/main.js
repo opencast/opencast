@@ -43,7 +43,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     'lib/video-js/video-js.min.css'
   ];
 
-
   var plugin;
   var events = {
     play: new Engage.Event('Video:play', 'plays the video', 'both'),
@@ -168,7 +167,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var zoom_step_size = 0.05;
   var decimal_places = 3;
 
-
   /* don't change these variables */
   var currentTime = 0;
   var Utils;
@@ -203,18 +201,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var id_switchPlayers = 'switchPlayers';
   var class_vjs_switchPlayer = 'vjs-switchPlayer';
   var class_btn_video = 'btn-video';
-  var class_vjs_menu_button = 'vjs-menu-button';
   var class_vjs_switchPlayer_value = 'vjs-switchPlayer-value';
-  var class_vjs_menu = 'vjs-menu';
   var class_vjs_menu_content = 'vjs-menu-content';
   var class_vjs_menu_item = 'vjs-menu-item';
   var class_vjsposter = 'vjs-poster';
   var class_vjs_openInPlayer = 'vjs-openInPlayer';
-  var class_vjs_control = 'vjs-control';
   var class_vjs_control_text = 'vjs-control-text';
-  var class_vjs_mute_control = 'vjs-mute-control';
   var class_vjs_remaining_time = 'vjs-remaining-time';
-  var class_audio_wrapper = 'audio_wrapper';
   var class_audioDisplay = 'audioDisplay';
   var class_audioDisplayError = 'audioDisplayError';
   var videosReady = false;
@@ -259,9 +252,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
   var foundQualities = undefined;
   var zoomTimeout = 500;
-  var zoomMiniMapWidth = 0.2;
-  var minimapStrokeColor = 'black';
-
 
   function initTranslate(language, funcSuccess, funcError) {
     var path = Engage.getPluginPath('EngagePluginVideoVideoJS').replace(/(\.\.\/)/g, '');
@@ -336,7 +326,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       }
     }
 
-    //avoid filtering to an empty list, better play something than nothing
+    // avoid filtering to an empty list, better play something than nothing
     if (newTracksArray.length < 1) {
       return tracks;
     }
@@ -607,7 +597,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       // reset drawings
       c.width = $('#indicator').width();
       c.height = $('#indicator').height();
-      c.width = c.width;
 
       var ctx = c.getContext('2d');
       ctx.fillStyle = '#FFFFFF';
@@ -637,7 +626,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     Engage.on(plugin.events.togglePiP.getName(), function (pip) {
       if (pip && videoFocused) {
         selector = '.videoFocusedPiP video';
-        mapSelector = '.videoFocusedPiP'
+        mapSelector = '.videoFocusedPiP';
         setTimeout(redrawMinimap, zoomTimeout);
       } else if (!pip && videoFocused) {
         selector = '.videoFocused video';
@@ -672,9 +661,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
           setTimeout(showMinimap, zoomTimeout);
         }
       } else if (!isPiP && videoFocused) {
-        // Toggle nonPiP Displays or leave focused mode while nonPiP
+        // Toggle non-PiP displays or leave focused mode while nonPiP
         if (singleVideo) {
-          // While Video with one Display loaded this could occur
+          // While video with one display loaded this could occur
           videoFocused = false;
           selector = 'video';
           mapSelector = '.videoDisplay';
@@ -685,9 +674,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
           setTimeout(redrawMinimap, zoomTimeout);
         }
       } else if (isPiP && videoFocused) {
-        // Toggle PiP Displays or leave focused mode while PiP
+        // Toggle PiP displays or leave focused mode while PiP
         if (singleVideo) {
-          // While Video with one display loaded this could occur
+          // While video with one display loaded this could occur
           videoFocused = false;
           selector = 'video';
           mapSelector = '.videoDisplay';
@@ -733,7 +722,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       if (event.deltaY > 0) {
         Engage.trigger(events.setZoomLevel.getName(), [zoom_step_size]);
         // move towards mouse position
-        var z = zoomLevels[zoomLevels.indexOf($(selector)[0].id) + 1]
+        var z = zoomLevels[zoomLevels.indexOf($(selector)[0].id) + 1];
 
         moveHorizontal(-((xdiff / 5) / z));
         moveVertical(-((ydiff / 5) / z));
@@ -752,7 +741,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       $(selector).mousemove(function (event) {
         if (lastEvent != null) {
           flag = 1;
-          // Movement
           var x_move = lastEvent.pageX - event.pageX;
           var y_move = lastEvent.pageY - event.pageY;
           Engage.trigger(plugin.events.moveHorizontal.getName(), -x_move);
@@ -808,7 +796,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         offset = Number(offset);
 
         if (step > 0 && (Math.abs($(selector).position().top) < step)) {
-          step = Math.abs($(selector).position().top)
+          step = Math.abs($(selector).position().top);
         }
 
         if (step < 0 && (offset + step < top)) {
@@ -865,10 +853,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         leftOffset = leftOffset - Math.abs(leftTrans);
         if (leftOffset < 0) {
           if (leftTrans > 0) {
-            Engage.trigger(plugin.events.moveHorizontal.getName(), leftOffset)
+            Engage.trigger(plugin.events.moveHorizontal.getName(), leftOffset);
           }
           if (leftTrans < 0) {
-            Engage.trigger(plugin.events.moveHorizontal.getName(), -leftOffset)
+            Engage.trigger(plugin.events.moveHorizontal.getName(), -leftOffset);
           }
         }
 
@@ -876,10 +864,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         topOffset = topOffset - Math.abs(topTrans);
         if (topOffset < 0) {
           if (topTrans > 0) {
-            Engage.trigger(plugin.events.moveVertical.getName(), topOffset)
+            Engage.trigger(plugin.events.moveVertical.getName(), topOffset);
           }
           if (topTrans < 0) {
-            Engage.trigger(plugin.events.moveVertical.getName(), -topOffset)
+            Engage.trigger(plugin.events.moveVertical.getName(), -topOffset);
           }
         }
 
