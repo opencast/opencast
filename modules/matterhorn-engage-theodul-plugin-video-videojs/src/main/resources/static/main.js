@@ -1443,7 +1443,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       var rate = videodisplayMaster.playbackRate();
       Engage.trigger(plugin.events.playbackRateChanged.getName(), (rate + value));
     }
-
   }
 
   function registerEventsAudioOnly(videoDisplay) {
@@ -1614,26 +1613,29 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     var videodisplayMaster = videojs(videoDisplay);
     var $videoDisplay = $('#' + videoDisplay);
 
-    if (numberOfVideodisplays == 1) {
-      videodisplayMaster.on('play', function () {
-        $('.' + class_vjsposter).detach();
-        Engage.trigger(plugin.events.play.getName(), true);
-        pressedPlayOnce = true;
-      });
-      videodisplayMaster.on('pause', function () {
-        Engage.trigger(plugin.events.pause.getName(), true);
-      });
-      videodisplayMaster.on('ended', function () {
-        Engage.trigger(plugin.events.ended.getName(), true);
-      });
-      videodisplayMaster.on('timeupdate', function () {
-        Engage.trigger(plugin.events.timeupdate.getName(), videodisplayMaster.currentTime(), true);
-      });
-    }
+    videodisplayMaster.on('play', function () {
+      $('.' + class_vjsposter).detach();
+      Engage.trigger(plugin.events.play.getName(), true);
+      pressedPlayOnce = true;
+    });
+
+    videodisplayMaster.on('pause', function () {
+      Engage.trigger(plugin.events.pause.getName(), true);
+    });
+
+    videodisplayMaster.on('ended', function () {
+      Engage.trigger(plugin.events.ended.getName(), true);
+    });
+
+    videodisplayMaster.on('timeupdate', function () {
+      Engage.trigger(plugin.events.timeupdate.getName(), videodisplayMaster.currentTime(), true);
+    });
+
     $('#' + id_btn_fullscreenCancel).click(function (e) {
       e.preventDefault();
       Engage.trigger(plugin.events.fullscreenCancel.getName());
     });
+
     Engage.on(plugin.events.fullscreenEnable.getName(), function () {
       if (numberOfVideodisplays == 1) {
         videodisplayMaster.requestFullscreen();
@@ -1663,6 +1665,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       $videoDisplay.removeClass('vjs-controls-disabled').addClass('vjs-controls-enabled');
       $('.' + id_videoDisplayClass).css('max-width', $(window).height() * videoAreaAspectRatio);
     });
+
     Engage.on(plugin.events.fullscreenCancel.getName(), function () {
       if (numberOfVideodisplays == 1) {
         $('#' + videoDisplay).css('padding-top', singleVideoPaddingTop);
@@ -1689,12 +1692,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       $('.' + id_videoDisplayClass).css('max-width', '');
       checkVideoDisplaySize();
     });
+
     Engage.on(plugin.events.playbackRateChanged.getName(), function (rate) {
       if (pressedPlayOnce) {
         Engage.log('Video: Playback rate changed to rate ' + rate);
         videodisplayMaster.playbackRate(rate);
       }
     });
+
     Engage.on(plugin.events.play.getName(), function (triggeredByMaster) {
       if (!triggeredByMaster && videosReady) {
         $('.' + class_vjsposter).detach();
@@ -1703,6 +1708,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         pressedPlayOnce = true;
       }
     });
+
     Engage.on(plugin.events.autoplay.getName(), function () {
       interval_autoplay = window.setInterval(function () {
         if (pressedPlayOnce) {
@@ -1713,6 +1719,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         }
       }, interval_autoplay_ms);
     });
+
     Engage.on(plugin.events.initialSeek.getName(), function (e) {
       parsedSeconds = Utils.parseSeconds(e);
       interval_initialSeek = window.setInterval(function () {
@@ -1727,12 +1734,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         }
       }, interval_initialSeek_ms);
     });
+
     Engage.on(plugin.events.pause.getName(), function (triggeredByMaster) {
       if (!triggeredByMaster && pressedPlayOnce) {
         clearAutoplay();
         videodisplayMaster.pause();
       }
     });
+
     Engage.on(plugin.events.playPause.getName(), function () {
       if (videodisplayMaster.paused()) {
         Engage.trigger(plugin.events.play.getName());
@@ -1740,6 +1749,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         Engage.trigger(plugin.events.pause.getName());
       }
     });
+
     Engage.on(plugin.events.seekLeft.getName(), function () {
       if (pressedPlayOnce) {
         var currTime = videodisplayMaster.currentTime();
@@ -1750,6 +1760,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         }
       }
     });
+
     Engage.on(plugin.events.seekRight.getName(), function () {
       if (pressedPlayOnce) {
         var currTime = videodisplayMaster.currentTime();
@@ -1761,26 +1772,32 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         }
       }
     });
+
     Engage.on(plugin.events.playbackRateIncrease.getName(), function () {
       changePlaybackRate(0.125, videodisplayMaster);
     });
+
     Engage.on(plugin.events.playbackRateDecrease.getName(), function () {
       changePlaybackRate(-0.125, videodisplayMaster);
     });
+
     Engage.on(plugin.events.volumeSet.getName(), function (volume) {
       if ((volume >= 0) && (volume <= 1)) {
         Engage.log('Video: Volume changed to ' + volume);
         videodisplayMaster.volume(volume);
       }
     });
+
     Engage.on(plugin.events.volumeGet.getName(), function (callback) {
       if (callback) {
         callback(videodisplayMaster.volume());
       }
     });
+
     Engage.on(plugin.events.timeupdate.getName(), function (time) {
       currentTime = time;
     });
+
     Engage.on(plugin.events.seek.getName(), function (time) {
       Engage.log('Video: Seek to ' + time);
       if (videosReady && pressedPlayOnce) {
@@ -1800,6 +1817,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         Engage.trigger(plugin.events.timeupdate.getName(), 0);
       }
     });
+
     Engage.on(plugin.events.sliderStop.getName(), function (time) {
       if (videosReady && pressedPlayOnce) {
         var duration = parseInt(Engage.model.get('videoDataModel').get('duration'));
@@ -1814,6 +1832,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         Engage.trigger(plugin.events.timeupdate.getName(), 0);
       }
     });
+
     Engage.on(plugin.events.ended.getName(), function () {
       if (videosReady) {
         Engage.log('Video: Video ended and ready');
@@ -1824,9 +1843,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         // Engage.trigger(plugin.events.seek.getName(), 0);
       }
     });
+
     videodisplayMaster.on(event_html5player_volumechange, function () {
       Engage.trigger(plugin.events.volumechange.getName(), videodisplayMaster.volume());
     });
+
     videodisplayMaster.on(event_html5player_fullscreenchange, function () {
       Engage.trigger(plugin.events.fullscreenChange.getName());
     });
@@ -1835,7 +1856,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
     Engage.on(plugin.events.focusVideo.getName(), function (display) {
       Engage.log('Video: received focusing video ' + display);
-
       var videoDiv;
 
       if (display === undefined || display === 'focus.none') {
@@ -1872,7 +1892,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
                 return;
               } else if (display === 'focus.next') {
                 selectNext = true;
-              } else {
+              } else if (last !== undefined) {
                 Engage.trigger(plugin.events.focusVideo.getName(),
                     Utils.getFlavorForVideoDisplay(last));
                 return;
@@ -1882,7 +1902,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
             i++;
           }
         }
-
       } else {
         videoDiv = getDivForFlavor(display);
         if (videoDiv === undefined) {
