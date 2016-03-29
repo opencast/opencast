@@ -298,6 +298,14 @@
     <bundle>mvn:org.opencastproject/matterhorn-workflow-service-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-workflow-workflowoperation/${project.version}</bundle>
   </feature>
+  
+  <feature name="opencast-ingest" version="${project.version}">
+    <feature version="${project.version}">opencast-core</feature>
+    
+    <bundle>mvn:org.opencastproject/matterhorn-ingest-service-api/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-ingest-service-impl/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-ingest-workflowoperation/${project.version}</bundle>
+  </feature>
 
   <feature name="opencast-worker" version="${project.version}">
     <feature version="${project.version}">opencast-core</feature>
