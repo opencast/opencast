@@ -47,8 +47,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -212,11 +210,6 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
     }
 
     String audioMuxingSourceFlavors = StringUtils.trimToNull(operation.getConfiguration(OPT_AUDIO_MUXING_SOURCE_FLAVORS));
-    if ((audioMuxingSourceFlavors != null)
-        && !Pattern.matches("^\\s*[^\\s,/]+/[^\\s,/]+\\s*(,\\s*[^\\s,/]+/[^\\s,/]+\\s*)*$", audioMuxingSourceFlavors))
-    {
-      throw new IllegalStateException("Option " + OPT_AUDIO_MUXING_SOURCE_FLAVORS + " has invalid value '" + audioMuxingSourceFlavors + "'");
-    }
 
     // Select those tracks that have matching flavors
     Track[] tracks = mediaPackage.getTracks(sourceFlavor);
@@ -409,19 +402,28 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
    */
   private Track findAudioTrack(Track videoTrack, MediaPackage mediaPackage, String audioMuxingSourceFlavors) {
 
-    Matcher matcher = Pattern.compile("\\s*(?<type>[^\\s,/]+)/(?<subtype>[^\\s,/]+)\\s*").matcher(audioMuxingSourceFlavors);
-    while (matcher.find()) {
-      String type = matcher.group("type");
-      if (QUESTION_MARK.equals(type)) type = videoTrack.getFlavor().getType();
-
-      String subtype = matcher.group("subtype");
-      if (QUESTION_MARK.equals(subtype)) subtype = videoTrack.getFlavor().getSubtype();
-
-      MediaPackageElementFlavor flavor = new MediaPackageElementFlavor(type, subtype);
-      for (Track track : mediaPackage.getTracks(flavor)) {
-        if (track.hasAudio()) {
-          logger.info("Audio muxing found audio source {} with flavor {}", track, track.getFlavor());
-          return track;
+    if (audioMuxingSourceFlavors != null) {
+      String type;
+      String subtype;
+      for (String flavorStr : audioMuxingSourceFlavors.split("[\\s,]")) {
+        if (!flavorStr.isEmpty()) {
+          MediaPackageElementFlavor flavor = null;
+          try {
+            flavor = MediaPackageElementFlavor.parseFlavor(flavorStr);
+          } catch (IllegalArgumentException e) {
+            logger.error("The parameter {} contains an invalid flavor: {}", OPT_AUDIO_MUXING_SOURCE_FLAVORS, flavorStr);
+            throw e;
+          }
+          type = (QUESTION_MARK.equals(flavor.getType())) ? videoTrack.getFlavor().getType() : flavor.getType();
+          subtype = (QUESTION_MARK.equals(flavor.getSubtype())) ? videoTrack.getFlavor().getSubtype() : flavor.getSubtype();
+          // Recreate the (possibly) modified flavor
+          flavor = new MediaPackageElementFlavor(type, subtype);
+          for (Track track : mediaPackage.getTracks(flavor)) {
+            if (track.hasAudio()) {
+              logger.info("Audio muxing found audio source {} with flavor {}", track, track.getFlavor());
+              return track;
+            }
+          }
         }
       }
     }
