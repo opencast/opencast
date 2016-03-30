@@ -64,7 +64,7 @@ role id can be added to the `mh_user_role` table. Here we set `ROLE_USER` for Ga
     INSERT INTO `opencast`.`mh_user_role` (`user_id`, `role_id`) VALUES ('220', '221');
 
 ** Note that you must set the value of the organization field to the organization ID specified in one of the
-`.../etc/load/org.opencast.organization-<organization_name>.cfg` files. In a default installation this is
+`.../etc/org.opencast.organization-<organization_name>.cfg` files. In a default installation this is
 `mh_default_org`.**
 
 ## Further Authentication Configuration
