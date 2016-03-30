@@ -12,6 +12,7 @@
 
 .videoDisplay {
     margin: 1px;
+    overflow: hidden;
 }
 
 .videoDefaultLayout {
