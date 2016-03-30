@@ -241,7 +241,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       em = emf.createEntityManager();
       Query q = em.createNamedQuery("findUserActions");
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
       Collection<UserAction> userActions = q.getResultList();
 
       for (UserAction a : userActions) {
@@ -283,7 +284,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       Query q = em.createNamedQuery("findUserActionsByType");
       q.setParameter("type", type);
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
       Collection<UserAction> userActions = q.getResultList();
 
       for (UserAction a : userActions) {
@@ -325,7 +327,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       q.setParameter("type", type);
       q.setParameter("mediapackageId", mediapackageId);
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
       @SuppressWarnings("unchecked")
       Collection<UserAction> userActions = q.getResultList();
 
@@ -365,7 +368,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       q.setParameter("begin", calBegin, TemporalType.TIMESTAMP);
       q.setParameter("end", calEnd, TemporalType.TIMESTAMP);
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
       Collection<UserAction> userActions = q.getResultList();
 
       for (UserAction a : userActions) {
@@ -394,7 +398,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       q.setParameter("type", type);
       q.setParameter("mediapackageId", mediapackageId);
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
       @SuppressWarnings("unchecked")
       Collection<UserAction> userActions = q.getResultList();
 
@@ -423,7 +428,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       q.setParameter("type", type);
       q.setParameter("mediapackageId", mediapackageId);
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
       @SuppressWarnings("unchecked")
       Collection<UserAction> userActions = q.getResultList();
 
@@ -493,7 +499,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       q.setParameter("begin", calBegin, TemporalType.TIMESTAMP);
       q.setParameter("end", calEnd, TemporalType.TIMESTAMP);
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
       Collection<UserAction> userActions = q.getResultList();
 
       for (UserAction a : userActions) {
@@ -532,7 +539,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       em = emf.createEntityManager();
       Query q = em.createNamedQuery("countSessionsGroupByMediapackage");
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
 
       @SuppressWarnings("unchecked")
       List<Object[]> result = q.getResultList();
@@ -582,7 +590,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       em = emf.createEntityManager();
       Query q = em.createNamedQuery("countSessionsGroupByMediapackageByIntervall");
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
       q.setParameter("begin", calBegin, TemporalType.TIMESTAMP);
       q.setParameter("end", calEnd, TemporalType.TIMESTAMP);
 
