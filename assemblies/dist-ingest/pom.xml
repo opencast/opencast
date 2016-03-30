@@ -76,7 +76,7 @@
         <configuration>
           <bootFeatures>
             <feature>standard</feature>
-            <feature>opencast-presentation</feature>
+            <feature>opencast-ingest</feature>
            </bootFeatures>
         </configuration>
       </plugin>
