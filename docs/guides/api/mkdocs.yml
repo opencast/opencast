@@ -1,0 +1,42 @@
+site_name: Opencast - API Documentation
+#repo_url: https://bitbucket.org/entwinemedia/opencast-api/
+
+# Default theme used is readthedocs
+theme: readthedocs
+
+# Some of the themes elements can be overridded by elements in this folder
+# Note: this is currently not working in on ReadTheDocs
+#theme_dir: 'theme_override'
+
+# The directory that contain the source .md files
+docs_dir: 'docs'
+
+# The directory to which the site is built using mkdocs
+site_dir: 'site'
+
+# This needs to be listed in order to populate the left navigation and the TOC
+# Items will appear in this order
+
+pages:
+- ['index.md', 'Introduction']
+- ['usage.md', 'Usage']
+- ['authentication.md', 'Authentication']
+- ['authorization.md', 'Authorization']
+- ['glossary.md', 'Glossary']
+- ['base-api.md', 'Base API']
+- ['events-api.md', 'Events API']
+- ['series-api.md', 'Series API']
+#- ['users-api.md', 'Users API']
+#- ['groups-api.md', 'Groups API']
+- ['security-api.md', 'Security API']
+
+
+# Version number of the documentation
+# Note: It is currently not possible to use custom varibles into templates or md
+# files, hence this is currently commented out.
+# build_version: ''
+
+# Git commit hash of the documentation build
+# Note: It is currently not possible to use custom varibles into templates or md
+# files, hence this is currently commented out.
+# build_hash: ''

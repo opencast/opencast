@@ -27,6 +27,12 @@
               </li>
               <li>
                 <span>
+                  <input id="publishToApi" name="publishToApi" type="checkbox" checked="checked" class="configField" value="true" />
+                  <span>&nbsp;External Applications</span>
+                </span>
+              </li>
+              <li>
+                <span>
                   <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" />
                   <span>&nbsp;YouTube</span>
                 </span>
@@ -46,6 +52,7 @@
       description="Applying default configuration values">
       <configurations>
         <configuration key="publishToEngage">true</configuration>
+        <configuration key="publishToApi">true</configuration>
         <configuration key="publishToYouTube">false</configuration>
       </configurations>
     </operation>

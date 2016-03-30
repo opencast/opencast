@@ -35,6 +35,9 @@ public interface MatterhornConstants {
   /** The property key for the Admin UI URL defined in the organization properties */
   String ADMIN_URL_ORG_PROPERTY = "org.opencastproject.admin.ui.url";
 
+  /** The property key for the external API URL defined in the organization properties */
+  String EXTERNAL_API_URL_ORG_PROPERTY = "org.opencastproject.external.api.url";
+
   /** The property key for the AssetManager URL in the organization properties */
   String ARCHIVE_URL_ORG_PROPERTY = "org.opencastproject.archiv.url";
 

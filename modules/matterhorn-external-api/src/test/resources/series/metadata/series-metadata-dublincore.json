@@ -1,0 +1,99 @@
+[
+  {
+    "id": "title",
+    "readOnly": false,
+    "value": "Via API",
+    "label": "EVENTS.SERIES.DETAILS.METADATA.TITLE",
+    "required": true,
+    "type": "text"
+  },
+  {
+    "id": "subjects",
+    "readOnly": false,
+    "value": ["Topic"],
+    "label": "EVENTS.SERIES.DETAILS.METADATA.SUBJECT",
+    "required": false,
+    "type": "text"
+  },
+  {
+    "id": "description",
+    "readOnly": false,
+    "value": "A series created over the external API",
+    "label": "EVENTS.SERIES.DETAILS.METADATA.DESCRIPTION",
+    "required": false,
+    "type": "text"
+  },
+  {
+    "id": "language",
+    "readOnly": false,
+    "value": "",
+    "label": "EVENTS.SERIES.DETAILS.METADATA.LANGUAGE",
+    "required": false,
+    "type": "text"
+  },
+  {
+    "id": "rightsHolder",
+    "readOnly": false,
+    "value": "",
+    "label": "EVENTS.SERIES.DETAILS.METADATA.RIGHTS",
+    "required": false,
+    "type": "text"
+  },
+  {
+    "id": "license",
+    "readOnly": false,
+    "value": "",
+    "label": "EVENTS.SERIES.DETAILS.METADATA.LICENSE",
+    "required": false,
+    "type": "text"
+  },
+  {
+    "id": "creator",
+    "readOnly": false,
+    "value": [
+      "Peter Feierabend",
+      " Florian Naumann",
+      " Niklas Vogler"
+    ],
+    "label": "EVENTS.SERIES.DETAILS.METADATA.ORGANIZERS",
+    "required": false,
+    "type": "mixed_text"
+  },
+  {
+    "id": "contributor",
+    "readOnly": false,
+    "value": [
+      "Nu'man Farooq Morcos",
+      " Alfie Gibbons"
+    ],
+    "label": "EVENTS.SERIES.DETAILS.METADATA.CONTRIBUTORS",
+    "required": false,
+    "type": "mixed_text"
+  },
+  {
+    "id": "publisher",
+    "readOnly": false,
+    "value": [
+      "Sophie Chandler"
+    ],
+    "label": "EVENTS.SERIES.DETAILS.METADATA.PUBLISHERS",
+    "required": false,
+    "type": "mixed_text"
+  },
+  {
+    "id": "createdBy",
+    "readOnly": true,
+    "value": "Gracie Walsh",
+    "label": "EVENTS.SERIES.DETAILS.METADATA.CREATED_BY",
+    "required": false,
+    "type": "text"
+  },
+  {
+    "id": "identifier",
+    "readOnly": true,
+    "value": "4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f",
+    "label": "EVENTS.SERIES.DETAILS.METADATA.ID",
+    "required": false,
+    "type": "text"
+  }
+]
