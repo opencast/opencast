@@ -175,7 +175,7 @@ Define that the file repository shall access all files locally:
 
     org.opencastproject.file.repo.url=${org.opencastproject.admin.ui.url}
 
-### etc/org.opencastproject.organization-mh_default_org.cfg
+### org.opencastproject.organization-mh_default_org.cfg
 
 Set the base URL of the server hosting the administrative tools. Again use a domain name instead of an IP address if
 possible:
@@ -186,7 +186,7 @@ Set the base URL of the server hosting the engage tools:
 
     org.opencastproject.engage.ui.url=http://<ENGAGE-URL>:8080
 
-### etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.properties
+### org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg
 
 To ensure that jobs are not dispatched by non-admin nodes you may also want to set:
 
