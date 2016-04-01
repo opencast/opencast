@@ -299,6 +299,24 @@
     <bundle>mvn:org.opencastproject/matterhorn-workflow-workflowoperation/${project.version}</bundle>
   </feature>
 
+  <feature name="opencast-ingest" version="${project.version}">
+    <feature version="${project.version}">opencast-core</feature>
+
+    <bundle>mvn:org.opencastproject/matterhorn-metadata-api/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-inspection-service-api/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-inspection-service-remote/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-scheduler-remote/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-smil-api/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-smil-impl/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-ingest-service-api/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-ingest-service-impl/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-runtime-info-ui/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-series-service-remote/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-workflow-service-remote/${project.version}</bundle>
+    <!-- Fixes MH-11263 - add LTI dependency to the kernel bundle for shared opencast.httpcontext -->
+    <bundle>mvn:org.opencastproject/matterhorn-lti/${project.version}</bundle>
+  </feature>
+
   <feature name="opencast-worker" version="${project.version}">
     <feature version="${project.version}">opencast-core</feature>
 
