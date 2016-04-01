@@ -119,6 +119,9 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
         executor.execute(future);
         try {
           BaseMessage baseMessage = (BaseMessage) future.get();
+          if (baseMessage == null) {
+            continue;
+          }
           securityService.setOrganization(baseMessage.getOrganization());
           securityService.setUser(baseMessage.getUser());
           if (baseMessage.getObject() instanceof IndexRecreateObject) {
