@@ -38,7 +38,7 @@ rules. Assume that the new tenant is called `tenant1` and should be mapped to `t
 
 ### Tenant Configuration
 
-Create a file called org.opencastproject.organization-tenant1.cfg in the `/load` directory of your Opencast
+Create a file called org.opencastproject.organization-tenant1.cfg in the `etc/` directory of your Opencast
 installation:
 
     id=tenant1

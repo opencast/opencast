@@ -122,7 +122,7 @@ through, but will block all other characters. For the German language for exampl
 characters would be blocked as well. So you want to configure Opencast to let them pass as well.
 
 You can do that by modifying the `pattern` in
-`etc/services/org.opencastproject.dictionary.regexp.DictionaryServiceImpl.properties`:
+`etc/org.opencastproject.dictionary.regexp.DictionaryServiceImpl.cfg`:
 
 For German, a suitable pattern could be:
 
