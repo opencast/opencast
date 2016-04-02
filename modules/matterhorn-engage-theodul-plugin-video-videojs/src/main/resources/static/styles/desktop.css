@@ -15,6 +15,10 @@
     overflow: hidden;
 }
 
+#engage_video {
+    overflow: hidden;
+}
+
 .videoDefaultLayout {
     float: left;
     width: 49.5%;
