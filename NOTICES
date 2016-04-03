@@ -437,8 +437,8 @@ modules/matterhorn-engage-theodul-plugin-timeline-statistics/src/test/resources/
   http://github.com/jrburke/requirejs
 
 modules/matterhorn-engage-theodul-plugin-video-videojs/src/main/resources/static/lib/synchronize.js
-  Synchronize.js v1.2.3 (https://github.com/CallToPower/Synchronize.js)
-  Copyright (c) 2013-2015, Denis Meyer
+  Synchronize.js v1.2.5 (https://github.com/CallToPower/Synchronize.js)
+  Copyright (c) 2013-2016, Denis Meyer
   Licensed under 3-clause BSD License (https://github.com/CallToPower/Synchronize.js/blob/master/LICENSE.txt)
 
 modules/matterhorn-engage-theodul-plugin-video-videojs/src/main/resources/static/lib/videojs/video.js
