@@ -285,12 +285,13 @@
 
 	<!-- Additional roles that will be added to those obtained from the attributes above -->
 	<!-- The convertToUpperCase and rolePrefix properties also affect the roles indicated here-->
-	<!-- <property name="additionalAuthorities">
+	<property name="additionalAuthorities">
 	  <set>
-	    <value>additional_authority_1</value>
-	    <value>additional_authority_2</value>
+	    <!-- Apparently, some web UIs require the user to always have the ROLE_ANONYMOUS present -->
+	    <value>ROLE_ANONYMOUS</value>
+	    <!-- <value>additional_authority_2</value> -->
 	  </set>
-	</property> -->
+	</property>
       </bean>
     </constructor-arg>
   </bean>
