@@ -44,5 +44,11 @@
   "focusNext":"Poner el foco en el vídeo siguiente",
   "togglePiP":"Activar\/desactivar vídeo superpuesto",
   "movePiP":"Mover vídeo superpuesto",
-  "shortcuts":"Atajos"
+  "shortcuts":"Atajos",
+  "moveLeft":"Move left",
+  "moveRight":"Move right",
+  "moveUp":"Move up",
+  "moveDown":"Move down",
+  "zoomIn":"Zoom in",
+  "zoomOut":"Zoom out"
 }

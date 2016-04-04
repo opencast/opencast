@@ -22,10 +22,15 @@
 package org.opencastproject.index.service.impl.event;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.opencastproject.index.service.impl.index.event.Event;
+import org.opencastproject.index.service.impl.index.event.Event.SchedulingStatus;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.util.DateTimeSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jettison.json.JSONException;
@@ -36,16 +41,27 @@ import org.json.simple.parser.ParseException;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 
-public class EventTest {
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
+public class EventTest {
+  private static final Logger logger = LoggerFactory.getLogger(EventTest.class);
+
+  private static final String ENTRY_KEY = "entry";
+  private static final String KEY_KEY = "key";
+  private static final String VALUE_KEY = "value";
   private static final String LOCATION_JSON_KEY = "location";
   private static final String DESCRIPTION_JSON_KEY = "description";
   private static final String CONTRIBUTOR_JSON_KEY = "contributor";
@@ -57,6 +73,7 @@ public class EventTest {
   private static final String ORGANIZATION_JSON_KEY = "organization";
   private static final String IDENTIFIER_JSON_KEY = "identifier";
   private static final String EVENT_JSON_KEY = "event";
+  private static final String AGENT_CONFIGURATION_KEY = "agent_configuration";
 
   private String id = "10.0000-1";
   private String title = "Land and Vegetation: Key players on the Climate Scene";
@@ -74,8 +91,17 @@ public class EventTest {
   private String contributor2 = "contributor-two";
   private String contributor3 = "contributor-three";
 
+  private Map<String, String> agentConfiguration = new HashMap<String, String>();
+  private String agentConfigurationKey1 = "key-1";
+  private String agentConfigurationValue1 = "value-1";
+  private String agentConfigurationKey2 = "key-2";
+  private String agentConfigurationValue2 = "value-2";
+  private String agentConfigurationKey3 = "key-3";
+  private String agentConfigurationValue3 = "value-3";
+
   private String eventJson;
   private String eventXml;
+  private String eventCAConfigJson;
 
   private final String defaultOrganization = new DefaultOrganization().getId();
 
@@ -89,9 +115,14 @@ public class EventTest {
     contributors.add(contributor1);
     contributors.add(contributor2);
     contributors.add(contributor3);
+    // Setup agent configurations
+    agentConfiguration.put(agentConfigurationKey1, agentConfigurationValue1);
+    agentConfiguration.put(agentConfigurationKey2, agentConfigurationValue2);
+    agentConfiguration.put(agentConfigurationKey3, agentConfigurationValue3);
     // Setup results
     eventJson = IOUtils.toString(getClass().getResource("/adminui_event_metadata.json"));
     eventXml = IOUtils.toString(getClass().getResource("/adminui_event_metadata.xml"));
+    eventCAConfigJson = IOUtils.toString(getClass().getResource("/adminui_event_metadata_agent_configuration.json"));
   }
 
   @Ignore
@@ -126,7 +157,7 @@ public class EventTest {
   }
 
   @Test
-  public void testToJson() throws ParseException {
+  public void testToJson() throws ParseException, IOException {
     Event event = new Event(id, defaultOrganization);
     event.setTitle(title);
     event.setDescription(description);
@@ -134,7 +165,8 @@ public class EventTest {
     event.setLocation(location);
     event.setPresenters(presenters);
     event.setContributors(contributors);
-    System.out.println(event.toJSON());
+    event.setAgentConfiguration(agentConfiguration);
+    logger.info(event.toJSON());
     JSONObject parse = (JSONObject) new JSONParser().parse(event.toJSON());
     if (parse.get(EVENT_JSON_KEY) == null || !(parse.get(EVENT_JSON_KEY) instanceof JSONObject)) {
       fail("There must be an event object returned.");
@@ -145,7 +177,6 @@ public class EventTest {
     assertEquals(title, eventJsonObject.get(TITLE_JSON_KEY));
     assertEquals(description, eventJsonObject.get(DESCRIPTION_JSON_KEY));
     assertEquals(subject, eventJsonObject.get(SUBJECT_JSON_KEY));
-
     assertEquals(location, eventJsonObject.get(LOCATION_JSON_KEY));
 
     JSONArray presentersArray = (JSONArray) ((JSONObject) eventJsonObject.get(PRESENTERS_JSON_KEY))
@@ -161,5 +192,27 @@ public class EventTest {
     assertEquals(contributor1, contributorsArray.get(0));
     assertEquals(contributor2, contributorsArray.get(1));
     assertEquals(contributor3, contributorsArray.get(2));
+
+    JSONObject agentConfigurationObject = (JSONObject) eventJsonObject.get(AGENT_CONFIGURATION_KEY);
+    JSONArray entryArray = (JSONArray) agentConfigurationObject.get(ENTRY_KEY);
+    // Ordering not important
+    assertThat(eventCAConfigJson, SameJSONAs.sameJSONAs(entryArray.toJSONString()).allowingAnyArrayOrdering());
   }
+
+  @Test
+  public void testHasRecordingStarted() {
+    Event event = new Event(id, defaultOrganization);
+    assertTrue(event.hasRecordingStarted());
+
+    Date now = new Date();
+
+    event.setSchedulingStatus(SchedulingStatus.READY_FOR_RECORDING.toString());
+    event.setTechnicalStartTime(DateTimeSupport.toUTC(now.getTime() - (3 * 60 * 1000)));
+    assertTrue(event.hasRecordingStarted());
+
+    event.setSchedulingStatus(SchedulingStatus.OPTED_OUT.toString());
+    event.setTechnicalStartTime(DateTimeSupport.toUTC(now.getTime() + (3 * 60 * 1000)));
+    assertFalse(event.hasRecordingStarted());
+  }
+
 }

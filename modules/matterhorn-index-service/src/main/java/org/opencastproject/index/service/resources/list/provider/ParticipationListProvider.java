@@ -64,9 +64,9 @@ public class ParticipationListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException {
-    Map<String, Object> result = new HashMap<String, Object>();
+    Map<String, String> result = new HashMap<String, String>();
     if (ParticipationFilterList.RECORDING_STATUS.equals(listName)) {
       result.put("READY", "READY");
       result.put("OPTED_OUT", "OPTED_OUT");

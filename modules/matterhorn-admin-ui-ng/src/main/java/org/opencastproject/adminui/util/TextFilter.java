@@ -39,7 +39,7 @@ public final class TextFilter {
    * Notes:
    *   - caseinsensitive
    *   - using union in case of multiple search strings
-   * 
+   *
    * @param searchStrings
    *          whitespace-separated list of search strings
    * @param text

@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.mediapackage;
 
 import static java.lang.String.format;
@@ -48,7 +47,7 @@ import javax.xml.XMLConstants;
  */
 @Immutable
 @ParametersAreNonnullByDefault
-public final class EName implements Serializable {
+public final class EName implements Serializable, Comparable<EName> {
   private static final long serialVersionUID = -5494762745288614634L;
 
   private final String namespaceURI;
@@ -105,11 +104,13 @@ public final class EName implements Serializable {
     return !XMLConstants.NULL_NS_URI.equals(namespaceURI);
   }
 
-  @Override public int hashCode() {
+  @Override
+  public int hashCode() {
     return hash(namespaceURI, localName);
   }
 
-  @Override public boolean equals(Object that) {
+  @Override
+  public boolean equals(Object that) {
     return (this == that) || (that instanceof EName && eqFields((EName) that));
   }
 
@@ -121,5 +122,15 @@ public final class EName implements Serializable {
   @Override
   public String toString() {
     return format("{%s}%s", namespaceURI, localName);
+  }
+
+  @Override
+  public int compareTo(EName o) {
+    final int r = getNamespaceURI().compareTo(o.getNamespaceURI());
+    if (r == 0) {
+      return getLocalName().compareTo(o.getLocalName());
+    } else {
+      return r;
+    }
   }
 }

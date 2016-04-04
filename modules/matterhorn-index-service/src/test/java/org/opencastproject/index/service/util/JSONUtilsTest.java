@@ -126,7 +126,7 @@ public class JSONUtilsTest {
     ListProvidersServiceImpl listProvidersService = new ListProvidersServiceImpl();
     SimpleSerializer serializer = new SimpleSerializer();
 
-    final Map<String, Object> license = new HashMap<String, Object>();
+    final Map<String, String> license = new HashMap<String, String>();
     license.put("contributor1", "My first contributor");
     license.put("contributor2", "My second contributor");
     license.put("contributor3", "My third contributor");
@@ -140,7 +140,7 @@ public class JSONUtilsTest {
       }
 
       @Override
-      public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
+      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
               throws ListProviderException {
         return ListProviderUtil.filterMap(license, query);
       }

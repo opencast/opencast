@@ -44,5 +44,11 @@
   "focusNext":"Nächstes Video vergrößern",
   "togglePiP":"Bild in Bild ein\/aus",
   "movePiP":"Bild in Bild verschieben",
-  "shortcuts":"Tastenkürzel"
+  "shortcuts":"Tastenkürzel",
+  "moveLeft":"Nach links bewegen",
+  "moveRight":"Nach rechts bewegen",
+  "moveUp":"Nach oben bewegen",
+  "moveDown":"Nach unten bewegen",
+  "zoomIn":"Hereinzommen",
+  "zoomOut":"Herauszoomen"
 }

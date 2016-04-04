@@ -82,6 +82,10 @@ public class GroupQueryBuilder extends AbstractElasticsearchQueryBuilder<GroupSe
       }
     }
 
+    if (query.getRole() != null) {
+      and(GroupIndexSchema.ROLE, query.getRole(), true);
+    }
+
     if (query.getName() != null) {
       and(GroupIndexSchema.NAME, query.getName(), true);
     }

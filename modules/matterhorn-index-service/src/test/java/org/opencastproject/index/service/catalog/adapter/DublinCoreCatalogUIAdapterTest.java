@@ -43,11 +43,14 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
@@ -58,6 +61,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 import java.io.File;
@@ -75,6 +81,7 @@ import java.util.Properties;
 import java.util.TreeMap;
 
 public class DublinCoreCatalogUIAdapterTest {
+  private static final Logger logger = LoggerFactory.getLogger(DublinCoreCatalogUIAdapterTest.class);
   private static final String TEMPORAL_DUBLIN_CORE_KEY = "temporal";
   private static final String INPUT_PERIOD = "start=2014-11-04T19:35:19Z; end=2014-11-04T20:48:23Z; scheme=W3C-DTF;";
   private static final String CHANGED_DURATION_PERIOD = "start=2014-11-04T19:35:19Z; end=2014-11-04T20:18:23Z; scheme=W3C-DTF;";
@@ -133,7 +140,7 @@ public class DublinCoreCatalogUIAdapterTest {
             Opt.<String> none());
     durationMetadataField = MetadataField.createDurationMetadataField(TEMPORAL_DUBLIN_CORE_KEY, Opt.some("duration"),
             "DURATION_LABEL", false, false, Opt.<Integer> none(), Opt.<String> none());
-    TreeMap<String, Object> collection = new TreeMap<String, Object>();
+    TreeMap<String, String> collection = new TreeMap<String, String>();
     collection.put("Entry 1", "Value 1");
     collection.put("Entry 2", "Value 2");
     collection.put("Entry 3", "Value 3");
@@ -144,7 +151,7 @@ public class DublinCoreCatalogUIAdapterTest {
     listProvidersService = EasyMock.createMock(ListProvidersService.class);
     EasyMock.expect(
             listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQueryImpl.class),
-                    EasyMock.anyObject(Organization.class))).andReturn(collection).anyTimes();
+                    EasyMock.anyObject(Organization.class), EasyMock.anyBoolean())).andReturn(collection).anyTimes();
     EasyMock.replay(listProvidersService);
 
     eventProperties = new Properties();
@@ -255,7 +262,7 @@ public class DublinCoreCatalogUIAdapterTest {
     configurationDublinCoreCatalogUIAdapter.setWorkspace(workspace);
     configurationDublinCoreCatalogUIAdapter.updated(eventProperties);
 
-    AbstractMetadataCollection abstractMetadata = configurationDublinCoreCatalogUIAdapter.getFields(mediapackage);
+    MetadataCollection abstractMetadata = configurationDublinCoreCatalogUIAdapter.getFields(mediapackage);
     assertThat(eventJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(abstractMetadata.toJSON()))
             .allowingAnyArrayOrdering());
   }
@@ -275,12 +282,12 @@ public class DublinCoreCatalogUIAdapterTest {
     DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
 
     MetadataField<String> titleField = MetadataField.createTextMetadataField(title, Opt.some(title),
-            "New Label for Title", true, false, Opt.<Map<String, Object>> none(), Opt.<String> none(),
+            "New Label for Title", true, false, Opt.<Map<String, String>> none(), Opt.<String> none(),
             Opt.<Integer> none(), Opt.<String> none());
     dublinCoreMetadata.addField(titleField, expectedTitle, listProvidersService);
 
     MetadataField<String> missingField = MetadataField.createTextMetadataField("missing", Opt.<String> none(),
-            "The Missing's Label", false, false, Opt.<Map<String, Object>> none(), Opt.<String> none(),
+            "The Missing's Label", false, false, Opt.<Map<String, String>> none(), Opt.<String> none(),
             Opt.<Integer> none(), Opt.<String> none());
     dublinCoreMetadata.addField(missingField, expectedMissing, listProvidersService);
 
@@ -448,6 +455,6 @@ public class DublinCoreCatalogUIAdapterTest {
     DublinCoreMetadataCollection metadata = new DublinCoreMetadataCollection();
     metadata.addField(startDate, "2014-11-01", listProvidersService);
     DublinCoreMetadataUtil.updateDublincoreCatalog(catalog, metadata);
-    System.out.println("Catalog:" + catalog.toXmlString());
+    logger.info("Catalog:" + catalog.toXmlString());
   }
 }

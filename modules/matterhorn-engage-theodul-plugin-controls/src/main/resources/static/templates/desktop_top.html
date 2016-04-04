@@ -23,7 +23,7 @@
             <img src="<%= plugin_path %>images/backward.png" aria-label="<%= str_prevChapter %>" title="<%= str_prevChapter %>" alt="<%= str_prevChapter %>" />
         </div>
         <div id="playpause_controls" class="controlbutton" role="button" aria-label="<%= str_playPauseVideo %>">
-            <img id="play_button" class="playpause_btn" src="<%= plugin_path %>images/play.png" aria-label="<%= str_playVideo %>" title="<%= str_playVideo %>" alt="<%= str_playVideo %>" /> 
+            <img id="play_button" class="playpause_btn" src="<%= plugin_path %>images/play.png" aria-label="<%= str_playVideo %>" title="<%= str_playVideo %>" alt="<%= str_playVideo %>" />
             <img id="pause_button" class="playpause_btn" style="display: none;" src="<%= plugin_path %>images/pause.png" aria-label="<%= str_pauseVideo %>" title="<%= str_pauseVideo %>" alt="<%= str_pauseVideo %>"  />
         </div>
         <div id="forward_button" class="controlbutton" role="button" aria-label="<%= str_nextChapter %>">
@@ -34,7 +34,7 @@
     <div id="volume" role="slider" aria-label="<%= str_volumeSlider %>"></div>
     <div class="volume_icon" id="volumeIcon">
         <img id="unmute_button" class="mute_btn" src="<%= plugin_path %>images/volume.png" role="button" aria-label="<%= str_muteVolume %>" title="<%= str_muteVolume %>" alt="<%= str_muteVolume %>" />
-        <img id="mute_button" class="mute_btn" style="display: none;" src="<%= plugin_path %>images/volumeMuted.png" role="button" aria-label="<%= str_unmuteVolume %>" title="<%= str_unmuteVolume %>" alt="<%= str_unmuteVolume %>" /> 
+        <img id="mute_button" class="mute_btn" style="display: none;" src="<%= plugin_path %>images/volumeMuted.png" role="button" aria-label="<%= str_unmuteVolume %>" title="<%= str_unmuteVolume %>" alt="<%= str_unmuteVolume %>" />
     </div>
     <div id="navigation_time">
         <% if((typeof startTime !== "undefined") && (typeof duration !== "undefined")) { %>
@@ -64,7 +64,7 @@
              && (typeof str_right !== "undefined")
              && (typeof str_beside !== "undefined")
 	     && (typeof str_quality !== "undefined")
-	     && (typeof qualities !== "undefined") 
+	     && (typeof qualities !== "undefined")
              && (typeof translatedqualities !== "undefined")) { %>
             <div class="btn-group">
                 <button id="dropdownMenuQuality" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_qualityButton %>">
@@ -81,6 +81,24 @@
                 </ul>
             </div>
 	    <% } %>
+            <% if(!flash) { %>
+            <div class="btn-group">
+                <button id="dropDownZoomToggle" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="Zoom">
+                <span class="glyphicon glyphicon-zoom-in"></span>
+                <span id="zoomLevelIndicator">Zoom</span>
+                <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu pull-right" role="menu">
+                    <li class="disabled" role="presentation"><a id="qualityDescription" role="menuitem" tabindex="-1" href="#"><b>Zoom</b></a></li>
+                    <li class="divider"></li>
+                    <li class="" role="presentation"><a id="resetZoom" role="menuitem" tabindex="-1" href="#"><b>Reset</b></a></li>
+                    <li class="divider"></li>
+                    <li role="presentation"><a id="zoomLevel1" role="menuitem" tabindex="-1" href="#"><b>150%</b></a></li>
+                    <li role="presentation"><a id="zoomLevel2" role="menuitem" tabindex="-1" href="#"><b>200%</b></a></li>
+                    <li role="presentation"><a id="zoomLevel3" role="menuitem" tabindex="-1" href="#"><b>250%</b></a></li>
+                </ul>
+            </div>
+      <% } %>
             <div class="btn-group">
                 <button id="dropdownMenuPlaybackRate" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_playbackRateButton %>">
                 <span class="glyphicon glyphicon-dashboard"></span>
@@ -104,7 +122,7 @@
              && (typeof str_left !== "undefined")
              && (typeof str_right !== "undefined")
              && (typeof str_beside !== "undefined")
-             && (typeof str_beside !== "undefined")) { %>            
+             && (typeof str_beside !== "undefined")) { %>
             <div class="btn-group">
                 <button id="dropdownMenuLayout" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_layoutButton %>">
                 <span class="glyphicon glyphicon-film"></span>

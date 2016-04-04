@@ -139,6 +139,7 @@
               org.opencastproject.message.broker.api.series,
               org.opencastproject.message.broker.api.theme,
               org.opencastproject.message.broker.api.workflow,
+              org.springframework.beans.factory.xml,
               *
             </Import-Package>
             <Embed-Dependency>
@@ -148,8 +149,13 @@
               org.opencastproject.message.broker.endpoint
             </Private-Package>
             <Export-Package>
-              org.opencastproject.message.broker.impl
+              org.opencastproject.message.broker.impl;version=${project.version}
             </Export-Package>
+            <_exportcontents>
+              javax.jms,
+              javax.transaction,
+              javax.transaction.xa
+            </_exportcontents>
             <Service-Component>
               OSGI-INF/broker_endpoint.xml,
               OSGI-INF/message_receiver_service.xml,

@@ -1,0 +1,14 @@
+[
+    {
+        "id"       : "track-1",
+        "type"     : "presenter/source",
+        "mimetype" : "video/mp4",
+        "url"      : "http://localhost:8080/archive/archive/mediapackage/8564f058-43ac-48e2-a5bc-f00d771bc2e0/track-1/0/track.mp4"
+    },
+    {
+        "id"       : "370597b6-35ec-45de-9101-ccb87b873ee7",
+        "type"     : "presenter/work",
+        "mimetype" : "video/mp4",
+        "url"      : "http://com.entwinemedia.eu.matterhorn.showcase.files.s3.amazonaws.com/mediapackage/40d7287c-7e6a-4692-9bc7-00dd12f7f60d/track-1/av.mov"
+    }
+]

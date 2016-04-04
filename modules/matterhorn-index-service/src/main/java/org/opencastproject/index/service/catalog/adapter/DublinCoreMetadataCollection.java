@@ -26,6 +26,7 @@ import org.opencastproject.index.service.resources.list.api.ListProvidersService
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
+import org.opencastproject.metadata.dublincore.MetadataField;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -42,23 +43,23 @@ import java.util.Map;
 public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
   private static final Logger logger = LoggerFactory.getLogger(DublinCoreMetadataCollection.class);
 
-  private Opt<Map<String, Object>> getCollection(MetadataField<?> metadataField,
+  private Opt<Map<String, String>> getCollection(MetadataField<?> metadataField,
           ListProvidersService listProvidersService) {
     try {
       if (listProvidersService != null && metadataField.getListprovider().isSome()) {
-        Map<String, Object> collection = listProvidersService.getList(metadataField.getListprovider().get(),
-                new ResourceListQueryImpl(), null);
+        Map<String, String> collection = listProvidersService.getList(metadataField.getListprovider().get(),
+                new ResourceListQueryImpl(), null, true);
         if (collection != null) {
           return Opt.some(collection);
         } else {
-          return Opt.<Map<String, Object>> none();
+          return Opt.<Map<String, String>> none();
         }
       } else {
-        return Opt.<Map<String, Object>> none();
+        return Opt.<Map<String, String>> none();
       }
     } catch (ListProviderException e) {
       logger.warn("Unable to set collection on metadata because {}", ExceptionUtils.getStackTrace(e));
-      return Opt.<Map<String, Object>> none();
+      return Opt.<Map<String, String>> none();
     }
   }
 

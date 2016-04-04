@@ -37,6 +37,7 @@ public final class ParticipationUtils {
 
   private ParticipationUtils() {
   }
+
   /**
    * @param input
    *          The input text from the endpoint.

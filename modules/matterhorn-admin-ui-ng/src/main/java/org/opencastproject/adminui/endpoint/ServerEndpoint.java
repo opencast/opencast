@@ -200,6 +200,8 @@ public class ServerEndpoint {
         int sumMeanRuntime = 0;
         int sumMeanQueueTime = 0;
         int totalServiceOnHost = 0;
+        int offlineJobProducerServices = 0;
+        int totalJobProducerServices = 0;
         Set<String> serviceTypes = new HashSet<String>();
         for (ServiceStatistics serviceStat : servicesStatistics) {
           if (server.getBaseUrl().equals(serviceStat.getServiceRegistration().getHost())) {
@@ -209,6 +211,13 @@ public class ServerEndpoint {
             jobsQueued += serviceStat.getQueuedJobs();
             sumMeanRuntime += serviceStat.getMeanRunTime();
             sumMeanQueueTime += serviceStat.getQueuedJobs();
+            if (!serviceStat.getServiceRegistration().isOnline()
+                    && serviceStat.getServiceRegistration().isJobProducer()) {
+              offlineJobProducerServices++;
+              totalJobProducerServices++;
+            } else if (serviceStat.getServiceRegistration().isJobProducer()) {
+              totalJobProducerServices++;
+            }
             serviceTypes.add(serviceStat.getServiceRegistration().getServiceType());
           }
         }
@@ -244,7 +253,7 @@ public class ServerEndpoint {
         }
 
         JSONObject jsonServer = new JSONObject();
-        jsonServer.put(KEY_ONLINE, server.isOnline());
+        jsonServer.put(KEY_ONLINE, server.isOnline() && offlineJobProducerServices <= totalJobProducerServices / 2);
         jsonServer.put(KEY_MAINTENANCE, server.isMaintenanceMode());
         jsonServer.put(KEY_NAME, server.getBaseUrl());
         jsonServer.put(KEY_CORES, server.getCores());

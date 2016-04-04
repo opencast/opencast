@@ -21,6 +21,7 @@
 
 package org.opencastproject.message.broker.api.scheduler;
 
+import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
@@ -32,14 +33,15 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
  * {@link Serializable} class that represents all of the possible messages sent through a SchedulerService queue.
  */
-public class SchedulerItem implements Serializable {
+public class SchedulerItem implements MessageItem, Serializable {
   private static final long serialVersionUID = 6061069989788904237L;
 
   public static final String SCHEDULER_QUEUE_PREFIX = "SCHEDULER.";
@@ -78,7 +80,7 @@ public class SchedulerItem implements Serializable {
    *          The new properties to update to.
    * @return Builds {@link SchedulerItem} for updating the properties of an event.
    */
-  public static SchedulerItem updateProperties(String mediaPackageId, Properties properties) {
+  public static SchedulerItem updateProperties(String mediaPackageId, Map<String, String> properties) {
     return new SchedulerItem(mediaPackageId, properties);
   }
 
@@ -88,7 +90,7 @@ public class SchedulerItem implements Serializable {
    * @return Builds {@link SchedulerItem} for deleting an event.
    */
   public static SchedulerItem delete(final String mediaPackageId) {
-    return new SchedulerItem(mediaPackageId);
+    return new SchedulerItem(mediaPackageId, Type.Delete);
   }
 
   /**
@@ -167,14 +169,10 @@ public class SchedulerItem implements Serializable {
    * @param properties
    *          The properties to update.
    */
-  public SchedulerItem(String mediaPackageId, Properties properties) {
+  public SchedulerItem(String mediaPackageId, Map<String, String> properties) {
     this.mediaPackageId = mediaPackageId;
     this.event = null;
-    try {
-      this.properties = serializeProperties(properties);
-    } catch (IOException e) {
-      throw new IllegalStateException();
-    }
+    this.properties = serializeProperties(properties);
     this.acl = null;
     this.reviewStatus = null;
     this.reviewDate = null;
@@ -189,7 +187,7 @@ public class SchedulerItem implements Serializable {
    * @param mediaPackageId
    *          The id of the event to delete.
    */
-  public SchedulerItem(String mediaPackageId) {
+  public SchedulerItem(String mediaPackageId, Type type) {
     this.mediaPackageId = mediaPackageId;
     this.event = null;
     this.properties = null;
@@ -198,7 +196,7 @@ public class SchedulerItem implements Serializable {
     this.blacklisted = null;
     this.reviewStatus = null;
     this.reviewDate = null;
-    this.type = Type.Delete;
+    this.type = type;
   }
 
   /**
@@ -287,6 +285,11 @@ public class SchedulerItem implements Serializable {
     this.type = Type.UpdateReviewStatus;
   }
 
+  @Override
+  public String getId() {
+    return mediaPackageId;
+  }
+
   public String getMediaPackageId() {
     return mediaPackageId;
   }
@@ -298,7 +301,7 @@ public class SchedulerItem implements Serializable {
     return DublinCoreUtil.fromXml(event).getOrElseNull();
   }
 
-  public Properties getProperties() {
+  public Map<String, String> getProperties() {
     try {
       return parseProperties(properties);
     } catch (IOException e) {
@@ -338,15 +341,14 @@ public class SchedulerItem implements Serializable {
    * Serializes Properties to String.
    *
    * @param caProperties
-   *          Properties to be serialized
+   *          properties to be serialized
    * @return serialized properties
-   * @throws IOException
-   *           if serialization fails
    */
-  private String serializeProperties(Properties caProperties) throws IOException {
-    StringWriter writer = new StringWriter();
-    caProperties.store(writer, "Capture Agent specific data");
-    return writer.toString();
+  private String serializeProperties(Map<String, String> caProperties) {
+    StringBuilder wfPropertiesString = new StringBuilder();
+    for (Map.Entry<String, String> entry : caProperties.entrySet())
+      wfPropertiesString.append(entry.getKey() + "=" + entry.getValue() + "\n");
+    return wfPropertiesString.toString();
   }
 
   /**
@@ -358,10 +360,10 @@ public class SchedulerItem implements Serializable {
    * @throws IOException
    *           if parsing fails
    */
-  private Properties parseProperties(String serializedProperties) throws IOException {
+  private Map<String, String> parseProperties(String serializedProperties) throws IOException {
     Properties caProperties = new Properties();
     caProperties.load(new StringReader(serializedProperties));
-    return caProperties;
+    return new HashMap<String, String>((Map) caProperties);
   }
 
 }

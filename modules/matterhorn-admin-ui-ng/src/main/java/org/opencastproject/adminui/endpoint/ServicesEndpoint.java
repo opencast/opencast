@@ -23,13 +23,28 @@ package org.opencastproject.adminui.endpoint;
 
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.adminui.exception.JsonCreationException;
+import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
+import org.opencastproject.index.service.resources.list.api.Service;
+import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
+import org.opencastproject.index.service.util.ListProviderUtil;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.api.ServiceStatistics;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.json.simple.JSONAware;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -45,7 +60,7 @@ import javax.ws.rs.core.Response;
 @RestService(name = "ServicesProxyService", title = "UI Services", notes = "These Endpoints deliver informations about the services required for the UI.", abstractText = "This service provides the services data for the UI.")
 public class ServicesEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(ServicesEndpoint.class);
-  private ListProvidersEndpoint listProvidersEndpoint;
+  private ServiceRegistry serviceRegistry;
 
   public void activate() {
     logger.info("ServicesEndpoint is activated!");
@@ -65,16 +80,86 @@ public class ServicesEndpoint {
   public Response getJobs(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset,
           @QueryParam("name") String name, @QueryParam("host") String host, @QueryParam("q") String text,
           @QueryParam("sort") String sort, @Context HttpHeaders headers) throws Exception {
+
     String textFilter = text == null ? null : "textFilter=" + text;
-    return listProvidersEndpoint.getList("services", limit, textFilter, offset, headers);
+
+    ResourceListQueryImpl query = new ResourceListQueryImpl();
+    query.setLimit(limit);
+    query.setOffset(offset);
+    EndpointUtil.addRequestFiltersToQuery(textFilter, query);
+
+    Map<String, Object> result = new HashMap<String, Object>();
+    ServiceQueryResult services = getFilteredList(query);
+
+    result.put("results", services.filteredResult);
+    result.put("total", String.valueOf(services.totalCount));
+    if (query != null) {
+      if (query.getLimit().isSome()) {
+        result.put("limit", Integer.toString(query.getLimit().get()));
+      }
+      if (query.getOffset().isSome()) {
+        result.put("offset", Integer.toString(query.getOffset().get()));
+      }
+    }
+
+    JSONObject jsonList;
+    try {
+      jsonList = EndpointUtil.generateJSONObject(result);
+    } catch (JsonCreationException e) {
+      logger.error("Not able to generate resources list JSON from the services list: {}", e);
+      return Response.serverError().build();
+    }
+
+    return Response.ok(jsonList.toString()).build();
   }
 
   /**
-   * @param listProvidersEndpoint
-   *          the listProvidersEndpoint to set
+   * @param serviceRegistry
+   *          the serviceRegistry to set
    */
-  public void setListProvidersEndpoint(ListProvidersEndpoint listProvidersEndpoint) {
-    this.listProvidersEndpoint = listProvidersEndpoint;
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
+  }
+
+  /**
+   * Query the list of services
+   */
+  private ServiceQueryResult getFilteredList(ResourceListQuery query) throws ServiceRegistryException {
+    ServiceQueryResult result = new ServiceQueryResult();
+    List<JSONAware> services = new ArrayList<JSONAware>();
+
+    List<ServiceStatistics> serviceStatistics = serviceRegistry.getServiceStatistics();
+    result.totalCount = serviceStatistics.size();
+    for (ServiceStatistics stats : serviceStatistics) {
+      Service service = new Service(stats);
+      if (service.isCompliant(query)) {
+        services.add(service);
+      }
+    }
+
+    result.filteredResult = ListProviderUtil.filterMap(services, query);
+    return result;
+  }
+
+  class ServiceQueryResult {
+    private int totalCount;
+    private List<JSONAware> filteredResult;
+
+    public int getTotalCount() {
+      return totalCount;
+    }
+
+    public void setTotalCount(int totalCount) {
+      this.totalCount = totalCount;
+    }
+
+    public List<JSONAware> getFilteredResult() {
+      return new ArrayList<JSONAware>(filteredResult);
+    }
+
+    public void setFilteredResult(List<JSONAware> filteredResult) {
+      this.filteredResult = new ArrayList<JSONAware>(filteredResult);
+    }
   }
 
 }

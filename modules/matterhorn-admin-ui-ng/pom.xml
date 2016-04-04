@@ -188,6 +188,10 @@
             <artifactId>servlet-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient-osgi</artifactId>
+        </dependency>
+        <dependency>
             <groupId>net.fortuna.ical4j</groupId>
             <artifactId>ical4j</artifactId>
         </dependency>
@@ -322,8 +326,8 @@
                                     <goal>install-node-and-npm</goal>
                                 </goals>
                                 <configuration>
-                                    <nodeVersion>v0.12.2</nodeVersion>
-                                    <npmVersion>2.3.0</npmVersion>
+                                    <nodeVersion>v4.4.0</nodeVersion>
+                                    <npmVersion>2.14.20</npmVersion>
                                 </configuration>
                             </execution>
 
@@ -338,12 +342,12 @@
                             </execution>
 
                             <execution>
-                                <id>grunt build</id>
+                                <id>frontend build</id>
                                 <goals>
-                                    <goal>grunt</goal>
+                                    <goal>npm</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>build --no-color --skipTests=${skipTests}</arguments>
+                                    <arguments>run build --no-color --skipTests=${skipTests}</arguments>
                                 </configuration>
                             </execution>
                         </executions>
@@ -373,25 +377,24 @@
                         <Http-Classpath>/webapp</Http-Classpath>
                         <Http-Welcome>index.html</Http-Welcome>
                         <Import-Package>
+                            net.fortuna.ical4j.*,
                             org.opencastproject.index.service.message,
                             *
                         </Import-Package>
                         <Private-Package>
-                            net.fortuna.ical4j.*,
                             org.opencastproject.adminui.util,
                             org.opencastproject.adminui.exception
                         </Private-Package>
-                        <Embed-Dependency>
-                            ical4j;inline=true
-                        </Embed-Dependency>
                         <Export-Package>
-                            org.opencastproject.adminui.api,
-                            org.opencastproject.adminui.endpoint,
-                            org.opencastproject.adminui.impl,
-                            org.opencastproject.adminui.impl.index,
-                            org.opencastproject.adminui.userdirectory,
-                            org.opencastproject.adminui.usersettings,
-                            org.opencastproject.adminui.usersettings.persistence
+                            org.opencastproject.adminui.api;version=${project.version},
+                            org.opencastproject.adminui.endpoint;version=${project.version},
+                            org.opencastproject.adminui.exception;version=${project.version},
+                            org.opencastproject.adminui.impl;version=${project.version},
+                            org.opencastproject.adminui.impl.index;version=${project.version},
+                            org.opencastproject.adminui.userdirectory;version=${project.version},
+                            org.opencastproject.adminui.usersettings;version=${project.version},
+                            org.opencastproject.adminui.usersettings.persistence;version=${project.version},
+                            org.opencastproject.adminui.util;version=${project.version}
                         </Export-Package>
                         <Service-Component>
                             OSGI-INF/acl_endpoint.xml,

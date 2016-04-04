@@ -35,7 +35,6 @@ import com.jayway.restassured.response.Response;
 import com.jayway.restassured.response.ResponseBody;
 
 import org.apache.http.HttpStatus;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -80,13 +79,12 @@ public class ListProvidersEndpointTest {
 
   @Test
   public void testGetWithFilters() throws ParseException {
-    Response response = given().log().all().pathParam("id", "services").parameters("filter", "name=non existing name")
+    Response response = given().log().all().pathParam("id", "SERVERS").parameters("filter", "name=non existing name")
             .expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).get(rt.host("/{id}.json"));
     ResponseBody body = response.getBody();
     String content = body.asString();
     JSONObject json = (JSONObject) parser.parse(content);
-    JSONArray array = (JSONArray) json.get("results");
-    assertEquals(0, array.size());
+    assertEquals(1, json.entrySet().size());
   }
 
   @Before

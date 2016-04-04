@@ -21,12 +21,14 @@
 
 package org.opencastproject.message.broker.api.acl;
 
+import org.opencastproject.message.broker.api.MessageItem;
+
 import java.io.Serializable;
 
 /**
  * {@link Serializable} class that represents all of the possible messages sent through an Acl queue.
  */
-public class AclItem implements Serializable {
+public class AclItem implements MessageItem, Serializable {
 
   private static final long serialVersionUID = -8329403993622629220L;
 
@@ -86,6 +88,11 @@ public class AclItem implements Serializable {
   public AclItem(String currentAclName, Type type) {
     this.currentAclName = currentAclName;
     this.type = type;
+  }
+
+  @Override
+  public String getId() {
+    return currentAclName;
   }
 
   public String getCurrentAclName() {

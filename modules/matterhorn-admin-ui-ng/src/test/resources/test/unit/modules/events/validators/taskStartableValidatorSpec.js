@@ -21,7 +21,8 @@ describe('adminNg.modules.events.validators.taskStartableValidator', function ()
             source: 'ARCHIVE',
             selected: true
         };
-        element = '<form name="testform"><input name="selection" type="checkbox" task-startable="{{row.source}}" ng-model="row.selected" class="child-cbox"></form>';
+        element = '<form name="testform"><input name="selection" type="checkbox" task-startable="{{row.source}}" ' +
+            'ng-model="row.selected" ng-change="rowSelectionChanged($index)" class="child-cbox"></form>';
     });
 
     describe('source === ARCHIVE', function () {

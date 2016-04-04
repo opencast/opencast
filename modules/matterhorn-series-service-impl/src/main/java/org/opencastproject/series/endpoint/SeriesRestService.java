@@ -65,6 +65,7 @@ import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 import com.entwinemedia.fn.data.json.SimpleSerializer;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -78,6 +79,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.text.ParseException;
 import java.util.Map;
 
@@ -809,7 +811,7 @@ public class SeriesRestService {
         }
       } else {
         if (seriesService.addSeriesElement(seriesId, elementType, data)) {
-          return R.created();
+          return R.created(URI.create(UrlSupport.concat(serverUrl, serviceUrl, seriesId, "elements", elementType)));
         } else {
           return R.serverError();
         }

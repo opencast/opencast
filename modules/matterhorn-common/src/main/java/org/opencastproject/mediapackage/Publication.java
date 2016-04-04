@@ -29,6 +29,53 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlJavaTypeAdapter(PublicationImpl.Adapter.class)
 public interface Publication extends MediaPackageElement {
+
   /** Returns the channel id. */
   String getChannel();
+
+  /**
+   * Returns the tracks that are part of this publication.
+   *
+   * @return the tracks
+   */
+  Track[] getTracks();
+
+  /**
+   * Adds a track to this publication.
+   *
+   * @param track
+   *          the track to add
+   */
+  void addTrack(Track track);
+
+  /**
+   * Returns the attachments that are part of this publication.
+   *
+   * @return the attachments
+   */
+  Attachment[] getAttachments();
+
+  /**
+   * Adds an attachment to this publication.
+   *
+   * @param attachment
+   *          the attachment to add
+   */
+  void addAttachment(Attachment attachment);
+
+  /**
+   * Returns the catalogs associated with this publication.
+   *
+   * @return the catalogs
+   */
+  Catalog[] getCatalogs();
+
+  /**
+   * Adds a catalog to this publication.
+   *
+   * @param catalog
+   *          the catalog to add
+   */
+  void addCatalog(Catalog catalog);
+
 }

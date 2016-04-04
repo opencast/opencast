@@ -21,19 +21,20 @@
 
 package org.opencastproject.index.service.catalog.adapter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.j;
 import static com.entwinemedia.fn.data.json.Jsons.v;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
-import com.entwinemedia.fn.data.Opt;
-import org.opencastproject.index.service.catalog.adapter.MetadataField.Type;
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.security.api.Organization;
+
+import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -57,8 +58,8 @@ public class MetadataFieldTest {
   private String endTime = "endTime";
   private Opt<String> optOutputID = Opt.some(defaultOutputID);
   private String label = "A_LABEL_FOR_THIS_PROPERTY";
-  private Map<String, Object> collection = new TreeMap<String, Object>();
-  private Opt<Map<String, Object>> optCollection = Opt.some(collection);
+  private Map<String, String> collection = new TreeMap<String, String>();
+  private Opt<Map<String, String>> optCollection = Opt.some(collection);
   private String collectionID = "Collection_ID";
   private Opt<String> optCollectionID = Opt.some(collectionID);
   private boolean readOnly = false;
@@ -79,7 +80,7 @@ public class MetadataFieldTest {
     listProvidersService = EasyMock.createMock(ListProvidersService.class);
     EasyMock.expect(
             listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQuery.class),
-                    EasyMock.anyObject(Organization.class))).andReturn(collection).anyTimes();
+                    EasyMock.anyObject(Organization.class), EasyMock.anyBoolean())).andReturn(collection).anyTimes();
     EasyMock.replay(listProvidersService);
   }
 
@@ -117,7 +118,7 @@ public class MetadataFieldTest {
     SimpleDateFormat dateFormat = new SimpleDateFormat();
     dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     String expectedJSON = RestUtils.getJsonString(j(f("readOnly", v(readOnly)), f("id", v(defaultInputID)),
-            f("label", v(label)), f("type", v(Type.DATE.toString().toLowerCase())),
+            f("label", v(label)), f("type", v(MetadataField.Type.DATE.toString().toLowerCase())),
             f("value", v(dateFormat.format(testDate))), f("required", v(required))));
 
     assertThat(expectedJSON, SameJSONAs.sameJSONAs(RestUtils.getJsonString(dateField.toJSON())));
@@ -136,7 +137,7 @@ public class MetadataFieldTest {
     String emptyValueJson = IOUtils.toString(getClass().getResource("/catalog-adapter/text/text-empty-value.json"));
     // Test JSON generated with no value.
     MetadataField<String> emptyValueTextField = MetadataField.createTextMetadataField(defaultInputID, optOutputID,
-            label, false, false, Opt.<Map<String, Object>> none(), Opt.<String> none(), Opt.<Integer> none(),
+            label, false, false, Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.<Integer> none(),
             Opt.<String> none());
     assertThat(emptyValueJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(emptyValueTextField.toJSON())));
   }
@@ -147,7 +148,7 @@ public class MetadataFieldTest {
     String withValueJson = IOUtils.toString(getClass().getResource("/catalog-adapter/text/text-with-value.json"));
     // Test JSON with value
     MetadataField<String> textField = MetadataField.createTextMetadataField(defaultInputID, optOutputID, label, false,
-            false, Opt.<Map<String, Object>> none(), Opt.<String> none(), Opt.<Integer> none(), Opt.<String> none());
+            false, Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.<Integer> none(), Opt.<String> none());
     textField.setValue(textValue);
     assertThat(withValueJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(textField.toJSON())));
   }
@@ -168,7 +169,7 @@ public class MetadataFieldTest {
     String withCollectionIDJson = IOUtils.toString(getClass().getResource(
             "/catalog-adapter/text/text-with-collection-id.json"));
     MetadataField<String> textFieldWithCollectionID = MetadataField.createTextMetadataField(defaultInputID,
-            optOutputID, label, false, false, Opt.<Map<String, Object>> none(), optCollectionID, Opt.<Integer> none(),
+            optOutputID, label, false, false, Opt.<Map<String, String>> none(), optCollectionID, Opt.<Integer> none(),
             Opt.<String> none());
     assertThat(withCollectionIDJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(textFieldWithCollectionID.toJSON())));
   }
@@ -179,7 +180,7 @@ public class MetadataFieldTest {
     String withCollectionIDJson = IOUtils.toString(getClass().getResource(
             "/catalog-adapter/text/text-long-with-value.json"));
     MetadataField<String> textLongField = MetadataField.createTextLongMetadataField(defaultInputID, optOutputID, label,
-            false, false, Opt.<Map<String, Object>> none(), Opt.<String> none(), Opt.<Integer> none(),
+            false, false, Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.<Integer> none(),
             Opt.<String> none());
     textLongField.setValue("This is the text value");
     assertThat(withCollectionIDJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(textLongField.toJSON())));

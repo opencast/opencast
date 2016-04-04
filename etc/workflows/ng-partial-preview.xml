@@ -113,11 +113,13 @@
     <!-- Publish previews -->
 
     <operation
-      id="publish-internal"
+      id="publish-configure"
       exception-handler-workflow="ng-partial-error"
       description="Publish to preview publication channel">
       <configurations>
         <configuration key="source-tags">preview</configuration>
+        <configuration key="channel-id">internal</configuration>
+        <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
       </configurations>
     </operation>
 

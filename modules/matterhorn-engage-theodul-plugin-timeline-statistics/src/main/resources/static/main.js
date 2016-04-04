@@ -301,8 +301,11 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
                     width: $(window).width() - 40,
                     height: "60"
                 };
+
                 // compile template and load into the html
-                this.$el.html(_.template(this.template, tempVars));
+                var template = _.template(this.template);
+                this.$el.html(template(tempVars));
+
                 rerender();
                 if (this.chart && this.chart.update) {
                     this.chart.update();

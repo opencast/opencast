@@ -25,6 +25,7 @@ import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
+import org.easymock.EasyMock;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
@@ -58,6 +59,7 @@ public class TestUsersEndpoint extends UsersEndpoint {
 
   public TestUsersEndpoint() throws Exception {
 
+    userDirectoryService = createNiceMock(UserDirectoryService.class);
     users = new ArrayList<User>();
 
     JpaOrganization organization = new JpaOrganization("org", "org", new HashMap<String, Integer>(), "ADMIN",
@@ -77,10 +79,10 @@ public class TestUsersEndpoint extends UsersEndpoint {
     users.add(user3);
     users.add(user4);
 
-    userDirectoryService = createNiceMock(UserDirectoryService.class);
     expect(userDirectoryService.getUsers()).andStubReturn(users.iterator());
+    EasyMock.expect(userDirectoryService.findUsers(EasyMock.anyString(), EasyMock.anyInt(), EasyMock.anyInt()))
+            .andDelegateTo(new TestUsers()).anyTimes();
     replay(userDirectoryService);
-
     this.setUserDirectoryService(userDirectoryService);
     this.setSecurityService(null);
     this.setJpaUserAndRoleProvider(null);
@@ -105,6 +107,11 @@ public class TestUsersEndpoint extends UsersEndpoint {
     @Override
     public Iterator<User> findUsers(String query, int offset, int limit) {
       return new SmartIterator<User>(limit, offset).applyLimitAndOffset(users).iterator();
+    }
+
+    @Override
+    public long countUsers() {
+      return 0;
     }
 
     @Override

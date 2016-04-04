@@ -61,12 +61,11 @@ import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -130,7 +129,7 @@ public class ComposerServiceTest {
       int status = p.waitFor();
       stdout.stopReading();
       stderr.stopReading();
-      System.out.println(buffer.toString());
+      logger.info(buffer.toString());
       if (status != 0)
         throw new IllegalStateException();
       if (buffer.toString().startsWith("ffmpeg version 2"))
@@ -215,7 +214,8 @@ public class ComposerServiceTest {
     encoderEngineFactory.activate(cc);
 
     String sourceTrackXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "       <track type='presentation/source'" + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
+            + "       <track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
+            + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
             + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>" + "       </track>";
     inspectedTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
 
@@ -258,7 +258,7 @@ public class ComposerServiceTest {
       return;
 
     assertTrue(source.isFile());
-    String sourceTrackXml = "<track id=\"track-1\" type=\"presentation/source\"><mimetype>video/quicktime</mimetype>"
+    String sourceTrackXml = "<track xmlns=\"http://mediapackage.opencastproject.org\" id=\"track-1\" type=\"presentation/source\"><mimetype>video/quicktime</mimetype>"
             + "<url>http://localhost:8080/workflow/samples/camera.mpg</url>"
             + "<checksum type=\"md5\">43b7d843b02c4a429b2f547a4f230d31</checksum><duration>14546</duration>"
             + "<video><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
@@ -295,12 +295,13 @@ public class ComposerServiceTest {
     composerService.setWorkspace(workspace);
     MediaInspectionService inspect = EasyMock.createNiceMock(MediaInspectionService.class);
     EasyMock.expect(inspect.inspect((URI) EasyMock.anyObject()))
-            .andThrow(new MediaInspectionException("test complete")).anyTimes();
+    .andThrow(new MediaInspectionException("test complete")).anyTimes();
     EasyMock.replay(workspace, inspect);
 
     // build a single media package to test with
     String sourceTrackXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "       <track type='presentation/source'" + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
+            + "       <track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
+            + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
             + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>" + "       </track>";
     Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
     try {
@@ -327,15 +328,17 @@ public class ComposerServiceTest {
     composerService.setWorkspace(workspace);
     MediaInspectionService inspect = EasyMock.createNiceMock(MediaInspectionService.class);
     EasyMock.expect(inspect.inspect((URI) EasyMock.anyObject()))
-            .andThrow(new MediaInspectionException("test complete")).anyTimes();
+    .andThrow(new MediaInspectionException("test complete")).anyTimes();
     EasyMock.replay(workspace, inspect);
 
     String sourceTrackVideoXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "       <track type='presentation/source'" + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
+            + "       <track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
+            + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
             + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>" + "       </track>";
     Track sourceTrackVideo = (Track) MediaPackageElementParser.getFromXml(sourceTrackVideoXml);
     String sourceTrackAudioXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "       <track type='presentation/source'" + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2b'>"
+            + "       <track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
+            + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2b'>"
             + "       <mimetype>audio/mp3</mimetype>" + "       <url>audio.mp3</url>" + "       </track>";
     Track sourceTrackAudio = (Track) MediaPackageElementParser.getFromXml(sourceTrackAudioXml);
 
@@ -363,12 +366,13 @@ public class ComposerServiceTest {
     composerService.setWorkspace(workspace);
     MediaInspectionService inspect = EasyMock.createNiceMock(MediaInspectionService.class);
     EasyMock.expect(inspect.inspect((URI) EasyMock.anyObject()))
-            .andThrow(new MediaInspectionException("test complete")).anyTimes();
+    .andThrow(new MediaInspectionException("test complete")).anyTimes();
     EasyMock.replay(workspace, inspect);
 
     // build a single media package to test with
     String sourceTrackXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "       <track type='presentation/source'" + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
+            + "       <track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
+            + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
             + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>" + "       </track>";
     Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
     try {
@@ -389,7 +393,8 @@ public class ComposerServiceTest {
 
     // build a single media package to test with
     String sourceTrackXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "       <track type='presentation/source'" + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
+            + "       <track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
+            + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
             + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>" + "       </track>";
     Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
 
@@ -439,7 +444,8 @@ public class ComposerServiceTest {
 
     // build two media package to test with
     String sourceTrack1Xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "       <track type='presentation/source'" + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
+            + "       <track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
+            + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
             + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>"
             + "<video><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
             + "<encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" /><resolution>640x480</resolution>"
@@ -447,7 +453,8 @@ public class ComposerServiceTest {
     Track sourceTrack1 = (Track) MediaPackageElementParser.getFromXml(sourceTrack1Xml);
 
     String sourceTrack2Xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "       <track type='presentation/source'" + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
+            + "       <track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
+            + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
             + "       <mimetype>video/mpeg</mimetype>" + "       <url>slidechanges.mov</url>"
             + "<video><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
             + "<encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" /><resolution>640x480</resolution>"

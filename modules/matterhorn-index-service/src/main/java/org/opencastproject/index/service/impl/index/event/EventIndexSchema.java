@@ -62,9 +62,6 @@ public interface EventIndexSchema extends IndexSchema {
   /** The attachment flavor */
   String ATTACHMENT_FLAVOR = "attachment_flavor";
 
-  /** The publication flavor */
-  String PUBLICATION_FLAVOR = "publication_flavor";
-
   /** The access policy */
   String ACCESS_POLICY = "access_policy";
 
@@ -101,9 +98,6 @@ public interface EventIndexSchema extends IndexSchema {
 
   /** The recording title */
   String TITLE = "title";
-
-  /** Boost values for ranking */
-  double TITLE_BOOST = 6.0;
 
   /** The recording start date */
   String START_DATE = "start_date";
@@ -175,6 +169,24 @@ public interface EventIndexSchema extends IndexSchema {
 
   /** The recording status */
   String RECORDING_STATUS = "recording_status";
+
+  /*
+   * Technical Metadata
+   */
+  /** Id of the agent that will record. */
+  String AGENT_ID = "agent_id";
+
+  /** The configuration settings for the agent when recording. */
+  String AGENT_CONFIGURATION = "agent_configuration";
+
+  /** The ending time of the recording. */
+  String TECHNICAL_END = "technical_end";
+
+  /** The start time of the recording. */
+  String TECHNICAL_START = "technical_start";
+
+  /** The technical presenters of the recording. */
+  String TECHNICAL_PRESENTERS = "technical_presenters";
 
   /*
    * Archive specific fields
