@@ -160,8 +160,11 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
                     shortcuts: shortcuts,
                     str_shortcuts: translate("shortcuts", "Shortcuts")
                 };
+
                 // compile template and load into the html
-                this.$el.html(_.template(this.template, tempVars));
+                var template = _.template(this.template);
+                this.$el.html(template(tempVars));
+
                 $("#engage_tab_" + plugin.name.replace(/\s/g,"_")).text(tempVars.str_shortcuts);
             }
         }
