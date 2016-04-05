@@ -27,6 +27,7 @@ import org.opencastproject.message.broker.api.MessageSender.DestinationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InterruptedIOException;
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
@@ -72,7 +73,15 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
       }
 
       // Create a MessageConsumer from the Session to the Topic or Queue
-      consumer = getSession().createConsumer(destination);
+      try {
+        consumer = getSession().createConsumer(destination);
+      } catch (JMSException e) {
+        if (e.getCause() instanceof InterruptedIOException) {
+          logger.trace("Exception due to message receiver shutdown: {}", e);
+        } else {
+          throw e;
+        }
+      }
 
       // Wait for a message
       return consumer.receive();
