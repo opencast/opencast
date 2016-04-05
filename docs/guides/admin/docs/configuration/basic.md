@@ -35,7 +35,7 @@ network access. The property to modify is:
 Step 2: Setting the Login Details
 ---------------------------------
 
-There are two authentication methods for Opencast. HTTP Digest authntication and form-based authentication. Both
+There are two authentication methods for Opencast. HTTP Digest authentication and form-based authentication. Both
 methods need a username and a password. Change the password for both! The important keys for this are:
 
  - `org.opencastproject.security.admin.user`
@@ -56,7 +56,7 @@ set to the same value on each of you Opencast nodes (Core, Worker, Capture Agent
 Step 3: Setting up Apache ActiveMQ Message Broker
 -------------------------------------------------
 
-Since version 2.0, Opencast requires a running Apache ActiveMQ instance with specific configuration.  The message
+Since version 2.0, Opencast requires a running Apache ActiveMQ instance with a specific configuration.  The message
 broker is mostly run on the admin server of Opencast but can be run separately. It needs to be started before Opencast.
 For more details about the setup, have a look at the [Apache ActiveMQ configuration guide](message-broker.md).
 
@@ -65,7 +65,7 @@ Step 4: Database Configuration
 ------------------------------
 
 Opencast uses an integrated HSQL database by default. While you will find it perfectly functional, it has certain
-drawvacks:
+drawbacks:
 
  - It is rather slow
  - It cannot be used for distributed set-ups
@@ -80,7 +80,7 @@ Step 4: Setting the Storage Directory (optional)
 ------------------------------------------------
 
 Even though it is not important for all systems – on test setups you can probably omit this – you will often want to set
-the storage directory. This directory is used to store all media, metadata, … Often, a NFS mount is used for this. You
-can set the directory by changing org.opencastproject.storage.dir like:
+the storage directory. This directory is used to store all media, metadata, … Often, an NFS mount is used for this. You
+can set the directory by changing `org.opencastproject.storage.dir` like:
 
     org.opencastproject.storage.dir=/media/mhdatamount

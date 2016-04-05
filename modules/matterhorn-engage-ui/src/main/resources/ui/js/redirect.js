@@ -26,7 +26,7 @@ $(document).ready(function() {
         var params = window.location.search.split(/\?/);
         
         if (params.length > 1) {
-           window.location = player + "?" + params[1];
+           window.location.replace(player + "?" + params[1]);
         }
     }
 

@@ -28,7 +28,7 @@ import java.util.concurrent.FutureTask;
 
 import javax.jms.Message;
 
-public interface MessageReceiver {
+public interface MessageReceiver extends MessageBrokerConnector {
 
   /**
    * Create a {@link java.util.concurrent.Future} for the next {@link java.jms.Message}.

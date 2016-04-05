@@ -25,12 +25,12 @@ import java.io.Serializable;
 
 import javax.jms.Message;
 
-public interface MessageSender {
+public interface MessageSender extends MessageBrokerConnector {
 
   /**
    * The types of message destinations there are to send to.
    */
-  enum DestinationType {
+  public static enum DestinationType {
     Queue, Topic
   };
 
@@ -41,8 +41,8 @@ public interface MessageSender {
    *          The id of the queue or topic.
    * @param type
    *          The type of destination either queue or topic.
-   * @param messageText
-   *          The text to send.
+   * @param message
+   *          The message to send.
    */
   void sendMessage(String destinationId, DestinationType type, Message message);
 

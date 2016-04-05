@@ -21,17 +21,12 @@
 
 package org.opencastproject.message.broker.impl;
 
-import static org.opencastproject.util.OsgiUtil.getContextProperty;
-import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
-
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender.DestinationType;
 import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,30 +57,6 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
   /** The OSGi configuration admin service */
   private ConfigurationAdmin configAdmin;
 
-  /** OSGi component activate callback */
-  public void activate(ComponentContext cc) throws Exception {
-    logger.info("MessageReceiver service is starting...");
-    final String url = getContextProperty(cc, ACTIVEMQ_BROKER_URL_KEY);
-    Option<String> username = getOptContextProperty(cc, ACTIVEMQ_BROKER_USERNAME_KEY);
-    Option<String> password = getOptContextProperty(cc, ACTIVEMQ_BROKER_PASSWORD_KEY);
-
-    logger.info("MessageReceiver is configured to connect with URL {}", url);
-    try {
-        disconnectMessageBroker();
-        connectMessageBroker(url, username, password);
-    } catch (JMSException e) {
-        throw new ConfigurationException(ACTIVEMQ_BROKER_URL_KEY, url, e);
-    }
-    logger.info("MessageReceiver service successfully started");
-  }
-
-  /** OSGi component deactivate callback */
-  public void deactivate() {
-    logger.info("MessageReceiver service is stopping...");
-    disconnectMessageBroker();
-    logger.info("MessageReceiver service successfully stopped");
-  }
-
   /**
    * Private function to get a message or none if there is an error.
    *
@@ -96,9 +67,11 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
    * @return A message or none if there was a problem getting the message.
    */
   private Option<Message> waitForMessage(String destinationId, DestinationType type) {
+    if (getSession() == null || !isConnected()) {
+      return Option.<Message> none();
+    }
     MessageConsumer consumer = null;
     try {
-
       // Create the destination (Topic or Queue)
       Destination destination;
       if (type.equals(DestinationType.Queue)) {
@@ -128,7 +101,7 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
           consumer.close();
         }
       } catch (JMSException e) {
-        logger.error("Unable to close connections after receipt of message {}", ExceptionUtils.getStackTrace(e));
+        logger.error("Unable to close connections after receipt of message", e);
       }
     }
   }
@@ -263,7 +236,7 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
       }
     } while (messageObject.isNone());
     return messageObject.get();
-  }
+      }
 
   @Override
   public FutureTask<Message> receiveMessage(final String destinationId, final DestinationType type) {

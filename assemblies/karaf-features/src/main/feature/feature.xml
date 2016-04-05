@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<features name="opencast-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.2.1 http://karaf.apache.org/xmlns/features/v1.2.1">
+<features name="opencast-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.2.1 http://karaf.apache.org/xmlns/features/v1.2.1">
 
   <feature name="jpa-eclipselink" version="${project.version}">
     <!-- NOTE: This feature may be removed as soon as we switch to Karaf 4 which comes with support for EclipseLink
@@ -85,11 +87,13 @@
     <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
 
     <!-- Spring Framework / Security -->
+    <bundle>mvn:org.springframework.ldap/org.springframework.ldap/1.3.1.RELEASE</bundle>
     <bundle>mvn:org.springframework.osgi/spring-osgi-core/1.2.1</bundle>
     <bundle>mvn:org.springframework.osgi/spring-osgi-extender/1.2.1</bundle>
     <bundle>mvn:org.springframework.osgi/spring-osgi-io/1.2.1</bundle>
     <bundle>mvn:org.springframework.security/spring-security-config/3.1.0.RELEASE</bundle>
     <bundle>mvn:org.springframework.security/spring-security-core/3.1.0.RELEASE</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-ldap/3.1.0.RELEASE</bundle>
     <bundle>mvn:org.springframework.security/spring-security-web/3.1.0.RELEASE</bundle>
     <bundle>mvn:org.springframework/spring-aop/3.1.0.RELEASE</bundle>
     <bundle>mvn:org.springframework/spring-asm/3.1.0.RELEASE</bundle>
@@ -324,6 +328,24 @@
     <bundle>mvn:org.opencastproject/matterhorn-videosegmenter-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-workflow-service-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-workflow-workflowoperation/${project.version}</bundle>
+  </feature>
+
+  <feature name="opencast-ingest" version="${project.version}">
+    <feature version="${project.version}">opencast-core</feature>
+
+    <bundle>mvn:org.opencastproject/matterhorn-metadata-api/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-inspection-service-api/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-inspection-service-remote/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-scheduler-remote/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-smil-api/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-smil-impl/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-ingest-service-api/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-ingest-service-impl/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-runtime-info-ui/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-series-service-remote/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-workflow-service-remote/${project.version}</bundle>
+    <!-- Fixes MH-11263 - add LTI dependency to the kernel bundle for shared opencast.httpcontext -->
+    <bundle>mvn:org.opencastproject/matterhorn-lti/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-worker" version="${project.version}">

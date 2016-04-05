@@ -35,6 +35,11 @@ public class MockMessageReceiver extends MessageReceiverImpl {
   }
 
   @Override
+  public boolean isConnected() {
+    return true;
+  }
+
+  @Override
   protected Session getSession() {
     return session;
   }

@@ -24,6 +24,7 @@
     <module>karaf-features</module>
     <module>dist-admin</module>
     <module>dist-allinone</module>
+    <module>dist-ingest</module>
     <module>dist-presentation</module>
     <module>dist-worker</module>
   </modules>
@@ -125,6 +126,13 @@
                     match="^karaf.clean.cache .*=.*$"
                     replace="karaf.clean.cache = true"
                     byline="true" />
+                  <!-- Prevent some libs from phoning home -->
+                  <echo file="target/assembly/etc/system.properties" append="true"
+                    >${line.separator}# Prevent certain libraries from phoning home</echo>
+                  <echo file="target/assembly/etc/system.properties" append="true"
+                    >${line.separator}net.sf.ehcache.skipUpdateCheck=true</echo>
+                  <echo file="target/assembly/etc/system.properties" append="true"
+                    >${line.separator}org.terracotta.quartz.skipUpdateCheck=true</echo>
                   <!-- Special configuration for development -->
                   <replaceregexp
                     file="target/classes/package.xml"
