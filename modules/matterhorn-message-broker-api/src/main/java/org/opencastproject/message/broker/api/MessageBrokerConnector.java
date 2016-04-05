@@ -19,37 +19,22 @@
  *
  */
 
-package org.opencastproject.message.broker.impl;
+package org.opencastproject.message.broker.api;
 
-import javax.jms.MessageProducer;
-import javax.jms.Session;
+public interface MessageBrokerConnector {
 
-/**
- * A mock class of {@link MessagerSenderImpl} to be used in unit tests.
- */
-public class MockMessageSender extends MessageSenderImpl {
+  /**
+   * Return if there is a connection to the message broker.
+   *
+   * @return If the connection to the message broker is active.
+   */
+  boolean isConnected();
 
-  private final Session session;
-  private final MessageProducer producer;
-
-  MockMessageSender(Session session, MessageProducer producer) {
-    this.session = session;
-    this.producer = producer;
-  }
-
-  @Override
-  public boolean isConnected() {
-    return true;
-  }
-
-  @Override
-  protected Session getSession() {
-    return session;
-  }
-
-  @Override
-  protected MessageProducer getMessageProducer() {
-    return producer;
-  }
+  /**
+   * Try reconnecting if there was no reconnection attempt in the immediate past.
+   *
+   * @return If the re-connection attempt was successful.
+   */
+  boolean reconnect();
 
 }

@@ -21,9 +21,12 @@
 
 package org.opencastproject.message.broker.endpoint;
 
+import static org.apache.http.HttpStatus.SC_NO_CONTENT;
+import static org.apache.http.HttpStatus.SC_SERVICE_UNAVAILABLE;
+
+import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.MessageSender.DestinationType;
-import org.opencastproject.message.broker.impl.MessageSenderImpl;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -35,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -46,8 +50,19 @@ import javax.ws.rs.core.Response.Status;
 @RestService(name = "messagebrokerservice", title = "Message Broker Service", notes = "", abstractText = "Handles publishers and subscribers connecting to message brokers")
 public class MessageBrokerServiceEndpoint {
 
+  private MessageReceiver messageReceiver;
+  private MessageSender messageSender;
+
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(MessageBrokerServiceEndpoint.class);
+
+  public void setMessageReceiver(MessageReceiver messageReceiver) {
+    this.messageReceiver = messageReceiver;
+  }
+
+  public void setMessageSender(MessageSender messageSender) {
+    this.messageSender = messageSender;
+  }
 
   @POST
   @Path("sendTextMessage")
@@ -80,9 +95,29 @@ public class MessageBrokerServiceEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
     }
 
-    MessageSenderImpl messageSenderImpl = new MessageSenderImpl();
-    messageSenderImpl.sendTextMessage(destinationId, destinationType, message);
+    messageSender.sendTextMessage(destinationId, destinationType, message);
     return Response.ok().build();
+  }
+
+  @GET
+  @Path("status")
+  @RestQuery(
+    name = "status",
+    description = "Return status of message broker",
+    returnDescription = "Return status of message broker",
+    reponses = {
+      @RestResponse(
+        responseCode = SC_NO_CONTENT,
+        description = "Connection to message broker ok"),
+      @RestResponse(
+        responseCode = SC_SERVICE_UNAVAILABLE,
+        description = "Not connected to message broker")
+    })
+  public Response getStatus() {
+    if (messageReceiver.reconnect() && messageSender.reconnect()) {
+      return Response.status(SC_NO_CONTENT).build();
+    }
+    return Response.status(SC_SERVICE_UNAVAILABLE).build();
   }
 
 }

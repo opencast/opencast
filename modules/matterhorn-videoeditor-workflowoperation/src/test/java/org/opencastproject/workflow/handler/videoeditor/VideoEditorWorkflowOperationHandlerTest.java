@@ -94,6 +94,7 @@ public class VideoEditorWorkflowOperationHandlerTest {
     workspaceMock = EasyMock.createNiceMock(Workspace.class);
 
     videoEditorWorkflowOperationHandler = new VideoEditorWorkflowOperationHandler();
+    videoEditorWorkflowOperationHandler.setJobBarrierPollingInterval(0);
     videoEditorWorkflowOperationHandler.setSmilService(smilService);
     videoEditorWorkflowOperationHandler.setVideoEditorService(videoEditorServiceMock);
     videoEditorWorkflowOperationHandler.setWorkspace(workspaceMock);

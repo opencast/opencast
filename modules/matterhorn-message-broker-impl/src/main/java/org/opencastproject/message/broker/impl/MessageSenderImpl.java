@@ -21,9 +21,6 @@
 
 package org.opencastproject.message.broker.impl;
 
-import static org.opencastproject.util.OsgiUtil.getContextProperty;
-import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
-
 import org.opencastproject.message.broker.api.BaseMessage;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.Organization;
@@ -33,8 +30,6 @@ import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,30 +57,6 @@ public class MessageSenderImpl extends MessageBaseFacility implements MessageSen
   /** The OSGi configuration admin service */
   private ConfigurationAdmin configAdmin;
 
-  /** OSGi component activate callback */
-  public void activate(ComponentContext cc) throws Exception {
-    logger.info("MessageSender service is starting...");
-    final String url = getContextProperty(cc, ACTIVEMQ_BROKER_URL_KEY);
-    Option<String> username = getOptContextProperty(cc, ACTIVEMQ_BROKER_USERNAME_KEY);
-    Option<String> password = getOptContextProperty(cc, ACTIVEMQ_BROKER_PASSWORD_KEY);
-
-    logger.info("MessageSender is configured to connect with URL {}", url);
-    try {
-      disconnectMessageBroker();
-      connectMessageBroker(url, username, password);
-    } catch (JMSException e) {
-      throw new ConfigurationException(ACTIVEMQ_BROKER_URL_KEY, url, e);
-    }
-    logger.info("MessageSender service successfully started");
-  }
-
-  /** OSGi component deactivate callback */
-  public void deactivate() throws Exception {
-    logger.info("MessageSender service is stopping...");
-    disconnectMessageBroker();
-    logger.info("MessageSender service successfully stopped");
-  }
-
   /**
    * A common function for sending all types of messages that this class handles. Only one Message or one message
    * payload can be provided.
@@ -109,7 +80,6 @@ public class MessageSenderImpl extends MessageBaseFacility implements MessageSen
           Option<String> messageText, Option<byte[]> messageBytes, Option<Integer> offset, Option<Integer> length,
           Option<Serializable> messageObject) {
     try {
-
       // Create a message or use the provided one.
       Message message = null;
       if (createdMessage.isSome()) {
