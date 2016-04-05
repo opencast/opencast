@@ -4,11 +4,11 @@ describe('Schedule Task Controller', function () {
     beforeEach(module('adminNg'));
 
     // initiate mocks
-    TableServiceMock = jasmine.createSpyObj('TableService', ['fetch', 'getSelected']);
+    TableServiceMock = jasmine.createSpyObj('TableService', ['fetch', 'copySelected', 'deselectAll']);
     FormNavigatorServiceMock = jasmine.createSpyObj('FormNavigatorService', ['navigateTo']);
     TaskResourceMock = jasmine.createSpyObj('TaskResource', ['save']);
     NotificationsMock = jasmine.createSpyObj('Notifications', ['add']);
-    TableServiceMock.getSelected.and.returnValue([{id: 'row1', selected: true}, {id: 'row2', selected: true}]);
+    TableServiceMock.copySelected.and.returnValue([{id: 'row1', selected: true}, {id: 'row2', selected: true}]);
     
     beforeEach(module(function ($provide) {
         $provide.value('FormNavigatorService', FormNavigatorServiceMock);
@@ -36,19 +36,18 @@ describe('Schedule Task Controller', function () {
 
     beforeEach(function () {
         $controller('ScheduleTaskCtrl', {$scope: $scope});
+        jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         $httpBackend.whenGET('/admin-ng/event/new/processing?tags=archive-ng').respond(getJSONFixture('admin-ng/event/new/processing'));
     });
 
     describe('basic functionality', function () {
 
         it('instantiation', function () {
-            expect(TableServiceMock.getSelected).toHaveBeenCalled();
+            expect(TableServiceMock.copySelected).toHaveBeenCalled();
         });
 
-        it('overwrites the navigateTo method', function () {
-            expect($scope.navigateTo).toBeDefined();
-            $scope.navigateTo('somewhere', 'hereIamNow', []);
-            expect(FormNavigatorServiceMock.navigateTo).toHaveBeenCalledWith('somewhere', 'hereIamNow', []);
+        it('is decorated with table functionality', function () {
+            expect($scope.hasAnySelected).toBeDefined();
         });
     });
 
@@ -80,6 +79,12 @@ describe('Schedule Task Controller', function () {
             expect(NotificationsMock.add).toHaveBeenCalledWith('error', 'TASK_NOT_CREATED', 'global', -1);
             expect($scope.close).toHaveBeenCalled();
         });
-        
+
+        it('deselects all rows on success', function () {
+            TaskResourceMock.save.calls.mostRecent().args[1].call($scope);
+            $timeout.flush();
+            expect(TableServiceMock.deselectAll).toHaveBeenCalled();
+        });
+
     });
 });

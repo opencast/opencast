@@ -51,7 +51,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
   public static final String LIST_ORG_KEY = "list.org";
   /** The logging instance */
   private static final Logger logger = LoggerFactory.getLogger(ListProvidersScanner.class);
- /** The Map to go from file locations of properties files to list names. **/
+  /** The Map to go from file locations of properties files to list names. **/
   private Map<String, String> fileToListNames = new HashMap<String, String>();
   /** The list providers service to add the list provider to. **/
   private ListProvidersService listProvidersService;
@@ -75,7 +75,8 @@ public class ListProvidersScanner implements ArtifactInstaller {
    */
   @Override
   public boolean canHandle(File artifact) {
-    return LIST_PROVIDERS_DIRECTORY.equals(artifact.getParentFile().getName()) && artifact.getName().endsWith(".properties");
+    return LIST_PROVIDERS_DIRECTORY.equals(artifact.getParentFile().getName())
+            && artifact.getName().endsWith(".properties");
   }
 
   /**
@@ -84,7 +85,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
   private class SingleResourceListProviderImpl implements ResourceListProvider {
     private String listName;
     private String orgId = "";
-    private Map<String, Object> list;
+    private Map<String, String> list;
 
     /**
      * Default constructor.
@@ -94,7 +95,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
      * @param list
      *          The list of properties to expose.
      */
-    SingleResourceListProviderImpl(String listName, Map<String, Object> list) {
+    SingleResourceListProviderImpl(String listName, Map<String, String> list) {
       this.listName = listName;
       this.list = list;
     }
@@ -114,13 +115,12 @@ public class ListProvidersScanner implements ArtifactInstaller {
     }
 
     @Override
-    public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
+    public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
             throws ListProviderException {
       logger.debug("Getting list " + listName + " query " + query + " org " + organization);
       if (this.listName.equals(listName) && "".equals(this.orgId)) {
         return Collections.unmodifiableMap(list);
-      }
-      else if (this.listName.equals(listName) && organization != null && organization.getId().equals(this.orgId)) {
+      } else if (this.listName.equals(listName) && organization != null && organization.getId().equals(this.orgId)) {
         return Collections.unmodifiableMap(list);
       } else {
         return null;
@@ -155,7 +155,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
     String orgId = "";
     logger.debug("Found list with name '{}'", listName);
     if (!"".equals(listName)) {
-      HashMap<String, Object> list = new HashMap<String, Object>();
+      HashMap<String, String> list = new HashMap<String, String>();
       Enumeration<Object> keys = properties.keys();
       while (keys.hasMoreElements()) {
         Object key = keys.nextElement();
@@ -167,8 +167,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
         } else if (keyString.equalsIgnoreCase(LIST_ORG_KEY)) {
           orgId = properties.get(key).toString();
           logger.debug("Found org:{}", orgId);
-        }
-        else {
+        } else {
           logger.debug("Skipping key:{}", keyString);
         }
       }
@@ -180,7 +179,9 @@ public class ListProvidersScanner implements ArtifactInstaller {
       listProvidersService.addProvider(singleResourceListProviderImpl.getListName(), singleResourceListProviderImpl);
       fileToListNames.put(artifact.getAbsolutePath(), singleResourceListProviderImpl.getListName());
     } else {
-      logger.error("Unable to add {} as a list provider because the {} entry was empty. Please add it to get this list provider to work.", new Object[] {artifact.getAbsolutePath(), LIST_NAME_KEY, listName});
+      logger.error(
+              "Unable to add {} as a list provider because the {} entry was empty. Please add it to get this list provider to work.",
+              new Object[] { artifact.getAbsolutePath(), LIST_NAME_KEY, listName });
     }
   }
 

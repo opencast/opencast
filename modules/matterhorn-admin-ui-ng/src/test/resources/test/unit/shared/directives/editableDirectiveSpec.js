@@ -2,6 +2,7 @@ describe('adminNg.directives.adminNgEditable', function () {
     var $compile, $rootScope, $httpBackend, element;
 
     beforeEach(module('adminNg'));
+    beforeEach(module('adminNg.filters'));
     beforeEach(module('shared/partials/editable.html'));
     beforeEach(module('shared/partials/editableBooleanValue.html'));
     beforeEach(module('shared/partials/editableSingleValue.html'));
@@ -27,6 +28,7 @@ describe('adminNg.directives.adminNgEditable', function () {
     }));
 
     beforeEach(function () {
+        jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
     });
 

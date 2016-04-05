@@ -21,13 +21,15 @@
 
 package org.opencastproject.index.service.catalog.adapter;
 
-import org.opencastproject.index.service.catalog.adapter.MetadataField.Type;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.metadata.dublincore.MetadataField.Type;
 import org.opencastproject.metadata.dublincore.Precision;
 
 import com.entwinemedia.fn.data.Opt;
@@ -68,7 +70,7 @@ public final class DublinCoreMetadataUtil {
    * @param metadata
    *          The {@link AbstractMetadataCollection} data definitions and values to update the catalog with.
    */
-  public static void updateDublincoreCatalog(DublinCoreCatalog dc, AbstractMetadataCollection metadata) {
+  public static void updateDublincoreCatalog(DublinCoreCatalog dc, MetadataCollection metadata) {
     for (MetadataField<?> field : metadata.getOutputFields().values()) {
       if (field.isUpdated() && field.getValue().isSome()) {
         final String namespace = field.getNamespace().or(DublinCore.TERMS_NS_URI);
@@ -81,11 +83,20 @@ public final class DublinCoreMetadataUtil {
           setDuration(dc, field, ename);
         } else if (field.getType() == Type.DATE) {
           setDate(dc, field, ename);
-        } else if (field.getType() == MetadataField.Type.MIXED_TEXT || field.getType() == MetadataField.Type.ITERABLE_TEXT) {
+        } else if (field.getType() == MetadataField.Type.MIXED_TEXT || field.getType() == Type.ITERABLE_TEXT) {
           setIterableString(dc, field, ename);
         } else {
+          if (field.isRequired() && StringUtils.isBlank(field.getValue().get().toString()))
+            throw new IllegalArgumentException(
+                    String.format(
+                            "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
+                            field.getInputID(), field.getType()));
           dc.set(ename, field.getValue().get().toString());
         }
+      } else if (field.getValue().isNone() && field.isRequired()) {
+        throw new IllegalArgumentException(String.format(
+                "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
+                field.getInputID(), field.getType()));
       }
     }
   }
@@ -102,9 +113,15 @@ public final class DublinCoreMetadataUtil {
    */
   private static void setIterableString(DublinCoreCatalog dc, MetadataField<?> field, final EName ename) {
     if (field.getValue().isSome()) {
-      @SuppressWarnings("unchecked")
-      Iterable<String> valueIterable = (Iterable<String>) field.getValue().get();
-      String valueString = StringUtils.join(valueIterable.iterator(), ",");
+      String valueString;
+      if (field.getValue().get() instanceof String) {
+        valueString = (String) field.getValue().get();
+      } else {
+        @SuppressWarnings("unchecked")
+        Iterable<String> valueIterable = (Iterable<String>) field.getValue().get();
+        valueString = StringUtils.join(valueIterable.iterator(), ",");
+      }
+
       if (StringUtils.isBlank(StringUtils.trimToEmpty(valueString))) {
         // The value of the iterative string is empty so we will remove it.
         dc.remove(ename);
@@ -351,8 +368,8 @@ public final class DublinCoreMetadataUtil {
     try {
       duration = Long.parseLong(field.getValue().get().toString());
     } catch (NumberFormatException e) {
-      logger.debug("Unable to parse the duration's value '{}' as a long value. Trying it as a period next.", field
-              .getValue().get());
+      logger.debug("Unable to parse the duration's value '{}' as a long value. Trying it as a period next.",
+              field.getValue().get());
     }
     if (duration < 1L) {
       duration = getDuration(period);
@@ -371,13 +388,13 @@ public final class DublinCoreMetadataUtil {
     for (Object configObject : Collections.list(configProperties.keys())) {
       String property = configObject.toString();
       if (getDublinCorePropertyName(property).isSome()) {
-        MetadataField<?> dublinCoreProperty = dublinCorePropertyMapByConfigurationName.get(getDublinCorePropertyName(
-                property).get());
+        MetadataField<?> dublinCoreProperty = dublinCorePropertyMapByConfigurationName
+                .get(getDublinCorePropertyName(property).get());
         if (dublinCoreProperty == null) {
           dublinCoreProperty = new MetadataField();
         }
-        dublinCoreProperty
-                .setValue(getDublinCorePropertyKey(property).get(), configProperties.get(property).toString());
+        dublinCoreProperty.setValue(getDublinCorePropertyKey(property).get(),
+                configProperties.get(property).toString());
         dublinCorePropertyMapByConfigurationName.put(getDublinCorePropertyName(property).get(), dublinCoreProperty);
       }
     }

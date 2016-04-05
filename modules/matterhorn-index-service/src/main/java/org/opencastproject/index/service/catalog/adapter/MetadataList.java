@@ -26,10 +26,12 @@ import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.j;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 
-import org.opencastproject.index.service.catalog.adapter.events.EventCatalogUIAdapter;
-import org.opencastproject.index.service.catalog.adapter.series.SeriesCatalogUIAdapter;
-import org.opencastproject.index.service.exception.MetadataParsingException;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.metadata.dublincore.MetadataParsingException;
+import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.util.data.Tuple;
 
 import com.entwinemedia.fn.Fn;
@@ -53,7 +55,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public final class MetadataList implements Iterable<Entry<String, Tuple<String, AbstractMetadataCollection>>> {
+public final class MetadataList implements Iterable<Entry<String, Tuple<String, MetadataCollection>>> {
 
   public enum Locked {
     NONE("NONE"), WORKFLOW_RUNNING("EVENTS.EVENTS.DETAILS.METADATA.LOCKED.RUNNING");
@@ -75,24 +77,24 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
   private static final String KEY_METADATA_FIELDS = "fields";
   private static final String KEY_METADATA_LOCKED = "locked";
 
-  private Map<String, Tuple<String, AbstractMetadataCollection>> metadataList = new HashMap<String, Tuple<String, AbstractMetadataCollection>>();
+  private Map<String, Tuple<String, MetadataCollection>> metadataList = new HashMap<>();
 
   private Locked locked = Locked.NONE;
 
   public MetadataList() {
   }
 
-  public MetadataList(AbstractMetadataCollection metadata, String json) throws MetadataParsingException {
+  public MetadataList(MetadataCollection metadata, String json) throws MetadataParsingException {
     this();
     fromJSON(metadata, json);
   }
 
   public JValue toJSON() {
     List<JValue> catalogs = new ArrayList<JValue>();
-    for (Entry<String, Tuple<String, AbstractMetadataCollection>> metadata : metadataList.entrySet()) {
+    for (Entry<String, Tuple<String, MetadataCollection>> metadata : metadataList.entrySet()) {
       List<JField> fields = new ArrayList<JField>();
 
-      AbstractMetadataCollection metadataCollection = metadata.getValue().getB();
+      MetadataCollection metadataCollection = metadata.getValue().getB();
 
       if (!Locked.NONE.equals(locked)) {
         fields.add(f(KEY_METADATA_LOCKED, v(locked.getValue())));
@@ -108,7 +110,7 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
     return a(catalogs);
   }
 
-  private void makeMetadataCollectionReadOnly(AbstractMetadataCollection metadataCollection) {
+  private void makeMetadataCollectionReadOnly(MetadataCollection metadataCollection) {
     for (MetadataField<?> field : metadataCollection.getFields())
       field.setReadOnly(true);
   }
@@ -137,7 +139,7 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
       if (value == null)
         continue;
 
-      Tuple<String, AbstractMetadataCollection> metadata = metadataList.get(flavor.toString());
+      Tuple<String, MetadataCollection> metadata = metadataList.get(flavor.toString());
       if (metadata == null)
         continue;
 
@@ -146,7 +148,7 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
     }
   }
 
-  private void fromJSON(AbstractMetadataCollection metadata, String json) throws MetadataParsingException {
+  private void fromJSON(MetadataCollection metadata, String json) throws MetadataParsingException {
     if (StringUtils.isBlank(json))
       throw new IllegalArgumentException("The JSON string must not be empty or null!");
 
@@ -176,17 +178,17 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
     }
   }
 
-  public Opt<AbstractMetadataCollection> getMetadataByAdapter(SeriesCatalogUIAdapter catalogUIAdapter) {
+  public Opt<MetadataCollection> getMetadataByAdapter(SeriesCatalogUIAdapter catalogUIAdapter) {
     return Stream.$(metadataList.keySet()).filter(adapterFilter._2(catalogUIAdapter.getFlavor().toString()))
             .map(toMetadata).head();
   }
 
-  public Opt<AbstractMetadataCollection> getMetadataByAdapter(EventCatalogUIAdapter catalogUIAdapter) {
+  public Opt<MetadataCollection> getMetadataByAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     return Stream.$(metadataList.keySet()).filter(adapterFilter._2(catalogUIAdapter.getFlavor().toString()))
             .map(toMetadata).head();
   }
 
-  public Opt<AbstractMetadataCollection> getMetadataByFlavor(String flavor) {
+  public Opt<MetadataCollection> getMetadataByFlavor(String flavor) {
     return Stream.$(metadataList.keySet()).filter(adapterFilter._2(flavor)).map(toMetadata).head();
   }
 
@@ -197,27 +199,27 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
     }
   };
 
-  private final Fn<String, AbstractMetadataCollection> toMetadata = new Fn<String, AbstractMetadataCollection>() {
+  private final Fn<String, MetadataCollection> toMetadata = new Fn<String, MetadataCollection>() {
     @Override
-    public AbstractMetadataCollection ap(String key) {
+    public MetadataCollection ap(String key) {
       return metadataList.get(key).getB();
     }
   };
 
-  public void add(EventCatalogUIAdapter adapter, AbstractMetadataCollection metadata) {
+  public void add(EventCatalogUIAdapter adapter, MetadataCollection metadata) {
     metadataList.put(adapter.getFlavor().toString(), Tuple.tuple(adapter.getUITitle(), metadata));
   }
 
-  public void add(SeriesCatalogUIAdapter adapter, AbstractMetadataCollection metadata) {
+  public void add(SeriesCatalogUIAdapter adapter, MetadataCollection metadata) {
     metadataList.put(adapter.getFlavor().toString(), Tuple.tuple(adapter.getUITitle(), metadata));
   }
 
-  public void add(String flavor, String title, AbstractMetadataCollection metadata) {
+  public void add(String flavor, String title, MetadataCollection metadata) {
     metadataList.put(flavor, Tuple.tuple(title, metadata));
   }
 
   @Override
-  public Iterator<Entry<String, Tuple<String, AbstractMetadataCollection>>> iterator() {
+  public Iterator<Entry<String, Tuple<String, MetadataCollection>>> iterator() {
     return metadataList.entrySet().iterator();
   }
 

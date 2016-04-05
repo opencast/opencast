@@ -63,8 +63,6 @@ import java.net.URI;
 
 import javax.servlet.http.HttpServletResponse;
 
-import junit.framework.Assert;
-
 public class DownloadDistributionServiceImplTest {
 
   private DownloadDistributionServiceImpl service = null;

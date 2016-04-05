@@ -175,12 +175,11 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
       if (uri != null) {
         String uriStr = uri.getNodeValue();
         String trimmedUriStr = uriStr.trim();
-        /* Warn the user if trimming is necessary as this means that the URI
-         * was technically invalid.
+        /*
+         * Warn the user if trimming is necessary as this means that the URI was technically invalid.
          */
         if (!trimmedUriStr.equals(uriStr)) {
-          logger.warn("Detected invalid URI. Trying to fix it by "
-              + "removing spaces from beginning/end.");
+          logger.warn("Detected invalid URI. Trying to fix it by " + "removing spaces from beginning/end.");
         }
         uri.setNodeValue(serializer.decodeURI(new URI(trimmedUriStr)).toString());
       }

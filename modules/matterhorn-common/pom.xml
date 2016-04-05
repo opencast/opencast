@@ -85,6 +85,10 @@
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
     </dependency>
+    <dependency>
+      <groupId>net.fortuna.ical4j</groupId>
+      <artifactId>ical4j</artifactId>
+    </dependency>
     <!-- OSGi -->
     <dependency>
       <groupId>org.osgi</groupId>
@@ -173,6 +177,15 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
+    </dependency>
+    <!--
+    - Parameterized tests for JUnit
+    - https://github.com/Pragmatists/JUnitParams
+    -->
+    <dependency>
+      <groupId>pl.pragmatists</groupId>
+      <artifactId>JUnitParams</artifactId>
+      <version>1.0.4</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -286,6 +299,8 @@
               !com.sun.*,
               !javax.el.*,
               !javax.servlet.jsp.*,
+              !net.fortuna.ical4j.factory,
+              !net.fortuna.ical4j.timezone,
               !org.apache.log.*,
               !org.apache.tools.*,
               !org.bouncycastle.crypto.*,
@@ -301,11 +316,24 @@
             </Import-Package>
             <Embed-Dependency>
               truezip;inline=true,
-              freemarker;inline=true
+              freemarker;inline=true,
+              ical4j;inline=true
             </Embed-Dependency>
             <Private-Package>
-              freemarker.core, freemarker.template
+              freemarker.core,
+              freemarker.template
             </Private-Package>
+            <_exportcontents>
+              net.fortuna.ical4j,
+              net.fortuna.ical4j.data,
+              net.fortuna.ical4j.filter,
+              net.fortuna.ical4j.model,
+              net.fortuna.ical4j.model.component,
+              net.fortuna.ical4j.model.parameter,
+              net.fortuna.ical4j.model.property,
+              net.fortuna.ical4j.transform,
+              net.fortuna.ical4j.util
+            </_exportcontents>
             <Export-Package>
               org.opencastproject.util.*;version=${project.version};-split-package:=merge-first,
               org.opencastproject.capture;version=${project.version},

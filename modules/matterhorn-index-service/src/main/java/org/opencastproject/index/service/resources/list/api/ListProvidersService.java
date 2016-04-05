@@ -43,8 +43,8 @@ public interface ListProvidersService {
    *          The organization context
    * @return a list of tuple id - value from the given source
    */
-  Map<String, Object> getList(String providerName, ResourceListQuery query, Organization organization)
-          throws ListProviderException;
+  Map<String, String> getList(String providerName, ResourceListQuery query, Organization organization,
+          boolean inverseValueKey) throws ListProviderException;
 
   /**
    * Adds an source to the service

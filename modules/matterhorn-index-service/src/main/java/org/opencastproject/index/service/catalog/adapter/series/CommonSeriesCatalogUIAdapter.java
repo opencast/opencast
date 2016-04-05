@@ -25,24 +25,16 @@ import static java.util.Objects.requireNonNull;
 
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
-import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
-import org.osgi.service.component.ComponentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 /**
  * This {@link SeriesCatalogUIAdapter} is the default implementation for series metadata.
@@ -50,32 +42,6 @@ import java.util.Properties;
 public class CommonSeriesCatalogUIAdapter extends ConfigurableSeriesDCCatalogUIAdapter implements ManagedService {
 
   private static final Logger logger = LoggerFactory.getLogger(CommonSeriesCatalogUIAdapter.class);
-
-  private SecurityService securityService;
-
-  public CommonSeriesCatalogUIAdapter() {
-    Properties seriesCatalogProperties = new Properties();
-    InputStream in = null;
-    try {
-      in = getClass().getResourceAsStream("/series-catalog.properties");
-      seriesCatalogProperties.load(in);
-    } catch (IOException e) {
-      throw new ComponentException(e);
-    } finally {
-      IoSupport.closeQuietly(in);
-    }
-    try {
-      updated(seriesCatalogProperties);
-    } catch (ConfigurationException e) {
-      logger.error("Error while configuring: {}", ExceptionUtils.getStackTrace(e));
-      throw new IllegalStateException("The default series DublinCore catalog UI adapter has configuration problems", e);
-    }
-  }
-
-  @Override
-  public String getOrganization() {
-    return securityService.getOrganization().getId();
-  }
 
   @Override
   public String getFlavor() {
@@ -85,11 +51,6 @@ public class CommonSeriesCatalogUIAdapter extends ConfigurableSeriesDCCatalogUIA
   @Override
   public String getUITitle() {
     return "Opencast Series DublinCore";
-  }
-
-  /** OSGi callback to bind {@link SecurityService} instance. */
-  public void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
   }
 
   @Override

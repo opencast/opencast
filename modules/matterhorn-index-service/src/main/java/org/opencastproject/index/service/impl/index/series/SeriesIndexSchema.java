@@ -37,9 +37,6 @@ public interface SeriesIndexSchema extends IndexSchema {
   /** The series title */
   String TITLE = "title";
 
-  /** Boost values for ranking */
-  double TITLE_BOOST = 6.0;
-
   /** The description of the series */
   String DESCRIPTION = "description";
 

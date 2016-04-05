@@ -98,22 +98,6 @@
           </virtualDestinationInterceptor>
           <virtualDestinationInterceptor>
             <virtualDestinations>
-              <compositeQueue name="INDEX_RECEIVER.QUEUE">
-                <forwardTo>
-                  <queue physicalName="INDEX_RECEIVER.QUEUE.Acl" />
-                  <queue physicalName="INDEX_RECEIVER.QUEUE.Archive" />
-                  <queue physicalName="INDEX_RECEIVER.QUEUE.Comments" />
-                  <queue physicalName="INDEX_RECEIVER.QUEUE.Groups" />
-                  <queue physicalName="INDEX_RECEIVER.QUEUE.Scheduler" />
-                  <queue physicalName="INDEX_RECEIVER.QUEUE.Series" />
-                  <queue physicalName="INDEX_RECEIVER.QUEUE.Themes" />
-                  <queue physicalName="INDEX_RECEIVER.QUEUE.Workflow" />
-                </forwardTo>
-              </compositeQueue>
-            </virtualDestinations>
-          </virtualDestinationInterceptor>
-          <virtualDestinationInterceptor>
-            <virtualDestinations>
               <compositeQueue name="RECORDING.QUEUE">
                 <forwardTo>
                   <queue physicalName="RECORDING.Adminui" />

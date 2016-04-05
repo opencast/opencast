@@ -34,6 +34,8 @@ import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
@@ -79,7 +81,7 @@ public class EventCatalogUIAdapterTest {
 
   @Before
   public void setUp() throws URISyntaxException, NotFoundException, IOException, ListProviderException {
-    TreeMap<String, Object> collection = new TreeMap<String, Object>();
+    TreeMap<String, String> collection = new TreeMap<String, String>();
     collection.put("Entry 1", "Value 1");
     collection.put("Entry 2", "Value 2");
     collection.put("Entry 3", "Value 3");
@@ -90,7 +92,7 @@ public class EventCatalogUIAdapterTest {
     listProvidersService = EasyMock.createMock(ListProvidersService.class);
     EasyMock.expect(
             listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQueryImpl.class),
-                    EasyMock.anyObject(Organization.class))).andReturn(collection).anyTimes();
+                    EasyMock.anyObject(Organization.class), EasyMock.anyBoolean())).andReturn(collection).anyTimes();
     EasyMock.replay(listProvidersService);
 
     eventProperties = new Properties();
@@ -140,8 +142,9 @@ public class EventCatalogUIAdapterTest {
     configurationDublinCoreCatalogUIAdapter.setWorkspace(workspace);
     configurationDublinCoreCatalogUIAdapter.updated(eventProperties);
 
-    AbstractMetadataCollection abstractMetadata = configurationDublinCoreCatalogUIAdapter.getFields(mediapackage);
-    assertThat(eventJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(abstractMetadata.toJSON())).allowingAnyArrayOrdering());
+    MetadataCollection abstractMetadata = configurationDublinCoreCatalogUIAdapter.getFields(mediapackage);
+    assertThat(eventJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(abstractMetadata.toJSON()))
+            .allowingAnyArrayOrdering());
   }
 
   @Ignore

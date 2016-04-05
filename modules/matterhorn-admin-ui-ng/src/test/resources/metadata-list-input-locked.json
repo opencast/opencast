@@ -101,10 +101,10 @@
             "type":"text"
          },
          {
-            "id":"agent",
+            "id":"location",
             "readOnly":true,
             "value":"",
-            "label":"EVENTS.EVENTS.DETAILS.METADATA.AGENT",
+            "label":"EVENTS.EVENTS.DETAILS.METADATA.LOCATION",
             "required":false,
             "type":"text"
          },
@@ -125,10 +125,10 @@
             "type":"date"
          },
          {
-            "id":"uid",
+            "id":"identifier",
             "readOnly":true,
             "value":"",
-            "label":"EVENTS.EVENTS.DETAILS.METADATA.UID",
+            "label":"EVENTS.EVENTS.DETAILS.METADATA.ID",
             "required":false,
             "type":"text"
          }

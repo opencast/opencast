@@ -24,9 +24,11 @@ package org.opencastproject.index.service.catalog.adapter;
 import static com.entwinemedia.fn.data.json.Jsons.a;
 
 import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.exception.MetadataParsingException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.metadata.dublincore.MetadataParsingException;
 
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JValue;
@@ -50,7 +52,7 @@ import java.util.Map;
 /**
  * Abstract container for the metadata
  */
-public abstract class AbstractMetadataCollection {
+public abstract class AbstractMetadataCollection implements MetadataCollection {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(AbstractMetadataCollection.class);
@@ -64,11 +66,7 @@ public abstract class AbstractMetadataCollection {
   private Map<String, MetadataField<?>> inputFields = new HashMap<String, MetadataField<?>>();
   private Map<String, MetadataField<?>> outputFields = new HashMap<String, MetadataField<?>>();
 
-  /**
-   * Format the metadata as JSON array
-   *
-   * @return a JSON array representation of the metadata
-   */
+  @Override
   public JValue toJSON() {
     List<JValue> metadata = new ArrayList<JValue>();
     for (MetadataField<?> metadataField : getFields()) {
@@ -77,40 +75,8 @@ public abstract class AbstractMetadataCollection {
     return a(metadata);
   }
 
-  /**
-   * Parse the given JSON string to extract the metadata. The JSON structure must look like this:
-   *
-   * <pre>
-   * [
-   *  {
-   *     "id"        : "field id",
-   *     "value"     : "field value",
-   *
-   *     // The following properties should not be present as they are useless,
-   *     // but they do not hurt for the parsing.
-   *
-   *     "label"     : "EVENTS.SERIES.DETAILS.METADATA.LABEL",
-   *     "type"      : "",
-   *     // The collection can be a json object like below...
-   *     "collection": { "id1": "value1", "id2": "value2" },
-   *     // Or a the id of the collection available through the resource endpoint
-   *     "collection": "USERS",
-   *     "readOnly": false
-   *   },
-   *
-   *   // Additionally fields
-   *   ...
-   * ]
-   * </pre>
-   *
-   * @param json
-   *          A JSON array of metadata as String
-   * @throws MetadataParsingException
-   *           if the JSON structure is not correct
-   * @throws IllegalArgumentException
-   *           if the JSON string is null or empty
-   */
-  public AbstractMetadataCollection fromJSON(String json) throws MetadataParsingException {
+  @Override
+  public MetadataCollection fromJSON(String json) throws MetadataParsingException {
     if (StringUtils.isBlank(json))
       throw new IllegalArgumentException("The JSON string must not be empty or null!");
 
@@ -144,23 +110,17 @@ public abstract class AbstractMetadataCollection {
     return this;
   }
 
+  @Override
   public Map<String, MetadataField<?>> getInputFields() {
     return inputFields;
   }
 
+  @Override
   public Map<String, MetadataField<?>> getOutputFields() {
     return outputFields;
   }
 
-  /**
-   * Add the given {@link MetadataField} field to the metadata list
-   *
-   * @param metadata
-   *          The {@link MetadataField} field to add
-   * @throws IllegalArgumentException
-   *           if the {@link MetadataField} is null
-   *
-   */
+  @Override
   public void addField(MetadataField<?> metadata) {
     if (metadata == null)
       throw new IllegalArgumentException("The metadata must not be null.");
@@ -209,8 +169,8 @@ public abstract class AbstractMetadataCollection {
 
     // Add all of the fields that have an index to their location starting at the lowest value.
     for (MetadataField<?> orderedField : orderedFields) {
-      Integer index = orderedField.getOrder().get() < fieldsInOrder.size() ? orderedField.getOrder().get() : fieldsInOrder
-              .size();
+      Integer index = orderedField.getOrder().get() < fieldsInOrder.size() ? orderedField.getOrder().get()
+              : fieldsInOrder.size();
       fieldsInOrder.add(index, orderedField);
     }
   }
@@ -235,6 +195,7 @@ public abstract class AbstractMetadataCollection {
     }
   }
 
+  @Override
   public void removeField(MetadataField<?> metadata) {
     if (metadata == null)
       throw new IllegalArgumentException("The metadata must not be null.");
@@ -243,16 +204,31 @@ public abstract class AbstractMetadataCollection {
     this.outputFields.remove(metadata.getOutputID());
   }
 
+  @Override
   public List<MetadataField<?>> getFields() {
     return this.fieldsInOrder;
   }
 
+  @Override
   public void updateStringField(MetadataField<?> current, String value) {
     if (current.getValue().isSome() && !(current.getValue().get() instanceof String)) {
       throw new IllegalArgumentException("Unable to update a field to a different type than String with this method!");
     }
     removeField(current);
     MetadataField<String> field = MetadataField.createTextMetadataField(current.getInputID(),
+            Opt.some(current.getOutputID()), current.getLabel(), current.isReadOnly(), current.isRequired(),
+            current.getCollection(), current.getCollectionID(), current.getOrder(), current.getNamespace());
+    field.setValue(value);
+    addField(field);
+  }
+
+  @Override
+  public void updateIterableStringField(MetadataField<?> current, Iterable<String> value) {
+    if (!(current.getType().equals(MetadataField.Type.ITERABLE_TEXT))) {
+      throw new IllegalArgumentException("Unable to update a field to a different type than String with this method!");
+    }
+    removeField(current);
+    MetadataField<Iterable<String>> field = MetadataField.createIterableStringMetadataField(current.getInputID(),
             Opt.some(current.getOutputID()), current.getLabel(), current.isReadOnly(), current.isRequired(),
             current.getCollection(), current.getCollectionID(), current.getOrder(), current.getNamespace());
     field.setValue(value);
@@ -271,15 +247,15 @@ public abstract class AbstractMetadataCollection {
    * @throws IllegalArgumentException
    *           if the name or the listProviderService is null or the name blank.
    */
-  protected Opt<Map<String, Object>> getCollection(String name, ListProvidersService listProviderService) {
+  protected Opt<Map<String, String>> getCollection(String name, ListProvidersService listProviderService) {
     if (StringUtils.isBlank(name))
       throw new IllegalArgumentException("The listName must not be null or empty!");
     if (listProviderService == null)
       throw new IllegalArgumentException("The list provider must not be null!");
 
-    Opt<Map<String, Object>> list;
+    Opt<Map<String, String>> list;
     try {
-      list = Opt.some(listProviderService.getList(name, new ResourceListQueryImpl(), null));
+      list = Opt.some(listProviderService.getList(name, new ResourceListQueryImpl(), null, true));
     } catch (ListProviderException e) {
       logger.warn("Not able to find a value list with the name {}", name);
       list = Opt.none();
@@ -287,6 +263,7 @@ public abstract class AbstractMetadataCollection {
     return list;
   }
 
+  @Override
   public boolean isUpdated() {
     for (MetadataField<?> field : fieldsInOrder) {
       if (field.isUpdated()) {
@@ -295,4 +272,5 @@ public abstract class AbstractMetadataCollection {
     }
     return false;
   }
+
 }

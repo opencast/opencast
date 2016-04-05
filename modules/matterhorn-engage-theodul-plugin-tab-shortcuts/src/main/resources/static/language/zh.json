@@ -44,5 +44,11 @@
   "focusNext":"關注下一段視頻",
   "togglePiP":"啟用\/禁用畫中畫",
   "movePiP":"在圖片中移動圖片",
-  "shortcuts":"快速鍵"
+  "shortcuts":"快速鍵",
+  "moveLeft":"Move left",
+  "moveRight":"Move right",
+  "moveUp":"Move up",
+  "moveDown":"Move down",
+  "zoomIn":"Zoom in",
+  "zoomOut":"Zoom out"
 }

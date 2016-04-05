@@ -1,0 +1,37 @@
+<div ng-click="enterEditMode()" ng-form="innerForm">
+    <span ng-show="!editMode">{{ presentableValue | localizeDate:params.type:'short' }}</span>
+
+    <i class="edit fa fa-pencil-square" ng-show="!editMode"></i>
+    <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
+
+    <textarea ng-keyup="keyUp($event)" type="{{ (params.type === 'time') ? 'text' : (params.type || 'text') }}"
+        ng-model="params.value" ng-blur="submit(); editMode = false" class="editable"
+        ng-show="params.type === 'text_long' && editMode" ng-required="params.required" name="{{ params.name }}"/>
+
+    <input ng-keyup="keyUp($event)" type="{{ (params.type === 'time') ? 'text' : (params.type || 'text') }}"
+        ng-model="params.value" ng-blur="submit(); editMode = false"
+        ng-show="editMode && params.type === 'text'" ng-required="params.required" name="{{ params.name }}"/>
+
+    <select chosen
+        ng-if="params.type === 'time' && editMode"
+        ng-change="submit()"
+        ng-keyup="keyUp($event)"
+        data-width="'100px'"
+        data-disable-search-threshold="8"
+        ng-model="params.hours"
+        ng-disabled="!editMode && params.type === 'time'" ng-required="params.required" name="hours"
+        data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+        ng-options="h.index as h.value for h in hours"
+    />
+    <select chosen
+        ng-if="params.type === 'time' && editMode"
+        ng-change="submit()"
+        ng-keyup="keyUp($event)"
+        data-width="'100px'"
+        data-disable-search-threshold="8"
+        ng-model="params.minutes"
+        ng-disabled="!editMode && params.type === 'time'" ng-required="params.required" name="minutes"
+        data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+        ng-options="m.index as m.value for m in minutes"
+    />
+</div>

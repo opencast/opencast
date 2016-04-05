@@ -32,6 +32,10 @@ describe('Source Step in New Event Wizard', function () {
             expect(isValid).toBeDefined();
         });
 
+        it('weekdays are defined', function () {
+            expect(NewEventSource.sortedWeekdays).toBeDefined();
+        });
+
         describe('with the source toggle set to later', function () {
             beforeEach(function () {
                 NewEventSource.ud.type = 'later';
@@ -109,26 +113,26 @@ describe('Source Step in New Event Wizard', function () {
             });
 
             it('# the state is not ready to poll for conflicts without necessary user data', function () {
-                expect(NewEventSource.readyToPollConflicts()).toBeFalsy();
+                expect(NewEventSource.canPollConflicts()).toBeFalsy();
             });
 
             it('# the state is ready to poll for conflicts with necessary user data', function () {
-                expect(NewEventSource.readyToPollConflicts()).toBeFalsy();
+                expect(NewEventSource.canPollConflicts()).toBeFalsy();
                 ud.SCHEDULE_MULTIPLE.start.date = '2014-07-01';
-                expect(NewEventSource.readyToPollConflicts()).toBeFalsy();
+                expect(NewEventSource.canPollConflicts()).toBeFalsy();
                 ud.SCHEDULE_MULTIPLE.end = '2014-08-01';
-                expect(NewEventSource.readyToPollConflicts()).toBeFalsy();
+                expect(NewEventSource.canPollConflicts()).toBeFalsy();
                 ud.SCHEDULE_MULTIPLE.device = {
                     id: 'an id, no matter which'
                 };
-                expect(NewEventSource.readyToPollConflicts()).toBeFalsy();
+                expect(NewEventSource.canPollConflicts()).toBeFalsy();
                 ud.SCHEDULE_MULTIPLE.duration = {
                     hour: '01',
                     minute: '00'
                 };
-                expect(NewEventSource.readyToPollConflicts()).toBeFalsy();
+                expect(NewEventSource.canPollConflicts()).toBeFalsy();
                 ud.SCHEDULE_MULTIPLE.weekdays = {MO: true};
-                expect(NewEventSource.readyToPollConflicts()).toBeTruthy();
+                expect(NewEventSource.canPollConflicts()).toBeTruthy();
             });
         });
     });
@@ -156,14 +160,14 @@ describe('Source Step in New Event Wizard', function () {
         });
 
         it('pushes the conflict into the conflict array', function () {
-            expect(NewEventSource.conflicts.length).toBe(1);
+            expect(NewEventSource.hasConflictingSettings()).toBeTruthy();
         });
 
         it('becomes valid again if the conflict is removed', function () {
             $httpBackend.expectPOST('/admin-ng/event/new/conflicts').respond(203);
             NewEventSource.checkConflicts();
             $httpBackend.flush();
-            expect(NewEventSource.conflicts.length).toBe(0);
+            expect(NewEventSource.hasConflictingSettings()).toBeFalsy();
             expect(NewEventSource.isValid()).toBeTruthy();
         });
     });

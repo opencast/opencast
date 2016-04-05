@@ -28,6 +28,7 @@ describe('Events API Resource', function () {
                 id: '40518',
                 title: 'Test Title',
                 presenters: ['Matt Smith', 'Chuck Norris'],
+                technical_presenters: ['Matt Smith', 'Chuck Norris'],
                 scheduling_status: 'SCHEDULED',
                 review_status: 'REVIEWED',
                 workflow_state: 'processing',
@@ -36,8 +37,11 @@ describe('Events API Resource', function () {
                     title: 'Physics325'
                 },
                 location: 'Room 2',
+                agentId: 'Room 2',
                 start_date: '2012-12-02T10:00:00Z',
+                technical_start_date: '2012-12-02T10:00:00Z',
                 end_date: '2012-12-02T11:15:00Z',
+                technical_end_date: '2012-12-02T11:15:00Z',
                 status: 'processing',
                 comments: {
                     resolved: 0,
@@ -51,6 +55,7 @@ describe('Events API Resource', function () {
                 id: '40519',
                 title: 'Test Title 2',
                 presenters: ['Matt Smith'],
+                technical_presenters: ['Matt Smith'],
                 scheduling_status: 'SCHEDULED',
                 review_status: 'REVIEWED',
                 workflow_state: 'processing',
@@ -59,8 +64,11 @@ describe('Events API Resource', function () {
                     title: 'Physics326'
                 },
                 location: 'Room 3',
+                agentId: 'Room 3',
                 start_date: '2012-12-01T08:59:00Z',
+                technical_start_date: '2012-12-01T08:59:00Z',
                 end_date: '2012-12-01T08:59:00Z',
+                technical_end_date: '2012-12-01T08:59:00Z',
                 status: 'processed',
                 comments: {
                     resolved: 1,
@@ -106,6 +114,7 @@ describe('Events API Resource', function () {
                     id: '40518',
                     title: 'Test Title',
                     presenters: ['Matt Smith', 'Chuck Norris'],
+                    technical_presenters: ['Matt Smith', 'Chuck Norris'],
                     series: {
                         id: '78753d04-18a4-4327-9a61-b6d93816a7d2',
                         title: 'Physics325'

@@ -54,6 +54,7 @@ public final class Collections {
   private Collections() {
   }
 
+  // TODO check all clients of this method since it potentially breaks!
   @SuppressWarnings("unchecked")
   private static <A, B> Collection<A> buildFrom(Collection<B> as) {
     try {
@@ -267,6 +268,7 @@ public final class Collections {
   }
 
   /** Append source collections <code>as</code> to <code>target</code>. */
+  @SafeVarargs
   public static <A, T extends Collection<A>, S extends Iterable<? extends A>> T appendToM(T target, S... as) {
     for (S s : as) {
       for (A a : s)
@@ -276,6 +278,7 @@ public final class Collections {
   }
 
   /** Append source collections <code>as</code> to <code>target</code>. */
+  @SafeVarargs
   public static <A, T extends Collection<A>, X extends A> T appendToA(T target, X... as) {
     java.util.Collections.addAll(target, as);
     return target;
@@ -283,7 +286,7 @@ public final class Collections {
 
   /** Concatenates two iterables into a new list. */
   public static <A, M extends Iterable<? extends A>> List<A> concat(M as, M bs) {
-    List<A> x = new ArrayList<A>();
+    List<A> x = new ArrayList<>();
     for (A a : as)
       x.add(a);
     for (A b : bs)
@@ -293,7 +296,7 @@ public final class Collections {
 
   /** Concatenates two lists. */
   public static <A> List<A> concat(List<? extends A> as, List<? extends A> bs) {
-    List<A> x = new ArrayList<A>();
+    List<A> x = new ArrayList<>();
     for (A a : as)
       x.add(a);
     for (A b : bs)
@@ -307,7 +310,7 @@ public final class Collections {
    * @return a new immutable map
    */
   public static <A, B> Map<A, B> merge(Map<? extends A, ? extends B> a, Map<? extends A, ? extends B> b) {
-    final Map<A, B> x = new HashMap<A, B>();
+    final Map<A, B> x = new HashMap<>();
     x.putAll(a);
     x.putAll(b);
     return java.util.Collections.unmodifiableMap(x);
@@ -319,7 +322,7 @@ public final class Collections {
    * @return a new immutable set
    */
   public static <A> Set<A> merge(Set<? extends A> a, Set<? extends A> b) {
-    final Set<A> x = new HashSet<A>();
+    final Set<A> x = new HashSet<>();
     x.addAll(a);
     x.addAll(b);
     return java.util.Collections.unmodifiableSet(x);
@@ -335,7 +338,7 @@ public final class Collections {
 
   /** Drain all elements of <code>as</code> into a list. */
   public static <A> List<A> toList(Iterator<? extends A> as) {
-    final List<A> t = new ArrayList<A>();
+    final List<A> t = new ArrayList<>();
     while (as.hasNext()) {
       t.add(as.next());
     }
@@ -344,15 +347,16 @@ public final class Collections {
 
   /** Create a list of tuples (K, V) from a map. */
   public static <K, V> List<Tuple<K, V>> toList(Map<K, V> map) {
-    List<Tuple<K, V>> list = new ArrayList<Tuple<K, V>>();
+    List<Tuple<K, V>> list = new ArrayList<>();
     for (Entry<K, V> entry : map.entrySet()) {
       list.add(Tuple.tuple(entry.getKey(), entry.getValue()));
     }
     return list;
   }
 
+  @SafeVarargs
   public static <K, V> Map<K, V> toList(Tuple<? extends K, ? extends V>... ts) {
-    final Map<K, V> map = new HashMap<K, V>(ts.length);
+    final Map<K, V> map = new HashMap<>(ts.length);
     for (Tuple<? extends K, ? extends V> t : ts) {
       map.put(t.getA(), t.getB());
     }
@@ -361,7 +365,7 @@ public final class Collections {
 
   /** Drain all elements of <code>as</code> into a list. */
   public static <A> List<A> toList(Collection<A> as) {
-    return new ArrayList<A>(as);
+    return new ArrayList<>(as);
   }
 
   /** Return nil if <code>a</code> is null or a list containing <code>a</code> otherwise. */
@@ -386,8 +390,9 @@ public final class Collections {
   }
 
   /** Create a list from an array. */
+  @SafeVarargs
   public static <A> List<A> list(A... as) {
-    final List<A> t = new ArrayList<A>();
+    final List<A> t = new ArrayList<>();
     java.util.Collections.addAll(t, as);
     return t;
   }
@@ -406,30 +411,32 @@ public final class Collections {
 
   /** Construct a new list by prepending an element to a given list. */
   public static <A> List<A> cons(A a, List<? extends A> as) {
-    final List<A> target = new ArrayList<A>(as.size() + 1);
+    final List<A> target = new ArrayList<>(as.size() + 1);
     target.add(a);
     target.addAll(as);
     return target;
   }
 
   /** Create a set from an array. */
+  @SafeVarargs
   public static <A> Set<A> set(A... as) {
-    final Set<A> t = new HashSet<A>(as.length);
+    final Set<A> t = new HashSet<>(as.length);
     java.util.Collections.addAll(t, as);
     return t;
   }
 
   /** Create a set from a list. */
   public static <A> Set<A> toSet(List<A> as) {
-    Set<A> r = new HashSet<A>(as.size());
+    Set<A> r = new HashSet<>(as.size());
     for (A a : as)
       r.add(a);
     return r;
   }
 
   /** Create a map from a list of tuples (K, V). */
+  @SafeVarargs
   public static <K, V> Map<K, V> map(Tuple<? extends K, ? extends V>... ts) {
-    final Map<K, V> map = new HashMap<K, V>(ts.length);
+    final Map<K, V> map = new HashMap<>(ts.length);
     for (Tuple<? extends K, ? extends V> t : ts) {
       map.put(t.getA(), t.getB());
     }
@@ -437,8 +444,9 @@ public final class Collections {
   }
 
   /** Create a sorted map from a list of tuples (K, V) based on the natural ordering of K. */
+  @SafeVarargs
   public static <K, V> SortedMap<K, V> smap(Tuple<? extends K, ? extends V>... ts) {
-    final SortedMap<K, V> map = new TreeMap<K, V>();
+    final SortedMap<K, V> map = new TreeMap<>();
     for (Tuple<? extends K, ? extends V> t : ts) {
       map.put(t.getA(), t.getB());
     }
@@ -446,8 +454,9 @@ public final class Collections {
   }
 
   /** Create a dictionary from a list of tuples (K, V). */
+  @SafeVarargs
   public static <K, V> Dictionary<K, V> dict(Tuple<? extends K, ? extends V>... ts) {
-    final Dictionary<K, V> dict = new Hashtable<K, V>(ts.length);
+    final Dictionary<K, V> dict = new Hashtable<>(ts.length);
     for (Tuple<? extends K, ? extends V> t : ts) {
       dict.put(t.getA(), t.getB());
     }
@@ -455,6 +464,7 @@ public final class Collections {
   }
 
   /** Create properties from a list of tuples (K, V). */
+  @SafeVarargs
   public static Properties properties(Tuple<String, String>... ts) {
     Properties a = new Properties();
     for (Tuple<String, String> t : ts) {
@@ -465,7 +475,7 @@ public final class Collections {
 
   /** Convert a properties object into a typed immutable map. */
   public static Map<String, String> toMap(final Properties p) {
-    final Map<String, String> m = new HashMap<String, String>();
+    final Map<String, String> m = new HashMap<>();
     for (Map.Entry e : p.entrySet()) {
       m.put(e.getKey().toString(), e.getValue().toString());
     }
@@ -520,13 +530,13 @@ public final class Collections {
 
   /** Partition a list in chunks of size <code>size</code>. The last chunk may be smaller. */
   public static <A> List<List<A>> grouped(List<A> as, int size) {
-    final List<List<A>> grouped = new ArrayList<List<A>>((as.size() / size) + 1);
-    List<A> group = new ArrayList<A>(size);
+    final List<List<A>> grouped = new ArrayList<>((as.size() / size) + 1);
+    List<A> group = new ArrayList<>(size);
     grouped.add(group);
     int count = size;
     for (A a : as) {
       if (count == 0) {
-        group = new ArrayList<A>(size);
+        group = new ArrayList<>(size);
         grouped.add(group);
         count = size;
       }
@@ -538,7 +548,7 @@ public final class Collections {
 
   /** Create a list of unique elements determined by a given criteria. */
   public static <A, B> Collection<A> unique(List<A> as, Function<A, B> criteria) {
-    final Map<B, A> unique = new HashMap<B, A>();
+    final Map<B, A> unique = new HashMap<>();
     for (A a : as) {
       unique.put(criteria.apply(a), a);
     }
@@ -612,6 +622,7 @@ public final class Collections {
   }
 
   /** Create an iterator form an array. */
+  @SafeVarargs
   public static <A> Iterator<A> iterator(final A... as) {
     return new Iterator<A>() {
       private int i = 0;
@@ -742,7 +753,7 @@ public final class Collections {
     return new Function<List<A>, List<A>>() {
       @Override
       public List<A> apply(List<A> as) {
-        List<A> asCopy = new ArrayList<A>(as);
+        List<A> asCopy = new ArrayList<>(as);
         java.util.Collections.sort(asCopy);
         return asCopy;
       }
@@ -780,7 +791,7 @@ public final class Collections {
 
   /** Concat (aka flatten) a collection of collections by concatenating them all. [[a]] -> [a] */
   public static <A, M extends Collection<? extends Collection<A>>> List<A> concat(M as) {
-    final List<A> target = new ArrayList<A>(as.size());
+    final List<A> target = new ArrayList<>(as.size());
     for (Collection<A> a : as) {
       target.addAll(a);
     }

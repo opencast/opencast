@@ -24,11 +24,9 @@ package org.opencastproject.index.service.catalog.adapter.series;
 import static java.util.Objects.requireNonNull;
 import static org.opencastproject.util.OsgiUtil.getCfg;
 
-import org.opencastproject.index.service.catalog.adapter.AbstractMetadataCollection;
 import org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterConfiguration;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataCollection;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
-import org.opencastproject.index.service.catalog.adapter.MetadataField;
 import org.opencastproject.index.service.catalog.adapter.events.ConfigurableEventDCCatalogUIAdapter;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.mediapackage.EName;
@@ -37,6 +35,9 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
@@ -112,7 +113,7 @@ public class ConfigurableSeriesDCCatalogUIAdapter implements SeriesCatalogUIAdap
   }
 
   @Override
-  public AbstractMetadataCollection getRawFields() {
+  public MetadataCollection getRawFields() {
     DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
     Set<String> emptyFields = new TreeSet<String>(dublinCoreProperties.keySet());
     populateEmptyFields(dublinCoreMetadata, emptyFields);
@@ -120,22 +121,24 @@ public class ConfigurableSeriesDCCatalogUIAdapter implements SeriesCatalogUIAdap
   }
 
   @Override
-  public Opt<AbstractMetadataCollection> getFields(String seriesId) {
-    final Opt<DublinCoreCatalog> optDCCatalog = loadDublinCoreCatalog(RequireUtil.requireNotBlank(seriesId, "seriesId"));
+  public Opt<MetadataCollection> getFields(String seriesId) {
+    final Opt<DublinCoreCatalog> optDCCatalog = loadDublinCoreCatalog(
+            RequireUtil.requireNotBlank(seriesId, "seriesId"));
     if (optDCCatalog.isSome()) {
       DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
       Set<String> emptyFields = new TreeSet<String>(dublinCoreProperties.keySet());
       getFieldValuesFromDublinCoreCatalog(dublinCoreMetadata, emptyFields, optDCCatalog.get());
       populateEmptyFields(dublinCoreMetadata, emptyFields);
-      return Opt.some((AbstractMetadataCollection) dublinCoreMetadata);
+      return Opt.some((MetadataCollection) dublinCoreMetadata);
     } else {
       return Opt.none();
     }
   }
 
   @Override
-  public boolean storeFields(String seriesId, AbstractMetadataCollection metadata) {
-    final Opt<DublinCoreCatalog> optDCCatalog = loadDublinCoreCatalog(RequireUtil.requireNotBlank(seriesId, "seriesId"));
+  public boolean storeFields(String seriesId, MetadataCollection metadata) {
+    final Opt<DublinCoreCatalog> optDCCatalog = loadDublinCoreCatalog(
+            RequireUtil.requireNotBlank(seriesId, "seriesId"));
     if (optDCCatalog.isSome()) {
       final DublinCoreCatalog dc = optDCCatalog.get();
       DublinCoreMetadataUtil.updateDublincoreCatalog(dc, metadata);

@@ -47,7 +47,7 @@ public interface ResourceListProvider {
    *          the organization context
    * @return the key-value list for the generator resource
    */
-  Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
+  Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException;
 
 }

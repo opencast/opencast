@@ -59,8 +59,8 @@ public class RolesListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
-    Map<String, Object> usersList = new HashMap<String, Object>();
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+    Map<String, String> usersList = new HashMap<String, String>();
 
     int offset = 0;
     int limit = 0;

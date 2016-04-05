@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.index.service.impl.index.event;
 
 import org.opencastproject.matterhorn.search.impl.AbstractSearchQuery;
@@ -57,6 +56,8 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private String created = null;
   private Date startFrom = null;
   private Date startTo = null;
+  private Date technicalStartFrom = null;
+  private Date technicalStartTo = null;
   private String creator = null;
   private String license = null;
   private String rights = null;
@@ -66,7 +67,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private final List<String> metadataFlavors = new ArrayList<String>();
   private final List<String> metadataMimetypes = new ArrayList<String>();
   private final List<String> attachmentFlavors = new ArrayList<String>();
-  private final List<String> publicationFlavors = new ArrayList<String>();
   private String accessPolicy = null;
   private String managedAcl = null;
   private String workflowState = null;
@@ -85,6 +85,10 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private final List<String> publications = new ArrayList<String>();
   private String workflowScheduledDate = null;
   private Long archiveVersion = null;
+  private String agentId = null;
+  private Date technicalStartTime = null;
+  private Date technicalEndTime = null;
+  private List<String> technicalPresenters = new ArrayList<String>();
 
   @SuppressWarnings("unused")
   private EventSearchQuery() {
@@ -471,6 +475,44 @@ public class EventSearchQuery extends AbstractSearchQuery {
   }
 
   /**
+   * The technical start date to start looking for events.
+   *
+   * @param startFrom
+   *          The technical start date to start looking for events
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withTechnicalStartFrom(Date startFrom) {
+    this.technicalStartFrom = startFrom;
+    return this;
+  }
+
+  /**
+   * @return The technical date after which all events returned should have been started
+   */
+  public Date getTechnicalStartFrom() {
+    return technicalStartFrom;
+  }
+
+  /**
+   * The technical start date to stop looking for events.
+   *
+   * @param startTo
+   *          The technical start date to stop looking for events
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withTechnicalStartTo(Date startTo) {
+    this.technicalStartTo = startTo;
+    return this;
+  }
+
+  /**
+   * @return The technical date before which all events returned should have been started
+   */
+  public Date getTechnicalStartTo() {
+    return technicalStartTo;
+  }
+
+  /**
    * Selects recordings with the given creator.
    *
    * @param creator
@@ -690,32 +732,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public String[] getAttachmentFlavor() {
     return attachmentFlavors.toArray(new String[attachmentFlavors.size()]);
-  }
-
-  /**
-   * Selects recording events with the given publication flavor.
-   * <p>
-   * Note that this method may be called multiple times to support selection of multiple recording events.
-   *
-   * @param publicationFlavor
-   *          the publication flavor
-   * @return the enhanced search query
-   */
-  public EventSearchQuery withPublicationFlavor(String publicationFlavor) {
-    if (StringUtils.isBlank(publicationFlavor))
-      throw new IllegalArgumentException("Publication flavor cannot be null");
-    clearExpectations();
-    this.publicationFlavors.add(publicationFlavor);
-    return this;
-  }
-
-  /**
-   * Returns the list of publication flavors or an empty array if no track type have been specified.
-   *
-   * @return the attachement flavors
-   */
-  public String[] getPublicationFlavor() {
-    return publicationFlavors.toArray(new String[publicationFlavors.size()]);
   }
 
   /**
@@ -1119,6 +1135,99 @@ public class EventSearchQuery extends AbstractSearchQuery {
   }
 
   /**
+   * Selects recordings with the given agent id.
+   *
+   * @param agentId
+   *          the agent id
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withAgentId(String agentId) {
+    clearExpectations();
+    this.agentId = agentId;
+    return this;
+  }
+
+  /**
+   * Returns the agent id of the recording.
+   *
+   * @return the agent id
+   */
+  public String getAgentId() {
+    return agentId;
+  }
+
+  /**
+   * Selects recordings with the given technical start date.
+   *
+   * @param technicalStartTime
+   *          the start date
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withTechnicalStartTime(Date technicalStartTime) {
+    clearExpectations();
+    this.technicalStartTime = technicalStartTime;
+    return this;
+  }
+
+  /**
+   * Returns the technical start date of the recording.
+   *
+   * @return the technical start date
+   */
+  public Date getTechnicalStartTime() {
+    return technicalStartTime;
+  }
+
+  /**
+   * Selects recordings with the given technical end date.
+   *
+   * @param technicalEndTime
+   *          the end date
+   * @return
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withTechnicalEndTime(Date technicalEndTime) {
+    clearExpectations();
+    this.technicalEndTime = technicalEndTime;
+    return this;
+  }
+
+  /**
+   * Returns the technical end date of the recording.
+   *
+   * @return the technical end date
+   */
+  public Date getTechnicalEndTime() {
+    return technicalEndTime;
+  }
+
+  /**
+   * Selects recording events with the given technical presenters.
+   * <p>
+   * Note that this method may be called multiple times to support selection of multiple recording events.
+   *
+   * @param presenter
+   *          the presenter
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withTechnicalPresenters(String presenter) {
+    if (StringUtils.isBlank(presenter))
+      throw new IllegalArgumentException("Presenter cannot be null");
+    clearExpectations();
+    this.technicalPresenters.add(presenter);
+    return this;
+  }
+
+  /**
+   * Returns the list of technical presenters or an empty array if no presenters have been specified.
+   *
+   * @return the technical presenters
+   */
+  public String[] getTechnicalPresenters() {
+    return technicalPresenters.toArray(new String[technicalPresenters.size()]);
+  }
+
+  /**
    * Defines the sort order for the recording start date.
    *
    * @param order
@@ -1140,6 +1249,27 @@ public class EventSearchQuery extends AbstractSearchQuery {
   }
 
   /**
+   * Defines the sort order for the technical recording start date.
+   *
+   * @param order
+   *          the order
+   * @return the enhanced search query
+   */
+  public EventSearchQuery sortByTechnicalStartDate(Order order) {
+    withSortOrder(EventIndexSchema.TECHNICAL_START, order);
+    return this;
+  }
+
+  /**
+   * Returns the sort order for the technical recording start date.
+   *
+   * @return the sort order
+   */
+  public Order getTechnicalStartDateSortOrder() {
+    return getSortOrder(EventIndexSchema.TECHNICAL_START);
+  }
+
+  /**
    * Defines the sort order for the recording end date.
    *
    * @param order
@@ -1158,6 +1288,27 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public Order getEndDateSortOrder() {
     return getSortOrder(EventIndexSchema.END_DATE);
+  }
+
+  /**
+   * Defines the sort order for the technical recording end date.
+   *
+   * @param order
+   *          the order
+   * @return the enhanced search query
+   */
+  public EventSearchQuery sortByTechnicalEndDate(Order order) {
+    withSortOrder(EventIndexSchema.TECHNICAL_END, order);
+    return this;
+  }
+
+  /**
+   * Returns the sort order for the technical recording end date.
+   *
+   * @return the sort order
+   */
+  public Order getTechnicalEndDateSortOrder() {
+    return getSortOrder(EventIndexSchema.TECHNICAL_END);
   }
 
   /**
@@ -1370,4 +1521,26 @@ public class EventSearchQuery extends AbstractSearchQuery {
     return getSortOrder(EventIndexSchema.EVENT_STATUS);
   }
 
+  /**
+   * Defines the sort order for publication.
+   *
+   * @param order
+   *          the sort order
+   * @return the updated query
+   */
+  public EventSearchQuery sortByPublicationIgnoringInternal(Order order) {
+    // TODO implement sort By Publication Ignoring Internal
+    withSortOrder(EventIndexSchema.PUBLICATION, order);
+    return this;
+  }
+
+  /**
+   * Returns the sort order for the publication.
+   *
+   * @return the sort order
+   */
+  public Order getPublicationSortOrder() {
+    // TODO implement getPublicationSortOrder
+    return getSortOrder(EventIndexSchema.PUBLICATION);
+  }
 }

@@ -285,7 +285,9 @@
             "MINUTE":"分鐘",
             "REPEATS":"重複",
             "START_DATE":"yyyy-mm-dd",
+            "START_DATE_FORMAT":"yyyy-mm-dd",
             "END_DATE":"yyyy-mm-dd"
+            "END_DATE_FORMAT":"yyyy-mm-dd"
           },
           "UPLOAD":{
             "CAPTION":"上載",
@@ -868,6 +870,7 @@
         "CAPTION":"使用者",
         "NAME":"姓名",
         "USERNAME":"使用者名稱",
+        "EMAIL":"電子郵件",
         "ROLES":"角色",
         "TYPE":"類型",
         "BLACKLIST_FROM":"從黑名單",

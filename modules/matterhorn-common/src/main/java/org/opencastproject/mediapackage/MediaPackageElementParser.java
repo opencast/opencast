@@ -21,10 +21,11 @@
 
 package org.opencastproject.mediapackage;
 
+import static org.apache.commons.io.IOUtils.toInputStream;
+
 import org.opencastproject.util.data.Function;
 
-import org.apache.commons.io.IOUtils;
-import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 import java.io.StringWriter;
 import java.util.LinkedList;
@@ -32,7 +33,7 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.bind.Unmarshaller;
 
 /**
  * Convenience implementation that supports serializing and deserializing media package elements.
@@ -89,14 +90,12 @@ public final class MediaPackageElementParser {
    *         if de-serializing the element fails
    */
   public static MediaPackageElement getFromXml(String xml) throws MediaPackageException {
+    Unmarshaller m = null;
     try {
-      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-              .parse(IOUtils.toInputStream(xml, "UTF-8"));
-      MediaPackageElement element = MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-              .elementFromManifest(doc.getDocumentElement(), new DefaultMediaPackageSerializerImpl());
-      return element;
-    } catch (Exception e) {
-      throw new MediaPackageException(e);
+      m = MediaPackageImpl.context.createUnmarshaller();
+      return (MediaPackageElement) m.unmarshal(new InputSource(toInputStream(xml)));
+    } catch (JAXBException e) {
+      throw new MediaPackageException(e.getLinkedException() != null ? e.getLinkedException() : e);
     }
   }
 
@@ -167,4 +166,5 @@ public final class MediaPackageElementParser {
       }
     }
   }
+
 }

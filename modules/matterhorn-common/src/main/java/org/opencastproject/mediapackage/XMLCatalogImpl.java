@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.mediapackage;
 
 import static java.lang.String.format;
@@ -46,6 +45,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -707,15 +707,18 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
       Element node = document.createElement(toQName(name));
       // Write prefix binding to document root element
       bindNamespaceFor(document, name);
-      for (Map.Entry<EName, String> entry : attributes.entrySet()) {
-        EName attrEName = entry.getKey();
+
+      List<EName> keySet = new ArrayList<>(attributes.keySet());
+      Collections.sort(keySet);
+      for (EName attrEName : keySet) {
+        String value = attributes.get(attrEName);
         if (attrEName.hasNamespace()) {
           // Write prefix binding to document root element
           bindNamespaceFor(document, attrEName);
           if (XSI_TYPE_ATTR.equals(attrEName)) {
             // Special treatment for xsi:type attributes
             try {
-              EName typeName = toEName(entry.getValue());
+              EName typeName = toEName(value);
               bindNamespaceFor(document, typeName);
             } catch (NamespaceBindingException ignore) {
               // Type is either not a QName or its namespace is not bound.
@@ -723,7 +726,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
             }
           }
         }
-        node.setAttribute(toQName(entry.getKey()), entry.getValue());
+        node.setAttribute(toQName(attrEName), value);
       }
       if (value != null) {
         node.appendChild(document.createTextNode(value));
@@ -733,7 +736,12 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
     @Override
     public int compareTo(@Nonnull CatalogEntry o) {
-      return name.getLocalName().compareTo(name.getLocalName());
+      final int r = getEName().compareTo(o.getEName());
+      if (r == 0) {
+        return getValue().compareTo(o.getValue());
+      } else {
+        return r;
+      }
     }
 
     /**
@@ -789,7 +797,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
   public String toXmlString() throws IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     toXml(out, true);
-    return new String(out.toByteArray(), "UTF-8");
+    return new String(out.toByteArray(), StandardCharsets.UTF_8);
   }
 
 }

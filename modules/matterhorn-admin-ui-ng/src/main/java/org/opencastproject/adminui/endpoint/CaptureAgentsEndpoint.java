@@ -179,14 +179,13 @@ public class CaptureAgentsEndpoint {
     // Run through and build a map of updates (rather than states)
     List<JValue> agentsJSON = new ArrayList<JValue>();
     for (Agent agent : filteredAgents) {
-      agentsJSON.add(generateJsonAgent(agent, inputs));
+      agentsJSON.add(generateJsonAgent(agent, /* Option.option(room), blacklist, */ inputs));
     }
 
     return okJsonList(agentsJSON, offset, limit, total);
   }
 
   private JValue generateJsonAgent(Agent agent, boolean withInputs) {
-
     List<JField> fields = new ArrayList<JField>();
     fields.add(f("Status", vN(agent.getState())));
     fields.add(f("Name", v(agent.getName())));
@@ -200,6 +199,13 @@ public class CaptureAgentsEndpoint {
     return j(fields);
   }
 
+  /**
+   * Generate a JSON devices list
+   *
+   * @param devices
+   *          an array of devices String
+   * @return A {@link JValue} representing the devices
+   */
   private JValue generateJsonDevice(String[] devices) {
     List<JValue> jsonDevices = new ArrayList<JValue>();
     for (String device : devices) {

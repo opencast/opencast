@@ -38,8 +38,8 @@ import java.util.TreeSet;
 
 public class ListProviderUtilTest {
 
-  private Map<String, Object> getTestMap() {
-    Map<String, Object> map = new HashMap<String, Object>();
+  private Map<String, String> getTestMap() {
+    Map<String, String> map = new HashMap<String, String>();
     map.put("21", "b: a test value");
     map.put("2", "c: second test value");
     map.put("34", "x: another test value");
@@ -53,7 +53,7 @@ public class ListProviderUtilTest {
 
   @Test
   public void testFilterMap() {
-    Map<String, Object> testMap = getTestMap();
+    Map<String, String> testMap = getTestMap();
     ResourceListQueryImpl query = new ResourceListQueryImpl();
     query.setLimit(3);
     query.setOffset(0);
@@ -73,10 +73,10 @@ public class ListProviderUtilTest {
 
   @Test
   public void testSortingMap() {
-    Map<String, Object> testMap = getTestMap();
+    Map<String, String> testMap = getTestMap();
 
     // Test ascent sorting
-    Map<String, Object> sortedMap = sortMapByValue(testMap, true);
+    Map<String, String> sortedMap = sortMapByValue(testMap, true);
 
     assertEquals(testMap.size(), sortedMap.size());
     TreeSet<Object> sortedValues = new TreeSet<Object>(new Comparator<Object>() {
@@ -89,11 +89,11 @@ public class ListProviderUtilTest {
     });
     sortedValues.addAll(testMap.values());
 
-    Iterator<Entry<String, Object>> iteratorSortedMap = sortedMap.entrySet().iterator();
+    Iterator<Entry<String, String>> iteratorSortedMap = sortedMap.entrySet().iterator();
     Iterator<Object> iteratorSortedValues = sortedValues.iterator();
 
     while (iteratorSortedMap.hasNext()) {
-      Entry<String, Object> entry = iteratorSortedMap.next();
+      Entry<String, String> entry = iteratorSortedMap.next();
       Object value = iteratorSortedValues.next();
       assertEquals(value, entry.getValue());
     }
@@ -113,7 +113,7 @@ public class ListProviderUtilTest {
     iteratorSortedValues = sortedValues.iterator();
 
     while (iteratorSortedMap.hasNext()) {
-      Entry<String, Object> entry = iteratorSortedMap.next();
+      Entry<String, String> entry = iteratorSortedMap.next();
       Object value = iteratorSortedValues.next();
       assertEquals(value, entry.getValue());
     }

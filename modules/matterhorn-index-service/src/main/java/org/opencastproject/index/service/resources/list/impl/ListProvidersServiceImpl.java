@@ -21,11 +21,15 @@
 
 package org.opencastproject.index.service.resources.list.impl;
 
+import static org.opencastproject.index.service.util.ListProviderUtil.invertMap;
+
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.util.ListProviderUtil;
+import org.opencastproject.scheduler.api.SchedulerService;
+import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
@@ -44,6 +48,8 @@ public class ListProvidersServiceImpl implements ListProvidersService {
 
   private static final Logger logger = LoggerFactory.getLogger(ListProvidersServiceImpl.class);
   private static final String FILTER_SUFFIX = "Filter";
+
+  public static final String REVIEW_STATUS = "review_status";
 
   private Map<String, ResourceListProvider> providers = new HashMap<String, ResourceListProvider>();
 
@@ -64,6 +70,7 @@ public class ListProvidersServiceImpl implements ListProvidersService {
   public void activate(BundleContext bundleContext) {
     addCountries();
     addWorkflowStatus();
+    addReviewStatus();
 
     // TODO create a file for each resource and made it dynamic
 
@@ -75,8 +82,8 @@ public class ListProvidersServiceImpl implements ListProvidersService {
       }
 
       @Override
-      public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
-        Map<String, Object> list = new HashMap<String, Object>();
+      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+        Map<String, String> list = new HashMap<String, String>();
         list.put("Location 1", "EVENTS.EVENT.TABLE.FILTER.LOCATION.LOCATION1");
         list.put("Location 2", "EVENTS.EVENT.TABLE.FILTER.LOCATION.LOCATION2");
         list.put("Location 3", "EVENTS.EVENT.TABLE.FILTER.LOCATION.LOCATION3");
@@ -93,8 +100,8 @@ public class ListProvidersServiceImpl implements ListProvidersService {
       }
 
       @Override
-      public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
-        Map<String, Object> list = new HashMap<String, Object>();
+      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+        Map<String, String> list = new HashMap<String, String>();
         list.put("Twitter", "EVENTS.EVENT.TABLE.FILTER.SOURCE.TWITTER");
         list.put("Github", "EVENTS.EVENT.TABLE.FILTER.SOURCE.GITHUB");
         list.put("Facebook", "EVENTS.EVENT.TABLE.FILTER.SOURCE.FACEBOOK");
@@ -111,8 +118,8 @@ public class ListProvidersServiceImpl implements ListProvidersService {
       }
 
       @Override
-      public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
-        Map<String, Object> list = new HashMap<String, Object>();
+      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+        Map<String, String> list = new HashMap<String, String>();
         list.put("Scheduled", "EVENTS.EVENT.TABLE.FILTER.STATUS.SCHEDULED");
         list.put("Recording", "EVENTS.EVENT.TABLE.FILTER.STATUS.RECORDING");
         list.put("Ingesting", "EVENTS.EVENT.TABLE.FILTER.STATUS.INGESTING");
@@ -133,7 +140,7 @@ public class ListProvidersServiceImpl implements ListProvidersService {
 
   private void addWorkflowStatus() {
     final String[] title = new String[] { "recording_states" };
-    final Map<String, Object> workflowStatus = new HashMap<String, Object>();
+    final Map<String, String> workflowStatus = new HashMap<String, String>();
 
     for (WorkflowState s : WorkflowInstance.WorkflowState.values()) {
       workflowStatus.put(s.name(), "EVENTS.EVENT.TABLE.FILTER.STATUS." + s.name());
@@ -147,7 +154,36 @@ public class ListProvidersServiceImpl implements ListProvidersService {
       }
 
       @Override
-      public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
+      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+        return ListProviderUtil.filterMap(workflowStatus, query);
+
+      }
+
+    });
+  }
+
+  // ====================================
+  // Event review status
+  // ====================================
+
+  private void addReviewStatus() {
+
+    final String[] title = new String[] { REVIEW_STATUS };
+    final Map<String, String> workflowStatus = new HashMap<String, String>();
+
+    for (ReviewStatus s : SchedulerService.ReviewStatus.values()) {
+      workflowStatus.put(s.name(), "FILTERS.EVENTS.REVIEW_STATUS." + s.name());
+    }
+
+    providers.put(title[0], new ResourceListProvider() {
+
+      @Override
+      public String[] getListNames() {
+        return title;
+      }
+
+      @Override
+      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
         return ListProviderUtil.filterMap(workflowStatus, query);
 
       }
@@ -162,7 +198,7 @@ public class ListProvidersServiceImpl implements ListProvidersService {
   private void addCountries() {
     final String[] title = new String[] { "countries" };
     String[] countriesISO = Locale.getISOCountries();
-    final Map<String, Object> countries = new HashMap<String, Object>();
+    final Map<String, String> countries = new HashMap<String, String>();
     for (String countryCode : countriesISO) {
       Locale obj = new Locale("", countryCode);
       countries.put(obj.getCountry(), obj.getDisplayCountry());
@@ -176,7 +212,7 @@ public class ListProvidersServiceImpl implements ListProvidersService {
       }
 
       @Override
-      public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization) {
+      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
         return ListProviderUtil.filterMap(countries, query);
       }
 
@@ -184,13 +220,17 @@ public class ListProvidersServiceImpl implements ListProvidersService {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
-          throws ListProviderException {
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization,
+          boolean inverseValueKey) throws ListProviderException {
     ResourceListProvider provider = providers.get(listName);
     if (provider == null)
       throw new ListProviderException("No resources list found with the name " + listName);
+    Map<String, String> list = provider.getList(listName, query, organization);
+    if (inverseValueKey) {
+      list = invertMap(list);
+    }
 
-    return provider.getList(listName, query, organization);
+    return list;
   }
 
   @Override

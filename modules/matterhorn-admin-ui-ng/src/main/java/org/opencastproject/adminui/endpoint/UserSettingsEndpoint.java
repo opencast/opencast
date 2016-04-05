@@ -42,7 +42,6 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -64,7 +63,7 @@ import javax.ws.rs.core.Response;
 public class UserSettingsEndpoint {
 
   /** The logging facility */
-  private static final Log logger = new Log(LoggerFactory.getLogger(ServerEndpoint.class));
+  private static final Log logger = Log.mk(ServerEndpoint.class);
 
   /** Base url of this endpoint */
   private String endpointBaseUrl;

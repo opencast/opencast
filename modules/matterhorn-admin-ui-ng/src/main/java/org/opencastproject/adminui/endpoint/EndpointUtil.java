@@ -23,6 +23,9 @@ package org.opencastproject.adminui.endpoint;
 
 import static java.lang.String.format;
 
+import org.opencastproject.adminui.exception.JsonCreationException;
+import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
+import org.opencastproject.index.service.resources.list.query.StringListFilter;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
 
@@ -31,12 +34,19 @@ import com.entwinemedia.fn.Fx;
 import com.entwinemedia.fn.data.json.JObjectWrite;
 import com.entwinemedia.fn.data.json.SimpleSerializer;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -51,15 +61,16 @@ public final class EndpointUtil {
   }
 
   /**
-   * Create a streaming response entity.
-   * Pass it as an entity parameter to one of the response builder methods like {@link org.opencastproject.util.RestUtil.R#ok(Object)}.
+   * Create a streaming response entity. Pass it as an entity parameter to one of the response builder methods like
+   * {@link org.opencastproject.util.RestUtil.R#ok(Object)}.
    */
   public static StreamingOutput stream(final Fx<Writer> out) {
     return new StreamingOutput() {
-      @Override public void write(OutputStream s) throws IOException, WebApplicationException {
+      @Override
+      public void write(OutputStream s) throws IOException, WebApplicationException {
         final Writer writer = new BufferedWriter(new OutputStreamWriter(s));
         out.ap(writer);
-        writer.flush();
+        writer.close();
       }
     };
   }
@@ -77,7 +88,8 @@ public final class EndpointUtil {
   }
 
   public static final Fn<Date, String> fnDay = new Fn<Date, String>() {
-    @Override public String ap(Date date) {
+    @Override
+    public String ap(Date date) {
       return dateDay(date);
     }
   };
@@ -87,8 +99,61 @@ public final class EndpointUtil {
   }
 
   public static final Fn<Date, String> fnSecond = new Fn<Date, String>() {
-    @Override public String ap(Date date) {
+    @Override
+    public String ap(Date date) {
       return dateSecond(date);
     }
   };
+
+  /**
+   * Returns a generated JSON object with key-value from given list
+   *
+   * @param list
+   *          The source list for the JSON object
+   * @return a JSON object containing the all the key-value as parameter
+   * @throws JSONException
+   */
+  public static <T> JSONObject generateJSONObject(Map<String, T> list) throws JsonCreationException {
+    JSONObject jsonList = new JSONObject();
+
+    for (Entry<String, T> entry : list.entrySet()) {
+      Object value = entry.getValue();
+      if (value instanceof String) {
+        jsonList.put(entry.getKey(), value);
+      } else if (value instanceof JSONObject) {
+        jsonList.put(entry.getKey(), value);
+      } else if (value instanceof List) {
+        Collection collection = (Collection) value;
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.addAll(collection);
+        jsonList.put(entry.getKey(), jsonArray);
+      } else {
+        throw new JsonCreationException("could not deal with " + value);
+      }
+    }
+
+    return jsonList;
+  }
+
+  /**
+   * Add the string based filters to the given list query.
+   *
+   * @param filterString
+   *          The string based filters
+   * @param query
+   *          The query to update with the filters
+   */
+  public static void addRequestFiltersToQuery(final String filterString, ResourceListQueryImpl query) {
+    if (filterString != null) {
+      String[] filters = filterString.split(",");
+      for (String filter : filters) {
+        String[] splitFilter = filter.split("=");
+        if (splitFilter != null && splitFilter.length == 2) {
+          String key = splitFilter[0];
+          String value = splitFilter[1];
+          query.addFilter(new StringListFilter(key, value));
+        }
+      }
+    }
+  }
 }

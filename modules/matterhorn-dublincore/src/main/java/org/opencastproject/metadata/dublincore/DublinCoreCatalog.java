@@ -18,8 +18,6 @@
  * the License.
  *
  */
-
-
 package org.opencastproject.metadata.dublincore;
 
 import static com.entwinemedia.fn.Stream.$;
@@ -124,7 +122,6 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public List<DublinCoreValue> get(EName property) {
     RequireUtil.notNull(property, "property");
     return mlist(getValuesAsList(property)).map(toDublinCoreValue).value();
@@ -422,7 +419,6 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
     super.clear();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Object clone() {
     DublinCoreCatalog clone = new DublinCoreCatalog();

@@ -23,6 +23,8 @@ package org.opencastproject.index.service.catalog.adapter;
 
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -50,7 +52,7 @@ public final class MetadataUtils {
    * @param dcEname
    *          The {@link EName} of the property to update in the {@link DublinCoreCatalog}
    */
-  public static void updateDCString(DublinCoreCatalog dc, AbstractMetadataCollection metadata, String jsonID,
+  public static void updateDCString(DublinCoreCatalog dc, MetadataCollection metadata, String jsonID,
           EName dcEname) {
     Opt<String> updatedString = MetadataUtils.getUpdatedStringMetadata(metadata, jsonID);
     if (updatedString.isSome()) {
@@ -67,7 +69,7 @@ public final class MetadataUtils {
    *          The key that the front end uses for this property.
    * @return An {@link Opt} with a possible {@link Date} value if it is available.
    */
-  public static Opt<Date> getUpdatedDateMetadata(AbstractMetadataCollection collection, String outputID) {
+  public static Opt<Date> getUpdatedDateMetadata(MetadataCollection collection, String outputID) {
     Opt<Date> field = Opt.<Date> none();
 
     if (collection.getOutputFields().get(outputID) != null) {
@@ -135,7 +137,7 @@ public final class MetadataUtils {
    *          The key used to id this {@link MetadataField} in the UI
    * @return The possible {@link String} value from a {@link MetadataField}.
    */
-  public static Opt<String> getUpdatedStringMetadata(AbstractMetadataCollection collection, String outputID) {
+  public static Opt<String> getUpdatedStringMetadata(MetadataCollection collection, String outputID) {
     Opt<String> field = Opt.<String> none();
 
     if (collection.getOutputFields().get(outputID) != null) {
@@ -172,7 +174,7 @@ public final class MetadataUtils {
    * @return The {@link Iterable<String>} value if available.
    */
   public static Iterable<String> getIterableStringMetadataByOutputID(
-          AbstractMetadataCollection abstractMetadataCollection, String outputID) {
+          MetadataCollection abstractMetadataCollection, String outputID) {
     MetadataField<?> metadataField = abstractMetadataCollection.getOutputFields().get(outputID);
     if (metadataField != null) {
       return getIterableStringMetadata(metadataField);
@@ -189,7 +191,7 @@ public final class MetadataUtils {
    *          The key in the UI that ids the relevant {@link MetadataField}
    * @return An optional {@link Iterable<String>} returned if updated.
    */
-  public static Opt<List<String>> getUpdatedIterableStringMetadata(AbstractMetadataCollection metadata, String outputID) {
+  public static Opt<List<String>> getUpdatedIterableStringMetadata(MetadataCollection metadata, String outputID) {
     Opt<List<String>> iterableString = Opt.<List<String>> none();
     MetadataField<?> field = metadata.getOutputFields().get(outputID);
     if (field == null) {

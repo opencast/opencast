@@ -10,9 +10,9 @@
   <dcterms:modified xsi:type="dcterms:W3CDTF">
     2007-12-05
   </dcterms:modified>
+  <dcterms:contributor>Loriot</dcterms:contributor>
   <dcterms:type>MovingImage/LectureRecording</dcterms:type>
   <dcterms:contributor>Harald Juhnke</dcterms:contributor>
-  <dcterms:contributor>Loriot</dcterms:contributor>
   <dcterms:title>A title</dcterms:title>
   <dcterms:title xml:lang="de">Ein Titel</dcterms:title>
   <oc:promoted>true</oc:promoted>

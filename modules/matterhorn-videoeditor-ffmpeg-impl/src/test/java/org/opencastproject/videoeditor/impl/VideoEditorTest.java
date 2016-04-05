@@ -116,7 +116,7 @@ public class VideoEditorTest {
   /**
    * Copies test files to the local file system, since jmf is not able to access movies from the resource section of a
    * bundle.
-   * 
+   *
    * @throws Except
    *           if setup fails
    */
@@ -203,7 +203,7 @@ public class VideoEditorTest {
 
     /* mock inspector output so that the job will alway pass */
     String sourceTrackXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "<track type='presentation/source' id='deadbeef-a926-4ba9-96d9-2fafbcc30d2a'>"
+            + "<track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source' id='deadbeef-a926-4ba9-96d9-2fafbcc30d2a'>"
             + "<audio id='audio-1'><encoder type='MP3 (MPEG audio layer 3)'/><channels>2</channels>"
             + "<bitrate>96000.0</bitrate></audio><video id='video-1'><device/>"
             + "<encoder type='FLV / Sorenson Spark / Sorenson H.263 (Flash Video)'/>"
@@ -213,7 +213,7 @@ public class VideoEditorTest {
 
     inspectedTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
     veditor = new VideoEditorServiceImpl() {
-    @Override
+      @Override
       protected Job inspect(Job job, URI workspaceURI) throws MediaInspectionException, ProcessFailedException {
         Job inspectionJob = EasyMock.createNiceMock(Job.class);
         try {

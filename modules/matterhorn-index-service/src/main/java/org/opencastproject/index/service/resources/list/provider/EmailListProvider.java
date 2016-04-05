@@ -84,9 +84,9 @@ public class EmailListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, Object> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException {
-    Map<String, Object> result = new HashMap<String, Object>();
+    Map<String, String> result = new HashMap<String, String>();
     if (getListNameFromFilter(EmailFilterList.TEMPLATE_NAMES).equals(listName)) {
       String nameText = null;
       if (query.hasFilter(NAME) && query.getFilter(NAME).getValue().isSome()

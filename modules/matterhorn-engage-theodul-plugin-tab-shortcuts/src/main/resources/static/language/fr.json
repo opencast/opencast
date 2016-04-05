@@ -44,5 +44,11 @@
   "focusNext":"Focus next video",
   "togglePiP":"Enable\/disable picture in picture",
   "movePiP":"Move picture in picture",
-  "shortcuts":"Raccourcis"
+  "shortcuts":"Raccourcis",
+  "moveLeft":"Move left",
+  "moveRight":"Move right",
+  "moveUp":"Move up",
+  "moveDown":"Move down",
+  "zoomIn":"Zoom in",
+  "zoomOut":"Zoom out"
 }

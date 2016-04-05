@@ -30,7 +30,6 @@ import org.opencastproject.util.Log;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -46,7 +45,7 @@ public class UserSettingsService {
   public static final String PERSISTENCE_UNIT = "org.opencastproject.adminui";
 
   /** Logging utilities */
-  private static final Log logger = new Log(LoggerFactory.getLogger(UserSettingsService.class));
+  private static final Log logger = Log.mk(UserSettingsService.class);
 
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;

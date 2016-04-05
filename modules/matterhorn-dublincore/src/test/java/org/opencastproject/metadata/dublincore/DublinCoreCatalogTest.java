@@ -23,6 +23,7 @@ package org.opencastproject.metadata.dublincore;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.mediapackage.EName;
@@ -52,8 +53,7 @@ public class DublinCoreCatalogTest {
     assertEquals(1, dc.get(DublinCore.PROPERTY_TITLE, DublinCore.LANGUAGE_UNDEFINED).size());
     assertEquals(2, dc.get(DublinCore.PROPERTY_TITLE, DublinCore.LANGUAGE_ANY).size());
     assertEquals(1, dc.get(DublinCore.PROPERTY_TITLE, "de").size());
-    assertEquals(
-            asList("Harald Juhnke", "Loriot"),
+    assertEquals(asList("Loriot", "Harald Juhnke"),
             dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_UNDEFINED));
     assertEquals(
             "The modified property should be of type W3CDTF.",
@@ -63,6 +63,7 @@ public class DublinCoreCatalogTest {
     assertTrue(
             "Property foo:id should be in the list of known properties.",
             dc.getProperties().contains(PROPERTY_FOO_ID));
+    assertNull("The DublinCore reader cannot detect the flavor", dc.getFlavor());
   }
 
   @Test

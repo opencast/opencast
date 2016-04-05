@@ -80,15 +80,16 @@ public final class CatalogUIAdapterConfiguration {
    */
   private void validate() throws ConfigurationException {
     if (configProperties.get(KEY_XML_ROOT_ELEMENT_NAME) == null)
-      throw new ConfigurationException(format("Value for configuration key '%s' is missing", KEY_XML_ROOT_ELEMENT_NAME));
+      throw new ConfigurationException(
+              format("Value for configuration key '%s' is missing", KEY_XML_ROOT_ELEMENT_NAME));
 
     if (configProperties.get(KEY_XML_ROOT_ELEMENT_NS_URI) == null)
-      throw new ConfigurationException(format("Value for configuration key '%s' is missing",
-              KEY_XML_ROOT_ELEMENT_NS_URI));
+      throw new ConfigurationException(
+              format("Value for configuration key '%s' is missing", KEY_XML_ROOT_ELEMENT_NS_URI));
 
     if (xmlNSContext.getPrefix(getCatalogXmlRootNamespace()) == null)
-      throw new ConfigurationException(format("Binding for XML namespace URI '%s' is missing",
-              getCatalogXmlRootNamespace()));
+      throw new ConfigurationException(
+              format("Binding for XML namespace URI '%s' is missing", getCatalogXmlRootNamespace()));
   }
 
   /**
@@ -104,10 +105,10 @@ public final class CatalogUIAdapterConfiguration {
         // First, we need to get the name of the binding
         final String nsBindingName = getXmlBindingNameFromConfigKey(key);
         // Once we have the name, we're able to retrieve the URI as well as the prefix
-        final String nsUri = (String) configProperties.get(XML_BINDING_KEY_PREFIX + nsBindingName
-                + XML_BINDING_URI_SUFFIX);
-        final String nsPrefix = (String) configProperties.get(XML_BINDING_KEY_PREFIX + nsBindingName
-                + XML_BINDING_PREFIX_SUFFIX);
+        final String nsUri = (String) configProperties
+                .get(XML_BINDING_KEY_PREFIX + nsBindingName + XML_BINDING_URI_SUFFIX);
+        final String nsPrefix = (String) configProperties
+                .get(XML_BINDING_KEY_PREFIX + nsBindingName + XML_BINDING_PREFIX_SUFFIX);
         // Check if URI and the prefix have valid values
         if (isBlank(nsUri))
           throw new ConfigurationException(format("No URI for namespace binding '%s' found", nsBindingName));
