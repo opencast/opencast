@@ -87,7 +87,6 @@ public class MessageBaseFacility {
   /** OSGi component activate callback */
   public void activate(BundleContext bc) throws Exception {
     final String name = this.getClass().getSimpleName();
-    logger.info("{} service is starting...", name);
     url = bc.getProperty(ACTIVEMQ_BROKER_URL_KEY);
     if (StringUtils.isBlank(url)) {
       logger.info("No valid URL found. Using default URL");
