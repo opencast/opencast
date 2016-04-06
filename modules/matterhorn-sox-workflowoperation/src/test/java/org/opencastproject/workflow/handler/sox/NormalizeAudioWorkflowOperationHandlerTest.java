@@ -146,6 +146,7 @@ public class NormalizeAudioWorkflowOperationHandlerTest {
 
     // set up the handler
     operationHandler = new NormalizeAudioWorkflowOperationHandler();
+    operationHandler.setJobBarrierPollingInterval(0);
     operationHandler.setComposerService(composer);
     operationHandler.setSoxService(sox);
     operationHandler.setWorkspace(workspace);

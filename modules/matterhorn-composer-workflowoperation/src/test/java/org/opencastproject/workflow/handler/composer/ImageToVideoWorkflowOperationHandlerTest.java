@@ -112,6 +112,7 @@ public class ImageToVideoWorkflowOperationHandlerTest {
 
     // set up service
     operationHandler = new ImageToVideoWorkflowOperationHandler();
+    operationHandler.setJobBarrierPollingInterval(0);
     operationHandler.setWorkspace(workspace);
     operationHandler.setServiceRegistry(serviceRegistry);
   }

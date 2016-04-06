@@ -1,32 +1,31 @@
 Logging and Privacy
 ===================
 
-The Opencast User-Tracking service stores actions of the users in the engage player within the database. This data is
-used for the footprint feature below the player and for the optional Analytics component.
+The Opencast User-Tracking service stores user actions of the Opencast players in the database. This data is used for
+the footprint feature of the player and for the optional analytics component.
 
-The settings for logging can be changed in the file:
+> *Note that enabling all of the logging option may result in legal problems depending on your contries privacy laws
+> andthe type of service you are running.*
 
-    ${CONF_DIR}/services/org.opencastproject.usertracking.impl.UserTrackingServiceImpl.properties
+The settings for logging user data can be found in:
 
-The following options are available:
+    .../etc/org.opencastproject.usertracking.impl.UserTrackingServiceImpl.cfg
 
- - `org.opencastproject.usertracking.detailedtrack`
-   Setting this key to true enables the user tracking javascript, setting it to false prevents the user tracking data
-   from being sent. With this set to false now logging will happen at all. The footprints are not available and
-   analytics will not work. Default is true.
- - `org.opencastproject.usertracking.log.ip`
-   IP-addresses will no longer be logged if this is set to false. Turning this of is needed in some contries, especially
-   Germany, if you don't have a permission from the user to store this data. Footprints will still work with this
-   feature set to false! Default is true.
- - `org.opencastproject.usertracking.log.user`
-   User login names will no longer be tracked if this is set to false. Turning this of is probably needed in most
-   countries, espacially if IP-logging is still active too. Footprints will still work if this is set to false! Default
-   is true.
- - `org.opencastproject.usertracking.log.session`
-   Browser session-IDs will no longer be tracked is this is set to false. This is just for the completness to prevent
-   any user related data. So far there is no known reason to turn this of. Footprints will still work if this is set to
-   false!  Default is true.
+Logging of user data can be controlled on two levels. First, logging can be generally activated or deactivated. Second,
+if it is activated, the data being logged can be defined.
 
-So if you want to use the footprint features but don't want to store any user specific data you can turn the logging of
-IP, username and session-ID off, without any problems. Analytics will probably not work then.
+`org.opencastproject.usertracking.detailedtrack` defines if the user tracking JavaScript code is loaded and data about
+user actions are being sent to and stored by Opencast. Deactivating this will effectively stop all logging. This may
+effect features like the footprints in the Opencast player.  Default: `true`.
 
+If logging is still activated in general, the following keys may be used to define the kind of data that is being
+logged. The keys have no effect if logging is turned off.
+
+Key                                           | Data to be logged    | Default value
+----------------------------------------------|----------------------|--------------
+`org.opencastproject.usertracking.log.ip`     | IP addresses         | `true`
+`org.opencastproject.usertracking.log.user`   | login names of users | `true`
+`org.opencastproject.usertracking.log.session`| Browser session-IDs  | `true`
+
+If you want to use the footprint feature but do not want to store any user specific data you can turn the logging of IP
+addresses, user names and session-IDs off.

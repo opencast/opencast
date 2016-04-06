@@ -93,6 +93,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
         logger.warn("The message receiver for " + getClassName()
                 + " was null so unable to listen for repopulate index messages. Ignore this warning if this is a test.");
         listening = false;
+        return;
       }
       logger.info("Starting to listen for {} Messages", getClassName());
       while (listening) {
@@ -101,7 +102,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
                   MessageSender.DestinationType.Queue);
           executor.execute(future);
           BaseMessage message = (BaseMessage) future.get();
-          if (!(message.getObject() instanceof IndexRecreateObject))
+          if (message == null || !(message.getObject() instanceof IndexRecreateObject))
             continue;
 
           IndexRecreateObject indexObject = (IndexRecreateObject) message.getObject();

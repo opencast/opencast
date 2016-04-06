@@ -98,6 +98,7 @@ public class InspectWorkflowOperationHandlerTest {
 
     // set up service
     operationHandler = new InspectWorkflowOperationHandler();
+    operationHandler.setJobBarrierPollingInterval(0);
 
     // set up mock metadata and metadata service providing it
     metadata = EasyMock.createNiceMock(MediaPackageMetadata.class);
