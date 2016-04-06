@@ -125,6 +125,7 @@ public class CompositeWorkflowOperationHandlerTest {
 
     // set up service
     operationHandler = new CompositeWorkflowOperationHandler();
+    operationHandler.setJobBarrierPollingInterval(0);
     operationHandler.setWorkspace(workspace);
     operationHandler.setServiceRegistry(serviceRegistry);
   }
