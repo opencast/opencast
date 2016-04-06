@@ -28,7 +28,7 @@ public interface MessageSender extends MessageBrokerConnector {
   /**
    * The types of message destinations there are to send to.
    */
-  public static enum DestinationType {
+  enum DestinationType {
     Queue, Topic
   };
 
