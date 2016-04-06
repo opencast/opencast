@@ -30,14 +30,15 @@ import static org.opencastproject.util.data.Tuple.tuple;
 import static org.xmlmatchers.XmlMatchers.similarTo;
 import static org.xmlmatchers.transform.XmlConverters.the;
 
-import java.util.Date;
+import org.opencastproject.fun.juc.Immutables;
+import org.opencastproject.job.api.Incident.Severity;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.opencastproject.fun.juc.Immutables;
-import org.opencastproject.job.api.Incident.Severity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
 
 public class IncidentParserTest {
 

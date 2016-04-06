@@ -27,8 +27,6 @@ import static org.junit.Assert.fail;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -39,6 +37,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
+
+import junit.framework.Assert;
 
 public class WorkingFileRepositoryTest {
 

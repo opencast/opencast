@@ -21,8 +21,8 @@
 
 package org.opencastproject.staticfiles.endpoint;
 
-import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.eq;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -32,8 +32,6 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.staticfiles.api.StaticFileService;
-//import org.opencastproject.staticfiles.impl.StaticFileServiceImpl;
-//import org.opencastproject.staticfiles.impl.StaticFileServiceImplTest;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.NotFoundException;
 

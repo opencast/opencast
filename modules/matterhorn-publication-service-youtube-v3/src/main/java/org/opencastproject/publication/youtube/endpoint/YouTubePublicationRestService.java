@@ -21,6 +21,11 @@
 
 package org.opencastproject.publication.youtube.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.opencastproject.util.RestUtil.R.badRequest;
+import static org.opencastproject.util.RestUtil.R.serverError;
+
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
@@ -35,6 +40,7 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,11 +51,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.opencastproject.util.RestUtil.R.badRequest;
-import static org.opencastproject.util.RestUtil.R.serverError;
 
 /**
  * Rest endpoint for publishing media to youtube.

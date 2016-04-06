@@ -25,11 +25,11 @@ import org.opencastproject.capture.admin.api.Recording;
 import org.opencastproject.capture.admin.api.RecordingState;
 import org.opencastproject.capture.admin.api.RecordingStateUpdate;
 
-import junit.framework.Assert;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 public class RecordingStateUpdateTest {
   private Recording recording = null;

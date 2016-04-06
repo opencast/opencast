@@ -26,17 +26,18 @@ import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.data.Collections.toArray;
 import static org.opencastproject.util.data.Monadics.mlist;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Function2;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Test;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class JobBarrierTest {
 

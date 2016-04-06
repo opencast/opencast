@@ -25,7 +25,6 @@ import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
-import org.easymock.EasyMock;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
@@ -34,6 +33,7 @@ import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.SmartIterator;
 
+import org.easymock.EasyMock;
 import org.junit.Ignore;
 
 import java.text.ParseException;

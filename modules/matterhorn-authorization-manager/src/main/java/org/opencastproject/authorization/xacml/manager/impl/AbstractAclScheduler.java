@@ -21,10 +21,13 @@
 
 package org.opencastproject.authorization.xacml.manager.impl;
 
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.Prelude.unexhaustiveMatch;
+
+import org.opencastproject.authorization.xacml.manager.api.ACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
-import org.opencastproject.authorization.xacml.manager.api.ACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.TransitionQuery;
@@ -37,6 +40,7 @@ import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
+
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -49,9 +53,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
-
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.Prelude.unexhaustiveMatch;
 
 /** Time control for the {@link AclServiceImpl}. */
 public abstract class AbstractAclScheduler {

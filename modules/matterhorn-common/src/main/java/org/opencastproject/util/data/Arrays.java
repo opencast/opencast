@@ -21,10 +21,10 @@
 
 package org.opencastproject.util.data;
 
+import static org.opencastproject.util.data.Option.some;
+
 import java.lang.reflect.Array;
 import java.util.List;
-
-import static org.opencastproject.util.data.Option.some;
 
 public final class Arrays {
   private Arrays() {

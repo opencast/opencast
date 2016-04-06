@@ -23,8 +23,8 @@ package org.opencastproject.message.broker.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.opencastproject.message.broker.api.MessageSender.DestinationType;
 
@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.osgi.framework.BundleContext;
 
 import java.io.Serializable;
+
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.ObjectMessage;

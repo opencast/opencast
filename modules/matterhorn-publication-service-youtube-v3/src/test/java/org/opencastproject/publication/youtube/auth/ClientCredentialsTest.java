@@ -21,16 +21,17 @@
 
 package org.opencastproject.publication.youtube.auth;
 
-import org.json.simple.parser.ParseException;
-import org.junit.Test;
-import org.opencastproject.publication.youtube.UnitTestUtils;
-
-import java.io.File;
-import java.io.IOException;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+
+import org.opencastproject.publication.youtube.UnitTestUtils;
+
+import org.json.simple.parser.ParseException;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
 
 public class ClientCredentialsTest {
 

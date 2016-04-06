@@ -47,8 +47,6 @@ import org.codehaus.jettison.json.JSONObject;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
-
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +54,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.StreamingOutput;
+
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 /**
  * Unit tests for {@link JSONUtils}

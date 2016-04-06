@@ -21,6 +21,8 @@
 
 package org.opencastproject.serviceregistry.impl.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+
 import org.opencastproject.rest.OsgiAbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.impl.NopServiceImpl;
 import org.opencastproject.util.RestUtil;
@@ -31,8 +33,6 @@ import org.opencastproject.util.doc.rest.RestService;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-
-import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 @Path("/")
 @RestService(

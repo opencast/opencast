@@ -21,20 +21,21 @@
 
 package org.opencastproject.util;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import static org.opencastproject.util.data.Monadics.mlist;
+
+import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Prelude;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import static org.opencastproject.util.data.Monadics.mlist;
 
 /** JSON builder based on json-simple. */
 public final class Jsons {

@@ -21,12 +21,12 @@
 
 package org.opencastproject.util;
 
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
 import org.opencastproject.util.data.Function;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /** Reflection utils. */
 public final class ReflectionUtil {

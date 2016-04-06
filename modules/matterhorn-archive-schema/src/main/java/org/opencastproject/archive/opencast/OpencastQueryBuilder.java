@@ -21,13 +21,13 @@
 
 package org.opencastproject.archive.opencast;
 
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.archive.api.Query;
 import org.opencastproject.archive.base.QueryBuilder;
 import org.opencastproject.archive.base.QueryBuilderBase;
 import org.opencastproject.util.data.Option;
-
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 /** Query builder for Opencast. */
 public class OpencastQueryBuilder extends QueryBuilderBase<OpencastQueryBuilder> implements OpencastQuery {

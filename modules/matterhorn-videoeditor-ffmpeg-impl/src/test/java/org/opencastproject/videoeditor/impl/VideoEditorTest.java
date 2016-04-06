@@ -24,16 +24,16 @@ package org.opencastproject.videoeditor.impl;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.opencastproject.inspection.api.MediaInspectionException;
+import org.opencastproject.inspection.ffmpeg.FFmpegAnalyzer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
-import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
-import org.opencastproject.inspection.api.MediaInspectionException;
-import org.opencastproject.inspection.ffmpeg.FFmpegAnalyzer;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -62,17 +62,17 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.ComponentContext;
 import java.util.Iterator;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**

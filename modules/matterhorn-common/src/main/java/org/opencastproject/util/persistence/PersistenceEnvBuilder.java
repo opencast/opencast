@@ -21,13 +21,14 @@
 
 package org.opencastproject.util.persistence;
 
+import static org.opencastproject.util.data.Collections.map;
+
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Lazy;
 
-import javax.persistence.spi.PersistenceProvider;
 import java.util.Map;
 
-import static org.opencastproject.util.data.Collections.map;
+import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Builder for persistence environments.

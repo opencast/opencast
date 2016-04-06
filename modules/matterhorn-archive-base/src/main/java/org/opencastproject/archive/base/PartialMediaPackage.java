@@ -21,13 +21,13 @@
 
 package org.opencastproject.archive.base;
 
+import static org.opencastproject.util.data.Monadics.mlist;
+
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.util.data.Predicate;
 
 import java.util.List;
-
-import static org.opencastproject.util.data.Monadics.mlist;
 
 /** Product of a media package and a media package element filter. */
 public class PartialMediaPackage {

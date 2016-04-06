@@ -24,10 +24,11 @@ package org.opencastproject.metadata.dublincore;
 import static java.lang.String.format;
 import static org.opencastproject.util.EqualsUtil.eq;
 
-import com.entwinemedia.fn.data.Opt;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.util.EqualsUtil;
 import org.opencastproject.util.RequireUtil;
+
+import com.entwinemedia.fn.data.Opt;
 
 import java.io.Serializable;
 

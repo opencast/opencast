@@ -21,12 +21,13 @@
 
 package org.opencastproject.series.impl;
 
-import com.entwinemedia.fn.data.Opt;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
+
+import com.entwinemedia.fn.data.Opt;
 
 import java.util.Iterator;
 import java.util.Map;

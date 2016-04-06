@@ -32,6 +32,15 @@ import static org.opencastproject.mediapackage.MediaPackageSupport.loadFromClass
 import static org.opencastproject.mediapackage.PublicationImpl.publication;
 import static org.opencastproject.util.MimeType.mimeType;
 
+import org.opencastproject.mediapackage.MediaPackageElement.Type;
+import org.opencastproject.util.ConfigurationException;
+
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -45,14 +54,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
-import org.junit.Test;
-import org.opencastproject.mediapackage.MediaPackageElement.Type;
-import org.opencastproject.util.ConfigurationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 /**
  * Test cases for the media package.

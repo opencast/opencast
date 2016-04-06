@@ -23,13 +23,15 @@
 package org.opencastproject.oaipmh;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+
 import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.Ignore;
 
-import javax.persistence.EntityManagerFactory;
 import java.beans.PropertyVetoException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.persistence.EntityManagerFactory;
 
 // Ignore this class since it doesn't contain any tests, just helpers
 @Ignore

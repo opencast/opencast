@@ -24,13 +24,13 @@ package org.opencastproject.adminui.endpoint;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
-import org.easymock.EasyMock;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.DateTimeSupport;
 
+import org.easymock.EasyMock;
 import org.junit.Ignore;
 
 import java.util.ArrayList;

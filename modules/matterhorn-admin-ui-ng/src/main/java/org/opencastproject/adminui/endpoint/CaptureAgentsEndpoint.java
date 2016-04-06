@@ -30,6 +30,7 @@ import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.adminui.util.TextFilter;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
@@ -49,7 +50,6 @@ import com.entwinemedia.fn.data.json.JField;
 import com.entwinemedia.fn.data.json.JValue;
 
 import org.apache.commons.lang3.StringUtils;
-import org.opencastproject.adminui.util.TextFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

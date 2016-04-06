@@ -22,16 +22,16 @@ package org.opencastproject.job.jpa;
 
 import static org.opencastproject.job.api.Job.FailureReason.NONE;
 
-import com.entwinemedia.fn.Fn;
-
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.FailureReason;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobImpl;
-
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
+
+import com.entwinemedia.fn.Fn;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

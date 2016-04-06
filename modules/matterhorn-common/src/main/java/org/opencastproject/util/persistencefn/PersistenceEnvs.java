@@ -28,6 +28,7 @@ import static org.opencastproject.util.persistencefn.PersistenceUtil.mkTestEntit
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
+
 import org.osgi.service.component.ComponentContext;
 
 import java.util.Map;

@@ -37,8 +37,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
-import de.schlichtherle.io.FileOutputStream;
-
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -54,6 +52,8 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import de.schlichtherle.io.FileOutputStream;
 
 /**
  * Tests XACML features of the security service

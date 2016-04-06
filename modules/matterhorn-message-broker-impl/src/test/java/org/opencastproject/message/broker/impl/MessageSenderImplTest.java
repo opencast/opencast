@@ -28,6 +28,7 @@ import org.opencastproject.security.api.SecurityService;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
+
 import java.io.Serializable;
 
 import javax.jms.Destination;

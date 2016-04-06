@@ -21,13 +21,6 @@
 
 package org.opencastproject.schema;
 
-import org.junit.Test;
-import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.util.data.Option;
-
-import java.util.Date;
-
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.schema.OcDublinCoreUtil.encodeCreated;
 import static org.opencastproject.schema.OcDublinCoreUtil.encodeDate;
@@ -36,6 +29,14 @@ import static org.opencastproject.schema.OcDublinCoreUtil.encodeDateCopyrighted;
 import static org.opencastproject.schema.OcDublinCoreUtil.encodeDateSubmitted;
 import static org.opencastproject.schema.test.TestUtil.randomDc;
 import static org.opencastproject.util.ReflectionUtil.run;
+
+import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.util.data.Option;
+
+import org.junit.Test;
+
+import java.util.Date;
 
 public class OcDublinCoreUtilTest {
   @Test

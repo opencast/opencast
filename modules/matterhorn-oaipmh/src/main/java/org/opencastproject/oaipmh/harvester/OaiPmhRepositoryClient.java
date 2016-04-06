@@ -22,24 +22,26 @@
 
 package org.opencastproject.oaipmh.harvester;
 
+import static org.opencastproject.oaipmh.OaiPmhUtil.toUtc;
+
+import org.opencastproject.oaipmh.Granularity;
+import org.opencastproject.oaipmh.OaiPmhConstants;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.opencastproject.oaipmh.Granularity;
-import org.opencastproject.oaipmh.OaiPmhConstants;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 import org.w3c.dom.Document;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 import java.util.Date;
 
-import static org.opencastproject.oaipmh.OaiPmhUtil.toUtc;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * The repository client provides low level methods to talk to an OAI-PMH repository.

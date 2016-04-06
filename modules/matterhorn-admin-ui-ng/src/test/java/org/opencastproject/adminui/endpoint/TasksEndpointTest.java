@@ -28,6 +28,7 @@ import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
 import org.opencastproject.rest.RestServiceTestEnv;
 
 import com.jayway.restassured.http.ContentType;
+
 import org.apache.http.HttpStatus;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

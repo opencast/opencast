@@ -21,11 +21,12 @@
 
 package org.opencastproject.archive.base;
 
-import org.junit.Test;
-import org.opencastproject.util.data.Option;
-
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
+
+import org.opencastproject.util.data.Option;
+
+import org.junit.Test;
 
 public class QueryBuilderTest {
   @Test

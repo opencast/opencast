@@ -20,8 +20,8 @@
  */
 package org.opencastproject.urlsigning.utils;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.urlsigning.common.Policy;

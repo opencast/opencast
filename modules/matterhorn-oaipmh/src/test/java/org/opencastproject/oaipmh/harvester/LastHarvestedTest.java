@@ -22,19 +22,21 @@
 
 package org.opencastproject.oaipmh.harvester;
 
-import org.joda.time.DateTime;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.oaipmh.TestUtil;
 import org.opencastproject.oaipmh.util.PersistenceEnv;
 import org.opencastproject.oaipmh.util.PersistenceUtil;
 import org.opencastproject.util.data.Option;
 
-import javax.persistence.EntityManagerFactory;
+import org.joda.time.DateTime;
+import org.junit.Test;
+
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.opencastproject.util.data.Option.some;
+import javax.persistence.EntityManagerFactory;
 
 /**
  * Test persistence of {@link LastHarvested}.

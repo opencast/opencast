@@ -43,6 +43,7 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
@@ -55,9 +56,8 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.commons.io.FileUtils;
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;

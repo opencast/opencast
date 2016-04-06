@@ -22,17 +22,18 @@
 
 package org.opencastproject.oaipmh.server;
 
+import static org.opencastproject.oaipmh.OaiPmhUtil.fromUtc;
+
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
-
-import static org.opencastproject.oaipmh.OaiPmhUtil.fromUtc;
 
 /**
  * Collection of general purpose functions.

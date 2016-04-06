@@ -21,13 +21,14 @@
 
 package org.opencastproject.publication.youtube;
 
+import org.opencastproject.publication.youtube.auth.ClientCredentials;
+
 import com.google.api.services.youtube.model.Playlist;
 import com.google.api.services.youtube.model.PlaylistItem;
 import com.google.api.services.youtube.model.PlaylistItemListResponse;
 import com.google.api.services.youtube.model.PlaylistListResponse;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.Video;
-import org.opencastproject.publication.youtube.auth.ClientCredentials;
 
 import java.io.IOException;
 

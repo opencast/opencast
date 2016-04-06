@@ -20,10 +20,10 @@
  */
 package org.opencastproject.mediapackage;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.xmlmatchers.XmlMatchers.isEquivalentTo;
 import static org.xmlmatchers.transform.XmlConverters.the;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertEquals;
 
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.mediapackage.track.TrackImpl;

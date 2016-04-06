@@ -21,17 +21,18 @@
 
 package org.opencastproject.util;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.util.data.Option;
+
+import org.junit.Test;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
-
-import static org.junit.Assert.assertEquals;
-import static org.opencastproject.util.data.Option.some;
 
 /**
  * Test case for {@link SolrUtils}.

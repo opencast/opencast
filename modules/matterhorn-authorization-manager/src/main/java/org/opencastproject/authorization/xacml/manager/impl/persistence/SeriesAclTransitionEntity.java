@@ -21,11 +21,18 @@
 
 package org.opencastproject.authorization.xacml.manager.impl.persistence;
 
+import static org.opencastproject.authorization.xacml.manager.impl.Util.createConfiguredWorkflowRef;
+import static org.opencastproject.authorization.xacml.manager.impl.Util.splitConfiguredWorkflowRef;
+import static org.opencastproject.util.ReflectionUtil.run;
+import static org.opencastproject.util.data.Option.option;
+
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
+
+import java.util.Date;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -42,12 +49,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
-import java.util.Date;
-
-import static org.opencastproject.authorization.xacml.manager.impl.Util.createConfiguredWorkflowRef;
-import static org.opencastproject.authorization.xacml.manager.impl.Util.splitConfiguredWorkflowRef;
-import static org.opencastproject.util.ReflectionUtil.run;
-import static org.opencastproject.util.data.Option.option;
 
 @Entity(name = "SeriesAclTransition")
 @Access(AccessType.FIELD)

@@ -21,9 +21,9 @@
 
 package org.opencastproject.mediapackage.identifier;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 /**
  * Tests non-handle Identifiers

@@ -28,6 +28,7 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase;
 
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -36,8 +37,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase;
 
 /**
  * Operation that holds for download of DVD image

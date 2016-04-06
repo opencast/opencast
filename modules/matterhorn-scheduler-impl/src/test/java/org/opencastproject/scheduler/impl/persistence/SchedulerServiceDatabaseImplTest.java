@@ -30,6 +30,7 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.util.NotFoundException;
+
 import org.junit.Before;
 import org.junit.Test;
 

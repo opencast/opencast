@@ -22,10 +22,17 @@
 
 package org.opencastproject.oaipmh.harvester;
 
-import org.apache.commons.lang3.ArrayUtils;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.oaipmh.util.PersistenceEnv;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
+
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,11 +45,6 @@ import javax.persistence.Query;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import java.util.Date;
-import java.util.List;
-
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 /**
  * Persists the last harvested time of a url.

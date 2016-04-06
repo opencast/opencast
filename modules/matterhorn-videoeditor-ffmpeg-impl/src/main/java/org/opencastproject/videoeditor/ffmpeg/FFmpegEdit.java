@@ -22,7 +22,6 @@
 
 package org.opencastproject.videoeditor.ffmpeg;
 
-
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.videoeditor.impl.VideoClip;
 import org.opencastproject.videoeditor.impl.VideoEditorProperties;
@@ -36,10 +35,10 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.Locale;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 /**

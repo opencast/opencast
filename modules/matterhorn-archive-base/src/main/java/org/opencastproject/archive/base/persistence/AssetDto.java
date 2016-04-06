@@ -21,9 +21,18 @@
 
 package org.opencastproject.archive.base.persistence;
 
+import static org.opencastproject.archive.api.Version.version;
+import static org.opencastproject.archive.base.StoragePath.spath;
+import static org.opencastproject.util.data.Tuple.tuple;
+import static org.opencastproject.util.persistence.PersistenceUtil.runFirstResultQuery;
+import static org.opencastproject.util.persistence.PersistenceUtil.runSingleResultQuery;
+import static org.opencastproject.util.persistence.PersistenceUtil.runUpdate;
+
 import org.opencastproject.archive.base.StoragePath;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
+
+import java.net.URI;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,14 +42,6 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import java.net.URI;
-
-import static org.opencastproject.archive.api.Version.version;
-import static org.opencastproject.archive.base.StoragePath.spath;
-import static org.opencastproject.util.data.Tuple.tuple;
-import static org.opencastproject.util.persistence.PersistenceUtil.runFirstResultQuery;
-import static org.opencastproject.util.persistence.PersistenceUtil.runSingleResultQuery;
-import static org.opencastproject.util.persistence.PersistenceUtil.runUpdate;
 
 /** JPA link to {@link org.opencastproject.archive.base.persistence.Asset}. */
 @Entity(name = "Asset")

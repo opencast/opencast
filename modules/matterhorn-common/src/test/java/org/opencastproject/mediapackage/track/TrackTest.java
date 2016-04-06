@@ -34,8 +34,6 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.elementbuilder.TrackBuilderPlugin;
 import org.opencastproject.util.IoSupport;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -52,6 +50,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.stream.StreamSource;
+
+import junit.framework.Assert;
 
 /**
  * Test case to Test the implementation of {@link TrackImpl}.

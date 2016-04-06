@@ -22,17 +22,18 @@
 
 package org.opencast.metadata.api.util;
 
-import org.junit.Test;
-import org.opencastproject.metadata.api.util.Interval;
-
-import java.util.Date;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.metadata.api.util.Interval.boundedInterval;
-import static org.opencastproject.metadata.api.util.Interval.rightBoundedInterval;
 import static org.opencastproject.metadata.api.util.Interval.leftBoundedInterval;
+import static org.opencastproject.metadata.api.util.Interval.rightBoundedInterval;
+
+import org.opencastproject.metadata.api.util.Interval;
+
+import org.junit.Test;
+
+import java.util.Date;
 
 public class IntervalTest {
 

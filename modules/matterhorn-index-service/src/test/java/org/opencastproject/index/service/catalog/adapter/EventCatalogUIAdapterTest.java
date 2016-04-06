@@ -47,8 +47,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,6 +56,8 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.TreeMap;
+
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class EventCatalogUIAdapterTest {
   private static final String label = "The Label";

@@ -40,6 +40,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import com.entwinemedia.fn.bool.Bool;
 import com.entwinemedia.fn.parser.Parsers;
 import com.entwinemedia.fn.parser.Result;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

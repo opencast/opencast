@@ -21,9 +21,9 @@
 
 package org.opencastproject.userdirectory;
 
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.data.Collections.set;
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.Group;

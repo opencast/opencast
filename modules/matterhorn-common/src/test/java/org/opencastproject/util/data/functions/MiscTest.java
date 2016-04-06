@@ -21,11 +21,11 @@
 
 package org.opencastproject.util.data.functions;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.ifThen;
+
+import org.junit.Test;
 
 public class MiscTest {
   @Test

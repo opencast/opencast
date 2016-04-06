@@ -23,7 +23,6 @@
 package org.opencastproject.remotetest.server;
 
 import static org.junit.Assert.assertEquals;
-
 import static org.opencastproject.remotetest.Main.BASE_URL;
 
 import org.opencastproject.remotetest.Main;

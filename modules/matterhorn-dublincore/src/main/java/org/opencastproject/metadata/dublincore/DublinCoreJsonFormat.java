@@ -24,8 +24,9 @@ package org.opencastproject.metadata.dublincore;
 import static org.opencastproject.metadata.dublincore.DublinCore.LANGUAGE_UNDEFINED;
 import static org.opencastproject.util.EqualsUtil.ne;
 
-import com.entwinemedia.fn.data.Opt;
 import org.opencastproject.mediapackage.EName;
+
+import com.entwinemedia.fn.data.Opt;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

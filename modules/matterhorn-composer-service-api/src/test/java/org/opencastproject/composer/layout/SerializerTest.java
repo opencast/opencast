@@ -21,11 +21,12 @@
 
 package org.opencastproject.composer.layout;
 
-import org.junit.Test;
-import org.opencastproject.util.JsonObj;
-
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.composer.layout.Offset.offset;
+
+import org.opencastproject.util.JsonObj;
+
+import org.junit.Test;
 
 public class SerializerTest {
   @Test

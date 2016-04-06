@@ -40,8 +40,8 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.persistence.PersistenceUtil;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

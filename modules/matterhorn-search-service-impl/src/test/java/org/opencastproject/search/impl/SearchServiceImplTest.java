@@ -22,12 +22,11 @@
 
 package org.opencastproject.search.impl;
 
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.opencastproject.security.api.Permissions.Action.READ;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;

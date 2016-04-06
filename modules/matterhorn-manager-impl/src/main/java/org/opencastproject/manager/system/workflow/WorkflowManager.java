@@ -22,31 +22,32 @@
 
 package org.opencastproject.manager.system.workflow;
 
-import java.io.IOException;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.io.FileInputStream;
-import java.io.BufferedInputStream;
-import java.util.HashMap;
-import java.io.File;
-import java.io.FileNotFoundException;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.opencastproject.manager.api.PluginManagerConstants;
 import org.opencastproject.manager.core.MetadataDocumentHandler;
 import org.opencastproject.manager.system.workflow.utils.JSONWorkflowBuilder;
+
+import org.apache.commons.io.FileUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import org.apache.commons.io.FileUtils;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.util.HashMap;
+
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 /**
  * This class represents the worflow's manager.

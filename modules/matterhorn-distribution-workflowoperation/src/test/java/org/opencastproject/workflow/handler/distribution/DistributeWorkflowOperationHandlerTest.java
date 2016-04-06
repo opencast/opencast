@@ -58,6 +58,7 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workflow.handler.inspection.InspectWorkflowOperationHandler;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -69,8 +70,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.opencastproject.workflow.handler.inspection.InspectWorkflowOperationHandler;
 
 @Ignore
 public class DistributeWorkflowOperationHandlerTest {

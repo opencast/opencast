@@ -24,16 +24,17 @@ package org.opencastproject.util;
 import static org.opencastproject.util.IoSupport.locked;
 import static org.opencastproject.util.IoSupport.withResource;
 
+import org.opencastproject.util.data.Effect;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.UUID;
-
-import org.opencastproject.util.data.Effect;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Run this program in two separate JVMs.
