@@ -21,13 +21,41 @@
 
 package org.opencastproject.mediapackage;
 
+import static java.lang.String.format;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.opencastproject.mediapackage.MediaPackageElementFlavor.flavor;
 
 import org.junit.Test;
 
 public class MediaPackageElementFlavorTest {
+
+  @Test
+  public void testInvalidConstructorArguments() {
+
+    String[][] inputArguments = new String[][] {
+      new String[] { null, null },
+      new String[] { "valid", null },
+      new String[] { null, "valid" },
+      new String[] { "invalid/type", "valid_subtype" },
+      new String[] { "valid_type", "invalid/subtype" }
+    };
+
+    for (String[] arguments : inputArguments) {
+      try {
+        new MediaPackageElementFlavor(arguments[0], arguments[1]);
+      } catch (Throwable e) {
+        assertEquals(format("Catched unexpected exception. The message was: %s", e.getMessage()),
+                IllegalArgumentException.class, e.getClass());
+        continue;
+      }
+      fail(format("Flavor constructor did not throw an expected exception with invalid arguments \"%s\" and \"%s\"",
+              arguments[0], arguments[1]));
+    }
+  }
+
   @Test
   public void testMatches() throws Exception {
     assertFalse("null does not match", flavor("a", "b").matches(null));
@@ -35,20 +63,19 @@ public class MediaPackageElementFlavorTest {
     assertFalse("Unequal flavors do not match", flavor("a", "b").matches(flavor("b", "a")));
     assertTrue("Wildcard type matches", flavor("*", "b").matches(flavor("a", "b")));
     assertTrue("Match is commutative",
-               flavor("a", "b").matches(flavor("*", "b")) && flavor("*", "b").matches(flavor("a", "b")));
+            flavor("a", "b").matches(flavor("*", "b")) && flavor("*", "b").matches(flavor("a", "b")));
     assertTrue("Wildcard subtype matches", flavor("a", "*").matches(flavor("a", "b")));
     assertTrue("Match is commutative",
-               flavor("a", "b").matches(flavor("a", "*")) && flavor("a", "*").matches(flavor("a", "b")));
+            flavor("a", "b").matches(flavor("a", "*")) && flavor("a", "*").matches(flavor("a", "b")));
     assertTrue("Wildcard matches", flavor("*", "*").matches(flavor("a", "b")));
     assertTrue("Match is commutative",
-               flavor("*", "*").matches(flavor("a", "b")) && flavor("a", "b").matches(flavor("*", "*")));
+            flavor("*", "*").matches(flavor("a", "b")) && flavor("a", "b").matches(flavor("*", "*")));
     assertTrue("Wildcard matches", flavor("*", "*").matches(flavor("*", "b")));
     assertTrue("Match is commutative",
-               flavor("*", "*").matches(flavor("*", "b")) && flavor("*", "b").matches(flavor("*", "*")));
+            flavor("*", "*").matches(flavor("*", "b")) && flavor("*", "b").matches(flavor("*", "*")));
     assertTrue("Wildcard matches", flavor("*", "*").matches(flavor("a", "*")));
     assertTrue("Match is commutative",
-               flavor("*", "*").matches(flavor("a", "*")) && flavor("a", "*").matches(flavor("*", "*")));
+            flavor("*", "*").matches(flavor("a", "*")) && flavor("a", "*").matches(flavor("*", "*")));
     assertTrue("Wildcard matches", flavor("*", "*").matches(flavor("*", "*")));
   }
 }
-

@@ -27,6 +27,6 @@ Community
 
 More information about the community can be found at:
 
-* [Opencast Community Website](http://opencast.org/)
-* [Mailing lists, IRC, …](http://opencast.org/communications)
+* [Opencast Website](http://opencast.org/)
+* [Mailing lists, IRC, …](http://opencast.org/community)
 * [Issue Tracker](http://opencast.jira.com/)

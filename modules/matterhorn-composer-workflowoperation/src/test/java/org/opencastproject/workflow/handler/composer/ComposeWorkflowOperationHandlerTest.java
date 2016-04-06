@@ -108,6 +108,7 @@ public class ComposeWorkflowOperationHandlerTest {
 
     // set up service
     operationHandler = new ComposeWorkflowOperationHandler();
+    operationHandler.setJobBarrierPollingInterval(0);
     operationHandler.setWorkspace(workspace);
     operationHandler.setServiceRegistry(serviceRegistry);
   }

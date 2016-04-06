@@ -68,6 +68,9 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /** Optional service registry */
   protected ServiceRegistry serviceRegistry = null;
 
+  /** The JobBarrier polling interval */
+  private long jobBarrierPollingInterval = JobBarrier.DEFAULT_POLLING_INTERVAL;
+
   /**
    * Activates this component with its properties once all of the collaborating services have been set
    *
@@ -404,6 +407,25 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
         return chuck(new WorkflowOperationException(key + " is missing or malformed"));
       }
     };
+  }
+
+  /**
+   * Set the @link org.opencastproject.job.api.JobBarrier polling interval.
+   * <p>
+   * While waiting for other jobs to finish, the barrier will poll the status of these jobs until they are finished. To
+   * reduce load on the system, the polling is done only every x milliseconds. This interval defines the sleep time
+   * between these polls.
+   * <p>
+   * If most cases you want to leave this at its default value. It will make sense, though, to adjust this time if you
+   * know that your job will be exceptionally short. An example of this might be the unit tests where other jobs are
+   * usually mocked. But this setting is not limited to tests and may be a sensible options for other jobs as well.
+   *
+   * @param interval the time in miliseconds between two polling operations
+   *
+   * @see org.opencastproject.job.api.JobBarrier#DEFAULT_POLLING_INTERVAL
+   */
+  public void setJobBarrierPollingInterval(long interval) {
+    this.jobBarrierPollingInterval = interval;
   }
 
   /**
