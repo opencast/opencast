@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-urlsigning-service-api</artifactId>
   <packaging>bundle</packaging>
-  <name>matterhorn-signing-service-api</name>
+  <name>matterhorn-urlsigning-service-api</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
