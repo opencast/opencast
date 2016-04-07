@@ -78,6 +78,7 @@ Start by naming the workflow and giving it a meaningful description:
     - *upload-ng*: Usable for uploaded media (new admin ui)
     - *schedule-ng*: Usable for scheduled events (new admin ui)
     - *archive-ng*: Usable for archived media (new admin ui)
+    - *delete-ng*: Usable for deletion of events with publications (new admin ui)
     - *editor*: Usable from the video editor
     - *upload*: Usable for uploaded media (old admin ui)
     - *schedule*: Usable for scheduled events (old admin ui)
