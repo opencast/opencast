@@ -20,16 +20,20 @@
  */
 .stats-container {
   .col {
-    $num-cols: 10;
-    $padding: 1%;
+    $num-cols: 8;
+    $padding: .5%;
 
     box-sizing: border-box;
     display: inline-block;
     vertical-align: top;
-    width: (99.8% / $num-cols);  // width is 99.8% to resolve the way Google Chrome (35.0.1916.153) handles sub-pixel rounding
+    width: (79.8% / $num-cols);  // width is 99.8% to resolve the way Google Chrome (35.0.1916.153) handles sub-pixel rounding
     margin-bottom: 20px;
+    margin-top: 1px;
 
     padding: 0 $padding;
+    &:first-child{
+        margin-left: 20%;
+    }
 
     &:nth-of-type(#{$num-cols}n) {
       padding-left: 0;
@@ -42,7 +46,7 @@
 
     .stat {
       text-align: center;
-      background: #fff;
+        @include linear-gradient(top, #388ed6, #2075b1)
       cursor: pointer;
       border-radius: $main-border-radius;
       border: $thin-border-stroke $main-border-color;
@@ -54,17 +58,20 @@
 
       h1 {
         font-weight: 100;
-        font-size: 40px;
-        background: darken($body-background, .5%);
-        margin: 0 0 15px 0;
-        padding: 15px 0;
+        font-size: 30px;
+        color: $body-background;
+        @include linear-gradient(top, #388ed6, #2075b1)
+        margin: 0 0 5px 0;
+        padding: 2px 0;
         border-bottom: $thin-border-stroke darken($body-background, 8%);
       }
 
       span {
         display: block;
-        margin-bottom: 15px;
+        margin-bottom: 5px;
         font-size: 13px;
+        height:30px;
+        color: $body-background;
       }
     }
   }
