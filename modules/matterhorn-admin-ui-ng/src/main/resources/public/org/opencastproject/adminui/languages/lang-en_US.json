@@ -463,7 +463,8 @@
            "EXTERNAL_API":               "External API Publication",
            "YOUTUBE":                    "Youtube",
            "OAIPMH":                     "OAI-PMH",
-           "SELECT_WORKFLOW":            "Select workflow"
+           "SELECT_WORKFLOW":            "Select workflow",
+           "SELECT_WORKFLOW_EMPTY":      "No workflows available"
          },
          "MEDIA": {
            "TRIM_MEDIA":    "Trim media",
