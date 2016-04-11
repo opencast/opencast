@@ -99,6 +99,16 @@ $(document).ready(function() {
       }
     }
 
+    function GetURLParameter(sParam) {
+      var sPageURL = window.location.search.substring(1);
+      var sURLVariables = sPageURL.split('&');
+      for (var i = 0; i < sURLVariables.length; i++) {
+        var sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] == sParam) {
+          return sParameterName[1];
+        }
+      }
+    }
 
     String.prototype.endsWith = function(suffix) {
         return this.indexOf(suffix, this.length - suffix.length) !== -1;
@@ -111,22 +121,50 @@ $(document).ready(function() {
         getInfo();
         registerHandler();
 
+        var serIdFromGet = GetURLParameter("seriesId");
+        console.log("Got: ");
+        console.log(serIdFromGet);
+
         var retrievedObject = sessionStorage.getItem("historyStack");
         if (retrievedObject != null) {
             stack = JSON.parse(retrievedObject);
             log("Retrieved history stack from session storage");
+            if(serIdFromGet != undefined) {
+              restData = "id="+serIdFromGet;
+              pushHistory(1, "series", restData);
+              $($navbarEpisodes).removeClass("active");
+              $($navbarSeries).addClass("active");
+              active = "series";
+              loadSeries(true);
+            } else {
+              pushHistory(1, "episodes", null);
+              $($navbarEpisodes).addClass("active");
+              $($navbarSeries).removeClass("active");
+              active = "episodes";
+              loadEpisodes(true);
+            }
         } else {
-            stack.push({
-                "page": 1,
-                "active": "episodes",
-                "rest": null
-            });
+            if(serIdFromGet != undefined) {
+              restData = "id="+serIdFromGet;
+              pushHistory(1, "series", restData);
+              $($navbarEpisodes).removeClass("active");
+              $($navbarSeries).addClass("active");
+              active = "series";
+              loadSeries(true);
+            } else {
+              pushHistory(1, "episodes", null);
+              $($navbarEpisodes).addClass("active");
+              $($navbarSeries).removeClass("active");
+              active = "episodes";
+              loadEpisodes(true);
+            }
         }
+
         $($main_container).html(msg_html_loading);
-        $($navbarEpisodes).addClass("active");
-        $($navbarSeries).removeClass("active");
-        active = "episodes";
-        loadEpisodes(true);
+        //$($navbarEpisodes).addClass("active");
+        //$($navbarSeries).removeClass("active");
+        //active = "episodes";
+        //loadEpisodes(true);
         endlessScrolling();
     }
 
@@ -172,6 +210,7 @@ $(document).ready(function() {
     });
 
     $(window).on("popstate", function(event) {
+        console.log("popstate");
         if (window.history.state == null && stack.length == 1) {
             return
         };
@@ -699,7 +738,7 @@ $(document).ready(function() {
                 tile = tile + "</div></div></div></div>";
 
                 $($main_container).append(tile);
-                
+
                 $("#" + data["id"]).attr("href", playerEndpoint + "?id=" + data["id"]);
 
                 $("#" + data["id"]).on("keypress", function(ev) {
@@ -725,6 +764,7 @@ $(document).ready(function() {
     }
 
     function createSeriesGrid(data) {
+        console.log("build series grid");
         if (data && data.id) {
             var seriesClass = "series" + data.id + " ";
             var color = generateSeriesColor(data.id);
@@ -784,6 +824,8 @@ $(document).ready(function() {
     }
 
     function loadSeries(cleanGrid) {
+      console.log("loadseries");
+      console.log(restData);
         var requestUrl = restEndpoint + "/series.json?limit=6&offset=" + (page - 1) * 6 + "&" + restData;
         $.ajax({
             url: requestUrl,
