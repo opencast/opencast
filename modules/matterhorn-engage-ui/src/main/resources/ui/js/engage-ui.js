@@ -628,7 +628,7 @@ $(document).ready(function() {
                 seriesClass = "series" + data.mediapackage.series + " ";
             }
 
-            var tile = mediaContainer + "<div class=\"tile\" id=\"" + serID + "\" role=\"menuitem\" tabindex=\"" + tabIndexNumber++ + "\">" +
+            var tile = mediaContainer + "<a class=\"tile\" id=\"" + serID + "\" role=\"menuitem\" tabindex=\"" + tabIndexNumber++ + "\">" +
                 "<div class=\"" + seriesClass + "seriesindicator \"/> " +
                 "<div class=\"tilecontent\">";
 
@@ -699,10 +699,8 @@ $(document).ready(function() {
                 tile = tile + "</div></div></div></div>";
 
                 $($main_container).append(tile);
-
-                $("#" + data["id"]).on("click", function() {
-                    $(location).attr("href", playerEndpoint + "?id=" + data["id"]);
-                });
+                
+                $("#" + data["id"]).attr("href", playerEndpoint + "?id=" + data["id"]);
 
                 $("#" + data["id"]).on("keypress", function(ev) {
                     if (ev.which == 13 || ev.which == 32) {
