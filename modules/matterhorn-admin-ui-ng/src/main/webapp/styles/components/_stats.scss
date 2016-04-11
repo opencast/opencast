@@ -26,7 +26,7 @@
     box-sizing: border-box;
     display: inline-block;
     vertical-align: top;
-    width: (79.8% / $num-cols);  // width is 99.8% to resolve the way Google Chrome (35.0.1916.153) handles sub-pixel rounding
+    width: (79.8% / $num-cols);  
     margin-bottom: 20px;
     margin-top: 1px;
 
