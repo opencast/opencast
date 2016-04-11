@@ -25,6 +25,7 @@ $(document).ready(function() {
     var msg_html_mediapackageempty = "<h2>No episodes available</h2>";
     var msg_html_nodata = "<h2>No data available</h2>";
     var msg_loginSuccessful = "Successfully logged in. Please reload the page if the page does not reload automatically.";
+    var msg_not_logged_in = "Not logged in";
     var msg_loginFailed = "Failed to log in.";
     var infoMeURL = "/info/me.json";
     var defaultPlayerURL = "/engage/ui/watch.html";
@@ -53,7 +54,6 @@ $(document).ready(function() {
     var $name_loginlogout = "#name-loginlogout";
     var $glyph_loginlogout = "#glyph-loginlogout";
 
-    $("[data-localize]").localize("language/media-module", {language :  "de"});
 
     function log(args) {
         if (debug && window.console) {
@@ -66,32 +66,38 @@ $(document).ready(function() {
       return language.replace(/\-.*/,'');
     }
 
-    var lang = detectLanguage();
-    var jsonstr = window.location.origin + "/engage/ui/language/media-module-de.json";
-    $.ajax({
-        url: jsonstr,
-        dataType: "json",
-        success: function(data) {
-          console.log(data);
-          console.log(data.username);
-          title_enterUsernamePassword = data.login_title;
-          placeholder_username = data.username;
-          placeholder_password = data.password;
-          placeholder_rememberMe = data.remember_me;
-          msg_enterUsernamePassword = data.login_request;
-          msg_html_sthWentWrong = "<h2>"+data.sthWentWrong+"<h2>";
-          msg_html_noepisodes = "<h2>"+data.no_episodes+"</h2>";
-          msg_html_noseries = "<h2>"+data.no_series+"</h2>";
-          msg_html_loading = "<h2>"+data.loading+"</h2>";
-          msg_html_mediapackageempty = "<h2>"+data.no_episodes+"</h2>";
-          msg_html_nodata = "<h2>"+data.no_data+"</h2>";
-          msg_loginSuccessful = data.login_success;
-          msg_loginFailed = data.login_failed;
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-          console.log("Failed to localize. Using default.");
-        }
-    });
+    function translate() {
+      var lang = detectLanguage();
+      var jsonstr = window.location.origin + "/engage/ui/language/media-module-"+lang+".json";
+      log("Trying to translate: " + lang);
+      if( lang != "en") {
+        // English is default
+        $.ajax({
+          url: jsonstr,
+          dataType: "json",
+          success: function(data) {
+            $("[data-localize]").localize("language/media-module", {language :  lang});
+            title_enterUsernamePassword = data.login_title;
+            placeholder_username = data.username;
+            placeholder_password = data.password;
+            placeholder_rememberMe = data.remember_me;
+            msg_enterUsernamePassword = data.login_request;
+            msg_html_sthWentWrong = "<h2>"+data.sthWentWrong+"<h2>";
+            msg_html_noepisodes = "<h2>"+data.no_episodes+"</h2>";
+            msg_html_noseries = "<h2>"+data.no_series+"</h2>";
+            msg_html_loading = "<h2>"+data.loading+"</h2>";
+            msg_html_mediapackageempty = "<h2>"+data.no_episodes+"</h2>";
+            msg_html_nodata = "<h2>"+data.no_data+"</h2>";
+            msg_loginSuccessful = data.login_success;
+            msg_loginFailed = data.login_failed;
+            msg_not_logged_in = data.not_logged_in;
+          },
+            error: function(jqXHR, textStatus, errorThrown) {
+              log("Failed to localize. Using default.");
+            }
+          });
+      }
+    }
 
 
     String.prototype.endsWith = function(suffix) {
@@ -100,7 +106,7 @@ $(document).ready(function() {
 
     function initialize() {
         $.enableLogging(true);
-
+        translate();
         $("#" + id_mhlogolink).attr("href", location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''));
         getInfo();
         registerHandler();
@@ -292,7 +298,7 @@ $(document).ready(function() {
     }
 
     function setAnonymousUser() {
-        $($nav_username).html("Not logged in");
+        $($nav_username).html(msg_not_logged_in);
         $($name_loginlogout).html("Login");
         $($glyph_loginlogout).removeClass("glyphicon-log-out").addClass("glyphicon-log-in");
         $($nav_loginlogoutLink).unbind("click");

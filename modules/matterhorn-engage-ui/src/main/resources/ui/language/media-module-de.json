@@ -36,5 +36,6 @@
   "loading":"Lade ...",
   "no_data":"Keine Daten verfügbar.",
   "login_success":"Erfolgreich angemeldet.",
-  "login_failed":"Fehler beim anmelden."
+  "login_failed":"Fehler beim anmelden.",
+  "not_logged_in":"Nicht eingeloggt"
 }

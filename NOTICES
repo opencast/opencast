@@ -489,6 +489,12 @@ modules/matterhorn-engage-ui/src/main/resources/ui/js/alertify/alertify.js
   Copyright Fabien Doiron <fabien.doiron@gmail.com>
   MIT license
 
+modules/matterhorn-engage-ui/src/main/resources/ui/js/jquery-localize.min.js
+  jquery.localize.js
+  Copyright (c) Jim Garvin (http://github.com/coderifous), 2008.
+  Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt)
+  and MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses.
+
 modules/matterhorn-engage-ui/src/main/resources/ui/js/bootstrap-accessibility.min.js
   bootstrap-accessibility-plugin - v1.0.4 - 2014-11-03
   https://github.com/paypal/bootstrap-accessibility-plugin
