@@ -62,7 +62,9 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   var browser_minVersion_chrome = 30;
   var browser_minVersion_opera = 20;
   var browser_minVersion_safari = 7;
-  var browser_minVersion_msie = 9;
+  var browser_minVersion_webkit = 7;
+  var browser_minVersion_msie = 11;
+  var browser_minVersion_msedge = 13;
   var zoom_wasd_step_size = 15;
 
   /* don't change these variables */
@@ -140,6 +142,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) ||
         (Bowser.opera && Bowser.version >= browser_minVersion_opera) ||
         (Bowser.safari && Bowser.version >= browser_minVersion_safari) ||
+        (Bowser.msedge && Bowser.version >= browser_minVersion_msedge) ||
         (Bowser.msie && Bowser.version >= browser_minVersion_msie);
   }
 
