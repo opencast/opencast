@@ -121,50 +121,75 @@ $(document).ready(function() {
         getInfo();
         registerHandler();
 
-        var serIdFromGet = GetURLParameter("seriesId");
-        console.log("Got: ");
-        console.log(serIdFromGet);
+        var loadSer = false;
+        var loadEp = false;
+
+        var seriesPage      = GetURLParameter("serPage");
+        var serIdFromGet    = GetURLParameter("seriesId");
+        if(seriesPage != undefined || serIdFromGet != undefined) loadSer = true;
+        seriesPage = seriesPage == undefined ? "1" : seriesPage;
+        serIdFromGet = serIdFromGet == undefined ? "" : "id="+serIdFromGet+"&";
+
+        var episodePage     = GetURLParameter("epPage");
+        var epFromGet       = GetURLParameter("epFrom");
+        if(episodePage != undefined || epFromGet != undefined) loadEp = true;
+        episodePage = episodePage == undefined ? "1" : episodePage;
+        epFromGet = epFromGet == undefined ? "" : "ser="+epFromGet+"&";
+
+        var searchQuery     = GetURLParameter("search");
+        searchQuery = searchQuery == undefined ? "" : searchQuery+"&";
+
+        var sort            = GetURLParameter("sort");
+        sort = sort == undefined ? "" : sort+"&";
 
         var retrievedObject = sessionStorage.getItem("historyStack");
+
+        console.log("Got: ");
+        console.log(serIdFromGet);
+        console.log(seriesPage);
+        console.log(epFromGet);
+        console.log(episodePage);
+        console.log(searchQuery);
+
         if (retrievedObject != null) {
-            stack = JSON.parse(retrievedObject);
-            log("Retrieved history stack from session storage");
-            if(serIdFromGet != undefined) {
-              restData = "id="+serIdFromGet;
-              pushHistory(1, "series", restData);
-              $($navbarEpisodes).removeClass("active");
-              $($navbarSeries).addClass("active");
-              active = "series";
-              loadSeries(true);
-            } else {
-              pushHistory(1, "episodes", null);
-              $($navbarEpisodes).addClass("active");
-              $($navbarSeries).removeClass("active");
-              active = "episodes";
-              loadEpisodes(true);
-            }
-        } else {
-            if(serIdFromGet != undefined) {
-              restData = "id="+serIdFromGet;
-              pushHistory(1, "series", restData);
-              $($navbarEpisodes).removeClass("active");
-              $($navbarSeries).addClass("active");
-              active = "series";
-              loadSeries(true);
-            } else {
-              pushHistory(1, "episodes", null);
-              $($navbarEpisodes).addClass("active");
-              $($navbarSeries).removeClass("active");
-              active = "episodes";
-              loadEpisodes(true);
-            }
+            //stack = JSON.parse(retrievedObject);
+            console.log("Retrieved history stack from session storage");
         }
 
+        if(loadEp || (!loadEp && !loadSer)) {
+            loadEpisodes(true, searchQuery+sort+epFromGet);
+        } else if(loadSer) {
+            loadSeries(true, searchQuery+sort+serIdFromGet);
+        }
+        /*
+        if(serIdFromGet != undefined) {
+            // Load specific series
+            restData = "id="+serIdFromGet;
+            pushHistory(1, "series", restData);
+            $($navbarEpisodes).removeClass("active");
+            $($navbarSeries).addClass("active");
+            active = "series";
+            loadSeries(true);
+        } else if(epFromGet != undefined) {
+            // load specific episodes from param
+            restData = "sid="+epFromGet;
+            pushHistory(1, "episodes", restData);
+            $($navbarEpisodes).addClass("active");
+            $($navbarSeries).removeClass("active");
+            active = "episodes";
+            loadEpisodes(true);
+        }
+
+        if(epFromGet == undefined && serIdFromGet == undefined) {
+            // no param commited
+            pushHistory(1, "episodes", null);
+            $($navbarEpisodes).addClass("active");
+            $($navbarSeries).removeClass("active");
+            active = "episodes";
+            loadEpisodes(true);
+        }
+        */
         $($main_container).html(msg_html_loading);
-        //$($navbarEpisodes).addClass("active");
-        //$($navbarSeries).removeClass("active");
-        //active = "episodes";
-        //loadEpisodes(true);
         endlessScrolling();
     }
 
@@ -210,18 +235,24 @@ $(document).ready(function() {
     });
 
     $(window).on("popstate", function(event) {
-        console.log("popstate");
-        if (window.history.state == null && stack.length == 1) {
-            return
+        /*console.log("!!popstate!!");
+        console.log(window.history.state);
+        if (window.history.state == null || stack.length == 1) {
+            console.log("no");
+            // no history and internal stack has only actual page
+            return;
         };
 
-        var choose = window.history.state - 1;
+        var choose = window.history.state - 2;
+
+        console.log("choose: " + choose);
         if (choose < 0) {
-            choose = 0;
+            return;
+            //choose = 0;
         };
-
+        console.log(stack);
         var dest = stack[choose];
-
+        console.log(dest);
         if (dest == undefined) {
             return;
         };
@@ -242,18 +273,23 @@ $(document).ready(function() {
             $($navbarEpisodes).removeClass("active");
             active = "series";
             loadSeries(true);
-        };
+        };*/
     });
 
     function pushHistory(page, active, rest) {
+        console.log("pushstate");
+        /*if(sessionStorage.getItem("historyStack") == null) {
+            // empty historyStack
+            stack = [];
+        }
         stack.push({
             "page": page,
             "active": active,
             "rest": rest
         });
         visited++;
-        history.pushState(visited, "", "");
-        sessionStorage.setItem("historyStack", JSON.stringify(stack));
+        history.pushState(visited, active, "");
+        sessionStorage.setItem("historyStack", JSON.stringify(stack));*/
     }
 
     function login() {
@@ -418,7 +454,7 @@ $(document).ready(function() {
 
             restData = "";
             $("input").val("");
-
+            /*
             switch ($(this).attr("data-search")) {
                 case "episodes":
                     active = "episodes";
@@ -434,8 +470,8 @@ $(document).ready(function() {
                     break;
                 default:
                     break;
-            }
-            $(".navbar-collapse").collapse('hide');
+            */
+            //$(".navbar-collapse").collapse('hide');
         });
 
         $($nav_switch_li).on("keypress", function(ev) {
@@ -570,7 +606,7 @@ $(document).ready(function() {
 
         /* handle search input */
         $($oc_search_form).submit(function(event) {
-            event.preventDefault();
+            /*event.preventDefault();
             var data = $(this).serialize();
 
             restData = data;
@@ -587,7 +623,7 @@ $(document).ready(function() {
                 loadEpisodes(true);
             }
 
-            $(".navbar-collapse").collapse('hide');
+            $(".navbar-collapse").collapse('hide');*/
         });
 
         $($oc_sort_dropdown).on("change", function() {
@@ -598,10 +634,11 @@ $(document).ready(function() {
         log("Handler registered");
     }
 
-    function loadEpisodes(cleanGrid) {
+    function loadEpisodes(cleanGrid, rest) {
+        console.log(rest);
         var requestUrl = restEndpoint + "episode.json?limit=" + bufferEntries +
             "&offset=" + ((page - 1)) * bufferEntries +
-            "&" + restData;
+            "&" + rest;
         $.ajax({
             url: requestUrl,
             dataType: "json",
@@ -735,7 +772,7 @@ $(document).ready(function() {
                     tile = tile + "<div class=\"duration\">" + hours + ":" + minutes + ":" + seconds + "</div>";
                 };
 
-                tile = tile + "</div></div></div></div>";
+                tile = tile + "</div></div></div></a>";
 
                 $($main_container).append(tile);
 
@@ -772,7 +809,7 @@ $(document).ready(function() {
             var creator = "<br>";
             var contributor = "<br>";
 
-            var tile = mediaContainer + "<div class=\"tile\" id=\"" + data.id + "\" role=\"menuitem\" tabindex=\"" + tabIndexNumber++ + "\"> " +
+            var tile = mediaContainer + "<a class=\"tile\" id=\"" + data.id + "\" role=\"menuitem\" tabindex=\"" + tabIndexNumber++ + "\"> " +
                 "<div class=\"" + seriesClass + "seriesindicator \"/> " +
                 "<div class=\"tilecontent\">";
 
@@ -788,11 +825,12 @@ $(document).ready(function() {
             };
             tile = tile + "<div class=\"contributor\">" + contributor + "</div>";
 
-            tile = tile + "</div></div></div>";
+            tile = tile + "</div></div></a>";
 
             $($main_container).append(tile);
+            $("#" + data.id).attr("href", "?epFrom="+data.id);
 
-            $("#" + data.id).on("click", function() {
+            /*$("#" + data.id).on("click", function() {
                 restData = "sid=" + data.id;
                 page = 1;
                 active = "episodes";
@@ -801,7 +839,7 @@ $(document).ready(function() {
                 pushHistory(1, "episodes", restData);
                 loadEpisodes(true);
             });
-
+            */
             $("#" + data.id).on("keypress", function(ev) {
                 if (ev.which == 13 || ev.which == 32) {
                     restData = "sid=" + data.id;
@@ -823,10 +861,10 @@ $(document).ready(function() {
         }
     }
 
-    function loadSeries(cleanGrid) {
+    function loadSeries(cleanGrid, rest) {
       console.log("loadseries");
-      console.log(restData);
-        var requestUrl = restEndpoint + "/series.json?limit=6&offset=" + (page - 1) * 6 + "&" + restData;
+      console.log(rest);
+        var requestUrl = restEndpoint + "/series.json?limit=6&offset=" + (page - 1) * 6 + "&" + rest;
         $.ajax({
             url: requestUrl,
             dataType: "json",
