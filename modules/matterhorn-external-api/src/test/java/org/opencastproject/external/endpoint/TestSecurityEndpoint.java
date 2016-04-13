@@ -20,11 +20,10 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static org.easymock.EasyMock.expect;
-
-import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
 import org.opencastproject.security.urlsigning.service.UrlSigningService;

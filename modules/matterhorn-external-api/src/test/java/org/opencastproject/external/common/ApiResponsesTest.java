@@ -21,13 +21,12 @@
 package org.opencastproject.external.common;
 
 import static com.entwinemedia.fn.data.json.Jsons.a;
-
-import static com.entwinemedia.fn.data.json.Jsons.v;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.v;
+import static org.junit.Assert.assertEquals;
 
 import com.entwinemedia.fn.data.json.JValue;
-import static org.junit.Assert.assertEquals;
 
 import org.apache.http.HttpStatus;
 import org.junit.Test;
