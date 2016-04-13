@@ -68,6 +68,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         sliderMouseout: new Engage.Event("Slider:mouseOut", "the mouse is off the slider", "trigger"),
         sliderMousemove: new Engage.Event("Slider:mouseMoved", "the mouse is moving over the slider", "trigger"),
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "trigger"),
+        seekLeft: new Engage.Event("Video:seekLeft", "", "trigger"),
+        seekRight: new Engage.Event("Video:seekRight", "", "trigger"),
         customOKMessage: new Engage.Event("Notification:customOKMessage", "a custom message with an OK button", "trigger"),
         customSuccess: new Engage.Event("Notification:customSuccess", "a custom success message", "trigger"),
         customError: new Engage.Event("Notification:customError", "an error occurred", "trigger"),
@@ -808,6 +810,28 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     Engage.trigger(plugin.events.play.getName(), false);
                 }
             });
+            
+            $("#" + id_forward_button).click(function() {
+                if (segments && (segments.length > 0)) {
+                    var seekTime = Utils.nextSegmentStart(segments, currentTime);
+                    if (!isNaN(seekTime)) {
+                        Engage.trigger(plugin.events.seek.getName(), seekTime / 1000);
+                    }
+                } else {
+                    Engage.trigger(plugin.events.seekRight.getName());
+                }
+            });
+
+            $("#" + id_backward_button).click(function() {
+                if (segments && (segments.length > 0)) {
+                    var seekTime = Utils.previousSegmentStart(segments, currentTime);
+                    if (!isNaN(seekTime)) {
+                        Engage.trigger(plugin.events.seek.getName(), seekTime / 1000);
+                    }
+                } else {
+                    Engage.trigger(plugin.events.seekLeft.getName());
+                }
+            });
 
             $("#" + id_fullscreen_button).click(function(e) {
                 e.preventDefault();
@@ -909,6 +933,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         if (videosReady) {
             Utils.greyIn(id_play_button);
             Utils.enable(id_play_button);
+            Utils.greyIn(id_forward_button);
+            Utils.enable(id_forward_button);
+            Utils.greyIn(id_backward_button);
+            Utils.enable(id_backward_button);
             if (!isAudioOnly) {
                 enableFullscreenButton = true;
                 $("#" + id_fullscreen_button).removeClass("disabled");
