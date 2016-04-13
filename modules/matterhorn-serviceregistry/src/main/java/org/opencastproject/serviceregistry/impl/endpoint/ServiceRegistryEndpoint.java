@@ -36,6 +36,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.serviceregistry.api.HostRegistration;
+import org.opencastproject.serviceregistry.api.JaxbHostRegistration;
 import org.opencastproject.serviceregistry.api.JaxbHostRegistrationList;
 import org.opencastproject.serviceregistry.api.JaxbServiceRegistration;
 import org.opencastproject.serviceregistry.api.JaxbServiceRegistrationList;
@@ -393,7 +394,7 @@ public class ServiceRegistryEndpoint {
     JaxbHostRegistrationList registrations = new JaxbHostRegistrationList();
     try {
       for (HostRegistration reg : serviceRegistry.getHostRegistrations())
-        registrations.add(reg);
+        registrations.add(new JaxbHostRegistration(reg));
       return registrations;
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
