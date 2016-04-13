@@ -667,7 +667,27 @@
            "REPLY_TO":       "Reply to",
            "CANCEL_REPLY":   "Dismiss",
            "DELETE":      "Delete",
-           "REASON":      "Reason"
+           "REASON":      "Reason",
+           "REASONS": {
+             "CUTTING" : "Cutting required",
+             "REVIEW" : "Review required",
+             "ASYNC" : "A/V-tracks asynchronous",
+             "AUDIO_ISSUE" : "Missing or defective audio track",
+             "CANCELED" : "Canceled event",
+             "CONFLICTING_METADATA" : "Conflicting metadata",
+             "IMPROPER_POINT" : "Improper in or out point",
+             "MISSING_AGREEMENT" : "Missing agreement",
+             "OTHER" : "Other",
+             "PRIVACY" : "Privacy concern",
+             "SEGMENTATION" : "Inaccurate segmentation",
+             "UNKNOWN_CREATOR" : "Creator unknown",
+             "VIDEO_ISSUE" : "Video distorted or cropped",
+             "WRONG_INPUT_FORMAT" : "Input file format not supported",
+             "WRONG_METADATA" : "Metadata needs correction",
+             "WRONG_SERIES_PUBLICATION" : "Wrong series or publication channel",
+             "WRONG_WORKFLOW" : "Wrong workflow",
+             "PROCESSING_FAILURE" : "Processing failure"
+           }
          },
          "METADATA": {
            "TITLE":          "Title",
