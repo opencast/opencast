@@ -24,6 +24,7 @@ define(['jquery', 'backbone'], function($, Backbone) {
     "use strict";
 
     var prop_shortcut = "player.shortcut.";
+    var prop_shortcut_sequence = "player.shortcut-sequence";
     var prop_allowedtags = "player.allowedtags";
     var prop_allowedformats = "player.allowedformats";
     var prop_mastervideotype = "player.mastervideotype";
@@ -44,6 +45,7 @@ define(['jquery', 'backbone'], function($, Backbone) {
             this.fetch({
                 success: function(me) {
                     var shortcuts = new Array();
+                    var shortcut_sequence = "";
                     var allowedTags;
                     var allowedFormats;
                     var mastervideotype = "";
@@ -61,6 +63,10 @@ define(['jquery', 'backbone'], function($, Backbone) {
                                     name: key.substring(prop_shortcut.length, key.length),
                                     key: value
                                 });
+                            }
+                            // the seuence in which shortcuts should be presented
+                            else if ((key == prop_shortcut_sequence) && value) {
+                                shortcut_sequence = value;
                             }
                             // allowed tags on videos that should be played
                             else if ((key == prop_allowedtags) && value) {
@@ -104,6 +110,7 @@ define(['jquery', 'backbone'], function($, Backbone) {
                     me.set("logo_player", logo_player);
                     me.set("link_mediamodule", link_mediamodule);
                     me.set("show_embed_links", show_embed_link);
+                    me.set("shortcut-sequence", shortcut_sequence)
                     ready = true;
                 }
             });

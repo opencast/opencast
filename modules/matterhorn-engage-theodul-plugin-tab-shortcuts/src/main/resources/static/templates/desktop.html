@@ -3,20 +3,24 @@
     <% if((typeof str_displayShortcuts !== "undefined")) { %>
     <div class="shortcutsTab">
       <% if((typeof shortcuts !== "undefined")
-	 && (typeof str_shortcutName !== "undefined")
+	 && (typeof categories !== "undefined") 
+         && (typeof str_shortcutName !== "undefined")
 	 && (typeof str_shortcut !== "undefined")) { %>
-      <table class="table table-striped table-hover table-bordered">
+      <% _.each(categories, function(cat) { %>
+      <div class="shortcut-category"> <p class="description-item-header"> <%= cat.name %></p>
+      <table class="table table-striped table-hover table-bordered shortcuts-table">
 	<th>
 	  <%= str_shortcutName %>
 	</th>
-	<th>
+	<th class="shortcut-column">
 	  <%= str_shortcut %>
 	</th>
-	<% _.each(shortcuts, function(sc) { %>
-	<tr><td><%= sc.name %></td><td><%= sc.val %></td></tr>
+	<% _.each(shortcuts[cat.val], function(sc) { %>
+	<tr><td><%= sc.name %></td><td class="shortcut-column"><%= sc.val %></td></tr>
 	<% }); %>
-      </table>
-      <% } %>
+      </table> </div>
+      <% }); %>
+    <% } %>
     </div>
     <div class="clear"></div>
     <% } else { %>
