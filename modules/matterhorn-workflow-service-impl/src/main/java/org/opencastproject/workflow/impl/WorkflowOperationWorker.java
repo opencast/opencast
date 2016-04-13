@@ -40,6 +40,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import com.entwinemedia.fn.bool.Bool;
 import com.entwinemedia.fn.parser.Parsers;
 import com.entwinemedia.fn.parser.Result;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +76,7 @@ final class WorkflowOperationWorker {
    * @param service
    *          the workflow service.
    */
-  public WorkflowOperationWorker(WorkflowOperationHandler handler, WorkflowInstance workflow,
+  WorkflowOperationWorker(WorkflowOperationHandler handler, WorkflowInstance workflow,
           WorkflowServiceImpl service) {
     this.handler = handler;
     this.workflow = workflow;
@@ -96,7 +97,7 @@ final class WorkflowOperationWorker {
    * @param service
    *          the workflow service.
    */
-  public WorkflowOperationWorker(WorkflowOperationHandler handler, WorkflowInstance workflow,
+  WorkflowOperationWorker(WorkflowOperationHandler handler, WorkflowInstance workflow,
           Map<String, String> properties, WorkflowServiceImpl service) {
     this(handler, workflow, service);
     this.properties = properties;
@@ -113,7 +114,7 @@ final class WorkflowOperationWorker {
    * @param service
    *          the workflow service.
    */
-  public WorkflowOperationWorker(WorkflowInstance workflow, Map<String, String> properties, WorkflowServiceImpl service) {
+  WorkflowOperationWorker(WorkflowInstance workflow, Map<String, String> properties, WorkflowServiceImpl service) {
     this(null, workflow, service);
     this.properties = properties;
   }
@@ -127,7 +128,7 @@ final class WorkflowOperationWorker {
    * @param service
    *          the workflow service.
    */
-  public WorkflowOperationWorker(WorkflowInstance workflow, WorkflowServiceImpl service) {
+  WorkflowOperationWorker(WorkflowInstance workflow, WorkflowServiceImpl service) {
     this(null, workflow, service);
   }
 

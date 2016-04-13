@@ -58,8 +58,6 @@ import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionRep
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -75,6 +73,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import junit.framework.Assert;
 
 /**
  * Test cases for the implementation at {@link WorkflowStatistics}.

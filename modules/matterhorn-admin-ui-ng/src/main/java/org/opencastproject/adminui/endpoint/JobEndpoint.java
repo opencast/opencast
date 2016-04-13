@@ -69,9 +69,9 @@ import com.entwinemedia.fn.data.json.JField;
 import com.entwinemedia.fn.data.json.JObjectWrite;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.SimpleSerializer;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

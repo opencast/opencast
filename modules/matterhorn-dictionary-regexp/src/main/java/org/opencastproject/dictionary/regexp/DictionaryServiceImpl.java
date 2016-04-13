@@ -22,22 +22,23 @@
 package org.opencastproject.dictionary.regexp;
 
 import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
-import org.opencastproject.util.ReadinessIndicator;
-import org.osgi.framework.BundleContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.io.UnsupportedEncodingException;
-import org.osgi.service.cm.ManagedService;
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 import org.opencastproject.dictionary.api.DictionaryService;
 import org.opencastproject.metadata.mpeg7.Textual;
 import org.opencastproject.metadata.mpeg7.TextualImpl;
+import org.opencastproject.util.ReadinessIndicator;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ManagedService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This dictionary implementation is a dummy implementation which which will

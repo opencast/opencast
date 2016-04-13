@@ -26,10 +26,9 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase;
 
 import org.osgi.service.component.ComponentContext;
-
-import org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase;
 
 /**
  * Workflow operation handler that signifies a workflow that is currently in the process of ingesting a recording.

@@ -9,90 +9,70 @@
   </tags>
   <description/>
   <configuration_panel>
-      <![CDATA[
-        <style type="text/css">
-        <!--
-            #workflow-configuration legend { padding-top:20px; padding-bottom:5px }
-            #workflow-configuration li { padding-top:5px; padding-bottom:5px; line-height:14px }
-            #workflow-configuration input[type="radio"] { padding-top:10px; padding-bottom:5px }
-            #workflow-configuration .workflow-configuration-subpanel { padding-top:5px; padding-left:28px; padding-bottom:5px }
-        -->
-        </style>
-        <div id="workflow-configuration">
-          <fieldset>
-            <legend>Add a comment that the recording needs:</legend>
-            <ul>
-              <li>
-                <span>
-                  <input id="flagForCutting" name="flagForCutting" type="checkbox" class="configField" value="true" />
-                  <span>&nbsp;Cutting</span>
-                </span>
-              </li>
-              <li>
-                <span>
-                  <input id="flagForReview" name="flagForReview" type="checkbox" class="configField" value="true" />
-                  <span>&nbsp;Review</span>
-                </span>
-              </li>
-            </ul>
-          </fieldset>
-          <fieldset>
-            <legend>After upload and ingest:</legend>
-            <ul>
-              <li>
-                <span>
-                  <input type="radio" name="holdOrPublishToggle" value="hold" />
-                  <span>&nbsp;Hold</span>
-                </span>
-              </li>
-              <li>
-                <span>
-                  <input type="radio" name="holdOrPublishToggle" value="publish" checked="checked" />
-                  <span>&nbsp;Publish right away to</span>
-                  <!-- Publication configuration panel -->
-                  <div id="publicationConfigurationPanel" class="workflow-configuration-subpanel">
-                    <ul>
-                    <li>
-                      <span>
-                        <input id="publishToEngage" name="publishToEngage" type="checkbox" checked="checked" class="configField" value="true" />
-                        <span>&nbsp;Opencast Media Module</span>
-                      </span>
-                    </li>
-                    <li>
-                      <span>
-                        <input id="publishToApi" name="publishToApi" type="checkbox" checked="checked" class="configField" value="true" />
-                        <span>&nbsp;External Applications</span>
-                      </span>
-                    </li>
-                    <li>
-                      <span>
-                        <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" />
-                        <span>&nbsp;YouTube</span>
-                      </span>
-                    </li>
-                    </ul>
-                  </div>
-                </span>
-              </li>
-            </ul>
-            <!-- Place to keep the hold vs. publication state -->
-            <input type="hidden" id="straightToPublishing" class="configField" value="true" />
-          </fieldset>
-        </div>
+    <![CDATA[
+      <style type="text/css">
+      <!--
+        #workflow-configuration legend { padding-top:20px; padding-bottom:5px }
+        #workflow-configuration li { padding:2px 20px;}
+        #workflow-configuration input[type=checkbox] { padding: 0px; }
+        #workflow-configuration label { display: inline-block; padding: 0px 5px; }
+        #workflow-configuration input:disabled+label{ opacity: 0.5; }
+      -->
+      </style>
+      <div id="workflow-configuration">
+        <fieldset>
+          <legend>Add a comment that the recording needs:</legend>
+          <ul>
+            <li>
+              <input id="flagForCutting" name="flagForCutting" type="checkbox" class="configField" value="true" />
+              <label for="flagForCutting">Cutting</label>
+            </li>
+            <li>
+              <input id="flagForReview" name="flagForReview" type="checkbox" class="configField" value="true" />
+              <label for="flagForReview">Review</label>
+            </li>
+          </ul>
+        </fieldset>
+        <fieldset>
+          <legend>After upload and ingest:</legend>
+          <ul>
+            <li>
+              <input id="holdOrPublishToggle_hold" type="radio" name="holdOrPublishToggle" value="hold" />
+              <label for="holdOrPublishToggle_hold">Hold</label>
+            </li>
+            <li>
+              <input id="holdOrPublishToggle_publish" type="radio" name="holdOrPublishToggle" value="publish" checked="checked" />
+              <label for="holdOrPublishToggle_publish">Publish right away to</label>
+              <ul id="publicationConfigurationPanel" class="workflow-configuration-subpanel">
+                <li>
+                  <input id="publishToEngage" name="publishToEngage" type="checkbox" checked="checked" class="configField" value="true" />
+                  <label for="publishToEngage">Opencast Media Module</label>
+                </li>
+                <li>
+                  <input id="publishToApi" name="publishToApi" type="checkbox" checked="checked" class="configField" value="true" />
+                  <label for="publishToApi">External Applications</label>
+                </li>
+                <li>
+                  <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
+                  <label for="publishToYouTube">YouTube</label>
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <!-- Place to keep the hold vs. publication state -->
+          <input type="hidden" id="straightToPublishing" class="configField" value="true" />
+        </fieldset>
+      </div>
 
-        <!-- Show or hide the hold and publication configuration panel -->
-        <script type="text/javascript">
-          $('input[name="holdOrPublishToggle"]').change(function(){
-              var selection = $(this).val();
-              if (selection == 'publish') {
-                  $('#publicationConfigurationPanel').show();
-                  $('#straightToPublishing').val(true);
-              } else {
-                  $('#publicationConfigurationPanel').hide();
-                  $('#straightToPublishing').val(false);
-              }
-          });
-      ]]>
+      <!-- Show or hide the hold and publication configuration panel -->
+      <script type="text/javascript">
+        $('input[name="holdOrPublishToggle"]').change(function(){
+            var show = $(this).val() == 'publish';
+            $('#publicationConfigurationPanel').toggle(show);
+            $('#straightToPublishing').val(show);
+        });
+      </script>
+    ]]>
   </configuration_panel>
 
   <operations>

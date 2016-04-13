@@ -21,10 +21,13 @@
 
 package org.opencastproject.smil.entity.api;
 
-import java.net.MalformedURLException;
-import javax.xml.bind.JAXBException;
 import org.opencastproject.smil.api.SmilException;
+
 import org.xml.sax.SAXException;
+
+import java.net.MalformedURLException;
+
+import javax.xml.bind.JAXBException;
 
 /**
  * Represent a SMIL document.

@@ -22,6 +22,22 @@
 
 package org.opencastproject.manager.servlet;
 
+import org.opencastproject.manager.api.PluginManagerConstants;
+import org.opencastproject.manager.core.TemplateLoader;
+import org.opencastproject.manager.core.TemplateWrapperFilter;
+import org.opencastproject.manager.system.MHManagerActivator;
+import org.opencastproject.manager.system.Restart;
+import org.opencastproject.manager.system.configeditor.Config;
+import org.opencastproject.manager.system.workflow.WorkflowManager;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -32,21 +48,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.opencastproject.manager.api.PluginManagerConstants;
-import org.opencastproject.manager.core.TemplateLoader;
-import org.opencastproject.manager.core.TemplateWrapperFilter;
-import org.opencastproject.manager.system.MHManagerActivator;
-import org.opencastproject.manager.system.Restart;
-import org.opencastproject.manager.system.configeditor.Config;
-import org.opencastproject.manager.system.workflow.WorkflowManager;
-import org.osgi.framework.BundleContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 /**
  * This class implements the HttpServlet.

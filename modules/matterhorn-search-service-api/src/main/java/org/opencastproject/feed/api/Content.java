@@ -31,7 +31,7 @@ package org.opencastproject.feed.api;
 public interface Content {
 
   /** The content mode */
-  public enum Mode {
+  enum Mode {
     Escaped, Xml
   };
 

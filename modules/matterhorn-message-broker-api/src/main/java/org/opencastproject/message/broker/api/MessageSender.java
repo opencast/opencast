@@ -23,9 +23,7 @@ package org.opencastproject.message.broker.api;
 
 import java.io.Serializable;
 
-import javax.jms.Message;
-
-public interface MessageSender {
+public interface MessageSender extends MessageBrokerConnector {
 
   /**
    * The types of message destinations there are to send to.
@@ -34,57 +32,6 @@ public interface MessageSender {
     Queue, Topic
   };
 
-  /**
-   * Send a {@link Message} asynchronously through a message broker to a queue or topic.
-   *
-   * @param destinationId
-   *          The id of the queue or topic.
-   * @param type
-   *          The type of destination either queue or topic.
-   * @param messageText
-   *          The text to send.
-   */
-  void sendMessage(String destinationId, DestinationType type, Message message);
-
-  /**
-   * Send a {@link String} asynchronously through a message broker to a queue or topic.
-   *
-   * @param destinationId
-   *          The id of the queue or topic.
-   * @param type
-   *          The type of destination either queue or topic.
-   * @param messageText
-   *          The text to send.
-   */
-  void sendTextMessage(String destinationId, DestinationType type, String messageText);
-
-  /**
-   * Send a message asynchronously with a payload of a byte array.
-   *
-   * @param destinationId
-   *          The id of the destination location.
-   * @param type
-   *          The type of the destination either queue or topic.
-   * @param bytes
-   *          The bytes to send.
-   */
-  void sendByteMessage(String destinationId, DestinationType type, byte[] bytes);
-
-  /**
-   * Send a message asynchronously with a byte array payload with a given offset and length.
-   *
-   * @param destinationId
-   *          The id of the destination location.
-   * @param type
-   *          The type of the destination.
-   * @param bytes
-   *          The bytes to send.
-   * @param offset
-   *          The offset to start sending the bytes.
-   * @param length
-   *          The length of the bytes to send.
-   */
-  void sendByteMessage(String destinationId, DestinationType type, byte[] bytes, int offset, int length);
 
   /**
    * Send a message asynchronously with a {@link Serializable} object.

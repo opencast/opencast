@@ -21,12 +21,14 @@
 
 package org.opencastproject.silencedetection.api;
 
-import java.util.LinkedList;
-import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *

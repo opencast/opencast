@@ -21,10 +21,10 @@
 
 package org.opencastproject.archive.base;
 
+import static org.opencastproject.util.EqualsUtil.eqObj;
+
 import org.opencastproject.archive.api.Version;
 import org.opencastproject.util.EqualsUtil;
-
-import static org.opencastproject.util.EqualsUtil.eqObj;
 
 /** A vector that uniquely identifies a stored media package asset. */
 public final class StoragePath {

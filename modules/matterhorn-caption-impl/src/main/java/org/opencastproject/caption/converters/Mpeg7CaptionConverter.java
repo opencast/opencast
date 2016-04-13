@@ -40,6 +40,7 @@ import org.opencastproject.metadata.mpeg7.Mpeg7Catalog;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogImpl;
 import org.opencastproject.metadata.mpeg7.TemporalDecomposition;
 import org.opencastproject.metadata.mpeg7.TextAnnotation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

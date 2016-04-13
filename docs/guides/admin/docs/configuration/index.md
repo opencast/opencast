@@ -17,5 +17,6 @@ General Configuration
  - [Multi Tenancy Configuration](multi.tenancy.md)
  - [Security Configuration](security.md)
     - [CAS Security Configuration](security.cas.md)
+    - [LDAP Authentication and Authorization (without CAS)](security.ldap.md)
  - [Workflow Configuration](workflow.md)
     - [Workflow Operation Handler](../workflowoperationhandlers/index.md)

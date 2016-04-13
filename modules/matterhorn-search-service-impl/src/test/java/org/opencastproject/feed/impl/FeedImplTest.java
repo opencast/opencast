@@ -21,29 +21,29 @@
 
 package org.opencastproject.feed.impl;
 
-import java.util.ArrayList;
-import java.util.Date;
+import org.opencastproject.feed.api.Category;
 import org.opencastproject.feed.api.Content;
 import org.opencastproject.feed.api.Content.Mode;
 import org.opencastproject.feed.api.Feed.Type;
 import org.opencastproject.feed.api.FeedEntry;
-import org.opencastproject.feed.api.Category;
 import org.opencastproject.feed.api.FeedExtension;
 import org.opencastproject.feed.api.Image;
 import org.opencastproject.feed.api.Link;
 import org.opencastproject.feed.api.Person;
 
-import junit.framework.Assert;
-
+import org.easymock.EasyMock;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import org.easymock.EasyMock;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+
+import junit.framework.Assert;
 
 public class FeedImplTest {
     private static final Logger logger = LoggerFactory.getLogger(FeedImplTest.class);

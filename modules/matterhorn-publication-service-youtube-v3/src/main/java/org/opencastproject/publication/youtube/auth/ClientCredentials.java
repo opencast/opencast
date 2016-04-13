@@ -22,11 +22,12 @@
 
 package org.opencastproject.publication.youtube.auth;
 
+import org.opencastproject.util.data.Collections;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.opencastproject.util.data.Collections;
 
 import java.io.File;
 import java.io.FileReader;

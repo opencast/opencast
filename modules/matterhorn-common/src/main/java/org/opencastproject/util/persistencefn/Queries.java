@@ -24,6 +24,7 @@ package org.opencastproject.util.persistencefn;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.P2;
 import com.entwinemedia.fn.data.Opt;
+
 import org.joda.time.base.AbstractInstant;
 
 import java.util.Date;

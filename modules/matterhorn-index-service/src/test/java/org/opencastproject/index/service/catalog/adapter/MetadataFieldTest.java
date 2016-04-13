@@ -41,13 +41,13 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
+
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class MetadataFieldTest {
   private String defaultInputID = "TestInputID";

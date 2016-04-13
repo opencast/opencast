@@ -30,8 +30,6 @@ import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.opencastproject.util.RequireUtil.notEmpty;
 import static org.opencastproject.util.RequireUtil.notNull;
 
-import com.entwinemedia.fn.data.json.JField;
-import com.entwinemedia.fn.data.json.JValue;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.EqualsUtil;
@@ -39,6 +37,9 @@ import org.opencastproject.util.Jsons;
 import org.opencastproject.util.Jsons.Obj;
 import org.opencastproject.util.Jsons.Val;
 import org.opencastproject.util.data.Option;
+
+import com.entwinemedia.fn.data.json.JField;
+import com.entwinemedia.fn.data.json.JValue;
 
 import org.apache.commons.lang3.StringUtils;
 

@@ -21,13 +21,16 @@
 
 package org.opencastproject.authorization.xacml.manager.impl.persistence;
 
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
-
-import org.apache.commons.io.IOUtils;
-import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+import static org.opencastproject.workflow.api.ConfiguredWorkflowRef.workflow;
 
 import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
@@ -47,20 +50,16 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
 
+import org.apache.commons.io.IOUtils;
+import org.easymock.EasyMock;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManagerFactory;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.workflow.api.ConfiguredWorkflowRef.workflow;
 
 /** Tests persistence: storing, merging, retrieving and removing. */
 public class OsgiJpaAclTransitionDbTest {

@@ -21,15 +21,15 @@
 
 package org.opencastproject.archive.opencast;
 
+import static org.junit.Assert.assertEquals;
+import static org.opencastproject.util.ReflectionUtil.run;
+import static org.opencastproject.util.data.Collections.nil;
+
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
-import static org.opencastproject.util.ReflectionUtil.run;
-import static org.opencastproject.util.data.Collections.nil;
 
 public class JaxbResultSetTest {
   /** Ensure all fields of an OpencastResultSet are copied to the JAXB DTO. */

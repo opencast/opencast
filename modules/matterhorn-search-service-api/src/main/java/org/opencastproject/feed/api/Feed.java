@@ -34,7 +34,7 @@ import java.util.List;
 public interface Feed {
 
   /** The type of feed to generate */
-  public enum Type {
+  enum Type {
     RSS, Atom;
     public static Type parseString(String type) {
       if (RSS.toString().equalsIgnoreCase(type))

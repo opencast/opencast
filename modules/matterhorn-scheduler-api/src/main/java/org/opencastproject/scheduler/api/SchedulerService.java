@@ -40,7 +40,7 @@ import java.util.Properties;
  */
 public interface SchedulerService {
 
-  public enum ReviewStatus {
+  enum ReviewStatus {
     UNSENT, UNCONFIRMED, CONFIRMED
   }
 

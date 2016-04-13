@@ -22,15 +22,16 @@
 
 package org.opencastproject.util.data;
 
-import org.junit.Test;
-import org.opencastproject.util.data.functions.Functions;
-
-import java.io.IOException;
-
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.data.functions.Functions.contra;
 import static org.opencastproject.util.data.functions.Functions.identity;
 import static org.opencastproject.util.data.functions.Functions.toPredicate;
+
+import org.opencastproject.util.data.functions.Functions;
+
+import org.junit.Test;
+
+import java.io.IOException;
 
 public class FunctionsTest {
   public static final Function<String, Integer> length = new Function<String, Integer>() {

@@ -23,7 +23,6 @@ package org.opencastproject.execute.impl;
 
 import org.opencastproject.execute.api.ExecuteException;
 import org.opencastproject.execute.api.ExecuteService;
-import org.opencastproject.execute.impl.ExecuteServiceImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;

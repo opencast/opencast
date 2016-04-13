@@ -22,12 +22,13 @@
 package org.opencastproject.metadata.dublincore;
 
 import org.opencastproject.util.IoSupport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

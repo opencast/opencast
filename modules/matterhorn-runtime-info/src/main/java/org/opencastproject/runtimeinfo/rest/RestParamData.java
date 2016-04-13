@@ -34,7 +34,7 @@ import java.util.Map;
  * Represents a single parameter for an endpoint.
  */
 public final class RestParamData {
-  public static enum Type {
+  public enum Type {
     BOOLEAN, FILE, STRING, TEXT, INTEGER
   };
 

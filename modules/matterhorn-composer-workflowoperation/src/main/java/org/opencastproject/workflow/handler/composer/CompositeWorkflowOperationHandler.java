@@ -331,7 +331,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
 
     private MediaPackageElementFlavor targetFlavor = null;
 
-    public CompositeSettings(MediaPackage mediaPackage, WorkflowOperationInstance operation)
+    CompositeSettings(MediaPackage mediaPackage, WorkflowOperationInstance operation)
             throws WorkflowOperationException {
       // Check which tags have been configured
       sourceTagsUpper = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS_UPPER));

@@ -30,11 +30,11 @@ import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.MimeTypes;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import java.net.URI;
+
+import junit.framework.Assert;
 
 public class TrackSupportTest {
   @Test

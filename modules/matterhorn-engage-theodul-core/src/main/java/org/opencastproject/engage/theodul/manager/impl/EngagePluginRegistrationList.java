@@ -21,14 +21,16 @@
 
 package org.opencastproject.engage.theodul.manager.impl;
 
+import org.opencastproject.engage.theodul.api.EngagePluginRegistration;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.opencastproject.engage.theodul.api.EngagePluginRegistration;
 
 /**
  * An JAX-B annotated class that wraps around a list of

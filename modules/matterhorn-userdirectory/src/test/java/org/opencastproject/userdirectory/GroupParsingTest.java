@@ -28,11 +28,11 @@ import org.opencastproject.security.api.JaxbGroup;
 import org.opencastproject.security.api.JaxbRole;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameAndTextQualifier;
 import org.custommonkey.xmlunit.XMLAssert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.StringWriter;
 import java.util.HashSet;

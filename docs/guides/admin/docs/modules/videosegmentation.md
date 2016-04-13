@@ -23,7 +23,7 @@ Configuration
 -------------
 
 The value for the frame difference as well as the minimum length for a segment can be configured in
-`etc/services/org.opencastproject.videosegmenter.ffmpeg.VideoSegmenterServiceImpl.properties`.
+`etc/org.opencastproject.videosegmenter.ffmpeg.VideoSegmenterServiceImpl.cfg`.
 
 The two options that can be set are the minimum length of a segment (defaults to 5 sec).
 

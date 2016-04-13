@@ -59,7 +59,7 @@ public interface VideoStream extends Stream {
 
   String getEncoderLibraryVendor();
 
-  public static class Adapter extends XmlAdapter<VideoStreamImpl, Stream> {
+  class Adapter extends XmlAdapter<VideoStreamImpl, Stream> {
     @Override
     public VideoStreamImpl marshal(Stream v) throws Exception {
       return (VideoStreamImpl) v;

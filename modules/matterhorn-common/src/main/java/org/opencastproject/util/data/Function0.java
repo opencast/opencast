@@ -22,9 +22,9 @@
 
 package org.opencastproject.util.data;
 
-import org.opencastproject.util.data.functions.Functions;
-
 import static org.opencastproject.util.data.functions.Misc.chuck;
+
+import org.opencastproject.util.data.functions.Functions;
 
 /**
  * Function of arity 0, i.e. a constant function.

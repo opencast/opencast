@@ -21,21 +21,23 @@
 
 package org.opencastproject.util.persistence;
 
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
-import org.osgi.service.component.ComponentContext;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.spi.PersistenceProvider;
-import java.util.Map;
-
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.opencastproject.util.persistence.PersistenceUtil.createEntityManager;
 import static org.opencastproject.util.persistence.PersistenceUtil.newEntityManagerFactory;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
+
+import org.osgi.service.component.ComponentContext;
+
+import java.util.Map;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.spi.PersistenceProvider;
 
 /** Persistence environment factory. */
 public final class PersistenceEnvs {

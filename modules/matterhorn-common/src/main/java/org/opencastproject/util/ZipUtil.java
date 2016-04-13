@@ -21,12 +21,6 @@
 
 package org.opencastproject.util;
 
-import de.schlichtherle.io.ArchiveDetector;
-import de.schlichtherle.io.ArchiveException;
-import de.schlichtherle.io.ArchiveWarningException;
-import de.schlichtherle.io.DefaultArchiveDetector;
-import de.schlichtherle.io.File;
-import de.schlichtherle.io.archive.zip.ZipDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +28,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Vector;
 import java.util.zip.Deflater;
+
+import de.schlichtherle.io.ArchiveDetector;
+import de.schlichtherle.io.ArchiveException;
+import de.schlichtherle.io.ArchiveWarningException;
+import de.schlichtherle.io.DefaultArchiveDetector;
+import de.schlichtherle.io.File;
+import de.schlichtherle.io.archive.zip.ZipDriver;
 
 /*
  * WARNING:

@@ -43,7 +43,7 @@ import java.util.List;
  */
 public interface ParticipationManagementDatabase {
 
-  public enum SortType {
+  enum SortType {
     DATE, DATE_DESC, SENDER, SENDER_DESC
   }
 

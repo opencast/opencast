@@ -23,11 +23,11 @@ package org.opencastproject.util.data.functions;
 
 import static org.opencastproject.util.EqualsUtil.eq;
 
-import java.util.List;
-
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
+
+import java.util.List;
 
 /** Various functions not directly bound to any type. */
 public final class Misc {

@@ -21,21 +21,6 @@
 
 package org.opencastproject.workflow.handler.videoeditor;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.xml.bind.JAXBException;
-import org.easymock.EasyMock;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -60,7 +45,25 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.easymock.EasyMock;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.bind.JAXBException;
 
 /**
  * Test class for {@link SilenceDetectionWorkflowOperationHandler}
@@ -94,6 +97,7 @@ public class SilenceDetectionWorkflowOperationHandlerTest {
     workspaceMock = EasyMock.createNiceMock(Workspace.class);
     // setup SilenceDetectionWorkflowOperationHandler
     silenceDetectionOperationHandler = new SilenceDetectionWorkflowOperationHandler();
+    silenceDetectionOperationHandler.setJobBarrierPollingInterval(0);
     silenceDetectionOperationHandler.setDetectionService(silenceDetectionServiceMock);
     silenceDetectionOperationHandler.setSmilService(smilService);
     silenceDetectionOperationHandler.setWorkspace(workspaceMock);

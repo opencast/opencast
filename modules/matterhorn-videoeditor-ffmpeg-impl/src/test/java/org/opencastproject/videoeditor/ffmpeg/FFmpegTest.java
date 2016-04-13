@@ -25,8 +25,6 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.StreamHelper;
 import org.opencastproject.videoeditor.impl.VideoClip;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+
+import junit.framework.Assert;
 
 /**
  * Tests the ffmpeg concatenation service

@@ -21,8 +21,9 @@
 
 package org.opencastproject.util.persistence;
 
-import javax.persistence.spi.PersistenceProvider;
 import java.util.Map;
+
+import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Definition of a contract for the use of a {@link PersistenceEnv} in an OSGi environment.

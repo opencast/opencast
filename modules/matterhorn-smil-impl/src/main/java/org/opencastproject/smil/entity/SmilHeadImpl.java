@@ -21,17 +21,19 @@
 
 package org.opencastproject.smil.entity;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlRootElement;
 import org.opencastproject.smil.entity.api.SmilHead;
 import org.opencastproject.smil.entity.api.SmilMeta;
 import org.opencastproject.smil.entity.api.SmilObject;
 import org.opencastproject.smil.entity.media.param.SmilMediaParamGroupImpl;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * {@link SmilHead} implementation.

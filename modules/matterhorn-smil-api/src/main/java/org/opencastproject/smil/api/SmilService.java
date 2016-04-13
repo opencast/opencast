@@ -21,10 +21,11 @@
 
 package org.opencastproject.smil.api;
 
-import java.io.File;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.smil.entity.api.Smil;
+
+import java.io.File;
 
 /**
  * {@link SmilService} provides {@link Smil} manipulation.

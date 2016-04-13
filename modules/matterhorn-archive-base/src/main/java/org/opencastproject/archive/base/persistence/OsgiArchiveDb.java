@@ -24,12 +24,14 @@ package org.opencastproject.archive.base.persistence;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.persistence.PersistenceEnv;
 import org.opencastproject.util.persistence.PersistenceUtil;
+
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.spi.PersistenceProvider;
 import java.util.Map;
+
+import javax.persistence.spi.PersistenceProvider;
 
 /** Implements {@link ArchiveDb}. Defines permanent storage for series. */
 public class OsgiArchiveDb extends AbstractArchiveDb {

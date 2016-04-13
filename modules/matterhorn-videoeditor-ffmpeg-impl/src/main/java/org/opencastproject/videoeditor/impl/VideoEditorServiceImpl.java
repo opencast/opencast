@@ -97,7 +97,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
   private static final String COLLECTION_ID = "videoeditor";
   private static final String SINK_FLAVOR_SUBTYPE = "trimmed";
 
-  private static enum Operation {
+  private enum Operation {
     PROCESS_SMIL
   }
 

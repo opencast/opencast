@@ -21,6 +21,10 @@
 
 package org.opencastproject.archive.base.persistence;
 
+import static org.opencastproject.util.data.Tuple.tuple;
+import static org.opencastproject.util.persistence.PersistenceUtil.runSingleResultQuery;
+import static org.opencastproject.util.persistence.PersistenceUtil.runUpdate;
+
 import org.opencastproject.archive.api.Version;
 import org.opencastproject.util.data.Option;
 
@@ -31,10 +35,6 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-
-import static org.opencastproject.util.data.Tuple.tuple;
-import static org.opencastproject.util.persistence.PersistenceUtil.runSingleResultQuery;
-import static org.opencastproject.util.persistence.PersistenceUtil.runUpdate;
 
 /** Supports the determination of the next free version identifier. */
 @Entity(name = "VersionClaim")

@@ -28,6 +28,7 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
 import com.entwinemedia.fn.data.Opt;
+
 import org.joda.time.Duration;
 import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.ISOPeriodFormat;

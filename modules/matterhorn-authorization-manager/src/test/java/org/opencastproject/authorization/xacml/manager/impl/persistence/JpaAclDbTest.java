@@ -21,7 +21,14 @@
 
 package org.opencastproject.authorization.xacml.manager.impl.persistence;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.security.api.AccessControlUtil.acl;
+import static org.opencastproject.security.api.AccessControlUtil.entries;
+import static org.opencastproject.security.api.AccessControlUtil.entry;
+import static org.opencastproject.util.data.Tuple.tuple;
+
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
 import org.opencastproject.security.api.AccessControlList;
@@ -31,13 +38,7 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.persistence.PersistenceUtil;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.opencastproject.security.api.AccessControlUtil.acl;
-import static org.opencastproject.security.api.AccessControlUtil.entries;
-import static org.opencastproject.security.api.AccessControlUtil.entry;
-import static org.opencastproject.util.data.Tuple.tuple;
+import org.junit.Test;
 
 /** Tests for {@link JpaAclDb}. */
 public final class JpaAclDbTest {

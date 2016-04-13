@@ -25,6 +25,7 @@ import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+
 import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.fun.juc.Mutables;
 import org.opencastproject.job.api.Incident;

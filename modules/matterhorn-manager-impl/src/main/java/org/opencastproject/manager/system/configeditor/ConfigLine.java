@@ -82,7 +82,7 @@ public class ConfigLine {
       this.isProperty = false;
 
       // comment uncommented text
-      if (!this.line.equals("") && !this.line.startsWith("#")) {
+      if (!"".equals(this.line) && !this.line.startsWith("#")) {
 
         this.line = "#".concat(this.line);
 

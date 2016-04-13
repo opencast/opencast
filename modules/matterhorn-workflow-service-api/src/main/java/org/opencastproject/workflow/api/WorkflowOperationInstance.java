@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlJavaTypeAdapter(WorkflowOperationInstanceImpl.Adapter.class)
 public interface WorkflowOperationInstance extends Configurable {
-  public enum OperationState {
+  enum OperationState {
     INSTANTIATED, RUNNING, PAUSED, SUCCEEDED, FAILED, SKIPPED, RETRY
   }
 

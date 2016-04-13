@@ -21,20 +21,23 @@
 
 package org.opencastproject.smil.impl;
 
-import javax.xml.bind.JAXBException;
-import org.junit.Test;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.entity.SmilImpl;
 import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.api.SmilObject;
+
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.xml.bind.JAXBException;
 
 public class SmilResponseImplTest {
 

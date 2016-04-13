@@ -24,6 +24,7 @@ package org.opencastproject.oaipmh.harvester;
 
 import org.opencastproject.oaipmh.Granularity;
 import org.opencastproject.oaipmh.OaiPmhUtil;
+
 import org.w3c.dom.Document;
 
 /**

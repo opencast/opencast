@@ -29,9 +29,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.util.data.Collections;
+
 import com.entwinemedia.fn.data.Iterators;
 import com.entwinemedia.fn.data.ListBuilders;
-import org.opencastproject.util.data.Collections;
 
 import org.junit.Test;
 

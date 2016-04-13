@@ -368,7 +368,7 @@ public final class JaxbUser implements User {
    */
   @Override
   public String toString() {
-    return new StringBuilder(userName).append(":").append(organization).append(":").append(provider).toString();
+    return String.format("%s:%s:%s", userName, organization, provider);
   }
 
   @Override

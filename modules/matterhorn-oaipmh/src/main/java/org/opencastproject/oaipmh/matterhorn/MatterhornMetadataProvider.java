@@ -28,6 +28,7 @@ import org.opencastproject.oaipmh.server.MetadataProvider;
 import org.opencastproject.oaipmh.server.OaiPmhRepository;
 import org.opencastproject.oaipmh.util.XmlGen;
 import org.opencastproject.search.api.SearchResultItem;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

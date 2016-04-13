@@ -11,7 +11,7 @@
     <property name="severity" value="error" />
   </module>
 
-  <!-- Allow Java code to supress checkstyle audits via CHECKSTYLE:OFF and CHECKSTYLE:ON comments -->
+  <!-- Allow Java code to suppress checkstyle audits via CHECKSTYLE:OFF and CHECKSTYLE:ON comments -->
   <module name="SuppressionCommentFilter"/>
 
   <!-- Checks whether spaces are used as opposed to tabs                    -->
@@ -20,32 +20,14 @@
 
   <!-- Checks whether files end with a new line.                        -->
   <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
-  <!--
   <module name="NewlineAtEndOfFile">
+    <property name="lineSeparator" value="lf"/>
     <property name="severity" value="error" />
   </module>
-  -->
 
   <!-- Checks that property files contain the same keys.         -->
   <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
   <module name="Translation" />
-
-  <!-- Checks that property files contain the same keys.         -->
-  <!-- See http://checkstyle.sf.net/config_duplicates.html -->
-  <!--
-  <module name="StrictDuplicateCode">
-    <property name="min" value="30" />
-    <property name="severity" value="error" />
-  </module>
-  -->
-
-  <!-- Checks for Size Violations.                    -->
-  <!-- See http://checkstyle.sf.net/config_sizes.html -->
-  <!--
-  <module name="FileLength">
-    <property name="severity" value="warning" />
-  </module>
-  -->
 
   <module name="TreeWalker">
     <property name="cacheFile" value="${checkstyle.cache.file}" />
@@ -55,11 +37,6 @@
 
     <!-- Checks for Naming Conventions.                  -->
     <!-- See http://checkstyle.sf.net/config_naming.html -->
-    <!--
-    <module name="ConstantName">
-      <property name="severity" value="error" />
-    </module>
-    -->
     <module name="LocalFinalVariableName">
       <property name="severity" value="error" />
     </module>
@@ -86,7 +63,7 @@
     </module>
 
     <!-- Checks for imports                              -->
-    <!-- See http://checkstyle.sf.net/config_import.html -->
+    <!-- See http://checkstyle.sf.net/config_imports.html -->
     <module name="AvoidStarImport">
       <property name="severity" value="error" />
     </module>
@@ -97,25 +74,13 @@
     <module name="UnusedImports">
       <property name="severity" value="error" />
     </module>
-
-    <!-- Checks for Size Violations.                    -->
-    <!-- See http://checkstyle.sf.net/config_sizes.html -->
-    <!--
-    <module name="LineLength">
-      <property name="max" value="120" />
-      <property name="severity" value="error" />
+    <module name="ImportOrder">
+      <property name="groups" value="org.opencastproject,com,net,org,java,javax"/>
+      <property name="ordered" value="true"/>
+      <property name="separated" value="true"/>
+      <property name="option" value="top"/>
+      <property name="sortStaticImportsAlphabetically" value="true"/>
     </module>
-    -->
-    <!--
-    <module name="MethodLength">
-      <property name="severity" value="error" />
-    </module>
-    -->
-    <!--
-    <module name="ParameterNumber">
-      <property name="severity" value="error" />
-    </module>
-    -->
 
     <!-- Checks for whitespace                               -->
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
@@ -125,14 +90,6 @@
     <module name="MethodParamPad">
       <property name="severity" value="error" />
     </module>
-    <!--
-    <module name="NoWhitespaceAfter">
-      <property name="severity" value="error" />
-    </module>
-    <module name="NoWhitespaceBefore">
-      <property name="severity" value="error" />
-    </module>
-    -->
     <module name="OperatorWrap">
       <property name="severity" value="error" />
     </module>
@@ -142,11 +99,6 @@
     <module name="TypecastParenPad">
       <property name="severity" value="error" />
     </module>
-    <!--
-    <module name="WhitespaceAfter">
-      <property name="severity" value="error" />
-    </module>
-    -->
     <module name="WhitespaceAround">
       <property name="tokens"
         value="ASSIGN, BAND, BAND_ASSIGN, BOR, BOR_ASSIGN, BSR, BSR_ASSIGN, BXOR, BXOR_ASSIGN, COLON, DIV, DIV_ASSIGN, EQUAL, GE, GT, LAND, LCURLY, LE, LITERAL_ASSERT, LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF, LITERAL_RETURN, LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, LOR, LT, MINUS, MINUS_ASSIGN, MOD, MOD_ASSIGN, NOT_EQUAL, PLUS, PLUS_ASSIGN, QUESTION, SL, SLIST, SL_ASSIGN, SR, SR_ASSIGN, STAR, STAR_ASSIGN, TYPE_EXTENSION_AND" />
@@ -162,33 +114,8 @@
       <property name="severity" value="error" />
     </module>
 
-    <!-- Checks for blocks. You know, those {}'s         -->
-    <!-- See http://checkstyle.sf.net/config_blocks.html -->
-    <!--
-    <module name="AvoidNestedBlocks">
-      <property name="severity" value="error" />
-    </module>
-    <module name="EmptyBlock">
-      <property name="severity" value="error" />
-    </module>
-    <module name="LeftCurly">
-      <property name="severity" value="error" />
-    </module>
-    <module name="NeedBraces">
-      <property name="severity" value="error" />
-    </module>
-    <module name="RightCurly">
-      <property name="severity" value="error" />
-    </module>
-    -->
-
     <!-- Checks for common coding problems               -->
     <!-- See http://checkstyle.sf.net/config_coding.html -->
-    <!--
-    <module name="AvoidInlineConditionals">
-      <property name="severity" value="error" />
-    </module>
-    -->
     <module name="EmptyStatement">
       <property name="severity" value="error" />
     </module>
@@ -204,11 +131,6 @@
     <module name="InnerAssignment">
       <property name="severity" value="error" />
     </module>
-    <!--
-    <module name="MagicNumber">
-      <property name="severity" value="error" />
-    </module>
-    -->
     <module name="MissingSwitchDefault">
       <property name="severity" value="error" />
     </module>
@@ -227,23 +149,7 @@
     <module name="SuperFinalize">
       <property name="severity" value="error" />
     </module>
-    <!--
-    <module name="RedundantThrows">
-      <property name="allowUnchecked" value="true"/>
-      <property name="severity" value="error" />
-    </module>
-    <module name="IllegalCatch">
-      <property name="severity" value="error" />
-      <property name="illegalClassNames" value="java.lang.RuntimeException" />
-    </module>
-    <module name="IllegalThrows">
-      <property name="severity" value="error" />
-    </module>
-    -->
     <module name="PackageDeclaration">
-      <property name="severity" value="error" />
-    </module>
-    <module name="JUnitTestCase">
       <property name="severity" value="error" />
     </module>
     <module name="DefaultComesLast">
@@ -276,11 +182,6 @@
     <module name="HideUtilityClassConstructor">
       <property name="severity" value="error" />
     </module>
-    <!--
-    <module name="InterfaceIsType">
-      <property name="severity" value="error" />
-    </module>
-    -->
     <module name="VisibilityModifier">
       <property name="protectedAllowed" value="true"/>
       <property name="severity" value="error" />
@@ -288,35 +189,10 @@
 
     <!-- Checks for metrics                               -->
     <!-- See http://checkstyle.sf.net/config_metrics.html -->
-    <!--
-    <module name="ClassFanOutComplexity">
-      <property name="severity" value="error" />
-    </module>
-    -->
-    <!--
-    <module name="CyclomaticComplexity">
-      <property name="severity" value="error" />
-    </module>
-    -->
-    <!--
-    <module name="ClassDataAbstractionCoupling">
-      <property name="severity" value="error" />
-    </module>
-    -->
     <module name="BooleanExpressionComplexity">
       <property name="max" value="10" />
       <property name="severity" value="error" />
     </module>
-    <!--
-    <module name="NPathComplexity">
-      <property name="severity" value="error" />
-    </module>
-    -->
-    <!--
-    <module name="JavaNCSS">
-      <property name="severity" value="error" />
-    </module>
-    -->
 
     <!-- Miscellaneous other checks.                   -->
     <!-- See http://checkstyle.sf.net/config_misc.html -->
@@ -334,12 +210,6 @@
       <property name="severity" value="error" />
     </module>
 
-  </module>
-
-  <!-- Check for newline character at eof -->
-  <module name="NewlineAtEndOfFile">
-    <property name="lineSeparator" value="lf"/>
-    <property name="severity" value="error" />
   </module>
 
 </module>

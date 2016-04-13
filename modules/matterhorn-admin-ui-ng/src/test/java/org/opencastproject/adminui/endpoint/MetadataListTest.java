@@ -37,14 +37,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.osgi.service.component.ComponentException;
 
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
 import javax.ws.rs.WebApplicationException;
+
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class MetadataListTest {
   private CommonEventCatalogUIAdapter episodeDublinCoreCatalogUIAdapter;

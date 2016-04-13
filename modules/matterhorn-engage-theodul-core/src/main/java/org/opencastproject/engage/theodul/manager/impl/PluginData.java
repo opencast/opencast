@@ -22,6 +22,7 @@
 package org.opencastproject.engage.theodul.manager.impl;
 
 import org.opencastproject.engage.theodul.api.EngagePlugin;
+
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 

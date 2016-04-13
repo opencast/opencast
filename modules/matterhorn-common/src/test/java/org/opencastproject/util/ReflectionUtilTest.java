@@ -21,10 +21,10 @@
 
 package org.opencastproject.util;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.ReflectionUtil.run;
+
+import org.junit.Test;
 
 public class ReflectionUtilTest {
   @Test

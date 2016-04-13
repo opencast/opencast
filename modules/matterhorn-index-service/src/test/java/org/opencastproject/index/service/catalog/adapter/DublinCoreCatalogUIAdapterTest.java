@@ -64,8 +64,6 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -79,6 +77,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
+
+import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class DublinCoreCatalogUIAdapterTest {
   private static final Logger logger = LoggerFactory.getLogger(DublinCoreCatalogUIAdapterTest.class);

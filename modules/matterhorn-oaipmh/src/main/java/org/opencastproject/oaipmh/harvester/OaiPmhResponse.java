@@ -22,7 +22,11 @@
 
 package org.opencastproject.oaipmh.harvester;
 
+import static org.apache.commons.lang3.StringUtils.trimToNull;
+import static org.opencastproject.util.data.Option.option;
+
 import org.opencastproject.util.data.Option;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -31,9 +35,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
-import static org.apache.commons.lang3.StringUtils.trimToNull;
-import static org.opencastproject.util.data.Option.option;
 
 /**
  * Base class for all OAI-PMH responses.

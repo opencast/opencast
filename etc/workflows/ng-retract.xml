@@ -4,6 +4,7 @@
   <title>Retract</title>
   <tags>
     <tag>archive-ng</tag>
+    <tag>delete-ng</tag>
   </tags>
   <description>Retract a recording</description>
   <configuration_panel>

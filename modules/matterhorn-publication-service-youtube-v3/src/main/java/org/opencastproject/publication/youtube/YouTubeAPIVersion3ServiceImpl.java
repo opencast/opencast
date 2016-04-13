@@ -21,6 +21,11 @@
 
 package org.opencastproject.publication.youtube;
 
+import org.opencastproject.publication.youtube.auth.ClientCredentials;
+import org.opencastproject.publication.youtube.auth.OAuth2CredentialFactory;
+import org.opencastproject.publication.youtube.auth.OAuth2CredentialFactoryImpl;
+import org.opencastproject.util.data.Collections;
+
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.http.InputStreamContent;
@@ -41,11 +46,8 @@ import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoListResponse;
 import com.google.api.services.youtube.model.VideoSnippet;
 import com.google.api.services.youtube.model.VideoStatus;
+
 import org.apache.commons.lang3.ArrayUtils;
-import org.opencastproject.publication.youtube.auth.ClientCredentials;
-import org.opencastproject.publication.youtube.auth.OAuth2CredentialFactory;
-import org.opencastproject.publication.youtube.auth.OAuth2CredentialFactoryImpl;
-import org.opencastproject.util.data.Collections;
 
 import java.io.BufferedInputStream;
 import java.io.File;

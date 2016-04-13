@@ -21,12 +21,14 @@
 
 package org.opencastproject.smil.entity;
 
-import java.util.List;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlID;
 import org.opencastproject.mediapackage.identifier.IdBuilder;
 import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
 import org.opencastproject.smil.entity.api.SmilObject;
+
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlID;
 
 /**
  * Implementation of {@link SmilObject}.

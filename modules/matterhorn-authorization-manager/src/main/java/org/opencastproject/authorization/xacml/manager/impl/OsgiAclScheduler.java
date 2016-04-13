@@ -21,14 +21,15 @@
 
 package org.opencastproject.authorization.xacml.manager.impl;
 
+import static org.opencastproject.security.util.SecurityUtil.createSystemUser;
+
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityContext;
-import org.osgi.service.component.ComponentContext;
 
-import static org.opencastproject.security.util.SecurityUtil.createSystemUser;
+import org.osgi.service.component.ComponentContext;
 
 /** OSGi implementation of {@link AbstractAclScheduler}. */
 public class OsgiAclScheduler extends AbstractAclScheduler {

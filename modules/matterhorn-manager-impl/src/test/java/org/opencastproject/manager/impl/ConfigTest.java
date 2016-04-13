@@ -21,18 +21,18 @@
 
 package org.opencastproject.manager.impl;
 
+import org.opencastproject.manager.system.configeditor.Config;
+
+import org.json.JSONException;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.net.URL;
 
 import junit.framework.Assert;
-
-import org.json.JSONException;
-import org.junit.Test;
-import org.opencastproject.manager.system.configeditor.Config;
-
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 
 

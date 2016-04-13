@@ -73,7 +73,7 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
 
   private float jobload = DEFAULT_JOB_LOAD;
 
-  private static enum Operation {
+  private enum Operation {
 
     SILENCE_DETECTION
   }

@@ -17,7 +17,7 @@ Reviewing Rules
  - To assign yourself as a reviewer, add a comment to the BitBucket pull request like “`I will //review// this`”. The
    use of `//review//` will make the [pull request filter](http://pullrequests.opencast.org) pick up the author of this
    comment as reviewer.
- - Pull requests for bug fixes (t/MH-XXXXX-...) may be reviewed and merged out of order.
+ - Pull requests for bug fixes or documentation may be reviewed and merged out of order.
  - Feature pull requests have to be merged in order unless their contributor or reviewer decide to temporarily skip it.
    Such a decision has to be justified by the existence of unresolved issues in that particular pull request.
  - There is a so-called “merge ticket” in Jira for `develop` and for each release branch. Committers must not merge code

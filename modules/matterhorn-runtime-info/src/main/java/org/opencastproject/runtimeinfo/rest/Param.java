@@ -35,7 +35,7 @@ import java.util.Vector;
  */
 @Deprecated
 public final class Param {
-  public static enum Type {
+  public enum Type {
     TEXT, STRING, BOOLEAN, FILE, ENUM
   };
 

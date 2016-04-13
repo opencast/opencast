@@ -21,15 +21,15 @@
 
 package org.opencastproject.archive.base;
 
+import static org.opencastproject.util.ReflectionUtil.bcall;
+import static org.opencastproject.util.ReflectionUtil.call;
+import static org.opencastproject.util.ReflectionUtil.xfer;
+
 import org.opencastproject.archive.api.Query;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
 import java.util.Date;
-
-import static org.opencastproject.util.ReflectionUtil.bcall;
-import static org.opencastproject.util.ReflectionUtil.call;
-import static org.opencastproject.util.ReflectionUtil.xfer;
 
 /** Mutable builder for {@link org.opencastproject.archive.api.Query}s. */
 public final class QueryBuilder extends QueryBuilderBase<QueryBuilder> {

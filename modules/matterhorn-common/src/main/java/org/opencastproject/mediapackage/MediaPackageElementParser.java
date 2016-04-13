@@ -26,6 +26,7 @@ import static org.apache.commons.io.IOUtils.toInputStream;
 import org.opencastproject.util.data.Function;
 
 import org.xml.sax.InputSource;
+
 import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;

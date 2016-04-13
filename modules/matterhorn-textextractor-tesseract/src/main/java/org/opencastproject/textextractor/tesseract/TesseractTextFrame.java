@@ -24,11 +24,11 @@ package org.opencastproject.textextractor.tesseract;
 import org.opencastproject.textextractor.api.TextFrame;
 import org.opencastproject.textextractor.api.TextLine;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 /**
  * This class represents a tesseract output frame that holds a number of lines found on an image. Note that Tesseract

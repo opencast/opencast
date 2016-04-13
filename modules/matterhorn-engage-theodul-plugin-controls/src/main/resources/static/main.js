@@ -34,8 +34,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var PLUGIN_TEMPLATE_MOBILE = "templates/mobile.html";
     var PLUGIN_STYLES_DESKTOP = [
         Engage.controls_top ? "styles/desktop_top.css" : "styles/desktop_bottom.css",
-        "lib/bootstrap/css/bootstrap.css",
-        "lib/jqueryui/themes/base/jquery-ui.css"
+        "lib/bootstrap/css/bootstrap.min.css",
+        "lib/jqueryui/jquery-ui.min.css"
     ];
     var PLUGIN_STYLES_EMBED = [
         "styles/embed.css"
@@ -488,8 +488,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                     flash: usingFlash
                 };
 
-                // compile template and load it
-                this.$el.html(_.template(this.template, tempVars));
+                // compile template and load into the html
+                var template = _.template(this.template);
+                this.$el.html(template(tempVars));
+
                 if (isDesktopMode) {
                     initControlsEvents();
                     if (aspectRatioTriggered) {
@@ -556,7 +558,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 };
 
                 // compile template and load into the html
-                this.$el.html(_.template(this.template, tempVars));
+                var template = _.template(this.template);
+                this.$el.html(template(tempVars));
             }
         }
     });

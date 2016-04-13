@@ -21,19 +21,21 @@
 
 package org.opencastproject.publication.youtube.auth;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.util.store.DataStore;
-import org.json.simple.parser.ParseException;
-import org.junit.Test;
-import org.opencastproject.publication.youtube.UnitTestUtils;
-
-import java.io.File;
-import java.io.IOException;
-
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+
+import org.opencastproject.publication.youtube.UnitTestUtils;
+
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.util.store.DataStore;
+
+import org.json.simple.parser.ParseException;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
 
 public class GoogleAPICredentialRequestorTest {
 

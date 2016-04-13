@@ -21,12 +21,11 @@
 
 package org.opencastproject.archive.opencast;
 
-import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
-
 import static org.opencastproject.util.data.Collections.cons;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.functions.Booleans.ne;
 import static org.opencastproject.util.osgi.SimpleServicePublisher.ServiceReg.reg;
+import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
 
 import org.opencastproject.archive.api.Archive;
 import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
@@ -75,6 +74,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.List;
+
 import javax.management.ObjectInstance;
 import javax.persistence.EntityManagerFactory;
 

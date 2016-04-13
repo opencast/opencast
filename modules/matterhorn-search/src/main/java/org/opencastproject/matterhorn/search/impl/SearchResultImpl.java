@@ -27,7 +27,6 @@ import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -52,9 +51,6 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /** The time it took to do the search in ms */
   protected long time = 0;
-
-  /** Flag to indicate the sorted state */
-  protected boolean sorted = true;
 
   /** The search result */
   protected List<SearchResultItem<T>> result = null;
@@ -89,7 +85,6 @@ public class SearchResultImpl<T> implements SearchResult<T> {
     if (result == null)
       result = new ArrayList<SearchResultItem<T>>();
     result.add(item);
-    sorted = false;
   }
 
   /**
@@ -101,10 +96,6 @@ public class SearchResultImpl<T> implements SearchResult<T> {
   public SearchResultItem<T>[] getItems() {
     if (result == null)
       return new SearchResultItem[] {};
-    if (!sorted) {
-      Collections.sort(result);
-      sorted = true;
-    }
     return result.toArray(new SearchResultItem[result.size()]);
   }
 

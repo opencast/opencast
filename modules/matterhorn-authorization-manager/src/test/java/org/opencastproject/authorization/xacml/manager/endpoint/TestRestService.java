@@ -21,10 +21,9 @@
 
 package org.opencastproject.authorization.xacml.manager.endpoint;
 
-import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
-
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
+import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.archive.api.Archive;
 import org.opencastproject.archive.api.HttpMediaPackageElementProvider;

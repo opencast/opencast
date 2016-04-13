@@ -21,8 +21,9 @@
 
 package org.opencastproject.smil.entity.api;
 
-import java.util.List;
 import org.opencastproject.smil.entity.media.api.SmilMediaObject;
+
+import java.util.List;
 
 /**
  * Represent a SMIL body element.

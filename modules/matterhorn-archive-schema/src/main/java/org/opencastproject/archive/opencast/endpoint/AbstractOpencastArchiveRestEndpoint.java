@@ -21,6 +21,11 @@
 
 package org.opencastproject.archive.opencast.endpoint;
 
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
+
 import org.opencastproject.archive.api.Query;
 import org.opencastproject.archive.base.endpoint.ArchiveRestEndpointBase;
 import org.opencastproject.archive.opencast.JaxbResultSet;
@@ -36,8 +41,11 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DefaultValue;
@@ -48,12 +56,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Date;
-
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 /**
  * Opencast specific REST endpoint of the archive.

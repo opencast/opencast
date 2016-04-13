@@ -21,6 +21,15 @@
 
 package org.opencastproject.manager.impl;
 
+import org.opencastproject.manager.api.PluginManagerConstants;
+import org.opencastproject.manager.system.workflow.WorkflowManager;
+
+import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.xml.sax.SAXException;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,14 +48,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import junit.framework.Assert;
-
-import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.opencastproject.manager.api.PluginManagerConstants;
-import org.opencastproject.manager.system.workflow.WorkflowManager;
-import org.xml.sax.SAXException;
 
 /**
  * This class is for workflow's tests.

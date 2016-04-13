@@ -44,6 +44,7 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workflow.handler.inspection.InspectWorkflowOperationHandler;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
@@ -58,8 +59,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.opencastproject.workflow.handler.inspection.InspectWorkflowOperationHandler;
 
 public class ConcatWorkflowOperationHandlerTest {
   private ConcatWorkflowOperationHandler operationHandler;
@@ -113,6 +112,7 @@ public class ConcatWorkflowOperationHandlerTest {
 
     // set up service
     operationHandler = new ConcatWorkflowOperationHandler();
+    operationHandler.setJobBarrierPollingInterval(0);
     operationHandler.setWorkspace(workspace);
     operationHandler.setServiceRegistry(serviceRegistry);
   }
