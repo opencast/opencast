@@ -70,6 +70,8 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         seek: new Engage.Event("Video:seek", "seek video to a given position in seconds", "trigger"),
         seekLeft: new Engage.Event("Video:seekLeft", "", "trigger"),
         seekRight: new Engage.Event("Video:seekRight", "", "trigger"),
+        nextChapter: new Engage.Event("Video:nextChapter", "", "trigger"),
+        previousChapter: new Engage.Event("Video:previousChapter", "", "trigger"),
         customOKMessage: new Engage.Event("Notification:customOKMessage", "a custom message with an OK button", "trigger"),
         customSuccess: new Engage.Event("Notification:customSuccess", "a custom success message", "trigger"),
         customError: new Engage.Event("Notification:customError", "an error occurred", "trigger"),
@@ -813,10 +815,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             
             $("#" + id_forward_button).click(function() {
                 if (segments && (segments.length > 0)) {
-                    var seekTime = Utils.nextSegmentStart(segments, currentTime);
-                    if (!isNaN(seekTime)) {
-                        Engage.trigger(plugin.events.seek.getName(), seekTime / 1000);
-                    }
+                    Engage.trigger(plugin.events.nextChapter.getName());
                 } else {
                     Engage.trigger(plugin.events.seekRight.getName());
                 }
@@ -824,10 +823,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
 
             $("#" + id_backward_button).click(function() {
                 if (segments && (segments.length > 0)) {
-                    var seekTime = Utils.previousSegmentStart(segments, currentTime);
-                    if (!isNaN(seekTime)) {
-                        Engage.trigger(plugin.events.seek.getName(), seekTime / 1000);
-                    }
+                    Engage.trigger(plugin.events.previousChapter.getName());
                 } else {
                     Engage.trigger(plugin.events.seekLeft.getName());
                 }
@@ -1198,6 +1194,24 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                         $("#" + id_pipIndicator).html(translate("right", "right"));
                     }
                     pipPos = pos;
+                }
+            });
+
+            Engage.on(plugin.events.nextChapter.getName(), function () {
+                if (segments && (segments.length > 0)) {
+                    var seekTime = Utils.nextSegmentStart(segments, currentTime);
+                    if (!isNaN(seekTime)) {
+                        Engage.trigger(plugin.events.seek.getName(), seekTime / 1000);
+                    }
+                }
+            });
+
+            Engage.on(plugin.events.previousChapter.getName(), function () {
+                if (segments && (segments.length > 0)) {
+                    var seekTime = Utils.previousSegmentStart(segments, currentTime);
+                    if (!isNaN(seekTime)) {
+                        Engage.trigger(plugin.events.seek.getName(), seekTime / 1000);
+                    }
                 }
             });
 
