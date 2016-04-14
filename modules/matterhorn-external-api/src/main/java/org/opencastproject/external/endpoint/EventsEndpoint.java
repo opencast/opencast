@@ -1129,6 +1129,7 @@ public class EventsEndpoint implements ManagedService {
       for (Attachment attachment : publication.getAttachments()) {
         attachments.add(j(f("id", vN(attachment.getIdentifier())), f("mediatype", vN(attachment.getMimeType())),
                 f("url", vN(getMediaPackageElementUri(attachment, sign))), f("flavor", vN(attachment.getFlavor())),
+                f("ref", vN(attachment.getReference())),
                 f("size", v(attachment.getSize())), f("checksum", vN(attachment.getChecksum())),
                 f("tags", jsonArrayFromList(Arrays.<String> toList().apply(attachment.getTags())))));
       }
