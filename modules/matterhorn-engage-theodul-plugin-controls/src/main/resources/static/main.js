@@ -1279,6 +1279,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             });
         });
     }
-    
+
     return plugin;
 });
