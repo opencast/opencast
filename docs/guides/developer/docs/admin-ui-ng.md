@@ -1,4 +1,4 @@
-Modifying sources
+Modifying Sources
 -----------------
 
 When you make changes to the sources it should be sufficient to rebuild the
@@ -11,7 +11,7 @@ mvn install
 cp ./target/matterhorn-admin-ui-ng-2.2-SNAPSHOT.jar ../../build/opencast-dist-allinone-2.2-SNAPSHOT/system/org/opencastproject/matterhorn-admin-ui-ng/2.2-SNAPSHOT/matterhorn-admin-ui-ng-2.2-SNAPSHOT.jar
 ```
 
-*Note that in the Example above, the paths are for a specific Opencast version.
+*Note that in the example above, the paths are for a specific Opencast version.
 Your paths might look different.*
 
 Live working on the UI
@@ -25,8 +25,8 @@ Changes to the source will (after a page reload) directly reflect in browser.
 
 To set this up do the following:
 
-First off, you need [Grunt][1] and [NodeJS][2]. Either install in on your System or use
-the local version from the Opencast Module:
+First off, you need [Grunt][1] and [NodeJS][2]. Either install it on your System or use
+the local version from the Opencast module:
 ```bash
 cd modules/matterhorn-admin-ui-ng
 export PATH=$PATH:node:node_modules/grunt-cli/bin
