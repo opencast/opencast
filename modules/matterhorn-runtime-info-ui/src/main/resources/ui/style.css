@@ -236,7 +236,7 @@ a:hover {
 	padding: 0 0 16px 16px;
 }
 #bottombanner ul {
-	list-style-image:url(/admin/img/icons/bullet-arrow.png);
+	list-style-image:url(/img/icons/bullet-arrow.png);
 	padding: 0 0 16px 16px;
 	margin-bottom:0
 }
