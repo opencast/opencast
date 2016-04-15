@@ -3,7 +3,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
   <link rel="shortcut icon" href="img/favicon.ico" />
-    <title>Opencast 2.0</title>
+    <title>Opencast</title>
     <script type="text/javascript" src="js/jquery/jquery.js"></script>
     <script type="text/javascript">
     $(document).ready(function() {
@@ -92,15 +92,15 @@
 
 
                 if (data.consistent) {
-                  $message.html("Matterhorn is running with consistent bundles version.");
+                  $message.html("Opencast is running with consistent bundles version.");
                   $messageDiv.addClass("ok");
-                  
+
                   checkAndDisplay(data.version, $version);
                   checkAndDisplay(data.buildNumber, $buildNumber);
                 } else {
-                  $message.html("Matterhorn is running with inconsistent bundles version. Update the deprecated bundles to avoid loss or corruption of data.");
+                  $message.html("Opencast is running with inconsistent bundles version. Update the deprecated bundles to avoid loss or corruption of data.");
                   $buildNumber.addClass("error");
-                  
+
                   if (typeof data.versions !== "undefined") {
                       $.each(data.versions, function (index, element) {
                           if ($.inArray(element.version, versions)) {
@@ -131,7 +131,7 @@
   <body>
     <div id="wrapper">
       <div id="topbanner">
-        <div id="matterhornlogo"><img src="img/mh_logos/MatterhornLogo_large.png" alt="Matterhorn logo" height="180" class="matterhornlogo" /></div>
+        <div id="matterhornlogo"><img src="img/mh_logos/MatterhornLogo_large.png" alt="Opencast logo" height="180" class="matterhornlogo" /></div>
         <div id="opencastlogo"><a href="http://www.opencastproject.org"><img src="img/mh_logos/OpencastLogo.png" alt="Opencast" height="36" hspace="20" vspace="5" border="0" /></a></div>
         <h1>Opencast</h1>
         <div id="promotext">
