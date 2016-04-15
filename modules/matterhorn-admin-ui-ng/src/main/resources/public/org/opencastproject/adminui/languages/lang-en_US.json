@@ -55,7 +55,9 @@
        "CONFIRMATION" : "Confirmation required"
      }
    },
+   "MEDIAMODULE": "Media Module",
    "HELP":{
+     "HELP": "Help",
      "USERS_GUIDE": "User's Guide",
      "DOCUMENTATION": "Documentation",
      "REST_DOC": "REST API Docs"
