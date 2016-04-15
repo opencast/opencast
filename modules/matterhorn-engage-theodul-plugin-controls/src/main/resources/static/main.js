@@ -229,6 +229,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     var mediapackageChange = "change:mediaPackage";
     var event_slidestart = "slidestart";
     var event_slidestop = "slidestop";
+    var event_slide = "slide";
     var plugin_path = "";
     var plugin_path_topIfBottom = "";
     var initCount = 7;
@@ -842,8 +843,13 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 Engage.trigger(plugin.events.sliderMousemove.getName(), currPos * dur);
             });
             // volume event
-            $("#" + id_volume).on(event_slidestop, function(event, ui) {
+            $("#" + id_volume).on(event_slide, function(event, ui) {
                 Engage.trigger(plugin.events.volumeSet.getName(), ui.value / 100);
+                if (ui.value === 0) {
+                    showMuteButton();
+                } else {
+                    showUnmuteButton();
+                }
             });
             // check segments
             if (segments && (segments.length > 0)) {
@@ -936,20 +942,28 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
     }
 
     function mute() {
-        $("#" + id_unmute_button).hide();
-        $("#" + id_mute_button).show();
+        showMuteButton();
         Engage.trigger(plugin.events.volumeSet.getName(), 0);
     }
 
     function unmute() {
-        $("#" + id_unmute_button).show();
-        $("#" + id_mute_button).hide();
+        showUnmuteButton();
         var vol = Basil.get(storage_lastvolume);
         if (vol) {
             Engage.trigger(plugin.events.volumeSet.getName(), vol / 100);
         } else {
             Engage.trigger(plugin.events.volumeSet.getName(), 1);
         }
+    }
+    
+    function showUnmuteButton () {
+        $("#" + id_unmute_button).show();
+        $("#" + id_mute_button).hide();
+    }
+    
+    function showMuteButton () {
+        $("#" + id_unmute_button).hide();
+        $("#" + id_mute_button).show();
     }
 
     function timeUpdate() {
