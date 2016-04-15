@@ -34,16 +34,20 @@ function ($scope, NewEventProcessing, TaskResource, Notifications) {
     };
 
     onSuccess = function () {
+        $scope.submitButton = false;
         $scope.close();
         Notifications.add('success', 'TASK_CREATED');
     };
 
     onFailure = function () {
+        $scope.submitButton = false;
         $scope.close();
         Notifications.add('error', 'TASK_NOT_CREATED', 'global', -1);
     };
 
+    $scope.submitButton = false;
     $scope.submit = function () {
+        $scope.submitButton = true;
         var eventIds = [], payload;
         eventIds.push($scope.$parent.resourceId);
         payload = {

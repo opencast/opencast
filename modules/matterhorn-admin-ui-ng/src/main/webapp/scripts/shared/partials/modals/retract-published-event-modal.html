@@ -40,7 +40,7 @@
     </div><!-- modal-content -->
 
    <footer>
-        <a ng-click="submit()" ng-class="$valid ? 'active' : 'disabled'" class="submit" translate="SUBMIT">Submit</a>
+        <a ng-click="submit()" ng-class="($valid && !submitButton) ? 'active' : 'disabled'" class="submit" translate="SUBMIT">Submit</a>
         <a ng-click="close()" class="cancel" translate="CANCEL">Cancel</a>
     </footer>
 </section>
