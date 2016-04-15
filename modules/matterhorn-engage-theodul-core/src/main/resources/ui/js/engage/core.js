@@ -368,12 +368,14 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
           break;
         case shortcut_movePiP:
           Mousetrap.bind(val.key, function () {
-            if (pipPos === "left") {
-              pipPos = "right";
-            } else {
-              pipPos = "left";
+            if (pip) {
+                if (pipPos === "left") {
+                  pipPos = "right";
+                } else {
+                  pipPos = "left";
+                }
+                engageCore.trigger(events.movePiP.getName(), pipPos);
             }
-            engageCore.trigger(events.movePiP.getName(), pipPos);
           });
           break;
         case shortcut_togglePiP:

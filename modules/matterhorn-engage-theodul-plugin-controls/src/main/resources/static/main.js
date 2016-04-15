@@ -733,19 +733,30 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             Engage.trigger(plugin.events.unmute.getName());
         }
 
-        if (Basil.get(storage_pip_pos) !== undefined) {
+        if (Basil.get(storage_pip_pos) !== undefined && Basil.get(storage_pip_pos) !== null) {
             var pipPos = Basil.get(storage_pip_pos);
             Engage.trigger(plugin.events.movePiP.getName(), pipPos);
+        } else {
+            if (Engage.model.get("meInfo").get("layout") !== "off") {
+                var pipPos = Engage.model.get("meInfo").get("layout");
+                Engage.trigger(plugin.events.movePiP.getName(), pipPos);
+            }
         }
-        if (Basil.get(storage_pip) !== undefined) {
+        if (Basil.get(storage_pip) !== undefined && Basil.get(storage_pip) !== null) {
             var pip = Basil.get(storage_pip);
             if (pip === false) {
                 Engage.trigger(plugin.events.togglePiP.getName(), pip);
             }
+        } else {
+            if (Engage.model.get("meInfo").get("layout") !== "off") {
+                Engage.trigger(plugin.events.togglePiP.getName(), true);
+            }
         }
-        if (Basil.get(storage_focus_video) !== undefined) {
+        if (Basil.get(storage_focus_video) !== undefined && Basil.get(storage_focus_video) !== null) {
             var focusVideo = Basil.get(storage_focus_video);
             currentFocusFlavor = focusVideo;
+        } else {
+            currentFocusFlavor = Engage.model.get("meInfo").get("focusedflavor");
         }
     }
 
@@ -913,6 +924,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 enableFullscreenButton = true;
                 $("#" + id_fullscreen_button).removeClass("disabled");
             }
+            $("#" + id_pipIndicator).html(translate("off", "off"));
             Engage.trigger(plugin.events.movePiP.getName(), pipPos);
             Engage.trigger(plugin.events.togglePiP.getName(), pipStatus);
             if (videosInitialReadyness) {
@@ -1137,7 +1149,26 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             Engage.on(plugin.events.togglePiP.getName(), function(pip) {
                 if (pip !== undefined) {
                     Basil.set(storage_pip, pip);
-                    if (! pip) {
+                    pipStatus = pip;
+                    if (currentFocusFlavor !== "focus.none") {
+                        if (! pip) {
+                            $("#" + id_pipIndicator).html(translate("beside", "beside"));
+                        } else {
+                            if (pipPos === "left") {
+                                $("#" + id_pipIndicator).html(translate("left", "left"));
+                            } else {
+                                $("#" + id_pipIndicator).html(translate("right", "right"));
+                            }
+                        }
+                    }                    
+                }
+            });
+            Engage.on(plugin.events.focusVideo.getName(), function(flavor) {
+                if (flavor !== undefined && flavor !== null && flavor.indexOf("focus.") < 1) {
+                    Basil.set(storage_focus_video, flavor);
+                    var pip = Basil.get(storage_pip);
+                    currentFocusFlavor = flavor;
+                    if (pip === undefined || ! pip) {
                         $("#" + id_pipIndicator).html(translate("beside", "beside"));
                     } else {
                         if (pipPos === "left") {
@@ -1146,30 +1177,26 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                             $("#" + id_pipIndicator).html(translate("right", "right"));
                         }
                     }
-                    pipStatus = pip;
-                }
-            });
-            Engage.on(plugin.events.focusVideo.getName(), function(flavor) {
-                if (flavor !== undefined && flavor !== null && flavor.indexOf("focus.") < 1) {
-                    Basil.set(storage_focus_video, flavor);
-                    currentFocusFlavor = flavor;
                 }
             });
             Engage.on(plugin.events.resetLayout.getName(), function() {
                 Basil.set(storage_focus_video, "focus.none");
                 currentFocusFlavor = "focus.none";
+                $("#" + id_pipIndicator).html(translate("off", "off"));
             });
 
 
             Engage.on(plugin.events.movePiP.getName(), function(pos) {
                 if (pos !== undefined) {
                     Basil.set(storage_pip_pos, pos);
-                    if (pos === "left") {
-                        $("#" + id_pipIndicator).html(translate("left", "left"));
-                    } else {
-                        $("#" + id_pipIndicator).html(translate("right", "right"));
-                    }
                     pipPos = pos;
+                    if (currentFocusFlavor !== "focus.none") {
+                        if (pos === "left") {
+                            $("#" + id_pipIndicator).html(translate("left", "left"));
+                        } else {
+                            $("#" + id_pipIndicator).html(translate("right", "right"));
+                        }
+                    }
                 }
             });
 
@@ -1252,6 +1279,6 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             });
         });
     }
-
+    
     return plugin;
 });
