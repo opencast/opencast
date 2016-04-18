@@ -5,7 +5,7 @@ $(document).ready(function() {
     var playerEndpoint = "";
     var page = 1;
     var totalEntries = -1;
-    var bufferEntries = 15; // number of entries to load for one page.
+    var bufferEntries = 6; // number of entries to load for one page.
     var restData = "";
     var active = "episodes";
     var stack = new Array();
@@ -124,32 +124,33 @@ $(document).ready(function() {
         var loadSer = false;
         var loadEp = false;
 
-        var seriesPage      = GetURLParameter("serPage");
-        var serIdFromGet    = GetURLParameter("seriesId");
+        var seriesPage      = GetURLParameter("serPage"); // navbar -> loadSer
+        var serIdFromGet    = GetURLParameter("seriesId"); // only series with this id -> loadSer
         if(seriesPage != undefined || serIdFromGet != undefined) loadSer = true;
         seriesPage = seriesPage == undefined ? "1" : seriesPage;
         serIdFromGet = serIdFromGet == undefined ? "" : "id="+serIdFromGet+"&";
 
-        var episodePage     = GetURLParameter("epPage");
-        var epFromGet       = GetURLParameter("epFrom");
+        var episodePage     = GetURLParameter("epPage"); // navbar -> loadEp
+        var epFromGet       = GetURLParameter("epFrom"); // ep only from this serie -> loadEp
         if(episodePage != undefined || epFromGet != undefined) loadEp = true;
         episodePage = episodePage == undefined ? "1" : episodePage;
-        epFromGet = epFromGet == undefined ? "" : "ser="+epFromGet+"&";
+        epFromGet = epFromGet == undefined ? "" : "sid="+epFromGet+"&";
 
-        var searchQuery     = GetURLParameter("search");
-        searchQuery = searchQuery == undefined ? "" : searchQuery+"&";
+        var searchQuery     = GetURLParameter("q");
+        searchQuery = searchQuery == undefined ? "" : "q="+searchQuery+"&";
 
         var sort            = GetURLParameter("sort");
-        sort = sort == undefined ? "" : sort+"&";
+        sort = sort == undefined ? "" : "sort="+sort+"&";
 
         var retrievedObject = sessionStorage.getItem("historyStack");
 
         console.log("Got: ");
-        console.log(serIdFromGet);
-        console.log(seriesPage);
-        console.log(epFromGet);
-        console.log(episodePage);
-        console.log(searchQuery);
+        console.log("serIdFromGet " + serIdFromGet);
+        console.log("seriesPage " + seriesPage);
+        console.log("epFromGet " + epFromGet);
+        console.log("episodePage " + episodePage);
+        console.log("searchQuery " + searchQuery);
+        console.log("sort " + sort);
 
         if (retrievedObject != null) {
             //stack = JSON.parse(retrievedObject);
@@ -157,38 +158,14 @@ $(document).ready(function() {
         }
 
         if(loadEp || (!loadEp && !loadSer)) {
+            active = "episodes";
+            console.log("load ep with: " + searchQuery+sort+epFromGet);
             loadEpisodes(true, searchQuery+sort+epFromGet);
         } else if(loadSer) {
+            active = "series";
             loadSeries(true, searchQuery+sort+serIdFromGet);
         }
-        /*
-        if(serIdFromGet != undefined) {
-            // Load specific series
-            restData = "id="+serIdFromGet;
-            pushHistory(1, "series", restData);
-            $($navbarEpisodes).removeClass("active");
-            $($navbarSeries).addClass("active");
-            active = "series";
-            loadSeries(true);
-        } else if(epFromGet != undefined) {
-            // load specific episodes from param
-            restData = "sid="+epFromGet;
-            pushHistory(1, "episodes", restData);
-            $($navbarEpisodes).addClass("active");
-            $($navbarSeries).removeClass("active");
-            active = "episodes";
-            loadEpisodes(true);
-        }
 
-        if(epFromGet == undefined && serIdFromGet == undefined) {
-            // no param commited
-            pushHistory(1, "episodes", null);
-            $($navbarEpisodes).addClass("active");
-            $($navbarSeries).removeClass("active");
-            active = "episodes";
-            loadEpisodes(true);
-        }
-        */
         $($main_container).html(msg_html_loading);
         endlessScrolling();
     }
@@ -451,30 +428,12 @@ $(document).ready(function() {
         $($nav_switch_li).click(function(event) {
             $($nav_switch_li).removeClass("active");
             $(this).addClass("active");
-
             restData = "";
             $("input").val("");
-            /*
-            switch ($(this).attr("data-search")) {
-                case "episodes":
-                    active = "episodes";
-                    page = 1;
-                    pushHistory(1, "episodes", null);
-                    loadEpisodes(true);
-                    break;
-                case "series":
-                    active = "series";
-                    page = 1;
-                    pushHistory(1, "series", null);
-                    loadSeries(true);
-                    break;
-                default:
-                    break;
-            */
-            //$(".navbar-collapse").collapse('hide');
         });
 
         $($nav_switch_li).on("keypress", function(ev) {
+            console.log("second");
             if (ev.which == 13 || ev.which == 32) {
                 $($nav_switch_li).removeClass("active");
                 $(this).addClass("active");
@@ -486,13 +445,11 @@ $(document).ready(function() {
                     case "episodes":
                         active = "episodes";
                         page = 1;
-                        pushHistory(1, "episodes", null);
                         loadEpisodes(true);
                         break;
                     case "series":
                         active = "series";
                         page = 1;
-                        pushHistory(1, "series", null);
                         loadSeries(true);
                         break;
                     default:
@@ -519,10 +476,8 @@ $(document).ready(function() {
             };
 
             if (active == "series") {
-                pushHistory(page, "series", restData);
                 loadSeries(true);
             } else if (active == "episodes") {
-                pushHistory(page, "episodes", restData);
                 loadEpisodes(true);
             };
 
@@ -545,10 +500,8 @@ $(document).ready(function() {
                 };
 
                 if (active == "series") {
-                    pushHistory(page, "series", restData);
                     loadSeries(true);
                 } else if (active == "episodes") {
-                    pushHistory(page, "episodes", restData);
                     loadEpisodes(true);
                 };
             }
@@ -570,10 +523,8 @@ $(document).ready(function() {
             };
 
             if (active == "series") {
-                pushHistory(page, "series", restData);
                 loadSeries(true);
             } else if (active == "episodes") {
-                pushHistory(page, "episodes", restData);
                 loadEpisodes(true);
             };
         });
@@ -595,10 +546,8 @@ $(document).ready(function() {
                 };
 
                 if (active == "series") {
-                    pushHistory(page, "series", restData);
                     loadSeries(true);
                 } else if (active == "episodes") {
-                    pushHistory(page, "episodes", restData);
                     loadEpisodes(true);
                 };
             }
