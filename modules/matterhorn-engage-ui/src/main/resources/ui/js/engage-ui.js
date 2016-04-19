@@ -4,6 +4,7 @@ $(document).ready(function() {
     var mediaContainer = '<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">';
     var playerEndpoint = "";
     var page = 1;
+    var sort = "";
     var totalEntries = -1;
     var bufferEntries = 6; // number of entries to load for one page.
     var restData = "";
@@ -121,49 +122,39 @@ $(document).ready(function() {
         getInfo();
         registerHandler();
 
-        var loadSer = false;
-        var loadEp = false;
+        // load series or episodes
+        var loadSer = ( (GetURLParameter("s") == undefined) ||
+            (GetURLParameter("s") != 1) ) ? false : true;
 
-        var seriesPage      = GetURLParameter("serPage"); // navbar -> loadSer
-        var serIdFromGet    = GetURLParameter("seriesId"); // only series with this id -> loadSer
-        if(seriesPage != undefined || serIdFromGet != undefined) loadSer = true;
-        seriesPage = seriesPage == undefined ? "1" : seriesPage;
-        serIdFromGet = serIdFromGet == undefined ? "" : "id="+serIdFromGet+"&";
+        var loadEp = ( (GetURLParameter("e") == undefined) ||
+            (GetURLParameter("e") != 1) ) ? false : true;
 
-        var episodePage     = GetURLParameter("epPage"); // navbar -> loadEp
+        console.log("Load Series or Episodes: " + loadSer + "/" + loadEp);
+
+        // get page from url parameter
+        page = GetURLParameter("p") == undefined ? 1 : parseInt(GetURLParameter("p"));
+        console.log("Load Page: " + page);
+
         var epFromGet       = GetURLParameter("epFrom"); // ep only from this serie -> loadEp
-        if(episodePage != undefined || epFromGet != undefined) loadEp = true;
-        episodePage = episodePage == undefined ? "1" : episodePage;
         epFromGet = epFromGet == undefined ? "" : "sid="+epFromGet+"&";
 
-        var searchQuery     = GetURLParameter("q");
-        searchQuery = searchQuery == undefined ? "" : "q="+searchQuery+"&";
+        // search query from form
+        var searchQuery = GetURLParameter("q") == undefined ? "" : "q="+GetURLParameter("q")+"&";
+        console.log("Searching for: " + searchQuery);
+        $("#searchInput").val(GetURLParameter("q"));
 
-        var sort            = GetURLParameter("sort");
-        sort = sort == undefined ? "" : "sort="+sort+"&";
-
-        var retrievedObject = sessionStorage.getItem("historyStack");
-
-        console.log("Got: ");
-        console.log("serIdFromGet " + serIdFromGet);
-        console.log("seriesPage " + seriesPage);
-        console.log("epFromGet " + epFromGet);
-        console.log("episodePage " + episodePage);
-        console.log("searchQuery " + searchQuery);
-        console.log("sort " + sort);
-
-        if (retrievedObject != null) {
-            //stack = JSON.parse(retrievedObject);
-            console.log("Retrieved history stack from session storage");
-        }
+        // sort
+        sort = GetURLParameter("sort") == undefined ? "" : "sort="+GetURLParameter("sort")+"&";
+        console.log("Sort: " + sort);
 
         if(loadEp || (!loadEp && !loadSer)) {
-            active = "episodes";
-            console.log("load ep with: " + searchQuery+sort+epFromGet);
-            loadEpisodes(true, searchQuery+sort+epFromGet);
+            $($nav_switch_li).removeClass("active");
+            $("#navbarEpisodes").addClass("active");
+            loadEpisodes(true, epFromGet+searchQuery+sort);
         } else if(loadSer) {
-            active = "series";
-            loadSeries(true, searchQuery+sort+serIdFromGet);
+            $($nav_switch_li).removeClass("active");
+            $("#navbarSeries").addClass("active");
+            loadSeries(true, searchQuery+sort);
         }
 
         $($main_container).html(msg_html_loading);
@@ -210,64 +201,6 @@ $(document).ready(function() {
     $(window).load(function() {
         initialize();
     });
-
-    $(window).on("popstate", function(event) {
-        /*console.log("!!popstate!!");
-        console.log(window.history.state);
-        if (window.history.state == null || stack.length == 1) {
-            console.log("no");
-            // no history and internal stack has only actual page
-            return;
-        };
-
-        var choose = window.history.state - 2;
-
-        console.log("choose: " + choose);
-        if (choose < 0) {
-            return;
-            //choose = 0;
-        };
-        console.log(stack);
-        var dest = stack[choose];
-        console.log(dest);
-        if (dest == undefined) {
-            return;
-        };
-
-        page = dest.page;
-        restData = dest.rest;
-
-        $("input").val("");
-
-        if (dest.active == "episodes") {
-            $($navbarEpisodes).addClass("active");
-            $($navbarSeries).removeClass("active");
-            active = "episodes";
-            loadEpisodes(true);
-        };
-        if (dest.active == "series") {
-            $($navbarSeries).addClass("active");
-            $($navbarEpisodes).removeClass("active");
-            active = "series";
-            loadSeries(true);
-        };*/
-    });
-
-    function pushHistory(page, active, rest) {
-        console.log("pushstate");
-        /*if(sessionStorage.getItem("historyStack") == null) {
-            // empty historyStack
-            stack = [];
-        }
-        stack.push({
-            "page": page,
-            "active": active,
-            "rest": rest
-        });
-        visited++;
-        history.pushState(visited, active, "");
-        sessionStorage.setItem("historyStack", JSON.stringify(stack));*/
-    }
 
     function login() {
         if (!askedForLogin) {
@@ -424,45 +357,11 @@ $(document).ready(function() {
     }
 
     function registerHandler() {
-        /* register handler for navbar */
-        $($nav_switch_li).click(function(event) {
-            $($nav_switch_li).removeClass("active");
-            $(this).addClass("active");
-            restData = "";
-            $("input").val("");
-        });
-
-        $($nav_switch_li).on("keypress", function(ev) {
-            console.log("second");
-            if (ev.which == 13 || ev.which == 32) {
-                $($nav_switch_li).removeClass("active");
-                $(this).addClass("active");
-
-                restData = "";
-                $("input").val("");
-
-                switch ($(this).attr("data-search")) {
-                    case "episodes":
-                        active = "episodes";
-                        page = 1;
-                        loadEpisodes(true);
-                        break;
-                    case "series":
-                        active = "series";
-                        page = 1;
-                        loadSeries(true);
-                        break;
-                    default:
-                        break;
-                }
-                $(".navbar-collapse").collapse('hide');
-            }
-        });
 
         /* pagination */
         $($next).on("click", function() {
             if ($(this).hasClass("disabled")) {
-                return;
+                //return;
             };
 
             if ($(this).hasClass("last")) {
@@ -474,7 +373,7 @@ $(document).ready(function() {
             if (page > 1) {
                 $($previous).removeClass("disabled");
             };
-
+            window.history.pushState("string", "page", "?p="+page);
             if (active == "series") {
                 loadSeries(true);
             } else if (active == "episodes") {
@@ -555,28 +454,22 @@ $(document).ready(function() {
 
         /* handle search input */
         $($oc_search_form).submit(function(event) {
-            /*event.preventDefault();
-            var data = $(this).serialize();
-
-            restData = data;
-            page = 1;
-
-            if (active == "series") {
-                pushHistory(page, "series", restData);
-                loadSeries(true);
+            log("Submit search input!");
+            if(active == "series") {
+                $("#oc-search-form .form-group").append(
+                    "<input type='hidden' name='s' value='1' />"
+                );
             } else if (active == "episodes") {
-                pushHistory(page, "episodes", restData);
-                loadEpisodes(true);
+                $("#oc-search-form .form-group").append(
+                    "<input type='hidden' name='e' value='1' />"
+                );
             } else {
-                pushHistory(page, "episodes", restData);
-                loadEpisodes(true);
+                console.err("Error!");
             }
-
-            $(".navbar-collapse").collapse('hide');*/
+            return true;
         });
 
         $($oc_sort_dropdown).on("change", function() {
-            log("submiting");
             $($oc_search_form).submit();
         });
 
@@ -584,7 +477,9 @@ $(document).ready(function() {
     }
 
     function loadEpisodes(cleanGrid, rest) {
-        console.log(rest);
+        console.log("Loading Episodes with: " + rest);
+        active="episodes";
+
         var requestUrl = restEndpoint + "episode.json?limit=" + bufferEntries +
             "&offset=" + ((page - 1)) * bufferEntries +
             "&" + rest;
@@ -777,18 +672,8 @@ $(document).ready(function() {
             tile = tile + "</div></div></a>";
 
             $($main_container).append(tile);
-            $("#" + data.id).attr("href", "?epFrom="+data.id);
+            $("#" + data.id).attr("href", "?e=1&p=1&epFrom="+data.id);
 
-            /*$("#" + data.id).on("click", function() {
-                restData = "sid=" + data.id;
-                page = 1;
-                active = "episodes";
-                $($navbarEpisodes).addClass("active");
-                $($navbarSeries).removeClass("active");
-                pushHistory(1, "episodes", restData);
-                loadEpisodes(true);
-            });
-            */
             $("#" + data.id).on("keypress", function(ev) {
                 if (ev.which == 13 || ev.which == 32) {
                     restData = "sid=" + data.id;
@@ -811,8 +696,8 @@ $(document).ready(function() {
     }
 
     function loadSeries(cleanGrid, rest) {
-      console.log("loadseries");
-      console.log(rest);
+        console.log("Loading Series with: " + rest);
+        active="series";
         var requestUrl = restEndpoint + "/series.json?limit=6&offset=" + (page - 1) * 6 + "&" + rest;
         $.ajax({
             url: requestUrl,
