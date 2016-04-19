@@ -14,8 +14,8 @@ cp ./target/matterhorn-admin-ui-ng-2.2-SNAPSHOT.jar ../../build/opencast-dist-al
 *Note that in the example above, the paths are for a specific Opencast version.
 Your paths might look different.*
 
-Live working on the UI
-----------------------
+Live working with running Opencast
+----------------------------------
 
 To speed up the development process for the UI you can test the code without
 building the module with maven.
@@ -51,3 +51,31 @@ You can still access the assembly version when connecting to
 
 [1]: http://gruntjs.com
 [2]: https://nodejs.org
+
+Live working with a mockup
+--------------------------
+
+If you do not want to keep a runing Opencast instance for developing the
+Admin UI NG you can use the mockup.
+
+*Be warned that a lot of functionality in this mockup acts very different from
+a actual Opencast instance*
+
+First off, you need [Grunt][1] and [NodeJS][2]. Either install it on your System or use
+the local version from the Opencast module:
+```bash
+cd modules/matterhorn-admin-ui-ng
+export PATH=$PATH:node:node_modules/grunt-cli/bin
+```
+
+To start the mockup webserver you need to checkout and build Opencast and
+then run:
+```bash
+cd modules/matterhorn-admin-ui-ng
+grunt serve
+```
+
+Grunt should print out the URL where you can see the standalone page running
+from sources.
+If you make changes in the sources of Admin UI NG they should be visible in
+browser after a page reload.
