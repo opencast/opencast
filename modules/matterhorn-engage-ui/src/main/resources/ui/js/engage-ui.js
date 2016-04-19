@@ -122,6 +122,10 @@ $(document).ready(function() {
         getInfo();
         registerHandler();
 
+        window.addEventListener("popstate", function(event) {
+          location.reload();
+        });
+
         // load series or episodes
         var loadSer = ( (GetURLParameter("s") == undefined) ||
             (GetURLParameter("s") != 1) ) ? false : true;
@@ -135,7 +139,8 @@ $(document).ready(function() {
         page = GetURLParameter("p") == undefined ? 1 : parseInt(GetURLParameter("p"));
         console.log("Load Page: " + page);
 
-        var epFromGet       = GetURLParameter("epFrom"); // ep only from this serie -> loadEp
+        // load episodes from specific series
+        var epFromGet       = GetURLParameter("epFrom");
         epFromGet = epFromGet == undefined ? "" : "sid="+epFromGet+"&";
 
         // search query from form
@@ -360,8 +365,9 @@ $(document).ready(function() {
 
         /* pagination */
         $($next).on("click", function() {
+            console.log("Click on Next");
             if ($(this).hasClass("disabled")) {
-                //return;
+                return;
             };
 
             if ($(this).hasClass("last")) {
@@ -373,7 +379,17 @@ $(document).ready(function() {
             if (page > 1) {
                 $($previous).removeClass("disabled");
             };
-            window.history.pushState("string", "page", "?p="+page);
+
+            console.log("Gehe zu Seite: " + page);
+            var searchString = window.location.search;
+            if(searchString == "") {
+              searchString = "?p=" + page;
+            } else {
+              searchString = searchString.replace(/p=\d/, "p=" + page)
+            }
+            console.log("Edit: " + searchString);
+            window.history.pushState("Media Module", "Page " + page, searchString);
+
             if (active == "series") {
                 loadSeries(true);
             } else if (active == "episodes") {
@@ -383,6 +399,7 @@ $(document).ready(function() {
         });
 
         $($next).on("keypress", function(ev) {
+            console.log("Keypress on Next");
             if (ev.which == 13 || ev.which == 32) {
                 if ($(this).hasClass("disabled")) {
                     return;
@@ -420,7 +437,15 @@ $(document).ready(function() {
             if (page == 1) {
                 $(this).addClass("disabled");
             };
-
+            console.log("Gehe zu Seite: " + page);
+            var searchString = window.location.search;
+            if(searchString == "") {
+              searchString = "?p=" + page;
+            } else {
+              searchString = searchString.replace(/p=\d/, "p=" + page)
+            }
+            console.log("Edit: " + searchString);
+            window.history.pushState("Media Module", "Page " + page, searchString);
             if (active == "series") {
                 loadSeries(true);
             } else if (active == "episodes") {
