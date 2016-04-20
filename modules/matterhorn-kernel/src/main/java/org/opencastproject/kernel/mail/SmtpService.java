@@ -146,12 +146,23 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    *           if sending the message failed
    */
   private void sendTestMessage(String recipient) throws MessagingException {
+    send(recipient, "Test from Opencast", "Hello world");
+  }
+
+  /**
+   * Method to send a message
+   * 
+   * @param to Recipient of the message
+   * @param subject Subject of the message
+   * @param body Body of the message
+   * @throws MessagingException if sending the message failed
+   */
+  public void send(String to, String subject, String body) throws MessagingException {
     MimeMessage message = createMessage();
-    message.addRecipient(RecipientType.TO, new InternetAddress(recipient));
-    message.setSubject("Test from Matterhorn");
-    message.setText("Hello world");
+    message.addRecipient(RecipientType.TO, new InternetAddress(to));
+    message.setSubject(subject);
+    message.setText(body);
     message.saveChanges();
     send(message);
   }
-
 }
