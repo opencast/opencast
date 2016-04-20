@@ -62,7 +62,7 @@ grunt proxy --proxy.host=http://localhost:8080 --proxy.username=opencast_system_
 ```
 
 *Note: host, username and password have to match your configuration
-(etc/custom.properties)*
+`etc/custom.properties`*
 
 Grunt should print out the URL where you can see the standalone page running
 from sources.
@@ -83,7 +83,7 @@ Live working with a Mockup
 --------------------------
 
 If you do not want to keep a running Opencast instance for developing the
-Admin UI NG you can start a mockup.
+Admin UI NG, you can start a mockup.
 
 *Be warned that __a lot__ of this mockup's functionality acts very differently from
 an actual Opencast instance*
