@@ -740,7 +740,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             if (Engage.model.get("meInfo").get("layout") !== "off") {
                 var pipPos = Engage.model.get("meInfo").get("layout");
                 Engage.trigger(plugin.events.movePiP.getName(), pipPos);
-            }
+            } 
         }
         if (Basil.get(storage_pip) !== undefined && Basil.get(storage_pip) !== null) {
             var pip = Basil.get(storage_pip);
@@ -748,7 +748,10 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
                 Engage.trigger(plugin.events.togglePiP.getName(), pip);
             }
         } else {
-            if (Engage.model.get("meInfo").get("layout") !== "off") {
+            if (Engage.model.get("meInfo").get("layout") === "off" ||
+                Engage.model.get("meInfo").get("layout") === "besides") {
+                Engage.trigger(plugin.events.togglePiP.getName(), false);
+            } else {
                 Engage.trigger(plugin.events.togglePiP.getName(), true);
             }
         }
@@ -756,7 +759,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             var focusVideo = Basil.get(storage_focus_video);
             currentFocusFlavor = focusVideo;
         } else {
-            currentFocusFlavor = Engage.model.get("meInfo").get("focusedflavor");
+            if (Engage.model.get("meInfo").get("layout") !== "off") {
+                currentFocusFlavor = Engage.model.get("meInfo").get("focusedflavor");
+            }
         }
     }
 
