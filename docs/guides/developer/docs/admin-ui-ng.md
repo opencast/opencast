@@ -1,5 +1,26 @@
-Prerequisites
--------------
+Modifying Sources
+-----------------
+
+When you make changes to the sources, it should be sufficient to rebuild the
+Admin UI NG module and copy the packaged module file into the Opencast assembly.
+
+Example:
+```bash
+cd modules/matterhorn-admin-ui-ng
+mvn install
+cp ./target/matterhorn-admin-ui-ng-2.2-SNAPSHOT.jar ../../build/opencast-dist-allinone-2.2-SNAPSHOT/system/org/opencastproject/matterhorn-admin-ui-ng/2.2-SNAPSHOT/matterhorn-admin-ui-ng-2.2-SNAPSHOT.jar
+```
+
+*Note: Before you run `mvn install` from a module's root directory,
+please make sure that you have built the complete software at least once
+--i.e. you should have already run `mvn install` from the repository root
+at some point.*
+
+*Note: In the example above, the paths are for a specific Opencast version.
+Your paths might look different.*
+
+Prerequisites for live working
+------------------------------
 
 Checkout and build Opencast.
 
@@ -16,24 +37,6 @@ export PATH=$PATH:node:node_modules/grunt-cli/bin
 Watch out for local or system-wide installations of Grunt and/or NodeJS as they can
 change the build behavior of Admin UI NG.*
 
-Modifying Sources
------------------
-
-When you make changes to the sources, it should be sufficient to rebuild the
-Admin UI NG module and copy the packaged module file into the Opencast assembly.
-
-Example:
-```bash
-cd modules/matterhorn-admin-ui-ng
-mvn install
-cp ./target/matterhorn-admin-ui-ng-2.2-SNAPSHOT.jar ../../build/opencast-dist-allinone-2.2-SNAPSHOT/system/org/opencastproject/matterhorn-admin-ui-ng/2.2-SNAPSHOT/matterhorn-admin-ui-ng-2.2-SNAPSHOT.jar
-```
-
-*Note: This will only work if you build Opencast in your repository once before.*
-
-*Note: In the example above, the paths are for a specific Opencast version.
-Your paths might look different.*
-
 Live working with running Opencast
 ----------------------------------
 
@@ -41,14 +44,14 @@ In order to speed up the UI development process, you can test the code without
 building the module with Maven.
 There is a Grunt task for starting a standalone web server offering the UI from
 the source.
-Changes to source will (after a page reload) be directly reflected in the browser.
+Changes to the source will (after a page reload) be directly reflected in the browser.
 
 *Be warned that some functionality in this live setup can be limited.
 Before reporting an issue, please test if you can reproduced the issue with a built Opencast.*
 
 This setup may be configured as follows:
 
-1. Follow the instruction in the Prerequisites section.
+1. Follow the instructions in the Prerequisites section.
 
 2. Start your Opencast instance.
 
@@ -87,7 +90,7 @@ an actual Opencast instance*
 
 This setup may be configured as follows:
 
-1. Follow the instruction in the Prerequisites section.
+1. Follow the instructions in the Prerequisites section.
 
 2. Start the mockup webserver by running:
 ```bash
