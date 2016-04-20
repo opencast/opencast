@@ -62,7 +62,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   var browser_minVersion_chrome = 30;
   var browser_minVersion_opera = 20;
   var browser_minVersion_safari = 7;
-  var browser_minVersion_webkit = 7;
   var browser_minVersion_msie = 11;
   var browser_minVersion_msedge = 13;
   var zoom_wasd_step_size = 15;
@@ -89,6 +88,12 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   var id_btn_login = "btn_login";
   var id_btn_tryAnyway = "btn_tryAnyway";
   var id_customError = "customError";
+  var id_min_firefox_version = "min-firefox-version";
+  var id_min_chrome_version = "min-chrome-version";
+  var id_min_opera_version = "min-opera-version";
+  var id_min_safari_version = "min-safari-version";
+  var id_min_msie_version = "min-msie-version";
+  var id_min_msedge_version = "min-msedge-version";
   var class_loading = "loading";
   var plugins_loaded = {};
   var loadingDelay1 = 500;
@@ -144,6 +149,15 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         (Bowser.safari && Bowser.version >= browser_minVersion_safari) ||
         (Bowser.msedge && Bowser.version >= browser_minVersion_msedge) ||
         (Bowser.msie && Bowser.version >= browser_minVersion_msie);
+  }
+  
+  function setMinBrowserVersions() {
+      $("#" + id_min_firefox_version).text(browser_minVersion_firefox);
+      $("#" + id_min_chrome_version).text(browser_minVersion_chrome);
+      $("#" + id_min_opera_version).text(browser_minVersion_opera);
+      $("#" + id_min_safari_version).text(browser_minVersion_safari);
+      $("#" + id_min_msedge_version).text(browser_minVersion_msedge);
+      $("#" + id_min_msie_version).text(browser_minVersion_msie);
   }
 
   function detectLanguage() {
@@ -711,6 +725,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
       $("." + class_loading).show();
       $("#" + id_loading1).show();
       initTranslate(detectLanguage());
+      setMinBrowserVersions();
       // the main core is our global event system
       this.dispatcher = _.clone(Backbone.Events);
       // link to the engage model
