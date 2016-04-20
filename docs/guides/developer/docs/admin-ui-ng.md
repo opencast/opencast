@@ -2,7 +2,7 @@ Prerequisites
 -------------
 
 You need [Grunt][1] and [NodeJS][2].
-Either install it on your System or use the local version from the Opencast module:
+Either install it on your system or use the local version from the Opencast module:
 
 ```bash
 cd modules/matterhorn-admin-ui-ng
