@@ -740,7 +740,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             if (Engage.model.get("meInfo").get("layout") !== "off") {
                 var pipPos = Engage.model.get("meInfo").get("layout");
                 Engage.trigger(plugin.events.movePiP.getName(), pipPos);
-            } 
+            }
         }
         if (Basil.get(storage_pip) !== undefined && Basil.get(storage_pip) !== null) {
             var pip = Basil.get(storage_pip);
