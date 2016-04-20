@@ -1,6 +1,8 @@
 Prerequisites
 -------------
 
+Checkout and build Opencast.
+
 You need [Grunt][1] and [NodeJS][2].
 Either install it on your system or use the local version from the Opencast module:
 
@@ -8,15 +10,16 @@ Either install it on your system or use the local version from the Opencast modu
 cd modules/matterhorn-admin-ui-ng
 export PATH=$PATH:node:node_modules/grunt-cli/bin
 ```
+*Note: The node and node_modules folders are created during the Maven build process.*
 
 *Note: We already had reports of Grunt behaving differently on different systems.
-Watch out for local-/system-installations of Grunt and or NodeJS as they can
+Watch out for local or system-wide installations of Grunt and/or NodeJS as they can
 change the build behavior of Admin UI NG.*
 
 Modifying Sources
 -----------------
 
-When you make changes to the sources it should be sufficient to rebuild the
+When you make changes to the sources, it should be sufficient to rebuild the
 Admin UI NG module and copy the packaged module file into the Opencast assembly.
 
 Example:
@@ -26,40 +29,48 @@ mvn install
 cp ./target/matterhorn-admin-ui-ng-2.2-SNAPSHOT.jar ../../build/opencast-dist-allinone-2.2-SNAPSHOT/system/org/opencastproject/matterhorn-admin-ui-ng/2.2-SNAPSHOT/matterhorn-admin-ui-ng-2.2-SNAPSHOT.jar
 ```
 
-*Note that in the example above, the paths are for a specific Opencast version.
+*Note: This will only work if you build Opencast in your repository once before.*
+
+*Note: In the example above, the paths are for a specific Opencast version.
 Your paths might look different.*
 
 Live working with running Opencast
 ----------------------------------
 
-To speed up the development process for the UI you can test the code without
+In order to speed up the UI development process, you can test the code without
 building the module with Maven.
 There is a Grunt task for starting a standalone web server offering the UI from
-source.
-Changes to source will (after a page reload) directly reflect in browser.
+the source.
+Changes to source will (after a page reload) be directly reflected in the browser.
 
 *Be warned that some functionality in this live setup can be limited.
-Before creating a issue please test with a build Opencast.*
+Before reporting an issue, please test if you can reproduced the issue with a built Opencast.*
 
-To set this up do the following:
+This setup may be configured as follows:
 
-Follow the instruction for Prerequisites.
+1. Follow the instruction in the Prerequisites section.
 
-To start the standalone webserver you need to checkout and build Opencast and
-run:
+2. Start your Opencast instance.
+
+3. Start the standalone webserver by running:
 ```bash
 cd modules/matterhorn-admin-ui-ng
 grunt proxy --proxy.host=http://localhost:8080 --proxy.username=opencast_system_account --proxy.password=CHANGE_ME
 ```
 
-*Note: that the host, username and password have to match your config
+*Note: host, username and password have to match your configuration
 (etc/custom.properties)*
 
 Grunt should print out the URL where you can see the standalone page running
 from sources.
-If you make changes in the sources of Admin UI NG they should be visible in
-browser after a page reload.
-You can still access the assembly version when connecting to
+Example:
+```
+[I 160420 16:35:29 server:281] Serving on http://127.0.0.1:8000
+```
+
+If you make changes to the Admin UI NG sources, they should be visible in
+the browser after a page reload.
+You can still access the builtin UI by accessing
 `http://localhost:8080`.
 
 [1]: http://gruntjs.com
@@ -69,17 +80,16 @@ Live working with a Mockup
 --------------------------
 
 If you do not want to keep a running Opencast instance for developing the
-Admin UI NG you can use the mockup.
+Admin UI NG you can start a mockup.
 
-*Be warned that a lot of functionality in this mockup acts very different from
-a actual Opencast instance*
+*Be warned that __a lot__ of this mockup's functionality acts very differently from
+an actual Opencast instance*
 
-To set this up do the following:
+This setup may be configured as follows:
 
-Follow the instruction for Prerequisites.
+1. Follow the instruction in the Prerequisites section.
 
-To start the mockup webserver you need to checkout and build Opencast and
-then run:
+2. Start the mockup webserver by running:
 ```bash
 cd modules/matterhorn-admin-ui-ng
 grunt serve
@@ -87,5 +97,10 @@ grunt serve
 
 Grunt should print out the URL where you can see the standalone page running
 from sources.
-If you make changes in the sources of Admin UI NG they should be visible in
-browser after a page reload.
+Example:
+```
+[I 160420 16:35:29 server:281] Serving on http://127.0.0.1:8000
+```
+
+If you make changes to the Admin UI NG sources, they should be visible in
+the browser after a page reload.
