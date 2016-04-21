@@ -749,7 +749,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
             }
         } else {
             if (Engage.model.get("meInfo").get("layout") === "off" ||
-                Engage.model.get("meInfo").get("layout") === "besides") {
+                Engage.model.get("meInfo").get("layout") === "beside") {
                 Engage.trigger(plugin.events.togglePiP.getName(), false);
             } else {
                 Engage.trigger(plugin.events.togglePiP.getName(), true);
