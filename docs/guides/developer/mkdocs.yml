@@ -26,3 +26,5 @@ pages:
 - Infrastructure:
    - Overview: 'infrastructure/index.md'
    - Nexus Maven Repository: 'infrastructure/nexus.md'
+- Module specific Development:
+   - Admin-UI-NG: 'admin-ui-ng.md'
