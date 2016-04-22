@@ -104,8 +104,14 @@ public class JobEndpoint {
   public static final Response NOT_FOUND = Response.status(Response.Status.NOT_FOUND).build();
   public static final Response SERVER_ERROR = Response.serverError().build();
 
+  private enum JobSort {
+    CREATOR, OPERATION, PROCESSINGHOST, STATUS, STARTED, SUBMITTED, TYPE,
+  }
+
   private static final String NEGATE_PREFIX = "-";
-  private static final String DESCENDING_SUFFIX = "_DESC";
+  private static final char SORT_ORDER_SEPARATOR = ':';
+  private static final String ASCENDING_SUFFIX = "ASC";
+  private static final String DESCENDING_SUFFIX = "DESC";
 
   private WorkflowService workflowService;
   private ServiceRegistry serviceRegistry;
@@ -135,11 +141,47 @@ public class JobEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(description = "Returns the list of active jobs", name = "jobs", restParameters = {
           @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "offset", description = "The offset", isRequired = false, type = RestParameter.Type.INTEGER) }, reponses = { @RestResponse(description = "Returns the list of active jobs from Matterhorn", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The list of jobs as JSON")
-  public Response getJobs(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset) {
+          @RestParameter(name = "offset", description = "The offset", isRequired = false, type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "sort", description = "The sort order. May include any of the following: OPERATION, STATUS, SUBMITTED, WORKFLOW."
+                  + "Add ':DESC' to reverse the sort order (e.g. SUBMITTED:DESC).", isRequired = false, type = RestParameter.Type.STRING)},
+          reponses = { @RestResponse(description = "Returns the list of active jobs from Matterhorn", responseCode = HttpServletResponse.SC_OK) },
+          returnDescription = "The list of jobs as JSON")
+  public Response getJobs(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset, @QueryParam("sort") final String sort) {
+    JobSort sortKey = JobSort.SUBMITTED;
+    boolean ascending = true;
+    if (StringUtils.isNotBlank(sort)) {
+      // Parse the sort field and direction
+      String[] sortFieldAndOrder = StringUtils.split(sort.trim(), SORT_ORDER_SEPARATOR);
+      if (sortFieldAndOrder.length < 1 || sortFieldAndOrder.length > 2) {
+        logger.warn("Sort parameter '{}' is not valid.", sort);
+      } else {
+        String sortField = StringUtils.trimToEmpty(sortFieldAndOrder[0]);
+        try {
+          sortKey = JobSort.valueOf(sortField.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            logger.warn("Sort value '{}' is not valid.", sortField);
+        }
+
+        if (sortFieldAndOrder.length == 2) {
+          String sortOrder = StringUtils.trimToEmpty(sortFieldAndOrder[1]);
+          switch (sortOrder.toUpperCase()) {
+            case ASCENDING_SUFFIX:
+              ascending = true;
+              break;
+            case DESCENDING_SUFFIX:
+              ascending = false;
+              break;
+            default:
+              logger.warn("Sort order '{}' is not valid.", sortOrder);
+          }
+        }
+      }
+    }
+
+    JobComparator comparator = new JobComparator(sortKey, ascending);
     Stream<Job> jobs = Stream.empty();
     try {
-      jobs = $(serviceRegistry.getJobs(null, Status.RUNNING)).filter(removeWorkflowJobs).sort(sortByCreationDate);
+      jobs = $(serviceRegistry.getJobs(null, Status.RUNNING)).filter(removeWorkflowJobs).sort(comparator);
     } catch (Exception e) {
       logger.error("Unable to get running jobs: {}", ExceptionUtils.getStackTrace(e));
       return RestUtil.R.serverError();
@@ -578,11 +620,66 @@ public class JobEndpoint {
     }
   };
 
-  private final Comparator<Job> sortByCreationDate = new Comparator<Job>() {
+  private class JobComparator implements Comparator<Job> {
+
+    private JobSort sortType;
+    private boolean ascending;
+
+    JobComparator(JobSort sortType, boolean ascending) {
+      this.sortType = sortType;
+      this.ascending = ascending;
+    }
+
     @Override
     public int compare(Job job1, Job job2) {
-      return job1.getDateCreated().compareTo(job2.getDateCreated());
-    }
-  };
+      int result = 0;
+      Object value1 = null;
+      Object value2 = null;
+      switch (sortType) {
+        case CREATOR:
+          value1 = job1.getCreator();
+          value2 = job2.getCreator();
+          break;
+        case OPERATION:
+          value1 = job1.getOperation();
+          value2 = job2.getOperation();
+          break;
+        case PROCESSINGHOST:
+          value1 = job1.getProcessingHost();
+          value2 = job2.getProcessingHost();
+          break;
+        case STARTED:
+          value1 = job1.getDateStarted();
+          value2 = job2.getDateStarted();
+          break;
+        case STATUS:
+          value1 = job1.getStatus();
+          value2 = job2.getStatus();
+          break;
+        case SUBMITTED:
+          value1 = job1.getDateCreated();
+          value2 = job2.getDateCreated();
+          break;
+        case TYPE:
+          value1 = job1.getJobType();
+          value2 = job2.getJobType();
+          break;
+        default:
+      }
 
+      if (value1 == null) {
+        return value2 == null ? 0 : 1;
+      }
+      if (value2 == null) {
+        return -1;
+      }
+      try {
+        result = ((Comparable)value1).compareTo(value2);
+      } catch (ClassCastException ex) {
+        logger.debug("Cant' compare two values for sorting.", ex);
+      }
+
+      return ascending ? result : -1 * result;
+    }
+  }
 }
