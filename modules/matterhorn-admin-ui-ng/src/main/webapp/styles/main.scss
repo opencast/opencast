@@ -238,6 +238,10 @@ textarea.editable {
   height: auto;
 }
 
+button.red {
+  @include btn(red);
+}
+
 button.green {
   @include btn(green-dark-bg);
 }
