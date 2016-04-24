@@ -3,7 +3,7 @@
 }
 
 body {
-	background: url("/admin/img/misc/body.gif") repeat scroll 0 0 #EDEDED;
+	background-color: #EDEDED;
 	margin: 20px 0;
 	font-family: "Lucida Grande", "Lucida Sans Unicode", sans-serif;
 	line-height:1.3em;/*18px*/
@@ -263,7 +263,7 @@ a:hover {
 
 #system-info.error .message{
 	font-size: 0.85em;
-	font-weight: normal;;
+	font-weight: normal;
 }
 
 #system-info.error .message{
