@@ -47,8 +47,15 @@
                     </ul>
                 </div>
 
-                <div ng-if="documentationUrl || restdocsUrl" class="nav-dd" id="help-dd" old-admin-ng-dropdown="">
-                    <div class="help"></div>
+                <div class="nav-dd" title="{{ 'MEDIAMODULE' | translate}}">
+                    <a ng-click="toURL(mediaModuleUrl)" href="{{mediaModuleUrl}}">
+                        <span class="fa fa-play-circle-o"><!-- Media Module --></span>
+                    </a>
+                </div>
+
+                <div ng-if="documentationUrl || restdocsUrl" title="{{ 'HELP.HELP' | translate}}" class="nav-dd"
+                    id="help-dd" old-admin-ng-dropdown="">
+                    <div class="fa fa-question-circle"></div>
                     <ul class="dropdown-ul">
                         <li ng-if="documentationUrl">
                         <a ng-click="toURL(documentationUrl)" href="{{documentationUrl}}">
@@ -56,7 +63,7 @@
                         </a>
                         </li>
                         <li ng-if="restdocsUrl" with-role="ROLE_ADMIN">
-                        <a ng-click="toURL(restdocsUrl)" href="{{restdocsUrl}}">
+                        <a target="_self" ng-click="toURL(restdocsUrl)" href="{{restdocsUrl}}">
                             <span translate="HELP.REST_DOC"><!-- REST Doc --></span>
                         </a>
                         </li>
