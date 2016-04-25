@@ -89,7 +89,7 @@ define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'en
             } else if (this.get("urlParameters").mode == "mobile") {
                 this.set("mode", "mobile");
             } else {
-                this.set("mode", (Bowser.mobile || Bowser.tablet) ? "mobile" : "desktop");
+                this.set("mode", (Bowser.mobile) ? "mobile" : "desktop");
             }
 
             // Check for user setting "Support unsupported browser"
