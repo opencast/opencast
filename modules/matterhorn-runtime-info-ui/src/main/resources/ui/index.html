@@ -21,7 +21,7 @@
 					            $('#col3m').append('<br /><a class="redbutton" id="captureLink" href="/capture">Go to Capture</a>');
 					            capt = true;
 					          } else if(data.rest[i].description.toLowerCase() == "Confidence Monitoring REST Endpoint".toLowerCase()) {
-					            $('#col4m').append('<br /><a class="redbutton" id="confidenceMonitoringLink" href="/confidence-monitoring">Go to Confidence Monitoring</a>');
+					            $('#col4m').append('<br /><a class="redbutton" id="confidenceMonitoringLink" '
                         + 'href="/confidence-monitoring">Go to Confidence Monitoring</a>');
 					            confMon = true;
 					          }
@@ -57,30 +57,6 @@
                 },
                 dbConsistent = false,
                 bundlesConsistent = false;
-
-            $.getJSON("/sysinfo/db/schemaversion", function (data) {
-                var $message = $sysInfoContainer.find("div#db span.message"),
-                    $messageDiv = $sysInfoContainer.find("div#db"),
-                    $dbVersion = $sysInfoContainer.find("#db-version span"),
-                    $dbApplication = $sysInfoContainer.find("#db-application span"),
-                    $dbRequiredVersions = $sysInfoContainer.find("#db-required-version span");
-
-                dbConsistent = data.consistent;
-                checkAndDisplay(data.schemaVersion, $dbVersion);
-                if (data.schemaAppliedAt) {
-                  checkAndDisplay(new Date(data.schemaAppliedAt), $dbApplication);
-                }
-                checkAndDisplay(data.requiredSchemaVersions, $dbRequiredVersions);
-
-                if (data.consistent) {
-                  $message.html("Matterhorn is running with consistent DB schema version.")
-                  $messageDiv.addClass("ok");
-                } else {
-                  $message.html("Different schema versions are required by the bundles. Update the DB to avoid loss or corruption of data.");
-                  $dbVersion.addClass("error");
-                  $dbRequiredVersions.addClass("error");
-                }
-            });
 
             $.getJSON("/sysinfo/bundles/version", function (data) {
                 var $message = $sysInfoContainer.find("div#build span.message"),
