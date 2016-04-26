@@ -9,12 +9,14 @@ angular.module('adminNg.controllers')
 
         var FEEDBACK_URL_PROPERTY = 'org.opencastproject.admin.feedback.url',
             DOCUMENTATION_URL_PROPERTY = 'org.opencastproject.admin.documentation.url',
-            RESTDOCS_URL_PROPERTY = 'org.opencastproject.admin.restdocs.url';
+            RESTDOCS_URL_PROPERTY = 'org.opencastproject.admin.restdocs.url',
+            MEDIA_MODULE_URL_PROPERTY = 'org.opencastproject.engage.ui.url';
 
         $scope.currentUser  = null;
         $scope.feedbackUrl = undefined;
         $scope.documentationUrl = undefined;
         $scope.restdocsUrl = undefined;
+        $scope.mediaModuleUrl = '/engage/ui';
 
         AuthService.getUser().$promise.then(function (user) {
             $scope.currentUser = user;
@@ -29,6 +31,10 @@ angular.module('adminNg.controllers')
 
             if (angular.isDefined(user.org.properties[RESTDOCS_URL_PROPERTY])) {
                 $scope.restdocsUrl = user.org.properties[RESTDOCS_URL_PROPERTY];
+            }
+
+            if (angular.isDefined(user.org.properties[MEDIA_MODULE_URL_PROPERTY])) {
+                $scope.mediaModuleUrl = user.org.properties[MEDIA_MODULE_URL_PROPERTY] + '/engage/ui';
             }
         });
 

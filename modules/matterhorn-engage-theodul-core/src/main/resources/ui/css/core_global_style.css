@@ -137,3 +137,7 @@
     /* padding: 15px 35px 45px; */
     /* border: 1px solid rgba(0,0,0,0.1); */
 }
+
+.browser-version {
+    display:inline;
+}
