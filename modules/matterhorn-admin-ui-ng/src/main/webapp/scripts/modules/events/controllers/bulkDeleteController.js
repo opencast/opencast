@@ -114,7 +114,8 @@ angular.module('adminNg.controllers')
             var resetSubmitButton = true,
             deleteIds = [],
             resource = Table.resource.indexOf('series') >= 0 ? 'series' : 'event',
-            endpoint = Table.resource.indexOf('series') >= 0 ? 'deleteSeries' : 'deleteEvents';
+            endpoint = Table.resource.indexOf('series') >= 0 ? 'deleteSeries' : 'deleteEvents',
+            sourceNotification = resource === 'series' ? 'SERIES' : 'EVENTS'; 
 
             if (Table.resource.indexOf('series') >= 0) {
                 deleteIds = getSelectedSeriesIds();
@@ -132,11 +133,11 @@ angular.module('adminNg.controllers')
                 }, function () {
                     $scope.submitButton = false;
                     Table.deselectAll();
-                    Notifications.add('success', 'EVENTS_DELETED');
+                    Notifications.add('success', sourceNotification + '_DELETED');
                     Modal.$scope.close();
                 }, function () {
                     $scope.submitButton = false;
-                    Notifications.add('error', 'EVENTS_NOT_DELETED');
+                    Notifications.add('error', sourceNotification + '_NOT_DELETED');
                     Modal.$scope.close();
                 });
             }
