@@ -90,12 +90,12 @@
      "EVENTS_UPDATED_ALL":   "All events have been successfully updated",
      "EVENTS_NOT_UPDATED":  "The event could not be saved",
      "EVENTS_NOT_UPDATED_ID":  "The event {{ id }} could not be saved",
-     "EVENTS_NOT_UPDATED_ALL":  "All the events could not be saved",
+     "EVENTS_NOT_UPDATED_ALL":  "None of the events could be saved",
      "SERIES_UPDATED_NB":   "{{ number }} series have been successfully updated",
      "SERIES_UPDATED_ALL":   "All series have been successfully updated",
      "SERIES_NOT_UPDATED":  "The series could not be saved",
      "SERIES_NOT_UPDATED_ID":  "The series {{ id }} could not be saved",
-     "SERIES_NOT_UPDATED_ALL":  "All the series could not be saved",
+     "SERIES_NOT_UPDATED_ALL":  "None of the series could be saved",
      "EVENTS_DELETED":      "The event has been deleted",
      "EVENTS_NOT_DELETED":  "The event(s) could not be deleted",
      "USER_BLACKLIST_CREATED": "The blacklist has been created",
@@ -268,7 +268,7 @@
         "ID": "ID",
         "SELECT_TASK": "Select Task",
         "SUMMARY": "Summary",
-        "WARNING": "This event has been published to at least one publication channel so it has to be retracted before it can be deleted. Select from the tasks below to retract the publictions."
+        "WARNING": "This event has been published to at least one publication channel so it has to be retracted before it can be deleted. Select from the tasks below to retract the publications."
      },
      "LICENSE": {
         "ALLRIGHTS": "All rights reserved",
@@ -671,7 +671,7 @@
            "REASONS": {
              "CUTTING" : "Cutting required",
              "REVIEW" : "Review required",
-             "ASYNC" : "A/V-tracks asynchronous",
+             "ASYNC" : "A/V tracks asynchronous",
              "AUDIO_ISSUE" : "Missing or defective audio track",
              "CANCELED" : "Canceled event",
              "CONFLICTING_METADATA" : "Conflicting metadata",
