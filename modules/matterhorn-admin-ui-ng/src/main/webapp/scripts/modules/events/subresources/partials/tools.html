@@ -117,7 +117,7 @@
                                 ng-model="video.workflow"
                                 ng-options="workflow.id as workflow.name for workflow in video.workflows" />
 
-                            <a ng-click="submit()" class="save-and-close-button">
+                            <a ng-click="submit()" ng-class="{disabled: submitButton}" class="save-and-close-button">
                                 {{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' | translate }}
                             </a>
                         </div>

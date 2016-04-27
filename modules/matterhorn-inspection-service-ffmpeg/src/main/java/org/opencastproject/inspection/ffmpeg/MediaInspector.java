@@ -240,9 +240,10 @@ public class MediaInspector {
       try {
         file = workspace.get(originalTrackUrl);
       } catch (NotFoundException e) {
-        throw new MediaInspectionException("File " + file + " was not found and can therefore not be inspected", e);
+        throw new MediaInspectionException("File " + originalTrackUrl + " was not found and can therefore not be "
+            + "inspected", e);
       } catch (IOException e) {
-        throw new MediaInspectionException("Error accessing " + file, e);
+        throw new MediaInspectionException("Error accessing " + originalTrackUrl, e);
       }
 
       // Make sure the file has an extension. Otherwise, tools like ffmpeg will not work.

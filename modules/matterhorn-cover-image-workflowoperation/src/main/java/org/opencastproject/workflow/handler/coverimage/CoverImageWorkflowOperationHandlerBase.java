@@ -327,6 +327,8 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
 
     for (String title : getFirstMetadataValue(metadata.getTitles()))
       appendXml(xml, "title", title);
+    for (String description : getFirstMetadataValue(metadata.getDescription()))
+      appendXml(xml, "description", description);
     for (String language : metadata.getLanguage())
       appendXml(xml, "language", language);
     for (Date created : metadata.getCreated())
