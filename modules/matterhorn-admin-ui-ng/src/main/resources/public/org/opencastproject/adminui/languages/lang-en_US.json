@@ -917,7 +917,7 @@
          },
          "PARTICIPATION": {
             "CAPTION": "Participation status template",
-            "WARNING_TEMPLATE": "Series paticipation status will be used as default value for new events that are part of the series.",
+            "WARNING_TEMPLATE": "Series participation status will be used as default value for new events that are part of the series.",
             "REVIEW_STATUS": {
               "CAPTION": "Review status"
             },
