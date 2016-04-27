@@ -98,6 +98,8 @@
      "SERIES_NOT_UPDATED_ALL":  "None of the series could be saved",
      "EVENTS_DELETED":      "The event has been deleted",
      "EVENTS_NOT_DELETED":  "The event(s) could not be deleted",
+     "SERIES_DELETED": "The series has been deleted",
+     "SERIES_NOT_DELETED": "The series could not be deleted",
      "USER_BLACKLIST_CREATED": "The blacklist has been created",
      "USER_BLACKLIST_NOT_CREATED":  "The blacklist could not be created",
      "USER_BLACKLIST_SAVED": "The blacklist has been saved",
