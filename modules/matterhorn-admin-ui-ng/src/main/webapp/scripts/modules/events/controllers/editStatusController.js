@@ -41,7 +41,8 @@ angular.module('adminNg.controllers')
     };
 
     $scope.submit = function () {
-        var resource = Table.resource.indexOf('series') >= 0 ? 'series' : 'event';
+        var resource = Table.resource.indexOf('series') >= 0 ? 'series' : 'event',
+            sourceNotification = resource === 'series' ? 'SERIES' : 'EVENTS'; 
         if ($scope.valid()) {
             OptoutsResource.save({
                 resource: resource,
@@ -51,8 +52,7 @@ angular.module('adminNg.controllers')
                 var nbErrors = data.error ? data.error.length : 0,
                     nbOK = data.ok ? data.ok.length : 0,
                     nbNotFound = data.notFound ? data.notFound.length : 0,
-                    nbBadRequest = data.badRequest ? data.badRequest.length : 0,
-                    sourceNotification = resource === 'series' ? 'SERIES' : 'EVENTS'; 
+                    nbBadRequest = data.badRequest ? data.badRequest.length : 0;
                 Table.deselectAll();
                 Modal.$scope.close();
                 if (nbErrors === 0 && nbBadRequest === 0 && nbNotFound === 0) {
@@ -87,7 +87,7 @@ angular.module('adminNg.controllers')
                 }
             }, function () {
                 Modal.$scope.close();
-                Notifications.add('error', 'EVENTS_NOT_UPDATED_ALL');
+                Notifications.add('error', sourceNotification + '_NOT_UPDATED_ALL');
             });
         }
     };
