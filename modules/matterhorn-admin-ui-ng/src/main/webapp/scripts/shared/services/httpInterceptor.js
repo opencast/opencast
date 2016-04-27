@@ -47,7 +47,7 @@ angular.module('adminNg').config(['$provide', '$httpProvider', function ($provid
  
       responseError: function (rejection) {
         switch (rejection.status) {
-          case 0:
+          case -1:
             addNotification('SERVICE_UNAVAILABLE');
             break;
           case 503:
