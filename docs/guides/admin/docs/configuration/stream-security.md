@@ -210,4 +210,4 @@ For installation instructions for external verification components:
 
 For further developer information including the [Opencast Signing Protocol](../../developer/stream-security-insights#Opencast Signing Protocol), please read the information here:
 
-* [Stream Security Developer Docs](../../developer/stream-security-insights) 
+* [Stream Security Developer Docs](../../developer/subsystems/stream-security) 

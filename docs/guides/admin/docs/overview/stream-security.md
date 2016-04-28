@@ -94,6 +94,6 @@ For the verification components there is the option for strict or non-strict che
 For further technical information like installation instructions, configuration guides, server plugins and the signing specification, please have a look at these documents:
 
 * [Configuration & Testing](../configuration/stream-security.md)
-* [Developer Documentation](../../developer/stream-security-insights)
+* [Developer Documentation](../../developer/subsystems/stream-security)
 * [Apache HTTPd Verification Component](https://bitbucket.org/opencast-community/apache-httpd-stream-security-plugin)
 * [Wowza Verification Component](https://bitbucket.org/opencast-community/wowza-stream-security-plugin)
