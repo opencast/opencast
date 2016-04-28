@@ -30,4 +30,3 @@ pages:
 - Infrastructure:
    - Overview: 'infrastructure/index.md'
    - Nexus Maven Repository: 'infrastructure/nexus.md'
-
