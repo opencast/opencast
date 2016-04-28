@@ -560,7 +560,7 @@
                                 placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.REPLY_TO' | translate }} @{{ originalComment.author.name }}"></textarea>
                             <button ng-class="{ disabled: !myComment.text.length || myComment.saving }" class="save green" ng-click="reply()"
                                 translate="EVENTS.EVENTS.DETAILS.COMMENTS.REPLY">Reply</button>
-                            <button class="cancel" ng-click="exitReplyMode()" translate="EVENTS.EVENTS.DETAILS.COMMENTS.CANCEL_REPLY">Cancel</button>
+                            <button class="red" ng-click="exitReplyMode()" translate="EVENTS.EVENTS.DETAILS.COMMENTS.CANCEL_REPLY">Cancel</button>
                             <input with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" type="checkbox" ng-model="myComment.resolved" id="resolved-checkbox" class="ios"/>
                             <label with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" for="resolved-checkbox" translate="EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED">Resolved</label>
                       </form>
