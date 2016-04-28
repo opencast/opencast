@@ -208,6 +208,6 @@ For installation instructions for external verification components:
 * [Apache HTTPd Verification Component](https://bitbucket.org/opencast-community/apache-httpd-stream-security-plugin)
 * [Wowza Verification Component](https://bitbucket.org/opencast-community/wowza-stream-security-plugin)
 
-For further developer information including the [Opencast Signing Protocol](../../developer/stream-security-insights#Opencast Signing Protocol), please read the information here:
+For further developer information including the [Opencast Signing Protocol](../../developer/subsystems/stream-security#Opencast Signing Protocol), please read the information here:
 
 * [Stream Security Developer Docs](../../developer/subsystems/stream-security) 
