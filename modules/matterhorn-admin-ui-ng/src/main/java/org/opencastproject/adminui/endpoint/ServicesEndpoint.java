@@ -21,30 +21,39 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static com.entwinemedia.fn.data.json.Jsons.f;
+import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.v;
+import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.adminui.exception.JsonCreationException;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.index.service.resources.list.api.Service;
-import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
-import org.opencastproject.index.service.util.ListProviderUtil;
+import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.matterhorn.search.SearchQuery;
+import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.api.ServiceState;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
+import org.opencastproject.util.SmartIterator;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.entwinemedia.fn.data.json.JValue;
+
+import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -62,10 +71,6 @@ public class ServicesEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(ServicesEndpoint.class);
   private ServiceRegistry serviceRegistry;
 
-  public void activate() {
-    logger.info("ServicesEndpoint is activated!");
-  }
-
   @GET
   @Path("services.json")
   @Produces(MediaType.APPLICATION_JSON)
@@ -81,36 +86,191 @@ public class ServicesEndpoint {
           @QueryParam("name") String name, @QueryParam("host") String host, @QueryParam("q") String text,
           @QueryParam("sort") String sort, @Context HttpHeaders headers) throws Exception {
 
-    String textFilter = text == null ? null : "textFilter=" + text;
+    Option<String> nameOpt = Option.option(name);
+    Option<String> hostOpt = Option.option(host);
+    Option<String> textOpt = Option.option(text);
+    Option<String> sortOpt = Option.option(sort);
 
-    ResourceListQueryImpl query = new ResourceListQueryImpl();
-    query.setLimit(limit);
-    query.setOffset(offset);
-    EndpointUtil.addRequestFiltersToQuery(textFilter, query);
-
-    Map<String, Object> result = new HashMap<String, Object>();
-    ServiceQueryResult services = getFilteredList(query);
-
-    result.put("results", services.filteredResult);
-    result.put("total", String.valueOf(services.totalCount));
-    if (query != null) {
-      if (query.getLimit().isSome()) {
-        result.put("limit", Integer.toString(query.getLimit().get()));
+    List<Service> services = new ArrayList<Service>();
+    for (ServiceStatistics stats : serviceRegistry.getServiceStatistics()) {
+      Service service = new Service(stats);
+      if (nameOpt.isSome() && !service.getName().equalsIgnoreCase(nameOpt.get())) {
+        continue;
       }
-      if (query.getOffset().isSome()) {
-        result.put("offset", Integer.toString(query.getOffset().get()));
+
+      if (hostOpt.isSome() && !service.getHost().equalsIgnoreCase(hostOpt.get())) {
+        continue;
+      }
+
+      if (textOpt.isSome()) {
+        if (!service.getName().toLowerCase().contains(textOpt.get().toLowerCase())
+                && !service.getHost().toLowerCase().contains(textOpt.get().toLowerCase()))
+          continue;
+      }
+      services.add(service);
+    }
+    int total = services.size();
+
+    if (sortOpt.isSome()) {
+      Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sortOpt.get());
+      if (!sortCriteria.isEmpty()) {
+        try {
+          SortCriterion sortCriterion = sortCriteria.iterator().next();
+          services.sort(new ServiceStatisticsComparator(
+                  sortCriterion.getFieldName(),
+                  sortCriterion.getOrder() == SearchQuery.Order.Ascending));
+        } catch (Exception ex) {
+          logger.warn("Failed to sort services collection.", ex);
+        }
       }
     }
 
-    JSONObject jsonList;
-    try {
-      jsonList = EndpointUtil.generateJSONObject(result);
-    } catch (JsonCreationException e) {
-      logger.error("Not able to generate resources list JSON from the services list: {}", e);
-      return Response.serverError().build();
+    List<JValue> jsonList = new ArrayList<JValue>();
+    for (Service s : new SmartIterator<Service>(limit, offset).applyLimitAndOffset(services)) {
+      jsonList.add(s.toJSON());
+    }
+    return RestUtils.okJsonList(jsonList, offset, limit, total);
+  }
+
+  class Service implements JSONAware {
+    public static final String COMPLETED_NAME = "completed";
+    public static final String HOST_NAME = "host";
+    public static final String MEAN_QUEUE_TIME_NAME = "meanQueueTime";
+    public static final String MEAN_RUN_TIME_NAME = "meanRunTime";
+    public static final String NAME_NAME = "name";
+    public static final String QUEUED_NAME = "queued";
+    public static final String RUNNING_NAME = "running";
+    public static final String STATUS_NAME = "status";
+
+    private final ServiceStatistics serviceStatistics;
+
+    Service(ServiceStatistics serviceStatistics) {
+      this.serviceStatistics = serviceStatistics;
     }
 
-    return Response.ok(jsonList.toString()).build();
+    public int getCompletedJobs() {
+      return serviceStatistics.getFinishedJobs();
+    }
+
+    public String getHost() {
+      return serviceStatistics.getServiceRegistration().getHost();
+    }
+
+    public long getMeanQueueTime() {
+      return serviceStatistics.getMeanQueueTime();
+    }
+
+    public long getMeanRunTime() {
+      return serviceStatistics.getMeanRunTime();
+    }
+
+    public String getName() {
+      return serviceStatistics.getServiceRegistration().getServiceType();
+    }
+
+    public int getQueuedJobs() {
+      return serviceStatistics.getQueuedJobs();
+    }
+
+    public int getRunningJobs() {
+      return serviceStatistics.getRunningJobs();
+    }
+
+    public ServiceState getStatus() {
+      return serviceStatistics.getServiceRegistration().getServiceState();
+    }
+
+    public Map<String, String> toMap() {
+      Map<String, String> serviceMap = new HashMap<String, String>();
+      serviceMap.put(COMPLETED_NAME, Integer.toString(getCompletedJobs()));
+      serviceMap.put(HOST_NAME, getHost());
+      serviceMap.put(MEAN_QUEUE_TIME_NAME, Long.toString(getMeanQueueTime()));
+      serviceMap.put(MEAN_RUN_TIME_NAME, Long.toString(getMeanRunTime()));
+      serviceMap.put(NAME_NAME, getName());
+      serviceMap.put(QUEUED_NAME, Integer.toString(getQueuedJobs()));
+      serviceMap.put(RUNNING_NAME, Integer.toString(getRunningJobs()));
+      serviceMap.put(STATUS_NAME, getStatus().name());
+      return serviceMap;
+    }
+
+    @Override
+    public String toJSONString() {
+      return JSONObject.toJSONString(toMap());
+    }
+
+    public JValue toJSON() {
+      return j(f(COMPLETED_NAME, v(getCompletedJobs())), f(HOST_NAME, vN(getHost())),
+              f(MEAN_QUEUE_TIME_NAME, v(getMeanQueueTime())), f(MEAN_RUN_TIME_NAME, v(getMeanRunTime())),
+              f(NAME_NAME, vN(getName())), f(QUEUED_NAME, v(getQueuedJobs())),
+              f(RUNNING_NAME, v(getRunningJobs())),
+              f(STATUS_NAME, vN(getStatus().name())));
+    }
+
+  }
+
+  class ServiceStatisticsComparator implements Comparator<Service> {
+
+    private final String sortBy;
+    private final boolean ascending;
+
+    ServiceStatisticsComparator(String sortBy, boolean ascending) {
+      if (StringUtils.equalsIgnoreCase(Service.COMPLETED_NAME, sortBy)) {
+        this.sortBy = Service.COMPLETED_NAME;
+      } else if (StringUtils.equalsIgnoreCase(Service.HOST_NAME, sortBy)) {
+        this.sortBy = Service.HOST_NAME;
+      } else if (StringUtils.equalsIgnoreCase(Service.MEAN_QUEUE_TIME_NAME, sortBy)) {
+        this.sortBy = Service.MEAN_QUEUE_TIME_NAME;
+      } else if (StringUtils.equalsIgnoreCase(Service.MEAN_RUN_TIME_NAME, sortBy)) {
+        this.sortBy = Service.MEAN_RUN_TIME_NAME;
+      } else if (StringUtils.equalsIgnoreCase(Service.NAME_NAME, sortBy)) {
+        this.sortBy = Service.NAME_NAME;
+      } else if (StringUtils.equalsIgnoreCase(Service.QUEUED_NAME, sortBy)) {
+        this.sortBy = Service.QUEUED_NAME;
+      } else if (StringUtils.equalsIgnoreCase(Service.RUNNING_NAME, sortBy)) {
+        this.sortBy = Service.RUNNING_NAME;
+      } else if (StringUtils.equalsIgnoreCase(Service.STATUS_NAME, sortBy)) {
+        this.sortBy = Service.STATUS_NAME;
+      } else {
+        throw new IllegalArgumentException(String.format("Can't sort services by %s.", sortBy));
+      }
+      this.ascending = ascending;
+    }
+
+    @Override
+    public int compare(Service s1, Service s2) {
+      int result = 0;
+      switch (sortBy) {
+        case Service.COMPLETED_NAME:
+          result = s1.getCompletedJobs() - s2.getCompletedJobs();
+          break;
+        case Service.HOST_NAME:
+          result = s1.getHost().compareToIgnoreCase(s2.getHost());
+          break;
+        case Service.MEAN_QUEUE_TIME_NAME:
+          result = (int) (s1.getMeanQueueTime() - s2.getMeanQueueTime());
+          break;
+        case Service.MEAN_RUN_TIME_NAME:
+          result = (int) (s1.getMeanRunTime() - s2.getMeanRunTime());
+          break;
+        case Service.QUEUED_NAME:
+          result = s1.getQueuedJobs() - s2.getQueuedJobs();
+          break;
+        case Service.RUNNING_NAME:
+          result = s1.getRunningJobs() - s2.getRunningJobs();
+          break;
+        case Service.STATUS_NAME:
+          result = s1.getStatus().compareTo(s2.getStatus());
+          break;
+        case Service.NAME_NAME: // default sorting criterium
+        default:
+          result = s1.getName().compareToIgnoreCase(s2.getName());
+      }
+      return ascending ? result : 0 - result;
+    }
+  }
+
+  public void activate() {
+    logger.info("ServicesEndpoint is activated!");
   }
 
   /**
@@ -120,46 +280,4 @@ public class ServicesEndpoint {
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
-
-  /**
-   * Query the list of services
-   */
-  private ServiceQueryResult getFilteredList(ResourceListQuery query) throws ServiceRegistryException {
-    ServiceQueryResult result = new ServiceQueryResult();
-    List<JSONAware> services = new ArrayList<JSONAware>();
-
-    List<ServiceStatistics> serviceStatistics = serviceRegistry.getServiceStatistics();
-    result.totalCount = serviceStatistics.size();
-    for (ServiceStatistics stats : serviceStatistics) {
-      Service service = new Service(stats);
-      if (service.isCompliant(query)) {
-        services.add(service);
-      }
-    }
-
-    result.filteredResult = ListProviderUtil.filterMap(services, query);
-    return result;
-  }
-
-  class ServiceQueryResult {
-    private int totalCount;
-    private List<JSONAware> filteredResult;
-
-    public int getTotalCount() {
-      return totalCount;
-    }
-
-    public void setTotalCount(int totalCount) {
-      this.totalCount = totalCount;
-    }
-
-    public List<JSONAware> getFilteredResult() {
-      return new ArrayList<JSONAware>(filteredResult);
-    }
-
-    public void setFilteredResult(List<JSONAware> filteredResult) {
-      this.filteredResult = new ArrayList<JSONAware>(filteredResult);
-    }
-  }
-
 }
