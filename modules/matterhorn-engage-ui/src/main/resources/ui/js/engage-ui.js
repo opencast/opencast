@@ -133,11 +133,11 @@ $(document).ready(function() {
         var loadEp = ( (GetURLParameter("e") == undefined) ||
             (GetURLParameter("e") != 1) ) ? false : true;
 
-        console.log("Load Series or Episodes: " + loadSer + "/" + loadEp);
+        log("Load Series or Episodes: " + loadSer + "/" + loadEp);
 
         // get page from url parameter
         page = GetURLParameter("p") == undefined ? 1 : parseInt(GetURLParameter("p"));
-        console.log("Load Page: " + page);
+        log("Load Page: " + page);
 
         // load episodes from specific series
         var epFromGet       = GetURLParameter("epFrom");
@@ -145,12 +145,12 @@ $(document).ready(function() {
 
         // search query from form
         var searchQuery = GetURLParameter("q") == undefined ? "" : "q="+GetURLParameter("q")+"&";
-        console.log("Searching for: " + searchQuery);
-        $("#searchInput").val(GetURLParameter("q"));
+        log("Searching for: " + searchQuery);
+        if(searchQuery != "") $("#searchInput").val(decodeURI(GetURLParameter("q")));
 
         // sort
         sort = GetURLParameter("sort") == undefined ? "" : "sort="+GetURLParameter("sort")+"&";
-        console.log("Sort: " + sort);
+        log("Sort: " + sort);
 
         if(loadEp || (!loadEp && !loadSer)) {
             $($nav_switch_li).removeClass("active");
@@ -365,7 +365,7 @@ $(document).ready(function() {
 
         /* pagination */
         $($next).on("click", function() {
-            console.log("Click on Next");
+            log("Click on Next");
             if ($(this).hasClass("disabled")) {
                 return;
             };
@@ -380,14 +380,17 @@ $(document).ready(function() {
                 $($previous).removeClass("disabled");
             };
 
-            console.log("Gehe zu Seite: " + page);
+            if (page == Math.floor(totalEntries / bufferEntries) + 1) {
+                $(this).addClass("disabled");
+            };
+
             var searchString = window.location.search;
             if(searchString == "") {
               searchString = "?p=" + page;
             } else {
               searchString = searchString.replace(/p=\d/, "p=" + page)
             }
-            console.log("Edit: " + searchString);
+
             window.history.pushState("Media Module", "Page " + page, searchString);
 
             if (active == "series") {
@@ -399,7 +402,7 @@ $(document).ready(function() {
         });
 
         $($next).on("keypress", function(ev) {
-            console.log("Keypress on Next");
+            log("Keypress on Next");
             if (ev.which == 13 || ev.which == 32) {
                 if ($(this).hasClass("disabled")) {
                     return;
@@ -437,14 +440,14 @@ $(document).ready(function() {
             if (page == 1) {
                 $(this).addClass("disabled");
             };
-            console.log("Gehe zu Seite: " + page);
+
             var searchString = window.location.search;
             if(searchString == "") {
               searchString = "?p=" + page;
             } else {
               searchString = searchString.replace(/p=\d/, "p=" + page)
             }
-            console.log("Edit: " + searchString);
+
             window.history.pushState("Media Module", "Page " + page, searchString);
             if (active == "series") {
                 loadSeries(true);
@@ -502,7 +505,7 @@ $(document).ready(function() {
     }
 
     function loadEpisodes(cleanGrid, rest) {
-        console.log("Loading Episodes with: " + rest);
+        log("Loading Episodes with: " + rest);
         active="episodes";
 
         var requestUrl = restEndpoint + "episode.json?limit=" + bufferEntries +
@@ -521,8 +524,9 @@ $(document).ready(function() {
 
                 if (data && data["search-results"] && data["search-results"]["total"]) {
                     // number of total search results
-                    var total = data["search-results"]["total"];
-                    totalEntries = total;
+                    totalEntries = data["search-results"]["total"];
+                    var total = data["search-results"]["limit"];
+
                     if (data["search-results"] == undefined || total == undefined) {
                         log("Error: Search results (total) undefined");
                         $($main_container).append(msg_html_sthWentWrong);
@@ -545,6 +549,7 @@ $(document).ready(function() {
                     } else {
                         $($next).removeClass("disabled");
                     }
+                    // TODO Why is limit = # results?
                     if (total == 1) {
                         buildGrid(result);
                         return;
@@ -670,7 +675,7 @@ $(document).ready(function() {
     }
 
     function createSeriesGrid(data) {
-        console.log("build series grid");
+        log("build series grid");
         if (data && data.id) {
             var seriesClass = "series" + data.id + " ";
             var color = generateSeriesColor(data.id);
@@ -721,7 +726,7 @@ $(document).ready(function() {
     }
 
     function loadSeries(cleanGrid, rest) {
-        console.log("Loading Series with: " + rest);
+        log("Loading Series with: " + rest);
         active="series";
         var requestUrl = restEndpoint + "/series.json?limit=6&offset=" + (page - 1) * 6 + "&" + rest;
         $.ajax({
@@ -735,8 +740,8 @@ $(document).ready(function() {
                         tabIndexNumber=100;
                     }
 
-                    var total = data2["search-results"]["total"];
-                    totalEntries = total;
+                    totalEntries = data2["search-results"]["total"];
+                    var total = data2["search-results"]["limit"];
 
                     if (total == 0) {
                         $($main_container).append(msg_html_noseries);
