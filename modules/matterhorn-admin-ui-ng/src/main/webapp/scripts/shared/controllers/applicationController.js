@@ -14,8 +14,8 @@ angular.module('adminNg.controllers')
 
         $scope.currentUser  = null;
         $scope.feedbackUrl = undefined;
-        $scope.documentationUrl = undefined;
-        $scope.restdocsUrl = undefined;
+        $scope.documentationUrl = 'http://docs.opencast.org';
+        $scope.restdocsUrl = '/rest_docs.html';
         $scope.mediaModuleUrl = '/engage/ui';
 
         AuthService.getUser().$promise.then(function (user) {
