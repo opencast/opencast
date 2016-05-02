@@ -66,7 +66,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@RestService(name = "ServicesProxyService", title = "UI Services", notes = "These Endpoints deliver informations about the services required for the UI.", abstractText = "This service provides the services data for the UI.")
+@RestService(name = "ServicesProxyService", title = "UI Services",
+        notes = "These Endpoints deliver informations about the services required for the UI.",
+        abstractText = "This service provides the services data for the UI.")
 public class ServicesEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(ServicesEndpoint.class);
   private ServiceRegistry serviceRegistry;
@@ -81,7 +83,8 @@ public class ServicesEndpoint {
           @RestParameter(name = "host", isRequired = false, description = "Filter results by host name", type = STRING),
           @RestParameter(name = "q", isRequired = false, description = "Filter results by free text query", type = STRING),
           @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
-                  + "of the following: ???.", type = STRING) }, reponses = { @RestResponse(description = "Returns the list of services from Matterhorn", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The list ")
+                  + "of the following: HOST, NAME (:DESC suffix result in descending sort order).", type = STRING)
+  }, reponses = { @RestResponse(description = "Returns the list of services from Opencast", responseCode = HttpServletResponse.SC_OK) },returnDescription = "The list of services")
   public Response getJobs(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset,
           @QueryParam("name") String name, @QueryParam("host") String host, @QueryParam("q") String text,
           @QueryParam("sort") String sort, @Context HttpHeaders headers) throws Exception {
@@ -94,18 +97,19 @@ public class ServicesEndpoint {
     List<Service> services = new ArrayList<Service>();
     for (ServiceStatistics stats : serviceRegistry.getServiceStatistics()) {
       Service service = new Service(stats);
-      if (nameOpt.isSome() && !service.getName().equalsIgnoreCase(nameOpt.get())) {
+      if (nameOpt.isSome() && !StringUtils.containsIgnoreCase(service.getName(), nameOpt.get())) {
         continue;
       }
 
-      if (hostOpt.isSome() && !service.getHost().equalsIgnoreCase(hostOpt.get())) {
+      if (hostOpt.isSome() && !StringUtils.containsIgnoreCase(service.getHost(), hostOpt.get())) {
         continue;
       }
 
       if (textOpt.isSome()) {
-        if (!service.getName().toLowerCase().contains(textOpt.get().toLowerCase())
-                && !service.getHost().toLowerCase().contains(textOpt.get().toLowerCase()))
+        if (!StringUtils.containsIgnoreCase(service.getName(), textOpt.get())
+                && !StringUtils.containsIgnoreCase(service.getHost(), textOpt.get())) {
           continue;
+        }
       }
       services.add(service);
     }
@@ -132,54 +136,103 @@ public class ServicesEndpoint {
     return RestUtils.okJsonList(jsonList, offset, limit, total);
   }
 
+  /**
+   * Service UI model. Wrapper class for a {@code ServiceStatistics} class.
+   */
   class Service implements JSONAware {
+    /** Completed model field name. */
     public static final String COMPLETED_NAME = "completed";
+    /** Host model field name. */
     public static final String HOST_NAME = "host";
+    /** MeanQueueTime model field name. */
     public static final String MEAN_QUEUE_TIME_NAME = "meanQueueTime";
+    /** MeanRunTime model field name. */
     public static final String MEAN_RUN_TIME_NAME = "meanRunTime";
+    /** (Service-) Name model field name. */
     public static final String NAME_NAME = "name";
+    /** Queued model field name. */
     public static final String QUEUED_NAME = "queued";
+    /** Running model field name. */
     public static final String RUNNING_NAME = "running";
+    /** Status model field name. */
     public static final String STATUS_NAME = "status";
 
+    /** Wrapped {@code ServiceStatistics} instance. */
     private final ServiceStatistics serviceStatistics;
 
+    /** Constructor, set {@code ServiceStatistics} instance to a final private property. */
     Service(ServiceStatistics serviceStatistics) {
       this.serviceStatistics = serviceStatistics;
     }
 
+    /**
+     * Returns completed jobs count.
+     * @return completed jobs count
+     */
     public int getCompletedJobs() {
       return serviceStatistics.getFinishedJobs();
     }
 
+    /**
+     * Returns service host name.
+     * @return service host name
+     */
     public String getHost() {
       return serviceStatistics.getServiceRegistration().getHost();
     }
 
+    /**
+     * Returns service mean queue time.
+     * @return service mean queue time
+     */
     public long getMeanQueueTime() {
       return serviceStatistics.getMeanQueueTime();
     }
 
+    /**
+     * Returns service mean run time.
+     * @return service mean run time
+     */
     public long getMeanRunTime() {
       return serviceStatistics.getMeanRunTime();
     }
 
+    /**
+     * Returns service name.
+     * @return service name
+     */
     public String getName() {
       return serviceStatistics.getServiceRegistration().getServiceType();
     }
 
+    /**
+     * Returns queued jobs count.
+     * @return queued jobs count
+     */
     public int getQueuedJobs() {
       return serviceStatistics.getQueuedJobs();
     }
 
+    /**
+     * Returns running jobs count.
+     * @return running jobs count
+     */
     public int getRunningJobs() {
       return serviceStatistics.getRunningJobs();
     }
 
+    /**
+     * Returns service status.
+     * @return service status
+     */
     public ServiceState getStatus() {
       return serviceStatistics.getServiceRegistration().getServiceState();
     }
 
+    /**
+     * Returns a map of all service fields.
+     * @return a map of all service fields
+     */
     public Map<String, String> toMap() {
       Map<String, String> serviceMap = new HashMap<String, String>();
       serviceMap.put(COMPLETED_NAME, Integer.toString(getCompletedJobs()));
@@ -193,11 +246,19 @@ public class ServicesEndpoint {
       return serviceMap;
     }
 
+    /**
+     * Returns a json representation of a service as {@code String}.
+     * @return a json representation of a service as {@code String}
+     */
     @Override
     public String toJSONString() {
       return JSONObject.toJSONString(toMap());
     }
 
+    /**
+     * Returns a json representation of a service as {@code JValue}.
+     * @return a json representation of a service as {@code JValue}
+     */
     public JValue toJSON() {
       return j(f(COMPLETED_NAME, v(getCompletedJobs())), f(HOST_NAME, vN(getHost())),
               f(MEAN_QUEUE_TIME_NAME, v(getMeanQueueTime())), f(MEAN_RUN_TIME_NAME, v(getMeanRunTime())),
@@ -205,14 +266,19 @@ public class ServicesEndpoint {
               f(RUNNING_NAME, v(getRunningJobs())),
               f(STATUS_NAME, vN(getStatus().name())));
     }
-
   }
 
+  /**
+   * {@code Service} comparator. Can compare service instances based on given sort criterium and sort order.
+   */
   class ServiceStatisticsComparator implements Comparator<Service> {
 
+    /** Sort criterium. */
     private final String sortBy;
+    /** Sort order (true if ascending, false otherwise). */
     private final boolean ascending;
 
+    /** Constructor. */
     ServiceStatisticsComparator(String sortBy, boolean ascending) {
       if (StringUtils.equalsIgnoreCase(Service.COMPLETED_NAME, sortBy)) {
         this.sortBy = Service.COMPLETED_NAME;
@@ -236,6 +302,12 @@ public class ServicesEndpoint {
       this.ascending = ascending;
     }
 
+    /**
+     * Compare two service instances based on given sort criterium and order.
+     * @param s1 first {@code Service} instance to compare
+     * @param s2 second {@code Service} instance to compare
+     * @return
+     */
     @Override
     public int compare(Service s1, Service s2) {
       int result = 0;
@@ -269,6 +341,7 @@ public class ServicesEndpoint {
     }
   }
 
+  /** OSGI activate method. */
   public void activate() {
     logger.info("ServicesEndpoint is activated!");
   }
