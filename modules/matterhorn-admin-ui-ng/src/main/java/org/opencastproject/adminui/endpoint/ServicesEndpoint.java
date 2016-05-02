@@ -83,8 +83,9 @@ public class ServicesEndpoint {
           @RestParameter(name = "host", isRequired = false, description = "Filter results by host name", type = STRING),
           @RestParameter(name = "q", isRequired = false, description = "Filter results by free text query", type = STRING),
           @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
-                  + "of the following: HOST, NAME (:DESC suffix result in descending sort order).", type = STRING)
-  }, reponses = { @RestResponse(description = "Returns the list of services from Opencast", responseCode = HttpServletResponse.SC_OK) },returnDescription = "The list of services")
+                  + "of the following: host, name, running, queued, completed,  meanRunTime, meanQueueTime, "
+                  + "status. The sort suffix must be :asc for ascending sort order and :desc for descending.", type = STRING)
+  }, reponses = { @RestResponse(description = "Returns the list of services from Opencast", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The list of services")
   public Response getJobs(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset,
           @QueryParam("name") String name, @QueryParam("host") String host, @QueryParam("q") String text,
           @QueryParam("sort") String sort, @Context HttpHeaders headers) throws Exception {
