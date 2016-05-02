@@ -8,6 +8,14 @@
     float: left;
 }
 
+.shortcuts-table {
+    min-width: 450px;
+}
+
+.shortcut-column {
+    width: 25%;
+}
+
 .clear {
     clear: both;
 }
