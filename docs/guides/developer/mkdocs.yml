@@ -21,6 +21,7 @@ pages:
    - Release Manager: 'release-manager.md'
 - Development Environment: 'development-environment.md'
 - Licenses and Legal Matters: 'license.md'
+- Localization: 'localization.md'
 - Packaging: 'packaging.md'
 - Proposal Log: 'proposal-log.md'
 - Infrastructure:
