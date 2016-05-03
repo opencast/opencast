@@ -116,7 +116,7 @@ public class ServerEndpointTest {
 
   @Test
   public void testSortCores() throws ParseException {
-    given().param("sort", "CORES").log().all().expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
+    given().param("sort", "CORES:ASC").log().all().expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .content("count", equalTo(4)).content("total", equalTo(4)).content("results[0].hostname", equalTo("host3"))
             .content("results[1].hostname", equalTo("host2")).when().get(rt.host("/servers.json"));
 
@@ -127,7 +127,7 @@ public class ServerEndpointTest {
 
   @Test
   public void testSortHostName() throws ParseException {
-    given().param("sort", "HOSTNAME").log().all().expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
+    given().param("sort", "HOSTNAME:ASC").log().all().expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .content("count", equalTo(4)).content("total", equalTo(4)).content("results[0].hostname", equalTo("host1"))
             .content("results[1].hostname", equalTo("host2")).when().get(rt.host("/servers.json"));
 
@@ -139,7 +139,7 @@ public class ServerEndpointTest {
 
   @Test
   public void testSortMeanRunTime() {
-    given().param("sort", "meanRunTime").log().all().expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
+    given().param("sort", "meanRunTime:ASC").log().all().expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .content("count", equalTo(4)).content("total", equalTo(4)).content("results[0].hostname", equalTo("host3"))
             .content("results[1].hostname", equalTo("host1")).content("results[2].hostname", equalTo("host2"))
             .when().get(rt.host("/servers.json"));
@@ -152,7 +152,7 @@ public class ServerEndpointTest {
 
   @Test
   public void testSortMeanQueueTime() {
-    given().param("sort", "meanQueueTime").log().all().expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
+    given().param("sort", "meanQueueTime:asc").log().all().expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .content("count", equalTo(4)).content("total", equalTo(4)).content("results[0].hostname", equalTo("host2"))
             .content("results[1].hostname", equalTo("host1")).content("results[2].hostname", equalTo("host3"))
             .when().get(rt.host("/servers.json"));
@@ -165,7 +165,7 @@ public class ServerEndpointTest {
 
   @Test
   public void testSortStatus() throws ParseException {
-    given().param("sort", "ONLINE").log().all().expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
+    given().param("sort", "ONLINE:ASC").log().all().expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .content("count", equalTo(4)).content("total", equalTo(4)).content("results[0].hostname", equalTo("host3"))
             .when().get(rt.host("/servers.json"));
 

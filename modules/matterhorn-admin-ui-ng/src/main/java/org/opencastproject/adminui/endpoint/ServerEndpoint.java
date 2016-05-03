@@ -25,6 +25,9 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.matterhorn.search.SearchQuery;
+import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
@@ -52,6 +55,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -172,7 +176,7 @@ public class ServerEndpoint {
           @RestParameter(name = "maxjobs", isRequired = false, description = "Filter results by the maximum of jobs that can be run at the same time", type = INTEGER, defaultValue = "-1"),
           @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
                   + "of the following: COMPLETED (jobs), CORES, HOSTNAME, MAINTENANCE, MEANQUEUETIME (mean for jobs), MEANRUNTIME (mean for jobs), ONLINE, QUEUED (jobs), RUNNING (jobs)."
-                  + "Add ':DESC' to reverse the sort order (e.g. HOSTNAME:DESC).", type = STRING) }, reponses = { @RestResponse(description = "Returns the list of jobs from Matterhorn",
+                  + "The suffix must be :ASC for ascending or :DESC for descending sort order (e.g. HOSTNAME:DESC).", type = STRING) }, reponses = { @RestResponse(description = "Returns the list of jobs from Matterhorn",
                   responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The list of servers")
   public Response getServers(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset,
           @QueryParam("online") boolean fOnline, @QueryParam("offline") boolean fOffline,
@@ -264,31 +268,15 @@ public class ServerEndpoint {
     Sort sortKey = Sort.HOSTNAME;
     Boolean ascending = true;
     if (StringUtils.isNotBlank(sort)) {
-      // Parse the sort field and direction
-      String[] sortFieldAndOrder = StringUtils.split(sort.trim(), SORT_ORDER_SEPARATOR);
-      if (sortFieldAndOrder.length < 1 || sortFieldAndOrder.length > 2) {
-        logger.warn("Sort parameter '{}' is not valid.", sort);
-      } else {
-        String sortField = StringUtils.trimToEmpty(sortFieldAndOrder[0]);
-        try {
-          sortKey = Sort.valueOf(sortField.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            logger.warn("Sort value '{}' is not valid.", sortField);
-        }
-
-        if (sortFieldAndOrder.length == 2) {
-          String sortOrder = StringUtils.trimToEmpty(sortFieldAndOrder[1]);
-          switch (sortOrder.toUpperCase()) {
-            case ASCENDING_SUFFIX:
-              ascending = true;
-              break;
-            case DESCENDING_SUFFIX:
-              ascending = false;
-              break;
-            default:
-              logger.warn("Sort order '{}' is not valid.", sortOrder);
-          }
-        }
+      try {
+        SortCriterion sortCriterion = RestUtils.parseSortQueryParameter(sort).iterator().next();
+        sortKey = Sort.valueOf(sortCriterion.getFieldName().toUpperCase());
+        ascending = SearchQuery.Order.Ascending == sortCriterion.getOrder()
+                || SearchQuery.Order.None == sortCriterion.getOrder();
+      } catch (WebApplicationException ex) {
+        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", new Object[] { sort });
+      } catch (IllegalArgumentException ex) {
+        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", new Object[] { sort });
       }
     }
 
