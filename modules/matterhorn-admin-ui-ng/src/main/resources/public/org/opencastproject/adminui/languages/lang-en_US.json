@@ -84,7 +84,7 @@
      "SERIES_ADDED":        "The series has been created",
      "SERIES_NOT_SAVED":    "The series could not be saved",
      "EVENTS_CREATED":      "The event has been created",
-     "EVENTS_UPLOAD_STARTED": "The event is being uploaded...",
+     "EVENTS_UPLOAD_STARTED": "The event is being uploaded…",
      "EVENTS_NOT_CREATED":  "The event could not be created",
      "EVENTS_UPDATED_NB":   "{{ number }} events have been successfully updated",
      "EVENTS_UPDATED_ALL":   "All events have been successfully updated",
@@ -141,7 +141,7 @@
      "TITLE_UPLOAD_ERROR": "Error while uploading media",
      "LICENSE_UPLOAD_ERROR": "Error while uploading media",
      "WATERMARK_UPLOAD_ERROR": "Error while uploading media",
-     "THEME_UPLOAD_STARTED": "The media is being uploaded...",
+     "THEME_UPLOAD_STARTED": "The media is being uploaded…",
      "THEME_CREATED": "The theme has been created",
      "THEME_NOT_CREATED": "The theme could not be created",
      "THEME_DELETED":        "The theme has been deleted",
@@ -150,7 +150,7 @@
      "TASK_NOT_CREATED": "The task could not be created",
      "VIDEO_CUT_NOT_SAVED": "The editing information could not be saved",
      "VIDEO_CUT_SAVED": "The editing information has been saved",
-     "VIDEO_CUT_PROCESSING": "The video is being processed...",
+     "VIDEO_CUT_PROCESSING": "The video is being processed…",
      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Please try again later.",
      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Please try again later.",
      "ACTIVE_TRANSACTION": "The current event can currently not be edited as it is involved of an active transaction."
@@ -662,7 +662,7 @@
          },
          "COMMENTS": {
            "CAPTION":     "Comments",
-           "PLACEHOLDER": "Comment...",
+           "PLACEHOLDER": "Comment…",
            "SELECTPLACEHOLDER": "Select reasons",
            "RESOLVED":    "Resolved",
            "REPLY":       "Reply",
@@ -1120,7 +1120,7 @@
             "TITLE": "Metadata",
             "NAME": {
               "CAPTION": "Name",
-              "PLACEHOLDER": "Name..."
+              "PLACEHOLDER": "Name…"
             }
           },
          "ACCESS": {
@@ -1158,7 +1158,7 @@
             "TITLE": "Metadata",
             "NAME": {
               "CAPTION": "Name",
-              "PLACEHOLDER": "Name..."
+              "PLACEHOLDER": "Name…"
             }
           },
          "ACCESS": {
@@ -1476,8 +1476,8 @@
    "LOGIN": {
      "WELCOME":  "Welcome to Opencast",
      "REMEMBER": "Remember me on this computer",
-     "USERNAME": "Username...",
-     "PASSWORD": "Password...",
+     "USERNAME": "Username…",
+     "PASSWORD": "Password…",
      "LOGIN":    "Login",
      "ERROR":    "Incorrect username and / or password"
    },
@@ -1485,16 +1485,16 @@
      "CLEAR":       "Clear all filters",
      "REMOVE":      "Remove filter",
      "ADD":         "Add filters",
-     "PLACEHOLDER": "Search...",
+     "PLACEHOLDER": "Search…",
      "PROFILES": {
        "FILTERS_HEADER":          "Saved filter sets",
        "EMPTY":                   "No saved filters yet",
        "SAVE_FILTERS":            "Save",
        "FILTER_HEADER":           "Save filter set",
        "NAME":                    "Name",
-       "NAME_PLACEHOLDER":        "Name...",
+       "NAME_PLACEHOLDER":        "Name…",
        "DESCRIPTION":             "Description",
-       "DESCRIPTION_PLACEHOLDER": "Description..."
+       "DESCRIPTION_PLACEHOLDER": "Description…"
      }
    },
    "FILTERS": {
@@ -1659,7 +1659,7 @@
    },
    "TABLE_SUMMARY": "{{numberOfRows}} rows",
    "TABLE_NO_RESULT": "No results found",
-   "TABLE_LOADING": "Loading...",
+   "TABLE_LOADING": "Loading…",
    "PM": {
      "BLACKLIST": {
        "REASONS": {
