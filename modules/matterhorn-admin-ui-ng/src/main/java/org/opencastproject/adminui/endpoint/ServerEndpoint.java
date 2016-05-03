@@ -143,10 +143,6 @@ public class ServerEndpoint {
   public static final Response NOT_FOUND = Response.status(Response.Status.NOT_FOUND).build();
   public static final Response SERVER_ERROR = Response.serverError().build();
 
-  private static final char SORT_ORDER_SEPARATOR = ':';
-  private static final String ASCENDING_SUFFIX = "ASC";
-  private static final String DESCENDING_SUFFIX = "DESC";
-
   private ServiceRegistry serviceRegistry;
 
   /** OSGi callback for the service registry. */
