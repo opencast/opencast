@@ -4,7 +4,7 @@
   <tools>
     <tool>
       <name>ffmpeg</name>
-      <minversion>2.8</minversion>
+      <minversion>3.0.1</minversion>
     </tool>
     <tool>
       <name>hunspell</name>
@@ -26,12 +26,34 @@
       <name>tesseract-langpack-deu</name>
       <minversion>3</minversion>
     </tool>
+    <tool>
+      <name>unzip</name>
+    </tool>
+    <tool>
+      <name>gcc-c++</name>
+    </tool>
+    <tool>
+      <name>tar</name>
+    </tool>
+    <tool>
+      <name>bzip2</name>
+    </tool>
+    <tool>
+      <name>git</name>
+    </tool>
   </tools>
 
   <!-- Specify which modules require which tools -->
   <requirements>
     <requirement>
       <build>maven</build>
+    </requirement>
+    <requirement>
+      <module>admin-ui-ng</module>
+      <build>unzip</build>
+      <build>gcc-c++</build>
+      <build>tar</build>
+      <build>bzip2</build>
     </requirement>
     <requirement>
       <module>composer-ffmpeg</module>
