@@ -4,7 +4,7 @@ Security usually is a challenging, technically aspects of any software system. H
 ## Content Security in Opencast 
 In many settings, some or even all content published by an Opencast installation must not be accessible by just anyone. Instead, access control restricts access to those users with corresponding permissions. So, if access control already ensures that each user only has access to the recordings he or she is allowed to see, what does Stream Security add to the mix?
 
-Looking more closely at what it means to serve recordings to a viewer reveals that a distinction needs to be made between the presentation of the video player, the recording metadata and the serving of the video streams, preview images etc. to that player. The former is protected by the Engage part of the Opencast application, while the latter are served by HTTP download and streaming servers like Apache HTTPd, Nginx or Wowza. The important takeaway here is that all of those distribution servers are independent of Opencast and have no knowledge about the current user and its permissions with regard to the video asset that user is requesting.
+Looking more closely at what it means to serve recordings to a viewer reveals that a distinction needs to be made between the presentation of the video player, the recording metadata and the serving of the video streams, preview images etc. to that player. The former is protected by the Engage part of the Opencast application, while the latter are served by HTTP download and streaming servers. The important takeaway here is that all of those distribution servers are independent of Opencast and have no knowledge about the current user and its permissions with regard to the video asset that user is requesting.
 
 To summarize: while Opencast is capable of assessing a recording’s access control list and the current user’s permissions to decide whether or not a user is allowed to access the recording’s metadata and have the player displayed, the download and streaming servers which are serving the actual video files to the player aren’t, and as a result, nothing is preventing an authorized user from passing on the actual links to the videos and images to the public, thereby circumventing the restrictions that had been implied on the presentation layer earlier on.
 
@@ -64,26 +64,19 @@ The combination of a policy specification and a signature algorithm forms the si
 ### Components
 A typical signing infrastructure consists of two main components: a signing service and a verification component. While the signing service is used to sign arbitrary URLs, the verification component is located on the distribution servers to protect the resources and only serve requests that have been properly signed. 
 
-All signing providers and verification components developed by the Opencast community implement the [Opencast Signing Protocol](../../developer/stream-security-insights#Opencast Signing Protocol) and are therefore compatible.
+All signing providers and verification components developed by the Opencast community implement the Opencast Signing Protocol as documented in the Developer Guide and are therefore compatible.
 
 #### URL Signing Service
 The URL Signing Service is designed to support one or more signing implementations called Signing Providers. With this concept, different signing protocols, and by virtue,  different verification components are supported. The resource is presented to each Signing Provider in turn, where it is either signed or passed on. This process continues until a signature is obtained.
 
-Out of the box, Opencast provides two implementations:
+Out of the box, Opencast provides the following implementation:
 
-* *Generic Signing Provider*: This provider may be used in combination with HTTP servers like Apache HTTPd or Nginx. It appends the necessary information (policy, signature and key id) to the URL.
-
-* *Wowza Signing Provider*: The Wowza Streaming Server requires the URL parameters to be properly ordered. This provider is taking these requirements into account and is also dealing with the specifics of the RTMP protocol. If you have content on a Wowza Streaming Server that will be consumed over HTTP such as Apple HLS you should configure the signing through this provider as well.
+* *Generic Signing Provider*: This provider may be used in combination with HTTP servers. It appends the necessary information (policy, signature and key id) to the URL.
 
 The URL Signing Service makes it straight forward to provide additional implementations to handle third party distribution servers URL signatures. This becomes important in situations where files are served by a server that is currently not supported or if files are served by a CDN that implements its own proprietary signing protocol.
 
 #### Verification components
 In order to take advantage of the signed URLs, a verification component needs to reside on the distribution servers to verify the validity of the signature (i.e. check that the URL has not been altered after it was signed) and then grant or deny access to the resource, based on the the policy associated  with the URL.
-
-The Opencast community currently maintains verification components for these servers:
-
-* Wowza Streaming server
-* Apache HTTPd
 
 In addition to these external verification components there is also an Opencast verification component called the UrlSigningFilter that is used to protect files that Opencast itself provides.
 
@@ -93,7 +86,5 @@ For the verification components there is the option for strict or non-strict che
 
 For further technical information like installation instructions, configuration guides, server plugins and the signing specification, please have a look at these documents:
 
-* [Configuration & Testing](../configuration/stream-security.md)
-* [Developer Documentation](../../developer/subsystems/stream-security)
-* [Apache HTTPd Verification Component](https://bitbucket.org/opencast-community/apache-httpd-stream-security-plugin)
-* [Wowza Verification Component](https://bitbucket.org/opencast-community/wowza-stream-security-plugin)
+* [Stream Security Configuration & Testing](../configuration/stream-security.md) 
+* The Opencast Signing Protocol is defined in the subsection Stream Security in the section Modules of the Developer Guide

@@ -23,10 +23,10 @@ pages:
 - Licenses and Legal Matters: 'license.md'
 - Packaging: 'packaging.md'
 - Proposal Log: 'proposal-log.md'
-- Subsystems:
-   - Overview: 'subsystems/index.md'
-   - Admin UI: 'subsystems/admin-ui.md'
-   - Stream Security: 'subsystems/stream-security.md'
+- Modules:
+   - Overview: 'modules/index.md'
+   - Admin UI: 'modules/admin-ui.md'
+   - Stream Security: 'modules/stream-security.md'
 - Infrastructure:
    - Overview: 'infrastructure/index.md'
    - Nexus Maven Repository: 'infrastructure/nexus.md'

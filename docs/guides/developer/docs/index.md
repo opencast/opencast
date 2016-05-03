@@ -11,9 +11,9 @@ These guides will help you if you want to participate in Opencast development.
  - [Proposal Log](proposal-log.md)
  - [Licenses and Legal Matters](license.md)
  - [Packaging Guidelines](packaging.md)
- - [Subsystems](subsystems/index.md)
-    - [Admin UI](subsystems/admin-ui.md)
-    - [Stream Security](subsystems/stream-security.md)
+ - [Modules](modules/index.md)
+    - [Admin UI](modules/admin-ui.md)
+    - [Stream Security](modules/stream-security.md)
  - [Project Infrastructure](infrastructure/index.md)
     - [Nexus Maven Repository](infrastructure/nexus.md)
 
