@@ -36,6 +36,8 @@ import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
+import org.opencastproject.matterhorn.search.SearchQuery;
+import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.IncidentL10n;
@@ -88,6 +90,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -110,7 +113,6 @@ public class JobEndpoint {
 
   private static final String NEGATE_PREFIX = "-";
   private static final char SORT_ORDER_SEPARATOR = ':';
-  private static final String ASCENDING_SUFFIX = "ASC";
   private static final String DESCENDING_SUFFIX = "DESC";
 
   private WorkflowService workflowService;
@@ -142,39 +144,23 @@ public class JobEndpoint {
   @RestQuery(description = "Returns the list of active jobs", name = "jobs", restParameters = {
           @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = RestParameter.Type.INTEGER),
           @RestParameter(name = "offset", description = "The offset", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "sort", description = "The sort order. May include any of the following: OPERATION, STATUS, SUBMITTED, WORKFLOW."
-                  + "Add ':DESC' to reverse the sort order (e.g. SUBMITTED:DESC).", isRequired = false, type = RestParameter.Type.STRING)},
-          reponses = { @RestResponse(description = "Returns the list of active jobs from Matterhorn", responseCode = HttpServletResponse.SC_OK) },
+          @RestParameter(name = "sort", description = "The sort order. May include any of the following: CREATOR, OPERATION, PROCESSINGHOST, STATUS, STARTED, SUBMITTED or TYPE. "
+                  + "The suffix must be :ASC for ascending or :DESC for descending sort order (e.g. OPERATION:DESC)", isRequired = false, type = RestParameter.Type.STRING)},
+          reponses = { @RestResponse(description = "Returns the list of active jobs from Opencast", responseCode = HttpServletResponse.SC_OK) },
           returnDescription = "The list of jobs as JSON")
   public Response getJobs(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset, @QueryParam("sort") final String sort) {
     JobSort sortKey = JobSort.SUBMITTED;
     boolean ascending = true;
     if (StringUtils.isNotBlank(sort)) {
-      // Parse the sort field and direction
-      String[] sortFieldAndOrder = StringUtils.split(sort.trim(), SORT_ORDER_SEPARATOR);
-      if (sortFieldAndOrder.length < 1 || sortFieldAndOrder.length > 2) {
-        logger.warn("Sort parameter '{}' is not valid.", sort);
-      } else {
-        String sortField = StringUtils.trimToEmpty(sortFieldAndOrder[0]);
-        try {
-          sortKey = JobSort.valueOf(sortField.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            logger.warn("Sort value '{}' is not valid.", sortField);
-        }
-
-        if (sortFieldAndOrder.length == 2) {
-          String sortOrder = StringUtils.trimToEmpty(sortFieldAndOrder[1]);
-          switch (sortOrder.toUpperCase()) {
-            case ASCENDING_SUFFIX:
-              ascending = true;
-              break;
-            case DESCENDING_SUFFIX:
-              ascending = false;
-              break;
-            default:
-              logger.warn("Sort order '{}' is not valid.", sortOrder);
-          }
-        }
+      try {
+        SortCriterion sortCriterion = RestUtils.parseSortQueryParameter(sort).iterator().next();
+        sortKey = JobSort.valueOf(sortCriterion.getFieldName().toUpperCase());
+        ascending = SearchQuery.Order.Ascending == sortCriterion.getOrder()
+                || SearchQuery.Order.None == sortCriterion.getOrder();
+      } catch (WebApplicationException ex) {
+        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", new Object[] { sort });
+      } catch (IllegalArgumentException ex) {
+        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", new Object[] { sort });
       }
     }
 
@@ -285,8 +271,9 @@ public class JobEndpoint {
     if (StringUtils.isNotBlank(sort)) {
       // Parse the sort field and direction
       Sort sortField = null;
-      if (sort.endsWith(DESCENDING_SUFFIX)) {
-        String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
+      if (sort.endsWith(SORT_ORDER_SEPARATOR + DESCENDING_SUFFIX)) {
+        int suffixLength = StringUtils.length(String.valueOf(SORT_ORDER_SEPARATOR)) + StringUtils.length(DESCENDING_SUFFIX);
+        String enumKey = sort.substring(0, StringUtils.length(sort) - suffixLength).toUpperCase();
         try {
           sortField = Sort.valueOf(enumKey);
           query.withSort(sortField, false);
@@ -676,7 +663,8 @@ public class JobEndpoint {
       try {
         result = ((Comparable)value1).compareTo(value2);
       } catch (ClassCastException ex) {
-        logger.debug("Cant' compare two values for sorting.", ex);
+        logger.debug("Can not compare \"{}\" with \"{}\": {}",
+                new Object[] { value1, value2, ex });
       }
 
       return ascending ? result : -1 * result;

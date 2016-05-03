@@ -74,8 +74,6 @@ public class JobEndpointTest {
     String actual = given().expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).when()
             .get(rt.host("/jobs.json")).asString();
 
-//    assertThat(eventString, SameJSONAs.sameJSONAs(actual));
-
     eventString = IOUtils.toString(getClass().getResource("/jobsLimitOffset.json"));
 
     actual = given().queryParam("offset", 1).queryParam("limit", 1).expect().log().all().statusCode(HttpStatus.SC_OK)
@@ -87,7 +85,7 @@ public class JobEndpointTest {
 
   @Test
   public void testSortCreator() {
-    given().param("sort", "creator").log().all().expect()
+    given().param("sort", "creator:ASC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
             .content("count", equalTo(4)).content("total", equalTo(5))
             .content("results[0].creator", equalTo("testuser1"))
@@ -108,7 +106,7 @@ public class JobEndpointTest {
 
   @Test
   public void testSortOperation() {
-    given().param("sort", "operation").log().all().expect()
+    given().param("sort", "operation:ASC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
             .content("count", equalTo(4)).content("total", equalTo(5))
             .content("results[0].operation", equalTo("Encode"))
@@ -129,7 +127,7 @@ public class JobEndpointTest {
 
   @Test
   public void testSortProcessingHost() {
-    given().param("sort", "processingHost").log().all().expect()
+    given().param("sort", "processingHost:ASC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
             .content("count", equalTo(4)).content("total", equalTo(5))
             .content("results[0].processingHost", equalTo("host1"))
@@ -150,7 +148,7 @@ public class JobEndpointTest {
 
   @Test
   public void testSortStarted() {
-    given().param("sort", "started").log().all().expect()
+    given().param("sort", "started:ASC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
             .content("count", equalTo(4)).content("total", equalTo(5))
             .content("results[0].started", equalTo("2014-06-05T09:05:00Z"))
@@ -171,7 +169,7 @@ public class JobEndpointTest {
 
   @Test
   public void testSortSubmitted() {
-    given().param("sort", "submitted").log().all().expect()
+    given().param("sort", "submitted:ASC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
             .content("count", equalTo(4)).content("total", equalTo(5))
             .content("results[0].submitted", equalTo("2014-06-05T09:05:00Z"))
@@ -192,7 +190,7 @@ public class JobEndpointTest {
 
   @Test
   public void testSortType() {
-    given().param("sort", "type").log().all().expect()
+    given().param("sort", "type:ASC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
             .content("count", equalTo(4)).content("total", equalTo(5))
             .content("results[0].type", equalTo("org.opencastproject.composer"))
