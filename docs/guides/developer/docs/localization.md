@@ -32,7 +32,7 @@ Note that the branch `<branch>` will be automatically created if it is not yet e
 
 To download the translations from Crowdin, use the following command:
 
-    java -jar crowdin-cli.jar --config .crowdin.yaml download translation -b <branch>
+    java -jar crowdin-cli.jar --config .crowdin.yaml download translations -b <branch>
 
 References
 ----------
