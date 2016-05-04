@@ -324,7 +324,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     String encodedPassword = null;
     //only update Password if a value is set
     if ("".equals(user.getPassword())) {
-        JpaUser old = UserDirectoryPersistenceUtil.findUser(user.getName(),user.getOrganization().getId(), emf);
+        JpaUser old = UserDirectoryPersistenceUtil.findUser(user.getUsername(),user.getOrganization().getId(), emf);
         encodedPassword = old.getPassword();
     } else  {
     // Update an JPA user with an encoded password.
