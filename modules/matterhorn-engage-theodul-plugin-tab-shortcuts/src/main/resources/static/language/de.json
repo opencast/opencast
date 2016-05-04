@@ -45,15 +45,15 @@
   "layout.togglePiP":"Bild in Bild ein\/aus",
   "layout.movePiP":"Bild in Bild verschieben",
   "shortcuts":"Tastenkürzel",
-  "zoom.moveLeft":"Nach links bewegen",
-  "zoom.moveRight":"Nach rechts bewegen",
-  "zoom.moveUp":"Nach oben bewegen",
-  "zoom.moveDown":"Nach unten bewegen",
-  "zoom.in":"Hereinzommen",
+  "zoom.moveLeft":"Nach links verschieben",
+  "zoom.moveRight":"Nach rechts verschieben",
+  "zoom.moveUp":"Nach oben verschieben",
+  "zoom.moveDown":"Nach unten verschieben",
+  "zoom.in":"Heranzoomen",
   "zoom.out":"Herauszoomen",
-  "controls":"Steuerung",
+  "controls":"Videosteuerungen",
   "volume":"Lautstärke",
   "playbackrate":"Wiedergabegeschwindigkeit",
-  "layout":"Bildschirmaufteilung",
-  "zoom":"Zoom"
+  "layout":"Bildschirmaufbau",
+  "zoom":"Vergrößerung"
 }
