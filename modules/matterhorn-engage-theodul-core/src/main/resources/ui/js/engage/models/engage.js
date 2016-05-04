@@ -112,7 +112,8 @@ define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'en
             "pluginsInfo": new PluginInfoModel(),
             "pluginModels": new PluginModelCollection(),
             "meInfo": new MeInfoModel(),
-            "urlParameters": {}
+            "urlParameters": {},
+            "language": "en"
         }
     });
 

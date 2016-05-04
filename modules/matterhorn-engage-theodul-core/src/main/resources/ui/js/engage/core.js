@@ -161,8 +161,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   }
 
   function detectLanguage() {
-    var language = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
-    return language.replace(/\-.*/, '');
+    return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
   }
 
   function initTranslate(language) {
@@ -177,8 +176,14 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         if (data) {
           data.value_locale = language;
           translationData = data;
+          engageCore.model.set("language", language);
         }
       }
+    }).fail(function(msg) {
+        engageCore.log("No language file found for " + language + ".");
+        if (language !== language.replace(/\-.*/, '')) {
+           initTranslate(language.replace(/\-.*/, ''));
+        }
     });
   }
 

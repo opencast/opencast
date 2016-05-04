@@ -36,11 +36,6 @@ define(["jquery"], function($) {
         // nothing to see here
     }
 
-    Utils.prototype.detectLanguage = function() {
-        var language = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
-        return language.replace(/\-.*/,'');
-    }
-
     Utils.prototype.escapeHtml = function(string) {
         return String(string).replace(/[&<>"'\/]/g, function(s) {
             return entityMap[s];
