@@ -19,7 +19,7 @@ Working with Crowdin CLI
 
 The Crowdin CLI command line tool is used to synchronize the master language files and translations between the Opencast code repository and Crowdin.
 
-The Crowdin CLI configuration can be found in `/.crowdin.json`
+The Crowdin CLI configuration can be found in `/.crowdin.yaml`
 
 ***Important**: To be able to access Crodwin using the Crowdin CLI tool, the API keys needs to be added to that configuration file.*
 
