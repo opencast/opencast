@@ -1,5 +1,5 @@
 ALTER TABLE mh_job ADD job_load FLOAT NOT NULL DEFAULT '1.0';
-ALTER TABLE mh_job ADD blocking_job BIGINT(20) DEFAULT NULL;
+ALTER TABLE mh_job ADD blocking_job BIGINT DEFAULT NULL;
 
 ALTER TABLE mh_host_registration ADD max_load FLOAT NOT NULL DEFAULT '1.0';
 UPDATE mh_host_registration SET max_load=max_jobs;
