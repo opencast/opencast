@@ -1,8 +1,6 @@
-Stream Security Developer Docs
-=================
-To get an introduction to Stream Security before deploying please read the overview at:
-
-* [Stream Security Overview](../admin/overview/stream-security)
+Stream Security Developer Guide
+===============================
+To get an introduction to Stream Security, please read the sub section Stream Security in the section Modules of the Admin Guide.
 
 # Opencast Signing Protocol
 The Signing Providers as well as the verification components that are developed by the Opencast community implement the policy and signature specified in the Opencast Signing Protocol. 
@@ -117,12 +115,5 @@ Opencast servers that have been configured to use URL signing service will have 
 
 ## Further information
 
-For an overview of Stream Security:
-
-* [Stream Security Overview](../admin/overview/stream-security)
-
-For further technical information like installation instructions, configuration guides, server plugins, please have a look at these documents:
-
-* [Configuration & Testing](../admin/configuration/stream-security)
-* [Apache HTTPd Verification Component](https://bitbucket.org/opencast-community/apache-httpd-stream-security-plugin)
-* [Wowza Verification Component](https://bitbucket.org/opencast-community/wowza-stream-security-plugin)
+* For an overview of Stream Security, please consult the sub section Stream Security in the section Modules of the Admin Guide.
+* For information about how to configure stream security on your Opencast servers, please consult the sub section Stream Security in the section Configuration of the Admin Guide

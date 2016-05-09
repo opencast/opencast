@@ -62,7 +62,8 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   var browser_minVersion_chrome = 30;
   var browser_minVersion_opera = 20;
   var browser_minVersion_safari = 7;
-  var browser_minVersion_msie = 9;
+  var browser_minVersion_msie = 11;
+  var browser_minVersion_msedge = 13;
   var zoom_wasd_step_size = 15;
 
   /* don't change these variables */
@@ -87,6 +88,12 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   var id_btn_login = "btn_login";
   var id_btn_tryAnyway = "btn_tryAnyway";
   var id_customError = "customError";
+  var id_min_firefox_version = "min-firefox-version";
+  var id_min_chrome_version = "min-chrome-version";
+  var id_min_opera_version = "min-opera-version";
+  var id_min_safari_version = "min-safari-version";
+  var id_min_msie_version = "min-msie-version";
+  var id_min_msedge_version = "min-msedge-version";
   var class_loading = "loading";
   var plugins_loaded = {};
   var loadingDelay1 = 500;
@@ -103,29 +110,29 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   var springSecurityLoginURL = "/j_spring_security_check";
   var springLoggedInStrCheck = "<title>Opencast – Login Page</title>";
   // shortcuts
-  var shortcut_playPause = "playPause";
-  var shortcut_seekLeft = "seekLeft";
-  var shortcut_seekRight = "seekRight";
-  var shortcut_playbackrateIncrease = "playbackrateIncrease";
-  var shortcut_playbackrateDecrease = "playbackrateDecrease";
-  var shortcut_muteToggle = "muteToggle";
-  var shortcut_volDown = "volDown";
-  var shortcut_volUp = "volUp";
-  var shortcut_fullscreenEnable = "fullscreenEnable";
-  var shortcut_fullscreenCancel = "fullscreenCancel";
-  var shortcut_jumpToBegin = "jumpToBegin";
-  var shortcut_prevChapter = "prevChapter";
-  var shortcut_nextChapter = "nextChapter";
-  var shortcut_prevFocus = "focusPrev";
-  var shortcut_nextFocus = "focusNext";
-  var shortcut_movePiP = "movePiP";
-  var shortcut_togglePiP = "togglePiP";
-  var shortcut_moveLeft = "moveLeft";
-  var shortcut_moveRight = "moveRight";
-  var shortcut_moveUp = "moveUp";
-  var shortcut_moveDown = "moveDown";
-  var shortcut_zoomIn = "zoomIn";
-  var shortcut_zoomOut = "zoomOut";
+  var shortcut_playPause = "controls.playPause";
+  var shortcut_seekLeft = "controls.seekLeft";
+  var shortcut_seekRight = "controls.seekRight";
+  var shortcut_playbackrateIncrease = "playbackrate.increase";
+  var shortcut_playbackrateDecrease = "playbackrate.decrease";
+  var shortcut_muteToggle = "volume.muteToggle";
+  var shortcut_volDown = "volume.down";
+  var shortcut_volUp = "volume.up";
+  var shortcut_fullscreenEnable = "fullscreen.enable";
+  var shortcut_fullscreenCancel = "fullscreen.cancel";
+  var shortcut_jumpToBegin = "controls.jumpToBegin";
+  var shortcut_prevChapter = "controls.prevChapter";
+  var shortcut_nextChapter = "controls.nextChapter";
+  var shortcut_prevFocus = "layout.focusPrev";
+  var shortcut_nextFocus = "layout.focusNext";
+  var shortcut_movePiP = "layout.movePiP";
+  var shortcut_togglePiP = "layout.togglePiP";
+  var shortcut_moveLeft = "zoom.moveLeft";
+  var shortcut_moveRight = "zoom.moveRight";
+  var shortcut_moveUp = "zoom.moveUp";
+  var shortcut_moveDown = "zoom.moveDown";
+  var shortcut_zoomIn = "zoom.in";
+  var shortcut_zoomOut = "zoom.out";
 
   var basilOptions = {
     namespace: "mhStorage"
@@ -140,7 +147,17 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         (Bowser.chrome && Bowser.version >= browser_minVersion_chrome) ||
         (Bowser.opera && Bowser.version >= browser_minVersion_opera) ||
         (Bowser.safari && Bowser.version >= browser_minVersion_safari) ||
+        (Bowser.msedge && Bowser.version >= browser_minVersion_msedge) ||
         (Bowser.msie && Bowser.version >= browser_minVersion_msie);
+  }
+  
+  function setMinBrowserVersions() {
+      $("#" + id_min_firefox_version).text(browser_minVersion_firefox);
+      $("#" + id_min_chrome_version).text(browser_minVersion_chrome);
+      $("#" + id_min_opera_version).text(browser_minVersion_opera);
+      $("#" + id_min_safari_version).text(browser_minVersion_safari);
+      $("#" + id_min_msedge_version).text(browser_minVersion_msedge);
+      $("#" + id_min_msie_version).text(browser_minVersion_msie);
   }
 
   function detectLanguage() {
@@ -368,12 +385,14 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
           break;
         case shortcut_movePiP:
           Mousetrap.bind(val.key, function () {
-            if (pipPos === "left") {
-              pipPos = "right";
-            } else {
-              pipPos = "left";
+            if (pip) {
+                if (pipPos === "left") {
+                  pipPos = "right";
+                } else {
+                  pipPos = "left";
+                }
+                engageCore.trigger(events.movePiP.getName(), pipPos);
             }
-            engageCore.trigger(events.movePiP.getName(), pipPos);
           });
           break;
         case shortcut_togglePiP:
@@ -708,6 +727,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
       $("." + class_loading).show();
       $("#" + id_loading1).show();
       initTranslate(detectLanguage());
+      setMinBrowserVersions();
       // the main core is our global event system
       this.dispatcher = _.clone(Backbone.Events);
       // link to the engage model

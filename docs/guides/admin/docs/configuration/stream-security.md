@@ -2,7 +2,7 @@ Configuration of Stream Security
 ================================
 To get an introduction to Stream Security before deploying please read the overview at:
 
-* [Stream Security Overview](../overview/stream-security.md)
+* [Stream Security Overview](../modules/stream-security.md)
 
 
 It is important to note that if Stream Security is enabled, all resources will be signed and protected, even ones that do not have any access restrictions defined in their ACL (“public ACLs”). Accessing resources with unsigned URLs will not be possible anymore.
@@ -21,7 +21,7 @@ There are three modules that are built by default and need to be present on each
 * matterhorn-urlsigning-service-api
 * matterhorn-urlsigning-service-impl
 
-If these modules are present, the URL Signing Service will be started and available, to which the URL Signing Providers (GenericUrlSigningProvider and WowzaUrlSigningProvider by default) can then register themselves.
+If these modules are present, the URL Signing Service will be started and available, to which the URL Signing Providers can then register themselves.
 
 ## Configuration of Signing Providers
 The Signing Providers that come with Opencast each have their own configuration file:
@@ -29,12 +29,8 @@ The Signing Providers that come with Opencast each have their own configuration 
 * GenericUrlSigningProvider: 
 
     *etc/services/org.opencastproject.security.urlsigning.provider.impl.GenericUrlSigningProvider.properties*
-
-* WowzaUrlSigningProvider: 
-
-    *etc/services/org.opencastproject.security.urlsigning.provider.impl.WowzaUrlSigningProvider.properties*
  
-Both Signing Providers follow the same configuration structure and support multiple configuration blocks, providing the settings for separate distributions (i.e. download or streaming servers, services or paths).
+Signing Providers follow the same configuration structure and support multiple configuration blocks, providing the settings for separate distributions (i.e. download or streaming servers, services or paths).
 
 Each configuration block consists of the following items:
 
@@ -83,13 +79,11 @@ The default expiration time for signed internal requests is **60 seconds**. This
 ## Configuration of verification components
 The verification components ensure that only valid and correctly signed URLs are accessible at any given time. URLs which are not properly signed or have expired will be rejected. 
 
-Out of the box, Opencast provides three different verification components, each supporting a different part of an Opencast based solution:
+Out of the box, Opencast provides an internal verification component:
 
-* Apache HTTPd
-* Wowza streaming server
 * Opencast internal UrlSigningFilter
 
-The following section is dedicated to the installation and configuration of the Opencast internal UrlSigningFilter. You can find the installation and configuration of the [Apache HTTPd verification component here](https://bitbucket.org/opencast-community/apache-httpd-stream-security-plugin) and the [Wowza verification component here](https://bitbucket.org/opencast-community/wowza-stream-security-plugin). 
+The following section is dedicated to the installation and configuration of the Opencast internal UrlSigningFilter. The stream security architecture allows the implementation for URL verification for third-party applications which are not covered in this documentation.
 
 ### Configuration of Opencast verification filter
 The Servlet Filter providing the verification of requests to Opencast internal resources is implemented in these two bundles:
@@ -129,7 +123,7 @@ The second step is to configure the filter defining the endpoints to be protecte
 
 The configuration defaults to a set of regular expressions which match all of the endpoints that serve files, and avoid protecting endpoints that only serve data. Therefore, the remaining step is enabling the filter by setting the property “enabled” to “true” and determining whether strict or non-strict verification of the resource is required.
 
-The latter is similar to the corresponding configuration option in the [Apache HTTPd verification component](https://bitbucket.org/opencast-community/apache-httpd-stream-security-plugin), where strict verification of resources means the entire URL will be considered when comparing the incoming request for a resource against the policy, including the scheme (http, https etc.), hostname and port. If turned off, only the path to the resource will be considered. So if the request is for a resource at “http://httpdserver:8080/the/full/path/video.mp4”, only the “/the/full/path/video.mp4” part of the URL will be checked against the policy’s path. As mentioned before, this is useful when using a load balancer so that the requested host name doesn’t have to match the actual hostname or if a video player is rewriting requests, e. g. by inserting the port number.
+ Note that strict verification of resources means the entire URL will be considered when comparing the incoming request for a resource against the policy, including the scheme (http, https etc.), hostname and port. If turned off, only the path to the resource will be considered. So if the request is for a resource at “http://httpdserver:8080/the/full/path/video.mp4”, only the “/the/full/path/video.mp4” part of the URL will be checked against the policy’s path. As mentioned before, this is useful when using a load balancer so that the requested host name doesn’t have to match the actual hostname or if a video player is rewriting requests, e. g. by inserting the port number.
 
 Example:
 
@@ -201,13 +195,6 @@ Inspecting and modifying the policy is useful for advanced testing, such as:
 ## Further information
 For an overview of Stream Security:
 
-* [Stream Security Overview](../overview/stream-security.md)
+* [Stream Security Overview](../modules/stream-security.md)
 
-For installation instructions for external verification components:
-
-* [Apache HTTPd Verification Component](https://bitbucket.org/opencast-community/apache-httpd-stream-security-plugin)
-* [Wowza Verification Component](https://bitbucket.org/opencast-community/wowza-stream-security-plugin)
-
-For further developer information including the [Opencast Signing Protocol](../../developer/stream-security-insights#Opencast Signing Protocol), please read the information here:
-
-* [Stream Security Developer Docs](../../developer/stream-security-insights) 
+For further developer information, please have a look at the sub section Stream Security in the section Modules of the Developer Guide.

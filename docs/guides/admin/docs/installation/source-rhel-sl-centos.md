@@ -40,8 +40,12 @@ Please make sure to install the following dependencies. Note that not all depend
 Required:
 
     java-devel >= 1:1.7.0
-    ffmpeg >= 2.8
+    ffmpeg >= 3.0.1
     maven >= 3.1
+    unzip
+    gcc-c++
+    tar
+    bzip2
 
 Required (not necessarily on the same machine):
 

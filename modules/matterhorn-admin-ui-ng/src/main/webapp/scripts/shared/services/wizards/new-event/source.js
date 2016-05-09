@@ -52,9 +52,12 @@ angular.module('adminNg.services')
         var tzOffset = (new Date()).getTimezoneOffset() / -60;
         self.tz = 'UTC' + (tzOffset < 0 ? '-' : '+') + tzOffset;
 
-        CaptureAgentsResource.query({inputs: true}).$promise.then(function (data) {
-            self.captureAgents = data.rows;
-        });
+        this.loadCaptureAgents = function () {
+            CaptureAgentsResource.query({inputs: true}).$promise.then(function (data) {
+              self.captureAgents = data.rows;
+            });
+        };
+        this.loadCaptureAgents();
 
         this.ud = _.clone(EMPTY_UD);
         this.weekdays = _.clone(WEEKDAYS);

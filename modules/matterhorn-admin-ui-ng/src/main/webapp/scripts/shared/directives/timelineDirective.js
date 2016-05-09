@@ -137,7 +137,8 @@ function (PlayerAdapter, $document, VideoService) {
 
                 var style = {
                     width: (scope.video.duration * 100 / scope.zoomValue) + '%',
-                    left:  (scope.zoomOffset * -100 / scope.video.duration) + '%'
+                    left:  (scope.zoomOffset * -100 / scope.video.duration) + '%',
+                    'overflow-x': 'hidden'
                 };
 
                 if (track.waveform) {

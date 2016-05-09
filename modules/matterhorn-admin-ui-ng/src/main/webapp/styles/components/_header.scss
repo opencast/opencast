@@ -35,7 +35,7 @@
     .header-branding {
         width: 200px;
         float: left;
-        padding: 16px 20px 18px;
+        padding: 14px 20px 14px;
     }
 
     .logo {
@@ -157,8 +157,9 @@
         @include fa-icon($fa-power-off, $icon-pesudo-position, $icon-display-value, 0 14px 0 0, 0, $icon-color, $icon-font-size);
     }
 
-    .help {
-        @include build-icon(auto, auto, help, 18px, 18px);
+    .fa {
+        color: #fff;
+        font-size: 20px;
     }
 
     // Language Dropdown

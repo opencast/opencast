@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.mediapackage;
 
 import static java.lang.String.format;
@@ -83,19 +82,36 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
    *          an optional description
    */
   public MediaPackageElementFlavor(String type, String subtype, String description) {
-    if (type == null)
-      throw new IllegalArgumentException("Flavor 'type' may not be null!");
-    if (subtype == null)
-      throw new IllegalArgumentException("Flavor 'subtype' may not be null!");
-    if (type.contains(SEPARATOR))
-      throw new IllegalArgumentException(
-              format("Invalid flavor type \"%s\". Flavor parts may not contain '%s'!", type, SEPARATOR));
-    if (subtype.contains(SEPARATOR))
-      throw new IllegalArgumentException(
-              format("Invalid flavor subtype \"%s\". Flavor parts may not contain '%s'!", subtype, SEPARATOR));
-    this.type = type.trim().toLowerCase();
-    this.subtype = subtype.trim().toLowerCase();
+    this.type = checkPartSyntax(type);
+    this.subtype = checkPartSyntax(subtype);
     this.description = description;
+  }
+
+  /**
+   * Checks that any of the parts this flavor consists of abide to the syntax restrictions
+   *
+   * @param part
+   * @return
+   */
+  private String checkPartSyntax(String part) {
+    // Parts may not be null
+    if (part == null)
+      throw new IllegalArgumentException("Flavor parts may not be null!");
+
+    // Parts may not contain the flavor separator character
+    if (part.contains(SEPARATOR))
+      throw new IllegalArgumentException(
+              format("Invalid flavor part \"%s\". Flavor parts may not contain '%s'!", part, SEPARATOR));
+
+    // Parts may not contain leading and trailing blanks, and may only consist of lowercase letters
+    String adaptedPart = part.trim().toLowerCase();
+
+    // Parts may not be empty
+    if (adaptedPart.isEmpty())
+      throw new IllegalArgumentException(
+              format("Invalid flavor part \"%s\". Flavor parts may not be blank or empty!", part));
+
+    return adaptedPart;
   }
 
   public MediaPackageElementFlavor() {
@@ -249,7 +265,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
     if (s == null)
       throw new IllegalArgumentException("Unable to create element flavor from 'null'");
     String[] parts = s.split(SEPARATOR);
-    if (parts.length < 2)
+    if (parts.length != 2)
       throw new IllegalArgumentException(format("Unable to create element flavor from \"%s\"", s));
     return new MediaPackageElementFlavor(parts[0], parts[1]);
   }

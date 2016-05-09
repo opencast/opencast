@@ -69,5 +69,18 @@ Account Management
     - Andy Wasklewicz
     - Basil Brunner
     - Lars Kiesow
+    - Michael Stypa
     - Tobias Schiebeck
     - Tobias Wunden
+
+Video Conferencing
+------------------
+
+- BigBlueButton
+    - [Conference rooms](http://matterhorn.bigbluebutton.org/matterhorn)
+        - Password: welcome
+    - [Recordings](http://matterhorn.bigbluebutton.org/matterhorn/recordings.jsp)
+    - Flash based
+- AppearIn
+    - [Conference room](http://appear.in/opencast)
+    - WebRTC based; Max. 8 persons
