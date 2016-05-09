@@ -513,6 +513,21 @@ CREATE TABLE mh_message_signature (
 CREATE INDEX IX_mh_message_signature_organization ON mh_message_signature (organization);
 CREATE INDEX IX_mh_message_signature_name ON mh_message_signature (name);
 
+CREATE TABLE mh_message_template (
+  id BIGINT(20) NOT NULL,
+  organization VARCHAR(128) NOT NULL,
+  body TEXT(65535) NOT NULL,
+  creation_date DATETIME NOT NULL,
+  subject VARCHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  template_type VARCHAR(255) DEFAULT NULL,
+  creator_username VARCHAR(255) NOT NULL,
+  hidden TINYINT(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (id),
+  CONSTRAINT UNQ_mh_message_template UNIQUE (organization, name),
+  CONSTRAINT FK_mh_message_template_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE INDEX IX_mh_message_template_organization ON mh_message_template (organization);
 CREATE INDEX IX_mh_message_template_name ON mh_message_template (name);
 
