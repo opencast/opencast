@@ -59,10 +59,11 @@ Important Administrative Notes
 
      | filename                                  | installation            |
      | ----------------------------------------- | ----------------------- |
-     | `opencast-dist-admin-2.1.1.tar.gz`        | admin node              |
-     | `opencast-dist-presentation-2.1.1.tar.gz` | presentation node       |
-     | `opencast-dist-worker-2.1.1.tar.gz`       | worker node             |
-     | `opencast-dist-allinone-2.1.1.tar.gz`     | all-in-one installation |
+     | `opencast-dist-admin-2.1.2.tar.gz`        | admin node              |
+     | `opencast-dist-ingest-2.1.2.tar.gz`       | ingest node             |
+     | `opencast-dist-presentation-2.1.2.tar.gz` | presentation node       |
+     | `opencast-dist-worker-2.1.2.tar.gz`       | worker node             |
+     | `opencast-dist-allinone-2.1.2.tar.gz`     | all-in-one installation |
 
     For your convenience the all-in-one installation is automatically extracted to the `build` folder.
 
@@ -91,6 +92,14 @@ Note that backing up your Opencast instance before doing a major update is stron
 6. Update the third party tools as documented
 7. Build Opencast 2.1
 8. Start Opencast
+
+Additional Notes About 2.1.2
+----------------------------
+
+Opencast 2.1.2 is a bug fix release that fixes some security issues of Opencast 2.1.2 and 
+a couple of minor issues. It provides a resolution of the issue of Opencast hanging if ActiveMQ 
+is not available and an additional assembly that creates an ingest-only server for the Opencast 
+Cluster. 
 
 
 Additional Notes About 2.1.1
