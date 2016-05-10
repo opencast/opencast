@@ -1660,6 +1660,7 @@
    "TABLE_SUMMARY": "{{numberOfRows}} rows",
    "TABLE_NO_RESULT": "No results found",
    "TABLE_LOADING": "Loading…",
+   "TABLE_EDIT": "Edit",
    "PM": {
      "BLACKLIST": {
        "REASONS": {
