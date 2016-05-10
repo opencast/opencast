@@ -132,8 +132,8 @@ function (PlayerAdapter, $document, VideoService) {
                 // Cache the zoom value and position
                 scope.zoomValue = scope.getZoomValue();
                 scope.zoomOffset = scope.getZoomOffset();
-                scope.from = scope.zoomOffset;
-                scope.to = scope.zoomOffset + scope.zoomValue;
+                scope.from = scope.getZoomFieldOffset();
+                scope.to = scope.getZoomFieldOffset() + scope.zoomValue;
 
                 var style = {
                     width: (scope.video.duration * 100 / scope.zoomValue) + '%',
