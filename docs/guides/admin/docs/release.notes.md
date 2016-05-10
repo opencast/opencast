@@ -28,10 +28,10 @@ How to Upgrade
 6. Update the third party tools as documented in the [installation docs](installation/index.md).
 7. Build Opencast 2.2
 8. Delete the "adminui" directory in your Opencast data directory.
-9. Start Matterhorn
+9. Start Opencast
 10. Log-in to the Karaf console on your node where the search service is running (usually presentation node) and install the opencast-migration feature by entering: `feature:install opencast-migration`
 11. Check the logs for errors!
-12. Restart Matterhorn.
+12. Restart Opencast.
 13. Reconstruct the Admin UI search index by opening `http://localhost:8080/admin-ng/index/recreateIndex` in your browser or use the REST-docs, open "Admin UI - Index Endpoint" and use the testing form on "/recreateIndex". The resulting page is empty but should return an HTTP status 200 (OK).
 
 For more detailed information on the upgrade check the [upgrade documentation](upgrade/index.md).
