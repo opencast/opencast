@@ -1609,10 +1609,5 @@
         <enabled>true</enabled>
       </releases>
     </repository>
-    <repository>
-      <id>eclipse-gemini</id>
-      <name>Eclipse Gemini Maven repository</name>
-      <url>http://download.eclipse.org/gemini/mvn/</url>
-    </repository>
   </repositories>
 </project>
