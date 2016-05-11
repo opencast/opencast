@@ -168,7 +168,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
       switch (language) {
           case "en": return "en-US";
           case "de": return "de-DE";
-          case "es": return "en-ES";
+          case "es": return "es-ES";
           case "fr": return "fr-FR";
           case "nl": return "nl-NL";
           case "fi": return "fi-FI";
@@ -205,7 +205,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
       }
     }).fail(function(msg) {
         engageCore.log("No language file found for " + selectedLanguage + ".");
-        if (language !== selectedLanguage || language !== language.replace(/\-.*/, '')) {
+        if (language !== getDefaultLanguage(language.replace(/\-.*/, '')) && language !== language.replace(/\-.*/, '')) {
            initTranslate(language.replace(/\-.*/, ''));
         }
     });
