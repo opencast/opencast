@@ -204,10 +204,12 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
             if (scuts) {
                 $.each(scuts, function(i, v) {
                     var cat = v.name.split(".")[0]
-                    shortcuts[cat].push({
-                        name: translate(v.name, v.name),
-                        val: translateKeyboardCombination(v.key, "+")
-                    });
+                    if (cat !== undefined && shortcuts[cat] !== undefined) {
+                        shortcuts[cat].push({
+                            name: translate(v.name, v.name),
+                            val: translateKeyboardCombination(v.key, "+")
+                        });
+                    }
                 });
                 shortcutsParsed = true;
             }
