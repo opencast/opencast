@@ -101,6 +101,8 @@
     <module>modules/matterhorn-execute-impl</module>
     <module>modules/matterhorn-execute-remote</module>
     <module>modules/matterhorn-fileupload</module>
+    <module>modules/matterhorn-hello-world-api</module>
+    <module>modules/matterhorn-hello-world-impl</module>
     <module>modules/matterhorn-holdstate-workflowoperation</module>
     <module>modules/matterhorn-incident-workflowoperation</module>
     <module>modules/matterhorn-index-service</module>
