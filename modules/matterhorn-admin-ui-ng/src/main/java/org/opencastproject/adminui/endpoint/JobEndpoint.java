@@ -112,8 +112,6 @@ public class JobEndpoint {
   }
 
   private static final String NEGATE_PREFIX = "-";
-  private static final char SORT_ORDER_SEPARATOR = ':';
-  private static final String DESCENDING_SUFFIX = "DESC";
 
   private WorkflowService workflowService;
   private ServiceRegistry serviceRegistry;
@@ -202,7 +200,9 @@ public class JobEndpoint {
           @RestParameter(name = "operation", isRequired = false, description = "Filter results by workflows' current operation.", type = STRING),
           @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
                   + "of the following: DATE_CREATED, TITLE, SERIES_TITLE, SERIES_ID, MEDIA_PACKAGE_ID, WORKFLOW_DEFINITION_ID, CREATOR, "
-                  + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = STRING) }, reponses = { @RestResponse(description = "Returns the list of tasks from Matterhorn", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The list of tasks as JSON")
+                  + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT.  The suffix must be :ASC for ascending or :DESC for descending sort order (e.g. TITLE:DESC).", type = STRING) },
+          reponses = { @RestResponse(description = "Returns the list of tasks from Matterhorn", responseCode = HttpServletResponse.SC_OK) },
+          returnDescription = "The list of tasks as JSON")
   public Response getTasks(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset,
           @QueryParam("status") List<String> states, @QueryParam("q") String text,
           @QueryParam("seriesId") String seriesId, @QueryParam("seriesTitle") String seriesTitle,
@@ -269,24 +269,17 @@ public class JobEndpoint {
 
     // Sorting
     if (StringUtils.isNotBlank(sort)) {
-      // Parse the sort field and direction
-      Sort sortField = null;
-      if (sort.endsWith(SORT_ORDER_SEPARATOR + DESCENDING_SUFFIX)) {
-        int suffixLength = StringUtils.length(String.valueOf(SORT_ORDER_SEPARATOR)) + StringUtils.length(DESCENDING_SUFFIX);
-        String enumKey = sort.substring(0, StringUtils.length(sort) - suffixLength).toUpperCase();
-        try {
-          sortField = Sort.valueOf(enumKey);
-          query.withSort(sortField, false);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", enumKey);
-        }
-      } else {
-        try {
-          sortField = Sort.valueOf(sort);
-          query.withSort(sortField);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", sort);
-        }
+      try {
+        SortCriterion sortCriterion = RestUtils.parseSortQueryParameter(sort).iterator().next();
+        Sort sortKey = Sort.valueOf(sortCriterion.getFieldName().toUpperCase());
+        boolean ascending = SearchQuery.Order.Ascending == sortCriterion.getOrder()
+                || SearchQuery.Order.None == sortCriterion.getOrder();
+
+        query.withSort(sortKey, ascending);
+      } catch (WebApplicationException ex) {
+        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", new Object[] { sort });
+      } catch (IllegalArgumentException ex) {
+        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", new Object[] { sort });
       }
     }
 
