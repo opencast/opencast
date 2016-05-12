@@ -17,6 +17,7 @@ tweaking. For some modules some more in depth documentation is available too.
       - [Create a new Plugin](player.plugin.development.md)
       - [Testing](player.testing.md)
  - [Search Index](searchindex.md)
+ - [Stream Security](stream-security.md)
  - [Text Extraction](textextraction.md)
  - Videoeditor
     - [Setup](videoeditor.setup.md)

@@ -47,7 +47,7 @@
                     </ul>
                 </div>
 
-                <div class="nav-dd" title="{{ 'MEDIAMODULE' | translate}}">
+                <div ng-if="mediaModuleUrl" class="nav-dd" title="{{ 'MEDIAMODULE' | translate}}">
                     <a ng-click="toURL(mediaModuleUrl)" href="{{mediaModuleUrl}}">
                         <span class="fa fa-play-circle-o"><!-- Media Module --></span>
                     </a>

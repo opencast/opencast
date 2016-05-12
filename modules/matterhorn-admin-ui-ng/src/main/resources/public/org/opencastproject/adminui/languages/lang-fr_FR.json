@@ -9,6 +9,8 @@
   "SAVE":"Enregistrer",
   "LOGOUT":"Déconnexion",
   "RESET":"Remise à zéro",
+  "SELECT_NO_OPTIONS":"No option",
+  "YES":"Yes",
   "LANGUAGES":{
     "ARABIC":"Arabe",
     "DANISH":"Danois",
@@ -53,7 +55,10 @@
       "CONFIRMATION":"Confirmation requise"
     }
   },
+  "MEDIAMODULE":"Media Module",
   "HELP":{
+    "HELP":"Help",
+    "USERS_GUIDE":"User's Guide",
     "DOCUMENTATION":"Documentation",
     "REST_DOC":"Documentation des API REST"
   },
@@ -79,12 +84,22 @@
     "SERIES_ADDED":"La série a été créée",
     "SERIES_NOT_SAVED":"La série n'a pas pu être enregistrée",
     "EVENTS_CREATED":"L'événement a été créé",
-    "EVENTS_UPLOAD_STARTED":"L'événement est en cours de chargement...",
+    "EVENTS_UPLOAD_STARTED":"The event is being uploaded…",
     "EVENTS_NOT_CREATED":"L'événement n'a pas pu être créé",
-    "EVENTS_UPDATED":"L'événement a été mis à jour",
+    "EVENTS_UPDATED_NB":"{{ number }} events have been successfully updated",
+    "EVENTS_UPDATED_ALL":"All events have been successfully updated",
     "EVENTS_NOT_UPDATED":"L'événement n'a pas pu être enregistré",
+    "EVENTS_NOT_UPDATED_ID":"The event {{ id }} could not be saved",
+    "EVENTS_NOT_UPDATED_ALL":"None of the events could be saved",
+    "SERIES_UPDATED_NB":"{{ number }} series have been successfully updated",
+    "SERIES_UPDATED_ALL":"All series have been successfully updated",
+    "SERIES_NOT_UPDATED":"The series could not be saved",
+    "SERIES_NOT_UPDATED_ID":"The series {{ id }} could not be saved",
+    "SERIES_NOT_UPDATED_ALL":"None of the series could be saved",
     "EVENTS_DELETED":"L'événement a été supprimé",
     "EVENTS_NOT_DELETED":"Le(s) événement(s) ne peut pas être supprimés",
+    "SERIES_DELETED":"The series has been deleted",
+    "SERIES_NOT_DELETED":"The series could not be deleted",
     "USER_BLACKLIST_CREATED":"La liste de blocage a été créée",
     "USER_BLACKLIST_NOT_CREATED":"La liste de blocage n'a pas pu être créée",
     "USER_BLACKLIST_SAVED":"La liste de blocage a été sauvée",
@@ -106,14 +121,19 @@
     "EMAIL_TEMPLATE_NAME_TAKEN":"Ce nom est déjà utilisé",
     "EMAIL_SENT":"Le messag a été envoyé",
     "EMAIL_NOT_SENT":"Le message n'a pas pu être envoyé",
-    "CONFLICT_DETECTED":"Conflit de programmation: les données sélectionnées entrent en conflit avec un événement existant. Veuillez changer l'emplacement ou les dates.",
-    "INVALID_ACL_RULES":"Les règles doivent contenir un rôle valide et un droit d'accès lecture et\/ou écriture.",
+    "CONFLICT_DETECTED":"Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
+    "INVALID_ACL_RULES":"Rules have to contain a valid role and read or\/and write right(s).",
     "MISSING_ACL_RULES":"Il faut au moins un rôle avec droit d'accès Lecture et Ecriture !",
     "SAVED_ACL_RULES":"Les règles d'accès ont été enregistrées.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Les événements existants dans cette série devront être retraités",
+    "SERIES_ACL_LOCKED":"Modification des droits d'accès n'est pas autorisée lorsque des opérations sont en cours d'exécution sur un événement appartenant à cette série",
     "SERIES_ACL_MISSING_READWRITE_ROLE":"Sélectionner au moins un role avec permission de lecture et écriture.",
     "EVENT_ACL_MISSING_READWRITE_ROLE":"Sélectionner au moins un role avec permission de lecture et écriture.",
-    "SERIES_ACL_LOCKED":"Modification des droits d'accès n'est pas autorisée lorsque des opérations sont en cours d'exécution sur un événement appartenant à cette série",
+    "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS":"The event opt-out status has been successfully updated.",
+    "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR":"Error while updating the event opt-out status.",
+    "EVENT_PARTICIPATION_STATUS_READONLY":"The participation status can not be updated as the scheduling start date is in the past.",
+    "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS":"The series opt-out status has been successfully updated.",
+    "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR":"Error while updating the series opt-out status.",
     "THEME_NAME_ALREADY_TAKEN":"Ce nom est déjà utilisé",
     "THEME_NAME_EMPTY":"Le nom ne peux pas rester vide",
     "BUMPER_UPLOAD_ERROR":"Erreur lors de l'envoi du ficher",
@@ -121,7 +141,7 @@
     "TITLE_UPLOAD_ERROR":"Erreur lors de l'envoi du ficher",
     "LICENSE_UPLOAD_ERROR":"Erreur lors de l'envoi du ficher",
     "WATERMARK_UPLOAD_ERROR":"Erreur lors de l'envoi du ficher",
-    "THEME_UPLOAD_STARTED":"Le fichier est en cours d'envoi...",
+    "THEME_UPLOAD_STARTED":"The media is being uploaded…",
     "THEME_CREATED":"Le thème a été créé",
     "THEME_NOT_CREATED":"Le thème n'a pas pu être créé",
     "THEME_DELETED":"Le thème a été supprimé",
@@ -130,9 +150,10 @@
     "TASK_NOT_CREATED":"La tâche n'a pas pu être créée",
     "VIDEO_CUT_NOT_SAVED":"Les informations n'ont pas pu être enregistrées",
     "VIDEO_CUT_SAVED":"Les informations ont été enregistrées",
-    "VIDEO_CUT_PROCESSING":"La vidéo est en cours de traitement...",
+    "VIDEO_CUT_PROCESSING":"The video is being processed…",
     "SERVER_UNRESPONSIVE":"Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
-    "SERVICE_UNAVAILABLE":"Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement."
+    "SERVICE_UNAVAILABLE":"Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
+    "ACTIVE_TRANSACTION":"The current event can currently not be edited as it is involved of an active transaction."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Actions",
@@ -146,11 +167,26 @@
     "DELETE":{
       "SERIES":{
         "CAPTION":"Supprimer",
-        "BUTTON":"Supprimer"
+        "BUTTON":"Delete"
       },
       "EVENTS":{
         "CAPTION":"Supprimer",
-        "BUTTON":"Supprimer"
+        "DELETE_EVENTS":"Delete Events",
+        "PUBLISHED":{
+          "NONE":"None of the selected events need to be retracted before they can be deleted.",
+          "WARNING":"The events below cannot be deleted as they have already been published and deleting them would leave no way to delete the published files. Instead choose a workflow below to retract the events first and then delete them."
+        },
+        "RETRACT_EVENTS":"Retract Events",
+        "SELECT_RETRACT_TASK":"Select a Retract Task",
+        "SUMMARY":{
+          "EVENTS_DELETED":"Events to be Deleted",
+          "EVENTS_RETRACTED":"Events to be Retracted",
+          "RETRACT_WORKFLOW":"Workflow to Retract Events"
+        },
+        "UNPUBLISHED":{
+          "NONE":"None of the selected events can be deleted without leaving orphan files."
+        },
+        "BUTTON":"Delete"
       }
     },
     "DELETE_EVENTS_WARNING_LINE1":"Une fois supprimés, toutes les métadonnées, les fichiers audio et vidéo seront supprimés et rendus irrécupérable.",
@@ -190,6 +226,7 @@
     "NEXT_STEP":"Suivant",
     "BACK":"Précédent",
     "CREATE":"Créer",
+    "RETRACT":"Retract",
     "UPDATE":"Appliquer",
     "DURATION":{
       "HOURS":"Heures",
@@ -227,6 +264,13 @@
     }
   },
   "EVENTS":{
+    "RETRACT":{
+      "CAPTION":"Retract Event",
+      "ID":"ID",
+      "SELECT_TASK":"Select Task",
+      "SUMMARY":"Summary",
+      "WARNING":"This event has been published to at least one publication channel so it has to be retracted before it can be deleted. Select from the tasks below to retract the publications."
+    },
     "LICENSE":{
       "ALLRIGHTS":"Tous droits réservés",
       "CCBY":"CC BY",
@@ -279,7 +323,7 @@
           "CAPTION":"Source",
           "SELECT_SOURCE":"Sélectionnez la source",
           "PLACEHOLDER":{
-            "ROOM":"Salle",
+            "LOCATION":"Location",
             "INPUTS":"Entrées",
             "HOUR":"Heure",
             "MINUTE":"Minute",
@@ -357,15 +401,15 @@
       "ADD_EVENT":"Ajouter événement",
       "TABLE":{
         "CAPTION":"Événements",
+        "CREATORS":"Creators",
         "TITLE":"Titre",
-        "CREATORS":"Présentateur(s)",
+        "PRESENTERS":"Presenter(s)",
         "SERIES":"Séries",
         "DATE":"Date",
         "START":"Début",
         "STOP":"Fin",
         "STATUS":"Statut",
         "LOCATION":"Emplacement",
-        "AGENT":"Agent ",
         "ACTION":"Actions",
         "FIRST":"Première",
         "LAST":"Dernière",
@@ -375,7 +419,8 @@
         "WORKFLOW_STATE":"Progression",
         "REVIEW_STATUS":"État de la révision",
         "PREVIOUS":"Précédente",
-        "NOCONTENT":"Aucune donnée disponible"
+        "NOCONTENT":"Aucune donnée disponible",
+        "PUBLISHED":"Published"
       },
       "SCHEDULING_STATUS":{
         "READY_FOR_RECORDING":"Prêt pour l'enregistrement",
@@ -398,13 +443,13 @@
         "PROCESSING_CANCELED":"Traitement annulé"
       },
       "DETAILS":{
-        "HEADER":"Détails de l'événement - {{resourceId}}",
+        "HEADER":"Détails de l'événement {{resourceId}}",
         "TABS":{
           "GENERAL":"Général",
           "METADATA":"Métadonnées",
           "EXTENDED-METADATA":"Métadonnées II",
-          "MEDIA":"Médias",
           "ASSETS":"Ressources",
+          "SCHEDULING":"Scheduling",
           "WORKFLOWS":"Flux de travail",
           "ACCESS":"Droits d'accès",
           "COMMENTS":"Commentaires"
@@ -416,9 +461,11 @@
           "OPTED_OUT":"Abstention",
           "CUSTOM":"Personnalisé",
           "ENGAGE":"Engage",
+          "EXTERNAL_API":"External API Publication",
           "YOUTUBE":"YouTube",
           "OAIPMH":"OAI-PMH",
-          "SELECT_WORKFLOW":"Sélectionner le flux de travail"
+          "SELECT_WORKFLOW":"Sélectionner le flux de travail",
+          "SELECT_WORKFLOW_EMPTY":"No workflows available"
         },
         "MEDIA":{
           "TRIM_MEDIA":"Couper",
@@ -436,6 +483,52 @@
           "MIMETYPE":"Type MIME",
           "TAGS":"Étiquettes",
           "LINK":"Lien"
+        },
+        "SOURCE":{
+          "CAPTION":"Source",
+          "SELECT_SOURCE":"Select source",
+          "PLACEHOLDER":{
+            "LOCATION":"Location",
+            "INPUTS":"Inputs",
+            "HOUR":"Hour",
+            "MINUTE":"Minute",
+            "REPEATS":"Repeats",
+            "START_DATE":"yyyy-mm-dd",
+            "END_DATE":"yyyy-mm-dd"
+          },
+          "UPLOAD":{
+            "CAPTION":"Upload",
+            "RECORDING_ELEMENTS":"Recording elements",
+            "SEGMENTABLE":{
+              "SHORT":"Slides",
+              "DETAIL":"The file contains a recording of a slide presentation (Keynote, Powerpoint, etc)."
+            },
+            "NON_SEGMENTABLE":{
+              "SHORT":"Presenter",
+              "DETAIL":"The file contains a recording of a person speaking to an audience."
+            },
+            "AUDIO_ONLY":{
+              "SHORT":"Audio only",
+              "DETAIL":"The file contains only audio."
+            }
+          },
+          "DATE_TIME":{
+            "CAPTION":"Schedule",
+            "START_DATE":"Start date",
+            "START_TIME":"Start time",
+            "TIMEZONE":"Time zone",
+            "END_DATE":"End date",
+            "DURATION":"Duration"
+          },
+          "SCHEDULE_SINGLE":{
+            "CAPTION":"Schedule single event"
+          },
+          "SCHEDULE_MULTIPLE":{
+            "CAPTION":"Schedule multiple events",
+            "REPEATS":"Repeats",
+            "REPEAT_ON":"Repeat on",
+            "WEEKDAYS":"Weekdays"
+          }
         },
         "ASSETS":{
           "CAPTION":"Ressources",
@@ -556,6 +649,7 @@
             "ROLE":"Rôle",
             "WRITE":"Ecriture",
             "READ":"Lecture",
+            "ADDITIONAL_ACTIONS":"Additional Actions",
             "ACTION":"Actions",
             "NEW":"Ajouter",
             "DETAILS":"Détails"
@@ -567,18 +661,38 @@
         },
         "COMMENTS":{
           "CAPTION":"Commentaires",
-          "PLACEHOLDER":"Commentaire...",
+          "PLACEHOLDER":"Comment…",
           "SELECTPLACEHOLDER":"Sélectionnez la raison",
           "RESOLVED":"Résolu",
           "REPLY":"Répondre",
           "REPLY_TO":"Répondre à",
           "CANCEL_REPLY":"Annuler",
           "DELETE":"Supprimer",
-          "REASON":"Motif"
+          "REASON":"Motif",
+          "REASONS":{
+            "CUTTING":"Cutting required",
+            "REVIEW":"Review required",
+            "ASYNC":"A\/V tracks asynchronous",
+            "AUDIO_ISSUE":"Missing or defective audio track",
+            "CANCELED":"Canceled event",
+            "CONFLICTING_METADATA":"Conflicting metadata",
+            "IMPROPER_POINT":"Improper in or out point",
+            "MISSING_AGREEMENT":"Missing agreement",
+            "OTHER":"Other",
+            "PRIVACY":"Privacy concern",
+            "SEGMENTATION":"Inaccurate segmentation",
+            "UNKNOWN_CREATOR":"Creator unknown",
+            "VIDEO_ISSUE":"Video distorted or cropped",
+            "WRONG_INPUT_FORMAT":"Input file format not supported",
+            "WRONG_METADATA":"Metadata needs correction",
+            "WRONG_SERIES_PUBLICATION":"Wrong series or publication channel",
+            "WRONG_WORKFLOW":"Wrong workflow",
+            "PROCESSING_FAILURE":"Erreur de traitement"
+          }
         },
         "METADATA":{
           "TITLE":"Titre",
-          "UID":"UID",
+          "ID":"UID",
           "SERIES":"Série",
           "RECORDING_DATE":"Date d'enregistrement",
           "SUBJECT":"Sujet",
@@ -586,7 +700,7 @@
           "START_DATE":"Date de début",
           "START_TIME":"Heure de début",
           "DURATION":"Durée",
-          "AGENT":"Agent",
+          "LOCATION":"Location",
           "SOURCE":"Source",
           "CREATED":"Créée",
           "CREATED_BY":"Auteur",
@@ -603,6 +717,26 @@
             "RUNNING":"Modification des métadonnées n'est pas autorisée lorsque des opérations sont en cours d'exécution sur un événement"
           }
         },
+        "SCHEDULING":{
+          "CAPTION":"Participation status",
+          "REVIEW_STATUS":{
+            "CAPTION":"Review status"
+          },
+          "OPTEDOUT":{
+            "CAPTION":"Opted-out Status",
+            "READY":"Ready for recording",
+            "OPTEDOUT":"Opted out"
+          },
+          "MESSAGES":{
+            "CAPTION":"Messages",
+            "CREATION_DATE":"Creation date",
+            "SENDER":"Sender",
+            "SUBJECT":"Subject"
+          },
+          "PLACEHOLDER":{
+            "PRESENTERS":"Presenter(s)"
+          }
+        },
         "WORKFLOWS":{
           "DETAILS":"Détails",
           "DESCRIPTION":"",
@@ -614,7 +748,10 @@
           "SERIES":"Séries",
           "SUBMITTED":"Soumis le",
           "MIMETYPE":"Type MIME",
-          "URL":"URL"
+          "URL":"URL",
+          "CONFIGURATION":"Configuration",
+          "NO_CONFIGURATION":"No existing configuration parameters for the selected workflow definition.",
+          "WORKFLOW":"Workflow"
         },
         "WORKFLOW_DETAILS":{
           "TITLE":"Détails du workflow",
@@ -697,6 +834,7 @@
             "ROLE":"Rôle",
             "WRITE":"Ecriture",
             "READ":"Lecture",
+            "ADDITIONAL_ACTIONS":"Additional Actions",
             "ACTION":"Actions",
             "NEW":"New policy",
             "DETAILS":"Détails"
@@ -732,6 +870,7 @@
         "TABS":{
           "METADATA":"Métadonnées",
           "EXTENDED_METADATA":"Métadonnées II",
+          "PARTICIPATION":"Participation",
           "EVENTS":"Événements",
           "PERMISSIONS":"Droits d'accès",
           "THEME":"Thème"
@@ -750,6 +889,7 @@
             "ROLE":"Rôle",
             "WRITE":"Ecriture",
             "READ":"Lecture",
+            "ADDITIONAL_ACTIONS":"Additional Actions",
             "ACTION":"Actions",
             "NEW":"Add row",
             "DETAILS":"Détails"
@@ -761,7 +901,7 @@
         },
         "METADATA":{
           "TITLE":"Titre",
-          "UID":"UID",
+          "ID":"UID",
           "SERIES":"Série",
           "PUBLISHERS":"Éditeur (s)",
           "ORGANIZERS":"Organisateur(s)",
@@ -773,6 +913,24 @@
           "LANGUAGE":"Langue",
           "LICENSE":"Licence",
           "DESCRIPTION":"Description"
+        },
+        "PARTICIPATION":{
+          "CAPTION":"Participation status template",
+          "WARNING_TEMPLATE":"Series participation status will be used as default value for new events that are part of the series.",
+          "REVIEW_STATUS":{
+            "CAPTION":"Review status"
+          },
+          "OPTEDOUT":{
+            "CAPTION":"Opted-out Status",
+            "READY":"Ready for recording",
+            "OPTEDOUT":"Opted out"
+          },
+          "MESSAGES":{
+            "CAPTION":"Messages",
+            "CREATION_DATE":"Creation date",
+            "SENDER":"Sender",
+            "SUBJECT":"Subject"
+          }
         },
         "EVENTS":{
           "TITLE":"Titre",
@@ -870,7 +1028,7 @@
         "CAPTION":"Utilisateurs",
         "NAME":"Nom",
         "USERNAME":"Nom d'utilisateur",
-        "EMAIL":"Adresse de courriel",
+        "EMAIL":"Email",
         "ROLES":"Rôles",
         "TYPE":"Type",
         "BLACKLIST_FROM":"Bloqué de",
@@ -961,7 +1119,7 @@
           "TITLE":"Métadonnées",
           "NAME":{
             "CAPTION":"Nom",
-            "PLACEHOLDER":"Nom..."
+            "PLACEHOLDER":"Name…"
           }
         },
         "ACCESS":{
@@ -976,6 +1134,7 @@
             "ROLE":"Rôle",
             "WRITE":"Ecriture",
             "READ":"Lecture",
+            "ADDITIONAL_ACTIONS":"Additional Actions",
             "ACTION":"Actions",
             "NEW":"Nouvelle ligne",
             "DETAILS":"Détails",
@@ -988,7 +1147,7 @@
         }
       },
       "DETAILS":{
-        "HEADER":"Détails des droits d'accès",
+        "HEADER":"Access Policy Details  - {{resourceId}}",
         "TABS":{
           "SUMMARY":"Résumé",
           "METADATA":"Métadonnées",
@@ -998,7 +1157,7 @@
           "TITLE":"Métadonnées",
           "NAME":{
             "CAPTION":"Nom",
-            "PLACEHOLDER":"Nom..."
+            "PLACEHOLDER":"Name…"
           }
         },
         "ACCESS":{
@@ -1013,6 +1172,7 @@
             "ROLE":"Rôle",
             "WRITE":"Ecriture",
             "READ":"Lecture",
+            "ADDITIONAL_ACTIONS":"Additional Actions",
             "ACTION":"Actions",
             "NEW":"Nouvelle ligne",
             "DETAILS":"Détails",
@@ -1315,8 +1475,8 @@
   "LOGIN":{
     "WELCOME":"Bienvenue sur Opencast",
     "REMEMBER":"Mémoriser mes informations de connexion sur cet ordinateur",
-    "USERNAME":"Nom d'utilisateur...",
-    "PASSWORD":"Mot de passe...",
+    "USERNAME":"Username…",
+    "PASSWORD":"Password…",
     "LOGIN":"Login",
     "ERROR":"Nom d'utilisateur et\/ou mot de passe incorrects"
   },
@@ -1324,28 +1484,82 @@
     "CLEAR":"Supprimer tous les filtres",
     "REMOVE":"Enlever le filtre",
     "ADD":"Ajouter des filtres",
-    "PLACEHOLDER":"Rechercher...",
+    "PLACEHOLDER":"Search…",
     "PROFILES":{
       "FILTERS_HEADER":"Filtres enregistrés",
       "EMPTY":"Aucun filtre enregistré",
       "SAVE_FILTERS":"Enregistrer",
       "FILTER_HEADER":"Enregistrer filtres",
       "NAME":"Nom",
-      "NAME_PLACEHOLDER":"Nom...",
+      "NAME_PLACEHOLDER":"Name…",
       "DESCRIPTION":"Description",
-      "DESCRIPTION_PLACEHOLDER":"Description..."
+      "DESCRIPTION_PLACEHOLDER":"Description…"
     }
   },
   "FILTERS":{
     "AGENTS":{
       "NAME":{
-        "LABEL":"Nom"
+        "LABEL":"Name"
       },
       "STATUS":{
-        "LABEL":"Statut"
+        "LABEL":"Status"
       }
     },
     "EVENTS":{
+      "AGENT_ID":{
+        "LABEL":"Capture Agent ID"
+      },
+      "ACCESS_POLICY":{
+        "LABEL":"Droits d'accès"
+      },
+      "COMMENTS":{
+        "LABEL":"Commentaires"
+      },
+      "CONTRIBUTORS":{
+        "LABEL":"Contributeurs"
+      },
+      "CREATOR":{
+        "LABEL":"Auteur"
+      },
+      "LANGUAGE":{
+        "LABEL":"Langue"
+      },
+      "LICENSE":{
+        "LABEL":"Licence"
+      },
+      "LOCATION":{
+        "LABEL":"Emplacement"
+      },
+      "OPTEDOUT":{
+        "LABEL":"Opted Out"
+      },
+      "PERIOD":{
+        "LABEL":"Période"
+      },
+      "PRESENTERS_BIBLIOGRAPHIC":{
+        "LABEL":"Presenter Bibliographic"
+      },
+      "PRESENTERS_TECHNICAL":{
+        "LABEL":"Presenter Technical"
+      },
+      "PROGRESS":{
+        "LABEL":"Progression"
+      },
+      "REVIEW_STATUS":{
+        "LABEL":"Review Status",
+        "CONFIRMED":"Confirmed",
+        "UNCONFIRMED":"Unconfirmed",
+        "UNSENT":"Unsent"
+      },
+      "SERIES":{
+        "LABEL":"Séries"
+      },
+      "SOURCE":{
+        "LABEL":"Source"
+      },
+      "START_DATE":{
+        "LABEL":"Date de début"
+      },
       "STATUS":{
         "LABEL":"Statut",
         "SCHEDULED":"Programmé",
@@ -1357,44 +1571,8 @@
         "UPLOAD":"Envoi",
         "ONHOLD":"En attente"
       },
-      "PROGRESS":{
-        "LABEL":"Progression"
-      },
-      "COMMENTS":{
-        "LABEL":"Commentaires"
-      },
-      "SERIES":{
-        "LABEL":"Séries"
-      },
-      "PRESENTERS":{
-        "LABEL":"Présentateurs"
-      },
-      "CONTRIBUTORS":{
-        "LABEL":"Contributeurs"
-      },
-      "START_DATE":{
-        "LABEL":"Date de début"
-      },
       "SUBJECT":{
         "LABEL":"Sujet"
-      },
-      "LOCATION":{
-        "LABEL":"Emplacement"
-      },
-      "LANGUAGE":{
-        "LABEL":"Langue"
-      },
-      "SOURCE":{
-        "LABEL":"Source"
-      },
-      "CREATOR":{
-        "LABEL":"Auteur"
-      },
-      "LICENSE":{
-        "LABEL":"Licence"
-      },
-      "TRACK_TYPE":{
-        "LABEL":"Type"
       },
       "TRACK_MIMETYPE":{
         "LABEL":"Type MIME"
@@ -1402,17 +1580,14 @@
       "TRACK_RESOLUTION":{
         "LABEL":"Résolution"
       },
-      "ACCESS_POLICY":{
-        "LABEL":"Droits d'accès"
+      "TRACK_TYPE":{
+        "LABEL":"Type"
       },
       "WORKFLOW_DEFINITION":{
         "LABEL":"Définition de workflow"
       },
       "WORKFLOW_STATE":{
         "LABEL":"Etat du workflow"
-      },
-      "PERIOD":{
-        "LABEL":"Période"
       }
     },
     "SERIES":{
@@ -1463,7 +1638,7 @@
         "LABEL":"Fournisseur"
       },
       "ROLE":{
-        "LABEL":"Rôle"
+        "LABEL":"Role"
       },
       "USERNAME":{
         "LABEL":"Nom d'utilisateur"
@@ -1474,11 +1649,16 @@
       "USER_DIRECTORY":{
         "LABEL":"Répertoire d'utilisateurs"
       }
+    },
+    "REVIEW_STATUS":{
+      "UNSENT":"Unsent",
+      "UNCONFIRMED":"Unconfirmed",
+      "CONFIRMED":"Confirmed"
     }
   },
   "TABLE_SUMMARY":"{{numberOfRows}} lignes",
   "TABLE_NO_RESULT":"Aucun résultat trouvé",
-  "TABLE_LOADING":"Chargement...",
+  "TABLE_LOADING":"Loading…",
   "PM":{
     "BLACKLIST":{
       "REASONS":{
@@ -1490,10 +1670,10 @@
     }
   },
   "DASHBOARD":{
-    "RUNNING":"Traitement en cours",
-    "FINISHED":"Terminé",
+    "RUNNING":"Running",
+    "FINISHED":"Finished",
     "FAILED":"Echoué",
     "FINISHED_WITH_COMMENTS":"Fini avec les commentaires ouverts",
-    "SCHEDULED":"Programmé"
+    "SCHEDULED":"Scheduled"
   }
 }

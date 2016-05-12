@@ -64,7 +64,7 @@ public class LanguageFileUtilTest {
 
   @Test
   public void testDisplayNameGerman() {
-    String expected = Locale.GERMAN.getDisplayName();
+    String expected = Locale.GERMAN.getDisplayName(Locale.GERMAN);
     assertEquals(expected, LanguageFileUtil.getDisplayLanguageFromLanguageCode("de_DE"));
     assertEquals(expected, LanguageFileUtil.getDisplayLanguageFromLanguageCode("de-de"));
     assertEquals(expected, LanguageFileUtil.getDisplayLanguageFromLanguageCode("de"));
