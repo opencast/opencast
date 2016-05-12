@@ -11,6 +11,9 @@ angular.module('adminNg.controllers')
                 name:  'name',
                 label: 'SYSTEMS.SERVICES.TABLE.NAME'
             }, {
+                name:  'host',
+                label: 'SYSTEMS.SERVICES.TABLE.HOST_NAME'
+            }, {
                 name:  'completed',
                 label: 'SYSTEMS.SERVICES.TABLE.COMPLETED'
             }, {

@@ -1443,6 +1443,7 @@
          "CAPTION":         "Services",
          "STATUS":          "Status",
          "NAME":            "Service name",
+         "HOST_NAME":       "Host name",
          "COMPLETED":       "Jobs completed",
          "RUNNING":         "Jobs running",
          "QUEUED":          "Jobs queued",
