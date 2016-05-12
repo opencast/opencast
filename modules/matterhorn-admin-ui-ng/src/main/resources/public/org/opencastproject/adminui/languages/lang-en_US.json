@@ -1401,13 +1401,16 @@
       },
      "JOBS": {
        "TABLE": {
+         "ACTION":    "Actions",
          "CAPTION":   "Jobs",
-         "TITLE":     "Title",
-         "SERIES":    "Series",
-         "WORKFLOW":  "Workflow",
+         "CREATED":   "Created",
+         "CREATOR":   "Creator",
+         "HOST_NAME": "Host name",
+         "OPERATION": "Operation",
+         "STARTED":   "Started",
          "STATUS":    "Status",
          "SUBMITTED": "Submitted",
-         "ACTION":    "Actions"
+         "TYPE":      "Type"
        },
        "DETAILS": {
          "HEADER": "Job details {{resourceId}}",
