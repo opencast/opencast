@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -90,19 +91,19 @@ public class ServicesEndpoint {
           @QueryParam("name") String name, @QueryParam("host") String host, @QueryParam("q") String text,
           @QueryParam("sort") String sort, @Context HttpHeaders headers) throws Exception {
 
-    Option<String> nameOpt = Option.option(name);
-    Option<String> hostOpt = Option.option(host);
-    Option<String> textOpt = Option.option(text);
-    Option<String> sortOpt = Option.option(sort);
+    Option<String> nameOpt = Option.option(StringUtils.trimToNull(name));
+    Option<String> hostOpt = Option.option(StringUtils.trimToNull(host));
+    Option<String> textOpt = Option.option(StringUtils.trimToNull(text));
+    Option<String> sortOpt = Option.option(StringUtils.trimToNull(sort));
 
     List<Service> services = new ArrayList<Service>();
     for (ServiceStatistics stats : serviceRegistry.getServiceStatistics()) {
       Service service = new Service(stats);
-      if (nameOpt.isSome() && !StringUtils.containsIgnoreCase(service.getName(), nameOpt.get())) {
+      if (nameOpt.isSome() && !StringUtils.equalsIgnoreCase(service.getName(), nameOpt.get())) {
         continue;
       }
 
-      if (hostOpt.isSome() && !StringUtils.containsIgnoreCase(service.getHost(), hostOpt.get())) {
+      if (hostOpt.isSome() && !StringUtils.equalsIgnoreCase(service.getHost(), hostOpt.get())) {
         continue;
       }
 
@@ -121,7 +122,7 @@ public class ServicesEndpoint {
       if (!sortCriteria.isEmpty()) {
         try {
           SortCriterion sortCriterion = sortCriteria.iterator().next();
-          services.sort(new ServiceStatisticsComparator(
+          Collections.sort(services, new ServiceStatisticsComparator(
                   sortCriterion.getFieldName(),
                   sortCriterion.getOrder() == SearchQuery.Order.Ascending));
         } catch (Exception ex) {
@@ -270,11 +271,11 @@ public class ServicesEndpoint {
   }
 
   /**
-   * {@code Service} comparator. Can compare service instances based on given sort criterium and sort order.
+   * {@code Service} comparator. Can compare service instances based on the given sort criterion and sort order.
    */
   class ServiceStatisticsComparator implements Comparator<Service> {
 
-    /** Sort criterium. */
+    /** Sort criterion. */
     private final String sortBy;
     /** Sort order (true if ascending, false otherwise). */
     private final boolean ascending;
@@ -304,7 +305,7 @@ public class ServicesEndpoint {
     }
 
     /**
-     * Compare two service instances based on given sort criterium and order.
+     * Compare two service instances.
      * @param s1 first {@code Service} instance to compare
      * @param s2 second {@code Service} instance to compare
      * @return

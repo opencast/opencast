@@ -121,12 +121,19 @@ public class ServicesEndpointTest {
             .content("results[0].name", equalTo("service2"))
             .when().get(rt.host(TEST_DATA_JSON));
 
+    // name param will be testet with equality (ignoring case), next test should not find any entries
     given().param("name", "service").log().all().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[0].name", equalTo("service1"))
-            .content("results[5].name", equalTo("service6"))
+            .content("count", equalTo(0))
+            .content("total", equalTo(0))
+            .when().get(rt.host(TEST_DATA_JSON));
+
+    // name param value should be trimmed server side
+    given().param("name", " service2 ").log().all().expect().statusCode(HttpStatus.SC_OK)
+            .contentType(ContentType.JSON)
+            .content("count", equalTo(1))
+            .content("total", equalTo(1))
+            .content("results[0].name", equalTo("service2"))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 
@@ -140,16 +147,20 @@ public class ServicesEndpointTest {
             .content("results[1].host", equalTo("host1"))
             .when().get(rt.host(TEST_DATA_JSON));
 
+    // host param will be testet with equality, next test should not find any entries
     given().param("host", "host").log().all().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
+            .content("count", equalTo(0))
+            .content("total", equalTo(0))
+            .when().get(rt.host(TEST_DATA_JSON));
+
+    // host param value should be trimmed server side
+    given().param("host", " host1 ").log().all().expect().statusCode(HttpStatus.SC_OK)
+            .contentType(ContentType.JSON)
+            .content("count", equalTo(2))
+            .content("total", equalTo(2))
             .content("results[0].host", equalTo("host1"))
             .content("results[1].host", equalTo("host1"))
-            .content("results[2].host", equalTo("host2"))
-            .content("results[3].host", equalTo("host3"))
-            .content("results[4].host", equalTo("host2"))
-            .content("results[5].host", equalTo("host4"))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 
