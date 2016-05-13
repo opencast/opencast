@@ -93,7 +93,8 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   public static final String NONCE_TIMEOUT_RETRY_KEY = "org.opencastproject.security.digest.nonce.retries";
 
   /** The configuration property specifying the duration a signed url will remain valid for. */
-  protected static final String INTERNAL_URL_SIGNING_DURATION_KEY = "org.opencastproject.security.internal.url.signing.duration";
+  protected static final String INTERNAL_URL_SIGNING_DURATION_KEY =
+    "org.opencastproject.security.internal.url.signing.duration";
 
   /**
    * The configuration property specifying the minimum amount of time in seconds wait before retrying a request after a
@@ -105,7 +106,8 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    * The configuration property specifying the maximum for a random amount of time in seconds above the base time to
    * wait.
    */
-  public static final String NONCE_TIMEOUT_RETRY_MAXIMUM_VARIABLE_TIME_KEY = "org.opencastproject.security.digest.nonce.variable.time";
+  public static final String NONCE_TIMEOUT_RETRY_MAXIMUM_VARIABLE_TIME_KEY =
+    "org.opencastproject.security.digest.nonce.variable.time";
 
   /** The default time until a connection attempt fails */
   public static final int DEFAULT_CONNECTION_TIMEOUT = 60 * 1000;
@@ -193,11 +195,11 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
             com.entwinemedia.fn.fns.Strings.toLongF);
     if (expiration.isSome()) {
       signedUrlExpiresDuration = expiration.get();
-      logger.info("The property {} has been configured to expire signed URLs in {}.",
+      logger.debug("The property {} has been configured to expire signed URLs in {}.",
               INTERNAL_URL_SIGNING_DURATION_KEY, Log.getHumanReadableTimeString(signedUrlExpiresDuration));
     } else {
       signedUrlExpiresDuration = DEFAULT_URL_SIGNING_EXPIRES_DURATION;
-      logger.info(
+      logger.debug(
               "The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
               INTERNAL_URL_SIGNING_DURATION_KEY, Log.getHumanReadableTimeString(signedUrlExpiresDuration));
     }

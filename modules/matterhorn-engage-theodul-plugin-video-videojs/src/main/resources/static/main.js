@@ -1440,6 +1440,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       Engage.trigger(plugin.events.playbackRateChanged.getName(), (rate + value));
     }
   }
+  
+  function startAudioPlayer(audio) {
+    clearAutoplay();
+    audio.play();
+    pressedPlayOnce = true;
+  }
 
   function registerEventsAudioOnly(videoDisplay) {
     var audioPlayer_id = $('#' + videoDisplay);
@@ -1472,9 +1478,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     });
     Engage.on(plugin.events.play.getName(), function (triggeredByMaster) {
       if (!triggeredByMaster && videosReady) {
-        clearAutoplay();
-        audioPlayer.play();
-        pressedPlayOnce = true;
+        startAudioPlayer(audioPlayer);
       }
     });
     Engage.on(plugin.events.autoplay.getName(), function () {
@@ -1555,7 +1559,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     });
     Engage.on(plugin.events.seek.getName(), function (time) {
       Engage.log('Video: Seek to ' + time);
-      if (videosReady && pressedPlayOnce) {
+      if (videosReady) {
+        if (! pressedPlayOnce) {
+            startAudioPlayer(audioPlayer);
+        }
         var duration = parseInt(Engage.model.get('videoDataModel').get('duration')) / 1000;
         if (duration && (time < duration)) {
           audioPlayer.currentTime = time;
@@ -1564,25 +1571,20 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
           Engage.trigger(plugin.events.timeupdate.getName(), audioPlayer.currentTime);
         }
       } else {
-        if (!videosReady) {
-          Engage.trigger(plugin.events.customNotification.getName(), translate('msg_waitToSetTime', 'Please wait until the video has been loaded to set a time.'));
-        } else { // pressedPlayOnce
-          Engage.trigger(plugin.events.customNotification.getName(), translate('msg_startPlayingToSetTime', 'Please start playing the video once to set a time.'));
-        }
+        Engage.trigger(plugin.events.customNotification.getName(), translate('msg_waitToSetTime', 'Please wait until the video has been loaded to set a time.'));
         Engage.trigger(plugin.events.timeupdate.getName(), 0);
       }
     });
     Engage.on(plugin.events.sliderStop.getName(), function (time) {
       Engage.log('Video: Slider stopped at ' + time);
-      if (videosReady && pressedPlayOnce) {
+      if (videosReady) {
+        if (! pressedPlayOnce) {
+            startAudioPlayer(audioPlayer);
+        }          
         var duration = parseInt(Engage.model.get('videoDataModel').get('duration'));
         audioPlayer.currentTime = (time / 1000) * (duration / 1000);
       } else {
-        if (!videosReady) {
-          Engage.trigger(plugin.events.customNotification.getName(), translate('msg_waitToSeek', 'Please wait until the video has been loaded to seek.'));
-        } else { // pressedPlayOnce
-          Engage.trigger(plugin.events.customNotification.getName(), translate('msg_startPlayingToSeek', 'Please start playing the video once to seek.'));
-        }
+        Engage.trigger(plugin.events.customNotification.getName(), translate('msg_startPlayingToSeek', 'Please start playing the video once to seek.'));
         Engage.trigger(plugin.events.timeupdate.getName(), 0);
       }
     });
@@ -1594,6 +1596,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         audioPlayer.currentTime = audioPlayer.duration;
       }
     });
+  }
+  
+  function startVideoPlayer(video) {
+    $('.' + class_vjsposter).detach();
+    clearAutoplay();
+    video.play();
+    pressedPlayOnce = true;
   }
 
   function registerEventsVideo(videoDisplay, numberOfVideodisplays) {
@@ -1611,9 +1620,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
     videodisplayMaster
         .on('play', function () {
-          $('.' + class_vjsposter).detach();
-          Engage.trigger(plugin.events.play.getName(), true);
-          pressedPlayOnce = true;
+            startVideoPlayer(videodisplayMaster);
         })
         .on('pause', function () {
           Engage.trigger(plugin.events.pause.getName(), true);
@@ -1695,10 +1702,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
     Engage.on(plugin.events.play.getName(), function (triggeredByMaster) {
       if (!triggeredByMaster && videosReady) {
-        $('.' + class_vjsposter).detach();
-        clearAutoplay();
-        videodisplayMaster.play();
-        pressedPlayOnce = true;
+          startVideoPlayer(videodisplayMaster);
       }
     });
 
@@ -1793,7 +1797,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
     Engage.on(plugin.events.seek.getName(), function (time) {
       Engage.log('Video: Seek to ' + time);
-      if (videosReady && pressedPlayOnce) {
+      if (videosReady) {
+        if (! pressedPlayOnce) {
+            startVideoPlayer(videodisplayMaster);
+        }
         var duration = parseInt(Engage.model.get('videoDataModel').get('duration')) / 1000;
         if (duration && (time < duration)) {
           videodisplayMaster.currentTime(time);
@@ -1802,26 +1809,21 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
           Engage.trigger(plugin.events.timeupdate.getName(), videodisplayMaster.currentTime());
         }
       } else {
-        if (!videosReady) {
-          Engage.trigger(plugin.events.customNotification.getName(), translate('msg_waitToSetTime', 'Please wait until the video has been loaded to set a time.'));
-        } else { // pressedPlayOnce
-          Engage.trigger(plugin.events.customNotification.getName(), translate('msg_startPlayingToSetTime', 'Please start playing the video once to set a time.'));
-        }
+        Engage.trigger(plugin.events.customNotification.getName(), translate('msg_waitToSetTime', 'Please wait until the video has been loaded to set a time.'));
         Engage.trigger(plugin.events.timeupdate.getName(), 0);
       }
     });
 
     Engage.on(plugin.events.sliderStop.getName(), function (time) {
-      if (videosReady && pressedPlayOnce) {
+      if (videosReady) {
+        if (! pressedPlayOnce) {
+            startVideoPlayer(videodisplayMaster);
+        }          
         var duration = parseInt(Engage.model.get('videoDataModel').get('duration'));
         var normTime = (time / 1000) * (duration / 1000);
         videodisplayMaster.currentTime(normTime);
       } else {
-        if (!videosReady) {
-          Engage.trigger(plugin.events.customNotification.getName(), translate('msg_waitToSeek', 'Please wait until the video has been loaded to seek.'));
-        } else { // pressedPlayOnce
-          Engage.trigger(plugin.events.customNotification.getName(), translate('msg_startPlayingToSeek', 'Please start playing the video once to seek.'));
-        }
+        Engage.trigger(plugin.events.customNotification.getName(), translate('msg_startPlayingToSeek', 'Please start playing the video once to seek.'));
         Engage.trigger(plugin.events.timeupdate.getName(), 0);
       }
     });
@@ -1832,8 +1834,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         videodisplayMaster.pause();
         Engage.trigger(plugin.events.pause.getName());
         videodisplayMaster.currentTime(0);
-        // videodisplayMaster.currentTime(videodisplayMaster.duration());
-        // Engage.trigger(plugin.events.seek.getName(), 0);
       }
     });
 

@@ -143,12 +143,10 @@ public final class LanguageFileUtil {
      * @return
      */
     public static String getDisplayLanguageFromLanguageCode(String languageCode) {
-        CompositeLanguageCodeParser parser = new CompositeLanguageCodeParser(
-                languageCode);
-        if (parser.isComposite()) {
-            return new Locale(parser.getSimpleLanguage()).getDisplayLanguage();
-        }
-        return new Locale(languageCode).getDisplayLanguage();
+        CompositeLanguageCodeParser parser = new CompositeLanguageCodeParser(languageCode);
+        Locale locale = parser.isComposite() ?  new Locale(parser.getSimpleLanguage()) : new Locale(languageCode);
+        String displayLanguage = locale.getDisplayLanguage(locale);
+        return Character.toUpperCase(displayLanguage.charAt(0)) + displayLanguage.substring(1);
     }
 
 }

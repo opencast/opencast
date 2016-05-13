@@ -128,13 +128,13 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     }
 
     // root directory
-    if (cc.getBundleContext().getProperty("org.opencastproject.file.repo.path") == null) {
+    rootDirectory = StringUtils.trimToNull(cc.getBundleContext().getProperty("org.opencastproject.file.repo.path"));
+    if (rootDirectory == null) {
       String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
-      if (storageDir == null)
+      if (storageDir == null) {
         throw new IllegalStateException("Storage directory must be set");
-      rootDirectory = storageDir + File.separator + "opencast" + File.separator + "workingfilerepo";
-    } else {
-      rootDirectory = cc.getBundleContext().getProperty("org.opencastproject.file.repo.path");
+      }
+      rootDirectory = storageDir + File.separator + "files";
     }
 
     try {

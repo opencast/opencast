@@ -13,7 +13,6 @@
 
   <sec:http pattern="/admin/img/**" security="none" />
   <sec:http pattern="/favicon.ico" security="none" />
-  <sec:http pattern="/images/**" security="none" />
   <sec:http pattern="/img/**" security="none" />
   <sec:http pattern="/js/**" security="none" />
   <sec:http pattern="/style.css" security="none" />

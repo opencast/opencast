@@ -50,6 +50,10 @@ angular.module('adminNg.controllers')
        if (current.step.title === 'Access Policy') {
          $scope.accessStep.loadSeriesAcl();
        }
+
+       if (current.step.title === 'Source') {
+         $scope.sourceStep.loadCaptureAgents();
+       }
      });
 
      $scope.states = [
