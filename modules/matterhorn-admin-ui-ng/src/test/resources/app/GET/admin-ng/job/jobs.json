@@ -3,19 +3,23 @@
   "limit": 2,
   "offset": 0,
   "results": [{
-    "operation": "START_OPERATION",
-    "series": "",
-    "status": "SUCCEEDED",
-    "submitted": "2014-10-20T09:37:28Z",
-    "title": "•mock• New job",
-    "workflow": "Encode, Analyze, and Distribute"
+      "creator": "testuser1",
+      "id": 1,
+      "operation": "START_OPERATION",
+      "processingHost": "admin.opencast.org",
+      "started": "2014-06-05T09:10:00Z",
+      "status": "RUNNING",
+      "submitted": "2014-06-05T09:10:00Z",
+      "type": "org.opencastproject.workflow"
   }, {
-    "operation": "END_OPERATION",
-    "series": "test videos",
-    "status": "SUCCEEDED",
-    "submitted": "2014-10-20T09:37:28Z",
-    "title": "•mock• Job with serie",
-    "workflow": "Encode, Analyze, and Distribute"
+      "creator": "testuser2",
+      "id": 1,
+      "operation": "Encode",
+      "processingHost": "worker01.opencast.org",
+      "started": "2014-06-05T09:10:00Z",
+      "status": "RUNNING",
+      "submitted": "2014-06-05T09:10:00Z",
+      "type": "org.opencastproject.workflow"
   }],
   "total": 2
 }
