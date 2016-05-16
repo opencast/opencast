@@ -52,7 +52,7 @@ following commands:
     chkconfig --level 345 mariadb on
 
 Now you have a MariaDB server running, but without a properly set up root account (no password, etc.) which might 
-pose a security risk. To create this initial configuration, there is a convenient tool that comes which MariaDB and 
+pose a security risk. To create this initial configuration, there is a convenient tool that comes with MariaDB and 
 which will help. You can launch this tool by executing (yes, it is still called mysql_…):
 
     mysql_secure_installation
