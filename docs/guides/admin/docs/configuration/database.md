@@ -52,8 +52,8 @@ following commands:
     chkconfig --level 345 mariadb on
 
 Now you have a MariaDB server running, but without a properly configured root account (no password, etc.) which might 
-pose a security risk. MariaDB includes a useful tool to secure your database server (it is also included in recent 
-MySQL distributions). You can launch this tool by executing (yes, it is still called mysql_…):
+pose a security risk. MariaDB includes a useful tool to secure your database server (it is also included in MySQL).
+You can launch this tool by executing (yes, it is still called mysql_…):
 
     mysql_secure_installation
 
