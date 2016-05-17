@@ -23,6 +23,7 @@ The following table contains the workflow operations that are available in an ou
 
 |Operation Handler |Description                              |Details|
 |------------------|---------------------------------------------------------------|------------------------------------|
+|analyze           |Analyze tracks in media package                                |[Documentation](analyze-woh.md)     |
 |analyze-audio     |Analyze first audio stream                                     |[Documentation](analyzeaudio-woh.md)|
 |append            |Hold for user to select workflow to continue with              |[Documentation](append-woh.md)|
 |archive           |Archive the current state of the mediapackage                  |[Documentation](archive-woh.md)|
