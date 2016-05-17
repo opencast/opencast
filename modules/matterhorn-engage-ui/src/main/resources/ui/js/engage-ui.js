@@ -63,21 +63,19 @@ $(document).ready(function() {
     }
 
     function detectLanguage() {
-      var language = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
-      return language.replace(/\-.*/,'');
+      return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en-US";
     }
 
     function translate() {
       var lang = detectLanguage();
       var jsonstr = window.location.origin + "/engage/ui/language/media-module-"+lang+".json";
       log("Trying to translate: " + lang);
-      if( lang != "en") {
-        // English is default
+      // Uses query localize to translate html document, skip default en language
+      $("[data-localize]").localize("language/media-module", {skipLanguage : ["en", "en-US"]});
         $.ajax({
           url: jsonstr,
           dataType: "json",
           success: function(data) {
-            $("[data-localize]").localize("language/media-module", {language :  lang});
             title_enterUsernamePassword = data.login_title;
             placeholder_username = data.username;
             placeholder_password = data.password;
@@ -97,7 +95,6 @@ $(document).ready(function() {
               log("Failed to localize. Using default.");
             }
           });
-      }
     }
 
     function GetURLParameter(sParam) {
