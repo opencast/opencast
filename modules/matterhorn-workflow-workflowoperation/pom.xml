@@ -86,6 +86,7 @@
               org.opencastproject.workflow.handler.workflow;version=${project.version}
             </Export-Package>
             <Service-Component>
+              OSGI-INF/operations/analyze.xml,
               OSGI-INF/operations/append.xml,
               OSGI-INF/operations/caption.xml,
               OSGI-INF/operations/cleanup.xml,
