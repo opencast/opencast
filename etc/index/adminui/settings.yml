@@ -387,5 +387,5 @@ network.host: 127.0.0.1
 
 ################################## Shutdown ###################################
 
-# Uncomment if you want to disable the Elasticsearch Shutdown API (recomended).
+# Disable the Elasticsearch Shutdown API (recomended).
 action.disable_shutdown: true
