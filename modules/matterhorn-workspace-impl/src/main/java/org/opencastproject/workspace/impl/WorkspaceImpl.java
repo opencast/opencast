@@ -81,6 +81,7 @@ import java.util.List;
 
 import javax.management.ObjectInstance;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * Implements a simple cache for remote URIs. Delegates methods to {@link WorkingFileRepository} wherever possible.
@@ -153,6 +154,7 @@ public final class WorkspaceImpl implements Workspace {
 
   /**
    * Check is a property exists in a given bundle context.
+   *
    * @param cc
    *          the OSGi component context
    * @param prop
@@ -174,7 +176,7 @@ public final class WorkspaceImpl implements Workspace {
         // use rootDir from CONFIG
         this.wsRoot = cc.getBundleContext().getProperty(WORKSPACE_DIR_KEY);
         logger.info("CONFIG " + WORKSPACE_DIR_KEY + ": " + this.wsRoot);
-      } else if (ensureContextProp(cc,STORAGE_DIR_KEY)) {
+      } else if (ensureContextProp(cc, STORAGE_DIR_KEY)) {
         // create rootDir by adding "workspace" to the default data directory
         this.wsRoot = PathSupport.concat(cc.getBundleContext().getProperty(STORAGE_DIR_KEY), "workspace");
         logger.warn("CONFIG " + WORKSPACE_DIR_KEY + " is missing: falling back to " + this.wsRoot);
@@ -212,13 +214,13 @@ public final class WorkspaceImpl implements Workspace {
     }
 
     // Set up the garbage collection timer
-    if (ensureContextProp(cc,  WORKSPACE_CLEANUP_PERIOD_KEY)) {
+    if (ensureContextProp(cc, WORKSPACE_CLEANUP_PERIOD_KEY)) {
       String period = cc.getBundleContext().getProperty(WORKSPACE_CLEANUP_PERIOD_KEY);
       try {
         garbageCollectionPeriodInSeconds = Integer.parseInt(period);
       } catch (NumberFormatException e) {
         logger.warn("Invalid configuration for workspace garbage collection period ({}={})",
-            WORKSPACE_CLEANUP_PERIOD_KEY, period);
+                WORKSPACE_CLEANUP_PERIOD_KEY, period);
       }
     }
 
@@ -229,7 +231,7 @@ public final class WorkspaceImpl implements Workspace {
         maxAgeInSeconds = Integer.parseInt(age);
       } catch (NumberFormatException e) {
         logger.warn("Invalid configuration for workspace garbage collection max age ({}={})",
-            WORKSPACE_CLEANUP_MAX_AGE_KEY, age);
+                WORKSPACE_CLEANUP_MAX_AGE_KEY, age);
       }
     }
 
@@ -630,8 +632,8 @@ public final class WorkspaceImpl implements Workspace {
     String path = collectionURI.toString();
     String filename = FilenameUtils.getName(path);
     String collection = getCollection(collectionURI);
-    logger.debug("Moving {} from {} to {}/{}", new String[] { filename, collection, toMediaPackage,
-            toMediaPackageElement });
+    logger.debug("Moving {} from {} to {}/{}",
+            new String[] { filename, collection, toMediaPackage, toMediaPackageElement });
     // move locally
     File original = toWorkspaceFile(collectionURI);
     if (original.isFile()) {
@@ -681,7 +683,9 @@ public final class WorkspaceImpl implements Workspace {
    * @return the local file representation
    */
   File toWorkspaceFile(URI uri) {
-    String uriString = uri.toString();
+    // MH-11497: Fix for compatibility with stream security: the query parameters are deleted.
+    // TODO Refactor this class to use the URI class and methods instead of String for handling URIs
+    String uriString = UriBuilder.fromUri(uri).replaceQuery(null).build().toString();
     String wfrPrefix = wfr.getBaseUri().toString();
     String serverPath = FilenameUtils.getPath(uriString);
     if (uriString.startsWith(wfrPrefix)) {
@@ -772,8 +776,8 @@ public final class WorkspaceImpl implements Workspace {
 
   private void waitForResource(final URI uri, final int expectedStatus, final String errorMsg) throws IOException {
     if (waitForResourceFlag) {
-      HttpUtil.waitForResource(trustedHttpClient, uri, expectedStatus, TIMEOUT, INTERVAL).fold(
-              Misc.<Exception, Void> chuck(), new Effect.X<Integer>() {
+      HttpUtil.waitForResource(trustedHttpClient, uri, expectedStatus, TIMEOUT, INTERVAL)
+              .fold(Misc.<Exception, Void> chuck(), new Effect.X<Integer>() {
                 @Override
                 public void xrun(Integer status) throws Exception {
                   if (ne(status, expectedStatus)) {
@@ -798,10 +802,10 @@ public final class WorkspaceImpl implements Workspace {
     final File rootDirecotry = new File(wsRoot);
 
     // Get path for mediapackage and collection directly
-    final String mediapackageDirectory = new File(rootDirecotry,
-        WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX).getAbsolutePath();
-    final String collectionDirectory = new File(rootDirecotry,
-        WorkingFileRepository.COLLECTION_PATH_PREFIX).getAbsolutePath();
+    final String mediapackageDirectory = new File(rootDirecotry, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX)
+            .getAbsolutePath();
+    final String collectionDirectory = new File(rootDirecotry, WorkingFileRepository.COLLECTION_PATH_PREFIX)
+            .getAbsolutePath();
 
     logger.info("Starting cleanup of workspace at {}", rootDirecotry);
     Collection<File> files = FileUtils.listFiles(rootDirecotry, null, true);
