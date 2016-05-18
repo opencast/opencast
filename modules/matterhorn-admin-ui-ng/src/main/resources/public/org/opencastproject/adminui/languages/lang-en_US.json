@@ -36,11 +36,6 @@
       "CHINESE":"Chinese"
     },
    "PREFERENCES":  {
-      "CAPTION": "Preferences",
-      "PROFILE": "Profile",
-      "NAME": "Name",
-      "REPLYTO": "Reply-to email",
-      "SIGNATURE": "Email Signature",
       "TABLE": {
         "CAPTION": "Edit Table View",
         "SUBHEADING": "Select the default data you would like displayed in the {{ tableName }} view",
