@@ -1,10 +1,10 @@
 # AnalyzeWorkflowOperationHandler
 
 ## Description
-The AnalyzeWorkflowOperationHandler analyzes the tracks in the mediapackage and sets workflow instance variables that
-can be used within workflows instances to control what workflow operations should be executed or not.
+The AnalyzeWorkflowOperationHandler analyzes specified tracks in the mediapackage and sets workflow instance variables that
+can be used to control if workflow operations should be executed.
 
-For all tracks matching the flavor *type*/*subtype* as specified using the mandatory configuration key *source-flavor*,
+For all tracks matching the flavor *type*/*subtype* as specified by the mandatory configuration key *source-flavor*,
 the following workflow instance variables will be set:
 
 |Name                  |Type   |Description                                                                 |
