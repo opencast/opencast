@@ -182,7 +182,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.ROOM' | translate }} <i class="required">*</i></td>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }} <i class="required">*</i></td>
                             <td>
                             <select chosen
                                 data-width="'200px'"
@@ -191,7 +191,7 @@
                                 data-disable-search-threshold="8"
                                 ng-model="wizard.step.ud.SCHEDULE_SINGLE.device"
                                 ng-options="value.name for (id, value) in wizard.step.captureAgents"
-                                data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.ROOM' | translate }}"
+                                data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }}"
                             />
                             </td>
                         </tr>
@@ -287,7 +287,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.ROOM' | translate }} <i class="required">*</i></td>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }} <i class="required">*</i></td>
                             <td>
                             <select chosen
                                 ng-disabled="wizard.step.checkingConflicts"
@@ -296,7 +296,7 @@
                                 data-disable-search-threshold="8"
                                 ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device"
                                 ng-options="value.name for (id, value) in wizard.step.captureAgents"
-                                data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.ROOM' | translate }}"
+                                data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }}"
                             />
                             </td>
                         </tr>
@@ -507,7 +507,7 @@
                             <td>{{ wizard.getStateControllerByName('source').getFormatedDuration() }}</td>
                         </tr>
                         <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].device.name">
-                            <td translate="EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.ROOM"><!--Room--></td>
+                            <td translate="EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION"><!--Location--></td>
                             <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].device.name }}</td>
                         </tr>
                         <tr ng-repeat="(key, value) in wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].SCHEDULE_SINGLE.device.inputs">
