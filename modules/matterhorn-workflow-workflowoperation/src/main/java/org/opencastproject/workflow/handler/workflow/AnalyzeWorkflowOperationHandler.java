@@ -20,7 +20,6 @@
  */
 package org.opencastproject.workflow.handler.workflow;
 
-import static com.entwinemedia.fn.Stream.$;
 import static java.lang.String.format;
 
 import org.opencastproject.job.api.JobContext;
@@ -32,8 +31,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-
-import com.entwinemedia.fn.Fn2;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,18 +74,15 @@ public class AnalyzeWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
     final Track[] tracks = mediaPackage.getTracks(sourceFlavor);
     if (tracks.length > 0) {
-      final Map<String, String> workflowProps = $(tracks)
-              .foldl(new HashMap<String, String>(), new Fn2<HashMap<String, String>, Track, HashMap<String, String>>() {
-                @Override public HashMap<String, String> ap(HashMap<String, String> sum, Track track) {
-                  final String varName = toVariableName(track.getFlavor());
-                  sum.put(varName + "_audio", Boolean.toString(track.hasAudio()));
-                  sum.put(varName + "_video", Boolean.toString(track.hasVideo()));
-                  return sum;
-                }
-              });
+      Map<String, String> properties = new HashMap<String, String>();
+      for (Track track : tracks) {
+        final String varName = toVariableName(track.getFlavor());
+        properties.put(varName + "_video", Boolean.toString(track.hasVideo()));
+        properties.put(varName + "_audio", Boolean.toString(track.hasAudio()));
+      }
       logger.info("Finished analyze workflow operation adding the properties: {}",
-                  propertiesAsString(workflowProps));
-      return createResult(mediaPackage, workflowProps, Action.CONTINUE, 0);
+                  propertiesAsString(properties));
+      return createResult(mediaPackage, properties, Action.CONTINUE, 0);
     } else {
       return fail(format("Invalid media package: Does not contain any tracks matching flavor %s", sourceFlavor));
     }
