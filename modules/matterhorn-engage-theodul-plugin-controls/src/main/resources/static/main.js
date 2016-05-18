@@ -377,11 +377,9 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         $.ajax({
             type: "GET",
             url: springSecurityLogoutURL,
-        }).done(function(msg) {
+        }).complete(function(msg) {
             location.reload();
             Engage.trigger(events.customSuccess.getName(), translate("logoutSuccessful", "Successfully logged out. Please reload the page if the page does not reload automatically."));
-        }).fail(function(msg) {
-            Engage.trigger(events.customSuccess.getName(), translate("logoutFailed", "Failed to log out."));
         });
     }
 

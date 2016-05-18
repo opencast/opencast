@@ -37,10 +37,6 @@ angular.module('adminNg.controllers')
 
             $scope.isError = false;
 
-            $scope.toLanguageClass = function (language) {
-                return Language.$convertLanguageToCode(language.code);
-            };
-
             $scope.changeLanguage = function (language) {
                 Language.changeLanguage(language);
             };
