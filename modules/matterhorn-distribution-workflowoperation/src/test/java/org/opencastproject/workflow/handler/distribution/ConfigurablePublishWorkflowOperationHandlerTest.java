@@ -39,6 +39,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Publication;
+import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.mediapackage.identifier.Id;
@@ -47,6 +48,7 @@ import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.MimeType;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -117,6 +119,8 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     track.setIdentifier(trackId);
     track.setURI(new URI("http://api.com/track"));
 
+    Publication publicationtest = new  PublicationImpl(trackId, channelId, new URI("http://api.com/publication"),MimeType.mimeType(trackId, trackId));
+
     Track unrelatedTrack = new TrackImpl();
     unrelatedTrack.addTag("unrelated");
 
@@ -127,6 +131,7 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
             new MediaPackageElement[] { attachment, catalog, track, unrelatedTrack });
     EasyMock.expect(mediapackage.getIdentifier()).andStubReturn(new IdImpl("mp-id"));
     mediapackage.add(EasyMock.capture(capturePublication));
+    mediapackage.add(publicationtest);
     EasyMock.expectLastCall();
     EasyMock.replay(mediapackage);
 
@@ -139,6 +144,8 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
             "http://api.opencast.org/api/events/${event_id}");
     EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.SOURCE_TAGS)).andStubReturn(
             "engage-download,engage-streaming");
+    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.STRATEGY)).andStubReturn(
+            "retract");
     EasyMock.replay(op);
 
     WorkflowInstance workflowInstance = EasyMock.createNiceMock(WorkflowInstance.class);
@@ -161,12 +168,17 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     EasyMock.expect(trackJob.getPayload()).andReturn(MediaPackageElementParser.getAsXml(track));
     EasyMock.replay(trackJob);
 
+    Job retractJob = EasyMock.createNiceMock(Job.class);
+    EasyMock.expect(retractJob.getPayload()).andReturn(MediaPackageElementParser.getAsXml(track));
+    EasyMock.replay(retractJob);
+
     DownloadDistributionService distributionService = EasyMock.createNiceMock(DownloadDistributionService.class);
     // Make sure that all of the elements are distributed.
     EasyMock.expect(distributionService.distribute(channelId, mediapackage, attachmentId, true)).andReturn(
             attachmentJob);
     EasyMock.expect(distributionService.distribute(channelId, mediapackage, catalogId, true)).andReturn(catalogJob);
     EasyMock.expect(distributionService.distribute(channelId, mediapackage, trackId, true)).andReturn(trackJob);
+    EasyMock.expect(distributionService.retract(channelId, mediapackage, channelId)).andReturn(retractJob);
     EasyMock.replay(distributionService);
 
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);

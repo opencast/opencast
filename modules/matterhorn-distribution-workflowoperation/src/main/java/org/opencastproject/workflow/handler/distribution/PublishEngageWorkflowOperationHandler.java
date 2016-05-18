@@ -49,6 +49,7 @@ import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
@@ -80,6 +81,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.logging.Level;
 
 /**
  * The workflow definition for handling "engage publication" operations
@@ -113,7 +115,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   //itbwpdk end
 
   /** Workflow configuration option keys to only merge or overwrite element in exiting mediapackage */
-  private static final String OPT_MERGE_ONLY = "merge-only";
+  private static final String STRATEGY = "retract";
 
   /** The streaming distribution service */
   private DistributionService streamingDistributionService = null;
@@ -184,8 +186,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
             "Add all of these comma separated tags to elements that have been distributed for download.");
     CONFIG_OPTIONS.put(CHECK_AVAILABILITY,
             "( true | false ) defaults to true. Check if the distributed download artifact is available at its URL");
-    CONFIG_OPTIONS.put(OPT_MERGE_ONLY,
-            "Republish only if it can be merged with or replace existing published data");
+    CONFIG_OPTIONS.put(STRATEGY,
+            "Strategy if there is an existing Publication");
   }
 
   @Override
@@ -321,7 +323,35 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         }
       }
 
-      List<Job> jobs = new ArrayList<Job>();
+        List<Job> jobs = new ArrayList<Job>();
+        switch (STRATEGY) {
+            case ("merge"):
+                //nothing to retract
+                break;
+            default:
+                //retract all published media , before publish
+                try {
+                    for (String elementId : downloadElementIds) {
+                        logger.info("Element distribution delay, sleeping for " + Integer.toString(distributionDelay));
+                        Thread.sleep(distributionDelay);
+                        Job job = downloadDistributionService.retract(CHANNEL_ID, mediaPackage, elementId);
+                        if (job != null) {
+                            jobs.add(job);
+                        }
+                    }
+                    if (distributeStreaming) {
+                        for (String elementId : streamingElementIds) {
+                            Job job = streamingDistributionService.retract(CHANNEL_ID, mediaPackage, elementId);
+                            if (job != null) {
+                                jobs.add(job);
+                            }
+                        }
+                    }
+                } catch (DistributionException e) {
+                    throw new WorkflowOperationException(e);
+                }
+        }
+//distribute Elements
       try {
         for (String elementId : downloadElementIds) {
           logger.info("Element distribution delay, sleeping for " +  Integer.toString(distributionDelay));
@@ -356,18 +386,24 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       try {
         MediaPackage mediaPackageForSearch = getMediaPackageForSearchIndex(mediaPackage, jobs, downloadSubflavor,
                 targetDownloadTags, downloadElementIds, streamingSubflavor, streamingElementIds, targetStreamingTags);
+            //Check if it is allready publisched
+          if (isMediapackagePublished(mediaPackageForSearch)) {
+              // MH-10216, check if only merging into existing mediapackage
+              final String republishStrategy = (workflowInstance.getCurrentOperation().getConfiguration(STRATEGY));
 
-        // MH-10216, check if only merging into existing mediapackage
-        boolean merge = Boolean.parseBoolean(workflowInstance.getCurrentOperation().getConfiguration(OPT_MERGE_ONLY));
-        if (merge) {
-          // merge() returns merged mediapackage or null mediaPackage is not published
-          mediaPackageForSearch = merge(mediaPackageForSearch);
-          if (mediaPackageForSearch == null) {
-            logger.info("Skipping republish for {} since it is not currently published", mediaPackage.getIdentifier().toString());
-            return createResult(mediaPackage, Action.SKIP);
+              switch (STRATEGY) {
+                  case ("merge") :
+                    // merge() returns merged mediapackage or null mediaPackage is not published
+                  mediaPackageForSearch = merge(mediaPackageForSearch);
+                  if (mediaPackageForSearch == null) {
+                      logger.info("Skipping republish for {} since it is not currently published", mediaPackage.getIdentifier().toString());
+                      return createResult(mediaPackage, Action.SKIP);
+                  }
+                  break;
+                  default :
+                    retractFromEngage(mediaPackage,mediaPackageForSearch);
+               }
           }
-        }
-
         if (!isPublishable(mediaPackageForSearch))
           throw new WorkflowOperationException("Media package does not meet criteria for publication");
 
@@ -590,6 +626,16 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     return hasTitle && hasTracks;
   }
 
+
+  protected boolean isMediapackagePublished(MediaPackage mediaPackage) {
+    SearchQuery query = new SearchQuery().withId(mediaPackage.toString());
+    query.includeEpisodes(true);
+    query.includeSeries(false);
+    SearchResult result = searchService.getByQuery(query);
+    return result.size() == 1;
+  }
+
+
   /**
    * MH-10216, method copied from the original RepublishWorkflowOperationHandler
    * Merges mediapackage with published mediapackage.
@@ -652,5 +698,29 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
     return mergedMediaPackage;
   }
+
+    private void retractFromEngage(MediaPackage mediaPackage, MediaPackage mediaPackageForSearch) throws WorkflowOperationException {
+        for (Publication publicationEelement : mediaPackage.getPublications()) {
+            if (CHANNEL_ID.equals(publicationEelement.getChannel())) {
+                mediaPackage.remove(publicationEelement);
+            }
+        }
+        Job retractJob = null;
+        try {
+            logger.info("Retracting already publisched Elements for Mediapackage: {}", mediaPackageForSearch.getIdentifier().toString());
+            retractJob = searchService.delete(mediaPackageForSearch.getIdentifier().toString());
+            if (!waitForStatus(retractJob).isSuccess()) {
+                throw new WorkflowOperationException("Mediapackage " + mediaPackageForSearch.getIdentifier()
+                        + " could not be retracted");
+            }
+        } catch (SearchException e) {
+            throw new WorkflowOperationException("Error retracting media package", e);
+
+        } catch (UnauthorizedException ex) {
+            java.util.logging.Logger.getLogger(PublishEngageWorkflowOperationHandler.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NotFoundException ex) {
+            java.util.logging.Logger.getLogger(PublishEngageWorkflowOperationHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
 }
