@@ -69,7 +69,7 @@ The metadata XML, which is passed to the cover image service, looks like the fol
       <date>24. April 2014</date>
       <time>11:21:00</time>
       <license>All rights reserved</license>
-      <description>2014-03-24T11:21:00Z</description>
+      <description>Here is a description of the video</description>
       <series>Superbowl Commercials</series>
       <contributors>Budweiser</contributors>
       <creators>Budweiser</creators>

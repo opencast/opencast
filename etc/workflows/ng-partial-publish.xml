@@ -82,7 +82,7 @@
 
     <operation
       id="tag"
-      description="Removing unneeded presenter-cover from dwonload publication">
+      description="Removing unneeded presenter-cover from download publication">
       <configurations>
         <configuration key="source-flavors">presenter/player+preview</configuration>
         <configuration key="target-tags">-engage-download</configuration>
