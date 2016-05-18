@@ -2065,6 +2065,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     var flavors = '';
     var mimetypes = '';
 
+    var allowedTags = Engage.model.get('meInfo').get('allowedtags');
+    var allowedFormats = Engage.model.get('meInfo').get('allowedformats');
+    mediaInfo.tracks = filterTracksByFormat(filterTracksByTag(mediaInfo.tracks, allowedTags), allowedFormats);
+
     if (mediaInfo.tracks && (mediaInfo.tracks.length > 0)) {
       for (var k = 0; k < mediaInfo.tracks.length; ++k) {
         if (flavors.indexOf(mediaInfo.tracks[k].type) < 0) {
@@ -2102,16 +2106,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     var duration = 0;
     var hasAudio = false;
     var hasVideo = false;
-    var allowedTags = Engage.model.get('meInfo').get('allowedtags');
-    var allowedFormats = Engage.model.get('meInfo').get('allowedformats');
-
     videoSources.audio = [];
 
     for (var j = 0; j < flavorsArray.length; ++j) {
       videoSources[Utils.extractFlavorMainType(flavorsArray[j])] = [];
     }
 
-    mediaInfo.tracks = filterTracksByFormat(filterTracksByTag(mediaInfo.tracks, allowedTags), allowedFormats);
     if (mediaInfo.tracks) {
       $(mediaInfo.tracks).each(function (i, track) {
         if (track.mimetype && track.type && acceptFormat(track)) {
