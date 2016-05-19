@@ -15,7 +15,8 @@ The PublishEngageWorkflowOperation will bring your media to the engage distribut
 |download-source-tags       |Specifies which media should be published for download                        |
 |download-target-subflavors |Subflavor to use for distributed material                                     |
 |download-target-tags       |Modify tags of published media                                                |
-|merge-only                 |Merge with existing published data. Skip if nothing had been published before |
+|strategy                   |if there is no Key, published Media would be retracted before publishing
+|                           | strategy= merge merges new Publication with existing Publication
 |streaming-source-flavors   |Specifies which media should be published to the streaming server             |
 |streaming-source-tags      |Specifies which media should be published to the streaming server             |
 |streaming-tagret-tags      |Modify tags of published media                                                |
@@ -34,5 +35,6 @@ The PublishEngageWorkflowOperation will bring your media to the engage distribut
             <configuration key="download-source-tags">engage,atom,rss</configuration>
             <configuration key="streaming-source-tags">engage</configuration>
             <configuration key="check-availability">true</configuration>
+            <configuration key="strategy">merge</configuration>
         </configurations>
     </operation>
