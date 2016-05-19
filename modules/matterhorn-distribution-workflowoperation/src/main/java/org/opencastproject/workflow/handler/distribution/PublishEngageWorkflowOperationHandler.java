@@ -115,6 +115,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private int distributionDelay = 0;
   //itbwpdk end
 
+  /** Workflow configuration option keys to only merge or overwrite element in exiting mediapackage */
+  private static final String STRATEGY = "retract";
+
   /** The streaming distribution service */
   private DistributionService streamingDistributionService = null;
 

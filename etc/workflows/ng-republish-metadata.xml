@@ -66,8 +66,8 @@
       description="Update recording in Opencast Media Module">
       <configurations>
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
-        <configuration key="check-availability">false</configuration>
         <configuration key="strategy">merge</configuration>
+        <configuration key="check-availability">false</configuration>
       </configurations>
     </operation>
 
