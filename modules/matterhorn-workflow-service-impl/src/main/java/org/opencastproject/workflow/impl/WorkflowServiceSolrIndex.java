@@ -21,6 +21,8 @@
 
 package org.opencastproject.workflow.impl;
 
+import static com.entwinemedia.fn.Stream.$;
+
 import static org.apache.solr.client.solrj.util.ClientUtils.escapeQueryChars;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.Option.option;
@@ -59,6 +61,8 @@ import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionReport;
 import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionReport.OperationReport;
 
+import com.entwinemedia.fn.Fn;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -87,7 +91,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -198,6 +201,13 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
   /** The thread pool to use in asynchronous indexing */
   protected ExecutorService indexingExecutor;
 
+  public static final Fn<Job, Boolean> operationIsStartWorkflow = new Fn<Job, Boolean>() {
+    @Override
+    public Boolean ap(Job job) {
+      return WorkflowServiceImpl.Operation.START_WORKFLOW.toString().equals(job.getOperation());
+    }
+  };
+
   /**
    * Callback from the OSGi environment on component registration. The indexing behavior can be set using component
    * context properties. <code>synchronousIndexing=true|false</code> determines whether threads performing workflow
@@ -269,7 +279,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       logger.info("The workflow index is empty, looking for workflows to index");
       // this may be a new index, so get all of the existing workflows and index them
       List<Job> jobs = null;
-      try {
+/*      try {
         jobs = serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null);
         Iterator<Job> ji = jobs.iterator();
         while (ji.hasNext()) {
@@ -279,6 +289,13 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
             ji.remove();
           }
         }
+      } catch (ServiceRegistryException e) {
+        logger.error("Unable to load the workflows jobs: {}", e.getMessage());
+        throw new ServiceException(e.getMessage());
+      }*/
+
+      try {
+        jobs = $(serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null)).filter(operationIsStartWorkflow).toList();
       } catch (ServiceRegistryException e) {
         logger.error("Unable to load the workflows jobs: {}", e.getMessage());
         throw new ServiceException(e.getMessage());
