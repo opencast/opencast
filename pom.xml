@@ -1,0 +1,1618 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XML-instance"
+  xsi:Location="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.opencastproject</groupId>
+  <artifactId>base</artifactId>
+  <version>2.2-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>opencast</name>
+  <description>Opencast is a media capture, processing, management and distribution system</description>
+  <url>http://opencast.org</url>
+  <inceptionYear>2009</inceptionYear>
+
+  <prerequisites>
+    <maven>3.1</maven>
+  </prerequisites>
+
+  <properties>
+    <checkstyle.skip>false</checkstyle.skip>
+    <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
+    <json-simple.version>1.1.1</json-simple.version>
+    <matterhorn.basedir>${basedir}</matterhorn.basedir>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <opencast.nexus.url>http://nexus.opencast.org</opencast.nexus.url>
+    <eclipselink.version>2.6.0</eclipselink.version>
+    <commons-compress.version>1.9</commons-compress.version>
+    <httpcomponents-httpcore.version>4.4.1</httpcomponents-httpcore.version>
+    <httpcomponents-httpclient.version>4.5</httpcomponents-httpclient.version>
+    <jmeter.version>2.4</jmeter.version>
+    <osgi.compendium.version>4.2.0</osgi.compendium.version>
+    <osgi.core.version>4.2.0</osgi.core.version>
+    <osgi.enterprise.version>4.2.0</osgi.enterprise.version>
+    <karaf.version>3.0.5</karaf.version>
+  </properties>
+
+  <modules>
+    <module>modules/matterhorn-admin-ui</module>
+    <module>modules/matterhorn-admin-ui-ng</module>
+    <module>modules/matterhorn-annotation-api</module>
+    <module>modules/matterhorn-annotation-impl</module>
+    <module>modules/matterhorn-archive-api</module>
+    <module>modules/matterhorn-archive-base</module>
+    <module>modules/matterhorn-archive-schema</module>
+    <module>modules/matterhorn-archive-storage-fs</module>
+    <module>modules/matterhorn-archive-workflowoperation</module>
+    <module>modules/matterhorn-authorization-manager</module>
+    <module>modules/matterhorn-authorization-xacml</module>
+    <module>modules/matterhorn-caption-api</module>
+    <module>modules/matterhorn-caption-impl</module>
+    <module>modules/matterhorn-caption-remote</module>
+    <module>modules/matterhorn-capture-admin-service-api</module>
+    <module>modules/matterhorn-capture-admin-service-impl</module>
+    <module>modules/matterhorn-capture-workflowoperation</module>
+    <module>modules/matterhorn-comments-workflowoperation</module>
+    <module>modules/matterhorn-common</module>
+    <module>modules/matterhorn-common-jpa-impl</module>
+    <module>modules/matterhorn-composer-ffmpeg</module>
+    <module>modules/matterhorn-composer-service-api</module>
+    <module>modules/matterhorn-composer-service-remote</module>
+    <module>modules/matterhorn-composer-workflowoperation</module>
+    <module>modules/matterhorn-conductor</module>
+    <module>modules/matterhorn-cover-image-api</module>
+    <module>modules/matterhorn-cover-image-impl</module>
+    <module>modules/matterhorn-cover-image-remote</module>
+    <module>modules/matterhorn-cover-image-workflowoperation</module>
+    <module>modules/matterhorn-dataloader</module>
+    <module>modules/matterhorn-db</module>
+    <module>modules/matterhorn-deprecated-workflowoperation</module>
+    <module>modules/matterhorn-dictionary-api</module>
+    <module>modules/matterhorn-dictionary-hunspell</module>
+    <module>modules/matterhorn-dictionary-none</module>
+    <module>modules/matterhorn-dictionary-regexp</module>
+    <module>modules/matterhorn-distribution-service-acl</module>
+    <module>modules/matterhorn-distribution-service-acl-remote</module>
+    <module>modules/matterhorn-distribution-service-api</module>
+    <module>modules/matterhorn-distribution-service-download</module>
+    <module>modules/matterhorn-distribution-service-download-remote</module>
+    <module>modules/matterhorn-distribution-service-streaming</module>
+    <module>modules/matterhorn-distribution-service-streaming-remote</module>
+    <module>modules/matterhorn-distribution-workflowoperation</module>
+    <module>modules/matterhorn-dublincore</module>
+    <module>modules/matterhorn-event-comment</module>
+    <module>modules/matterhorn-engage-theodul-api</module>
+    <module>modules/matterhorn-engage-theodul-core</module>
+    <module>modules/matterhorn-engage-theodul-plugin-archetype</module>
+    <module>modules/matterhorn-engage-theodul-plugin-controls</module>
+    <module>modules/matterhorn-engage-theodul-plugin-custom-mhConnection</module>
+    <module>modules/matterhorn-engage-theodul-plugin-custom-notifications</module>
+    <module>modules/matterhorn-engage-theodul-plugin-custom-usertracking</module>
+    <module>modules/matterhorn-engage-theodul-plugin-description</module>
+    <module>modules/matterhorn-engage-theodul-plugin-tab-description</module>
+    <module>modules/matterhorn-engage-theodul-plugin-tab-shortcuts</module>
+    <module>modules/matterhorn-engage-theodul-plugin-tab-slidetext</module>
+    <module>modules/matterhorn-engage-theodul-plugin-timeline-statistics</module>
+    <module>modules/matterhorn-engage-theodul-plugin-video-videojs</module>
+    <module>modules/matterhorn-engage-ui</module>
+    <module>modules/matterhorn-execute-api</module>
+    <module>modules/matterhorn-execute-impl</module>
+    <module>modules/matterhorn-execute-remote</module>
+    <module>modules/matterhorn-fileupload</module>
+    <module>modules/matterhorn-holdstate-workflowoperation</module>
+    <module>modules/matterhorn-incident-workflowoperation</module>
+    <module>modules/matterhorn-index-service</module>
+    <module>modules/matterhorn-ingest-service-api</module>
+    <module>modules/matterhorn-ingest-service-impl</module>
+    <module>modules/matterhorn-ingest-workflowoperation</module>
+    <module>modules/matterhorn-inspection-service-api</module>
+    <module>modules/matterhorn-inspection-service-ffmpeg</module>
+    <module>modules/matterhorn-inspection-service-remote</module>
+    <module>modules/matterhorn-inspection-workflowoperation</module>
+    <module>modules/matterhorn-kernel</module>
+    <module>modules/matterhorn-load-test</module>
+    <module>modules/matterhorn-load-test-engage</module>
+    <module>modules/matterhorn-lti</module>
+    <module>modules/matterhorn-manager-api</module>
+    <module>modules/matterhorn-manager-impl</module>
+    <module>modules/matterhorn-mediapackage-manipulator</module>
+    <module>modules/matterhorn-mediapackage-ui</module>
+    <module>modules/matterhorn-message-broker-api</module>
+    <module>modules/matterhorn-message-broker-impl</module>
+    <module>modules/matterhorn-messages</module>
+    <module>modules/matterhorn-metadata</module>
+    <module>modules/matterhorn-metadata-api</module>
+    <module>modules/matterhorn-migration</module>
+    <module>modules/matterhorn-mpeg7</module>
+    <module>modules/matterhorn-notification-workflowoperation</module>
+    <module>modules/matterhorn-oaipmh</module>
+    <module>modules/matterhorn-participation-api</module>
+    <module>modules/matterhorn-presets</module>
+    <module>modules/matterhorn-publication-service-api</module>
+    <module>modules/matterhorn-publication-service-youtube-remote</module>
+    <module>modules/matterhorn-publication-service-youtube-v3</module>
+    <module>modules/matterhorn-runtime-info</module>
+    <module>modules/matterhorn-runtime-info-ui</module>
+    <module>modules/matterhorn-runtime-info-ui-ng</module>
+    <module>modules/matterhorn-scheduler-api</module>
+    <module>modules/matterhorn-scheduler-impl</module>
+    <module>modules/matterhorn-scheduler-remote</module>
+    <module>modules/matterhorn-scheduler-workflowoperation</module>
+    <module>modules/matterhorn-schema</module>
+    <module>modules/matterhorn-search</module>
+    <module>modules/matterhorn-search-api</module>
+    <module>modules/matterhorn-search-service-api</module>
+    <module>modules/matterhorn-search-service-feeds</module>
+    <module>modules/matterhorn-search-service-impl</module>
+    <module>modules/matterhorn-search-service-remote</module>
+    <module>modules/matterhorn-search-workflowoperation</module>
+    <module>modules/matterhorn-security-cas</module>
+    <module>modules/matterhorn-security-ldap</module>
+    <module>modules/matterhorn-security-openid</module>
+    <module>modules/matterhorn-security-shibboleth</module>
+    <module>modules/matterhorn-series-service-api</module>
+    <module>modules/matterhorn-series-service-impl</module>
+    <module>modules/matterhorn-series-service-remote</module>
+    <module>modules/matterhorn-serviceregistry</module>
+    <module>modules/matterhorn-serviceregistry-remote</module>
+    <module>modules/matterhorn-silencedetection-api</module>
+    <module>modules/matterhorn-silencedetection-impl</module>
+    <module>modules/matterhorn-silencedetection-remote</module>
+    <module>modules/matterhorn-smil-api</module>
+    <module>modules/matterhorn-smil-impl</module>
+    <module>modules/matterhorn-solr</module>
+    <module>modules/matterhorn-sox-api</module>
+    <module>modules/matterhorn-sox-impl</module>
+    <module>modules/matterhorn-sox-remote</module>
+    <module>modules/matterhorn-sox-workflowoperation</module>
+    <module>modules/matterhorn-speech-recognition-service-api</module>
+    <module>modules/matterhorn-speech-recognition-workflowoperation</module>
+    <module>modules/matterhorn-static</module>
+    <module>modules/matterhorn-static-file-service-api</module>
+    <module>modules/matterhorn-static-file-service-impl</module>
+    <module>modules/matterhorn-test-harness</module>
+    <module>modules/matterhorn-textanalyzer-api</module>
+    <module>modules/matterhorn-textanalyzer-impl</module>
+    <module>modules/matterhorn-textanalyzer-remote</module>
+    <module>modules/matterhorn-textanalyzer-workflowoperation</module>
+    <module>modules/matterhorn-textextractor-tesseract</module>
+    <module>modules/matterhorn-themes</module>
+    <module>modules/matterhorn-themes-workflowoperation</module>
+    <module>modules/matterhorn-urlsigning-common</module>
+    <module>modules/matterhorn-urlsigning-service-api</module>
+    <module>modules/matterhorn-urlsigning-service-impl</module>
+    <module>modules/matterhorn-urlsigning-verifier-service-api</module>
+    <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
+    <module>modules/matterhorn-userdirectory</module>
+    <module>modules/matterhorn-userdirectory-ldap</module>
+    <module>modules/matterhorn-usertracking-api</module>
+    <module>modules/matterhorn-usertracking-impl</module>
+    <module>modules/matterhorn-videoeditor-api</module>
+    <module>modules/matterhorn-videoeditor-ffmpeg-impl</module>
+    <module>modules/matterhorn-videoeditor-remote</module>
+    <module>modules/matterhorn-videoeditor-workflowoperation</module>
+    <module>modules/matterhorn-videosegmenter-api</module>
+    <module>modules/matterhorn-videosegmenter-ffmpeg</module>
+    <module>modules/matterhorn-videosegmenter-remote</module>
+    <module>modules/matterhorn-videosegmenter-workflowoperation</module>
+    <module>modules/matterhorn-webconsole</module>
+    <module>modules/matterhorn-workflow-service-api</module>
+    <module>modules/matterhorn-workflow-service-impl</module>
+    <module>modules/matterhorn-workflow-service-remote</module>
+    <module>modules/matterhorn-workflow-workflowoperation</module>
+    <module>modules/matterhorn-working-file-repository-service-api</module>
+    <module>modules/matterhorn-working-file-repository-service-impl</module>
+    <module>modules/matterhorn-working-file-repository-service-remote</module>
+    <module>modules/matterhorn-workspace-api</module>
+    <module>modules/matterhorn-workspace-impl</module>
+    <module>assemblies</module>
+  </modules>
+
+  <build>
+    <defaultGoal>install</defaultGoal>
+    <testResources>
+      <!-- Add a log4j configuration file to the test resources -->
+      <testResource>
+        <directory>${matterhorn.basedir}/docs/log4j</directory>
+        <includes>
+          <include>log4j.properties</include>
+        </includes>
+      </testResource>
+      <!-- Re-add the test resources as defined by the project -->
+      <testResource>
+        <directory>${project.basedir}/src/test/resources</directory>
+      </testResource>
+    </testResources>
+    <!-- This defines what plugins run on a global basis.  Plugins defined here run for all child poms without needing to reference them from the child pom.  Note that configuration data goes in the pluginManagement stanza below -->
+    <plugins>
+      <!-- Require Java 7 or higher for building -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+          <encoding>UTF-8</encoding>
+          <compilerArgument>${compilerArgument}</compilerArgument>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <version>1.3</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>create</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <doCheck>false</doCheck>
+          <doUpdate>false</doUpdate>
+          <shortRevisionLength>7</shortRevisionLength>
+        </configuration>
+      </plugin>
+      <!-- Attach sources for all builds -->
+      <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-source-plugin</artifactId> <executions>
+        <execution> <id>attach-sources</id> <phase>verify</phase> <goals> <goal>jar-no-fork</goal> <goal>test-jar-no-fork</goal>
+        </goals> </execution> </executions> </plugin> -->
+      <!-- Run tests and display test output in the console -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <useFile>false</useFile>
+          <argLine>-Dfile.encoding=UTF-8</argLine> <!-- see https://jira.codehaus.org/browse/SUREFIRE-951 -->
+          <systemPropertyVariables>
+            <M2_REPO>${settings.localRepository}</M2_REPO>
+            <java.awt.headless>true</java.awt.headless>
+            <eclipselink.logging.level>CONFIG</eclipselink.logging.level>
+            <java.util.logging.config.file>${basedir}/conf/services/java.util.logging.properties</java.util.logging.config.file>
+            <logj4.configuration>${basedir}/docs/log4j/log4j.properties</logj4.configuration>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+      <!-- Ensure that the source code matches the Matterhorn style rules -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.17</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>6.15</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <skip>${checkstyle.skip}</skip>
+          <configLocation>${matterhorn.basedir}/docs/checkstyle/matterhorn-checkstyle.xml</configLocation>
+          <headerLocation>${matterhorn.basedir}/docs/checkstyle/matterhorn-header.txt</headerLocation>
+          <includeTestSourceDirectory>true</includeTestSourceDirectory>
+          <consoleOutput>true</consoleOutput>
+          <logViolationsToConsole>true</logViolationsToConsole>
+          <excludes>**/package-info.java</excludes>
+          <failOnViolation>true</failOnViolation>
+          <failsOnError>true</failsOnError>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.atlassian.maven.plugins</groupId>
+        <artifactId>maven-clover2-plugin</artifactId>
+        <version>4.0.4</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>0.0.23</version>
+      </plugin>
+    </plugins>
+    <!-- This defines the global plugin configurations. Plugins with configuration
+      shared across multiple child poms should be configured here, and then referenced
+      in the child. -->
+    <pluginManagement>
+      <plugins>
+        <!-- Fix eclipse (indigo) maven integration -->
+        <!-- See http://wiki.eclipse.org/M2E_plugin_execution_not_covered for
+          more information -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <versionRange>[1.0.0,)</versionRange>
+                    <goals>
+                      <goal>check</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute />
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>com.github.eirslett</groupId>
+                    <artifactId>frontend-maven-plugin</artifactId>
+                    <versionRange>[0.0.23,)</versionRange>
+                    <goals>
+                      <goal>install-node-and-npm</goal>
+                      <goal>npm</goal>
+                      <goal>grunt</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-pmd-plugin</artifactId>
+                    <versionRange>[3.0.0,)</versionRange>
+                    <goals>
+                      <goal>pmd</goal>
+                      <goal>cpd</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute />
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>de.empulse.eclipselink</groupId>
+                    <artifactId>staticweave-maven-plugin</artifactId>
+                    <versionRange>[1.0.0,)</versionRange>
+                    <goals>
+                      <goal>weave</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute>
+                      <runOnIncremental>true</runOnIncremental>
+                    </execute>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-scr-plugin</artifactId>
+          <version>1.6.0</version>
+          <executions>
+            <execution>
+              <id>generate-scr-scrdescriptor</id>
+              <goals>
+                <goal>scr</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.2</version>
+          <configuration>
+            <source>1.7</source>
+            <target>1.7</target>
+            <compilerArgument>${compilerArgument}</compilerArgument>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>2.4</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <!-- NOTE: this should match the settings for the reporting plugin below -->
+          <version>2.10.1</version>
+          <configuration>
+            <!-- <aggregate>true</aggregate> -->
+            <!-- <detectLinks>true</detectLinks> -->
+            <!-- http://jira.codehaus.org/browse/MJAVADOC-273 -->
+            <detectJavaApiLink>true</detectJavaApiLink>
+            <javadocVersion>1.7</javadocVersion>
+            <maxmemory>512m</maxmemory>
+            <quiet>true</quiet>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>javadoc</goal>
+              </goals>
+              <phase>site</phase>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>2.0.1</version>
+          <inherited>true</inherited>
+          <configuration>
+            <instructions>
+              <Bundle-Category>opencastproject</Bundle-Category>
+              <Bundle-DocURL>http://opencastproject.org/</Bundle-DocURL>
+              <Bundle-Vendor>The Opencast Project</Bundle-Vendor>
+              <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            </instructions>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.18</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>2.13</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>1.8</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.9</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.4</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-eclipse-plugin</artifactId>
+          <version>2.9</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <version>2.3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.5.5</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.7</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>chronos-maven-plugin</artifactId>
+          <version>1.0-SNAPSHOT</version>
+          <executions>
+            <execution>
+              <id>performance-test</id>
+              <goals>
+                <goal>jmeter</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>1.7</version>
+          <configuration>
+            <sources>
+              <source>${basedir}/src/main/resources/</source>
+            </sources>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>add-source</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>3.3</version>
+          <configuration>
+            <!--<includeTests>true</includeTests> -->
+            <typeResolution>true</typeResolution>
+            <targetJdk>1.7</targetJdk>
+          </configuration>
+          <executions>
+            <execution>
+              <phase>validate</phase>
+              <goals>
+                <goal>pmd</goal>
+                <goal>cpd</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>de.empulse.eclipselink</groupId>
+          <artifactId>staticweave-maven-plugin</artifactId>
+          <version>1.0.0</version>
+          <executions>
+            <execution>
+              <phase>process-classes</phase>
+              <goals>
+                <goal>weave</goal>
+              </goals>
+              <configuration>
+                <persistenceXMLLocation>META-INF/persistence.xml
+                </persistenceXMLLocation>
+                <logLevel>FINE</logLevel>
+              </configuration>
+            </execution>
+          </executions>
+          <dependencies>
+            <dependency>
+              <groupId>org.eclipse.persistence</groupId>
+              <artifactId>org.eclipse.persistence.jpa</artifactId>
+              <version>${eclipselink.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>com.github.klieber</groupId>
+          <artifactId>phantomjs-maven-plugin</artifactId>
+          <version>0.7</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>install</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <version>1.9.8</version>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.github.searls</groupId>
+          <artifactId>jasmine-maven-plugin</artifactId>
+          <version>2.0</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>test</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>2.6.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>servlet-api</artifactId>
+        <version>2.5</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-all</artifactId>
+        <version>5.3.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.geronimo.specs</groupId>
+        <artifactId>geronimo-jms_1.1_spec</artifactId>
+        <version>1.1.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.mina</groupId>
+        <artifactId>mina-core</artifactId>
+        <version>2.0.9</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.mina</groupId>
+        <artifactId>mina-integration-beans</artifactId>
+        <version>2.0.9</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.mina</groupId>
+        <artifactId>mina-integration-jmx</artifactId>
+        <version>2.0.9</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.mina</groupId>
+        <artifactId>mina-integration-ognl</artifactId>
+        <version>2.0.9</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-bundle</artifactId>
+        <version>1.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-core</artifactId>
+        <version>1.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.tika</groupId>
+        <artifactId>tika-parsers</artifactId>
+        <version>1.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.solr</groupId>
+        <artifactId>solr-core</artifactId>
+        <exclusions>
+          <exclusion>
+            <groupId>woodstox</groupId>
+            <artifactId>wstx-asl</artifactId>
+          </exclusion>
+        </exclusions>
+        <version>1.4.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.solr</groupId>
+        <artifactId>solr-solrj</artifactId>
+        <version>1.4.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>18.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.fortuna.ical4j</groupId>
+        <artifactId>ical4j</artifactId>
+        <version>1.0-rc2-patched</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
+        <version>1.8.5_1</version>
+      </dependency>
+
+      <!-- OSGi -->
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.core</artifactId>
+        <version>${osgi.core.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.compendium</artifactId>
+        <version>${osgi.compendium.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>org.apache.felix.fileinstall</artifactId>
+        <version>3.1.10</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>org.apache.felix.metatype</artifactId>
+        <version>1.0.4</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <!-- JSRs -->
+      <dependency>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>2.2.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>javax.activation</groupId>
+        <artifactId>activation</artifactId>
+        <version>1.1.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>javax.mail</groupId>
+        <artifactId>mail</artifactId>
+        <version>1.4.7</version>
+      </dependency>
+
+      <dependency>
+        <groupId>javax.ws.rs</groupId>
+        <artifactId>jsr311-api</artifactId>
+        <version>1.1.A</version>
+      </dependency>
+
+      <!-- JPA -->
+      <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>org.eclipse.persistence.core</artifactId>
+        <version>${eclipselink.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>org.eclipse.persistence.jpa</artifactId>
+        <version>${eclipselink.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>org.eclipse.persistence.jpa.jpql</artifactId>
+        <version>${eclipselink.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>org.eclipse.persistence.asm</artifactId>
+        <version>${eclipselink.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>org.eclipse.persistence.antlr</artifactId>
+        <version>${eclipselink.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.persistence</groupId>
+        <artifactId>javax.persistence</artifactId>
+        <version>2.1.0</version>
+      </dependency>
+
+      <!-- CXF -->
+      <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-bundle-jaxrs</artifactId>
+        <version>3.0.2</version>
+      </dependency>
+
+      <!-- Spring -->
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>org.springframework.aop</artifactId>
+        <version>3.1.0.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>org.springframework.asm</artifactId>
+        <version>3.1.0.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>org.springframework.core</artifactId>
+        <version>3.1.0.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>org.springframework.beans</artifactId>
+        <version>3.1.0.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>org.springframework.jdbc</artifactId>
+        <version>3.1.0.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>org.springframework.expression</artifactId>
+        <version>3.1.0.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>org.springframework.transaction</artifactId>
+        <version>3.1.0.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>org.springframework.context</artifactId>
+        <version>3.1.0.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>org.springframework.context.support</artifactId>
+        <version>3.1.0.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>org.springframework.web</artifactId>
+        <version>3.1.0.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.osgi</groupId>
+        <artifactId>org.springframework.osgi.io</artifactId>
+        <version>1.2.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.osgi</groupId>
+        <artifactId>org.springframework.osgi.core</artifactId>
+        <version>1.2.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.osgi</groupId>
+        <artifactId>org.springframework.osgi.extender</artifactId>
+        <version>1.2.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>org.springframework.security.core</artifactId>
+        <version>3.1.0.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>org.springframework.security.config</artifactId>
+        <version>3.1.0.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>org.springframework.security.web</artifactId>
+        <version>3.1.0.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>org.springframework.security.openid</artifactId>
+        <version>3.1.0.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.security.oauth</groupId>
+        <artifactId>spring-security-oauth</artifactId>
+        <version>1.0.0.M1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-cas</artifactId>
+        <version>3.1.0.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-ldap</artifactId>
+        <version>3.1.0.RELEASE</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jasig.cas</groupId>
+        <artifactId>com.springsource.org.jasig.cas.client</artifactId>
+        <version>3.1.12</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.opensaml</groupId>
+        <artifactId>com.springsource.org.opensaml</artifactId>
+        <version>1.1.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.openid4java</groupId>
+        <artifactId>com.springsource.org.openid4java</artifactId>
+        <version>0.9.5</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.sourceforge.nekohtml</groupId>
+        <artifactId>com.springsource.org.cyberneko.html</artifactId>
+        <version>1.9.13</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.commons-httpclient</artifactId>
+        <version>3.1_7</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.xerces</artifactId>
+        <version>2.9.1_3</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.jsr305</artifactId>
+        <version>2.0.1_1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpcore-osgi</artifactId>
+        <version>4.3.3</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient-osgi</artifactId>
+        <version>4.3.6</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymock</artifactId>
+        <scope>test</scope>
+        <version>3.3</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jdom</groupId>
+        <artifactId>com.springsource.org.jdom</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>com.springsource.org.apache.lucene</artifactId>
+        <version>2.4.1</version>
+      </dependency>
+
+      <!-- logging -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.6.4</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>1.6.4</version>
+      </dependency>
+
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.16</version>
+        <scope>test</scope>
+      </dependency>
+
+      <!-- apache commons syncing -->
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-compress</artifactId>
+        <version>${commons-compress.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>1.9</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-collections</groupId>
+        <artifactId>commons-collections</artifactId>
+        <version>3.2.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-fileupload</groupId>
+        <artifactId>commons-fileupload</artifactId>
+        <version>1.2.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.4</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-pool</groupId>
+        <artifactId>commons-pool</artifactId>
+        <version>1.5.3</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-csv</artifactId>
+        <version>1.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>com.springsource.org.apache.commons.beanutils</artifactId>
+        <version>1.7.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>2.6</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>org.apache.felix.http.bundle</artifactId>
+        <classifier>opencast</classifier>
+        <version>2.2.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.google.code.findbugs</groupId>
+        <artifactId>jsr305</artifactId>
+        <version>3.0.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.googlecode.json-simple</groupId>
+        <artifactId>json-simple</artifactId>
+        <version>${json-simple.version}</version>
+      </dependency>
+
+      <!-- testing -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.11</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>1.3.172</version>
+      </dependency>
+
+      <dependency>
+        <groupId>c3p0</groupId>
+        <artifactId>c3p0</artifactId>
+        <version>0.9.1.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.entwinemedia.common</groupId>
+        <artifactId>functional</artifactId>
+        <version>1.1.1</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <!-- All non-build related project data below here -->
+
+  <organization>
+    <name>Opencast Project</name>
+    <url>http://www.opencastproject.org/</url>
+  </organization>
+
+  <!-- Active contributors to Opencast -->
+  <developers>
+    <developer>
+      <id>ruben.perez</id>
+      <name>Ruben Perez Vazquez</name>
+      <email>ruben.perez@uni-koeln.de</email>
+      <organization>University of Cologne</organization>
+      <organizationUrl>http://www.uni-koeln.de</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>rrolf</id>
+      <name>Ruediger Rolf</name>
+      <email>rrolf@uni-osnabrueck.de</email>
+      <organization>University of Osnabrueck</organization>
+      <organizationUrl>http://www.uni-osnabrueck.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>greg_logan</id>
+      <name>Greg Logan</name>
+      <email>gregorydlogan@gmail.com</email>
+      <organization>Independent Consultant</organization>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>-6</timezone>
+    </developer>
+    <developer>
+      <id>matjaz</id>
+      <name>Matjaz Rihtar</name>
+      <email>matjaz.rihtar@ijs.si</email>
+      <organization>Jozef Stefan Institute</organization>
+      <organizationUrl>http://www.ijs.si</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>twunden</id>
+      <name>Tobias Wunden</name>
+      <email>twunden@extron.com</email>
+      <organization>Extron Electronics</organization>
+      <organizationUrl>http://extron.com</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>akm220</id>
+      <name>Adam McKenzie</name>
+      <email>amckenzie@extron.com</email>
+      <organization>Extron Electronics</organization>
+      <organizationUrl>http://extron.com</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>-6</timezone>
+    </developer>
+    <developer>
+      <id>cedriessen</id>
+      <name>Christoph Driessen</name>
+      <email>cdriessen@extron.com</email>
+      <organization>Extron Electronics</organization>
+      <organizationUrl>http://extron.com</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>wsmirnow</id>
+      <name>Waldemar Smirnow</name>
+      <email>wsmirnow@uni-osnabrueck.de</email>
+      <organization>University of Osnabrueck</organization>
+      <organizationUrl>http://www.uni-osnabrueck.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>lrohner</id>
+      <name>Lukas Rohner</name>
+      <email>lrohner@extron.com</email>
+      <organization>Extron Electronics</organization>
+      <organizationUrl>http://extron.com</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>xavier.butty</id>
+      <name>Xavier Butty</name>
+      <email></email>
+      <organization></organization>
+      <organizationUrl></organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>etmoyo</id>
+      <name>Edmore Moyo</name>
+      <email>edmore.moyo@uct.ac.za</email>
+      <organization>University of Cape Town</organization>
+      <organizationUrl>http://www.uct.ac.za</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+2</timezone>
+    </developer>
+    <developer>
+      <id>jamesp</id>
+      <name>James Perrin</name>
+      <email>james.perrin@manchester.ac.uk</email>
+      <organization>University of Manchester</organization>
+      <organizationUrl>http://www.manchester.ac.uk</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>0</timezone>
+    </developer>
+    <developer>
+      <id>ts23</id>
+      <name>Tobias Schiebeck</name>
+      <email>tobias.schiebeck@manchester.ac.uk</email>
+      <organization>University of Manchester</organization>
+      <organizationUrl>http://www.manchester.ac.uk</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>0</timezone>
+    </developer>
+    <developer>
+      <id>karen</id>
+      <name>Karen Dolan</name>
+      <email>kdolan@dce.harvard.edu</email>
+      <organization>Harvard University, Division of Continuing Education</organization>
+      <organizationUrl>http://www.dce.harvard.edu</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>-5</timezone>
+    </developer>
+    <developer>
+      <id>lkiesow</id>
+      <name>Lars Kiesow</name>
+      <email>lkiesow@uos.de</email>
+      <url>http://lkiesow.de</url>
+      <organization>ELAN e.V., University of Osnabrück</organization>
+      <organizationUrl>http://www.virtuos.uos.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+        <role>qa</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+      <properties>
+        <irc.nick>lkiesow</irc.nick>
+      </properties>
+    </developer>
+    <developer>
+      <id>basil.brunner</id>
+      <name>Basil Brunner</name>
+      <email>bbrunner@extron.com</email>
+      <organization>Extron Electronics</organization>
+      <organizationUrl>http://extron.com</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>mstypa</id>
+      <name>Michael Stypa</name>
+      <email>michael@stypa.info</email>
+      <url>http://michael.stypa.info</url>
+      <organization>ELAN e.V., University of Osnabrück</organization>
+      <organizationUrl>http://www.virtuos.uos.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+      <properties>
+        <irc.nick>mstypa</irc.nick>
+        <bitbucket.nick>doofy</bitbucket.nick>
+      </properties>
+    </developer>
+    <developer>
+      <id>rsantos</id>
+      <name>Rute Santos</name>
+      <email>rute_santos@harvard.edu</email>
+      <organization>Harvard University, Division of Continuing Education</organization>
+      <organizationUrl>http://www.dce.harvard.edu</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>-5</timezone>
+    </developer>
+  </developers>
+
+  <!-- People having significantly contributed to Opencast in the past -->
+  <contributors>
+    <contributor>
+      <name>Micah Sutton</name>
+      <email>msutton3@unl.edu</email>
+    </contributor>
+    <contributor>
+      <name>Jamie Hodge</name>
+      <email>jamieh@hum.ku.dk</email>
+    </contributor>
+    <contributor>
+      <name>Johannes Emden</name>
+      <email>johannes.emden@uni-osnabrueck.de</email>
+    </contributor>
+    <contributor>
+      <name>Andre Klassen</name>
+      <email>andre.klassen@uni-osnabrueck.de</email>
+    </contributor>
+    <contributor>
+      <name>Stefan Altevogt</name>
+      <email>saltevog@uni-osnabrueck.de</email>
+    </contributor>
+    <contributor>
+      <name>Josh Holtzman</name>
+      <email>jholtzman@berkeley.edu</email>
+    </contributor>
+    <contributor>
+      <name>Jaime Gago</name>
+      <email>jaime@entwinemedia.com</email>
+    </contributor>
+    <contributor>
+      <name>Judy Stern</name>
+      <email>jlstern@berkeley.edu</email>
+    </contributor>
+    <contributor>
+      <name>Michelle Ziegmann</name>
+      <email>michelle@media.berkeley.edu</email>
+    </contributor>
+    <contributor>
+      <name>David Horwitz</name>
+      <email>david.horwitz@uct.ac.za</email>
+    </contributor>
+    <contributor>
+      <name>Nils H. Birnbaum</name>
+      <email>nbirnbau@uni-osnabrueck.de</email>
+    </contributor>
+    <contributor>
+      <name>Denis Meyer</name>
+      <email>denmeyer@uni-osnabrueck.de</email>
+    </contributor>
+    <contributor>
+      <name>Markus Moormann</name>
+      <email>mmoorman@uni-osnabrueck.de</email>
+    </contributor>
+    <contributor>
+      <name>Kenneth Lui</name>
+      <email>hkkenneth@gmail.com</email>
+    </contributor>
+    <contributor>
+      <name>Eduardo Alonso Gil</name>
+      <email>ealonso@uvigo.es</email>
+    </contributor>
+    <contributor>
+      <name>Kristofor Amundson</name>
+      <email>kta719@mail.usask.ca</email>
+    </contributor>
+    <contributor>
+      <name>Christopher Brooks</name>
+      <email>cab938@mail.usask.ca</email>
+    </contributor>
+    <contributor>
+      <name>Adam Hochman</name>
+      <email>adam@media.berkeley.edu</email>
+    </contributor>
+    <contributor>
+      <name>Benjamin Wulff</name>
+      <email>bwulff@uos.de</email>
+    </contributor>
+    <contributor>
+      <name>Aaron Zeckoski</name>
+      <email>azeckoski@vt.edu</email>
+    </contributor>
+    <contributor>
+      <name>Markus Ketterl</name>
+      <email>mketterl@uni-osnabrueck.de</email>
+    </contributor>
+    <contributor>
+      <name>Bostjan Pajntar</name>
+      <email>bostjan.pajntar@ijs.si</email>
+    </contributor>
+    <contributor>
+      <name>Nejc Skofic</name>
+      <email>nejc.skofic@ijs.si</email>
+    </contributor>
+    <contributor>
+      <name>Per Pascal Grube</name>
+      <email>pascal.grube@flightmare.net</email>
+    </contributor>
+    <contributor>
+      <name>Pascal Aubort</name>
+      <email>pascal@entwinemedia.com</email>
+    </contributor>
+  </contributors>
+
+  <mailingLists>
+    <mailingList>
+      <name>Matterhorn Mailing List</name>
+      <subscribe>https://groups.google.com/a/opencast.org/forum/#!forum/matterhorn</subscribe>
+      <unsubscribe>https://groups.google.com/a/opencast.org/forum/#!forum/matterhorn</unsubscribe>
+      <post>matterhorn@opencast.org</post>
+      <archive>https://groups.google.com/a/opencast.org/forum/#!forum/matterhorn</archive>
+    </mailingList>
+  </mailingLists>
+
+  <licenses>
+    <license>
+      <name>Educational Community License, Version 2.0</name>
+      <url>http://www.osedu.org/licenses/ECL-2.0/ecl2.txt</url>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:git:https://bitbucket.org/opencast-community/matterhorn.git</connection>
+    <developerConnection>scm:git:git@bitbucket.org:opencast-community/matterhorn.git</developerConnection>
+    <url>https://bitbucket.org/opencast-community</url>
+  </scm>
+
+  <issueManagement>
+    <system>jira</system>
+    <url>https://opencast.jira.com</url>
+  </issueManagement>
+
+  <!-- Site Report generation settings -->
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <aggregate>true</aggregate>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <!-- NOTE: this should match the settings for the build plugin above -->
+        <version>2.10.1</version>
+        <configuration>
+          <!-- <aggregate>true</aggregate> -->
+          <!-- <detectLinks>true</detectLinks> -->
+          <!-- http://jira.codehaus.org/browse/MJAVADOC-273 -->
+          <detectJavaApiLink>true</detectJavaApiLink>
+          <javadocVersion>1.7</javadocVersion>
+          <maxmemory>512m</maxmemory>
+          <quiet>true</quiet>
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <id>default</id>
+            <reports>
+              <report>javadoc</report>
+            </reports>
+          </reportSet>
+          <reportSet>
+            <id>aggregate</id>
+            <inherited>false</inherited>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.1</version>
+        <configuration>
+          <aggregate>false</aggregate>
+          <inputEncoding>UTF-8</inputEncoding>
+          <outputEncoding>UTF-8</outputEncoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.1.2</version>
+        <configuration>
+          <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>cim</report>
+              <report>dependencies</report>
+              <report>dependency-convergence</report>
+<!--3.3              <report>dependency-info</report>-->
+              <report>dependency-management</report>
+<!--3.3              <report>distribution-management</report>-->
+              <report>index</report>
+              <report>issue-tracking</report>
+<!--              <report>license</report>-->
+              <report>mailing-list</report>
+<!--3.3              <report>modules</report>-->
+              <report>plugin-management</report>
+              <report>plugins</report>
+              <report>project-team</report>
+              <report>scm</report>
+              <report>summary</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.3</version>
+        <configuration>
+          <aggregate>true</aggregate>
+          <!--<includeTests>true</includeTests>-->
+          <typeResolution>true</typeResolution>
+          <targetJdk>1.7</targetJdk>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>opencast</id>
+      <name>Opencast Repo</name>
+      <url>${opencast.nexus.url}/nexus/content/groups/public</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <repositories>
+    <repository>
+      <id>opencast</id>
+      <name>Opencast Repo</name>
+      <url>${opencast.nexus.url}/nexus/content/groups/public</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>eclipse-gemini</id>
+      <name>Eclipse Gemini Maven repository</name>
+      <url>http://download.eclipse.org/gemini/mvn/</url>
+    </repository>
+  </repositories>
+</project>
