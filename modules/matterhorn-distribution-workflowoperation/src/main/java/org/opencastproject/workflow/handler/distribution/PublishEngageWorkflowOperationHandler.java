@@ -105,6 +105,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String STREAMING_SOURCE_FLAVORS = "streaming-source-flavors";
   private static final String STREAMING_TARGET_SUBFLAVOR = "streaming-target-subflavor";
   private static final String CHECK_AVAILABILITY = "check-availability";
+  private static final String STRATEGY = "strategy";
 
   //itbwpdk start
   /** Distribution delay between elements for engage */
@@ -113,9 +114,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   /** Distribution delay between elements for engage */
   private int distributionDelay = 0;
   //itbwpdk end
-
-  /** Workflow configuration option keys to only merge or overwrite element in exiting mediapackage */
-  private static final String STRATEGY = "retract";
 
   /** The streaming distribution service */
   private DistributionService streamingDistributionService = null;
@@ -241,6 +239,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     String streamingTargetTags = StringUtils.trimToEmpty(op.getConfiguration(STREAMING_TARGET_TAGS));
     String streamingSourceFlavors = StringUtils.trimToEmpty(op.getConfiguration(STREAMING_SOURCE_FLAVORS));
     String streamingTargetSubflavor = StringUtils.trimToNull(op.getConfiguration(STREAMING_TARGET_SUBFLAVOR));
+    String republishStrategy = (workflowInstance.getCurrentOperation().getConfiguration(STRATEGY));
+
     boolean checkAvailability = option(op.getConfiguration(CHECK_AVAILABILITY)).bind(trimToNone).map(toBool)
             .getOrElse(true);
 
@@ -324,7 +324,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       }
 
         List<Job> jobs = new ArrayList<Job>();
-        switch (STRATEGY) {
+        switch (republishStrategy) {
             case ("merge"):
                 //nothing to retract
                 break;
@@ -389,9 +389,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
             //Check if it is allready publisched
           if (isMediapackagePublished(mediaPackageForSearch)) {
               // MH-10216, check if only merging into existing mediapackage
-              final String republishStrategy = (workflowInstance.getCurrentOperation().getConfiguration(STRATEGY));
 
-              switch (STRATEGY) {
+              switch (republishStrategy) {
                   case ("merge") :
                     // merge() returns merged mediapackage or null mediaPackage is not published
                   mediaPackageForSearch = merge(mediaPackageForSearch);

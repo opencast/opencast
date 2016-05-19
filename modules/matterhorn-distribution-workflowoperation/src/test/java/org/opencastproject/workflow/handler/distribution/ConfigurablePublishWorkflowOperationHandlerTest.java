@@ -132,6 +132,7 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     EasyMock.expect(mediapackage.getIdentifier()).andStubReturn(new IdImpl("mp-id"));
     mediapackage.add(EasyMock.capture(capturePublication));
     mediapackage.add(publicationtest);
+    EasyMock.expect(mediapackage.getPublications()).andStubReturn(new Publication[] {publicationtest});
     EasyMock.expectLastCall();
     EasyMock.replay(mediapackage);
 
