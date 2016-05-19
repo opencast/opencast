@@ -278,9 +278,10 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
     }
 
     /**
-     *
-     * @param mp
-     * @param channelId
+     * Removes Pubblication for distributionChannel 
+     * 
+     * @param mp Mediapackage
+     * @param channelId Publication-Channel
      * @throws org.opencastproject.workflow.api.WorkflowOperationException
      */
     private void retract(MediaPackage mp, String channelId) throws WorkflowOperationException {

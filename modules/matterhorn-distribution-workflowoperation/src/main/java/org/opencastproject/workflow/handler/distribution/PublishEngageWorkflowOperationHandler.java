@@ -697,7 +697,13 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
     return mergedMediaPackage;
   }
-
+/**
+ * Removes every Publication for Searchindex from Mediapackage
+ * Removes Mediapackage from Searchindex
+ * @param mediaPackage Mediapackage
+ * @param mediaPackageForSearch Mediapackage prepared for searchIndex
+ * @throws WorkflowOperationException 
+ */
     private void retractFromEngage(MediaPackage mediaPackage, MediaPackage mediaPackageForSearch) throws WorkflowOperationException {
         for (Publication publicationEelement : mediaPackage.getPublications()) {
             if (CHANNEL_ID.equals(publicationEelement.getChannel())) {
