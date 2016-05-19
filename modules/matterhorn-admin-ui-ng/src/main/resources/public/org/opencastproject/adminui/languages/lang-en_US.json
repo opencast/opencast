@@ -122,6 +122,8 @@
      "EMAIL_SENT": "The message has been sent",
      "EMAIL_NOT_SENT": "The message could not be sent",
      "CONFLICT_DETECTED":   "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
+     "CONFLICT_ALREADY_ENDED":   "Scheduling error: The event has already ended.",
+     "CONFLICT_END_BEFORE_START":   "Scheduling error: Schedule end has to be later than the start.",
      "INVALID_ACL_RULES":   "Rules have to contain a valid role and read or/and write right(s).",
      "MISSING_ACL_RULES":   "At least one role with Read and Write permissions is required!",
      "SAVED_ACL_RULES":   "The access rules have been saved.",
