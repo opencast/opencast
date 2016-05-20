@@ -77,13 +77,8 @@
                     <div class="h-nav dropdown-icon">{{ currentUser.user.name || currentUser.user.username }}</div>
                     <ul class="dropdown-ul">
                         <li>
-                        <a data-open-modal="user-preferences">
-                            <span class="cogs-icon" translate="PREFERENCES.CAPTION">Preferences</span>
-                        </a>
-                        </li>
-                        <li>
                         <a ng-click="logout()">
-                                <span class="logout-icon" translate="LOGOUT">Logout</span>
+                            <span class="logout-icon" translate="LOGOUT">Logout</span>
                         </a>
                         </li>
                     </ul>
