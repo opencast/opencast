@@ -11,7 +11,16 @@ INSERT INTO mh_user_session (session_id, user_ip, user_id) SELECT session, user_
 
 ALTER TABLE mh_user_action CHANGE session session_id VARCHAR(50);
 
-DROP INDEX IX_mh_user_action_user_id ON mh_user_action;
+set @exist := (select count(*) from information_schema.statistics where TABLE_NAME = "mh_user_action" and INDEX_NAME = "IX_mh_user_action_user_id");
+set @sqlstmt := if( @exist > 0, 'DROP INDEX IX_mh_user_action_user_id ON mh_user_action;', 'SELECT "1.6.x upgraded schema detected"' );
+PREPARE stmt FROM @sqlstmt;
+EXECUTE stmt;
+
+set @exist := (select count(*) from information_schema.statistics where TABLE_NAME = "mh_user_action" and INDEX_NAME = "IX_mh_user_action_user_d");
+set @sqlstmt := if( @exist > 0, 'DROP INDEX IX_mh_user_action_user_d ON mh_user_action;', 'SELECT "1.4.0 upgraded schema detected"' );
+PREPARE stmt FROM @sqlstmt;
+EXECUTE stmt;
+
 DROP INDEX IX_mh_user_action_session_id ON mh_user_action;
 
 ALTER TABLE mh_user_action DROP COLUMN user_id;
