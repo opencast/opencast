@@ -11,15 +11,9 @@ INSERT INTO mh_user_session (session_id, user_ip, user_id) SELECT session, user_
 
 ALTER TABLE mh_user_action CHANGE session session_id VARCHAR(50);
 
-set @exist := (select count(*) from information_schema.statistics where TABLE_NAME = "mh_user_action" and INDEX_NAME = "IX_mh_user_action_user_id");
-set @sqlstmt := if( @exist > 0, 'DROP INDEX IX_mh_user_action_user_id ON mh_user_action;', 'SELECT "1.6.x upgraded schema detected"' );
-PREPARE stmt FROM @sqlstmt;
-EXECUTE stmt;
-
-set @exist := (select count(*) from information_schema.statistics where TABLE_NAME = "mh_user_action" and INDEX_NAME = "IX_mh_user_action_user_d");
-set @sqlstmt := if( @exist > 0, 'DROP INDEX IX_mh_user_action_user_d ON mh_user_action;', 'SELECT "1.4.0 upgraded schema detected"' );
-PREPARE stmt FROM @sqlstmt;
-EXECUTE stmt;
+DROP INDEX IF EXISTS IX_mh_user_action_user_id ON mh_user_action;
+#Fixing possible typo when upgrading from Opencast 1.4
+DROP INDEX IF EXISTS IX_mh_user_action_user_d ON mh_user_action;
 
 DROP INDEX IX_mh_user_action_session_id ON mh_user_action;
 
@@ -207,12 +201,12 @@ RENAME TABLE mh_episode_episode TO mh_archive_episode;
 RENAME TABLE mh_episode_version_claim TO mh_archive_version_claim;
 
 -- rename foreign key and constraints
-ALTER TABLE mh_archive_asset DROP FOREIGN KEY FK_mh_episode_asset_organization;
-ALTER TABLE mh_archive_asset DROP INDEX UNQ_mh_episode_asset_0;
+ALTER TABLE mh_archive_asset DROP FOREIGN KEY IF EXISTS FK_mh_episode_asset_organization;
+ALTER TABLE mh_archive_asset DROP INDEX IF EXISTS UNQ_mh_episode_asset_0;
 ALTER TABLE mh_archive_asset ADD CONSTRAINT UNQ_mh_archive_asset_0 UNIQUE (organization, mediapackage, mediapackageelement, version);
 ALTER TABLE mh_archive_asset ADD CONSTRAINT FK_mh_archive_asset_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE;
 
-ALTER TABLE mh_archive_episode DROP FOREIGN KEY FK_mh_episode_episode_organization;
+ALTER TABLE mh_archive_episode DROP FOREIGN KEY IF EXISTS FK_mh_episode_episode_organization;
 ALTER TABLE mh_archive_episode ADD CONSTRAINT FK_mh_archive_episode_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE;
 
 -- rename indizies
