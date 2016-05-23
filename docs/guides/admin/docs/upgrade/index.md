@@ -27,7 +27,11 @@ If you want to re-use this config file from your 2.1 installation, please update
 7. Build Opencast 2.1
 8. Delete the `adminui` directory in your Opencast data directory.
 9. Start Opencast using the interactive script in `bin/start-opencast`
-10. Log-in to the Karaf console on your node where the search service is running (usually presentation node) and install the opencast-migration feature by entering: `feature:install opencast-migration`
+10. Log-in to the Karaf console on your node where the search service is running (usually presentation node) 
+    and install the opencast-migration feature by entering: `feature:install opencast-migration`
+
+    *Make sure that your current engage search index contains all episodes. Retracted recordings will not be 
+    migrated, i.e.*
 11. Check the logs for errors!
 12. Restart Opencast service - you do not need to use the interactive start script.
 13. Reconstruct the Admin UI search index. There are two ways to reconstruct the index:
