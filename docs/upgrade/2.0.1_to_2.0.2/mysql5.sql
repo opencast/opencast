@@ -6,19 +6,21 @@ ALTER TABLE mh_user_action
 ADD CONSTRAINT FK_mh_user_action_session_id FOREIGN KEY (session_id) REFERENCES mh_user_session (session_id) ON DELETE CASCADE;
 
 ALTER TABLE mh_host_registration
-DROP INDEX UNQ_mh_host_registration_0,
+DROP INDEX IF EXISTS UNQ_mh_host_registration_0,
 ADD CONSTRAINT UNQ_mh_host_registration UNIQUE (host);
 
 ALTER TABLE mh_service_registration
-DROP INDEX UNQ_mh_service_registration_0,
+DROP INDEX IF EXISTS UNQ_mh_service_registration_0,
 ADD CONSTRAINT UNQ_mh_service_registration UNIQUE (host_registration, service_type);
 
 ALTER TABLE mh_service_registration
-DROP FOREIGN KEY FK_service_registration_host_registration,
+DROP FOREIGN KEY IF EXISTS FK_service_registration_host_registration;
+ALTER TABLE mh_service_registration
 ADD CONSTRAINT FK_mh_service_registration_host_registration FOREIGN KEY (host_registration) REFERENCES mh_host_registration (id) ON DELETE CASCADE;
 
 ALTER TABLE mh_job_argument
-DROP FOREIGN KEY FK_job_argument_id,
+DROP FOREIGN KEY IF EXISTS FK_job_argument_id;
+ALTER TABLE mh_job_argument
 ADD CONSTRAINT FK_mh_job_argument_id FOREIGN KEY (id) REFERENCES mh_job (id) ON DELETE CASCADE;
 
 ALTER TABLE mh_job_context
@@ -30,7 +32,8 @@ DROP FOREIGN KEY FK_job_context_id,
 ADD CONSTRAINT FK_mh_job_context_id FOREIGN KEY (id) REFERENCES mh_job (id) ON DELETE CASCADE;
 
 ALTER TABLE mh_job_mh_service_registration
-DROP FOREIGN KEY mhjobmhservice_registrationservicesRegistration_id,
+DROP FOREIGN KEY IF EXISTS mhjobmhservice_registrationservicesRegistration_id;
+ALTER TABLE mh_job_mh_service_registration
 ADD CONSTRAINT FK_mh_job_mh_service_registration_servicesRegistration_id FOREIGN KEY (servicesRegistration_id) REFERENCES mh_service_registration (id) ON DELETE CASCADE;
 
 ALTER TABLE mh_incident
@@ -90,7 +93,7 @@ ADD CONSTRAINT UNQ_mh_user_ref_role UNIQUE (user_id, role_id);
 -- Fix naming conventions from 2.0.1
 
 ALTER TABLE mh_series_property
-DROP FOREIGN KEY FK_mh_series_property_series,
+DROP FOREIGN KEY IF EXISTS FK_mh_series_property_series,
 ADD CONSTRAINT FK_mh_series_property_organization_series FOREIGN KEY (organization, series) REFERENCES mh_series (organization, id) ON DELETE CASCADE;
 
 ALTER TABLE mh_email_configuration
