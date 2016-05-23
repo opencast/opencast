@@ -42,17 +42,17 @@ import javax.xml.bind.annotation.XmlType;
 public class Payload {
 
   @XmlElement(name = "filename")
-  String filename; // name of the uploaded file
+  private String filename; // name of the uploaded file
   @XmlElement(name = "totalsize")
-  long totalsize; // size of the file
+  private long totalsize; // size of the file
   @XmlElement(name = "currentsize")
-  long currentsize; // number of bytes that have already been (successfully) recieved
+  private long currentsize; // number of bytes that have already been (successfully) recieved
   @XmlElement(name = "url")
   private URL url; // URL of the completely uploaded file
   @XmlElement(name = "mediapackage", namespace = "http://mediapackage.opencastproject.org")
-  MediaPackage mediapackage; // the mediapackage this UploadJob should belong to
+  private MediaPackage mediapackage; // the mediapackage this UploadJob should belong to
   @XmlElement(name = "flavor")
-  MediaPackageElementFlavor flavor;
+  private MediaPackageElementFlavor flavor;
 
   public Payload() {
     this.filename = "unknown";

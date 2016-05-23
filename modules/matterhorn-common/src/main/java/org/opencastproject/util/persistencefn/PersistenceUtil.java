@@ -136,11 +136,11 @@ public final class PersistenceUtil {
   //
 
   private static final ProductBuilder P = com.entwinemedia.fn.Products.E;
-  private static Map<String, String> TEST_ENTITY_MANAGER_PROPS = $(
+  private static final Map<String, String> TEST_ENTITY_MANAGER_PROPS = $(
           P.p2("eclipselink.ddl-generation", "create-tables"),
           P.p2("eclipselink.ddl-generation.output-mode", "database"))
           .group(Products.<String>p2_1(), Products.<String>p2_2());
-  private static Map<String, String> TEST_ENTITY_MANAGER_LOGGING_PROPS = $(
+  private static final Map<String, String> TEST_ENTITY_MANAGER_LOGGING_PROPS = $(
           P.p2("eclipselink.logging.level.sql", "FINE"),
           P.p2("eclipselink.logging.parameters", "true"))
           .group(Products.<String>p2_1(), Products.<String>p2_2());

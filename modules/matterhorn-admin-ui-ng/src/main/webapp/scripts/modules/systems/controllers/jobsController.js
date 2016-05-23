@@ -11,6 +11,9 @@ angular.module('adminNg.controllers')
                 name:  'type',
                 label: 'SYSTEMS.JOBS.TABLE.TYPE'
             }, {
+                name:  'processingHost',
+                label: 'SYSTEMS.JOBS.TABLE.HOST_NAME'
+            }, {
                 name:  'submitted',
                 label: 'SYSTEMS.JOBS.TABLE.SUBMITTED'
             }, {
@@ -19,9 +22,6 @@ angular.module('adminNg.controllers')
             }, {
                 name:  'creator',
                 label: 'SYSTEMS.JOBS.TABLE.CREATOR',
-            }, {
-                name:  'processingHost',
-                label: 'SYSTEMS.JOBS.TABLE.HOST_NAME'
             //}, {
             //    template: 'modules/systems/partials/jobActionsCell.html',
             //    label:    'SYSTEMS.JOBS.TABLE.ACTION',

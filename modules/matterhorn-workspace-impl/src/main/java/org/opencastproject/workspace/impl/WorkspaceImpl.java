@@ -149,7 +149,7 @@ public final class WorkspaceImpl implements Workspace {
    */
   public WorkspaceImpl(String rootDirectory, boolean waitForResource) {
     this.wsRoot = rootDirectory;
-    this.waitForResourceFlag = waitForResourceFlag;
+    this.waitForResourceFlag = waitForResource;
   }
 
   /**
