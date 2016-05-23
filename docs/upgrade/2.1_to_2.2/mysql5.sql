@@ -47,10 +47,10 @@ INSERT INTO mh_event_comment_reply (id, event_comment_id, creation_date, author,
   SELECT r.id, c.Comment_id, r.creation_date, r.author, r.text, r.modification_date 
   FROM mh_comment_reply AS r, mh_comment_mh_comment_reply AS c;
 
-DROP TABLE mh_event_mh_comment;
-DROP TABLE mh_message_template_mh_comment;
-DROP TABLE mh_comment_mh_comment_reply;
-DROP TABLE mh_comment_reply;
-DROP TABLE mh_message_signature_mh_comment;
-DROP TABLE mh_comment;
-DROP TABLE mh_upload;
+DROP TABLE IF EXISTS mh_event_mh_comment;
+DROP TABLE IF EXISTS mh_message_template_mh_comment;
+DROP TABLE IF EXISTS mh_comment_mh_comment_reply;
+DROP TABLE IF EXISTS mh_comment_reply;
+DROP TABLE IF EXISTS mh_message_signature_mh_comment;
+DROP TABLE IF EXISTS mh_comment;
+DROP TABLE IF EXISTS mh_upload;
