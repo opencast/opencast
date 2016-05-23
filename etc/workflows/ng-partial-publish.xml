@@ -81,6 +81,28 @@
     <!-- Create a cover image with the default template -->
 
     <operation
+      id="tag"
+      description="Removing unneeded presenter-cover from download publication">
+      <configurations>
+        <configuration key="source-flavors">presenter/player+preview</configuration>
+        <configuration key="target-tags">-engage-download</configuration>
+      </configurations>
+    </operation>
+    
+    <operation
+      id="image"
+      exception-handler-workflow="ng-partial-error"
+      description="Creating player preview image">
+      <configurations>
+        <configuration key="source-flavor">presenter/trimmed</configuration>
+        <configuration key="source-tags"></configuration>
+        <configuration key="target-flavor">presenter/coverbackground</configuration>
+        <configuration key="encoding-profile">player-preview.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <operation
       id="cover-image"
       fail-on-error="true"
       exception-handler-workflow="error"
@@ -89,9 +111,9 @@
         <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
         <configuration key="width">1920</configuration>
         <configuration key="height">1080</configuration>
-        <configuration key="posterimage-flavor">presenter/player+preview</configuration>
-        <configuration key="target-flavor">image/cover</configuration>
-        <configuration key="target-tags">archive</configuration>
+        <configuration key="posterimage-flavor">presenter/coverbackground</configuration>
+        <configuration key="target-flavor">presenter/player+preview</configuration>
+        <configuration key="target-tags">archive, engage-download</configuration>
      </configurations>
     </operation>
 

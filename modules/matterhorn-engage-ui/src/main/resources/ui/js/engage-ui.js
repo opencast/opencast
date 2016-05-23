@@ -248,12 +248,9 @@ $(document).ready(function() {
     function logout() {
         $.ajax({
             type: "GET",
-            url: springSecurityLogoutURL,
-        }).done(function(msg) {
-            checkLoggedOut = true;
+            url: springSecurityLogoutURL
+        }).complete(function(msg) {
             initialize();
-        }).fail(function(msg) {
-            $($nav_logoutLink).attr("href", springSecurityLogoutURL);
         });
     }
 

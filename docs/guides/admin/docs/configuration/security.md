@@ -46,27 +46,6 @@ The set of user and role providers can be configured. If you do not want to keep
 database, you can replace the JpaUserAndRoleProvider with the LdapUserProvider by replacing the
 matterhorn-userdirectory-jpa jar with the matterhorn-userdirectory-ldap jar.
 
-### Adding Users to the Opencast Database
-
-Additional users can be created by adding a username, organization and password hash to the `mh_user` table in the
-Opencast database. The default hash method is MD5 and the password must be salted with the username in curly braces.
-
-**At the moment, there is no graphical user interface for this task. It has to be done in the database.**
-
-Example: Adding Garfield with the password 'monday' (in MySQL)
-
-    INSERT INTO `opencast`.`mh_user` (`username`, `organization`, `password`) VALUES ('garfield', 'mh_default_org', MD5('monday{garfield}'));
-
-In the next step roles for the newly created user can be added to the `mh_role` table. After that the created user and
-role id can be added to the `mh_user_role` table. Here we set `ROLE_USER` for Garfield:
-
-    INSERT INTO `opencast`.`mh_role` (`organization`, `name`, `description`) VALUES ('mh_default_org', 'ROLE_USER', 'The user role');
-    INSERT INTO `opencast`.`mh_user_role` (`user_id`, `role_id`) VALUES ('220', '221');
-
-** Note that you must set the value of the organization field to the organization ID specified in one of the
-`.../etc/org.opencast.organization-<organization_name>.cfg` files. In a default installation this is
-`mh_default_org`.**
-
 ## Further Authentication Configuration
 
 [Configure Central Authentication Service (CAS)](security.cas.md)
