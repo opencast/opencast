@@ -31,7 +31,7 @@ If you want to re-use this config file from your 2.1 installation, please update
     and install the opencast-migration feature by entering: `feature:install opencast-migration`
 
     *Make sure that your current engage search index contains all episodes. Retracted recordings will not be 
-    migrated, i.e.*
+    migrated.*
 11. Check the logs for errors!
 12. Restart Opencast service - you do not need to use the interactive start script.
 13. Reconstruct the Admin UI search index. There are two ways to reconstruct the index:
