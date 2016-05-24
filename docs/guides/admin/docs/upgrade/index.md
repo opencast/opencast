@@ -4,10 +4,12 @@
 You will find the database migration script in /docs/upgrade/2.1_to_2.2/<vendor>.sql
 
 ## Distribution artifacts migration
-With the introduction of stream security, there was the need to be able to prevent cross-tenants access on the 
-download and streaming distribution artifacts. To reach that the download and streaming distribution service has been
-adjusted to generate their artifact URL including the tenant. Because of this new URL's all existing artifact URL's 
-need a migration and the artifacts in the file systems need to be moved to a new location.
+With the introduction of the stream security, the distribution URLs he distribution URLs in Opencast 2.2 have changed
+to provide a clearer separation between the artifacts belonging to the different tenants present in the system. 
+In particular, now the tenant's name will be part of all its artifacts' URLs. This change makes it easier to protect 
+the distributed artifacts from being accessed by a tenant they do not belong to. It affects all the Opencast 
+deployments, even if only one tenant (the "default organization") is defined or even if the Stream Security 
+mechanism is not active.
 
 ## Configuration changes
 
