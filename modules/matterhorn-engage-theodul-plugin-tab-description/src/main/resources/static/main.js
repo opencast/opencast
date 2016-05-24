@@ -97,14 +97,13 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
     /* don't change these variables */
     var viewsModelChange = "change:views";
     var mediapackageChange = "change:mediaPackage";
-    var initCount = 4;
+    var initCount = 3;
     var mediapackageError = false;
     var translations = new Array();
     var locale = "en";
     var dateFormat = "MMMM Do YYYY, h:mm:ss a";
-    var Utils;
 
-    function initTranslate(language, funcSuccess, funcError) {
+    function initTranslate(language) {
         var path = Engage.getPluginPath("EngagePluginTabDescription").replace(/(\.\.\/)/g, "");
         var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
 
@@ -117,18 +116,8 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
                 if (data) {
                     data.value_locale = language;
                     translations = data;
-                    if (funcSuccess) {
-                        funcSuccess(translations);
-                    }
-                } else {
-                    if (funcError) {
-                        funcError();
-                    }
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                if (funcError) {
-                    funcError();
+                    locale = translate("value_locale", locale);
+                    dateFormat = translate("value_dateFormatFull", dateFormat);
                 }
             }
         });
@@ -202,13 +191,6 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
                 this.$el.html(template(tempVars));
 
                 $("#engage_tab_" + plugin.name.replace(/\s/g,"_")).text(tempVars.str_description);
-                /*
-        	    $(".description-item").mouseover(function() {
-        	        $(this).removeClass("description-itemColor").addClass("description-itemColor-hover");
-        	    }).mouseout(function() {
-        	        $(this).removeClass("description-itemColor-hover").addClass("description-itemColor");
-        	    });
-        	*/
             }
         }
     });
@@ -216,6 +198,7 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if (isDesktopMode && plugin.inserted) {
+            initTranslate(Engage.model.get("language"));
             // create a new view with the media package model and the template
             var descriptionTabView = new DescriptionTabView(Engage.model.get("mediaPackage"), plugin.template);
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
@@ -232,27 +215,6 @@ define(["jquery", "underscore", "backbone", "engage/core", "moment"], function($
         // init event
         Engage.log("Tab:Description: Init");
         var relative_plugin_path = Engage.getPluginPath("EngagePluginTabDescription");
-
-        // load utils class
-        require([relative_plugin_path + "utils"], function(utils) {
-            Engage.log("Tab:Description: Utils class loaded");
-            Utils = new utils();
-            initTranslate(Utils.detectLanguage(), function() {
-                Engage.log("Tab:Description: Successfully translated.");
-                locale = translate("value_locale", locale);
-                dateFormat = translate("value_dateFormatFull", dateFormat);
-                initCount -= 1;
-                if (initCount <= 0) {
-                    initPlugin();
-                }
-            }, function() {
-                Engage.log("Tab:Description: Error translating...");
-                initCount -= 1;
-                if (initCount <= 0) {
-                    initPlugin();
-                }
-            });
-        });
 
         Engage.model.on(viewsModelChange, function() {
             initCount -= 1;

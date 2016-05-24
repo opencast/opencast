@@ -2319,7 +2319,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   require([relative_plugin_path + 'utils'], function (utils) {
     Engage.log('Video: Utils class loaded');
     Utils = new utils();
-    initTranslate(Utils.detectLanguage(), function () {
+    initTranslate(Engage.model.get("language"), function () {
       Engage.log('Video: Successfully translated.');
       initCount -= 1;
       if (initCount <= 0) {

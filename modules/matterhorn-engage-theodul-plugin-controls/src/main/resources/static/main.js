@@ -1323,7 +1323,7 @@ define(["require", "jquery", "underscore", "backbone", "basil", "bootbox", "enga
         require([relative_plugin_path + "utils"], function(utils) {
             Engage.log("Controls: Utils class loaded");
             Utils = new utils();
-            initTranslate(Utils.detectLanguage(), function() {
+            initTranslate(Engage.model.get("language"), function() {
                 Engage.log("Controls: Successfully translated.");
                 initCount -= 1;
                 if (initCount <= 0) {
