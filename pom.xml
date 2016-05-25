@@ -100,6 +100,7 @@
     <module>modules/matterhorn-execute-api</module>
     <module>modules/matterhorn-execute-impl</module>
     <module>modules/matterhorn-execute-remote</module>
+    <module>modules/matterhorn-execute-workflowoperation</module>
     <module>modules/matterhorn-fileupload</module>
     <module>modules/matterhorn-holdstate-workflowoperation</module>
     <module>modules/matterhorn-incident-workflowoperation</module>
@@ -276,7 +277,7 @@
           </systemPropertyVariables>
         </configuration>
       </plugin>
-      <!-- Ensure that the source code matches the Matterhorn style rules -->
+      <!-- Ensure that the source code matches the style rules -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
@@ -285,7 +286,7 @@
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>6.15</version>
+            <version>6.18</version>
           </dependency>
         </dependencies>
         <configuration>
@@ -1608,11 +1609,6 @@
       <releases>
         <enabled>true</enabled>
       </releases>
-    </repository>
-    <repository>
-      <id>eclipse-gemini</id>
-      <name>Eclipse Gemini Maven repository</name>
-      <url>http://download.eclipse.org/gemini/mvn/</url>
     </repository>
   </repositories>
 </project>

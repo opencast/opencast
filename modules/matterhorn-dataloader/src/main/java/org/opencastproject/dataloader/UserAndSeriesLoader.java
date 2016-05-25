@@ -49,7 +49,7 @@ import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 import org.opencastproject.util.NotFoundException;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,6 +96,9 @@ public class UserAndSeriesLoader {
   /** The departmental admin (not the super admin) role suffix */
   public static final String ADMIN_PREFIX = "ADMIN";
 
+  /** Configuration property to set if to load default users */
+  public static final String PROP_DEMO_LOAD_USER = "org.opencastproject.security.demo.loadusers";
+
   /** The read permission */
   public static final String READ = Permissions.Action.READ.toString();
 
@@ -127,11 +130,8 @@ public class UserAndSeriesLoader {
    */
   protected void activate(ComponentContext cc) {
 
-    String loadUsers = StringUtils.trimToNull(cc.getBundleContext().getProperty(
-            "org.opencastproject.security.demo.loadusers"));
-
     // Load the demo users, if necessary
-    if (Boolean.valueOf(loadUsers)) {
+    if (BooleanUtils.toBoolean(cc.getBundleContext().getProperty(PROP_DEMO_LOAD_USER))) {
       // Load 100 series and 1000 users, but don't block activation
       new Loader().start();
     }

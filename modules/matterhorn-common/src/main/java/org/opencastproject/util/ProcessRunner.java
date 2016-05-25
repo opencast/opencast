@@ -43,7 +43,6 @@ public final class ProcessRunner {
 
   public static final Pred<String> TO_CONSOLE = new Pred<String>() {
     @Override public Boolean ap(String s) {
-      System.out.println(s);
       return true;
     }
   };

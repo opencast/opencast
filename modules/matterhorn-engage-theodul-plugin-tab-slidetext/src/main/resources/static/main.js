@@ -256,7 +256,8 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
         require([relative_plugin_path + "utils"], function(utils) {
             Engage.log("Tab:Slidetext: Utils class loaded");
             Utils = new utils();
-            initTranslate(Utils.detectLanguage(), function() {
+            plugin.timeStrToSeconds = Utils.timeStrToSeconds;
+            initTranslate(Engage.model.get("language"), function() {
                 Engage.log("Tab:Slidetext: Successfully translated.");
                 initCount -= 1;
                 if (initCount <= 0) {

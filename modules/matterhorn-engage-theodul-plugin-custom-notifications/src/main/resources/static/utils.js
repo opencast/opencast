@@ -27,11 +27,6 @@ define(["jquery", "moment"], function($, Moment) {
         // nothing to see here
     }
 
-    Utils.prototype.detectLanguage = function() {
-        var language = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
-        return language.replace(/\-.*/,'');
-    }
-
     /**
      * Format the current date and time
      *

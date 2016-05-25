@@ -53,8 +53,8 @@ installation:
     prop.org.opencastproject.engage.ui.url=https://tenant1_presentation.myuniversity.edu
 
     # Default properties for the user interface
-    prop.logo_mediamodule=/img/MatterhornLogo_large.png
-    prop.logo_player=/img/OpencastLogo.png
+    prop.logo_mediamodule=/engage/ui/img/logo/opencast-icon.svg
+    prop.logo_player=/engage/ui/img/logo/opencast.svg
 
     # Define which parts of the admin ui should be visible
     prop.adminui.i18n_tab_episode.enable=false

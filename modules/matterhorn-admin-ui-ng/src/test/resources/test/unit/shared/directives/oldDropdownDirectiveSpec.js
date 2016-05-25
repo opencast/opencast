@@ -32,10 +32,4 @@ describe('adminNg.directives.oldAdminNgDropdown', function () {
         element.find('a').click();
         expect(element).not.toHaveClass('active');
     });
-
-    it('does nothing when clicking other elements', function () {
-        expect(element).not.toHaveClass('active');
-        element.find('ul').click();
-        expect(element).not.toHaveClass('active');
-    });
 });

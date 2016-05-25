@@ -39,7 +39,6 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,7 +114,7 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
       if (loadParam != null) {
         load = loadParam;
       }
-     
+
       Job retJob = null;
       if ((inputElementStr != null) && (inputMpStr != null)) {
         logger.error("Only one input MediaPackage OR input MediaPackageElement can be set at the same time");
