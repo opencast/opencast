@@ -112,15 +112,6 @@ public class QueryPreprocessorTest {
 
   @Test
   public void testBinaryOperators() {
-    // Escape operator if operands are missing
-    assertEquals("\\&&", QueryPreprocessor.sanitize("&&"));
-    assertEquals("*Hello* \\&&", QueryPreprocessor.sanitize("Hello &&"));
-    assertEquals("\\&& *World*", QueryPreprocessor.sanitize("&& World"));
-
-    // Don't escape operator if used correctly
-    assertEquals("*Hello* && *World*", QueryPreprocessor.sanitize("Hello && World"));
-    assertEquals("*Hello* || *World*", QueryPreprocessor.sanitize("Hello || World"));
-
     testBinaryOperator("&&");
     testBinaryOperator("||");
   }
