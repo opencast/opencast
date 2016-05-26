@@ -51,7 +51,7 @@ public class QueryPreprocessorTest {
   }
 
   @Test
-  public void testWildcars() {
+  public void testWildcards() {
     // Don't escape wildcards occuring as individual tokens
     assertEquals("*", QueryPreprocessor.sanitize("*"));
     assertEquals("*", QueryPreprocessor.sanitize(" * "));
