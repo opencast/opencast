@@ -34,23 +34,66 @@ public class QueryPreprocessorTest {
   }
 
   public void testDoubleQuotes() {
-    assertEquals("Hello \"World\"", QueryPreprocessor.sanitize("Hello \"World\""));
+    // No partial matching for quoted strings
+    assertEquals("\"Hello\"", QueryPreprocessor.sanitize("\"Hello\""));
+    assertEquals("*Hello* \"World\"", QueryPreprocessor.sanitize("Hello \"World\""));
+
+    // Auto-completion and partial matching in case of missing double-quote
     assertEquals("Hello \"World\"*", QueryPreprocessor.sanitize("Hello \"World"));
-    assertEquals("\"Hello World\"", QueryPreprocessor.sanitize("\"Hello World\""));
+    assertEquals("Hello \"World Again\"*", QueryPreprocessor.sanitize("Hello \"World Again"));
+
+    // Partial matching for tokens containing quoted strings but starting and ending with characters
     assertEquals("*He\"llo Wor\"ld*", QueryPreprocessor.sanitize("He\"llo Wor\"ld"));
+
+    // double quotes do not delimit tokens
+    assertEquals("*Hello\"World\"Again*", QueryPreprocessor.sanitize("Hello\"World\"Again"));
+    assertEquals("\"Hello\"\"World\"", QueryPreprocessor.sanitize("\"Hello\"\"World\""));
+  }
+
+  @Test
+  public void testWildcars() {
+    // Don't escape wildcards occuring as individual tokens
+    assertEquals("*", QueryPreprocessor.sanitize("*"));
+    assertEquals("*", QueryPreprocessor.sanitize(" * "));
+    assertEquals("*?*", QueryPreprocessor.sanitize("?"));
+    assertEquals("*?*", QueryPreprocessor.sanitize(" ? "));
+
+    // Don't escape wildcards occuring within tokens
+    assertEquals("*H*llo* *Worl*d*", QueryPreprocessor.sanitize("H*llo Worl*d"));
+    assertEquals("*H?llo* *Worl?d*", QueryPreprocessor.sanitize("H?llo Worl?d"));
   }
 
   @Test
   public void testUnaryOperators() {
+    // Escape operator if operand is missing
     assertEquals("\\-", QueryPreprocessor.sanitize("-"));
     assertEquals("\\-", QueryPreprocessor.sanitize(" - "));
+
+    // Escape operator if occuring within a token
     assertEquals("*test\\-unit*", QueryPreprocessor.sanitize("test-unit"));
     assertEquals("*test\\-unit*", QueryPreprocessor.sanitize("*test-unit"));
     assertEquals("*test\\-unit*", QueryPreprocessor.sanitize("test-unit*"));
     assertEquals("*test\\-unit*", QueryPreprocessor.sanitize("*test-unit*"));
-    assertEquals("-*test\\-unit*", QueryPreprocessor.sanitize("-test-unit"));
     assertEquals("*test\\-unit\\-*", QueryPreprocessor.sanitize("test-unit-"));
     assertEquals("-*\\-test\\-\\-unit\\-\\-*", QueryPreprocessor.sanitize("--test--unit--"));
+
+    // Partial matching for operands
+    assertEquals("-*test\\-unit*", QueryPreprocessor.sanitize("-test-unit"));
+    assertEquals("-*test\\-unit*", QueryPreprocessor.sanitize("-*test-unit"));
+    assertEquals("-*test\\-unit*", QueryPreprocessor.sanitize("-test-unit*"));
+    assertEquals("-*test\\-unit*", QueryPreprocessor.sanitize("-*test-unit*"));
+  }
+
+  @Test
+  public void testBinaryOperators() {
+    // Escape operator if operands are missing
+    assertEquals("\\&&", QueryPreprocessor.sanitize("&&"));
+    assertEquals("*Hello* \\&&", QueryPreprocessor.sanitize("Hello &&"));
+    assertEquals("\\&& *World*", QueryPreprocessor.sanitize("&& World"));
+
+    // Don't escape operator if used correctly
+    assertEquals("*Hello* && *World*", QueryPreprocessor.sanitize("Hello && World"));
+    assertEquals("*Hello* || *World*", QueryPreprocessor.sanitize("Hello || World"));
   }
 
   public void testPartialMatches() {
@@ -62,12 +105,6 @@ public class QueryPreprocessorTest {
     assertEquals("*Hello* *World*", QueryPreprocessor.sanitize("Hello* World"));
     assertEquals("*Hello* *World*", QueryPreprocessor.sanitize("Hello *World"));
     assertEquals("*Hello* *World*", QueryPreprocessor.sanitize("*Hello* *World*"));
-
-
-    assertEquals("", QueryPreprocessor.sanitize(""));
-    assertEquals("", QueryPreprocessor.sanitize(""));
-    assertEquals("", QueryPreprocessor.sanitize(""));
-    assertEquals("", QueryPreprocessor.sanitize(""));
   }
 
 }
