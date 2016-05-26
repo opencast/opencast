@@ -234,7 +234,7 @@ public final class QueryPreprocessor {
     if (!currentToken.isEmpty()) {
       if (openDoubleQuote)
         // Syntax error detected. We fix this and also append an asterisk for better usability
-        currentToken += DOUBLE_QUOTE + ASTERISK;
+        currentToken += Character.toString(DOUBLE_QUOTE) + ASTERISK;
       tokens.add(currentToken);
     }
 
