@@ -23,8 +23,9 @@ package org.opencastproject.util;
 
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
 import org.opencastproject.util.data.Function0;
+
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

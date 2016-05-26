@@ -21,25 +21,28 @@
 
 package org.opencastproject.silencedetection.ffmpeg;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Properties;
-import org.easymock.EasyMock;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.silencedetection.api.SilenceDetectionFailedException;
 import org.opencastproject.silencedetection.impl.SilenceDetectionProperties;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.StreamHelper;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.easymock.EasyMock;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Properties;
 
 public class SilenceDetectorTest {
   private static final Logger logger = LoggerFactory.getLogger(SilenceDetectorTest.class);

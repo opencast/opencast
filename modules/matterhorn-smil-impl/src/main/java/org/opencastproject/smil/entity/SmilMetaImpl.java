@@ -21,11 +21,13 @@
 
 package org.opencastproject.smil.entity;
 
-import java.util.List;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
 import org.opencastproject.smil.entity.api.SmilMeta;
 import org.opencastproject.smil.entity.api.SmilObject;
+
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * {@link SmilMeta} implemetation.

@@ -195,7 +195,7 @@
         <configuration key="source-flavor">presenter/source</configuration>
         <configuration key="target-flavor">presenter/work</configuration>
         <configuration key="rewrite">false</configuration>
-        <configuration key="promiscuous-audio-muxing">true</configuration>
+        <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
       </configurations>
     </operation>
 
@@ -210,7 +210,7 @@
         <configuration key="source-flavor">presentation/source</configuration>
         <configuration key="target-flavor">presentation/work</configuration>
         <configuration key="rewrite">false</configuration>
-        <configuration key="promiscuous-audio-muxing">true</configuration>
+        <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
       </configurations>
     </operation>
 

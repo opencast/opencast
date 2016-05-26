@@ -248,12 +248,9 @@ $(document).ready(function() {
     function logout() {
         $.ajax({
             type: "GET",
-            url: springSecurityLogoutURL,
-        }).done(function(msg) {
-            checkLoggedOut = true;
+            url: springSecurityLogoutURL
+        }).complete(function(msg) {
             initialize();
-        }).fail(function(msg) {
-            $($nav_logoutLink).attr("href", springSecurityLogoutURL);
         });
     }
 
@@ -594,7 +591,7 @@ $(document).ready(function() {
 
             tile = tile + "<h4 class=\"title\">" + data.dcTitle + "</h4>";
 
-            // append thumbnail 
+            // append thumbnail
             var thumb = "";
             var time = 0;
             var creator = "<br>";
@@ -602,10 +599,23 @@ $(document).ready(function() {
             var date = "<br>";
 
             if (data.mediapackage) {
-                if (data.mediapackage.attachments && data.mediapackage.attachments.attachment[1].url) {
-                    thumb = data.mediapackage.attachments.attachment[1].url;
-                    tile = tile + "<div><img class=\"thumbnail img-responsive img-rounded\" src=\"" + thumb + "\"></div>";
-                };
+                if (data.mediapackage.attachments && data.mediapackage.attachments.attachment) {
+                    // Try finding the best preview image:
+                    // presentation/search+preview > presenter/search+preview > any other preview
+                    for (var i = 0; i < data.mediapackage.attachments.attachment.length; i++) {
+                        var att = data.mediapackage.attachments.attachment[i];
+                        if (att.url && att.type.indexOf('+preview') > 0) {
+                            if (thumb == '' || att.type.indexOf('/search+preview') > 0) {
+                                thumb = data.mediapackage.attachments.attachment[i].url;
+                                if (att.type == 'presentation/search+preview') {
+                                    // Stop if we got presentation/search+preview. We do not want to overwrite that.
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    tile = tile + '<div><img class="thumbnail img-responsive img-rounded" src="' + thumb + '"></div>';
+                }
 
                 tile = tile + "<div class=\"infos\">";
 

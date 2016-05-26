@@ -21,6 +21,13 @@
 
 package org.opencastproject.workflow.handler.holdstate;
 
+import static org.opencastproject.mediapackage.MediaPackageElementFlavor.flavor;
+import static org.opencastproject.mediapackage.MediaPackageElementFlavor.parseFlavor;
+import static org.opencastproject.util.EqualsUtil.eq;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.functions.Misc.error;
+
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
@@ -36,7 +43,9 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase;
 import org.opencastproject.workspace.api.Workspace;
+
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,15 +55,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import static org.opencastproject.mediapackage.MediaPackageElementFlavor.flavor;
-import static org.opencastproject.mediapackage.MediaPackageElementFlavor.parseFlavor;
-import static org.opencastproject.util.EqualsUtil.eq;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.functions.Misc.error;
-
-import org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase;
 
 /**
  * Simple implementation that holds for user-entered trim points.

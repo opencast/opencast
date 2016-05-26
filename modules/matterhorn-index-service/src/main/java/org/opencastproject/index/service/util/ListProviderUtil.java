@@ -46,7 +46,7 @@ public final class ListProviderUtil {
    *
    * @param map
    *          The map to sort
-   * @param ascending
+   * @param asc
    *          If the sorting should be done ascendantly (true) or not
    * @return a sorted map
    */

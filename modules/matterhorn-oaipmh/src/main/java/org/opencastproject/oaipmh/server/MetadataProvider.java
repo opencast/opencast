@@ -23,6 +23,7 @@
 package org.opencastproject.oaipmh.server;
 
 import org.opencastproject.search.api.SearchResultItem;
+
 import org.w3c.dom.Element;
 
 /**

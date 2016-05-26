@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-urlsigning-service-api</artifactId>
   <packaging>bundle</packaging>
-  <name>matterhorn-signing-service-api</name>
+  <name>matterhorn-urlsigning-service-api</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>2.2-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>

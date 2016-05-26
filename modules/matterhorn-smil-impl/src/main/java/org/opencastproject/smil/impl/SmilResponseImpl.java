@@ -21,11 +21,21 @@
 
 package org.opencastproject.smil.impl;
 
+import org.opencastproject.smil.api.SmilException;
+import org.opencastproject.smil.api.SmilResponse;
+import org.opencastproject.smil.entity.SmilImpl;
+import org.opencastproject.smil.entity.SmilObjectImpl;
+import org.opencastproject.smil.entity.api.Smil;
+import org.opencastproject.smil.entity.api.SmilObject;
+
+import org.apache.commons.io.IOUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.StringWriter;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -35,13 +45,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.apache.commons.io.IOUtils;
-import org.opencastproject.smil.api.SmilException;
-import org.opencastproject.smil.api.SmilResponse;
-import org.opencastproject.smil.entity.SmilImpl;
-import org.opencastproject.smil.entity.SmilObjectImpl;
-import org.opencastproject.smil.entity.api.Smil;
-import org.opencastproject.smil.entity.api.SmilObject;
 
 /**
  * {@link SmilResponse} implementation.

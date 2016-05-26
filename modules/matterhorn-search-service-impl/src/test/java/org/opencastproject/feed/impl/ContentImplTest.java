@@ -21,11 +21,12 @@
 
 package org.opencastproject.feed.impl;
 
+import org.opencastproject.feed.api.Content;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.opencastproject.feed.api.Content;
 
 public class ContentImplTest {
 

@@ -107,11 +107,15 @@ angular.module('adminNg.controllers')
         }
     };
 
+    $scope.submitButton = false;
     $scope.submit = function () {
         if ($scope.valid()) {
-            var deleteIds = [],
+            $scope.submitButton = true;
+            var resetSubmitButton = true,
+            deleteIds = [],
             resource = Table.resource.indexOf('series') >= 0 ? 'series' : 'event',
-            endpoint = Table.resource.indexOf('series') >= 0 ? 'deleteSeries' : 'deleteEvents';
+            endpoint = Table.resource.indexOf('series') >= 0 ? 'deleteSeries' : 'deleteEvents',
+            sourceNotification = resource === 'series' ? 'SERIES' : 'EVENTS'; 
 
             if (Table.resource.indexOf('series') >= 0) {
                 deleteIds = getSelectedSeriesIds();
@@ -121,16 +125,19 @@ angular.module('adminNg.controllers')
                 });
             }
             if (deleteIds.length > 0) {
+                resetSubmitButton = false;
                 BulkDeleteResource.delete({}, {
                     resource: resource,
                     endpoint: endpoint,
                     eventIds: deleteIds
                 }, function () {
+                    $scope.submitButton = false;
                     Table.deselectAll();
-                    Notifications.add('success', 'EVENTS_DELETED');
+                    Notifications.add('success', sourceNotification + '_DELETED');
                     Modal.$scope.close();
                 }, function () {
-                    Notifications.add('error', 'EVENTS_NOT_DELETED');
+                    $scope.submitButton = false;
+                    Notifications.add('error', sourceNotification + '_NOT_DELETED');
                     Modal.$scope.close();
                 });
             }
@@ -140,6 +147,7 @@ angular.module('adminNg.controllers')
                     retractEventIds.push(row.id);
                 });
                 if (retractEventIds.length > 0) {
+                    resetSubmitButton = false;
                     payload = {
                         workflows: $scope.processing.ud.workflow.id,
                         configuration: $scope.processing.ud.workflow.selection.configuration,
@@ -148,15 +156,22 @@ angular.module('adminNg.controllers')
                     TaskResource.save(payload, $scope.onSuccess, $scope.onFailure);
                 }
             }
-        }
+            if (resetSubmitButton) {
+                // in this case, no callback would ever set submitButton to false again
+                $scope.submitButton = false;
+            }
+        } 
+
     };
 
     $scope.onSuccess = function () {
+        $scope.submitButton = false;
         $scope.close();
         Notifications.add('success', 'TASK_CREATED');
     };
 
     $scope.onFailure = function () {
+        $scope.submitButton = false;
         $scope.close();
         Notifications.add('error', 'TASK_NOT_CREATED', 'global', -1);
     };

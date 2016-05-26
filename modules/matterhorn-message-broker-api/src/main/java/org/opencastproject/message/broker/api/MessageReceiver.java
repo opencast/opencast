@@ -26,42 +26,7 @@ import org.opencastproject.message.broker.api.MessageSender.DestinationType;
 import java.io.Serializable;
 import java.util.concurrent.FutureTask;
 
-import javax.jms.Message;
-
-public interface MessageReceiver {
-
-  /**
-   * Create a {@link java.util.concurrent.Future} for the next {@link java.jms.Message}.
-   *
-   * @param destinationId
-   *          The unique id for the queue or topic to listen to.
-   * @param type
-   *          The type of destination either queue or topic.
-   * @return A {@link Message}
-   */
-  FutureTask<Message> receiveMessage(String destinationId, DestinationType type);
-
-  /**
-   * Create a {@link java.util.concurrent.Future} for the next {@link String} from a {@link java.jms.TextMessage}.
-   *
-   * @param destinationId
-   *          The unique id for the queue or topic to listen to.
-   * @param type
-   *          The type of destination either queue or topic.
-   * @return A {@link String}
-   */
-  FutureTask<String> receiveString(String destinationId, DestinationType type);
-
-  /**
-   * {@link java.util.concurrent.Future} for the next byte[] from a {@link java.jms.BytesMessage}.
-   *
-   * @param destinationId
-   *          The unique id for the queue or topic to listen to.
-   * @param type
-   *          The type of destination either queue or topic.
-   * @return A byte[].
-   */
-  FutureTask<byte[]> receiveByteArray(String destinationId, DestinationType type);
+public interface MessageReceiver extends MessageBrokerConnector {
 
   /**
    * {@link java.util.concurrent.Future} for the next {@link Serializable} from an {@link java.jms.ObjectMessage}.

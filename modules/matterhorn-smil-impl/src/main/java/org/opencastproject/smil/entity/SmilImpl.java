@@ -21,12 +21,22 @@
 
 package org.opencastproject.smil.entity;
 
+import org.opencastproject.smil.api.SmilException;
+import org.opencastproject.smil.entity.api.Smil;
+import org.opencastproject.smil.entity.api.SmilBody;
+import org.opencastproject.smil.entity.api.SmilHead;
+import org.opencastproject.smil.entity.api.SmilObject;
+import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
+
+import org.xml.sax.SAXException;
+
 import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -37,13 +47,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import org.opencastproject.smil.api.SmilException;
-import org.opencastproject.smil.entity.api.Smil;
-import org.opencastproject.smil.entity.api.SmilBody;
-import org.opencastproject.smil.entity.api.SmilHead;
-import org.opencastproject.smil.entity.api.SmilObject;
-import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
-import org.xml.sax.SAXException;
 
 /**
  * {@link Smil} implementation.

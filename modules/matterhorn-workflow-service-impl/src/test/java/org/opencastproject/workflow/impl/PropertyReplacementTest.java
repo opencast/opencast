@@ -21,12 +21,12 @@
 
 package org.opencastproject.workflow.impl;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import junit.framework.Assert;
 
 /**
  * Tests property replacement in workflow operation instances

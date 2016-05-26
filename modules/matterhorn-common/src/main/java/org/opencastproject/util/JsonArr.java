@@ -21,15 +21,15 @@
 
 package org.opencastproject.util;
 
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.functions.Misc.cast;
+
 import org.opencastproject.util.data.Function;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.functions.Misc.cast;
 
 public final class JsonArr implements Iterable<JsonVal> {
   private final List<Object> val;

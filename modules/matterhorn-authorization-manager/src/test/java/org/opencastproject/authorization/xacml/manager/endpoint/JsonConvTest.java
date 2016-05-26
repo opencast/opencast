@@ -21,8 +21,13 @@
 
 package org.opencastproject.authorization.xacml.manager.endpoint;
 
-import com.jayway.restassured.path.json.JsonPath;
-import org.junit.Test;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.junit.Assert.assertEquals;
+import static org.opencastproject.security.api.AccessControlUtil.acl;
+import static org.opencastproject.security.api.AccessControlUtil.entry;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
@@ -32,19 +37,16 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
+
+import com.jayway.restassured.path.json.JsonPath;
+
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.junit.Assert.assertEquals;
-import static org.opencastproject.security.api.AccessControlUtil.acl;
-import static org.opencastproject.security.api.AccessControlUtil.entry;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 public final class JsonConvTest {
   private static final Logger logger = LoggerFactory.getLogger(JsonConvTest.class);

@@ -21,6 +21,13 @@
 
 package org.opencastproject.workflow.api;
 
+import static org.opencastproject.util.EqualsUtil.eqMap;
+import static org.opencastproject.util.EqualsUtil.eqObj;
+import static org.opencastproject.util.EqualsUtil.hash;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
@@ -28,13 +35,6 @@ import org.opencastproject.util.data.Option;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.opencastproject.util.EqualsUtil.eqMap;
-import static org.opencastproject.util.EqualsUtil.eqObj;
-import static org.opencastproject.util.EqualsUtil.hash;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /** Product type of a workflow reference and its parameters. */
 public final class ConfiguredWorkflowRef {

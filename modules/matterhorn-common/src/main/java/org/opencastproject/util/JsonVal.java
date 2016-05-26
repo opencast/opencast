@@ -21,14 +21,14 @@
 
 package org.opencastproject.util;
 
+import static org.opencastproject.util.data.functions.Misc.cast;
+
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.functions.Options;
 import org.opencastproject.util.data.functions.Strings;
 
 import java.util.List;
 import java.util.Map;
-
-import static org.opencastproject.util.data.functions.Misc.cast;
 
 public final class JsonVal {
   private final Object val;

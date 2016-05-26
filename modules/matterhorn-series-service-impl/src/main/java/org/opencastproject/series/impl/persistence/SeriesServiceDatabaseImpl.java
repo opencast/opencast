@@ -21,7 +21,6 @@
 
 package org.opencastproject.series.impl.persistence;
 
-import com.entwinemedia.fn.data.Opt;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
@@ -38,6 +37,8 @@ import org.opencastproject.series.impl.SeriesServiceDatabase;
 import org.opencastproject.series.impl.SeriesServiceDatabaseException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
+
+import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;

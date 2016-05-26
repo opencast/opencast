@@ -22,10 +22,10 @@
 
 package org.opencastproject.manager.core;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.apache.commons.io.IOUtils;
 
 /**
  * This class represents a template loader.

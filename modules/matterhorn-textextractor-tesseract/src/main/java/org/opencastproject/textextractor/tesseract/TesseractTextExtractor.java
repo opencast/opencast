@@ -30,6 +30,7 @@ import org.opencastproject.textextractor.api.TextFrame;
 import org.opencastproject.util.ProcessRunner;
 
 import com.entwinemedia.fn.Pred;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;

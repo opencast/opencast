@@ -33,7 +33,7 @@ public abstract class TemplateType {
 
     private final TemplateType type;
 
-    private Type(TemplateType type) {
+    Type(TemplateType type) {
       this.type = type;
     }
 

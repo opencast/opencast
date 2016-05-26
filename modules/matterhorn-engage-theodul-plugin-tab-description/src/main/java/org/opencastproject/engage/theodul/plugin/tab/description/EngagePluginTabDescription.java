@@ -21,11 +21,13 @@
 
 package org.opencastproject.engage.theodul.plugin.tab.description;
 
-import javax.ws.rs.Path;
 import org.opencastproject.engage.theodul.api.AbstractEngagePlugin;
+
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.Path;
 
 @Path("/")
 public class EngagePluginTabDescription extends AbstractEngagePlugin {

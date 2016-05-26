@@ -29,8 +29,6 @@ import org.opencastproject.remotetest.util.SampleUtils;
 import org.opencastproject.remotetest.util.TrustedHttpClient;
 import org.opencastproject.remotetest.util.Utils;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -55,6 +53,8 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathConstants;
+
+import junit.framework.Assert;
 
 /**
  * Tests the working file repository's rest endpoint

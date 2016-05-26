@@ -55,7 +55,9 @@
        "CONFIRMATION" : "Confirmation required"
      }
    },
+   "MEDIAMODULE": "Media Module",
    "HELP":{
+     "HELP": "Help",
      "USERS_GUIDE": "User's Guide",
      "DOCUMENTATION": "Documentation",
      "REST_DOC": "REST API Docs"
@@ -82,20 +84,22 @@
      "SERIES_ADDED":        "The series has been created",
      "SERIES_NOT_SAVED":    "The series could not be saved",
      "EVENTS_CREATED":      "The event has been created",
-     "EVENTS_UPLOAD_STARTED": "The event is being uploaded...",
+     "EVENTS_UPLOAD_STARTED": "The event is being uploaded…",
      "EVENTS_NOT_CREATED":  "The event could not be created",
      "EVENTS_UPDATED_NB":   "{{ number }} events have been successfully updated",
      "EVENTS_UPDATED_ALL":   "All events have been successfully updated",
      "EVENTS_NOT_UPDATED":  "The event could not be saved",
      "EVENTS_NOT_UPDATED_ID":  "The event {{ id }} could not be saved",
-     "EVENTS_NOT_UPDATED_ALL":  "All the events could not be saved",
+     "EVENTS_NOT_UPDATED_ALL":  "None of the events could be saved",
      "SERIES_UPDATED_NB":   "{{ number }} series have been successfully updated",
      "SERIES_UPDATED_ALL":   "All series have been successfully updated",
      "SERIES_NOT_UPDATED":  "The series could not be saved",
      "SERIES_NOT_UPDATED_ID":  "The series {{ id }} could not be saved",
-     "SERIES_NOT_UPDATED_ALL":  "All the series could not be saved",
+     "SERIES_NOT_UPDATED_ALL":  "None of the series could be saved",
      "EVENTS_DELETED":      "The event has been deleted",
      "EVENTS_NOT_DELETED":  "The event(s) could not be deleted",
+     "SERIES_DELETED": "The series has been deleted",
+     "SERIES_NOT_DELETED": "The series could not be deleted",
      "USER_BLACKLIST_CREATED": "The blacklist has been created",
      "USER_BLACKLIST_NOT_CREATED":  "The blacklist could not be created",
      "USER_BLACKLIST_SAVED": "The blacklist has been saved",
@@ -122,8 +126,6 @@
      "MISSING_ACL_RULES":   "At least one role with Read and Write permissions is required!",
      "SAVED_ACL_RULES":   "The access rules have been saved.",
      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "The existing events in this series will need to be reprocessed",
-     "SERIES_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
-     "EVENT_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
      "SERIES_ACL_LOCKED": "Editing Access Policies is not allowed when operations are running on an event that is part of the series",
      "SERIES_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
      "EVENT_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
@@ -139,7 +141,7 @@
      "TITLE_UPLOAD_ERROR": "Error while uploading media",
      "LICENSE_UPLOAD_ERROR": "Error while uploading media",
      "WATERMARK_UPLOAD_ERROR": "Error while uploading media",
-     "THEME_UPLOAD_STARTED": "The media is being uploaded...",
+     "THEME_UPLOAD_STARTED": "The media is being uploaded…",
      "THEME_CREATED": "The theme has been created",
      "THEME_NOT_CREATED": "The theme could not be created",
      "THEME_DELETED":        "The theme has been deleted",
@@ -148,7 +150,7 @@
      "TASK_NOT_CREATED": "The task could not be created",
      "VIDEO_CUT_NOT_SAVED": "The editing information could not be saved",
      "VIDEO_CUT_SAVED": "The editing information has been saved",
-     "VIDEO_CUT_PROCESSING": "The video is being processed...",
+     "VIDEO_CUT_PROCESSING": "The video is being processed…",
      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Please try again later.",
      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Please try again later.",
      "ACTIVE_TRANSACTION": "The current event can currently not be edited as it is involved of an active transaction."
@@ -268,7 +270,7 @@
         "ID": "ID",
         "SELECT_TASK": "Select Task",
         "SUMMARY": "Summary",
-        "WARNING": "This event has been published to at least one publication channel so it has to be retracted before it can be deleted. Select from the tasks below to retract the publictions."
+        "WARNING": "This event has been published to at least one publication channel so it has to be retracted before it can be deleted. Select from the tasks below to retract the publications."
      },
      "LICENSE": {
         "ALLRIGHTS": "All rights reserved",
@@ -463,7 +465,8 @@
            "EXTERNAL_API":               "External API Publication",
            "YOUTUBE":                    "Youtube",
            "OAIPMH":                     "OAI-PMH",
-           "SELECT_WORKFLOW":            "Select workflow"
+           "SELECT_WORKFLOW":            "Select workflow",
+           "SELECT_WORKFLOW_EMPTY":      "No workflows available"
          },
          "MEDIA": {
            "TRIM_MEDIA":    "Trim media",
@@ -659,14 +662,34 @@
          },
          "COMMENTS": {
            "CAPTION":     "Comments",
-           "PLACEHOLDER": "Comment...",
+           "PLACEHOLDER": "Comment…",
            "SELECTPLACEHOLDER": "Select reasons",
            "RESOLVED":    "Resolved",
            "REPLY":       "Reply",
            "REPLY_TO":       "Reply to",
            "CANCEL_REPLY":   "Dismiss",
            "DELETE":      "Delete",
-           "REASON":      "Reason"
+           "REASON":      "Reason",
+           "REASONS": {
+             "CUTTING" : "Cutting required",
+             "REVIEW" : "Review required",
+             "ASYNC" : "A/V tracks asynchronous",
+             "AUDIO_ISSUE" : "Missing or defective audio track",
+             "CANCELED" : "Canceled event",
+             "CONFLICTING_METADATA" : "Conflicting metadata",
+             "IMPROPER_POINT" : "Improper in or out point",
+             "MISSING_AGREEMENT" : "Missing agreement",
+             "OTHER" : "Other",
+             "PRIVACY" : "Privacy concern",
+             "SEGMENTATION" : "Inaccurate segmentation",
+             "UNKNOWN_CREATOR" : "Creator unknown",
+             "VIDEO_ISSUE" : "Video distorted or cropped",
+             "WRONG_INPUT_FORMAT" : "Input file format not supported",
+             "WRONG_METADATA" : "Metadata needs correction",
+             "WRONG_SERIES_PUBLICATION" : "Wrong series or publication channel",
+             "WRONG_WORKFLOW" : "Wrong workflow",
+             "PROCESSING_FAILURE" : "Processing failure"
+           }
          },
          "METADATA": {
            "TITLE":          "Title",
@@ -894,7 +917,7 @@
          },
          "PARTICIPATION": {
             "CAPTION": "Participation status template",
-            "WARNING_TEMPLATE": "Series paticipation status will be used as default value for new events that are part of the series.",
+            "WARNING_TEMPLATE": "Series participation status will be used as default value for new events that are part of the series.",
             "REVIEW_STATUS": {
               "CAPTION": "Review status"
             },
@@ -1097,7 +1120,7 @@
             "TITLE": "Metadata",
             "NAME": {
               "CAPTION": "Name",
-              "PLACEHOLDER": "Name..."
+              "PLACEHOLDER": "Name…"
             }
           },
          "ACCESS": {
@@ -1135,7 +1158,7 @@
             "TITLE": "Metadata",
             "NAME": {
               "CAPTION": "Name",
-              "PLACEHOLDER": "Name..."
+              "PLACEHOLDER": "Name…"
             }
           },
          "ACCESS": {
@@ -1378,13 +1401,16 @@
       },
      "JOBS": {
        "TABLE": {
+         "ACTION":    "Actions",
          "CAPTION":   "Jobs",
-         "TITLE":     "Title",
-         "SERIES":    "Series",
-         "WORKFLOW":  "Workflow",
+         "CREATED":   "Created",
+         "CREATOR":   "Creator",
+         "HOST_NAME": "Host name",
+         "OPERATION": "Operation",
+         "STARTED":   "Started",
          "STATUS":    "Status",
          "SUBMITTED": "Submitted",
-         "ACTION":    "Actions"
+         "TYPE":      "Type"
        },
        "DETAILS": {
          "HEADER": "Job details {{resourceId}}",
@@ -1417,6 +1443,7 @@
          "CAPTION":         "Services",
          "STATUS":          "Status",
          "NAME":            "Service name",
+         "HOST_NAME":       "Host name",
          "COMPLETED":       "Jobs completed",
          "RUNNING":         "Jobs running",
          "QUEUED":          "Jobs queued",
@@ -1453,8 +1480,8 @@
    "LOGIN": {
      "WELCOME":  "Welcome to Opencast",
      "REMEMBER": "Remember me on this computer",
-     "USERNAME": "Username...",
-     "PASSWORD": "Password...",
+     "USERNAME": "Username…",
+     "PASSWORD": "Password…",
      "LOGIN":    "Login",
      "ERROR":    "Incorrect username and / or password"
    },
@@ -1462,16 +1489,16 @@
      "CLEAR":       "Clear all filters",
      "REMOVE":      "Remove filter",
      "ADD":         "Add filters",
-     "PLACEHOLDER": "Search...",
+     "PLACEHOLDER": "Search…",
      "PROFILES": {
        "FILTERS_HEADER":          "Saved filter sets",
        "EMPTY":                   "No saved filters yet",
        "SAVE_FILTERS":            "Save",
        "FILTER_HEADER":           "Save filter set",
        "NAME":                    "Name",
-       "NAME_PLACEHOLDER":        "Name...",
+       "NAME_PLACEHOLDER":        "Name…",
        "DESCRIPTION":             "Description",
-       "DESCRIPTION_PLACEHOLDER": "Description..."
+       "DESCRIPTION_PLACEHOLDER": "Description…"
      }
    },
    "FILTERS": {
@@ -1636,7 +1663,8 @@
    },
    "TABLE_SUMMARY": "{{numberOfRows}} rows",
    "TABLE_NO_RESULT": "No results found",
-   "TABLE_LOADING": "Loading...",
+   "TABLE_LOADING": "Loading…",
+   "TABLE_EDIT": "Edit",
    "PM": {
      "BLACKLIST": {
        "REASONS": {

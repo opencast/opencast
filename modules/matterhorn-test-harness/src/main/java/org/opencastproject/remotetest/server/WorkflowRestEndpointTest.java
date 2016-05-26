@@ -27,8 +27,6 @@ import static org.opencastproject.remotetest.Main.BASE_URL;
 import org.opencastproject.remotetest.Main;
 import org.opencastproject.remotetest.util.TrustedHttpClient;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -55,6 +53,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
+
+import junit.framework.Assert;
 
 /**
  * Tests the functionality of a remote workflow service rest endpoint

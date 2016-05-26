@@ -21,11 +21,12 @@
 
 package org.opencastproject.smil.entity.media;
 
-import javax.xml.bind.annotation.XmlSeeAlso;
 import org.opencastproject.smil.entity.SmilObjectImpl;
 import org.opencastproject.smil.entity.media.api.SmilMediaObject;
 import org.opencastproject.smil.entity.media.container.SmilMediaContainerImpl;
 import org.opencastproject.smil.entity.media.element.SmilMediaElementImpl;
+
+import javax.xml.bind.annotation.XmlSeeAlso;
 
 /**
  * {@link SmilMediaObject} implementation.

@@ -21,14 +21,14 @@
 
 package org.opencastproject.util.persistence;
 
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
 import org.joda.time.DateTime;
 
 import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * Type safe access of a database table.

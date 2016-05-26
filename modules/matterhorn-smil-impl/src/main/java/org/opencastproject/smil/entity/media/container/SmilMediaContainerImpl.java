@@ -21,17 +21,19 @@
 
 package org.opencastproject.smil.entity.media.container;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.entity.SmilObjectImpl;
 import org.opencastproject.smil.entity.api.SmilObject;
 import org.opencastproject.smil.entity.media.SmilMediaObjectImpl;
 import org.opencastproject.smil.entity.media.api.SmilMediaObject;
 import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlSeeAlso;
 
 /**
  * {@link SmilMediaContainer} abstract class.

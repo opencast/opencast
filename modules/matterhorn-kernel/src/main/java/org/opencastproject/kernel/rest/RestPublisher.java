@@ -345,7 +345,7 @@ public class RestPublisher implements RestConstants {
   class StaticResourceClassLoader extends ClassLoader {
     private Bundle bundle = null;
 
-    public StaticResourceClassLoader(Bundle bundle) {
+    StaticResourceClassLoader(Bundle bundle) {
       super();
       this.bundle = bundle;
     }

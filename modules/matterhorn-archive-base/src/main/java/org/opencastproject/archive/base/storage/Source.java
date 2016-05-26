@@ -21,13 +21,13 @@
 
 package org.opencastproject.archive.base.storage;
 
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.data.Option;
 
 import java.net.URI;
-
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 /** A data source along with optional content hints. */
 public final class Source {

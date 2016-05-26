@@ -22,15 +22,15 @@
 
 package org.opencastproject.manager.system.workflow.utils;
 
+import org.opencastproject.manager.core.MetadataDocumentHandler;
+
+import org.osgi.framework.BundleContext;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-
-import org.opencastproject.manager.core.MetadataDocumentHandler;
-import org.osgi.framework.BundleContext;
-
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 

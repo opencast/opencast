@@ -24,8 +24,6 @@ package org.opencastproject.workingfilerepository.impl;
 
 import org.opencastproject.util.UrlSupport;
 
-import junit.framework.Assert;
-
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -40,6 +38,8 @@ import java.net.URI;
 import java.util.Arrays;
 
 import javax.ws.rs.core.Response;
+
+import junit.framework.Assert;
 
 public class WorkingFileRepositoryRestEndpointTest {
 

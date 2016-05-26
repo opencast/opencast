@@ -21,11 +21,11 @@
 
 package org.opencastproject.util;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.MimeType.mimeType;
+
+import org.junit.Test;
 
 public class MimeTypeTest {
   @Test

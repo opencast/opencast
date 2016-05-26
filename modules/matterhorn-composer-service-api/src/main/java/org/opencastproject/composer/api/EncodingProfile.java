@@ -23,8 +23,9 @@
 package org.opencastproject.composer.api;
 
 import java.util.List;
-import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
+
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * An encoding format encapsulates all the relevant configuration data for
@@ -36,7 +37,7 @@ public interface EncodingProfile {
    * Input and output formats.
    */
   @XmlType(name = "media-type", namespace = "http://composer.opencastproject.org")
-  public enum MediaType {
+  enum MediaType {
     // Nothing is a special type that indicates that the encoding process does not produce any media
     Audio, Visual, AudioVisual, Stream, EnhancedAudio, Image, ImageSequence, Cover, Nothing;
 

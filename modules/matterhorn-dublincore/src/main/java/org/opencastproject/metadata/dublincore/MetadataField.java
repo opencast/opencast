@@ -154,7 +154,7 @@ public class MetadataField<A> {
   /**
    * Metadata field constructor
    *
-   * @param id
+   * @param inputID
    *          The identifier of the new metadata field
    * @param label
    *          the label of the field. The string displayed next to the field value on the frontend. This is usually be a

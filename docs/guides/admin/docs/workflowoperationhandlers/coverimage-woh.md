@@ -21,13 +21,33 @@ target-tags|String|archive,download|-|Comma separated list of tags to be applied
 
 ## Operation Example
 
+Operation example with metadata derived from events metadata:
+
     <operation
       id="cover-image"
       fail-on-error="true"
       exception-handler-workflow="error"
       description="Create a cover image">
       <configurations>
-        <configuration key="stylesheet">file:///etc/opencast/branding/coverimage/opencast-default.xsl</configuration>
+        <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
+        <configuration key="width">1920</configuration>
+        <configuration key="height">1080</configuration>
+        <configuration key="posterimage-flavor">presenter/coverbackground</configuration>
+        <configuration key="target-flavor">presenter/player+preview</configuration>
+        <configuration key="target-tags">archive, engage-download</configuration>
+     </configurations>
+    </operation>
+
+
+Operation example with metadata provided in the operations configuration:
+
+    <operation
+      id="cover-image"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Create a cover image">
+      <configurations>
+        <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
         <configuration key="metadata"><![CDATA[<meta><title>my custom title</title><special>very special</special></meta>]]></configuration>
         <configuration key="width">1920</configuration>
         <configuration key="height">1080</configuration>
@@ -39,17 +59,23 @@ target-tags|String|archive,download|-|Comma separated list of tags to be applied
 
 ## Template
 
-As a starting point for your own template you best take a look at file /coverimage/default-template.xsl in the resources
-of the bundle opencast-conductor. The metadata XML, which is passed to the cover image service in case you don't pass
-your own, looks like the following example:
+As a starting point for your own template you best take a look at file etc/branding/coverimage.xsl. 
+
+The metadata XML, which is passed to the cover image service, looks like the following example:
 
     <?xml version="1.0"?>
     <metadata>
       <title>Puppy Love</title>
-      <date>2014-03-24T11:21:00Z</date>
+      <date>24. April 2014</date>
+      <time>11:21:00</time>
       <license>All rights reserved</license>
+      <description>Here is a description of the video</description>
       <series>Superbowl Commercials</series>
       <contributors>Budweiser</contributors>
       <creators>Budweiser</creators>
       <subjects>Commercial</subjects>
     </metadata>
+
+### Date and Time
+
+The date is localized based on your servers Java Runtime language settings.

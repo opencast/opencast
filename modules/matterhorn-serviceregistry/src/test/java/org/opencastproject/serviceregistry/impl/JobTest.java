@@ -22,22 +22,19 @@
 package org.opencastproject.serviceregistry.impl;
 
 import static com.entwinemedia.fn.Stream.$;
-import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.data.Arrays.mkString;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.functions.Booleans.eq;
+import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Stream;
-
-import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.FailureReason;
 import org.opencastproject.job.api.Job.Status;
+import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
@@ -57,6 +54,9 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.persistence.PersistenceEnv;
+
+import com.entwinemedia.fn.Fn;
+import com.entwinemedia.fn.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.easymock.EasyMock;

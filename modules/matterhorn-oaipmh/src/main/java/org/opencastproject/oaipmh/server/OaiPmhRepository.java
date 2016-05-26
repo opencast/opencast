@@ -22,6 +22,17 @@
 
 package org.opencastproject.oaipmh.server;
 
+import static org.opencastproject.oaipmh.OaiPmhUtil.toOaiRepresentation;
+import static org.opencastproject.oaipmh.OaiPmhUtil.toUtc;
+import static org.opencastproject.oaipmh.OaiPmhUtil.toUtcDay;
+import static org.opencastproject.oaipmh.OaiPmhUtil.toUtcSecond;
+import static org.opencastproject.oaipmh.server.Functions.isAfter;
+import static org.opencastproject.util.data.Collections.find;
+import static org.opencastproject.util.data.Collections.map;
+import static org.opencastproject.util.data.Collections.mkString;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.oaipmh.Granularity;
 import org.opencastproject.oaipmh.util.XmlGen;
 import org.opencastproject.search.api.SearchQuery;
@@ -33,6 +44,7 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Predicate;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -46,17 +58,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import static org.opencastproject.oaipmh.OaiPmhUtil.toOaiRepresentation;
-import static org.opencastproject.oaipmh.OaiPmhUtil.toUtc;
-import static org.opencastproject.oaipmh.OaiPmhUtil.toUtcDay;
-import static org.opencastproject.oaipmh.OaiPmhUtil.toUtcSecond;
-import static org.opencastproject.oaipmh.server.Functions.isAfter;
-import static org.opencastproject.util.data.Collections.find;
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Collections.mkString;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 /**
  * An OAI-PMH protocol compliant repository.

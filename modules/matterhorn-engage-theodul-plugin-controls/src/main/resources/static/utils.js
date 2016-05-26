@@ -66,7 +66,7 @@ define(["jquery"], function($) {
     }
 
     Utils.prototype.getFormattedPlaybackRate = function(rate) {
-	return (rate * 100) + "%";
+    return (rate * 100) + "%";
     }
 
     /**
@@ -207,6 +207,35 @@ define(["jquery"], function($) {
             
         }
         return segments;
+    }
+
+    /**
+     * get starttime next segment and 0 if the last segment has been reached
+     *
+     * @param id
+     */
+    Utils.prototype.nextSegmentStart = function(segments, currentTime) {
+        for (var i = 0; i < segments.length; i++) {
+            if (segments[i].time > currentTime * 1000) {
+                return segments[i].time;
+            }
+        }
+        return 0; // if currentTime is beyond last segment start
+    }
+    
+        /**
+     * get starttime next segment and 0 if the last segment has been reached
+     *
+     * @param id
+     */
+    Utils.prototype.previousSegmentStart = function(segments, currentTime) {
+        for (var i = (segments.length - 1); i >= 0; i--) {
+            // added limit that last segment can jump to previous segment and not only segment start
+            if (segments[i].time < (currentTime * 1000) - 900) { 
+                return segments[i].time;
+            }
+        }
+        return 0; // jump only to the start
     }
 
     /**

@@ -44,7 +44,7 @@ import com.entwinemedia.fn.FnX;
 import com.entwinemedia.fn.Prelude;
 import com.entwinemedia.fn.Unit;
 import com.google.common.io.Resources;
-import de.schlichtherle.io.FileWriter;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -73,6 +73,8 @@ import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Properties;
+
+import de.schlichtherle.io.FileWriter;
 
 /**
  * Contains operations concerning IO.

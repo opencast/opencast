@@ -21,10 +21,10 @@
 
 package org.opencastproject.kernel.bundleinfo;
 
-import org.opencastproject.util.data.Option;
-
 import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.EqualsUtil.hash;
+
+import org.opencastproject.util.data.Option;
 
 public final class BundleVersion {
   private final String bundleVersion;

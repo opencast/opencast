@@ -23,14 +23,16 @@
 package org.opencastproject.oaipmh.util;
 
 import org.opencastproject.util.data.Function;
+
 import org.osgi.service.component.ComponentContext;
+
+import java.util.Collections;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.spi.PersistenceProvider;
-import java.util.Collections;
-import java.util.Map;
 
 /**
  * Functions supporting persistence.

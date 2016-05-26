@@ -21,18 +21,19 @@
 
 package org.opencastproject.util;
 
-import org.apache.commons.lang3.StringUtils;
+import static org.opencastproject.util.data.functions.Strings.format;
+import static org.opencastproject.util.data.functions.Strings.trimToNone;
+
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
-
-import static org.opencastproject.util.data.functions.Strings.format;
-import static org.opencastproject.util.data.functions.Strings.trimToNone;
 
 /**
  * Utility class for the solr database.

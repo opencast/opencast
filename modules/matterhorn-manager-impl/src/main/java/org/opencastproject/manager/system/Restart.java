@@ -22,19 +22,17 @@
 
 package org.opencastproject.manager.system;
 
-import java.io.File;
-import java.io.IOException;
+import org.opencastproject.manager.api.PluginManagerConstants;
 
 import org.apache.commons.io.FileUtils;
-
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleException;
 import org.osgi.framework.BundleContext;
-
+import org.osgi.framework.BundleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.opencastproject.manager.api.PluginManagerConstants;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * This Class restarts the framework.

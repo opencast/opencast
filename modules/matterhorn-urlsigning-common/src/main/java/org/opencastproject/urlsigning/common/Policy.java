@@ -20,10 +20,10 @@
  */
 package org.opencastproject.urlsigning.common;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Optional;
 import com.google.common.net.InetAddresses;
-
-import static java.util.Objects.requireNonNull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;

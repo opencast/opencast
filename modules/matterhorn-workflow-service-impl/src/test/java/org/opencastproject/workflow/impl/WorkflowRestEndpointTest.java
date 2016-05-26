@@ -29,13 +29,13 @@ import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.endpoint.WorkflowRestService;
 
-import junit.framework.Assert;
-
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+
+import junit.framework.Assert;
 
 public class WorkflowRestEndpointTest {
 

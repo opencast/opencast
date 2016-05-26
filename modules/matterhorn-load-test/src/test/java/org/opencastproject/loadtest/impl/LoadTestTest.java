@@ -28,8 +28,6 @@ import static org.easymock.EasyMock.verify;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.systems.MatterhornConstants;
 
-import junit.framework.Assert;
-
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -38,6 +36,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
 import java.util.Properties;
+
+import junit.framework.Assert;
 
 public class LoadTestTest {
   private Properties properties;

@@ -21,12 +21,13 @@
 
 package org.opencastproject.engage.theodul.manager.impl;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * A Classloader that loads resources from a bundle or from a directory in the

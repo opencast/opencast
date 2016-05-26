@@ -22,8 +22,10 @@
 package org.opencastproject.publication.youtube;
 
 import org.opencastproject.mediapackage.MediaPackage;
+
 import com.google.api.client.googleapis.media.MediaHttpUploader;
 import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

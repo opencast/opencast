@@ -9,6 +9,4 @@
   <service>
     <provide interface="org.opencastproject.message.broker.api.MessageReceiver" />
   </service>
-  <reference name="config-admin" interface="org.osgi.service.cm.ConfigurationAdmin"
-    cardinality="1..1" policy="static" bind="setConfigurationAdmin" />
 </scr:component>

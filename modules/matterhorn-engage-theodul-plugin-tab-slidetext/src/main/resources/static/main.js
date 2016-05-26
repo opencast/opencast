@@ -188,8 +188,11 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
                     str_noSlidesAvailable: translate("noSlidesAvailable", "No slides available."),
                     str_slide_text: translate("slide_text", "Slide text")
                 };
+
                 // compile template and load into the html
-                this.$el.html(_.template(this.template, tempVars));
+                var template = _.template(this.template);
+                this.$el.html(template(tempVars));
+
                 $("#engage_tab_" + plugin.name.replace(/\s/g,"_")).text(tempVars.str_slide_text);
                 if (segments && (segments.length > 0)) {
                     Engage.log("Tab:Slidetext: " + segments.length + " segments are available.");

@@ -38,12 +38,12 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.jmx.JmxUtil;
+import org.opencastproject.util.persistence.PersistenceUtil;
 
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.opencastproject.util.persistence.PersistenceUtil;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;

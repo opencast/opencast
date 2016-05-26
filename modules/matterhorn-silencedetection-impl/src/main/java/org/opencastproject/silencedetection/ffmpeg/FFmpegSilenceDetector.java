@@ -21,7 +21,21 @@
 
 package org.opencastproject.silencedetection.ffmpeg;
 
+import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.Track;
+import org.opencastproject.silencedetection.api.MediaSegment;
+import org.opencastproject.silencedetection.api.MediaSegments;
+import org.opencastproject.silencedetection.api.SilenceDetectionFailedException;
+import org.opencastproject.silencedetection.impl.SilenceDetectionProperties;
+import org.opencastproject.util.NotFoundException;
+import org.opencastproject.workspace.api.Workspace;
+
 import com.google.common.io.LineReader;
+
+import org.apache.commons.lang3.StringUtils;
+import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,18 +49,6 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.osgi.framework.BundleContext;
-import org.apache.commons.lang3.StringUtils;
-import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.mediapackage.Track;
-import org.opencastproject.silencedetection.api.MediaSegment;
-import org.opencastproject.silencedetection.api.MediaSegments;
-import org.opencastproject.silencedetection.api.SilenceDetectionFailedException;
-import org.opencastproject.silencedetection.impl.SilenceDetectionProperties;
-import org.opencastproject.util.NotFoundException;
-import org.opencastproject.workspace.api.Workspace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Find silent sequences in audio stream using Gstreamer.

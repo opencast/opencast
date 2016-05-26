@@ -35,6 +35,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
+
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;

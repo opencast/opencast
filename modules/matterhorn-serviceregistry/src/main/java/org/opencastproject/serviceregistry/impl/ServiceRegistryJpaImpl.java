@@ -32,8 +32,6 @@ import static org.opencastproject.serviceregistry.api.ServiceState.ERROR;
 import static org.opencastproject.serviceregistry.api.ServiceState.NORMAL;
 import static org.opencastproject.serviceregistry.api.ServiceState.WARNING;
 
-import com.entwinemedia.fn.Fn;
-
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -66,6 +64,8 @@ import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.jmx.JmxUtil;
+
+import com.entwinemedia.fn.Fn;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -2988,7 +2988,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
      * @param loadByHost
      *          the current work load by host
      */
-    public LoadComparator(SystemLoad loadByHost) {
+    LoadComparator(SystemLoad loadByHost) {
       this.loadByHost = loadByHost;
     }
 
@@ -3005,23 +3005,31 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * Comparator that will sort jobs according to their status. Those that were restarted are on top, those that are
    * queued are next.
    */
-  private static final class DispatchableComparator implements Comparator<JpaJob> {
+  static final class DispatchableComparator implements Comparator<JpaJob> {
 
     @Override
     public int compare(JpaJob jobA, JpaJob jobB) {
 
       // Jobs that are in "restart" mode should be handled first
       if (Status.RESTART.equals(jobA.getStatus()) && !Status.RESTART.equals(jobB.getStatus())) {
-        return 1;
-      } else if (Status.RESTART.equals(jobB.getStatus()) && !Status.RESTART.equals(jobA.getStatus())) {
         return -1;
+      } else if (Status.RESTART.equals(jobB.getStatus()) && !Status.RESTART.equals(jobA.getStatus())) {
+        return 1;
       }
 
       // Regular jobs should be processed prior to workflow and workflow operation jobs
       if (TYPE_WORKFLOW.equals(jobA.getJobType()) && !TYPE_WORKFLOW.equals(jobB.getJobType())) {
-        return -1;
-      } else if (TYPE_WORKFLOW.equals(jobB.getJobType()) && !TYPE_WORKFLOW.equals(jobA.getJobType())) {
         return 1;
+      } else if (TYPE_WORKFLOW.equals(jobB.getJobType()) && !TYPE_WORKFLOW.equals(jobA.getJobType())) {
+        return -1;
+      }
+
+      // Use created date
+      if (jobA.getDateCreated() != null && jobB.getDateCreated() != null) {
+        if (jobA.getDateCreated().getTime() < jobB.getDateCreated().getTime())
+          return -1;
+        else if (jobA.getDateCreated().getTime() > jobB.getDateCreated().getTime())
+          return 1;
       }
 
       // undecided

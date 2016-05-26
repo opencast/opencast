@@ -23,6 +23,7 @@
 package org.opencastproject.mediapackage;
 
 import org.opencastproject.mediapackage.identifier.Id;
+
 import org.w3c.dom.Node;
 
 import java.io.InputStream;

@@ -21,13 +21,13 @@
 
 package org.opencastproject.schema.test;
 
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.schema.OcDublinCore;
 import org.opencastproject.util.data.Option;
 
 import java.util.Date;
 import java.util.UUID;
-
-import static org.opencastproject.util.data.Option.some;
 
 public final class TestUtil {
   private TestUtil() {

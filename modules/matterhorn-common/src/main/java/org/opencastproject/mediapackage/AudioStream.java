@@ -59,7 +59,7 @@ public interface AudioStream extends Stream {
 
   String getEncoderLibraryVendor();
 
-  public static class Adapter extends XmlAdapter<AudioStreamImpl, Stream> {
+  class Adapter extends XmlAdapter<AudioStreamImpl, Stream> {
     @Override
     public AudioStreamImpl marshal(Stream v) throws Exception {
       return (AudioStreamImpl) v;

@@ -21,7 +21,14 @@
 
 package org.opencastproject.archive.opencast;
 
+import static org.opencastproject.util.IoSupport.withResource;
+import static org.opencastproject.util.data.Monadics.mlist;
+
 import org.opencastproject.util.data.Function;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -33,12 +40,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.transform.stream.StreamSource;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.opencastproject.util.IoSupport.withResource;
-import static org.opencastproject.util.data.Monadics.mlist;
 
 /** The search result represents a set of result items that has been compiled as a result for a search operation. */
 @XmlAccessorType(XmlAccessType.FIELD)

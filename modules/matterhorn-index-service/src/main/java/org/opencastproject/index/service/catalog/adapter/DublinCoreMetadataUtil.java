@@ -29,8 +29,8 @@ import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
-import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.metadata.dublincore.MetadataField.Type;
+import org.opencastproject.metadata.dublincore.Precision;
 
 import com.entwinemedia.fn.data.Opt;
 

@@ -31,6 +31,7 @@ import com.entwinemedia.fn.ProductBuilder;
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Products;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+
 import org.osgi.service.component.ComponentContext;
 
 import java.beans.PropertyVetoException;

@@ -21,14 +21,6 @@
 
 package org.opencastproject.smil.entity.media.element;
 
-import java.net.URI;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.entity.SmilObjectImpl;
 import org.opencastproject.smil.entity.api.SmilObject;
@@ -36,6 +28,16 @@ import org.opencastproject.smil.entity.media.SmilMediaObjectImpl;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.smil.entity.media.param.SmilMediaParamImpl;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
+
+import java.net.URI;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlSeeAlso;
 
 /**
  * {@code SmilMediaElemnt} implementation.

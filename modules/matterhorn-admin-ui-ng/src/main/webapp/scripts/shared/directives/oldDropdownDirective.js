@@ -14,10 +14,10 @@ angular.module('adminNg.directives')
                 var tagName = event.target.tagName, value = event.target.innerHTML;
 
 
-                if (tagName === 'DIV' || tagName === 'SPAN' || tagName === 'I') {
+                if (tagName !== 'A' ) {
                     angular.element('.drop-down-container, .nav-dd').not(this).removeClass('active');
                     angular.element(this).toggleClass('active');
-                } else if (tagName === 'A') {
+                } else {
                     // makes the dropdown invisible after selection
                     angular.element(this).toggleClass('active');
                     if (angular.isDefined(value) && value.length > 0 && angular.isDefined($scope.fn)) {

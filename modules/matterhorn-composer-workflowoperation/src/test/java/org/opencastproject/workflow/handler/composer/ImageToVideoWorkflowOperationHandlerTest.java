@@ -43,6 +43,7 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workflow.handler.inspection.InspectWorkflowOperationHandler;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
@@ -56,8 +57,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.opencastproject.workflow.handler.inspection.InspectWorkflowOperationHandler;
 
 public class ImageToVideoWorkflowOperationHandlerTest {
   private ImageToVideoWorkflowOperationHandler operationHandler;
@@ -112,6 +111,7 @@ public class ImageToVideoWorkflowOperationHandlerTest {
 
     // set up service
     operationHandler = new ImageToVideoWorkflowOperationHandler();
+    operationHandler.setJobBarrierPollingInterval(0);
     operationHandler.setWorkspace(workspace);
     operationHandler.setServiceRegistry(serviceRegistry);
   }

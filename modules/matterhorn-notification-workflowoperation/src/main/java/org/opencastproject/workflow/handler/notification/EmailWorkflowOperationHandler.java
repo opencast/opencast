@@ -35,10 +35,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 /**
  * Please describe what this handler does.
@@ -48,7 +45,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   private static final Logger logger = LoggerFactory.getLogger(EmailWorkflowOperationHandler.class);
 
   /** The smtp service */
-  private SmtpService smptService = null;
+  private SmtpService smtpService = null;
 
   // Configuration properties used in the workflow definition
   private static final String TO_PROPERTY = "to";
@@ -89,19 +86,10 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     // Set the body of the message to be the ID of the media package
     String body = srcPackage.getTitle() + "(" + srcPackage.getIdentifier().toString() + ")";
 
-    // Create the mail message
-    MimeMessage message = smptService.createMessage();
-
     try {
-      message.addRecipient(RecipientType.TO, new InternetAddress(to));
-      message.setSubject(subject);
-      message.setText(body);
-      message.saveChanges();
-
       logger.debug("Sending e-mail notification to {}", to);
-      smptService.send(message);
+      smtpService.send(to, subject, body);
       logger.info("E-mail notification sent to {}", to);
-
     } catch (MessagingException e) {
       throw new WorkflowOperationException(e);
     }
@@ -117,7 +105,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
    *          the smtp service
    */
   void setSmtpService(SmtpService smtpService) {
-    this.smptService = smtpService;
+    this.smtpService = smtpService;
   }
 
 }

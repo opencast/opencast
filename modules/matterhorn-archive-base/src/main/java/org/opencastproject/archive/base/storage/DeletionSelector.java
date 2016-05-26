@@ -21,13 +21,13 @@
 
 package org.opencastproject.archive.base.storage;
 
-import org.opencastproject.archive.api.Version;
-import org.opencastproject.util.data.Option;
-
 import static org.opencastproject.util.EqualsUtil.eqObj;
 import static org.opencastproject.util.EqualsUtil.hash;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
+
+import org.opencastproject.archive.api.Version;
+import org.opencastproject.util.data.Option;
 
 public final class DeletionSelector {
   private final String mediaPackageId;

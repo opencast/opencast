@@ -21,13 +21,13 @@
 
 package org.opencastproject.authorization.xacml.manager.api;
 
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.util.data.Option;
 
 import java.util.Date;
-
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 /**
  * Represents a query to find transitions. Please note that predicates are joined to an "and" expression.

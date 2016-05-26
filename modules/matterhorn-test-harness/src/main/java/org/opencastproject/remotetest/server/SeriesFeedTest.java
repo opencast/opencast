@@ -20,14 +20,12 @@
  */
 package org.opencastproject.remotetest.server;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.commons.io.IOUtils;
+import static org.opencastproject.remotetest.Main.BASE_URL;
 
 import org.opencastproject.remotetest.Main;
-import static org.opencastproject.remotetest.Main.BASE_URL;
 import org.opencastproject.remotetest.util.TrustedHttpClient;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -42,9 +40,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.opencastproject.remotetest.Main.BASE_URL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Gets series feeds

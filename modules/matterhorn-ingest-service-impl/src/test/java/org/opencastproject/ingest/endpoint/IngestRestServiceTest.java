@@ -228,7 +228,7 @@ public class IngestRestServiceTest {
     private int ok = 0;
     private int error = 0;
 
-    public LimitVerifier(int numberOfIngests) {
+    LimitVerifier(int numberOfIngests) {
       this.numberOfIngests = numberOfIngests;
     }
 

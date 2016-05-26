@@ -160,8 +160,11 @@ define(["require", "jquery", "underscore", "backbone", "engage/core", "moment"],
                 if (Moment(tempVars.date) != null) {
                     tempVars.date = Moment(tempVars.date).format(dateFormat);
                 }
+
                 // compile template and load into the html
-                this.$el.html(_.template(this.template, tempVars));
+                var template = _.template(this.template);
+                this.$el.html(template(tempVars));
+
                 if (tempVars.title) {
                     document.title = tempVars.title;
                 }

@@ -23,6 +23,7 @@
 package org.opencastproject.oaipmh.harvester;
 
 import org.opencastproject.oaipmh.OaiPmhConstants;
+
 import org.springframework.util.xml.SimpleNamespaceContext;
 
 import javax.xml.namespace.NamespaceContext;

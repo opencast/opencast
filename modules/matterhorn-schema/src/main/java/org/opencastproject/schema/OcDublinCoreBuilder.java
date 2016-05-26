@@ -21,14 +21,14 @@
 
 package org.opencastproject.schema;
 
+import static org.opencastproject.util.data.Option.error;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 
 import java.util.Date;
-
-import static org.opencastproject.util.data.Option.error;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 /** Mutable builder for {@link org.opencastproject.schema.OcDublinCore}. */
 public class OcDublinCoreBuilder implements OcDublinCore {

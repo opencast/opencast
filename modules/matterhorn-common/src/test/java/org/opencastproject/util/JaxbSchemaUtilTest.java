@@ -21,13 +21,14 @@
 
 package org.opencastproject.util;
 
-import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
+import static org.junit.Assert.assertNotNull;
+
 import org.opencastproject.job.api.JaxbJob;
 
-import javax.xml.bind.JAXBContext;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 
-import static org.junit.Assert.assertNotNull;
+import javax.xml.bind.JAXBContext;
 
 public class JaxbSchemaUtilTest {
 

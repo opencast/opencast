@@ -97,12 +97,14 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
 
     /* don't change these variables */
     var shortcuts = new Array();
+    var categories = new Array();
     var initCount = 4;
     var infoMeChange = "change:infoMe";
     var mediapackageChange = "change:mediaPackage";
     var translations = new Array();
     var mediapackageError = false;
     var shortcutsParsed = false;
+    var categoriesParsed = false;
     var Utils;
 
     function initTranslate(language, funcSuccess, funcError) {
@@ -158,10 +160,14 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
                     str_shortcutName: translate("name", "Shortcut name"),
                     str_shortcut: translate("shortcut", "Shortcut"),
                     shortcuts: shortcuts,
+                    categories: categories,
                     str_shortcuts: translate("shortcuts", "Shortcuts")
                 };
+
                 // compile template and load into the html
-                this.$el.html(_.template(this.template, tempVars));
+                var template = _.template(this.template);
+                this.$el.html(template(tempVars));
+
                 $("#engage_tab_" + plugin.name.replace(/\s/g,"_")).text(tempVars.str_shortcuts);
             }
         }
@@ -193,11 +199,12 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
 
     function prepareShortcuts() {
         if (!shortcutsParsed) {
+            prepareCategories();
             var scuts = Engage.model.get("meInfo").get("shortcuts");
             if (scuts) {
-                scuts.sort(Utils.shortcutsCompare);
                 $.each(scuts, function(i, v) {
-                    shortcuts.push({
+                    var cat = v.name.split(".")[0]
+                    shortcuts[cat].push({
                         name: translate(v.name, v.name),
                         val: translateKeyboardCombination(v.key, "+")
                     });
@@ -206,6 +213,25 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
             }
         }
     }
+
+    function prepareCategories() {
+        if (!categoriesParsed) {
+            var categorySequenceString = Engage.model.get("meInfo").get("shortcut-sequence");            
+            var categorySequence = new Array();
+            if (typeof categorySequenceString !== "undefined") 
+                categorySequence = categorySequenceString.split(',');
+            if (categorySequence) {
+                $.each(categorySequence, function(i, v) {
+                    categories.push({
+                        name: translate(v, v),
+                        val: v
+                    });
+                    shortcuts[v] = new Array();
+                });
+                categoriesParsed = true;
+            }
+        }
+    }    
 
     function initPlugin() {
         // only init if plugin template was inserted into the DOM

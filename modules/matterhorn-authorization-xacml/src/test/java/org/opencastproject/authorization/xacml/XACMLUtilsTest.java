@@ -21,10 +21,9 @@
 
 package org.opencastproject.authorization.xacml;
 
-import static org.junit.Assert.assertThat;
-
-import static org.xmlmatchers.XmlMatchers.isEquivalentTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.xmlmatchers.XmlMatchers.isEquivalentTo;
 import static org.xmlmatchers.transform.XmlConverters.the;
 
 import org.opencastproject.mediapackage.MediaPackage;

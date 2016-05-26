@@ -21,8 +21,9 @@
 
 package org.opencastproject.smil.entity.media.container.api;
 
-import java.util.List;
 import org.opencastproject.smil.entity.media.api.SmilMediaObject;
+
+import java.util.List;
 
 /**
  * Represent a media container like {@code par}, {@code seq},...

@@ -21,9 +21,10 @@
 
 package org.opencastproject.smil.api;
 
-import javax.xml.bind.JAXBException;
 import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.api.SmilObject;
+
+import javax.xml.bind.JAXBException;
 
 /**
  * {@link SmilService} response container for {@link Smil} and

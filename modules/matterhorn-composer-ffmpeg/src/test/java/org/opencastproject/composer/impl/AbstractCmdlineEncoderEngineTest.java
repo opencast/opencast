@@ -23,10 +23,10 @@ package org.opencastproject.composer.impl;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Before;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;

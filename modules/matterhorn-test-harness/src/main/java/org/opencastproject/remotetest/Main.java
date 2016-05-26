@@ -26,8 +26,6 @@ import org.opencastproject.remotetest.ui.SeleniumTestSuite;
 import org.opencastproject.remotetest.util.TrustedHttpClient;
 import org.opencastproject.remotetest.util.WorkflowUtils;
 
-import junit.framework.Assert;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -73,6 +71,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
+
+import junit.framework.Assert;
 
 /**
  * Runs JUnit and/or Selenium test suites against a Matterhorn server and/or capture agent.

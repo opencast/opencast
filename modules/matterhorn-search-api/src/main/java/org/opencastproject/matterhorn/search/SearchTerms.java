@@ -30,7 +30,7 @@ import java.util.Collection;
 public interface SearchTerms<T extends Object> {
 
   /** The search quantifier */
-  public enum Quantifier {
+  enum Quantifier {
     All, Any
   };
 

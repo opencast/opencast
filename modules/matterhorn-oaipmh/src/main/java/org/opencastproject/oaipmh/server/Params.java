@@ -22,13 +22,14 @@
 
 package org.opencastproject.oaipmh.server;
 
-import org.apache.commons.lang3.StringUtils;
-import org.opencastproject.oaipmh.OaiPmhConstants;
-import org.opencastproject.util.data.Option;
-
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.util.data.Option.eq;
 import static org.opencastproject.util.data.Option.option;
+
+import org.opencastproject.oaipmh.OaiPmhConstants;
+import org.opencastproject.util.data.Option;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Helper to encapsulate HTTP parameter handling.

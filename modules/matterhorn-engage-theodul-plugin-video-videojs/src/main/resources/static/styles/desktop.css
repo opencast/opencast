@@ -12,6 +12,11 @@
 
 .videoDisplay {
     margin: 1px;
+    overflow: hidden;
+}
+
+#engage_video {
+    overflow: hidden;
 }
 
 .videoDefaultLayout {

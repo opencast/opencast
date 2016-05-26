@@ -29,7 +29,7 @@ import java.util.Map;
  * The result of a workflow operation.
  */
 public interface WorkflowOperationResult {
-  public enum Action {
+  enum Action {
     CONTINUE, PAUSE, SKIP
   }
 

@@ -27,7 +27,7 @@
                             ng-class="{ disabled: action == 'edit', error: blurred.username && !userForm.username.$valid }">
                     </div>
                     <div class="row">
-                        <label>{{'USERS.USERS.DETAILS.FORM.NAME' | translate }}<i class="required"> *</i></label>
+                        <label>{{'USERS.USERS.DETAILS.FORM.NAME' | translate }}<i ng-if="action != 'edit'" class="required"> *</i></label>
                         <input type="text" name="name" required
                             placeholder="{{ 'USERS.USERS.DETAILS.FORM.NAME' | translate }}..."
                             ng-disabled="!manageable"
@@ -37,7 +37,7 @@
                             ng-class="{ disabled: !manageable, error: blurred.name && !userForm.name.$valid }">
                     </div>
                     <div class="row">
-                        <label>{{ 'USERS.USERS.DETAILS.FORM.EMAIL' | translate }}<i class="required"> *</i></label>
+                        <label>{{ 'USERS.USERS.DETAILS.FORM.EMAIL' | translate }}<i ng-if="action != 'edit'" class="required"> *</i></label>
                         <input type="email" name="email" required
                             placeholder="{{ 'USERS.USERS.DETAILS.FORM.EMAIL' | translate }}..."
                             ng-disabled="!manageable"
@@ -47,9 +47,9 @@
                             ng-class="{ disabled: !manageable, error: blurred.email && !userForm.email.$valid }">
                     </div>
 
-                    <div class="row"  ng-if="action != 'edit'">
-                        <label>{{ 'USERS.USERS.DETAILS.FORM.PASSWORD' | translate }}<i class="required"> *</i></label>
-                        <input type="password" name="password" required
+                    <div class="row"  >
+                        <label>{{ 'USERS.USERS.DETAILS.FORM.PASSWORD' | translate }}<i ng-if="action != 'edit'" class="required"> *</i></label>
+                        <input type="password" name="password"
                             placeholder="{{ 'USERS.USERS.DETAILS.FORM.PASSWORD' | translate }}..."
                             admin-ng-pw-check="user.repeatedPassword"
                             ng-required="action != 'edit'"

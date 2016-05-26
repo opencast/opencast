@@ -6,6 +6,7 @@ angular.module('adminNg.controllers')
             $scope.group.$promise.then(function() {
                 $scope.user.available.$promise.then(function() {
                     // Now that we have the user users and the available users populate the selected and available
+                    $scope.user.selected = [];
                     angular.forEach($scope.group.users, function (user) {
                         $scope.user.selected.push({name: user.name, value: user.username});
                     });
@@ -21,6 +22,7 @@ angular.module('adminNg.controllers')
             $scope.group.$promise.then(function() {
                 $scope.role.available.$promise.then(function() {
                     // Now that we have the user roles and the available roles populate the selected and available
+                    $scope.role.selected = [];
                     angular.forEach($scope.group.roles, function (role) {
                         $scope.role.selected.push({name: role, value: role});
                     });

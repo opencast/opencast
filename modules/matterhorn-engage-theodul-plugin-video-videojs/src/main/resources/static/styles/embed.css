@@ -5,7 +5,7 @@
 }
 
 .vjs-openInPlayer:before {
-    content: "\e00e";
+    content: "\2771";
 }
 
 .vjs-switchPlayer {

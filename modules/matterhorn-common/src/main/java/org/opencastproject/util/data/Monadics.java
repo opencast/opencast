@@ -21,15 +21,6 @@
 
 package org.opencastproject.util.data;
 
-import org.apache.commons.lang3.ArrayUtils;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
-
 import static java.lang.StrictMath.min;
 import static java.util.Arrays.asList;
 import static org.opencastproject.util.data.Collections.appendTo;
@@ -43,6 +34,15 @@ import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Prelude.unexhaustiveMatch;
 import static org.opencastproject.util.data.Tuple.tuple;
+
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 public final class Monadics {
 

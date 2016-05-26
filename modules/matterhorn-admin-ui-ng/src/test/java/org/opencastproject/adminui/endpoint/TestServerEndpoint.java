@@ -29,7 +29,6 @@ import org.opencastproject.serviceregistry.api.JaxbServiceRegistration;
 import org.opencastproject.serviceregistry.api.JaxbServiceStatistics;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
-import org.opencastproject.workflow.api.WorkflowService;
 
 import org.easymock.EasyMock;
 import org.junit.Ignore;
@@ -51,7 +50,6 @@ public class TestServerEndpoint extends ServerEndpoint {
   private static final String HOST4 = "host4";
 
   private ServiceRegistry serviceRegistry;
-  private WorkflowService workflowService;
   private MediaPackageBuilderImpl mpBuilder;
 
   public TestServerEndpoint() throws Exception {
@@ -70,10 +68,10 @@ public class TestServerEndpoint extends ServerEndpoint {
     JaxbServiceRegistration service4 = new JaxbServiceRegistration("test", HOST4, "");
 
     List<ServiceStatistics> statistics = new ArrayList<ServiceStatistics>();
-    statistics.add(new JaxbServiceStatistics(service1, 200, 200, 2, 2, 2));
-    statistics.add(new JaxbServiceStatistics(service2, 200, 200, 4, 4, 2));
-    statistics.add(new JaxbServiceStatistics(service3, 200, 200, 2, 4, 2));
-    statistics.add(new JaxbServiceStatistics(service4, 200, 200, 2, 4, 2));
+    statistics.add(new JaxbServiceStatistics(service1, 200, 3, 2, 2, 2));
+    statistics.add(new JaxbServiceStatistics(service2, 300, 2, 4, 4, 2));
+    statistics.add(new JaxbServiceStatistics(service3, 100, 4, 2, 4, 2));
+    statistics.add(new JaxbServiceStatistics(service4, 400, 5, 2, 4, 2));
 
     EasyMock.expect(serviceRegistry.getHostRegistrations()).andReturn(hosts).anyTimes();
     EasyMock.expect(serviceRegistry.getServiceStatistics()).andReturn(statistics).anyTimes();
