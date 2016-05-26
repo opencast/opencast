@@ -180,7 +180,6 @@ public final class QueryPreprocessor {
    * @return
    *        list of tokens
    */
-
   private static ArrayList<String> tokenize(String queryString) {
 
     ArrayList<String> tokens = new ArrayList<String>();
