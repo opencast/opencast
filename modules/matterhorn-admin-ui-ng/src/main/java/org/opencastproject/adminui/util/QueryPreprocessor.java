@@ -95,17 +95,15 @@ public final class QueryPreprocessor {
     while (i < tokens.size()) {
       String token = tokens.get(i);
 
-      if (UNARY_OPERATORS.contains(token.charAt(0))) {
+      if (isUnaryOperator(token)) {
         sanitizedToken = sanitizeUnaryOperator(token);
       }
-      else if (BINARY_OPERATORS.contains(token)) {
-        if ((i == 0) || BINARY_OPERATORS.contains(tokens.get(i - 1))
-          || (i >= tokens.size() - 1) || BINARY_OPERATORS.contains(tokens.get(i + 1))) {
+      else if (isBinaryOperator(token)) {
+        if ((i == 0) || isBinaryOperator(tokens.get(i - 1)) || (i >= tokens.size() - 1) || isBinaryOperator(tokens.get(i + 1)))
+          // Escape operator since operands missing
           sanitizedToken = Character.toString(BACKSLASH) + token;
-        }
-        else {
+        else
           sanitizedToken = token;
-        }
       }
       else
         sanitizedToken = enablePartialMatches(token, 0);
@@ -118,6 +116,15 @@ public final class QueryPreprocessor {
     logger.info("Sanitized input '{}' to '{}'", queryString, sanitizedQueryString);
     return sanitizedQueryString;
   }
+
+  private static boolean isUnaryOperator(String token) {
+    return (token.length() > 0) && UNARY_OPERATORS.contains(token.charAt(0));
+  }
+
+  private static boolean isBinaryOperator(String token) {
+    return BINARY_OPERATORS.contains(token);
+  }
+
 
   /**
    * Helper method to enable partial matching for string literals or operand
