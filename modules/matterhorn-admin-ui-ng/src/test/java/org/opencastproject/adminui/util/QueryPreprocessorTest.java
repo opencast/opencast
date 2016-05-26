@@ -64,6 +64,18 @@ public class QueryPreprocessorTest {
   }
 
   @Test
+  public void testCharacterEscaping() {
+    // Unsupported special characters are escaped
+    assertEquals("*\\(* *\\)* *\\[* *\\]* *\\{* *\\}* *\\~* *\\^* *\\:* *\\\\*", QueryPreprocessor.sanitize(" ( ) [ ] { } ~ ^ : \\"));
+
+    // Unsupported special characters are not escaped in quoted strings
+    assertEquals("\" ( ) [ ] { } ~ ^ : \\\"", QueryPreprocessor.sanitize("\" ( ) [ ] { } ~ ^ : \\\""));
+
+    // Supported special characters are not escape in quoted strings
+    assertEquals("\"|| && + - ! * ?\"", QueryPreprocessor.sanitize("\"|| && + - ! * ?\""));
+  }
+
+  @Test
   public void testUnaryOperators() {
     testUnaryOperator("+");
     testUnaryOperator("-");
