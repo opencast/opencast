@@ -125,7 +125,6 @@ public final class QueryPreprocessor {
     return BINARY_OPERATORS.contains(token);
   }
 
-
   /**
    * Helper method to enable partial matching for string literals or operand
    *
