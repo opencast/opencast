@@ -65,23 +65,36 @@ public class QueryPreprocessorTest {
 
   @Test
   public void testUnaryOperators() {
+    testUnaryOperator("+");
+    testUnaryOperator("-");
+    testUnaryOperator("!");
+  }
+
+  private void testUnaryOperator(String operator) {
     // Escape operator if operand is missing
-    assertEquals("\\-", QueryPreprocessor.sanitize("-"));
-    assertEquals("\\-", QueryPreprocessor.sanitize(" - "));
+    assertEquals("\\" + operator, QueryPreprocessor.sanitize(operator));
+    assertEquals("\\" + operator, QueryPreprocessor.sanitize(" " + operator + " "));
 
     // Escape operator if occuring within a token
-    assertEquals("*test\\-unit*", QueryPreprocessor.sanitize("test-unit"));
-    assertEquals("*test\\-unit*", QueryPreprocessor.sanitize("*test-unit"));
-    assertEquals("*test\\-unit*", QueryPreprocessor.sanitize("test-unit*"));
-    assertEquals("*test\\-unit*", QueryPreprocessor.sanitize("*test-unit*"));
-    assertEquals("*test\\-unit\\-*", QueryPreprocessor.sanitize("test-unit-"));
-    assertEquals("-*\\-test\\-\\-unit\\-\\-*", QueryPreprocessor.sanitize("--test--unit--"));
+    assertEquals("*test\\" + operator + "unit*", QueryPreprocessor.sanitize("test" + operator + "unit"));
+    assertEquals("*test\\" + operator + "unit*", QueryPreprocessor.sanitize("*test" + operator + "unit"));
+    assertEquals("*test\\" + operator + "unit*", QueryPreprocessor.sanitize("test" + operator + "unit*"));
+    assertEquals("*test\\" + operator + "unit*", QueryPreprocessor.sanitize("*test" + operator + "unit*"));
+    assertEquals("*test\\" + operator + "unit\\" + operator + "*",
+                 QueryPreprocessor.sanitize("test" + operator + "unit" + operator));
+    assertEquals(
+      operator + "*\\" + operator + "test\\" + operator + "unit\\" + operator + "\\" + operator + "*",
+      QueryPreprocessor.sanitize(operator + operator + "test" + operator + "unit" + operator + operator));
 
     // Partial matching for operands
-    assertEquals("-*test\\-unit*", QueryPreprocessor.sanitize("-test-unit"));
-    assertEquals("-*test\\-unit*", QueryPreprocessor.sanitize("-*test-unit"));
-    assertEquals("-*test\\-unit*", QueryPreprocessor.sanitize("-test-unit*"));
-    assertEquals("-*test\\-unit*", QueryPreprocessor.sanitize("-*test-unit*"));
+    assertEquals(operator + "*test\\" + operator + "unit*",
+      QueryPreprocessor.sanitize(operator + "test" + operator + "unit"));
+    assertEquals(operator + "*test\\" + operator + "unit*",
+      QueryPreprocessor.sanitize(operator + "*test" + operator + "unit"));
+    assertEquals(operator + "*test\\" + operator + "unit*",
+      QueryPreprocessor.sanitize(operator + "test" + operator + "unit*"));
+    assertEquals(operator + "*test\\" + operator + "unit*",
+      QueryPreprocessor.sanitize(operator + "*test" + operator + "unit*"));
   }
 
   @Test
@@ -94,6 +107,21 @@ public class QueryPreprocessorTest {
     // Don't escape operator if used correctly
     assertEquals("*Hello* && *World*", QueryPreprocessor.sanitize("Hello && World"));
     assertEquals("*Hello* || *World*", QueryPreprocessor.sanitize("Hello || World"));
+
+    testBinaryOperator("&&");
+    testBinaryOperator("||");
+  }
+
+  private void testBinaryOperator(String operator) {
+    // Escape operator if operands are missing
+    assertEquals("\\" + operator, QueryPreprocessor.sanitize(operator));
+    assertEquals("\\" + operator, QueryPreprocessor.sanitize(" " + operator + " "));
+    assertEquals("*Hello* \\" + operator, QueryPreprocessor.sanitize("Hello " + operator));
+    assertEquals("\\" + operator + " *World*", QueryPreprocessor.sanitize(operator + " World"));
+
+    // Don't escape operator if used correctly
+    assertEquals("*Hello* " + operator + " *World*",
+      QueryPreprocessor.sanitize("Hello " + operator + " World"));
   }
 
   public void testPartialMatches() {
