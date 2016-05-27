@@ -206,7 +206,7 @@ public final class QueryPreprocessor {
       } else if (openDoubleQuote) {
         // No special handling of characters within quoted strings
         currentToken += ch;
-      } else if (((ch == MINUS) || (ch == PLUS) || (ch == EXPLANATION_MARK)) && (currentToken.isEmpty())) {
+      } else if (isUnaryOperator("" + ch) && currentToken.isEmpty()) {
         // We only allow unary operators as first character of a token
         currentToken += ch;
       } else if (((ch == AMPERSAND) || (ch == PIPE))
