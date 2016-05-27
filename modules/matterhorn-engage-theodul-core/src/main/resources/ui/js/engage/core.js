@@ -332,7 +332,8 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
           || (e.keyCode === 34)
           || (e.keyCode === 13))
           && ((e.target !== $("input#username")[0])
-          && (e.target !== $("input#password")[0]))) {
+          && (e.target !== $("input#password")[0])
+          && (e.target !== $("input#navigation_time_current")[0]))) {
         return false;
       }
     });
