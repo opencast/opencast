@@ -282,6 +282,10 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
         }
       }
     }
+    // Wait until all retraction jobs have returned
+    if (!waitForStatus(jobs.keySet().toArray(new Job[jobs.keySet().size()])).isSuccess()) {
+      throw new WorkflowOperationException("One of the retraction jobs did not complete successfully");
+    }
   }
 
   private void fail(MediaPackage mp) throws WorkflowOperationException {

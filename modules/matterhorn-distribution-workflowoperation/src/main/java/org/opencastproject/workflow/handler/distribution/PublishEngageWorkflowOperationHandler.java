@@ -115,9 +115,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private int distributionDelay = 0;
   //itbwpdk end
 
-  /** Workflow configuration option keys to only merge or overwrite element in exiting mediapackage */
-  private static final String STRATEGY = "retract";
-
   /** The streaming distribution service */
   private DistributionService streamingDistributionService = null;
 
@@ -352,6 +349,10 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
             }
           } catch (DistributionException e) {
             throw new WorkflowOperationException(e);
+          }
+          // Wait until all retraction jobs have returned
+          if (!waitForStatus(jobs.toArray(new Job[jobs.size()])).isSuccess()) {
+            throw new WorkflowOperationException("One of the retraction jobs did not complete successfully");
           }
       }
 //distribute Elements
@@ -725,9 +726,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
             throw new WorkflowOperationException("Error retracting media package", e);
 
         } catch (UnauthorizedException ex) {
-            java.util.logging.Logger.getLogger(PublishEngageWorkflowOperationHandler.class.getName()).log(Level.SEVERE, null, ex);
+         logger.error("Retraction failed of Mediapackage: { }", mediaPackageForSearch.getIdentifier().toString() , ex);
         } catch (NotFoundException ex) {
-            java.util.logging.Logger.getLogger(PublishEngageWorkflowOperationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Retraction failed of Mediapackage: { }", mediaPackageForSearch.getIdentifier().toString(), ex);
         }
     }
 
