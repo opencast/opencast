@@ -36,11 +36,6 @@
     "CHINESE":"中文"
   },
   "PREFERENCES":{
-    "CAPTION":"选项",
-    "PROFILE":"个人资料",
-    "NAME":"姓名",
-    "REPLYTO":"回复电子邮件",
-    "SIGNATURE":"电子邮件签名",
     "TABLE":{
       "CAPTION":"编辑表格",
       "SUBHEADING":"选择择您希望显示在 {{ tableName }} 的设定值",
@@ -122,6 +117,8 @@
     "EMAIL_SENT":"邮件已发送",
     "EMAIL_NOT_SENT":"邮件无法发送",
     "CONFLICT_DETECTED":"排程有冲突：该新事件与已存在的某个事件有重叠，请更改位置、日期或时间。",
+    "CONFLICT_ALREADY_ENDED":"Scheduling error: The event has already ended.",
+    "CONFLICT_END_BEFORE_START":"Scheduling error: Schedule end has to be later than the start.",
     "INVALID_ACL_RULES":"规则必须含有一个拥有读取和\/或写入权限的有效角色。",
     "MISSING_ACL_RULES":"至少有一个角色必须具有读取和写入权限。",
     "SAVED_ACL_RULES":"访问权限已保存",
@@ -1400,13 +1397,16 @@
     },
     "JOBS":{
       "TABLE":{
+        "ACTION":"操作",
         "CAPTION":"作业",
-        "TITLE":"标题",
-        "SERIES":"系列",
-        "WORKFLOW":"工作流",
+        "CREATED":"创建",
+        "CREATOR":"创建者",
+        "HOST_NAME":"主机名",
+        "OPERATION":"Operation",
+        "STARTED":"已启动",
         "STATUS":"状态",
         "SUBMITTED":"已提出",
-        "ACTION":"操作"
+        "TYPE":"类型"
       },
       "DETAILS":{
         "HEADER":"作业信息 {{resourceId}}",
@@ -1439,6 +1439,7 @@
         "CAPTION":"服务",
         "STATUS":"状态",
         "NAME":"服务名",
+        "HOST_NAME":"主机名",
         "COMPLETED":"作业已完",
         "RUNNING":"作业运行中",
         "QUEUED":"作业排序",
@@ -1659,6 +1660,7 @@
   "TABLE_SUMMARY":"{{numberOfRows}} 行",
   "TABLE_NO_RESULT":"未找到结果",
   "TABLE_LOADING":"加载中...",
+  "TABLE_EDIT":"编辑",
   "PM":{
     "BLACKLIST":{
       "REASONS":{

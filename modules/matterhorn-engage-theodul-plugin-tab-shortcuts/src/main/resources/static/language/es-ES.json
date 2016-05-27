@@ -4,7 +4,7 @@
   "shortcutOverview":"Resumen del atajo",
   "name":"Nombre del atajo",
   "shortcut":"Atajo",
-  "fullscreen":"Fullscreen",
+  "fullscreen":"Pantalla Completa",
   "controls.playPause":"Reproducir\/Pausar",
   "playbackrate.decrease":"Disminuir la velocidad de reproducción",
   "playbackrate.increase":"Aumentar la velocidad de reproducción",
@@ -51,9 +51,9 @@
   "zoom.moveDown":"Mover hacia abajo",
   "zoom.in":"Ampliar",
   "zoom.out":"Alejar",
-  "controls":"Video controls",
-  "volume":"Volume",
-  "playbackrate":"Playbackrate",
-  "layout":"Screen layout",
+  "controls":"Controles de vídeo",
+  "volume":"Volumen",
+  "playbackrate":"Playback rate",
+  "layout":"Disposición de pantalla",
   "zoom":"Zoom"
 }
