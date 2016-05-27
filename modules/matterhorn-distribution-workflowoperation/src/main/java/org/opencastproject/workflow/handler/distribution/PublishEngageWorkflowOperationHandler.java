@@ -81,7 +81,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.logging.Level;
 
 /**
  * The workflow definition for handling "engage publication" operations
