@@ -1,13 +1,25 @@
 //$(document).ready(function() {
-requirejs(['jquery', 'bootbox', 'bootstrap-accessibility',
-  'jquery.liveSearch', 'alertify/alertify',
-  'seedrandom', 'jquery.utils', 'dropdowns-enhancement' ],
+requirejs(['jquery', 'bootbox', 'underscore', 'bootstrap-accessibility',
+  'jquery.liveSearch', 'alertify/alertify', 'seedrandom', 'jquery.utils',
+  'dropdowns-enhancement' ],
 function   ($) {
 
+    // bool
     var debug = false;
+    var askedForLogin = false;
+    var checkLoggedOut = false;
+
+    // URL's and Endpoints
     var restEndpoint = "/search/";
-    var mediaContainer = '<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">';
     var playerEndpoint = "";
+    var infoMeURL = "/info/me.json";
+    var defaultPlayerURL = "/engage/ui/watch.html";
+    var springSecurityLoginURL = "/j_spring_security_check";
+    var springSecurityLogoutURL = "/j_spring_security_logout";
+
+
+    // various variables
+    var mediaContainer = '<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">';
     var page = 1;
     var sort = "";
     var totalEntries = -1;
@@ -20,6 +32,7 @@ function   ($) {
     var seriesRgbMax = new Array(220, 220, 220); //color range.
     var seriesRgbOffset = new Array(20, 20, 20); //darkest possible color
 
+    // localization placeholder
     var title_enterUsernamePassword = "Login with your Opencast account";
     var placeholder_username = "Username";
     var placeholder_password = "Password";
@@ -34,12 +47,9 @@ function   ($) {
     var msg_loginSuccessful = "Successfully logged in. Please reload the page if the page does not reload automatically.";
     var msg_not_logged_in = "Not logged in";
     var msg_loginFailed = "Failed to log in.";
-
-    var infoMeURL = "/info/me.json";
-    var defaultPlayerURL = "/engage/ui/watch.html";
-    var springSecurityLoginURL = "/j_spring_security_check";
-    var springSecurityLogoutURL = "/j_spring_security_logout";
     var springLoggedInStrCheck = "<title>Opencast – Login Page</title>";
+
+    // jquery shortcuts
     var $navbarEpisodes = "#navbarEpisodes";
     var $navbarSeries = "#navbarSeries";
     var $headerLogo = "#headerLogo";
@@ -52,8 +62,6 @@ function   ($) {
     var $previous = ".previous";
     var $first = ".first";
     var $last = ".last";
-    var askedForLogin = false;
-    var checkLoggedOut = false;
     var $more_content = "#more";
     var $no_more_content = "#no-more";
     var id_mhlogolink = "mhlogolink";

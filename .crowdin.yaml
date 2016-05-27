@@ -14,3 +14,7 @@ files:
   -
     source: '/modules/**/src/main/resources/static/language/en.json'
     translation: '/modules/**/src/main/resources/static/language/%two_letters_code%.json'
+
+  -
+    source: '/modules/matterhorn-engage-ui/src/main/resources/ui/language/en.json'
+    translation: '/modules/matterhorn-engage-ui/src/main/resources/ui/language/%two_letters_code%.json'

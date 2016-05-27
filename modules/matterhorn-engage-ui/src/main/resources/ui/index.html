@@ -3,40 +3,25 @@
     <head>
         <!-- styles -->
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-        <!-- <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css"> -->
         <link rel="stylesheet" type="text/css" href="css/bootstrap-accessibility.css">
         <link rel="stylesheet" type="text/css" href="css/engage-ui.css">
         <link rel="stylesheet" type="text/css" href="js/lib/alertify/alertify.css">
         <link rel="stylesheet" type="text/css" href="js/lib/alertify/alertify-bootstrap-3.css">
         <link rel="stylesheet" type="text/css" href="css/dropdowns-enhancement.css">
-        <!-- scripts
-        <script type="text/javascript" src="js/jquery.js"></script>
-        <script type="text/javascript" src="js/jquery.liveSearch.js"></script>
-        <script type="text/javascript" src="js/bootbox.js"></script>
-        <script type="text/javascript" src="js/alertify/alertify.js"></script>
-        <script type="text/javascript" src="js/seedrandom.js"></script>
-        <script type="text/javascript" src="js/jquery.utils.js"></script>
-        <script type="text/javascript" src="js/bootstrap.min.js"></script>
-        <script type="text/javascript" src="js/dropdowns-enhancement.js"></script>
-        <script type="text/javascript" src="js/bootstrap-accessibility.min.js"></script>
-        <script type="text/javascript" src="js/engage-ui.js"></script>
-        <script type="text/javascript" src="js/jquery.localize.min.js"></script>
-        <script type="text/javascript" src="js/i18next.min.js"></script> -->
+        <!-- requirejs -->
         <script src="js/lib/require.js"></script>
         <script>
-        //Load common code that includes config, then load the app
-        //logic for this page. Do the requirejs calls here instead of
-        //a separate file so after a build there are only 2 HTTP
-        //requests instead of three.
-        requirejs(['js/common.js'], function (common) {
-            requirejs(['app/engage-ui']);
-        });
+          requirejs(['js/common.js'], function (common) {
+              requirejs(['app/engage-ui']);
+          });
         </script>
+        <!-- meta -->
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="utf-8">
         <meta name="description" content="Opencast Media Module">
         <meta name="author" content="Opencast">
-        <title>Media Module</title>
+
+        <title><%= title %></title>
     </head>
     <body>
         <div class="navbar navbar-default navbar-fixed-top" role="navigation" role="menubar">
@@ -53,7 +38,7 @@
                             <img id="headerLogo" src="" class="img-responsive">
                         </a>
                     </div>
-                    <h1 class="navbar-brand">Media Module</h1>
+                    <h1 class="navbar-brand"><%= header %></h1>
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav" id="nav-switch" role="menu">

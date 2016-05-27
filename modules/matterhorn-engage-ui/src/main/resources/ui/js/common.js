@@ -32,6 +32,9 @@ requirejs.config({
     },
     'redirect' : {
       deps: ['jquery']
+    },
+    'underscore' : {
+      exports: '_'
     }
   }
 });
