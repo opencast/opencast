@@ -93,19 +93,20 @@ public final class QueryPreprocessor {
 
       if (isUnaryOperator(token)) {
         sanitizedToken = sanitizeUnaryOperator(token);
-      }
-      else if (isBinaryOperator(token)) {
-        if ((i == 0) || isBinaryOperator(tokens.get(i - 1)) || (i >= tokens.size() - 1) || isBinaryOperator(tokens.get(i + 1)))
+      } else if (isBinaryOperator(token)) {
+        if ((i == 0) || isBinaryOperator(tokens.get(i - 1)) || (i >= tokens.size() - 1) || isBinaryOperator(tokens.get(i + 1))) {
           // Escape operator since operands missing
           sanitizedToken = Character.toString(BACKSLASH) + token;
-        else
+        } else {
           sanitizedToken = token;
-      }
-      else
+        }
+      } else {
         sanitizedToken = enablePartialMatches(token, 0);
+      }
 
-      if (i != 0)
+      if (i != 0) {
         sanitizedQueryString += " ";
+      }
       sanitizedQueryString += sanitizedToken;
       i++;
     }
@@ -137,8 +138,9 @@ public final class QueryPreprocessor {
     char ch = string.charAt(begin);
     if ((ch != DOUBLE_QUOTE) && (ch != ASTERISK)) {
       result = "";
-      if (begin > 0)
+      if (begin > 0) {
         result += string.substring(0, begin);
+      }
       result += ASTERISK;
       result += string.substring(begin, string.length());
     }
@@ -163,10 +165,10 @@ public final class QueryPreprocessor {
    */
   private static String sanitizeUnaryOperator(String token) {
     String sanitizedToken;
-    if (token.length() == 1)
+    if (token.length() == 1) {
       // Escape unary operator because of missing operand
       sanitizedToken = Character.toString(BACKSLASH) + token.charAt(0);
-    else {
+    } else {
       sanitizedToken = enablePartialMatches(token, 1);
     }
     return sanitizedToken;
@@ -201,41 +203,37 @@ public final class QueryPreprocessor {
           currentToken = "";
         }
         openDoubleQuote = !openDoubleQuote;
-      }
-      else if (openDoubleQuote) {
+      } else if (openDoubleQuote) {
         // No special handling of characters within quoted strings
         currentToken += ch;
-      }
-      else if (((ch == MINUS) || (ch == PLUS) || (ch == EXPLANATION_MARK)) && (currentToken.isEmpty())) {
+      } else if (((ch == MINUS) || (ch == PLUS) || (ch == EXPLANATION_MARK)) && (currentToken.isEmpty())) {
         // We only allow unary operators as first character of a token
         currentToken += ch;
-      }
-      else if (((ch == AMPERSAND) || (ch == PIPE))
-               && (lookahead(i + 1, queryString) == ch) && Character.isWhitespace(lookahead(i + 2, queryString))) {
+      } else if (((ch == AMPERSAND) || (ch == PIPE))
+                 && (lookahead(i + 1, queryString) == ch) && Character.isWhitespace(lookahead(i + 2, queryString))) {
         // Binary operator detected, i.e. && or ||
         tokens.add(Character.toString(ch) + Character.toString(ch));
         i++; // We nastily skip the binary operator, i.e. we are taken two characters in this round
-      }
-      else if (Character.isWhitespace(ch)) {
+      } else if (Character.isWhitespace(ch)) {
         // Whitespace delimits tokens
         if (!currentToken.isEmpty()) {
           tokens.add(currentToken);
           currentToken = "";
         }
-      }
-      else
-      {
-        if (ESCAPED_CHARACTERS.contains(ch))
+      } else {
+        if (ESCAPED_CHARACTERS.contains(ch)) {
           currentToken += Character.toString(BACKSLASH) + ch;
-        else
+        } else {
           currentToken += ch;
+        }
       }
       i++;
     }
     if (!currentToken.isEmpty()) {
-      if (openDoubleQuote)
+      if (openDoubleQuote) {
         // Syntax error detected. We fix this and also append an asterisk for better usability
         currentToken += Character.toString(DOUBLE_QUOTE);
+      }
       tokens.add(currentToken);
     }
 
@@ -254,10 +252,11 @@ public final class QueryPreprocessor {
    *        the character found at specified position or ' ' if position not within string
    */
   private static char lookahead(int position, String string) {
-    if (position < string.length())
+    if (position < string.length()) {
       return string.charAt(position);
-    else
+    } else {
       return ' ';
+    }
   }
 
 }
