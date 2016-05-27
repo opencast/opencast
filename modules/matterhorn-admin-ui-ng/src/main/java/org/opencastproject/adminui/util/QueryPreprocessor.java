@@ -96,7 +96,7 @@ public final class QueryPreprocessor {
       } else if (isBinaryOperator(token)) {
         if ((i == 0) || isBinaryOperator(tokens.get(i - 1)) || (i >= tokens.size() - 1) || isBinaryOperator(tokens.get(i + 1))) {
           // Escape operator since operands missing
-          sanitizedToken = Character.toString(BACKSLASH) + token;
+          sanitizedToken = "" + BACKSLASH + token;
         } else {
           sanitizedToken = token;
         }
@@ -167,7 +167,7 @@ public final class QueryPreprocessor {
     String sanitizedToken;
     if (token.length() == 1) {
       // Escape unary operator because of missing operand
-      sanitizedToken = Character.toString(BACKSLASH) + token.charAt(0);
+      sanitizedToken = "" + BACKSLASH + token.charAt(0);
     } else {
       sanitizedToken = enablePartialMatches(token, 1);
     }
@@ -212,7 +212,7 @@ public final class QueryPreprocessor {
       } else if (((ch == AMPERSAND) || (ch == PIPE))
                  && (lookahead(i + 1, queryString) == ch) && Character.isWhitespace(lookahead(i + 2, queryString))) {
         // Binary operator detected, i.e. && or ||
-        tokens.add(Character.toString(ch) + Character.toString(ch));
+        tokens.add("" + ch + ch);
         i++; // We nastily skip the binary operator, i.e. we are taken two characters in this round
       } else if (Character.isWhitespace(ch)) {
         // Whitespace delimits tokens
@@ -222,7 +222,7 @@ public final class QueryPreprocessor {
         }
       } else {
         if (ESCAPED_CHARACTERS.contains(ch)) {
-          currentToken += Character.toString(BACKSLASH) + ch;
+          currentToken += "" + BACKSLASH + ch;
         } else {
           currentToken += ch;
         }
@@ -231,8 +231,8 @@ public final class QueryPreprocessor {
     }
     if (!currentToken.isEmpty()) {
       if (openDoubleQuote) {
-        // Syntax error detected. We fix this and also append an asterisk for better usability
-        currentToken += Character.toString(DOUBLE_QUOTE);
+        // Syntax error detected. We fix this.
+        currentToken += DOUBLE_QUOTE;
       }
       tokens.add(currentToken);
     }
