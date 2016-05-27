@@ -1,4 +1,9 @@
-$(document).ready(function() {
+//$(document).ready(function() {
+requirejs(['jquery', 'bootbox', 'bootstrap-accessibility',
+  'jquery.liveSearch', 'alertify/alertify',
+  'seedrandom', 'jquery.utils', 'dropdowns-enhancement' ],
+function   ($) {
+
     var debug = false;
     var restEndpoint = "/search/";
     var mediaContainer = '<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">';
@@ -14,6 +19,7 @@ $(document).ready(function() {
     var tabIndexNumber = 100;
     var seriesRgbMax = new Array(220, 220, 220); //color range.
     var seriesRgbOffset = new Array(20, 20, 20); //darkest possible color
+
     var title_enterUsernamePassword = "Login with your Opencast account";
     var placeholder_username = "Username";
     var placeholder_password = "Password";
@@ -28,6 +34,7 @@ $(document).ready(function() {
     var msg_loginSuccessful = "Successfully logged in. Please reload the page if the page does not reload automatically.";
     var msg_not_logged_in = "Not logged in";
     var msg_loginFailed = "Failed to log in.";
+
     var infoMeURL = "/info/me.json";
     var defaultPlayerURL = "/engage/ui/watch.html";
     var springSecurityLoginURL = "/j_spring_security_check";
@@ -68,33 +75,33 @@ $(document).ready(function() {
 
     function translate() {
       var lang = detectLanguage();
-      var jsonstr = window.location.origin + "/engage/ui/language/media-module-"+lang+".json";
-      log("Trying to translate: " + lang);
+      //var jsonstr = window.location.origin + "/engage/ui/language/media-module-"+lang+".json";
+      console.log("Detected Language: " + lang);
       // Uses query localize to translate html document, skip default en language
-      $("[data-localize]").localize("language/media-module", {skipLanguage : ["en", "en-US"]});
-        $.ajax({
-          url: jsonstr,
-          dataType: "json",
-          success: function(data) {
-            title_enterUsernamePassword = data.login_title;
-            placeholder_username = data.username;
-            placeholder_password = data.password;
-            placeholder_rememberMe = data.remember_me;
-            msg_enterUsernamePassword = data.login_request;
-            msg_html_sthWentWrong = "<h2>"+data.sthWentWrong+"<h2>";
-            msg_html_noepisodes = "<h2>"+data.no_episodes+"</h2>";
-            msg_html_noseries = "<h2>"+data.no_series+"</h2>";
-            msg_html_loading = "<h2>"+data.loading+"</h2>";
-            msg_html_mediapackageempty = "<h2>"+data.no_episodes+"</h2>";
-            msg_html_nodata = "<h2>"+data.no_data+"</h2>";
-            msg_loginSuccessful = data.login_success;
-            msg_loginFailed = data.login_failed;
-            msg_not_logged_in = data.not_logged_in;
-          },
-            error: function(jqXHR, textStatus, errorThrown) {
-              log("Failed to localize. Using default.");
-            }
-          });
+      //$("[data-localize]").localize("language/media-module", {skipLanguage : ["en", "en-US"]});
+        // $.ajax({
+        //   url: jsonstr,
+        //   dataType: "json",
+        //   success: function(data) {
+        //     title_enterUsernamePassword = data.login_title;
+        //     placeholder_username = data.username;
+        //     placeholder_password = data.password;
+        //     placeholder_rememberMe = data.remember_me;
+        //     msg_enterUsernamePassword = data.login_request;
+        //     msg_html_sthWentWrong = "<h2>"+data.sthWentWrong+"<h2>";
+        //     msg_html_noepisodes = "<h2>"+data.no_episodes+"</h2>";
+        //     msg_html_noseries = "<h2>"+data.no_series+"</h2>";
+        //     msg_html_loading = "<h2>"+data.loading+"</h2>";
+        //     msg_html_mediapackageempty = "<h2>"+data.no_episodes+"</h2>";
+        //     msg_html_nodata = "<h2>"+data.no_data+"</h2>";
+        //     msg_loginSuccessful = data.login_success;
+        //     msg_loginFailed = data.login_failed;
+        //     msg_not_logged_in = data.not_logged_in;
+        //   },
+        //     error: function(jqXHR, textStatus, errorThrown) {
+        //       log("Failed to localize. Using default.");
+        //     }
+        //   });
     }
 
     function GetURLParameter(sParam) {

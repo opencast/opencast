@@ -6,10 +6,10 @@
         <!-- <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css"> -->
         <link rel="stylesheet" type="text/css" href="css/bootstrap-accessibility.css">
         <link rel="stylesheet" type="text/css" href="css/engage-ui.css">
-        <link rel="stylesheet" type="text/css" href="js/alertify/alertify.css">
-        <link rel="stylesheet" type="text/css" href="js/alertify/alertify-bootstrap-3.css">
+        <link rel="stylesheet" type="text/css" href="js/lib/alertify/alertify.css">
+        <link rel="stylesheet" type="text/css" href="js/lib/alertify/alertify-bootstrap-3.css">
         <link rel="stylesheet" type="text/css" href="css/dropdowns-enhancement.css">
-        <!-- scripts -->
+        <!-- scripts
         <script type="text/javascript" src="js/jquery.js"></script>
         <script type="text/javascript" src="js/jquery.liveSearch.js"></script>
         <script type="text/javascript" src="js/bootbox.js"></script>
@@ -21,6 +21,17 @@
         <script type="text/javascript" src="js/bootstrap-accessibility.min.js"></script>
         <script type="text/javascript" src="js/engage-ui.js"></script>
         <script type="text/javascript" src="js/jquery.localize.min.js"></script>
+        <script type="text/javascript" src="js/i18next.min.js"></script> -->
+        <script src="js/lib/require.js"></script>
+        <script>
+        //Load common code that includes config, then load the app
+        //logic for this page. Do the requirejs calls here instead of
+        //a separate file so after a build there are only 2 HTTP
+        //requests instead of three.
+        requirejs(['js/common.js'], function (common) {
+            requirejs(['app/engage-ui']);
+        });
+        </script>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta charset="utf-8">
         <meta name="description" content="Opencast Media Module">
