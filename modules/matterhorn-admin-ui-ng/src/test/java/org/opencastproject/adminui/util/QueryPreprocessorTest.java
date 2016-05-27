@@ -39,9 +39,9 @@ public class QueryPreprocessorTest {
     assertEquals("\"Hello\"", QueryPreprocessor.sanitize("\"Hello\""));
     assertEquals("*Hello* \"World\"", QueryPreprocessor.sanitize("Hello \"World\""));
 
-    // Auto-completion and partial matching in case of missing double-quote
-    assertEquals("*Hello* \"World\"*", QueryPreprocessor.sanitize("Hello \"World"));
-    assertEquals("*Hello* \"World Again\"*", QueryPreprocessor.sanitize("Hello \"World Again"));
+    // Auto-completion in case of missing double-quote
+    assertEquals("*Hello* \"World\"", QueryPreprocessor.sanitize("Hello \"World"));
+    assertEquals("*Hello* \"World Again\"", QueryPreprocessor.sanitize("Hello \"World Again"));
 
     // Partial matching for tokens containing quoted strings but starting and ending with characters
     assertEquals("*He\"llo Wor\"ld*", QueryPreprocessor.sanitize("He\"llo Wor\"ld"));
