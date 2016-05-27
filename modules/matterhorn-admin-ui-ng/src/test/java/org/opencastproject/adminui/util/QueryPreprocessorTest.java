@@ -43,12 +43,8 @@ public class QueryPreprocessorTest {
     assertEquals("*Hello* \"World\"", QueryPreprocessor.sanitize("Hello \"World"));
     assertEquals("*Hello* \"World Again\"", QueryPreprocessor.sanitize("Hello \"World Again"));
 
-    // Partial matching for tokens containing quoted strings but starting and ending with characters
-    assertEquals("*He\"llo Wor\"ld*", QueryPreprocessor.sanitize("He\"llo Wor\"ld"));
-
-    // double quotes do not delimit tokens
-    assertEquals("*Hello\"World\"Again*", QueryPreprocessor.sanitize("Hello\"World\"Again"));
-    assertEquals("\"Hello\"\"World\"", QueryPreprocessor.sanitize("\"Hello\"\"World\""));
+    // Escape double quote within tokens, i.e. ensure whitespace separated tokens
+    assertEquals("*He\\\"llo* *Wor\\\"ld*", QueryPreprocessor.sanitize("He\"llo Wor\"ld"));
   }
 
   @Test

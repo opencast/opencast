@@ -196,13 +196,19 @@ public final class QueryPreprocessor {
       char ch = queryString.charAt(i);
 
       if (ch == DOUBLE_QUOTE) {
-        currentToken += DOUBLE_QUOTE;
-        if (openDoubleQuote && Character.isWhitespace(lookahead(i + 1, queryString))) {
+        if (openDoubleQuote) {
           // end of string literal is also end of whitespace delimited token
+          currentToken += DOUBLE_QUOTE;
           tokens.add(currentToken);
           currentToken = "";
+          openDoubleQuote = false;
+        } else if (currentToken.isEmpty()) {
+          currentToken += DOUBLE_QUOTE;
+          openDoubleQuote = true;
+        } else {
+          // Escape double quote character to enforce whitespace separated tokens
+          currentToken += "" + BACKSLASH + DOUBLE_QUOTE;
         }
-        openDoubleQuote = !openDoubleQuote;
       } else if (openDoubleQuote) {
         // No special handling of characters within quoted strings
         currentToken += ch;
