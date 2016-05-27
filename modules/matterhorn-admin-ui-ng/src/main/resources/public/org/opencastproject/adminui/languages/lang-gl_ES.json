@@ -36,11 +36,6 @@
     "CHINESE":"Chinés"
   },
   "PREFERENCES":{
-    "CAPTION":"Preferencias",
-    "PROFILE":"Perfil",
-    "NAME":"Nome",
-    "REPLYTO":"Enderezo de correo de resposta",
-    "SIGNATURE":"Sinatura do correo electrónico",
     "TABLE":{
       "CAPTION":"Modificar Vista de Táboa",
       "SUBHEADING":"Seleccione os datos que se amosarán por defecto na vista da táboa {{ tableName }}",
@@ -122,6 +117,8 @@
     "EMAIL_SENT":"Mensaxe enviada",
     "EMAIL_NOT_SENT":"Non se puido enviar a mensaxe",
     "CONFLICT_DETECTED":"Conflito de programación: o novo evento coincide con outro existente. Por favor, cambie a sala, as datas ou as horas.",
+    "CONFLICT_ALREADY_ENDED":"Scheduling error: The event has already ended.",
+    "CONFLICT_END_BEFORE_START":"Scheduling error: Schedule end has to be later than the start.",
     "INVALID_ACL_RULES":"As regras deben conter un nome de rol válido e permiso(s) de lectura e\/ou escritura.",
     "MISSING_ACL_RULES":"Requírese, como mínimo, un rol con permisos de Lectura e Escritura!",
     "SAVED_ACL_RULES":"Regras de acceso gardadas.",
@@ -1400,13 +1397,16 @@
     },
     "JOBS":{
       "TABLE":{
+        "ACTION":"Accións",
         "CAPTION":"Traballos",
-        "TITLE":"Título",
-        "SERIES":"Serie",
-        "WORKFLOW":"Fluxo de traballo",
+        "CREATED":"Creado",
+        "CREATOR":"Creador",
+        "HOST_NAME":"Nome do servidor",
+        "OPERATION":"Operation",
+        "STARTED":"Iniciado",
         "STATUS":"Estado",
         "SUBMITTED":"Enviado",
-        "ACTION":"Accións"
+        "TYPE":"Tipo"
       },
       "DETAILS":{
         "HEADER":"Detalles do traballo {{resourceId}}",
@@ -1439,6 +1439,7 @@
         "CAPTION":"Servizos",
         "STATUS":"Estado",
         "NAME":"Nome do servizo",
+        "HOST_NAME":"Nome do servidor",
         "COMPLETED":"Traballos completados",
         "RUNNING":"Traballos en execución",
         "QUEUED":"Traballos en cola",
@@ -1659,6 +1660,7 @@
   "TABLE_SUMMARY":"{{numberOfRows}} filas",
   "TABLE_NO_RESULT":"Non se atoparon resultados",
   "TABLE_LOADING":"Cargando…",
+  "TABLE_EDIT":"Modificar",
   "PM":{
     "BLACKLIST":{
       "REASONS":{

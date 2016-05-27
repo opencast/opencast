@@ -36,11 +36,6 @@
     "CHINESE":"Κινέζικα"
   },
   "PREFERENCES":{
-    "CAPTION":"Προτιμήσεις",
-    "PROFILE":"Προφίλ",
-    "NAME":"Όνομα",
-    "REPLYTO":"Απάντηση σε μήνυμα ηλεκτρονικού ταχυδρομείου",
-    "SIGNATURE":"Υπογραφή ηλεκτρονικού ταχυδρομείου",
     "TABLE":{
       "CAPTION":"Επεξεργασία προβολής πίνακα",
       "SUBHEADING":"Επιλέξτε τα προεπιλεγμένα δεδομένα που θέλετε να εμφανίζεται στην προβολή {{ tableName }}",
@@ -122,6 +117,8 @@
     "EMAIL_SENT":"Το μήνυμα έχει σταλεί",
     "EMAIL_NOT_SENT":"Δεν μπόρεσε να σταλεί το μήνυμα",
     "CONFLICT_DETECTED":"Σύγκρουση στον προγραμματισμό: η νέα εκδήλωση συμπίμπτει με μία υπάρχουσα. Παρακαλώ αλλάξτε την αίθουσα, τις ημερηνίες ή τις ημέρες.",
+    "CONFLICT_ALREADY_ENDED":"Scheduling error: The event has already ended.",
+    "CONFLICT_END_BEFORE_START":"Scheduling error: Schedule end has to be later than the start.",
     "INVALID_ACL_RULES":"Οι κανόνες πρέπει να περιέχουν έναν έγκυρο ρόλο και δικαίωμα(τα) ανάγνωσης ή\/και εγγραφής.",
     "MISSING_ACL_RULES":"Απαιτείται τουλάχιστον ένας ρόλος με δικαιώματα ανάγνωσης και εγγραφής!",
     "SAVED_ACL_RULES":"Οι κανόνες πρόσβασης έχουν αποθηκευτεί.",
@@ -1400,13 +1397,16 @@
     },
     "JOBS":{
       "TABLE":{
+        "ACTION":"Ενέργειες",
         "CAPTION":"Εργασίες",
-        "TITLE":"Τίτλος",
-        "SERIES":"Σειρά",
-        "WORKFLOW":"Ροή εργασίας",
+        "CREATED":"Δημιουργήθηκε",
+        "CREATOR":"Δημιουργός",
+        "HOST_NAME":"Όνομα κεντρικού υπολογιστή",
+        "OPERATION":"Operation",
+        "STARTED":"Ξεκίνησε",
         "STATUS":"Κατάσταση",
         "SUBMITTED":"Υποβλήθηκε",
-        "ACTION":"Ενέργειες"
+        "TYPE":"Τύπος"
       },
       "DETAILS":{
         "HEADER":"Λεπτομέρειες εργασίας {{resourceId}}",
@@ -1439,6 +1439,7 @@
         "CAPTION":"Υπηρεσίες",
         "STATUS":"Κατάσταση",
         "NAME":"Όνομα υπηρεσίας",
+        "HOST_NAME":"Όνομα κεντρικού υπολογιστή",
         "COMPLETED":"Ολοκληρωμένες εργασίες",
         "RUNNING":"Εργασίες σε εκτέλεση",
         "QUEUED":"Εργασίες στην ουρά",
@@ -1659,6 +1660,7 @@
   "TABLE_SUMMARY":"{{numberOfRows}} γραμμές",
   "TABLE_NO_RESULT":"Δεν βρέθηκαν αποτελέσματα",
   "TABLE_LOADING":"Φόρτωση…",
+  "TABLE_EDIT":"Επεξεργασία",
   "PM":{
     "BLACKLIST":{
       "REASONS":{
