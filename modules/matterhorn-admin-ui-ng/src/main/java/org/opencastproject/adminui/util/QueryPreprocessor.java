@@ -213,7 +213,7 @@ public final class QueryPreprocessor {
       } else if (openDoubleQuote) {
         // No special handling of characters within quoted strings
         currentToken += ch;
-      } else if (isUnaryOperator("" + ch) && currentToken.isEmpty()) {
+      } else if (isUnaryOperator("" + ch) && Character.isWhitespace(charAt(i - 1, query)) {
         // We only allow unary operators as first character of a token
         currentToken += ch;
       } else if (isBinaryOperator("" + ch + charAt(i + 1, query))
