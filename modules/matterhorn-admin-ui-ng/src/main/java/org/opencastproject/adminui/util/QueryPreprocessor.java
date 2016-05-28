@@ -60,6 +60,8 @@ public final class QueryPreprocessor {
     PLUS,
     EXPLANATION_MARK,
     BACKSLASH,
+    AMPERSAND,
+    PIPE,
     '(', ')', '{', '}', '[', ']', ':', '^', '~'
   ));
 
@@ -78,15 +80,15 @@ public final class QueryPreprocessor {
   /**
    * Sanitize a potentially malformed query string so it conforms to the Lucene query syntax
    *
-   * @param queryString
+   * @param query
    *          potentially malformed Lucene query string
    * @return
    *        sanitized query string
    */
-  public static String sanitize(String queryString) {
-    String sanitizedQueryString = "";
+  public static String sanitize(String query) {
+    String sanitizedQuery = "";
     String sanitizedToken;
-    ArrayList<String> tokens = tokenize(queryString);
+    ArrayList<String> tokens = tokenize(query);
     int i = 0;
     while (i < tokens.size()) {
       String token = tokens.get(i);
@@ -105,13 +107,13 @@ public final class QueryPreprocessor {
       }
 
       if (i != 0) {
-        sanitizedQueryString += " ";
+        sanitizedQuery += " ";
       }
-      sanitizedQueryString += sanitizedToken;
+      sanitizedQuery += sanitizedToken;
       i++;
     }
-    logger.info("Sanitized input '{}' to '{}'", queryString, sanitizedQueryString);
-    return sanitizedQueryString;
+    logger.info("Sanitized input '{}' to '{}'", query, sanitizedQuery);
+    return sanitizedQuery;
   }
 
   private static boolean isUnaryOperator(String token) {
@@ -177,23 +179,22 @@ public final class QueryPreprocessor {
   /**
    * Helper method to (pseudo)-tokenize a character sequence
    *
-   * @param queryString
+   * @param query
    *          string to be tokenized
    * @return
    *        list of tokens
    */
-  private static ArrayList<String> tokenize(String queryString) {
+  private static ArrayList<String> tokenize(String query) {
 
     ArrayList<String> tokens = new ArrayList<String>();
     String currentToken = "";
 
     boolean openDoubleQuote = false;
-
     int i = 0;
 
-    while (i < queryString.length()) {
+    while (i < query.length()) {
 
-      char ch = queryString.charAt(i);
+      char ch = query.charAt(i);
 
       if (ch == DOUBLE_QUOTE) {
         if (openDoubleQuote) {
@@ -202,7 +203,8 @@ public final class QueryPreprocessor {
           tokens.add(currentToken);
           currentToken = "";
           openDoubleQuote = false;
-        } else if (currentToken.isEmpty()) {
+        } else if (currentToken.isEmpty()
+                   || (isUnaryOperator("" + charAt(i - 1, query)) && Character.isWhitespace(charAt(i - 2, query)))) {
           currentToken += DOUBLE_QUOTE;
           openDoubleQuote = true;
         } else {
@@ -215,11 +217,12 @@ public final class QueryPreprocessor {
       } else if (isUnaryOperator("" + ch) && currentToken.isEmpty()) {
         // We only allow unary operators as first character of a token
         currentToken += ch;
-      } else if (((ch == AMPERSAND) || (ch == PIPE))
-                 && (lookahead(i + 1, queryString) == ch) && Character.isWhitespace(lookahead(i + 2, queryString))) {
-        // Binary operator detected, i.e. && or ||
-        tokens.add("" + ch + ch);
-        i++; // We nastily skip the binary operator, i.e. we are taken two characters in this round
+      } else if (isBinaryOperator("" + ch + charAt(i + 1, query))
+                 && Character.isWhitespace(charAt(i - 1, query))
+                 && Character.isWhitespace(charAt(i + 2, query))) {
+          // Binary operator detected, i.e. whitespace delimited && or ||
+          tokens.add("" + ch + ch);
+          i++; // We nastily skip the binary operator, i.e. we are taken two characters in this round
       } else if (Character.isWhitespace(ch)) {
         // Whitespace delimits tokens
         if (!currentToken.isEmpty()) {
@@ -246,7 +249,6 @@ public final class QueryPreprocessor {
     return tokens;
   }
 
-
   /**
    * Helper method to look up characters in strings without resulting in IndexOutOfBound exceptions
    *
@@ -257,8 +259,8 @@ public final class QueryPreprocessor {
    * @return
    *        the character found at specified position or ' ' if position not within string
    */
-  private static char lookahead(int position, String string) {
-    if (position < string.length()) {
+  private static char charAt(int position, String string) {
+    if ((0 <= position) && (position < string.length())) {
       return string.charAt(position);
     } else {
       return ' ';

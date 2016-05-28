@@ -104,6 +104,13 @@ public class QueryPreprocessorTest {
       QueryPreprocessor.sanitize(operator + "test" + operator + "unit*"));
     assertEquals(operator + "*test\\" + operator + "unit*",
       QueryPreprocessor.sanitize(operator + "*test" + operator + "unit*"));
+
+    // Binary operators are escaped when appearing as operangs of unary operators
+    assertEquals(operator + "*\\|\\|*", QueryPreprocessor.sanitize(operator + "||"));
+    assertEquals(operator + "*\\&\\&*", QueryPreprocessor.sanitize(operator + "&&"));
+
+    // Double quotes can be used in argument
+    assertEquals(operator + "\"Hello World\"", QueryPreprocessor.sanitize(operator + "\"Hello World\""));
   }
 
   @Test
