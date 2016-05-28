@@ -198,7 +198,6 @@ public final class QueryPreprocessor {
 
       if (ch == DOUBLE_QUOTE) {
         if (openDoubleQuote) {
-          // end of string literal is also end of whitespace delimited token
           currentToken += DOUBLE_QUOTE;
           tokens.add(currentToken);
           currentToken = "";
