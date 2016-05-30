@@ -2,6 +2,7 @@
    "MATTERHORN":   "Opencast",
    "NAV_HOME":     "Start",
    "NAV_ABOUT":    "About",
+   "NO":           "No",
    "SUBMIT":       "Submit",
    "UPDATE":       "Update",
    "CANCEL":       "Cancel",
@@ -1523,6 +1524,9 @@
        "CREATOR": {
          "LABEL": "Creator"
        },
+       "HOSTNAME": {
+         "LABEL": "Host name"
+       },
        "LANGUAGE": {
          "LABEL": "Language"
        },
@@ -1592,6 +1596,18 @@
          "LABEL": "Workflow state"
        }
      },
+     "JOBS": {
+       "HOSTNAME": {
+           "LABEL": "Host name"
+       },
+       "STATUS": {
+           "LABEL": "Status",
+           "PAUSED": "Paused",
+           "QUEUED": "Queued",
+           "RUNNING": "Running",
+           "WAITING": "Waiting"
+       }
+     },
      "SERIES": {
       "TITLE": {
         "LABEL": "Name"
@@ -1620,6 +1636,34 @@
       "CREATION_DATE": {
         "LABEL": "Creation date"
       }
+     },
+     "SERVERS": {
+       "HOSTNAME": {
+           "LABEL": "Host name"
+       },
+       "STATUS": {
+         "LABEL": "Status",
+         "MAINTENANCE": "Maintenance",
+         "ONLINE": "Online",
+         "OFFLINE": "Offline"
+       }
+     },
+     "SERVICES": {
+        "ACTIONS": {
+            "LABEL": "Has actions"
+        },
+        "HOSTNAME": {
+            "LABEL": "Host name"
+        },
+        "NAME": {
+            "LABEL": "Name"
+        },
+        "STATUS": {
+            "LABEL": "Status",
+            "ERROR": "Error",
+            "NORMAL": "Normal",
+            "WARNING": "Warning"
+        }
      },
      "THEMES": {
       "NAME": {

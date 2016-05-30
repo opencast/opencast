@@ -1,6 +1,6 @@
 angular.module('adminNg.controllers')
-.controller('JobsCtrl', ['$scope', 'Table', 'JobsResource',
-    function ($scope, Table, JobsResource) {
+.controller('JobsCtrl', ['$scope', 'Table', 'JobsResource', 'ResourcesFilterResource',
+    function ($scope, Table, JobsResource, ResourcesFilterResource) {
 
         $scope.table = Table;
         $scope.table.configure({
@@ -14,6 +14,12 @@ angular.module('adminNg.controllers')
                 name:  'processingHost',
                 label: 'SYSTEMS.JOBS.TABLE.HOST_NAME'
             }, {
+                name:  'status',
+                label: 'SYSTEMS.JOBS.TABLE.STATUS'
+            }, {
+                name:  'processingHost',
+                label: 'SYSTEMS.JOBS.TABLE.HOST_NAME'
+            }, {
                 name:  'submitted',
                 label: 'SYSTEMS.JOBS.TABLE.SUBMITTED'
             }, {
@@ -21,7 +27,7 @@ angular.module('adminNg.controllers')
                 label: 'SYSTEMS.JOBS.TABLE.STARTED'
             }, {
                 name:  'creator',
-                label: 'SYSTEMS.JOBS.TABLE.CREATOR',
+                label: 'SYSTEMS.JOBS.TABLE.CREATOR'
             //}, {
             //    template: 'modules/systems/partials/jobActionsCell.html',
             //    label:    'SYSTEMS.JOBS.TABLE.ACTION',
@@ -32,5 +38,7 @@ angular.module('adminNg.controllers')
             category:   'systems',
             apiService: JobsResource
         });
+
+        $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
     }
 ]);

@@ -27,6 +27,7 @@ import static com.entwinemedia.fn.data.json.Jsons.v;
 import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.index.service.resources.list.query.ServicesListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.matterhorn.search.SortCriterion;
@@ -61,8 +62,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -80,39 +79,60 @@ public class ServicesEndpoint {
   @RestQuery(description = "Returns the list of services", name = "services", restParameters = {
           @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = RestParameter.Type.INTEGER),
           @RestParameter(name = "offset", description = "The offset", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "name", isRequired = false, description = "Filter results by service name", type = STRING),
-          @RestParameter(name = "host", isRequired = false, description = "Filter results by host name", type = STRING),
-          @RestParameter(name = "q", isRequired = false, description = "Filter results by free text query", type = STRING),
-          @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
+          @RestParameter(name = "filter", description = "Filter results by name, host, actions, status or free text query", isRequired = false, type = STRING),
+          @RestParameter(name = "sort", description = "The sort order.  May include any "
                   + "of the following: host, name, running, queued, completed,  meanRunTime, meanQueueTime, "
-                  + "status. The sort suffix must be :asc for ascending sort order and :desc for descending.", type = STRING)
+                  + "status. The sort suffix must be :asc for ascending sort order and :desc for descending.", isRequired = false, type = STRING)
   }, reponses = { @RestResponse(description = "Returns the list of services from Opencast", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The list of services")
-  public Response getJobs(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset,
-          @QueryParam("name") String name, @QueryParam("host") String host, @QueryParam("q") String text,
-          @QueryParam("sort") String sort, @Context HttpHeaders headers) throws Exception {
+  public Response getServices(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset,
+          @QueryParam("filter") String filter, @QueryParam("sort") String sort) throws Exception {
 
-    Option<String> nameOpt = Option.option(StringUtils.trimToNull(name));
-    Option<String> hostOpt = Option.option(StringUtils.trimToNull(host));
-    Option<String> textOpt = Option.option(StringUtils.trimToNull(text));
     Option<String> sortOpt = Option.option(StringUtils.trimToNull(sort));
+    ServicesListQuery query = new ServicesListQuery();
+    EndpointUtil.addRequestFiltersToQuery(filter, query);
+
+    String fName = null;
+    if (query.getName().isSome())
+      fName = StringUtils.trimToNull(query.getName().get());
+    String fHostname = null;
+    if (query.getHostname().isSome())
+      fHostname = StringUtils.trimToNull(query.getHostname().get());
+    String fStatus = null;
+    if (query.getStatus().isSome())
+      fStatus = StringUtils.trimToNull(query.getStatus().get());
+    String fFreeText = null;
+    if (query.getFreeText().isSome())
+      fFreeText = StringUtils.trimToNull(query.getFreeText().get());
 
     List<Service> services = new ArrayList<Service>();
     for (ServiceStatistics stats : serviceRegistry.getServiceStatistics()) {
       Service service = new Service(stats);
-      if (nameOpt.isSome() && !StringUtils.equalsIgnoreCase(service.getName(), nameOpt.get())) {
+      if (fName != null && !StringUtils.equalsIgnoreCase(service.getName(), fName))
         continue;
-      }
 
-      if (hostOpt.isSome() && !StringUtils.equalsIgnoreCase(service.getHost(), hostOpt.get())) {
+      if (fHostname != null && !StringUtils.equalsIgnoreCase(service.getHost(), fHostname))
         continue;
-      }
 
-      if (textOpt.isSome()) {
-        if (!StringUtils.containsIgnoreCase(service.getName(), textOpt.get())
-                && !StringUtils.containsIgnoreCase(service.getHost(), textOpt.get())) {
-          continue;
+      if (fStatus != null && !StringUtils.equalsIgnoreCase(service.getStatus().toString(), fStatus))
+        continue;
+
+      if (query.getActions().isSome()) {
+        ServiceState serviceState = service.getStatus();
+
+        if (query.getActions().get()) {
+          if (ServiceState.NORMAL == serviceState)
+            continue;
+        } else {
+          if (ServiceState.NORMAL != serviceState)
+            continue;
         }
       }
+
+      if (fFreeText != null && !StringUtils.containsIgnoreCase(service.getName(), fFreeText)
+                && !StringUtils.containsIgnoreCase(service.getHost(), fFreeText)
+                && !StringUtils.containsIgnoreCase(service.getStatus().toString(), fFreeText))
+        continue;
+
       services.add(service);
     }
     int total = services.size();
@@ -145,7 +165,7 @@ public class ServicesEndpoint {
     /** Completed model field name. */
     public static final String COMPLETED_NAME = "completed";
     /** Host model field name. */
-    public static final String HOST_NAME = "host";
+    public static final String HOST_NAME = "hostname";
     /** MeanQueueTime model field name. */
     public static final String MEAN_QUEUE_TIME_NAME = "meanQueueTime";
     /** MeanRunTime model field name. */

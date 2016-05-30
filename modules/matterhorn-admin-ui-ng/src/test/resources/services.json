@@ -8,7 +8,7 @@
       "meanQueueTime": 0,
       "meanRunTime": 0,
       "queued": 0,
-      "host": "host1",
+      "hostname": "host1",
       "name": "service1",
       "completed": 0,
       "status": "NORMAL"
@@ -17,7 +17,7 @@
       "meanQueueTime": 456,
       "meanRunTime": 123,
       "queued": 3,
-      "host": "host1",
+      "hostname": "host1",
       "name": "service2",
       "completed": 5,
       "status": "ERROR"
@@ -26,7 +26,7 @@
       "meanQueueTime": 10,
       "meanRunTime": 30,
       "queued": 5,
-      "host": "host2",
+      "hostname": "host2",
       "name": "service3",
       "completed": 20,
       "status": "NORMAL"
@@ -35,7 +35,7 @@
       "meanQueueTime": 30,
       "meanRunTime": 10,
       "queued": 1,
-      "host": "host3",
+      "hostname": "host3",
       "name": "service4",
       "completed": 0,
       "status": "WARNING"
@@ -44,7 +44,7 @@
       "meanQueueTime": 0,
       "meanRunTime": 0,
       "queued": 0,
-      "host": "host2",
+      "hostname": "host2",
       "name": "service5",
       "completed": 10,
       "status": "NORMAL"
@@ -53,7 +53,7 @@
       "meanQueueTime": 60,
       "meanRunTime": 0,
       "queued": 1,
-      "host": "host4",
+      "hostname": "host4",
       "name": "service6",
       "completed": 0,
       "status": "NORMAL"
