@@ -11,9 +11,6 @@ angular.module('adminNg.controllers')
                 name:  'type',
                 label: 'SYSTEMS.JOBS.TABLE.TYPE'
             }, {
-                name:  'processingHost',
-                label: 'SYSTEMS.JOBS.TABLE.HOST_NAME'
-            }, {
                 name:  'status',
                 label: 'SYSTEMS.JOBS.TABLE.STATUS'
             }, {
