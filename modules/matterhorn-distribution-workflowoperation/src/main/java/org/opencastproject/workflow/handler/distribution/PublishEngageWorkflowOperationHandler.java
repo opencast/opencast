@@ -238,7 +238,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     String streamingTargetTags = StringUtils.trimToEmpty(op.getConfiguration(STREAMING_TARGET_TAGS));
     String streamingSourceFlavors = StringUtils.trimToEmpty(op.getConfiguration(STREAMING_SOURCE_FLAVORS));
     String streamingTargetSubflavor = StringUtils.trimToNull(op.getConfiguration(STREAMING_TARGET_SUBFLAVOR));
-    String republishStrategy = (workflowInstance.getCurrentOperation().getConfiguration(STRATEGY));
+    String republishStrategy = StringUtils.trimToEmpty(op.getConfiguration(STRATEGY));
 
     boolean checkAvailability = option(op.getConfiguration(CHECK_AVAILABILITY)).bind(trimToNone).map(toBool)
             .getOrElse(true);
