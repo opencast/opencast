@@ -16,6 +16,43 @@ Release Schedule
 |June 2nd - June 12th              |Final QA phase *(Check release readiness)*
 |June 15th                         |Release of Opencast 2.2
 
+How to Upgrade
+--------------
+
+1. Check out/download Opencast 2.2
+2. Stop your current Opencast instance
+3. Back up Opencast files and database (optional)
+4. Run the appropriate database upgrade script(s)
+     - `/docs/upgrade/2.1_to_2.2/`
+5. Review the configuration changes and adjust your configuration accordingly
+6. Update the third party tools as documented in the [installation docs](installation/index.md).
+7. Build Opencast 2.2
+8. Delete the `adminui` directory in your Opencast data directory.
+9. Start Opencast using the interactive script in `bin/start-opencast`
+10. Log-in to the Karaf console on your node where the search service is running (usually presentation node) 
+    and install the opencast-migration feature by entering: `feature:install opencast-migration`. 
+
+    *Make sure that your current engage search index contains all episodes. Retracted recordings will not be 
+    migrated.*
+11. Check the logs for errors!
+12. Restart Opencast service - you do not need to use the interactive start script.
+13. Reconstruct the Admin UI search index. There are two ways to reconstruct the index: 
+  
+  * By opening `http://localhost:8080/admin-ng/index/recreateIndex` in your browser.
+    The resulting page is empty but should return an HTTP status 200 (OK).
+  * By using the REST documentation, open "Admin UI - Index Endpoint" and use the testing form on `/recreateIndex`.
+    The resulting page is empty but should return an HTTP status 200 (OK).
+    You can find the REST documentation in the help-section of the Admin UI behind the *?*-symbol.
+
+### Configuration changes
+
+* In `org.opencastproject.organization-mh_default_org.cfg` the keyboard shortcut identifiers (starting with
+prop.player.shortcut.*) have been changed and some new shortcuts for the zoom feature have been added.
+If you want to re-use this config file from your 2.1 installation, please update this section.
+
+For more detailed information on the upgrade check the [upgrade documentation](upgrade/index.md).
+
+
 
 Opencast 2.1: Release Notes
 ===========================

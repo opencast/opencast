@@ -313,30 +313,32 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
     try {
       op = Operation.valueOf(job.getOperation());
 
-      switch (arguments.size()) {
-        case 5:
-          strAux = arguments.remove(4);
-          expectedType = (strAux == null) ? null : Type.valueOf(strAux);
-          outFileName = StringUtils.trimToNull(arguments.remove(3));
-          if (((outFileName != null) && (expectedType == null)) || ((outFileName == null) && (expectedType != null)))
-            throw new ExecuteException("The output type and filename must be both specified");
-          outFileName = (outFileName == null) ? null : job.getId() + "_" + outFileName;
+      int nargs = arguments.size();
 
-        case 3:
-          switch (op) {
-            case Execute_Mediapackage:
-              mp = MediaPackageParser.getFromXml(arguments.remove(2));
-              return doProcess(arguments, mp, outFileName, expectedType);
-            case Execute_Element:
-              element = MediaPackageElementParser.getFromXml(arguments.remove(2));
-              return doProcess(arguments, element, outFileName, expectedType);
-            default:
-              throw new IllegalStateException("Don't know how to handle operation '" + job.getOperation() + "'");
-          }
+      if (nargs != 3 && nargs != 5) {
+        throw new IndexOutOfBoundsException("Incorrect number of parameters for operation execute_" + op + ": "
+                + arguments.size());
+      }
+      if (nargs == 5) {
+        strAux = arguments.remove(4);
+        expectedType = (strAux == null) ? null : Type.valueOf(strAux);
+        outFileName = StringUtils.trimToNull(arguments.remove(3));
+        if ((StringUtils.isNotBlank(outFileName) && (expectedType == null))
+            || (StringUtils.isBlank(outFileName) && (expectedType != null))) {
+          throw new ExecuteException("The output type and filename must be both specified");
+        }
+        outFileName = (outFileName == null) ? null : job.getId() + "_" + outFileName;
+      }
 
+      switch (op) {
+        case Execute_Mediapackage:
+          mp = MediaPackageParser.getFromXml(arguments.remove(2));
+          return doProcess(arguments, mp, outFileName, expectedType);
+        case Execute_Element:
+          element = MediaPackageElementParser.getFromXml(arguments.remove(2));
+          return doProcess(arguments, element, outFileName, expectedType);
         default:
-          throw new IndexOutOfBoundsException("Incorrect number of parameters for operation execute_" + op + ": "
-                  + arguments.size());
+          throw new IllegalStateException("Don't know how to handle operation '" + job.getOperation() + "'");
       }
 
     } catch (MediaPackageException e) {
@@ -559,26 +561,26 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
   /**
    * Returns a list of strings broken on whitespace characters except where those whitespace characters are escaped or
    * quoted.
-   * 
+   *
    * @return list of individual arguments
    */
   private List<String> splitParameters(String input) {
 
     // This delimiter matches any non-escaped quote
-    final String QUOTE_DELIM = "(?<!\\\\)\"";
+    final String quoteDelim = "(?<!\\\\)\"";
 
     // This delimiter matches any number of non-escaped spaces
-    final String SPACE_DELIM = "((?<!\\\\)\\s)+";
+    final String spaceDelim = "((?<!\\\\)\\s)+";
 
     ArrayList<String> parsedInput = new ArrayList<String>();
     boolean quoted = false;
 
-    for (String token1 : input.split(QUOTE_DELIM))
+    for (String token1 : input.split(quoteDelim))
       if (quoted) {
         parsedInput.add(token1);
         quoted = false;
       } else {
-        for (String token2 : token1.split(SPACE_DELIM))
+        for (String token2 : token1.split(spaceDelim))
           // This ignores empty tokens if quotes are at the beginning or the end of the string
           if (!token2.isEmpty())
             parsedInput.add(token2);

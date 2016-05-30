@@ -36,11 +36,6 @@
     "CHINESE":"Chinois"
   },
   "PREFERENCES":{
-    "CAPTION":"Paramètres",
-    "PROFILE":"Profil",
-    "NAME":"Nom",
-    "REPLYTO":"Courriel de réponse",
-    "SIGNATURE":"Signature",
     "TABLE":{
       "CAPTION":"Modifier la table",
       "SUBHEADING":"Sélectionner les données à afficher par défaut dans la table {{ tableName }}",
@@ -122,6 +117,8 @@
     "EMAIL_SENT":"Le messag a été envoyé",
     "EMAIL_NOT_SENT":"Le message n'a pas pu être envoyé",
     "CONFLICT_DETECTED":"Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
+    "CONFLICT_ALREADY_ENDED":"Scheduling error: The event has already ended.",
+    "CONFLICT_END_BEFORE_START":"Scheduling error: Schedule end has to be later than the start.",
     "INVALID_ACL_RULES":"Rules have to contain a valid role and read or\/and write right(s).",
     "MISSING_ACL_RULES":"Il faut au moins un rôle avec droit d'accès Lecture et Ecriture !",
     "SAVED_ACL_RULES":"Les règles d'accès ont été enregistrées.",
@@ -1400,13 +1397,16 @@
     },
     "JOBS":{
       "TABLE":{
+        "ACTION":"Actions",
         "CAPTION":"Tâches",
-        "TITLE":"Titre",
-        "SERIES":"Série",
-        "WORKFLOW":"Workflow",
+        "CREATED":"Créée",
+        "CREATOR":"Auteur",
+        "HOST_NAME":"Nom d'hôte",
+        "OPERATION":"Operation",
+        "STARTED":"Démarré",
         "STATUS":"Statut",
         "SUBMITTED":"Envoyée",
-        "ACTION":"Actions"
+        "TYPE":"Type"
       },
       "DETAILS":{
         "HEADER":"Détails de l'opération {{resourceId}}",
@@ -1439,6 +1439,7 @@
         "CAPTION":"Services",
         "STATUS":"Statut",
         "NAME":"Nom du service",
+        "HOST_NAME":"Nom d'hôte",
         "COMPLETED":"Tâches achevées",
         "RUNNING":"Tâches en cours",
         "QUEUED":"Tâches en attente",
@@ -1659,6 +1660,7 @@
   "TABLE_SUMMARY":"{{numberOfRows}} lignes",
   "TABLE_NO_RESULT":"Aucun résultat trouvé",
   "TABLE_LOADING":"Loading…",
+  "TABLE_EDIT":"Éditer",
   "PM":{
     "BLACKLIST":{
       "REASONS":{

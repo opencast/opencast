@@ -20,69 +20,46 @@
  */
 'use strict';
 
-/**
- *
- * HINT: form validation uses hidden fields: unresolvedConflictsValidation, conditionalFormValidation
- *
- */
 // Controller for creating a new event. This is a wizard, so it implements a state machine design pattern.
 angular.module('adminNg.controllers')
-.controller('NewEventCtrl', ['$scope', 'NewEventResource', 'Notifications', 'Modal',
-    'NewEventMetadata', 'NewEventSource', 'NewEventProcessing', 'NewEventAccess', 'NewEventSummary', '$translate', 'RegexService',
- function ($scope, NewEventResource, Notifications, Modal,
-           NewEventMetadata, NewEventSource, NewEventProcessing, NewEventAccess, NewEventSummary, $translate, RegexService) {
-
-     $scope.metadataStep = NewEventMetadata;
-     $scope.sourceStep = NewEventSource;
-     $scope.processingStep = NewEventProcessing.get();
-     $scope.accessStep = NewEventAccess;
-     $scope.summaryStep = NewEventSummary;
-
-     if (angular.isDefined($scope.metadataStep) && angular.isDefined($scope.accessStep)) {
-         $scope.accessStep.setMetadata($scope.metadataStep);
-     }
-
-     $scope.$on('wizard:stepChanged', function (old, current) {
-       if (old.targetScope.selectedStep.title !== current.step.title && old.targetScope.selectedStep.title === 'Processing') {
-         $scope.processingStep.save();
-       }
-
-       if (current.step.title === 'Access Policy') {
-         $scope.accessStep.loadSeriesAcl();
-       }
-
-       if (current.step.title === 'Source') {
-         $scope.sourceStep.loadCaptureAgents();
-       }
-     });
-
-     $scope.states = [
-         {name: 'metadata', stateController: $scope.metadataStep},
-         {name: 'source', stateController: $scope.sourceStep},
-         {name: 'processing', stateController: $scope.processingStep},
-         {name: 'access', stateController: $scope.accessStep},
-         {name: 'summary', stateController: $scope.summaryStep}
-     ];
-
-
+.controller('NewEventCtrl', ['$scope', 'NewEventStates', 'NewEventResource', 'EVENT_TAB_CHANGE', 'Notifications', 'Modal',
+ function ($scope, NewEventStates, NewEventResource, EVENT_TAB_CHANGE, Notifications, Modal) {
+    $scope.states = NewEventStates.get();
     // This is a hack, due to the fact that we need to read html from the server :(
     // Shall be banished ASAP
-     var resetStates = function () {
-         angular.forEach($scope.states, function(state)  {
-             if (angular.isDefined(state.stateController.reset)) {
-                 state.stateController.reset();
-             }
-         });
-     };
 
-    $scope.save = function () {
-        // required but without logic
-    };
+    var metadata,
+        accessController,
+        // Reset all the wizard states
+        resetStates = function () {
+            angular.forEach($scope.states, function(state)  {
+                if (angular.isDefined(state.stateController.reset)) {
+                    state.stateController.reset();
+                }
+            });
+        };
 
-    // translate the date patterns to a regex
-    $scope.translateToPattern = function(key) {
-        return RegexService.translateDateFormatToPattern($translate.instant(key));
-    };
+    angular.forEach($scope.states, function (state) {
+        if (state.stateController.isAccessState) {
+            accessController = state.stateController;
+        } else if (state.stateController.isMetadataState) {
+            metadata = state.stateController;
+        }
+    });
+
+    if (angular.isDefined(metadata) && angular.isDefined(accessController)) {
+        accessController.setMetadata(metadata);
+    }
+
+    $scope.$on(EVENT_TAB_CHANGE, function (event, args) {
+        if (args.old !== args.current && args.old.stateController.isProcessingState) {
+            args.old.stateController.save();
+        }
+
+        if (args.current.stateController.isAccessState) {
+            args.current.stateController.loadSeriesAcl();
+        }
+    });
 
     $scope.submit = function () {
         var messageId, userdata = { metadata: []}, ace = [];
@@ -93,7 +70,7 @@ angular.module('adminNg.controllers')
             (e || window.event).returnValue = confirmationMessage;     //Gecko + IE
             return confirmationMessage;                                //Webkit, Safari, Chrome etc.
         };
-
+        
         angular.forEach($scope.states, function (state) {
 
             if (state.stateController.isMetadataState) {
@@ -120,14 +97,6 @@ angular.module('adminNg.controllers')
                                 'role'   : policy.role
                             });
                         }
-
-                        angular.forEach(policy.actions.value, function(customAction){
-                           ace.push({
-                                'action' : customAction,
-                                'allow'  : true,
-                                'role'   : policy.role
-                           });
-                        });
                     }
                 });
 
@@ -158,5 +127,4 @@ angular.module('adminNg.controllers')
         // add message that never disappears
         messageId = Notifications.add('success', 'EVENTS_UPLOAD_STARTED', 'global', -1);
     };
-
- }]);
+}]);

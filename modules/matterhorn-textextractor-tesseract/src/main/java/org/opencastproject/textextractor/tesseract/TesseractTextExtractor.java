@@ -22,8 +22,6 @@
 
 package org.opencastproject.textextractor.tesseract;
 
-import static com.entwinemedia.fn.Equality.ne;
-
 import org.opencastproject.textextractor.api.TextExtractor;
 import org.opencastproject.textextractor.api.TextExtractorException;
 import org.opencastproject.textextractor.api.TextFrame;
@@ -145,7 +143,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
     try {
       final int exitCode = ProcessRunner.run(ProcessRunner.mk(binary, opts), fnLogDebug, new Pred<String>() {
         @Override public Boolean ap(String line) {
-          if (ne("Page 0", line.trim())) {
+          if (!line.trim().startsWith("Page") && !line.trim().startsWith("Tesseract Open Source OCR Engine")) {
             logger.warn(line);
           }
           return true;

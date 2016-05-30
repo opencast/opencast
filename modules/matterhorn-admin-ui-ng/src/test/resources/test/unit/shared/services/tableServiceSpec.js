@@ -85,64 +85,6 @@ describe('Table', function () {
         });
     });
 
-    describe('#mergeColumns', function(){
-        var availableColumns;
-
-        beforeEach(function(){
-            availableColumns = [{
-                name: 'status'
-            }, {
-                name: 'title',
-                deactivated: false
-            }, {
-                name: 'color',
-                deactivated: false
-            }];
-        });
-
-        it('returns only available columns', function(){
-            var storedColumns = [{
-                name: 'color',
-                deactivated: false
-            }, {
-                name: 'title',
-                deactivated: false
-            }, {
-                name: 'group',
-                deactivated: false
-            }];
-
-            var columns = Table.mergeColumns(storedColumns, availableColumns);
-
-            expect(columns).toEqual([{
-                name: 'color',
-                deactivated: false
-            }, {
-                name: 'title',
-                deactivated: false
-            }, {
-                name: 'status',
-                deactivated: false
-            }]);
-        });
-
-        it('returns the default columns when no stored columns are available', function(){
-            var columns = Table.mergeColumns(undefined, availableColumns);
-            expect(columns).toEqual(availableColumns);
-        });
-
-        it('returns empty columns without any columns given', function(){
-            expect(Table.mergeColumns(undefined, undefined)).toEqual([]);
-        });
-    });
-
-    describe('#getTableName', function(){
-        it('extracts the table name from the current url', function(){
-            spyOn($location, 'path').and.returnValue('/module/events');
-            expect(Table.getTableName()).toEqual('events');
-        });
-    });
-
     describe('#fetch', function () {
         beforeEach(function () {
             Table.resource = 'users';
