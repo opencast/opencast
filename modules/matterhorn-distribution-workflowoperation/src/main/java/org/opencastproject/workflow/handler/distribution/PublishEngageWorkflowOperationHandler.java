@@ -323,37 +323,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       }
 
       List<Job> jobs = new ArrayList<Job>();
-      switch (republishStrategy) {
-        case ("merge"):
-          //nothing to retract
-          break;
-        default:
-          //retract all published media , before publish
-          try {
-            for (String elementId : downloadElementIds) {
-              logger.info("Element distribution delay, sleeping for " + Integer.toString(distributionDelay));
-              Thread.sleep(distributionDelay);
-              Job job = downloadDistributionService.retract(CHANNEL_ID, mediaPackage, elementId);
-              if (job != null) {
-                jobs.add(job);
-              }
-            }
-            if (distributeStreaming) {
-              for (String elementId : streamingElementIds) {
-                Job job = streamingDistributionService.retract(CHANNEL_ID, mediaPackage, elementId);
-                if (job != null) {
-                  jobs.add(job);
-                }
-              }
-            }
-          } catch (DistributionException e) {
-            throw new WorkflowOperationException(e);
-          }
-          // Wait until all retraction jobs have returned
-          if (!waitForStatus(jobs.toArray(new Job[jobs.size()])).isSuccess()) {
-            throw new WorkflowOperationException("One of the retraction jobs did not complete successfully");
-          }
-      }
+
 //distribute Elements
       try {
         for (String elementId : downloadElementIds) {
@@ -389,8 +359,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       try {
         MediaPackage mediaPackageForSearch = getMediaPackageForSearchIndex(mediaPackage, jobs, downloadSubflavor,
                 targetDownloadTags, downloadElementIds, streamingSubflavor, streamingElementIds, targetStreamingTags);
-        //Check if it is allready publisched
-        if (isMediapackagePublished(mediaPackageForSearch)) {
+
           // MH-10216, check if only merging into existing mediapackage
 
           switch (republishStrategy) {
@@ -403,9 +372,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
               }
               break;
             default:
-              retractFromEngage(mediaPackage, mediaPackageForSearch);
+              retractFromEngage(mediaPackage);
           }
-        }
+
         if (!isPublishable(mediaPackageForSearch))
           throw new WorkflowOperationException("Media package does not meet criteria for publication");
 
@@ -628,13 +597,23 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     return hasTitle && hasTracks;
   }
 
-
-  protected boolean isMediapackagePublished(MediaPackage mediaPackage) {
-    SearchQuery query = new SearchQuery().withId(mediaPackage.toString());
+  protected MediaPackage getDistributedMediapackage(String mediaPackageID) throws WorkflowOperationException {
+    MediaPackage mediaPackage = null;
+    SearchQuery query = new SearchQuery().withId(mediaPackageID);
     query.includeEpisodes(true);
     query.includeSeries(false);
     SearchResult result = searchService.getByQuery(query);
-    return result.size() == 1;
+    if (result.size() == 0) {
+      logger.info("The search service doesn't know mediapackage {}.", mediaPackageID);
+      return mediaPackage; // i.e. null
+    } else if (result.size() > 1) {
+      logger.warn("More than one mediapackage with id {} returned from search service", mediaPackageID);
+      throw new WorkflowOperationException("More than one mediapackage with id " + mediaPackageID + " found");
+    } else {
+      // else, merge the new with the existing (new elements will overwrite existing elements)
+      mediaPackage = result.getItems()[0].getMediaPackage();
+    }
+    return mediaPackage;
   }
 
 
@@ -648,20 +627,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    */
   protected MediaPackage merge(MediaPackage mediaPackageForSearch) throws WorkflowOperationException {
     MediaPackage mergedMediaPackage = null;
-      SearchQuery query = new SearchQuery().withId(mediaPackageForSearch.toString());
-      query.includeEpisodes(true);
-      query.includeSeries(false);
-      SearchResult result = searchService.getByQuery(query);
-      if (result.size() == 0) {
-        logger.info("The search service doesn't know mediapackage {}, cannot be republished.", mediaPackageForSearch);
-        return mergedMediaPackage; // i.e. null
-      } else if (result.size() > 1) {
-        logger.warn("More than one mediapackage with id {} returned from search service", mediaPackageForSearch);
-        throw new WorkflowOperationException("More than one mediapackage with id " + mediaPackageForSearch + " found");
-      } else {
-        // else, merge the new with the existing (new elements will overwrite existing elements)
-        mergedMediaPackage = mergePackages(mediaPackageForSearch, result.getItems()[0].getMediaPackage());
-      }
+    mergedMediaPackage = mergePackages(mediaPackageForSearch,
+            getDistributedMediapackage(mediaPackageForSearch.toString()));
 
     return mergedMediaPackage;
   }
@@ -705,30 +672,50 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
  * Removes Mediapackage from Searchindex
  * @param mediaPackage Mediapackage
  * @param mediaPackageForSearch Mediapackage prepared for searchIndex
- * @throws WorkflowOperationException 
+ * @throws WorkflowOperationException
  */
-    private void retractFromEngage(MediaPackage mediaPackage, MediaPackage mediaPackageForSearch) throws WorkflowOperationException {
-        for (Publication publicationEelement : mediaPackage.getPublications()) {
-            if (CHANNEL_ID.equals(publicationEelement.getChannel())) {
-                mediaPackage.remove(publicationEelement);
-            }
-        }
-        Job retractJob = null;
-        try {
-            logger.info("Retracting already publisched Elements for Mediapackage: {}", mediaPackageForSearch.getIdentifier().toString());
-            retractJob = searchService.delete(mediaPackageForSearch.getIdentifier().toString());
-            if (!waitForStatus(retractJob).isSuccess()) {
-                throw new WorkflowOperationException("Mediapackage " + mediaPackageForSearch.getIdentifier()
-                        + " could not be retracted");
-            }
-        } catch (SearchException e) {
-            throw new WorkflowOperationException("Error retracting media package", e);
-
-        } catch (UnauthorizedException ex) {
-         logger.error("Retraction failed of Mediapackage: { }", mediaPackageForSearch.getIdentifier().toString() , ex);
-        } catch (NotFoundException ex) {
-            logger.error("Retraction failed of Mediapackage: { }", mediaPackageForSearch.getIdentifier().toString(), ex);
+  private void retractFromEngage(MediaPackage mediaPackage) throws WorkflowOperationException {
+    for (Publication publicationElement : mediaPackage.getPublications()) {
+        if (CHANNEL_ID.equals(publicationElement.getChannel())) {
+            mediaPackage.remove(publicationElement);
         }
     }
+    List<Job> jobs = new ArrayList<Job>();
+    try {
+      MediaPackage distributedMediaPackage = getDistributedMediapackage(mediaPackage.toString());
+      if (distributedMediaPackage != null) {
+        for (MediaPackageElement element : distributedMediaPackage.getElements()) {
+         logger.info("Element distribution delay, sleeping for " + Integer.toString(distributionDelay));
+         Thread.sleep(distributionDelay);
+         Job retractDownloadJob = downloadDistributionService.retract(CHANNEL_ID, distributedMediaPackage, element.getIdentifier());
+         if (retractDownloadJob != null) {
+           jobs.add(retractDownloadJob);
+         }
+         if (distributeStreaming) {
+           Job retractStreamingJob = streamingDistributionService.retract(CHANNEL_ID, distributedMediaPackage, element.getIdentifier());
+           if (retractStreamingJob != null) {
+             jobs.add(retractStreamingJob);
+           }
+         }
+        }
+        Job deleteSearchJob = null;
+        logger.info("Retracting already publisched Elements for Mediapackage: {}", mediaPackage.getIdentifier().toString());
+        deleteSearchJob = searchService.delete(mediaPackage.getIdentifier().toString());
+        if (deleteSearchJob != null) {
+          jobs.add(deleteSearchJob);
+        }
+      }
+      // Wait until all retraction jobs have returned
+      if (!waitForStatus(jobs.toArray(new Job[jobs.size()])).isSuccess()) {
+        throw new WorkflowOperationException("One of the retraction jobs did not complete successfully");
+      }
+    } catch (DistributionException e) {
+      throw new WorkflowOperationException(e);
+    } catch (SearchException e) {
+      throw new WorkflowOperationException("Error retracting media package", e);
+    } catch (UnauthorizedException | NotFoundException | InterruptedException ex) {
+      logger.error("Retraction failed of Mediapackage: { }", mediaPackage.getIdentifier().toString(), ex);
+    }
+  }
 
 }
