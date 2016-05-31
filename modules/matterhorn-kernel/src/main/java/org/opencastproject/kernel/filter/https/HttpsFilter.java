@@ -21,6 +21,9 @@
 
 package org.opencastproject.kernel.filter.https;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 
 import javax.servlet.Filter;
@@ -35,6 +38,8 @@ import javax.servlet.http.HttpServletRequest;
  * This filter is wrapping <code>HttpServletRequest</code>s in such a way that they feature the https scheme.
  */
 public class HttpsFilter implements Filter {
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(HttpsFilter.class);
 
   /** Request header that is set when behind an SSL proxy */
   public static final String X_FORWARDED_SSL = "X-Forwarded-SSL";
@@ -53,6 +58,7 @@ public class HttpsFilter implements Filter {
 
     // Check if the forwarded SSL header is set
     if (X_FORWARDED_SSL_VALUE.equalsIgnoreCase(httpReqquest.getHeader(X_FORWARDED_SSL))) {
+      logger.debug("Found forwarded SSL header");
       httpReqquest = new HttpsRequestWrapper(httpReqquest);
     }
     chain.doFilter(httpReqquest, response);

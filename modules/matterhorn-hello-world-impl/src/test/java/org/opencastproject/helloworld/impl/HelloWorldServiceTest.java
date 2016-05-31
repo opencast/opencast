@@ -23,9 +23,9 @@ package org.opencastproject.helloworld.impl;
 
 import org.opencastproject.helloworld.api.HelloWorldService;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.Assert;
 
 /**
  * Test class for Hello World Tutorial

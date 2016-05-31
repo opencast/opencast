@@ -22,6 +22,8 @@
 package org.opencastproject.kernel.filter.proxy;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -38,6 +40,8 @@ import javax.servlet.http.HttpServletRequest;
  * original IP.
  */
 public class TransparentProxyFilter implements Filter {
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(TransparentProxyFilter.class);
 
   /** Request header that is set when behind a proxy */
   public static final String X_FORWARDED_FOR = "X-Forwarded-For";
@@ -50,8 +54,9 @@ public class TransparentProxyFilter implements Filter {
           ServletException {
     HttpServletRequest httpReqquest = (HttpServletRequest) request;
 
-    // Check if the forwarded SSL header is set
+    // Check if the X-Forwarded-For header is set
     if (StringUtils.isNotBlank(httpReqquest.getHeader(X_FORWARDED_FOR))) {
+      logger.debug("Found X-Forwarded-For header. Resetting source IP");
       httpReqquest = new TransparentProxyRequestWrapper(httpReqquest);
     }
 

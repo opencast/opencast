@@ -41,7 +41,7 @@ public class AgentsListProvider implements ResourceListProvider {
   public static final String NAME = PROVIDER_PREFIX + ".NAME";
   public static final String STATUS = PROVIDER_PREFIX + ".STATUS";
 
-  private static final String[] NAMES = { PROVIDER_PREFIX, NAME };
+  private static final String[] NAMES = { NAME, STATUS };
   private static final Logger logger = LoggerFactory.getLogger(AgentsListProvider.class);
 
   /** The capture agent service */

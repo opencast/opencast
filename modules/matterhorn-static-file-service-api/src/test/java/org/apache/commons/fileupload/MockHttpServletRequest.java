@@ -1,3 +1,4 @@
+// CHECKSTYLE:OFF
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements. See the NOTICE file distributed with
@@ -14,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// CHECKSTYLE:ON
 package org.apache.commons.fileupload;
 
 import java.io.BufferedReader;
@@ -521,7 +523,7 @@ public class MockHttpServletRequest implements HttpServletRequest {
     /**
      * Creates a new instance, which returns the given streams data.
      */
-    public MyServletInputStream(InputStream pStream) {
+    MyServletInputStream(InputStream pStream) {
       in = pStream;
     }
 

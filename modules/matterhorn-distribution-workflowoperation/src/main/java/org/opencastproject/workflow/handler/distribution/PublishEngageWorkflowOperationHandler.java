@@ -61,6 +61,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.client.utils.URIUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -106,7 +107,10 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   //itbwpdk start
   /** Distribution delay between elements for engage */
-  private static final String DISTRIBUTION_DELAY__PROPERTY = "org.opencastproject.distribution.delay";
+  private static final String DISTRIBUTION_DELAY_PROPERTY = "org.opencastproject.distribution.delay";
+
+  /** Distribution delay default value */
+  private static final int DISTRIBUTION_DELAY_DEFAULT = 1000;
 
   /** Distribution delay between elements for engage */
   private int distributionDelay = 0;
@@ -193,17 +197,11 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     super.activate(cc);
     BundleContext bundleContext = cc.getBundleContext();
 
-    // Get element distribution delay
-    if (StringUtils.isNotBlank(bundleContext.getProperty(DISTRIBUTION_DELAY__PROPERTY))) {
-      distributionDelay = Integer.parseInt(bundleContext.getProperty(DISTRIBUTION_DELAY__PROPERTY));
-    } else {
-      distributionDelay = 0;
-    }
-
+    // Get configuration
+    distributionDelay = NumberUtils.toInt(bundleContext.getProperty(DISTRIBUTION_DELAY_PROPERTY),
+        DISTRIBUTION_DELAY_DEFAULT);
     serverUrl = UrlSupport.url(bundleContext.getProperty(SERVER_URL_PROPERTY));
-
-    if (StringUtils.isNotBlank(bundleContext.getProperty(STREAMING_URL_PROPERTY)))
-      distributeStreaming = true;
+    distributeStreaming = StringUtils.isNotBlank(bundleContext.getProperty(STREAMING_URL_PROPERTY));
   }
 
   /**
