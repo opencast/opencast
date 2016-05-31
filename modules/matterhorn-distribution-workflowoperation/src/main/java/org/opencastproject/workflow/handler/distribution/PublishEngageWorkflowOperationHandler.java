@@ -360,20 +360,20 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         MediaPackage mediaPackageForSearch = getMediaPackageForSearchIndex(mediaPackage, jobs, downloadSubflavor,
                 targetDownloadTags, downloadElementIds, streamingSubflavor, streamingElementIds, targetStreamingTags);
 
-          // MH-10216, check if only merging into existing mediapackage
-
-          switch (republishStrategy) {
-            case ("merge"):
-              // merge() returns merged mediapackage or null mediaPackage is not published
-              mediaPackageForSearch = merge(mediaPackageForSearch);
-              if (mediaPackageForSearch == null) {
-                logger.info("Skipping republish for {} since it is not currently published", mediaPackage.getIdentifier().toString());
-                return createResult(mediaPackage, Action.SKIP);
-              }
-              break;
-            default:
-              retractFromEngage(mediaPackage);
-          }
+        // MH-10216, check if only merging into existing mediapackage
+        removePublicationElement(mediaPackage);
+        switch (republishStrategy) {
+          case ("merge"):
+            // merge() returns merged mediapackage or null mediaPackage is not published
+            mediaPackageForSearch = merge(mediaPackageForSearch);
+            if (mediaPackageForSearch == null) {
+              logger.info("Skipping republish for {} since it is not currently published", mediaPackage.getIdentifier().toString());
+              return createResult(mediaPackage, Action.SKIP);
+            }
+            break;
+          default:
+            retractFromEngage(mediaPackage);
+        }
 
         if (!isPublishable(mediaPackageForSearch))
           throw new WorkflowOperationException("Media package does not meet criteria for publication");
@@ -667,6 +667,15 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
     return mergedMediaPackage;
   }
+
+  private void removePublicationElement(MediaPackage mediaPackage) {
+    for (Publication publicationElement : mediaPackage.getPublications()) {
+        if (CHANNEL_ID.equals(publicationElement.getChannel())) {
+            mediaPackage.remove(publicationElement);
+        }
+    }
+  }
+
 /**
  * Removes every Publication for Searchindex from Mediapackage
  * Removes Mediapackage from Searchindex
@@ -675,11 +684,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
  * @throws WorkflowOperationException
  */
   private void retractFromEngage(MediaPackage mediaPackage) throws WorkflowOperationException {
-    for (Publication publicationElement : mediaPackage.getPublications()) {
-        if (CHANNEL_ID.equals(publicationElement.getChannel())) {
-            mediaPackage.remove(publicationElement);
-        }
-    }
     List<Job> jobs = new ArrayList<Job>();
     try {
       MediaPackage distributedMediaPackage = getDistributedMediapackage(mediaPackage.toString());
