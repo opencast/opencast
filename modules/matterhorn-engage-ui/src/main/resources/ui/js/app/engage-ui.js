@@ -80,7 +80,7 @@ function   ($) {
       return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en-US";
     }
 
-    function translate() {
+    function loadAndTranslate(callbackFunction) {
       console.log("translate");
       var lang = detectLanguage();
       var jsonstr = window.location.origin + "/engage/ui/language/"+lang+".json";
@@ -99,48 +99,46 @@ function   ($) {
         error: function(jqXHR, textStatus, errorThrown) {
           log("Something went wrong.")
         }
-      });
+      }).done(function(){
+        $.ajax({
+          // load translation
+          url: jsonstr,
+          dataType: "json",
+          success: function(data) {
+            // append to template and insert
+            $("body").append(template(data));
 
-
-      // load translation
-      $.ajax({
-        url: jsonstr,
-        dataType: "json",
-        success: function(data) {
-          // append to template and insert
-          $("body").append(template(data));
-
-          // set variables
-          title_enterUsernamePassword = data.login_title;
-          placeholder_username = data.username;
-          placeholder_password = data.password;
-          placeholder_rememberMe = data.remember_me;
-          msg_enterUsernamePassword = data.login_request;
-          msg_html_sthWentWrong = "<h2>"+data.sthWentWrong+"<h2>";
-          msg_html_noepisodes = "<h2>"+data.no_episodes+"</h2>";
-          msg_html_noseries = "<h2>"+data.no_series+"</h2>";
-          msg_html_loading = "<h2>"+data.loading+"</h2>";
-          msg_html_mediapackageempty = "<h2>"+data.no_episodes+"</h2>";
-          msg_html_nodata = "<h2>"+data.no_data+"</h2>";
-          msg_loginSuccessful = data.login_success;
-          msg_loginFailed = data.login_failed;
-          msg_not_logged_in = data.not_logged_in;
-          },
-          error: function(jqXHR, textStatus, errorThrown) {
-            log("Failed to localize. Try loading default.");
-            $.ajax({
-              url: window.location.origin + "/engage/ui/language/en-US.json",
-              dataType: "json",
-              success: function(data) {
-                $("body").append(template(data));
-              },
-              error: function(jqXHR, textStatus, errorThrown) {
-                log("Something went terrible wrong.")
-              }
-            });
-
-          }
-        });
+            // set variables
+            title_enterUsernamePassword = data.login_title;
+            placeholder_username = data.username;
+            placeholder_password = data.password;
+            placeholder_rememberMe = data.remember_me;
+            msg_enterUsernamePassword = data.login_request;
+            msg_html_sthWentWrong = "<h2>"+data.sthWentWrong+"<h2>";
+            msg_html_noepisodes = "<h2>"+data.no_episodes+"</h2>";
+            msg_html_noseries = "<h2>"+data.no_series+"</h2>";
+            msg_html_loading = "<h2>"+data.loading+"</h2>";
+            msg_html_mediapackageempty = "<h2>"+data.no_episodes+"</h2>";
+            msg_html_nodata = "<h2>"+data.no_data+"</h2>";
+            msg_loginSuccessful = data.login_success;
+            msg_loginFailed = data.login_failed;
+            msg_not_logged_in = data.not_logged_in;
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+              log("Failed to localize. Try loading default.");
+              $.ajax({
+                url: window.location.origin + "/engage/ui/language/en-US.json",
+                dataType: "json",
+                success: function(data) {
+                  $("body").append(template(data));
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                  log("Something went terrible wrong.")
+                }
+              });
+            }
+          });
+      }).always(callbackFunction);
       }
 
     function GetURLParameter(sParam) {
@@ -161,7 +159,6 @@ function   ($) {
     function initialize() {
 
         $.enableLogging(true);
-        translate();
 
         $("#" + id_mhlogolink).attr("href", location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''));
         getInfo();
@@ -249,7 +246,7 @@ function   ($) {
     }
 
     $(document).ready(function() {
-        initialize();
+        loadAndTranslate(initialize);
     });
 
     function login() {
@@ -346,6 +343,7 @@ function   ($) {
     }
 
     function getInfo() {
+      console.log("get info");
         $.ajax({
             url: infoMeURL,
             dataType: "json",
@@ -408,6 +406,7 @@ function   ($) {
         /* pagination */
         $($next).on("click", function() {
             log("Click on Next");
+
             if ($(this).hasClass("disabled")) {
                 return;
             };
