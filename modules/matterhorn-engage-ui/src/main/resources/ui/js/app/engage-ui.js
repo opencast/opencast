@@ -70,7 +70,6 @@ function   ($) {
     var $name_loginlogout = "#name-loginlogout";
     var $glyph_loginlogout = "#glyph-loginlogout";
 
-
     function log(args) {
         if (debug && window.console) {
             console.log(args);
@@ -82,35 +81,52 @@ function   ($) {
     }
 
     function translate() {
+      console.log("translate");
       var lang = detectLanguage();
-      //var jsonstr = window.location.origin + "/engage/ui/language/media-module-"+lang+".json";
+      var jsonstr = window.location.origin + "/engage/ui/language/"+lang+".json";
       console.log("Detected Language: " + lang);
-      // Uses query localize to translate html document, skip default en language
-      //$("[data-localize]").localize("language/media-module", {skipLanguage : ["en", "en-US"]});
-        // $.ajax({
-        //   url: jsonstr,
-        //   dataType: "json",
-        //   success: function(data) {
-        //     title_enterUsernamePassword = data.login_title;
-        //     placeholder_username = data.username;
-        //     placeholder_password = data.password;
-        //     placeholder_rememberMe = data.remember_me;
-        //     msg_enterUsernamePassword = data.login_request;
-        //     msg_html_sthWentWrong = "<h2>"+data.sthWentWrong+"<h2>";
-        //     msg_html_noepisodes = "<h2>"+data.no_episodes+"</h2>";
-        //     msg_html_noseries = "<h2>"+data.no_series+"</h2>";
-        //     msg_html_loading = "<h2>"+data.loading+"</h2>";
-        //     msg_html_mediapackageempty = "<h2>"+data.no_episodes+"</h2>";
-        //     msg_html_nodata = "<h2>"+data.no_data+"</h2>";
-        //     msg_loginSuccessful = data.login_success;
-        //     msg_loginFailed = data.login_failed;
-        //     msg_not_logged_in = data.not_logged_in;
-        //   },
-        //     error: function(jqXHR, textStatus, errorThrown) {
-        //       log("Failed to localize. Using default.");
-        //     }
-        //   });
-    }
+
+      var template;
+      var templateData;
+
+      // load template
+      $.ajax({
+        url: window.location.origin + "/engage/ui/template/desktop.html",
+        dataType: "html",
+        success: function(data) {
+          template = _.template(data);
+        }
+      });
+      console.log(template);
+
+      // load translation
+      $.ajax({
+        url: jsonstr,
+        dataType: "json",
+        success: function(data) {
+
+          $("body").append(template(data));
+
+          title_enterUsernamePassword = data.login_title;
+          placeholder_username = data.username;
+          placeholder_password = data.password;
+          placeholder_rememberMe = data.remember_me;
+          msg_enterUsernamePassword = data.login_request;
+          msg_html_sthWentWrong = "<h2>"+data.sthWentWrong+"<h2>";
+          msg_html_noepisodes = "<h2>"+data.no_episodes+"</h2>";
+          msg_html_noseries = "<h2>"+data.no_series+"</h2>";
+          msg_html_loading = "<h2>"+data.loading+"</h2>";
+          msg_html_mediapackageempty = "<h2>"+data.no_episodes+"</h2>";
+          msg_html_nodata = "<h2>"+data.no_data+"</h2>";
+          msg_loginSuccessful = data.login_success;
+          msg_loginFailed = data.login_failed;
+          msg_not_logged_in = data.not_logged_in;
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            log("Failed to localize. Using default.");
+          }
+        });
+      }
 
     function GetURLParameter(sParam) {
       var sPageURL = window.location.search.substring(1);
@@ -128,8 +144,10 @@ function   ($) {
     };
 
     function initialize() {
+
         $.enableLogging(true);
         translate();
+
         $("#" + id_mhlogolink).attr("href", location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''));
         getInfo();
         registerHandler();
@@ -215,7 +233,7 @@ function   ($) {
 
     }
 
-    $(window).load(function() {
+    $(document).ready(function() {
         initialize();
     });
 
