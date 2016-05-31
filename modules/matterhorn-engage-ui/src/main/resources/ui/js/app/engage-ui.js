@@ -95,18 +95,22 @@ function   ($) {
         dataType: "html",
         success: function(data) {
           template = _.template(data);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          log("Something went wrong.")
         }
       });
-      console.log(template);
+
 
       // load translation
       $.ajax({
         url: jsonstr,
         dataType: "json",
         success: function(data) {
-
+          // append to template and insert
           $("body").append(template(data));
 
+          // set variables
           title_enterUsernamePassword = data.login_title;
           placeholder_username = data.username;
           placeholder_password = data.password;
@@ -123,7 +127,18 @@ function   ($) {
           msg_not_logged_in = data.not_logged_in;
           },
           error: function(jqXHR, textStatus, errorThrown) {
-            log("Failed to localize. Using default.");
+            log("Failed to localize. Try loading default.");
+            $.ajax({
+              url: window.location.origin + "/engage/ui/language/en-US.json",
+              dataType: "json",
+              success: function(data) {
+                $("body").append(template(data));
+              },
+              error: function(jqXHR, textStatus, errorThrown) {
+                log("Something went terrible wrong.")
+              }
+            });
+
           }
         });
       }

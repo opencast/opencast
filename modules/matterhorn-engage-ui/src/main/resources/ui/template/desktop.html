@@ -1,182 +1,182 @@
 <div class="navbar navbar-default navbar-fixed-top" role="navigation" role="menubar">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            </button>
-            <div class="navbar-brand">
-                <a href="#" id="mhlogolink">
-                    <img id="headerLogo" src="" class="img-responsive">
-                </a>
-            </div>
-            <h1 class="navbar-brand">Media Module</h1>
-        </div>
-        <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav" id="nav-switch" role="menu">
-                <li id="navbarEpisodes" data-search="episodes" class="active">
-                    <a href="?e=1&p=1" role="menuitem" tabindex="1" data-localize="episodes">Episodes</a>
-                </li>
-                <li id="navbarSeries" data-search="series">
-                    <a href="?s=1&p=1" role="menuitem" tabindex="2" data-localize="series">Series</a>
-                </li>
-            </ul>
-            <ul class="navbar-form navbar-right" id="nav-dropdownLoginLogout">
-  <div class="btn-group">
-<button id="dropdownMenuLoginLogoutInfo" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" tabindex="6">
-<span class="glyphicon glyphicon-user"></span>
-<span id="nav-username">
-  Anonymous
-</span>
-<span class="caret"></span>
-</button>
-<ul class="dropdown-menu" role="menu">
-<li role="presentation">
-  <a id="nav-loginlogoutLink" role="menuitem" tabindex="-1" href="#">
-                      <span id="glyph-loginlogout" class="glyphicon glyphicon-log-in"></span>
-    <span id="name-loginlogout">Login</span>
-  </a>
-</li>
-</ul>
-  </div>
-            </ul>
-            <form method="get" id="oc-search-form" class="navbar-form navbar-right" role="search" autocomplete="off" accept-charset="UTF-8">
-                <div class="form-group">
-                    <input id="searchInput" type="text" class="form-control" placeholder="Search" name="q" tabindex="3">
-                </div>
-                <div class="btn-group">
-                    <button id="buttonSorting" class="btn btn-default dropdown-toggle" type="button"
-                      data-toggle="dropdown" class="btn btn-default dropdown-toggle" aria-label="Sorting"
-                      tabindex="4">
-                        <%= sort %>
-                        <span class="caret"></span>
-                    </button>
-                    <ul id="dropdownMenuSorting" class="dropdown-menu" role="menu" tabindex="-1">
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_CREATED_DESC" value="DATE_CREATED_DESC" checked="checked">
-                            <label for="DATE_CREATED_DESC" data-localize="recording_date_new">
-                                Recording Date (newer)
-                            </label>
-                        </li>
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_CREATED" value="DATE_CREATED">
-                            <label for="DATE_CREATED" data-localize="recording_date_old">
-                                Recording Date (older)
-                            </label>
-                        </li>
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_PUBLISHED_DESC" value="DATE_PUBLISHED_DESC">
-                            <label for="DATE_PUBLISHED_DESC"  data-localize="publishing_date_new">
-                                Publishing Date (newer)
-                            </label>
-                        </li>
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_PUBLISHED" value="DATE_PUBLISHED">
-                            <label for="DATE_PUBLISHED" data-localize="publishing_date_old">
-                                Publishing Date (older)
-                            </label>
-                        </li>
-                        <li role="presentation" class="divider"></li>
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="TITLE" value="TITLE">
-                            <label for="TITLE" data-localize="title_a_z">
-                                Title (A-Z)
-                            </label>
-                        </li>
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="TITLE_DESC" value="TITLE_DESC">
-                            <label for="TITLE_DESC" data-localize="title_z_a">
-                                Title (Z-A)
-                            </label>
-                        </li>
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="CREATOR" value="CREATOR">
-                            <label for="CREATOR" data-localize="author_a_z">
-                                Author (A-Z)
-                            </label>
-                        </li>
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="CREATOR_DESC" value="CREATOR_DESC">
-                            <label for="CREATOR_DESC" data-localize="author_z_a">
-                                Author (Z-A)
-                            </label>
-                        </li>
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="CONTRIBUTOR" value="CONTRIBUTOR">
-                            <label for="CONTRIBUTOR" data-localize="contributor_a_z">
-                                Contributor (A-Z)
-                            </label>
-                        </li>
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="CONTRIBUTOR_DESC" value="CONTRIBUTOR_DESC">
-                            <label for="CONTRIBUTOR_DESC" data-localize="contributor_z_a">
-                                Contributor (Z-A)
-                            </label>
-                        </li>
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="PUBLISHER" value="PUBLISHER">
-                            <label for="PUBLISHER" data-localize="publisher_a_z">
-                                Publisher (A-Z)
-                            </label>
-                        </li>
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="PUBLISHER_DESC" value="PUBLISHER_DESC">
-                            <label for="PUBLISHER_DESC" data-localize="publisher_z_a">
-                                Publisher (Z-A)
-                            </label>
-                        </li>
-                        <li role="presentation" class="divider"></li>
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="SERIES_ID" value="SERIES_ID">
-                            <label for="SERIES_ID" data-localize="series">
-                                Series
-                            </label>
-                        </li>
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="LANGUAGE" value="LANGUAGE">
-                            <label for="LANGUAGE" data-localize="language">
-                                Language
-                            </label>
-                        </li>
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="LICENSE" value="LICENSE">
-                            <label for="LICENSE" data-localize="license">
-                                License
-                            </label>
-                        </li>
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="SUBJECT" value="SUBJECT">
-                            <label for="SUBJECT" data-localize="subject">
-                                Subject
-                            </label>
-                        </li>
-                        <li role="presentation">
-                            <input type="radio" class="oc-sort-dropdown" name="sort" id="DESCRIPTION" value="DESCRIPTION">
-                            <label for="DESCRIPTION" data-localize="description">
-                                Description
-                            </label>
-                        </li>
-                    </ul>
-                </div>
-                <button id="oc-search-btn" type="submit"
-                class="btn btn-default" tabindex="5" data-localize="search" formenctype="multipart/form-data">
-                Search
-                </button>
-            </form>
-        </div>
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      </button>
+      <div class="navbar-brand">
+        <a href="#" id="mhlogolink">
+        <img id="headerLogo" src="" class="img-responsive">
+        </a>
+      </div>
+      <h1 class="navbar-brand">Media Module</h1>
     </div>
+    <div class="collapse navbar-collapse">
+      <ul class="nav navbar-nav" id="nav-switch" role="menu">
+        <li id="navbarEpisodes" data-search="episodes" class="active">
+          <a href="?e=1&p=1" role="menuitem" tabindex="1"><%= episodes %></a>
+        </li>
+        <li id="navbarSeries" data-search="series">
+          <a href="?s=1&p=1" role="menuitem" tabindex="2"><%= series %></a>
+        </li>
+      </ul>
+      <ul class="navbar-form navbar-right" id="nav-dropdownLoginLogout">
+        <div class="btn-group">
+          <button id="dropdownMenuLoginLogoutInfo" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" tabindex="6">
+          <span class="glyphicon glyphicon-user"></span>
+          <span id="nav-username">
+          Anonymous
+          </span>
+          <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li role="presentation">
+              <a id="nav-loginlogoutLink" role="menuitem" tabindex="-1" href="#">
+              <span id="glyph-loginlogout" class="glyphicon glyphicon-log-in"></span>
+              <span id="name-loginlogout">Login</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </ul>
+      <form method="get" id="oc-search-form" class="navbar-form navbar-right" role="search" autocomplete="off" accept-charset="UTF-8">
+        <div class="form-group">
+          <input id="searchInput" type="text" class="form-control" placeholder="Search" name="q" tabindex="3">
+        </div>
+        <div class="btn-group">
+          <button id="buttonSorting" class="btn btn-default dropdown-toggle" type="button"
+            data-toggle="dropdown" class="btn btn-default dropdown-toggle" aria-label="Sorting"
+            tabindex="4">
+          <%= sort %>
+          <span class="caret"></span>
+          </button>
+          <ul id="dropdownMenuSorting" class="dropdown-menu" role="menu" tabindex="-1">
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_CREATED_DESC" value="DATE_CREATED_DESC" checked="checked">
+              <label for="DATE_CREATED_DESC">
+              <%= recording_date_new %>
+              </label>
+            </li>
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_CREATED" value="DATE_CREATED">
+              <label for="DATE_CREATED">
+                <%= recording_date_old %>
+              </label>
+            </li>
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_PUBLISHED_DESC" value="DATE_PUBLISHED_DESC">
+              <label for="DATE_PUBLISHED_DESC">
+              <%= publishing_date_new %>
+              </label>
+            </li>
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_PUBLISHED" value="DATE_PUBLISHED">
+              <label for="DATE_PUBLISHED">
+              <%= publishing_date_old %>
+              </label>
+            </li>
+            <li role="presentation" class="divider"></li>
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="TITLE" value="TITLE">
+              <label for="TITLE">
+              <%= title_a_z %>
+              </label>
+            </li>
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="TITLE_DESC" value="TITLE_DESC">
+              <label for="TITLE_DESC">
+              <%= title_z_a %>
+              </label>
+            </li>
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="CREATOR" value="CREATOR">
+              <label for="CREATOR">
+              <%= author_a_z %>
+              </label>
+            </li>
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="CREATOR_DESC" value="CREATOR_DESC">
+              <label for="CREATOR_DESC">
+              <%= author_z_a %>
+              </label>
+            </li>
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="CONTRIBUTOR" value="CONTRIBUTOR">
+              <label for="CONTRIBUTOR">
+              <%= contributor_a_z %>
+              </label>
+            </li>
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="CONTRIBUTOR_DESC" value="CONTRIBUTOR_DESC">
+              <label for="CONTRIBUTOR_DESC">
+              <%= contributor_z_a %>
+              </label>
+            </li>
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="PUBLISHER" value="PUBLISHER">
+              <label for="PUBLISHER">
+              <%= publisher_a_z %>
+              </label>
+            </li>
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="PUBLISHER_DESC" value="PUBLISHER_DESC">
+              <label for="PUBLISHER_DESC">
+              <%= publisher_z_a %>
+              </label>
+            </li>
+            <li role="presentation" class="divider"></li>
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="SERIES_ID" value="SERIES_ID">
+              <label for="SERIES_ID">
+              <%= series %>
+              </label>
+            </li>
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="LANGUAGE" value="LANGUAGE">
+              <label for="LANGUAGE">
+              <%= language %>
+              </label>
+            </li>
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="LICENSE" value="LICENSE">
+              <label for="LICENSE">
+              <%= license %>
+              </label>
+            </li>
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="SUBJECT" value="SUBJECT">
+              <label for="SUBJECT">
+              <%= subject %>
+              </label>
+            </li>
+            <li role="presentation">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="DESCRIPTION" value="DESCRIPTION">
+              <label for="DESCRIPTION">
+              <%= description %>
+              </label>
+            </li>
+          </ul>
+        </div>
+        <button id="oc-search-btn" type="submit"
+          class="btn btn-default" tabindex="5" formenctype="multipart/form-data">
+        <%= search %>
+        </button>
+      </form>
+    </div>
+  </div>
 </div>
 <div class="container main-grid">
 <div class="main-content" id="main-content">
-    <div class="container-fluid" id="main-container" role="menu"></div>
+  <div class="container-fluid" id="main-container" role="menu"></div>
 </div>
 <ul class="pager" role="menu">
-    <li class="first previous disabled"><a role="menuitem" tabindex="10" data-localize="first">&#8676; First</a></li>
-    <li class="previous disabled"><a role="menuitem" tabindex="9" data-localize="prev">&larr; Previous</a></li>
-    <li class="last next"><a role="menuitem" tabindex="8" data-localize="last">Last &#8677;</a></li>
-    <li class="next"><a role="menuitem" tabindex="7" data-localize="next">Next &rarr;</a></li>
+  <li class="first previous disabled"><a role="menuitem" tabindex="10" >&#8676; <%= first %></a></li>
+  <li class="previous disabled"><a role="menuitem" tabindex="9" >&larr; <%= prev %></a></li>
+  <li class="last next"><a role="menuitem" tabindex="8" ><%= last %> &#8677;</a></li>
+  <li class="next"><a role="menuitem" tabindex="7" ><%= next %> &rarr;</a></li>
 </ul>
 <div id="more" class="scroll-indicator">Loading More Content</div>
 <div id="no-more" class="scroll-indicator">No More Content</div>

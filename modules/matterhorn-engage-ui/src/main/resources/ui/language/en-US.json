@@ -1,5 +1,6 @@
 {
-  "value_locale":"de-de",
+  "series":"Serien",
+  "episodes":"Episoden",
   "sort":"Sortieren",
   "recording_date_new":"Aufnahmedatum (Neuste)",
   "recording_date_old":"Aufnahmedatum (Älteste)",
@@ -13,8 +14,6 @@
   "contributor_z_a":"Beitragender (Z-A)",
   "publisher_a_z":"Veröffentlichender (A-Z)",
   "publisher_z_a":"Veröffentlichender (Z-A)",
-  "series":"Serie",
-  "episodes":"Episoden",
   "language":"Sprache",
   "license":"Lizenz",
   "subject":"Thema",
