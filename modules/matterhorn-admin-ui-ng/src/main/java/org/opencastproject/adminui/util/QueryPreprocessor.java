@@ -112,7 +112,7 @@ public final class QueryPreprocessor {
       sanitizedQuery += sanitizedToken;
       i++;
     }
-    logger.info("Sanitized input '{}' to '{}'", query, sanitizedQuery);
+    logger.debug("Sanitized input '{}' to '{}'", query, sanitizedQuery);
     return sanitizedQuery;
   }
 
