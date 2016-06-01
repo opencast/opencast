@@ -53,12 +53,14 @@
 
                 <nav class="login-nav nav-dd-container" id="nav-dd-container">
                     <div class="nav-dd lang-dd" id="lang-dd" old-admin-ng-dropdown>
-                        <img class=lang-flag src="img/lang/{{ currentLanguageCode }}.svg" alt="{{ currentLanguageCode }}" />
+                        <img class=lang-flag ng-attr-src="img/lang/{{ currentLanguageCode }}.svg"
+                            ng-attr-alt="{{ currentLanguageCode }}" />
                         <span>{{ currentLanguageName }}</span>
                         <ul class="dropdown-ul">
                             <li><a href="#" ng-repeat="language in availableLanguages | orderBy:'displayLanguage'"
                                 ng-click="changeLanguage(language.code)">
-                                <img class=lang-flag src="img/lang/{{ language.code }}.svg" alt="{{ language.code }}" />
+                                <img class=lang-flag ng-attr-src="img/lang/{{ language.code }}.svg"
+                                    ng-attr-alt="{{ language.code }}" />
                                 {{ language.displayLanguage }}
                                 </a>
                             </li>
