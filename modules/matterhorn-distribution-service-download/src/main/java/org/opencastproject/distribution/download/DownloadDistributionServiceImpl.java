@@ -254,7 +254,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
       try {
         FileSupport.link(source, destination, true);
       } catch (IOException e) {
-        throw new DistributionException(format("Unable to copy %s tp %s", source, destination), e);
+        throw new DistributionException(format("Unable to copy %s to %s", source, destination), e);
       }
 
       // Create a representation of the distributed file in the mediapackage

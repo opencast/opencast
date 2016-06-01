@@ -322,8 +322,16 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         }
       }
 
-      List<Job> jobs = new ArrayList<Job>();
+      removePublicationElement(mediaPackage);
+        switch (republishStrategy) {
+          case ("merge"):
+              // nothing to do here. Other publication strategies can be added to this list later on
+            break;
+          default:
+            retractFromEngage(mediaPackage);
+        }
 
+      List<Job> jobs = new ArrayList<Job>();
 //distribute Elements
       try {
         for (String elementId : downloadElementIds) {
@@ -372,7 +380,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
             }
             break;
           default:
-            retractFromEngage(mediaPackage);
+            // nothing to do here
         }
 
         if (!isPublishable(mediaPackageForSearch))
