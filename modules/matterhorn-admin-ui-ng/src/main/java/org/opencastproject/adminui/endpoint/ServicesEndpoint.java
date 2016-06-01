@@ -43,7 +43,7 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import com.entwinemedia.fn.data.json.JValue;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
