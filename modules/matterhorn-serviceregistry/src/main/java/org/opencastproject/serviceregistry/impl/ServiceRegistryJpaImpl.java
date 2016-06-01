@@ -1855,7 +1855,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       // Make sure we also include the services that have no processing history so far
       List<ServiceRegistrationJpaImpl> services = em.createNamedQuery("ServiceRegistration.getAll").getResultList();
-
       for (ServiceRegistrationJpaImpl s : services) {
         statsMap.put(s.getId(), new JaxbServiceStatistics(s));
       }
