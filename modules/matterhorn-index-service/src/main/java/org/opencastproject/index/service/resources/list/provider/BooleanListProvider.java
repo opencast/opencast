@@ -35,19 +35,13 @@ import java.util.Map;
 /** Boolean list provider. */
 public class BooleanListProvider implements ResourceListProvider {
 
-  public static final String TRUE = "TRUE";
-  public static final String FALSE = "FALSE";
-  public static final String TRUE_FALSE = "TRUE_FALSE";
+  public static final String YES_NO = "YES_NO";
   public static final String YES = "YES";
   public static final String NO = "NO";
-  public static final String YES_NO = "YES_NO";
-  public static final String ON = "ON";
-  public static final String OFF = "OFF";
-  public static final String ON_OFF = "ON_OFF";
 
   /** The names of the different list available through this provider. */
   private static final String[] NAMES = new String[] {
-    TRUE, FALSE, TRUE_FALSE, YES, NO, YES_NO, ON, OFF, ON_OFF
+    YES_NO, YES, NO
   };
 
   @Override
@@ -67,18 +61,6 @@ public class BooleanListProvider implements ResourceListProvider {
     if (StringUtils.equalsIgnoreCase(NO, listNameTrimmed)
             || StringUtils.equalsIgnoreCase(YES_NO, listNameTrimmed))
       result.put("false", NO);
-    if (StringUtils.equalsIgnoreCase(TRUE, listNameTrimmed)
-            || StringUtils.equalsIgnoreCase(TRUE_FALSE, listNameTrimmed))
-      result.put("true", TRUE);
-    if (StringUtils.equalsIgnoreCase(FALSE, listNameTrimmed)
-            || StringUtils.equalsIgnoreCase(TRUE_FALSE, listNameTrimmed))
-      result.put("false", FALSE);
-    if (StringUtils.equalsIgnoreCase(ON, listNameTrimmed)
-            || StringUtils.equalsIgnoreCase(ON_OFF, listNameTrimmed))
-      result.put("true", ON);
-    if (StringUtils.equalsIgnoreCase(OFF, listNameTrimmed)
-            || StringUtils.equalsIgnoreCase(ON_OFF, listNameTrimmed))
-      result.put("false", OFF);
 
     return result;
   }
@@ -104,13 +86,9 @@ public class BooleanListProvider implements ResourceListProvider {
    */
   public static <Boolean> Option<Boolean> parseValue(String filterValue) {
     String value = StringUtils.trimToEmpty(filterValue);
-    if (StringUtils.equalsIgnoreCase(YES, value)
-            || StringUtils.equalsIgnoreCase(ON, value)
-            || StringUtils.equalsIgnoreCase(TRUE, value))
+    if (StringUtils.equalsIgnoreCase(YES, value))
       return (Option<Boolean>) Option.option(true);
-    else if (StringUtils.equalsIgnoreCase(NO, value)
-            || StringUtils.equalsIgnoreCase(OFF, value)
-            || StringUtils.equalsIgnoreCase(FALSE, value))
+    else if (StringUtils.equalsIgnoreCase(NO, value))
       return (Option<Boolean>) Option.option(false);
     else return Option.<Boolean> none();
   }
