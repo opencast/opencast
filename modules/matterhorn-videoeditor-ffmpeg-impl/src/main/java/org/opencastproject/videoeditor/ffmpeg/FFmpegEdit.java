@@ -62,6 +62,7 @@ public class FFmpegEdit {
   protected float vfade;
   protected float afade;
   protected String ffmpegProperties = DEFAULT_FFMPEG_PROPERTIES;
+  protected String ffmpegScaleFilter = null;
   protected String videoCodec = null;  // By default, use the same codec as source
   protected String audioCodec = null;
 
@@ -100,6 +101,7 @@ public class FFmpegEdit {
       this.vfade = Float.parseFloat(DEFAULT_VIDEO_FADE);
     }
     this.ffmpegProperties = properties.getProperty(VideoEditorProperties.FFMPEG_PROPERTIES, DEFAULT_FFMPEG_PROPERTIES);
+    this.ffmpegScaleFilter = properties.getProperty(VideoEditorProperties.FFMPEG_SCALE_FILTER, null);
     this.videoCodec = properties.getProperty(VideoEditorProperties.VIDEO_CODEC, null);
     this.audioCodec = properties.getProperty(VideoEditorProperties.AUDIO_CODEC, null);
   }
@@ -190,8 +192,16 @@ public class FFmpegEdit {
         }
       }
     }
-    if (hasVideo && outputResolution != null && outputResolution.length() > 3) // format is "<width>x<height>"
-      scale = ",scale=" + outputResolution;    // scale each clip to the same size
+    if (hasVideo) {
+      if (outputResolution != null && outputResolution.length() > 3) { // format is "<width>x<height>"
+        // scale each clip to the same size
+        scale = ",scale=" + outputResolution;
+      }
+      else if (ffmpegScaleFilter != null) {
+        // Use scale filter if configured
+        scale = ",scale=" +  ffmpegScaleFilter;
+      }
+    }
 
     for (i = 0; i < n; i++) { // Examine each clip
       // get clip and add fades to each clip
