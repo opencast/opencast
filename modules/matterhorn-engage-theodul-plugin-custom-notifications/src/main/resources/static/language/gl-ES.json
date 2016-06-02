@@ -1,6 +1,6 @@
 {
   "value_locale":"gl",
-  "value_dateFormatFull":"Do de MMMM de YYYY, h:mm:ss a",
+  "value_dateFormatFull":"MMMM Do YYYY, h:mm:ss a",
   "error_videoLoading":"O vídeo está a cargarse. Por favor, espere un momento.",
   "error_audioLoading":"O audio está a cargarse. Por favor, espere un momento.",
   "msg_videoLoadedSuccessfully":"O vídeo cargouse correctamente.",
