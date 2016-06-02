@@ -1,6 +1,6 @@
 {
   "value_locale":"gl",
-  "value_dateFormatFull":"Do de MMMM de YYYY, h:mm:ss a",
+  "value_dateFormatFull":"MMMM Do YYYY, h:mm:ss a",
   "videoTitle":"Título do vídeo",
   "creator":"Creador",
   "date":"Data"
