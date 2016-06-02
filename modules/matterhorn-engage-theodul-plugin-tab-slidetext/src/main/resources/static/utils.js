@@ -27,11 +27,6 @@ define(["jquery"], function($) {
         // nothing to see here
     }
 
-    Utils.prototype.detectLanguage = function() {
-        var language = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
-        return language.replace(/\-.*/,'');
-    }
-
     /**
      * Returns the input time in milliseconds
      *

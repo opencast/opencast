@@ -1620,6 +1620,61 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getActiveJobs()
+   */
+  @Override
+  public List<Job> getActiveJobs() throws ServiceRegistryException {
+    List<Status> statuses = new ArrayList<Status>();
+    for (Status status : Status.values()) {
+      if (status.isActive())
+        statuses.add(status);
+    }
+    try {
+      EntityManager em = emf.createEntityManager();
+      List<JpaJob> jpaJobs = getJobsByStatus(em, statuses.toArray(new Status[statuses.size()]));
+      List<Job> jobs = new ArrayList<Job>(jpaJobs.size());
+      for (JpaJob jpaJob : jpaJobs) {
+        jobs.add(jpaJob.toJob());
+      }
+      return jobs;
+    } catch (Exception e) {
+      throw new ServiceRegistryException(e);
+    }
+  }
+
+  /**
+   * Get the list of jobs with status from the given statuses.
+   *
+   * @param em the entity manager
+   * @param statuses variable sized array of status values to test on jobs
+   * @return list of jobs with status from statuses
+   * @throws ServiceRegistryException if there is a problem communicating with the jobs database
+   */
+  public List<JpaJob> getJobsByStatus(EntityManager em, Status... statuses) throws ServiceRegistryException {
+    if (statuses == null || statuses.length < 1)
+      throw new IllegalArgumentException("At least one job status must be given.");
+
+    List<Integer> ordinalStatuses = new ArrayList<>();
+    for (Status status : statuses) {
+      ordinalStatuses.add(status.ordinal());
+    }
+    TypedQuery<JpaJob> query = null;
+    try {
+      query = em.createNamedQuery("Job.statuses", JpaJob.class);
+      query.setParameter("statuses", ordinalStatuses);
+      List<JpaJob> jpaJobs = query.getResultList();
+      for (JpaJob jpaJob : jpaJobs) {
+        setJobUri(jpaJob);
+      }
+      return jpaJobs;
+    } catch (Exception e) {
+      throw new ServiceRegistryException(e);
+    }
+  }
+
+  /**
    * Gets jobs of all types that are in the {@value Status#QUEUED} and {@value Status#RESTART} state.
    *
    * @param em

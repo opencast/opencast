@@ -41,7 +41,7 @@ angular.module('adminNg.services.language')
                 return undefined;
             }
 
-            return this.$convertLanguageToCode(me.currentLanguage.code);
+            return me.currentLanguage.code;
         };
 
         /**
@@ -128,7 +128,7 @@ angular.module('adminNg.services.language')
         this.getAvailableLanguageCodes = function () {
             var result = [];
             angular.forEach(me.availableLanguages, function (value) {
-                result.push(this.$convertLanguageToCode(value.code));
+                result.push(value.code);
             }, this);
             return result;
         };
@@ -431,21 +431,6 @@ angular.module('adminNg.services.language')
             deferred.promise.then(function () {
                 $rootScope.$emit('language-changed', me.currentLanguage.code);
             });
-        };
-
-        /**
-        * @ngdoc function
-        * @name Language.$convertLanguageToCode
-        * @description
-        * Converts a language string (e.g. 'de_DE') to a language code (e.g. 'de').
-        * @returns {string} The language code for the input value.
-        */
-        this.$convertLanguageToCode = function (language) {
-            var languageCode = language, index = languageCode.indexOf('_');
-            if (index > 0) {
-                return languageCode.substring(0, index);
-            }
-            return languageCode;
         };
     };
 

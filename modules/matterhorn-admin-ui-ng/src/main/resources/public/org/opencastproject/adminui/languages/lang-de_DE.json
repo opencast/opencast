@@ -36,11 +36,6 @@
     "CHINESE":"Chinesisch"
   },
   "PREFERENCES":{
-    "CAPTION":"Einstellungen",
-    "PROFILE":"Profil",
-    "NAME":"Name",
-    "REPLYTO":"Antwort-E-Mail-Adresse",
-    "SIGNATURE":"E-Mail-Signatur",
     "TABLE":{
       "CAPTION":"Tabellenansicht bearbeiten",
       "SUBHEADING":"Wählen Sie die Standard-Daten, die Sie in der {{ tableName }}-Ansicht anzeigen möchten",
@@ -122,6 +117,8 @@
     "EMAIL_SENT":"Die Nachricht wurde gesendet",
     "EMAIL_NOT_SENT":"Die Nachricht konnte nicht gesendet werden",
     "CONFLICT_DETECTED":"Planungskonflikt: Die neue Aufzeichnung überlappt zeitlich mit einer bereits bestehenden Aufzeichnung. Bitte Ort, Datum oder Zeit anpassen.",
+    "CONFLICT_ALREADY_ENDED":"Planungskonflikt: Aufzeichnungen können nicht in der Vergangenheit geplant werden.",
+    "CONFLICT_END_BEFORE_START":"Planungskonflikt: Die Aufzeichnungen können nicht enden bevor sie starten.",
     "INVALID_ACL_RULES":"Regeln müssen eine gültige Rolle und Lese-\/Schreibrechte enthalten.",
     "MISSING_ACL_RULES":"Es ist mindestens eine Rolle mit Lese- und Schreibberechtigungen erforderlich!",
     "SAVED_ACL_RULES":"Die Zugriffsregeln wurden gespeichert.",
@@ -265,7 +262,7 @@
   },
   "EVENTS":{
     "RETRACT":{
-      "CAPTION":"Aufzeichnunge zurückziehen",
+      "CAPTION":"Aufzeichnungen zurückziehen",
       "ID":"ID",
       "SELECT_TASK":"Task auswählen",
       "SUMMARY":"Zusammenfassung",
@@ -1400,13 +1397,16 @@
     },
     "JOBS":{
       "TABLE":{
+        "ACTION":"Aktionen",
         "CAPTION":"Aufgaben",
-        "TITLE":"Titel",
-        "SERIES":"Serien",
-        "WORKFLOW":"Workflow",
+        "CREATED":"Erstellt am",
+        "CREATOR":"Author",
+        "HOST_NAME":"Hostname",
+        "OPERATION":"Operation",
+        "STARTED":"Gestartet",
         "STATUS":"Status",
         "SUBMITTED":"Übermittelt",
-        "ACTION":"Aktionen"
+        "TYPE":"Typ"
       },
       "DETAILS":{
         "HEADER":"Job-Details {{resourceId}}",
@@ -1439,6 +1439,7 @@
         "CAPTION":"Dienste",
         "STATUS":"Status",
         "NAME":"Dienstname",
+        "HOST_NAME":"Hostname",
         "COMPLETED":"Jobs abgeschlossen",
         "RUNNING":"Jobs in Bearbeitung",
         "QUEUED":"Jobs in Warteschlange",
@@ -1659,6 +1660,7 @@
   "TABLE_SUMMARY":"{{numberOfRows}} Zeile(n)",
   "TABLE_NO_RESULT":"Keine Treffer gefunden.",
   "TABLE_LOADING":"Lädt…",
+  "TABLE_EDIT":"Bearbeiten",
   "PM":{
     "BLACKLIST":{
       "REASONS":{

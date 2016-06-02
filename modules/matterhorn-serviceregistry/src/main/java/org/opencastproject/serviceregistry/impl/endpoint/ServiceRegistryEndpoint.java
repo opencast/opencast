@@ -529,6 +529,36 @@ public class ServiceRegistryEndpoint {
   }
 
   @GET
+  @Path("activeJobs.xml")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "activejobsasxml",
+          description = "Returns all active jobs as XML.",
+          returnDescription = "A list of active jobs as XML",
+          reponses = { @RestResponse(responseCode = SC_OK, description = "Active jobs found.") })
+  public JaxbJobList getActiveJobsAsXml() {
+    try {
+      return new JaxbJobList(serviceRegistry.getActiveJobs());
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @GET
+  @Path("activeJobs.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "activejobsasjson",
+          description = "Returns all active jobs as JSON.",
+          returnDescription = "A list of active jobs as JSON",
+          reponses = { @RestResponse(responseCode = SC_OK, description = "Active jobs found.") })
+  public JaxbJobList getActiveJobsAsJson() {
+    try {
+      return new JaxbJobList(serviceRegistry.getActiveJobs());
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @GET
   @Path("count")
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(name = "count", description = "Returns the number of jobs matching the query parameters as plain text.", returnDescription = "The number of matching jobs", restParameters = {

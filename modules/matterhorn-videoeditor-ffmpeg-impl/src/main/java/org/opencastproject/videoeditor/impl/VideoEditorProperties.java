@@ -36,6 +36,7 @@ public interface VideoEditorProperties {
   String OUTPUT_FILE_EXTENSION = "outputfile.extension";
   String FFMPEG_PROPERTIES = "ffmpeg.properties";
   String FFMPEG_PRESET = "ffmpeg.preset";
+  String FFMPEG_SCALE_FILTER = "ffmpeg.scalefilter";
   String AUDIO_FADE = "audio.fade";
   String VIDEO_FADE = "video.fade";
   String DEFAULT_EXTENSION = ".mp4";

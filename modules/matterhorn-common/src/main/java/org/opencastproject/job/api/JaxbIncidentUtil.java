@@ -22,6 +22,9 @@
 package org.opencastproject.job.api;
 
 final class JaxbIncidentUtil {
+  private JaxbIncidentUtil() {
+  }
+
   static final String ELEM_NESTED_INCIDENT = "incident";
   static final String ELEM_NESTED_TREE = "incidents";
 }

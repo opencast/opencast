@@ -701,6 +701,29 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     return result;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getActiveJobs()
+   */
+  @Override
+  public List<Job> getActiveJobs() throws ServiceRegistryException {
+    List<Job> result = new ArrayList<Job>();
+    synchronized (jobs) {
+      for (String serializedJob : jobs.values()) {
+        Job job = null;
+        try {
+          job = JobParser.parseJob(serializedJob);
+        } catch (IOException e) {
+          throw new IllegalStateException("Error unmarshaling job", e);
+        }
+        if (job.getStatus().isActive())
+          result.add(job);
+      }
+    }
+    return result;
+  }
+
   @Override
   public Incidents incident() {
     return incidents;

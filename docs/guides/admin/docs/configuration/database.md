@@ -2,7 +2,7 @@ Database Configuration
 ======================
 
 Opencast ships with embedded JDBC drivers for the H2 (HSQL), MySQL/MariaDB databases. The built in H2 databased is used
-by default and needs no configuration, but it is strongly recommended to use MySQL or MariaDB instead as there will be a
+by default, and needs no configuration, but it is strongly recommended to use MySQL or MariaDB instead as there will be a
 huge performance gain, especially if more data are in that database.
 
 *Notice:* For a distributed set-up of Opencast, you cannot use the internal H2 database.
@@ -21,7 +21,7 @@ Setting up MySQL/MariaDB
 
 ### Requirements
 
-Before following this guide you should have:
+Before following this guide, you should have:
 
  - Installed the Opencast Core System
  - Followed the [Basic Configuration instructions](basic.md)
@@ -33,8 +33,8 @@ This step is not Opencast specific and may be different for your needs (e.g.  if
 server). It shall only be a guide for people with no experience setting up MySQL/MariaDB and to help them get things
 running.
 
-*Notice:* If your distribution still shipps MySQL instead of MariaDB, the installation should still be very much the
-same. Only the names will of course change.
+*Notice:* If your distribution includes MySQL instead of MariaDB, the installation should still be very much the
+same.
 
 First you have to install the MariaDB server. Usually you would do that by using the package management tool of you
 distribution. On RedHat based systems (CentOS, Scientific Linux, …) this should be:
@@ -51,16 +51,16 @@ following commands:
     service mariadb start
     chkconfig --level 345 mariadb on
 
-Now you have a MariaDB server running, but without a properly set up root account (no password, etc.) which might pose a
-security risk. To create this initial configuration, there is a convenient tool that comes which MariaDB and which will
-help. You can launch this tool by executing (yes, it is still called mysql_…):
+Now you have a MariaDB server running, but without a properly configured root account (no password, etc.) which might 
+pose a security risk. MariaDB includes a useful tool to secure your database server (it is also included in MySQL).
+You can launch this tool by executing (yes, it is still called mysql_…):
 
     mysql_secure_installation
 
 It will guide you through the steps of setting up a root account with password, etc.
 
 
-### Step 1: Create a Opencast Database
+### Step 1: Create an Opencast Database
 
 The first step, if you have not already done this, is obviously to create a database for Opencast. You can use the
 following SQL code to to that. For executing the SQL, use the MySQL/MariaDB client (run the mysql program from your
@@ -79,13 +79,13 @@ Then create a user `opencast` with the password `opencast_password` and grant hi
     GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,INDEX ON opencast.*
       TO 'opencast'@'localhost' IDENTIFIED BY 'opencast_password';
 
-*Notice:* Of cause you may use other names for user or database and should use a different password.
+*Notice:* You can choose another name for the user and database and we would recommend that you use a different password.
 
 
 On Distributed Systems, additionally to `'username'@'localhost'` which would allow access from the local machine only,
 for a distributed system you would also create a user like `'username'@'10.0.1.%'` and grant the necessary rights to
 this user as well. The `10.0.1.%` specifies the IP range which gets access to the server with `%` being a wildcard for
-anything.  For more details on MySQL user creation have a look at MySQL Reference Manual :: 6.3.2 Adding User Accounts.
+anything.  For more details on MySQL user creation have a look at [MySQL Reference Manual :: Adding User Accounts](http://mysql.com/doc/en/adding-users.html).
 
 Finally, leave the MySQL/MariaDB client shell and restart the database server to enable the user with:
 
@@ -98,11 +98,12 @@ or if you have a systemd based system:
 
 ### Step 2: Set up the Database Structure
 
-To set up the database structure you can (and should!) use the Opencast ddl scripts. You can find the script either at
-`/usr/share/opencast/docs/scripts/ddl/mysql5.sql` or download it from BitBucket.
+To set up the database structure you can (and should!) use the Opencast ddl scripts. You can find the script in the 
+installations document folder `.../docs/scripts/ddl/mysql5.sql`. You can also download the script from BitBucket.
 
-Switch to the directory that contains the mysql5.sql file and run the MySQL/MariaDB client with the user you created in
-the previous step (`-u opencast`) and switch to the database you want to use (`opencast`):
+To import the database structure from the MySQL/MariaDB Client, switch to the directory that contains the `mysql5.sql` 
+file and run the MySQL/MariaDB client with the user you created in the previous step (`-u opencast`) and switch to 
+the database you want to use (`opencast`):
 
     mysql -u opencast -p opencast
 
@@ -110,41 +111,42 @@ Run the ddl script:
 
     mysql> source mysql5.sql;
 
-Instead of using the MySQL/MariaDB Client, you can, of cause, also use every other method for executing SQL code like
-phpMyAdmin or MySQL-Workbench…
+To import the script directly from the command line:
 
+    mysql -u opencast -p opencast < .../docs/scripts/ddl/mysql5.sql
+
+Instead of using the MySQL/MariaDB Client, you can also use other methods for executing SQL code like phpMyAdmin or 
+MySQL-Workbench.
 
 ### Step 3: Configure Opencast
 
-The following settings are made in the .../etc`/custom.properties` file (often `/etc/opencast/custom.properties`). Use
-the editor of your choice to open it, e.g.:
+The following settings are made in the `.../etc/custom.properties` file (often `/etc/opencast/custom.properties`). 
+Use the editor of your choice to open it, e.g.:
 
-    vim /etc/opencast/custom.properties
+    vim etc/opencast/custom.properties
 
-Now change the following configuration keys:
+Now change the following configuration keys (uncomment where necessary):
 
     org.opencastproject.db.ddl.generation=false
 
 If set to true, the database structure will be generated automatically. It works, but all database optimizations are
 lost. You should never do this, unless you need it for development purposes.
 
+Tell Opencast to use MySQL:
+
     org.opencastproject.db.vendor=MySQL
 
-Tell Opencast that you use MySQL.
+Tell Opencast to use the JDBC driver for MySQL:
 
     org.opencastproject.db.jdbc.driver=com.mysql.jdbc.Driver
 
-Tell Opencast to use the JDBC driver for MySQL.
+Tell Opencast where to find the database and the name of the database (Replace “localhost” and “opencast” if necessary):
 
     org.opencastproject.db.jdbc.url=jdbc:mysql://localhost/opencast
 
-Tell Opencast where to find the database and the name of the database. Replace “localhost” and “opencast” if necessary.
+Tell Opencast which username and password to use for accessing the database:
 
     org.opencastproject.db.jdbc.user=opencast
-
-Tell Opencast which username to use for accessing the database. This user need to have the rights to read from and
-write to the database.
-
     org.opencastproject.db.jdbc.pass=opencast_password
 
-Tell Opencast which password to use for accessing the database. This must obviously fit the username.
+*Notice:* This user needs to have the necessary rights to the database, similar to the user that was created in Step 1.

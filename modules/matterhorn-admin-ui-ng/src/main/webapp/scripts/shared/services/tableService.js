@@ -34,44 +34,16 @@ angular.module('adminNg.services')
         };
 
         this.refreshColumns = function () {
-            var storedColumnConfig = Storage.get('table_column_visibility', this.getTableName());
-            me.columns = this.mergeColumns(storedColumnConfig.columns, me.options.columns);
-        };
-
-        this.getTableName = function(){
-            var currentPath = $location.path();
-            return currentPath.substring(currentPath.lastIndexOf('/') + 1, currentPath.length);
-        };
-
-        this.mergeColumns = function(oldConf, newConf){
-            var merged = [];
-
-            // find valid properties in old conf
-            _.each(oldConf, function (item) {
-                var hitsInNewConf = _.filter(newConf, function (ref) {
-                    return ref.name === item.name;
-                });
-
-                if (hitsInNewConf.length > 0) {
-                    // still valid
-                    merged.push(hitsInNewConf[0]);
-                } // else it's obsolete
-            });
-
-            // add missing new properties
-            _.each(newConf, function (item) {
-                var hitsInConf = _.filter(merged, function (ref) {
-                    return ref.name === item.name;
-                });
-
-                if (hitsInConf.length === 0) {
-                    // missing
-                    item.deactivated = false;
-                    merged.push(item);
-                }
-            });
-
-           return merged;
+            var currentTable, currentPath, localStorageColumnConfig;
+            currentPath = $location.path();
+            currentTable = currentPath.substring(currentPath.lastIndexOf('/') + 1, currentPath.length);
+            localStorageColumnConfig = Storage.get('table_column_visibility', currentTable, currentPath);
+            if (!$.isEmptyObject(localStorageColumnConfig)) {
+                me.columns = localStorageColumnConfig.columns;
+                me.columnsConfiguredFromLocalStorage = true;
+            } else {
+                me.columnsConfiguredFromLocalStorage = false;
+            }
         };
 
         this.getDirectAccessiblePages = function () {
@@ -176,6 +148,15 @@ angular.module('adminNg.services')
             me.allSelected = false;
             me.options = options;
             me.refreshColumns();
+
+            if (!me.columnsConfiguredFromLocalStorage) {
+                // The user has not configured the columns before, hence we will
+                // configure them from scratch
+                me.columns = options.columns;
+                angular.forEach(me.columns, function (column) {
+                    column.deactivated = false;
+                });
+            }
 
             me.caption = options.caption;
             me.resource = options.resource;

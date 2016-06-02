@@ -48,7 +48,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class OrganizationFilter implements Filter {
 
-  private static final String APACHE_HTTPD_MOD_PROXY_FORWARD_HEADER = "X-Forwarded-For";
+  private static final String X_FORWARDED_FOR = "X-Forwarded-For";
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(OrganizationFilter.class);
@@ -112,27 +112,26 @@ public class OrganizationFilter implements Filter {
         if (orgs.size() == 1) {
           org = orgs.get(0);
           logger.trace("Defaulting organization to {}", org);
-        } else {
-          logger.warn("No organization is mapped to handle {}", url);
         }
       }
 
+      // If an organization was found, move on. Otherwise return a 404
+      if (org == null) {
+        logger.warn("No organization is mapped to handle {}", url);
+        httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "No organization is mapped to handle " + url);
+      }
+      securityService.setOrganization(org);
+
       // Set the client's IP address
-      if (StringUtils.isNotBlank(httpRequest.getHeader(APACHE_HTTPD_MOD_PROXY_FORWARD_HEADER))) {
-        logger.trace("Found '{}' header for client IP '{}'", APACHE_HTTPD_MOD_PROXY_FORWARD_HEADER, httpRequest.getHeader(APACHE_HTTPD_MOD_PROXY_FORWARD_HEADER));
-        securityService.setUserIP(httpRequest.getHeader(APACHE_HTTPD_MOD_PROXY_FORWARD_HEADER));
+      if (StringUtils.isNotBlank(httpRequest.getHeader(X_FORWARDED_FOR))) {
+        logger.trace("Found '{}' header for client IP '{}'", X_FORWARDED_FOR, httpRequest.getHeader(X_FORWARDED_FOR));
+        securityService.setUserIP(httpRequest.getHeader(X_FORWARDED_FOR));
       } else {
         logger.trace("Using client IP from request '{}'", httpRequest.getRemoteAddr());
         securityService.setUserIP(httpRequest.getRemoteAddr());
       }
 
-      // If an organization was found, move on. Otherwise return a 404
-      if (org != null) {
-        securityService.setOrganization(org);
-        chain.doFilter(request, response);
-      } else {
-        httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "No organization is mapped to handle " + url);
-      }
+      chain.doFilter(request, response);
 
     } finally {
       securityService.setOrganization(null);

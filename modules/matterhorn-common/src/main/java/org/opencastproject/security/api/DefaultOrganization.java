@@ -38,8 +38,8 @@ public class DefaultOrganization extends JaxbOrganization {
 
   static {
     Map<String, String> properties = new HashMap<String, String>();
-    properties.put("logo_large", "/admin/img/mh_logos/MatterhornLogo_large.png");
-    properties.put("logo_small", "/admin/img/mh_logos/OpencastLogo.png");
+    properties.put("logo_large", "/admin/img/logo/opencast.svg");
+    properties.put("logo_small", "/admin/img/logo/opencast-icon.svg");
     DEFAULT_PROPERTIES = Collections.unmodifiableMap(properties);
 
     Map<String, Integer> servers = new HashMap<String, Integer>();

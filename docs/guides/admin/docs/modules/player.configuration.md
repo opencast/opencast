@@ -22,7 +22,7 @@ Configuration
 
 The logo in the top right can easily be replaced by changing the path or URL for logo small.
 
-    prop.logo_player=/engage/ui/img/mh_logos/OpencastLogo.png
+    prop.logo_player=/engage/ui/img/logo/opencast.svg
 
 Options:
 

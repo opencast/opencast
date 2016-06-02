@@ -161,24 +161,55 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   }
 
   function detectLanguage() {
-    var language = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
-    return language.replace(/\-.*/, '');
+    return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
+  }
+  
+  function getDefaultLanguage(language) {
+      switch (language) {
+          case "en": return "en-US";
+          case "de": return "de-DE";
+          case "es": return "es-ES";
+          case "fr": return "fr-FR";
+          case "gl": return "gl-ES";
+          case "nl": return "nl-NL";
+          case "fi": return "fi-FI";
+          case "it": return "it-IT";
+          case "ja": return "ja-JA";
+          case "tlh": return "tlh-AA";
+          case "no": return "no-NO";
+          case "pt": return "pt-BR";
+          case "ru": return "ru-RU";
+          case "sv": return "sv-SE";
+          case "tr": return "tr-TR";
+          case "zh": return "zh-CN";
+          case "el": return "el-GR";
+          default: return null;
+      }
   }
 
   function initTranslate(language) {
     var jsonstr = "";
-
-    console.log("Controls: selecting language " + language);
-    jsonstr += "language/" + language + ".json";
+    var selectedLanguage = language;
+    if (getDefaultLanguage(language) !== null) {
+        selectedLanguage = getDefaultLanguage(language);
+    }
+    console.log("Controls: selecting language " + selectedLanguage);
+    jsonstr += "language/" + selectedLanguage + ".json";
     $.ajax({
       url: jsonstr,
       dataType: "json",
       success: function (data) {
         if (data) {
-          data.value_locale = language;
+          data.value_locale = selectedLanguage;
           translationData = data;
+          engageCore.model.set("language", selectedLanguage);
         }
       }
+    }).fail(function(msg) {
+        engageCore.log("No language file found for " + selectedLanguage + ".");
+        if (language !== getDefaultLanguage(language.replace(/\-.*/, '')) && language !== language.replace(/\-.*/, '')) {
+           initTranslate(language.replace(/\-.*/, ''));
+        }
     });
   }
 
