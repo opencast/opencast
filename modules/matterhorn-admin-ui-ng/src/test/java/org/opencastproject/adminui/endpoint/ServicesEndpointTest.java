@@ -114,22 +114,20 @@ public class ServicesEndpointTest {
 
   @Test
   public void testNameFilter() {
-    given().param("name", "service2").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "name:service2").log().all().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
             .content("count", equalTo(1))
             .content("total", equalTo(1))
             .content("results[0].name", equalTo("service2"))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    // name param will be testet with equality (ignoring case), next test should not find any entries
-    given().param("name", "service").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "name:service").log().all().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
             .content("count", equalTo(0))
             .content("total", equalTo(0))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    // name param value should be trimmed server side
-    given().param("name", " service2 ").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", " name:service2 ").log().all().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
             .content("count", equalTo(1))
             .content("total", equalTo(1))
@@ -138,83 +136,108 @@ public class ServicesEndpointTest {
   }
 
   @Test
-  public void testHostFilter() {
-    given().param("host", "host1").log().all().expect().statusCode(HttpStatus.SC_OK)
+  public void testHostnameFilter() {
+    given().param("filter", "hostname:host1").log().all().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
             .content("count", equalTo(2))
             .content("total", equalTo(2))
-            .content("results[0].host", equalTo("host1"))
-            .content("results[1].host", equalTo("host1"))
+            .content("results[0].hostname", equalTo("host1"))
+            .content("results[1].hostname", equalTo("host1"))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    // host param will be testet with equality, next test should not find any entries
-    given().param("host", "host").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "hostname:host").log().all().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
             .content("count", equalTo(0))
             .content("total", equalTo(0))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    // host param value should be trimmed server side
-    given().param("host", " host1 ").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", " hostname:host1 ").log().all().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
             .content("count", equalTo(2))
             .content("total", equalTo(2))
-            .content("results[0].host", equalTo("host1"))
-            .content("results[1].host", equalTo("host1"))
+            .content("results[0].hostname", equalTo("host1"))
+            .content("results[1].hostname", equalTo("host1"))
+            .when().get(rt.host(TEST_DATA_JSON));
+  }
+
+  @Test
+  public void testActionsFilter() {
+    given().param("filter", "actions:true").log().all().expect().statusCode(HttpStatus.SC_OK)
+            .contentType(ContentType.JSON)
+            .content("count", equalTo(2))
+            .content("total", equalTo(2))
+            .content("results[0].hostname", equalTo("host1"))
+            .content("results[0].name", equalTo("service2"))
+            .content("results[1].hostname", equalTo("host3"))
+            .content("results[1].name", equalTo("service4"))
+            .when().get(rt.host(TEST_DATA_JSON));
+
+    given().param("filter", "actions:false").log().all().expect().statusCode(HttpStatus.SC_OK)
+            .contentType(ContentType.JSON)
+            .content("count", equalTo(4))
+            .content("total", equalTo(4))
+            .content("results[0].hostname", equalTo("host1"))
+            .content("results[0].name", equalTo("service1"))
+            .content("results[1].hostname", equalTo("host2"))
+            .content("results[1].name", equalTo("service3"))
+            .content("results[2].hostname", equalTo("host2"))
+            .content("results[2].name", equalTo("service5"))
+            .content("results[3].hostname", equalTo("host4"))
+            .content("results[3].name", equalTo("service6"))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 
   @Test
   public void testFreeTextFilter() {
-    given().param("q", "host1").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "textFilter:host1").log().all().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
             .content("count", equalTo(2))
             .content("total", equalTo(2))
-            .content("results[0].host", equalTo("host1"))
-            .content("results[1].host", equalTo("host1"))
+            .content("results[0].hostname", equalTo("host1"))
+            .content("results[1].hostname", equalTo("host1"))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("q", "service4").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "textFilter:service4").log().all().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
             .content("count", equalTo(1))
             .content("total", equalTo(1))
             .content("results[0].name", equalTo("service4"))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("q", "2").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "textFilter:2").log().all().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
             .content("count", equalTo(3))
             .content("total", equalTo(3))
             .content("results[0].name", equalTo("service2"))
-            .content("results[1].host", equalTo("host2"))
-            .content("results[2].host", equalTo("host2"))
+            .content("results[1].hostname", equalTo("host2"))
+            .content("results[2].hostname", equalTo("host2"))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 
   @Test
   public void testHostSort() {
-    given().param("sort", "host:asc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "hostname:asc").log().all().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
             .content("count", equalTo(6))
             .content("total", equalTo(6))
-            .content("results[0].host", equalTo("host1"))
-            .content("results[1].host", equalTo("host1"))
-            .content("results[2].host", equalTo("host2"))
-            .content("results[3].host", equalTo("host2"))
-            .content("results[4].host", equalTo("host3"))
-            .content("results[5].host", equalTo("host4"))
+            .content("results[0].hostname", equalTo("host1"))
+            .content("results[1].hostname", equalTo("host1"))
+            .content("results[2].hostname", equalTo("host2"))
+            .content("results[3].hostname", equalTo("host2"))
+            .content("results[4].hostname", equalTo("host3"))
+            .content("results[5].hostname", equalTo("host4"))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("sort", "host:desc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "hostname:desc").log().all().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
             .content("count", equalTo(6))
             .content("total", equalTo(6))
-            .content("results[5].host", equalTo("host1"))
-            .content("results[4].host", equalTo("host1"))
-            .content("results[3].host", equalTo("host2"))
-            .content("results[2].host", equalTo("host2"))
-            .content("results[1].host", equalTo("host3"))
-            .content("results[0].host", equalTo("host4"))
+            .content("results[5].hostname", equalTo("host1"))
+            .content("results[4].hostname", equalTo("host1"))
+            .content("results[3].hostname", equalTo("host2"))
+            .content("results[2].hostname", equalTo("host2"))
+            .content("results[1].hostname", equalTo("host3"))
+            .content("results[0].hostname", equalTo("host4"))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 

@@ -1,0 +1,20 @@
+{
+    "hostname": {
+        "options": {
+            "admin.opencast.org": "admin.opencast.org",
+            "worker01.opencast.org": "worker01.opencast.org"
+        },
+        "label": "FILTERS.JOBS.HOSTNAME.LABEL",
+        "type": "select"
+    },
+    "status": {
+        "options": {
+            "PAUSED": "FILTERS.JOBS.STATUS.PAUSED",
+            "QUEUED": "FILTERS.JOBS.STATUS.QUEUED",
+            "RUNNING": "FILTERS.JOBS.STATUS.RUNNING",
+            "WAITING": "FILTERS.JOBS.STATUS.WAITING"
+        },
+        "label": "FILTERS.JOBS.STATUS.LABEL",
+        "type": "select"
+    }
+}

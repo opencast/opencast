@@ -1,0 +1,73 @@
+{
+    "name": {
+        "options": {
+            "•mock• ch.entwine.annotations": "•mock• ch.entwine.annotations",
+            "•mock• org.opencastproject.adminui.endpoint.JobEndpoint": "•mock• org.opencastproject.adminui.endpoint.JobEndpoint",
+            "•mock• org.opencastproject.adminui.endpoint.ListProvidersEndpoint": "•mock• org.opencastproject.adminui.endpoint.ListProvidersEndpoint",
+            "•mock• org.opencastproject.adminui.endpoint.ServicesEndpoint": "•mock• org.opencastproject.adminui.endpoint.ServicesEndpoint",
+            "•mock• org.opencastproject.adminui.endpoint.autocomplete": "•mock• org.opencastproject.adminui.endpoint.autocomplete",
+            "•mock• org.opencastproject.adminui.endpoint.seriesdetails": "•mock• org.opencastproject.adminui.endpoint.seriesdetails",
+            "•mock• org.opencastproject.adminui.i18n": "•mock• org.opencastproject.adminui.i18n",
+            "•mock• org.opencastproject.analytics": "•mock• org.opencastproject.analytics",
+            "•mock• org.opencastproject.annotation": "•mock• org.opencastproject.annotation",
+            "•mock• org.opencastproject.authorization.xacml.manager": "•mock• org.opencastproject.authorization.xacml.manager",
+            "•mock• org.opencastproject.caption": "•mock• org.opencastproject.caption",
+            "•mock• org.opencastproject.capture.admin": "•mock• org.opencastproject.capture.admin",
+            "•mock• org.opencastproject.composer": "•mock• org.opencastproject.composer",
+            "•mock• org.opencastproject.coverimage": "•mock• org.opencastproject.coverimage",
+            "•mock• org.opencastproject.distribution.acl": "•mock• org.opencastproject.distribution.acl",
+            "•mock• org.opencastproject.distribution.download": "•mock• org.opencastproject.distribution.download",
+            "•mock• org.opencastproject.distribution.streaming": "•mock• org.opencastproject.distribution.streaming",
+            "•mock• org.opencastproject.episode": "•mock• org.opencastproject.episode",
+            "•mock• org.opencastproject.files": "•mock• org.opencastproject.files",
+            "•mock• org.opencastproject.fileupload": "•mock• org.opencastproject.fileupload",
+            "•mock• org.opencastproject.groups": "•mock• org.opencastproject.groups",
+            "•mock• org.opencastproject.info": "•mock• org.opencastproject.info",
+            "•mock• org.opencastproject.ingest": "•mock• org.opencastproject.ingest",
+            "•mock• org.opencastproject.inspection": "•mock• org.opencastproject.inspection",
+            "•mock• org.opencastproject.kernel.bundleinfo": "•mock• org.opencastproject.kernel.bundleinfo",
+            "•mock• org.opencastproject.manipulator": "•mock• org.opencastproject.manipulator",
+            "•mock• org.opencastproject.oaipmhinfo": "•mock• org.opencastproject.oaipmhinfo",
+            "•mock• org.opencastproject.organization": "•mock• org.opencastproject.organization",
+            "•mock• org.opencastproject.publication.oaipmh": "•mock• org.opencastproject.publication.oaipmh",
+            "•mock• org.opencastproject.publication.youtube": "•mock• org.opencastproject.publication.youtube",
+            "•mock• org.opencastproject.scheduler": "•mock• org.opencastproject.scheduler",
+            "•mock• org.opencastproject.search": "•mock• org.opencastproject.search",
+            "•mock• org.opencastproject.series": "•mock• org.opencastproject.series",
+            "•mock• org.opencastproject.serviceregistry": "•mock• org.opencastproject.serviceregistry",
+            "•mock• org.opencastproject.sox": "•mock• org.opencastproject.sox",
+            "•mock• org.opencastproject.textanalyzer": "•mock• org.opencastproject.textanalyzer",
+            "•mock• org.opencastproject.userdirectory.roles": "•mock• org.opencastproject.userdirectory.roles",
+            "•mock• org.opencastproject.userdirectory.users": "•mock• org.opencastproject.userdirectory.users",
+            "•mock• org.opencastproject.usertracking": "•mock• org.opencastproject.usertracking",
+            "•mock• org.opencastproject.videosegmenter": "•mock• org.opencastproject.videosegmenter",
+            "•mock• org.opencastproject.workflow": "•mock• org.opencastproject.workflow"
+        },
+        "label": "FILTERS.SERVICES.NAME.LABEL",
+        "type": "select"
+    },
+    "hostname": {
+        "options": {
+            "http:\/\/mh-allinone.localdomain": "http:\/\/mh-allinone.localdomain "
+        },
+        "label": "FILTERS.SERVICES.HOSTNAME.LABEL",
+        "type": "select"
+    },
+    "actions": {
+        "options": {
+            "true": "YES",
+            "false": "NO"
+        },
+        "label": "FILTERS.SERVICES.ACTIONS.LABEL",
+        "type": "select"
+    },
+    "status": {
+        "options": {
+            "ERROR": "FILTERS.SERVICES.STATUS.ERROR",
+            "WARNING": "FILTERS.SERVICES.STATUS.WARNING",
+            "NORMAL": "FILTERS.SERVICES.STATUS.NORMAL"
+        },
+        "label": "FILTERS.SERVICES.STATUS.LABEL",
+        "type": "select"
+    }
+}
