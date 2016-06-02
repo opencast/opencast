@@ -3,8 +3,37 @@
 
 # How to search for content
 
-To use the search functionality, click on the search box and type in your search terms. Search terms are automatically sent as you type. To cancel search entries, just remove the text and press enter (⏎).
+To use the search functionality, click on the search box and type in your search terms. Search terms are automatically sent as you type. To cancel search entries, just remove the text from the search box.
 
+The search is case-insensitive. To improve the user experience and allow you to see search results while you are typing, the search terms are automatically surrounded by multiple character wildcards, i.e. `hello` results in the same results as `*hello*` and therefore would also match the string *helloworld*.
+
+Note that the individual search terms are ORed, so when typing `hello world` you are searching for items matching either the term *\*hello\** or the term *\*world\** (or both terms).
+
+For the advanced user, the search boxes for Events, Series and Themes support advanced search facilities:
+
+## Wildcard Searches and Phrases
+*Events, Series and Themes only*
+
+You can use the symbol `?` for single character wildcard searches and the symbol `*` for multiple character wildcard searches.
+
+For example, `str?ng` matches to both *string* or *strong*, while `st*g` matches *string*, *strong* or *strassbourg*.
+
+You can use phrases (groups of words surrounded by double quotes) to enforce exact matches:
+
+For example, `"Hello World"` matches *Hello World*, *Hello World 2* but not *Hello* or *World*
+
+## Boolean Operators
+*Events, Series and Themes only*
+
+The required operator `+` can be used to limit the search results to result that must match the term following the required operator,
+while the prohibit operator `-` is used to exlude items matching the term following the operator.
+
+For example, `hello +world` matches *hello world* but not *hello again*, whereas `hello -world` matches *hello* but not *hello world*.
+  
+The NOT operator `!` can be used to negate a term, so `!hello` matches all items **not** matching *hello*.
+The AND operator `&&` can be used to override the default term conjunction which is OR.
+
+For example, `hello world` matches to items where the terms *hello* **or** *world* occur, while `hello && world` matches only to items where both the terms *hello* **and** *world* occur.
 
 # Playing with Filters
 
