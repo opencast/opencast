@@ -58,7 +58,6 @@
         <configuration key="layout-preview">
           {"horizontalCoverage":0.5,"anchorOffset":{"referring":{"left":1.0,"top":0.0},"reference":{"left":1.0,"top":0.0},"offset":{"x":0,"y":0}}};
           {"horizontalCoverage":0.5,"anchorOffset":{"referring":{"left":0.0,"top":0.0},"reference":{"left":0.0,"top":0.0},"offset":{"x":0,"y":0}}};
-          {"anchorOffset":{"referring":{"left":0.0,"top":1.0},"offset":{"y":0,"x":0},"reference":{"left":0.0,"top":1.0}}}
         </configuration>
       </configurations>
     </operation>
