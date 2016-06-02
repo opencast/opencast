@@ -2,7 +2,7 @@
   "MATTERHORN":"Opencast",
   "NAV_HOME":"Zur Startseite",
   "NAV_ABOUT":"Über",
-  "NO":"No",
+  "NO":"Nein",
   "SUBMIT":"Speichern",
   "UPDATE":"Aktualisieren",
   "CANCEL":"Abbrechen",
@@ -1602,9 +1602,9 @@
       "STATUS":{
         "LABEL":"Status",
         "PAUSED":"Pausiert",
-        "QUEUED":"Queued",
+        "QUEUED":"In Warteschlange",
         "RUNNING":"In Verarbeitung",
-        "WAITING":"Waiting"
+        "WAITING":"Wartend"
       }
     },
     "SERIES":{
@@ -1649,7 +1649,7 @@
     },
     "SERVICES":{
       "ACTIONS":{
-        "LABEL":"Has actions"
+        "LABEL":"Hat Aktionen"
       },
       "HOSTNAME":{
         "LABEL":"Hostname"
@@ -1659,7 +1659,7 @@
       },
       "STATUS":{
         "LABEL":"Status",
-        "ERROR":"Error",
+        "ERROR":"Fehler",
         "NORMAL":"Normal",
         "WARNING":"Achtung"
       }
