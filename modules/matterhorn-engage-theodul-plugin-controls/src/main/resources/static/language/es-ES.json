@@ -1,7 +1,7 @@
 {
   "value_locale":"es",
   "ok":"Aceptar",
-  "loginInformation":"Inicie sesión con su cuenta de usuario de Matterhorn",
+  "loginInformation":"Inicie sesión con su cuenta de usuario de Opencast",
   "login":"Iniciar sesión",
   "logout":"Cerrar sesión",
   "loginLogout":"Iniciar\/Cerrar sesión",
@@ -38,7 +38,7 @@
   "right":"derecha",
   "off":"apagado",
   "low":"Baja",
-  "medium":"Media",
-  "high":"Alta",
+  "medium":"Medio",
+  "high":"Alto",
   "beside":"junto a"
 }

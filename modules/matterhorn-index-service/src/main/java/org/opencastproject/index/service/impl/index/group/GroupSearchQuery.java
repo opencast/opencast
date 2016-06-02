@@ -368,6 +368,26 @@ public class GroupSearchQuery extends AbstractSearchQuery {
     return getSortOrder(GroupIndexSchema.ROLE);
   }
 
+  /**
+   * Defines the sort order for the group by description.
+   *
+   * @param order the order
+   * @return the enhanced search query
+   */
+  public GroupSearchQuery sortByDescription(Order order) {
+    withSortOrder(GroupIndexSchema.DESCRIPTION, order);
+    return this;
+  }
+
+  /**
+   * Returns the sort order for the group description.
+   *
+   * @return the sort order
+   */
+  public Order getGroupDescriptionSortOrder() {
+    return getSortOrder(GroupIndexSchema.DESCRIPTION);
+  }
+
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();

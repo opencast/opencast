@@ -81,6 +81,7 @@ import java.util.List;
 
 import javax.management.ObjectInstance;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * Implements a simple cache for remote URIs. Delegates methods to {@link WorkingFileRepository} wherever possible.
@@ -153,7 +154,7 @@ public final class WorkspaceImpl implements Workspace {
 
   /**
    * Check is a property exists in a given bundle context.
-   * 
+   *
    * @param cc
    *          the OSGi component context
    * @param prop
@@ -682,7 +683,9 @@ public final class WorkspaceImpl implements Workspace {
    * @return the local file representation
    */
   File toWorkspaceFile(URI uri) {
-    String uriString = uri.toString();
+    // MH-11497: Fix for compatibility with stream security: the query parameters are deleted.
+    // TODO Refactor this class to use the URI class and methods instead of String for handling URIs
+    String uriString = UriBuilder.fromUri(uri).replaceQuery(null).build().toString();
     String wfrPrefix = wfr.getBaseUri().toString();
     String serverPath = FilenameUtils.getPath(uriString);
     if (uriString.startsWith(wfrPrefix)) {

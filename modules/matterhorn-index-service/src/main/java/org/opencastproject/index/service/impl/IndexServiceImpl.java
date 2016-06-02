@@ -1046,6 +1046,9 @@ public class IndexServiceImpl implements IndexService {
           case GroupIndexSchema.NAME:
             query.sortByName(criterion.getOrder());
             break;
+          case GroupIndexSchema.DESCRIPTION:
+            query.sortByDescription(criterion.getOrder());
+            break;
           case GroupIndexSchema.ROLE:
             query.sortByRole(criterion.getOrder());
             break;

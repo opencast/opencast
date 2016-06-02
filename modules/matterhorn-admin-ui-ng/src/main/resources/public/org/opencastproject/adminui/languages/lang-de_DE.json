@@ -262,7 +262,7 @@
   },
   "EVENTS":{
     "RETRACT":{
-      "CAPTION":"Aufzeichnunge zurückziehen",
+      "CAPTION":"Aufzeichnungen zurückziehen",
       "ID":"ID",
       "SELECT_TASK":"Task auswählen",
       "SUMMARY":"Zusammenfassung",

@@ -27,7 +27,7 @@
   "esc":"Escape",
   "escape":"Escape",
   "backspace":"Retroceso",
-  "space":"Espacio",
+  "space":"Espazo",
   "pageup":"Re. Páx.",
   "pagedown":"Av. Páx.",
   "end":"Fin",
@@ -53,7 +53,7 @@
   "zoom.out":"Afastar",
   "controls":"Controis de vídeo",
   "volume":"Volume",
-  "playbackrate":"Playback rate",
+  "playbackrate":"Velocidade de reprodución",
   "layout":"Disposición da pantalla",
   "zoom":"Zoom"
 }
