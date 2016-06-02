@@ -172,13 +172,14 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
       switch (rePublishStrategy) {
 
         case ("fail"):
+          //fail is a dummy function for further distribution strategies 
           fail(mp);
           break;
         default:
           retract(mp, channelId);
       }
     }
-    //----
+
     final String[] sourceFlavors = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(SOURCE_FLAVORS)), ",");
     final String[] sourceTags = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(SOURCE_TAGS)), ",");
 
@@ -218,9 +219,8 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
         }
 
         // Wait until all distribution jobs have returned
-        if (!waitForStatus(jobs.keySet().toArray(new Job[jobs.keySet().size()])).isSuccess()) {
+        if (!waitForStatus(jobs.keySet().toArray(new Job[jobs.keySet().size()])).isSuccess())
           throw new WorkflowOperationException("One of the distribution jobs did not complete successfully");
-        }
 
         MediaPackageElement element = null;
         for (Entry<Job, MediaPackageElement> job : jobs.entrySet()) {
@@ -273,7 +273,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
         try {
           final Job retractjob = distributionService.retract(channelId, mp, publicationElement.getChannel());
           jobs.put(retractjob, publicationElement);
-          logger.debug("Retracting jon '{}' for element '{}' of media package '{}' created.", new Object[]{retractjob,
+          logger.debug("Retracting job '{}' for element '{}' of media package '{}' created.", new Object[]{retractjob,
             publicationElement, mp});
         } catch (DistributionException e) {
           logger.error("Creating the retracting job for element '{}' of media package '{}' failed: {}",
@@ -287,7 +287,11 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
       throw new WorkflowOperationException("One of the retraction jobs did not complete successfully");
     }
   }
-
+/**
+ * Dummy function for further publication strategies
+ * @param mp
+ * @throws WorkflowOperationException 
+ */
   private void fail(MediaPackage mp) throws WorkflowOperationException {
     logger.error("There is already a Published Media, fail Stragy for Mediapackage {}", mp.getIdentifier());
     throw new WorkflowOperationException("There is already a Published Media, fail Stragy for Mediapackage ");

@@ -325,7 +325,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       removePublicationElement(mediaPackage);
         switch (republishStrategy) {
           case ("merge"):
-              // nothing to do here. Other publication strategies can be added to this list later on
+              // nothing to do here. other publication strategies can be added to this list later on
             break;
           default:
             retractFromEngage(mediaPackage);
@@ -380,7 +380,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
             }
             break;
           default:
-            // nothing to do here
+          // nothing to do here
         }
 
         if (!isPublishable(mediaPackageForSearch))
@@ -711,7 +711,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
          }
         }
         Job deleteSearchJob = null;
-        logger.info("Retracting already publisched Elements for Mediapackage: {}", mediaPackage.getIdentifier().toString());
+        logger.info("Retracting already published Elements for Mediapackage: {}", mediaPackage.getIdentifier().toString());
         deleteSearchJob = searchService.delete(mediaPackage.getIdentifier().toString());
         if (deleteSearchJob != null) {
           jobs.add(deleteSearchJob);
