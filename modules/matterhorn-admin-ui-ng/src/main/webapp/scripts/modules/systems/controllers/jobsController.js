@@ -5,14 +5,14 @@ angular.module('adminNg.controllers')
         $scope.table = Table;
         $scope.table.configure({
             columns: [{
+                name:  'status',
+                label: 'SYSTEMS.JOBS.TABLE.STATUS'
+            }, {
                 name:  'operation',
                 label: 'SYSTEMS.JOBS.TABLE.OPERATION'
             }, {
                 name:  'type',
                 label: 'SYSTEMS.JOBS.TABLE.TYPE'
-            }, {
-                name:  'status',
-                label: 'SYSTEMS.JOBS.TABLE.STATUS'
             }, {
                 name:  'processingHost',
                 label: 'SYSTEMS.JOBS.TABLE.HOST_NAME'
