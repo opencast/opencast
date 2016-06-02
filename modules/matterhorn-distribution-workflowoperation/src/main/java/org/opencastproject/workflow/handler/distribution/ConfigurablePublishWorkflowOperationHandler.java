@@ -61,8 +61,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-/** WOH that distributes selected elements to an internal distribution channel and adds reflective publication elements
- *  to the media package. */
+/**
+ * WOH that distributes selected elements to an internal distribution channel and adds reflective publication elements
+ *  to the media package.
+ */
 
 public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
@@ -172,7 +174,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
       switch (rePublishStrategy) {
 
         case ("fail"):
-          //fail is a dummy function for further distribution strategies 
+          //fail is a dummy function for further distribution strategies
           fail(mp);
           break;
         default:
@@ -290,7 +292,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
 /**
  * Dummy function for further publication strategies
  * @param mp
- * @throws WorkflowOperationException 
+ * @throws WorkflowOperationException
  */
   private void fail(MediaPackage mp) throws WorkflowOperationException {
     logger.error("There is already a Published Media, fail Stragy for Mediapackage {}", mp.getIdentifier());
