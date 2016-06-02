@@ -31,8 +31,11 @@ import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.query.AgentsListQuery;
 import org.opencastproject.index.service.resources.list.query.EventListQuery;
 import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
+import org.opencastproject.index.service.resources.list.query.JobsListQuery;
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
+import org.opencastproject.index.service.resources.list.query.ServersListQuery;
+import org.opencastproject.index.service.resources.list.query.ServicesListQuery;
 import org.opencastproject.index.service.resources.list.query.ThemesListQuery;
 import org.opencastproject.index.service.resources.list.query.UsersListQuery;
 import org.opencastproject.index.service.util.JSONUtils;
@@ -186,12 +189,18 @@ public class ListProvidersEndpoint {
       query = new SeriesListQuery();
     } else if ("events".equals(page)) {
       query = new EventListQuery();
+    } else if ("jobs".equals(page)) {
+      query = new JobsListQuery();
     } else if ("recordings".equals(page)) {
       query = new AgentsListQuery();
     } else if ("users".equals(page)) {
       query = new UsersListQuery();
     } else if ("groups".equals(page)) {
       query = new GroupsListQuery();
+    } else if ("servers".equals(page)) {
+      query = new ServersListQuery();
+    } else if ("services".equals(page)) {
+      query = new ServicesListQuery();
     } else if ("themes".equals(page)) {
       query = new ThemesListQuery();
     } else {

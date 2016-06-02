@@ -147,10 +147,10 @@ public final class EndpointUtil {
     if (filterString != null) {
       String[] filters = filterString.split(",");
       for (String filter : filters) {
-        String[] splitFilter = filter.split("=");
+        String[] splitFilter = filter.split(":", 2);
         if (splitFilter != null && splitFilter.length == 2) {
-          String key = splitFilter[0];
-          String value = splitFilter[1];
+          String key = splitFilter[0].trim();
+          String value = splitFilter[1].trim();
           query.addFilter(new StringListFilter(key, value));
         }
       }

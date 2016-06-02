@@ -103,8 +103,7 @@ public class TestJobEndpoint extends JobEndpoint {
     EasyMock.expect(workflowService.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class)))
             .andReturn(workflowSet).anyTimes();
     EasyMock.expect(workflowService.countWorkflowInstances()).andReturn(workflowSet.size()).anyTimes();
-    EasyMock.expect(serviceRegistry.getJobs(EasyMock.anyString(), EasyMock.anyObject(Status.class))).andReturn(jobs)
-            .anyTimes();
+    EasyMock.expect(serviceRegistry.getActiveJobs()).andReturn(jobs).anyTimes();
 
     EasyMock.replay(workflowService);
     EasyMock.replay(serviceRegistry);

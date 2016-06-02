@@ -1,6 +1,6 @@
 angular.module('adminNg.controllers')
-.controller('ServicesCtrl', ['$scope', 'Table', 'ServicesResource', 'ServiceResource',
-    function ($scope, Table, ServicesResource, ServiceResource) {
+.controller('ServicesCtrl', ['$scope', 'Table', 'ServicesResource', 'ServiceResource', 'ResourcesFilterResource',
+    function ($scope, Table, ServicesResource, ServiceResource, ResourcesFilterResource) {
 
         $scope.table = Table;
         $scope.table.configure({
@@ -11,7 +11,7 @@ angular.module('adminNg.controllers')
                 name:  'name',
                 label: 'SYSTEMS.SERVICES.TABLE.NAME'
             }, {
-                name:  'host',
+                name:  'hostname',
                 label: 'SYSTEMS.SERVICES.TABLE.HOST_NAME'
             }, {
                 name:  'completed',
@@ -39,9 +39,11 @@ angular.module('adminNg.controllers')
             apiService: ServicesResource
         });
 
-        $scope.table.sanitize = function (host, serviceType) {
+        $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
+
+        $scope.table.sanitize = function (hostname, serviceType) {
             ServiceResource.sanitize({
-                host: host,
+                host: hostname,
                 serviceType: serviceType
             }, function () {
                 $scope.table.fetch();

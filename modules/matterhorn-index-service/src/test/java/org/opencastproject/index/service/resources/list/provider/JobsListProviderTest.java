@@ -21,86 +21,53 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import static org.opencastproject.index.service.resources.list.provider.JobsListProvider.JobFilter.CONTRIBUTOR;
-import static org.opencastproject.index.service.resources.list.provider.JobsListProvider.JobFilter.SERIES;
-import static org.opencastproject.index.service.resources.list.provider.JobsListProvider.JobFilter.STATUS;
-import static org.opencastproject.index.service.resources.list.provider.JobsListProvider.JobFilter.TITLE;
-import static org.opencastproject.index.service.resources.list.provider.JobsListProvider.JobFilter.WORKFLOW;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.index.service.resources.list.query.JobsListQueryImpl;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageBuilder;
-import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
-import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function;
+import org.opencastproject.index.service.resources.list.query.JobsListQuery;
+import org.opencastproject.job.api.Job;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
-import org.opencastproject.workflow.api.WorkflowException;
-import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
-import org.opencastproject.workflow.api.WorkflowListener;
-import org.opencastproject.workflow.api.WorkflowParsingException;
-import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workflow.api.WorkflowSet;
-import org.opencastproject.workflow.api.WorkflowSetImpl;
-import org.opencastproject.workflow.api.WorkflowStateException;
-import org.opencastproject.workflow.api.WorkflowStatistics;
 
+import org.apache.commons.lang3.StringUtils;
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.net.URL;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 
 public class JobsListProviderTest {
 
   private JobsListProvider jobsListProvider;
-  private Map<String, Object> resultList;
-  private MediaPackageBuilder mpBuilder;
   private WorkflowService workflowService;
-  private WorkflowSetImpl workflowSet;
-  private Function<WorkflowQuery, Boolean> testWorkflowQuery;
+
+  private List<WorkflowDefinition> workflowDefinitions;
 
   @Before
   public void setUp() throws Exception {
     jobsListProvider = new JobsListProvider();
-
-    workflowSet = new WorkflowSetImpl();
-
-    mpBuilder = new MediaPackageBuilderImpl();
+    workflowDefinitions = new ArrayList<WorkflowDefinition>();
 
     WorkflowDefinition wfD = new WorkflowDefinitionImpl();
     wfD.setTitle("Full");
     wfD.setId("full");
-
-    WorkflowInstanceImpl workflowInstanceImpl1 = new WorkflowInstanceImpl(wfD,
-            loadMpFromResource("jobs_mediapackage1"), 2L, null, null, new HashMap<String, String>());
-    WorkflowInstanceImpl workflowInstanceImpl2 = new WorkflowInstanceImpl(wfD,
-            loadMpFromResource("jobs_mediapackage2"), 2L, null, null, new HashMap<String, String>());
-    WorkflowInstanceImpl workflowInstanceImpl3 = new WorkflowInstanceImpl(wfD,
-            loadMpFromResource("jobs_mediapackage3"), 2L, null, null, new HashMap<String, String>());
-
-    workflowInstanceImpl1.setState(WorkflowState.PAUSED);
-    workflowInstanceImpl2.setState(WorkflowState.PAUSED);
-    workflowInstanceImpl3.setState(WorkflowState.INSTANTIATED);
-
-    workflowSet.addItem(workflowInstanceImpl1);
-    workflowSet.addItem(workflowInstanceImpl2);
-    workflowSet.addItem(workflowInstanceImpl3);
+    workflowDefinitions.add(wfD);
+    wfD = new WorkflowDefinitionImpl();
+    wfD.setTitle("Quick");
+    wfD.setId("quick");
+    workflowDefinitions.add(wfD);
 
     workflowService = EasyMock.createNiceMock(WorkflowService.class);
-    EasyMock.expect(workflowService.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class)))
-            .andReturn(workflowSet).anyTimes();
+    EasyMock.expect(workflowService.listAvailableWorkflowDefinitions())
+            .andReturn(workflowDefinitions).anyTimes();
 
     jobsListProvider.setWorkflowService(workflowService);
     jobsListProvider.activate(null);
@@ -109,188 +76,40 @@ public class JobsListProviderTest {
   }
 
   @Test
-  public void testListNames() throws ListProviderException {
-    ResourceListQuery query = new JobsListQueryImpl();
+  public void testStatusListName() throws ListProviderException, WorkflowDatabaseException {
+    ResourceListQuery query = new JobsListQuery();
 
-    org.junit.Assert.assertEquals(3,
-            jobsListProvider.getList(JobsListProvider.getListNameFromFilter(TITLE), query, null).size());
+    assertEquals(4, jobsListProvider.getList(JobsListProvider.LIST_STATUS, query, null).size());
+    for (Entry<String, String> entry : jobsListProvider.getList(JobsListProvider.LIST_STATUS, query, null).entrySet()) {
+      try {
+        Job.Status.valueOf(entry.getKey());
+      } catch (IllegalArgumentException ex) {
+        fail("Can not parse job state");
+      }
 
-    org.junit.Assert.assertEquals(3, jobsListProvider.getList("jobs", query, null).size());
-    org.junit.Assert.assertEquals(3, jobsListProvider.getList("non-existing-name", query, null).size());
-
-    org.junit.Assert.assertEquals(2,
-            jobsListProvider.getList(JobsListProvider.getListNameFromFilter(CONTRIBUTOR), query, null).size());
-
-    org.junit.Assert.assertEquals(2,
-            jobsListProvider.getList(JobsListProvider.getListNameFromFilter(STATUS), query, null).size());
-    org.junit.Assert.assertEquals(1,
-            jobsListProvider.getList(JobsListProvider.getListNameFromFilter(SERIES), query, null).size());
-    org.junit.Assert.assertEquals(1,
-            jobsListProvider.getList(JobsListProvider.getListNameFromFilter(WORKFLOW), query, null).size());
+      assertTrue(StringUtils.startsWith(entry.getValue(), JobsListProvider.JOB_STATUS_FILTER_PREFIX));
+    }
   }
 
   @Test
-  public void testQueries() throws ListProviderException, WorkflowDatabaseException {
-    workflowService = EasyMock.createNiceMock(WorkflowService.class);
-    EasyMock.expect(workflowService.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class)))
-            .andDelegateTo(getWorkflowServiceStub()).anyTimes();
+  public void testWorkflowListName() throws ListProviderException, WorkflowDatabaseException {
+    ResourceListQuery query = new JobsListQuery();
 
-    jobsListProvider.setWorkflowService(workflowService);
-    jobsListProvider.activate(null);
+    assertEquals(workflowDefinitions.size(),
+            jobsListProvider.getList(JobsListProvider.LIST_WORKFLOW, query, null).size());
 
-    EasyMock.replay(workflowService);
+    for (Entry<String, String> entry : jobsListProvider.getList(
+            JobsListProvider.LIST_WORKFLOW, query, null).entrySet()) {
 
-    final JobsListQueryImpl query = new JobsListQueryImpl();
-    query.setLimit(1);
-    query.setOffset(1);
-    query.withStatus(WorkflowState.FAILED);
-    query.withText("test");
-
-    testWorkflowQuery = new Function<WorkflowQuery, Boolean>() {
-      @Override
-      public Boolean apply(WorkflowQuery q) {
-        Assert.assertEquals((long) (query.getLimit().get()), q.getCount());
-        Assert.assertEquals((long) (query.getOffset().get()), q.getStartPage());
-        return null;
+      boolean match = false;
+      for (WorkflowDefinition wfD : workflowDefinitions) {
+        if (StringUtils.equals(wfD.getId(), entry.getKey())
+                && StringUtils.equals(wfD.getTitle(), entry.getValue())) {
+          match = true;
+          break;
+        }
       }
-    };
-    jobsListProvider.getList(JobsListProvider.getListNameFromFilter(TITLE), query, null).size();
+      assertTrue(match);
+    }
   }
-
-  private MediaPackage loadMpFromResource(String name) throws Exception {
-    URL url = JobsListProviderTest.class.getResource("/" + name + ".xml");
-    return mpBuilder.loadFromXml(url.openStream());
-  }
-
-  private WorkflowService getWorkflowServiceStub() {
-    return new WorkflowService() {
-      @Override
-      public void addWorkflowListener(WorkflowListener listener) {
-      }
-
-      @Override
-      public void removeWorkflowListener(WorkflowListener listener) {
-      }
-
-      @Override
-      public void registerWorkflowDefinition(WorkflowDefinition workflow) throws WorkflowDatabaseException {
-      }
-
-      @Override
-      public void unregisterWorkflowDefinition(String workflowDefinitionId) throws NotFoundException,
-              WorkflowDatabaseException {
-      }
-
-      @Override
-      public WorkflowDefinition getWorkflowDefinitionById(String id) throws WorkflowDatabaseException,
-              NotFoundException {
-        return null;
-      }
-
-      @Override
-      public WorkflowInstance getWorkflowById(long workflowId) throws WorkflowDatabaseException, NotFoundException,
-              UnauthorizedException {
-        return null;
-      }
-
-      @Override
-      public WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
-        testWorkflowQuery.apply(query);
-        return workflowSet;
-      }
-
-      @Override
-      public WorkflowSet getWorkflowInstancesForAdministrativeRead(WorkflowQuery q) throws WorkflowDatabaseException,
-              UnauthorizedException {
-        return null;
-      }
-
-      @Override
-      public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage,
-              Map<String, String> properties) throws WorkflowDatabaseException, WorkflowParsingException {
-        return null;
-      }
-
-      @Override
-      public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage,
-              Long parentWorkflowId, Map<String, String> properties) throws WorkflowDatabaseException,
-              WorkflowParsingException, NotFoundException {
-        return null;
-      }
-
-      @Override
-      public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage)
-              throws WorkflowDatabaseException, WorkflowParsingException {
-        return null;
-      }
-
-      @Override
-      public long countWorkflowInstances() throws WorkflowDatabaseException {
-        return 0;
-      }
-
-      @Override
-      public long countWorkflowInstances(WorkflowState state, String operation) throws WorkflowDatabaseException {
-        return 0;
-      }
-
-      @Override
-      public WorkflowStatistics getStatistics() throws WorkflowDatabaseException {
-        return null;
-      }
-
-      @Override
-      public WorkflowInstance stop(long workflowInstanceId) throws WorkflowException, NotFoundException,
-              UnauthorizedException {
-        return null;
-      }
-
-      @Override
-      public void remove(long workflowInstanceId) throws WorkflowDatabaseException, WorkflowParsingException,
-              NotFoundException, UnauthorizedException, WorkflowStateException {
-      }
-
-      @Override
-      public WorkflowInstance suspend(long workflowInstanceId) throws WorkflowException, NotFoundException,
-              UnauthorizedException {
-        return null;
-      }
-
-      @Override
-      public WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, WorkflowException,
-              UnauthorizedException {
-        return null;
-      }
-
-      @Override
-      public WorkflowInstance resume(long workflowInstanceId, Map<String, String> properties) throws NotFoundException,
-              WorkflowException, IllegalStateException, UnauthorizedException {
-        return null;
-      }
-
-      @Override
-      public void update(WorkflowInstance workflowInstance) throws WorkflowException, UnauthorizedException {
-      }
-
-      @Override
-      public List<WorkflowDefinition> listAvailableWorkflowDefinitions() throws WorkflowDatabaseException {
-        return null;
-      }
-
-      @Override
-      public void cleanupWorkflowInstances(int lifetime, WorkflowState state) throws WorkflowDatabaseException,
-              UnauthorizedException {
-
-      }
-
-      @Override
-      public void moveMissingCapturesFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException {
-      }
-
-      @Override
-      public void moveMissingIngestsFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException {
-      }
-    };
-  }
-
 }
