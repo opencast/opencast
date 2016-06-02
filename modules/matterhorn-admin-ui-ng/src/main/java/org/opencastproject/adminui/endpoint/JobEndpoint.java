@@ -166,11 +166,7 @@ public class JobEndpoint {
 
     List<Job> jobs = new ArrayList<Job>();
     try {
-      for (Job job : serviceRegistry.getJobs(null, null)) {
-        // filter all inactive jobs
-        if (job.getStatus().isTerminated())
-          continue;
-
+      for (Job job : serviceRegistry.getActiveJobs()) {
         // filter workflow jobs
         if (StringUtils.equals(WorkflowService.JOB_TYPE, job.getJobType())
                 && StringUtils.equals("START_WORKFLOW", job.getOperation()))
