@@ -162,7 +162,7 @@ public class ServicesEndpointTest {
 
   @Test
   public void testActionsFilter() {
-    given().param("filter", "actions:yes").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "actions:true").log().all().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
             .content("count", equalTo(2))
             .content("total", equalTo(2))
@@ -172,7 +172,7 @@ public class ServicesEndpointTest {
             .content("results[1].name", equalTo("service4"))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("filter", "actions:no").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "actions:false").log().all().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
             .content("count", equalTo(4))
             .content("total", equalTo(4))
@@ -184,16 +184,6 @@ public class ServicesEndpointTest {
             .content("results[2].name", equalTo("service5"))
             .content("results[3].hostname", equalTo("host4"))
             .content("results[3].name", equalTo("service6"))
-            .when().get(rt.host(TEST_DATA_JSON));
-
-    given().param("filter", " actions:true ").log().all().expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON)
-            .content("count", equalTo(2))
-            .content("total", equalTo(2))
-            .content("results[0].hostname", equalTo("host1"))
-            .content("results[0].name", equalTo("service2"))
-            .content("results[1].hostname", equalTo("host3"))
-            .content("results[1].name", equalTo("service4"))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 

@@ -86,9 +86,11 @@ public class BooleanListProvider implements ResourceListProvider {
    */
   public static <Boolean> Option<Boolean> parseValue(String filterValue) {
     String value = StringUtils.trimToEmpty(filterValue);
-    if (StringUtils.equalsIgnoreCase(YES, value))
+    if (StringUtils.equalsIgnoreCase(YES, value)
+            || StringUtils.equalsIgnoreCase("true", value))
       return (Option<Boolean>) Option.option(true);
-    else if (StringUtils.equalsIgnoreCase(NO, value))
+    else if (StringUtils.equalsIgnoreCase(NO, value)
+            || StringUtils.equalsIgnoreCase("false", value))
       return (Option<Boolean>) Option.option(false);
     else return Option.<Boolean> none();
   }
