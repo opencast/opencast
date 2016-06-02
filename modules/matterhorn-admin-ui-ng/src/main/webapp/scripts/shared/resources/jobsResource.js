@@ -8,9 +8,12 @@ angular.module('adminNg.resources')
             parse = function (r) {
                 var row = {};
                 row.operation = r.operation;
-                row.workflow = r.workflow;
+                row.type = r.type;
                 row.status = r.status;
                 row.submitted = Language.formatDateTime('short', r.submitted);
+                row.started = Language.formatDateTime('short', r.started);
+                row.creator = r.creator;
+                row.processingHost = r.processingHost;
                 return row;
             };
 

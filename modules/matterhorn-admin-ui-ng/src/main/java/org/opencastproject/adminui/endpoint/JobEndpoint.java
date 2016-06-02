@@ -36,6 +36,8 @@ import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
+import org.opencastproject.matterhorn.search.SearchQuery;
+import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.IncidentL10n;
@@ -88,6 +90,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -104,8 +107,11 @@ public class JobEndpoint {
   public static final Response NOT_FOUND = Response.status(Response.Status.NOT_FOUND).build();
   public static final Response SERVER_ERROR = Response.serverError().build();
 
+  private enum JobSort {
+    CREATOR, OPERATION, PROCESSINGHOST, STATUS, STARTED, SUBMITTED, TYPE,
+  }
+
   private static final String NEGATE_PREFIX = "-";
-  private static final String DESCENDING_SUFFIX = "_DESC";
 
   private WorkflowService workflowService;
   private ServiceRegistry serviceRegistry;
@@ -135,11 +141,31 @@ public class JobEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(description = "Returns the list of active jobs", name = "jobs", restParameters = {
           @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "offset", description = "The offset", isRequired = false, type = RestParameter.Type.INTEGER) }, reponses = { @RestResponse(description = "Returns the list of active jobs from Matterhorn", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The list of jobs as JSON")
-  public Response getJobs(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset) {
+          @RestParameter(name = "offset", description = "The offset", isRequired = false, type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "sort", description = "The sort order. May include any of the following: CREATOR, OPERATION, PROCESSINGHOST, STATUS, STARTED, SUBMITTED or TYPE. "
+                  + "The suffix must be :ASC for ascending or :DESC for descending sort order (e.g. OPERATION:DESC)", isRequired = false, type = RestParameter.Type.STRING)},
+          reponses = { @RestResponse(description = "Returns the list of active jobs from Opencast", responseCode = HttpServletResponse.SC_OK) },
+          returnDescription = "The list of jobs as JSON")
+  public Response getJobs(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset, @QueryParam("sort") final String sort) {
+    JobSort sortKey = JobSort.SUBMITTED;
+    boolean ascending = true;
+    if (StringUtils.isNotBlank(sort)) {
+      try {
+        SortCriterion sortCriterion = RestUtils.parseSortQueryParameter(sort).iterator().next();
+        sortKey = JobSort.valueOf(sortCriterion.getFieldName().toUpperCase());
+        ascending = SearchQuery.Order.Ascending == sortCriterion.getOrder()
+                || SearchQuery.Order.None == sortCriterion.getOrder();
+      } catch (WebApplicationException ex) {
+        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", new Object[] { sort });
+      } catch (IllegalArgumentException ex) {
+        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", new Object[] { sort });
+      }
+    }
+
+    JobComparator comparator = new JobComparator(sortKey, ascending);
     Stream<Job> jobs = Stream.empty();
     try {
-      jobs = $(serviceRegistry.getJobs(null, Status.RUNNING)).filter(removeWorkflowJobs).sort(sortByCreationDate);
+      jobs = $(serviceRegistry.getJobs(null, Status.RUNNING)).filter(removeWorkflowJobs).sort(comparator);
     } catch (Exception e) {
       logger.error("Unable to get running jobs: {}", ExceptionUtils.getStackTrace(e));
       return RestUtil.R.serverError();
@@ -174,7 +200,9 @@ public class JobEndpoint {
           @RestParameter(name = "operation", isRequired = false, description = "Filter results by workflows' current operation.", type = STRING),
           @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
                   + "of the following: DATE_CREATED, TITLE, SERIES_TITLE, SERIES_ID, MEDIA_PACKAGE_ID, WORKFLOW_DEFINITION_ID, CREATOR, "
-                  + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = STRING) }, reponses = { @RestResponse(description = "Returns the list of tasks from Matterhorn", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The list of tasks as JSON")
+                  + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT.  The suffix must be :ASC for ascending or :DESC for descending sort order (e.g. TITLE:DESC).", type = STRING) },
+          reponses = { @RestResponse(description = "Returns the list of tasks from Matterhorn", responseCode = HttpServletResponse.SC_OK) },
+          returnDescription = "The list of tasks as JSON")
   public Response getTasks(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset,
           @QueryParam("status") List<String> states, @QueryParam("q") String text,
           @QueryParam("seriesId") String seriesId, @QueryParam("seriesTitle") String seriesTitle,
@@ -241,23 +269,17 @@ public class JobEndpoint {
 
     // Sorting
     if (StringUtils.isNotBlank(sort)) {
-      // Parse the sort field and direction
-      Sort sortField = null;
-      if (sort.endsWith(DESCENDING_SUFFIX)) {
-        String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
-        try {
-          sortField = Sort.valueOf(enumKey);
-          query.withSort(sortField, false);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", enumKey);
-        }
-      } else {
-        try {
-          sortField = Sort.valueOf(sort);
-          query.withSort(sortField);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", sort);
-        }
+      try {
+        SortCriterion sortCriterion = RestUtils.parseSortQueryParameter(sort).iterator().next();
+        Sort sortKey = Sort.valueOf(sortCriterion.getFieldName().toUpperCase());
+        boolean ascending = SearchQuery.Order.Ascending == sortCriterion.getOrder()
+                || SearchQuery.Order.None == sortCriterion.getOrder();
+
+        query.withSort(sortKey, ascending);
+      } catch (WebApplicationException ex) {
+        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", new Object[] { sort });
+      } catch (IllegalArgumentException ex) {
+        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", new Object[] { sort });
       }
     }
 
@@ -578,11 +600,67 @@ public class JobEndpoint {
     }
   };
 
-  private final Comparator<Job> sortByCreationDate = new Comparator<Job>() {
+  private class JobComparator implements Comparator<Job> {
+
+    private JobSort sortType;
+    private boolean ascending;
+
+    JobComparator(JobSort sortType, boolean ascending) {
+      this.sortType = sortType;
+      this.ascending = ascending;
+    }
+
     @Override
     public int compare(Job job1, Job job2) {
-      return job1.getDateCreated().compareTo(job2.getDateCreated());
-    }
-  };
+      int result = 0;
+      Object value1 = null;
+      Object value2 = null;
+      switch (sortType) {
+        case CREATOR:
+          value1 = job1.getCreator();
+          value2 = job2.getCreator();
+          break;
+        case OPERATION:
+          value1 = job1.getOperation();
+          value2 = job2.getOperation();
+          break;
+        case PROCESSINGHOST:
+          value1 = job1.getProcessingHost();
+          value2 = job2.getProcessingHost();
+          break;
+        case STARTED:
+          value1 = job1.getDateStarted();
+          value2 = job2.getDateStarted();
+          break;
+        case STATUS:
+          value1 = job1.getStatus();
+          value2 = job2.getStatus();
+          break;
+        case SUBMITTED:
+          value1 = job1.getDateCreated();
+          value2 = job2.getDateCreated();
+          break;
+        case TYPE:
+          value1 = job1.getJobType();
+          value2 = job2.getJobType();
+          break;
+        default:
+      }
 
+      if (value1 == null) {
+        return value2 == null ? 0 : 1;
+      }
+      if (value2 == null) {
+        return -1;
+      }
+      try {
+        result = ((Comparable)value1).compareTo(value2);
+      } catch (ClassCastException ex) {
+        logger.debug("Can not compare \"{}\" with \"{}\": {}",
+                new Object[] { value1, value2, ex });
+      }
+
+      return ascending ? result : -1 * result;
+    }
+  }
 }

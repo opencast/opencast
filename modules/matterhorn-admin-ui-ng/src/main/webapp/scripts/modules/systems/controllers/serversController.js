@@ -9,7 +9,7 @@ angular.module('adminNg.controllers')
                 template: 'modules/systems/partials/serverStatusCell.html',
                 label:    'SYSTEMS.SERVERS.TABLE.STATUS'
             }, {
-                name:  'name',
+                name:  'hostname',
                 label: 'SYSTEMS.SERVERS.TABLE.HOST_NAME'
             }, {
                 name:  'cores',
