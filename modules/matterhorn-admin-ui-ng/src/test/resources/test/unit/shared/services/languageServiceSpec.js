@@ -74,7 +74,7 @@ describe('adminNg.services.language', function () {
 
     it('retrieves available languages as an Array of Strings', function () {
         Language.setAvailableLanguages([{ code: 'de_DE' }, { code: 'en_US' }]);
-        expect(Language.getAvailableLanguageCodes()).toEqual(['de', 'en']);
+        expect(Language.getAvailableLanguageCodes()).toEqual(['de_DE', 'en_US']);
     });
 
     describe('#formatTime', function () {
@@ -91,7 +91,7 @@ describe('adminNg.services.language', function () {
     describe('#getLanguageCode', function () {
 
         it('returns the correct language code', function () {
-            expect(Language.getLanguageCode()).toEqual('en');
+            expect(Language.getLanguageCode()).toEqual('en_US');
         });
 
         describe('without a configured language', function () {
@@ -376,24 +376,7 @@ describe('adminNg.services.language', function () {
         });
     });
 
-    describe('#$convertLanguageToCode', function () {
-
-        describe('with a language string', function () {
-
-            it('returns the language code', function () {
-                expect(Language.$convertLanguageToCode('de_DE')).toEqual('de');
-            });
-        });
-
-        describe('with a language code', function () {
-
-            it('returns the language code', function () {
-                expect(Language.$convertLanguageToCode('jp')).toEqual('jp');
-            });
-        });
-    });
-
-    describe('#toLocalTime', function () {      
+    describe('#toLocalTime', function () {
 
         it('converts a zulu time string back to local time', function () {
             var localTime = JsHelper.toZuluTimeString({

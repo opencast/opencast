@@ -6,6 +6,7 @@
   "results": [{
     "completed": 2,
     "cores": 2,
+    "hostname":"http:\/\/mh-worker1.localdomain",
     "maintenance": false,
     "meanQueueTime": 498,
     "meanRunTime": 390201,
@@ -17,6 +18,7 @@
   {
     "completed": 2,
     "cores": 8,
+    "hostname":"http:\/\/mh-allinone.localdomain",
     "maintenance": true,
     "meanQueueTime": 3600,
     "meanRunTime": 200,
@@ -28,6 +30,7 @@
   {
     "completed": 2,
     "cores": 4,
+    "hostname":"http:\/\/mh-engage.localdomain",
     "maintenance": false,
     "meanQueueTime": 4,
     "meanRunTime": 200,
@@ -39,6 +42,7 @@
   {
     "completed": 2,
     "cores": 6,
+    "hostname":"http:\/\/mh-worker2.localdomain",
     "maintenance": false,
     "meanQueueTime": 4,
     "meanRunTime": 200,

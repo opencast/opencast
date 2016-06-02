@@ -5,7 +5,7 @@ angular.module('adminNg.services')
         this.ud = {};
         this.requiredMetadata = {};
 
-        me.isMetadataState = true;
+        me.isMetadataExtendedState = true;
 
         // As soon as the required metadata fields arrive from the backend,
         // we check which are mandatory.

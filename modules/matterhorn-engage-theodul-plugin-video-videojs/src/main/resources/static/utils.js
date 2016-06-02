@@ -27,11 +27,6 @@ define(["jquery"], function($) {
         // nothing to see here
     }
 
-    Utils.prototype.detectLanguage = function() {
-        var language = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
-        return language.replace(/\-.*/,'');
-    };
-
     Utils.prototype.extractFlavorMainType = function(flavor) {
         var types = flavor.split("/");
         if (types.length > 0) {

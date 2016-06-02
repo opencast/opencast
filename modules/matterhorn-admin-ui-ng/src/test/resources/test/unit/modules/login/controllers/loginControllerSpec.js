@@ -81,12 +81,6 @@ describe('Login Controller', function () {
         beforeEach(function () {
             $controller('LoginCtrl', {$scope: $scope});
         });
-
-        it('wraps Language.$convertLanguageToCode', function () {
-            spyOn(Language, '$convertLanguageToCode');
-            $scope.toLanguageClass({ code: 'de_DE' });
-            expect(Language.$convertLanguageToCode).toHaveBeenCalledWith('de_DE');
-        });
     });
 
     describe('#changeLanguage', function () {

@@ -52,6 +52,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 import org.opencastproject.adminui.exception.JobEndpointException;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
+import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.archive.opencast.OpencastArchive;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
@@ -1695,7 +1696,7 @@ public abstract class AbstractEventEndpoint {
       if (EventListQuery.FILTER_AGENT_NAME.equals(name))
         query.withAgentId(filters.get(name));
       if (EventListQuery.FILTER_TEXT_NAME.equals(name))
-        query.withText("*" + filters.get(name) + "*");
+        query.withText(QueryPreprocessor.sanitize(filters.get(name)));
       if (EventListQuery.FILTER_SERIES_NAME.equals(name))
         query.withSeriesId(filters.get(name));
       if (EventListQuery.FILTER_STATUS_NAME.equals(name))

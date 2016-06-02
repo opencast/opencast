@@ -79,6 +79,8 @@ import javax.persistence.Version;
                 + "where j.creatorServiceRegistration.serviceType = :serviceType order by j.dateCreated"),
         @NamedQuery(name = "Job.status", query = "SELECT j FROM Job j "
                 + "where j.status = :status order by j.dateCreated"),
+        @NamedQuery(name = "Job.statuses", query = "SELECT j FROM Job j "
+                + "where j.status in :statuses order by j.dateCreated"),
         @NamedQuery(name = "Job.all", query = "SELECT j FROM Job j order by j.dateCreated"),
         @NamedQuery(name = "Job.dispatchable.status", query = "SELECT j FROM Job j where j.dispatchable = true and "
                 + "j.status in :statuses order by j.dateCreated"),
