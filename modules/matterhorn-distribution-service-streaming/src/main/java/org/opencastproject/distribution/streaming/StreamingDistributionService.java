@@ -238,7 +238,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
       final File destination = locations.get().createDistributionFile(securityService.getOrganization().getId(),
               channelId, mp.getIdentifier().compact(), element.getIdentifier(), element.getURI());
-      
+
       if (!destination.equals(source)) {
         // Put the file in place if  sourcesfile differs destinationfile
         try {
