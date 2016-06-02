@@ -119,6 +119,7 @@ public class OrganizationFilter implements Filter {
       if (org == null) {
         logger.warn("No organization is mapped to handle {}", url);
         httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "No organization is mapped to handle " + url);
+        return;
       }
       securityService.setOrganization(org);
 
