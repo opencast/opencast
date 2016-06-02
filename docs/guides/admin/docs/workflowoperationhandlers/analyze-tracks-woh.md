@@ -1,7 +1,7 @@
-# AnalyzeWorkflowOperationHandler
+# AnalyzeTracksWorkflowOperationHandler
 
 ## Description
-The AnalyzeWorkflowOperationHandler analyzes specified tracks in the mediapackage and sets workflow instance variables that
+The AnalyzeTracksWorkflowOperationHandler analyzes specified tracks in the mediapackage and sets workflow instance variables that
 can be used to control if workflow operations should be executed.
 
 For all tracks matching the flavor specified by the mandatory configuration key *source-flavor*,
@@ -23,10 +23,10 @@ the following workflow instance variables will be set:
 ##Operation Example
 
     <operation
-      id="analyze"
+      id="analyze-tracks"
       fail-on-error="true"
       exception-handler-workflow="ng-partial-error"
-      description="Analyze tracks and set control variables">
+      description="Analyze tracks in media package and set control variables">
       <configurations>
         <configuration key="source-flavor">*/work</configuration>
       </configurations>

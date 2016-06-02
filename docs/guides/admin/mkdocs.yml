@@ -69,7 +69,7 @@ pages:
    - Upgrading Home: 'upgrade/index.md'
 - Workflow Operation Handler:
    - Overview: 'workflowoperationhandlers/index.md'
-   - Analyze: 'workflowoperationhandlers/analyze-woh.md'
+   - Analyze Tracks: 'workflowoperationhandlers/analyze-tracks-woh.md'
    - Analyze Audio: 'workflowoperationhandlers/analyzeaudio-woh.md'
    - Append: 'workflowoperationhandlers/append-woh.md'
    - Archive: 'workflowoperationhandlers/archive-woh.md'

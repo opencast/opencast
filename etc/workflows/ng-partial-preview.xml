@@ -19,7 +19,7 @@
     <!-- Transcode video previews -->
 
     <operation
-      id="analyze"
+      id="analyze-tracks"
       exception-handler-workflow="ng-partial-error"
       description="Analyze tracks in media package an set control variables">
       <configurations>

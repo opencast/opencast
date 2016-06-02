@@ -46,7 +46,7 @@ import java.util.TreeMap;
 /**
  * Workflow operation handler for analyzing tracks and set control variables.
  */
-public class AnalyzeWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
+public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** Configuration key for the "flavor" of the tracks to use as a source input */
   public static final String OPT_SOURCE_FLAVOR = "source-flavor";
@@ -61,13 +61,13 @@ public class AnalyzeWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory
-          .getLogger(AnalyzeWorkflowOperationHandler.class);
+          .getLogger(AnalyzeTracksWorkflowOperationHandler.class);
 
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
 
-    logger.info("Running analyze workflow operation on workflow {}", workflowInstance.getId());
+    logger.info("Running analyze-tracks workflow operation on workflow {}", workflowInstance.getId());
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     final String sourceFlavorName = getConfig(workflowInstance, OPT_SOURCE_FLAVOR);
     final MediaPackageElementFlavor sourceFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavorName);
@@ -80,7 +80,7 @@ public class AnalyzeWorkflowOperationHandler extends AbstractWorkflowOperationHa
         properties.put(varName + "_video", Boolean.toString(track.hasVideo()));
         properties.put(varName + "_audio", Boolean.toString(track.hasAudio()));
       }
-      logger.info("Finished analyze workflow operation adding the properties: {}",
+      logger.info("Finished analyze-tracks workflow operation adding the properties: {}",
                   propertiesAsString(properties));
       return createResult(mediaPackage, properties, Action.CONTINUE, 0);
     } else {
