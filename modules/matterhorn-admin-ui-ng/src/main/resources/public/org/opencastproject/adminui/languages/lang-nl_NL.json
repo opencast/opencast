@@ -2,6 +2,7 @@
   "MATTERHORN":"Opencast",
   "NAV_HOME":"Start",
   "NAV_ABOUT":"Over",
+  "NO":"No",
   "SUBMIT":"Verzenden",
   "UPDATE":"Updaten",
   "CANCEL":"Annuleren",
@@ -1522,6 +1523,9 @@
       "CREATOR":{
         "LABEL":"Auteur"
       },
+      "HOSTNAME":{
+        "LABEL":"Hostnaam"
+      },
       "LANGUAGE":{
         "LABEL":"Taal"
       },
@@ -1591,6 +1595,18 @@
         "LABEL":"Workflow status"
       }
     },
+    "JOBS":{
+      "HOSTNAME":{
+        "LABEL":"Hostnaam"
+      },
+      "STATUS":{
+        "LABEL":"Status",
+        "PAUSED":"Gepauseerd",
+        "QUEUED":"Queued",
+        "RUNNING":"In uitvoering",
+        "WAITING":"Waiting"
+      }
+    },
     "SERIES":{
       "TITLE":{
         "LABEL":"Naam"
@@ -1618,6 +1634,34 @@
       },
       "CREATION_DATE":{
         "LABEL":"Aangemaakt op"
+      }
+    },
+    "SERVERS":{
+      "HOSTNAME":{
+        "LABEL":"Hostnaam"
+      },
+      "STATUS":{
+        "LABEL":"Status",
+        "MAINTENANCE":"Onderhoud",
+        "ONLINE":"Online",
+        "OFFLINE":"Offline"
+      }
+    },
+    "SERVICES":{
+      "ACTIONS":{
+        "LABEL":"Has actions"
+      },
+      "HOSTNAME":{
+        "LABEL":"Hostnaam"
+      },
+      "NAME":{
+        "LABEL":"Naam"
+      },
+      "STATUS":{
+        "LABEL":"Status",
+        "ERROR":"Error",
+        "NORMAL":"Normal",
+        "WARNING":"Let op"
       }
     },
     "THEMES":{

@@ -2,6 +2,7 @@
   "MATTERHORN":"Opencast",
   "NAV_HOME":"Accueil",
   "NAV_ABOUT":"À propos",
+  "NO":"No",
   "SUBMIT":"Envoyer",
   "UPDATE":"Appliquer",
   "CANCEL":"Annuler",
@@ -1522,6 +1523,9 @@
       "CREATOR":{
         "LABEL":"Auteur"
       },
+      "HOSTNAME":{
+        "LABEL":"Nom d'hôte"
+      },
       "LANGUAGE":{
         "LABEL":"Langue"
       },
@@ -1591,6 +1595,18 @@
         "LABEL":"Etat du workflow"
       }
     },
+    "JOBS":{
+      "HOSTNAME":{
+        "LABEL":"Nom d'hôte"
+      },
+      "STATUS":{
+        "LABEL":"Statut",
+        "PAUSED":"Suspendu",
+        "QUEUED":"Queued",
+        "RUNNING":"Traitement en cours",
+        "WAITING":"Waiting"
+      }
+    },
     "SERIES":{
       "TITLE":{
         "LABEL":"Nom"
@@ -1618,6 +1634,34 @@
       },
       "CREATION_DATE":{
         "LABEL":"Date de création "
+      }
+    },
+    "SERVERS":{
+      "HOSTNAME":{
+        "LABEL":"Nom d'hôte"
+      },
+      "STATUS":{
+        "LABEL":"Statut",
+        "MAINTENANCE":"Maintenance",
+        "ONLINE":"Online",
+        "OFFLINE":"Offline"
+      }
+    },
+    "SERVICES":{
+      "ACTIONS":{
+        "LABEL":"Has actions"
+      },
+      "HOSTNAME":{
+        "LABEL":"Nom d'hôte"
+      },
+      "NAME":{
+        "LABEL":"Nom"
+      },
+      "STATUS":{
+        "LABEL":"Statut",
+        "ERROR":"Error",
+        "NORMAL":"Normal",
+        "WARNING":"Avertissement"
       }
     },
     "THEMES":{
