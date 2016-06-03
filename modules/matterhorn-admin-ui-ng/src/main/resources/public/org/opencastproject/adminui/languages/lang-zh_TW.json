@@ -2,6 +2,7 @@
   "MATTERHORN":"Opencast",
   "NAV_HOME":"已啟動",
   "NAV_ABOUT":"關於",
+  "NO":"No",
   "SUBMIT":"送出",
   "UPDATE":"更新",
   "CANCEL":"取消",
@@ -1522,6 +1523,9 @@
       "CREATOR":{
         "LABEL":"建立者"
       },
+      "HOSTNAME":{
+        "LABEL":"主機名稱"
+      },
       "LANGUAGE":{
         "LABEL":"語言"
       },
@@ -1591,6 +1595,18 @@
         "LABEL":"工作流程狀態"
       }
     },
+    "JOBS":{
+      "HOSTNAME":{
+        "LABEL":"主機名稱"
+      },
+      "STATUS":{
+        "LABEL":"狀態",
+        "PAUSED":"暫停",
+        "QUEUED":"Queued",
+        "RUNNING":"運行中",
+        "WAITING":"Waiting"
+      }
+    },
     "SERIES":{
       "TITLE":{
         "LABEL":"姓名"
@@ -1618,6 +1634,34 @@
       },
       "CREATION_DATE":{
         "LABEL":"創建日期"
+      }
+    },
+    "SERVERS":{
+      "HOSTNAME":{
+        "LABEL":"主機名稱"
+      },
+      "STATUS":{
+        "LABEL":"狀態",
+        "MAINTENANCE":"維護",
+        "ONLINE":"Online",
+        "OFFLINE":"Offline"
+      }
+    },
+    "SERVICES":{
+      "ACTIONS":{
+        "LABEL":"Has actions"
+      },
+      "HOSTNAME":{
+        "LABEL":"主機名稱"
+      },
+      "NAME":{
+        "LABEL":"姓名"
+      },
+      "STATUS":{
+        "LABEL":"狀態",
+        "ERROR":"Error",
+        "NORMAL":"Normal",
+        "WARNING":"警告"
       }
     },
     "THEMES":{

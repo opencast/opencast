@@ -2,6 +2,7 @@
   "MATTERHORN":"Opencast",
   "NAV_HOME":"Inicio",
   "NAV_ABOUT":"Acerca de",
+  "NO":"No",
   "SUBMIT":"Enviar",
   "UPDATE":"Actualizar",
   "CANCEL":"Cancelar",
@@ -1522,6 +1523,9 @@
       "CREATOR":{
         "LABEL":"Creador"
       },
+      "HOSTNAME":{
+        "LABEL":"Nombre del equipo"
+      },
       "LANGUAGE":{
         "LABEL":"Idioma"
       },
@@ -1591,6 +1595,18 @@
         "LABEL":"Estado del flujo de trabajo"
       }
     },
+    "JOBS":{
+      "HOSTNAME":{
+        "LABEL":"Nombre del equipo"
+      },
+      "STATUS":{
+        "LABEL":"Estado",
+        "PAUSED":"En pausa",
+        "QUEUED":"Queued",
+        "RUNNING":"Procesando",
+        "WAITING":"Waiting"
+      }
+    },
     "SERIES":{
       "TITLE":{
         "LABEL":"Nombre"
@@ -1618,6 +1634,34 @@
       },
       "CREATION_DATE":{
         "LABEL":"Fecha de creación"
+      }
+    },
+    "SERVERS":{
+      "HOSTNAME":{
+        "LABEL":"Nombre del equipo"
+      },
+      "STATUS":{
+        "LABEL":"Estado",
+        "MAINTENANCE":"Mantenimiento",
+        "ONLINE":"Online",
+        "OFFLINE":"Offline"
+      }
+    },
+    "SERVICES":{
+      "ACTIONS":{
+        "LABEL":"Has actions"
+      },
+      "HOSTNAME":{
+        "LABEL":"Nombre del equipo"
+      },
+      "NAME":{
+        "LABEL":"Nombre"
+      },
+      "STATUS":{
+        "LABEL":"Estado",
+        "ERROR":"Error",
+        "NORMAL":"Normal",
+        "WARNING":"Advertencia"
       }
     },
     "THEMES":{
