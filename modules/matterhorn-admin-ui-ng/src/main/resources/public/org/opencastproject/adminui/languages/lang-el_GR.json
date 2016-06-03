@@ -2,7 +2,7 @@
   "MATTERHORN":"Οpencast",
   "NAV_HOME":"Έναρξη",
   "NAV_ABOUT":"Σχετικά με",
-  "NO":"No",
+  "NO":"'Οχι",
   "SUBMIT":"Υποβολή",
   "UPDATE":"Ενημέρωση",
   "CANCEL":"Ακύρωση",
@@ -1602,9 +1602,9 @@
       "STATUS":{
         "LABEL":"Κατάσταση",
         "PAUSED":"Σε παύση",
-        "QUEUED":"Queued",
+        "QUEUED":"Στην ουρά",
         "RUNNING":"Εκτελείται",
-        "WAITING":"Waiting"
+        "WAITING":"Αναμονή"
       }
     },
     "SERIES":{
@@ -1643,13 +1643,13 @@
       "STATUS":{
         "LABEL":"Κατάσταση",
         "MAINTENANCE":"Συντήρηση",
-        "ONLINE":"Online",
-        "OFFLINE":"Offline"
+        "ONLINE":"Συνδεδεμένος",
+        "OFFLINE":"Αποσυνδεδεμένος"
       }
     },
     "SERVICES":{
       "ACTIONS":{
-        "LABEL":"Has actions"
+        "LABEL":"Έχει ενέργειες"
       },
       "HOSTNAME":{
         "LABEL":"Όνομα κεντρικού υπολογιστή"
@@ -1659,8 +1659,8 @@
       },
       "STATUS":{
         "LABEL":"Κατάσταση",
-        "ERROR":"Error",
-        "NORMAL":"Normal",
+        "ERROR":"Σφάλμα",
+        "NORMAL":"Κανονική",
         "WARNING":"Προειδοποίηση"
       }
     },
