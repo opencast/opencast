@@ -2,7 +2,7 @@
   "MATTERHORN":"Opencast",
   "NAV_HOME":"Start",
   "NAV_ABOUT":"Over",
-  "NO":"No",
+  "NO":"Nee",
   "SUBMIT":"Verzenden",
   "UPDATE":"Updaten",
   "CANCEL":"Annuleren",
@@ -1602,9 +1602,9 @@
       "STATUS":{
         "LABEL":"Status",
         "PAUSED":"Gepauseerd",
-        "QUEUED":"Queued",
+        "QUEUED":"In wachtrij",
         "RUNNING":"In uitvoering",
-        "WAITING":"Waiting"
+        "WAITING":"Wachtend"
       }
     },
     "SERIES":{
@@ -1649,7 +1649,7 @@
     },
     "SERVICES":{
       "ACTIONS":{
-        "LABEL":"Has actions"
+        "LABEL":"Acties"
       },
       "HOSTNAME":{
         "LABEL":"Hostnaam"
@@ -1659,8 +1659,8 @@
       },
       "STATUS":{
         "LABEL":"Status",
-        "ERROR":"Error",
-        "NORMAL":"Normal",
+        "ERROR":"Fout",
+        "NORMAL":"Normaal",
         "WARNING":"Let op"
       }
     },
