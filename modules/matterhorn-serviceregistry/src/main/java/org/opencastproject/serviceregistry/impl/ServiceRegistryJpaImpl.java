@@ -113,6 +113,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.RollbackException;
+import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
 /** JPA implementation of the {@link ServiceRegistry} */
@@ -171,6 +172,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Configuration key for the collection of job statistics */
   protected static final String OPT_JOBSTATISTICS = "jobstats.collect";
 
+  /** Configuration key for the retrieval of service statistics: Do not consider jobs older than max_job_age (in days) */
+  protected static final String OPT_SERVICE_STATISTICS_MAX_JOB_AGE = "org.opencastproject.statistics.services.max_job_age";
+
   /** The http client to use when connecting to remote servers */
   protected TrustedHttpClient client = null;
 
@@ -182,6 +186,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** Default setting on job statistics collection */
   static final boolean DEFAULT_JOB_STATISTICS = true;
+
+  /** Default setting on service statistics retrieval */
+  static final int DEFAULT_SERVICE_STATISTICS_MAX_JOB_AGE = 14;
 
   /** Default value for {@link #maxAttemptsBeforeErrorState} */
   private static final int MAX_FAILURE_BEFORE_ERROR_STATE = 1;
@@ -223,6 +230,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** Whether to collect detailed job statistics */
   protected boolean collectJobstats = DEFAULT_JOB_STATISTICS;
+
+  /** Maximum age of jobs being considering for service statistics */
+  protected int maxJobAge = DEFAULT_SERVICE_STATISTICS_MAX_JOB_AGE;
 
   /** A static list of statuses that influence how load balancing is calculated */
   protected static final List<Status> JOB_STATUSES_INFLUENCING_LOAD_BALANCING;
@@ -744,6 +754,17 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         logger.warn("Job statistics collection flag '{}' is malformed, setting to {}", jobStatsString,
                 DEFAULT_JOB_STATISTICS);
         collectJobstats = DEFAULT_JOB_STATISTICS;
+      }
+    }
+
+    String maxJobAgeString = StringUtils.trimToNull((String) properties.get(OPT_SERVICE_STATISTICS_MAX_JOB_AGE));
+    if (maxJobAgeString != null) {
+      try {
+        maxJobAge = Integer.parseInt(maxJobAgeString);
+        logger.info("Set service statistics max job age to {}", maxJobAgeString);
+      } catch (NumberFormatException e) {
+        logger.warn("Can not set service statistics max job age to {}. {} must be an integer", maxJobAgeString,
+                OPT_SERVICE_STATISTICS_MAX_JOB_AGE);
       }
     }
 
@@ -1863,6 +1884,25 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public List<ServiceStatistics> getServiceStatistics() throws ServiceRegistryException {
+    Date now = new Date();
+    return getServiceStatistics(
+             DateUtils.addDays(now, -maxJobAge),
+             DateUtils.addDays(now, 1)); // Avoid glitches around 'now' by setting the endDate to 'tomorrow'
+  }
+
+  /**
+   * Gets performance and runtime statistics for each known service registration.
+   * For the statistics, only jobs created within the time interval [startDate, endDate] are being considered
+   *
+   * @param startDate
+   *          Only jobs created after this data are considered for statistics
+   * @param endDate
+   *          Only jobs created before this data are considered for statistics
+   * @return the service statistics
+   * @throws ServiceRegistryException
+   *           if there is a problem accessing the service registry
+   */
+  private List<ServiceStatistics> getServiceStatistics(Date startDate, Date endDate) throws ServiceRegistryException {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
@@ -1875,6 +1915,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
 
       Query query = em.createNamedQuery("ServiceRegistration.statistics");
+      query.setParameter("minDateCreated", startDate, TemporalType.TIMESTAMP);
+      query.setParameter("maxDateCreated", endDate, TemporalType.TIMESTAMP);
+
       List queryResults = query.getResultList();
       for (Object result : queryResults) {
         Object[] oa = (Object[]) result;
