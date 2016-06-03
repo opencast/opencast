@@ -59,6 +59,10 @@ angular.module('adminNg.controllers')
         if (args.current.stateController.isAccessState) {
             args.current.stateController.loadSeriesAcl();
         }
+
+        if (args.current.stateController.isSourceState) {
+            args.current.stateController.loadCaptureAgents();
+        }
     });
 
     $scope.submit = function () {
