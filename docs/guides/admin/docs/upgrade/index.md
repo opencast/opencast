@@ -20,6 +20,14 @@ or
 
 With the mysql5 script you might encouter errors in the logs about missing INDEXes and non existing FOREIGN KEYS. You can probably ignore these errors. If your MySQL database is not working afterwards we can only recommend to try MariaDB. You should not use the shell import of the SQL script for MySQL, as unlike with the SOURCE command, the processing of the script in the shell will stop, as soon as an error is encountered!
 
+## System Account
+
+If you are upgrading from Opencast 1.x or 2.0 to 2.2 you should notice that the default username of the digest user has changed. You should stick to your current username (matterhorn_system_account) as otherwise the creating user for some jobs cannot be found.
+
+## Scheduled Events
+
+It is highly recommended that you don't have scheduled jobs left in your system before the migration, as the migration of scheduled events sometimes fails. 
+
 ## Distribution artifacts migration
 With the introduction of the stream security, the distribution URLs he distribution URLs in Opencast 2.2 have changed
 to provide a clearer separation between the artifacts belonging to the different tenants present in the system. 
