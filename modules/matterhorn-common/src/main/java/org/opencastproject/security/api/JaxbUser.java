@@ -347,8 +347,7 @@ public final class JaxbUser implements User {
     if (!(obj instanceof User))
       return false;
     User other = (User) obj;
-    return userName.equals(other.getUsername()) && organization.equals(other.getOrganization())
-            && EqualsUtil.eq(provider, other.getProvider());
+    return userName.equals(other.getUsername()) && organization.equals(other.getOrganization());
   }
 
   /**
