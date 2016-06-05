@@ -94,7 +94,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     focusVideo: new Engage.Event('Video:focusVideo', 'increases the size of one video', 'handler'),
     resetLayout: new Engage.Event('Video:resetLayout', 'resets the layout of the videodisplays', 'handler'),
     movePiP: new Engage.Event('Video:movePiP', 'moves the smaller picture over the larger to the different corners', 'handler'),
-    togglePiP: new Engage.Event('Video:togglePiP', 'switches between PiP and next to each other layout', 'handler'),
+    togglePiP: new Engage.Event('Video:togglePiP', 'switches between PiP and next to each other layout', 'both'),
     setZoomLevel: new Engage.Event('Video:setZoomLevel', 'sets the zoom level', 'trigger'),
     zoomReset: new Engage.Event('Video:resetZoom', 'resets position and zoom level', 'trigger'),
     zoomChange: new Engage.Event('Video:zoomChange', 'zoom level has changed', 'handler'),
@@ -506,7 +506,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         };
 
         // compile template and load it
-        this.$el.html(_.template(this.template, tempVars));
+        var template = _.template(this.template);
+        this.$el.html(template(tempVars));
+        
         initControlsEvents();
 
         if (isDesktopMode) {
@@ -832,7 +834,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
       });
 
       // use as mute button in desktop mode
-      if (isDesktopMode) {
+      if (!isMobileMode) {
         $('#' + id_volumeIcon).click(function () {
           var isMute = Basil.get(storage_muted);
           if (isMute == 'true') {
@@ -905,10 +907,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
       // volume event
       $('#' + id_volumeSlider).on(event_slide, function (event, ui) {
         Engage.trigger(plugin.events.volumeSet.getName(), ui.value / 100);
-        if (ui.value === 0) {
-          showMuteButton();
-        } else {
-          showUnmuteButton();
+        if (!isMobileMode) {
+          if (ui.value === 0) {
+            showMuteButton();
+          } else {
+            showUnmuteButton();
+          }
         }
       });
       // check segments
@@ -934,7 +938,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
 
       // register special events for mobile template
       if (isMobileMode) {
-        $('#' + id_videoWrapper).click(function () {
+        $('#' + id_videoWrapper).hammer().bind('tap', function () {
           Engage.trigger(plugin.events.showControls.getName());
         });
 
@@ -1243,8 +1247,22 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         } else {
           Basil.set(storage_muted, 'true');
         }
+
+        // ui feedback in mobile mode
+        if (isMobileMode) {
+          var $el = $('#' + id_volumeIcon + ' span');
+          if (volume === 0) {
+            $el.removeClass('low');
+            $el.addClass('muted');
+          } else if (volume < 0.6) {
+            $el.removeClass('muted');
+            $el.addClass('low');
+          } else {
+            $el.removeClass('low muted');
+          }
+        }
       });
-      Engage.on(plugin.events.volumeUp.getName(), function (audio) {
+      Engage.on(plugin.events.volumeUp.getName(), function () {
         var vol = getVolume();
         if ((vol + volUpDown) <= 100) {
           Engage.trigger(plugin.events.volumeSet.getName(), (vol + volUpDown) / 100);
@@ -1253,7 +1271,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         }
         unmute();
       });
-      Engage.on(plugin.events.volumeDown.getName(), function (audio) {
+      Engage.on(plugin.events.volumeDown.getName(), function () {
         var vol = getVolume();
         if ((vol - volUpDown) > 0) {
           Engage.trigger(plugin.events.volumeSet.getName(), (vol - volUpDown) / 100);
@@ -1361,7 +1379,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
                   $('#' + id_pipIndicator).html(translate('right', 'right'));
                 }
               }
-            }                    
+            }
           }
         });
         Engage.on(plugin.events.focusVideo.getName(), function (flavor) {

@@ -341,23 +341,23 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     if (videoSources === undefined) {
       return;
     }
-    var tagList = new Set();
+    var tagList = [];
 
     for (var v in videoSources) {
       for (var i = 0; i < videoSources[v].length; i++) {
         for (var j = 0; j < videoSources[v][i].tags.tag.length; j++) {
           if (keyword !== undefined) {
             if (videoSources[v][i].tags.tag[j].indexOf(keyword) > 0) {
-              tagList.add(videoSources[v][i].tags.tag[j]);
+              tagList.push(videoSources[v][i].tags.tag[j]);
             }
           } else {
-            tagList.add(videoSources[v][i].tags.tag[j]);
+            tagList.push(videoSources[v][i].tags.tag[j]);
           }
         }
       }
     }
 
-    return tagList;
+    return _.uniq(tagList);
   }
 
   /**
@@ -384,7 +384,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     }
     var sortedResolutionsList = _.map(qualitiesList, function (quality) {
       var currentTrack = filterTracksByTag(tracks, quality + '-quality')[0];
-      sortedResolutionsList.push([quality, currentTrack.resolution.substring(0, currentTrack.resolution.indexOf('x'))]);
+      return [quality, currentTrack.resolution.substring(0, currentTrack.resolution.indexOf('x'))];
     });
     sortedResolutionsList.sort(compareQuality);
     foundQualities = [];
@@ -1199,7 +1199,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     }
 
     // compile template and load into the html
-    videoDataView.$el.html(_.template(videoDataView.template, tempVars));
+    var template = _.template(videoDataView.template);
+    videoDataView.$el.html(template(tempVars));
 
     if (!mediapackageError) {
       calculateAspectRatio(videoSources);
@@ -1604,13 +1605,17 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
           Engage.trigger(plugin.events.timeupdate.getName(), videodisplayMaster.currentTime(), true);
         });
     } else {
+      // To get rid of the undesired "click on poster to play" functionality,
+      // we remove all event listeners attached to the vjs posters by cloning the dom element.
+      $('.' + class_vjsposter).replaceWith(function () {
+        return $(this).clone();
+      });
+
       // register events on every video display in mobile mode
       // because only one display is playing at the same time
- 
       Engage.model.get('videoDataModel').get('ids').forEach(function (id) {
         videojs(id).on('play', function () {
           Engage.trigger(plugin.events.play.getName(), true);
-          pressedPlayOnce = true;
         });
         videojs(id).on('ended', function () {
           Engage.trigger(plugin.events.ended.getName(), true);
@@ -1815,7 +1820,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     Engage.on(plugin.events.sliderStop.getName(), function (time) {
       if (videosReady) {
         if (!pressedPlayOnce) {
-          startVideoPlayer(videodisplayMaster);
+          Engage.trigger(plugin.events.play.getName(), false);
         }
         var duration = parseInt(Engage.model.get('videoDataModel').get('duration'));
         var normTime = (time / 1000) * (duration / 1000);
@@ -2409,4 +2414,4 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   });
 
   return plugin;
-});
+})

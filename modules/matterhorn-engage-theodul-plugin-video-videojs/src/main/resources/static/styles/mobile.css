@@ -1,4 +1,4 @@
-/*theodul video videojs plugin, embed mode styles*/
+/* theodul video videojs plugin, mobile mode styles */
 
 .vjs-openInPlayer {
     float: right !important;
@@ -38,6 +38,10 @@
 #engage_video.animate {
     -webkit-transition: transform 0.8s linear;
     transition: transform 0.8s linear;
+}
+
+#engage_video .videojs_wrapper .video-js {
+    width: 100%;
 }
 
 .videoDisplay {
