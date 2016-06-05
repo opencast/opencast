@@ -488,6 +488,14 @@ public interface ServiceRegistry {
   List<Job> getJobs(String serviceType, Status status) throws ServiceRegistryException;
 
   /**
+   * Get the list of active jobs.
+   *
+   * @return list of active jobs
+   * @throws ServiceRegistryException if there is a problem accessing the service registry
+   */
+  List<Job> getActiveJobs() throws ServiceRegistryException;
+
+  /**
    * Get all child jobs from a job
    *
    * @param id

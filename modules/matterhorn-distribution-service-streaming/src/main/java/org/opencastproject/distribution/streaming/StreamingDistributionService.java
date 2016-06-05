@@ -238,18 +238,21 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
       final File destination = locations.get().createDistributionFile(securityService.getOrganization().getId(),
               channelId, mp.getIdentifier().compact(), element.getIdentifier(), element.getURI());
-      // Put the file in place
-      try {
-        FileUtils.forceMkdir(destination.getParentFile());
-      } catch (IOException e) {
-        throw new DistributionException("Unable to create " + destination.getParentFile(), e);
-      }
-      logger.info("Distributing {} to {}", mpeId, destination);
 
-      try {
-        FileSupport.link(source, destination, true);
-      } catch (IOException e) {
-        throw new DistributionException("Unable to copy " + source + " to " + destination, e);
+      if (!destination.equals(source)) {
+        // Put the file in place if  sourcesfile differs destinationfile
+        try {
+          FileUtils.forceMkdir(destination.getParentFile());
+        } catch (IOException e) {
+          throw new DistributionException("Unable to create " + destination.getParentFile(), e);
+        }
+        logger.info("Distributing {} to {}", mpeId, destination);
+
+        try {
+          FileSupport.link(source, destination, true);
+        } catch (IOException e) {
+          throw new DistributionException("Unable to copy " + source + " to " + destination, e);
+        }
       }
       // Create a representation of the distributed file in the mediapackage
       final MediaPackageElement distributedElement = (MediaPackageElement) element.clone();

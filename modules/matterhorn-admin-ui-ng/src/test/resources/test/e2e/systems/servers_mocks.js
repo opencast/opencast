@@ -32,6 +32,7 @@ exports.httpBackendMock = function () {
                 results: [{
                     completed: 2,
                     cores: 2,
+                    hostname: 'http:\/\/mh-worker1.localdomain',
                     maintenance: true,
                     meanQueueTime: 4,
                     meanRunTime: 200,
@@ -49,6 +50,7 @@ exports.httpBackendMock = function () {
                 results: [{
                     completed: 2,
                     cores: 2,
+                    hostname: 'http:\/\/mh-worker1.localdomain',
                     maintenance: false,
                     meanQueueTime: 4,
                     meanRunTime: 200,

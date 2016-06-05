@@ -1,7 +1,8 @@
 {
   "MATTERHORN":"Opencast",
-  "NAV_HOME":"開始",
+  "NAV_HOME":"已啟動",
   "NAV_ABOUT":"關於",
+  "NO":"No",
   "SUBMIT":"送出",
   "UPDATE":"更新",
   "CANCEL":"取消",
@@ -9,8 +10,8 @@
   "SAVE":"儲存",
   "LOGOUT":"登出",
   "RESET":"重設",
-  "SELECT_NO_OPTIONS":"No option",
-  "YES":"Yes",
+  "SELECT_NO_OPTIONS":"沒有選項",
+  "YES":"是",
   "LANGUAGES":{
     "ARABIC":"阿拉伯文",
     "DANISH":"丹麥文",
@@ -36,11 +37,6 @@
     "CHINESE":"中文"
   },
   "PREFERENCES":{
-    "CAPTION":"選項",
-    "PROFILE":"個人資料",
-    "NAME":"姓名",
-    "REPLYTO":"回覆電子郵件",
-    "SIGNATURE":"電子郵件簽名",
     "TABLE":{
       "CAPTION":"編輯表格",
       "SUBHEADING":"選擇擇您希望顯示在 {{ tableName }} 的設定值",
@@ -55,10 +51,10 @@
       "CONFIRMATION":"需要確認"
     }
   },
-  "MEDIAMODULE":"Media Module",
+  "MEDIAMODULE":"媒體模組",
   "HELP":{
-    "HELP":"Help",
-    "USERS_GUIDE":"User's Guide",
+    "HELP":"說明",
+    "USERS_GUIDE":"使用說明",
     "DOCUMENTATION":"文件檔案",
     "REST_DOC":"REST API 文檔"
   },
@@ -84,22 +80,22 @@
     "SERIES_ADDED":"該系列已新增",
     "SERIES_NOT_SAVED":"該系列無法儲存",
     "EVENTS_CREATED":"事件已創建",
-    "EVENTS_UPLOAD_STARTED":"The event is being uploaded…",
+    "EVENTS_UPLOAD_STARTED":"該事件正在上傳...",
     "EVENTS_NOT_CREATED":"事件不能創建",
-    "EVENTS_UPDATED_NB":"{{ number }} events have been successfully updated",
-    "EVENTS_UPDATED_ALL":"All events have been successfully updated",
+    "EVENTS_UPDATED_NB":"你的 {{ number }} 事件已經成功的更新了",
+    "EVENTS_UPDATED_ALL":"已成功更新所有事件",
     "EVENTS_NOT_UPDATED":"事件無法儲存",
-    "EVENTS_NOT_UPDATED_ID":"The event {{ id }} could not be saved",
-    "EVENTS_NOT_UPDATED_ALL":"None of the events could be saved",
-    "SERIES_UPDATED_NB":"{{ number }} series have been successfully updated",
-    "SERIES_UPDATED_ALL":"All series have been successfully updated",
-    "SERIES_NOT_UPDATED":"The series could not be saved",
+    "EVENTS_NOT_UPDATED_ID":"無法保存事件 {{ id }}",
+    "EVENTS_NOT_UPDATED_ALL":"無可保存任何的事件",
+    "SERIES_UPDATED_NB":"{{ number }} 系列已成功更新",
+    "SERIES_UPDATED_ALL":"已成功更新所有系列",
+    "SERIES_NOT_UPDATED":"該系列無法儲存",
     "SERIES_NOT_UPDATED_ID":"The series {{ id }} could not be saved",
-    "SERIES_NOT_UPDATED_ALL":"None of the series could be saved",
+    "SERIES_NOT_UPDATED_ALL":"無可保存任何的事件",
     "EVENTS_DELETED":"事件已刪除",
     "EVENTS_NOT_DELETED":"事件無法刪除",
-    "SERIES_DELETED":"The series has been deleted",
-    "SERIES_NOT_DELETED":"The series could not be deleted",
+    "SERIES_DELETED":"該系列已被刪除",
+    "SERIES_NOT_DELETED":"該系列無法儲存",
     "USER_BLACKLIST_CREATED":"黑名單已創建",
     "USER_BLACKLIST_NOT_CREATED":"黑名單無法創建",
     "USER_BLACKLIST_SAVED":"黑名單已儲存",
@@ -122,6 +118,8 @@
     "EMAIL_SENT":"郵件已發送",
     "EMAIL_NOT_SENT":"郵件無法發送",
     "CONFLICT_DETECTED":"Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
+    "CONFLICT_ALREADY_ENDED":"Scheduling error: The event has already ended.",
+    "CONFLICT_END_BEFORE_START":"Scheduling error: Schedule end has to be later than the start.",
     "INVALID_ACL_RULES":"Rules have to contain a valid role and read or\/and write right(s).",
     "MISSING_ACL_RULES":"至少有一個角色必須具有讀取和寫入權限。",
     "SAVED_ACL_RULES":"存取權限已儲存",
@@ -141,7 +139,7 @@
     "TITLE_UPLOAD_ERROR":"上傳時發生錯誤",
     "LICENSE_UPLOAD_ERROR":"上傳時發生錯誤",
     "WATERMARK_UPLOAD_ERROR":"上傳時發生錯誤",
-    "THEME_UPLOAD_STARTED":"The media is being uploaded…",
+    "THEME_UPLOAD_STARTED":"正在上載媒體......",
     "THEME_CREATED":"主題已創建",
     "THEME_NOT_CREATED":"主題無法創建",
     "THEME_DELETED":"主題已被刪除",
@@ -150,7 +148,7 @@
     "TASK_NOT_CREATED":"任務無法創建",
     "VIDEO_CUT_NOT_SAVED":"視訊剪輯無法儲存",
     "VIDEO_CUT_SAVED":"視訊剪輯已儲存",
-    "VIDEO_CUT_PROCESSING":"The video is being processed…",
+    "VIDEO_CUT_PROCESSING":"正在處理的視頻...",
     "SERVER_UNRESPONSIVE":"伺服器沒有回應，請稍後再試。",
     "SERVICE_UNAVAILABLE":"服務沒有回應，請稍後再試。",
     "ACTIVE_TRANSACTION":"The current event can currently not be edited as it is involved of an active transaction."
@@ -167,16 +165,16 @@
     "DELETE":{
       "SERIES":{
         "CAPTION":"刪除",
-        "BUTTON":"Delete"
+        "BUTTON":"刪除"
       },
       "EVENTS":{
         "CAPTION":"刪除",
-        "DELETE_EVENTS":"Delete Events",
+        "DELETE_EVENTS":"删除事件",
         "PUBLISHED":{
           "NONE":"None of the selected events need to be retracted before they can be deleted.",
           "WARNING":"The events below cannot be deleted as they have already been published and deleting them would leave no way to delete the published files. Instead choose a workflow below to retract the events first and then delete them."
         },
-        "RETRACT_EVENTS":"Retract Events",
+        "RETRACT_EVENTS":"收回事件",
         "SELECT_RETRACT_TASK":"Select a Retract Task",
         "SUMMARY":{
           "EVENTS_DELETED":"Events to be Deleted",
@@ -186,7 +184,7 @@
         "UNPUBLISHED":{
           "NONE":"None of the selected events can be deleted without leaving orphan files."
         },
-        "BUTTON":"Delete"
+        "BUTTON":"刪除"
       }
     },
     "DELETE_EVENTS_WARNING_LINE1":"一經刪除，所有事件的後設資料，影音視訊文件將被刪除，無法恢復。",
@@ -226,7 +224,7 @@
     "NEXT_STEP":"下一步",
     "BACK":"上一個",
     "CREATE":"創建",
-    "RETRACT":"Retract",
+    "RETRACT":"撤銷",
     "UPDATE":"更新",
     "DURATION":{
       "HOURS":"小時",
@@ -265,10 +263,10 @@
   },
   "EVENTS":{
     "RETRACT":{
-      "CAPTION":"Retract Event",
-      "ID":"ID",
-      "SELECT_TASK":"Select Task",
-      "SUMMARY":"Summary",
+      "CAPTION":"撤銷事件",
+      "ID":"编号",
+      "SELECT_TASK":"選擇任務",
+      "SUMMARY":"摘要",
       "WARNING":"This event has been published to at least one publication channel so it has to be retracted before it can be deleted. Select from the tasks below to retract the publications."
     },
     "LICENSE":{
@@ -323,7 +321,7 @@
           "CAPTION":"來源",
           "SELECT_SOURCE":"選擇來源",
           "PLACEHOLDER":{
-            "LOCATION":"Location",
+            "LOCATION":"位置",
             "INPUTS":"輸入",
             "HOUR":"小時",
             "MINUTE":"分鐘",
@@ -401,9 +399,9 @@
       "ADD_EVENT":"增加事件",
       "TABLE":{
         "CAPTION":"事件",
-        "CREATORS":"Creators",
+        "CREATORS":"建立者",
         "TITLE":"標題",
-        "PRESENTERS":"Presenter(s)",
+        "PRESENTERS":"演講者",
         "SERIES":"系列",
         "DATE":"日期",
         "START":"開始",
@@ -420,7 +418,7 @@
         "REVIEW_STATUS":"檢視狀態",
         "PREVIOUS":"前一項",
         "NOCONTENT":"無可用數據",
-        "PUBLISHED":"Published"
+        "PUBLISHED":"已發布"
       },
       "SCHEDULING_STATUS":{
         "READY_FOR_RECORDING":"準備錄製",
@@ -449,7 +447,7 @@
           "METADATA":"後設資料",
           "EXTENDED-METADATA":"擴展後設資料",
           "ASSETS":"資產",
-          "SCHEDULING":"Scheduling",
+          "SCHEDULING":"排程任務",
           "WORKFLOWS":"工作流程",
           "ACCESS":"存取權限",
           "COMMENTS":"意見"
@@ -461,11 +459,11 @@
           "OPTED_OUT":"選擇退出",
           "CUSTOM":"自定義",
           "ENGAGE":"搞",
-          "EXTERNAL_API":"External API Publication",
+          "EXTERNAL_API":"外部 API 出版物",
           "YOUTUBE":"YouTube 的影音視訊",
           "OAIPMH":"OAI-PMH",
           "SELECT_WORKFLOW":"選擇工作流程",
-          "SELECT_WORKFLOW_EMPTY":"No workflows available"
+          "SELECT_WORKFLOW_EMPTY":"沒有可用的工作流"
         },
         "MEDIA":{
           "TRIM_MEDIA":"修剪媒體",
@@ -485,49 +483,49 @@
           "LINK":"鏈接"
         },
         "SOURCE":{
-          "CAPTION":"Source",
-          "SELECT_SOURCE":"Select source",
+          "CAPTION":"來源",
+          "SELECT_SOURCE":"選擇來源",
           "PLACEHOLDER":{
-            "LOCATION":"Location",
-            "INPUTS":"Inputs",
-            "HOUR":"Hour",
-            "MINUTE":"Minute",
-            "REPEATS":"Repeats",
+            "LOCATION":"位置",
+            "INPUTS":"輸入",
+            "HOUR":"小時",
+            "MINUTE":"分鐘",
+            "REPEATS":"重複",
             "START_DATE":"yyyy-mm-dd",
             "END_DATE":"yyyy-mm-dd"
           },
           "UPLOAD":{
-            "CAPTION":"Upload",
-            "RECORDING_ELEMENTS":"Recording elements",
+            "CAPTION":"上傳",
+            "RECORDING_ELEMENTS":"錄製內容",
             "SEGMENTABLE":{
-              "SHORT":"Slides",
-              "DETAIL":"The file contains a recording of a slide presentation (Keynote, Powerpoint, etc)."
+              "SHORT":"投影片",
+              "DETAIL":"該文件包含投影片播放（Keynote和PowerPoint等）的記錄。"
             },
             "NON_SEGMENTABLE":{
-              "SHORT":"Presenter",
-              "DETAIL":"The file contains a recording of a person speaking to an audience."
+              "SHORT":"演講者",
+              "DETAIL":"該文件包含演講者對聽眾演講的錄音。"
             },
             "AUDIO_ONLY":{
-              "SHORT":"Audio only",
-              "DETAIL":"The file contains only audio."
+              "SHORT":"只有音訊",
+              "DETAIL":"該文件只包含音訊檔。"
             }
           },
           "DATE_TIME":{
-            "CAPTION":"Schedule",
-            "START_DATE":"Start date",
-            "START_TIME":"Start time",
-            "TIMEZONE":"Time zone",
-            "END_DATE":"End date",
-            "DURATION":"Duration"
+            "CAPTION":"預定排程",
+            "START_DATE":"開始日期",
+            "START_TIME":"開始時間",
+            "TIMEZONE":"時區",
+            "END_DATE":"結束日期",
+            "DURATION":"持續時間"
           },
           "SCHEDULE_SINGLE":{
-            "CAPTION":"Schedule single event"
+            "CAPTION":"單一事件的排程"
           },
           "SCHEDULE_MULTIPLE":{
-            "CAPTION":"Schedule multiple events",
-            "REPEATS":"Repeats",
-            "REPEAT_ON":"Repeat on",
-            "WEEKDAYS":"Weekdays"
+            "CAPTION":"多個事件的排程",
+            "REPEATS":"重複",
+            "REPEAT_ON":"重複於",
+            "WEEKDAYS":"上班日"
           }
         },
         "ASSETS":{
@@ -649,7 +647,7 @@
             "ROLE":"角色",
             "WRITE":"寫",
             "READ":"讀",
-            "ADDITIONAL_ACTIONS":"Additional Actions",
+            "ADDITIONAL_ACTIONS":"更多選項",
             "ACTION":"操作",
             "NEW":"新政策",
             "DETAILS":"詳細信息"
@@ -661,7 +659,7 @@
         },
         "COMMENTS":{
           "CAPTION":"評論",
-          "PLACEHOLDER":"Comment…",
+          "PLACEHOLDER":"評論......",
           "SELECTPLACEHOLDER":"選擇原因",
           "RESOLVED":"已解決",
           "REPLY":"回覆",
@@ -670,23 +668,23 @@
           "DELETE":"刪除",
           "REASON":"理由",
           "REASONS":{
-            "CUTTING":"Cutting required",
-            "REVIEW":"Review required",
-            "ASYNC":"A\/V tracks asynchronous",
+            "CUTTING":"切割所需",
+            "REVIEW":"需要審查",
+            "ASYNC":"A \/ V 跟蹤非同步",
             "AUDIO_ISSUE":"Missing or defective audio track",
-            "CANCELED":"Canceled event",
+            "CANCELED":"已取消的事件",
             "CONFLICTING_METADATA":"Conflicting metadata",
             "IMPROPER_POINT":"Improper in or out point",
             "MISSING_AGREEMENT":"Missing agreement",
-            "OTHER":"Other",
-            "PRIVACY":"Privacy concern",
+            "OTHER":"其他",
+            "PRIVACY":"隱私方面的考慮",
             "SEGMENTATION":"Inaccurate segmentation",
-            "UNKNOWN_CREATOR":"Creator unknown",
+            "UNKNOWN_CREATOR":"創作者未知",
             "VIDEO_ISSUE":"Video distorted or cropped",
             "WRONG_INPUT_FORMAT":"Input file format not supported",
             "WRONG_METADATA":"Metadata needs correction",
             "WRONG_SERIES_PUBLICATION":"Wrong series or publication channel",
-            "WRONG_WORKFLOW":"Wrong workflow",
+            "WRONG_WORKFLOW":"錯誤的工作流",
             "PROCESSING_FAILURE":"處理程序失敗"
           }
         },
@@ -700,7 +698,7 @@
           "START_DATE":"開始日期",
           "START_TIME":"開始時間",
           "DURATION":"持續時間",
-          "LOCATION":"Location",
+          "LOCATION":"位置",
           "SOURCE":"來源",
           "CREATED":"創建",
           "CREATED_BY":"創建者",
@@ -718,23 +716,23 @@
           }
         },
         "SCHEDULING":{
-          "CAPTION":"Participation status",
+          "CAPTION":"參與狀態",
           "REVIEW_STATUS":{
-            "CAPTION":"Review status"
+            "CAPTION":"檢視狀態"
           },
           "OPTEDOUT":{
-            "CAPTION":"Opted-out Status",
-            "READY":"Ready for recording",
-            "OPTEDOUT":"Opted out"
+            "CAPTION":"退出狀態",
+            "READY":"準備錄製",
+            "OPTEDOUT":"選擇退出"
           },
           "MESSAGES":{
-            "CAPTION":"Messages",
-            "CREATION_DATE":"Creation date",
-            "SENDER":"Sender",
-            "SUBJECT":"Subject"
+            "CAPTION":"訊息",
+            "CREATION_DATE":"創建日期",
+            "SENDER":"發送者",
+            "SUBJECT":"主題"
           },
           "PLACEHOLDER":{
-            "PRESENTERS":"Presenter(s)"
+            "PRESENTERS":"演講者"
           }
         },
         "WORKFLOWS":{
@@ -749,9 +747,9 @@
           "SUBMITTED":"已提出",
           "MIMETYPE":"Mimetype",
           "URL":"網址",
-          "CONFIGURATION":"Configuration",
+          "CONFIGURATION":"配置",
           "NO_CONFIGURATION":"No existing configuration parameters for the selected workflow definition.",
-          "WORKFLOW":"Workflow"
+          "WORKFLOW":"工作流程"
         },
         "WORKFLOW_DETAILS":{
           "TITLE":"工作流程細節",
@@ -870,7 +868,7 @@
         "TABS":{
           "METADATA":"後設資料",
           "EXTENDED_METADATA":"擴展後設資料",
-          "PARTICIPATION":"Participation",
+          "PARTICIPATION":"參與",
           "EVENTS":"事件",
           "PERMISSIONS":"存取權限",
           "THEME":"主題"
@@ -889,7 +887,7 @@
             "ROLE":"角色",
             "WRITE":"寫",
             "READ":"讀",
-            "ADDITIONAL_ACTIONS":"Additional Actions",
+            "ADDITIONAL_ACTIONS":"更多選項",
             "ACTION":"操作",
             "NEW":"新政策",
             "DETAILS":"詳細信息"
@@ -918,18 +916,18 @@
           "CAPTION":"Participation status template",
           "WARNING_TEMPLATE":"Series participation status will be used as default value for new events that are part of the series.",
           "REVIEW_STATUS":{
-            "CAPTION":"Review status"
+            "CAPTION":"檢視狀態"
           },
           "OPTEDOUT":{
-            "CAPTION":"Opted-out Status",
-            "READY":"Ready for recording",
-            "OPTEDOUT":"Opted out"
+            "CAPTION":"退出狀態",
+            "READY":"準備錄製",
+            "OPTEDOUT":"選擇退出"
           },
           "MESSAGES":{
-            "CAPTION":"Messages",
-            "CREATION_DATE":"Creation date",
-            "SENDER":"Sender",
-            "SUBJECT":"Subject"
+            "CAPTION":"訊息",
+            "CREATION_DATE":"創建日期",
+            "SENDER":"發送者",
+            "SUBJECT":"主題"
           }
         },
         "EVENTS":{
@@ -1028,7 +1026,7 @@
         "CAPTION":"使用者",
         "NAME":"姓名",
         "USERNAME":"使用者名稱",
-        "EMAIL":"Email",
+        "EMAIL":"電子郵件",
         "ROLES":"角色",
         "TYPE":"類型",
         "BLACKLIST_FROM":"從黑名單",
@@ -1119,7 +1117,7 @@
           "TITLE":"後設資料",
           "NAME":{
             "CAPTION":"姓名",
-            "PLACEHOLDER":"Name…"
+            "PLACEHOLDER":"名稱..."
           }
         },
         "ACCESS":{
@@ -1157,7 +1155,7 @@
           "TITLE":"後設資料",
           "NAME":{
             "CAPTION":"姓名",
-            "PLACEHOLDER":"Name…"
+            "PLACEHOLDER":"名稱..."
           }
         },
         "ACCESS":{
@@ -1400,13 +1398,16 @@
     },
     "JOBS":{
       "TABLE":{
+        "ACTION":"操作",
         "CAPTION":"工作",
-        "TITLE":"標題",
-        "SERIES":"系列",
-        "WORKFLOW":"工作流程",
+        "CREATED":"創建",
+        "CREATOR":"建立者",
+        "HOST_NAME":"主機名稱",
+        "OPERATION":"運作",
+        "STARTED":"已啟動",
         "STATUS":"狀態",
         "SUBMITTED":"已提出",
-        "ACTION":"操作"
+        "TYPE":"類型"
       },
       "DETAILS":{
         "HEADER":"工作信息 {{resourceId}}",
@@ -1439,6 +1440,7 @@
         "CAPTION":"服務",
         "STATUS":"狀態",
         "NAME":"服務名",
+        "HOST_NAME":"主機名稱",
         "COMPLETED":"工作已完",
         "RUNNING":"工作運行中",
         "QUEUED":"工作排序",
@@ -1475,8 +1477,8 @@
   "LOGIN":{
     "WELCOME":"歡迎來到Opencast",
     "REMEMBER":"在此計算機上記住我",
-    "USERNAME":"Username…",
-    "PASSWORD":"Password…",
+    "USERNAME":"使用者名稱...",
+    "PASSWORD":"密碼...",
     "LOGIN":"登入",
     "ERROR":"不正確的使用者名稱 和\/或 密碼"
   },
@@ -1484,25 +1486,25 @@
     "CLEAR":"清除所有過濾器",
     "REMOVE":"刪除過濾器",
     "ADD":"添加過濾器",
-    "PLACEHOLDER":"Search…",
+    "PLACEHOLDER":"搜索...",
     "PROFILES":{
       "FILTERS_HEADER":"保存的過濾器集",
       "EMPTY":"沒有保存的過濾器還",
       "SAVE_FILTERS":"儲存",
       "FILTER_HEADER":"儲存過濾器設置",
       "NAME":"姓名",
-      "NAME_PLACEHOLDER":"Name…",
+      "NAME_PLACEHOLDER":"名稱...",
       "DESCRIPTION":"說明",
-      "DESCRIPTION_PLACEHOLDER":"Description…"
+      "DESCRIPTION_PLACEHOLDER":"說明..."
     }
   },
   "FILTERS":{
     "AGENTS":{
       "NAME":{
-        "LABEL":"Name"
+        "LABEL":"姓名"
       },
       "STATUS":{
-        "LABEL":"Status"
+        "LABEL":"狀態"
       }
     },
     "EVENTS":{
@@ -1521,6 +1523,9 @@
       "CREATOR":{
         "LABEL":"建立者"
       },
+      "HOSTNAME":{
+        "LABEL":"主機名稱"
+      },
       "LANGUAGE":{
         "LABEL":"語言"
       },
@@ -1531,7 +1536,7 @@
         "LABEL":"位置"
       },
       "OPTEDOUT":{
-        "LABEL":"Opted Out"
+        "LABEL":"選擇退出"
       },
       "PERIOD":{
         "LABEL":"週期"
@@ -1546,10 +1551,10 @@
         "LABEL":"進程"
       },
       "REVIEW_STATUS":{
-        "LABEL":"Review Status",
-        "CONFIRMED":"Confirmed",
-        "UNCONFIRMED":"Unconfirmed",
-        "UNSENT":"Unsent"
+        "LABEL":"檢視狀態",
+        "CONFIRMED":"確認",
+        "UNCONFIRMED":"未經證實的",
+        "UNSENT":"未發送"
       },
       "SERIES":{
         "LABEL":"系列"
@@ -1590,6 +1595,18 @@
         "LABEL":"工作流程狀態"
       }
     },
+    "JOBS":{
+      "HOSTNAME":{
+        "LABEL":"主機名稱"
+      },
+      "STATUS":{
+        "LABEL":"狀態",
+        "PAUSED":"暫停",
+        "QUEUED":"Queued",
+        "RUNNING":"運行中",
+        "WAITING":"Waiting"
+      }
+    },
     "SERIES":{
       "TITLE":{
         "LABEL":"姓名"
@@ -1619,6 +1636,34 @@
         "LABEL":"創建日期"
       }
     },
+    "SERVERS":{
+      "HOSTNAME":{
+        "LABEL":"主機名稱"
+      },
+      "STATUS":{
+        "LABEL":"狀態",
+        "MAINTENANCE":"維護",
+        "ONLINE":"Online",
+        "OFFLINE":"Offline"
+      }
+    },
+    "SERVICES":{
+      "ACTIONS":{
+        "LABEL":"Has actions"
+      },
+      "HOSTNAME":{
+        "LABEL":"主機名稱"
+      },
+      "NAME":{
+        "LABEL":"姓名"
+      },
+      "STATUS":{
+        "LABEL":"狀態",
+        "ERROR":"Error",
+        "NORMAL":"Normal",
+        "WARNING":"警告"
+      }
+    },
     "THEMES":{
       "NAME":{
         "LABEL":"姓名"
@@ -1638,7 +1683,7 @@
         "LABEL":"供應商"
       },
       "ROLE":{
-        "LABEL":"Role"
+        "LABEL":"角色"
       },
       "USERNAME":{
         "LABEL":"使用者名稱"
@@ -1651,14 +1696,15 @@
       }
     },
     "REVIEW_STATUS":{
-      "UNSENT":"Unsent",
-      "UNCONFIRMED":"Unconfirmed",
-      "CONFIRMED":"Confirmed"
+      "UNSENT":"未發送",
+      "UNCONFIRMED":"未確認",
+      "CONFIRMED":"確認"
     }
   },
   "TABLE_SUMMARY":"{{numberOfRows}} 行",
   "TABLE_NO_RESULT":"沒有找到結果",
-  "TABLE_LOADING":"Loading…",
+  "TABLE_LOADING":"載入中…",
+  "TABLE_EDIT":"編輯",
   "PM":{
     "BLACKLIST":{
       "REASONS":{
@@ -1670,10 +1716,10 @@
     }
   },
   "DASHBOARD":{
-    "RUNNING":"Running",
-    "FINISHED":"Finished",
+    "RUNNING":"使用中",
+    "FINISHED":"已完成",
     "FAILED":"失敗",
     "FINISHED_WITH_COMMENTS":"完成與公開作出的評論",
-    "SCHEDULED":"Scheduled"
+    "SCHEDULED":"已排程"
   }
 }

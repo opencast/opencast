@@ -50,6 +50,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
+import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
@@ -632,7 +633,7 @@ public class SeriesEndpoint {
         } else if (SeriesListQuery.FILTER_CREATOR_NAME.equals(name)) {
           query.withCreator(filters.get(name));
         } else if (SeriesListQuery.FILTER_TEXT_NAME.equals(name)) {
-          query.withText("*" + filters.get(name) + "*");
+          query.withText(QueryPreprocessor.sanitize(filters.get(name)));
         } else if (SeriesListQuery.FILTER_LANGUAGE_NAME.equals(name)) {
           query.withLanguage(filters.get(name));
         } else if (SeriesListQuery.FILTER_LICENSE_NAME.equals(name)) {

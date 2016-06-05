@@ -176,7 +176,7 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
 
   /**
    * {@inheritDoc}
-   * @throws ServiceRegistryException 
+   * @throws ServiceRegistryException
    *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(String, String, long, int, float)
    */
@@ -521,6 +521,27 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
       getHttpClient().close(response);
     }
     throw new ServiceRegistryException("Unable to retrieve jobs via http:" + response.getStatusLine());
+  }
+
+  @Override
+  public List<Job> getActiveJobs() throws ServiceRegistryException {
+    QueryStringBuilder qsb = new QueryStringBuilder("activeJobs.xml");
+    final HttpGet get = get(qsb.toString());
+    HttpResponse response = null;
+    int responseStatusCode;
+    try {
+      response = getHttpClient().execute(get);
+      responseStatusCode = response.getStatusLine().getStatusCode();
+      if (responseStatusCode == HttpStatus.SC_OK) {
+        final JaxbJobList jaxbJobList = JobParser.parseJobList(response.getEntity().getContent());
+        return $(jaxbJobList.getJobs()).map(JaxbJob.fnToJob()).toList();
+      }
+    } catch (IOException e) {
+      throw new ServiceRegistryException("Unable to get active jobs", e);
+    } finally {
+      getHttpClient().close(response);
+    }
+    throw new ServiceRegistryException("Unable to retrieve active jobs via http:" + response.getStatusLine());
   }
 
   @Override
