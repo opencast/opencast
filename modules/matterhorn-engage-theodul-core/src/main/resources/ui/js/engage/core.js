@@ -177,6 +177,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
           case "ja": return "ja-JA";
           case "tlh": return "tlh-AA";
           case "no": return "no-NO";
+          case "pl": return "pl-PL";
           case "pt": return "pt-BR";
           case "ru": return "ru-RU";
           case "sv": return "sv-SE";
