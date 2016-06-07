@@ -17,7 +17,6 @@ function   ($) {
     var springSecurityLoginURL = "/j_spring_security_check";
     var springSecurityLogoutURL = "/j_spring_security_logout";
 
-
     // various variables
     var mediaContainer = '<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">';
     var page = 1;
@@ -80,11 +79,40 @@ function   ($) {
       return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en-US";
     }
 
+    function getDefaultLanguage(language) {
+        switch (language) {
+            case "en": return "en-US";
+            case "de": return "de-DE";
+            case "es": return "es-ES";
+            case "fr": return "fr-FR";
+            case "gl": return "gl-ES";
+            case "nl": return "nl-NL";
+            case "fi": return "fi-FI";
+            case "it": return "it-IT";
+            case "ja": return "ja-JA";
+            case "tlh": return "tlh-AA";
+            case "no": return "no-NO";
+            case "pt": return "pt-BR";
+            case "ru": return "ru-RU";
+            case "sv": return "sv-SE";
+            case "tr": return "tr-TR";
+            case "zh": return "zh-CN";
+            case "el": return "el-GR";
+            default: return null;
+        }
+    }
+
     function loadAndTranslate(callbackFunction) {
-      console.log("translate");
+      log("loadAndTranslate");
+
       var lang = detectLanguage();
-      var jsonstr = window.location.origin + "/engage/ui/language/"+lang+".json";
-      console.log("Detected Language: " + lang);
+      var selectedLanguage = lang;
+      if (getDefaultLanguage(lang) !== null) {
+          selectedLanguage = getDefaultLanguage(lang);
+      }
+
+      var jsonstr = window.location.origin + "/engage/ui/language/"+selectedLanguage+".json";
+      console.log("Detected Language: " + selectedLanguage);
 
       var template;
       var templateData;
@@ -93,53 +121,45 @@ function   ($) {
       $.ajax({
         url: window.location.origin + "/engage/ui/template/desktop.html",
         dataType: "html",
-        success: function(data) {
-          template = _.template(data);
-        },
+
         error: function(jqXHR, textStatus, errorThrown) {
-          log("Something went wrong.")
+          console.error("Something went wrong while loading template.")
+          $("body").append("Error loading template.")
         }
-      }).done(function(){
+
+      }).done(function(tData){
+        // set template data
+        template = _.template(tData);
+
+        // load translation
         $.ajax({
-          // load translation
           url: jsonstr,
           dataType: "json",
-          success: function(data) {
-            // append to template and insert
-            $("body").append(template(data));
 
-            // set variables
-            title_enterUsernamePassword = data.login_title;
-            placeholder_username = data.username;
-            placeholder_password = data.password;
-            placeholder_rememberMe = data.remember_me;
-            msg_enterUsernamePassword = data.login_request;
-            msg_html_sthWentWrong = "<h2>"+data.sthWentWrong+"<h2>";
-            msg_html_noepisodes = "<h2>"+data.no_episodes+"</h2>";
-            msg_html_noseries = "<h2>"+data.no_series+"</h2>";
-            msg_html_loading = "<h2>"+data.loading+"</h2>";
-            msg_html_mediapackageempty = "<h2>"+data.no_episodes+"</h2>";
-            msg_html_nodata = "<h2>"+data.no_data+"</h2>";
-            msg_loginSuccessful = data.login_success;
-            msg_loginFailed = data.login_failed;
-            msg_not_logged_in = data.not_logged_in;
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-              log("Failed to localize. Try loading default.");
-              $.ajax({
-                url: window.location.origin + "/engage/ui/language/en-US.json",
-                dataType: "json",
-                success: function(data) {
-                  $("body").append(template(data));
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                  log("Something went terrible wrong.")
-                }
-              });
+          success: function(data) {
+            log("Append template and set variables.");
+            setTemplateAndVariables(data, template);
+          },
+
+          error: function(jqXHR, textStatus, errorThrown) {
+            console.warn("Failed to load language data. Try to guess alternative ... ");
+
+            // load default en-US
+            $.ajax({
+              url: window.location.origin + "/engage/ui/language/en-US.json",
+              dataType: "json",
+              success: function(data) {
+                setTemplateAndVariables(data, template);
+              },
+              error: function(jqXHR, textStatus, errorThrown) {
+                console.error("Something went terrible wrong.");
+              }
+            }); // ajax default en-US
+
             }
-          });
-      }).always(callbackFunction);
-      }
+          }).always(callbackFunction);
+      });
+    }
 
     function GetURLParameter(sParam) {
       var sPageURL = window.location.search.substring(1);
@@ -156,9 +176,31 @@ function   ($) {
         return this.indexOf(suffix, this.length - suffix.length) !== -1;
     };
 
-    function initialize() {
+    function setTemplateAndVariables(tData, template) {
+      console.log("setTemplateAndVariables");
 
-        $.enableLogging(true);
+      $("body").append(template(tData));
+
+      // set variables
+      title_enterUsernamePassword = tData.login_title;
+      placeholder_username = tData.username;
+      placeholder_password = tData.password;
+      placeholder_rememberMe = tData.remember_me;
+      msg_enterUsernamePassword = tData.login_request;
+      msg_html_sthWentWrong = "<h2>"+tData.sthWentWrong+"<h2>";
+      msg_html_noepisodes = "<h2>"+tData.no_episodes+"</h2>";
+      msg_html_noseries = "<h2>"+tData.no_series+"</h2>";
+      msg_html_loading = "<h2>"+tData.loading+"</h2>";
+      msg_html_mediapackageempty = "<h2>"+tData.no_episodes+"</h2>";
+      msg_html_nodata = "<h2>"+tData.no_data+"</h2>";
+      msg_loginSuccessful = tData.login_success;
+      msg_loginFailed = tData.login_failed;
+      msg_not_logged_in = tData.not_logged_in;
+
+    }
+
+    function initialize() {
+        log("Start initialize.");
 
         $("#" + id_mhlogolink).attr("href", location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''));
         getInfo();
@@ -167,6 +209,8 @@ function   ($) {
         window.addEventListener("popstate", function(event) {
           location.reload();
         });
+
+        debug = GetURLParameter("debug");
 
         // load series or episodes
         var loadSer = ( (GetURLParameter("s") == undefined) ||
@@ -195,10 +239,12 @@ function   ($) {
         log("Sort: " + sort);
 
         if(loadEp || (!loadEp && !loadSer)) {
+            log("First");
             $($nav_switch_li).removeClass("active");
             $("#navbarEpisodes").addClass("active");
             loadEpisodes(true, epFromGet+searchQuery+sort);
         } else if(loadSer) {
+            log("Second");
             $($nav_switch_li).removeClass("active");
             $("#navbarSeries").addClass("active");
             loadSeries(true, searchQuery+sort);
@@ -246,6 +292,7 @@ function   ($) {
     }
 
     $(document).ready(function() {
+        $.enableLogging(true);
         loadAndTranslate(initialize);
     });
 
@@ -292,7 +339,7 @@ function   ($) {
                                     if (msg.indexOf(springLoggedInStrCheck) == -1) {
                                         location.reload();
                                         alertify.success(msg_loginSuccessful + " '" + username + "'.");
-                                        initialize();
+                                        loadAndTranslate(initialize);
                                     } else {
                                         alertify.error(msg_loginFailed + " '" + username + "'.");
                                     }
@@ -322,7 +369,7 @@ function   ($) {
             type: "GET",
             url: springSecurityLogoutURL
         }).complete(function(msg) {
-            initialize();
+            loadAndTranslate(initialize);
         });
     }
 
@@ -343,7 +390,6 @@ function   ($) {
     }
 
     function getInfo() {
-      console.log("get info");
         $.ajax({
             url: infoMeURL,
             dataType: "json",
@@ -746,6 +792,7 @@ function   ($) {
             $("#" + data.id).attr("href", "?e=1&p=1&epFrom="+data.id);
 
             $("#" + data.id).on("keypress", function(ev) {
+                log("keypress")
                 if (ev.which == 13 || ev.which == 32) {
                     restData = "sid=" + data.id;
                     page = 1;
