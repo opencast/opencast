@@ -17,6 +17,35 @@ definitions consist of a list of workflow operations, which basically map a piec
        ...
     </definition>
 
+## Conditional Execution
+
+The attribute *if* of the element *operation* can be used to specify an execution condition that controls if a workflow operation should be executed at runtime.
+    
+Th attribute *if* expects a boolean expression of the following form:
+
+    <expression> ::= <term> ["OR" <expression>]
+    <term> ::= <value> ["AND" <term>]
+    <value> ::= ["NOT"]* ( "(" <expression> ")" | <relation> | <bool-literal> )
+    <relation> ::= <relation-factor> <rel-literal> <relation-factor>
+    <relation-factor> ::= <operation> | <number>
+    <operation> ::= <number> <op-literal> <number>
+    <rel-literal> ::= ">=" | ">" | "<=" | "<" | "=" | "!="
+    <op-literal> ::= "+" | "-" | "*" | "/"
+    <bool-literal> ::= "true" | "false"
+
+Besides constants directly encoded within the boolean expression, workflow instance variables that hold the booelan values (*true* or *false*) or numbers can be used within such expressions. Workflow instance variables can be accessed by using ${variableName}. 
+
+Example:
+
+        <operation
+          id="tag"
+          if="${variableName1} AND NOT (${variableName2} OR ${variableName3})">
+          <configurations>
+            [...]
+          </configurations>
+       </operation>
+
+
 ##Default Workflow Operations
 
 The following table contains the workflow operations that are available in an out-of-the-box Opencast installation:
