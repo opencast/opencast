@@ -29,6 +29,7 @@ The following table contains the workflow operations that are available in an ou
 |archive           |Archive the current state of the mediapackage                  |[Documentation](archive-woh.md)|
 |caption           |Waiting for user to upload captions                            |[Documentation](caption-woh.md)|
 |cleanup           |Cleanup the working file repository                            | |
+|comment           |Add, resolve or delete a comment                               |[Documentation](comment-woh.md)|
 |compose           |Encode media files using FFmpeg                                |[Documentation](compose-woh.md)|
 |composite         |Compose two videos on one canvas.                              |[Documentation](composite-woh.md)|
 |concat            |Concatenate multiple video tracks into one video track         |[Documentation](concat-woh.md)|
