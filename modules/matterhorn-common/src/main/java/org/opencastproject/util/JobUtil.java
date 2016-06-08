@@ -31,6 +31,7 @@ import static org.opencastproject.util.data.Tuple.tuple;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobBarrier;
+import org.opencastproject.job.api.JobBarrier.Result;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
@@ -84,28 +85,42 @@ public final class JobUtil {
     }
   }
 
-  public static JobBarrier.Result waitForJobs(ServiceRegistry reg, long timeout, Job... jobs) {
-    JobBarrier barrier = new JobBarrier(null, reg, jobs);
+  public static JobBarrier.Result waitForJobs(Job waiter, ServiceRegistry reg, long timeout, Job... jobs) {
+    JobBarrier barrier = new JobBarrier(waiter, reg, jobs);
     return barrier.waitForJobs(timeout);
+  }
+
+  public static JobBarrier.Result waitForJobs(Job waiter, ServiceRegistry reg, Job... jobs) {
+    JobBarrier barrier = new JobBarrier(waiter, reg, jobs);
+    return barrier.waitForJobs();
+  }
+
+  public static JobBarrier.Result waitForJobs(ServiceRegistry reg, long timeout, Job... jobs) {
+    return waitForJobs(null, reg, timeout, jobs);
   }
 
   public static JobBarrier.Result waitForJobs(ServiceRegistry reg, Job... jobs) {
-    JobBarrier barrier = new JobBarrier(null, reg, jobs);
-    return barrier.waitForJobs();
+    return waitForJobs(null, reg, jobs);
+  }
+
+  public static JobBarrier.Result waitForJobs(Job waiter, ServiceRegistry reg, long timeout, Collection<Job> jobs) {
+    return waitForJobs(waiter, reg, timeout, toArray(Job.class, jobs));
   }
 
   public static JobBarrier.Result waitForJobs(ServiceRegistry reg, long timeout, Collection<Job> jobs) {
-    JobBarrier barrier = new JobBarrier(null, reg, toArray(Job.class, jobs));
-    return barrier.waitForJobs(timeout);
+    return waitForJobs(null, reg, timeout, toArray(Job.class, jobs));
+  }
+
+  public static JobBarrier.Result waitForJobs(Job waiter, ServiceRegistry reg, Collection<Job> jobs) {
+    return waitForJobs(waiter, reg, toArray(Job.class, jobs));
   }
 
   public static JobBarrier.Result waitForJobs(ServiceRegistry reg, Collection<Job> jobs) {
-    JobBarrier barrier = new JobBarrier(null, reg, toArray(Job.class, jobs));
-    return barrier.waitForJobs();
+    return waitForJobs(null, reg, jobs);
   }
 
   /** Check if <code>job</code> is not done yet and wait in case. */
-  public static JobBarrier.Result waitForJob(ServiceRegistry reg, Option<Long> timeout, Job job) {
+  public static JobBarrier.Result waitForJob(Job waiter, ServiceRegistry reg, Option<Long> timeout, Job job) {
     final Job.Status status = job.getStatus();
     // only create a barrier if the job is not done yet
     switch (status) {
@@ -116,9 +131,22 @@ public final class JobUtil {
         return new JobBarrier.Result(map(tuple(job, status)));
       default:
         for (Long t : timeout)
-          return waitForJobs(reg, t, job);
-        return waitForJobs(reg, job);
+          return waitForJobs(waiter, reg, t, job);
+        return waitForJobs(waiter, reg, job);
     }
+  }
+
+  /** Check if <code>job</code> is not done yet and wait in case. */
+  public static JobBarrier.Result waitForJob(ServiceRegistry reg, Option<Long> timeout, Job job) {
+    return waitForJob(null, reg, timeout, job);
+  }
+
+  public static JobBarrier.Result waitForJob(Job waiter, ServiceRegistry reg, Job job) {
+    return waitForJob(waiter, reg, none(0L), job);
+  }
+
+  public static JobBarrier.Result waitForJob(ServiceRegistry reg, Job job) {
+    return waitForJob(null, reg, none(0L), job);
   }
 
   /**
@@ -143,28 +171,39 @@ public final class JobUtil {
       case QUEUED:
       case RESTART:
       case RUNNING:
+      case WAITING:
         return true;
       default:
         throw new IllegalStateException("Found job in unknown state '" + job.getStatus() + "'");
     }
   }
 
-  public static JobBarrier.Result waitForJob(ServiceRegistry reg, Job job) {
-    return waitForJob(reg, none(0L), job);
-  }
-
   public interface JobEnv {
+    JobBarrier.Result waitForJobs(Job waiter, long timeout, Job... jobs);
+
     JobBarrier.Result waitForJobs(long timeout, Job... jobs);
+
+    JobBarrier.Result waitForJobs(Job waiter, Job... jobs);
 
     JobBarrier.Result waitForJobs(Job... jobs);
 
-    JobBarrier.Result waitForJobs(long tomeout, List<Job> jobs);
+    JobBarrier.Result waitForJobs(Job waiter, long timeout, List<Job> jobs);
+
+    JobBarrier.Result waitForJobs(long timeout, List<Job> jobs);
+
+    JobBarrier.Result waitForJobs(Job waiter, List<Job> jobs);
 
     JobBarrier.Result waitForJobs(List<Job> jobs);
 
+    JobBarrier.Result waitForJob(Job waiter, Option<Long> timeout, Job job);
+
     JobBarrier.Result waitForJob(Option<Long> timeout, Job job);
 
+    JobBarrier.Result waitForJob(Job waiter, long timeout, Job job);
+
     JobBarrier.Result waitForJob(long timeout, Job job);
+
+    JobBarrier.Result waitForJob(Job waiter, Job job);
 
     JobBarrier.Result waitForJob(Job job);
   }
@@ -193,6 +232,26 @@ public final class JobUtil {
       }
 
       @Override
+      public Result waitForJobs(Job waiter, long timeout, Job... jobs) {
+        return JobUtil.waitForJobs(waiter, reg, timeout, jobs);
+      }
+
+      @Override
+      public Result waitForJobs(Job waiter, Job... jobs) {
+        return JobUtil.waitForJobs(waiter, reg, jobs);
+      }
+
+      @Override
+      public Result waitForJobs(Job waiter, long timeout, List<Job> jobs) {
+        return JobUtil.waitForJobs(waiter, reg, timeout, jobs);
+      }
+
+      @Override
+      public Result waitForJobs(Job waiter, List<Job> jobs) {
+        return JobUtil.waitForJobs(waiter, reg, jobs);
+      }
+
+      @Override
       public JobBarrier.Result waitForJob(Option<Long> timeout, Job job) {
         return JobUtil.waitForJob(reg, timeout, job);
       }
@@ -206,6 +265,21 @@ public final class JobUtil {
       public JobBarrier.Result waitForJob(Job job) {
         return JobUtil.waitForJob(reg, job);
       }
+
+      @Override
+      public Result waitForJob(Job waiter, Option<Long> timeout, Job job) {
+        return JobUtil.waitForJob(waiter, reg, job);
+      }
+
+      @Override
+      public Result waitForJob(Job waiter, long timeout, Job job) {
+        return JobUtil.waitForJob(waiter, reg, some(timeout), job);
+      }
+
+      @Override
+      public Result waitForJob(Job waiter, Job job) {
+        return JobUtil.waitForJob(waiter, reg, job);
+      }
     };
   }
 
@@ -214,20 +288,53 @@ public final class JobUtil {
    * as a function.
    */
   public static Function<Job, JobBarrier.Result> waitForJob(final ServiceRegistry reg, final Option<Long> timeout) {
+    return waitForJob(null, reg, timeout);
+  }
+
+  /**
+   * {@link #waitForJob(org.opencastproject.job.api.Job, org.opencastproject.serviceregistry.api.ServiceRegistry, org.opencastproject.util.data.Option, org.opencastproject.job.api.Job)}
+   * as a function.
+   */
+  public static Function<Job, JobBarrier.Result> waitForJob(final Job waiter, final ServiceRegistry reg,
+          final Option<Long> timeout) {
     return new Function<Job, JobBarrier.Result>() {
       @Override
       public JobBarrier.Result apply(Job job) {
-        return waitForJob(reg, timeout, job);
+        return waitForJob(waiter, reg, timeout, job);
+      }
+    };
+  }
+
+  /** Wait for the job to complete and return the success value. */
+  public static Function<Job, Boolean> waitForJobSuccess(final Job waiter, final ServiceRegistry reg,
+          final Option<Long> timeout) {
+    return new Function<Job, Boolean>() {
+      @Override
+      public Boolean apply(Job job) {
+        return waitForJob(waiter, reg, timeout, job).isSuccess();
       }
     };
   }
 
   /** Wait for the job to complete and return the success value. */
   public static Function<Job, Boolean> waitForJobSuccess(final ServiceRegistry reg, final Option<Long> timeout) {
-    return new Function<Job, Boolean>() {
+    return waitForJobSuccess(null, reg, timeout);
+  }
+
+  /**
+   * Interpret the payload of a completed {@link Job} as a {@link MediaPackageElement}. Wait for the job to complete if
+   * necessary.
+   *
+   * @throws MediaPackageException
+   *           in case the payload is not a mediapackage element
+   */
+  public static Function<Job, MediaPackageElement> payloadAsMediaPackageElement(final Job waiter,
+          final ServiceRegistry reg) {
+    return new Function.X<Job, MediaPackageElement>() {
       @Override
-      public Boolean apply(Job job) {
-        return waitForJob(reg, timeout, job).isSuccess();
+      public MediaPackageElement xapply(Job job) throws MediaPackageException {
+        waitForJob(waiter, reg, none(0L), job);
+        return MediaPackageElementParser.getFromXml(job.getPayload());
       }
     };
   }
@@ -240,13 +347,7 @@ public final class JobUtil {
    *           in case the payload is not a mediapackage element
    */
   public static Function<Job, MediaPackageElement> payloadAsMediaPackageElement(final ServiceRegistry reg) {
-    return new Function.X<Job, MediaPackageElement>() {
-      @Override
-      public MediaPackageElement xapply(Job job) throws MediaPackageException {
-        waitForJob(reg, none(0L), job);
-        return MediaPackageElementParser.getFromXml(job.getPayload());
-      }
-    };
+    return payloadAsMediaPackageElement(null, reg);
   }
 
   public static final Function<HttpResponse, Option<Job>> jobFromHttpResponse = new Function<HttpResponse, Option<Job>>() {
