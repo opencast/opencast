@@ -49,7 +49,7 @@ angular.module('adminNg.controllers')
             } else {
                 VersionResource.query(function(response){
                     $scope.version = response.version ? response : (angular.isArray(response.versions) ? response.versions[0]:{});
-                    if (!response.consistent || angular.isUndefined($scope.version.buildNumber)) {
+                    if (!response.consistent) {
                         $scope.version.buildNumber = 'inconsistent';
                     }
                 });
@@ -59,7 +59,6 @@ angular.module('adminNg.controllers')
                 $scope.currentLanguageCode = Language.getLanguageCode();
                 $scope.currentLanguageName = Language.getLanguage().displayLanguage;
                 $scope.availableLanguages = Language.getAvailableLanguages();
-                
             });
 
             // For the logout please check the navigationController.
