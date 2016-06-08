@@ -23,6 +23,7 @@ package org.opencastproject.job.api;
 
 import static com.entwinemedia.fn.data.Opt.none;
 import static com.entwinemedia.fn.data.Opt.some;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.Job.Status;
@@ -42,7 +43,6 @@ import org.opencastproject.util.NotFoundException;
 
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +69,7 @@ public abstract class AbstractJobProducer implements JobProducer {
    * Creates a new abstract job producer for jobs of the given type.
    *
    * @param jobType
-   *         the job type
+   *          the job type
    */
   public AbstractJobProducer(String jobType) {
     this.jobType = jobType;
@@ -139,9 +139,16 @@ public abstract class AbstractJobProducer implements JobProducer {
     }
 
     SystemLoad systemLoad = getServiceRegistry().getCurrentHostLoads(true);
-    //Note: We are not adding the job load in the next line because it is already accounted for in the load values we
-    //get back from the service registry.
+    // Note: We are not adding the job load in the next line because it is already accounted for in the load values we
+    // get back from the service registry.
     float currentLoad = systemLoad.get(getServiceRegistry().getRegistryHostname()).getLoadFactor();
+
+    // If the actual job load is greater the host's max load this job never get's processed, so decrease the job load to
+    // be the max host load
+    if (job.getJobLoad() > maxload.getLoadFactor()) {
+      currentLoad -= (job.getJobLoad() - maxload.getLoadFactor());
+    }
+
     if (currentLoad > maxload.getLoadFactor()) {
       logger.debug("Declining job {} of type {} because load of {} would exceed this node's limit of {}.",
               new Object[] { job.getId(), job.getJobType(), currentLoad, maxload.getLoadFactor() });
@@ -190,7 +197,7 @@ public abstract class AbstractJobProducer implements JobProducer {
    * associated job as the payload.
    *
    * @param job
-   *         the job to process
+   *          the job to process
    * @return the operation result
    * @throws Exception
    */
@@ -209,16 +216,15 @@ public abstract class AbstractJobProducer implements JobProducer {
      * Constructs a new job runner
      *
      * @param job
-     *         the job to run
+     *          the job to run
      * @param currentJob
-     *         the current running job
+     *          the current running job
      */
     JobRunner(Job job, Job currentJob) {
       this.jobId = job.getId();
       if (currentJob != null) {
         this.currentJobId = some(currentJob.getId());
-      }
-      else {
+      } else {
         currentJobId = none();
       }
     }
@@ -268,7 +274,7 @@ public abstract class AbstractJobProducer implements JobProducer {
         jobAfterProcessing.setStatus(Status.FAILED);
         jobAfterProcessing = getServiceRegistry().updateJob(jobAfterProcessing);
         getServiceRegistry().incident().unhandledException(jobAfterProcessing, Severity.FAILURE, t);
-        logger.error("Error handling operation '{}': {}", jobAfterProcessing.getOperation(), ExceptionUtils.getStackTrace(t));
+        logger.error("Error handling operation '{}': {}", jobAfterProcessing.getOperation(), getStackTrace(t));
         if (t instanceof ServiceRegistryException)
           throw (ServiceRegistryException) t;
       }

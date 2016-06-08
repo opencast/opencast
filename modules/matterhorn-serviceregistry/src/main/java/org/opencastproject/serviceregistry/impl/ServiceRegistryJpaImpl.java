@@ -2265,127 +2265,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * Dispatches the job to the least loaded service that will accept the job, or throws a
-   * <code>ServiceUnavailableException</code> if there is no such service.
-   *
-   * @param em
-   *          the current entity manager
-   * @param job
-   *          the job to dispatch
-   * @param services
-   *          a list of service registrations
-   * @return the host that accepted the dispatched job, or <code>null</code> if no services took the job.
-   * @throws ServiceRegistryException
-   *           if the service registrations are unavailable
-   * @throws ServiceUnavailableException
-   *           if no service is available or if all available services refuse to take on more work
-   * @throws UndispatchableJobException
-   *           if the current job cannot be processed
-   */
-  protected String dispatchJob(EntityManager em, JpaJob job, List<ServiceRegistration> services)
-          throws ServiceRegistryException, ServiceUnavailableException, UndispatchableJobException {
-
-    if (services.size() == 0) {
-      logger.debug("No service is currently available to handle jobs of type '" + job.getJobType() + "'");
-      throw new ServiceUnavailableException("No service of type " + job.getJobType() + " available");
-    }
-
-    // Try the service registrations, after the first one finished, we quit;
-    job.setStatus(Status.DISPATCHING);
-
-    boolean triedDispatching = false;
-
-    for (ServiceRegistration registration : services) {
-      job.setProcessorServiceRegistration((ServiceRegistrationJpaImpl) registration);
-
-      try {
-        job = updateInternal(em, job);
-      } catch (Exception e) {
-        // In theory, we should catch javax.persistence.OptimisticLockException. Unfortunately, eclipselink throws
-        // org.eclipse.persistence.exceptions.OptimisticLockException. In order to avoid importing the implementation
-        // specific APIs, we just catch Exception.
-        logger.debug("Unable to dispatch {}.  This is likely caused by another service registry dispatching the job",
-                job);
-        throw new UndispatchableJobException("Job " + job.getId() + " is already being dispatched");
-      }
-
-      triedDispatching = true;
-
-      String serviceUrl = UrlSupport
-              .concat(new String[] { registration.getHost(), registration.getPath(), "dispatch" });
-      HttpPost post = new HttpPost(serviceUrl);
-
-      // Add current organization and user so they can be used during execution at the remote end
-      post.addHeader(ORGANIZATION_HEADER, securityService.getOrganization().getId());
-      post.addHeader(USER_HEADER, securityService.getUser().getUsername());
-
-      try {
-        String jobXml = JobParser.toXml(new JaxbJob(job.toJob()));
-        List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-        params.add(new BasicNameValuePair("job", jobXml));
-        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
-        post.setEntity(entity);
-      } catch (IOException e) {
-        logger.warn("Job parsing error on job {}", job, e);
-        job.setStatus(Status.FAILED);
-        job.setProcessorServiceRegistration(null);
-        job = updateJob(job);
-        throw new ServiceRegistryException("Can not serialize job " + job, e);
-      }
-
-      // Post the request
-      HttpResponse response = null;
-      int responseStatusCode;
-      try {
-        logger.debug("Trying to dispatch job {} of type '{}' to {}", new String[] { Long.toString(job.getId()),
-                job.getJobType(), registration.getHost() });
-        if (!START_WORKFLOW.equals(job.getOperation()))
-          setCurrentJob(job.toJob());
-        response = client.execute(post);
-        responseStatusCode = response.getStatusLine().getStatusCode();
-        if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
-          return registration.getHost();
-        } else if (responseStatusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
-          logger.debug("Service {} is currently refusing to accept jobs of type {}", registration, job.getOperation());
-          continue;
-        } else if (responseStatusCode == HttpStatus.SC_PRECONDITION_FAILED) {
-          job.setStatus(Status.FAILED);
-          job = updateJob(job);
-          logger.debug("Service {} refused to accept {}", registration, job);
-          throw new UndispatchableJobException(IOUtils.toString(response.getEntity().getContent()));
-        } else if (responseStatusCode == HttpStatus.SC_METHOD_NOT_ALLOWED) {
-          logger.debug("Service {} is not yet reachable", registration);
-          continue;
-        } else {
-          logger.warn("Service {} failed ({}) accepting {}", new Object[] { registration, responseStatusCode, job });
-          continue;
-        }
-      } catch (UndispatchableJobException e) {
-        throw e;
-      } catch (Exception e) {
-        logger.warn("Unable to dispatch job {}", job.getId(), e);
-      } finally {
-        client.close(response);
-        setCurrentJob(null);
-      }
-    }
-
-    // We've tried dispatching to every online service that can handle this type of job, with no luck.
-    if (triedDispatching) {
-      try {
-        job.setStatus(Status.QUEUED);
-        job.setProcessorServiceRegistration(null);
-        job = updateJob(job);
-      } catch (Exception e) {
-        logger.error("Unable to put job back into queue", e);
-      }
-    }
-
-    logger.debug("Unable to dispatch {}, no service is currently ready to accept the job", job);
-    throw new UndispatchableJobException("Job " + job.getId() + " is currently undispatchable");
-  }
-
-  /**
    * Update the jobs failure history and the service status with the given information. All these data are then use for
    * the jobs failover strategy. Only the terminated job (with FAILED or FINISHED status) are taken into account.
    *
@@ -2988,6 +2867,162 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           em.close();
       }
     }
+
+    /**
+     * Dispatches the job to the least loaded service that will accept the job, or throws a
+     * <code>ServiceUnavailableException</code> if there is no such service.
+     *
+     * @param em
+     *          the current entity manager
+     * @param job
+     *          the job to dispatch
+     * @param services
+     *          a list of service registrations
+     * @return the host that accepted the dispatched job, or <code>null</code> if no services took the job.
+     * @throws ServiceRegistryException
+     *           if the service registrations are unavailable
+     * @throws ServiceUnavailableException
+     *           if no service is available or if all available services refuse to take on more work
+     * @throws UndispatchableJobException
+     *           if the current job cannot be processed
+     */
+    protected String dispatchJob(EntityManager em, JpaJob job, List<ServiceRegistration> services)
+            throws ServiceRegistryException, ServiceUnavailableException, UndispatchableJobException {
+
+      if (services.size() == 0) {
+        logger.debug("No service is currently available to handle jobs of type '" + job.getJobType() + "'");
+        throw new ServiceUnavailableException("No service of type " + job.getJobType() + " available");
+      }
+
+      // Try the service registrations, after the first one finished, we quit;
+      job.setStatus(Status.DISPATCHING);
+
+      boolean triedDispatching = false;
+
+      boolean onlyHighestMaxLoadHosts = false;
+      final Float highestMaxLoad = $(services).map(toHostRegistration).map(toMaxLoad).sort(sortFloatValuesDesc).head2();
+      if (job.getJobLoad() > highestMaxLoad) {
+        // None of the available hosts is able to accept the job due to less host load
+        onlyHighestMaxLoadHosts = true;
+      }
+
+      for (ServiceRegistration registration : services) {
+        job.setProcessorServiceRegistration((ServiceRegistrationJpaImpl) registration);
+
+        // Skip registration of host with less max load than highest available max load
+        if (onlyHighestMaxLoadHosts
+                && job.getProcessorServiceRegistration().getHostRegistration().getMaxLoad() != highestMaxLoad) {
+          continue;
+        }
+
+        try {
+          job = updateInternal(em, job);
+        } catch (Exception e) {
+          // In theory, we should catch javax.persistence.OptimisticLockException. Unfortunately, eclipselink throws
+          // org.eclipse.persistence.exceptions.OptimisticLockException. In order to avoid importing the implementation
+          // specific APIs, we just catch Exception.
+          logger.debug("Unable to dispatch {}.  This is likely caused by another service registry dispatching the job",
+                  job);
+          throw new UndispatchableJobException("Job " + job.getId() + " is already being dispatched");
+        }
+
+        triedDispatching = true;
+
+        String serviceUrl = UrlSupport
+                .concat(new String[] { registration.getHost(), registration.getPath(), "dispatch" });
+        HttpPost post = new HttpPost(serviceUrl);
+
+        // Add current organization and user so they can be used during execution at the remote end
+        post.addHeader(ORGANIZATION_HEADER, securityService.getOrganization().getId());
+        post.addHeader(USER_HEADER, securityService.getUser().getUsername());
+
+        try {
+          String jobXml = JobParser.toXml(new JaxbJob(job.toJob()));
+          List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+          params.add(new BasicNameValuePair("job", jobXml));
+          UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
+          post.setEntity(entity);
+        } catch (IOException e) {
+          logger.warn("Job parsing error on job {}", job, e);
+          job.setStatus(Status.FAILED);
+          job.setProcessorServiceRegistration(null);
+          job = updateJob(job);
+          throw new ServiceRegistryException("Can not serialize job " + job, e);
+        }
+
+        // Post the request
+        HttpResponse response = null;
+        int responseStatusCode;
+        try {
+          logger.debug("Trying to dispatch job {} of type '{}' to {}",
+                  new String[] { Long.toString(job.getId()), job.getJobType(), registration.getHost() });
+          if (!START_WORKFLOW.equals(job.getOperation()))
+            setCurrentJob(job.toJob());
+          response = client.execute(post);
+          responseStatusCode = response.getStatusLine().getStatusCode();
+          if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
+            return registration.getHost();
+          } else if (responseStatusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
+            logger.debug("Service {} is currently refusing to accept jobs of type {}", registration,
+                    job.getOperation());
+            continue;
+          } else if (responseStatusCode == HttpStatus.SC_PRECONDITION_FAILED) {
+            job.setStatus(Status.FAILED);
+            job = updateJob(job);
+            logger.debug("Service {} refused to accept {}", registration, job);
+            throw new UndispatchableJobException(IOUtils.toString(response.getEntity().getContent()));
+          } else if (responseStatusCode == HttpStatus.SC_METHOD_NOT_ALLOWED) {
+            logger.debug("Service {} is not yet reachable", registration);
+            continue;
+          } else {
+            logger.warn("Service {} failed ({}) accepting {}", new Object[] { registration, responseStatusCode, job });
+            continue;
+          }
+        } catch (UndispatchableJobException e) {
+          throw e;
+        } catch (Exception e) {
+          logger.warn("Unable to dispatch job {}", job.getId(), e);
+        } finally {
+          client.close(response);
+          setCurrentJob(null);
+        }
+      }
+
+      // We've tried dispatching to every online service that can handle this type of job, with no luck.
+      if (triedDispatching) {
+        try {
+          job.setStatus(Status.QUEUED);
+          job.setProcessorServiceRegistration(null);
+          job = updateJob(job);
+        } catch (Exception e) {
+          logger.error("Unable to put job back into queue", e);
+        }
+      }
+
+      logger.debug("Unable to dispatch {}, no service is currently ready to accept the job", job);
+      throw new UndispatchableJobException("Job " + job.getId() + " is currently undispatchable");
+    }
+
+    private final Fn<ServiceRegistration, HostRegistration> toHostRegistration = new Fn<ServiceRegistration, HostRegistration>() {
+      @Override
+      public HostRegistration ap(ServiceRegistration s) {
+        return ((ServiceRegistrationJpaImpl) s).getHostRegistration();
+      }
+    };
+
+    private final Fn<HostRegistration, Float> toMaxLoad = new Fn<HostRegistration, Float>() {
+      @Override
+      public Float ap(HostRegistration h) {
+        return h.getMaxLoad();
+      }
+    };
+
+    private final Comparator<Float> sortFloatValuesDesc = new Comparator<Float>() {
+      @Override
+      public int compare(Float o1, Float o2) {
+        return o2.compareTo(o1);
+      }
+    };
   }
 
   /** A periodic check on each service registration to ensure that it is still alive. */
