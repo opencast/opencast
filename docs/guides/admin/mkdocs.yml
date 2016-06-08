@@ -74,6 +74,7 @@ pages:
    - Append: 'workflowoperationhandlers/append-woh.md'
    - Archive: 'workflowoperationhandlers/archive-woh.md'
    - Caption: 'workflowoperationhandlers/caption-woh.md'
+   - Cleanup: 'workflowoperationhandlers/cleanup-woh.md'
    - Comment: 'workflowoperationhandlers/comment-woh.md'
    - Compose: 'workflowoperationhandlers/compose-woh.md'
    - Composite: 'workflowoperationhandlers/composite-woh.md'
