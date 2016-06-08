@@ -1652,8 +1652,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       if (status.isActive())
         statuses.add(status);
     }
+    EntityManager em = null;
     try {
-      EntityManager em = emf.createEntityManager();
+      em = emf.createEntityManager();
       List<JpaJob> jpaJobs = getJobsByStatus(em, statuses.toArray(new Status[statuses.size()]));
       List<Job> jobs = new ArrayList<Job>(jpaJobs.size());
       for (JpaJob jpaJob : jpaJobs) {
@@ -1662,6 +1663,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       return jobs;
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
+    } finally {
+      if (em != null)
+        em.close();
     }
   }
 
