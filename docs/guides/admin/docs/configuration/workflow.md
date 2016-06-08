@@ -250,7 +250,7 @@ Here is an example of a configurable operation:
       ...
     </operation>
 
-The attribute *if* specifies the execution condition in means of the operation only being executed if that condition
+The attribute `if` specifies the execution condition in means of the operation only being executed if that condition
 evaluates to true. You can find more details on conditional execution in the next section.
 
 Once the operation is configured to accept a variable, we need to describe how to gather the value from the
@@ -273,8 +273,8 @@ this, the [defaults operation](../workflowoperationhandlers/defaults-woh.md) can
 
 ## Conditional Execution
 
-The attribute *if* of the element *operation* can be used to specify an execution condition that controls if a workflow
-operation should be executed at runtime. Th attribute *if* expects a boolean expression of the following form:
+The attribute `if` of the element `operation` can be used to specify an execution condition that controls if a workflow
+operation should be executed at runtime. Th attribute `if` expects a boolean expression of the following form:
 
     <expression> ::= <term> ["OR" <expression>]
     <term> ::= <value> ["AND" <term>]
@@ -288,7 +288,7 @@ operation should be executed at runtime. Th attribute *if* expects a boolean exp
 
 Besides constants directly encoded within the boolean expression, workflow instance variables that hold the booelan
 values (*true* or *false*) or numbers can be used within such expressions. Workflow instance variables can be accessed
-by using ${variableName}. 
+by using `${variableName}`. 
 
 Example:
 
