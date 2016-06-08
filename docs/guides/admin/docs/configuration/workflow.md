@@ -273,8 +273,8 @@ this, the [defaults operation](../workflowoperationhandlers/defaults-woh.md) can
 
 ## Conditional Execution
 
-The attribute `if` of the element `operation` can be used to specify an execution condition that controls if a workflow
-operation should be executed at runtime. Th attribute `if` expects a boolean expression of the following form:
+The attribute `if` of the `operation` element can be used to specify a condition to control whether the workflow
+operation should be executed. This so-called execution condition is a boolean expression of the following form:
 
     <expression> ::= <term> ["OR" <expression>]
     <term> ::= <value> ["AND" <term>]
@@ -286,7 +286,7 @@ operation should be executed at runtime. Th attribute `if` expects a boolean exp
     <op-literal> ::= "+" | "-" | "*" | "/"
     <bool-literal> ::= "true" | "false"
 
-Besides constants directly encoded within the boolean expression, workflow instance variables that hold the booelan
+Besides constants directly encoded within the boolean expression, workflow instance variables that hold the boolean
 values (*true* or *false*) or numbers can be used within such expressions. Workflow instance variables can be accessed
 by using `${variableName}`. 
 
