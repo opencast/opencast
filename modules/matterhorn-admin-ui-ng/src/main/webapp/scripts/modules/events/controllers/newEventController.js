@@ -74,7 +74,7 @@ angular.module('adminNg.controllers')
             (e || window.event).returnValue = confirmationMessage;     //Gecko + IE
             return confirmationMessage;                                //Webkit, Safari, Chrome etc.
         };
-        
+
         angular.forEach($scope.states, function (state) {
 
             if (state.stateController.isMetadataState) {

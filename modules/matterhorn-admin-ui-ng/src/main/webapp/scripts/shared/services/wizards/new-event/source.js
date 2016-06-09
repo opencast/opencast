@@ -9,23 +9,6 @@ angular.module('adminNg.services')
     var SCHEDULE_MULTIPLE = 'SCHEDULE_MULTIPLE';
     var WEEKDAY_PREFIX = 'EVENTS.EVENTS.NEW.WEEKDAYS.';
     var UPLOAD = 'UPLOAD';
-    var EMPTY_UD  = {
-            upload: {},
-
-            SCHEDULE_SINGLE: {
-               device: {
-                   inputMethods: {}
-               }
-            },
-
-            SCHEDULE_MULTIPLE: {
-               device: {
-                   inputMethods: {}
-               },
-               weekdays: {},
-               presentableWeekdays: ''
-            }
-        };
 
     var WEEKDAYS = {
         'MO': WEEKDAY_PREFIX + 'MO',
@@ -61,8 +44,27 @@ angular.module('adminNg.services')
         };
         this.loadCaptureAgents();
 
-        this.ud = _.clone(EMPTY_UD);
-        this.weekdays = _.clone(WEEKDAYS);
+        this.reset = function () {
+          self.weekdays = _.clone(WEEKDAYS);
+          self.ud = {
+            upload: {},
+
+            SCHEDULE_SINGLE: {
+              device: {
+                inputMethods: {}
+              }
+            },
+
+            SCHEDULE_MULTIPLE: {
+              device: {
+                inputMethods: {}
+              },
+              weekdays: {},
+              presentableWeekdays: ''
+            }
+          };
+        };
+        this.reset();
 
         this.sortedWeekdays = _.map(self.weekdays, function(day, index) {
             return { key: index, translation: day };
