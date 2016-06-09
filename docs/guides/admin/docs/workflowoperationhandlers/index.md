@@ -34,9 +34,11 @@ The following table contains the workflow operations that are available in an ou
 |composite         |Compose two videos on one canvas.                              |[Documentation](composite-woh.md)|
 |concat            |Concatenate multiple video tracks into one video track         |[Documentation](concat-woh.md)|
 |copy              |Copy media package elements to target directory                |[Documentation](copy-woh.md)|
+|cover-image       |Generate a cover-image containing metadata                     |[Documentation](coverimage-woh.md)|
 |defaults          |Applies default workflow configuration values                  |[Documentation](defaults-woh.md)|
 |editor            |Waiting for user to review, then cut video based on edit-list  |[Documentation](editor-woh.md)|
 |email             |Sends email notifications at any part of a workflow            |[Documentation](email-woh.md)|
+|encode            |Encode media files to differents formats in parallel           |[Documentation](encode-woh.md)|
 |extract-text      |Extracting text from presentation segments                     |[Documentation](extracttext-woh.md)|
 |http-notify       |Notifies an HTTP endpoint about the process of the workflow    |[Documentation](httpnotify-woh.md)|
 |image             |Extract images from a video using FFmpeg                       |[Documentation](image-woh.md)|
