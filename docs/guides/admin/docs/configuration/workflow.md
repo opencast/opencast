@@ -286,8 +286,9 @@ operation should be executed. This so-called execution condition is a boolean ex
     <op-literal> ::= "+" | "-" | "*" | "/"
     <bool-literal> ::= "true" | "false"
 
-Within such boolean expressions, workflow instance variables that hold boolean values (*true* or *false*) or numbers
-can be used. Workflow instance variables can be accessed by using `${variableName}`. 
+As the formal description above explains, such boolean expressions may contain the booelan constants (`true` and
+`false`) and numbers, as well as references to the variables of the workflow instance that contain these data types.
+Workflow instance variables can be accessed by using `${variableName}`. 
 
 Example:
 
