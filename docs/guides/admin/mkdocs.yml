@@ -79,6 +79,7 @@ pages:
    - Compose: 'workflowoperationhandlers/compose-woh.md'
    - Composite: 'workflowoperationhandlers/composite-woh.md'
    - Concat: 'workflowoperationhandlers/concat-woh.md'
+   - Copy: 'workflowoperationhandlers/copy-woh.md'
    - Cover Image: 'workflowoperationhandlers/coverimage-woh.md'
    - Defaults: 'workflowoperationhandlers/defaults-woh.md'
    - Editor: 'workflowoperationhandlers/editor-woh.md'

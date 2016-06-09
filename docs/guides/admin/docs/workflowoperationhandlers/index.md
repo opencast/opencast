@@ -33,6 +33,7 @@ The following table contains the workflow operations that are available in an ou
 |compose           |Encode media files using FFmpeg                                |[Documentation](compose-woh.md)|
 |composite         |Compose two videos on one canvas.                              |[Documentation](composite-woh.md)|
 |concat            |Concatenate multiple video tracks into one video track         |[Documentation](concat-woh.md)|
+|copy              |Copy media package elements to target directory                |[Documentation](copy-woh.md)|
 |defaults          |Applies default workflow configuration values                  |[Documentation](defaults-woh.md)|
 |editor            |Waiting for user to review, then cut video based on edit-list  |[Documentation](editor-woh.md)|
 |email             |Sends email notifications at any part of a workflow            |[Documentation](email-woh.md)|
