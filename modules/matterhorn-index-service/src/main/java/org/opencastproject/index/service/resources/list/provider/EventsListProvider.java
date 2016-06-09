@@ -56,7 +56,7 @@ public class EventsListProvider implements ResourceListProvider {
   }
 
   private static final String[] NAMES = { PROVIDER_PREFIX, CONTRIBUTORS, PRESENTERS_BIBLIOGRAPHIC, PRESENTERS_TECHNICAL,
-          SUBJECT, LOCATION, PROGRESS, STATUS, /* REVIEW_STATUS,*/ COMMENTS };
+          SUBJECT, LOCATION, PROGRESS, STATUS, REVIEW_STATUS, COMMENTS };
 
   private static final Logger logger = LoggerFactory.getLogger(EventsListProvider.class);
 
