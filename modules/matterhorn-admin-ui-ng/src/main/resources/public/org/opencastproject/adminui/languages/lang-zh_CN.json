@@ -1649,7 +1649,7 @@
     },
     "SERVICES":{
       "ACTIONS":{
-        "LABEL":"Has actions"
+        "LABEL":"Actions available"
       },
       "HOSTNAME":{
         "LABEL":"主机名"
@@ -1659,7 +1659,7 @@
       },
       "STATUS":{
         "LABEL":"状态",
-        "ERROR":"Error",
+        "ERROR":"错误",
         "NORMAL":"Normal",
         "WARNING":"警告"
       }
