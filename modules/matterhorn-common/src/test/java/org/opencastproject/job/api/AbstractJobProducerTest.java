@@ -21,9 +21,7 @@
 
 package org.opencastproject.job.api;
 
-import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -38,17 +36,19 @@ import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.easymock.EasyMockSupport;
 import org.easymock.IAnswer;
 import org.junit.Before;
 import org.junit.Test;
 
-public class AbstractJobProducerTest {
+public class AbstractJobProducerTest extends EasyMockSupport {
 
   private JobProducerTest jobProducer;
+  private ServiceRegistry serviceRegistry;
 
   @Before
   public void setUp() throws Exception {
-    ServiceRegistry serviceRegistry = createNiceMock(ServiceRegistry.class);
+    serviceRegistry = createNiceMock(ServiceRegistry.class);
     expect(serviceRegistry.count(JobProducerTest.JOB_TYPE, Status.DISPATCHING)).andReturn(2L).anyTimes();
     expect(serviceRegistry.count(JobProducerTest.JOB_TYPE, Status.RUNNING)).andReturn(3L).anyTimes();
     final Capture<Job> job = EasyMock.newCapture();
@@ -58,6 +58,50 @@ public class AbstractJobProducerTest {
         return job.getValue();
       }
     });
+
+    SecurityService securityService = createNiceMock(SecurityService.class);
+    UserDirectoryService userDirectoryService = createNiceMock(UserDirectoryService.class);
+    OrganizationDirectoryService organizationDirectoryService = createNiceMock(OrganizationDirectoryService.class);
+
+    jobProducer = new JobProducerTest(serviceRegistry, securityService, userDirectoryService,
+            organizationDirectoryService);
+  }
+
+  @Test
+  public void testGetType() throws Exception {
+    replayAll();
+
+    assertEquals("test", jobProducer.getJobType());
+  }
+
+  @Test
+  public void testIsReadyToAcceptJobs() throws Exception {
+    replayAll();
+
+    assertTrue(jobProducer.isReadyToAcceptJobs("any operation"));
+  }
+
+  @Test
+  public void testCountJobs() throws Exception {
+    replayAll();
+
+    assertEquals(2, jobProducer.countJobs(Status.DISPATCHING));
+    assertEquals(3, jobProducer.countJobs(Status.RUNNING));
+  }
+
+  @Test
+  public void testAcceptJob() throws Exception {
+    replayAll();
+
+    Job job = new JobImpl();
+    job.setStatus(Status.DISPATCHING);
+    assertEquals(Status.DISPATCHING, job.getStatus());
+    jobProducer.acceptJob(job);
+    assertEquals(Status.RUNNING, job.getStatus());
+  }
+
+  @Test
+  public void testIsReadyToAccept() throws Exception {
     expect(serviceRegistry.getRegistryHostname()).andReturn("test").anyTimes();
     expect(serviceRegistry.getMaxLoadOnNode("test")).andReturn(new NodeLoad("test", 4.0f)).anyTimes();
     SystemLoad systemLoad = new SystemLoad();
@@ -69,43 +113,8 @@ public class AbstractJobProducerTest {
     SystemLoad systemLoad3 = new SystemLoad();
     systemLoad3.addNodeLoad(new NodeLoad("test", 5.0f));
     expect(serviceRegistry.getCurrentHostLoads(true)).andReturn(systemLoad3);
+    replayAll();
 
-    SecurityService securityService = createNiceMock(SecurityService.class);
-    UserDirectoryService userDirectoryService = createNiceMock(UserDirectoryService.class);
-    OrganizationDirectoryService organizationDirectoryService = createNiceMock(OrganizationDirectoryService.class);
-    replay(securityService, serviceRegistry, userDirectoryService, organizationDirectoryService);
-
-    jobProducer = new JobProducerTest(serviceRegistry, securityService, userDirectoryService,
-            organizationDirectoryService);
-  }
-
-  @Test
-  public void testGetType() throws Exception {
-    assertEquals("test", jobProducer.getJobType());
-  }
-
-  @Test
-  public void testIsReadyToAcceptJobs() throws Exception {
-    assertTrue(jobProducer.isReadyToAcceptJobs("any operation"));
-  }
-
-  @Test
-  public void testCountJobs() throws Exception {
-    assertEquals(2, jobProducer.countJobs(Status.DISPATCHING));
-    assertEquals(3, jobProducer.countJobs(Status.RUNNING));
-  }
-
-  @Test
-  public void testAcceptJob() throws Exception {
-    Job job = new JobImpl();
-    job.setStatus(Status.DISPATCHING);
-    assertEquals(Status.DISPATCHING, job.getStatus());
-    jobProducer.acceptJob(job);
-    assertEquals(Status.RUNNING, job.getStatus());
-  }
-
-  @Test
-  public void testIsReadyToAccept() throws Exception {
     Job job = new JobImpl(3);
     job.setStatus(Status.DISPATCHING);
     job.setProcessingHost("same");

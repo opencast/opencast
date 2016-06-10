@@ -22,6 +22,7 @@
 package org.opencastproject.caption.impl;
 
 import static org.opencastproject.util.MimeType.mimeType;
+import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
 
 import org.opencastproject.caption.api.Caption;
 import org.opencastproject.caption.api.CaptionConverter;
@@ -555,6 +556,8 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
   @Override
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
     captionJobLoad = LoadUtil.getConfiguredLoadValue(properties, CAPTION_JOB_LOAD_KEY, DEFAULT_CAPTION_JOB_LOAD, serviceRegistry);
+    acceptJobLoadsExeedingMaxLoad = getOptCfgAsBoolean(properties, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
+            .getOrElse(acceptJobLoadsExeedingMaxLoad);
   }
 
 }

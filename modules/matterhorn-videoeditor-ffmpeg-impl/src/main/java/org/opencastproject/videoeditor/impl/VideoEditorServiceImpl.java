@@ -21,6 +21,8 @@
 
 package org.opencastproject.videoeditor.impl;
 
+import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
+
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;
@@ -453,7 +455,6 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     logger.debug("deactivating...");
   }
 
-
   @Override
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
     this.properties = new Properties();
@@ -466,6 +467,8 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     logger.debug("Properties updated!");
 
     jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD, serviceRegistry);
+    acceptJobLoadsExeedingMaxLoad = getOptCfgAsBoolean(properties, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
+            .getOrElse(acceptJobLoadsExeedingMaxLoad);
   }
 
   public void setMediaInspectionService(MediaInspectionService inspectionService) {

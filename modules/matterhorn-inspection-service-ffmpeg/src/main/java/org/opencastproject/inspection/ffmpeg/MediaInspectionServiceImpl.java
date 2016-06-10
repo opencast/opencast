@@ -21,6 +21,8 @@
 
 package org.opencastproject.inspection.ffmpeg;
 
+import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
+
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;
@@ -128,6 +130,9 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
             serviceRegistry);
     enrichJobLoad = LoadUtil.getConfiguredLoadValue(properties, ENRICH_JOB_LOAD_KEY, DEFAULT_ENRICH_JOB_LOAD,
             serviceRegistry);
+
+    acceptJobLoadsExeedingMaxLoad = getOptCfgAsBoolean(properties, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
+            .getOrElse(acceptJobLoadsExeedingMaxLoad);
 
     for (String accurateFrameCountString : OsgiUtil.getOptCfg(properties, CFG_KEY_ACCURATE_FRAME_COUNT).toOpt()) {
       boolean accurateFrameCount = BooleanUtils.toBoolean(accurateFrameCountString);

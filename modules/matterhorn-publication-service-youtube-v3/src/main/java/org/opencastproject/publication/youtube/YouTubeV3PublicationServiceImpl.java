@@ -21,6 +21,8 @@
 
 package org.opencastproject.publication.youtube;
 
+import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
+
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -192,6 +194,8 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
 
     youtubePublishJobLoad = LoadUtil.getConfiguredLoadValue(properties, YOUTUBE_PUBLISH_LOAD_KEY, DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD, serviceRegistry);
     youtubeRetractJobLoad = LoadUtil.getConfiguredLoadValue(properties, YOUTUBE_RETRACT_LOAD_KEY, DEFAULT_YOUTUBE_RETRACT_JOB_LOAD, serviceRegistry);
+    acceptJobLoadsExeedingMaxLoad = getOptCfgAsBoolean(properties, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
+            .getOrElse(acceptJobLoadsExeedingMaxLoad);
   }
 
   @Override

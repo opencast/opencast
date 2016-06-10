@@ -21,6 +21,8 @@
 
 package org.opencastproject.silencedetection.impl;
 
+import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
+
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
@@ -269,6 +271,8 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
     logger.debug("Properties updated!");
 
     jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD, serviceRegistry);
+    acceptJobLoadsExeedingMaxLoad = getOptCfgAsBoolean(properties, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
+            .getOrElse(acceptJobLoadsExeedingMaxLoad);
   }
 
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {

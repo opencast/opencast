@@ -19,9 +19,9 @@
  *
  */
 
-
 package org.opencastproject.distribution.acl;
 
+import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
 import static org.opencastproject.util.RequireUtil.notNull;
 
 import org.opencastproject.distribution.api.DistributionException;
@@ -438,6 +438,8 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
     distributeJobLoad = LoadUtil.getConfiguredLoadValue(properties, DISTRIBUTE_JOB_LOAD_KEY, DEFAULT_DISTRIBUTE_JOB_LOAD, serviceRegistry);
     retractJobLoad = LoadUtil.getConfiguredLoadValue(properties, RETRACT_JOB_LOAD_KEY, DEFAULT_RETRACT_JOB_LOAD, serviceRegistry);
+    acceptJobLoadsExeedingMaxLoad = getOptCfgAsBoolean(properties, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
+            .getOrElse(acceptJobLoadsExeedingMaxLoad);
   }
 
 }

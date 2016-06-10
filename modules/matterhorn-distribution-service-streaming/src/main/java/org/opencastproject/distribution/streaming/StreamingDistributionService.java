@@ -22,6 +22,7 @@
 package org.opencastproject.distribution.streaming;
 
 import static java.lang.String.format;
+import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
 import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.UrlSupport.concat;
@@ -240,7 +241,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
               channelId, mp.getIdentifier().compact(), element.getIdentifier(), element.getURI());
 
       if (!destination.equals(source)) {
-        // Put the file in place if  sourcesfile differs destinationfile
+        // Put the file in place if sourcesfile differs destinationfile
         try {
           FileUtils.forceMkdir(destination.getParentFile());
         } catch (IOException e) {
@@ -560,6 +561,8 @@ public class StreamingDistributionService extends AbstractJobProducer implements
             DEFAULT_DISTRIBUTE_JOB_LOAD, serviceRegistry);
     retractJobLoad = LoadUtil.getConfiguredLoadValue(properties, RETRACT_JOB_LOAD_KEY, DEFAULT_RETRACT_JOB_LOAD,
             serviceRegistry);
+    acceptJobLoadsExeedingMaxLoad = getOptCfgAsBoolean(properties, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
+            .getOrElse(acceptJobLoadsExeedingMaxLoad);
   }
 
   public static class Locations {

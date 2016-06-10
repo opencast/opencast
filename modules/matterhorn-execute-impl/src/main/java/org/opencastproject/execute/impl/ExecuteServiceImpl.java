@@ -19,8 +19,9 @@
  *
  */
 
-
 package org.opencastproject.execute.impl;
+
+import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
 
 import org.opencastproject.execute.api.ExecuteException;
 import org.opencastproject.execute.api.ExecuteService;
@@ -682,6 +683,8 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
   @Override
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws org.osgi.service.cm.ConfigurationException {
     executeJobLoad = LoadUtil.getConfiguredLoadValue(properties, EXECUTE_JOB_LOAD_KEY, DEFAULT_EXECUTE_JOB_LOAD, serviceRegistry);
+    acceptJobLoadsExeedingMaxLoad = getOptCfgAsBoolean(properties, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
+            .getOrElse(acceptJobLoadsExeedingMaxLoad);
   }
 
 }

@@ -59,6 +59,17 @@ public abstract class AbstractJobProducer implements JobProducer {
   /** The logger */
   static final Logger logger = LoggerFactory.getLogger(AbstractJobProducer.class);
 
+  /** The default value whether to accept a job whose load exceeds the host’s max load */
+  public static final boolean DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING = true;
+
+  /**
+   * The key to look for in the service configuration file to override the {@link DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING}
+   */
+  public static final String ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY = "job.load.acceptexceeding";
+
+  /** Whether to accept a job whose load exceeds the host’s max load */
+  protected boolean acceptJobLoadsExeedingMaxLoad = DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING;
+
   /** The types of job that this producer can handle */
   protected String jobType = null;
 
@@ -143,10 +154,14 @@ public abstract class AbstractJobProducer implements JobProducer {
     // get back from the service registry.
     float currentLoad = systemLoad.get(getServiceRegistry().getRegistryHostname()).getLoadFactor();
 
-    // If the actual job load is greater the host's max load this job never get's processed, so decrease the job load to
-    // be the max host load
-    if (job.getJobLoad() > maxload.getLoadFactor()) {
-      currentLoad -= (job.getJobLoad() - maxload.getLoadFactor());
+    // Whether to accept a job whose load exceeds the host’s max load
+    if (acceptJobLoadsExeedingMaxLoad) {
+      // If the actual job load is greater the host's max load this job never get's processed. So decrease the current
+      // load by the difference of the job load and max load
+      if (job.getJobLoad() > maxload.getLoadFactor()) {
+        float decreaseLoad = job.getJobLoad() - maxload.getLoadFactor();
+        currentLoad -= decreaseLoad;
+      }
     }
 
     if (currentLoad > maxload.getLoadFactor()) {
@@ -238,7 +253,8 @@ public abstract class AbstractJobProducer implements JobProducer {
       if (currentJobId.isSome())
         serviceRegistry.setCurrentJob(serviceRegistry.getJob(currentJobId.get()));
 
-      final Organization organization = getOrganizationDirectoryService().getOrganization(jobBeforeProcessing.getOrganization());
+      final Organization organization = getOrganizationDirectoryService()
+              .getOrganization(jobBeforeProcessing.getOrganization());
       securityService.setOrganization(organization);
       final User user = getUserDirectoryService().loadUser(jobBeforeProcessing.getCreator());
       securityService.setUser(user);
