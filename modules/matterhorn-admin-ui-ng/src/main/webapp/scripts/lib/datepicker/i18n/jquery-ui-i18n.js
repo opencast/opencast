@@ -292,7 +292,7 @@ jQuery(function($){
 });
 /* Written by Stuart. */
 jQuery(function($){
-	$.datepicker.regional['en-GB'] = {
+	$.datepicker.regional['en'] = {
 		closeText: 'Done',
 		prevText: 'Prev',
 		nextText: 'Next',
@@ -310,7 +310,7 @@ jQuery(function($){
 		isRTL: false,
 		showMonthAfterYear: false,
 		yearSuffix: ''};
-	$.datepicker.setDefaults($.datepicker.regional['en-GB']);
+	$.datepicker.setDefaults($.datepicker.regional['en']);
 });
 /* Based on the en-GB initialisation. */
 jQuery(function($){
