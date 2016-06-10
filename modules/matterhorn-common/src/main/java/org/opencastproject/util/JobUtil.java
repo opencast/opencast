@@ -31,7 +31,6 @@ import static org.opencastproject.util.data.Tuple.tuple;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobBarrier;
-import org.opencastproject.job.api.JobBarrier.Result;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
@@ -65,7 +64,8 @@ public final class JobUtil {
    *
    * @return the payload or none, if either to job cannot be found or if the job has no or an empty payload
    */
-  public static Opt<String> getPayload(ServiceRegistry reg, Job job) throws NotFoundException, ServiceRegistryException {
+  public static Opt<String> getPayload(ServiceRegistry reg, Job job)
+          throws NotFoundException, ServiceRegistryException {
     for (Job updated : update(reg, job)) {
       return Opt.nul(updated.getPayload());
     }
@@ -85,36 +85,157 @@ public final class JobUtil {
     }
   }
 
-  public static JobBarrier.Result waitForJobs(Job waiter, ServiceRegistry reg, long timeout, Job... jobs) {
-    JobBarrier barrier = new JobBarrier(waiter, reg, jobs);
+  /**
+   * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
+   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}. The
+   * <code>waiter</code> is the job which is waiting for the other jobs to finish.
+   *
+   * @param waiter
+   *          the job waiting for the other jobs to finish
+   * @param reg
+   *          the service registry
+   * @param pollingInterval
+   *          the time in miliseconds between two polling operations
+   * @param timeout
+   *          the maximum amount of time to wait
+   * @param jobs
+   *          the jobs to monitor
+   * @return the job barrier result
+   */
+  public static JobBarrier.Result waitForJobs(Job waiter, ServiceRegistry reg, long pollingInterval, long timeout,
+          Job... jobs) {
+    JobBarrier barrier = new JobBarrier(waiter, reg, pollingInterval, jobs);
     return barrier.waitForJobs(timeout);
   }
 
-  public static JobBarrier.Result waitForJobs(Job waiter, ServiceRegistry reg, Job... jobs) {
-    JobBarrier barrier = new JobBarrier(waiter, reg, jobs);
-    return barrier.waitForJobs();
+  /**
+   * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
+   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}. The
+   * <code>waiter</code> is the job which is waiting for the other jobs to finish.
+   *
+   * @param waiter
+   *          the job waiting for the other jobs to finish
+   * @param reg
+   *          the service registry
+   * @param timeout
+   *          the maximum amount of time to wait
+   * @param jobs
+   *          the jobs to monitor
+   * @return the job barrier result
+   */
+  public static JobBarrier.Result waitForJobs(Job waiter, ServiceRegistry reg, long timeout, Job... jobs) {
+    return waitForJobs(waiter, reg, JobBarrier.DEFAULT_POLLING_INTERVAL, timeout, jobs);
   }
 
+  /**
+   * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
+   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}. The
+   * <code>waiter</code> is the job which is waiting for the other jobs to finish.
+   *
+   * @param waiter
+   *          the job waiting for the other jobs to finish
+   * @param reg
+   *          the service registry
+   * @param jobs
+   *          the jobs to monitor
+   * @return the job barrier result
+   */
+  public static JobBarrier.Result waitForJobs(Job waiter, ServiceRegistry reg, Job... jobs) {
+    return waitForJobs(waiter, reg, 0L, jobs);
+  }
+
+  /**
+   * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
+   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}.
+   *
+   * @param reg
+   *          the service registry
+   * @param timeout
+   *          the maximum amount of time to wait
+   * @param jobs
+   *          the jobs to monitor
+   * @return the job barrier result
+   */
   public static JobBarrier.Result waitForJobs(ServiceRegistry reg, long timeout, Job... jobs) {
     return waitForJobs(null, reg, timeout, jobs);
   }
 
+  /**
+   * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
+   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}.
+   *
+   * @param reg
+   *          the service registry
+   * @param jobs
+   *          the jobs to monitor
+   * @return the job barrier result
+   */
   public static JobBarrier.Result waitForJobs(ServiceRegistry reg, Job... jobs) {
     return waitForJobs(null, reg, jobs);
   }
 
+  /**
+   * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
+   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}. The
+   * <code>waiter</code> is the job which is waiting for the other jobs to finish.
+   *
+   * @param waiter
+   *          the job waiting for the other jobs to finish
+   * @param reg
+   *          the service registry
+   * @param timeout
+   *          the maximum amount of time to wait
+   * @param jobs
+   *          the jobs to monitor
+   * @return the job barrier result
+   */
   public static JobBarrier.Result waitForJobs(Job waiter, ServiceRegistry reg, long timeout, Collection<Job> jobs) {
     return waitForJobs(waiter, reg, timeout, toArray(Job.class, jobs));
   }
 
+  /**
+   * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
+   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}.
+   *
+   * @param reg
+   *          the service registry
+   * @param timeout
+   *          the maximum amount of time to wait
+   * @param jobs
+   *          the jobs to monitor
+   * @return the job barrier result
+   */
   public static JobBarrier.Result waitForJobs(ServiceRegistry reg, long timeout, Collection<Job> jobs) {
     return waitForJobs(null, reg, timeout, toArray(Job.class, jobs));
   }
 
+  /**
+   * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
+   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}. The
+   * <code>waiter</code> is the job which is waiting for the other jobs to finish.
+   *
+   * @param waiter
+   *          the job waiting for the other jobs to finish
+   * @param reg
+   *          the service registry
+   * @param jobs
+   *          the jobs to monitor
+   * @return the job barrier result
+   */
   public static JobBarrier.Result waitForJobs(Job waiter, ServiceRegistry reg, Collection<Job> jobs) {
     return waitForJobs(waiter, reg, toArray(Job.class, jobs));
   }
 
+  /**
+   * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
+   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}.
+   *
+   * @param reg
+   *          the service registry
+   * @param jobs
+   *          the jobs to monitor
+   * @return the job barrier result
+   */
   public static JobBarrier.Result waitForJobs(ServiceRegistry reg, Collection<Job> jobs) {
     return waitForJobs(null, reg, jobs);
   }
@@ -141,10 +262,22 @@ public final class JobUtil {
     return waitForJob(null, reg, timeout, job);
   }
 
+  /**
+   * Check if <code>job</code> is not done yet and wait in case.
+   *
+   * @param waiter
+   *          the job waiting for the other jobs to finish
+   * @param reg
+   *          the service registry
+   * @param job
+   *          the job to monitor
+   * @return the job barrier result
+   */
   public static JobBarrier.Result waitForJob(Job waiter, ServiceRegistry reg, Job job) {
     return waitForJob(waiter, reg, none(0L), job);
   }
 
+  /** Check if <code>job</code> is not done yet and wait in case. */
   public static JobBarrier.Result waitForJob(ServiceRegistry reg, Job job) {
     return waitForJob(null, reg, none(0L), job);
   }
@@ -176,111 +309,6 @@ public final class JobUtil {
       default:
         throw new IllegalStateException("Found job in unknown state '" + job.getStatus() + "'");
     }
-  }
-
-  public interface JobEnv {
-    JobBarrier.Result waitForJobs(Job waiter, long timeout, Job... jobs);
-
-    JobBarrier.Result waitForJobs(long timeout, Job... jobs);
-
-    JobBarrier.Result waitForJobs(Job waiter, Job... jobs);
-
-    JobBarrier.Result waitForJobs(Job... jobs);
-
-    JobBarrier.Result waitForJobs(Job waiter, long timeout, List<Job> jobs);
-
-    JobBarrier.Result waitForJobs(long timeout, List<Job> jobs);
-
-    JobBarrier.Result waitForJobs(Job waiter, List<Job> jobs);
-
-    JobBarrier.Result waitForJobs(List<Job> jobs);
-
-    JobBarrier.Result waitForJob(Job waiter, Option<Long> timeout, Job job);
-
-    JobBarrier.Result waitForJob(Option<Long> timeout, Job job);
-
-    JobBarrier.Result waitForJob(Job waiter, long timeout, Job job);
-
-    JobBarrier.Result waitForJob(long timeout, Job job);
-
-    JobBarrier.Result waitForJob(Job waiter, Job job);
-
-    JobBarrier.Result waitForJob(Job job);
-  }
-
-  /** Create a job environment which encapsulates the needed service registry. */
-  public static JobEnv jobEnv(final ServiceRegistry reg) {
-    return new JobEnv() {
-      @Override
-      public JobBarrier.Result waitForJobs(long timeout, Job... jobs) {
-        return JobUtil.waitForJobs(reg, timeout, jobs);
-      }
-
-      @Override
-      public JobBarrier.Result waitForJobs(Job... jobs) {
-        return JobUtil.waitForJobs(reg, jobs);
-      }
-
-      @Override
-      public JobBarrier.Result waitForJobs(long timeout, List<Job> jobs) {
-        return JobUtil.waitForJobs(reg, timeout, jobs);
-      }
-
-      @Override
-      public JobBarrier.Result waitForJobs(List<Job> jobs) {
-        return JobUtil.waitForJobs(reg, jobs);
-      }
-
-      @Override
-      public Result waitForJobs(Job waiter, long timeout, Job... jobs) {
-        return JobUtil.waitForJobs(waiter, reg, timeout, jobs);
-      }
-
-      @Override
-      public Result waitForJobs(Job waiter, Job... jobs) {
-        return JobUtil.waitForJobs(waiter, reg, jobs);
-      }
-
-      @Override
-      public Result waitForJobs(Job waiter, long timeout, List<Job> jobs) {
-        return JobUtil.waitForJobs(waiter, reg, timeout, jobs);
-      }
-
-      @Override
-      public Result waitForJobs(Job waiter, List<Job> jobs) {
-        return JobUtil.waitForJobs(waiter, reg, jobs);
-      }
-
-      @Override
-      public JobBarrier.Result waitForJob(Option<Long> timeout, Job job) {
-        return JobUtil.waitForJob(reg, timeout, job);
-      }
-
-      @Override
-      public JobBarrier.Result waitForJob(long timeout, Job job) {
-        return JobUtil.waitForJob(reg, some(timeout), job);
-      }
-
-      @Override
-      public JobBarrier.Result waitForJob(Job job) {
-        return JobUtil.waitForJob(reg, job);
-      }
-
-      @Override
-      public Result waitForJob(Job waiter, Option<Long> timeout, Job job) {
-        return JobUtil.waitForJob(waiter, reg, job);
-      }
-
-      @Override
-      public Result waitForJob(Job waiter, long timeout, Job job) {
-        return JobUtil.waitForJob(waiter, reg, some(timeout), job);
-      }
-
-      @Override
-      public Result waitForJob(Job waiter, Job job) {
-        return JobUtil.waitForJob(waiter, reg, job);
-      }
-    };
   }
 
   /**

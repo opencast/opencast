@@ -66,6 +66,7 @@ import org.opencastproject.util.jmx.JmxUtil;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Fn2;
+import com.entwinemedia.fn.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -96,8 +97,6 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -114,7 +113,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.RollbackException;
-import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
 /** JPA implementation of the {@link ServiceRegistry} */
@@ -877,6 +875,15 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     return job;
   }
 
+  private Fn<JpaJob, JpaJob> fnSetJobUri() {
+    return new Fn<JpaJob, JpaJob>() {
+      @Override
+      public JpaJob ap(JpaJob job) {
+        return setJobUri(job);
+      }
+    };
+  }
+
   /**
    * Internal method to update a job, throwing unwrapped JPA exceptions.
    *
@@ -1565,17 +1572,17 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       List<JpaJob> jobs = query.getResultList();
       if (jobs.size() == 0) {
         jobs = getChildren(em, id);
-        Collections.sort(jobs, new Comparator<JpaJob>() {
-          @Override
-          public int compare(JpaJob job1, JpaJob job2) {
+      }
+      return $(jobs).sort(new Comparator<JpaJob>() {
+        @Override
+        public int compare(JpaJob job1, JpaJob job2) {
+          if (job1.getDateCreated() == null || job2.getDateCreated() == null) {
+            return 0;
+          } else {
             return job1.getDateCreated().compareTo(job2.getDateCreated());
           }
-        });
-      }
-      for (JpaJob job : jobs) {
-        setJobUri(job);
-      }
-      return $(jobs).map(fnToJob()).toList();
+        }
+      }).map(fnSetJobUri()).map(fnToJob()).toList();
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {
@@ -2023,10 +2030,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *          if true, the map will include only hosts that are online and have non-maintenance mode services
    * @return the map of hosts to job counts
    */
-  @SuppressWarnings("unchecked")
   SystemLoad getHostLoads(EntityManager em, boolean activeOnly) {
-
-    Map<String, NodeLoad> loadByHost = new LinkedHashMap<String, NodeLoad>();
+    final SystemLoad systemLoad = new SystemLoad();
 
     // Find all jobs that are currently running on any given host, or get all of them
     Query q = em.createNamedQuery("ServiceRegistration.hostloads");
@@ -2057,24 +2062,22 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         load = 0.0f;
       }
 
+      String host = service.getHost();
+
       // Add the service registration
-      if (loadByHost.containsKey(service.getHost())) {
-        NodeLoad serviceLoad = loadByHost.get(service.getHost());
-        float newLoad = serviceLoad.getLoadFactor() + load;
-        serviceLoad.setLoadFactor(newLoad);
-        loadByHost.put(service.getHost(), serviceLoad);
+      NodeLoad serviceLoad;
+      if (systemLoad.containsHost(host)) {
+        serviceLoad = systemLoad.get(host);
+        serviceLoad.setLoadFactor(serviceLoad.getLoadFactor() + load);
       } else {
-        loadByHost.put(service.getHost(), new NodeLoad(service.getHost(), load));
+        serviceLoad = new NodeLoad(host, load);
       }
+
+      systemLoad.addNodeLoad(serviceLoad);
     }
 
-    SystemLoad systemLoad = new SystemLoad();
-    systemLoad.setNodeLoads(loadByHost.values());
-
-    // Initialize the list of hosts
-    List<HostRegistration> hosts = em.createNamedQuery("HostRegistration.getAll").getResultList();
     // This is important, otherwise services which have no current load are not listed in the output!
-    for (HostRegistration h : hosts) {
+    for (HostRegistration h : getHostRegistrations(em)) {
       if (!systemLoad.containsHost(h.getBaseUrl())) {
         systemLoad.addNodeLoad(new NodeLoad(h.getBaseUrl(), 0.0f));
       }
@@ -2679,26 +2682,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   @Override
   public SystemLoad getMaxLoads() throws ServiceRegistryException {
-    Query query = null;
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      query = em.createNamedQuery("HostRegistration.getAll");
-      SystemLoad loads = new SystemLoad();
-      @SuppressWarnings("unchecked")
-      Iterator<HostRegistration> hrIter = query.getResultList().iterator();
-      while (hrIter.hasNext()) {
-        HostRegistration hr = hrIter.next();
-        NodeLoad load = new NodeLoad(hr.getBaseUrl(), hr.getMaxLoad());
-        loads.addNodeLoad(load);
-      }
-      return loads;
-    } catch (Exception e) {
-      throw new ServiceRegistryException(e);
-    } finally {
-      if (em != null)
-        em.close();
+    final SystemLoad loads = new SystemLoad();
+    for (HostRegistration host : getHostRegistrations()) {
+      NodeLoad load = new NodeLoad(host.getBaseUrl(), host.getMaxLoad());
+      loads.addNodeLoad(load);
     }
+    return loads;
   }
 
   /**
@@ -2748,7 +2737,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       EntityManager em = null;
       try {
         em = emf.createEntityManager();
-        List<JpaJob> jobsToDispatch = getDispatchableJobs(em);
+        Stream<JpaJob> jobsToDispatch = $(getDispatchableJobs(em));
         List<String> undispatchableJobTypes = new ArrayList<String>();
 
         // FIXME: the stats are not currently used and the queries are very
@@ -2759,10 +2748,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         }
 
         // Make sure dispatching is happening in an ideal order
-        Collections.sort(jobsToDispatch, new DispatchableComparator());
+        jobsToDispatch = jobsToDispatch.sort(new DispatchableComparator());
 
         // Remove outdated jobs from priority list
-        Set<Long> jobIds = $(jobsToDispatch).map(toJobId).toSet();
+        Set<Long> jobIds = jobsToDispatch.map(toJobId).toSet();
         for (Long jobId : new HashSet<>(dispatchPriorityList.keySet())) {
           if (!jobIds.contains(jobId))
             dispatchPriorityList.remove(jobId);
@@ -2826,13 +2815,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
             // same time if there is processing capacity available.
             boolean parentHasRunningChildren = false;
             if (parentJob != null) {
-              List<Job> childJobs = getChildJobs(parentJob.getId());
-              if (childJobs != null) {
-                for (Job child : childJobs) {
-                  if (Status.RUNNING.equals(child.getStatus())) {
-                    parentHasRunningChildren = true;
-                    break;
-                  }
+              for (Job child : getChildJobs(parentJob.getId())) {
+                if (Status.RUNNING.equals(child.getStatus())) {
+                  parentHasRunningChildren = true;
+                  break;
                 }
               }
             }
