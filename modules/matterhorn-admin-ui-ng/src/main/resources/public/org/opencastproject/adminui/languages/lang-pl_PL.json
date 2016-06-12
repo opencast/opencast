@@ -127,11 +127,11 @@
     "SERIES_ACL_LOCKED":"Edytowanie zasad dostępu jest niedozwolone, jeśli wykonywane są operacje dotyczące zdarzenia, które jest częścią serii",
     "SERIES_ACL_MISSING_READWRITE_ROLE":"Zasada dostępu musi zawierać przynajmniej jedną rolę użytkownika z uprawnieniem do zapisu lub odczytu.",
     "EVENT_ACL_MISSING_READWRITE_ROLE":"Zasada dostępu musi zawierać przynajmniej jedną rolę użytkownika z uprawnieniem do zapisu lub odczytu.",
-    "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS":"The event opt-out status has been successfully updated.",
-    "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR":"Error while updating the event opt-out status.",
-    "EVENT_PARTICIPATION_STATUS_READONLY":"The participation status can not be updated as the scheduling start date is in the past.",
-    "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS":"The series opt-out status has been successfully updated.",
-    "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR":"Error while updating the series opt-out status.",
+    "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS":"Status wykluczenia został z powodzeniem zaktualizowany.",
+    "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR":"Błąd podczas aktualizacji statusu wykluczenia wydarzenia.",
+    "EVENT_PARTICIPATION_STATUS_READONLY":"Status uczestnictwa nie może być zaktualizowany w momencie w którym data rozpoczęcia już minęła.",
+    "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS":"Status wykluczenia został z powodzeniem zaktualizowany.",
+    "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR":"Błąd podczas aktualizacji statusu wykluczenia serii.",
     "THEME_NAME_ALREADY_TAKEN":"Ta nazwa jest już w użyciu",
     "THEME_NAME_EMPTY":"Nazwa nie może być pusta",
     "BUMPER_UPLOAD_ERROR":"Wystąpił błąd podczas przesyłania multimediów",
@@ -151,7 +151,7 @@
     "VIDEO_CUT_PROCESSING":"Nagranie jest przetwarzane…",
     "SERVER_UNRESPONSIVE":"Oops! Serwer nie odpowiada. Proszę spróbować ponownie później.",
     "SERVICE_UNAVAILABLE":"Oops! Serwer nie odpowiada. Proszę spróbować ponownie później.",
-    "ACTIVE_TRANSACTION":"The current event can currently not be edited as it is involved of an active transaction."
+    "ACTIVE_TRANSACTION":"Wydarzenie nie może być modyfikowane, ponieważ w chwili obecnej system wykonuje operacje z jego udziałem."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Działania",
@@ -267,7 +267,7 @@
       "ID":"Identyfikator",
       "SELECT_TASK":"Wybierz Zadanie",
       "SUMMARY":"Podsumowanie",
-      "WARNING":"This event has been published to at least one publication channel so it has to be retracted before it can be deleted. Select from the tasks below to retract the publications."
+      "WARNING":"Wydarzenie zostało opublikowane w przynajmniej jednym kanale. Żeby je usunąć należy wycofać je z publikacji."
     },
     "LICENSE":{
       "ALLRIGHTS":"Wszelkie prawa zastrzeżone",
@@ -914,7 +914,7 @@
         },
         "PARTICIPATION":{
           "CAPTION":"Wzór stanu uczestnictwa",
-          "WARNING_TEMPLATE":"Series participation status will be used as default value for new events that are part of the series.",
+          "WARNING_TEMPLATE":"Status uczestnictwa obowiązujący dla serii będzie domyślną wartością dla wydarzeń do niej przypisanych.",
           "REVIEW_STATUS":{
             "CAPTION":"Status przeglądu"
           },
@@ -1261,7 +1261,7 @@
         },
         "TITLE":{
           "CAPTION":"Tytuł",
-          "DESCRIPTION":"Predefined slide including descriptive metadata appended to the beginning or end of a recording.",
+          "DESCRIPTION":"Wstępnie zdefiniowanych slajd, zawierający dokładny opis metadanych, który zostanie dodany na początku lub końcu nagrania.",
           "ACTIVE":"Aktywne"
         },
         "WATERMARK":{
@@ -1355,7 +1355,7 @@
         "TITLE":{
           "CAPTION":"Tytuł",
           "FILE_UPLOADED":"Pliki wysłane: ",
-          "DESCRIPTION":"Predefined slide including descriptive metadata appended to the beginning or end of a recording.",
+          "DESCRIPTION":"Slajd, zawierający dokładny opis metadanych, który zostanie dodany na początku lub końcu nagrania.",
           "ACTIVE":"Aktywne",
           "ENABLE":"Włącz tytuły slajdów",
           "BACKGROUND":"Tło",
