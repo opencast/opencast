@@ -3,6 +3,31 @@
 ## Database Migration
 You will find the database migration script in /docs/upgrade/2.1_to_2.2/<vendor>.sql
 
+*Notice:* We highly recommend to use MariaDB 10.0+ instead of MySQL 5.5+, as the migration scripts for MariaDB are much more robust. 
+
+Switch to the directory that contains the mysql5.sql or mariadb10.sql file and run the MySQL/MariaDB client with the 
+database user and switch to the database you want to use (`opencast`):
+
+    mysql -u opencast -p opencast
+
+Run the ddl script:
+
+    mysql> source mariadb10.sql;
+
+or 
+
+    mysql> source mysql5.sql;
+
+With the mysql5 script you might encouter errors in the logs about missing INDEXes and non existing FOREIGN KEYS. You can probably ignore these errors. If your MySQL database is not working afterwards we can only recommend to try MariaDB. You should not use the shell import of the SQL script for MySQL, as unlike with the SOURCE command, the processing of the script in the shell will stop, as soon as an error is encountered!
+
+## System Account
+
+If you are upgrading from Opencast 1.x or 2.0 to 2.2 you should notice that the default username of the digest user has changed. You should stick to your current username (matterhorn_system_account) as otherwise the creating user for some jobs cannot be found.
+
+## Scheduled Events
+
+It is highly recommended that you don't have scheduled jobs left in your system before the migration, as the migration of scheduled events sometimes fails. 
+
 ## Distribution artifacts migration
 With the introduction of the stream security, the distribution URLs he distribution URLs in Opencast 2.2 have changed
 to provide a clearer separation between the artifacts belonging to the different tenants present in the system. 
