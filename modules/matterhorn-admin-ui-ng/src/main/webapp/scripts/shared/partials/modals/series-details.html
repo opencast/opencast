@@ -7,7 +7,7 @@
     <nav class="modal-nav" id="modal-nav">
         <a ng-click="openTab('metadata')" data-modal-tab="metadata" ng-class="{ active: tab == 'metadata' }" translate="EVENTS.SERIES.DETAILS.TABS.METADATA" with-role="ROLE_UI_SERIES_DETAILS_METADATA_VIEW">Metadata</a>
         <a ng-if="metadata.entries.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.SERIES.DETAILS.TABS.EXTENDED_METADATA" with-role="ROLE_UI_SERIES_DETAILS_EXTMETADATA_VIEW">Metadata</a>
-        <a ng-click="openTab('participation')" data-modal-tab="participation" ng-class="{ active: tab == 'participation' }" translate="EVENTS.SERIES.DETAILS.TABS.PARTICIPATION" with-role="ROLE_UI_SERIES_DETAILS_EXTMETADATA_VIEW">Participation</a>
+        <!--<a ng-click="openTab('participation')" data-modal-tab="participation" ng-class="{ active: tab == 'participation' }" translate="EVENTS.SERIES.DETAILS.TABS.PARTICIPATION" with-role="ROLE_UI_SERIES_DETAILS_EXTMETADATA_VIEW">Participation</a>-->
 <!--         <a ng-click="openTab('events')" data-modal-tab="events" ng-class="{ active: tab == 'events' }" translate="EVENTS.SERIES.DETAILS.TABS.EVENTS">Events</a> -->
         <a ng-click="openTab('permissions')" data-modal-tab="permissions" ng-class="{ active: tab == 'permissions' }" translate="EVENTS.SERIES.DETAILS.TABS.PERMISSIONS" with-role="ROLE_UI_SERIES_DETAILS_ACL_VIEW">Access Policy</a>
         <a ng-click="openTab('theme')" data-modal-tab="theme" ng-class="{ active: tab == 'theme' }" translate="EVENTS.SERIES.DETAILS.TABS.THEME" with-role="ROLE_UI_SERIES_DETAILS_THEMES_VIEW">Theme</a>
@@ -59,6 +59,7 @@
         </div>
     </div>
 
+<!--
     <div class="modal-content" data-modal-tab-content="participation">
         <div class="modal-body">
             <div data-admin-ng-notifications="" context="series-participation"></div>
@@ -69,12 +70,10 @@
                     <p translate="EVENTS.SERIES.DETAILS.PARTICIPATION.WARNING_TEMPLATE"></p>
                 </div>
 
-                <!-- Participation status -->
                 <div class="obj">   
                     <header  translate="EVENTS.SERIES.DETAILS.PARTICIPATION.CAPTION">Participation Status</header>
 
                     <div class="obj-container padded">
-                        <!-- <p><span translate="EVENTS.SERIES.DETAILS.PARTICIPATION.REVIEW_STATUS.CAPTION">Review status</span>: {{ participation.review_status }}</p> -->
                         
                         <div class="form-container">
                             <div class="row">
@@ -89,9 +88,7 @@
                     </div>   
                 </div>
 
-
-                <!-- Messages -->
-<!--                 <div class="obj tbl-container">
+                <div class="obj tbl-container">
                     <header translate="EVENTS.SERIES.DETAILS.PARTICIPATION.MESSAGES.CAPTION">Participation</header>
                     <div class="obj-container">
                         <table class="main-tbl">
@@ -113,12 +110,12 @@
                             </tbody>
                         </table>
                     </div>
-                </div> -->
+                </div>
 
             </div>
         </div>
     </div>
-
+-->
 <!--     <div class="modal-content" data-modal-tab-content="events">
         <p class="tab-desc"></p>
         <div class="full-col">

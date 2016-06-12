@@ -102,8 +102,8 @@ public class EventListQuery extends ResourceListQueryImpl {
     this.availableFilters.add(createStartDateFilter(Option.<Tuple<Date, Date>> none()));
     this.availableFilters.add(createStatusFilter(Option.<String> none()));
     this.availableFilters.add(createCommentsFilter(Option.<String> none()));
-    this.availableFilters.add(createOptedoutFilter(Option.<Boolean> none()));
-    this.availableFilters.add(createReviewStatusFilter(Option.<String> none()));
+//    this.availableFilters.add(createOptedoutFilter(Option.<Boolean> none()));
+//    this.availableFilters.add(createReviewStatusFilter(Option.<String> none()));
   }
 
   /**
