@@ -2,7 +2,7 @@
   "MATTERHORN":"Opencast",
   "NAV_HOME":"开始",
   "NAV_ABOUT":"关于",
-  "NO":"No",
+  "NO":"否",
   "SUBMIT":"提交",
   "UPDATE":"更新",
   "CANCEL":"取消",
@@ -118,8 +118,8 @@
     "EMAIL_SENT":"邮件已发送",
     "EMAIL_NOT_SENT":"邮件无法发送",
     "CONFLICT_DETECTED":"排程有冲突：该新事件与已存在的某个事件有重叠，请更改位置、日期或时间。",
-    "CONFLICT_ALREADY_ENDED":"Scheduling error: The event has already ended.",
-    "CONFLICT_END_BEFORE_START":"Scheduling error: Schedule end has to be later than the start.",
+    "CONFLICT_ALREADY_ENDED":"排程错误 ︰ 该事件已结束。",
+    "CONFLICT_END_BEFORE_START":"排程错误 ︰ 结束时间必须要迟于开始时间。",
     "INVALID_ACL_RULES":"规则必须含有一个拥有读取和\/或写入权限的有效角色。",
     "MISSING_ACL_RULES":"至少有一个角色必须具有读取和写入权限。",
     "SAVED_ACL_RULES":"访问权限已保存",
@@ -601,8 +601,8 @@
               "SAMPLINGRATE":"采样速度",
               "FRAMECOUNT":"帧数",
               "PEAKLEVELDB":"峰值电平 (dB)",
-              "RMSLEVELDB":"RMS level (dB)",
-              "RMSPEAKDB":"RMS peak (dB)",
+              "RMSLEVELDB":"均方根水平 (dB)",
+              "RMSPEAKDB":"均方根峰值 (dB)",
               "FRAMERATE":"帧速",
               "RESOLUTION":"分辨率",
               "SIZE":"文件大小",
@@ -914,7 +914,7 @@
         },
         "PARTICIPATION":{
           "CAPTION":"参与状态 template",
-          "WARNING_TEMPLATE":"Series participation status will be used as default value for new events that are part of the series.",
+          "WARNING_TEMPLATE":"系列的参与状态将被用做该系列中的新建事件的默认值。",
           "REVIEW_STATUS":{
             "CAPTION":"复查状态"
           },
@@ -1403,7 +1403,7 @@
         "CREATED":"创建",
         "CREATOR":"创建者",
         "HOST_NAME":"主机名",
-        "OPERATION":"Operation",
+        "OPERATION":"操作",
         "STARTED":"已启动",
         "STATUS":"状态",
         "SUBMITTED":"已提出",
@@ -1602,9 +1602,9 @@
       "STATUS":{
         "LABEL":"状态",
         "PAUSED":"暂停",
-        "QUEUED":"Queued",
+        "QUEUED":"已列队",
         "RUNNING":"运行中",
-        "WAITING":"Waiting"
+        "WAITING":"等待中"
       }
     },
     "SERIES":{
@@ -1643,13 +1643,13 @@
       "STATUS":{
         "LABEL":"状态",
         "MAINTENANCE":"维护",
-        "ONLINE":"Online",
-        "OFFLINE":"Offline"
+        "ONLINE":"在线",
+        "OFFLINE":"离线"
       }
     },
     "SERVICES":{
       "ACTIONS":{
-        "LABEL":"Has actions"
+        "LABEL":"可用操作"
       },
       "HOSTNAME":{
         "LABEL":"主机名"
@@ -1659,8 +1659,8 @@
       },
       "STATUS":{
         "LABEL":"状态",
-        "ERROR":"Error",
-        "NORMAL":"Normal",
+        "ERROR":"错误",
+        "NORMAL":"常规",
         "WARNING":"警告"
       }
     },

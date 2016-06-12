@@ -127,7 +127,7 @@
     "SERIES_ACL_LOCKED":"No es posible editar las Políticas de Acceso cuando existen operaciones activas en algún evento de la serie",
     "SERIES_ACL_MISSING_READWRITE_ROLE":"La Política de Acceso requiere al menos un rol con permisos de Lectura y Escritura.",
     "EVENT_ACL_MISSING_READWRITE_ROLE":"La Política de Acceso requiere al menos un rol con permisos de Lectura y Escritura.",
-    "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS":"El estado de aprobación del evento se ha actualizado correctamente.",
+    "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS":"El estado de aprobación de la serie se ha actualizado correctamente.",
     "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR":"Error al actualizar el estado de aprobación del evento.",
     "EVENT_PARTICIPATION_STATUS_READONLY":"No se puede actualizar el estado de aprobación del evento después de la fecha de inicio programada.",
     "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS":"El estado de aprobación de la serie se ha actualizado correctamente.",
@@ -1602,9 +1602,9 @@
       "STATUS":{
         "LABEL":"Estado",
         "PAUSED":"En pausa",
-        "QUEUED":"Queued",
+        "QUEUED":"En cola",
         "RUNNING":"Procesando",
-        "WAITING":"Waiting"
+        "WAITING":"Esperando"
       }
     },
     "SERIES":{
@@ -1643,13 +1643,13 @@
       "STATUS":{
         "LABEL":"Estado",
         "MAINTENANCE":"Mantenimiento",
-        "ONLINE":"Online",
-        "OFFLINE":"Offline"
+        "ONLINE":"Conectado",
+        "OFFLINE":"Desconectado"
       }
     },
     "SERVICES":{
       "ACTIONS":{
-        "LABEL":"Has actions"
+        "LABEL":"Hay acciones disponibles"
       },
       "HOSTNAME":{
         "LABEL":"Nombre del equipo"
