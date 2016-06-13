@@ -131,4 +131,9 @@ angular.module('adminNg.controllers')
         // add message that never disappears
         messageId = Notifications.add('success', 'EVENTS_UPLOAD_STARTED', 'global', -1);
     };
+
+    $scope.close = function () {
+        resetStates();
+        Modal.$scope.close();
+    }
 }]);
