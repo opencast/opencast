@@ -217,7 +217,6 @@ public class JpaJob {
           CascadeType.MERGE })
   private List<JpaJob> childJobs;
 
-
   @Transient
   private String createdHost;
 
@@ -225,10 +224,10 @@ public class JpaJob {
   private String processingHost;
 
   @Transient
-  private Long parentJobId = -1L;
+  private Long parentJobId = null;
 
   @Transient
-  private long rootJobId = -1L;
+  private Long rootJobId = null;
 
   @Transient
   private FailureReason failureReason = NONE;
@@ -239,7 +238,8 @@ public class JpaJob {
   @Transient
   private URI uri;
 
-  public JpaJob() { }
+  public JpaJob() {
+  }
 
   public JpaJob(User currentUser, Organization organization, ServiceRegistrationJpaImpl creatingService,
           String operation, List<String> arguments, String payload, boolean dispatchable, float load) {
@@ -397,7 +397,6 @@ public class JpaJob {
   public void setUri(URI uri) {
     this.uri = uri;
   }
-
 
   public long getId() {
     return id;
