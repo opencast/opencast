@@ -66,7 +66,7 @@ $(document).ready(function() {
     function initialize() {
         $.enableLogging(true);
 
-        $("#" + id_mhlogolink).attr("href", location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''));
+        $("#" + id_mhlogolink).attr("href", location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + "/engage/ui");
         getInfo();
         registerHandler();
 
