@@ -17,7 +17,7 @@ Notes:
 Opencast uses to ACL actions to authorize roles to perform specific actions on a given object:
 
 * `read` allows the role to access to object
-* `write` allows the role to modifiy the object
+* `write` allows the role to modify the object
 
 Those built-in actions are known to Opencast.
 
@@ -42,5 +42,5 @@ The ACL editor of the Admin UI will allow the user to set those actions.
 
 Notes:
 
-* To ensure compatibility with future Opencast verions, it is highly recommended to use a prefix for your
-custom action identifiers in case later Opencast versions would introduce an action with the same name
+* To ensure compatibility with future Opencast versions, it is highly recommended to use a prefix for your
+customized additional actions in case later Opencast versions would introduce an action with the same name
