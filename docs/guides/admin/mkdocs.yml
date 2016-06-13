@@ -40,6 +40,7 @@ pages:
       - Central Authentication Service (CAS): 'configuration/security.cas.md'
       - LDAP Authentication and Authorization (without CAS): 'configuration/security.ldap.md'
       - Stream Security: 'configuration/stream-security.md'
+      - Access Control Lists: 'configuration/acl.md'
    - Workflow: 'configuration/workflow.md'
 - Modules:
    - Overview: 'modules/index.md'

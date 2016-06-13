@@ -19,5 +19,6 @@ General Configuration
     - [CAS Security Configuration](security.cas.md)
     - [LDAP Authentication and Authorization (without CAS)](security.ldap.md)
     - [Stream Security](stream-security.md)
+    - [Access Control Lists](acl.md)
  - [Workflow Configuration](workflow.md)
     - [Workflow Operation Handler](../workflowoperationhandlers/index.md)
