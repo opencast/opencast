@@ -113,6 +113,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.RollbackException;
+import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
 /** JPA implementation of the {@link ServiceRegistry} */
