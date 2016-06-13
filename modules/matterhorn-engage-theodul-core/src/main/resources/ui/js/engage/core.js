@@ -148,7 +148,8 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         (Bowser.opera && Bowser.version >= browser_minVersion_opera) ||
         (Bowser.safari && Bowser.version >= browser_minVersion_safari) ||
         (Bowser.msedge && Bowser.version >= browser_minVersion_msedge) ||
-        (Bowser.msie && Bowser.version >= browser_minVersion_msie);
+        (Bowser.msie && Bowser.version >= browser_minVersion_msie) ||
+        (Bowser.mobile) || (Bowser.ios);
   }
   
   function setMinBrowserVersions() {
