@@ -14,6 +14,7 @@ General Configuration
  - [Load Configuration](load.md)
  - [Logging and Privacy Configuration](logging.and.privacy.md)
  - [Message Broker Configuration](message-broker.md)
+ - [Metadata Configuration](metadata.md)
  - [Multi Tenancy Configuration](multi.tenancy.md)
  - [Security Configuration](security.md)
     - [CAS Security Configuration](security.cas.md)
