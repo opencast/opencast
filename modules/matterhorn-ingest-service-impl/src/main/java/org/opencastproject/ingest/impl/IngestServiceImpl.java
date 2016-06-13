@@ -189,7 +189,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   public static final float DEFAULT_INGEST_FILE_JOB_LOAD = 1.0f;
 
   /** The approximate load placed on the system by ingesting a zip file */
-  public static final float DEFAULT_INGEST_ZIP_JOB_LOAD = 2.0f;
+  public static final float DEFAULT_INGEST_ZIP_JOB_LOAD = 1.0f;
 
   /** The key to look for in the service configuration file to override the {@link DEFAULT_INGEST_FILE_JOB_LOAD} */
   public static final String FILE_JOB_LOAD_KEY = "job.load.ingest.file";
@@ -544,7 +544,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.info("Ingest of mediapackage {} done", mediaPackageId);
       job.setStatus(Job.Status.FINISHED);
       return workflowInstance;
-
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
     } catch (MediaPackageException e) {
@@ -577,10 +576,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       throw new IngestException(e);
     } finally {
       IOUtils.closeQuietly(zis);
+      finallyUpdateJob(job);
       for (String filename : collectionFilenames) {
         workingFileRepository.deleteFromCollection(Long.toString(job.getId()), filename);
       }
-      finallyUpdateJob(job);
     }
   }
 
@@ -676,8 +675,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               newUrl });
       return mp;
     } catch (IOException e) {
-      if (job != null)
-        job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
@@ -713,8 +710,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               newUrl });
       return mp;
     } catch (IOException e) {
-      if (job != null)
-        job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
@@ -751,8 +746,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               mediaPackage, newUrl });
       return mp;
     } catch (IOException e) {
-      if (job != null)
-        job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
@@ -785,8 +778,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               mediaPackage, newUrl });
       return mp;
     } catch (IOException e) {
-      if (job != null)
-        job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
@@ -826,8 +817,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               newUrl });
       return mp;
     } catch (IOException e) {
-      if (job != null)
-        job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
@@ -921,8 +910,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               newUrl });
       return mp;
     } catch (IOException e) {
-      if (job != null)
-        job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
@@ -959,8 +946,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               mediaPackage, newUrl });
       return mp;
     } catch (IOException e) {
-      if (job != null)
-        job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
@@ -996,8 +981,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               mediaPackage, newUrl });
       return mp;
     } catch (IOException e) {
-      if (job != null)
-        job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
@@ -1727,7 +1710,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   }
 
   /**
-   * Private utility to update Job, called from a finally block.
+   * Private utility to update and optionally fail job, called from a finally block.
    *
    * @param job
    *          to be updated, may be null
@@ -1735,12 +1718,16 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    *           when unable to update ingest job
    */
   private void finallyUpdateJob(Job job) throws IngestException {
+    if (job == null) {
+      logger.debug("Not updating null job.");
+      return;
+    }
+
+    if (!Job.Status.FINISHED.equals(job.getStatus()))
+      job.setStatus(Job.Status.FAILED);
+
     try {
-      if (job != null) {
-        serviceRegistry.updateJob(job);
-      } else {
-        logger.debug("Not updating null job.");
-      }
+      serviceRegistry.updateJob(job);
     } catch (Exception e) {
       throw new IngestException("Unable to update ingest job", e);
     }

@@ -2,7 +2,7 @@
   "MATTERHORN":"Opencast",
   "NAV_HOME":"Inicio",
   "NAV_ABOUT":"Acerca de",
-  "NO":"No",
+  "NO":"Non",
   "SUBMIT":"Enviar",
   "UPDATE":"Actualizar",
   "CANCEL":"Cancelar",
@@ -1602,9 +1602,9 @@
       "STATUS":{
         "LABEL":"Estado",
         "PAUSED":"Pausado",
-        "QUEUED":"Queued",
+        "QUEUED":"Na cola",
         "RUNNING":"Procesando",
-        "WAITING":"Waiting"
+        "WAITING":"Esperando"
       }
     },
     "SERIES":{
@@ -1643,13 +1643,13 @@
       "STATUS":{
         "LABEL":"Estado",
         "MAINTENANCE":"Mantemento",
-        "ONLINE":"Online",
-        "OFFLINE":"Offline"
+        "ONLINE":"Conectado",
+        "OFFLINE":"Desconectado"
       }
     },
     "SERVICES":{
       "ACTIONS":{
-        "LABEL":"Has actions"
+        "LABEL":"Hai accións dispoñibles"
       },
       "HOSTNAME":{
         "LABEL":"Nome do servidor"
@@ -1659,7 +1659,7 @@
       },
       "STATUS":{
         "LABEL":"Estado",
-        "ERROR":"Error",
+        "ERROR":"Erro",
         "NORMAL":"Normal",
         "WARNING":"Advertencia"
       }

@@ -2,8 +2,12 @@ Database Configuration
 ======================
 
 Opencast ships with embedded JDBC drivers for the H2 (HSQL), MySQL/MariaDB databases. The built in H2 databased is used
-by default, and needs no configuration, but it is strongly recommended to use MySQL or MariaDB instead as there will be a
+by default, and needs no configuration, but it is strongly recommended to use MariaDB 10.0 instead as there will be a
 huge performance gain, especially if more data are in that database.
+
+*Notice:* Opencast 2.2 is not compatible wit MySQL 5.7 (and probaly MariaDB 10.1). **Please use MariaDB 10.0 or MySQL 5.5 or 5.6.**
+
+*Notice:* In general we recomment to use MariaDB 10.0 instead of MySQL 5.5, as the MariaDB is fully compatible with MySQL 5.5 but not vice versa. The enhancements of MariaDB, i.e. allowed more robust migration scripts than MySQL.
 
 *Notice:* For a distributed set-up of Opencast, you cannot use the internal H2 database.
 

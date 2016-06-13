@@ -3,10 +3,7 @@ angular.module('adminNg.directives')
 
     function getCurrentLanguageCode() {
         var lc = Language.getLanguageCode();
-        if (lc === 'en') {
-            // in order to reset to default, we need to leave the language code empty
-            lc = '';
-        }
+        lc = lc.replace(/\_.*/, ''); // remove long locale, as the datepicker does not support this
         return lc;
     }
 

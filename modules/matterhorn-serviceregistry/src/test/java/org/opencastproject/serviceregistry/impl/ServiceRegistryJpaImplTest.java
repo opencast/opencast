@@ -44,6 +44,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.util.persistence.PersistenceUtil;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
@@ -238,6 +239,70 @@ public class ServiceRegistryJpaImplTest {
     logger.info("Undispatachable job 1 " + undispatchableJob2.getId());
     undispatchableJob2 = serviceRegistryJpaImpl.getJob(undispatchableJob2.getId());
     assertEquals(Status.RUNNING, undispatchableJob2.getStatus());
+  }
+
+  @Test
+  public void testHostAddedToPriorityList() throws Exception {
+    serviceRegistryJpaImpl.scheduledExecutor.shutdown();
+    serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
+    serviceRegistryJpaImpl.activate(null);
+    Hashtable<String, String> properties = new Hashtable<>();
+    properties.put("dispatchinterval", "1000");
+    serviceRegistryJpaImpl.updated(properties);
+    registerTestHostAndService();
+    Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_OPERATION, null, null, true, null);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistryJpaImpl, testJob);
+    try {
+      barrier.waitForJobs(2000);
+      Assert.fail();
+    } catch (Exception e) {
+      Assert.assertEquals(1, serviceRegistryJpaImpl.dispatchPriorityList.size());
+    }
+  }
+
+  @Test
+  public void testHostsBeingRemovedFromPriorityList() throws Exception {
+    serviceRegistryJpaImpl.scheduledExecutor.shutdown();
+    serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
+    serviceRegistryJpaImpl.activate(null);
+    Hashtable<String, String> properties = new Hashtable<>();
+    properties.put("dispatchinterval", "1000");
+    serviceRegistryJpaImpl.updated(properties);
+    registerTestHostAndService();
+    serviceRegistryJpaImpl.dispatchPriorityList.put(0L, TEST_HOST);
+    Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_2, TEST_OPERATION, null, null, true, null);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistryJpaImpl, testJob);
+    try {
+      barrier.waitForJobs(2000);
+      Assert.fail();
+    } catch (Exception e) {
+      Assert.assertEquals(0, serviceRegistryJpaImpl.dispatchPriorityList.size());
+    }
+  }
+
+  @Test
+  public void testIgnoreHostsInPriorityList() throws Exception {
+    serviceRegistryJpaImpl.scheduledExecutor.shutdown();
+    serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
+    serviceRegistryJpaImpl.activate(null);
+    Hashtable<String, String> properties = new Hashtable<>();
+    properties.put("dispatchinterval", "1000");
+    serviceRegistryJpaImpl.updated(properties);
+    registerTestHostAndService();
+    Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_2, TEST_OPERATION, null, null, true, null);
+    Job testJob2 = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_OPERATION, null, null, true, null);
+    serviceRegistryJpaImpl.dispatchPriorityList.put(testJob2.getId(), TEST_HOST);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistryJpaImpl, testJob, testJob2);
+    try {
+      barrier.waitForJobs(2000);
+      Assert.fail();
+    } catch (Exception e) {
+      Assert.assertTrue(StringUtils.isBlank(serviceRegistryJpaImpl.getJob(testJob.getId()).getProcessingHost()));
+      Assert.assertTrue(StringUtils.isNotBlank(serviceRegistryJpaImpl.getJob(testJob2.getId()).getProcessingHost()));
+      Assert.assertEquals(1, serviceRegistryJpaImpl.dispatchPriorityList.size());
+      String blockingHost = serviceRegistryJpaImpl.dispatchPriorityList.get(testJob2.getId());
+      Assert.assertEquals(TEST_HOST, blockingHost);
+    }
   }
 
   @Test

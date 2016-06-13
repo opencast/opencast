@@ -52,8 +52,8 @@ public class JobImpl implements Job {
   private Long queueTime = 0L;
   private Long runTime = 0L;
   private String payload;
-  private Long parentJobId = -1L;
-  private Long rootJobId = -1L;
+  private Long parentJobId = null;
+  private Long rootJobId = null;
   private boolean dispatchable = true;
   private URI uri;
   private Float load = 1.0F;

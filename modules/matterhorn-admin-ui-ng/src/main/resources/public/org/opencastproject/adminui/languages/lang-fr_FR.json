@@ -2,7 +2,7 @@
   "MATTERHORN":"Opencast",
   "NAV_HOME":"Accueil",
   "NAV_ABOUT":"À propos",
-  "NO":"No",
+  "NO":"Non",
   "SUBMIT":"Envoyer",
   "UPDATE":"Appliquer",
   "CANCEL":"Annuler",
@@ -10,8 +10,8 @@
   "SAVE":"Enregistrer",
   "LOGOUT":"Déconnexion",
   "RESET":"Remise à zéro",
-  "SELECT_NO_OPTIONS":"No option",
-  "YES":"Yes",
+  "SELECT_NO_OPTIONS":"Pas d'options",
+  "YES":"Oui",
   "LANGUAGES":{
     "ARABIC":"Arabe",
     "DANISH":"Danois",
@@ -51,10 +51,10 @@
       "CONFIRMATION":"Confirmation requise"
     }
   },
-  "MEDIAMODULE":"Media Module",
+  "MEDIAMODULE":"Module Multimédia",
   "HELP":{
-    "HELP":"Help",
-    "USERS_GUIDE":"User's Guide",
+    "HELP":"Aide",
+    "USERS_GUIDE":"Guide de l'utilisateur",
     "DOCUMENTATION":"Documentation",
     "REST_DOC":"Documentation des API REST"
   },
@@ -80,22 +80,22 @@
     "SERIES_ADDED":"La série a été créée",
     "SERIES_NOT_SAVED":"La série n'a pas pu être enregistrée",
     "EVENTS_CREATED":"L'événement a été créé",
-    "EVENTS_UPLOAD_STARTED":"The event is being uploaded…",
+    "EVENTS_UPLOAD_STARTED":"L’événement est en cours de téléchargement...",
     "EVENTS_NOT_CREATED":"L'événement n'a pas pu être créé",
-    "EVENTS_UPDATED_NB":"{{ number }} events have been successfully updated",
-    "EVENTS_UPDATED_ALL":"All events have been successfully updated",
+    "EVENTS_UPDATED_NB":"{{ number }} événements ont été mis à jour avec succès",
+    "EVENTS_UPDATED_ALL":"Tous les événements ont été mis à jour avec succès",
     "EVENTS_NOT_UPDATED":"L'événement n'a pas pu être enregistré",
-    "EVENTS_NOT_UPDATED_ID":"The event {{ id }} could not be saved",
-    "EVENTS_NOT_UPDATED_ALL":"None of the events could be saved",
-    "SERIES_UPDATED_NB":"{{ number }} series have been successfully updated",
-    "SERIES_UPDATED_ALL":"All series have been successfully updated",
-    "SERIES_NOT_UPDATED":"The series could not be saved",
-    "SERIES_NOT_UPDATED_ID":"The series {{ id }} could not be saved",
-    "SERIES_NOT_UPDATED_ALL":"None of the series could be saved",
+    "EVENTS_NOT_UPDATED_ID":"L'événement {{ id }} n’a pas pu être enregistré",
+    "EVENTS_NOT_UPDATED_ALL":"Aucun des événements n'a pu être enregistré",
+    "SERIES_UPDATED_NB":"{{ number }} séries ont été mis à jour avec succès",
+    "SERIES_UPDATED_ALL":"Toutes les séries ont été mis à jour avec succès",
+    "SERIES_NOT_UPDATED":"La série n'a pas pu être enregistrée",
+    "SERIES_NOT_UPDATED_ID":"La série {{ id }} n’a pas pu être enregistré",
+    "SERIES_NOT_UPDATED_ALL":"Aucune des séries n’a pu être enregistré",
     "EVENTS_DELETED":"L'événement a été supprimé",
     "EVENTS_NOT_DELETED":"Le(s) événement(s) ne peut pas être supprimés",
-    "SERIES_DELETED":"The series has been deleted",
-    "SERIES_NOT_DELETED":"The series could not be deleted",
+    "SERIES_DELETED":"La série a été supprimé",
+    "SERIES_NOT_DELETED":"La série n’a pu être supprimé",
     "USER_BLACKLIST_CREATED":"La liste de blocage a été créée",
     "USER_BLACKLIST_NOT_CREATED":"La liste de blocage n'a pas pu être créée",
     "USER_BLACKLIST_SAVED":"La liste de blocage a été sauvée",
@@ -117,21 +117,21 @@
     "EMAIL_TEMPLATE_NAME_TAKEN":"Ce nom est déjà utilisé",
     "EMAIL_SENT":"Le messag a été envoyé",
     "EMAIL_NOT_SENT":"Le message n'a pas pu être envoyé",
-    "CONFLICT_DETECTED":"Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
-    "CONFLICT_ALREADY_ENDED":"Scheduling error: The event has already ended.",
-    "CONFLICT_END_BEFORE_START":"Scheduling error: Schedule end has to be later than the start.",
-    "INVALID_ACL_RULES":"Rules have to contain a valid role and read or\/and write right(s).",
+    "CONFLICT_DETECTED":"Conflit de programmation: le nouvel événement entre en conflit avec un événement existant. Veuillez changer l'emplacement ou les dates.",
+    "CONFLICT_ALREADY_ENDED":"Erreur de programmation : l’événement est déjà terminée.",
+    "CONFLICT_END_BEFORE_START":"Erreur de programmation : la fin de l’événement programmé doit être postérieure au début.",
+    "INVALID_ACL_RULES":"Les règles doivent contenir un rôle valide et un droit d'accès lecture et\/ou écriture.",
     "MISSING_ACL_RULES":"Il faut au moins un rôle avec droit d'accès Lecture et Ecriture !",
     "SAVED_ACL_RULES":"Les règles d'accès ont été enregistrées.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Les événements existants dans cette série devront être retraités",
     "SERIES_ACL_LOCKED":"Modification des droits d'accès n'est pas autorisée lorsque des opérations sont en cours d'exécution sur un événement appartenant à cette série",
     "SERIES_ACL_MISSING_READWRITE_ROLE":"Sélectionner au moins un role avec permission de lecture et écriture.",
     "EVENT_ACL_MISSING_READWRITE_ROLE":"Sélectionner au moins un role avec permission de lecture et écriture.",
-    "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS":"The event opt-out status has been successfully updated.",
-    "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR":"Error while updating the event opt-out status.",
-    "EVENT_PARTICIPATION_STATUS_READONLY":"The participation status can not be updated as the scheduling start date is in the past.",
-    "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS":"The series opt-out status has been successfully updated.",
-    "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR":"Error while updating the series opt-out status.",
+    "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS":"Le statut de l'événement opt-out a été mis à jour avec succès.",
+    "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR":"Erreur lors de la mise à jour du statut de l’événement opt-out.",
+    "EVENT_PARTICIPATION_STATUS_READONLY":"Le statut de l’événement de participation ne peut pas être mis à jour car la date de début programmée est dans le passé.",
+    "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS":"Le statut opt-out de la série a été mis à jour avec succès.",
+    "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR":"Erreur lors de la mise à jour du statut opt-out de la série.",
     "THEME_NAME_ALREADY_TAKEN":"Ce nom est déjà utilisé",
     "THEME_NAME_EMPTY":"Le nom ne peux pas rester vide",
     "BUMPER_UPLOAD_ERROR":"Erreur lors de l'envoi du ficher",
@@ -139,7 +139,7 @@
     "TITLE_UPLOAD_ERROR":"Erreur lors de l'envoi du ficher",
     "LICENSE_UPLOAD_ERROR":"Erreur lors de l'envoi du ficher",
     "WATERMARK_UPLOAD_ERROR":"Erreur lors de l'envoi du ficher",
-    "THEME_UPLOAD_STARTED":"The media is being uploaded…",
+    "THEME_UPLOAD_STARTED":"Le média est en cours de téléchargement…",
     "THEME_CREATED":"Le thème a été créé",
     "THEME_NOT_CREATED":"Le thème n'a pas pu être créé",
     "THEME_DELETED":"Le thème a été supprimé",
@@ -148,10 +148,10 @@
     "TASK_NOT_CREATED":"La tâche n'a pas pu être créée",
     "VIDEO_CUT_NOT_SAVED":"Les informations n'ont pas pu être enregistrées",
     "VIDEO_CUT_SAVED":"Les informations ont été enregistrées",
-    "VIDEO_CUT_PROCESSING":"The video is being processed…",
+    "VIDEO_CUT_PROCESSING":"La vidéo est en cours de traitement…",
     "SERVER_UNRESPONSIVE":"Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
     "SERVICE_UNAVAILABLE":"Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
-    "ACTIVE_TRANSACTION":"The current event can currently not be edited as it is involved of an active transaction."
+    "ACTIVE_TRANSACTION":"L'événement en cours ne peut actuellement pas être modifié car il est impliqué d'une transaction active."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Actions",
@@ -165,26 +165,26 @@
     "DELETE":{
       "SERIES":{
         "CAPTION":"Supprimer",
-        "BUTTON":"Delete"
+        "BUTTON":"Supprimer"
       },
       "EVENTS":{
         "CAPTION":"Supprimer",
-        "DELETE_EVENTS":"Delete Events",
+        "DELETE_EVENTS":"Supprimer les Evénements",
         "PUBLISHED":{
-          "NONE":"None of the selected events need to be retracted before they can be deleted.",
-          "WARNING":"The events below cannot be deleted as they have already been published and deleting them would leave no way to delete the published files. Instead choose a workflow below to retract the events first and then delete them."
+          "NONE":"Aucun des événements sélectionnés ne doit être rétracté avant qu'ils puissent être supprimés.",
+          "WARNING":"Les événements ci-dessous n'ont pas pu être supprimés car ils ont déjà été publiés et leur suppression ne permettrait plus ensuite la suppression des fichiers publiés. Veuillez choisir un flux de travail ci-dessous afin de retirer ces événements, puis supprimez-les ensuite."
         },
-        "RETRACT_EVENTS":"Retract Events",
-        "SELECT_RETRACT_TASK":"Select a Retract Task",
+        "RETRACT_EVENTS":"Retirer les événements",
+        "SELECT_RETRACT_TASK":"Sélectionnez une tâche de rétraction",
         "SUMMARY":{
-          "EVENTS_DELETED":"Events to be Deleted",
-          "EVENTS_RETRACTED":"Events to be Retracted",
-          "RETRACT_WORKFLOW":"Workflow to Retract Events"
+          "EVENTS_DELETED":"Événements à supprimer",
+          "EVENTS_RETRACTED":"Événements à retirer",
+          "RETRACT_WORKFLOW":"Flux de travail pour retirer les événements"
         },
         "UNPUBLISHED":{
-          "NONE":"None of the selected events can be deleted without leaving orphan files."
+          "NONE":"Aucun des événements sélectionnés ne peut être supprimé sans laisser de fichiers orphelins."
         },
-        "BUTTON":"Delete"
+        "BUTTON":"Supprimer"
       }
     },
     "DELETE_EVENTS_WARNING_LINE1":"Une fois supprimés, toutes les métadonnées, les fichiers audio et vidéo seront supprimés et rendus irrécupérable.",
@@ -224,7 +224,7 @@
     "NEXT_STEP":"Suivant",
     "BACK":"Précédent",
     "CREATE":"Créer",
-    "RETRACT":"Retract",
+    "RETRACT":"Retirer",
     "UPDATE":"Appliquer",
     "DURATION":{
       "HOURS":"Heures",
@@ -263,11 +263,11 @@
   },
   "EVENTS":{
     "RETRACT":{
-      "CAPTION":"Retract Event",
+      "CAPTION":"Retirer l'événement",
       "ID":"ID",
-      "SELECT_TASK":"Select Task",
-      "SUMMARY":"Summary",
-      "WARNING":"This event has been published to at least one publication channel so it has to be retracted before it can be deleted. Select from the tasks below to retract the publications."
+      "SELECT_TASK":"Sélectionnez la tâche",
+      "SUMMARY":"Résumé",
+      "WARNING":"Cet événement a été publié dans au moins un canal de publication et doit donc être retiré avant de pouvoir être supprimé. Veuillez choisir parmi les tâches ci-dessous afin de retirer les publications."
     },
     "LICENSE":{
       "ALLRIGHTS":"Tous droits réservés",
@@ -321,15 +321,15 @@
           "CAPTION":"Source",
           "SELECT_SOURCE":"Sélectionnez la source",
           "PLACEHOLDER":{
-            "LOCATION":"Location",
+            "LOCATION":"Emplacement",
             "INPUTS":"Entrées",
             "HOUR":"Heure",
             "MINUTE":"Minute",
             "REPEATS":"Répétitions",
             "START_DATE":"aaaa-mm-jj",
-            "START_DATE_FORMAT":"yyyy-mm-dd",
+            "START_DATE_FORMAT":"aaaa-mm-jj",
             "END_DATE":"aaaa-mm-jj",
-            "END_DATE_FORMAT":"yyyy-mm-dd"
+            "END_DATE_FORMAT":"aaaa-mm-jj"
           },
           "UPLOAD":{
             "CAPTION":"Envoyer",
@@ -399,9 +399,9 @@
       "ADD_EVENT":"Ajouter événement",
       "TABLE":{
         "CAPTION":"Événements",
-        "CREATORS":"Creators",
+        "CREATORS":"Créateurs",
         "TITLE":"Titre",
-        "PRESENTERS":"Presenter(s)",
+        "PRESENTERS":"Présentateur(s)",
         "SERIES":"Séries",
         "DATE":"Date",
         "START":"Début",
@@ -418,7 +418,7 @@
         "REVIEW_STATUS":"État de la révision",
         "PREVIOUS":"Précédente",
         "NOCONTENT":"Aucune donnée disponible",
-        "PUBLISHED":"Published"
+        "PUBLISHED":"Publié"
       },
       "SCHEDULING_STATUS":{
         "READY_FOR_RECORDING":"Prêt pour l'enregistrement",
@@ -447,7 +447,7 @@
           "METADATA":"Métadonnées",
           "EXTENDED-METADATA":"Métadonnées II",
           "ASSETS":"Ressources",
-          "SCHEDULING":"Scheduling",
+          "SCHEDULING":"Planification",
           "WORKFLOWS":"Flux de travail",
           "ACCESS":"Droits d'accès",
           "COMMENTS":"Commentaires"
@@ -459,11 +459,11 @@
           "OPTED_OUT":"Abstention",
           "CUSTOM":"Personnalisé",
           "ENGAGE":"Engage",
-          "EXTERNAL_API":"External API Publication",
+          "EXTERNAL_API":"Publication de l’API externe",
           "YOUTUBE":"YouTube",
           "OAIPMH":"OAI-PMH",
           "SELECT_WORKFLOW":"Sélectionner le flux de travail",
-          "SELECT_WORKFLOW_EMPTY":"No workflows available"
+          "SELECT_WORKFLOW_EMPTY":"Aucun flux de travail disponible"
         },
         "MEDIA":{
           "TRIM_MEDIA":"Couper",
@@ -484,48 +484,48 @@
         },
         "SOURCE":{
           "CAPTION":"Source",
-          "SELECT_SOURCE":"Select source",
+          "SELECT_SOURCE":"Sélectionnez la source",
           "PLACEHOLDER":{
-            "LOCATION":"Location",
-            "INPUTS":"Inputs",
-            "HOUR":"Hour",
+            "LOCATION":"Emplacement",
+            "INPUTS":"Entrées",
+            "HOUR":"Heure",
             "MINUTE":"Minute",
-            "REPEATS":"Repeats",
-            "START_DATE":"yyyy-mm-dd",
-            "END_DATE":"yyyy-mm-dd"
+            "REPEATS":"Répétitions",
+            "START_DATE":"aaaa-mm-jj",
+            "END_DATE":"aaaa-mm-jj"
           },
           "UPLOAD":{
-            "CAPTION":"Upload",
-            "RECORDING_ELEMENTS":"Recording elements",
+            "CAPTION":"Envoi",
+            "RECORDING_ELEMENTS":"Éléments de l'enregistrement",
             "SEGMENTABLE":{
-              "SHORT":"Slides",
-              "DETAIL":"The file contains a recording of a slide presentation (Keynote, Powerpoint, etc)."
+              "SHORT":"Diapositives",
+              "DETAIL":"Le fichier contient un enregistrement d'une présentation de diapositives (Keynote, Powerpoint, etc.)."
             },
             "NON_SEGMENTABLE":{
-              "SHORT":"Presenter",
-              "DETAIL":"The file contains a recording of a person speaking to an audience."
+              "SHORT":"Présentateur",
+              "DETAIL":"Le fichier contient un enregistrement d'une personne s'adressant à une audience."
             },
             "AUDIO_ONLY":{
-              "SHORT":"Audio only",
-              "DETAIL":"The file contains only audio."
+              "SHORT":"Audio seulement",
+              "DETAIL":"Le fichier contient uniquement une piste audio."
             }
           },
           "DATE_TIME":{
-            "CAPTION":"Schedule",
-            "START_DATE":"Start date",
-            "START_TIME":"Start time",
-            "TIMEZONE":"Time zone",
-            "END_DATE":"End date",
-            "DURATION":"Duration"
+            "CAPTION":"Planification",
+            "START_DATE":"Date de début ",
+            "START_TIME":"Heure de début",
+            "TIMEZONE":"Fuseau horaire",
+            "END_DATE":"Date de fin",
+            "DURATION":"Durée"
           },
           "SCHEDULE_SINGLE":{
-            "CAPTION":"Schedule single event"
+            "CAPTION":"Programmer un événement"
           },
           "SCHEDULE_MULTIPLE":{
-            "CAPTION":"Schedule multiple events",
-            "REPEATS":"Repeats",
-            "REPEAT_ON":"Repeat on",
-            "WEEKDAYS":"Weekdays"
+            "CAPTION":"Programmer des événements récurrents",
+            "REPEATS":"Répétitions",
+            "REPEAT_ON":"Répéter",
+            "WEEKDAYS":"Jours de la semaine"
           }
         },
         "ASSETS":{
@@ -538,64 +538,64 @@
             "CAPTION":"Pièces jointes",
             "ID":"Id",
             "TYPE":"Type",
-            "MIMETYPE":"Mimetype",
-            "TAGS":"Tags",
-            "LINK":"Link",
+            "MIMETYPE":"Type MIME",
+            "TAGS":"Étiquettes",
+            "LINK":"Lien",
             "DETAILS":{
-              "TITLE":"Attachment details",
-              "CAPTION":"Attachment details",
+              "TITLE":"Détails de la pièce jointe",
+              "CAPTION":"Détails de la pièce jointe",
               "ID":"Id",
               "TYPE":"Type",
-              "MIMETYPE":"Mimetype",
-              "TAGS":"Tags",
+              "MIMETYPE":"Type MIME",
+              "TAGS":"Étiquettes",
               "URL":"URL",
-              "SIZE":"Size",
-              "CHECKSUM":"Checksum",
-              "REFERENCE":"Reference"
+              "SIZE":"Taille",
+              "CHECKSUM":"Somme de contrôle",
+              "REFERENCE":"Référence"
             }
           },
           "CATALOGS":{
-            "TITLE":"Catalogs",
-            "CAPTION":"Catalogs",
+            "TITLE":"Catalogues",
+            "CAPTION":"Catalogues",
             "ID":"Id",
             "TYPE":"Type",
-            "MIMETYPE":"Mimetype",
-            "TAGS":"Tags",
-            "LINK":"Link",
+            "MIMETYPE":"Type MIME",
+            "TAGS":"Étiquettes",
+            "LINK":"Lien",
             "DETAILS":{
-              "TITLE":"Catalog details",
-              "CAPTION":"Catalog details",
+              "TITLE":"Détails du catalogue",
+              "CAPTION":"Détails du catalogue",
               "ID":"Id",
               "TYPE":"Type",
-              "MIMETYPE":"Mimetype",
-              "TAGS":"Tags",
+              "MIMETYPE":"Type MIME",
+              "TAGS":"Étiquettes",
               "URL":"URL",
-              "SIZE":"Size",
-              "CHECKSUM":"Checksum",
-              "REFERENCE":"Reference"
+              "SIZE":"Taille",
+              "CHECKSUM":"Somme de contrôle",
+              "REFERENCE":"Référence"
             }
           },
           "MEDIA":{
-            "TITLE":"Media",
-            "CAPTION":"Media",
+            "TITLE":"Médias",
+            "CAPTION":"Médias",
             "ID":"ID",
             "TYPE":"Type",
-            "MIMETYPE":"Mimetype",
-            "TAGS":"Tags",
-            "LINK":"Link",
+            "MIMETYPE":"Type MIME",
+            "TAGS":"Étiquettes",
+            "LINK":"Lien",
             "DETAILS":{
-              "TITLE":"Media details",
+              "TITLE":"Détails du média",
               "ID":"ID",
               "TYPE":"Type",
-              "MIMETYPE":"Mimetype",
+              "MIMETYPE":"Type MIME",
               "URL":"URL",
-              "RECORDING_DATE":"Recording date",
+              "RECORDING_DATE":"Date d'enregistrement",
               "FLAVOR":"Flavor",
-              "TAGS":"Tags",
-              "DURATION":"Duration",
-              "STREAM_AUDIO":"Audio streams",
-              "STREAM_VIDEO":"Video streams",
-              "CHANNELS":"Channels",
+              "TAGS":"Étiquettes",
+              "DURATION":"Durée",
+              "STREAM_AUDIO":"Flux audio",
+              "STREAM_VIDEO":"Flux vidéo",
+              "CHANNELS":"Chaînes",
               "BITRATE":"Débit binaire",
               "BITDEPTH":"Profondeur de bits",
               "SAMPLINGRATE":"Fréquence d'échantillonnage",
@@ -604,8 +604,8 @@
               "RMSLEVELDB":"Niveau RMS (dB)",
               "RMSPEAKDB":"Pic RMS (dB)",
               "FRAMERATE":"Fréquence d'images",
-              "RESOLUTION":"Resolution",
-              "SIZE":"Size",
+              "RESOLUTION":"Résolution",
+              "SIZE":"Taille",
               "SCANTYPE":"Type d'analyse",
               "SCANORDER":"Ordre de l'analyse"
             }
@@ -613,23 +613,23 @@
           "PUBLICATIONS":{
             "TITLE":"Publications",
             "CAPTION":"Publications",
-            "CHANNEL":"Channel",
+            "CHANNEL":"Chaine",
             "ID":"Id",
             "TYPE":"Type",
-            "MIMETYPE":"Mimetype",
-            "TAGS":"Tags",
-            "LINK":"Link",
+            "MIMETYPE":"Type MIME",
+            "TAGS":"Étiquettes",
+            "LINK":"Lien",
             "DETAILS":{
-              "TITLE":"Publication details",
-              "CAPTION":"Publication details",
+              "TITLE":"Détails de publication",
+              "CAPTION":"Détails de publication",
               "ID":"Id",
               "TYPE":"Type",
-              "MIMETYPE":"Mimetype",
-              "TAGS":"Tags",
+              "MIMETYPE":"Type MIME",
+              "TAGS":"Étiquettes",
               "URL":"URL",
-              "SIZE":"Size",
-              "CHANNEL":"Channel",
-              "REFERENCE":"Reference"
+              "SIZE":"Taille",
+              "CHANNEL":"Chaine",
+              "REFERENCE":"Référence"
             }
           }
         },
@@ -647,7 +647,7 @@
             "ROLE":"Rôle",
             "WRITE":"Ecriture",
             "READ":"Lecture",
-            "ADDITIONAL_ACTIONS":"Additional Actions",
+            "ADDITIONAL_ACTIONS":"Actions supplémentaires",
             "ACTION":"Actions",
             "NEW":"Ajouter",
             "DETAILS":"Détails"
@@ -659,7 +659,7 @@
         },
         "COMMENTS":{
           "CAPTION":"Commentaires",
-          "PLACEHOLDER":"Comment…",
+          "PLACEHOLDER":"Commentaire…",
           "SELECTPLACEHOLDER":"Sélectionnez la raison",
           "RESOLVED":"Résolu",
           "REPLY":"Répondre",
@@ -668,23 +668,23 @@
           "DELETE":"Supprimer",
           "REASON":"Motif",
           "REASONS":{
-            "CUTTING":"Cutting required",
-            "REVIEW":"Review required",
-            "ASYNC":"A\/V tracks asynchronous",
-            "AUDIO_ISSUE":"Missing or defective audio track",
-            "CANCELED":"Canceled event",
-            "CONFLICTING_METADATA":"Conflicting metadata",
-            "IMPROPER_POINT":"Improper in or out point",
-            "MISSING_AGREEMENT":"Missing agreement",
-            "OTHER":"Other",
-            "PRIVACY":"Privacy concern",
-            "SEGMENTATION":"Inaccurate segmentation",
-            "UNKNOWN_CREATOR":"Creator unknown",
-            "VIDEO_ISSUE":"Video distorted or cropped",
-            "WRONG_INPUT_FORMAT":"Input file format not supported",
-            "WRONG_METADATA":"Metadata needs correction",
-            "WRONG_SERIES_PUBLICATION":"Wrong series or publication channel",
-            "WRONG_WORKFLOW":"Wrong workflow",
+            "CUTTING":"Coupe nécessaire",
+            "REVIEW":"Vérification requise",
+            "ASYNC":"Pistes A\/V asynchrones",
+            "AUDIO_ISSUE":"Piste audio manquante ou défectueuse",
+            "CANCELED":"Événement annulé",
+            "CONFLICTING_METADATA":"Conflit de métadonnées",
+            "IMPROPER_POINT":"Point d'entrée ou de sortie incorrect",
+            "MISSING_AGREEMENT":"Accord manquant",
+            "OTHER":"Autre",
+            "PRIVACY":"Problème de respect de la vie privée",
+            "SEGMENTATION":"Segmentation imprécise",
+            "UNKNOWN_CREATOR":"Créateur inconnu",
+            "VIDEO_ISSUE":"Vidéo déformée ou recadrée",
+            "WRONG_INPUT_FORMAT":"Format de fichier d’entrée non supporté",
+            "WRONG_METADATA":"Métadonnées a besoin de correction",
+            "WRONG_SERIES_PUBLICATION":"Mauvaise série au canal de publication",
+            "WRONG_WORKFLOW":"Mauvais flux de travail",
             "PROCESSING_FAILURE":"Erreur de traitement"
           }
         },
@@ -698,7 +698,7 @@
           "START_DATE":"Date de début",
           "START_TIME":"Heure de début",
           "DURATION":"Durée",
-          "LOCATION":"Location",
+          "LOCATION":"Emplacement",
           "SOURCE":"Source",
           "CREATED":"Créée",
           "CREATED_BY":"Auteur",
@@ -709,30 +709,30 @@
           "LANGUAGE":"Langue",
           "COPYRIGHT":"Copyright ",
           "VISIBILITY":"Visibilité",
-          "PUBLIC":"Public target",
+          "PUBLIC":"Public cible",
           "OS":"Système d'exploitation",
           "LOCKED":{
             "RUNNING":"Modification des métadonnées n'est pas autorisée lorsque des opérations sont en cours d'exécution sur un événement"
           }
         },
         "SCHEDULING":{
-          "CAPTION":"Participation status",
+          "CAPTION":"Statut de participation",
           "REVIEW_STATUS":{
-            "CAPTION":"Review status"
+            "CAPTION":"État de la révision"
           },
           "OPTEDOUT":{
-            "CAPTION":"Opted-out Status",
-            "READY":"Ready for recording",
-            "OPTEDOUT":"Opted out"
+            "CAPTION":"Statut désinscrit",
+            "READY":"Prêt pour l'enregistrement",
+            "OPTEDOUT":"Abstention"
           },
           "MESSAGES":{
             "CAPTION":"Messages",
-            "CREATION_DATE":"Creation date",
-            "SENDER":"Sender",
-            "SUBJECT":"Subject"
+            "CREATION_DATE":"Date de création ",
+            "SENDER":"Expéditeur",
+            "SUBJECT":"Objet "
           },
           "PLACEHOLDER":{
-            "PRESENTERS":"Presenter(s)"
+            "PRESENTERS":"Présentateur(s)"
           }
         },
         "WORKFLOWS":{
@@ -748,12 +748,12 @@
           "MIMETYPE":"Type MIME",
           "URL":"URL",
           "CONFIGURATION":"Configuration",
-          "NO_CONFIGURATION":"No existing configuration parameters for the selected workflow definition.",
-          "WORKFLOW":"Workflow"
+          "NO_CONFIGURATION":"Aucun paramètre de configuration existant pour la définition du flux de travail sélectionné.",
+          "WORKFLOW":"Flux de travail"
         },
         "WORKFLOW_DETAILS":{
           "TITLE":"Détails du workflow",
-          "CONFIGURATION":"Workflow configuration"
+          "CONFIGURATION":"Configuration du flux de travail"
         },
         "WORKFLOW_OPERATIONS":{
           "TITLE":"Opérations du workflow"
@@ -771,7 +771,7 @@
           "MIMETYPE":"Type MIME",
           "URL":"URL",
           "RECORDING_DATE":"Date d'enregistrement",
-          "TAGS":"Tags",
+          "TAGS":"Étiquettes",
           "DURATION":"Durée",
           "STREAM_AUDIO":"Flux audio",
           "STREAM_VIDEO":"Flux vidéo",
@@ -826,15 +826,15 @@
           },
           "ACCESS_POLICY":{
             "TITLE":"Droits d'accès",
-            "DESCRIPTION":"At least one role with Read and Write permissions is required.",
+            "DESCRIPTION":"Il faut au moins un rôle avec droit d'accès Lecture et Ecriture.",
             "LABEL":"Séléctionner un modèle",
             "EMPTY":"Aucun modèle trouvé",
             "ROLE":"Rôle",
             "WRITE":"Ecriture",
             "READ":"Lecture",
-            "ADDITIONAL_ACTIONS":"Additional Actions",
+            "ADDITIONAL_ACTIONS":"Actions supplémentaires",
             "ACTION":"Actions",
-            "NEW":"New policy",
+            "NEW":"Nouvelle politique",
             "DETAILS":"Détails"
           },
           "ROLES":{
@@ -887,7 +887,7 @@
             "ROLE":"Rôle",
             "WRITE":"Ecriture",
             "READ":"Lecture",
-            "ADDITIONAL_ACTIONS":"Additional Actions",
+            "ADDITIONAL_ACTIONS":"Actions supplémentaires",
             "ACTION":"Actions",
             "NEW":"Add row",
             "DETAILS":"Détails"
@@ -913,21 +913,21 @@
           "DESCRIPTION":"Description"
         },
         "PARTICIPATION":{
-          "CAPTION":"Participation status template",
-          "WARNING_TEMPLATE":"Series participation status will be used as default value for new events that are part of the series.",
+          "CAPTION":"Modèle de statut de participation",
+          "WARNING_TEMPLATE":"L'état de participation de la série servira de valeur par défaut pour les nouveaux événements qui feront partie de la série.",
           "REVIEW_STATUS":{
-            "CAPTION":"Review status"
+            "CAPTION":"État de la révision"
           },
           "OPTEDOUT":{
-            "CAPTION":"Opted-out Status",
-            "READY":"Ready for recording",
-            "OPTEDOUT":"Opted out"
+            "CAPTION":"Statut désinscrit",
+            "READY":"Prêt pour l'enregistrement",
+            "OPTEDOUT":"Abstention"
           },
           "MESSAGES":{
             "CAPTION":"Messages",
-            "CREATION_DATE":"Creation date",
-            "SENDER":"Sender",
-            "SUBJECT":"Subject"
+            "CREATION_DATE":"Date de création ",
+            "SENDER":"Expéditeur",
+            "SUBJECT":"Objet "
           }
         },
         "EVENTS":{
@@ -1026,7 +1026,7 @@
         "CAPTION":"Utilisateurs",
         "NAME":"Nom",
         "USERNAME":"Nom d'utilisateur",
-        "EMAIL":"Email",
+        "EMAIL":"E-mail",
         "ROLES":"Rôles",
         "TYPE":"Type",
         "BLACKLIST_FROM":"Bloqué de",
@@ -1117,7 +1117,7 @@
           "TITLE":"Métadonnées",
           "NAME":{
             "CAPTION":"Nom",
-            "PLACEHOLDER":"Name…"
+            "PLACEHOLDER":"Nom…"
           }
         },
         "ACCESS":{
@@ -1132,7 +1132,7 @@
             "ROLE":"Rôle",
             "WRITE":"Ecriture",
             "READ":"Lecture",
-            "ADDITIONAL_ACTIONS":"Additional Actions",
+            "ADDITIONAL_ACTIONS":"Actions supplémentaires",
             "ACTION":"Actions",
             "NEW":"Nouvelle ligne",
             "DETAILS":"Détails",
@@ -1145,7 +1145,7 @@
         }
       },
       "DETAILS":{
-        "HEADER":"Access Policy Details  - {{resourceId}}",
+        "HEADER":"Détails des droits d'accès - {{resourceId}}",
         "TABS":{
           "SUMMARY":"Résumé",
           "METADATA":"Métadonnées",
@@ -1155,7 +1155,7 @@
           "TITLE":"Métadonnées",
           "NAME":{
             "CAPTION":"Nom",
-            "PLACEHOLDER":"Name…"
+            "PLACEHOLDER":"Nom…"
           }
         },
         "ACCESS":{
@@ -1170,7 +1170,7 @@
             "ROLE":"Rôle",
             "WRITE":"Ecriture",
             "READ":"Lecture",
-            "ADDITIONAL_ACTIONS":"Additional Actions",
+            "ADDITIONAL_ACTIONS":"Actions supplémentaires",
             "ACTION":"Actions",
             "NEW":"Nouvelle ligne",
             "DETAILS":"Détails",
@@ -1252,12 +1252,12 @@
         "BUMPER":{
           "CAPTION":"Bumper (début)",
           "DESCRIPTION":"Vidéo prédéfinie ajoutée au début d'un enregistrement.",
-          "ACTIVE":"Active"
+          "ACTIVE":"Actif"
         },
         "TRAILER":{
           "CAPTION":"Bumper (fin)",
           "DESCRIPTION":"Vidéo prédéfinie ajoutée à la fin d'un enregistrement.",
-          "ACTIVE":"Active"
+          "ACTIVE":"Actif"
         },
         "TITLE":{
           "CAPTION":"Titre",
@@ -1337,7 +1337,7 @@
           "CAPTION":"Bumper (début)",
           "FILE_UPLOADED":"Fichier transféré: ",
           "DESCRIPTION":"Vidéo prédéfinie ajoutée au début d'un enregistrement",
-          "ACTIVE":"Active",
+          "ACTIVE":"Actif",
           "ENABLE":"Activer bumper",
           "SELECT":"Sélectionner",
           "UPLOAD_LABEL":"Envoyer vidéo",
@@ -1347,7 +1347,7 @@
           "CAPTION":"Bumper (fin)",
           "FILE_UPLOADED":"Fichier transféré: ",
           "DESCRIPTION":"Vidéo prédéfinie ajoutée à la fin d'un enregistrement.",
-          "ACTIVE":"Active",
+          "ACTIVE":"Actif",
           "ENABLE":"Activer bumper",
           "UPLOAD_LABEL":"Envoyer vidéo",
           "UPLOAD_BUTTON":"Envoyer"
@@ -1356,7 +1356,7 @@
           "CAPTION":"Titre",
           "FILE_UPLOADED":"Fichier transféré: ",
           "DESCRIPTION":"Diapositive prédéfinie contenant des métadonnées, ajoutée au début ou à la fin d'un enregistrement.",
-          "ACTIVE":"Active",
+          "ACTIVE":"Actif",
           "ENABLE":"Activer la diapositive de titre",
           "BACKGROUND":"Arrière-plan",
           "EXTRACT":"Extraire l'arrière-plan",
@@ -1368,7 +1368,7 @@
           "CAPTION":"Filigrane",
           "FILE_UPLOADED":"Fichier transféré: ",
           "DESCRIPTION":"Image semi-transparente qui se superpose à toutes les images de l'enregistrement.",
-          "ACTIVE":"Active",
+          "ACTIVE":"Actif",
           "TOP_LEFT":"En haut à gauche",
           "TOP_RIGHT":"En haut à droite",
           "BOTTOM_LEFT":"En bas à gauche",
@@ -1403,7 +1403,7 @@
         "CREATED":"Créée",
         "CREATOR":"Auteur",
         "HOST_NAME":"Nom d'hôte",
-        "OPERATION":"Operation",
+        "OPERATION":"Opération",
         "STARTED":"Démarré",
         "STATUS":"Statut",
         "SUBMITTED":"Envoyée",
@@ -1477,8 +1477,8 @@
   "LOGIN":{
     "WELCOME":"Bienvenue sur Opencast",
     "REMEMBER":"Mémoriser mes informations de connexion sur cet ordinateur",
-    "USERNAME":"Username…",
-    "PASSWORD":"Password…",
+    "USERNAME":"Nom d’utilisateur…",
+    "PASSWORD":"Mot de passe…",
     "LOGIN":"Login",
     "ERROR":"Nom d'utilisateur et\/ou mot de passe incorrects"
   },
@@ -1486,14 +1486,14 @@
     "CLEAR":"Supprimer tous les filtres",
     "REMOVE":"Enlever le filtre",
     "ADD":"Ajouter des filtres",
-    "PLACEHOLDER":"Search…",
+    "PLACEHOLDER":"Rechercher…",
     "PROFILES":{
       "FILTERS_HEADER":"Filtres enregistrés",
       "EMPTY":"Aucun filtre enregistré",
       "SAVE_FILTERS":"Enregistrer",
       "FILTER_HEADER":"Enregistrer filtres",
       "NAME":"Nom",
-      "NAME_PLACEHOLDER":"Name…",
+      "NAME_PLACEHOLDER":"Nom…",
       "DESCRIPTION":"Description",
       "DESCRIPTION_PLACEHOLDER":"Description…"
     }
@@ -1501,15 +1501,15 @@
   "FILTERS":{
     "AGENTS":{
       "NAME":{
-        "LABEL":"Name"
+        "LABEL":"Nom"
       },
       "STATUS":{
-        "LABEL":"Status"
+        "LABEL":"Statut"
       }
     },
     "EVENTS":{
       "AGENT_ID":{
-        "LABEL":"Capture Agent ID"
+        "LABEL":"ID de l’Agent de Capture"
       },
       "ACCESS_POLICY":{
         "LABEL":"Droits d'accès"
@@ -1536,25 +1536,25 @@
         "LABEL":"Emplacement"
       },
       "OPTEDOUT":{
-        "LABEL":"Opted Out"
+        "LABEL":"Désinscrit"
       },
       "PERIOD":{
         "LABEL":"Période"
       },
       "PRESENTERS_BIBLIOGRAPHIC":{
-        "LABEL":"Presenter Bibliographic"
+        "LABEL":"Présentateur bibliographique"
       },
       "PRESENTERS_TECHNICAL":{
-        "LABEL":"Presenter Technical"
+        "LABEL":"Présentateur technique"
       },
       "PROGRESS":{
         "LABEL":"Progression"
       },
       "REVIEW_STATUS":{
-        "LABEL":"Review Status",
-        "CONFIRMED":"Confirmed",
-        "UNCONFIRMED":"Unconfirmed",
-        "UNSENT":"Unsent"
+        "LABEL":"État de la révision",
+        "CONFIRMED":"Confirmé",
+        "UNCONFIRMED":"Non confirmé",
+        "UNSENT":"Non envoyé"
       },
       "SERIES":{
         "LABEL":"Séries"
@@ -1602,9 +1602,9 @@
       "STATUS":{
         "LABEL":"Statut",
         "PAUSED":"Suspendu",
-        "QUEUED":"Queued",
+        "QUEUED":"En attente",
         "RUNNING":"Traitement en cours",
-        "WAITING":"Waiting"
+        "WAITING":"En Attente"
       }
     },
     "SERIES":{
@@ -1643,13 +1643,13 @@
       "STATUS":{
         "LABEL":"Statut",
         "MAINTENANCE":"Maintenance",
-        "ONLINE":"Online",
-        "OFFLINE":"Offline"
+        "ONLINE":"En Ligne",
+        "OFFLINE":"Hors-Ligne"
       }
     },
     "SERVICES":{
       "ACTIONS":{
-        "LABEL":"Has actions"
+        "LABEL":"Actions disponibles"
       },
       "HOSTNAME":{
         "LABEL":"Nom d'hôte"
@@ -1659,7 +1659,7 @@
       },
       "STATUS":{
         "LABEL":"Statut",
-        "ERROR":"Error",
+        "ERROR":"Erreur",
         "NORMAL":"Normal",
         "WARNING":"Avertissement"
       }
@@ -1683,7 +1683,7 @@
         "LABEL":"Fournisseur"
       },
       "ROLE":{
-        "LABEL":"Role"
+        "LABEL":"Rôle"
       },
       "USERNAME":{
         "LABEL":"Nom d'utilisateur"
@@ -1696,14 +1696,14 @@
       }
     },
     "REVIEW_STATUS":{
-      "UNSENT":"Unsent",
-      "UNCONFIRMED":"Unconfirmed",
-      "CONFIRMED":"Confirmed"
+      "UNSENT":"Non envoyé",
+      "UNCONFIRMED":"Non confirmé",
+      "CONFIRMED":"Confirmé"
     }
   },
   "TABLE_SUMMARY":"{{numberOfRows}} lignes",
   "TABLE_NO_RESULT":"Aucun résultat trouvé",
-  "TABLE_LOADING":"Loading…",
+  "TABLE_LOADING":"Chargement en cours…",
   "TABLE_EDIT":"Éditer",
   "PM":{
     "BLACKLIST":{
@@ -1716,10 +1716,10 @@
     }
   },
   "DASHBOARD":{
-    "RUNNING":"Running",
-    "FINISHED":"Finished",
+    "RUNNING":"En cours",
+    "FINISHED":"Terminé",
     "FAILED":"Echoué",
     "FINISHED_WITH_COMMENTS":"Fini avec les commentaires ouverts",
-    "SCHEDULED":"Scheduled"
+    "SCHEDULED":"Programmé"
   }
 }

@@ -200,8 +200,18 @@ public class TasksEndpoint {
 
     List<WorkflowInstance> instances = archive.applyWorkflow(workflow(wfd, optionsMap),
             httpMediaPackageElementProvider.getUriRewriter(), IteratorUtils.toList(eventIds.iterator()));
+
+    JSONObject json = new JSONObject();
+    JSONArray workflows = new JSONArray();
+
+    for (int i = 0; i < instances.size(); i++) {
+      workflows.add(instances.get(i).getId());
+    }
+
+    json.put("workflows", workflows);
+
     return Response.status(Status.CREATED)
-            .entity(StringUtils.join(Stream.$(instances).map(getWorkflowIds).toList(), ",")).build();
+            .entity(json.toJSONString()).build();
   }
 
   private static <A, B> Fn2<Map<A, B>, Entry<A, B>, Map<A, B>> mapFold() {
