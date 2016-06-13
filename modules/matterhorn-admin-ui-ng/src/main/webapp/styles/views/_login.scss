@@ -164,58 +164,17 @@
 
 
 // Remember Me Toggle and Label
-.remember-me-toggle {
-    display: table;
-    width: 100%;
-
-    input#remember {
-        height: 28px;
-        position: relative;
-        width: 44px;
-        outline-style: none;
-        vertical-align: top;
-        transition: none;
-    }
-}
-
-.remember-me-content {
-    display: table-cell;
+.remember-me {
     text-align: center;
 
-    .check-toggle,
-    input {
-        display: inline-block !important;
-        vertical-align: top;
-    }
-
-    .check-toggle input {
-        margin: 0;
+    input#remember {
+        display: inline !important;
+        width: auto;
     }
 
     label {
-        display: inline-block !important;
+        display: inline !important;
         margin: 4px 0 0 10px;
         line-height: 20px;
-    }
-
-    // If character count of label exceeds "var maxCharacterCount" (defined in main.js) add this class
-    &.split-layout {
-
-        .check-toggle,
-        label {
-            float: left;
-        }
-
-        .check-toggle {
-            margin-top: 7px;
-            width: 44px;
-        }
-
-        label {
-            margin-top: 0;
-            margin-left: 15px;
-            width: 291px;
-            text-align: left;
-        }
     }
 }
