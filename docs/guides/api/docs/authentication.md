@@ -3,7 +3,7 @@
 
 # Introduction
 
-The Application API’s security layer supports a multitude of mechanisms for authentication such as api keys, digest authentication and others. That being said, the two mechanisms presented below tie in perfectly with the user management infrastructure and therefore the favorable options.
+The Application API’s security layer is desigined to support a multitude of mechanisms for authentication such as api keys, digest authentication and others. While the current implementation only supports basic authentication, further authentication mechanism may be added in the future.
 
 # Basic Authentication
 The Application API is protected by basic authentication, requiring a user and a password be sent in the form of the standard HTTP `Authorization` header. (see [Figure 2](#figure_2)). In the header, the username and password are sent encoded in Base64 format.
