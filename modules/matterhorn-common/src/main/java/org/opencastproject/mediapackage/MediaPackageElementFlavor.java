@@ -16,13 +16,16 @@
 
 package org.opencastproject.mediapackage;
 
+import static java.lang.String.format;
+
 import org.opencastproject.util.data.Function;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * ELement flavors describe {@link MediaPackageElement}s in a semantic way. They reveal or give at least a hint about
@@ -36,6 +39,11 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
    * Serial version uid
    */
   private static final long serialVersionUID = 1L;
+
+  /**
+   * Character that separates both parts of a flavor
+   */
+  private static final String SEPARATOR = "/";
 
   /**
    * String representation of type
@@ -69,9 +77,15 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
    */
   public MediaPackageElementFlavor(String type, String subtype, String description) {
     if (type == null)
-      throw new IllegalArgumentException("Argument 'type' of element type may not be null!");
+      throw new IllegalArgumentException("Flavor 'type' may not be null!");
     if (subtype == null)
-      throw new IllegalArgumentException("Argument 'subtype' of element type may not be null!");
+      throw new IllegalArgumentException("Flavor 'subtype' may not be null!");
+    if (type.contains(SEPARATOR))
+      throw new IllegalArgumentException(
+              format("Invalid flavor type \"%s\". Flavor parts may not contain '%s'!", type, SEPARATOR));
+    if (subtype.contains(SEPARATOR))
+      throw new IllegalArgumentException(
+              format("Invalid flavor subtype \"%s\". Flavor parts may not contain '%s'!", subtype, SEPARATOR));
     this.type = type.trim().toLowerCase();
     this.subtype = subtype.trim().toLowerCase();
     this.description = description;
@@ -211,7 +225,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
    */
   @Override
   public String toString() {
-    return type + "/" + subtype;
+    return type + SEPARATOR + subtype;
   }
 
   /**
@@ -226,18 +240,18 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
   public static MediaPackageElementFlavor parseFlavor(String s) throws IllegalArgumentException {
     if (s == null)
       throw new IllegalArgumentException("Unable to create element flavor from 'null'");
-    String[] parts = s.split("/");
+    String[] parts = s.split(SEPARATOR);
     if (parts.length < 2)
-      throw new IllegalArgumentException("Unable to create element flavor from '" + s + "'");
+      throw new IllegalArgumentException(format("Unable to create element flavor from \"%s\"", s));
     return new MediaPackageElementFlavor(parts[0], parts[1]);
   }
 
-  public static final Function<String, MediaPackageElementFlavor> parseFlavor =
-          new Function<String, MediaPackageElementFlavor>() {
-            @Override public MediaPackageElementFlavor apply(String s) {
-              return parseFlavor(s);
-            }
-          };
+  public static final Function<String, MediaPackageElementFlavor> parseFlavor = new Function<String, MediaPackageElementFlavor>() {
+    @Override
+    public MediaPackageElementFlavor apply(String s) {
+      return parseFlavor(s);
+    }
+  };
 
   /**
    * Helper class to store type/subtype equivalents for a given element type.
