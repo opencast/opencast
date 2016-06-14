@@ -63,7 +63,7 @@ Header            |Type       | Comment
 
 There are multiple ways to authorize a request - see the [authorization section](authorization.md) for more details. In short, the Application API either supports specifying the execution user, the execution user’s roles or a combination of the two in which case the execution roles will be added to the execution user’s existing roles.
 
-If no user is specified, Matterhorn’s `anonymous` user is used to execute the request, potentially enriched by the roles provided using the `X-ROLES` request.
+If no user is specified, Opencast’s `anonymous` user is used to execute the request, potentially enriched by the roles provided using the `X-ROLES` request.
 
 Header            |Type       | Comment                                                                   
 :-----------------|:----------|:--------------------------------------------------------------------------

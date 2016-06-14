@@ -13,7 +13,7 @@
 ## Introduction
 
 In order to allow for robust technical integration of applications like learning management systems or mobile
-applications, Opencast Matterhorn offers an Application API (AAPI) to allow those applications to provide access
+applications, Opencast offers an Application API (AAPI) to allow those applications to provide access
 to and management of resources exposed through the API.
 The API has been designed and implemented to support large numbers of clients, each with considerable
 amounts of requests per time interval. In addition, security has been a focus to ensure protection of the
@@ -23,7 +23,7 @@ managed data and to support use cases promoting differing views on the managed d
 ## Architectural Overview
 
 The Application API has been implemented as an abstraction layer to multiple internal APIs that the underlying
-application (Opencast Matterhorn) offers for the manipulation of resources like series, events or users (see [Figure
+application (Opencast) offers for the manipulation of resources like series, events or users (see [Figure
 1: Architectural overview](#figure_1)).
 
 ### Authentication and Authorization
@@ -36,7 +36,7 @@ respectively.
 
 
 ### Requests for data
-The abstraction layer is backed by a dedicated index, which is kept up-to-date using Matterhorn’s message
+The abstraction layer is backed by a dedicated index, which is kept up-to-date using Opencast’s message
 broker. When a request to an API method is received (1), the data is compiled using the index and returned to
 the client (2). Since the index is scalable and optimized for performance, a large number of requests can be
 processed per time interval.
@@ -44,7 +44,7 @@ The corresponding requests along with the potential responses are defined later 
 
 ### Processing of updates
 Whenever a client sends updated information to the Application API, it will forward that information to the
-corresponding Opencast Matterhorn services (3), which in turn will process the data and send messages to the
+corresponding Opencast services (3), which in turn will process the data and send messages to the
 message bus accordingly (4). The messages are consumed by the Application API’s data store and can be
 served to its clients from now on.
 The corresponding requests along with the data structures and potential responses are defined later on in
@@ -65,7 +65,7 @@ Since as part of the communication, the API is used to transfer potentially sens
 
 
 ### Url Space
-The API is located at the `/api` namespace on the Matterhorn admin node. This results in all requests to the Application API starting with `https://<hostname>/api`, where the hostname is depending on the installation and tenant (see “Multi Tenancy”).
+The API is located at the `/api` namespace on the Opencast admin node. This results in all requests to the Application API starting with `https://<hostname>/api`, where the hostname is depending on the installation and tenant (see “Multi Tenancy”).
 
 
 ### Versioning
@@ -86,4 +86,4 @@ Patch        | Bugfixes applied in a backwards-compatible manner.
 As a consequence, the API is expected to be backwards compatible between minor version upgrades, including the patch level. This means that a client that has been developed against version 1.0.0 of the api will work with version 1.1.3 as well. This however may not be true going from version 1.1.0 to 2.0.0
 
 ### Multi tenancy
-With Matterhorn being a multi tenant application, the application API reflects that characteristics as well. Requests are mapped to individual tenants by matching the requests’s hostname against a tenants set of configured hostnames.
+With Opencast being a multi tenant application, the application API reflects that characteristics as well. Requests are mapped to individual tenants by matching the requests’s hostname against a tenants set of configured hostnames.
