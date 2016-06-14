@@ -21,8 +21,6 @@
 
 package org.opencastproject.videosegmenter.ffmpeg;
 
-import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
-
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Catalog;
@@ -156,8 +154,9 @@ VideoSegmenterService, ManagedService {
     this.binary = FFMPEG_BINARY_DEFAULT;
   }
 
-
+  @Override
   public void activate(ComponentContext cc) {
+    super.activate(cc);
     /* Configure segmenter */
     final String path = cc.getBundleContext().getProperty(FFMPEG_BINARY_CONFIG);
     this.binary = path == null ? FFMPEG_BINARY_DEFAULT : path;
@@ -200,8 +199,6 @@ VideoSegmenterService, ManagedService {
     }
 
     segmenterJobLoad = LoadUtil.getConfiguredLoadValue(properties, SEGMENTER_JOB_LOAD_KEY, DEFAULT_SEGMENTER_JOB_LOAD, serviceRegistry);
-    acceptJobLoadsExeedingMaxLoad = getOptCfgAsBoolean(properties, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
-            .getOrElse(acceptJobLoadsExeedingMaxLoad);
   }
 
   /**

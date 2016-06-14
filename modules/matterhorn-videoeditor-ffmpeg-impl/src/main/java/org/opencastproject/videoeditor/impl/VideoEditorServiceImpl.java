@@ -21,8 +21,6 @@
 
 package org.opencastproject.videoeditor.impl;
 
-import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
-
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;
@@ -446,8 +444,10 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     return organizationDirectoryService;
   }
 
-  protected void activate(ComponentContext context) {
+  @Override
+  public void activate(ComponentContext context) {
     logger.debug("activating...");
+    super.activate(context);
     FFmpegEdit.init(context.getBundleContext());
   }
 
@@ -467,8 +467,6 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     logger.debug("Properties updated!");
 
     jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD, serviceRegistry);
-    acceptJobLoadsExeedingMaxLoad = getOptCfgAsBoolean(properties, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
-            .getOrElse(acceptJobLoadsExeedingMaxLoad);
   }
 
   public void setMediaInspectionService(MediaInspectionService inspectionService) {

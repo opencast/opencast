@@ -21,7 +21,6 @@
 
 package org.opencastproject.sox.impl;
 
-import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
 import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.job.api.AbstractJobProducer;
@@ -137,8 +136,10 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService, M
    * @param cc
    *          the component context
    */
-  void activate(ComponentContext cc) {
+  @Override
+  public void activate(ComponentContext cc) {
     logger.info("Activating sox service");
+    super.activate(cc);
     // Configure sox
     String path = (String) cc.getBundleContext().getProperty(CONFIG_SOX_PATH);
     if (path == null) {
@@ -491,8 +492,6 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService, M
             serviceRegistry);
     normalizeJobLoad = LoadUtil.getConfiguredLoadValue(properties, NORMALIZE_JOB_LOAD_KEY, DEFAULT_NORMALIZE_JOB_LOAD,
             serviceRegistry);
-    acceptJobLoadsExeedingMaxLoad = getOptCfgAsBoolean(properties, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
-            .getOrElse(acceptJobLoadsExeedingMaxLoad);
   }
 
 }

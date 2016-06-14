@@ -22,7 +22,6 @@
 package org.opencastproject.search.impl;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
 
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
@@ -188,7 +187,9 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @param cc
    *          the component context
    */
+  @Override
   public void activate(final ComponentContext cc) throws IllegalStateException {
+    super.activate(cc);
     final String solrServerUrlConfig = StringUtils.trimToNull(cc.getBundleContext().getProperty(CONFIG_SOLR_URL));
 
     logger.info("Setting up solr server");
@@ -733,7 +734,5 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
     addJobLoad = LoadUtil.getConfiguredLoadValue(properties, ADD_JOB_LOAD_KEY, DEFAULT_ADD_JOB_LOAD, serviceRegistry);
     deleteJobLoad = LoadUtil.getConfiguredLoadValue(properties, DELETE_JOB_LOAD_KEY, DEFAULT_DELETE_JOB_LOAD, serviceRegistry);
-    acceptJobLoadsExeedingMaxLoad = getOptCfgAsBoolean(properties, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
-            .getOrElse(acceptJobLoadsExeedingMaxLoad);
   }
 }

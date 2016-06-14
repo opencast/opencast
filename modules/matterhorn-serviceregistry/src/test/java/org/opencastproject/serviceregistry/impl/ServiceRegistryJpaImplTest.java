@@ -191,7 +191,6 @@ public class ServiceRegistryJpaImplTest {
     serviceRegistryJpaImpl.registerService(TEST_SERVICE, TEST_HOST, TEST_PATH);
     serviceRegistryJpaImpl.registerService(TEST_SERVICE, TEST_HOST_OTHER, TEST_PATH);
     serviceRegistryJpaImpl.registerService(TEST_SERVICE_2, TEST_HOST, TEST_PATH_2);
-    serviceRegistryJpaImpl.registerService(TEST_SERVICE_3, TEST_HOST, TEST_PATH_3);
   }
 
   private void setupBundleContext() throws InvalidSyntaxException {
@@ -275,6 +274,7 @@ public class ServiceRegistryJpaImplTest {
     properties.put("dispatchinterval", "1000");
     serviceRegistryJpaImpl.updated(properties);
     registerTestHostAndService();
+    serviceRegistryJpaImpl.registerService(TEST_SERVICE_3, TEST_HOST, TEST_PATH_3);
     Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_3, TEST_OPERATION, null, null, true, null);
     JobBarrier barrier = new JobBarrier(null, serviceRegistryJpaImpl, testJob);
     try {

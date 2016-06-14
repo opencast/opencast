@@ -22,7 +22,6 @@
 package org.opencastproject.distribution.streaming;
 
 import static java.lang.String.format;
-import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
 import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.UrlSupport.concat;
@@ -134,7 +133,9 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     super(JOB_TYPE);
   }
 
-  protected void activate(ComponentContext cc) {
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
     // Get the configured streaming and server URLs
     if (cc != null) {
       for (final String streamingUrl : getOptContextProperty(cc, "org.opencastproject.streaming.url")) {
@@ -561,8 +562,6 @@ public class StreamingDistributionService extends AbstractJobProducer implements
             DEFAULT_DISTRIBUTE_JOB_LOAD, serviceRegistry);
     retractJobLoad = LoadUtil.getConfiguredLoadValue(properties, RETRACT_JOB_LOAD_KEY, DEFAULT_RETRACT_JOB_LOAD,
             serviceRegistry);
-    acceptJobLoadsExeedingMaxLoad = getOptCfgAsBoolean(properties, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
-            .getOrElse(acceptJobLoadsExeedingMaxLoad);
   }
 
   public static class Locations {

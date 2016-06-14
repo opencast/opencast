@@ -24,7 +24,6 @@ package org.opencastproject.composer.impl;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.fun.juc.Immutables.list;
 import static org.opencastproject.serviceregistry.api.Incidents.NO_DETAILS;
-import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
@@ -78,9 +77,9 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -207,7 +206,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param ctx
    *          the bundle context
    */
-  void activate(BundleContext ctx) {
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
     logger.info("Activating composer service");
   }
 
@@ -2223,8 +2224,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
     captionJobLoad = LoadUtil.getConfiguredLoadValue(properties, CAPTION_JOB_LOAD_KEY, DEFAULT_CAPTION_JOB_LOAD, serviceRegistry);
-    acceptJobLoadsExeedingMaxLoad = getOptCfgAsBoolean(properties, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
-            .getOrElse(acceptJobLoadsExeedingMaxLoad);
   }
 
 }

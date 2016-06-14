@@ -24,6 +24,7 @@ package org.opencastproject.job.api;
 import static com.entwinemedia.fn.data.Opt.none;
 import static com.entwinemedia.fn.data.Opt.some;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.Job.Status;
@@ -40,9 +41,11 @@ import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.functions.Strings;
 
 import com.entwinemedia.fn.data.Opt;
 
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +68,7 @@ public abstract class AbstractJobProducer implements JobProducer {
   /**
    * The key to look for in the service configuration file to override the {@link DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING}
    */
-  public static final String ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY = "job.load.acceptexceeding";
+  public static final String ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY = "org.opencastproject.job.load.acceptexceeding";
 
   /** Whether to accept a job whose load exceeds the host’s max load */
   protected boolean acceptJobLoadsExeedingMaxLoad = DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING;
@@ -75,6 +78,12 @@ public abstract class AbstractJobProducer implements JobProducer {
 
   /** To enable threading when dispatching jobs */
   protected ExecutorService executor = Executors.newCachedThreadPool();
+
+  /** OSGI activate method. */
+  public void activate(ComponentContext cc) {
+    acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY).map(Strings.toBool)
+            .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
+  }
 
   /**
    * Creates a new abstract job producer for jobs of the given type.
