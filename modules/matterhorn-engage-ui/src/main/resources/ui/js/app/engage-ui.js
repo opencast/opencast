@@ -622,6 +622,7 @@ function   ($) {
 
                     if (total == 0) {
                         $($main_container).append(msg_html_noepisodes);
+                        $($next).addClass("disabled");
                         return;
                     };
 
@@ -636,7 +637,7 @@ function   ($) {
                     } else {
                         $($next).removeClass("disabled");
                     }
-                    // TODO Why is limit = # results?
+
                     if (total == 1) {
                         buildGrid(result);
                         return;
@@ -833,6 +834,7 @@ function   ($) {
 
                     if (total == 0) {
                         $($main_container).append(msg_html_noseries);
+                        $($next).addClass("disabled");
                         return;
                     };
 
