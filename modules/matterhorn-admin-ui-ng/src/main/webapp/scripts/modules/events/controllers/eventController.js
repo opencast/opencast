@@ -185,7 +185,7 @@ angular.module('adminNg.controllers')
                 $scope.checkForActiveTransactionsTimer = $timeout(checkForActiveTransactions, 3000);
             },
             fetchChildResources = function (id) {
-                $scope.general        = EventGeneralResource.get({ id: id }, function () {
+                $scope.general = EventGeneralResource.get({ id: id }, function () {
                     angular.forEach($scope.general.publications, function (publication) {
                         publication.label = publication.name;
                     });
