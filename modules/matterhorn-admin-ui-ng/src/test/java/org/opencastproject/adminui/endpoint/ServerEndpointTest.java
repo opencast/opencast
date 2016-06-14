@@ -86,11 +86,6 @@ public class ServerEndpointTest {
             .contentType(ContentType.JSON).content("limit", equalTo(limit)).content("offset", equalTo(offset))
             .content("count", equalTo(total - offset)).content("total", equalTo(total)).when().get(rt.host("/servers.json"));
 
-    limit = -1; // negative limit is not allowed and will be changed to 0
-    given().param("limit", limit).param("offset", offset).log().all().expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON).content("limit", equalTo(limit)).content("offset", equalTo(offset))
-            .content("count", equalTo(total - offset)).content("total", equalTo(total)).when().get(rt.host("/servers.json"));
-
     limit = 4;
     offset = -1; // negatiive offset not allowed and will be changed to 0
     given().param("limit", limit).param("offset", offset).log().all().expect().statusCode(HttpStatus.SC_OK)
@@ -100,18 +95,73 @@ public class ServerEndpointTest {
   }
 
   @Test
-  public void testFilters() {
-    given().param("online", true).param("maintenance", true).log().all().expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON).content("count", equalTo(2)).content("total", equalTo(4)).when()
-            .get(rt.host("/servers.json"));
+  public void testHostNameFilter() {
+    given().param("filter", "hostname:host1").log().all().expect()
+            .statusCode(HttpStatus.SC_OK)
+            .contentType(ContentType.JSON)
+            .content("total", equalTo(1))
+            .content("count", equalTo(1))
+            .content("results[0].hostname", equalTo("host1"))
+            .when().get(rt.host("/servers.json"));
 
-    given().param("q", "host1").param("maintenance", true).log().all().expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON).content("count", equalTo(0)).content("total", equalTo(4)).when()
-            .get(rt.host("/servers.json"));
+    given().param("filter", "hostname:non-existing").log().all().expect()
+            .statusCode(HttpStatus.SC_OK)
+            .contentType(ContentType.JSON)
+            .content("total", equalTo(0))
+            .content("count", equalTo(0))
+            .when().get(rt.host("/servers.json"));
+  }
 
-    given().param("q", "host1").param("maintenance", false).log().all().expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON).content("count", equalTo(1)).content("total", equalTo(4)).when()
-            .get(rt.host("/servers.json"));
+  @Test
+  public void testStatusFilter() {
+    given().param("filter", "status:online").log().all().expect()
+            .statusCode(HttpStatus.SC_OK)
+            .contentType(ContentType.JSON)
+            .content("total", equalTo(3))
+            .content("count", equalTo(3))
+            .content("results[0].online", equalTo(true))
+            .content("results[1].online", equalTo(true))
+            .content("results[2].online", equalTo(true))
+            .when().get(rt.host("/servers.json"));
+
+    given().param("filter", "status:offline").log().all().expect()
+            .statusCode(HttpStatus.SC_OK)
+            .contentType(ContentType.JSON)
+            .content("total", equalTo(1))
+            .content("count", equalTo(1))
+            .content("results[0].online", equalTo(false))
+            .when().get(rt.host("/servers.json"));
+
+    given().param("filter", "status:maintenance").log().all().expect()
+            .statusCode(HttpStatus.SC_OK)
+            .contentType(ContentType.JSON)
+            .content("total", equalTo(2))
+            .content("count", equalTo(2))
+            .content("results[0].maintenance", equalTo(true))
+            .content("results[1].maintenance", equalTo(true))
+            .when().get(rt.host("/servers.json"));
+  }
+
+  @Test
+  public void testFreeTextFilter() {
+    given().param("filter", "textFilter:host1").log().all().expect()
+            .statusCode(HttpStatus.SC_OK)
+            .contentType(ContentType.JSON)
+            .content("total", equalTo(1))
+            .content("count", equalTo(1))
+            .content("results[0].hostname", equalTo("host1"))
+            .when().get(rt.host("/servers.json"));
+
+    given().param("filter", "textFilter:ost").param("sort", "hostname:ASC").log().all().expect()
+            .statusCode(HttpStatus.SC_OK)
+            .contentType(ContentType.JSON)
+            .content("total", equalTo(4))
+            .content("count", equalTo(4))
+            .content("results[0].hostname", equalTo("host1"))
+            .content("results[1].hostname", equalTo("host2"))
+            .content("results[2].hostname", equalTo("host3"))
+            .content("results[3].hostname", equalTo("host4"))
+            .when().get(rt.host("/servers.json"));
   }
 
   @Test

@@ -42,6 +42,8 @@ angular.module('adminNg.services')
     var Source = function () {
         var self = this;
 
+        self.isSourceState = true;
+
         this.checkingConflicts = false;
         this.hasConflicts = false;
         this.hasConflictingSettings = function () {

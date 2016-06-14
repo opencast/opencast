@@ -1,6 +1,6 @@
 {
   "value_locale":"gl",
-  "value_dateFormatFull":"Do de MMMM de YYYY, h:mm:ss a",
+  "value_dateFormatFull":"MMMM Do YYYY, h:mm:ss a",
   "title":"Título",
   "noTitle":"Sen título",
   "creator":"Creador",

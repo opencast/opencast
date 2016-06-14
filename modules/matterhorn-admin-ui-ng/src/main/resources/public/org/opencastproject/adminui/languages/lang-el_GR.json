@@ -2,6 +2,7 @@
   "MATTERHORN":"Οpencast",
   "NAV_HOME":"Έναρξη",
   "NAV_ABOUT":"Σχετικά με",
+  "NO":"'Οχι",
   "SUBMIT":"Υποβολή",
   "UPDATE":"Ενημέρωση",
   "CANCEL":"Ακύρωση",
@@ -117,8 +118,8 @@
     "EMAIL_SENT":"Το μήνυμα έχει σταλεί",
     "EMAIL_NOT_SENT":"Δεν μπόρεσε να σταλεί το μήνυμα",
     "CONFLICT_DETECTED":"Σύγκρουση στον προγραμματισμό: η νέα εκδήλωση συμπίμπτει με μία υπάρχουσα. Παρακαλώ αλλάξτε την αίθουσα, τις ημερηνίες ή τις ημέρες.",
-    "CONFLICT_ALREADY_ENDED":"Scheduling error: The event has already ended.",
-    "CONFLICT_END_BEFORE_START":"Scheduling error: Schedule end has to be later than the start.",
+    "CONFLICT_ALREADY_ENDED":"Σφάλμα στον προγραμματισμό. Η εκδήλωση έχει ήδη λήξει.",
+    "CONFLICT_END_BEFORE_START":"Σφάλμα στον προγραμματισμό. Η προγραμματισμένη λήξη πρέπει να είναι μεταγενέστερη από την προγραμματισμένη έναρξη.",
     "INVALID_ACL_RULES":"Οι κανόνες πρέπει να περιέχουν έναν έγκυρο ρόλο και δικαίωμα(τα) ανάγνωσης ή\/και εγγραφής.",
     "MISSING_ACL_RULES":"Απαιτείται τουλάχιστον ένας ρόλος με δικαιώματα ανάγνωσης και εγγραφής!",
     "SAVED_ACL_RULES":"Οι κανόνες πρόσβασης έχουν αποθηκευτεί.",
@@ -1402,7 +1403,7 @@
         "CREATED":"Δημιουργήθηκε",
         "CREATOR":"Δημιουργός",
         "HOST_NAME":"Όνομα κεντρικού υπολογιστή",
-        "OPERATION":"Operation",
+        "OPERATION":"Λειτουργία",
         "STARTED":"Ξεκίνησε",
         "STATUS":"Κατάσταση",
         "SUBMITTED":"Υποβλήθηκε",
@@ -1522,6 +1523,9 @@
       "CREATOR":{
         "LABEL":"Δημιουργός"
       },
+      "HOSTNAME":{
+        "LABEL":"Όνομα κεντρικού υπολογιστή"
+      },
       "LANGUAGE":{
         "LABEL":"Γλώσσα"
       },
@@ -1591,6 +1595,18 @@
         "LABEL":"Κατάσταση ροής εργασίας"
       }
     },
+    "JOBS":{
+      "HOSTNAME":{
+        "LABEL":"Όνομα κεντρικού υπολογιστή"
+      },
+      "STATUS":{
+        "LABEL":"Κατάσταση",
+        "PAUSED":"Σε παύση",
+        "QUEUED":"Στην ουρά",
+        "RUNNING":"Εκτελείται",
+        "WAITING":"Αναμονή"
+      }
+    },
     "SERIES":{
       "TITLE":{
         "LABEL":"Όνομα"
@@ -1618,6 +1634,34 @@
       },
       "CREATION_DATE":{
         "LABEL":"Ημερομηνία δημιουργίας"
+      }
+    },
+    "SERVERS":{
+      "HOSTNAME":{
+        "LABEL":"Όνομα κεντρικού υπολογιστή"
+      },
+      "STATUS":{
+        "LABEL":"Κατάσταση",
+        "MAINTENANCE":"Συντήρηση",
+        "ONLINE":"Συνδεδεμένος",
+        "OFFLINE":"Αποσυνδεδεμένος"
+      }
+    },
+    "SERVICES":{
+      "ACTIONS":{
+        "LABEL":"Έχει ενέργειες"
+      },
+      "HOSTNAME":{
+        "LABEL":"Όνομα κεντρικού υπολογιστή"
+      },
+      "NAME":{
+        "LABEL":"Όνομα"
+      },
+      "STATUS":{
+        "LABEL":"Κατάσταση",
+        "ERROR":"Σφάλμα",
+        "NORMAL":"Κανονική",
+        "WARNING":"Προειδοποίηση"
       }
     },
     "THEMES":{

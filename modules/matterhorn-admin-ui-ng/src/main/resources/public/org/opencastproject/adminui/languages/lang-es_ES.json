@@ -2,6 +2,7 @@
   "MATTERHORN":"Opencast",
   "NAV_HOME":"Inicio",
   "NAV_ABOUT":"Acerca de",
+  "NO":"No",
   "SUBMIT":"Enviar",
   "UPDATE":"Actualizar",
   "CANCEL":"Cancelar",
@@ -17,7 +18,7 @@
     "GERMAN":"Alemán",
     "GERMAN_CH":"Alemán de Suiza",
     "FINNISH":"Finlandés",
-    "HINDI":"Hindú",
+    "HINDI":"Hindi",
     "ITALIAN":"Italiano",
     "JAPANESE":"Japonés",
     "DUTCH":"Neerlandés",
@@ -117,8 +118,8 @@
     "EMAIL_SENT":"El mensaje ha sido enviado",
     "EMAIL_NOT_SENT":"No se ha podido enviar el mensaje",
     "CONFLICT_DETECTED":"Conflicto de programación: el nuevo evento se solapa con otro existente. Por favor, cambie la sala, las fechas o las horas.",
-    "CONFLICT_ALREADY_ENDED":"Scheduling error: The event has already ended.",
-    "CONFLICT_END_BEFORE_START":"Scheduling error: Schedule end has to be later than the start.",
+    "CONFLICT_ALREADY_ENDED":"Error de programación: El evento ya ha terminado.",
+    "CONFLICT_END_BEFORE_START":"Error de programación: El final tiene que ser más tarde que el comienzo.",
     "INVALID_ACL_RULES":"Las reglas deben contener un nombre de rol válido y permiso(s) de lectura y\/o escritura.",
     "MISSING_ACL_RULES":"¡Se requiere al menos un rol con permisos de Lectura y Escritura!",
     "SAVED_ACL_RULES":"Se han guardado las reglas de acceso.",
@@ -324,7 +325,7 @@
             "INPUTS":"Entradas",
             "HOUR":"Hora",
             "MINUTE":"Minuto",
-            "REPEATS":"Repetir",
+            "REPEATS":"Repeticiones",
             "START_DATE":"aaaa-mm-dd",
             "START_DATE_FORMAT":"aaaa-mm-dd",
             "END_DATE":"aaaa-mm-dd",
@@ -343,7 +344,7 @@
             },
             "AUDIO_ONLY":{
               "SHORT":"Solo audio",
-              "DETAIL":"El archivo solo contiene sonido."
+              "DETAIL":"El archivo solo contiene audio."
             }
           },
           "DATE_TIME":{
@@ -365,7 +366,7 @@
           }
         },
         "PROCESSING":{
-          "CAPTION":"Procesado",
+          "CAPTION":"Procesando",
           "SELECT_WORKFLOW":"Seleccione flujo de trabajo",
           "SELECT_WORKFLOW_EMPTY":"No hay flujos de trabajo disponibles",
           "WORKFLOW":"Flujo de trabajo"
@@ -390,7 +391,7 @@
       },
       "NAVIGATION":{
         "EVENTS":"Eventos",
-        "SERIES":"Serie",
+        "SERIES":"Series",
         "OVERVIEW":"Resumen"
       },
       "UPLOAD":"Subir",
@@ -430,7 +431,7 @@
         "BLACKLISTED":"En la lista negra",
         "RECORDING":"Grabando",
         "UPLOADING":"Subiendo",
-        "INGESTING":"Importando",
+        "INGESTING":"Ingestando",
         "PENDING":"Pendiente",
         "PROCESSING":"Procesando",
         "PAUSED":"En pausa",
@@ -583,7 +584,7 @@
             "TAGS":"Etiquetas",
             "LINK":"Enlace",
             "DETAILS":{
-              "TITLE":"Detalles de multimedia",
+              "TITLE":"Detalles de los archivos multimedia",
               "ID":"Identificador",
               "TYPE":"Tipo",
               "MIMETYPE":"Tipo MIME",
@@ -978,7 +979,7 @@
         "TABS":{
           "LOCATIONS":"Ubicaciones",
           "DATES":"Fechas",
-          "REASON":"Causa",
+          "REASON":"Motivo",
           "SUMMARY":"Resumen"
         },
         "LOCATIONS":{
@@ -993,7 +994,7 @@
         },
         "REASON":{
           "SELECT_REASON":"Seleccionar",
-          "REASON":"Causa",
+          "REASON":"Motivo",
           "COMMENTS":"Comentarios"
         },
         "SUMMARY":{
@@ -1001,7 +1002,7 @@
           "LOCATION":"Ubicación",
           "DATE_FROM":"Desde",
           "DATE_TO":"Hasta",
-          "REASON":"Causa",
+          "REASON":"Motivo",
           "COMMENTS":"Comentarios"
         }
       }
@@ -1188,7 +1189,7 @@
         "NAME":"Nombre",
         "DATE_FROM":"Desde",
         "DATE_TO":"Hasta",
-        "REASON":"Causa",
+        "REASON":"Motivo",
         "ACTION":"Acciones"
       },
       "DETAILS":{
@@ -1197,7 +1198,7 @@
         "TABS":{
           "USERS":"Usuarios",
           "DATES":"Fechas",
-          "REASON":"Causa",
+          "REASON":"Motivo",
           "SUMMARY":"Resumen"
         },
         "USERS":{
@@ -1212,7 +1213,7 @@
         },
         "REASON":{
           "SELECT_REASON":"Seleccionar",
-          "REASON":"Causa",
+          "REASON":"Motivo",
           "COMMENTS":"Comentarios"
         },
         "SUMMARY":{
@@ -1220,7 +1221,7 @@
           "USER":"Usuario",
           "DATE_FROM":"Desde",
           "DATE_TO":"Hasta",
-          "REASON":"Causa",
+          "REASON":"Motivo",
           "COMMENTS":"Comentarios"
         }
       }
@@ -1323,7 +1324,7 @@
       },
       "DETAILS":{
         "NEWCAPTION":"Crear estilo",
-        "EDITCAPTION":"Modificar estilo",
+        "EDITCAPTION":"Editar estilo",
         "GENERAL":{
           "CAPTION":"General",
           "NAME":"Nombre",
@@ -1402,7 +1403,7 @@
         "CREATED":"Fecha de creación",
         "CREATOR":"Creador",
         "HOST_NAME":"Nombre del equipo",
-        "OPERATION":"Operation",
+        "OPERATION":"Operación",
         "STARTED":"Iniciado",
         "STATUS":"Estado",
         "SUBMITTED":"Enviado",
@@ -1522,6 +1523,9 @@
       "CREATOR":{
         "LABEL":"Creador"
       },
+      "HOSTNAME":{
+        "LABEL":"Nombre del equipo"
+      },
       "LANGUAGE":{
         "LABEL":"Idioma"
       },
@@ -1532,7 +1536,7 @@
         "LABEL":"Ubicación"
       },
       "OPTEDOUT":{
-        "LABEL":"No Aprobado"
+        "LABEL":"No se Grabará"
       },
       "PERIOD":{
         "LABEL":"Periodo"
@@ -1550,7 +1554,7 @@
         "LABEL":"Estado de Revisión",
         "CONFIRMED":"Confirmado",
         "UNCONFIRMED":"Sin confirmar",
-        "UNSENT":"No han sido enviados"
+        "UNSENT":"No enviado"
       },
       "SERIES":{
         "LABEL":"Serie"
@@ -1565,7 +1569,7 @@
         "LABEL":"Estado",
         "SCHEDULED":"Programado",
         "RECORDING":"Grabando",
-        "INGESTING":"Importando",
+        "INGESTING":"Ingestando",
         "PROCESSING":"Procesando",
         "ARCHIVE":"Archivo",
         "WAITINGFOR":"Esperando",
@@ -1589,6 +1593,18 @@
       },
       "WORKFLOW_STATE":{
         "LABEL":"Estado del flujo de trabajo"
+      }
+    },
+    "JOBS":{
+      "HOSTNAME":{
+        "LABEL":"Nombre del equipo"
+      },
+      "STATUS":{
+        "LABEL":"Estado",
+        "PAUSED":"En pausa",
+        "QUEUED":"Queued",
+        "RUNNING":"Procesando",
+        "WAITING":"Waiting"
       }
     },
     "SERIES":{
@@ -1618,6 +1634,34 @@
       },
       "CREATION_DATE":{
         "LABEL":"Fecha de creación"
+      }
+    },
+    "SERVERS":{
+      "HOSTNAME":{
+        "LABEL":"Nombre del equipo"
+      },
+      "STATUS":{
+        "LABEL":"Estado",
+        "MAINTENANCE":"Mantenimiento",
+        "ONLINE":"Online",
+        "OFFLINE":"Offline"
+      }
+    },
+    "SERVICES":{
+      "ACTIONS":{
+        "LABEL":"Has actions"
+      },
+      "HOSTNAME":{
+        "LABEL":"Nombre del equipo"
+      },
+      "NAME":{
+        "LABEL":"Nombre"
+      },
+      "STATUS":{
+        "LABEL":"Estado",
+        "ERROR":"Error",
+        "NORMAL":"Normal",
+        "WARNING":"Advertencia"
       }
     },
     "THEMES":{
@@ -1652,7 +1696,7 @@
       }
     },
     "REVIEW_STATUS":{
-      "UNSENT":"No han sido enviados",
+      "UNSENT":"No enviado",
       "UNCONFIRMED":"Sin confirmar",
       "CONFIRMED":"Confirmado"
     }

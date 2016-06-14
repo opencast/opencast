@@ -1,6 +1,6 @@
 angular.module('adminNg.controllers')
-.controller('ServersCtrl', ['$scope', 'Table', 'ServersResource', 'ServiceResource',
-    function ($scope, Table, ServersResource, ServiceResource) {
+.controller('ServersCtrl', ['$scope', 'Table', 'ServersResource', 'ServiceResource', 'ResourcesFilterResource',
+    function ($scope, Table, ServersResource, ServiceResource, ResourcesFilterResource) {
 
         $scope.table = Table;
         $scope.table.configure({
@@ -43,6 +43,8 @@ angular.module('adminNg.controllers')
             category:   'systems',
             apiService: ServersResource
         });
+
+        $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
 
         $scope.table.setMaintenanceMode = function (host, maintenance) {
             ServiceResource.setMaintenanceMode({

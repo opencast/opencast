@@ -2,6 +2,7 @@
   "MATTERHORN":"Opencast",
   "NAV_HOME":"Inicio",
   "NAV_ABOUT":"Acerca de",
+  "NO":"No",
   "SUBMIT":"Enviar",
   "UPDATE":"Actualizar",
   "CANCEL":"Cancelar",
@@ -17,7 +18,7 @@
     "GERMAN":"Alemán",
     "GERMAN_CH":"Alemán de Suíza",
     "FINNISH":"Finés",
-    "HINDI":"Hindú",
+    "HINDI":"Hindi",
     "ITALIAN":"Italiano",
     "JAPANESE":"Xaponés",
     "DUTCH":"Neerlandés",
@@ -81,12 +82,12 @@
     "EVENTS_CREATED":"Evento creado",
     "EVENTS_UPLOAD_STARTED":"Cargando o evento…",
     "EVENTS_NOT_CREATED":"Non se puido crear o evento",
-    "EVENTS_UPDATED_NB":"{{ number }} eventos actualizados correctamente",
+    "EVENTS_UPDATED_NB":"{{ number }} eventos foron actualizados correctamente",
     "EVENTS_UPDATED_ALL":"Todos os eventos foron actualizados correctamente",
     "EVENTS_NOT_UPDATED":"Non se puido gardar o evento",
     "EVENTS_NOT_UPDATED_ID":"Non se puido gardar o evento {{ id }}",
     "EVENTS_NOT_UPDATED_ALL":"Non se puido gardar ningún evento",
-    "SERIES_UPDATED_NB":"{{ number }} series actualizadas correctamente",
+    "SERIES_UPDATED_NB":"{{ number }} series foron actualizadas correctamente",
     "SERIES_UPDATED_ALL":"Todas as series foron actualizadas correctamente",
     "SERIES_NOT_UPDATED":"Non se puido gardar a serie",
     "SERIES_NOT_UPDATED_ID":"Non se puido gardar a serie {{ id }}",
@@ -117,16 +118,16 @@
     "EMAIL_SENT":"Mensaxe enviada",
     "EMAIL_NOT_SENT":"Non se puido enviar a mensaxe",
     "CONFLICT_DETECTED":"Conflito de programación: o novo evento coincide con outro existente. Por favor, cambie a sala, as datas ou as horas.",
-    "CONFLICT_ALREADY_ENDED":"Scheduling error: The event has already ended.",
-    "CONFLICT_END_BEFORE_START":"Scheduling error: Schedule end has to be later than the start.",
+    "CONFLICT_ALREADY_ENDED":"Erro de programación: O evento xa rematou.",
+    "CONFLICT_END_BEFORE_START":"Erro de programación: O final ten que ser máis tarde que o comezo.",
     "INVALID_ACL_RULES":"As regras deben conter un nome de rol válido e permiso(s) de lectura e\/ou escritura.",
     "MISSING_ACL_RULES":"Requírese, como mínimo, un rol con permisos de Lectura e Escritura!",
     "SAVED_ACL_RULES":"Regras de acceso gardadas.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Os eventos que contén esta serie terán que ser reprocesados",
-    "SERIES_ACL_LOCKED":"No se permite modificar as Políticas de Acceso cando existen operacións activas nalgún evento da serie",
+    "SERIES_ACL_LOCKED":"Non se permite modificar as Políticas de Acceso cando existen operacións activas nalgún evento da serie",
     "SERIES_ACL_MISSING_READWRITE_ROLE":"A Política de Acceso require polo menos un rol con permisos de Lectura e Escritura.",
     "EVENT_ACL_MISSING_READWRITE_ROLE":"A Política de Acceso require polo menos un rol con permisos de Lectura e Escritura.",
-    "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS":"El estado de aprobación do evento actualizouse correctamente.",
+    "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS":"O estado de aprobación do evento actualizouse correctamente.",
     "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR":"Error ó actualizar o estado de aprobación do evento.",
     "EVENT_PARTICIPATION_STATUS_READONLY":"No se pode actualizar o estado de aprobación do evento despois da data de inicio programada.",
     "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS":"El estado de aprobación da serie actualizouse correctamente.",
@@ -325,10 +326,10 @@
             "HOUR":"Hora",
             "MINUTE":"Minuto",
             "REPEATS":"Repeticións",
-            "START_DATE":"dd-mm-yyyy",
-            "START_DATE_FORMAT":"dd-mm-yyyy",
-            "END_DATE":"dd-mm-yyyy",
-            "END_DATE_FORMAT":"dd-mm-yyyy"
+            "START_DATE":"aaaa-mm-dd",
+            "START_DATE_FORMAT":"aaaa-mm-dd",
+            "END_DATE":"aaaa-mm-dd",
+            "END_DATE_FORMAT":"aaaa-mm-dd"
           },
           "UPLOAD":{
             "CAPTION":"Subir",
@@ -390,7 +391,7 @@
       },
       "NAVIGATION":{
         "EVENTS":"Eventos",
-        "SERIES":"Serie",
+        "SERIES":"Series",
         "OVERVIEW":"Resumo"
       },
       "UPLOAD":"Subir",
@@ -490,8 +491,8 @@
             "HOUR":"Hora",
             "MINUTE":"Minuto",
             "REPEATS":"Repeticións",
-            "START_DATE":"dd-mm-yyyy",
-            "END_DATE":"dd-mm-yyyy"
+            "START_DATE":"aaaa-mm-dd",
+            "END_DATE":"aaaa-mm-dd"
           },
           "UPLOAD":{
             "CAPTION":"Subir",
@@ -672,7 +673,7 @@
             "ASYNC":"Pistas de A\/V asíncronas",
             "AUDIO_ISSUE":"Pista de audio non dispoñible ou defectuosa",
             "CANCELED":"Evento cancelado",
-            "CONFLICTING_METADATA":"Conflicto de metadatos",
+            "CONFLICTING_METADATA":"Conflito de metadatos",
             "IMPROPER_POINT":"Punto inicial ou final incorrecto",
             "MISSING_AGREEMENT":"Acordo non dispoñible",
             "OTHER":"Outro",
@@ -728,7 +729,7 @@
             "CAPTION":"Mensaxes",
             "CREATION_DATE":"Data de Creación",
             "SENDER":"Remitente",
-            "SUBJECT":"Tema"
+            "SUBJECT":"Asunto"
           },
           "PLACEHOLDER":{
             "PRESENTERS":"Relator(es)"
@@ -831,7 +832,7 @@
             "ROLE":"Rol",
             "WRITE":"Escritura",
             "READ":"Lectura",
-            "ADDITIONAL_ACTIONS":"Máis accións",
+            "ADDITIONAL_ACTIONS":"Accións adicionais",
             "ACTION":"Accións",
             "NEW":"Nova política",
             "DETAILS":"Detalles"
@@ -886,7 +887,7 @@
             "ROLE":"Rol",
             "WRITE":"Escritura",
             "READ":"Lectura",
-            "ADDITIONAL_ACTIONS":"Máis accións",
+            "ADDITIONAL_ACTIONS":"Accións adicionais",
             "ACTION":"Accións",
             "NEW":"Nova política",
             "DETAILS":"Detalles"
@@ -956,7 +957,7 @@
         "TITLE":"UID",
         "NAME":"Nome",
         "LOCATION":"Ubicación",
-        "UPDATED":"Última actualicación",
+        "UPDATED":"Última actualización",
         "NEXT_DATE":"Próximo evento",
         "NEXT_NAME":"Título do próximo evento",
         "STATUS":"Estado",
@@ -1131,7 +1132,7 @@
             "ROLE":"Rol",
             "WRITE":"Escritura",
             "READ":"Lectura",
-            "ADDITIONAL_ACTIONS":"Máis accións",
+            "ADDITIONAL_ACTIONS":"Accións adicionais",
             "ACTION":"Accións",
             "NEW":"Nova política",
             "DETAILS":"Detalles",
@@ -1169,7 +1170,7 @@
             "ROLE":"Rol",
             "WRITE":"Escritura",
             "READ":"Lectura",
-            "ADDITIONAL_ACTIONS":"Máis accións",
+            "ADDITIONAL_ACTIONS":"Accións adicionais",
             "ACTION":"Accións",
             "NEW":"Nova política",
             "DETAILS":"Detalles",
@@ -1260,7 +1261,7 @@
         },
         "TITLE":{
           "CAPTION":"Título",
-          "DESCRIPTION":"Diapositiva predefinida que se anexa al principio ou ó final dunha gravación e que contén metadatos descritivos.",
+          "DESCRIPTION":"Diapositiva predefinida que se anexa ó principio ou ó final dunha gravación e que contén metadatos descritivos.",
           "ACTIVE":"Activo"
         },
         "WATERMARK":{
@@ -1354,7 +1355,7 @@
         "TITLE":{
           "CAPTION":"Título",
           "FILE_UPLOADED":"Arquivo subido: ",
-          "DESCRIPTION":"Diapositiva predefinida que se anexa al principio ou ó final dunha gravación e que contén metadatos descritivos.",
+          "DESCRIPTION":"Diapositiva predefinida que se anexa ó principio ou ó final dunha gravación e que contén metadatos descritivos.",
           "ACTIVE":"Activo",
           "ENABLE":"Activar diapositiva de título",
           "BACKGROUND":"Fondo",
@@ -1402,7 +1403,7 @@
         "CREATED":"Creado",
         "CREATOR":"Creador",
         "HOST_NAME":"Nome do servidor",
-        "OPERATION":"Operation",
+        "OPERATION":"Operación",
         "STARTED":"Iniciado",
         "STATUS":"Estado",
         "SUBMITTED":"Enviado",
@@ -1465,7 +1466,7 @@
       "ANNOTATIONS":"Anotacións"
     },
     "ACTIONS":{
-      "SPLIT":"Marcar",
+      "SPLIT":"Dividir",
       "CUT":"Cortar",
       "REPLAY_SEGMENT":"Reproducir segmento",
       "UNDO":"Desfacer",
@@ -1522,6 +1523,9 @@
       "CREATOR":{
         "LABEL":"Creador"
       },
+      "HOSTNAME":{
+        "LABEL":"Nome do servidor"
+      },
       "LANGUAGE":{
         "LABEL":"Idioma"
       },
@@ -1573,7 +1577,7 @@
         "ONHOLD":"En espera"
       },
       "SUBJECT":{
-        "LABEL":"Asunto"
+        "LABEL":"Tema"
       },
       "TRACK_MIMETYPE":{
         "LABEL":"Tipo Mime"
@@ -1591,6 +1595,18 @@
         "LABEL":"Estado do fluxo de traballo"
       }
     },
+    "JOBS":{
+      "HOSTNAME":{
+        "LABEL":"Nome do servidor"
+      },
+      "STATUS":{
+        "LABEL":"Estado",
+        "PAUSED":"Pausado",
+        "QUEUED":"Queued",
+        "RUNNING":"Procesando",
+        "WAITING":"Waiting"
+      }
+    },
     "SERIES":{
       "TITLE":{
         "LABEL":"Nome"
@@ -1602,7 +1618,7 @@
         "LABEL":"Organizadores"
       },
       "SUBJECT":{
-        "LABEL":"Asunto"
+        "LABEL":"Tema"
       },
       "LANGUAGE":{
         "LABEL":"Idioma"
@@ -1618,6 +1634,34 @@
       },
       "CREATION_DATE":{
         "LABEL":"Data de Creación"
+      }
+    },
+    "SERVERS":{
+      "HOSTNAME":{
+        "LABEL":"Nome do servidor"
+      },
+      "STATUS":{
+        "LABEL":"Estado",
+        "MAINTENANCE":"Mantemento",
+        "ONLINE":"Online",
+        "OFFLINE":"Offline"
+      }
+    },
+    "SERVICES":{
+      "ACTIONS":{
+        "LABEL":"Has actions"
+      },
+      "HOSTNAME":{
+        "LABEL":"Nome do servidor"
+      },
+      "NAME":{
+        "LABEL":"Nome"
+      },
+      "STATUS":{
+        "LABEL":"Estado",
+        "ERROR":"Error",
+        "NORMAL":"Normal",
+        "WARNING":"Advertencia"
       }
     },
     "THEMES":{
@@ -1674,8 +1718,8 @@
   "DASHBOARD":{
     "RUNNING":"Procesando",
     "FINISHED":"Finalizado",
-    "FAILED":"Fallado",
-    "FINISHED_WITH_COMMENTS":"Finalizado con comentarios pendentes",
+    "FAILED":"Errado",
+    "FINISHED_WITH_COMMENTS":"Rematado con comentarios pendentes",
     "SCHEDULED":"Programado"
   }
 }

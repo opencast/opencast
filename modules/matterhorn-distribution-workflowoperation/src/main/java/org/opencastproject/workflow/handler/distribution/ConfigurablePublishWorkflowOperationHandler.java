@@ -63,9 +63,11 @@ import java.util.UUID;
 
 /**
  * WOH that distributes selected elements to an internal distribution channel and adds reflective publication elements
- * to the media package.
+ *  to the media package.
  */
+
 public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
+
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ConfigurablePublishWorkflowOperationHandler.class);
 
@@ -88,6 +90,8 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
   static final String SOURCE_TAGS = "source-tags";
   static final String SOURCE_FLAVORS = "source-flavors";
   static final String WITH_PUBLISHED_ELEMENTS = "with-published-elements";
+  static final String STRATEGY = "strategy";
+
   /** The workflow configuration key for defining the url pattern. */
   static final String URL_PATTERN = "url-pattern";
 
@@ -163,6 +167,20 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
 
     final boolean withPublishedElements = Boolean.parseBoolean(StringUtils.trimToEmpty(op
             .getConfiguration(WITH_PUBLISHED_ELEMENTS)));
+
+    if (mp.getPublications().length > 0) {
+      final String rePublishStrategy = StringUtils.trimToEmpty(op.getConfiguration(STRATEGY));
+
+      switch (rePublishStrategy) {
+
+        case ("fail"):
+          //fail is a dummy function for further distribution strategies
+          fail(mp);
+          break;
+        default:
+          retract(mp, channelId);
+      }
+    }
 
     final String[] sourceFlavors = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(SOURCE_FLAVORS)), ",");
     final String[] sourceTags = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(SOURCE_TAGS)), ",");
@@ -241,4 +259,43 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
     return createResult(mp, Action.CONTINUE);
   }
 
+  /**
+   * Removes publication for distributionChannel
+   *
+   * @param mp Mediapackage
+   * @param channelId Publication-Channel
+   * @throws org.opencastproject.workflow.api.WorkflowOperationException
+   */
+  private void retract(MediaPackage mp, String channelId) throws WorkflowOperationException {
+    Map<Job, MediaPackageElement> jobs = new HashMap<>();
+    for (final Publication publicationElement : mp.getPublications()) {
+      if (channelId.equals(publicationElement.getChannel())) {
+        logger.info("Start retracting element '{}' of media package '{}' from publication channel '{}'", new Object[]{
+          publicationElement, mp, channelId});
+        try {
+          final Job retractjob = distributionService.retract(channelId, mp, publicationElement.getChannel());
+          jobs.put(retractjob, publicationElement);
+          logger.debug("Retracting job '{}' for element '{}' of media package '{}' created.", new Object[]{retractjob,
+            publicationElement, mp});
+        } catch (DistributionException e) {
+          logger.error("Creating the retracting job for element '{}' of media package '{}' failed: {}",
+                  new Object[]{publicationElement, mp, getStackTrace(e)});
+          throw new WorkflowOperationException(e);
+        }
+      }
+    }
+    // Wait until all retraction jobs have returned
+    if (!waitForStatus(jobs.keySet().toArray(new Job[jobs.keySet().size()])).isSuccess()) {
+      throw new WorkflowOperationException("One of the retraction jobs did not complete successfully");
+    }
+  }
+/**
+ * Dummy function for further publication strategies
+ * @param mp
+ * @throws WorkflowOperationException
+ */
+  private void fail(MediaPackage mp) throws WorkflowOperationException {
+    logger.error("There is already a Published Media, fail Stragy for Mediapackage {}", mp.getIdentifier());
+    throw new WorkflowOperationException("There is already a Published Media, fail Stragy for Mediapackage ");
+  }
 }

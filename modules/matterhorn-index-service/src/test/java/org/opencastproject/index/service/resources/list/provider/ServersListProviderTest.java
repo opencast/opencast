@@ -21,17 +21,14 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
+import static org.junit.Assert.assertEquals;
+
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.index.service.resources.list.provider.ServersListProvider.ServersFilterList;
-import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
+import org.opencastproject.index.service.resources.list.query.ServersListQuery;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.JaxbHostRegistration;
-import org.opencastproject.serviceregistry.api.JaxbServiceRegistration;
-import org.opencastproject.serviceregistry.api.JaxbServiceStatistics;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.serviceregistry.api.ServiceStatistics;
-import org.opencastproject.workflow.api.WorkflowDatabaseException;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -39,6 +36,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ServersListProviderTest {
 
@@ -62,67 +60,41 @@ public class ServersListProviderTest {
     hosts.add(new JaxbHostRegistration(HOST3, "1.1.1.3", 500000, 2, 8, false, false));
     hosts.add(new JaxbHostRegistration(HOST4, "1.1.1.4", 500000, 6, 8, true, true));
 
-    JaxbServiceRegistration service1 = new JaxbServiceRegistration("test", HOST1, "");
-    JaxbServiceRegistration service2 = new JaxbServiceRegistration("test", HOST2, "");
-    JaxbServiceRegistration service3 = new JaxbServiceRegistration("test", HOST3, "");
-    JaxbServiceRegistration service4 = new JaxbServiceRegistration("test", HOST4, "");
-
-    List<ServiceStatistics> statistics = new ArrayList<ServiceStatistics>();
-    statistics.add(new JaxbServiceStatistics(service1, 200, 200, 2, 2, 2));
-    statistics.add(new JaxbServiceStatistics(service2, 200, 200, 4, 4, 2));
-    statistics.add(new JaxbServiceStatistics(service3, 200, 200, 2, 4, 2));
-    statistics.add(new JaxbServiceStatistics(service4, 200, 200, 2, 4, 2));
-
     EasyMock.expect(serviceRegistry.getHostRegistrations()).andReturn(hosts).anyTimes();
-    EasyMock.expect(serviceRegistry.getServiceStatistics()).andReturn(statistics).anyTimes();
 
     serverListProvider.setServiceRegistry(serviceRegistry);
     serverListProvider.activate(null);
 
     EasyMock.replay(serviceRegistry);
-
   }
 
   @Test
   public void testListNames() throws ListProviderException {
-    ResourceListQuery query = new ResourceListQueryImpl();
+    ResourceListQuery query = new ServersListQuery();
 
-    org.junit.Assert.assertEquals(
-            4,
-            serverListProvider.getList(ServersListProvider.getListNameFromFilter(ServersFilterList.HOSTNAME), query,
-                    null).size());
-
-    org.junit.Assert.assertEquals(4, serverListProvider.getList("servers", query, null).size());
-    org.junit.Assert.assertEquals(4, serverListProvider.getList("non-existing-name", query, null).size());
-
-    org.junit.Assert.assertEquals(
-            3,
-            serverListProvider.getList(ServersListProvider.getListNameFromFilter(ServersFilterList.CORES), query,
-                    null).size());
-
-    org.junit.Assert.assertEquals(
-            1,
-            serverListProvider.getList(ServersListProvider.getListNameFromFilter(ServersFilterList.MAXJOBS), query,
-                    null).size());
-    org.junit.Assert.assertEquals(
-            2,
-            serverListProvider.getList(ServersListProvider.getListNameFromFilter(ServersFilterList.MEMORY), query,
-                    null).size());
-    org.junit.Assert.assertEquals(4,
-            serverListProvider
-                    .getList(ServersListProvider.getListNameFromFilter(ServersFilterList.PATH), query, null).size());
-    org.junit.Assert.assertEquals(
-            1,
-            serverListProvider.getList(ServersListProvider.getListNameFromFilter(ServersFilterList.SERVICE), query,
-                    null).size());
+    assertEquals(4, serverListProvider.getList("non-existing-name", query, null).size());
+    assertEquals(4, serverListProvider.getList(ServersListProvider.LIST_HOSTNAME, query, null).size());
+    assertEquals(3, serverListProvider.getList(ServersListProvider.LIST_STATUS, query, null).size());
   }
 
   @Test
-  public void testQueries() throws ListProviderException, WorkflowDatabaseException {
-    ResourceListQueryImpl query = new ResourceListQueryImpl();
-    query.setOffset(2);
-    org.junit.Assert.assertEquals(2, serverListProvider.getList("servers", query, null).size());
-    query.setLimit(1);
-    org.junit.Assert.assertEquals(2, serverListProvider.getList("servers", query, null).size());
+  public void testHostnameList() throws ListProviderException {
+    ResourceListQuery query = new ServersListQuery();
+
+    Map<String, String> list = serverListProvider.getList(ServersListProvider.LIST_HOSTNAME, query, null);
+    assertEquals(HOST1, list.get(HOST1));
+    assertEquals(HOST2, list.get(HOST2));
+    assertEquals(HOST3, list.get(HOST3));
+    assertEquals(HOST4, list.get(HOST4));
+  }
+
+  @Test
+  public void testStatusList() throws ListProviderException {
+    ResourceListQuery query = new ServersListQuery();
+
+    Map<String, String> list = serverListProvider.getList(ServersListProvider.LIST_STATUS, query, null);
+    assertEquals(ServersListProvider.SERVER_STATUS_LABEL_ONLINE, list.get(ServersListProvider.SERVER_STATUS_ONLINE));
+    assertEquals(ServersListProvider.SERVER_STATUS_LABEL_OFFLINE, list.get(ServersListProvider.SERVER_STATUS_OFFLINE));
+    assertEquals(ServersListProvider.SERVER_STATUS_LABEL_MAINTENANCE, list.get(ServersListProvider.SERVER_STATUS_MAINTENANCE));
   }
 }

@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>2.2-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -86,6 +86,7 @@
               org.opencastproject.workflow.handler.workflow;version=${project.version}
             </Export-Package>
             <Service-Component>
+              OSGI-INF/operations/analyze-tracks.xml,
               OSGI-INF/operations/append.xml,
               OSGI-INF/operations/caption.xml,
               OSGI-INF/operations/cleanup.xml,
