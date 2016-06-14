@@ -39,6 +39,7 @@ pages:
       - General Security: 'configuration/security.md'
       - Central Authentication Service (CAS): 'configuration/security.cas.md'
       - LDAP Authentication and Authorization (without CAS): 'configuration/security.ldap.md'
+      - Stream Security: 'configuration/stream-security.md'
    - Workflow: 'configuration/workflow.md'
 - Modules:
    - Overview: 'modules/index.md'
@@ -56,6 +57,7 @@ pages:
       - Configuration: 'modules/player.configuration.md'
       - URL Parameters: 'modules/player.url.parameter.md'
    - Search Index: 'modules/searchindex.md'
+   - Stream Security: 'modules/stream-security.md'
    - Text Extraction: 'modules/textextraction.md'
    - Video Editor:
       - Overview: 'modules/videoeditor.manual.md'
@@ -67,6 +69,7 @@ pages:
    - Upgrading Home: 'upgrade/index.md'
 - Workflow Operation Handler:
    - Overview: 'workflowoperationhandlers/index.md'
+   - Analyze Tracks: 'workflowoperationhandlers/analyze-tracks-woh.md'
    - Analyze Audio: 'workflowoperationhandlers/analyzeaudio-woh.md'
    - Append: 'workflowoperationhandlers/append-woh.md'
    - Archive: 'workflowoperationhandlers/archive-woh.md'

@@ -28,7 +28,6 @@ import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.util.DateTimeSupport;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -165,14 +164,14 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
 
     // Text
     if (text != null) {
-      QueryStringQueryBuilder queryBuilder = QueryBuilders.queryString(QueryParser.escape(text)).field(TEXT);
+      QueryStringQueryBuilder queryBuilder = QueryBuilders.queryString(text).field(TEXT);
       booleanQuery.must(queryBuilder);
       this.queryBuilder = booleanQuery;
     }
 
     // Fuzzy text
     if (fuzzyText != null) {
-      FuzzyLikeThisQueryBuilder fuzzyQueryBuilder = QueryBuilders.fuzzyLikeThisQuery(TEXT_FUZZY).likeText(QueryParser.escape(fuzzyText));
+      FuzzyLikeThisQueryBuilder fuzzyQueryBuilder = QueryBuilders.fuzzyLikeThisQuery(TEXT_FUZZY).likeText(fuzzyText);
       booleanQuery.must(fuzzyQueryBuilder);
       this.queryBuilder = booleanQuery;
     }

@@ -36,7 +36,6 @@ import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
@@ -61,6 +60,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedMap;
@@ -327,10 +328,14 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
 
     for (String title : getFirstMetadataValue(metadata.getTitles()))
       appendXml(xml, "title", title);
+    for (String description : getFirstMetadataValue(metadata.getDescription()))
+      appendXml(xml, "description", description);
     for (String language : metadata.getLanguage())
       appendXml(xml, "language", language);
     for (Date created : metadata.getCreated())
-      appendXml(xml, "date", DateTimeSupport.toUTC(created.getTime()));
+      appendXml(xml, "date", DateFormat.getDateInstance(DateFormat.LONG).format(created));
+    for (Date created : metadata.getCreated())
+      appendXml(xml, "time", new SimpleDateFormat("HH:mm:ss").format(created));
     for (String license : getFirstMetadataValue(metadata.getLicenses()))
       appendXml(xml, "license", license);
     for (String isPartOf : metadata.getIsPartOf())

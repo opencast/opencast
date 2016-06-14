@@ -488,8 +488,8 @@ module.exports = function (grunt) {
       },
       coverage: {
         singleRun : true,
-        reporters : ["dots", "coverage"],
-        browsers  : ["PhantomJS"]
+        reporters : ['dots', 'coverage'],
+        browsers  : ['PhantomJS']
       }
     },
 

@@ -21,17 +21,27 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
+import static com.entwinemedia.fn.data.json.Jsons.f;
+import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.index.service.resources.list.provider.ServersListProvider;
+import org.opencastproject.index.service.resources.list.query.ServersListQuery;
+import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.matterhorn.search.SearchQuery;
+import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
+import org.opencastproject.util.SmartIterator;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+
+import com.entwinemedia.fn.data.json.JValue;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
@@ -52,8 +62,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -62,13 +71,13 @@ import javax.ws.rs.core.Response;
 public class ServerEndpoint {
 
   private enum Sort {
-    STATUS, HOSTNAME, CORES, COMPLETED, MAINTENANCE, RUNNING, QUEUED, QUEUETIME, RUNTIME
+    COMPLETED, CORES, HOSTNAME, MAINTENANCE, MEANQUEUETIME, MEANRUNTIME, ONLINE, QUEUED, RUNNING
   }
 
   // List of property keys for the JSON job object
   private static final String KEY_ONLINE = "online";
   private static final String KEY_MAINTENANCE = "maintenance";
-  private static final String KEY_NAME = "name";
+  private static final String KEY_HOSTNAME = "hostname";
   private static final String KEY_CORES = "cores";
   private static final String KEY_RUNNING = "running";
   private static final String KEY_COMPLETED = "completed";
@@ -94,7 +103,7 @@ public class ServerEndpoint {
       int result;
 
       switch (sortType) {
-        case STATUS:
+        case ONLINE:
           Boolean status1 = (Boolean) host1.get(KEY_ONLINE);
           Boolean status2 = (Boolean) host2.get(KEY_ONLINE);
           result = status1.compareTo(status2);
@@ -116,16 +125,16 @@ public class ServerEndpoint {
         case RUNNING:
           result = ((Integer) host1.get(KEY_RUNNING)).compareTo((Integer) host2.get(KEY_RUNNING));
           break;
-        case QUEUETIME:
+        case MEANQUEUETIME:
           result = ((Integer) host1.get(KEY_MEAN_QUEUE_TIME)).compareTo((Integer) host2.get(KEY_MEAN_QUEUE_TIME));
           break;
-        case RUNTIME:
-          result = ((Integer) host1.get(KEY_MEAN_QUEUE_TIME)).compareTo((Integer) host2.get(KEY_MEAN_QUEUE_TIME));
+        case MEANRUNTIME:
+          result = ((Integer) host1.get(KEY_MEAN_RUN_TIME)).compareTo((Integer) host2.get(KEY_MEAN_RUN_TIME));
           break;
         case HOSTNAME:
         default:
-          String name1 = (String) host1.get(KEY_NAME);
-          String name2 = (String) host2.get(KEY_NAME);
+          String name1 = (String) host1.get(KEY_HOSTNAME);
+          String name2 = (String) host2.get(KEY_HOSTNAME);
           result = name1.compareTo(name2);
       }
 
@@ -138,8 +147,6 @@ public class ServerEndpoint {
   public static final Response UNAUTHORIZED = Response.status(Response.Status.UNAUTHORIZED).build();
   public static final Response NOT_FOUND = Response.status(Response.Status.NOT_FOUND).build();
   public static final Response SERVER_ERROR = Response.serverError().build();
-
-  private static final String DESCENDING_SUFFIX = "_DESC";
 
   private ServiceRegistry serviceRegistry;
 
@@ -158,147 +165,162 @@ public class ServerEndpoint {
   @RestQuery(description = "Returns the list of servers", name = "servers", restParameters = {
           @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = INTEGER),
           @RestParameter(name = "offset", description = "The offset", isRequired = false, type = INTEGER),
-          @RestParameter(name = "online", isRequired = false, description = "Filter results by server current online status", type = BOOLEAN),
-          @RestParameter(name = "offline", isRequired = false, description = "Filter results by server current offline status", type = BOOLEAN),
-          @RestParameter(name = "maintenance", isRequired = false, description = "Filter results by server current maintenance status", type = BOOLEAN),
-          @RestParameter(name = "q", isRequired = false, description = "Filter results by free text query", type = STRING),
-          @RestParameter(name = "types", isRequired = false, description = "Filter results by sevices types registred on the server", type = STRING),
-          @RestParameter(name = "ipaddress", isRequired = false, description = "Filter results by the server ip address", type = STRING),
-          @RestParameter(name = "cores", isRequired = false, description = "Filter results by the number of cores", type = INTEGER, defaultValue = "-1"),
-          @RestParameter(name = "memory", isRequired = false, description = "Filter results by the server memory available in bytes", type = INTEGER),
-          @RestParameter(name = "path", isRequired = false, description = "Filter results by the server path", type = STRING),
-          @RestParameter(name = "maxjobs", isRequired = false, description = "Filter results by the maximum of jobs that can be run at the same time", type = INTEGER, defaultValue = "-1"),
-          @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
-                  + "of the following: STATUS, NAME, CORES, COMPLETED (jobs), RUNNING (jobs), QUEUED (jobs), QUEUETIME (mean for jobs), MAINTENANCE, RUNTIME (mean for jobs)."
-                  + "Add '_DESC' to reverse the sort order (e.g. NAME_DESC).", type = STRING) }, reponses = { @RestResponse(description = "Returns the list of jobs from Matterhorn", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The list ")
+          @RestParameter(name = "filter", description = "Filter results by hostname, status or free text query", isRequired = false, type = STRING),
+          @RestParameter(name = "sort", description = "The sort order.  May include any "
+                  + "of the following: COMPLETED (jobs), CORES, HOSTNAME, MAINTENANCE, MEANQUEUETIME (mean for jobs), "
+                  + "MEANRUNTIME (mean for jobs), ONLINE, QUEUED (jobs), RUNNING (jobs)."
+                  + "The suffix must be :ASC for ascending or :DESC for descending sort order (e.g. HOSTNAME:DESC).", isRequired = false, type = STRING) },
+          reponses = { @RestResponse(description = "Returns the list of jobs from Matterhorn", responseCode = HttpServletResponse.SC_OK) },
+          returnDescription = "The list of servers")
   public Response getServers(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset,
-          @QueryParam("online") boolean fOnline, @QueryParam("offline") boolean fOffline,
-          @QueryParam("q") String fText, @QueryParam("maintenance") boolean fMaintenance,
-          @QueryParam("types") List<String> fTypes, @QueryParam("ipaddress") String ipAddress,
-          @QueryParam("cores") Integer fCores, @QueryParam("memory") Integer fMemory, @QueryParam("path") String fPath,
-          @QueryParam("maxjobs") int fMaxJobs, @QueryParam("sort") String sort, @Context HttpHeaders headers)
+          @QueryParam("filter") String filter, @QueryParam("sort") String sort)
           throws Exception {
 
-    JSONArray jsonList = new JSONArray();
-    List<HostRegistration> allServers = serviceRegistry.getHostRegistrations();
-    List<JSONObject> sortedServers = new ArrayList<JSONObject>();
+    ServersListQuery query = new ServersListQuery();
+    EndpointUtil.addRequestFiltersToQuery(filter, query);
+    query.setLimit(limit);
+    query.setOffset(offset);
 
-    int i = 0;
-    for (HostRegistration server : allServers) {
-      if (i++ < offset) {
-        continue;
-      } else if (limit != 0 && sortedServers.size() == limit) {
-        break;
-      } else {
-
-        // Get all the services statistics pro host
-        // TODO improve the service registry to get service statistics by host
-        List<ServiceStatistics> servicesStatistics = serviceRegistry.getServiceStatistics();
-        int jobsCompleted = 0;
-        int jobsRunning = 0;
-        int jobsQueued = 0;
-        int sumMeanRuntime = 0;
-        int sumMeanQueueTime = 0;
-        int totalServiceOnHost = 0;
-        int offlineJobProducerServices = 0;
-        int totalJobProducerServices = 0;
-        Set<String> serviceTypes = new HashSet<String>();
-        for (ServiceStatistics serviceStat : servicesStatistics) {
-          if (server.getBaseUrl().equals(serviceStat.getServiceRegistration().getHost())) {
-            totalServiceOnHost++;
-            jobsCompleted += serviceStat.getFinishedJobs();
-            jobsRunning += serviceStat.getRunningJobs();
-            jobsQueued += serviceStat.getQueuedJobs();
-            sumMeanRuntime += serviceStat.getMeanRunTime();
-            sumMeanQueueTime += serviceStat.getQueuedJobs();
-            if (!serviceStat.getServiceRegistration().isOnline()
-                    && serviceStat.getServiceRegistration().isJobProducer()) {
-              offlineJobProducerServices++;
-              totalJobProducerServices++;
-            } else if (serviceStat.getServiceRegistration().isJobProducer()) {
-              totalJobProducerServices++;
-            }
-            serviceTypes.add(serviceStat.getServiceRegistration().getServiceType());
+    List<JSONObject> servers = new ArrayList<JSONObject>();
+    for (HostRegistration server : serviceRegistry.getHostRegistrations()) {
+      // Get all the services statistics pro host
+      // TODO improve the service registry to get service statistics by host
+      List<ServiceStatistics> servicesStatistics = serviceRegistry.getServiceStatistics();
+      int jobsCompleted = 0;
+      int jobsRunning = 0;
+      int jobsQueued = 0;
+      int sumMeanRuntime = 0;
+      int sumMeanQueueTime = 0;
+      int totalServiceOnHost = 0;
+      int offlineJobProducerServices = 0;
+      int totalJobProducerServices = 0;
+      Set<String> serviceTypes = new HashSet<String>();
+      for (ServiceStatistics serviceStat : servicesStatistics) {
+        if (server.getBaseUrl().equals(serviceStat.getServiceRegistration().getHost())) {
+          totalServiceOnHost++;
+          jobsCompleted += serviceStat.getFinishedJobs();
+          jobsRunning += serviceStat.getRunningJobs();
+          jobsQueued += serviceStat.getQueuedJobs();
+          sumMeanRuntime += serviceStat.getMeanRunTime();
+          sumMeanQueueTime += serviceStat.getMeanQueueTime();
+          if (!serviceStat.getServiceRegistration().isOnline()
+                  && serviceStat.getServiceRegistration().isJobProducer()) {
+            offlineJobProducerServices++;
+            totalJobProducerServices++;
+          } else if (serviceStat.getServiceRegistration().isJobProducer()) {
+            totalJobProducerServices++;
           }
+          serviceTypes.add(serviceStat.getServiceRegistration().getServiceType());
         }
-        int meanRuntime = sumMeanRuntime / totalServiceOnHost;
-        int meanQueueTime = sumMeanQueueTime / totalServiceOnHost;
-
-        boolean vOnline = server.isOnline();
-        boolean vMaintenance = server.isMaintenanceMode();
-        String vName = server.getBaseUrl();
-        int vCores = server.getCores();
-        int vRunning = jobsRunning;
-        int vQueued = jobsQueued;
-        int vCompleted = jobsCompleted;
-
-        if (fOffline && vOnline)
-          continue;
-        if (fOnline && !vOnline)
-          continue;
-        if (fMaintenance && !vMaintenance)
-          continue;
-        if (fMaxJobs > 0 && fMaxJobs < (vRunning + vQueued + vCompleted))
-          continue;
-        if (fCores != null && fCores > 0 && fCores != vCores)
-          continue;
-        if (fMemory != null && fMemory > 0 && ((Integer) fMemory).longValue() != server.getMemory())
-          continue;
-        if (StringUtils.isNotBlank(fPath) && !vName.toLowerCase().contains(fPath.toLowerCase()))
-          continue;
-        if (StringUtils.isNotBlank(fText) && !vName.toLowerCase().contains(fText.toLowerCase())) {
-          String allString = vName.toLowerCase().concat(server.getIpAddress().toLowerCase());
-          if (!allString.contains(fText.toLowerCase()))
-            continue;
-        }
-
-        JSONObject jsonServer = new JSONObject();
-        jsonServer.put(KEY_ONLINE, server.isOnline() && offlineJobProducerServices <= totalJobProducerServices / 2);
-        jsonServer.put(KEY_MAINTENANCE, server.isMaintenanceMode());
-        jsonServer.put(KEY_NAME, server.getBaseUrl());
-        jsonServer.put(KEY_CORES, server.getCores());
-        jsonServer.put(KEY_RUNNING, jobsRunning);
-        jsonServer.put(KEY_QUEUED, jobsQueued);
-        jsonServer.put(KEY_COMPLETED, jobsCompleted);
-        jsonServer.put(KEY_MEAN_RUN_TIME, meanRuntime);
-        jsonServer.put(KEY_MEAN_QUEUE_TIME, meanQueueTime);
-        sortedServers.add(jsonServer);
       }
+      int meanRuntime = totalServiceOnHost > 0 ? sumMeanRuntime / totalServiceOnHost : 0;
+      int meanQueueTime = totalServiceOnHost > 0 ? sumMeanQueueTime / totalServiceOnHost : 0;
+
+      boolean vOnline = server.isOnline();
+      boolean vMaintenance = server.isMaintenanceMode();
+      String vHostname = server.getBaseUrl();
+      int vCores = server.getCores();
+
+      if (query.getHostname().isSome()
+              && !StringUtils.equalsIgnoreCase(vHostname, query.getHostname().get()))
+          continue;
+
+      if (query.getStatus().isSome()) {
+        if (StringUtils.equalsIgnoreCase(
+                ServersListProvider.SERVER_STATUS_ONLINE,
+                query.getStatus().get())
+                && !vOnline)
+          continue;
+        if (StringUtils.equalsIgnoreCase(
+                ServersListProvider.SERVER_STATUS_OFFLINE,
+                query.getStatus().get())
+                && vOnline)
+          continue;
+        if (StringUtils.equalsIgnoreCase(
+                ServersListProvider.SERVER_STATUS_MAINTENANCE,
+                query.getStatus().get())
+                && !vMaintenance)
+          continue;
+      }
+
+      if (query.getFreeText().isSome()
+                && !StringUtils.containsIgnoreCase(vHostname, query.getFreeText().get())
+                && !StringUtils.containsIgnoreCase(server.getIpAddress(), query.getFreeText().get()))
+        continue;
+
+      JSONObject jsonServer = new JSONObject();
+      jsonServer.put(KEY_ONLINE, vOnline && offlineJobProducerServices <= totalJobProducerServices / 2);
+      jsonServer.put(KEY_MAINTENANCE, vMaintenance);
+      jsonServer.put(KEY_HOSTNAME, vHostname);
+      jsonServer.put(KEY_CORES, vCores);
+      jsonServer.put(KEY_RUNNING, jobsRunning);
+      jsonServer.put(KEY_QUEUED, jobsQueued);
+      jsonServer.put(KEY_COMPLETED, jobsCompleted);
+      jsonServer.put(KEY_MEAN_RUN_TIME, meanRuntime);
+      jsonServer.put(KEY_MEAN_QUEUE_TIME, meanQueueTime);
+      servers.add(jsonServer);
     }
 
     // Sorting
     Sort sortKey = Sort.HOSTNAME;
     Boolean ascending = true;
     if (StringUtils.isNotBlank(sort)) {
-      // Parse the sort field and direction
-      org.opencastproject.workflow.api.WorkflowQuery.Sort sortField = null;
-      if (sort.endsWith(DESCENDING_SUFFIX)) {
-        ascending = false;
-        String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
-        try {
-          sortKey = Sort.valueOf(enumKey);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", enumKey);
-        }
-      } else {
-        try {
-          sortKey = Sort.valueOf(sort);
-        } catch (IllegalArgumentException e) {
-          logger.warn("No sort enum matches '{}'", sort);
-        }
+      try {
+        SortCriterion sortCriterion = RestUtils.parseSortQueryParameter(sort).iterator().next();
+        sortKey = Sort.valueOf(sortCriterion.getFieldName().toUpperCase());
+        ascending = SearchQuery.Order.Ascending == sortCriterion.getOrder()
+                || SearchQuery.Order.None == sortCriterion.getOrder();
+      } catch (WebApplicationException ex) {
+        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", new Object[] { sort });
+      } catch (IllegalArgumentException ex) {
+        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", new Object[] { sort });
       }
     }
-    Collections.sort(sortedServers, new ServerComparator(sortKey, ascending));
 
-    jsonList.addAll(sortedServers);
+    JSONArray jsonList = new JSONArray();
+    if (!servers.isEmpty()) {
+      Collections.sort(servers, new ServerComparator(sortKey, ascending));
+      jsonList.addAll(new SmartIterator(
+              query.getLimit().getOrElse(0),
+              query.getOffset().getOrElse(0))
+              .applyLimitAndOffset(servers));
+    }
 
-    JSONObject response = new JSONObject();
-    response.put("results", jsonList);
-    response.put("count", jsonList.size());
-    response.put("offset", offset);
-    response.put("limit", limit);
-    response.put("total", allServers.size());
+    return RestUtils.okJsonList(
+            getServersListAsJson(jsonList),
+            query.getOffset().getOrElse(0),
+            query.getLimit().getOrElse(0),
+            servers.size());
+  }
 
-    return Response.ok(response.toString()).build();
+  /**
+   * Transform each list item to JValue representation.
+   * @param servers list with servers JSONObjects
+   * @return servers list
+   */
+  private List<JValue> getServersListAsJson(List<JSONObject> servers) {
+    List<JValue> jsonServers = new ArrayList<JValue>();
+    for (JSONObject server : servers) {
+      Boolean vOnline = (Boolean) server.get(KEY_ONLINE);
+      Boolean vMaintenance = (Boolean) server.get(KEY_MAINTENANCE);
+      String vHostname = (String) server.get(KEY_HOSTNAME);
+      Integer vCores = (Integer) server.get(KEY_CORES);
+      Integer vRunning = (Integer) server.get(KEY_RUNNING);
+      Integer vQueued = (Integer) server.get(KEY_QUEUED);
+      Integer vCompleted = (Integer) server.get(KEY_COMPLETED);
+      Integer vMeanRunTime = (Integer) server.get(KEY_MEAN_RUN_TIME);
+      Integer vMeanQueueTime = (Integer) server.get(KEY_MEAN_QUEUE_TIME);
+
+      jsonServers.add(j(f(KEY_ONLINE, v(vOnline)),
+              f(KEY_MAINTENANCE, v(vMaintenance)),
+              f(KEY_HOSTNAME, v(vHostname)),
+              f(KEY_CORES, v(vCores)),
+              f(KEY_RUNNING, v(vRunning)),
+              f(KEY_QUEUED, v(vQueued)),
+              f(KEY_COMPLETED, v(vCompleted)),
+              f(KEY_MEAN_RUN_TIME, v(vMeanRunTime)),
+              f(KEY_MEAN_QUEUE_TIME, v(vMeanQueueTime))));
+    }
+    return jsonServers;
   }
 }

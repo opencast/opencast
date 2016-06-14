@@ -22,6 +22,8 @@
 
 package org.opencastproject.composer.impl.ffmpeg;
 
+import static org.apache.commons.lang3.StringUtils.startsWithAny;
+
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.impl.AbstractCmdlineEncoderEngine;
@@ -125,7 +127,6 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
     // Process the commandline. The variables in that commandline might either
     // be replaced by commandline parts from the configuration or commandline
     // parameters as specified at runtime.
-    List<String> argumentList = new ArrayList<String>();
     for (Map.Entry<String, String> entry : format.getExtensions().entrySet()) {
       String key = entry.getKey();
       if (key.startsWith(CMD_SUFFIX) && key.length() > CMD_SUFFIX.length()) {
@@ -139,10 +140,14 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
     // Replace the commandline parameters passed in at compile time
     commandline = processParameters(commandline);
 
+    List<String> argumentList = new ArrayList<String>();
+    // Disable the print of encoding progress/statistics.
+    argumentList.add("-nostats");
     String[] args = commandline.split(" ");
     for (String a : args)
       if (!"".equals(a.trim()))
         argumentList.add(a);
+
     return argumentList;
   }
 
@@ -168,23 +173,21 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
       return;
 
     // Others go to trace logging
-    if (message.startsWith("FFmpeg version") || message.startsWith("configuration") || message.startsWith("lib")
-            || message.startsWith("size=") || message.startsWith("frame=") || message.startsWith("built on"))
-
+    if (startsWithAny(message.toLowerCase(),
+          new String[] {"ffmpeg version", "configuration", "lib", "size=", "frame=", "built with"})) {
       logger.trace(message);
 
     // Some to debug
-    else if (message.startsWith("Input #") || message.startsWith("Duration:") || message.startsWith("Stream #")
-            || message.startsWith("Stream mapping") || message.startsWith("Output #") || message.startsWith("video:")
-            || message.startsWith("Metadata") || message.startsWith("Program")
-            || message.startsWith("Last message repeated")
-            || message.startsWith("PIX_FMT_YUV420P will be used as an intermediate format for rescaling"))
-
+    } else if (startsWithAny(message.toLowerCase(),
+          new String[] { "artist", "compatible_brands", "copyright", "creation_time", "description", "duration",
+            "encoder", "handler_name", "input #", "last message repeated", "major_brand", "metadata", "minor_version",
+            "output #", "program", "side data:", "stream #", "stream mapping", "title", "video:", "[libx264 @ "})) {
       logger.debug(message);
 
     // And the rest is likely to deserve at least info
-    else
+    } else {
       logger.info(message);
+    }
   }
 
   /**

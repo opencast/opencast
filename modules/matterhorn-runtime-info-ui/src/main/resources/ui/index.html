@@ -3,7 +3,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
   <link rel="shortcut icon" href="img/favicon.ico" />
-    <title>Opencast 2.0</title>
+    <title>Opencast</title>
     <script type="text/javascript" src="js/jquery/jquery.js"></script>
     <script type="text/javascript">
     $(document).ready(function() {
@@ -21,7 +21,7 @@
 					            $('#col3m').append('<br /><a class="redbutton" id="captureLink" href="/capture">Go to Capture</a>');
 					            capt = true;
 					          } else if(data.rest[i].description.toLowerCase() == "Confidence Monitoring REST Endpoint".toLowerCase()) {
-					            $('#col4m').append('<br /><a class="redbutton" id="confidenceMonitoringLink" href="/confidence-monitoring">Go to Confidence Monitoring</a>');
+					            $('#col4m').append('<br /><a class="redbutton" id="confidenceMonitoringLink" '
                         + 'href="/confidence-monitoring">Go to Confidence Monitoring</a>');
 					            confMon = true;
 					          }
@@ -58,30 +58,6 @@
                 dbConsistent = false,
                 bundlesConsistent = false;
 
-            $.getJSON("/sysinfo/db/schemaversion", function (data) {
-                var $message = $sysInfoContainer.find("div#db span.message"),
-                    $messageDiv = $sysInfoContainer.find("div#db"),
-                    $dbVersion = $sysInfoContainer.find("#db-version span"),
-                    $dbApplication = $sysInfoContainer.find("#db-application span"),
-                    $dbRequiredVersions = $sysInfoContainer.find("#db-required-version span");
-
-                dbConsistent = data.consistent;
-                checkAndDisplay(data.schemaVersion, $dbVersion);
-                if (data.schemaAppliedAt) {
-                  checkAndDisplay(new Date(data.schemaAppliedAt), $dbApplication);
-                }
-                checkAndDisplay(data.requiredSchemaVersions, $dbRequiredVersions);
-
-                if (data.consistent) {
-                  $message.html("Matterhorn is running with consistent DB schema version.")
-                  $messageDiv.addClass("ok");
-                } else {
-                  $message.html("Different schema versions are required by the bundles. Update the DB to avoid loss or corruption of data.");
-                  $dbVersion.addClass("error");
-                  $dbRequiredVersions.addClass("error");
-                }
-            });
-
             $.getJSON("/sysinfo/bundles/version", function (data) {
                 var $message = $sysInfoContainer.find("div#build span.message"),
                     $messageDiv = $sysInfoContainer.find("div#build"),
@@ -92,15 +68,15 @@
 
 
                 if (data.consistent) {
-                  $message.html("Matterhorn is running with consistent bundles version.");
+                  $message.html("Opencast is running with consistent bundles version.");
                   $messageDiv.addClass("ok");
-                  
+
                   checkAndDisplay(data.version, $version);
                   checkAndDisplay(data.buildNumber, $buildNumber);
                 } else {
-                  $message.html("Matterhorn is running with inconsistent bundles version. Update the deprecated bundles to avoid loss or corruption of data.");
+                  $message.html("Opencast is running with inconsistent bundles version. Update the deprecated bundles to avoid loss or corruption of data.");
                   $buildNumber.addClass("error");
-                  
+
                   if (typeof data.versions !== "undefined") {
                       $.each(data.versions, function (index, element) {
                           if ($.inArray(element.version, versions)) {
@@ -131,8 +107,8 @@
   <body>
     <div id="wrapper">
       <div id="topbanner">
-        <div id="matterhornlogo"><img src="img/mh_logos/MatterhornLogo_large.png" alt="Matterhorn logo" height="180" class="matterhornlogo" /></div>
-        <div id="opencastlogo"><a href="http://www.opencastproject.org"><img src="img/mh_logos/OpencastLogo.png" alt="Opencast" height="36" hspace="20" vspace="5" border="0" /></a></div>
+        <div id="matterhornlogo"><img src="img/logo/opencast-icon.svg" alt="Opencast logo" style="height: 120px; margin: 30px;" /></div>
+        <div id="opencastlogo"><a href="http://www.opencastproject.org"><img src="img/logo/opencast.svg" alt="Opencast" height="36" hspace="20" vspace="5" border="0" /></a></div>
         <h1>Opencast</h1>
         <div id="promotext">
           <p>Opencast is a free, open-source system that provides a lecture capture solution and an enterprise media

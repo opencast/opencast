@@ -36,6 +36,7 @@ import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,13 +73,13 @@ import javax.ws.rs.core.Response;
 public class FileUploadRestService {
 
   // message field names
-  final String REQUESTFIELD_FILENAME = "filename";
-  final String REQUESTFIELD_FILESIZE = "filesize";
-  final String REQUESTFIELD_DATA = "filedata";
-  final String REQUESTFIELD_CHUNKSIZE = "chunksize";
-  final String REQUESTFIELD_CHUNKNUM = "chunknumber";
-  final String REQUESTFIELD_MEDIAPACKAGE = "mediapackage";
-  final String REQUESTFIELD_FLAVOR = "flavor";
+  static final String REQUESTFIELD_FILENAME = "filename";
+  static final String REQUESTFIELD_FILESIZE = "filesize";
+  static final String REQUESTFIELD_DATA = "filedata";
+  static final String REQUESTFIELD_CHUNKSIZE = "chunksize";
+  static final String REQUESTFIELD_CHUNKNUM = "chunknumber";
+  static final String REQUESTFIELD_MEDIAPACKAGE = "mediapackage";
+  static final String REQUESTFIELD_FLAVOR = "flavor";
   private static final Logger log = LoggerFactory.getLogger(FileUploadRestService.class);
   private FileUploadService uploadService;
   private MediaPackageBuilderFactory factory = null;
@@ -125,7 +126,7 @@ public class FileUploadRestService {
           @FormParam(REQUESTFIELD_MEDIAPACKAGE) String mediapackage,
           @FormParam(REQUESTFIELD_FLAVOR) String flav) {
     try {
-      if (filename == null || filename.trim().length() == 0) {
+      if (StringUtils.isBlank(filename)) {
         filename = "john.doe";
       }
       if (filesize < 1) {
@@ -135,12 +136,12 @@ public class FileUploadRestService {
         chunksize = -1;
       }
       MediaPackage mp = null;
-      if (mediapackage != null && !mediapackage.equals("")) {
+      if (StringUtils.isNotBlank(mediapackage)) {
         mp = factory.newMediaPackageBuilder().loadFromXml(mediapackage);
       }
 
       MediaPackageElementFlavor flavor = null;
-      if (flav != null && !flav.equals("")) {
+      if (StringUtils.isNotBlank(flav)) {
         flavor = new MediaPackageElementFlavor(flav.split("/")[0], flav.split("/")[1]);
       }
 
@@ -293,7 +294,7 @@ public class FileUploadRestService {
     StringBuilder sb = new StringBuilder();
     sb.append("Unexpected error (").append(e.getClass().getName()).append(")");
     String message = e.getMessage();
-    if (message != null && message.length() > 0) {
+    if (StringUtils.isNotBlank(message)) {
       sb.append(": ").append(message);
     }
     return sb.toString();

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>2.2-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -203,6 +203,7 @@
               OSGI-INF/list_providers_service.xml,
               OSGI-INF/list-providers/acl.xml,
               OSGI-INF/list-providers/agents.xml,
+              OSGI-INF/list-providers/boolean.xml,
               OSGI-INF/list-providers/comments.xml,
               OSGI-INF/list-providers/contributors.xml,
               OSGI-INF/list-providers/email.xml,
@@ -212,6 +213,8 @@
               OSGI-INF/list-providers/participation.xml,
               OSGI-INF/list-providers/roles.xml,
               OSGI-INF/list-providers/series.xml,
+              OSGI-INF/list-providers/servers.xml,
+              OSGI-INF/list-providers/services.xml,
               OSGI-INF/list-providers/themes.xml,
               OSGI-INF/list-providers/users.xml,
               OSGI-INF/list-providers/workflows.xml

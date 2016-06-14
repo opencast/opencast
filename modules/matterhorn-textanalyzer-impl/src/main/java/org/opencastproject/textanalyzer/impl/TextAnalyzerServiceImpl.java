@@ -217,7 +217,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
               .newElement(Catalog.TYPE, MediaPackageElements.TEXTS);
       catalog.setURI(uri);
 
-      logger.info("Finished text extraction of {}", imageUrl);
+      logger.debug("Created MPEG7 catalog for {}", imageUrl);
 
       return catalog;
     } catch (Exception e) {

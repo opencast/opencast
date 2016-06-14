@@ -24,9 +24,9 @@ package org.opencastproject.helloworld.impl.endpoint;
 import org.opencastproject.helloworld.api.HelloWorldService;
 import org.opencastproject.helloworld.impl.HelloWorldServiceImpl;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.Assert;
 
 import javax.ws.rs.core.Response;
 

@@ -72,6 +72,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+
 public class JobTest {
 
   private static final String JOB_TYPE_1 = "testing1";
@@ -194,6 +195,34 @@ public class JobTest {
     receipt = serviceRegistry.updateJob(receipt);
     long queuedJobs = serviceRegistry.count(JOB_TYPE_1, Status.RUNNING);
     assertEquals(0, queuedJobs);
+  }
+
+  @Test
+  public void testGetActiveJobs() throws Exception {
+    Job job = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_1, OPERATION_NAME, null, null, false, null);
+    job.setStatus(Status.RUNNING);
+    job = serviceRegistry.updateJob(job);
+
+    job = serviceRegistry.createJob(LOCALHOST, JOB_TYPE_2, OPERATION_NAME, null, null, false, null);
+    job.setStatus(Status.RUNNING);
+    job = serviceRegistry.updateJob(job);
+
+    // Search using both the job type and status
+    List<Job> jobs = serviceRegistry.getActiveJobs();
+    assertEquals(2, jobs.size());
+
+    long jobId = jobs.get(0).getId();
+    for (Status status : Status.values()) {
+      job = serviceRegistry.getJob(jobId);
+      job.setStatus(status);
+      serviceRegistry.updateJob(job);
+
+      jobs = serviceRegistry.getActiveJobs();
+      if (status.isActive())
+        assertEquals(2, jobs.size());
+      else
+        assertEquals(1, jobs.size());
+    }
   }
 
   @Test

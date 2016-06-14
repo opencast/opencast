@@ -56,8 +56,11 @@ angular.module('adminNg.controllers')
         $scope.player = {};
         $scope.video  = ToolsResource.get({ id: $scope.id, tool: 'editor' });
 
+        $scope.submitButton = false;
         $scope.submit = function () {
+            $scope.submitButton = true;
             $scope.video.$save({ id: $scope.id, tool: $scope.tab }, function () {
+                $scope.submitButton = false;
                 if ($scope.video.workflow) {
                     Notifications.add('success', 'VIDEO_CUT_PROCESSING');
                 } else {
@@ -65,6 +68,7 @@ angular.module('adminNg.controllers')
                 }
                 $location.url('/events/' + $scope.resource);
             }, function () {
+                $scope.submitButton = false;
                 Notifications.add('error', 'VIDEO_CUT_NOT_SAVED', 'video-tools');
             });
         };

@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>2.2-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -252,39 +252,6 @@
             <!--<param>org.opencastproject.mediapackage*Test</param>-->
           </targetTests>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <skip>${checkstyle.skip}</skip>
-          <configLocation>${matterhorn.basedir}/docs/checkstyle/matterhorn-checkstyle.xml</configLocation>
-          <headerLocation>${matterhorn.basedir}/docs/checkstyle/matterhorn-header.txt</headerLocation>
-          <includeTestSourceDirectory>true</includeTestSourceDirectory>
-          <consoleOutput>true</consoleOutput>
-          <logViolationsToConsole>true</logViolationsToConsole>
-          <!-- disabled checking PersistenceUtil/PersistenceEnvs because of this strange error:
-               /modules/matterhorn-common/src/main/java/org/opencastproject/util/persistence/PersistenceUtil.java
-               200:9   expecting EOF, found 'try' -->
-          <excludes>
-            **/ProcessRunner.java,
-            **/StreamConsumer.java,
-            **/package-info.java,
-            **/PersistenceUtil.java,
-            **/PersistenceEnvs.java,
-            **/JaxbIncident*.java
-          </excludes>
-          <failOnViolation>true</failOnViolation>
-          <failsOnError>true</failsOnError>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>validate</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>

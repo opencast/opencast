@@ -33,32 +33,32 @@ import java.util.List;
 
 /**
  * Uses the bundle for finding files in the bundle's classpath.
- * 
+ *
  * @author ademasi
- * 
+ *
  */
 public class ClassPathInspector implements PathInspector {
-    private Bundle bundle;
+  private Bundle bundle;
 
-    public ClassPathInspector() {
-    };
+  public ClassPathInspector() {
+  };
 
-    public ClassPathInspector(Bundle bundle) {
-        this.bundle = bundle;
+  public ClassPathInspector(Bundle bundle) {
+    this.bundle = bundle;
+  }
+
+  @Override
+  public List<String> listFiles(String path) throws IllegalPathException {
+    Enumeration<?> entries = bundle.findEntries(path, "*", false);
+    return toList(entries);
+  }
+
+  private List<String> toList(Enumeration<?> entries) {
+    List<String> result = new ArrayList<String>();
+    while (entries.hasMoreElements()) {
+      URL file = (URL) entries.nextElement();
+      result.add(file.getPath().replaceAll(LanguageServiceImpl.TRANSLATION_FILES_PATH, "").replaceAll("/", ""));
     }
-
-    @Override
-    public List<String> listFiles(String path) throws IllegalPathException {
-        Enumeration<?> entries = bundle.findEntries(path, "*", false);
-        return toList(entries);
-    }
-
-    private List<String> toList(Enumeration<?> entries) {
-        List<String> result = new ArrayList<String>();
-        while (entries.hasMoreElements()) {
-            URL file = (URL) entries.nextElement();
-            result.add(file.getPath().replaceAll(LanguageServiceImpl.TRANSLATION_FILES_PATH, "").replaceAll("/", ""));
-        }
-        return result;
-    }
+    return result;
+  }
 }

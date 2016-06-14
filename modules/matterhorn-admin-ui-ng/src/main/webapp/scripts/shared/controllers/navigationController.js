@@ -35,10 +35,6 @@ angular.module('adminNg.controllers')
             Language.changeLanguage(key);
         };
 
-        $scope.toLanguageClass = function (language) {
-            return Language.$convertLanguageToCode(language.code);
-        };
-
         $rootScope.$on('language-changed', function () {
             $scope.currentLanguageCode = Language.getLanguageCode();
             $scope.currentLanguageName = Language.getLanguage().displayLanguage;

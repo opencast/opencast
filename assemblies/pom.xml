@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>2.2-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -23,6 +23,7 @@
   <modules>
     <module>karaf-features</module>
     <module>dist-admin</module>
+    <module>dist-adminworker</module>
     <module>dist-allinone</module>
     <module>dist-ingest</module>
     <module>dist-presentation</module>
@@ -59,7 +60,7 @@
               <fileset>
                 <directory>${opencast.basedir}/build/</directory>
                 <includes>
-                  <include>${project.artifactId}*.tar.gz</include>
+                  <include>${project.artifactId}-*.tar.gz</include>
                   <include>${project.artifactId}-*/</include>
                 </includes>
               </fileset>

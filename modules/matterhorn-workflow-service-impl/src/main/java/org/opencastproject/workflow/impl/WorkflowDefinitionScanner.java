@@ -101,7 +101,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
       }
     }
 
-    logger.info("Installing workflow from file '{}'", artifact.getName());
+    logger.debug("Installing workflow from file '{}'", artifact.getName());
     artifactsWithError.remove(artifact);
     artifactIds.put(artifact, def.getId());
     putWorkflowDefinition(def.getId(), def);

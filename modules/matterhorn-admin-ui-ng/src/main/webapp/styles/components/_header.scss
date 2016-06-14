@@ -35,7 +35,7 @@
     .header-branding {
         width: 200px;
         float: left;
-        padding: 16px 20px 18px;
+        padding: 14px 20px 14px;
     }
 
     .logo {
@@ -157,8 +157,9 @@
         @include fa-icon($fa-power-off, $icon-pesudo-position, $icon-display-value, 0 14px 0 0, 0, $icon-color, $icon-font-size);
     }
 
-    .help {
-        @include build-icon(auto, auto, help, 18px, 18px);
+    .fa {
+        color: #fff;
+        font-size: 20px;
     }
 
     // Language Dropdown
@@ -171,41 +172,27 @@
     }
 
     // Language Flags
+    @mixin flag-style($size) {
+        height: $size;
+        vertical-align: middle;
+        border-radius: 1px;
+        border: 1px solid gray;
+    }
+
     .lang {
         display: inline-block;
         vertical-align: middle;
         margin-right: 10px;
-
-        $size: 24px;
-
-        &.en {
-            @include build-icon(auto, auto, english, $size, $size);
-        }
-
-        &.de {
-            @include build-icon(auto, auto, german, $size, $size);
-        }
-
-        &.fr {
-            @include build-icon(auto, auto, french, $size, $size);
-        }
-
-        &.es {
-            @include build-icon(auto, auto, spanish, $size, $size);
-        }
-
-        &.no {
-            @include build-icon(auto, auto, norwegian, $size, $size);
-        }
-
-        &.ja {
-            @include build-icon(auto, auto, japanese, $size, $size);
-        }
-
-        &.zh {
-            @include build-icon(auto, auto, chinese, $size, $size);
+        img {
+            @include flag-style(18px);
         }
     }
+
+    .lang-flag {
+        @include flag-style(16px);
+        margin-right: 5px;
+    }
+
 }
 
 // Dropdown Icon

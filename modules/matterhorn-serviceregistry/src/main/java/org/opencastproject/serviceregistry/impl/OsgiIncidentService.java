@@ -21,7 +21,6 @@
 
 package org.opencastproject.serviceregistry.impl;
 
-import static java.lang.String.format;
 import static org.opencastproject.util.IoSupport.loadPropertiesFromUrl;
 import static org.opencastproject.util.data.Monadics.mlist;
 
@@ -142,8 +141,8 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
   private static final String PROPERTIES_GLOB = "*.properties";
 
   private void storeIncidentTexts(Bundle bundle) {
-    logger.info(format("Scanning bundle %s, (ID %d) for incident localizations", bundle.getSymbolicName(),
-            bundle.getBundleId()));
+    logger.debug("Scanning bundle {}, (ID {}) for incident localizations", bundle.getSymbolicName(),
+        bundle.getBundleId());
     final Enumeration l10n = bundle.findEntries(INCIDENT_L10N_DIR, PROPERTIES_GLOB, false);
     while (l10n != null && l10n.hasMoreElements()) {
       final URL resourceUrl = (URL) l10n.nextElement();
@@ -158,7 +157,7 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
       for (String key : texts.stringPropertyNames()) {
         final String text = texts.getProperty(key);
         final String dbKey = mlist(keyBase, key).concat(locale).mkString(".");
-        logger.debug(format("Storing text %s=%s", dbKey, text));
+        logger.debug("Storing text {}={}", dbKey, text);
         penv.tx(Queries.persistOrUpdate(IncidentTextDto.mk(dbKey, text)));
       }
     }

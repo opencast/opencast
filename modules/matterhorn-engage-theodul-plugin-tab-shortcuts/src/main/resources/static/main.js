@@ -97,15 +97,16 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
 
     /* don't change these variables */
     var shortcuts = new Array();
-    var initCount = 4;
+    var categories = new Array();
+    var initCount = 3;
     var infoMeChange = "change:infoMe";
     var mediapackageChange = "change:mediaPackage";
     var translations = new Array();
     var mediapackageError = false;
     var shortcutsParsed = false;
-    var Utils;
+    var categoriesParsed = false;
 
-    function initTranslate(language, funcSuccess, funcError) {
+    function initTranslate(language) {
         var path = Engage.getPluginPath("EngagePluginTabShortcuts").replace(/(\.\.\/)/g, "");
         var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
 
@@ -118,18 +119,6 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
                 if (data) {
                     data.value_locale = language;
                     translations = data;
-                    if (funcSuccess) {
-                        funcSuccess(translations);
-                    }
-                } else {
-                    if (funcError) {
-                        funcError();
-                    }
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                if (funcError) {
-                    funcError();
                 }
             }
         });
@@ -158,6 +147,7 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
                     str_shortcutName: translate("name", "Shortcut name"),
                     str_shortcut: translate("shortcut", "Shortcut"),
                     shortcuts: shortcuts,
+                    categories: categories,
                     str_shortcuts: translate("shortcuts", "Shortcuts")
                 };
 
@@ -196,23 +186,46 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
 
     function prepareShortcuts() {
         if (!shortcutsParsed) {
+            prepareCategories();
             var scuts = Engage.model.get("meInfo").get("shortcuts");
             if (scuts) {
-                scuts.sort(Utils.shortcutsCompare);
                 $.each(scuts, function(i, v) {
-                    shortcuts.push({
-                        name: translate(v.name, v.name),
-                        val: translateKeyboardCombination(v.key, "+")
-                    });
+                    var cat = v.name.split(".")[0]
+                    if (cat !== undefined && shortcuts[cat] !== undefined) {
+                        shortcuts[cat].push({
+                            name: translate(v.name, v.name),
+                            val: translateKeyboardCombination(v.key, "+")
+                        });
+                    }
                 });
                 shortcutsParsed = true;
             }
         }
     }
 
+    function prepareCategories() {
+        if (!categoriesParsed) {
+            var categorySequenceString = Engage.model.get("meInfo").get("shortcut-sequence");            
+            var categorySequence = new Array();
+            if (typeof categorySequenceString !== "undefined") 
+                categorySequence = categorySequenceString.split(',');
+            if (categorySequence) {
+                $.each(categorySequence, function(i, v) {
+                    categories.push({
+                        name: translate(v, v),
+                        val: v
+                    });
+                    shortcuts[v] = new Array();
+                });
+                categoriesParsed = true;
+            }
+        }
+    }    
+
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
         if (isDesktopMode && plugin.inserted) {
+            initTranslate(Engage.model.get("language"));
             // create a new view with the media package model and the template
             var shortcutsTabView = new ShortcutsTabView(Engage.model.get("mediaPackage"), plugin.template);
             Engage.on(plugin.events.mediaPackageModelError.getName(), function(msg) {
@@ -225,25 +238,6 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
         // init event
         Engage.log("Tab:Shortcuts: Init");
         var relative_plugin_path = Engage.getPluginPath("EngagePluginTabShortcuts");
-
-        // load utils class
-        require([relative_plugin_path + "utils"], function(utils) {
-            Engage.log("Tab:Shortcuts: Utils class loaded");
-            Utils = new utils();
-            initTranslate(Utils.detectLanguage(), function() {
-                Engage.log("Tab:Shortcuts: Successfully translated.");
-                initCount -= 1;
-                if (initCount <= 0) {
-                    initPlugin();
-                }
-            }, function() {
-                Engage.log("Tab:Shortcuts: Error translating...");
-                initCount -= 1;
-                if (initCount <= 0) {
-                    initPlugin();
-                }
-            });
-        });
 
         // listen on a change/set of the mediaPackage model
         Engage.model.on(mediapackageChange, function() {

@@ -87,17 +87,23 @@ public class TestJobEndpoint extends JobEndpoint {
     workflowSet.setTotalCount(3);
 
     List<Job> jobs = new ArrayList<Job>();
-    jobs.add(createJob(1, Status.RUNNING, ComposerService.JOB_TYPE, "test"));
-    jobs.add(createJob(2, Status.RUNNING, WorkflowService.JOB_TYPE, "START_WORKFLOW"));
-    jobs.add(createJob(3, Status.RUNNING, WorkflowService.JOB_TYPE, "RESUME"));
-    jobs.add(createJob(4, Status.RUNNING, MediaInspectionService.JOB_TYPE, "Inspect"));
+    jobs.add(createJob(1, Status.RUNNING, ComposerService.JOB_TYPE, "test",
+            "2014-06-05T09:10:00Z", "2014-06-05T09:10:00Z", "testuser1", "host1"));
+    jobs.add(createJob(2, Status.RUNNING, WorkflowService.JOB_TYPE, "START_WORKFLOW",
+            "2014-06-05T09:16:00Z", "2014-06-05T09:16:00Z", "testuser1", "host3"));
+    jobs.add(createJob(3, Status.RUNNING, WorkflowService.JOB_TYPE, "RESUME",
+            "2014-06-05T09:11:11Z", "2014-06-05T09:11:11Z", "testuser2", "host3"));
+    jobs.add(createJob(4, Status.RUNNING, MediaInspectionService.JOB_TYPE, "Inspect",
+            "2014-06-05T09:16:00Z", "2014-06-05T09:16:00Z", "testuser1", "host2"));
+    jobs.add(createJob(5, Status.RUNNING, ComposerService.JOB_TYPE, "Encode",
+            "2014-06-05T09:05:00Z", "2014-06-05T09:05:00Z", "testuser3", "host1"));
+
 
     EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job).anyTimes();
     EasyMock.expect(workflowService.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class)))
             .andReturn(workflowSet).anyTimes();
     EasyMock.expect(workflowService.countWorkflowInstances()).andReturn(workflowSet.size()).anyTimes();
-    EasyMock.expect(serviceRegistry.getJobs(EasyMock.anyString(), EasyMock.anyObject(Status.class))).andReturn(jobs)
-            .anyTimes();
+    EasyMock.expect(serviceRegistry.getActiveJobs()).andReturn(jobs).anyTimes();
 
     EasyMock.replay(workflowService);
     EasyMock.replay(serviceRegistry);
@@ -107,16 +113,18 @@ public class TestJobEndpoint extends JobEndpoint {
     this.activate(null);
   }
 
-  private Job createJob(int id, Status status, String jobType, String operation) throws Exception {
-    Date date = new Date(DateTimeSupport.fromUTC("2014-06-05T09:15:56Z"));
+  private Job createJob(int id, Status status, String jobType, String operation,
+          String created, String started, String creator, String hostname) throws Exception {
+    Date createdDate = new Date(DateTimeSupport.fromUTC(created));
+    Date startedDate = new Date(DateTimeSupport.fromUTC(started));
     Job job = new JobImpl(id);
     job.setStatus(status);
     job.setJobType(jobType);
     job.setOperation(operation);
-    job.setCreator("testuser");
-    job.setProcessingHost("host");
-    job.setDateCreated(date);
-    job.setDateStarted(date);
+    job.setCreator(creator);
+    job.setProcessingHost(hostname);
+    job.setDateCreated(createdDate);
+    job.setDateStarted(startedDate);
     return job;
   }
 

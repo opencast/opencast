@@ -120,6 +120,9 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   /** The load introduced on the system by creating a delete job */
   private float deleteJobLoad = DEFAULT_DELETE_JOB_LOAD;
 
+  /** counter how often the index has already been tried to populate */
+  private int retriesToPopulateIndex = 0;
+
   /** List of available operations on jobs */
   private enum Operation {
     Add, Delete
@@ -529,6 +532,10 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           indexManager.add(mediaPackage.getA(), acl, deletionDate, modificationDate);
         } catch (Exception e) {
           logger.error("Unable to index search instances: {}", e);
+          if (retryToPopulateIndex(systemUserName)) {
+            logger.warn("Trying to re-index search index later. Aborting for now.");
+            return;
+          }
           errors++;
         } finally {
           securityService.setOrganization(null);
@@ -539,6 +546,38 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
         logger.error("Skipped {} erroneous search entries while populating the search index", errors);
       logger.info("Finished populating search index");
     }
+  }
+
+  private boolean retryToPopulateIndex(final String systemUserName) {
+    if (retriesToPopulateIndex > 0) {
+      return false;
+    }
+
+    long instancesInSolr = 0L;
+
+    try {
+      instancesInSolr = indexManager.count();
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
+
+    if (instancesInSolr > 0) {
+      logger.debug("Search index found, other files could be indexed. No retry needed.");
+      return false;
+    }
+
+    retriesToPopulateIndex++;
+
+      new Thread() {
+        public void run() {
+          try {
+            Thread.sleep(30000);
+          } catch (InterruptedException ex) {
+          }
+          populateIndex(systemUserName);
+        }
+      }.start();
+    return true;
   }
 
   /**

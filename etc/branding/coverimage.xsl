@@ -31,6 +31,9 @@
           .presentor, .presentationdate {
             font-size: 1.2em;
           }
+          .description {
+            font-size: 0.5em;
+          }          
           .license {
             font-size: 0.8em;
           }
@@ -78,8 +81,11 @@
         <tspan class="presentor" dy="12%" x="50%">
           <xsl:value-of select="metadata/creators" />
         </tspan>
+        <tspan class="description" dy="12%" x="50%">
+          <xsl:value-of select="metadata/description" />
+        </tspan>        
         <tspan class="presentationdate" dy="12%" x="50%">
-          <xsl:value-of select="metadata/date" />
+          <xsl:value-of select="metadata/date" />, <xsl:value-of select="metadata/time" />
         </tspan>
         <tspan class="license" dy="10%" x="50%">
           <xsl:value-of select="metadata/license" />

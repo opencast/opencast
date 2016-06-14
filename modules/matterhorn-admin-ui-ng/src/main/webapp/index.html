@@ -32,21 +32,35 @@
     <body ng-cloak ng-controller="ApplicationCtrl" ng-click="bodyClicked()">
         <header ng-controller="NavCtrl" class="primary-header">
             <div class="header-branding">
-                <img src="img/opencast_logo_white.png" width="100px" height="20px" alt="Opencast logo" />
+                <a href="/" target="_self">
+                    <img src="img/opencast-white.svg" height="20px" alt="Opencast Logo" />
+                </a>
             </div>
             <nav class="header-nav nav-dd-container" id="nav-dd-container">
                 <div class="nav-dd lang-dd" id="lang-dd" old-admin-ng-dropdown="">
-                    <div class="lang" ng-class="currentLanguageCode"></div>
+                    <div class="lang" ng-class="currentLanguageCode">
+                        <img ng-attr-src="img/lang/{{ currentLanguageCode }}.svg"
+                            ng-attr-alt="{{ currentLanguageCode }}" />
+                    </div>
                     <ul class="dropdown-ul">
                         <li><a href="#" ng-repeat="language in availableLanguages | orderBy:'displayLanguage'"
                             ng-click="changeLanguage(language.code)">
-                        <i class="lang {{ toLanguageClass(language) }}"></i>{{ language.displayLanguage }}</a>
+                            <img class=lang-flag ng-attr-src="img/lang/{{ language.code }}.svg"
+                                ng-attr-alt="{{ language.code }}" />
+                            {{ language.displayLanguage }}</a>
                         </li>
                     </ul>
                 </div>
 
-                <div ng-if="documentationUrl || restdocsUrl" class="nav-dd" id="help-dd" old-admin-ng-dropdown="">
-                    <div class="help"></div>
+                <div ng-if="mediaModuleUrl" class="nav-dd" title="{{ 'MEDIAMODULE' | translate}}">
+                    <a ng-click="toURL(mediaModuleUrl)" href="{{mediaModuleUrl}}">
+                        <span class="fa fa-play-circle-o"><!-- Media Module --></span>
+                    </a>
+                </div>
+
+                <div ng-if="documentationUrl || restdocsUrl" title="{{ 'HELP.HELP' | translate}}" class="nav-dd"
+                    id="help-dd" old-admin-ng-dropdown="">
+                    <div class="fa fa-question-circle"></div>
                     <ul class="dropdown-ul">
                         <li ng-if="documentationUrl">
                         <a ng-click="toURL(documentationUrl)" href="{{documentationUrl}}">
@@ -54,7 +68,7 @@
                         </a>
                         </li>
                         <li ng-if="restdocsUrl" with-role="ROLE_ADMIN">
-                        <a ng-click="toURL(restdocsUrl)" href="{{restdocsUrl}}">
+                        <a target="_self" ng-click="toURL(restdocsUrl)" href="{{restdocsUrl}}">
                             <span translate="HELP.REST_DOC"><!-- REST Doc --></span>
                         </a>
                         </li>
@@ -65,13 +79,8 @@
                     <div class="h-nav dropdown-icon">{{ currentUser.user.name || currentUser.user.username }}</div>
                     <ul class="dropdown-ul">
                         <li>
-                        <a data-open-modal="user-preferences">
-                            <span class="cogs-icon" translate="PREFERENCES.CAPTION">Preferences</span>
-                        </a>
-                        </li>
-                        <li>
                         <a ng-click="logout()">
-                                <span class="logout-icon" translate="LOGOUT">Logout</span>
+                            <span class="logout-icon" translate="LOGOUT">Logout</span>
                         </a>
                         </li>
                     </ul>
@@ -205,6 +214,7 @@
         <script src="scripts/shared/services/wizards/new-event/processing.js"></script>
         <script src="scripts/shared/services/wizards/new-event/source.js"></script>
         <script src="scripts/shared/services/wizards/new-event/summary.js"></script>
+        <script src="scripts/shared/services/wizards/new-event/states.js"></script>
         <script src="scripts/shared/services/wizards/new-group/summary.js"></script>
         <script src="scripts/shared/services/wizards/new-group/users.js"></script>
         <script src="scripts/shared/services/wizards/new-group/roles.js"></script>

@@ -181,7 +181,7 @@
     <footer ng-if="currentForm === 'summaryForm'">
         <a ng-click="submit()"
             data-modal-tab="next" class="submit"
-            ng-class="{active: summaryForm.$valid, inactive: summaryForm.$invalid}">
+            ng-class="{active: summaryForm.$valid, inactive: summaryForm.$invalid, disabled: submitButton}">
             {{ 'WIZARD.RETRACT' | translate }}
         </a>
         <a ng-click="navigateTo('retractForm', currentForm, [])"

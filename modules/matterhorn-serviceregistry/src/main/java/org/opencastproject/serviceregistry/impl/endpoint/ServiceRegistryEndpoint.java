@@ -36,6 +36,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.serviceregistry.api.HostRegistration;
+import org.opencastproject.serviceregistry.api.JaxbHostRegistration;
 import org.opencastproject.serviceregistry.api.JaxbHostRegistrationList;
 import org.opencastproject.serviceregistry.api.JaxbServiceRegistration;
 import org.opencastproject.serviceregistry.api.JaxbServiceRegistrationList;
@@ -393,7 +394,7 @@ public class ServiceRegistryEndpoint {
     JaxbHostRegistrationList registrations = new JaxbHostRegistrationList();
     try {
       for (HostRegistration reg : serviceRegistry.getHostRegistrations())
-        registrations.add(reg);
+        registrations.add(new JaxbHostRegistration(reg));
       return registrations;
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
@@ -525,6 +526,36 @@ public class ServiceRegistryEndpoint {
       throw new WebApplicationException(e);
     }
 
+  }
+
+  @GET
+  @Path("activeJobs.xml")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "activejobsasxml",
+          description = "Returns all active jobs as XML.",
+          returnDescription = "A list of active jobs as XML",
+          reponses = { @RestResponse(responseCode = SC_OK, description = "Active jobs found.") })
+  public JaxbJobList getActiveJobsAsXml() {
+    try {
+      return new JaxbJobList(serviceRegistry.getActiveJobs());
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @GET
+  @Path("activeJobs.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "activejobsasjson",
+          description = "Returns all active jobs as JSON.",
+          returnDescription = "A list of active jobs as JSON",
+          reponses = { @RestResponse(responseCode = SC_OK, description = "Active jobs found.") })
+  public JaxbJobList getActiveJobsAsJson() {
+    try {
+      return new JaxbJobList(serviceRegistry.getActiveJobs());
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
   }
 
   @GET

@@ -49,6 +49,7 @@ import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
@@ -61,6 +62,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.client.utils.URIUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -103,17 +105,18 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String STREAMING_SOURCE_FLAVORS = "streaming-source-flavors";
   private static final String STREAMING_TARGET_SUBFLAVOR = "streaming-target-subflavor";
   private static final String CHECK_AVAILABILITY = "check-availability";
+  private static final String STRATEGY = "strategy";
 
   //itbwpdk start
   /** Distribution delay between elements for engage */
-  private static final String DISTRIBUTION_DELAY__PROPERTY = "org.opencastproject.distribution.delay";
+  private static final String DISTRIBUTION_DELAY_PROPERTY = "org.opencastproject.distribution.delay";
+
+  /** Distribution delay default value */
+  private static final int DISTRIBUTION_DELAY_DEFAULT = 1000;
 
   /** Distribution delay between elements for engage */
   private int distributionDelay = 0;
   //itbwpdk end
-
-  /** Workflow configuration option keys to only merge or overwrite element in exiting mediapackage */
-  private static final String OPT_MERGE_ONLY = "merge-only";
 
   /** The streaming distribution service */
   private DistributionService streamingDistributionService = null;
@@ -184,8 +187,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
             "Add all of these comma separated tags to elements that have been distributed for download.");
     CONFIG_OPTIONS.put(CHECK_AVAILABILITY,
             "( true | false ) defaults to true. Check if the distributed download artifact is available at its URL");
-    CONFIG_OPTIONS.put(OPT_MERGE_ONLY,
-            "Republish only if it can be merged with or replace existing published data");
+    CONFIG_OPTIONS.put(STRATEGY,
+            "Strategy if there is an existing Publication");
   }
 
   @Override
@@ -193,17 +196,11 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     super.activate(cc);
     BundleContext bundleContext = cc.getBundleContext();
 
-    // Get element distribution delay
-    if (StringUtils.isNotBlank(bundleContext.getProperty(DISTRIBUTION_DELAY__PROPERTY))) {
-      distributionDelay = Integer.parseInt(bundleContext.getProperty(DISTRIBUTION_DELAY__PROPERTY));
-    } else {
-      distributionDelay = 0;
-    }
-
+    // Get configuration
+    distributionDelay = NumberUtils.toInt(bundleContext.getProperty(DISTRIBUTION_DELAY_PROPERTY),
+        DISTRIBUTION_DELAY_DEFAULT);
     serverUrl = UrlSupport.url(bundleContext.getProperty(SERVER_URL_PROPERTY));
-
-    if (StringUtils.isNotBlank(bundleContext.getProperty(STREAMING_URL_PROPERTY)))
-      distributeStreaming = true;
+    distributeStreaming = StringUtils.isNotBlank(bundleContext.getProperty(STREAMING_URL_PROPERTY));
   }
 
   /**
@@ -239,6 +236,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     String streamingTargetTags = StringUtils.trimToEmpty(op.getConfiguration(STREAMING_TARGET_TAGS));
     String streamingSourceFlavors = StringUtils.trimToEmpty(op.getConfiguration(STREAMING_SOURCE_FLAVORS));
     String streamingTargetSubflavor = StringUtils.trimToNull(op.getConfiguration(STREAMING_TARGET_SUBFLAVOR));
+    String republishStrategy = StringUtils.trimToEmpty(op.getConfiguration(STRATEGY));
+
     boolean checkAvailability = option(op.getConfiguration(CHECK_AVAILABILITY)).bind(trimToNone).map(toBool)
             .getOrElse(true);
 
@@ -321,7 +320,17 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         }
       }
 
+      removePublicationElement(mediaPackage);
+        switch (republishStrategy) {
+          case ("merge"):
+              // nothing to do here. other publication strategies can be added to this list later on
+            break;
+          default:
+            retractFromEngage(mediaPackage);
+        }
+
       List<Job> jobs = new ArrayList<Job>();
+//distribute Elements
       try {
         for (String elementId : downloadElementIds) {
           logger.info("Element distribution delay, sleeping for " +  Integer.toString(distributionDelay));
@@ -358,14 +367,18 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
                 targetDownloadTags, downloadElementIds, streamingSubflavor, streamingElementIds, targetStreamingTags);
 
         // MH-10216, check if only merging into existing mediapackage
-        boolean merge = Boolean.parseBoolean(workflowInstance.getCurrentOperation().getConfiguration(OPT_MERGE_ONLY));
-        if (merge) {
-          // merge() returns merged mediapackage or null mediaPackage is not published
-          mediaPackageForSearch = merge(mediaPackageForSearch);
-          if (mediaPackageForSearch == null) {
-            logger.info("Skipping republish for {} since it is not currently published", mediaPackage.getIdentifier().toString());
-            return createResult(mediaPackage, Action.SKIP);
-          }
+        removePublicationElement(mediaPackage);
+        switch (republishStrategy) {
+          case ("merge"):
+            // merge() returns merged mediapackage or null mediaPackage is not published
+            mediaPackageForSearch = merge(mediaPackageForSearch);
+            if (mediaPackageForSearch == null) {
+              logger.info("Skipping republish for {} since it is not currently published", mediaPackage.getIdentifier().toString());
+              return createResult(mediaPackage, Action.SKIP);
+            }
+            break;
+          default:
+          // nothing to do here
         }
 
         if (!isPublishable(mediaPackageForSearch))
@@ -590,6 +603,26 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     return hasTitle && hasTracks;
   }
 
+  protected MediaPackage getDistributedMediapackage(String mediaPackageID) throws WorkflowOperationException {
+    MediaPackage mediaPackage = null;
+    SearchQuery query = new SearchQuery().withId(mediaPackageID);
+    query.includeEpisodes(true);
+    query.includeSeries(false);
+    SearchResult result = searchService.getByQuery(query);
+    if (result.size() == 0) {
+      logger.info("The search service doesn't know mediapackage {}.", mediaPackageID);
+      return mediaPackage; // i.e. null
+    } else if (result.size() > 1) {
+      logger.warn("More than one mediapackage with id {} returned from search service", mediaPackageID);
+      throw new WorkflowOperationException("More than one mediapackage with id " + mediaPackageID + " found");
+    } else {
+      // else, merge the new with the existing (new elements will overwrite existing elements)
+      mediaPackage = result.getItems()[0].getMediaPackage();
+    }
+    return mediaPackage;
+  }
+
+
   /**
    * MH-10216, method copied from the original RepublishWorkflowOperationHandler
    * Merges mediapackage with published mediapackage.
@@ -600,20 +633,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    */
   protected MediaPackage merge(MediaPackage mediaPackageForSearch) throws WorkflowOperationException {
     MediaPackage mergedMediaPackage = null;
-      SearchQuery query = new SearchQuery().withId(mediaPackageForSearch.toString());
-      query.includeEpisodes(true);
-      query.includeSeries(false);
-      SearchResult result = searchService.getByQuery(query);
-      if (result.size() == 0) {
-        logger.info("The search service doesn't know mediapackage {}, cannot be republished.", mediaPackageForSearch);
-        return mergedMediaPackage; // i.e. null
-      } else if (result.size() > 1) {
-        logger.warn("More than one mediapackage with id {} returned from search service", mediaPackageForSearch);
-        throw new WorkflowOperationException("More than one mediapackage with id " + mediaPackageForSearch + " found");
-      } else {
-        // else, merge the new with the existing (new elements will overwrite existing elements)
-        mergedMediaPackage = mergePackages(mediaPackageForSearch, result.getItems()[0].getMediaPackage());
-      }
+    mergedMediaPackage = mergePackages(mediaPackageForSearch,
+            getDistributedMediapackage(mediaPackageForSearch.toString()));
 
     return mergedMediaPackage;
   }
@@ -651,6 +672,60 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     }
 
     return mergedMediaPackage;
+  }
+
+  private void removePublicationElement(MediaPackage mediaPackage) {
+    for (Publication publicationElement : mediaPackage.getPublications()) {
+        if (CHANNEL_ID.equals(publicationElement.getChannel())) {
+            mediaPackage.remove(publicationElement);
+        }
+    }
+  }
+
+/**
+ * Removes every Publication for Searchindex from Mediapackage
+ * Removes Mediapackage from Searchindex
+ * @param mediaPackage Mediapackage
+ * @param mediaPackageForSearch Mediapackage prepared for searchIndex
+ * @throws WorkflowOperationException
+ */
+  private void retractFromEngage(MediaPackage mediaPackage) throws WorkflowOperationException {
+    List<Job> jobs = new ArrayList<Job>();
+    try {
+      MediaPackage distributedMediaPackage = getDistributedMediapackage(mediaPackage.toString());
+      if (distributedMediaPackage != null) {
+        for (MediaPackageElement element : distributedMediaPackage.getElements()) {
+         logger.info("Element distribution delay, sleeping for " + Integer.toString(distributionDelay));
+         Thread.sleep(distributionDelay);
+         Job retractDownloadJob = downloadDistributionService.retract(CHANNEL_ID, distributedMediaPackage, element.getIdentifier());
+         if (retractDownloadJob != null) {
+           jobs.add(retractDownloadJob);
+         }
+         if (distributeStreaming) {
+           Job retractStreamingJob = streamingDistributionService.retract(CHANNEL_ID, distributedMediaPackage, element.getIdentifier());
+           if (retractStreamingJob != null) {
+             jobs.add(retractStreamingJob);
+           }
+         }
+        }
+        Job deleteSearchJob = null;
+        logger.info("Retracting already published Elements for Mediapackage: {}", mediaPackage.getIdentifier().toString());
+        deleteSearchJob = searchService.delete(mediaPackage.getIdentifier().toString());
+        if (deleteSearchJob != null) {
+          jobs.add(deleteSearchJob);
+        }
+      }
+      // Wait until all retraction jobs have returned
+      if (!waitForStatus(jobs.toArray(new Job[jobs.size()])).isSuccess()) {
+        throw new WorkflowOperationException("One of the retraction jobs did not complete successfully");
+      }
+    } catch (DistributionException e) {
+      throw new WorkflowOperationException(e);
+    } catch (SearchException e) {
+      throw new WorkflowOperationException("Error retracting media package", e);
+    } catch (UnauthorizedException | NotFoundException | InterruptedException ex) {
+      logger.error("Retraction failed of Mediapackage: { }", mediaPackage.getIdentifier().toString(), ex);
+    }
   }
 
 }

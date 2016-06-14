@@ -5,7 +5,7 @@
 
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
-  <version>2.2-SNAPSHOT</version>
+  <version>2.3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>opencast</name>
@@ -33,7 +33,7 @@
     <osgi.compendium.version>4.2.0</osgi.compendium.version>
     <osgi.core.version>4.2.0</osgi.core.version>
     <osgi.enterprise.version>4.2.0</osgi.enterprise.version>
-    <karaf.version>3.0.5</karaf.version>
+    <karaf.version>3.0.6</karaf.version>
   </properties>
 
   <modules>
@@ -100,8 +100,11 @@
     <module>modules/matterhorn-execute-api</module>
     <module>modules/matterhorn-execute-impl</module>
     <module>modules/matterhorn-execute-remote</module>
+    <module>modules/matterhorn-execute-workflowoperation</module>
     <module>modules/matterhorn-external-api</module>
     <module>modules/matterhorn-fileupload</module>
+    <module>modules/matterhorn-hello-world-api</module>
+    <module>modules/matterhorn-hello-world-impl</module>
     <module>modules/matterhorn-holdstate-workflowoperation</module>
     <module>modules/matterhorn-incident-workflowoperation</module>
     <module>modules/matterhorn-index-service</module>
@@ -277,7 +280,7 @@
           </systemPropertyVariables>
         </configuration>
       </plugin>
-      <!-- Ensure that the source code matches the Matterhorn style rules -->
+      <!-- Ensure that the source code matches the style rules -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
@@ -286,7 +289,7 @@
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>6.15</version>
+            <version>6.18</version>
           </dependency>
         </dependencies>
         <configuration>
@@ -630,8 +633,8 @@
 
       <dependency>
         <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-client</artifactId>
-        <version>5.10.0</version>
+        <artifactId>activemq-all</artifactId>
+        <version>5.3.1</version>
       </dependency>
 
       <dependency>
@@ -812,68 +815,68 @@
       <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-bundle-jaxrs</artifactId>
-        <version>2.2.9</version>
+        <version>2.2.12</version>
       </dependency>
 
       <!-- Spring -->
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>org.springframework.aop</artifactId>
-        <version>3.1.0.RELEASE</version>
+        <version>3.1.4.RELEASE</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>org.springframework.asm</artifactId>
-        <version>3.1.0.RELEASE</version>
+        <version>3.1.4.RELEASE</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>org.springframework.core</artifactId>
-        <version>3.1.0.RELEASE</version>
+        <version>3.1.4.RELEASE</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>org.springframework.beans</artifactId>
-        <version>3.1.0.RELEASE</version>
+        <version>3.1.4.RELEASE</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>org.springframework.jdbc</artifactId>
-        <version>3.1.0.RELEASE</version>
+        <version>3.1.4.RELEASE</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>org.springframework.expression</artifactId>
-        <version>3.1.0.RELEASE</version>
+        <version>3.1.4.RELEASE</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>org.springframework.transaction</artifactId>
-        <version>3.1.0.RELEASE</version>
+        <version>3.1.4.RELEASE</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>org.springframework.context</artifactId>
-        <version>3.1.0.RELEASE</version>
+        <version>3.1.4.RELEASE</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>org.springframework.context.support</artifactId>
-        <version>3.1.0.RELEASE</version>
+        <version>3.1.4.RELEASE</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>org.springframework.web</artifactId>
-        <version>3.1.0.RELEASE</version>
+        <version>3.1.4.RELEASE</version>
       </dependency>
 
       <dependency>
@@ -897,25 +900,25 @@
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>org.springframework.security.core</artifactId>
-        <version>3.1.0.RELEASE</version>
+        <version>3.1.4.RELEASE</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>org.springframework.security.config</artifactId>
-        <version>3.1.0.RELEASE</version>
+        <version>3.1.4.RELEASE</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>org.springframework.security.web</artifactId>
-        <version>3.1.0.RELEASE</version>
+        <version>3.1.4.RELEASE</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>org.springframework.security.openid</artifactId>
-        <version>3.1.0.RELEASE</version>
+        <version>3.1.4.RELEASE</version>
       </dependency>
 
       <dependency>
@@ -927,13 +930,13 @@
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-cas</artifactId>
-        <version>3.1.0.RELEASE</version>
+        <version>3.1.4.RELEASE</version>
       </dependency>
 
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-ldap</artifactId>
-        <version>3.1.0.RELEASE</version>
+        <version>3.1.4.RELEASE</version>
       </dependency>
 
       <dependency>
@@ -994,7 +997,7 @@
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
         <scope>test</scope>
-        <version>3.3</version>
+        <version>3.4</version>
       </dependency>
 
       <dependency>
@@ -1013,19 +1016,19 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.6.4</version>
+        <version>1.7.21</version>
       </dependency>
 
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
-        <version>1.6.4</version>
+        <version>1.7.21</version>
       </dependency>
 
       <dependency>
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
-        <version>1.2.16</version>
+        <version>1.2.17</version>
         <scope>test</scope>
       </dependency>
 
@@ -1046,7 +1049,7 @@
       <dependency>
         <groupId>commons-collections</groupId>
         <artifactId>commons-collections</artifactId>
-        <version>3.2.1</version>
+        <version>3.2.2</version>
       </dependency>
 
       <dependency>
@@ -1609,11 +1612,6 @@
       <releases>
         <enabled>true</enabled>
       </releases>
-    </repository>
-    <repository>
-      <id>eclipse-gemini</id>
-      <name>Eclipse Gemini Maven repository</name>
-      <url>http://download.eclipse.org/gemini/mvn/</url>
     </repository>
   </repositories>
 </project>

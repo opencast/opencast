@@ -238,6 +238,10 @@ textarea.editable {
   height: auto;
 }
 
+button.red {
+  @include btn(red);
+}
+
 button.green {
   @include btn(green-dark-bg);
 }
@@ -459,7 +463,7 @@ input.disabled, select.disabled {
       }
 
       a.wide {
-        width: 2em;
+        width: inline;
       }
 
       a:hover:not(.active) {

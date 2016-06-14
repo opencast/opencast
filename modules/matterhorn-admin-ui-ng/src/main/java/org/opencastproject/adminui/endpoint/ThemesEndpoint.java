@@ -39,6 +39,7 @@ import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
+import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
 import org.opencastproject.index.service.impl.index.theme.ThemeIndexSchema;
@@ -194,7 +195,7 @@ public class ThemesEndpoint {
       if (ThemesListQuery.FILTER_CREATOR_NAME.equals(name))
         query.withCreator(filters.get(name));
       if (ThemesListQuery.FILTER_TEXT_NAME.equals(name))
-        query.withText("*" + filters.get(name) + "*");
+        query.withText(QueryPreprocessor.sanitize(filters.get(name)));
     }
 
     if (optSort.isSome()) {

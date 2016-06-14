@@ -1,6 +1,6 @@
 angular.module('adminNg.services')
-.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', '$translate', 'underscore',
-    function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate, _) {
+.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', '$translate', 'underscore', '$timeout',
+    function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate, _, $timeout) {
 
     // -- constants ------------------------------------------------------------------------------------------------- --
 
@@ -42,6 +42,8 @@ angular.module('adminNg.services')
     var Source = function () {
         var self = this;
 
+        self.isSourceState = true;
+
         this.checkingConflicts = false;
         this.hasConflicts = false;
         this.hasConflictingSettings = function () {
@@ -52,9 +54,12 @@ angular.module('adminNg.services')
         var tzOffset = (new Date()).getTimezoneOffset() / -60;
         self.tz = 'UTC' + (tzOffset < 0 ? '-' : '+') + tzOffset;
 
-        CaptureAgentsResource.query({inputs: true}).$promise.then(function (data) {
-            self.captureAgents = data.rows;
-        });
+        this.loadCaptureAgents = function () {
+            CaptureAgentsResource.query({inputs: true}).$promise.then(function (data) {
+              self.captureAgents = data.rows;
+            });
+        };
+        this.loadCaptureAgents();
 
         this.ud = _.clone(EMPTY_UD);
         this.weekdays = _.clone(WEEKDAYS);
@@ -151,6 +156,7 @@ angular.module('adminNg.services')
             var release = function(conflicts) {
                 self.hasConflicts = _.size(conflicts) > 0;
                 self.updateWeekdays();
+                self.checkValidity();
             };
 
             // -- ajax ---------------------------------------------------------------------------------------------- --
@@ -178,6 +184,48 @@ angular.module('adminNg.services')
             }
         };
 
+        this.checkValidity = function () {
+            var data = self.ud[getType()];
+
+            if (self.alreadyEndedNotification) {
+                Notifications.remove(self.alreadyEndedNotification, NOTIFICATION_CONTEXT);
+            }
+            // check if start is in the past and has already ended
+            if (angular.isDefined(data.start) && angular.isDefined(data.start.hour)
+                && angular.isDefined(data.start.minute) && angular.isDefined(data.start.date)
+                && angular.isDefined(data.duration) && angular.isDefined(data.duration.hour)
+                && angular.isDefined(data.duration.minute)) {
+                var startDate = new Date(data.start.date);
+                startDate.setHours(data.start.hour + data.duration.hour, data.start.minute + data.duration.minute,
+                    0, 0);
+                var nowDate = new Date();
+                if (startDate < nowDate) {
+                    self.alreadyEndedNotification = Notifications.add('error', 'CONFLICT_ALREADY_ENDED',
+                        NOTIFICATION_CONTEXT);
+                    self.hasConflicts = true;
+                }
+            }
+
+            if (self.endBeforeStartNotification) {
+                Notifications.remove(self.endBeforeStartNotification, NOTIFICATION_CONTEXT);
+            }
+            // check if end date is before start date
+            if (angular.isDefined(data.start) && angular.isDefined(data.start.date)
+                && angular.isDefined(data.end)) {
+                var startDate = new Date(data.start.date);
+                var endDate = new Date(data.end);
+                if (endDate < startDate) {
+                    self.endBeforeStartNotification = Notifications.add('error', 'CONFLICT_END_BEFORE_START',
+                        NOTIFICATION_CONTEXT);
+                    self.hasConflicts = true;
+                }
+            }
+
+            $timeout(function () {
+                self.checkValidity();
+             }, 5000);
+        };
+
         /**
          * Update the presentation fo the weekdays for the summary
          */
@@ -191,7 +239,7 @@ angular.module('adminNg.services')
             angular.forEach(self.sortedWeekdays, function (day, idx) {
                 keysOrder[day.translation] = idx;
             });
-            
+
             if (self.isScheduleMultiple()) {
                 angular.forEach(self.ud.SCHEDULE_MULTIPLE.weekdays, function (weekday, index) {
                     if (weekday) {
@@ -225,7 +273,7 @@ angular.module('adminNg.services')
             }
 
             return time;
-        };        
+        };
 
         this.getFormatedDuration = function () {
             var time;
