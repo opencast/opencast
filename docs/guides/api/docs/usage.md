@@ -23,32 +23,6 @@ With every response, the api version is specified as part of the standard HTTP `
 
 Versions should be specified as obtained from the [Base API](base-api.md#versions) call to `/versions`.
 
-## Performance
-
-In order to provide a maximum in performance to users of the API, the [ETag mechanism](http://en.wikipedia.org/wiki/HTTP_ETag) is supported with most resources. When serving data to a client, the API sends the `ETag` header along with the response, thereby identifiying the modification date and time of the data represented in a format that is internal to the API.
-
-__Sample__
-
-```
-GET /api/events
-```
-
-```
-ETag: "686897696a7c876b7e"
-```
-
-When querying the API for the same data, clients are now able to indicate to the API that they already have a representation of the data by specifying the value of the ETag in the `If-None-Match` request header:
-
-```
-If-None-Match: "686897696a7c876b7e"
-```
-
-The API is now able to decide based on this header whether the data on the server is more recent or whether it is unchanged from when the client asked last time. Depending on the outcome of that assessment, the API either sends back `200 OK` along with the response body that contains the most recent data or a `304 NOT MODIFIED` without a response body.
-
-Response Code       |Body       | Comment                                                                   
-:-------------------|:----------|:--------------------------------------------------------------------------
-`200 OK`            | yes       | The client either did not specify the `If-None-Match` header or the data on the server is more recent than what has been identified by the ETag value.
-`304 NOT MODIFIED ` | no        | The server decided that based on the `If-None-Match` header, the client already holds on to the most recent version of the data.
 
 ## Authentication
 
