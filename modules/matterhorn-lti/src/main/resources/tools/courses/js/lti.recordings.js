@@ -189,13 +189,11 @@ $(function(){
 			if(presenter_present === true && image_attachments[j].type ===  "presenter/search+preview"){
 			    //get the presenter thumbnail
 			    search_image_url = image_attachments[j].url;
-			    search_image_url = search_image_url.slice(search_image_url.indexOf("/static"));
 			    break;
 			}
 			if(presenter_present === false && presentation_present === true && image_attachments[j].type ===  "presentation/search+preview"){
 			    //get the presentation thumbnail
 			    search_image_url = image_attachments[j].url;
-			    search_image_url = search_image_url.slice(search_image_url.indexOf("/static"));
 			    break;
 			}
 		    }
