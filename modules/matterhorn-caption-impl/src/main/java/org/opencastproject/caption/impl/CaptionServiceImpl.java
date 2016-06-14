@@ -130,7 +130,9 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
    * @param componentContext
    *          the component context
    */
+  @Override
   public void activate(ComponentContext componentContext) {
+    super.activate(componentContext);
     this.componentContext = componentContext;
   }
 

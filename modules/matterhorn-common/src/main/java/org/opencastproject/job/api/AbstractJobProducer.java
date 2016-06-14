@@ -23,6 +23,8 @@ package org.opencastproject.job.api;
 
 import static com.entwinemedia.fn.data.Opt.none;
 import static com.entwinemedia.fn.data.Opt.some;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.Job.Status;
@@ -39,10 +41,11 @@ import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.functions.Strings;
 
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,17 +62,34 @@ public abstract class AbstractJobProducer implements JobProducer {
   /** The logger */
   static final Logger logger = LoggerFactory.getLogger(AbstractJobProducer.class);
 
+  /** The default value whether to accept a job whose load exceeds the host’s max load */
+  public static final boolean DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING = true;
+
+  /**
+   * The key to look for in the service configuration file to override the {@link DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING}
+   */
+  public static final String ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY = "org.opencastproject.job.load.acceptexceeding";
+
+  /** Whether to accept a job whose load exceeds the host’s max load */
+  protected boolean acceptJobLoadsExeedingMaxLoad = DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING;
+
   /** The types of job that this producer can handle */
   protected String jobType = null;
 
   /** To enable threading when dispatching jobs */
   protected ExecutorService executor = Executors.newCachedThreadPool();
 
+  /** OSGI activate method. */
+  public void activate(ComponentContext cc) {
+    acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY).map(Strings.toBool)
+            .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
+  }
+
   /**
    * Creates a new abstract job producer for jobs of the given type.
    *
    * @param jobType
-   *         the job type
+   *          the job type
    */
   public AbstractJobProducer(String jobType) {
     this.jobType = jobType;
@@ -139,9 +159,20 @@ public abstract class AbstractJobProducer implements JobProducer {
     }
 
     SystemLoad systemLoad = getServiceRegistry().getCurrentHostLoads(true);
-    //Note: We are not adding the job load in the next line because it is already accounted for in the load values we
-    //get back from the service registry.
+    // Note: We are not adding the job load in the next line because it is already accounted for in the load values we
+    // get back from the service registry.
     float currentLoad = systemLoad.get(getServiceRegistry().getRegistryHostname()).getLoadFactor();
+
+    // Whether to accept a job whose load exceeds the host’s max load
+    if (acceptJobLoadsExeedingMaxLoad) {
+      // If the actual job load is greater the host's max load this job never get's processed. So decrease the current
+      // load by the difference of the job load and max load
+      if (job.getJobLoad() > maxload.getLoadFactor()) {
+        float decreaseLoad = job.getJobLoad() - maxload.getLoadFactor();
+        currentLoad -= decreaseLoad;
+      }
+    }
+
     if (currentLoad > maxload.getLoadFactor()) {
       logger.debug("Declining job {} of type {} because load of {} would exceed this node's limit of {}.",
               new Object[] { job.getId(), job.getJobType(), currentLoad, maxload.getLoadFactor() });
@@ -190,7 +221,7 @@ public abstract class AbstractJobProducer implements JobProducer {
    * associated job as the payload.
    *
    * @param job
-   *         the job to process
+   *          the job to process
    * @return the operation result
    * @throws Exception
    */
@@ -209,16 +240,15 @@ public abstract class AbstractJobProducer implements JobProducer {
      * Constructs a new job runner
      *
      * @param job
-     *         the job to run
+     *          the job to run
      * @param currentJob
-     *         the current running job
+     *          the current running job
      */
     JobRunner(Job job, Job currentJob) {
       this.jobId = job.getId();
       if (currentJob != null) {
         this.currentJobId = some(currentJob.getId());
-      }
-      else {
+      } else {
         currentJobId = none();
       }
     }
@@ -232,7 +262,8 @@ public abstract class AbstractJobProducer implements JobProducer {
       if (currentJobId.isSome())
         serviceRegistry.setCurrentJob(serviceRegistry.getJob(currentJobId.get()));
 
-      final Organization organization = getOrganizationDirectoryService().getOrganization(jobBeforeProcessing.getOrganization());
+      final Organization organization = getOrganizationDirectoryService()
+              .getOrganization(jobBeforeProcessing.getOrganization());
       securityService.setOrganization(organization);
       final User user = getUserDirectoryService().loadUser(jobBeforeProcessing.getCreator());
       securityService.setUser(user);
@@ -268,7 +299,7 @@ public abstract class AbstractJobProducer implements JobProducer {
         jobAfterProcessing.setStatus(Status.FAILED);
         jobAfterProcessing = getServiceRegistry().updateJob(jobAfterProcessing);
         getServiceRegistry().incident().unhandledException(jobAfterProcessing, Severity.FAILURE, t);
-        logger.error("Error handling operation '{}': {}", jobAfterProcessing.getOperation(), ExceptionUtils.getStackTrace(t));
+        logger.error("Error handling operation '{}': {}", jobAfterProcessing.getOperation(), getStackTrace(t));
         if (t instanceof ServiceRegistryException)
           throw (ServiceRegistryException) t;
       }

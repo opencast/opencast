@@ -248,8 +248,10 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
     return organizationDirectoryService;
   }
 
-  protected void activate(ComponentContext context) {
+  @Override
+  public void activate(ComponentContext context) {
     logger.debug("activating...");
+    super.activate(context);
     FFmpegSilenceDetector.init(context.getBundleContext());
   }
 

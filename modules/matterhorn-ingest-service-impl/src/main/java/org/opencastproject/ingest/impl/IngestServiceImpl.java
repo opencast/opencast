@@ -273,7 +273,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param cc
    *          the osgi component context
    */
-  protected void activate(ComponentContext cc) {
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
     logger.info("Ingest Service started.");
     defaultWorkflowDefinionId = StringUtils.trimToNull(cc.getBundleContext().getProperty(WORKFLOW_DEFINITION_DEFAULT));
     if (defaultWorkflowDefinionId == null) {
