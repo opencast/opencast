@@ -24,7 +24,7 @@
 
     <div class="modal-content" data-modal-tab-content="general">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj list-obj">
                     <header translate="EVENTS.EVENTS.DETAILS.GENERAL.PUBLICATION_STATUS">Publication Status</header>
@@ -47,7 +47,7 @@
 
     <div class="modal-content" data-modal-tab-content="metadata">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div data-admin-ng-notification="" data-type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
             <div class="full-col">
                 <div class="obj tbl-details">
@@ -70,7 +70,7 @@
 
     <div class="modal-content" data-modal-tab-content="extended-metadata" ng-if="metadata.entries.length > 0">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
             <div class="full-col">
                 <div class="obj tbl-details" ng-repeat="catalog in metadata.entries">
@@ -92,7 +92,7 @@
 
     <div class="modal-content" data-modal-tab-content="assets">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CAPTION">Assets</header>
@@ -137,7 +137,7 @@
     <div class="modal-content" data-modal-tab-content="scheduling">
         <div class="modal-body">
             <div data-admin-ng-notifications="" context="event-scheduling"></div>
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
 
                 <!-- Scheduling configuration -->
@@ -269,7 +269,7 @@
 
     <div class="modal-content" data-modal-tab-content="workflows">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <ul>
                     <li>
@@ -374,7 +374,6 @@
     <div class="modal-content" data-modal-tab-content="access">
         <p class="tab-desc"></p>
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
             <div data-admin-ng-notification="" type="warning" show="access.episode_access.locked" message="{{ metadata.locked }}"></div>
             <div data-admin-ng-notifications="" type="error" context="event-acl"></div>
             <div data-admin-ng-notifications="" context="events-access"></div>
@@ -479,7 +478,7 @@
 
     <div class="modal-content" data-modal-tab-content="comments">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
 
                 <!--
@@ -572,7 +571,7 @@
 
     <div class="modal-content" data-modal-tab-content="quick-actions-details" data-level="2" data-label="EVENTS.EVENTS.DETAILS.QUICKACTION_WORKFLOW_DETAILS.TITLE">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj workflow-options">
                     <header translate="EVENTS.EVENTS.DETAILS.QUICKACTION_WORKFLOW_DETAILS.TITLE">Workflow Details</header>
@@ -595,7 +594,7 @@
 
     <div class="modal-content" data-modal-tab-content="errors-and-warnings" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container">
                     <header translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.HEADER">Errors &amp; Warnings</header>
@@ -631,8 +630,8 @@
 
     <div class="modal-content" data-modal-tab-content="error-details" data-level="4" data-label="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.HEADER">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
-           <div class="full-col">
+            <div data-admin-ng-notifications="" context="events-access"></div>
+            <div class="full-col">
                <div class="obj tbl-details">
                    <header translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.HEADER">Error Details</header>
                    <div class="obj-container">
@@ -685,7 +684,7 @@
 
     <div class="modal-content" data-modal-tab-content="attachments" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.TITLE">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.CAPTION">Attachments</header>
@@ -718,7 +717,7 @@
 
     <div class="modal-content" data-modal-tab-content="catalogs" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.TITLE">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.CAPTION">Catalogs</header>
@@ -751,7 +750,7 @@
 
     <div class="modal-content" data-modal-tab-content="media" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.TITLE">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.CAPTION">Media</header>
@@ -784,7 +783,7 @@
 
     <div class="modal-content" data-modal-tab-content="publications" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.TITLE">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.CAPTION">Publications</header>
@@ -815,7 +814,7 @@
 
     <div class="modal-content" data-modal-tab-content="attachment-details" data-parent="attachments" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.TITLE">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.CAPTION">Attachment</header>
@@ -862,7 +861,7 @@
 
     <div class="modal-content" data-modal-tab-content="catalog-details" data-parent="catalogs" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.TITLE">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.CAPTION">Catalogs</header>
@@ -909,7 +908,7 @@
 
     <div class="modal-content" data-modal-tab-content="media-details" data-parent="media" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TITLE">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-details">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TITLE">Media Details</header>
@@ -1033,7 +1032,7 @@
 
     <div class="modal-content" data-modal-tab-content="publications-details" data-parent="publications" data-level="3" data-label="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.TITLE">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
                     <header translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.CAPTION">Publications</header>
@@ -1081,7 +1080,7 @@
 
     <div class="modal-content" data-modal-tab-content="workflow-details" data-parent="workflows" data-level="2" data-label="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-details">
                     <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE">Workflow Details</header>
@@ -1138,7 +1137,7 @@
 
     <div class="modal-content" data-modal-tab-content="workflow-operations" data-parent="workflows" data-level="3" data-label="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TITLE">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container">
                     <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TITLE">Workflow Operations</header>
@@ -1169,7 +1168,7 @@
 
     <div class="modal-content" data-modal-tab-content="operation-details" data-parent="workflows" data-level="4" data-label="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TITLE">
         <div class="modal-body">
-            <div data-admin-ng-notification="" data-type="warning" show="transactions.read_only" message="NOTIFICATIONS.ACTIVE_TRANSACTION"></div>
+            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-details">
                     <header translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TITLE">Operation Details</header>
