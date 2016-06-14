@@ -84,9 +84,11 @@ public class ServiceRegistryJpaImplTest {
 
   private static final String TEST_SERVICE = "ingest";
   private static final String TEST_SERVICE_2 = "compose";
+  private static final String TEST_SERVICE_3 = "org.opencastproject.workflow";
   private static final String TEST_OPERATION = "ingest";
   private static final String TEST_PATH = "/ingest";
   private static final String TEST_PATH_2 = "/compose";
+  private static final String TEST_PATH_3 = "/workflow";
   private static final String TEST_HOST = "http://localhost:8080";
   private static final String TEST_HOST_OTHER = "http://otherhost:8080";
 
@@ -169,7 +171,10 @@ public class ServiceRegistryJpaImplTest {
         if (!request.hasCaptured())
           return unavailableResponse;
 
-        if (request.getValue().getURI().toString().contains(TEST_SERVICE))
+        if (request.getValue().getURI().toString().contains(TEST_PATH))
+          return unavailableResponse;
+
+        if (request.getValue().getURI().toString().contains(TEST_PATH_3))
           return unavailableResponse;
 
         return successRespone;
@@ -186,6 +191,7 @@ public class ServiceRegistryJpaImplTest {
     serviceRegistryJpaImpl.registerService(TEST_SERVICE, TEST_HOST, TEST_PATH);
     serviceRegistryJpaImpl.registerService(TEST_SERVICE, TEST_HOST_OTHER, TEST_PATH);
     serviceRegistryJpaImpl.registerService(TEST_SERVICE_2, TEST_HOST, TEST_PATH_2);
+    serviceRegistryJpaImpl.registerService(TEST_SERVICE_3, TEST_HOST, TEST_PATH_3);
   }
 
   private void setupBundleContext() throws InvalidSyntaxException {
@@ -257,6 +263,25 @@ public class ServiceRegistryJpaImplTest {
       Assert.fail();
     } catch (Exception e) {
       Assert.assertEquals(1, serviceRegistryJpaImpl.dispatchPriorityList.size());
+    }
+  }
+
+  @Test
+  public void testHostAddedToPriorityListExceptWorkflowType() throws Exception {
+    serviceRegistryJpaImpl.scheduledExecutor.shutdown();
+    serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
+    serviceRegistryJpaImpl.activate(null);
+    Hashtable<String, String> properties = new Hashtable<>();
+    properties.put("dispatchinterval", "1000");
+    serviceRegistryJpaImpl.updated(properties);
+    registerTestHostAndService();
+    Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_3, TEST_OPERATION, null, null, true, null);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistryJpaImpl, testJob);
+    try {
+      barrier.waitForJobs(2000);
+      Assert.fail();
+    } catch (Exception e) {
+      Assert.assertEquals(0, serviceRegistryJpaImpl.dispatchPriorityList.size());
     }
   }
 

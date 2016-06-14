@@ -2981,7 +2981,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       // We've tried dispatching to every online service that can handle this type of job, with no luck.
       if (triedDispatching) {
         String host = job.getProcessorServiceRegistration().getHost();
-        if (!dispatchPriorityList.containsKey(job.getId()))
+        // Workflow type jobs are not set to priority list, because they handle accepting jobs not based on the job load
+        if (!dispatchPriorityList.containsKey(job.getId()) && !TYPE_WORKFLOW.equals(job.getJobType()))
           dispatchPriorityList.put(job.getId(), host);
 
         try {
