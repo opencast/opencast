@@ -3,10 +3,7 @@
 
   <id>fast</id>
   <title>Fast Testing Workflow</title>
-  <tags>
-    <tag>upload-ng</tag>
-    <tag>schedule-ng</tag>
-  </tags>
+  <tags/>
   <description>
     A minimal workflow that transcodes the media into distribution formats, then
     sends the resulting distribution files, along with their associated metadata,
