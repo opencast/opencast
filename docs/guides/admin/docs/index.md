@@ -20,7 +20,9 @@ Release Documentation
 
 The Opencast Release Documentation is the official Opencast documentation for each release. It contains:
 
- - [Release Notes](release.notes.md)
+ - [Release Notes](releasenotes.md)
+ - [Upgrade](upgrade.md)
+ - [Changelog](changelog.md)
  - [Installation Guides](installation/index.md)
  - [Configuration Guides](configuration/index.md)
     - [Basic Configuration](configuration/basic.md)

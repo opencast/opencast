@@ -15,7 +15,9 @@ site_dir: 'site'
 
 pages:
 - Home: 'index.md'
-- Release Notes: 'release.notes.md'
+- Release Notes: 'releasenotes.md'
+- Upgrade: 'upgrade.md'
+- Changelog: 'changelog.md'
 - Installation:
    - Overview: 'installation/index.md'
    - Multiple Servers: 'installation/multiple-servers.md'
@@ -65,8 +67,6 @@ pages:
       - Architecture: 'modules/videoeditor.architecture.md'
    - Video Segmentation: 'modules/videosegmentation.md'
    - YouTube Publication: 'modules/youtubepublication.md'
-- Upgrade:
-   - Upgrading Home: 'upgrade/index.md'
 - Workflow Operation Handler:
    - Overview: 'workflowoperationhandlers/index.md'
    - Analyze Tracks: 'workflowoperationhandlers/analyze-tracks-woh.md'
