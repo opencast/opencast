@@ -158,7 +158,9 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
   /**
    * Called when service activates. Defined in OSGi resource file.
    */
+  @Override
   public synchronized void activate(final ComponentContext cc) {
+    super.activate(cc);
     properties.setBundleContext(cc.getBundleContext());
   }
 

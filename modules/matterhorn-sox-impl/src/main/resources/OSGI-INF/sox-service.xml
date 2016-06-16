@@ -5,6 +5,7 @@
     <property name="service.description" value="Sox audio processing service" />
     <service>
       <provide interface="org.opencastproject.sox.api.SoxService" />
+      <provide interface="org.osgi.service.cm.ManagedService" />
     </service>
     <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace" 
       cardinality="1..1" policy="static" bind="setWorkspace" />

@@ -24,6 +24,8 @@ package org.opencastproject.serviceregistry.impl;
 import static com.entwinemedia.fn.Stream.$;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.opencastproject.job.api.AbstractJobProducer.ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY;
+import static org.opencastproject.job.api.AbstractJobProducer.DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING;
 import static org.opencastproject.job.api.Job.FailureReason.DATA;
 import static org.opencastproject.job.api.Job.Status.FAILED;
 import static org.opencastproject.job.jpa.JpaJob.fnToJob;
@@ -32,6 +34,7 @@ import static org.opencastproject.security.api.SecurityConstants.USER_HEADER;
 import static org.opencastproject.serviceregistry.api.ServiceState.ERROR;
 import static org.opencastproject.serviceregistry.api.ServiceState.NORMAL;
 import static org.opencastproject.serviceregistry.api.ServiceState.WARNING;
+import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -62,6 +65,7 @@ import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.util.jmx.JmxUtil;
 
 import com.entwinemedia.fn.Fn;
@@ -244,7 +248,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.RUNNING);
   }
 
+  /** The dispatcher priority list */
   protected final Map<Long, String> dispatchPriorityList = new HashMap<>();
+
+  /** Whether to accept a job whose load exceeds the host’s max load */
+  protected Boolean acceptJobLoadsExeedingMaxLoad = true;
 
   /** OSGi DI */
   void setEntityManagerFactory(EntityManagerFactory emf) {
@@ -317,6 +325,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         logger.error("Invalid filter syntax: {}", e);
         throw new IllegalStateException(e);
       }
+    }
+
+    // Whether a service accepts a job whose load exceeds the host’s max load
+    if (cc != null) {
+      acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY).map(Strings.toBool)
+              .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
     }
 
     // Schedule the heartbeat with the default interval
@@ -2899,8 +2913,21 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       boolean triedDispatching = false;
 
+      boolean onlyHighestMaxLoadHosts = false;
+      final Float highestMaxLoad = $(services).map(toHostRegistration).map(toMaxLoad).sort(sortFloatValuesDesc).head2();
+      if (job.getJobLoad() > highestMaxLoad) {
+        // None of the available hosts is able to accept the job due to less host load
+        onlyHighestMaxLoadHosts = true;
+      }
+
       for (ServiceRegistration registration : services) {
         job.setProcessorServiceRegistration((ServiceRegistrationJpaImpl) registration);
+
+        // Skip registration of host with less max load than highest available max load
+        if (onlyHighestMaxLoadHosts
+                && job.getProcessorServiceRegistration().getHostRegistration().getMaxLoad() != highestMaxLoad) {
+          continue;
+        }
 
         try {
           job = updateInternal(em, job);
@@ -2968,7 +2995,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       // We've tried dispatching to every online service that can handle this type of job, with no luck.
       if (triedDispatching) {
         String host = job.getProcessorServiceRegistration().getHost();
-        if (!dispatchPriorityList.containsKey(job.getId()))
+        // Workflow type jobs are not set to priority list, because they handle accepting jobs not based on the job load
+        // If the system don't accepts jobs whose load exceeds the host's max load we can't make use of the priority
+        // list
+        if (acceptJobLoadsExeedingMaxLoad && !dispatchPriorityList.containsKey(job.getId())
+                && !TYPE_WORKFLOW.equals(job.getJobType()))
           dispatchPriorityList.put(job.getId(), host);
 
         try {
