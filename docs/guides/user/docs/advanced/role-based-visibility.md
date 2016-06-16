@@ -1,20 +1,24 @@
 # Role-Based Visibility
 
-Opencast supports a powerful mechanism that allow selective restrictions of access to the administrative user
-interface.
+Opencast supports a powerful mechanism that allows to provide users selective access to the administrative user
+interface. Using that mechanism, it is possible to configure what parts of the UI (and therefore functionality)
+are visibile to a given user based on the user's roles. Hence, we call that mechanism it role-based visibility.
 
 ## How To Use
 
-Role-based visibility is supposed to be used together with Opencast's support for user groups. If you want to
-restrict access for specific users, create a group reflecting the access restrictions.
+The best practise to assign a larger set of roles to a user is to use Opencast's support for user groups. This
+way, you can define a group whose roles provide access to the parts of the UI you want to provide access to. Given
+such a group, you can just add users to that group and they will get all the roles of the group which includes
+roles that allow the users to access specific parts of the UI.
 
 Please consult the [Groups section](../groups.md) for information about adding new groups.
 
-The important part to restrict the access are the roles the belong to the group: All the roles whose names starts
-with the prefix ROLE_UI can be used for access restriction. Additionally, ROLE_ADMIN_UI is used to specify whether
-users of a group have access to the login page.
+There is a set of so-called user interface roles, each of them providing access to a specific part of the 
+administrative user interface. Those roles can be easily identified by their name prefix *ROLE_UI*.
+Additionally, *ROLE_ADMIN_UI* is used to allow access to the login page.
 
-**Important** Groups that should provide restricted access to the UI may not contain the role ROLE_ADMIN
+**Important** *ROLE_ADMIN* implicitly provides full access to the user interface. When working with role-based
+visibility, users (and the groups they belong to) may not have *ROLE_ADMIN* therefore.
 
 ## User Interface Roles
 
@@ -25,12 +29,12 @@ if necessary.
 It is important to understand that the UI roles are not coupled, i.e. having a particular role does not imply any other
 permission than the one exactly provided by the role.
 
-Example: Just having the role ROLE_UI_NAV_CAPTURE_VIEW won't display the navigation menu. This requires the role
-ROLE_UI_NAV, too.
+Example: Just having the role *ROLE_UI_NAV_CAPTURE_VIEW* won't display the navigation menu. This requires the role
+*ROLE_UI_NAV*, too.
 
 The advantage of having independent roles is that it makes role-based visibility even more flexible, For example, it is
-possible to not use the navigation menu at all. As drawback, it makes configuration more advanced. But configured
-role-based visibility is not a daily tasks.
+possible to not use the navigation menu at all. The drawback of this approach is that it makes configuration more
+advanced. But configuring role-based visibility is not a daily tasks.
 
 ### Navigation Menu
 
@@ -46,8 +50,8 @@ administrative user interface.
 |ROLE_UI_NAV_ORGANIZATION_VIEW  |Display navigation menu entry *Organization*  |
 |ROLE_UI_NAV_CONFIGURATION_VIEW |Display navigation menu entry *Configuration* |
 
-If you want to provide access to the navigation menu, *ROLE_UI_NAV* is needed. Then, for each of the menu entries,
-include the respective role.
+If you want to provide access to the navigation menu, *ROLE_UI_NAV* is needed. Then, for each of the
+navigation menu entries, include the respective role if the menu entry should be accessible by the user.
 
 Note that this really just controls the navigation menu and its menu entries. Not less, not more.
 
