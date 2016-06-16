@@ -15,7 +15,6 @@ Please consult the [Groups section](../groups.md) for information about adding n
 
 There is a set of so-called user interface roles, each of them providing access to a specific part of the 
 administrative user interface. Those roles can be easily identified by their name prefix *ROLE_UI*.
-Additionally, *ROLE_ADMIN_UI* is used to allow access to the login page.
 
 **Important** *ROLE_ADMIN* implicitly provides full access to the user interface. When working with role-based
 visibility, users (and the groups they belong to) may not have *ROLE_ADMIN* therefore.
@@ -35,6 +34,15 @@ Example: Just having the role *ROLE_UI_NAV_CAPTURE_VIEW* won't display the navig
 The advantage of having independent roles is that it makes role-based visibility even more flexible, For example, it is
 possible to not use the navigation menu at all. The drawback of this approach is that it makes configuration more
 advanced. But configuring role-based visibility is not a daily tasks.
+
+### General Access
+
+**Important:** *ROLE_ADMIN_UI* is required for accessing the admin ui in general in means of providing access to
+some often used resources
+
+|Role                           |User Interface                                                     |
+|-------------------------------|-------------------------------------------------------------------|
+|ROLE_ADMIN_UI                  |Allow user to access login page as well as commonly used resources |
 
 ### Navigation Menu
 
