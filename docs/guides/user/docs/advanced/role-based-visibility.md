@@ -2,7 +2,7 @@
 
 Opencast supports a powerful mechanism that allows to provide users selective access to the administrative user
 interface. Using that mechanism, it is possible to configure what parts of the UI (and therefore functionality)
-are visibile to a given user based on the user's roles. Hence, we call that mechanism it role-based visibility.
+are visibile to a given user based on the user's roles. Hence, we call that mechanism role-based visibility.
 
 ## How To Use
 
