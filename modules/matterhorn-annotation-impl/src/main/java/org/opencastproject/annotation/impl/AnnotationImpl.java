@@ -1,24 +1,32 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.annotation.impl;
 
 import org.opencastproject.annotation.api.Annotation;
 
 import java.util.Date;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -41,6 +49,7 @@ import javax.xml.bind.annotation.XmlType;
  * A JAXB-annotated implementation of {@link Annotation}
  */
 @Entity(name = "Annotation")
+@Access(AccessType.FIELD)
 @Table(name = "mh_annotation")
 @NamedQueries({
 
@@ -119,80 +128,99 @@ public class AnnotationImpl implements Annotation {
   public AnnotationImpl() {
   }
 
+  @Override
   public Long getAnnotationId() {
     return annotationId;
   }
 
+  @Override
   public void setAnnotationId(Long annotationId) {
     this.annotationId = annotationId;
   }
 
+  @Override
   public String getMediapackageId() {
     return mediapackageId;
   }
 
+  @Override
   public void setMediapackageId(String mediapackageId) {
     this.mediapackageId = mediapackageId;
   }
 
+  @Override
   public String getUserId() {
     return userId;
   }
 
+  @Override
   public void setUserId(String userId) {
     this.userId = userId;
   }
 
+  @Override
   public String getSessionId() {
     return sessionId;
   }
 
+  @Override
   public void setSessionId(String sessionId) {
     this.sessionId = sessionId;
   }
 
+  @Override
   public int getInpoint() {
     return inpoint;
   }
 
+  @Override
   public void setInpoint(int inpoint) {
     this.inpoint = inpoint;
     updateLength();
   }
 
+  @Override
   public int getOutpoint() {
     return outpoint;
   }
 
+  @Override
   public void setOutpoint(int outpoint) {
     this.outpoint = outpoint;
     updateLength();
   }
 
+  @Override
   public int getLength() {
     return length;
   }
 
+  @Override
   public String getType() {
     return type;
   }
 
+  @Override
   public void setType(String type) {
     this.type = type;
   }
 
+  @Override
   public String getValue() {
     return value;
   }
 
+  @Override
   public void setValue(String value) {
     this.value = value;
   }
 
+  @Override
   public Date getCreated() {
     return created;
   }
 
+  @Override
   public void setCreated(Date created) {
     this.created = created;
   }
@@ -201,10 +229,12 @@ public class AnnotationImpl implements Annotation {
     this.length = this.outpoint - this.inpoint;
   }
 
+  @Override
   public Boolean getPrivate() {
     return this.privateAnnotation;
   }
 
+  @Override
   public void setPrivate(Boolean isPrivate) {
     this.privateAnnotation = isPrivate;
   }

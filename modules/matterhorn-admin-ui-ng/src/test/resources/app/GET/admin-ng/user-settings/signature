@@ -1,0 +1,21 @@
+{
+  "sender": {
+    "address": "adi@panter.ch",
+    "name": "test"
+  },
+  "id": 1501,
+  "creationDate": "2014-08-26T15:51:22Z",
+  "replyTo": {
+    
+  },
+  "name": "admin",
+  "comments": [
+    
+  ],
+  "signature": "test",
+  "creator": {
+    "username": "admin",
+    "email": null,
+    "name": "Admin User"
+  }
+}

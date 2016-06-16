@@ -1,0 +1,116 @@
+[
+    {
+        "id": "title",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.EVENTS.EVENTS.DETAILS.METADATA.TITLE",
+        "readOnly": false,
+        "type": "text",
+        "value": "New"
+    },
+    {
+        "id": "uid",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.EVENTS.EVENTS.DETAILS.METADATA.UID",
+        "readOnly": true,
+        "type": "text",
+        "value": "ID"
+    },
+    {
+        "id": "presenters",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.EVENTS.EVENTS.DETAILS.METADATA.PRESENTER",
+        "readOnly": false,
+        "type": "text",
+        "value": [
+            "Xavier"
+        ]
+    },
+    {
+        "id": "series",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.EVENTS.EVENTS.DETAILS.METADATA.SERIES",
+        "readOnly": false,
+        "type": "text",
+        "value": "Sample"
+    },
+    {
+        "id": "contributors",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.EVENTS.EVENTS.DETAILS.METADATA.CONTRIBUTORS",
+        "readOnly": false,
+        "type": "text",
+        "value": "New contributor"
+    },
+    {
+        "id": "subject",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.EVENTS.EVENTS.DETAILS.METADATA.SUBJECT",
+        "readOnly": false,
+        "type": "text",
+        "value": "My subject"
+    },
+    {
+        "id": "language",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.EVENTS.EVENTS.DETAILS.METADATA.LANGUAGE",
+        "readOnly": false,
+        "type": "text",
+        "value": "French"
+    },
+    {
+        "id": "description",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.EVENTS.EVENTS.DETAILS.METADATA.DESCRIPTION",
+        "readOnly": false,
+        "type": "text",
+        "value": "Simple recording to test the metadata edition"
+    },
+    {
+        "id": "startDate",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
+        "readOnly": false,
+        "type": "date",
+        "value": "2014-05-15"
+    },
+    {
+        "id": "startTime",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.EVENTS.EVENTS.DETAILS.METADATA.START_TIME",
+        "readOnly": false,
+        "type": "time",
+        "value": "03:47"
+    },
+    {
+        "id": "duration",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.EVENTS.EVENTS.DETAILS.METADATA.DURATION",
+        "readOnly": true,
+        "type": "text",
+        "value": "00:00:52"
+    },
+    {
+        "id": "agent",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.EVENTS.EVENTS.DETAILS.METADATA.AGENT",
+        "readOnly": false,
+        "type": "text",
+        "value": "TestAgent"
+    },
+    {
+        "id": "source",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.EVENTS.EVENTS.DETAILS.METADATA.SOURCE",
+        "readOnly": false,
+        "type": "text",
+        "value": ""
+    },
+    {
+        "id": "created",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.EVENTS.EVENTS.DETAILS.METADATA.CREATED",
+        "readOnly": true,
+        "type": "date",
+        "value": "2014-05-15T13:47:00Z"
+    },
+    {
+        "id": "createdBy",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.EVENTS.EVENTS.DETAILS.METADATA.CREATED_BY",
+        "readOnly": false,
+        "type": "text",
+        "value": "Xavier"
+    },
+    {
+        "id": "license",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.EVENTS.EVENTS.DETAILS.METADATA.LICENSE",
+        "readOnly": false,
+        "type": "text",
+        "value": "Creative Commons 3.0: Attribution-NonCommercial-NoDerivs"
+    }
+]

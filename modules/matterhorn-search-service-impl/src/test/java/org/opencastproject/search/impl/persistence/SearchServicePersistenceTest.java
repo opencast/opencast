@@ -1,19 +1,27 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.search.impl.persistence;
+
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -22,40 +30,28 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Tuple;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.mchange.v2.c3p0.DataSources;
-
-import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Tests persistence: storing, merging, retrieving and removing.
  */
 public class SearchServicePersistenceTest {
 
-  private ComboPooledDataSource pooledDataSource;
   private SearchServiceDatabaseImpl searchDatabase;
-  private String storage;
-
   private MediaPackage mediaPackage;
   private AccessControlList accessControlList;
   private SecurityService securityService;
@@ -65,32 +61,16 @@ public class SearchServicePersistenceTest {
    */
   @Before
   public void setUp() throws Exception {
-    long currentTime = System.currentTimeMillis();
-    storage = PathSupport.concat("target", "db" + currentTime + ".h2.db");
-
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + currentTime);
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Collect the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
-
     securityService = EasyMock.createNiceMock(SecurityService.class);
     DefaultOrganization defaultOrganization = new DefaultOrganization();
-    User user = new JaxbUser("admin", defaultOrganization, new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE,
+    User user = new JaxbUser("admin", "test", defaultOrganization, new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE,
             defaultOrganization));
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
 
     searchDatabase = new SearchServiceDatabaseImpl();
-    searchDatabase.setPersistenceProvider(new PersistenceProvider());
-    searchDatabase.setPersistenceProperties(props);
+    searchDatabase.setEntityManagerFactory(newTestEntityManagerFactory(SearchServiceDatabaseImpl.PERSISTENCE_UNIT));
     searchDatabase.setSecurityService(securityService);
     searchDatabase.activate(null);
 
@@ -98,7 +78,7 @@ public class SearchServicePersistenceTest {
 
     accessControlList = new AccessControlList();
     List<AccessControlEntry> acl = accessControlList.getEntries();
-    acl.add(new AccessControlEntry("admin", "write", true));
+    acl.add(new AccessControlEntry("admin", Permissions.Action.WRITE.toString(), true));
   }
 
   @Test
@@ -179,16 +159,6 @@ public class SearchServicePersistenceTest {
       i++;
     }
     Assert.assertEquals(1, i);
-  }
-
-  /**
-   * @throws java.lang.Exception
-   */
-  @After
-  public void tearDown() throws Exception {
-    searchDatabase.deactivate(null);
-    DataSources.destroy(pooledDataSource);
-    FileUtils.deleteQuietly(new File(storage));
   }
 
 }

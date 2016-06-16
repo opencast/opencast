@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:oc="http://www.opencastproject.org/matterhorn/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <dcterms:creator>Org Admin</dcterms:creator>
+   <dcterms:creator>Admin User</dcterms:creator>
+   <dcterms:license>Creative Commons 3.0: Attribution-NonCommercial-NoDerivs</dcterms:license>
+   <dcterms:temporal xsi:type="dcterms:Period">start=2015-03-24T14:15:00Z; end=2015-03-24T15:40:00Z; scheme=W3C-DTF;</dcterms:temporal>
+   <dcterms:subject>The subject for the Event</dcterms:subject>
+   <oc:agentTimezone>0</oc:agentTimezone>
+   <dcterms:rightsHolder>The rights for the Event</dcterms:rightsHolder>
+   <dcterms:title>The Title of the Event</dcterms:title>
+   <dcterms:contributor>Org Admin</dcterms:contributor>
+   <dcterms:created xsi:type="dcterms:W3CDTF">2014-11-12T17:47:37Z</dcterms:created>
+   <dcterms:description>The description of the Event</dcterms:description>
+   <dcterms:language>en</dcterms:language>
+   <dcterms:spatial>demo_capture_agent</dcterms:spatial>
+   <dcterms:identifier>2936233058022517295</dcterms:identifier>
+</dublincore>

@@ -1,0 +1,8 @@
+<section ng-show="open" id="add-event-modal" ng-keyup="keyUp($event)" tabindex="1" class="modal wizard modal-animation" ng-controller="NewEventCtrl">
+    <header>
+        <a class="fa fa-times close-modal" ng-click="close()"></a>
+        <h2 translate="EVENTS.EVENTS.NEW.CAPTION"><!--Create New Event--></h2>
+    </header>
+   <admin-ng-wizard data-name="new-event" data-states="states" data-submit="submit">
+   </admin-ng-wizard>
+</section>

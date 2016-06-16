@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.job.api;
 
 import static org.easymock.EasyMock.createNiceMock;
@@ -26,14 +32,17 @@ import org.opencastproject.util.data.Function2;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Ignore
 public class JobBarrierTest {
+
+  private static final Logger logger = LoggerFactory.getLogger(JobBarrierTest.class);
+
   @Test
   public void testWaitForJobsAllFinish() throws Exception {
     for (int x = 10; x > 0; x--) {
@@ -54,7 +63,7 @@ public class JobBarrierTest {
     for (long i = (long) (Math.random() * 100.0D); i > 0; i--) {
       jobs.put(i, jobCreator.apply(i));
     }
-    System.out.println("Waiting for " + jobs.size() + " jobs");
+    logger.info("Waiting for " + jobs.size() + " jobs");
     // create a service registry mock returning those jobs
     final ServiceRegistry sr = createNiceMock(ServiceRegistry.class);
     EasyMock.expect(sr.getJob(EasyMock.anyLong())).andAnswer(new IAnswer<Job>() {
@@ -66,7 +75,7 @@ public class JobBarrierTest {
     }).anyTimes();
     EasyMock.replay(sr);
     // wait for all jobs to complete
-    final JobBarrier.Result res = new JobBarrier(sr, 10, toArray(Job.class, jobs.values())).waitForJobs();
+    final JobBarrier.Result res = new JobBarrier(null, sr, 10, toArray(Job.class, jobs.values())).waitForJobs();
     // check if there are still running jobs
     final boolean noRunningJobs = mlist(jobs.values()).foldl(true, new Function2<Boolean, TestJob, Boolean>() {
       @Override
@@ -104,7 +113,7 @@ public class JobBarrierTest {
     }
   };
 
-  public static class TestJob extends JaxbJob {
+  public static class TestJob extends JobImpl {
     private final Status endStatus;
     private long finishTime;
     private Status lastReportedStatus;

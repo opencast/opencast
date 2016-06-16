@@ -1,28 +1,32 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.distribution.download;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
-import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageBuilder;
-import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -33,6 +37,7 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.PathSupport;
@@ -40,8 +45,6 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.workspace.api.Workspace;
-
-import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -51,11 +54,11 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.InputStream;
 import java.net.URI;
 
 import javax.servlet.http.HttpServletResponse;
@@ -66,19 +69,12 @@ public class DownloadDistributionServiceImplTest {
   private MediaPackage mp = null;
   private File distributionRoot = null;
   private ServiceRegistry serviceRegistry = null;
+  private DefaultOrganization defaultOrganization;
 
   @Before
   public void setUp() throws Exception {
     final File mediaPackageRoot = new File(getClass().getResource("/mediapackage.xml").toURI()).getParentFile();
-    MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
-    builder.setSerializer(new DefaultMediaPackageSerializerImpl(mediaPackageRoot));
-    InputStream is = null;
-    try {
-      is = getClass().getResourceAsStream("/mediapackage.xml");
-      mp = builder.loadFromXml(is);
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
+    mp = MediaPackageParser.getFromXml(IOUtils.toString(getClass().getResourceAsStream("/mediapackage.xml"), "UTF-8"));
 
     distributionRoot = new File(mediaPackageRoot, "static");
     service = new DownloadDistributionServiceImpl();
@@ -103,9 +99,9 @@ public class DownloadDistributionServiceImplTest {
             }).anyTimes();
     EasyMock.replay(httpClient);
 
-    DefaultOrganization defaultOrganization = new DefaultOrganization();
-    User anonymous = new JaxbUser("anonymous", defaultOrganization, new JaxbRole(
-            DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, defaultOrganization));
+    defaultOrganization = new DefaultOrganization();
+    User anonymous = new JaxbUser("anonymous", "test", defaultOrganization,
+            new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, defaultOrganization));
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);
@@ -113,8 +109,8 @@ public class DownloadDistributionServiceImplTest {
 
     Organization organization = new DefaultOrganization();
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
-    EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
-            .andReturn(organization).anyTimes();
+    EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject())).andReturn(organization)
+            .anyTimes();
     EasyMock.replay(organizationDirectoryService);
     service.setOrganizationDirectoryService(organizationDirectoryService);
 
@@ -125,7 +121,7 @@ public class DownloadDistributionServiceImplTest {
     service.setSecurityService(securityService);
 
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
-            organizationDirectoryService);
+            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
     service.setServiceRegistry(serviceRegistry);
     service.setTrustedHttpClient(httpClient);
     service.distributionDirectory = distributionRoot;
@@ -158,10 +154,11 @@ public class DownloadDistributionServiceImplTest {
     Job job1 = service.distribute("engage-player", mp, "track-1");
     Job job2 = service.distribute("engage-player", mp, "catalog-1");
     Job job3 = service.distribute("oai-pmh", mp, "catalog-1");
-    JobBarrier jobBarrier = new JobBarrier(serviceRegistry, 500, job1, job2, job3);
+    JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 500, job1, job2, job3);
     jobBarrier.waitForJobs();
 
-    File mpDir = new File(distributionRoot, PathSupport.path("engage-player", mp.getIdentifier().compact()));
+    File mpDir = new File(distributionRoot,
+            PathSupport.path(defaultOrganization.getId(), "engage-player", mp.getIdentifier().compact()));
     Assert.assertTrue(mpDir.exists());
     File mediaDir = new File(mpDir, "track-1");
     File metadataDir = new File(mpDir, "catalog-1");
@@ -183,7 +180,7 @@ public class DownloadDistributionServiceImplTest {
     Job job3 = service.distribute("engage-player", mp, "catalog-2");
     Job job4 = service.distribute("engage-player", mp, "notes");
     Job job5 = service.distribute("oai-pmh", mp, "track-1");
-    JobBarrier jobBarrier = new JobBarrier(serviceRegistry, 500, job1, job2, job3, job4, job5);
+    JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 500, job1, job2, job3, job4, job5);
     jobBarrier.waitForJobs();
 
     // Add the new elements to the mediapackage
@@ -193,7 +190,8 @@ public class DownloadDistributionServiceImplTest {
     mp.add(MediaPackageElementParser.getFromXml(job4.getPayload()));
     mp.add(MediaPackageElementParser.getFromXml(job5.getPayload()));
 
-    File mpDir = new File(distributionRoot, PathSupport.path("engage-player", mp.getIdentifier().compact()));
+    File mpDir = new File(distributionRoot,
+            PathSupport.path(defaultOrganization.getId(), "engage-player", mp.getIdentifier().compact()));
     File mediaDir = new File(mpDir, "track-1");
     File metadata1Dir = new File(mpDir, "catalog-1");
     File metadata2Dir = new File(mpDir, "catalog-2");
@@ -212,7 +210,7 @@ public class DownloadDistributionServiceImplTest {
     Job job7 = service.retract("engage-player", mp, "catalog-1");
     Job job8 = service.retract("engage-player", mp, "catalog-2");
     Job job9 = service.retract("engage-player", mp, "notes");
-    jobBarrier = new JobBarrier(serviceRegistry, 500, job6, job7, job8, job9);
+    jobBarrier = new JobBarrier(null, serviceRegistry, 500, job6, job7, job8, job9);
     jobBarrier.waitForJobs();
 
     Assert.assertFalse(service.getDistributionFile("engage-player", mp, mp.getElementById("track-1")).isFile());
@@ -232,7 +230,7 @@ public class DownloadDistributionServiceImplTest {
     Job job3 = service.distribute("engage-player", mp, "catalog-2");
     Job job4 = service.distribute("engage-player", mp, "notes");
     Job job5 = service.distribute("oai-pmh", mp, "notes");
-    JobBarrier jobBarrier = new JobBarrier(serviceRegistry, 500, job1, job2, job3, job4, job5);
+    JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 500, job1, job2, job3, job4, job5);
     jobBarrier.waitForJobs();
 
     // Add the new elements to the mediapackage
@@ -247,7 +245,8 @@ public class DownloadDistributionServiceImplTest {
     MediaPackageElement job5Element = MediaPackageElementParser.getFromXml(job5.getPayload());
     mp.add(job5Element);
 
-    File mpDir = new File(distributionRoot, PathSupport.path("engage-player", mp.getIdentifier().compact()));
+    File mpDir = new File(distributionRoot,
+            PathSupport.path(defaultOrganization.getId(), "engage-player", mp.getIdentifier().compact()));
     File mediaDir = new File(mpDir, "track-1");
     File metadata1Dir = new File(mpDir, "catalog-1");
     File metadata2Dir = new File(mpDir, "catalog-2");
@@ -266,7 +265,7 @@ public class DownloadDistributionServiceImplTest {
     Job job7 = service.retract("engage-player", mp, job2Element.getIdentifier());
     Job job8 = service.retract("engage-player", mp, job3Element.getIdentifier());
     Job job9 = service.retract("engage-player", mp, job4Element.getIdentifier());
-    jobBarrier = new JobBarrier(serviceRegistry, 500, job6, job7, job8, job9);
+    jobBarrier = new JobBarrier(null, serviceRegistry, 500, job6, job7, job8, job9);
     jobBarrier.waitForJobs();
 
     // Remove the distributed elements from the mediapackage

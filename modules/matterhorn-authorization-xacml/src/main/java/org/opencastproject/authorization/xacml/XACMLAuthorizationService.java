@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.authorization.xacml;
 
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY;
@@ -42,6 +48,7 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
@@ -54,19 +61,14 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Options;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.security.xacml.core.JBossPDP;
 import org.jboss.security.xacml.core.model.context.AttributeType;
 import org.jboss.security.xacml.core.model.context.RequestType;
 import org.jboss.security.xacml.core.model.context.SubjectType;
-import org.jboss.security.xacml.core.model.policy.ActionType;
-import org.jboss.security.xacml.core.model.policy.ApplyType;
-import org.jboss.security.xacml.core.model.policy.AttributeValueType;
-import org.jboss.security.xacml.core.model.policy.EffectType;
-import org.jboss.security.xacml.core.model.policy.PolicyType;
-import org.jboss.security.xacml.core.model.policy.RuleType;
 import org.jboss.security.xacml.factories.RequestAttributeFactory;
 import org.jboss.security.xacml.factories.RequestResponseContextFactory;
 import org.jboss.security.xacml.interfaces.PolicyDecisionPoint;
@@ -82,7 +84,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
 /**
@@ -137,7 +138,8 @@ public class XACMLAuthorizationService implements AuthorizationService {
       public Tuple<AccessControlList, AclScope> apply() {
         logger.debug("No XACML attachment found in {}", mp);
         if (StringUtils.isNotBlank(mp.getSeries())) {
-          logger.info("Falling back to using default acl from series");
+          logger.info("Falling back to using default acl from series {} for mediapackage {}", mp.getSeries(),
+                  mp.getIdentifier());
           try {
             return tuple(seriesService.getSeriesAccessControl(mp.getSeries()), AclScope.Series);
           } catch (Exception e) {
@@ -219,11 +221,14 @@ public class XACMLAuthorizationService implements AuthorizationService {
         // add attachment
         final String elementId = toElementId(scope);
         URI uri;
+        InputStream in = null;
         try {
-          uri = workspace.put(mp.getIdentifier().toString(), elementId, XACML_FILENAME,
-                  IOUtils.toInputStream(xacmlContent));
+          in = IOUtils.toInputStream(xacmlContent);
+          uri = workspace.put(mp.getIdentifier().toString(), elementId, XACML_FILENAME, in);
         } catch (IOException e) {
-          throw new MediaPackageException("Can not store xacml for mediapackage " + mp.getIdentifier());
+          throw new MediaPackageException("Error storing xacml for mediapackage " + mp.getIdentifier());
+        } finally {
+          IOUtils.closeQuietly(in);
         }
 
         if (attachment == null) {
@@ -232,6 +237,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
         }
         attachment.setURI(uri);
         attachment.setIdentifier(elementId);
+        attachment.setMimeType(MimeTypes.XML);
         // setting the URI to a new source so the checksum will most like be invalid
         attachment.setChecksum(null);
         mp.add(attachment);
@@ -452,55 +458,21 @@ public class XACMLAuthorizationService implements AuthorizationService {
     return Tuple.tuple(mp, attachment);
   }
 
-  private PolicyType unmarshalPolicy(InputStream in) {
-    try {
-      return ((JAXBElement<PolicyType>) XACMLUtils.jBossXacmlJaxbContext.createUnmarshaller().unmarshal(in)).getValue();
-    } catch (JAXBException e) {
-      throw new Error("Unable to unmarshall xacml document");
-    }
-  }
-
   /** Load an ACL from the given URI. */
   private Option<AccessControlList> loadAcl(final URI uri) {
-    File file = fromWorkspace(uri);
+    final File file = fromWorkspace(uri);
     if (file == null)
       return none();
 
     return withFile(file, new Function2<InputStream, File, AccessControlList>() {
       @Override
       public AccessControlList apply(InputStream in, File aclFile) {
-        final PolicyType policy = unmarshalPolicy(in);
-        final AccessControlList acl = new AccessControlList();
-        final List<AccessControlEntry> entries = acl.getEntries();
-        for (Object object : policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition()) {
-          if (object instanceof RuleType) {
-            RuleType rule = (RuleType) object;
-            if (rule.getTarget() == null) {
-              continue;
-            }
-            ActionType action = rule.getTarget().getActions().getAction().get(0);
-            String actionForAce = (String) action.getActionMatch().get(0).getAttributeValue().getContent().get(0);
-            String role = null;
-            JAXBElement<ApplyType> apply = (JAXBElement<ApplyType>) rule.getCondition().getExpression();
-            for (JAXBElement<?> element : apply.getValue().getExpression()) {
-              if (element.getValue() instanceof AttributeValueType) {
-                role = (String) ((AttributeValueType) element.getValue()).getContent().get(0);
-                break;
-              }
-            }
-            if (role == null) {
-              logger.warn("Unable to find a role in rule {}", rule);
-              continue;
-            }
-            AccessControlEntry ace = new AccessControlEntry(role, actionForAce, rule.getEffect().equals(
-                    EffectType.PERMIT));
-            entries.add(ace);
-          } else {
-            logger.debug("Skipping {}", object);
-          }
+        try {
+          return XACMLUtils.parseXacml(in);
+        } catch (JAXBException e) {
+          FileUtils.deleteQuietly(file);
+          throw new Error("Unable to unmarshall XACML document from " + file + ":" + e);
         }
-
-        return acl;
       }
     });
   }

@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.kernel.security;
 
 import static org.easymock.EasyMock.createMock;
@@ -21,6 +27,8 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.kernel.http.api.HttpClient;
@@ -29,19 +37,26 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClientException;
+import org.opencastproject.security.urlsigning.exception.UrlSigningException;
+import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
-import junit.framework.Assert;
+import com.entwinemedia.fn.data.Opt;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
 import org.apache.http.params.HttpParams;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
@@ -50,6 +65,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
 import java.io.IOException;
+
+import junit.framework.Assert;
 
 public class TrustedHttpClientImplTest {
 
@@ -573,5 +590,141 @@ public class TrustedHttpClientImplTest {
 
     HttpResponse response = client.execute(httpPost);
     Assert.assertEquals(200, response.getStatusLine().getStatusCode());
+  }
+
+  @Test
+  public void testNotAcceptsUrlSigningService() throws IOException {
+    String notAcceptsUrl = "http://notaccepts.com";
+    HttpGet get = new HttpGet(notAcceptsUrl);
+
+    // Setup signing service
+    UrlSigningService urlSigningService = EasyMock.createMock(UrlSigningService.class);
+    EasyMock.expect(urlSigningService.accepts(notAcceptsUrl)).andReturn(false);
+    EasyMock.replay(urlSigningService);
+
+    CredentialsProvider cp = EasyMock.createNiceMock(CredentialsProvider.class);
+    Capture<HttpUriRequest> request = EasyMock.newCapture();
+
+    // Setup Http Client
+    HttpClient httpClient = createMock("Request", HttpClient.class);
+    HttpParams httpParams = createNiceMock(HttpParams.class);
+    expect(httpClient.getParams()).andReturn(httpParams);
+    expect(httpClient.getCredentialsProvider()).andReturn(cp);
+    expect(httpClient.execute(EasyMock.capture(request))).andReturn(new BasicHttpResponse(new BasicStatusLine(HttpVersion.HTTP_1_1, 200, "ok")));
+    EasyMock.replay(httpClient);
+
+    // Setup DefaultHttpClientFactory
+    HttpClientFactory httpClientFactory = createMock(HttpClientFactory.class);
+    expect(httpClientFactory.makeHttpClient()).andReturn(httpClient).atLeastOnce();
+    replay(httpClientFactory);
+
+    client = new TrustedHttpClientImpl("user", "pass");
+    client.setHttpClientFactory(httpClientFactory);
+    client.setSecurityService(securityService);
+    client.setUrlSigningService(urlSigningService);
+    client.execute(get);
+    assertTrue(request.hasCaptured());
+    assertEquals(get.getURI().toString(), request.getValue().getURI().toString());
+  }
+
+  @Test
+  public void testAcceptsUrlSigningService() throws IOException, UrlSigningException {
+    String acceptsUrl = "http://accepts.com";
+    String signedUrl = "http://accepts.com?policy=testPolicy&signature=testSignature&keyId=testKeyId";
+    HttpGet get = new HttpGet(acceptsUrl);
+
+    // Setup signing service
+    UrlSigningService urlSigningService = EasyMock.createMock(UrlSigningService.class);
+    EasyMock.expect(urlSigningService.accepts(acceptsUrl)).andReturn(true);
+    EasyMock.expect(urlSigningService.sign(EasyMock.anyString(), EasyMock.anyLong(), EasyMock.anyLong(),
+            EasyMock.anyString())).andReturn(signedUrl);
+    EasyMock.replay(urlSigningService);
+
+    CredentialsProvider cp = EasyMock.createNiceMock(CredentialsProvider.class);
+    Capture<HttpUriRequest> request = EasyMock.newCapture();
+
+    // Setup Http Client
+    HttpClient httpClient = createMock("Request", HttpClient.class);
+    HttpParams httpParams = createNiceMock(HttpParams.class);
+    expect(httpClient.getParams()).andReturn(httpParams);
+    expect(httpClient.getCredentialsProvider()).andReturn(cp);
+    expect(httpClient.execute(EasyMock.capture(request))).andReturn(new BasicHttpResponse(new BasicStatusLine(HttpVersion.HTTP_1_1, 200, "ok")));
+    EasyMock.replay(httpClient);
+
+    // Setup DefaultHttpClientFactory
+    HttpClientFactory httpClientFactory = createMock(HttpClientFactory.class);
+    expect(httpClientFactory.makeHttpClient()).andReturn(httpClient).atLeastOnce();
+    replay(httpClientFactory);
+
+    client = new TrustedHttpClientImpl("user", "pass");
+    client.setHttpClientFactory(httpClientFactory);
+    client.setSecurityService(securityService);
+    client.setUrlSigningService(urlSigningService);
+    client.execute(get);
+    assertTrue(request.hasCaptured());
+    assertEquals(signedUrl, request.getValue().getURI().toString());
+  }
+
+  @Test
+  public void testAlreadySignedUrlIgnoredByUrlSigningService() throws IOException, UrlSigningException {
+    String acceptsUrl = "http://alreadysigned.com?signature=thesig&policy=thepolicy&keyId=thekey";
+    HttpHead headRequest = new HttpHead(acceptsUrl);
+
+    // Setup signing service
+    UrlSigningService urlSigningService = EasyMock.createMock(UrlSigningService.class);
+    EasyMock.expect(urlSigningService.accepts(acceptsUrl)).andReturn(true);
+    EasyMock.replay(urlSigningService);
+
+    CredentialsProvider cp = EasyMock.createNiceMock(CredentialsProvider.class);
+    Capture<HttpUriRequest> request = EasyMock.newCapture();
+
+    // Setup Http Client
+    HttpClient httpClient = createMock("Request", HttpClient.class);
+    HttpParams httpParams = createNiceMock(HttpParams.class);
+    expect(httpClient.getParams()).andReturn(httpParams);
+    expect(httpClient.getCredentialsProvider()).andReturn(cp);
+    expect(httpClient.execute(EasyMock.capture(request))).andReturn(new BasicHttpResponse(new BasicStatusLine(HttpVersion.HTTP_1_1, 200, "ok")));
+    EasyMock.replay(httpClient);
+
+    // Setup DefaultHttpClientFactory
+    HttpClientFactory httpClientFactory = createMock(HttpClientFactory.class);
+    expect(httpClientFactory.makeHttpClient()).andReturn(httpClient).atLeastOnce();
+    replay(httpClientFactory);
+
+    client = new TrustedHttpClientImpl("user", "pass");
+    client.setHttpClientFactory(httpClientFactory);
+    client.setSecurityService(securityService);
+    client.setUrlSigningService(urlSigningService);
+    client.execute(headRequest);
+    assertTrue(request.hasCaptured());
+    assertEquals(acceptsUrl, request.getValue().getURI().toString());
+  }
+
+  @Test
+  public void testGetSignedUrl() throws IOException, UrlSigningException {
+    HttpGet notAccepted = new HttpGet("http://notAccepted.com");
+    HttpGet alreadySigned = new HttpGet("http://alreadySigned.com?signature=thesignature&keyId=theKeyId&policy=thePolicy");
+    HttpPost notGetOrHead = new HttpPost("http://notGetOrHead.com");
+    HttpGet ok = new HttpGet("http://ok.com");
+    String signedOk = "http://ok.com?signature=thesignature&keyId=theKeyId&policy=thePolicy";
+
+    // Setup signing service
+    UrlSigningService urlSigningService = EasyMock.createMock(UrlSigningService.class);
+    EasyMock.expect(urlSigningService.accepts(notAccepted.getURI().toString())).andReturn(false);
+    EasyMock.expect(urlSigningService.accepts(alreadySigned.getURI().toString())).andReturn(true);
+    EasyMock.expect(urlSigningService.accepts(notGetOrHead.getURI().toString())).andReturn(true);
+    EasyMock.expect(urlSigningService.accepts(ok.getURI().toString())).andReturn(true);
+    EasyMock.expect(
+            urlSigningService.sign(ok.getURI().toString(), TrustedHttpClientImpl.DEFAULT_URL_SIGNING_EXPIRES_DURATION,
+                    null, null)).andReturn(signedOk);
+    EasyMock.replay(urlSigningService);
+
+    client = new TrustedHttpClientImpl("user", "pass");
+    client.setUrlSigningService(urlSigningService);
+    assertTrue(client.getSignedUrl(notAccepted).isNone());
+    assertTrue(client.getSignedUrl(notGetOrHead).isNone());
+    Opt<HttpUriRequest> result = client.getSignedUrl(ok);
+    assertTrue(result.isSome());
+    assertEquals(signedOk, result.get().getURI().toString());
   }
 }

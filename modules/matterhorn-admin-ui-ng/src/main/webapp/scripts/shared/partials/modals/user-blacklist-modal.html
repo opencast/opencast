@@ -1,0 +1,8 @@
+<section ng-show="open" id="user-blacklist-modal" ng-keyup="keyUp($event)" tabindex="1" class="modal wizard modal-animation ng-hide" ng-controller="UserblacklistCtrl">
+    <header>
+        <a class="fa fa-times close-modal" ng-click="close()"></a>
+        <h2 translate="USERS.BLACKLISTS.DETAILS.NEWCAPTION">Blacklist by User</h2>
+    </header>
+   <admin-ng-wizard data-name="userblacklist" data-states="states" data-submit="submit">
+   </admin-ng-wizard>
+</section>

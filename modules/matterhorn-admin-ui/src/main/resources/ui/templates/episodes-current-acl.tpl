@@ -1,10 +1,10 @@
-<div class="episode-schedule current" id="<%= this.id %>">
+<div class="episode-schedule current" id="<%! this.id %>">
     <span>
         Active ACL
     </span>
     <span>
-        <select class="acl" id="acl-<%= this.id %>">
-            <%= this.acl %>
+        <select class="acl" id="acl-<%! this.id %>">
+            <%! this.acl %>
         </select>
         <span class="aclLabel"></span>
     </span>

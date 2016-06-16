@@ -1,19 +1,29 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.authorization.xacml;
+
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.security.api.AccessControlEntry;
+import org.opencastproject.security.api.AccessControlList;
 
 import org.jboss.security.xacml.core.model.policy.ActionMatchType;
 import org.jboss.security.xacml.core.model.policy.ActionType;
@@ -31,13 +41,16 @@ import org.jboss.security.xacml.core.model.policy.ResourcesType;
 import org.jboss.security.xacml.core.model.policy.RuleType;
 import org.jboss.security.xacml.core.model.policy.SubjectAttributeDesignatorType;
 import org.jboss.security.xacml.core.model.policy.TargetType;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.security.api.AccessControlEntry;
-import org.opencastproject.security.api.AccessControlList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import java.io.StringWriter;
 
 /**
  * Utility implementation for dealing with XACML data.
@@ -64,6 +77,8 @@ public final class XACMLUtils {
   public static final String ISSUER = "matterhorn";
   /** The JAXB Context to use for marshaling XACML security policy documents */
   protected static JAXBContext jBossXacmlJaxbContext;
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(XACMLUtils.class);
 
   /** Static initializer for the single JAXB context */
   static {
@@ -79,6 +94,54 @@ public final class XACMLUtils {
    * Private constructor to disable clients from instantiating this class.
    */
   private XACMLUtils() {
+  }
+
+  /**
+   * Parses a XACML into an {@link AccessControlList}.
+   * <p>
+   * Only rules which follow the structure of those created by {@link #getXacml(MediaPackage, AccessControlList)} may be
+   * successfully parsed. All other rules are ignored.
+   * 
+   * @param xacml
+   *          the XACML to parse
+   * @return the ACL, never {@code null}
+   * @throws JAXBException
+   *           if unmarshalling fails
+   */
+  public static AccessControlList parseXacml(InputStream xacml) throws JAXBException {
+    @SuppressWarnings("unchecked")
+    final PolicyType policy = ((JAXBElement<PolicyType>) XACMLUtils.jBossXacmlJaxbContext.createUnmarshaller().unmarshal(xacml)).getValue();
+    final AccessControlList acl = new AccessControlList();
+    final List<AccessControlEntry> entries = acl.getEntries();
+    for (Object object : policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition()) {
+      if (object instanceof RuleType) {
+        RuleType rule = (RuleType) object;
+        if (rule.getTarget() == null) {
+          continue;
+        }
+        ActionType action = rule.getTarget().getActions().getAction().get(0);
+        String actionForAce = (String) action.getActionMatch().get(0).getAttributeValue().getContent().get(0);
+        String role = null;
+        @SuppressWarnings("unchecked")
+        JAXBElement<ApplyType> apply = (JAXBElement<ApplyType>) rule.getCondition().getExpression();
+        for (JAXBElement<?> element : apply.getValue().getExpression()) {
+          if (element.getValue() instanceof AttributeValueType) {
+            role = (String) ((AttributeValueType) element.getValue()).getContent().get(0);
+            break;
+          }
+        }
+        if (role == null) {
+          logger.warn("Unable to find a role in rule {}", rule);
+          continue;
+        }
+        AccessControlEntry ace = new AccessControlEntry(role, actionForAce, rule.getEffect().equals(EffectType.PERMIT));
+        entries.add(ace);
+      } else {
+        logger.debug("XACML rule '{}' out of policy '{} could not be parsed to ACE", object, policy);
+      }
+    }
+
+    return acl;
   }
 
   /**

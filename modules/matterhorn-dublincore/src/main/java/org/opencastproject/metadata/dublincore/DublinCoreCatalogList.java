@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.metadata.dublincore;
 
 import org.opencastproject.util.IoSupport;
@@ -21,6 +27,8 @@ import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -53,10 +61,10 @@ import javax.xml.xpath.XPathFactory;
  *
  */
 public class DublinCoreCatalogList {
-
   /** Array storing Dublin cores */
   private List<DublinCoreCatalog> catalogList = new LinkedList<DublinCoreCatalog>();
   private long totalCatalogCount = 0;
+  private static final Logger logger = LoggerFactory.getLogger(DublinCoreCatalogList.class);
 
   /**
    * Initialize with the given catalog list.
@@ -148,19 +156,14 @@ public class DublinCoreCatalogList {
         long totalCount = Long.parseLong((String) json.get("totalCount"));
         JSONArray catalogsArray = (JSONArray) json.get("catalogs");
         for (Object catalog : catalogsArray) {
-          InputStream is = null;
-          try {
-            is = IOUtils.toInputStream(((JSONObject) catalog).toJSONString(), "UTF-8");
-            catalogs.add(new DublinCoreCatalogImpl(is));
-          } finally {
-            IoSupport.closeQuietly(is);
-          }
+          catalogs.add(DublinCoreJsonFormat.read((JSONObject) catalog));
         }
         return new DublinCoreCatalogList(catalogs, totalCount);
       } catch (Exception e) {
         throw new IllegalStateException("Unable to load dublin core catalog list, json parsing failed.", e);
       }
     } else {
+      // XML
       InputStream is = null;
       try {
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -179,7 +182,7 @@ public class DublinCoreCatalogList {
           InputStream nodeIs = null;
           try {
             nodeIs = nodeToString(nodes.item(i));
-            catalogs.add(new DublinCoreCatalogImpl(nodeIs));
+            catalogs.add(DublinCoreXmlFormat.read(nodeIs));
           } finally {
             IoSupport.closeQuietly(nodeIs);
           }
@@ -209,7 +212,7 @@ public class DublinCoreCatalogList {
       t.transform(new DOMSource(node), new StreamResult(outputStream));
       return new ByteArrayInputStream(outputStream.toByteArray());
     } catch (TransformerException te) {
-      System.out.println("nodeToString Transformer Exception");
+      logger.warn("nodeToString Transformer Exception", te);
     }
     return null;
   }
@@ -224,7 +227,7 @@ public class DublinCoreCatalogList {
     JSONObject jsonObj = new JSONObject();
     JSONArray jsonArray = new JSONArray();
     for (DublinCoreCatalog catalog : catalogList) {
-      jsonArray.add(((DublinCoreCatalogImpl) catalog).toJsonObject());
+      jsonArray.add(DublinCoreJsonFormat.writeJsonObject((DublinCoreCatalog) catalog));
     }
     jsonObj.put("totalCount", String.valueOf(totalCatalogCount));
     jsonObj.put("catalogs", jsonArray);

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.workflow.handler.speechrecognition.SpeechRecognitionWorkflowOperationHandler"
+               immediate="true"
+               activate="activate">
+  <implementation class="org.opencastproject.workflow.handler.speechrecognition.SpeechRecognitionWorkflowOperationHandler"/>
+
+  <property name="service.description" value="Speech recognition Workflow Operation Handler"/>
+  <property name="workflow.operation" value="speech-recognition"/>
+
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
+  </service>
+
+  <reference name="SpeechRecognitionService"
+             interface="org.opencastproject.speechrecognition.api.SpeechRecognitionService"
+             cardinality="1..1"
+             policy="static"
+             bind="setSpeechRecognitionService"/>
+  <reference name="serviceRegistry"
+             interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             cardinality="1..1"
+             policy="static"
+             bind="setServiceRegistry"/>
+</scr:component>

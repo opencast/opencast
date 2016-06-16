@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.serviceregistry.api;
 
 import static org.opencastproject.util.data.Option.some;
@@ -22,11 +28,12 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.joda.time.DateTimeConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,7 +114,7 @@ public class RemoteBase {
    *          the http request. If the URI is specified, it should include only the path beyond the service endpoint.
    *          For example, a request intended for http://{host}/{service}/extra/path/info.xml should include the URI
    *          "/extra/path/info.xml".
-   * @return the response object
+   * @return the response object, or null if we can not connect to any services
    */
   protected HttpResponse getResponse(HttpRequestBase httpRequest) {
     return getResponse(httpRequest, HttpStatus.SC_OK);
@@ -127,6 +134,7 @@ public class RemoteBase {
    */
   protected HttpResponse getResponse(HttpRequestBase httpRequest, Integer... expectedHttpStatus) {
 
+    final long maxWaitTimeMillis = System.currentTimeMillis() + DateTimeConstants.MILLIS_PER_DAY;
     boolean warnedUnavailability = false;
 
     // Try forever
@@ -134,6 +142,7 @@ public class RemoteBase {
 
       List<ServiceRegistration> remoteServices = null;
       List<String> servicesInWarningState = new ArrayList<String>();
+      List<String> servicesInKnownState = new ArrayList<String>();
 
       // Find available services
       boolean warned = false;
@@ -166,10 +175,10 @@ public class RemoteBase {
       }
 
       // Try each available service
+      String fullUrl = null;
       for (ServiceRegistration remoteService : remoteServices) {
         HttpResponse response = null;
         try {
-          String fullUrl = null;
           if (uriSuffix == null) {
             fullUrl = UrlSupport.concat(remoteService.getHost(), remoteService.getPath());
           } else {
@@ -183,7 +192,7 @@ public class RemoteBase {
           response = client.execute(httpRequest);
           StatusLine status = response.getStatusLine();
           if (Arrays.asList(expectedHttpStatus).contains(status.getStatusCode())) {
-            if (servicesInWarningState.contains(fullUrl)) {
+            if (servicesInWarningState.contains(fullUrl) || servicesInKnownState.contains(fullUrl)) {
               logger.warn("Service at {} is back to normal with expected status code {}", fullUrl,
                       status.getStatusCode());
             }
@@ -192,12 +201,23 @@ public class RemoteBase {
             if (!knownHttpStatuses.contains(status.getStatusCode()) && !servicesInWarningState.contains(fullUrl)) {
               logger.warn("Service at {} returned unexpected response code {}", fullUrl, status.getStatusCode());
               servicesInWarningState.add(fullUrl);
+              servicesInKnownState.remove(fullUrl);
+            } else if (knownHttpStatuses.contains(status.getStatusCode()) && !servicesInKnownState.contains(fullUrl)) {
+              logger.info("Service at {} returned known response code {}", fullUrl, status.getStatusCode());
+              servicesInKnownState.add(fullUrl);
+              servicesInWarningState.remove(fullUrl);
             }
-            closeConnection(response);
           }
         } catch (Exception e) {
-          closeConnection(response);
+          logger.error("Exception while trying to dispatch job to {}: {}", fullUrl, e);
+          servicesInWarningState.add(fullUrl);
         }
+        closeConnection(response);
+      }
+
+      if (servicesInKnownState.isEmpty()) {
+        logger.warn("All services of type '{}' are in unknown state, abort remote call {}", serviceType, originalUri);
+        return null;
       }
 
       // Reset Original URI
@@ -212,6 +232,12 @@ public class RemoteBase {
       }
 
       try {
+        if (System.currentTimeMillis() > maxWaitTimeMillis) {
+          logger.warn(
+                  "Still no service of type '{}' available while waiting for more than one day, abort remote call {}",
+                  serviceType, originalUri);
+          return null;
+        }
         Thread.sleep(TIMEOUT);
       } catch (InterruptedException e) {
         logger.warn("Interrupted while waiting for remote service of type '{}'", serviceType);
@@ -276,6 +302,7 @@ public class RemoteBase {
      * @throws IOException
      * @see java.io.InputStream#close()
      */
+    @Override
     public void close() throws IOException {
       delegateStream.close();
       closeConnection(httpResponse);
@@ -285,6 +312,7 @@ public class RemoteBase {
      * @param readlimit
      * @see java.io.InputStream#mark(int)
      */
+    @Override
     public void mark(int readlimit) {
       delegateStream.mark(readlimit);
     }
@@ -293,6 +321,7 @@ public class RemoteBase {
      * @return whether this stream supports marking
      * @see java.io.InputStream#markSupported()
      */
+    @Override
     public boolean markSupported() {
       return delegateStream.markSupported();
     }
@@ -316,6 +345,7 @@ public class RemoteBase {
      *              <code>b.length - off</code>
      * @see java.io.InputStream#read(byte[], int, int)
      */
+    @Override
     public int read(byte[] b, int off, int len) throws IOException {
       return delegateStream.read(b, off, len);
     }
@@ -332,6 +362,7 @@ public class RemoteBase {
      *              if <code>b</code> is <code>null</code>.
      * @see java.io.InputStream#read(byte[])
      */
+    @Override
     public int read(byte[] b) throws IOException {
       return delegateStream.read(b);
     }
@@ -340,6 +371,7 @@ public class RemoteBase {
      * @throws IOException
      * @see java.io.InputStream#reset()
      */
+    @Override
     public void reset() throws IOException {
       delegateStream.reset();
     }
@@ -352,6 +384,7 @@ public class RemoteBase {
      *              if the stream does not support seek, or if some other I/O error occurs.
      * @see java.io.InputStream#skip(long)
      */
+    @Override
     public long skip(long n) throws IOException {
       return delegateStream.skip(n);
     }
@@ -360,6 +393,7 @@ public class RemoteBase {
      * @return
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
       return getClass().getName() + " : " + delegateStream.toString();
     }

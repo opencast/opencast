@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.metadata.dublincore;
 
 import org.opencastproject.mediapackage.Catalog;
@@ -25,17 +31,17 @@ import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.metadata.api.MediapackageMetadataImpl;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.io.IOUtils;
+import com.entwinemedia.fn.Stream;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -47,8 +53,7 @@ import javax.xml.transform.stream.StreamResult;
 /**
  * Parses {@link DublinCoreCatalog}s from serialized DC representations.
  */
-public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalog>,
-        MediaPackageMetadataService {
+public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalog>, MediaPackageMetadataService {
 
   private static final Logger logger = LoggerFactory.getLogger(DublinCoreCatalogService.class);
 
@@ -101,21 +106,8 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
   @Override
   public MediaPackageMetadata getMetadata(MediaPackage mp) {
     MediapackageMetadataImpl metadata = new MediapackageMetadataImpl();
-
-    Catalog[] dcs = mp.getCatalogs(DublinCoreCatalog.ANY_DUBLINCORE);
-    for (Catalog catalog : dcs) {
-      DublinCoreCatalog dc;
-      InputStream in = null;
-      try {
-        File f = workspace.get(catalog.getURI());
-        in = new FileInputStream(f);
-        dc = load(in);
-      } catch (Exception e) {
-        logger.warn("Unable to load metadata from catalog '{}'", catalog);
-        continue;
-      } finally {
-        IOUtils.closeQuietly(in);
-      }
+    for (Catalog catalog : Stream.$(mp.getCatalogs(DublinCoreCatalog.ANY_DUBLINCORE)).sort(COMPARE_BY_FLAVOR)) {
+      DublinCoreCatalog dc = DublinCoreUtil.loadDublinCore(workspace, catalog);
       if (MediaPackageElements.EPISODE.equals(catalog.getFlavor())) {
         // Title
         metadata.setTitle(dc.getFirst(DublinCore.PROPERTY_TITLE));
@@ -164,12 +156,23 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
         // Series Title and Identifier
         metadata.setSeriesTitle(dc.getFirst(DublinCore.PROPERTY_TITLE));
         metadata.setSeriesIdentifier(dc.getFirst(DublinCore.PROPERTY_IDENTIFIER));
+      } else if (catalog.getFlavor().getSubtype().startsWith(MediaPackageElements.OAIPMH.getSubtype())) {
+        // ignoring OAI-PMH dublincore flavors
       } else {
         logger.warn("Unexpected dublin core catalog flavor found, ignoring '" + catalog.getFlavor() + "'");
       }
     }
     return metadata;
   }
+
+  public static final Comparator<Catalog> COMPARE_BY_FLAVOR = new Comparator<Catalog>() {
+    @Override
+    public int compare(Catalog c1, Catalog c2) {
+      if (MediaPackageElements.EPISODE.equals(c1.getFlavor()))
+        return 1;
+      return -1;
+    }
+  };
 
   /**
    *
@@ -181,7 +184,7 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
   public DublinCoreCatalog load(InputStream in) throws IOException {
     if (in == null)
       throw new IllegalArgumentException("Stream must not be null");
-    return new DublinCoreCatalogImpl(in);
+    return DublinCores.read(in);
   }
 
   /**
@@ -204,7 +207,7 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
    */
   @Override
   public DublinCoreCatalog newInstance() {
-    return new DublinCoreCatalogImpl();
+    return DublinCores.mkOpencastEpisode().getCatalog();
   }
 
   /**

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  name="org.opencastproject.userdirectory.UserIdRoleProvider" immediate="true">
+  <implementation class="org.opencastproject.userdirectory.UserIdRoleProvider" />
+  <property name="service.description" value="Provides the user id role" />
+  <service>
+    <provide interface="org.opencastproject.security.api.RoleProvider" />
+    <provide interface="org.opencastproject.userdirectory.UserIdRoleProvider" />
+  </service>
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+</scr:component>

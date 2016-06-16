@@ -1,20 +1,27 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.security.api;
 
+import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.EqualsUtil.bothNotNull;
 import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
@@ -29,6 +36,9 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
+
+import com.entwinemedia.fn.Pred;
+import com.entwinemedia.fn.fns.Booleans;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,13 +70,16 @@ public final class AccessControlUtil {
    * @param org
    *          the organization
    * @param action
-   *          the action to perform
+   *          The action to perform. <code>action</code> may be an arbitrary object. The authorization check is done on
+   *          the string representation of the object (<code>#toString()</code>). This allows to group actions as enums
+   *          and use them without converting them to a string manually. See
+   *          {@link org.opencastproject.security.api.Permissions.Action}.
    * @return whether this action should be allowed
    * @throws IllegalArgumentException
    *           if any of the arguments are null
    */
-  public static boolean isAuthorized(AccessControlList acl, User user, Organization org, String action) {
-    if (action == null || user == null || acl == null)
+  public static boolean isAuthorized(AccessControlList acl, User user, Organization org, Object action) {
+    if (action == null || user == null || acl == null || org == null)
       throw new IllegalArgumentException();
 
     // Check for the global and local admin role
@@ -75,7 +88,7 @@ public final class AccessControlUtil {
 
     Set<Role> userRoles = user.getRoles();
     for (AccessControlEntry entry : acl.getEntries()) {
-      if (!action.equals(entry.getAction()))
+      if (!action.toString().equals(entry.getAction()))
         continue;
 
       String aceRole = entry.getRole();
@@ -87,6 +100,112 @@ public final class AccessControlUtil {
       }
     }
     return false;
+  }
+
+  /**
+   * {@link AccessControlUtil#isAuthorized(org.opencastproject.security.api.AccessControlList, org.opencastproject.security.api.User, org.opencastproject.security.api.Organization, Object)}
+   * as a predicate function.
+   */
+  private static Pred<Object> isAuthorizedFn(final AccessControlList acl, final User user, final Organization org) {
+    return new Pred<Object>() {
+      @Override
+      public Boolean ap(Object action) {
+        return isAuthorized(acl, user, org, action);
+      }
+    };
+  }
+
+  /**
+   * Returns true only if <em>all</em> actions are authorized.
+   *
+   * @see #isAuthorized(AccessControlList, User, Organization, Object)
+   */
+  public static boolean isAuthorizedAll(AccessControlList acl, User user, Organization org, Object... actions) {
+    return !$(actions).exists(Booleans.not(isAuthorizedFn(acl, user, org)));
+  }
+
+  /**
+   * Returns true if at least <em>one</em> action is authorized.
+   *
+   * @see #isAuthorized(AccessControlList, User, Organization, Object)
+   */
+  public static boolean isAuthorizedOne(AccessControlList acl, User user, Organization org, Object... actions) {
+    return $(actions).exists(isAuthorizedFn(acl, user, org));
+  }
+
+  /**
+   * Returns true if <em>all</em> actions are prohibited.
+   *
+   * @see #isAuthorized(AccessControlList, User, Organization, Object)
+   */
+  public static boolean isProhibitedAll(AccessControlList acl, User user, Organization org, Object... actions) {
+    return !$(actions).exists(isAuthorizedFn(acl, user, org));
+  }
+
+  /**
+   * Returns true if at least <em>one</em> action is prohibited.
+   *
+   * @see #isAuthorized(AccessControlList, User, Organization, Object)
+   */
+  public static boolean isProhibitedOne(AccessControlList acl, User user, Organization org, Object... actions) {
+    return $(actions).exists(Booleans.not(isAuthorizedFn(acl, user, org)));
+  }
+
+  /**
+   * Extends an access control list with an access control entry
+   *
+   * @param acl
+   *          the access control list to extend
+   * @param role
+   *          the access control entry role
+   * @param action
+   *          the access control entry action
+   * @param allow
+   *          whether this access control entry role is allowed to take this action
+   * @return the extended access control list or the same if already contained
+   */
+  public static AccessControlList extendAcl(AccessControlList acl, String role, String action, boolean allow) {
+    AccessControlList newAcl = new AccessControlList();
+    boolean foundAce = false;
+    for (AccessControlEntry ace : acl.getEntries()) {
+      if (ace.getAction().equalsIgnoreCase(action) && ace.getRole().equalsIgnoreCase(role)) {
+        if (ace.isAllow() == allow) {
+          // Entry is already the same so just return the acl
+          return acl;
+        } else {
+          // We need to change the allow on the one entry.
+          foundAce = true;
+          newAcl.getEntries().add(new AccessControlEntry(role, action, allow));
+        }
+      } else {
+        newAcl.getEntries().add(ace);
+      }
+    }
+    if (!foundAce)
+      newAcl.getEntries().add(new AccessControlEntry(role, action, allow));
+
+    return newAcl;
+  }
+
+  /**
+   * Reduces an access control list by an access control entry
+   *
+   * @param acl
+   *          the access control list to reduce
+   * @param role
+   *          the role of the access control entry to remove
+   * @param action
+   *          the action of the access control entry to remove
+   * @return the reduced access control list or the same if already contained
+   */
+  public static AccessControlList reduceAcl(AccessControlList acl, String role, String action) {
+    AccessControlList newAcl = new AccessControlList();
+    for (AccessControlEntry ace : acl.getEntries()) {
+      if (!ace.getAction().equalsIgnoreCase(action) || !ace.getRole().equalsIgnoreCase(role)) {
+        newAcl.getEntries().add(ace);
+      }
+    }
+    return newAcl;
   }
 
   public static final Function<String, Option<AclScope>> toAclScope = new Function<String, Option<AclScope>>() {

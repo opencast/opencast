@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.composer.impl;
 
 import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
@@ -26,7 +32,7 @@ import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.ReadinessIndicator;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -43,8 +49,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * This manager class tries to read encoding profiles from the classpath.
@@ -60,6 +66,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
   private static final String PROP_OUTPUT = ".output";
   private static final String PROP_SUFFIX = ".suffix";
   private static final String PROP_MIMETYPE = ".mimetype";
+  private static final String PROP_JOBLOAD = ".jobload";
 
   /** OSGi bundle context */
   private BundleContext bundleCtx = null;
@@ -195,11 +202,21 @@ public class EncodingProfileScanner implements ArtifactInstaller {
               + "' is unknwon");
     }
 
-    // Suffix
-    String suffixObj = getDefaultProperty(profile, PROP_SUFFIX, properties, defaultProperties);
-    if (StringUtils.isBlank(suffixObj))
-      throw new ConfigurationException("Suffix (" + PROP_SUFFIX + ") of profile '" + profile + "' is missing");
-    df.setSuffix(StringUtils.trim(suffixObj));
+    //Suffixes with tags?
+    List<String> tags = getTags(profile, properties, defaultProperties);
+    if (tags.size() > 0) {
+      for (String tag : tags) {
+        String prop = PROP_SUFFIX + "." + tag;
+        String suffixObj = getDefaultProperty(profile, prop, properties, defaultProperties);
+        df.setSuffix(tag, StringUtils.trim(suffixObj));
+      }
+    } else {
+      // Suffix old stile, without tags
+      String suffixObj = getDefaultProperty(profile, PROP_SUFFIX, properties, defaultProperties);
+      if (StringUtils.isBlank(suffixObj))
+        throw new ConfigurationException("Suffix (" + PROP_SUFFIX + ") of profile '" + profile + "' is missing");
+      df.setSuffix(StringUtils.trim(suffixObj));
+    }
 
     // Mimetype
     String mimeTypeObj = getDefaultProperty(profile, PROP_MIMETYPE, properties, defaultProperties);
@@ -219,6 +236,10 @@ public class EncodingProfileScanner implements ArtifactInstaller {
     if (StringUtils.isBlank(applicableObj))
       throw new ConfigurationException("Input type (" + PROP_APPLICABLE + ") of profile '" + profile + "' is missing");
     df.setApplicableType(MediaType.parseString(StringUtils.trimToEmpty(applicableObj)));
+
+    String jobLoad = getDefaultProperty(profile, PROP_JOBLOAD, properties, defaultProperties);
+    if (!StringUtils.isBlank(jobLoad))
+      df.setJobLoad(Float.valueOf(jobLoad));
 
     // Look for extensions
     String extensionKey = PROP_PREFIX + profile + ".";
@@ -258,6 +279,37 @@ public class EncodingProfileScanner implements ArtifactInstaller {
   }
 
   /**
+   * Get any tags that might follow the PROP_SUFFIX
+   * @param profile
+   *          the profile identifier
+   * @param properties
+   *          the properties
+   * @param list
+   *          the list of default property keys
+   * @return A list of tags for output files
+   */
+
+  private static List<String> getTags(String profile, Properties properties, List<String> list) {
+    Set<Object> keys = properties.keySet();
+    StringBuffer buf = new StringBuffer(PROP_PREFIX);
+    buf.append(profile);
+    buf.append(PROP_SUFFIX);
+    String key = buf.toString();
+
+    ArrayList<String> tags = new ArrayList<String>();
+    for (Object o : keys) {
+      String k = o.toString();
+      if (k.startsWith(key)) {
+        if (k.substring(key.length()).length() > 0) {
+          list.add(k);
+          tags.add(k.substring(key.length() + 1));
+        }
+      }
+    }
+    return tags;
+  }
+
+  /**
    * {@inheritDoc}
    *
    * @see org.apache.felix.fileinstall.ArtifactListener#canHandle(java.io.File)
@@ -277,7 +329,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
     logger.info("Registering encoding profiles from {}", artifact);
     try {
       Map<String, EncodingProfile> profileMap = loadFromProperties(artifact);
-      for (Entry<String, EncodingProfile> entry : profileMap.entrySet()) {
+      for (Map.Entry<String, EncodingProfile> entry : profileMap.entrySet()) {
         logger.info("Installed profile {}", entry.getValue().getIdentifier());
         profiles.put(entry.getKey(), entry.getValue());
       }

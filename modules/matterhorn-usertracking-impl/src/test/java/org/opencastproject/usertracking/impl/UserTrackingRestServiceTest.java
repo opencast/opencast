@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.usertracking.impl;
 
 import org.opencastproject.rest.RestConstants;
@@ -20,8 +26,9 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.usertracking.api.UserAction;
+import org.opencastproject.usertracking.api.UserSession;
 import org.opencastproject.usertracking.api.UserTrackingException;
 import org.opencastproject.usertracking.api.UserTrackingService;
 import org.opencastproject.usertracking.endpoint.UserTrackingRestService;
@@ -54,11 +61,11 @@ public class UserTrackingRestServiceTest {
     SecurityService security = EasyMock.createMock(SecurityService.class);
     EasyMock.expect(security.getUser())
             .andReturn(
-                    new JaxbUser(MOCK_USER, new DefaultOrganization(), new JaxbRole("ROLE_USER",
+                    new JaxbUser(MOCK_USER, "test", new DefaultOrganization(), new JaxbRole("ROLE_USER",
                             new DefaultOrganization()))).anyTimes();
 
     BundleContext bc = EasyMock.createMock(BundleContext.class);
-    EasyMock.expect(bc.getProperty(MatterhornConstans.SERVER_URL_PROPERTY)).andReturn("http://www.example.org:8080")
+    EasyMock.expect(bc.getProperty(MatterhornConstants.SERVER_URL_PROPERTY)).andReturn("http://www.example.org:8080")
             .anyTimes();
 
     @SuppressWarnings("rawtypes")
@@ -73,7 +80,7 @@ public class UserTrackingRestServiceTest {
     EasyMock.expect(ua.getId()).andReturn(4L).anyTimes();
 
     UserTrackingService usertracking = EasyMock.createMock(UserTrackingService.class);
-    EasyMock.expect(usertracking.addUserFootprint(EasyMock.isA(UserAction.class))).andReturn(ua).anyTimes();
+    EasyMock.expect(usertracking.addUserFootprint(EasyMock.isA(UserAction.class), EasyMock.isA(UserSession.class))).andReturn(ua).anyTimes();
 
     EasyMock.replay(security, bc, dict, context, ua, usertracking);
 
@@ -115,9 +122,9 @@ public class UserTrackingRestServiceTest {
     Assert.assertEquals("FOOTPRINT", a.getType());
     Assert.assertTrue(a.getIsPlaying());
     Assert.assertEquals("test", a.getMediapackageId());
-    Assert.assertEquals(MOCK_SESSION_ID, a.getSessionId());
-    Assert.assertEquals(REMOTE_IP, a.getUserIp());
-    Assert.assertEquals(MOCK_USER, a.getUserId());
+    Assert.assertEquals(MOCK_SESSION_ID, a.getSession().getSessionId());
+    Assert.assertEquals(REMOTE_IP, a.getSession().getUserIp());
+    Assert.assertEquals(MOCK_USER, a.getSession().getUserId());
 
     request = getMockHttpSessionWithProxy();
     r = service.addFootprint("test", "20", "30", "FOOTPRINT", "true", request);
@@ -128,8 +135,8 @@ public class UserTrackingRestServiceTest {
     Assert.assertEquals("FOOTPRINT", a.getType());
     Assert.assertTrue(a.getIsPlaying());
     Assert.assertEquals("test", a.getMediapackageId());
-    Assert.assertEquals(MOCK_SESSION_ID, a.getSessionId());
-    Assert.assertEquals(REMOTE_IP, a.getUserIp());
-    Assert.assertEquals(MOCK_USER, a.getUserId());
+    Assert.assertEquals(MOCK_SESSION_ID, a.getSession().getSessionId());
+    Assert.assertEquals(REMOTE_IP, a.getSession().getUserIp());
+    Assert.assertEquals(MOCK_USER, a.getSession().getUserId());
   }
 }

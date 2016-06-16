@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.kernel.userdirectory;
 
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
@@ -29,6 +35,8 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -38,6 +46,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 /**
  * Provides a sorted set of known users
@@ -64,29 +74,38 @@ public class UserEndpoint {
   @Path("users.xml")
   @Produces(MediaType.APPLICATION_XML)
   @RestQuery(name = "allusersasxml", description = "Returns a list of users", returnDescription = "Returns a XML representation of the list of user accounts", restParameters = {
-          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The user accounts.") })
-  public JaxbUserList getUsersAsXml(@QueryParam("limit") int limit, @QueryParam("offset") int offset)
-          throws IOException {
+          @RestParameter(description = "The search query, must be at lest 3 characters long.", isRequired = false, name = "query", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.INTEGER),
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.INTEGER) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The user accounts.") })
+  public Response getUsersAsXml(@QueryParam("query") String queryString, @QueryParam("limit") int limit,
+          @QueryParam("offset") int offset) throws IOException {
     if (limit < 1)
       limit = 100;
 
+    String query = "%";
+    if (StringUtils.isNotBlank(queryString)) {
+      if (queryString.trim().length() < 3)
+        return Response.status(Status.BAD_REQUEST).build();
+      query = queryString;
+    }
+
     JaxbUserList userList = new JaxbUserList();
-    for (Iterator<User> i = userDirectoryService.findUsers("%", offset, limit); i.hasNext();) {
+    for (Iterator<User> i = userDirectoryService.findUsers(query, offset, limit); i.hasNext();) {
       userList.add(i.next());
     }
-    return userList;
+    return Response.ok(userList).build();
   }
 
   @GET
   @Path("users.json")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "allusersasjson", description = "Returns a list of users", returnDescription = "Returns a JSON representation of the list of user accounts", restParameters = {
-          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The user accounts.") })
-  public JaxbUserList getUsersAsJson(@QueryParam("limit") int limit, @QueryParam("offset") int offset)
-          throws IOException {
-    return getUsersAsXml(limit, offset);
+          @RestParameter(description = "The search query, must be at lest 3 characters long.", isRequired = false, name = "query", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.INTEGER),
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.INTEGER) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The user accounts.") })
+  public Response getUsersAsJson(@QueryParam("query") String queryString, @QueryParam("limit") int limit,
+          @QueryParam("offset") int offset) throws IOException {
+    return getUsersAsXml(queryString, limit, offset);
   }
 
   @GET

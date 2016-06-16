@@ -274,6 +274,7 @@
    <field name="acl_edit" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="acl_contribute" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="acl_read" type="string" indexed="true" stored="true" multiValued="true"/>
+   <field name="opt_out" type="boolean" indexed="true" stored="true" multiValued="false" default="false"/>
 
    <!-- Sort fields -->
    <!-- It is certainly not a good idea to make sort fields multi valued since it may lead to unpredictable results

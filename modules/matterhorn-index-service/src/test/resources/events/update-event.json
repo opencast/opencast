@@ -1,0 +1,16 @@
+[
+   {
+      "flavor":"dublincore/episode",
+      "title":"EVENTS.EVENTS.DETAILS.CATALOG.EPISODE",
+      "fields":[
+         {
+            "id":"title",
+            "readOnly":false,
+            "value":"Updated Title",
+            "label":"EVENTS.EVENTS.DETAILS.METADATA.TITLE",
+            "required":true,
+            "type":"text"
+         }
+      ]
+   }
+]

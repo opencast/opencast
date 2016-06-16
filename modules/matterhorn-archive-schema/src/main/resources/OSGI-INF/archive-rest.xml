@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+        immediate="true"
+        activate="activate"
+        name="org.opencastproject.archive.opencast.endpoint.OsgiOpencastArchiveRestEndpoint">
+  <implementation class="org.opencastproject.archive.opencast.endpoint.OsgiOpencastArchiveRestEndpoint"/>
+
+  <property name="service.description" value="Archive REST Endpoint"/>
+  <property name="opencast.service.type" value="org.opencastproject.archive"/>
+  <property name="opencast.service.path" value="/archive"/>
+
+  <service>
+    <!-- Needed for the RestPublisher to pick up the service. -->
+    <provide interface="org.opencastproject.archive.opencast.endpoint.OsgiOpencastArchiveRestEndpoint"/>
+  </service>
+
+  <reference name="archive"
+          interface="org.opencastproject.archive.opencast.OpencastArchive"
+          cardinality="1..1"
+          policy="static"
+          bind="setArchive"/>
+  <reference name="workflow-service"
+          interface="org.opencastproject.workflow.api.WorkflowService"
+          cardinality="1..1"
+          policy="static"
+          bind="setWorkflowService"/>
+  <reference name="security-service"
+          interface="org.opencastproject.security.api.SecurityService"
+          cardinality="1..1"
+          policy="static"
+          bind="setSecurityService"/>
+</scr:component>

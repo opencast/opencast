@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.authorization.xacml.manager.api;
 
 import org.opencastproject.security.api.AccessControlList;
@@ -43,10 +49,8 @@ public interface AclService {
    * @throws AclServiceException
    *           if exception occurred
    */
-  EpisodeACLTransition addEpisodeTransition(String episodeId,
-                                            Option<Long> managedAclId,
-                                            Date at,
-                                            Option<ConfiguredWorkflowRef> workflow) throws AclServiceException;
+  EpisodeACLTransition addEpisodeTransition(String episodeId, Option<Long> managedAclId, Date at,
+          Option<ConfiguredWorkflowRef> workflow) throws AclServiceException;
 
   /**
    * Adds a series ACL to schedule at the given date
@@ -108,8 +112,7 @@ public interface AclService {
    *           if the scheduled series ACL was not found
    */
   SeriesACLTransition updateSeriesTransition(long transitionId, long managedAclId, Date at,
-          Option<ConfiguredWorkflowRef> workflow, boolean override) throws AclServiceException,
-          NotFoundException;
+          Option<ConfiguredWorkflowRef> workflow, boolean override) throws AclServiceException, NotFoundException;
 
   /**
    * Marks a series transition as completed
@@ -122,8 +125,7 @@ public interface AclService {
    * @throws NotFoundException
    *           if the scheduled series ACL was not found
    */
-  SeriesACLTransition markSeriesTransitionAsCompleted(long transitionId) throws AclServiceException,
-          NotFoundException;
+  SeriesACLTransition markSeriesTransitionAsCompleted(long transitionId) throws AclServiceException, NotFoundException;
 
   /**
    * Marks an episode transition as completed
@@ -202,7 +204,7 @@ public interface AclService {
    * Immediate ACL transition application to an episode.
    *
    * @throws AclServiceException
-   *          in case of any error
+   *           in case of any error
    */
   void applyEpisodeAclTransition(final EpisodeACLTransition t) throws AclServiceException;
 
@@ -212,40 +214,79 @@ public interface AclService {
    * @param episodeId
    *          the episode id
    * @param managedAcl
-   *          the ACL to apply, <code>none</code> to delete the episode ACL from the media package to cause
-   *          a fallback to the series ACL
+   *          the ACL to apply, <code>none</code> to delete the episode ACL from the media package to cause a fallback
+   *          to the series ACL
    * @param workflow
    *          an optional workflow to apply to the episode afterwards
    * @return true if the episode exists
    * @throws AclServiceException
-   *          in case of any error
+   *           in case of any error
    */
-  boolean applyAclToEpisode(String episodeId, Option<ManagedAcl> managedAcl, Option<ConfiguredWorkflowRef> workflow) throws AclServiceException;
+  boolean applyAclToEpisode(String episodeId, Option<ManagedAcl> managedAcl, Option<ConfiguredWorkflowRef> workflow)
+          throws AclServiceException;
+
+  /**
+   * Immediate ACL application to an episode.
+   *
+   * @param episodeId
+   *          the episode id
+   * @param acl
+   *          the ACL to apply, <code>null</code> to delete the episode ACL from the media package to cause a fallback
+   *          to the series ACL
+   * @param workflow
+   *          an optional workflow to apply to the episode afterwards
+   * @return true if the episode exists
+   * @throws AclServiceException
+   *           in case of any error
+   */
+  boolean applyAclToEpisode(String episodeId, AccessControlList acl, Option<ConfiguredWorkflowRef> workflow)
+          throws AclServiceException;
 
   /**
    * Immediate ACL transition application to a series.
    *
    * @throws AclServiceException
-   *         in case of any error
+   *           in case of any error
    */
   void applySeriesAclTransition(final SeriesACLTransition t) throws AclServiceException;
 
   /**
-   * Immediate ACL application to an episode.
+   * Immediate ACL application to a series.
    *
    * @param seriesId
    *          the series id
    * @param managedAcl
    *          the ACL to apply
    * @param override
-   *          if true the series ACL will take precedence over any existing episode ACL
+   *          if true it will force the use the series ACL for all the episodes in the series. Otherwise, only episodes
+   *          that don't have a custom access control list defined will be adjusted to the new series ACL.
    * @param workflow
    *          an optional workflow to apply to the episode afterwards
-   * @return true if the episode exists
+   * @return false if the series doesn't exists
    * @throws AclServiceException
-   *          in case of any error
+   *           in case of any error
    */
-  boolean applyAclToSeries(String seriesId, ManagedAcl managedAcl, boolean override, Option<ConfiguredWorkflowRef> workflow) throws AclServiceException;
+  boolean applyAclToSeries(String seriesId, ManagedAcl managedAcl, boolean override,
+          Option<ConfiguredWorkflowRef> workflow) throws AclServiceException;
+
+  /**
+   * Immediate ACL application to a series.
+   *
+   * @param seriesId
+   *          the series id
+   * @param acl
+   *          the ACL to apply
+   * @param override
+   *          if true it will force the use the series ACL for all the episodes in the series. Otherwise, only episodes
+   *          that don't have a custom access control list defined will be adjusted to the new series ACL.
+   * @param workflow
+   *          an optional workflow to apply to the episode afterwards
+   * @return false if the series doesn't exists
+   * @throws AclServiceException
+   *           in case of any error
+   */
+  boolean applyAclToSeries(String seriesId, AccessControlList acl, boolean override,
+          Option<ConfiguredWorkflowRef> workflow) throws AclServiceException;
 
   /**
    * Return all ACLs of this organization.

@@ -1,0 +1,13 @@
+{
+    "value_locale": "en",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "error_videoLoading": "The video is loading. Please wait a moment.",
+    "error_audioLoading": "The audio is loading. Please wait a moment.",
+    "msg_videoLoadedSuccessfully": "The video has been loaded successfully.",
+    "msg_audioLoadedSuccessfully": "The audio has been loaded successfully.",
+    "msg_videoBuffering": "The video is currently buffering. Please wait a moment.",
+    "msg_videoBufferedSuccessfullyAndAutoplaying": "The video has been buffered successfully and is now autoplaying.",
+    "msg_videoBufferedSuccessfully": "The video has been buffered successfully.",
+    "error": "Error",
+    "error_AudioCodecNotSupported": "Error: The audio codec is not supported by this browser"
+}

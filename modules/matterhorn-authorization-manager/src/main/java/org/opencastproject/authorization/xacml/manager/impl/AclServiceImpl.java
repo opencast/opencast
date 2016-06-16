@@ -1,27 +1,37 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.authorization.xacml.manager.impl;
 
-import static org.opencastproject.authorization.xacml.manager.impl.Util.getMp;
+import static org.opencastproject.authorization.xacml.manager.impl.Util.getArchiveMp;
+import static org.opencastproject.authorization.xacml.manager.impl.Util.toAcl;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getId;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.workflow.api.ConfiguredWorkflowRef.toConfiguredWorkflow;
-import static org.opencastproject.workflow.handler.EngagePublicationChannel.CHANNEL_ID;
+import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
 
+import org.opencastproject.archive.api.Archive;
+import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
+import org.opencastproject.archive.base.QueryBuilder;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
@@ -31,15 +41,14 @@ import org.opencastproject.authorization.xacml.manager.api.TransitionQuery;
 import org.opencastproject.authorization.xacml.manager.api.TransitionResult;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
-import org.opencastproject.episode.api.EpisodeQuery;
-import org.opencastproject.episode.api.EpisodeService;
-import org.opencastproject.episode.api.HttpMediaPackageElementProvider;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.job.api.JobBarrier.Result;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.message.broker.api.acl.AclItem;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchService;
@@ -60,6 +69,7 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -75,32 +85,35 @@ public final class AclServiceImpl implements AclService {
   private final AclTransitionDb persistence;
   private final AclDb aclDb;
   private final SeriesService seriesService;
-  private final EpisodeService episodeService;
+  private final Archive<?> archive;
   private final SearchService searchService;
   private final AuthorizationService authorizationService;
   private final WorkflowService workflowService;
   private final SecurityService securityService;
-  private final HttpMediaPackageElementProvider httpMediaPackageElementProvider;
+  private final HttpMediaPackageElementProvider archiveHttpMediaPackageElementProvider;
   private final DistributionService distributionService;
   private final ServiceRegistry serviceRegistry;
+  private final MessageSender messageSender;
 
   public AclServiceImpl(Organization organization, AclDb aclDb, AclTransitionDb transitionDb,
-          SeriesService seriesService, EpisodeService episodeService, SearchService searchService,
+          SeriesService seriesService, Archive<?> archive, SearchService searchService,
           WorkflowService workflowService, SecurityService securityService,
-          HttpMediaPackageElementProvider httpMediaPackageElementProvider, AuthorizationService authorizationService,
-          DistributionService distributionService, ServiceRegistry serviceRegistry) {
+          HttpMediaPackageElementProvider archiveHttpMediaPackageElementProvider,
+          AuthorizationService authorizationService, DistributionService distributionService,
+          ServiceRegistry serviceRegistry, MessageSender messageSender) {
     this.organization = organization;
     this.persistence = transitionDb;
     this.aclDb = aclDb;
     this.seriesService = seriesService;
-    this.episodeService = episodeService;
+    this.archive = archive;
     this.searchService = searchService;
     this.workflowService = workflowService;
     this.securityService = securityService;
-    this.httpMediaPackageElementProvider = httpMediaPackageElementProvider;
+    this.archiveHttpMediaPackageElementProvider = archiveHttpMediaPackageElementProvider;
     this.authorizationService = authorizationService;
     this.distributionService = distributionService;
     this.serviceRegistry = serviceRegistry;
+    this.messageSender = messageSender;
   }
 
   @Override
@@ -160,29 +173,36 @@ public final class AclServiceImpl implements AclService {
 
   @Override
   public SeriesACLTransition markSeriesTransitionAsCompleted(long transitionId) throws AclServiceException,
-          NotFoundException {
+  NotFoundException {
     return persistence.markSeriesTransitionAsCompleted(organization, transitionId);
   }
 
   @Override
   public EpisodeACLTransition markEpisodeTransitionAsCompleted(long transitionId) throws AclServiceException,
-          NotFoundException {
+  NotFoundException {
     return persistence.markEpisodeTransitionAsCompleted(organization, transitionId);
   }
 
   @Override
-  public boolean applyAclToEpisode(String episodeId, Option<ManagedAcl> managedAcl,
-          Option<ConfiguredWorkflowRef> workflow) throws AclServiceException {
+  public boolean applyAclToEpisode(String episodeId, AccessControlList acl, Option<ConfiguredWorkflowRef> workflow)
+          throws AclServiceException {
     try {
+      Option<MediaPackage> mediaPackage = Option.<MediaPackage> none();
+      if (archive != null)
+        mediaPackage = getFromArchiveByMpId(episodeId);
+
+      Option<AccessControlList> aclOpt = Option.option(acl);
       // the episode service is the source of authority for the retrieval of media packages
-      for (final MediaPackage episodeSvcMp : getFromEpisodeServiceByMpId(episodeId)) {
+      for (final MediaPackage episodeSvcMp : mediaPackage) {
         final String episodeSvcMpId = episodeSvcMp.getIdentifier().toString();
-        managedAcl.fold(new Option.EMatch<ManagedAcl>() {
+        aclOpt.fold(new Option.EMatch<AccessControlList>() {
           // set the new episode ACL
           @Override
-          public void esome(final ManagedAcl acl) {
+          public void esome(final AccessControlList acl) {
             // update in episode service
-            episodeService.add(authorizationService.setAcl(episodeSvcMp, AclScope.Episode, acl.getAcl()).getA());
+            MediaPackage mp = authorizationService.setAcl(episodeSvcMp, AclScope.Episode, acl).getA();
+            if (archive != null)
+              archive.add(mp);
             // update in search service
             // cannot just add the media package retrieved from the episode service but have to use
             // the one from the search service
@@ -190,13 +210,12 @@ public final class AclServiceImpl implements AclService {
               @Override
               protected void esome(MediaPackage searchSvcMp) {
                 try {
-                  Attachment episodeXACML = authorizationService.setAcl(searchSvcMp, AclScope.Episode, acl.getAcl())
-                          .getB();
+                  Attachment episodeXACML = authorizationService.setAcl(searchSvcMp, AclScope.Episode, acl).getB();
 
                   // Distribute the updated XACML file
                   Job distributionJob = distributionService.distribute(CHANNEL_ID, searchSvcMp,
                           episodeXACML.getIdentifier());
-                  JobBarrier barrier = new JobBarrier(serviceRegistry, distributionJob);
+                  JobBarrier barrier = new JobBarrier(null, serviceRegistry, distributionJob);
                   Result jobResult = barrier.waitForJobs();
                   if (jobResult.getStatus().get(distributionJob).equals(Job.Status.FINISHED)) {
                     searchSvcMp.remove(episodeXACML);
@@ -206,7 +225,7 @@ public final class AclServiceImpl implements AclService {
                     logger.error("Unable to distribute XACML {}", episodeXACML.getIdentifier());
                   }
                   Job addSearchJob = searchService.add(searchSvcMp);
-                  barrier = new JobBarrier(serviceRegistry, addSearchJob);
+                  barrier = new JobBarrier(null, serviceRegistry, addSearchJob);
                   barrier.waitForJobs();
                 } catch (Exception e) {
                   logger.warn(e.getMessage());
@@ -224,7 +243,9 @@ public final class AclServiceImpl implements AclService {
           @Override
           public void enone() {
             // update in episode service
-            episodeService.add(authorizationService.removeAcl(episodeSvcMp, AclScope.Episode));
+            MediaPackage mp = authorizationService.removeAcl(episodeSvcMp, AclScope.Episode);
+            if (archive != null)
+              archive.add(mp);
             // update in search service
             // cannot just add the media package retrieved from the episode service but have to use
             // the one from the search service
@@ -233,7 +254,7 @@ public final class AclServiceImpl implements AclService {
                 // Retract the updated XACML file
                 retractXacmlElements(searchSvcMp, AclScope.Episode);
                 Job addSearchJob = searchService.add(authorizationService.removeAcl(searchSvcMp, AclScope.Episode));
-                JobBarrier barrier = new JobBarrier(serviceRegistry, addSearchJob);
+                JobBarrier barrier = new JobBarrier(null, serviceRegistry, addSearchJob);
                 barrier.waitForJobs();
               } catch (Exception e) {
                 logger.warn("Cannot add media package to search service");
@@ -255,6 +276,12 @@ public final class AclServiceImpl implements AclService {
     }
   }
 
+  @Override
+  public boolean applyAclToEpisode(String episodeId, Option<ManagedAcl> managedAcl,
+          Option<ConfiguredWorkflowRef> workflow) throws AclServiceException {
+    return applyAclToEpisode(episodeId, managedAcl.map(toAcl).getOrElseNull(), workflow);
+  }
+
   /** Update the ACL of an episode. */
   @Override
   public void applyEpisodeAclTransition(final EpisodeACLTransition t) throws AclServiceException {
@@ -273,7 +300,7 @@ public final class AclServiceImpl implements AclService {
     List<Attachment> aclAttachments = authorizationService.getAclAttachments(searchSvcMp, Option.some(scope));
     for (Attachment xacml : aclAttachments) {
       Job retractJob = distributionService.retract(CHANNEL_ID, searchSvcMp, xacml.getIdentifier());
-      JobBarrier barrier = new JobBarrier(serviceRegistry, retractJob);
+      JobBarrier barrier = new JobBarrier(null, serviceRegistry, retractJob);
       Result jobResult = barrier.waitForJobs();
       if (!jobResult.getStatus().get(retractJob).equals(Job.Status.FINISHED))
         logger.error("Unable to retract XACML {}", xacml.getIdentifier());
@@ -281,7 +308,7 @@ public final class AclServiceImpl implements AclService {
   }
 
   @Override
-  public boolean applyAclToSeries(String seriesId, ManagedAcl managedAcl, boolean override,
+  public boolean applyAclToSeries(String seriesId, AccessControlList acl, boolean override,
           Option<ConfiguredWorkflowRef> workflow) throws AclServiceException {
     try {
       if (override) {
@@ -291,17 +318,21 @@ public final class AclServiceImpl implements AclService {
         // requires knowledge of the services implementation.
         //
         // delete in episode service
-        for (MediaPackage mp : getFromEpisodeServiceBySeriesId(seriesId)) {
-          // remove episode xacml and update in episode service
-          MediaPackage removedAclMp = authorizationService.removeAcl(mp, AclScope.Episode);
-          episodeService.add(removedAclMp);
+        List<MediaPackage> mediaPackages = new ArrayList<MediaPackage>();
+        if (archive != null)
+          mediaPackages = getFromArchiveBySeriesId(seriesId);
+
+        for (MediaPackage mp : mediaPackages) {
+          // remove episode xacml and update in archive service
+          if (archive != null)
+            archive.add(authorizationService.removeAcl(mp, AclScope.Episode));
         }
         // delete in search service
         for (MediaPackage mp : getFromSearchServiceBySeriesId(seriesId)) {
           // Retract the updated XACML file
           retractXacmlElements(mp, AclScope.Episode);
           Job addSearchJob = searchService.add(authorizationService.removeAcl(mp, AclScope.Episode));
-          JobBarrier barrier = new JobBarrier(serviceRegistry, addSearchJob);
+          JobBarrier barrier = new JobBarrier(null, serviceRegistry, addSearchJob);
           barrier.waitForJobs();
         }
       }
@@ -309,22 +340,21 @@ public final class AclServiceImpl implements AclService {
       // this will in turn update the search service by the SeriesUpdatedEventHandler
       // and the episode service by the EpisodesPermissionsUpdatedEventHandler
       try {
-        seriesService.updateAccessControl(seriesId, managedAcl.getAcl());
+        seriesService.updateAccessControl(seriesId, acl);
       } catch (NotFoundException e) {
         return false;
-      }
-      // apply optional workflow to media packages from episode service
-      // Attention: As long as the update event handler triggered by the seriesService#updateAccessControl
-      // call run asynchronously workflow application will most likely crash or cause data corruption
-      for (ConfiguredWorkflowRef workflowRef : workflow) {
-        logger.warn("Workflow application is disabled for now because of concurrency issues.");
-        // applyWorkflow(getFromEpisodeServiceBySeriesId(seriesId), workflowRef);
       }
       return true;
     } catch (Exception e) {
       logger.error("Error applying series ACL", e);
       throw new AclServiceException(e);
     }
+  }
+
+  @Override
+  public boolean applyAclToSeries(String seriesId, ManagedAcl managedAcl, boolean override,
+          Option<ConfiguredWorkflowRef> workflow) throws AclServiceException {
+    return applyAclToSeries(seriesId, managedAcl.getAcl(), override, workflow);
   }
 
   /** Update the ACL of a series. */
@@ -346,17 +376,17 @@ public final class AclServiceImpl implements AclService {
    *
    * @return single element list or empty list
    */
-  private Option<MediaPackage> getFromEpisodeServiceByMpId(String mpId) {
+  private Option<MediaPackage> getFromArchiveByMpId(String mpId) {
     return mlist(
-            episodeService.find(EpisodeQuery.query(securityService).id(mpId).onlyLastVersion(),
-                    httpMediaPackageElementProvider.getUriRewriter()).getItems()).map(getMp).option();
+            archive.find(QueryBuilder.query().mediaPackageId(mpId).onlyLastVersion(true),
+                    archiveHttpMediaPackageElementProvider.getUriRewriter()).getItems()).map(getArchiveMp).option();
   }
 
   /** Return all media packages of a series from the episode service. */
-  private List<MediaPackage> getFromEpisodeServiceBySeriesId(String seriesId) {
+  private List<MediaPackage> getFromArchiveBySeriesId(String seriesId) {
     return mlist(
-            episodeService.find(EpisodeQuery.query(securityService).seriesId(seriesId).onlyLastVersion(),
-                    httpMediaPackageElementProvider.getUriRewriter()).getItems()).map(getMp).value();
+            archive.find(QueryBuilder.query().seriesId(seriesId).onlyLastVersion(true),
+                    archiveHttpMediaPackageElementProvider.getUriRewriter()).getItems()).map(getArchiveMp).value();
   }
 
   /**
@@ -376,7 +406,7 @@ public final class AclServiceImpl implements AclService {
   }
 
   /** Extract a media package from a search result item. */
-  private Function<SearchResultItem, MediaPackage> extractMediaPackage = new Function<SearchResultItem, MediaPackage>() {
+  private final Function<SearchResultItem, MediaPackage> extractMediaPackage = new Function<SearchResultItem, MediaPackage>() {
     @Override
     public MediaPackage apply(SearchResultItem item) {
       return item.getMediaPackage();
@@ -389,8 +419,9 @@ public final class AclServiceImpl implements AclService {
       @Override
       public Void some(ConfiguredWorkflow workflow) {
         logger.info("Apply optional workflow {}", workflow.getWorkflowDefinition().getId());
-        episodeService.applyWorkflow(workflow, httpMediaPackageElementProvider.getUriRewriter(), mlist(mps).map(getId)
-                .value());
+        if (archive != null)
+          archive.applyWorkflow(workflow, archiveHttpMediaPackageElementProvider.getUriRewriter(), mlist(mps)
+                  .map(getId).value());
         return null;
       }
 
@@ -414,12 +445,25 @@ public final class AclServiceImpl implements AclService {
 
   @Override
   public boolean updateAcl(ManagedAcl acl) {
-    return aclDb.updateAcl(acl);
+    Option<ManagedAcl> oldName = getAcl(acl.getId());
+    boolean updateAcl = aclDb.updateAcl(acl);
+    if (updateAcl) {
+      if (oldName.isSome() && !(oldName.get().getName().equals(acl.getName()))) {
+        AclItem aclItem = AclItem.update(oldName.get().getName(), acl.getName());
+        messageSender.sendObjectMessage(AclItem.ACL_QUEUE, MessageSender.DestinationType.Queue, aclItem);
+      }
+    }
+    return updateAcl;
   }
 
   @Override
   public Option<ManagedAcl> createAcl(AccessControlList acl, String name) {
-    return aclDb.createAcl(organization, acl, name);
+    Option<ManagedAcl> createAcl = aclDb.createAcl(organization, acl, name);
+    if (createAcl.isSome()) {
+      AclItem aclItem = AclItem.create(createAcl.get().getName());
+      messageSender.sendObjectMessage(AclItem.ACL_QUEUE, MessageSender.DestinationType.Queue, aclItem);
+    }
+    return createAcl;
   }
 
   @Override
@@ -428,8 +472,14 @@ public final class AclServiceImpl implements AclService {
     final TransitionResult result = persistence.getByQuery(organization, query);
     if (result.getEpisodeTransistions().size() > 0 || result.getSeriesTransistions().size() > 0)
       return false;
-    if (aclDb.deleteAcl(organization, id))
+    Option<ManagedAcl> deletedAcl = getAcl(id);
+    if (aclDb.deleteAcl(organization, id)) {
+      if (deletedAcl.isSome()) {
+        AclItem aclItem = AclItem.delete(deletedAcl.get().getName());
+        messageSender.sendObjectMessage(AclItem.ACL_QUEUE, MessageSender.DestinationType.Queue, aclItem);
+      }
       return true;
+    }
     throw new NotFoundException("Managed acl with id " + id + " not found.");
   }
 }

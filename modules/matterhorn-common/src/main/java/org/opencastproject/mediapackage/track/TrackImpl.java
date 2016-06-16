@@ -1,42 +1,52 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 
 package org.opencastproject.mediapackage.track;
 
 import org.opencastproject.mediapackage.AbstractMediaPackageElement;
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.mediapackage.Stream;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeType;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class is the base implementation for a media track, which itself is part of a media package, representing e. g.
@@ -50,6 +60,10 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
   /** Serial version UID */
   private static final long serialVersionUID = -1092781733885994038L;
 
+  public enum StreamingProtocol {
+    DOWNLOAD,HLS,DASH,HDS,SMOOTH,MMS,RTP,RTSP,RTMP,RTMPE,PNM,PNA,ICY,BITTORENTLIVE,FILE,UNKNOWN
+  }
+
   /** The duration in milliseconds */
   @XmlElement(name = "duration")
   protected Long duration = null;
@@ -59,6 +73,9 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
 
   @XmlElement(name = "video")
   protected List<VideoStream> video = new ArrayList<VideoStream>();
+
+  @XmlAttribute(name = "transport")
+  protected StreamingProtocol transport = null;
 
   /** Needed by JAXB */
   public TrackImpl() {
@@ -186,7 +203,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
    *      MediaPackageSerializer)
    */
   @Override
-  public Node toManifest(Document document, MediaPackageSerializer serializer) {
+  public Node toManifest(Document document, MediaPackageSerializer serializer) throws MediaPackageException {
     Node node = super.toManifest(document, serializer);
 
     // duration
@@ -208,6 +225,7 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
    *
    * @see org.opencastproject.mediapackage.Track#getDescription()
    */
+  @Override
   public String getDescription() {
     StringBuffer buf = new StringBuffer("");
     /*
@@ -217,6 +235,15 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
      * buf.append(getMimeType()); }
      */
     return buf.toString().toLowerCase();
+  }
+
+  public void setTransport(StreamingProtocol transport) {
+    this.transport = transport;
+  }
+
+  public StreamingProtocol getTransport() {
+    if (transport == null) return autodetectTransport(getURI());
+    return transport;
   }
 
   /**
@@ -238,13 +265,32 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
   // }
 
   public static class Adapter extends XmlAdapter<TrackImpl, Track> {
+    @Override
     public TrackImpl marshal(Track mp) throws Exception {
       return (TrackImpl) mp;
     }
 
+    @Override
     public Track unmarshal(TrackImpl mp) throws Exception {
       return mp;
     }
+  }
+
+  private StreamingProtocol autodetectTransport(URI uri) {
+    if (uri == null || uri.getScheme() == null) return null;
+    if (uri.getScheme().toLowerCase().startsWith("http")) {
+        if (uri.getFragment() == null) return StreamingProtocol.DOWNLOAD;
+        else if (uri.getFragment().toLowerCase().endsWith(".m3u8")) return StreamingProtocol.HLS;
+        else if (uri.getFragment().toLowerCase().endsWith(".mpd")) return StreamingProtocol.DASH;
+        else if (uri.getFragment().toLowerCase().endsWith(".f4m")) return StreamingProtocol.HDS;
+        else setTransport(StreamingProtocol.DOWNLOAD);
+    }
+    else if (uri.getScheme().toLowerCase().startsWith("rtmp")) return StreamingProtocol.RTMP;
+    else if (uri.getScheme().toLowerCase().startsWith("rtmpe")) return StreamingProtocol.RTMPE;
+    else if (uri.getScheme().toLowerCase().startsWith("file")) return StreamingProtocol.FILE;
+    else if (uri.getScheme().toLowerCase().startsWith("rtp")) return StreamingProtocol.RTP;
+    else if (uri.getScheme().toLowerCase().startsWith("rtsp")) return StreamingProtocol.RTSP;
+    return StreamingProtocol.UNKNOWN;
   }
 
 }

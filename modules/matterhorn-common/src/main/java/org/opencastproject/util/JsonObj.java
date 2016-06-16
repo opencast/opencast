@@ -1,36 +1,44 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.util;
-
-import org.apache.commons.io.IOUtils;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
 
 import static java.lang.String.format;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.cast;
 import static org.opencastproject.util.data.functions.Misc.chuck;
+
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
+
+import org.apache.commons.io.IOUtils;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /** Accessor for JSON objects aka maps. */
 // todo -- think about using specialized Exception (JsonExcpetion ?); handle parse exception in jsonObj(String)
@@ -56,9 +64,17 @@ public final class JsonObj {
     return new JsonObj(parse(IOUtils.toString(in)));
   }
 
+  public static final Function<InputStream, JsonObj> fromInputStream = new Function.X<InputStream, JsonObj>() {
+    @Override
+    public JsonObj xapply(InputStream in) throws Exception {
+      return mk(in);
+    }
+  };
+
   /** {@link #jsonObj(java.util.Map)} as a function. */
   public static final Function<Map, JsonObj> jsonObj = new Function<Map, JsonObj>() {
-    @Override public JsonObj apply(Map json) {
+    @Override
+    public JsonObj apply(Map json) {
       return jsonObj(json);
     }
   };
@@ -69,6 +85,10 @@ public final class JsonObj {
     } catch (ParseException e) {
       return chuck(e);
     }
+  }
+
+  public Set keySet() {
+    return json.keySet();
   }
 
   public JsonVal val(String key) {
@@ -87,6 +107,10 @@ public final class JsonObj {
     return new JsonArr(get(List.class, key));
   }
 
+  public boolean has(String key) {
+    return json.containsKey(key);
+  }
+
   /**
    * Get mandatory value of type <code>ev</code>.
    *
@@ -99,8 +123,8 @@ public final class JsonObj {
       try {
         return cast(v, ev);
       } catch (ClassCastException e) {
-        throw new RuntimeException(format("Key %s has not required type %s but %s",
-                                          key, ev.getName(), v.getClass().getName()));
+        throw new RuntimeException(format("Key %s has not required type %s but %s", key, ev.getName(), v.getClass()
+                .getName()));
       }
     } else {
       throw new RuntimeException(format("Key %s does not exist", key));
@@ -128,6 +152,7 @@ public final class JsonObj {
 
   /**
    * Get mandatory JSON object.
+   *
    * @deprecated
    */
   public JsonObj getObj(String key) {
@@ -136,6 +161,7 @@ public final class JsonObj {
 
   /**
    * Get an optional JSON object.
+   *
    * @deprecated
    */
   public Option<JsonObj> optObj(String key) {

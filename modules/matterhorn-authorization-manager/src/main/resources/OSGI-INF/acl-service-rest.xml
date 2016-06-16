@@ -16,10 +16,10 @@
     cardinality="1..1" policy="static" bind="setSecurityService" />
   <reference name="authorization-service" interface="org.opencastproject.security.api.AuthorizationService"
     cardinality="1..1" policy="static" bind="setAuthorizationService" />
-  <reference name="episode-service" interface="org.opencastproject.episode.api.EpisodeService"
-    cardinality="1..1" policy="static" bind="setEpisodeService" />
+  <reference name="archive" interface="org.opencastproject.archive.api.Archive"
+    cardinality="1..1" policy="dynamic" bind="setArchive" />
   <reference name="series-service" interface="org.opencastproject.series.api.SeriesService"
     cardinality="1..1" policy="static" bind="setSeriesService" />
-  <reference name="httpMediaPackageElementProvider" interface="org.opencastproject.episode.api.HttpMediaPackageElementProvider"
-    cardinality="1..1" policy="static" bind="setHttpMediaPackageElementProvider" />
+  <reference name="archiveHttpMediaPackageElementProvider" interface="org.opencastproject.archive.api.HttpMediaPackageElementProvider"
+    cardinality="1..1" policy="dynamic" bind="setHttpMediaPackageElementProvider" />
 </scr:component>

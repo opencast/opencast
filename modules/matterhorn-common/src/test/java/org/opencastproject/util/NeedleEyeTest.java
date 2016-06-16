@@ -1,26 +1,38 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
-package org.opencastproject.util;
 
-import org.junit.Test;
-import org.opencastproject.util.data.Function0;
+package org.opencastproject.util;
 
 import static org.junit.Assert.assertTrue;
 
+import org.opencastproject.util.data.Function0;
+
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class NeedleEyeTest {
+
+  private static final Logger logger = LoggerFactory.getLogger(NeedleEyeTest.class);
+
   @Test
   public void testNeedleEye() throws Exception {
     // test has been run a thousand times, increase the number to see for yourself
@@ -49,7 +61,7 @@ public class NeedleEyeTest {
           result[0] = true;
           return;
         }
-        System.out.println("not executed");
+        logger.info("not executed");
       }
     };
   }
@@ -57,9 +69,9 @@ public class NeedleEyeTest {
   private Function0<Boolean> sleep(final long time) {
     return new Function0.X<Boolean>() {
       @Override public Boolean xapply() throws Exception {
-        System.out.println(this + " is sleeping for " + time + " ms");
+        logger.info(this + " is sleeping for " + time + " ms");
         Thread.sleep(time);
-        System.out.println(this + " awaked");
+        logger.info(this + " awaked");
         return true;
       }
     };

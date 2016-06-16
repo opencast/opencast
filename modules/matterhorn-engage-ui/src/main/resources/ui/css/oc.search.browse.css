@@ -64,8 +64,12 @@ a:hover {
   display: inline-block;
 }
 
+.oc-sort-bar-holder {
+  position:relative;
+}
+
 .oc-sort-controls {
-  position:absolute;
+  position:relative;
   top: 0;
   right: 0;
 }

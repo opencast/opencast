@@ -1,0 +1,25 @@
+{
+  "count": 2,
+  "limit": 2,
+  "offset": 0,
+  "results": [{
+    "creator": "testuser1",
+    "id": 1,
+    "operation": "START_OPERATION",
+    "processingHost": "admin.opencast.org",
+    "started": "2014-06-05T09:10:00Z",
+    "status": "RUNNING",
+    "submitted": "2014-06-05T09:10:00Z",
+    "type": "org.opencastproject.workflow"
+  }, {
+    "creator": "testuser2",
+    "id": 1,
+    "operation": "Encode",
+    "processingHost": "worker01.opencast.org",
+    "started": "2014-06-05T09:10:00Z",
+    "status": "RUNNING",
+    "submitted": "2014-06-05T09:10:00Z",
+    "type": "org.opencastproject.workflow"
+  }],
+  "total": 2
+}

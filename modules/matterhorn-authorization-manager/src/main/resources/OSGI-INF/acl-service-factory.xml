@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-        name="org.opencastproject.authorization.xacml.manager.impl.OsgiAclServiceFactory">
+        name="org.opencastproject.authorization.xacml.manager.impl.OsgiAclServiceFactory" immediate="true" activate="activate" deactivate="deactivate">
   <implementation class="org.opencastproject.authorization.xacml.manager.impl.OsgiAclServiceFactory" />
   <property name="service.description" value="Factory to create ACL services for storage and scheduling on a per organization basis" />
   <service>
@@ -10,11 +10,11 @@
           cardinality="1..1" policy="static" bind="setAclDb"/>
   <reference name="authorization-service" interface="org.opencastproject.security.api.AuthorizationService"
           cardinality="1..1" policy="static" bind="setAuthorizationService"/>
-  <reference name="episode-service" interface="org.opencastproject.episode.api.EpisodeService"
-          cardinality="1..1" policy="static" bind="setEpisodeService"/>
-  <reference name="http-media-package-element-provider"
-          interface="org.opencastproject.episode.api.HttpMediaPackageElementProvider"
-          cardinality="1..1" policy="static" bind="setHttpMediaPackageElementProvider"/>
+  <reference name="archive" interface="org.opencastproject.archive.api.Archive"
+          cardinality="1..1" policy="dynamic" bind="setArchive"/>
+  <reference name="archive-http-media-package-element-provider"
+          interface="org.opencastproject.archive.api.HttpMediaPackageElementProvider"
+          cardinality="1..1" policy="dynamic" bind="setHttpMediaPackageElementProvider"/>
   <reference name="search-service" interface="org.opencastproject.search.api.SearchService"
           cardinality="1..1" policy="static" bind="setSearchService"/>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
@@ -29,4 +29,10 @@
           cardinality="1..1" policy="static" bind="setServiceRegistry"/>
   <reference name="distribution-service" interface="org.opencastproject.distribution.api.DistributionService"
           cardinality="1..1" policy="static" target="(distribution.channel=download)" bind="setDistributionService"/>
+  <reference name="message-receiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
+          cardinality="1..1" policy="static" bind="setMessageReceiver"/>
+  <reference name="message-sender" interface="org.opencastproject.message.broker.api.MessageSender"
+          cardinality="1..1" policy="static" bind="setMessageSender"/>
+  <reference name="organization-directory-service" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+          cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
 </scr:component>

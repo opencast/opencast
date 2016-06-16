@@ -1,27 +1,29 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.textanalyzer.impl;
 
-import org.opencastproject.composer.api.ComposerService;
-import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.dictionary.api.DictionaryService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
-import org.opencastproject.job.api.JobBarrier;
-import org.opencastproject.job.api.JobBarrier.Result;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
@@ -34,6 +36,7 @@ import org.opencastproject.metadata.mpeg7.Mpeg7CatalogImpl;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.metadata.mpeg7.SpatioTemporalDecomposition;
 import org.opencastproject.metadata.mpeg7.TemporalDecomposition;
+import org.opencastproject.metadata.mpeg7.Textual;
 import org.opencastproject.metadata.mpeg7.Video;
 import org.opencastproject.metadata.mpeg7.VideoSegment;
 import org.opencastproject.metadata.mpeg7.VideoText;
@@ -49,25 +52,29 @@ import org.opencastproject.textextractor.api.TextExtractor;
 import org.opencastproject.textextractor.api.TextExtractorException;
 import org.opencastproject.textextractor.api.TextFrame;
 import org.opencastproject.textextractor.api.TextLine;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
-import org.opencastproject.metadata.mpeg7.Textual;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.List;
 
 /**
  * Media analysis service that takes takes an image and returns text as extracted from that image.
  */
-public class TextAnalyzerServiceImpl extends AbstractJobProducer implements TextAnalyzerService {
+public class TextAnalyzerServiceImpl extends AbstractJobProducer implements TextAnalyzerService, ManagedService {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(TextAnalyzerServiceImpl.class);
@@ -80,17 +87,20 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   /** Resulting collection in the working file repository */
   public static final String COLLECTION_ID = "ocrtext";
 
-  /** Name of encoding profile used to create tiff images */
-  public static final String TIFF_CONVERSION_PROFILE = "image-conversion.http";
+  /** The approximate load placed on the system by creating a text analysis job */
+  public static final float DEFAULT_ANALYSIS_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_ANALYSIS_JOB_LOAD} */
+  public static final String ANALYSIS_JOB_LOAD_KEY = "job.load.analysis";
+
+  /** The approximate load placed on the system by creating a text analysis job */
+  private float analysisJobLoad = DEFAULT_ANALYSIS_JOB_LOAD;
 
   /** The text extraction implemenetation */
   private TextExtractor textExtractor = null;
 
   /** Reference to the receipt service */
   private ServiceRegistry serviceRegistry = null;
-
-  /** The composer service */
-  protected ComposerService composerService = null;
 
   /** The workspace to ue when retrieving remote media files */
   private Workspace workspace = null;
@@ -136,7 +146,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   public Job extract(Attachment image) throws TextAnalyzerException, MediaPackageException {
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Extract.toString(),
-              Arrays.asList(MediaPackageElementParser.getAsXml(image)));
+              Arrays.asList(MediaPackageElementParser.getAsXml(image)), analysisJobLoad);
     } catch (ServiceRegistryException e) {
       throw new TextAnalyzerException("Unable to create job", e);
     }
@@ -153,45 +163,16 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @return a receipt containing the resulting mpeg-7 catalog
    * @throws TextAnalyzerException
    */
-  @SuppressWarnings("unchecked")
   private Catalog extract(Job job, Attachment image) throws TextAnalyzerException, MediaPackageException {
 
-    final Attachment attachment;
-    final URI imageUrl;
-
-    // Make sure the attachment is a tiff
-
-    // Make sure this image is of type tif
-    if (!image.getURI().getPath().endsWith(".tif")) {
-      try {
-        logger.info("Converting " + image + " to tif format");
-        Job conversionJob = composerService.convertImage(image, TIFF_CONVERSION_PROFILE);
-        JobBarrier barrier = new JobBarrier(serviceRegistry, conversionJob);
-        Result result = barrier.waitForJobs();
-        if (!result.isSuccess()) {
-          throw new TextAnalyzerException("Unable to convert " + image + " to tiff");
-        }
-        conversionJob = serviceRegistry.getJob(conversionJob.getId()); // get the latest copy
-        attachment = (Attachment) MediaPackageElementParser.getFromXml(conversionJob.getPayload());
-        imageUrl = attachment.getURI();
-      } catch (EncoderException e) {
-        throw new TextAnalyzerException(e);
-      } catch (NotFoundException e) {
-        throw new TextAnalyzerException(e);
-      } catch (ServiceRegistryException e) {
-        throw new TextAnalyzerException(e);
-      }
-    } else {
-      attachment = (Attachment) image;
-      imageUrl = attachment.getURI();
-    }
+    final Attachment attachment = image;
+    final URI imageUrl = attachment.getURI();
 
     File imageFile = null;
     try {
       Mpeg7CatalogImpl mpeg7 = Mpeg7CatalogImpl.newInstance();
 
       logger.info("Starting text extraction from {}", imageUrl);
-
       try {
         imageFile = workspace.get(imageUrl);
       } catch (NotFoundException e) {
@@ -221,8 +202,14 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
       logger.info("Text extraction of {} finished, {} lines found", attachment.getURI(), videoTexts.length);
 
       URI uri;
+      InputStream in;
       try {
-        uri = workspace.putInCollection(COLLECTION_ID, job.getId() + ".xml", mpeg7CatalogService.serialize(mpeg7));
+        in = mpeg7CatalogService.serialize(mpeg7);
+      } catch (IOException e) {
+        throw new TextAnalyzerException("Error serializing mpeg7", e);
+      }
+      try {
+        uri = workspace.putInCollection(COLLECTION_ID, job.getId() + ".xml", in);
       } catch (IOException e) {
         throw new TextAnalyzerException("Unable to put mpeg7 into the workspace", e);
       }
@@ -230,7 +217,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
               .newElement(Catalog.TYPE, MediaPackageElements.TEXTS);
       catalog.setURI(uri);
 
-      logger.info("Finished text extraction of {}", imageUrl);
+      logger.debug("Created MPEG7 catalog for {}", imageUrl);
 
       return catalog;
     } catch (Exception e) {
@@ -384,16 +371,6 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   }
 
   /**
-   * OSGi callback to set the composer service.
-   *
-   * @param composer
-   *          the composer
-   */
-  protected void setComposerService(ComposerService composer) {
-    this.composerService = composer;
-  }
-
-  /**
    * Callback for setting the security service.
    *
    * @param securityService
@@ -453,4 +430,8 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
     return organizationDirectoryService;
   }
 
+  @Override
+  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+    analysisJobLoad = LoadUtil.getConfiguredLoadValue(properties, ANALYSIS_JOB_LOAD_KEY, DEFAULT_ANALYSIS_JOB_LOAD, serviceRegistry);
+  }
 }

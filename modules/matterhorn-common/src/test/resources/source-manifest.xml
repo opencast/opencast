@@ -1,7 +1,7 @@
 <oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org" id="10.0000/2" start="2007-12-05T13:40:00" duration="10044">
   <oc:media>
     <!-- also contained in target by id and urlname -->
-    <oc:track id="track-1" type="presentation/source">
+    <oc:track transport="FILE" id="track-1" type="presentation/source">
       <oc:mimetype>video/quicktime</oc:mimetype>
       <oc:url>tracks/vonly.mov</oc:url>
       <oc:checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</oc:checksum>
@@ -16,7 +16,7 @@
       </oc:video>
     </oc:track>
     <!-- not contained in target by id but urlname -->
-    <oc:track id="track-3" type="presenter/source">
+    <oc:track transport="FILE" id="track-3" type="presenter/source">
       <oc:mimetype>video/quicktime</oc:mimetype>
       <oc:url>tracks/aonly.mov</oc:url>
       <oc:checksum type="md5">950f9fa49caa8f1c5bbc36892f6fd062</oc:checksum>

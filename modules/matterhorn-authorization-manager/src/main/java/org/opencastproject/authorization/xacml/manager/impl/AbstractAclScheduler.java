@@ -1,24 +1,33 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.authorization.xacml.manager.impl;
 
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.Prelude.unexhaustiveMatch;
+
+import org.opencastproject.authorization.xacml.manager.api.ACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
-import org.opencastproject.authorization.xacml.manager.api.AclTransition;
 import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.TransitionQuery;
@@ -31,6 +40,7 @@ import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
+
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -43,9 +53,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
-
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.Prelude.unexhaustiveMatch;
 
 /** Time control for the {@link AclServiceImpl}. */
 public abstract class AbstractAclScheduler {
@@ -154,9 +161,9 @@ public abstract class AbstractAclScheduler {
             final TransitionQuery q = TransitionQuery.query().before(now).withDone(false);
             try {
               final TransitionResult r = aclMan.getTransitions(q);
-              final List<AclTransition> transitions = Collections.<AclTransition>concat(r.getEpisodeTransistions(), r.getSeriesTransistions());
+              final List<ACLTransition> transitions = Collections.<ACLTransition>concat(r.getEpisodeTransistions(), r.getSeriesTransistions());
               logger.debug("Found {} transition/s for organization {}", transitions.size(), org.getId());
-              for (final AclTransition t : transitions) {
+              for (final ACLTransition t : transitions) {
                 if (t instanceof EpisodeACLTransition) {
                   final EpisodeACLTransition et = (EpisodeACLTransition) t;
                   logger.info("Apply transition to episode {}", et.getEpisodeId());

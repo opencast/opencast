@@ -1,19 +1,27 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.annotation.impl;
+
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.annotation.api.Annotation;
 import org.opencastproject.annotation.api.AnnotationList;
@@ -24,63 +32,35 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
 import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 /**
  * Tests the JPA implementation of the annotation service
  */
 public class AnnotationServiceJpaImplTest {
-  private ComboPooledDataSource pooledDataSource = null;
   private AnnotationServiceJpaImpl annotationService = null;
 
   @Before
   public void setUp() throws Exception {
-    // Set up the database
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + System.currentTimeMillis());
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Set up the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
-
     // Set up a mock security service that always returns "me" as the current user
-
     DefaultOrganization organization = new DefaultOrganization();
     JaxbRole role = new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, organization, "");
     HashSet<JaxbRole> roles = new HashSet<JaxbRole>();
     roles.add(role);
-    User me = new JaxbUser("me", organization, roles);
+    User me = new JaxbUser("me", "test", organization, roles);
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(me).anyTimes();
     EasyMock.replay(securityService);
 
     // Set up the annotation service
     annotationService = new AnnotationServiceJpaImpl();
-    annotationService.setPersistenceProvider(new PersistenceProvider());
-    annotationService.setPersistenceProperties(props);
+    annotationService.setEntityManagerFactory(newTestEntityManagerFactory(AnnotationServiceJpaImpl.PERSISTENCE_UNIT));
     annotationService.setSecurityService(securityService);
-    annotationService.activate(null);
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    annotationService.deactivate();
   }
 
   @Test

@@ -1,0 +1,17 @@
+{
+  "FILTERS.USERS.ROLES.LABEL": {
+    "ROLE_ADMIN": "FILTERS.USERS.ROLES.ROLE_ADMIN",
+    "ROLE_ANONYMOUS": "FILTERS.USERS.ROLES.ROLE_ANONYMOUS"
+  },
+  "FILTERS.USERS.USERNAME.LABEL": {
+    "admin": "admin",
+    "matterhorn_system_account": "matterhorn_system_account"
+  },
+  "FILTERS.USERS.NAME.LABEL": {
+    "Digest User": "Digest User",
+    "Admin User": "Admin User"
+  },
+  "FILTERS.USERS.USER_DIRECTORY.LABEL": {
+    "matterhorn-in-memory": "matterhorn-in-memory"
+  }
+}

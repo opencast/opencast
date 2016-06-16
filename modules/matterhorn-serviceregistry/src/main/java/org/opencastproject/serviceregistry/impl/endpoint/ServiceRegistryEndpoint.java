@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.serviceregistry.impl.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
@@ -20,8 +26,9 @@ import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.JaxbJobList;
@@ -29,6 +36,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.serviceregistry.api.HostRegistration;
+import org.opencastproject.serviceregistry.api.JaxbHostRegistration;
 import org.opencastproject.serviceregistry.api.JaxbHostRegistrationList;
 import org.opencastproject.serviceregistry.api.JaxbServiceRegistration;
 import org.opencastproject.serviceregistry.api.JaxbServiceRegistrationList;
@@ -36,8 +44,10 @@ import org.opencastproject.serviceregistry.api.JaxbServiceStatisticsList;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.api.ServiceState;
+import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -46,13 +56,15 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 
 import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -95,7 +107,7 @@ public class ServiceRegistryEndpoint {
    *          OSGi component context
    */
   public void activate(ComponentContext cc) {
-    serverUrl = (String) cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
+    serverUrl = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
     servicePath = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
   }
 
@@ -117,6 +129,13 @@ public class ServiceRegistryEndpoint {
   @RestQuery(name = "statisticsasxml", description = "List the service registrations in the cluster, along with some simple statistics", returnDescription = "The service statistics.", reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the service statistics") })
   public Response getStatisticsAsXml() throws ServiceRegistryException {
     return getStatisticsAsJson();
+  }
+
+  @GET
+  @Path("servicewarnings")
+  @RestQuery(name = "servicewarnings", description = "Get the number of services currently in a non-NORMAL state", returnDescription = "The count of abnormal services.", reponses = { @RestResponse(responseCode = SC_OK, description = "A plain text representation of the number of abnormal services") })
+  public long serviceWarnings() throws ServiceRegistryException {
+    return serviceRegistry.countOfAbnormalServices();
   }
 
   @POST
@@ -195,10 +214,14 @@ public class ServiceRegistryEndpoint {
   @Path("registerhost")
   @RestQuery(name = "registerhost", description = "Add a new server to the cluster.", returnDescription = "No content.", restParameters = {
           @RestParameter(name = "host", isRequired = true, description = "The host name, including the http(s) protocol", type = Type.STRING),
-          @RestParameter(name = "maxJobs", isRequired = true, description = "The maximum number of concurrent jobs this host can run", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was registered successfully") })
-  public void register(@FormParam("host") String host, @FormParam("maxJobs") int maxJobs) {
+          @RestParameter(name = "address", isRequired = true, description = "The IP address", type = Type.STRING),
+          @RestParameter(name = "memory", isRequired = true, description = "The allocated memory", type = Type.STRING),
+          @RestParameter(name = "cores", isRequired = true, description = "The available cores", type = Type.STRING),
+          @RestParameter(name = "maxLoad", isRequired = true, description = "The maximum load this host support", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was registered successfully") })
+  public void register(@FormParam("host") String host, @FormParam("address") String address,
+          @FormParam("memory") long memory, @FormParam("cores") int cores, @FormParam("maxLoad") float maxLoad) {
     try {
-      serviceRegistry.registerHost(host, maxJobs);
+      serviceRegistry.registerHost(host, address, memory, cores, maxLoad);
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }
@@ -265,6 +288,50 @@ public class ServiceRegistryEndpoint {
   }
 
   @GET
+  @Path("health")
+  @RestQuery(name = "health", description = "Checks the status of the registered services", returnDescription = "Returns NO_CONTENT if services are in a proper state", restParameters = {
+          @RestParameter(name = "serviceType", isRequired = false, type = Type.STRING, description = "The service type identifier"),
+          @RestParameter(name = "host", isRequired = false, type = Type.STRING, description = "The host, including the http(s) protocol") }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Every service is in a proper state."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No service of that type on that host is registered."),
+          @RestResponse(responseCode = SC_SERVICE_UNAVAILABLE, description = "At least one service is in error state.") })
+  public Response getHealthStatus(@QueryParam("serviceType") String serviceType, @QueryParam("host") String host)
+          throws NotFoundException {
+    try {
+      if (isNotBlank(serviceType) && isNotBlank(host)) {
+        // This is a request for one specific service. Return it, or SC_NOT_FOUND if not found
+        ServiceRegistration reg = serviceRegistry.getServiceRegistration(serviceType, host);
+        if (reg == null)
+          throw new NotFoundException();
+
+        if (ServiceState.ERROR.equals(reg.getServiceState()))
+          throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+      } else if (isBlank(serviceType) && isBlank(host)) {
+        // This is a request for all service registrations
+        for (ServiceRegistration reg : serviceRegistry.getServiceRegistrations()) {
+          if (ServiceState.ERROR.equals(reg.getServiceState()))
+            throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+        }
+      } else if (isNotBlank(serviceType)) {
+        // This is a request for all service registrations of a particular type
+        for (ServiceRegistration reg : serviceRegistry.getServiceRegistrationsByType(serviceType)) {
+          if (ServiceState.ERROR.equals(reg.getServiceState()))
+            throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+        }
+      } else if (isNotBlank(host)) {
+        // This is a request for all service registrations of a particular host
+        for (ServiceRegistration reg : serviceRegistry.getServiceRegistrationsByHost(host)) {
+          if (ServiceState.ERROR.equals(reg.getServiceState()))
+            throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+        }
+      }
+      return Response.noContent().build();
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @GET
   @Path("services.xml")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "servicesasxml", description = "Returns a service registraton or list of available service registrations as XML.", returnDescription = "The services list as XML", restParameters = {
@@ -327,7 +394,7 @@ public class ServiceRegistryEndpoint {
     JaxbHostRegistrationList registrations = new JaxbHostRegistrationList();
     try {
       for (HostRegistration reg : serviceRegistry.getHostRegistrations())
-        registrations.add(reg);
+        registrations.add(new JaxbHostRegistration(reg));
       return registrations;
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
@@ -351,6 +418,7 @@ public class ServiceRegistryEndpoint {
           @RestParameter(name = "operation", isRequired = true, type = Type.STRING, description = "The operation this job should execute"),
           @RestParameter(name = "payload", isRequired = false, type = Type.TEXT, description = "The job type identifier"),
           @RestParameter(name = "start", isRequired = false, type = Type.BOOLEAN, description = "Whether the job should be queued for dispatch and execution"),
+          @RestParameter(name = "jobLoad", isRequired = false, type = Type.STRING, description = "The load this job will incur on the system"),
           @RestParameter(name = "arg", isRequired = false, type = Type.TEXT, description = "An argument for the operation"),
           @RestParameter(name = "arg", isRequired = false, type = Type.TEXT, description = "An argument for the operation"),
           @RestParameter(name = "arg", isRequired = false, type = Type.TEXT, description = "An argument for the operation"),
@@ -371,8 +439,15 @@ public class ServiceRegistryEndpoint {
     boolean start = StringUtils.isBlank(request.getParameter("start"))
             || Boolean.TRUE.toString().equalsIgnoreCase(request.getParameter("start"));
     try {
-      Job job = ((ServiceRegistryJpaImpl) serviceRegistry).createJob(host, jobType, operation, arguments, payload,
-              start, serviceRegistry.getCurrentJob());
+      Job job = null;
+      if (StringUtils.isNotBlank(request.getParameter("jobLoad"))) {
+        Float jobLoad = Float.parseFloat(request.getParameter("jobLoad"));
+        job = ((ServiceRegistryJpaImpl) serviceRegistry).createJob(host, jobType, operation, arguments, payload,
+              start, serviceRegistry.getCurrentJob(), jobLoad);
+      } else {
+        job = ((ServiceRegistryJpaImpl) serviceRegistry).createJob(host, jobType, operation, arguments, payload,
+                start, serviceRegistry.getCurrentJob());
+      }
       return Response.created(job.getUri()).entity(new JaxbJob(job)).build();
     } catch (IllegalArgumentException e) {
       throw new WebApplicationException(Status.BAD_REQUEST);
@@ -424,20 +499,16 @@ public class ServiceRegistryEndpoint {
   @GET
   @Path("job/{id}/children.xml")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "childrenjobsasxml", description = "Returns all children from a job as XML.", returnDescription = "A list of children jobs as XML", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier") }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "Jobs found."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No children jobs found.") })
-  public JaxbJobList getChildrenJobsAsXml(@PathParam("id") long id) throws NotFoundException {
+  @RestQuery(name = "childrenjobsasxml", description = "Returns all children from a job as XML.", returnDescription = "A list of children jobs as XML", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier") }, reponses = { @RestResponse(responseCode = SC_OK, description = "Jobs found.") })
+  public JaxbJobList getChildrenJobsAsXml(@PathParam("id") long id) {
     return getChildrenJobsAsJson(id);
   }
 
   @GET
   @Path("job/{id}/children.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "childrenjobsasjson", description = "Returns all children from a job as JSON.", returnDescription = "A list of children jobs as JSON", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier") }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "Jobs found."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No children jobs found.") })
-  public JaxbJobList getChildrenJobsAsJson(@PathParam("id") long id) throws NotFoundException {
+  @RestQuery(name = "childrenjobsasjson", description = "Returns all children from a job as JSON.", returnDescription = "A list of children jobs as JSON", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier") }, reponses = { @RestResponse(responseCode = SC_OK, description = "Jobs found.") })
+  public JaxbJobList getChildrenJobsAsJson(@PathParam("id") long id) {
     try {
       return new JaxbJobList(serviceRegistry.getChildJobs(id));
     } catch (ServiceRegistryException e) {
@@ -458,6 +529,36 @@ public class ServiceRegistryEndpoint {
   }
 
   @GET
+  @Path("activeJobs.xml")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "activejobsasxml",
+          description = "Returns all active jobs as XML.",
+          returnDescription = "A list of active jobs as XML",
+          reponses = { @RestResponse(responseCode = SC_OK, description = "Active jobs found.") })
+  public JaxbJobList getActiveJobsAsXml() {
+    try {
+      return new JaxbJobList(serviceRegistry.getActiveJobs());
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @GET
+  @Path("activeJobs.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "activejobsasjson",
+          description = "Returns all active jobs as JSON.",
+          returnDescription = "A list of active jobs as JSON",
+          reponses = { @RestResponse(responseCode = SC_OK, description = "Active jobs found.") })
+  public JaxbJobList getActiveJobsAsJson() {
+    try {
+      return new JaxbJobList(serviceRegistry.getActiveJobs());
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @GET
   @Path("count")
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(name = "count", description = "Returns the number of jobs matching the query parameters as plain text.", returnDescription = "The number of matching jobs", restParameters = {
@@ -467,15 +568,18 @@ public class ServiceRegistryEndpoint {
           @RestParameter(name = "operation", isRequired = false, type = Type.STRING, description = "The job's operation") }, reponses = { @RestResponse(responseCode = SC_OK, description = "Job count returned.") })
   public long count(@QueryParam("serviceType") String serviceType, @QueryParam("status") Job.Status status,
           @QueryParam("host") String host, @QueryParam("operation") String operation) {
-    if (isBlank(serviceType)) {
-      throw new WebApplicationException(Response.serverError().entity("Service type must not be null").build());
-    }
     try {
       if (isNotBlank(host) && isNotBlank(operation)) {
+        if (isBlank(serviceType))
+          throw new WebApplicationException(Response.serverError().entity("Service type must not be null").build());
         return serviceRegistry.count(serviceType, host, operation, status);
       } else if (isNotBlank(host)) {
+        if (isBlank(serviceType))
+          throw new WebApplicationException(Response.serverError().entity("Service type must not be null").build());
         return serviceRegistry.countByHost(serviceType, host, status);
       } else if (isNotBlank(operation)) {
+        if (isBlank(serviceType))
+          throw new WebApplicationException(Response.serverError().entity("Service type must not be null").build());
         return serviceRegistry.countByOperation(serviceType, operation, status);
       } else {
         return serviceRegistry.count(serviceType, status);
@@ -489,10 +593,77 @@ public class ServiceRegistryEndpoint {
   @Path("maxconcurrentjobs")
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(name = "maxconcurrentjobs", description = "Returns the number of jobs that the servers in this service registry can execute concurrently. If there is only one server in this service registry this will be the number of jobs that one server is able to do at one time. If it is a distributed install across many servers then this number will be the total number of jobs the cluster can process concurrently.", returnDescription = "The maximum number of concurrent jobs", reponses = { @RestResponse(responseCode = SC_OK, description = "Maximum number of concurrent jobs returned.") })
+  @Deprecated
   public Response getMaximumConcurrentWorkflows() {
+    return Response.status(Status.MOVED_PERMANENTLY).type(MediaType.TEXT_PLAIN)
+            .header("Location", servicePath + "/maxload").build();
+  }
+
+  @GET
+  @Path("maxload")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "maxload", description = "Returns the maximum load that servers in this service registry can execute concurrently.  "
+          + "If there is only one server in this service registry this will be the maximum load that one server is able to handle at one time.  "
+          + "If it is a distributed install across many servers then this number will be the maximum load the cluster can process concurrently.",
+          returnDescription = "The maximum load of the cluster or server", restParameters = {
+              @RestParameter(name = "host", isRequired = false, type = Type.STRING, description = "The host you want to know the maximum load for.")
+          }, reponses = { @RestResponse(responseCode = SC_OK, description = "Maximum load for the cluster.") })
+  public Response getMaxLoadOnNode(@QueryParam("host") String host) throws NotFoundException {
     try {
-      Integer count = serviceRegistry.getMaxConcurrentJobs();
-      return Response.ok(count).build();
+      if (StringUtils.isEmpty(host)) {
+        return Response.ok(serviceRegistry.getMaxLoads()).build();
+      } else {
+        SystemLoad systemLoad = new SystemLoad();
+        systemLoad.addNodeLoad(serviceRegistry.getMaxLoadOnNode(host));
+        return Response.ok(systemLoad).build();
+      }
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @GET
+  @Path("currentload")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "currentload", description = "Returns the current load on the servers in this service registry.  "
+          + "If there is only one server in this service registry this will be the the load that one server.  "
+          + "If it is a distributed install across many servers then this number will be a dictionary of the load on all nodes in the cluster.",
+          returnDescription = "The current load across the cluster", restParameters = {
+              @RestParameter(name = "activeOnly", isRequired = false, type = Type.BOOLEAN, description = "Whether to only get the load of active nodes.  Defaults to false.")
+          }, reponses = { @RestResponse(responseCode = SC_OK, description = "Current load for the cluster.") })
+  public Response getCurrentLoad(@QueryParam("activeOnly") String activeOnly) {
+    try {
+      boolean activeOnlyBool = Boolean.valueOf(activeOnly);
+      return Response.ok(serviceRegistry.getCurrentHostLoads(activeOnlyBool)).build();
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+
+  @DELETE
+  @Path("job/{id}")
+  @RestQuery(name = "deletejob", description = "Deletes a job from the service registry", returnDescription = "No data is returned, just the HTTP status code", pathParameters = { @RestParameter(isRequired = true, name = "id", type = Type.INTEGER, description = "ID of the job to delete") }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Job successfully deleted"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Job with given id could not be found") })
+  public Response deleteJob(@PathParam("id") long id) throws NotFoundException {
+    try {
+      serviceRegistry.removeJob(id);
+      return Response.noContent().build();
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @POST
+  @Path("removeparentlessjobs")
+  @RestQuery(name = "removeparentlessjobs", description = "Removes all jobs without a parent job which have passed their lifetime", returnDescription = "No data is returned, just the HTTP status code", restParameters = { @RestParameter(name = "lifetime", isRequired = true, type = Type.INTEGER, description = "Lifetime of parentless jobs") }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Parentless jobs successfully removed"),
+          @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, description = "Error while removing parentless jobs") })
+  public Response removeParentlessJobs(@FormParam("lifetime") int lifetime) {
+    try {
+      serviceRegistry.removeParentlessJobs(lifetime);
+      return Response.noContent().build();
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }

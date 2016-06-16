@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 
 package org.opencastproject.mediapackage.elementbuilder;
 
@@ -29,7 +35,7 @@ import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -58,6 +64,7 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#accept(org.opencastproject.mediapackage.MediaPackageElement.Type,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
+  @Override
   public boolean accept(MediaPackageElement.Type type, MediaPackageElementFlavor flavor) {
     return type.equals(MediaPackageElement.Type.Track);
   }
@@ -65,6 +72,7 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
   /**
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#accept(org.w3c.dom.Node)
    */
+  @Override
   public boolean accept(Node elementNode) {
     String name = elementNode.getNodeName();
     if (name.contains(":")) {
@@ -78,6 +86,7 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
    *      org.opencastproject.mediapackage.MediaPackageElement.Type,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
+  @Override
   public boolean accept(URI uri, MediaPackageElement.Type type, MediaPackageElementFlavor flavor) {
     return MediaPackageElement.Type.Track.equals(type);
   }
@@ -85,6 +94,7 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
   /**
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#elementFromURI(URI)
    */
+  @Override
   public MediaPackageElement elementFromURI(URI uri) throws UnsupportedElementException {
     logger.trace("Creating track from " + uri);
     Track track = TrackImpl.fromURI(uri);
@@ -95,6 +105,7 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#newElement(org.opencastproject.mediapackage.MediaPackageElement.Type
    *      ,org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
+  @Override
   public MediaPackageElement newElement(MediaPackageElement.Type type, MediaPackageElementFlavor flavor) {
     Track track = new TrackImpl();
     track.setFlavor(flavor);
@@ -105,12 +116,14 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#elementFromManifest(org.w3c.dom.Node,
    *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */
+  @Override
   public MediaPackageElement elementFromManifest(Node elementNode, MediaPackageSerializer serializer)
           throws UnsupportedElementException {
 
     String id = null;
     MimeType mimeType = null;
     MediaPackageElementFlavor flavor = null;
+    TrackImpl.StreamingProtocol transport = null;
     String reference = null;
     URI url = null;
     long size = -1;
@@ -121,7 +134,7 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
       id = (String) xpath.evaluate("@id", elementNode, XPathConstants.STRING);
 
       // url
-      url = serializer.resolvePath(xpath.evaluate("url/text()", elementNode).trim());
+      url = serializer.decodeURI(new URI(xpath.evaluate("url/text()", elementNode).trim()));
 
       // reference
       reference = (String) xpath.evaluate("@ref", elementNode, XPathConstants.STRING);
@@ -135,6 +148,11 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
       String flavorValue = (String) xpath.evaluate("@type", elementNode, XPathConstants.STRING);
       if (StringUtils.isNotEmpty(flavorValue))
         flavor = MediaPackageElementFlavor.parseFlavor(flavorValue);
+
+      // transport
+      String transportValue = (String) xpath.evaluate("@transport", elementNode, XPathConstants.STRING);
+      if (StringUtils.isNotEmpty(transportValue))
+        transport = TrackImpl.StreamingProtocol.valueOf(transportValue);
 
       // checksum
       String checksumValue = (String) xpath.evaluate("checksum/text()", elementNode, XPathConstants.STRING);
@@ -176,6 +194,10 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
 
       if (flavor != null)
         track.setFlavor(flavor);
+
+      //set transport
+      if (transport != null)
+        track.setTransport(transport);
 
       // description
       String description = (String) xpath.evaluate("description/text()", elementNode, XPathConstants.STRING);

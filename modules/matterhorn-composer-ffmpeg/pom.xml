@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.6-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -99,7 +99,6 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>2.5.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -111,15 +110,11 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
-              org.osgi.service.component.*,
-              org.apache.commons.httpclient.*,
-              org.opencastproject.mediapackage;version=${project.version},
-              javax.xml.parsers;version=0,
-              org.xml.sax;version=0,
-              org.w3c.dom;version=0,
-              *;resolution:=optional
+              !org.apache.ws.commons.*,
+              *
             </Import-Package>
             <Private-Package> org.apache.xmlrpc.* </Private-Package>
             <Export-Package>org.opencastproject.composer.impl.*;version=${project.version}</Export-Package>

@@ -37,17 +37,17 @@
         <td class="ui-state-active">
           <input type="checkbox" value="<%= e.id %>" class="selectEpisode"/>
         </td>
-        <td class="ui-state-active"><%= e.title %></td>
-        <td class="ui-state-active"><%= e.creators %></td>
-        <td class="ui-state-active"><%= ocUtils.dflt(e.seriesTitle) %>
+        <td class="ui-state-active"><%! e.title %></td>
+        <td class="ui-state-active"><%! e.creators %></td>
+        <td class="ui-state-active"><%! ocUtils.dflt(e.seriesTitle) %>
           <% if (e.series) { %>
-            <input type="hidden" class="seriesId" value="<%= e.series %>"/>
+            <input type="hidden" class="seriesId" value="<%! e.series %>"/>
           <% } %>
         </td>
         <td class="ui-state-active" style="text-align: right"><%= e.date %></td>
         <td class="ui-state-active">
           <% if (e.workflow) { %>
-            <span class="active-workflow"><%= e.workflow %></span>
+            <span class="active-workflow"><%! e.workflow %></span>
           <% } %>
         </td>
         <td class="ui-state-active">

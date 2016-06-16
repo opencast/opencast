@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.mediapackage;
 
 import org.opencastproject.util.UrlSupport;
@@ -30,6 +36,9 @@ public class DefaultMediaPackageSerializerImpl implements MediaPackageSerializer
 
   /** Optional package root file */
   protected URL packageRoot = null;
+
+  /** It's very likely that this should be the first serializer when encoding an URI, therefore choose a high ranking */
+  public static final int RANKING = 1000;
 
   /**
    * Creates a new package serializer that will work completely transparent, therefore resolving urls by simply
@@ -88,9 +97,12 @@ public class DefaultMediaPackageSerializerImpl implements MediaPackageSerializer
    * This serializer implementation tries to cope with relative urls. Should the root url be set to any value other than
    * <code>null</code>, the serializer will try to convert element urls to relative paths if possible. .
    *
+   * @throws URISyntaxException
+   *           if the resulting URI contains syntax errors
    * @see org.opencastproject.mediapackage.MediaPackageSerializer#encodeURI(URI)
    */
-  public String encodeURI(URI uri) {
+  @Override
+  public URI encodeURI(URI uri) throws URISyntaxException {
     if (uri == null)
       throw new IllegalArgumentException("Argument url is null");
 
@@ -98,7 +110,7 @@ public class DefaultMediaPackageSerializerImpl implements MediaPackageSerializer
 
     // Has a package root been set? If not, no relative paths!
     if (packageRoot == null)
-      return uri.toString();
+      return uri;
 
     // A package root has been set
     String rootPath = packageRoot.toExternalForm();
@@ -106,7 +118,7 @@ public class DefaultMediaPackageSerializerImpl implements MediaPackageSerializer
       path = path.substring(rootPath.length());
     }
 
-    return path;
+    return new URI(path);
   }
 
   /**
@@ -117,15 +129,16 @@ public class DefaultMediaPackageSerializerImpl implements MediaPackageSerializer
    * Note that for absolute paths without a protocol, the <code>file://</code> protocol is assumed.
    *
    * @see #DefaultMediaPackageSerializerImpl(URL)
-   * @see org.opencastproject.mediapackage.MediaPackageSerializer#resolvePath(java.lang.String)
+   * @see org.opencastproject.mediapackage.MediaPackageSerializer#decodeURI(URI)
    */
-  public URI resolvePath(String path) throws URISyntaxException {
-    if (path == null)
-      throw new IllegalArgumentException("Argument path is null");
+  @Override
+  public URI decodeURI(URI uri) throws URISyntaxException {
+    if (uri == null)
+      throw new IllegalArgumentException("Argument uri is null");
 
     // If the path starts with neither a protocol nor a path separator, the packageRoot is used to
     // create the url relative to the root
-    URI uri = null;
+    String path = uri.toString();
     boolean isRelative = false;
     try {
       uri = new URI(path);
@@ -149,6 +162,11 @@ public class DefaultMediaPackageSerializerImpl implements MediaPackageSerializer
     }
 
     return uri;
+  }
+
+  @Override
+  public int getRanking() {
+    return RANKING;
   }
 
 }

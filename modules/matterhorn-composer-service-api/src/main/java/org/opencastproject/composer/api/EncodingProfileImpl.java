@@ -1,24 +1,30 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 
 package org.opencastproject.composer.api;
 
 import org.opencastproject.util.EqualsUtil;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,9 +67,10 @@ public class EncodingProfileImpl implements EncodingProfile {
   @XmlElement(name = "outputmediatype")
   protected MediaType outputType = null;
 
-  /** Suffix */
+  /** Suffix
   @XmlElement(name = "suffix")
   protected String suffix = null;
+  */
 
   /** Mime type */
   @XmlElement(name = "mimetype")
@@ -77,6 +84,12 @@ public class EncodingProfileImpl implements EncodingProfile {
   @XmlElement(name = "extension")
   @XmlElementWrapper(name = "extensions")
   protected List<Extension> extensions = new ArrayList<Extension>();
+
+  @XmlElementWrapper(name = "suffixes")
+  protected HashMap<String,String> suffixes = new HashMap<String, String>();
+
+  @XmlElement(name = "jobLoad")
+  protected Float jobLoad = 1.0f;
 
   /**
    * Private, since the profile should be created using the static factory method.
@@ -173,7 +186,12 @@ public class EncodingProfileImpl implements EncodingProfile {
    */
   @Override
   public String getSuffix() {
-    return suffix;
+    if (suffixes.keySet().size() == 0) return null;
+    if (suffixes.containsKey("default")) {
+      return suffixes.get("default");
+    } else {
+      return suffixes.get(suffixes.values().toArray()[0]);
+    }
   }
 
   /**
@@ -183,7 +201,17 @@ public class EncodingProfileImpl implements EncodingProfile {
    *          the file suffix
    */
   public void setSuffix(String suffix) {
-    this.suffix = suffix;
+    setSuffix("default", suffix);
+  }
+
+  /**
+   * Sets the suffix for encoded file names.
+   *
+   * @param suffix
+   *          the file suffix
+   */
+  public void setSuffix(String tag ,String suffix) {
+    this.suffixes.put(tag, suffix);
   }
 
   /**
@@ -326,6 +354,25 @@ public class EncodingProfileImpl implements EncodingProfile {
   /**
    * {@inheritDoc}
    *
+   * @see org.opencastproject.composer.api.EncodingProfile#getJobLoad()
+   */
+  @Override
+  public float getJobLoad() {
+    return jobLoad;
+  }
+
+  /**
+   * Sets the job load for this encoding profile
+   *
+   * @param jobLoad the load caused by one instance of this encoding profile running
+   */
+  public void setJobLoad(Float jobLoad) {
+    this.jobLoad = jobLoad;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -355,6 +402,17 @@ public class EncodingProfileImpl implements EncodingProfile {
   @Override
   public String toString() {
     return identifier;
+  }
+
+  @Override
+  public String getSuffix(String tag) {
+    if (suffixes.containsKey(tag)) return suffixes.get(tag);
+    else return null;
+  }
+
+  @Override
+  public List<String> getTags() {
+    return new ArrayList<String>(suffixes.keySet());
   }
 
   /**

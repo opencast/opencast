@@ -1,16 +1,21 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
 package org.opencastproject.scheduler.impl;
@@ -117,7 +122,7 @@ public class CaptureNowProlongingService implements ManagedService {
 
   /**
    * Activates the component
-   * 
+   *
    * @param cc
    *          the component's context
    */
@@ -206,7 +211,7 @@ public class CaptureNowProlongingService implements ManagedService {
 
   /**
    * Returns the initial time duration (in milliseconds) of a recording started by the CaptureNow service
-   * 
+   *
    * @return the initial time
    */
   public int getInitialTime() {
@@ -215,7 +220,7 @@ public class CaptureNowProlongingService implements ManagedService {
 
   /**
    * Returns the time duration (in milliseconds) a recording is prolonged by the prolonging job.
-   * 
+   *
    * @return the prolonging time
    */
   public int getProlongingTime() {
@@ -312,8 +317,8 @@ public class CaptureNowProlongingService implements ManagedService {
     return search.getCatalogList().get(0);
   }
 
-  public void prolongEvent(DublinCoreCatalog eventCatalog, String agentId) throws UnauthorizedException,
-          NotFoundException, SchedulerException {
+  public void prolongEvent(DublinCoreCatalog eventCatalog, String agentId)
+          throws UnauthorizedException, NotFoundException, SchedulerException {
     long eventId = Integer.parseInt(eventCatalog.getFirst(PROPERTY_IDENTIFIER));
 
     DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(eventCatalog.getFirst(DublinCore.PROPERTY_TEMPORAL));
@@ -328,8 +333,8 @@ public class CaptureNowProlongingService implements ManagedService {
       if (eventId == Integer.parseInt(conflictCatalog.getFirst(PROPERTY_IDENTIFIER)))
         continue;
 
-      Date conflictingStartDate = EncodingSchemeUtils.decodeMandatoryPeriod(
-              conflictCatalog.getFirst(DublinCore.PROPERTY_TEMPORAL)).getStart();
+      Date conflictingStartDate = EncodingSchemeUtils
+              .decodeMandatoryPeriod(conflictCatalog.getFirst(DublinCore.PROPERTY_TEMPORAL)).getStart();
 
       prolongedEndDate = new DateTime(conflictingStartDate).minusMinutes(1).toDate();
 

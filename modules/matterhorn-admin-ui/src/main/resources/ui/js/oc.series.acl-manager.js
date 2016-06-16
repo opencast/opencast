@@ -855,7 +855,9 @@ opencast.series.aclScheduler.SeriesSchedule = function(value, seriesScheduler){
      */
     self.init = function(){
         self.id    = value.transitionId;
-
+        if (self.id === undefined) {
+            self.id = value.id;
+        }
         self.override = value.override;
 
         if(value.acl && value.acl.id)

@@ -1,28 +1,39 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.manager.impl;
+
+import org.opencastproject.manager.system.configeditor.Config;
+
+import org.json.JSONException;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URL;
 
 import junit.framework.Assert;
 
-import org.json.JSONException;
-import org.junit.Test;
-import org.opencastproject.manager.system.configeditor.Config;
 
 
 
@@ -32,7 +43,7 @@ public class ConfigTest {
   private Config config;
 
   @Test
-  public void testConfigConstructor() {
+  public void testConfigConstructor() throws ParseException {
 
     URL url = this.getClass().getResource("/configs");
     String absFile = url.getFile();
@@ -45,7 +56,10 @@ public class ConfigTest {
 
       String json = "{\"path\":\"/system.properties\",\"lines\":[\"#\",\"# Uncommented property.\",\"#\",\"\",{\"enabled\":true,\"value\":\"8080\",\"key\":\"org.osgi.service.http.port\"},\"\",\"#\",\"# Commented property\",\"#\",\"\",{\"enabled\":false,\"value\":\"commented.property.value\",\"key\":\"commented.property.name\"}]}";
 
-      Assert.assertEquals(config.toJSON(), json);
+      JSONParser parser = new JSONParser();
+      JSONObject obj1 = (JSONObject) parser.parse(config.toJSON());
+      JSONObject obj2 = (JSONObject) parser.parse(json);
+      Assert.assertTrue(obj1.equals(obj2));
 
       this.config = config;
 
@@ -57,7 +71,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void testUpdateProperty() {
+  public void testUpdateProperty() throws ParseException {
 
     URL url = this.getClass().getResource("/configs");
     String absFile = url.getFile();
@@ -75,7 +89,10 @@ public class ConfigTest {
     String json = "{\"path\":\"/system.properties\",\"lines\":[\"#\",\"# Uncommented property.\",\"#\",\"\",{\"enabled\":true,\"value\":\"8080\",\"key\":\"org.osgi.service.http.port\"},\"\",\"#\",\"# Commented property\",\"#\",\"\",{\"enabled\":true,\"value\":\"commented.property.value\",\"key\":\"commented.property.name\"}]}";
 
     try {
-      Assert.assertEquals(config.toJSON(), json);
+      JSONParser parser = new JSONParser();
+      JSONObject obj1 = (JSONObject) parser.parse(config.toJSON());
+      JSONObject obj2 = (JSONObject) parser.parse(json);
+      Assert.assertTrue(obj1.equals(obj2));
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -86,7 +103,10 @@ public class ConfigTest {
     json = "{\"path\":\"/system.properties\",\"lines\":[\"#\",\"# Uncommented property.\",\"#\",\"\",{\"enabled\":true,\"value\":\"8080\",\"key\":\"org.osgi.service.http.port\"},\"\",\"#\",\"# Commented property\",\"#\",\"\",{\"enabled\":true,\"value\":\"commented.property.new_value\",\"key\":\"commented.property.name\"}]}";
 
     try {
-      Assert.assertEquals(config.toJSON(), json);
+      JSONParser parser = new JSONParser();
+      JSONObject obj1 = (JSONObject) parser.parse(config.toJSON());
+      JSONObject obj2 = (JSONObject) parser.parse(json);
+      Assert.assertTrue(obj1.equals(obj2));
     } catch (JSONException e) {
       e.printStackTrace();
     }
@@ -94,7 +114,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void testAddProperty() {
+  public void testAddProperty() throws ParseException {
 
     URL url = this.getClass().getResource("/configs");
     String absFile = url.getFile();
@@ -111,16 +131,17 @@ public class ConfigTest {
     String json = "{\"path\":\"/system.properties\",\"lines\":[\"#\",\"# Uncommented property.\",\"#\",\"\",{\"enabled\":true,\"value\":\"8080\",\"key\":\"org.osgi.service.http.port\"},{\"enabled\":true,\"value\":\"new.property.value\",\"key\":\"new.property.name\"},\"\",\"#\",\"# Commented property\",\"#\",\"\",{\"enabled\":false,\"value\":\"commented.property.value\",\"key\":\"commented.property.name\"}]}";
 
     try {
-
-      Assert.assertEquals(config.toJSON(), json);
-
+      JSONParser parser = new JSONParser();
+      JSONObject obj1 = (JSONObject) parser.parse(config.toJSON());
+      JSONObject obj2 = (JSONObject) parser.parse(json);
+      Assert.assertTrue(obj1.equals(obj2));
     } catch (JSONException e) {
       e.printStackTrace();
     }
   }
 
   @Test
-  public void testSaveConfig() {
+  public void testSaveConfig() throws ParseException {
 
     String absFile = this.getClass().getResource("/temp").getFile();
 
@@ -147,7 +168,10 @@ public class ConfigTest {
       // compare
       String json = "{\"path\":\"/system_new.properties\",\"lines\":[\"#\",\"# Uncommented property.\",\"#\",\"\",{\"enabled\":true,\"value\":\"8080\",\"key\":\"org.osgi.service.http.port\"},{\"enabled\":true,\"value\":\"new.property.value\",\"key\":\"new.property.name\"},\"\",\"#\",\"# Commented property\",\"#\",\"\",{\"enabled\":false,\"value\":\"commented.property.value\",\"key\":\"commented.property.name\"}]}";
 
-      Assert.assertEquals(config.toJSON(), json);
+      JSONParser parser = new JSONParser();
+      JSONObject obj1 = (JSONObject) parser.parse(config.toJSON());
+      JSONObject obj2 = (JSONObject) parser.parse(json);
+      Assert.assertTrue(obj1.equals(obj2));
 
     } catch (JSONException e) {
       e.printStackTrace();

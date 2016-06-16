@@ -97,7 +97,8 @@
             elem = $.ajax({
                       url: elem,
                       type: "GET",
-                      async: false
+                      async: false,
+                      cache: true
                     }).responseText;
             var ns, regexp, str = $.jqote(elem, data, t),
                 $$ = !qreg.test(str) ?

@@ -35,13 +35,13 @@
           <input type="checkbox" value="<%= data[j].recordings[i].id %>" class="selectRecording" />
         </td>
         <td class="ui-state-active">
-          <%= data[j].recordings[i].title %>
+          <%! data[j].recordings[i].title %>
         </td>
         <td class="ui-state-active">
-          <%= data[j].recordings[i].creators %>
+          <%! data[j].recordings[i].creators %>
         </td>
         <td class="ui-state-active">
-          <%= (data[j].recordings[i].seriesTitle) ? data[j].recordings[i].seriesTitle : ''  %>
+          <%! (data[j].recordings[i].seriesTitle) ? data[j].recordings[i].seriesTitle : ''  %>
         </td>
         <td class="ui-state-active">
           <%= data[j].recordings[i].captureAgent %>
@@ -65,8 +65,12 @@
             <% if (data[j].recordings[i].error) { %>
             <div class="foldable">
               <div class="fold-header" style="color:red;font-weight:bold;"><%= data[j].recordings[i].state %></div>
+              <% if (!data[j].recordings[i].incident) { %>
               <div class="fold-body">
                 <%= data[j].recordings[i].error %>
+              <% } else { %>
+              <div id="workflowId-<%= data[j].recordings[i].id %>" class="fold-body empty">
+              <% } %>
               </div>
             </div>
             <% } else { %>

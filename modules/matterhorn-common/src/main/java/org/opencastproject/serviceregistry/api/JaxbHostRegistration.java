@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.serviceregistry.api;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -36,12 +42,20 @@ public class JaxbHostRegistration implements HostRegistration {
   @XmlElement(name = "base_url")
   protected String baseUrl;
 
+  @XmlElement(name = "address")
+  protected String address;
+
+  @XmlElement(name = "memory")
+  protected long memory;
+
+  @XmlElement(name = "cores")
+  protected int cores;
+
   /**
-   * The maximum number of concurrent jobs this host can run. Typically, this is the number of cores available to the
-   * JVM.
+   * The maximum load this host can run.  This is not necessarily 1-to-1 with the number of jobs.
    */
-  @XmlElement(name = "max_jobs")
-  protected int maxJobs;
+  @XmlElement(name = "max_load")
+  protected float maxLoad;
 
   @XmlElement(name = "online")
   protected boolean online;
@@ -66,16 +80,26 @@ public class JaxbHostRegistration implements HostRegistration {
    *
    * @param baseUrl
    *          the base URL for this host
-   * @param maxJobs
-   *          the maximum number of concurrent jobs that this host can run.
+   * @param address
+   *          the IP address for this host
+   * @param memory
+   *          the allocated memory of this host
+   * @param cores
+   *          the available cores of this host
+   * @param maxLoad
+   *          the maximum load that this host can support
    * @param online
    *          whether the host is online and available for service
    * @param online
    *          whether the host is in maintenance mode
    */
-  public JaxbHostRegistration(String baseUrl, int maxJobs, boolean online, boolean maintenance) {
+  public JaxbHostRegistration(String baseUrl, String address, long memory, int cores, float maxLoad, boolean online,
+          boolean maintenance) {
     this.baseUrl = baseUrl;
-    this.maxJobs = maxJobs;
+    this.address = address;
+    this.memory = memory;
+    this.cores = cores;
+    this.maxLoad = maxLoad;
     this.online = online;
     this.maintenanceMode = maintenance;
     this.active = true;
@@ -88,7 +112,10 @@ public class JaxbHostRegistration implements HostRegistration {
    */
   public JaxbHostRegistration(HostRegistration hostRegistration) {
     this.baseUrl = hostRegistration.getBaseUrl();
-    this.maxJobs = hostRegistration.getMaxJobs();
+    this.address = hostRegistration.getIpAddress();
+    this.memory = hostRegistration.getMemory();
+    this.cores = hostRegistration.getCores();
+    this.maxLoad = hostRegistration.getMaxLoad();
     this.online = hostRegistration.isOnline();
     this.active = hostRegistration.isActive();
     this.maintenanceMode = hostRegistration.isMaintenanceMode();
@@ -116,22 +143,82 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.serviceregistry.api.HostRegistration#getMaxJobs()
+   * 
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#getIpAddress()
    */
   @Override
-  public int getMaxJobs() {
-    return maxJobs;
+  public String getIpAddress() {
+    return address;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#setIpAddress(String)
+   */
+  @Override
+  public void setIpAddress(String address) {
+    this.address = address;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#getMemory()
+   */
+  @Override
+  public long getMemory() {
+    return memory;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#setMemory(long)
+   */
+  @Override
+  public void setMemory(long memory) {
+    this.memory = memory;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#getCores()
+   */
+  @Override
+  public int getCores() {
+    return cores;
+  }
+
+  /**
+   * {@inheritDoc}
+   * 
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#setCores(int)
+   */
+  @Override
+  public void setCores(int cores) {
+    this.cores = cores;
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.HostRegistration#setMaxJobs(int)
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#getMaxLoad()
    */
   @Override
-  public void setMaxJobs(int maxJobs) {
-    this.maxJobs = maxJobs;
+  public float getMaxLoad() {
+    return maxLoad;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#setMaxLoad(int)
+   */
+  @Override
+  public void setMaxLoad(float maxLoad) {
+    this.maxLoad = maxLoad;
   }
 
   /**

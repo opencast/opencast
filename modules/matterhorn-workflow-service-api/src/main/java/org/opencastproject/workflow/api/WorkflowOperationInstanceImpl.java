@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.workflow.api;
 
 import java.util.ArrayList;
@@ -213,6 +219,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    * @param jobId
    *          the job identifier
    */
+  @Override
   public void setId(Long jobId) {
     this.jobId = jobId;
   }
@@ -237,6 +244,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
     this.template = template;
   }
 
+  @Override
   public String getDescription() {
     return description;
   }
@@ -249,6 +257,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
     this.executeCondition = condition;
   }
 
+  @Override
   public String getExecutionCondition() {
     return executeCondition;
   }
@@ -257,15 +266,18 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
     this.skipCondition = condition;
   }
 
+  @Override
   public String getSkipCondition() {
     return skipCondition;
   }
 
   static class Adapter extends XmlAdapter<WorkflowOperationInstanceImpl, WorkflowOperationInstance> {
+    @Override
     public WorkflowOperationInstanceImpl marshal(WorkflowOperationInstance op) throws Exception {
       return (WorkflowOperationInstanceImpl) op;
     }
 
+    @Override
     public WorkflowOperationInstance unmarshal(WorkflowOperationInstanceImpl op) throws Exception {
       return op;
     }
@@ -281,6 +293,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
     return state;
   }
 
+  @Override
   public void setState(OperationState state) {
     Date now = new Date();
     if (OperationState.RUNNING.equals(state)) {
@@ -306,6 +319,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    *
    * @see org.opencastproject.workflow.api.WorkflowInstance#getConfiguration(java.lang.String)
    */
+  @Override
   public String getConfiguration(String key) {
     if (key == null || configurations == null)
       return null;
@@ -321,6 +335,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    *
    * @see org.opencastproject.workflow.api.WorkflowInstance#removeConfiguration(java.lang.String)
    */
+  @Override
   public void removeConfiguration(String key) {
     if (key == null || configurations == null)
       return;
@@ -338,6 +353,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    *
    * @see org.opencastproject.workflow.api.WorkflowInstance#setConfiguration(java.lang.String, java.lang.String)
    */
+  @Override
   public void setConfiguration(String key, String value) {
     if (key == null)
       return;
@@ -373,6 +389,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
   /**
    * @return the holdStateUserInterfaceUrl
    */
+  @Override
   public String getHoldStateUserInterfaceUrl() {
     return holdStateUserInterfaceUrl;
   }
@@ -397,6 +414,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    *
    * @return title to be displayed
    */
+  @Override
   public String getHoldActionTitle() {
     return holdActionTitle;
   }
@@ -440,6 +458,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
   /**
    * @return the dateStarted
    */
+  @Override
   public Date getDateStarted() {
     return dateStarted;
   }
@@ -455,6 +474,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
   /**
    * @return the dateCompleted
    */
+  @Override
   public Date getDateCompleted() {
     return dateCompleted;
   }
@@ -473,7 +493,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#getTimeInQueue()
    */
   @Override
-  public long getTimeInQueue() {
+  public Long getTimeInQueue() {
     return timeInQueue;
   }
 
@@ -547,6 +567,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#isAbortable()
    */
+  @Override
   public Boolean isAbortable() {
     return abortable;
   }
@@ -566,6 +587,7 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
    *
    * @see org.opencastproject.workflow.api.WorkflowOperationInstance#isContinuable()
    */
+  @Override
   public Boolean isContinuable() {
     return continuable;
   }

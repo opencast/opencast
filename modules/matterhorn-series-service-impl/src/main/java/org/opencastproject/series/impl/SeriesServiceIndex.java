@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.series.impl;
 
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -58,7 +64,22 @@ public interface SeriesServiceIndex {
    * @throws SeriesServiceDatabaseException
    *           if exception occurred and synchronous indexing is enabled
    */
-  void updateSecurityPolicy(String seriesId, AccessControlList accessControl) throws NotFoundException, SeriesServiceDatabaseException;
+  void updateSecurityPolicy(String seriesId, AccessControlList accessControl) throws NotFoundException,
+          SeriesServiceDatabaseException;
+
+  /**
+   * Index opt out status for existing series entry.
+   *
+   * @param seriesId
+   *          ID of series for which the opt out status will be updated
+   * @param optedOut
+   *          the opt out status
+   * @throws NotFoundException
+   *           if series with specified ID does not exist
+   * @throws SeriesServiceDatabaseException
+   *           if exception occurred and synchronous indexing is enabled
+   */
+  void updateOptOutStatus(String seriesId, boolean optedOut) throws NotFoundException, SeriesServiceDatabaseException;
 
   /**
    * Removes series from index.
@@ -97,6 +118,19 @@ public interface SeriesServiceIndex {
   AccessControlList getAccessControl(String seriesID) throws NotFoundException, SeriesServiceDatabaseException;
 
   /**
+   * Returns the opt out status of series with the given series id
+   *
+   * @param seriesId
+   *          the series id
+   * @return the opt out status
+   * @throws NotFoundException
+   *           if there is no series with specified series ID
+   * @throws SeriesServiceDatabaseException
+   *           if exception occurred
+   */
+  boolean isOptOut(String seriesId) throws NotFoundException, SeriesServiceDatabaseException;
+
+  /**
    * Search over indexed series with query.
    *
    * @param query
@@ -115,4 +149,5 @@ public interface SeriesServiceIndex {
    *           if count cannot be retrieved
    */
   long count() throws SeriesServiceDatabaseException;
+
 }

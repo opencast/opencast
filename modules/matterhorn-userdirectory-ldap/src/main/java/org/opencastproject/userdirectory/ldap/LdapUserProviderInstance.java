@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.userdirectory.ldap;
 
 import org.opencastproject.security.api.CachingUserProviderMXBean;
@@ -23,10 +29,12 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 
-import com.google.common.base.Function;
-import com.google.common.collect.MapMaker;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -43,7 +51,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -59,6 +66,8 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(LdapUserProviderInstance.class);
 
+  public static final String PROVIDER_NAME = "ldap";
+
   /** The spring ldap userdetails service delegate */
   private LdapUserDetailsService delegate = null;
 
@@ -72,7 +81,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   private AtomicLong ldapLoads = null;
 
   /** A cache of users, which lightens the load on the LDAP server */
-  private ConcurrentMap<String, Object> cache = null;
+  private LoadingCache<String, Object> cache = null;
 
   /** A token to store in the miss cache */
   protected Object nullToken = new Object();
@@ -136,15 +145,21 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
     }
 
     // Setup the caches
-    cache = new MapMaker().maximumSize(cacheSize).expireAfterWrite(cacheExpiration, TimeUnit.MINUTES)
-            .makeComputingMap(new Function<String, Object>() {
-              public Object apply(String id) {
+    cache = CacheBuilder.newBuilder().maximumSize(cacheSize).expireAfterWrite(cacheExpiration, TimeUnit.MINUTES)
+            .build(new CacheLoader<String, Object>() {
+              @Override
+              public Object load(String id) throws Exception {
                 User user = loadUserFromLdap(id);
                 return user == null ? nullToken : user;
               }
             });
 
     registerMBean(pid);
+  }
+
+  @Override
+  public String getName() {
+    return PROVIDER_NAME;
   }
 
   /**
@@ -190,14 +205,15 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
     logger.debug("LdapUserProvider is loading user " + userName);
     requests.incrementAndGet();
     try {
-      Object user = cache.get(userName);
+      // use #getUnchecked since the loader does not throw any checked exceptions
+      Object user = cache.getUnchecked(userName);
       if (user == nullToken) {
         return null;
       } else {
         return (JaxbUser) user;
       }
-    } catch (NullPointerException e) {
-      logger.debug("This map throws NPE rather than returning null.  Swallowing that exception here.");
+    } catch (UncheckedExecutionException e) {
+      logger.warn("Exception while loading user " + userName, e);
       return null;
     }
   }
@@ -235,7 +251,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
           roles.add(new JaxbRole(authority.getAuthority(), jaxbOrganization));
         }
       }
-      User user = new JaxbUser(userDetails.getUsername(), jaxbOrganization, roles);
+      User user = new JaxbUser(userDetails.getUsername(), PROVIDER_NAME, jaxbOrganization, roles);
       cache.put(userName, user);
       return user;
     } finally {
@@ -248,6 +264,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
    *
    * @see org.opencastproject.security.api.CachingUserProviderMXBean#getCacheHitRatio()
    */
+  @Override
   public float getCacheHitRatio() {
     if (requests.get() == 0) {
       return 0;
@@ -267,6 +284,17 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   public Iterator<User> getUsers() {
     // TODO implement LDAP get all users
     return Collections.<User> emptyList().iterator();
+  }
+
+  @Override
+  public long countUsers() {
+    // TODO implement LDAP count users
+    return 0;
+  }
+
+  @Override
+  public void invalidate(String userName) {
+    cache.invalidate(userName);
   }
 
 }

@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.6-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -35,13 +35,12 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-json</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -237,15 +236,16 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               org.opencastproject.rest;version=${project.version},
               *;resolution:=optional
             </Import-Package>
+            <Export-Package>
+              org.opencastproject.lti;version=${project.version}
+            </Export-Package>
             <Private-Package>tools.*</Private-Package>
-            <Service-Component>
-              OSGI-INF/opencast-lti.xml
-            </Service-Component>
             <Http-Alias>/ltitools</Http-Alias>
             <Http-Classpath>/tools</Http-Classpath>
             <Http-Welcome>index.html</Http-Welcome>

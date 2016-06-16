@@ -1,30 +1,37 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.workflow.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.opencastproject.workflow.api.WorkflowService.READ_PERMISSION;
 
-import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -46,7 +53,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Test cases for the implementation at {@link WorkflowServiceDaoSolrImpl}.
+ * Test cases for the implementation at {@link WorkflowServiceSolrIndex}.
  */
 public class WorkflowServiceSolrIndexTest {
 
@@ -67,7 +74,7 @@ public class WorkflowServiceSolrIndexTest {
 
     // Create a job with a workflow as its payload
     List<Job> jobs = new ArrayList<Job>();
-    JaxbJob job = new JaxbJob();
+    Job job = new JobImpl();
     WorkflowInstanceImpl workflow = new WorkflowInstanceImpl();
     workflow.setId(123);
     workflow.setCreator(securityService.getUser());
@@ -84,6 +91,9 @@ public class WorkflowServiceSolrIndexTest {
     EasyMock.expect(serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null)).andReturn(jobs);
     EasyMock.expect(serviceRegistry.getJob(123)).andReturn(job);
     EasyMock.replay(serviceRegistry);
+
+    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
+    EasyMock.replay(messageSender);
 
     // Now create the dao
     dao = new WorkflowServiceSolrIndex();
@@ -107,7 +117,7 @@ public class WorkflowServiceSolrIndexTest {
   @Test
   public void testBuildSimpleQuery() throws Exception {
     WorkflowQuery q = new WorkflowQuery().withMediaPackage("123").withSeriesId("series1");
-    String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
+    String solrQuery = dao.createQuery(q, Permissions.Action.READ.toString(), true);
     String expected = "oc_org:mh_default_org AND mediapackageid:123 AND seriesid:series1";
     assertEquals(expected, solrQuery);
   }
@@ -119,7 +129,7 @@ public class WorkflowServiceSolrIndexTest {
   public void testBuildMultiStateQuery() throws Exception {
     WorkflowQuery q = new WorkflowQuery().withSeriesId("series1").withState(WorkflowState.RUNNING)
             .withState(WorkflowState.PAUSED);
-    String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
+    String solrQuery = dao.createQuery(q, Permissions.Action.READ.toString(), true);
     String expected = "oc_org:mh_default_org AND seriesid:series1 AND (state:running OR state:paused)";
     assertEquals(expected, solrQuery);
   }
@@ -131,7 +141,7 @@ public class WorkflowServiceSolrIndexTest {
   public void testBuildNegativeStatesQuery() throws Exception {
     WorkflowQuery q = new WorkflowQuery().withSeriesId("series1").withoutState(WorkflowState.RUNNING)
             .withoutState(WorkflowState.PAUSED);
-    String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
+    String solrQuery = dao.createQuery(q, Permissions.Action.READ.toString(), true);
     String expected = "oc_org:mh_default_org AND seriesid:series1 AND (-state:running AND -state:paused AND *:*)";
     assertEquals(expected, solrQuery);
   }
@@ -142,7 +152,7 @@ public class WorkflowServiceSolrIndexTest {
   @Test
   public void testBuildNegativeStateQuery() throws Exception {
     WorkflowQuery q = new WorkflowQuery().withSeriesId("series1").withoutState(WorkflowState.RUNNING);
-    String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
+    String solrQuery = dao.createQuery(q, Permissions.Action.READ.toString(), true);
     String expected = "oc_org:mh_default_org AND seriesid:series1 AND (-state:running AND *:*)";
     assertEquals(expected, solrQuery);
   }
@@ -153,7 +163,7 @@ public class WorkflowServiceSolrIndexTest {
   @Test
   public void testNonAdminQuery() throws Exception {
     String userRole = "ROLE_USER";
-    User nonAdminUser = new JaxbUser("noAdmin", new DefaultOrganization(), new JaxbRole(userRole,
+    User nonAdminUser = new JaxbUser("noAdmin", "test", new DefaultOrganization(), new JaxbRole(userRole,
             new DefaultOrganization()));
 
     // security service
@@ -164,7 +174,7 @@ public class WorkflowServiceSolrIndexTest {
     dao.setSecurityService(securityService);
 
     WorkflowQuery q = new WorkflowQuery().withMediaPackage("123").withSeriesId("series1");
-    String solrQuery = dao.createQuery(q, READ_PERMISSION, true);
+    String solrQuery = dao.createQuery(q, Permissions.Action.READ.toString(), true);
     String expected = "oc_org:mh_default_org AND mediapackageid:123 AND seriesid:series1 AND oc_org:"
             + DefaultOrganization.DEFAULT_ORGANIZATION_ID + " AND (oc_creator:" + nonAdminUser.getUsername()
             + " OR oc_acl_read:" + userRole + ")";

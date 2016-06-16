@@ -1,21 +1,27 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.capture.admin.impl;
 
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.fail;
 import static org.opencastproject.capture.admin.api.AgentState.IDLE;
 import static org.opencastproject.capture.admin.api.AgentState.UNKNOWN;
 import static org.opencastproject.capture.admin.api.RecordingState.CAPTURING;
@@ -31,26 +37,21 @@ import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
-import junit.framework.Assert;
-
 import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.service.cm.ConfigurationException;
 
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -58,12 +59,9 @@ import java.util.UUID;
 public class CaptureAgentStateServiceImplTest {
   private CaptureAgentStateServiceImpl service = null;
   private Properties capabilities;
-  private ComboPooledDataSource pooledDataSource = null;
-  private long timestamp = -1L;
 
   @Before
   public void setUp() throws Exception {
-    timestamp = System.currentTimeMillis();
     setupService();
 
     capabilities = new Properties();
@@ -74,25 +72,13 @@ public class CaptureAgentStateServiceImplTest {
   }
 
   private void setupService() throws Exception {
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + timestamp);
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Collect the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
 
     service = new CaptureAgentStateServiceImpl();
-    service.setPersistenceProvider(new PersistenceProvider());
-    service.setPersistenceProperties(props);
+    service.setEntityManagerFactory(PersistenceUtil.newTestEntityManagerFactory(CaptureAgentStateServiceImpl.PERSISTENCE_UNIT));
 
     WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
     EasyMock.expect(workflowService.getWorkflowInstances((WorkflowQuery) EasyMock.anyObject()))
-            .andReturn(new WorkflowSetImpl()).anyTimes();
+    .andReturn(new WorkflowSetImpl()).anyTimes();
     EasyMock.replay(workflowService);
     service.setWorkflowService(workflowService);
 
@@ -100,7 +86,7 @@ public class CaptureAgentStateServiceImplTest {
 
     HashSet<JaxbRole> roles = new HashSet<JaxbRole>();
     roles.add(new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, organization, ""));
-    User user = new JaxbUser("testuser", organization, roles);
+    User user = new JaxbUser("testuser", "test", organization, roles);
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
@@ -113,7 +99,6 @@ public class CaptureAgentStateServiceImplTest {
   @After
   public void tearDown() {
     service.deactivate();
-    pooledDataSource.close();
   }
 
   @Test
@@ -341,10 +326,9 @@ public class CaptureAgentStateServiceImplTest {
 
     // Shut down the service completely
     service.deactivate();
-    service = null;
 
     // Restart the service with the same configuration as before
-    setupService();
+    service.activate(null);
 
     Assert.assertEquals(3, service.getKnownAgents().size());
 
@@ -491,7 +475,7 @@ public class CaptureAgentStateServiceImplTest {
     DefaultOrganization organization = new DefaultOrganization();
     HashSet<JaxbRole> roleSet = new HashSet<JaxbRole>();
     roleSet.add(new JaxbRole("ROLE_NOT_ADMIN", organization, ""));
-    User user = new JaxbUser("testuser", organization, roleSet);
+    User user = new JaxbUser("testuser", "test", organization, roleSet);
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
@@ -538,17 +522,17 @@ public class CaptureAgentStateServiceImplTest {
     lastHeardFrom = agent.getLastHeardFrom();
     service.setAgentState(name, CAPTURING);
     agent = service.getAgent(name);
-    Assert.assertTrue(lastHeardFrom < agent.getLastHeardFrom());
+    Assert.assertTrue(lastHeardFrom <= agent.getLastHeardFrom());
 
     lastHeardFrom = agent.getLastHeardFrom();
     service.setAgentState(name, IDLE);
     agent = service.getAgent(name);
-    Assert.assertTrue(lastHeardFrom < agent.getLastHeardFrom());
+    Assert.assertTrue(lastHeardFrom <= agent.getLastHeardFrom());
 
     lastHeardFrom = agent.getLastHeardFrom();
     service.setAgentState(name, IDLE);
     agent = service.getAgent(name);
-    Assert.assertTrue(lastHeardFrom < agent.getLastHeardFrom());
+    Assert.assertTrue(lastHeardFrom <= agent.getLastHeardFrom());
   }
 
 

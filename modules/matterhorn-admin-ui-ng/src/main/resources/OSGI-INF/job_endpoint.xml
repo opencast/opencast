@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.adminui.endpoint.JobEndpoint" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.adminui.endpoint.JobEndpoint" />
+  <property name="service.description" value="Admin UI - Job facade Endpoint" />
+  
+  <property name="opencast.service.type" value="org.opencastproject.adminui.endpoint.JobEndpoint" />
+  <property name="opencast.service.path" value="/admin-ng/job" />
+  <service>
+    <provide interface="org.opencastproject.adminui.endpoint.JobEndpoint" />
+  </service>
+
+    <reference name="workflowService" interface="org.opencastproject.workflow.api.WorkflowService"
+          cardinality="1..1" policy="static" bind="setWorkflowService"/>   
+    <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+          cardinality="1..1" policy="static" bind="setServiceRegistry"/>    
+    <reference name="incidentService" interface="org.opencastproject.serviceregistry.api.IncidentService"
+          cardinality="1..1" policy="static" bind="setIncidentService"/>    
+</scr:component>

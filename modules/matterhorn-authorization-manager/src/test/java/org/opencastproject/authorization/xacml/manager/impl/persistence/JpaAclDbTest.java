@@ -1,21 +1,34 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.authorization.xacml.manager.impl.persistence;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.security.api.AccessControlUtil.acl;
+import static org.opencastproject.security.api.AccessControlUtil.entries;
+import static org.opencastproject.security.api.AccessControlUtil.entry;
+import static org.opencastproject.util.data.Tuple.tuple;
+
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
 import org.opencastproject.security.api.AccessControlList;
@@ -25,13 +38,7 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.persistence.PersistenceUtil;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.opencastproject.security.api.AccessControlUtil.acl;
-import static org.opencastproject.security.api.AccessControlUtil.entries;
-import static org.opencastproject.security.api.AccessControlUtil.entry;
-import static org.opencastproject.util.data.Tuple.tuple;
+import org.junit.Test;
 
 /** Tests for {@link JpaAclDb}. */
 public final class JpaAclDbTest {
@@ -67,7 +74,7 @@ public final class JpaAclDbTest {
     // update with new name
     final ManagedAcl org1AclUpdated = new ManagedAclImpl(org1Acl.getId(), "public2", org1Acl.getOrganizationId(), org1Acl.getAcl());
     assertTrue(p.updateAcl(org1AclUpdated));
-    assertEquals("public2", p.getAcl(org1, org1AclUpdated.getId()).get().getName());
+    assertEquals("public", p.getAcl(org1, org1AclUpdated.getId()).get().getName());
     // try to update a non-existing ACL
     assertFalse(p.updateAcl(new ManagedAclImpl(27427492384723L, "public2", org1.getId(), org1Acl.getAcl())));
     assertEquals(2, p.getAcls(org1).size());

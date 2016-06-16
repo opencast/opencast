@@ -1,26 +1,28 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.inspection.ffmpeg;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.tika.metadata.HttpHeaders;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.Parser;
-import org.apache.tika.sax.BodyContentHandler;
+import static org.opencastproject.util.data.Collections.map;
+
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.ffmpeg.api.AudioStreamMetadata;
 import org.opencastproject.inspection.ffmpeg.api.MediaAnalyzer;
@@ -46,6 +48,13 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.tika.metadata.HttpHeaders;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.sax.BodyContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,11 +67,9 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
-import static org.opencastproject.util.data.Collections.map;
-
 /**
- * Contains the business logic for media inspection.
- * Its primary purpose is to decouple the inspection logic from all OSGi/MH job management boilerplate.
+ * Contains the business logic for media inspection. Its primary purpose is to decouple the inspection logic from all
+ * OSGi/MH job management boilerplate.
  */
 public class MediaInspector {
   private static final Logger logger = LoggerFactory.getLogger(MediaInspector.class);
@@ -72,20 +79,28 @@ public class MediaInspector {
   private final Parser tikaParser;
   private final String ffprobePath;
 
-  public MediaInspector(Workspace workspace, Parser tikaParser, String ffprobePath) {
+  /** Whether the calculation of the frames is accurate or not */
+  private boolean accurateFrameCount = false;
+
+  public void setAccurateFrameCount(boolean accurateFrameCount) {
+    this.accurateFrameCount = accurateFrameCount;
+  }
+
+  public MediaInspector(Workspace workspace, Parser tikaParser, String ffprobePath, boolean accurateFrameCount) {
     this.workspace = workspace;
     this.tikaParser = tikaParser;
     this.ffprobePath = ffprobePath;
+    this.accurateFrameCount = accurateFrameCount;
   }
 
   /**
    * Inspects the element that is passed in as uri.
    *
    * @param trackURI
-   *         the element uri
+   *          the element uri
    * @return the inspected track
    * @throws org.opencastproject.inspection.api.MediaInspectionException
-   *         if inspection fails
+   *           if inspection fails
    */
   public Track inspectTrack(URI trackURI) throws MediaInspectionException {
     logger.debug("inspect(" + trackURI + ") called, using workspace " + workspace);
@@ -187,15 +202,14 @@ public class MediaInspector {
    * Enriches the given element's mediapackage.
    *
    * @param element
-   *         the element to enrich
+   *          the element to enrich
    * @param override
-   *         <code>true</code> to override existing metadata
+   *          <code>true</code> to override existing metadata
    * @return the enriched element
    * @throws MediaInspectionException
-   *         if enriching fails
+   *           if enriching fails
    */
-  public MediaPackageElement enrich(MediaPackageElement element, boolean override)
-          throws MediaInspectionException {
+  public MediaPackageElement enrich(MediaPackageElement element, boolean override) throws MediaInspectionException {
     if (element instanceof Track) {
       final Track originalTrack = (Track) element;
       return enrichTrack(originalTrack, override);
@@ -208,9 +222,9 @@ public class MediaInspector {
    * Enriches the track's metadata and can be executed in an asynchronous way.
    *
    * @param originalTrack
-   *         the original track
+   *          the original track
    * @param override
-   *         <code>true</code> to override existing metadata
+   *          <code>true</code> to override existing metadata
    * @return the media package element
    * @throws MediaInspectionException
    */
@@ -226,9 +240,10 @@ public class MediaInspector {
       try {
         file = workspace.get(originalTrackUrl);
       } catch (NotFoundException e) {
-        throw new MediaInspectionException("File " + file + " was not found and can therefore not be inspected", e);
+        throw new MediaInspectionException("File " + originalTrackUrl + " was not found and can therefore not be "
+            + "inspected", e);
       } catch (IOException e) {
-        throw new MediaInspectionException("Error accessing " + file, e);
+        throw new MediaInspectionException("Error accessing " + originalTrackUrl, e);
       }
 
       // Make sure the file has an extension. Otherwise, tools like ffmpeg will not work.
@@ -325,16 +340,16 @@ public class MediaInspector {
   }
 
   /**
-   * Enriches the media package element metadata such as the mime type, the file size etc.
-   * The method mutates the argument element.
+   * Enriches the media package element metadata such as the mime type, the file size etc. The method mutates the
+   * argument element.
    *
    * @param element
-   *         the media package element
+   *          the media package element
    * @param override
-   *         <code>true</code> to overwrite existing metadata
+   *          <code>true</code> to overwrite existing metadata
    * @return the enriched element
    * @throws MediaInspectionException
-   *         if enriching fails
+   *           if enriching fails
    */
   private MediaPackageElement enrichElement(final MediaPackageElement element, final boolean override)
           throws MediaInspectionException {
@@ -383,17 +398,17 @@ public class MediaInspector {
    * Asks the media analyzer to extract the file's metadata.
    *
    * @param file
-   *         the file
+   *          the file
    * @return the file container metadata
    * @throws MediaInspectionException
-   *         if metadata extraction fails
+   *           if metadata extraction fails
    */
   private MediaContainerMetadata getFileMetadata(File file) throws MediaInspectionException {
     if (file == null)
       throw new IllegalArgumentException("file to analyze cannot be null");
     try {
-      MediaAnalyzer analyzer = new FFmpegAnalyzer();
-      analyzer.setConfig(map(Tuple.<String, Object>tuple(FFmpegAnalyzer.FFPROBE_BINARY_CONFIG, ffprobePath)));
+      MediaAnalyzer analyzer = new FFmpegAnalyzer(accurateFrameCount);
+      analyzer.setConfig(map(Tuple.<String, Object> tuple(FFmpegAnalyzer.FFPROBE_BINARY_CONFIG, ffprobePath)));
       return analyzer.analyze(file);
     } catch (MediaAnalyzerException e) {
       throw new MediaInspectionException(e);
@@ -404,12 +419,12 @@ public class MediaInspector {
    * Adds the video related metadata to the track.
    *
    * @param track
-   *         the track
+   *          the track
    * @param metadata
-   *         the container metadata
+   *          the container metadata
    * @throws Exception
-   *         Media analysis is fragile, and may throw any kind of runtime exceptions due to inconsistencies in the
-   *         media's metadata
+   *           Media analysis is fragile, and may throw any kind of runtime exceptions due to inconsistencies in the
+   *           media's metadata
    */
   private Track addVideoStreamMetadata(TrackImpl track, MediaContainerMetadata metadata) throws Exception {
     List<VideoStreamMetadata> videoList = metadata.getVideoStreamMetadata();
@@ -420,6 +435,7 @@ public class MediaInspector {
         video.setBitRate(v.getBitRate());
         video.setFormat(v.getFormat());
         video.setFormatVersion(v.getFormatVersion());
+        video.setFrameCount(v.getFrames());
         video.setFrameHeight(v.getFrameHeight());
         video.setFrameRate(v.getFrameRate());
         video.setFrameWidth(v.getFrameWidth());
@@ -436,12 +452,12 @@ public class MediaInspector {
    * Adds the audio related metadata to the track.
    *
    * @param track
-   *         the track
+   *          the track
    * @param metadata
-   *         the container metadata
+   *          the container metadata
    * @throws Exception
-   *         Media analysis is fragile, and may throw any kind of runtime
-   *         exceptions due to inconsistencies in the media's metadata
+   *           Media analysis is fragile, and may throw any kind of runtime exceptions due to inconsistencies in the
+   *           media's metadata
    */
   private Track addAudioStreamMetadata(TrackImpl track, MediaContainerMetadata metadata) throws Exception {
     List<AudioStreamMetadata> audioList = metadata.getAudioStreamMetadata();
@@ -453,6 +469,7 @@ public class MediaInspector {
         audio.setChannels(a.getChannels());
         audio.setFormat(a.getFormat());
         audio.setFormatVersion(a.getFormatVersion());
+        audio.setFrameCount(a.getFrames());
         audio.setBitDepth(a.getResolution());
         audio.setSamplingRate(a.getSamplingRate());
         // TODO: retain the original audio metadata
@@ -463,12 +480,11 @@ public class MediaInspector {
   }
 
   /**
-   * Determines the content type of an input stream. This method reads part of
-   * the stream, so it is typically best to close the stream immediately after
-   * calling this method.
+   * Determines the content type of an input stream. This method reads part of the stream, so it is typically best to
+   * close the stream immediately after calling this method.
    *
    * @param in
-   *         the input stream
+   *          the input stream
    * @return the content type
    */
   private MimeType extractContentType(InputStream in) {

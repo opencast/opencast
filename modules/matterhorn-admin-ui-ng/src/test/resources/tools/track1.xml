@@ -1,0 +1,13 @@
+<ns3:track type="presenter/source" id="track-1">
+	<ns3:mimetype>video/mp4</ns3:mimetype>
+	<ns3:tags/>
+	<ns3:url>http://mhtest.virtuos.uos.de:8080/files/mediapackage/74a9a83a-017e-4e0d-b508-40cb0802aeb7/c81128ab-477e-462f-8fdb-90233fe82dda/short.mp4</ns3:url>
+	<ns3:checksum type="md5">3b66fb20b59ca385501efd829e574b2f</ns3:checksum>
+	<ns3:duration>3200</ns3:duration>
+	<ns3:video id="video-1"><ns3:device/>
+		<ns3:encoder type="H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"/>
+		<ns3:bitrate>1464700.0</ns3:bitrate>
+		<ns3:framerate>30.0</ns3:framerate>
+		<ns3:resolution>320x240</ns3:resolution>
+	</ns3:video>
+</ns3:track>

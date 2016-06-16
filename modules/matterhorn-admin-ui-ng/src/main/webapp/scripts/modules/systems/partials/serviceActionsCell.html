@@ -1,0 +1,6 @@
+<a ng-if="row.status !== 'NORMAL'" 
+	class="sanitize fa fa-undo" 
+	ng-click="table.sanitize(row.host, row.name)" 
+	title="{{ 'SYSTEMS.SERVICES.TABLE.SANITIZE' | translate }}"
+	with-role="ROLE_UI_SERVICES_STATUS_EDIT">
+</a>

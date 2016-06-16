@@ -1,20 +1,28 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
 
+
 package org.opencastproject.composer.impl.ffmpeg;
+
+import static org.apache.commons.lang3.StringUtils.startsWithAny;
 
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
@@ -119,7 +127,6 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
     // Process the commandline. The variables in that commandline might either
     // be replaced by commandline parts from the configuration or commandline
     // parameters as specified at runtime.
-    List<String> argumentList = new ArrayList<String>();
     for (Map.Entry<String, String> entry : format.getExtensions().entrySet()) {
       String key = entry.getKey();
       if (key.startsWith(CMD_SUFFIX) && key.length() > CMD_SUFFIX.length()) {
@@ -133,13 +140,14 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
     // Replace the commandline parameters passed in at compile time
     commandline = processParameters(commandline);
 
-    // Remove unused commandline parts
-    commandline = commandline.replaceAll("#\\{.*?\\}", "");
-
+    List<String> argumentList = new ArrayList<String>();
+    // Disable the print of encoding progress/statistics.
+    argumentList.add("-nostats");
     String[] args = commandline.split(" ");
     for (String a : args)
       if (!"".equals(a.trim()))
         argumentList.add(a);
+
     return argumentList;
   }
 
@@ -165,23 +173,21 @@ public class FFmpegEncoderEngine extends AbstractCmdlineEncoderEngine {
       return;
 
     // Others go to trace logging
-    if (message.startsWith("FFmpeg version") || message.startsWith("configuration") || message.startsWith("lib")
-            || message.startsWith("size=") || message.startsWith("frame=") || message.startsWith("built on"))
-
+    if (startsWithAny(message.toLowerCase(),
+          new String[] {"ffmpeg version", "configuration", "lib", "size=", "frame=", "built with"})) {
       logger.trace(message);
 
     // Some to debug
-    else if (message.startsWith("Input #") || message.startsWith("Duration:") || message.startsWith("Stream #")
-            || message.startsWith("Stream mapping") || message.startsWith("Output #") || message.startsWith("video:")
-            || message.startsWith("Metadata") || message.startsWith("Program")
-            || message.startsWith("Last message repeated")
-            || message.startsWith("PIX_FMT_YUV420P will be used as an intermediate format for rescaling"))
-
+    } else if (startsWithAny(message.toLowerCase(),
+          new String[] { "artist", "compatible_brands", "copyright", "creation_time", "description", "duration",
+            "encoder", "handler_name", "input #", "last message repeated", "major_brand", "metadata", "minor_version",
+            "output #", "program", "side data:", "stream #", "stream mapping", "title", "video:", "[libx264 @ "})) {
       logger.debug(message);
 
     // And the rest is likely to deserve at least info
-    else
+    } else {
       logger.info(message);
+    }
   }
 
   /**

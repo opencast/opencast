@@ -1,0 +1,26 @@
+{
+    "metadata": {
+        "field": ""
+    },
+    "sources": {
+        "type" "Upload",
+        "metadata": {
+        
+        }
+        "files": {
+            "presenter"    : "test.avi",
+            "presentation" : "bla.mp4",
+            "audio"        : "test.mp3"
+        }
+    },
+    "Processing": {
+        "worfklow": "",
+        "configuration": {
+            "key": "value"
+        }
+    },
+    "Access": {
+        "id":43,
+        "name":"Public"
+    }
+}

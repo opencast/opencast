@@ -1,36 +1,43 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.search.impl.persistence;
 
-import static org.opencastproject.search.api.SearchService.CONTRIBUTE_PERMISSION;
-import static org.opencastproject.search.api.SearchService.READ_PERMISSION;
-import static org.opencastproject.search.api.SearchService.WRITE_PERMISSION;
+import static org.opencastproject.security.api.Permissions.Action.CONTRIBUTE;
+import static org.opencastproject.security.api.Permissions.Action.READ;
+import static org.opencastproject.security.api.Permissions.Action.WRITE;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlUtil;
-import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,28 +46,24 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import javax.persistence.spi.PersistenceProvider;
+import javax.persistence.TypedQuery;
 
 /**
  * Implements {@link SearchServiceDatabase}. Defines permanent storage for series.
  */
 public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
+  /** JPA persistence unit name */
+  public static final String PERSISTENCE_UNIT = "org.opencastproject.search.impl.persistence";
+
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceDatabaseImpl.class);
-
-  /** Persistence provider set by OSGi */
-  protected PersistenceProvider persistenceProvider;
-
-  /** Persistence properties used to create {@link EntityManagerFactory} */
-  protected Map<String, Object> persistenceProperties;
 
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;
@@ -68,44 +71,20 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   /** The security service */
   protected SecurityService securityService;
 
+  /** OSGi DI */
+  public void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
+  }
+
   /**
    * Creates {@link EntityManagerFactory} using persistence provider and properties passed via OSGi.
    *
    * @param cc
+   * @throws SearchServiceDatabaseException
    */
-  public void activate(ComponentContext cc) {
+  public void activate(ComponentContext cc) throws SearchServiceDatabaseException {
     logger.info("Activating persistence manager for search service");
-    emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.search.impl.persistence",
-            persistenceProperties);
-  }
-
-  /**
-   * Closes entity manager factory.
-   *
-   * @param cc
-   */
-  public void deactivate(ComponentContext cc) {
-    emf.close();
-  }
-
-  /**
-   * OSGi callback to set persistence properties.
-   *
-   * @param persistenceProperties
-   *          persistence properties
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
-  }
-
-  /**
-   * OSGi callback to set persistence provider.
-   *
-   * @param persistenceProvider
-   *          {@link PersistenceProvider} object
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
+    this.populateSeriesData();
   }
 
   /**
@@ -118,6 +97,36 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
     this.securityService = securityService;
   }
 
+  private void populateSeriesData() throws SearchServiceDatabaseException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      TypedQuery<SearchEntity> q = (TypedQuery<SearchEntity>) em.createNamedQuery("Search.getNoSeries");
+      List<SearchEntity> seriesList = q.getResultList();
+      for (SearchEntity series : seriesList) {
+        String mpSeriesId = MediaPackageParser.getFromXml(series.getMediaPackageXML()).getSeries();
+        if (StringUtils.isNotBlank(mpSeriesId) && !mpSeriesId.equals(series.getSeriesId())) {
+          logger.info("Fixing missing series ID for episode {}, series is {}", series.getMediaPackageId(), mpSeriesId);
+          series.setSeriesId(mpSeriesId);
+          em.merge(series);
+        }
+      }
+      tx.commit();
+    } catch (Exception e) {
+      logger.error("Could not update media package: {}", e.getMessage());
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      throw new SearchServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
   /**
    * {@inheritDoc}
    *
@@ -125,7 +134,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    */
   @Override
   public void deleteMediaPackage(String mediaPackageId, Date deletionDate) throws SearchServiceDatabaseException,
-          NotFoundException {
+  NotFoundException {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
@@ -143,7 +152,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
         User currentUser = securityService.getUser();
         Organization currentOrg = securityService.getOrganization();
-        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE_PERMISSION))
+        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE.toString()))
           throw new UnauthorizedException(currentUser + " is not authorized to delete media package " + mediaPackageId);
 
         searchEntity.setDeletionDate(deletionDate);
@@ -204,7 +213,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    */
   @Override
   public AccessControlList getAccessControlList(String mediaPackageId) throws NotFoundException,
-          SearchServiceDatabaseException {
+  SearchServiceDatabaseException {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
@@ -253,6 +262,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         searchEntity.setMediaPackageXML(mediaPackageXML);
         searchEntity.setAccessControl(AccessControlParser.toXml(acl));
         searchEntity.setModificationDate(now);
+        searchEntity.setSeriesId(mediaPackage.getSeries());
         em.persist(searchEntity);
       } else {
         // Ensure this user is allowed to update this media package
@@ -261,7 +271,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
           AccessControlList accessList = AccessControlParser.parseAcl(accessControlXml);
           User currentUser = securityService.getUser();
           Organization currentOrg = securityService.getOrganization();
-          if (!AccessControlUtil.isAuthorized(accessList, currentUser, currentOrg, WRITE_PERMISSION)) {
+          if (!AccessControlUtil.isAuthorized(accessList, currentUser, currentOrg, WRITE.toString())) {
             throw new UnauthorizedException(currentUser + " is not authorized to update media package "
                     + mediaPackageId);
           }
@@ -271,6 +281,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         entity.setMediaPackageXML(mediaPackageXML);
         entity.setAccessControl(AccessControlParser.toXml(acl));
         entity.setModificationDate(now);
+        entity.setSeriesId(mediaPackage.getSeries());
         em.merge(entity);
       }
       tx.commit();
@@ -309,9 +320,9 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         User currentUser = securityService.getUser();
         Organization currentOrg = securityService.getOrganization();
         // There are several reasons a user may need to load a episode: to read content, to edit it, or add content
-        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ_PERMISSION)
-                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, CONTRIBUTE_PERMISSION)
-                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE_PERMISSION)) {
+        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString())
+                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, CONTRIBUTE.toString())
+                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE.toString())) {
           throw new UnauthorizedException(currentUser + " is not authorized to see episode " + mediaPackageId);
         }
       }
@@ -352,7 +363,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
         User currentUser = securityService.getUser();
         Organization currentOrg = securityService.getOrganization();
-        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ_PERMISSION))
+        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString()))
           throw new UnauthorizedException(currentUser + " is not authorized to read media package " + mediaPackageId);
       }
       return searchEntity.getModificationDate();
@@ -393,7 +404,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
         User currentUser = securityService.getUser();
         Organization currentOrg = securityService.getOrganization();
-        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ_PERMISSION))
+        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString()))
           throw new UnauthorizedException(currentUser + " is not authorized to read media package " + mediaPackageId);
       }
       return searchEntity.getDeletionDate();
@@ -433,7 +444,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
         User currentUser = securityService.getUser();
         Organization currentOrg = securityService.getOrganization();
-        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ_PERMISSION))
+        if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString()))
           throw new UnauthorizedException(currentUser + " is not authorized to read media package " + mediaPackageId);
       }
       return searchEntity.getOrganization();

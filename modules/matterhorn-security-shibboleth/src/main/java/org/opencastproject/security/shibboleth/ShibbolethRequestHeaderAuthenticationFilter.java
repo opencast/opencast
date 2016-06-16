@@ -1,19 +1,27 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.security.shibboleth;
+
+import org.opencastproject.security.api.UserDirectoryService;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,6 +42,9 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
   /** Spring security's user details manager */
   private UserDetailsService userDetailsService = null;
 
+  /** The user directory service */
+  private UserDirectoryService userDirectoryService = null;
+
   /** The implementation that is taking care of extracting user attributes from the request */
   private ShibbolethLoginHandler loginHandler = null;
 
@@ -45,6 +56,7 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
     super.afterPropertiesSet();
     Assert.notNull(userDetailsService, "A UserDetailsService must be set");
     Assert.notNull(loginHandler, "A ShibbolethLoginHandler must be set");
+    Assert.notNull(userDirectoryService, "A UserDirectoryService must be set");
   }
 
   /**
@@ -55,6 +67,7 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
    * @param request
    *          the incoming request
    */
+  @Override
   protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {
     String o = (String) (super.getPreAuthenticatedPrincipal(request));
     if (debug)
@@ -66,6 +79,7 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
         }
       } catch (UsernameNotFoundException e) {
         loginHandler.newUserLogin(o, request);
+        userDirectoryService.invalidate(o);
       }
     }
     return o;
@@ -113,6 +127,16 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
    */
   public void setUserDetailsService(UserDetailsService userDetailsService) {
     this.userDetailsService = userDetailsService;
+  }
+
+  /**
+   * Sets the user directory service which allows to invalidate the cache of a new created user.
+   *
+   * @param userDirectoryService
+   *          the user directory service
+   */
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    this.userDirectoryService = userDirectoryService;
   }
 
   /**

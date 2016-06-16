@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.search.impl.persistence;
 
 import java.util.Date;
@@ -35,13 +41,18 @@ import javax.persistence.TemporalType;
 @NamedQueries({
         @NamedQuery(name = "Search.findAll", query = "SELECT s FROM SearchEntity s"),
         @NamedQuery(name = "Search.getCount", query = "SELECT COUNT(s) FROM SearchEntity s"),
-        @NamedQuery(name = "Search.findById", query = "SELECT s FROM SearchEntity s WHERE s.mediaPackageId=:mediaPackageId") })
+        @NamedQuery(name = "Search.findById", query = "SELECT s FROM SearchEntity s WHERE s.mediaPackageId=:mediaPackageId"),
+        @NamedQuery(name = "Search.findBySeriesId", query = "SELECT s FROM SearchEntity s WHERE s.seriesId=:seriesId"),
+        @NamedQuery(name = "Search.getNoSeries", query = "SELECT s FROM SearchEntity s WHERE s.seriesId IS NULL")})
 public class SearchEntity {
 
   /** media package id, primary key */
   @Id
   @Column(name = "id", length = 128)
   private String mediaPackageId;
+
+  @Column(name = "series_id", length = 128)
+  protected String seriesId;
 
   /** Organization id */
   @Column(name = "organization", length = 128)
@@ -175,5 +186,22 @@ public class SearchEntity {
    */
   public void setModificationDate(Date modificationDate) {
     this.modificationDate = modificationDate;
+  }
+
+  /**
+   * @return the series Id for this search entry
+   */
+  public String getSeriesId() {
+    return seriesId;
+  }
+
+  /**
+   * Sets the series ID
+   *
+   * @param seriesId
+   *          the series ID
+   */
+  public void setSeriesId(String seriesId) {
+    this.seriesId = seriesId;
   }
 }

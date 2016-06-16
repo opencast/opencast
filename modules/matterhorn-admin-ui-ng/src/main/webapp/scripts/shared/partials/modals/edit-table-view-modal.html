@@ -1,0 +1,62 @@
+<section translate-cloak class="modal active modal-open" ng-keyup="keyUp($event)" id="edit-table-view-modal" style="display: block;" ng-controller="TablePreferencesCtrl">
+    <header>
+        <a ng-click="close()" class="fa fa-times close-modal"></a>
+        <h2 translate="PREFERENCES.TABLE.CAPTION"><!--Edit Table View--></h2>
+    </header>
+    
+    <div class="modal-content">
+        <div class="modal-body">
+        
+            <div class="tab-description for-header">
+                <p translate="PREFERENCES.TABLE.SUBHEADING" translate-values='{ tableName: tableName}'></p>
+            </div>
+        
+            <div class="row">
+                
+                <div class="col">
+                    <div class="obj drag-available-column">
+                        <header>
+                            <h2 translate="PREFERENCES.TABLE.AVAILABLE_COLUMNS"><!--Available Columns--></h2>
+                        </header>
+                        <ul class="drag-drop-items">
+                            <li class="drag-item" ng-repeat="col in deactivatedColumns" ng-if="col.deactivated">
+                                <div class="title">{{ col.label | translate }}</div>
+                                <a class="move-item add" ng-click="changeColumn(col, false)"></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>    
+                
+                <div class="col" >
+                    <div class="obj drag-selected-column">
+                        <header>
+                            <h2 translate="PREFERENCES.TABLE.SELECTED_COLUMNS"><!--Selected Columns--></h2>
+                        </header>
+                        <ul class="drag-drop-items">
+                            <li ui-sortable ng-model="activeColumns">
+                                <div  ng-repeat="column in activeColumns" class="drag-item">
+                                    <div class="title">{{ column.label | translate }}</div>
+                                    <a class="move-item remove" ng-click="changeColumn(column, true)"></a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            
+            </div>
+        
+            <div class="tab-description for-footer">
+                <p translate="PREFERENCES.TABLE.FOOTER_TEXT" translate-values="{resetTranslation: resetTranslation}"><!--The order and selection will be saved automatically. Press "Reset" to restore the default view.--></p>
+            </div>
+        
+        </div>
+    </div>
+    
+    <footer>
+        <a ng-click="close()" class="cancel" translate="CANCEL"><!--Cancel--></a>
+        <div class="pull-right">
+            <!-- <a ng-click="initialize()" class="cancel" translate="RESET"><!--Reset--></a>
+            <a ng-click="save(); close()" class="submit" translate="SAVE"><!--Save As Default--></a>
+        </div>
+    </footer>
+</section>

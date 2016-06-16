@@ -8,4 +8,6 @@
   </service>
   <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
     cardinality="1..1" policy="static" bind="setTrustedHttpClient" />
+  <reference name="incidentService" interface="org.opencastproject.serviceregistry.api.IncidentService"
+    cardinality="0..1" policy="dynamic" bind="setIncidentService" />
 </scr:component>

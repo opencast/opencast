@@ -1,0 +1,169 @@
+<section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="capture-agent-details-modal">
+
+    <header>
+        <a class="fa fa-times close-modal" ng-click="close()"></a>
+        <h2>Recording Details {{resourceId}}</h2>
+    </header>
+
+    <nav class="modal-nav" id="modal-nav">
+        <a ng-click="openTab('details')" data-modal-tab="details" ng-class="{ active: tab == 'details' }">Details</a>
+    </nav>
+
+    <a ng-click="showAdjacent(true)"><i class="arrow fa fa-chevron-left"></i></a>
+    <a ng-click="showAdjacent()"><i class="arrow fa fa-chevron-right"></i></a>
+
+    <div class="modal-content" data-modal-tab-content="details">
+        <div class="col">
+            <div class="obj tbl-details">
+                <header>Agent Details <i class="fa fa-chevron-down"></i></header>
+                <div class="obj-container">
+                    <table class="main-tbl">
+                        <tr>
+                            <td>Agent Name</td>
+                            <td>3ep1</td>
+                        </tr>
+                        <tr>
+                            <td>Location</td>
+                            <td>Johnson Hall</td>
+                        </tr>
+                        <tr>
+                            <td>UID</td>
+                            <td>34121532</td>
+                        </tr>
+                        <tr>
+                            <td>IP</td>
+                            <td>169.182.0.1</td>
+                        </tr>
+                        <tr>
+                            <td>Version</td>
+                            <td>21.0.12</td>
+                        </tr>
+                        <tr>
+                            <td>Model</td>
+                            <td>Entropywave E1000</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="obj tbl-details">
+                <header>Device Capabilities <i class="fa fa-chevron-down"></i></header>
+                <div class="obj-container">
+                    <table class="main-tbl">
+                        <tr>
+                            <td>Source</td>
+                            <td>Camera</td>
+                        </tr>
+                        <tr>
+                            <td>Flavor</td>
+                            <td>Presenter</td>
+                        </tr>
+                        <tr>
+                            <td>Outputfile</td>
+                            <td>screen_out.mpg</td>
+                        </tr>
+                        <tr>
+                            <td>Buffer size</td>
+                            <td>200</td>
+                        </tr>
+                        <tr>
+                            <td>Codec</td>
+                            <td>mpeg2video</td>
+                        </tr>
+                        <tr>
+                            <td>Bitrate</td>
+                            <td>1024</td>
+                        </tr>
+                        <tr>
+                            <td>Container</td>
+                            <td>mpegtsmux</td>
+                        </tr>
+                        <tr>
+                            <td class="spacer" colspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td>Source</td>
+                            <td>Desktop</td>
+                        </tr>
+                        <tr>
+                            <td>Flavor</td>
+                            <td>Presenter</td>
+                        </tr>
+                        <tr>
+                            <td>Outputfile</td>
+                            <td>screen_out.mpg</td>
+                        </tr>
+                        <tr>
+                            <td>Buffer size</td>
+                            <td>200</td>
+                        </tr>
+                        <tr>
+                            <td>Codec</td>
+                            <td>mpeg2video</td>
+                        </tr>
+                        <tr>
+                            <td>Bitrate</td>
+                            <td>1024</td>
+                        </tr>
+                        <tr>
+                            <td>Container</td>
+                            <td>mpegtsmux</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="obj tbl-details collapsed">
+                <header>History <i class="fa fa-chevron-down"></i></header>
+                <div class="obj-container"></div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="obj comments">
+                <header>Comments <i class="fa fa-chevron-down"></i></header>
+                <div class="obj-container">
+                    <div class="comment-container">
+                        <div class="comment">
+                            <div class="date"><i class="fa fa-clock-o"></i>2013-12-04 14:00</div>
+                            <h4>Andy Wasklewicz</h4>
+                            <span class="category">Poor sound quality</span>
+                            <p>I am not sure if this is related to batteries in the microphone or a short circut</p>
+                            <div class="reply"><i class="fa fa-share"></i> Reply</div>
+                            <hr>
+                        </div>
+
+                        <div class="comment">
+                            <div class="date"><i class="fa fa-clock-o"></i>2013-12-04 14:00</div>
+                            <h4>Mike Busby</h4>
+                            <span class="category">Poor sound quality</span>
+                            <p><span>@andywasklewicz</span> That microphone is such a pile of garbage. We should get another one.</p>
+                            <div class="reply"><i class="fa fa-share"></i> Reply</div>
+                            <hr>
+                        </div>
+                    </div>
+
+                    <div class="add-comment">
+                        <div class="drop-down-container" id="comment-reason-dd">
+                            <span>Reason</span><i class="fa fa-chevron-down"></i>
+                            <ul class="dropdown-ul">
+                                <li><a href="#">Poor Sound Quality</a></li>
+                                <li><a href="#">Reason 2</a></li>
+                                <li><a href="#">Reason 3</a></li>
+                            </ul>
+                        </div>
+
+                        <input type="text" placeholder="Comment...">
+                    </div>
+                </div>
+            </div>
+
+            <div class="obj tbl-details collapsed">
+                <header>Tags <i class="fa fa-chevron-down"></i></header>
+                <div class="obj-container">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="btm-spacer"></div>
+</section>

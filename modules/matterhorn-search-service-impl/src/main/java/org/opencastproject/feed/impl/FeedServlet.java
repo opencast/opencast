@@ -1,28 +1,36 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 
 package org.opencastproject.feed.impl;
 
 import org.opencastproject.feed.api.Feed;
 import org.opencastproject.feed.api.FeedGenerator;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
 
 import com.sun.syndication.io.SyndFeedOutput;
 import com.sun.syndication.io.WireFeedOutput;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
@@ -73,12 +81,17 @@ public class FeedServlet extends HttpServlet {
   /** List of feed generators */
   private List<FeedGenerator> feeds = new ArrayList<FeedGenerator>();
 
+  /** The security service */
+  private SecurityService securityService = null;
+
   /**
    * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
    *      javax.servlet.http.HttpServletResponse)
    */
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+    /* Temporary unavailable until someone fixes the feed service
     ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
     try {
       Thread.currentThread().setContextClassLoader(FeedServlet.class.getClassLoader());
@@ -86,6 +99,7 @@ public class FeedServlet extends HttpServlet {
     } finally {
       Thread.currentThread().setContextClassLoader(originalContextClassLoader);
     }
+    */
   }
 
   /**
@@ -106,6 +120,7 @@ public class FeedServlet extends HttpServlet {
           throws ServletException, IOException {
     logger.debug("Requesting RSS or Atom feed.");
     FeedInfo feedInfo = null;
+    Organization organization = securityService.getOrganization();
 
     // Try to extract requested feed type and content
     try {
@@ -125,7 +140,7 @@ public class FeedServlet extends HttpServlet {
     Feed feed = null;
     for (FeedGenerator generator : feeds) {
       if (generator.accept(feedInfo.getQuery())) {
-        feed = generator.createFeed(feedInfo.getType(), feedInfo.getQuery(), feedInfo.getSize());
+        feed = generator.createFeed(feedInfo.getType(), feedInfo.getQuery(), feedInfo.getSize(), organization);
         if (feed == null) {
           response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
           return;
@@ -255,6 +270,16 @@ public class FeedServlet extends HttpServlet {
   public void removeFeedGenerator(FeedGenerator generator) {
     logger.info("Removing '{}' feed", generator.getIdentifier());
     feeds.remove(generator);
+  }
+
+  /**
+   * OSGi callback to set the security service.
+   *
+   * @param securityService
+   *          the security service
+   */
+  void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
 }

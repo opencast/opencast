@@ -1,25 +1,31 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.workflow.impl;
+
+import static com.entwinemedia.fn.Stream.$;
 
 import static org.apache.solr.client.solrj.util.ClientUtils.escapeQueryChars;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.workflow.api.WorkflowService.READ_PERMISSION;
-import static org.opencastproject.workflow.api.WorkflowService.WRITE_PERMISSION;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -28,6 +34,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -37,7 +44,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowException;
@@ -55,10 +61,12 @@ import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionReport;
 import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionReport.OperationReport;
 
+import com.entwinemedia.fn.Fn;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
@@ -83,7 +91,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -194,6 +201,13 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
   /** The thread pool to use in asynchronous indexing */
   protected ExecutorService indexingExecutor;
 
+  public static final Fn<Job, Boolean> operationIsStartWorkflow = new Fn<Job, Boolean>() {
+    @Override
+    public Boolean ap(Job job) {
+      return WorkflowServiceImpl.Operation.START_WORKFLOW.toString().equals(job.getOperation());
+    }
+  };
+
   /**
    * Callback from the OSGi environment on component registration. The indexing behavior can be set using component
    * context properties. <code>synchronousIndexing=true|false</code> determines whether threads performing workflow
@@ -210,13 +224,8 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       } catch (MalformedURLException e) {
         throw new IllegalStateException("Unable to connect to solr at " + solrServerUrlConfig, e);
       }
-    } else if (cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT) != null) {
-      solrRoot = cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT);
     } else {
-      String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
-      if (storageDir == null)
-        throw new IllegalStateException("Storage dir must be set (org.opencastproject.storage.dir)");
-      solrRoot = PathSupport.concat(storageDir, "workflowindex");
+      solrRoot = SolrServerFactory.getEmbeddedDir(cc, CONFIG_SOLR_ROOT, "workflow");
     }
     Object syncIndexingConfig = cc.getProperties().get("synchronousIndexing");
     if (syncIndexingConfig != null && (syncIndexingConfig instanceof Boolean)) {
@@ -270,16 +279,9 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       logger.info("The workflow index is empty, looking for workflows to index");
       // this may be a new index, so get all of the existing workflows and index them
       List<Job> jobs = null;
+
       try {
-        jobs = serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null);
-        Iterator<Job> ji = jobs.iterator();
-        while (ji.hasNext()) {
-          Job job = ji.next();
-          if (!WorkflowServiceImpl.Operation.START_WORKFLOW.toString().equals(job.getOperation())) {
-            logger.debug("Removing unrelated job {} of type {}", job.getId(), job.getOperation());
-            ji.remove();
-          }
-        }
+        jobs = $(serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null)).filter(operationIsStartWorkflow).toList();
       } catch (ServiceRegistryException e) {
         logger.error("Unable to load the workflows jobs: {}", e.getMessage());
         throw new ServiceException(e.getMessage());
@@ -410,6 +412,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       }
     } else {
       indexingExecutor.submit(new Runnable() {
+        @Override
         public void run() {
           try {
             SolrInputDocument doc = createDocument(instance);
@@ -530,9 +533,9 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
     // Define containers for common permissions
     List<String> reads = new ArrayList<String>();
-    permissions.put(READ_PERMISSION, reads);
+    permissions.put(Permissions.Action.READ.toString(), reads);
     List<String> writes = new ArrayList<String>();
-    permissions.put(WRITE_PERMISSION, writes);
+    permissions.put(Permissions.Action.WRITE.toString(), writes);
 
     String adminRole = securityService.getOrganization().getAdminRole();
 
@@ -591,7 +594,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       query.append(" AND ");
     query.append(ORG_KEY).append(":").append(escapeQueryChars(orgId));
 
-    appendSolrAuthFragment(query, READ_PERMISSION);
+    appendSolrAuthFragment(query, Permissions.Action.READ.toString());
 
     try {
       QueryResponse response = solrServer.query(new SolrQuery(query.toString()));
@@ -624,7 +627,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     try {
       String orgId = securityService.getOrganization().getId();
       StringBuilder queryString = new StringBuilder().append(ORG_KEY).append(":").append(escapeQueryChars(orgId));
-      appendSolrAuthFragment(queryString, WRITE_PERMISSION);
+      appendSolrAuthFragment(queryString, Permissions.Action.WRITE.toString());
       SolrQuery solrQuery = new SolrQuery(queryString.toString());
       solrQuery.addFacetField(WORKFLOW_DEFINITION_KEY);
       solrQuery.addFacetField(OPERATION_KEY);
@@ -661,7 +664,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
               StringBuilder baseSolrQuery = new StringBuilder().append(ORG_KEY).append(":")
                       .append(escapeQueryChars(orgId));
-              appendSolrAuthFragment(baseSolrQuery, WRITE_PERMISSION);
+              appendSolrAuthFragment(baseSolrQuery, Permissions.Action.WRITE.toString());
               solrQuery = new SolrQuery(baseSolrQuery.toString());
               solrQuery.addFacetField(STATE_KEY);
               solrQuery.addFacetQuery(STATE_KEY + ":" + WorkflowState.FAILED);
@@ -995,11 +998,11 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
   public WorkflowSet getWorkflowInstances(WorkflowQuery query, String action, boolean applyPermissions)
           throws WorkflowDatabaseException {
     int count = query.getCount() > 0 ? (int) query.getCount() : 20; // default to 20 items if not specified
-    int startPage = query.getStartPage() > 0 ? (int) query.getStartPage() : 0; // default to page zero
+    int startIndex = query.getStartPage() > 0 ? (int) query.getStartPage() * count : (int) query.getStartIndex();
 
     SolrQuery solrQuery = new SolrQuery();
     solrQuery.setRows(count);
-    solrQuery.setStart(startPage * count);
+    solrQuery.setStart(startIndex);
 
     String solrQueryString = createQuery(query, action, applyPermissions);
     solrQuery.setQuery(solrQueryString);

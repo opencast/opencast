@@ -1,29 +1,37 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.authorization.xacml.manager.impl.persistence;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.mchange.v2.c3p0.DataSources;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
+import static org.opencastproject.workflow.api.ConfiguredWorkflowRef.workflow;
+
 import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
@@ -39,26 +47,19 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
 
-import java.io.File;
+import org.apache.commons.io.IOUtils;
+import org.easymock.EasyMock;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.InputStream;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.workflow.api.ConfiguredWorkflowRef.workflow;
+import javax.persistence.EntityManagerFactory;
 
 /** Tests persistence: storing, merging, retrieving and removing. */
 public class OsgiJpaAclTransitionDbTest {
@@ -68,42 +69,24 @@ public class OsgiJpaAclTransitionDbTest {
   private static final Organization ORG = new DefaultOrganization();
   private static final Organization ORG2 = new JaxbOrganization("another-org");
 
-  private ComboPooledDataSource pooledDataSource;
   private OsgiJpaAclTransitionDb db;
   private JpaAclDb aclDb;
-  private String storage;
   private AccessControlList acl;
   private SecurityService securityService;
 
   /** @throws java.lang.Exception */
   @Before
   public void setUp() throws Exception {
-    long currentTime = System.currentTimeMillis();
-    storage = PathSupport.concat("target", "db" + currentTime + ".h2.db");
-
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + currentTime);
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Collect the persistence properties
-    final Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
-
     securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.replay(securityService);
 
-    final PersistenceProvider persitenceProvider = new PersistenceProvider();
     db = new OsgiJpaAclTransitionDb();
-    db.setPersistenceProvider(persitenceProvider);
-    db.setPersistenceProperties(props);
+    EntityManagerFactory emf = newTestEntityManagerFactory(OsgiJpaAclTransitionDb.PERSISTENCE_UNIT);
+    db.setEntityManagerFactory(emf);
     db.activate(null);
 
-    aclDb = new JpaAclDb(PersistenceUtil.newPersistenceEnvironment(persitenceProvider, "org.opencastproject.authorization.xacml.manager", props));
+    aclDb = new JpaAclDb(persistenceEnvironment(emf));
 
     InputStream in = null;
     try {
@@ -112,14 +95,6 @@ public class OsgiJpaAclTransitionDbTest {
     } finally {
       IOUtils.closeQuietly(in);
     }
-  }
-
-  /** @throws java.lang.Exception */
-  @After
-  public void tearDown() throws Exception {
-    db.deactivate(null);
-    DataSources.destroy(pooledDataSource);
-    FileUtils.deleteQuietly(new File(storage));
   }
 
   @Test
@@ -202,8 +177,8 @@ public class OsgiJpaAclTransitionDbTest {
   @Test
   public void testGetEpisodeTransitions() throws Exception {
     final ManagedAcl macl = createAcl();
-    EpisodeACLTransition t1 = db.storeEpisodeAclTransition(ORG, "uuid", new Date(), some(macl.getId()), Option.<ConfiguredWorkflowRef>none());
-    EpisodeACLTransition t2 = db.storeEpisodeAclTransition(ORG, "uuid", new Date(), some(macl.getId()), Option.<ConfiguredWorkflowRef>none());
+    db.storeEpisodeAclTransition(ORG, "uuid", new Date(), some(macl.getId()), Option.<ConfiguredWorkflowRef> none());
+    db.storeEpisodeAclTransition(ORG, "uuid", new Date(), some(macl.getId()), Option.<ConfiguredWorkflowRef> none());
 
     // there should now be two transitions for episode "uuid"
     List<EpisodeACLTransition> episodes = db.getEpisodeAclTransitions(ORG, "uuid");
@@ -216,8 +191,8 @@ public class OsgiJpaAclTransitionDbTest {
   @Test
   public void testGetSeriesTransitions() throws Exception {
     final ManagedAcl macl = createAcl();
-    SeriesACLTransition t1 = db.storeSeriesAclTransition(ORG, "uuid", new Date(), macl.getId(), true, Option.<ConfiguredWorkflowRef>none());
-    SeriesACLTransition t2 = db.storeSeriesAclTransition(ORG, "uuid", new Date(), macl.getId(), false, Option.<ConfiguredWorkflowRef>none());
+    db.storeSeriesAclTransition(ORG, "uuid", new Date(), macl.getId(), true, Option.<ConfiguredWorkflowRef> none());
+    db.storeSeriesAclTransition(ORG, "uuid", new Date(), macl.getId(), false, Option.<ConfiguredWorkflowRef> none());
 
     // there should now be two transitions for series "uuid"
     List<SeriesACLTransition> series = db.getSeriesAclTransitions(ORG, "uuid");

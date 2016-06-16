@@ -1,25 +1,31 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 
 package org.opencastproject.mediapackage.track;
 
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.MediaPackageSerializer;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -53,6 +59,15 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
   @XmlElement(name = "bitrate")
   protected Float bitrate;
 
+  @XmlElement(name = "peakleveldb")
+  protected Float pkLevDb;
+
+  @XmlElement(name = "rmsleveldb")
+  protected Float rmsLevDb;
+
+  @XmlElement(name = "rmspeakdb")
+  protected Float rmsPkDb;
+
   public AudioStreamImpl() {
     this(UUID.randomUUID().toString());
   }
@@ -62,28 +77,21 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
   }
 
   /**
-   * Construct an audio stream from another audio stream
-   *
-   * @param s
-   */
-  public AudioStreamImpl(AudioStreamImpl s) {
-    this.bitdepth = s.bitdepth;
-    this.bitrate = s.bitrate;
-    this.channels = s.channels;
-    this.device = s.device;
-    this.encoder = s.encoder;
-    this.identifier = s.identifier;
-    this.samplingrate = s.samplingrate;
-  }
-
-  /**
    * @see org.opencastproject.mediapackage.ManifestContributor#toManifest(org.w3c.dom.Document,
    *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */
+  @Override
   public Node toManifest(Document document, MediaPackageSerializer serializer) {
     Element node = document.createElement("audio");
     // Stream ID
     node.setAttribute("id", getIdentifier());
+
+    // Frame count
+    if (frameCount != null) {
+      Element frameCountNode = document.createElement("framecount");
+      frameCountNode.appendChild(document.createTextNode(Long.toString(frameCount)));
+      node.appendChild(frameCountNode);
+    }
 
     // Device
     Element deviceNode = document.createElement("device");
@@ -149,6 +157,24 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
       node.appendChild(samplingrateNode);
     }
 
+    // Pk lev dB
+    if (pkLevDb != null) {
+      Element peakleveldbNode = document.createElement("peakleveldb");
+      peakleveldbNode.appendChild(document.createTextNode(pkLevDb.toString()));
+      node.appendChild(peakleveldbNode);
+    }
+    // RMS lev dB
+    if (rmsLevDb != null) {
+      Element rmsleveldbNode = document.createElement("rmsleveldb");
+      rmsleveldbNode.appendChild(document.createTextNode(rmsLevDb.toString()));
+      node.appendChild(rmsleveldbNode);
+    }
+    // RMS Pk dB
+    if (rmsPkDb != null) {
+      Element rmspeakdbNode = document.createElement("rmspeakdb");
+      rmspeakdbNode.appendChild(document.createTextNode(rmsPkDb.toString()));
+      node.appendChild(rmspeakdbNode);
+    }
     return node;
   }
 
@@ -166,6 +192,15 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     if (StringUtils.isEmpty(sid))
       sid = streamIdHint;
     AudioStreamImpl as = new AudioStreamImpl(sid);
+
+    // Frame count
+    try {
+      String frameCount = (String) xpath.evaluate("framecount/text()", node, XPathConstants.STRING);
+      if (!StringUtils.isBlank(frameCount))
+        as.frameCount = new Long(frameCount.trim());
+    } catch (NumberFormatException e) {
+      throw new IllegalStateException("Frame count was malformatted: " + e.getMessage());
+    }
 
     // bit depth
     try {
@@ -203,6 +238,33 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
       throw new IllegalStateException("Bit rate was malformatted: " + e.getMessage());
     }
 
+    // Pk lev dB
+    try {
+      String pkLev = (String) xpath.evaluate("peakleveldb/text()", node, XPathConstants.STRING);
+      if (!StringUtils.isBlank(pkLev))
+        as.pkLevDb = new Float(pkLev.trim());
+    } catch (NumberFormatException e) {
+      throw new IllegalStateException("Pk lev dB was malformatted: " + e.getMessage());
+    }
+
+    // RMS lev dB
+    try {
+      String rmsLev = (String) xpath.evaluate("rmsleveldb/text()", node, XPathConstants.STRING);
+      if (!StringUtils.isBlank(rmsLev))
+        as.rmsLevDb = new Float(rmsLev.trim());
+    } catch (NumberFormatException e) {
+      throw new IllegalStateException("RMS lev dB was malformatted: " + e.getMessage());
+    }
+
+    // RMS Pk dB
+    try {
+      String rmsPk = (String) xpath.evaluate("rmspeakdb/text()", node, XPathConstants.STRING);
+      if (!StringUtils.isBlank(rmsPk))
+        as.rmsPkDb = new Float(rmsPk.trim());
+    } catch (NumberFormatException e) {
+      throw new IllegalStateException("RMS Pk dB was malformatted: " + e.getMessage());
+    }
+
     // device
     String captureDevice = (String) xpath.evaluate("device/@type", node, XPathConstants.STRING);
     if (!StringUtils.isBlank(captureDevice))
@@ -228,20 +290,39 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     return as;
   }
 
+  @Override
   public Integer getBitDepth() {
     return bitdepth;
   }
 
+  @Override
   public Integer getChannels() {
     return channels;
   }
 
+  @Override
   public Integer getSamplingRate() {
     return samplingrate;
   }
 
+  @Override
   public Float getBitRate() {
     return bitrate;
+  }
+
+  @Override
+  public Float getPkLevDb() {
+    return pkLevDb;
+  }
+
+  @Override
+  public Float getRmsLevDb() {
+    return rmsLevDb;
+  }
+
+  @Override
+  public Float getRmsPkDb() {
+    return rmsPkDb;
   }
 
   // Setter
@@ -262,26 +343,44 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     this.bitrate = bitRate;
   }
 
+  public void setPkLevDb(Float pkLevDb) {
+    this.pkLevDb = pkLevDb;
+  }
+
+  public void setRmsLevDb(Float rmsLevDb) {
+    this.rmsLevDb = rmsLevDb;
+  }
+
+  public void setRmsPkDb(Float rmsPkDb) {
+    this.rmsPkDb = rmsPkDb;
+  }
+
+  @Override
   public void setCaptureDevice(String captureDevice) {
     this.device.type = captureDevice;
   }
 
+  @Override
   public void setCaptureDeviceVersion(String captureDeviceVersion) {
     this.device.version = captureDeviceVersion;
   }
 
+  @Override
   public void setCaptureDeviceVendor(String captureDeviceVendor) {
     this.device.vendor = captureDeviceVendor;
   }
 
+  @Override
   public void setFormat(String format) {
     this.encoder.type = format;
   }
 
+  @Override
   public void setFormatVersion(String formatVersion) {
     this.encoder.version = formatVersion;
   }
 
+  @Override
   public void setEncoderLibraryVendor(String encoderLibraryVendor) {
     this.encoder.vendor = encoderLibraryVendor;
   }

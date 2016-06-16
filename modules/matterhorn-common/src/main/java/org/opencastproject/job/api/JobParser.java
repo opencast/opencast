@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.job.api;
 
 import org.apache.commons.io.IOUtils;
@@ -64,15 +70,13 @@ public final class JobParser {
    *
    * @param in
    *          The serialized data
-   * @param format
-   *          the serialization format
    * @return The job
    */
   public static Job parseJob(InputStream in) throws IOException {
     Unmarshaller unmarshaller;
     try {
       unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(in), JaxbJob.class).getValue();
+      return unmarshaller.unmarshal(new StreamSource(in), JaxbJob.class).getValue().toJob();
     } catch (Exception e) {
       throw new IOException(e);
     } finally {
@@ -89,7 +93,7 @@ public final class JobParser {
    * @throws IOException
    *           if parsing fails
    */
-  public static String toXml(Job job) throws IOException {
+  public static String toXml(JaxbJob job) throws IOException {
     try {
       Marshaller marshaller = jaxbContext.createMarshaller();
       Writer writer = new StringWriter();
@@ -114,7 +118,7 @@ public final class JobParser {
   /**
    * Parses a stream representing a {@link JaxbJobList}
    *
-   * @param content
+   * @param in
    *          the serialized data
    * @return the job list
    */

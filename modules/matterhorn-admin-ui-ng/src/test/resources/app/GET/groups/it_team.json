@@ -1,0 +1,453 @@
+{
+  "group": {
+    "id": "it_team",
+    "organization": {
+      "id": "mh_default_org",
+      "name": "•mock• Opencast Project",
+      "servers": {
+        "server": {
+          "port": "-1",
+          "name": "•mock• mhallinone-sbox.ethz.ch"
+        }
+      },
+      "adminRole": "ROLE_ADMIN",
+      "anonymousRole": "ROLE_ANONYMOUS",
+      "properties": {
+        "property": [
+          {
+            "key": "engageui.link_mobile_redirect.url",
+            "$": "http:\/\/opencast.org\/matterhorn\/"
+          },
+          {
+            "key": "trim.select_item_at_current_time",
+            "$": "y"
+          },
+          {
+            "key": "engageui.links_media_module.enable",
+            "$": "true"
+          },
+          {
+            "key": "trim.set_current_time_as_outpoint",
+            "$": "o"
+          },
+          {
+            "key": "engageui.link_download.enable",
+            "$": "false"
+          },
+          {
+            "key": "logo_large",
+            "$": "\/engage\/ui\/img\/mh_logos\/MatterhornLogo_large.png"
+          },
+          {
+            "key": "login.display_defaults",
+            "$": "false"
+          },
+          {
+            "key": "trim.play_ending_of_current_segment",
+            "$": "n"
+          },
+          {
+            "key": "engageui.link_mobile_redirect.description",
+            "$": "For more information have a look at the official site."
+          },
+          {
+            "key": "trim.previous_marker",
+            "$": "up"
+          },
+          {
+            "key": "trim.delete_selected_segment",
+            "$": "delete"
+          },
+          {
+            "key": "adminui.chunksize",
+            "$": "2024"
+          },
+          {
+            "key": "org.opencastproject.engage.ui.url",
+            "$": "http:\/\/mhallinone-sbox.ethz.ch"
+          },
+          {
+            "key": "trim.next_marker",
+            "$": "down"
+          },
+          {
+            "key": "trim.next_frame",
+            "$": "right"
+          },
+          {
+            "key": "trim.play_pause",
+            "$": "space"
+          },
+          {
+            "key": "adminui.i18n_tab_users.enable",
+            "$": "false"
+          },
+          {
+            "key": "engageui.annotations.enable",
+            "$": "false"
+          },
+          {
+            "key": "org.opencastproject.oaipmh.server.hosturl",
+            "$": "http:\/\/mhallinone-sbox.ethz.ch"
+          },
+          {
+            "key": "trim.play_current_segment",
+            "$": "c"
+          },
+          {
+            "key": "trim.previous_frame",
+            "$": "left"
+          },
+          {
+            "key": "adminui.series_prepopulate.enable",
+            "$": "false"
+          },
+          {
+            "key": "adminui.i18n_tab_episode.enable",
+            "$": "true"
+          },
+          {
+            "key": "engageui.link_mobile_redirect.enable",
+            "$": "false"
+          },
+          {
+            "key": "trim.split_at_current_time",
+            "$": "v"
+          },
+          {
+            "key": "org.opencastproject.admin.ui.url",
+            "$": "http:\/\/mhallinone-sbox.ethz.ch"
+          },
+          {
+            "key": "engageui.player",
+            "$": "engage"
+          },
+          {
+            "key": "trim.set_current_time_as_inpoint",
+            "$": "i"
+          },
+          {
+            "key": "feed.url",
+            "$": "http:\/\/mhallinone-sbox.ethz.ch"
+          },
+          {
+            "key": "engageui.extendedannotations.enable",
+            "$": "false"
+          },
+          {
+            "key": "trim.play_current_pre_post",
+            "$": "shift+c"
+          },
+          {
+            "key": "logo_small",
+            "$": "\/engage\/ui\/img\/mh_logos\/OpencastLogo.png"
+          }
+        ]
+      }
+    },
+    "name": "•mock• IT Team",
+    "description": "The IT Team",
+    "role": "ROLE_GROUP_IT_TEAM",
+    "members": {
+      "member": "admin"
+    },
+    "roles": {
+      "role": [
+        {
+          "name": "•mock• ROLE_ADMIN",
+          "organization": {
+            "id": "mh_default_org",
+            "name": "•mock• Opencast Project",
+            "servers": {
+              "server": {
+                "port": "-1",
+                "name": "•mock• mhallinone-sbox.ethz.ch"
+              }
+            },
+            "adminRole": "ROLE_ADMIN",
+            "anonymousRole": "ROLE_ANONYMOUS",
+            "properties": {
+              "property": [
+                {
+                  "key": "engageui.link_mobile_redirect.url",
+                  "$": "http:\/\/opencast.org\/matterhorn\/"
+                },
+                {
+                  "key": "trim.select_item_at_current_time",
+                  "$": "y"
+                },
+                {
+                  "key": "engageui.links_media_module.enable",
+                  "$": "true"
+                },
+                {
+                  "key": "trim.set_current_time_as_outpoint",
+                  "$": "o"
+                },
+                {
+                  "key": "engageui.link_download.enable",
+                  "$": "false"
+                },
+                {
+                  "key": "logo_large",
+                  "$": "\/engage\/ui\/img\/mh_logos\/MatterhornLogo_large.png"
+                },
+                {
+                  "key": "login.display_defaults",
+                  "$": "false"
+                },
+                {
+                  "key": "trim.play_ending_of_current_segment",
+                  "$": "n"
+                },
+                {
+                  "key": "engageui.link_mobile_redirect.description",
+                  "$": "For more information have a look at the official site."
+                },
+                {
+                  "key": "trim.previous_marker",
+                  "$": "up"
+                },
+                {
+                  "key": "trim.delete_selected_segment",
+                  "$": "delete"
+                },
+                {
+                  "key": "adminui.chunksize",
+                  "$": "2024"
+                },
+                {
+                  "key": "org.opencastproject.engage.ui.url",
+                  "$": "http:\/\/mhallinone-sbox.ethz.ch"
+                },
+                {
+                  "key": "trim.next_marker",
+                  "$": "down"
+                },
+                {
+                  "key": "trim.next_frame",
+                  "$": "right"
+                },
+                {
+                  "key": "trim.play_pause",
+                  "$": "space"
+                },
+                {
+                  "key": "adminui.i18n_tab_users.enable",
+                  "$": "false"
+                },
+                {
+                  "key": "engageui.annotations.enable",
+                  "$": "false"
+                },
+                {
+                  "key": "org.opencastproject.oaipmh.server.hosturl",
+                  "$": "http:\/\/mhallinone-sbox.ethz.ch"
+                },
+                {
+                  "key": "trim.play_current_segment",
+                  "$": "c"
+                },
+                {
+                  "key": "trim.previous_frame",
+                  "$": "left"
+                },
+                {
+                  "key": "adminui.series_prepopulate.enable",
+                  "$": "false"
+                },
+                {
+                  "key": "adminui.i18n_tab_episode.enable",
+                  "$": "true"
+                },
+                {
+                  "key": "engageui.link_mobile_redirect.enable",
+                  "$": "false"
+                },
+                {
+                  "key": "trim.split_at_current_time",
+                  "$": "v"
+                },
+                {
+                  "key": "org.opencastproject.admin.ui.url",
+                  "$": "http:\/\/mhallinone-sbox.ethz.ch"
+                },
+                {
+                  "key": "engageui.player",
+                  "$": "engage"
+                },
+                {
+                  "key": "trim.set_current_time_as_inpoint",
+                  "$": "i"
+                },
+                {
+                  "key": "feed.url",
+                  "$": "http:\/\/mhallinone-sbox.ethz.ch"
+                },
+                {
+                  "key": "engageui.extendedannotations.enable",
+                  "$": "false"
+                },
+                {
+                  "key": "trim.play_current_pre_post",
+                  "$": "shift+c"
+                },
+                {
+                  "key": "logo_small",
+                  "$": "\/engage\/ui\/img\/mh_logos\/OpencastLogo.png"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "•mock• ROLE_USER",
+          "organization": {
+            "id": "mh_default_org",
+            "name": "•mock• Opencast Project",
+            "servers": {
+              "server": {
+                "port": "-1",
+                "name": "•mock• mhallinone-sbox.ethz.ch"
+              }
+            },
+            "adminRole": "ROLE_ADMIN",
+            "anonymousRole": "ROLE_ANONYMOUS",
+            "properties": {
+              "property": [
+                {
+                  "key": "engageui.link_mobile_redirect.url",
+                  "$": "http:\/\/opencast.org\/matterhorn\/"
+                },
+                {
+                  "key": "trim.select_item_at_current_time",
+                  "$": "y"
+                },
+                {
+                  "key": "engageui.links_media_module.enable",
+                  "$": "true"
+                },
+                {
+                  "key": "trim.set_current_time_as_outpoint",
+                  "$": "o"
+                },
+                {
+                  "key": "engageui.link_download.enable",
+                  "$": "false"
+                },
+                {
+                  "key": "logo_large",
+                  "$": "\/engage\/ui\/img\/mh_logos\/MatterhornLogo_large.png"
+                },
+                {
+                  "key": "login.display_defaults",
+                  "$": "false"
+                },
+                {
+                  "key": "trim.play_ending_of_current_segment",
+                  "$": "n"
+                },
+                {
+                  "key": "engageui.link_mobile_redirect.description",
+                  "$": "For more information have a look at the official site."
+                },
+                {
+                  "key": "trim.previous_marker",
+                  "$": "up"
+                },
+                {
+                  "key": "trim.delete_selected_segment",
+                  "$": "delete"
+                },
+                {
+                  "key": "adminui.chunksize",
+                  "$": "2024"
+                },
+                {
+                  "key": "org.opencastproject.engage.ui.url",
+                  "$": "http:\/\/mhallinone-sbox.ethz.ch"
+                },
+                {
+                  "key": "trim.next_marker",
+                  "$": "down"
+                },
+                {
+                  "key": "trim.next_frame",
+                  "$": "right"
+                },
+                {
+                  "key": "trim.play_pause",
+                  "$": "space"
+                },
+                {
+                  "key": "adminui.i18n_tab_users.enable",
+                  "$": "false"
+                },
+                {
+                  "key": "engageui.annotations.enable",
+                  "$": "false"
+                },
+                {
+                  "key": "org.opencastproject.oaipmh.server.hosturl",
+                  "$": "http:\/\/mhallinone-sbox.ethz.ch"
+                },
+                {
+                  "key": "trim.play_current_segment",
+                  "$": "c"
+                },
+                {
+                  "key": "trim.previous_frame",
+                  "$": "left"
+                },
+                {
+                  "key": "adminui.series_prepopulate.enable",
+                  "$": "false"
+                },
+                {
+                  "key": "adminui.i18n_tab_episode.enable",
+                  "$": "true"
+                },
+                {
+                  "key": "engageui.link_mobile_redirect.enable",
+                  "$": "false"
+                },
+                {
+                  "key": "trim.split_at_current_time",
+                  "$": "v"
+                },
+                {
+                  "key": "org.opencastproject.admin.ui.url",
+                  "$": "http:\/\/mhallinone-sbox.ethz.ch"
+                },
+                {
+                  "key": "engageui.player",
+                  "$": "engage"
+                },
+                {
+                  "key": "trim.set_current_time_as_inpoint",
+                  "$": "i"
+                },
+                {
+                  "key": "feed.url",
+                  "$": "http:\/\/mhallinone-sbox.ethz.ch"
+                },
+                {
+                  "key": "engageui.extendedannotations.enable",
+                  "$": "false"
+                },
+                {
+                  "key": "trim.play_current_pre_post",
+                  "$": "shift+c"
+                },
+                {
+                  "key": "logo_small",
+                  "$": "\/engage\/ui\/img\/mh_logos\/OpencastLogo.png"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

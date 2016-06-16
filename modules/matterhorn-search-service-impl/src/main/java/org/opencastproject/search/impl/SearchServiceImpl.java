@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 
 package org.opencastproject.search.impl;
 
@@ -23,6 +29,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.search.api.SearchException;
@@ -37,6 +44,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -46,18 +54,20 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.solr.SolrServerFactory;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.osgi.framework.ServiceException;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,13 +81,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * A Solr-based {@link SearchService} implementation.
  */
-public final class SearchServiceImpl extends AbstractJobProducer implements SearchService {
+public final class SearchServiceImpl extends AbstractJobProducer implements SearchService, ManagedService {
 
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
@@ -90,6 +101,27 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   /** The job type */
   public static final String JOB_TYPE = "org.opencastproject.search";
+
+  /** The load introduced on the system by creating an add job */
+  public static final float DEFAULT_ADD_JOB_LOAD = 1.0f;
+
+  /** The load introduced on the system by creating a delete job */
+  public static final float DEFAULT_DELETE_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_ADD_JOB_LOAD} */
+  public static final String ADD_JOB_LOAD_KEY = "job.load.add";
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_DELETE_JOB_LOAD} */
+  public static final String DELETE_JOB_LOAD_KEY = "job.load.delete";
+
+  /** The load introduced on the system by creating an add job */
+  private float addJobLoad = DEFAULT_ADD_JOB_LOAD;
+
+  /** The load introduced on the system by creating a delete job */
+  private float deleteJobLoad = DEFAULT_DELETE_JOB_LOAD;
+
+  /** counter how often the index has already been tried to populate */
+  private int retriesToPopulateIndex = 0;
 
   /** List of available operations on jobs */
   private enum Operation {
@@ -130,6 +162,9 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectory = null;
 
+  /** The optional Mediapackage serializer */
+  protected MediaPackageSerializer serializer = null;
+
   /**
    * Creates a new instance of the search service.
    */
@@ -161,6 +196,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     solrServer = new Object() {
       SolrServer create() {
         if (solrServerUrlConfig != null) {
+          /* Use external SOLR server */
           try {
             logger.info("Setting up solr server at {}", solrServerUrlConfig);
             URL solrServerUrl = new URL(solrServerUrlConfig);
@@ -168,21 +204,10 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           } catch (MalformedURLException e) {
             throw connectError(solrServerUrlConfig, e);
           }
-        } else if (cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT) != null) {
-          String solrRoot = cc.getBundleContext().getProperty(CONFIG_SOLR_ROOT);
-          try {
-            logger.debug("Setting up solr server at {}", solrRoot);
-            return setupSolr(new File(solrRoot));
-          } catch (IOException e) {
-            throw connectError(solrServerUrlConfig, e);
-          } catch (SolrServerException e) {
-            throw connectError(solrServerUrlConfig, e);
-          }
         } else {
-          String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
-          if (storageDir == null)
-            throw new IllegalStateException("Storage dir must be set (org.opencastproject.storage.dir)");
-          String solrRoot = PathSupport.concat(storageDir, "searchindex");
+          /* Set-up embedded SOLR */
+          String solrRoot = SolrServerFactory.getEmbeddedDir(cc, CONFIG_SOLR_ROOT, "search");
+
           try {
             logger.debug("Setting up solr server at {}", solrRoot);
             return setupSolr(new File(solrRoot));
@@ -202,7 +227,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     }.create();
     // CHECKSTYLE:ON
 
-    solrRequester = new SolrRequester(solrServer, securityService);
+    solrRequester = new SolrRequester(solrServer, securityService, serializer);
     indexManager = new SolrIndexManager(solrServer, workspace, mdServices, seriesService, mpeg7CatalogService,
             securityService);
 
@@ -311,7 +336,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           UnauthorizedException, ServiceRegistryException {
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Add.toString(),
-              Arrays.asList(MediaPackageParser.getAsXml(mediaPackage)));
+              Arrays.asList(MediaPackageParser.getAsXml(mediaPackage)), addJobLoad);
     } catch (ServiceRegistryException e) {
       throw new SearchException(e);
     }
@@ -336,8 +361,8 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     User currentUser = securityService.getUser();
     String orgAdminRole = securityService.getOrganization().getAdminRole();
     if (!currentUser.hasRole(orgAdminRole) && !currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-            && !authorizationService.hasPermission(mediaPackage, WRITE_PERMISSION)) {
-      throw new UnauthorizedException(currentUser, SearchService.WRITE_PERMISSION);
+            && !authorizationService.hasPermission(mediaPackage, Permissions.Action.WRITE.toString())) {
+      throw new UnauthorizedException(currentUser, Permissions.Action.WRITE.toString());
     }
     if (mediaPackage == null) {
       throw new IllegalArgumentException("Unable to add a null mediapackage");
@@ -349,7 +374,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
     try {
       if (indexManager.add(mediaPackage, acl, now)) {
-        logger.info("Added mediapackage {} to the search index", mediaPackage.getIdentifier());
+        logger.info("Added mediapackage `{}` to the search index, using ACL `{}`", mediaPackage, acl);
       } else {
         logger.warn("Failed to add mediapackage {} to the search index", mediaPackage.getIdentifier());
       }
@@ -372,7 +397,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    */
   public Job delete(String mediaPackageId) throws SearchException, UnauthorizedException, NotFoundException {
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Delete.toString(), Arrays.asList(mediaPackageId));
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Delete.toString(), Arrays.asList(mediaPackageId), deleteJobLoad);
     } catch (ServiceRegistryException e) {
       throw new SearchException(e);
     }
@@ -507,6 +532,10 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           indexManager.add(mediaPackage.getA(), acl, deletionDate, modificationDate);
         } catch (Exception e) {
           logger.error("Unable to index search instances: {}", e);
+          if (retryToPopulateIndex(systemUserName)) {
+            logger.warn("Trying to re-index search index later. Aborting for now.");
+            return;
+          }
           errors++;
         } finally {
           securityService.setOrganization(null);
@@ -517,6 +546,38 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
         logger.error("Skipped {} erroneous search entries while populating the search index", errors);
       logger.info("Finished populating search index");
     }
+  }
+
+  private boolean retryToPopulateIndex(final String systemUserName) {
+    if (retriesToPopulateIndex > 0) {
+      return false;
+    }
+
+    long instancesInSolr = 0L;
+
+    try {
+      instancesInSolr = indexManager.count();
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
+
+    if (instancesInSolr > 0) {
+      logger.debug("Search index found, other files could be indexed. No retry needed.");
+      return false;
+    }
+
+    retriesToPopulateIndex++;
+
+      new Thread() {
+        public void run() {
+          try {
+            Thread.sleep(30000);
+          } catch (InterruptedException ex) {
+          }
+          populateIndex(systemUserName);
+        }
+      }.start();
+    return true;
   }
 
   /**
@@ -656,4 +717,21 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     return userDirectoryService;
   }
 
+  /**
+   * Sets the optional MediaPackage serializer.
+   *
+   * @param serializer
+   *          the serializer
+   */
+  protected void setMediaPackageSerializer(MediaPackageSerializer serializer) {
+    this.serializer = serializer;
+    if (solrRequester != null)
+      solrRequester.setMediaPackageSerializer(serializer);
+  }
+
+  @Override
+  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+    addJobLoad = LoadUtil.getConfiguredLoadValue(properties, ADD_JOB_LOAD_KEY, DEFAULT_ADD_JOB_LOAD, serviceRegistry);
+    deleteJobLoad = LoadUtil.getConfiguredLoadValue(properties, DELETE_JOB_LOAD_KEY, DEFAULT_DELETE_JOB_LOAD, serviceRegistry);
+  }
 }

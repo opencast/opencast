@@ -1,0 +1,52 @@
+{
+    "settings-total": 1,
+    "limit":100, 
+    "settings":[
+        {
+            "id": 98,
+            "value": "Series",
+            "key":"default-view"
+        },
+        {
+            "id": 130,
+            "value": "Other value",
+            "key": "setting2"
+        }    
+    ],
+    "signature-total": 1,
+    "signatures": [
+        {
+            "sender": {
+                "address":"fullname@fake.com",
+                "name":"Full Name"
+            },
+            "id": 10,
+            "creationDate":"2014-05-30T16:00:34Z",
+            "replayTo":{},
+            "name":"Other Full Name",
+            "comments": [
+                { 
+                    "id":83,
+                    "author": {
+                        "username":"otheruser",
+                        "email":"otheruser@fake.com",
+                        "name":"Other Users Name"
+                    },
+                    "creationDate":"2014-06-05T21:31:40Z",
+                    "text":"Updated template",
+                    "reason":"Changed working",
+                    "replies":[],
+                    "modificationDate":"2014-06-05T21:31:40Z",
+                    "resolvedStatus":true
+                }
+            ],
+            "signature":"This is the signature",
+            "creator": {
+                "username":"username2",
+                "email":"fullname@fake.com",
+                "name":"Full Name"
+            }
+        }
+    ],
+    "offset":0
+}

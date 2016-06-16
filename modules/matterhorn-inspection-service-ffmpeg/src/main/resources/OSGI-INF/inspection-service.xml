@@ -5,9 +5,10 @@
     immediate="true" activate="activate">
     <implementation class="org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl" />
     <property name="service.description" value="Media Inspection Service" />
+    <property name="service.pid" value="org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl" />
     <service>
-      <provide interface="org.osgi.service.cm.ManagedService" />
       <provide interface="org.opencastproject.inspection.api.MediaInspectionService" />
+      <provide interface="org.osgi.service.cm.ManagedService" />
     </service>
     <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace" cardinality="1..1"
       policy="static" bind="setWorkspace" />

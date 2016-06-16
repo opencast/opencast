@@ -1,31 +1,25 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
-package org.opencastproject.authorization.xacml.manager.endpoint;
 
-import org.opencastproject.authorization.xacml.manager.api.AclTransition;
-import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
-import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
-import org.opencastproject.authorization.xacml.manager.api.TransitionResult;
-import org.opencastproject.security.api.AccessControlEntry;
-import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.util.DateTimeSupport;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Tuple;
+package org.opencastproject.authorization.xacml.manager.endpoint;
 
 import static org.opencastproject.authorization.xacml.manager.impl.Util.splitConfiguredWorkflowRef;
 import static org.opencastproject.util.Jsons.Obj;
@@ -36,6 +30,18 @@ import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.Jsons.stringVal;
 import static org.opencastproject.util.data.Monadics.mlist;
+
+import org.opencastproject.authorization.xacml.manager.api.ACLTransition;
+import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
+import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
+import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
+import org.opencastproject.authorization.xacml.manager.api.TransitionResult;
+import org.opencastproject.security.api.AccessControlEntry;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.data.Function;
+import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.Tuple;
 
 /** Converter functions from business objects to JSON structures. */
 public final class JsonConv {
@@ -181,7 +187,7 @@ public final class JsonConv {
     }
   };
 
-  private static Obj digestAclTransition(AclTransition t) {
+  private static Obj digestAclTransition(ACLTransition t) {
     return obj(p(KEY_TRANSITION_ID, t.getTransitionId()),
                p(KEY_ORGANIZATION_ID, t.getOrganizationId()),
                p(KEY_APPLICATION_DATE, DateTimeSupport.toUTC(t.getApplicationDate().getTime())),
@@ -189,7 +195,7 @@ public final class JsonConv {
             .append(workflowObj(t));
   }
 
-  private static Obj workflowObj(AclTransition t) {
+  private static Obj workflowObj(ACLTransition t) {
     final Tuple<Option<String>, Option<String>> ws = splitConfiguredWorkflowRef(t.getWorkflow());
     return obj(p(KEY_WORKFLOW_ID, ws.getA().map(stringVal).getOrElse(ZERO_VAL)),
                p(KEY_WORKFLOW_PARAMS, ws.getB().map(stringVal).getOrElse(ZERO_VAL)));

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:series xmlns:ns2="http://ui.matterhorn.opencastproject.org">
+	<identifier>10.0000-1</identifier>
+	<title>Land and Vegetation: Key players on the Climate Scene</title>
+	<description>This is the description for this series.</description>
+	<subject>This is the subject</subject>
+	<organization>Organization</organization>
+	<language>Klingon</language>
+	<creator>Creator Name</creator>
+	<organizers>organizer-one</organizers>
+	<license>Creative Commons 2.0</license>
+	<access_policy>ROLE_ADMIN</access_policy>
+	<opt_out>true</opt_out>
+	<createdDateTime>2011-07-16T20:39:05Z</createdDateTime>
+	<organizers>organizer-two</organizers>
+	<organizers>organizer-three</organizers>
+	<contributors>contributor-one</contributors>
+	<contributors>contributor-two</contributors>
+	<contributors>contributor-three</contributors>
+</ns2:series>

@@ -1,7 +1,7 @@
 <%
 /* expects { episode: {}, workflows: {} } */
 %>
-<h2>Details for <%= this.episode.title %></h2>
+<h2>Details for <%! this.episode.title %></h2>
 
 <div class="section">
   <div class="section-title">Mediapackage</div>
@@ -29,9 +29,9 @@
   <tbody>
     <% _.each(this.workflows, function(a) { %>
       <tr valign="top">
-        <td class="ui-state-active"><%= a.started %> - <%= a.completed %></td>
-        <td class="ui-state-active"><%= a.title %></td>
-        <td class="ui-state-active"><%= a.state %></td>
+        <td class="ui-state-active"><%! a.started %> - <%! a.completed %></td>
+        <td class="ui-state-active"><%! a.title %></td>
+        <td class="ui-state-active"><%! a.state %></td>
         <td class="ui-state-active"><a href="index.html#/inspect?id=<%= a.id %>">Details</a></td>
       </tr>
     <% }); %>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype-descriptor xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd" name="matterhorn-engage-theodul-plugin-description"
+    xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  
+  <requiredProperties>
+    
+    <requiredProperty key="version">
+      <defaultValue>1.5-SNAPSHOT</defaultValue>
+    </requiredProperty>
+    
+    <requiredProperty key="plugin_type">
+    </requiredProperty>
+    
+    <requiredProperty key="plugin_version">
+    </requiredProperty>
+
+    <!-- registry name of the plugin -->
+    <requiredProperty key="plugin_name">
+    </requiredProperty>
+
+    <!-- specifies if the plugin should provide a REST endpoint -->
+    <requiredProperty key="plugin_rest">
+      <!-- defaultValue>false</defaultValue -->
+    </requiredProperty>
+
+    <!-- short description of the plugin -->
+    <requiredProperty key="plugin_description">
+    </requiredProperty>
+    
+  </requiredProperties>
+
+  
+  <fileSets>
+    
+    <!-- Java sources must be filtered to be alligned -->
+    <fileSet filtered="true" packaged="true" encoding="UTF-8">
+      <directory>src/main/java</directory>
+      <includes>
+        <include>**/*.java</include>
+      </includes>
+    </fileSet>
+
+    <!-- .xml must be filtered so that the SCR component declaration gets alligned -->
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>src/main/resources</directory>
+      <includes>
+        <include>**/*.xml</include>
+      </includes>
+    </fileSet>
+
+    <!-- static resources must be filtered to be adjusted to plugin type-->
+    <fileSet filtered="true" encoding="UTF-8">
+      <directory>src/main/resources</directory>
+      <includes>
+        <include>**/*.html</include>
+        <include>**/*.js</include>
+        <include>**/*.css</include>
+      </includes>
+    </fileSet>
+
+    <!-- JS test sources -->
+    <fileSet encoding="UTF-8">
+      <directory>src/test/resources</directory>
+      <includes>
+        <include>**/*.js</include>
+      </includes>
+    </fileSet>
+
+  </fileSets>
+
+</archetype-descriptor>

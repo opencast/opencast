@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- vim: et:ts=2:sw=2:sts=2:cc=121
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+<link rel="shortcut icon" href="img/favicon.ico" />
+<title>Opencast REST Service Documentation</title>
+
+<style>
+body {
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  border-bottom: 1px solid silver;
+  padding-bottom: 10px;
+}
+
+a {
+  color: black;
+  text-decoration: none;
+}
+
+a:hover {
+  color: gray;
+}
+</style>
+
+<script type="text/javascript" src="js/jquery/jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(function($) {
+  $.getJSON("/info/components.json", function(data) {
+    $.each(data, function(section) {
+      if ("rest" == section) {
+        $.each(data.rest, function(i) {
+          $('#docs1').append('<li><a href="/docs.html?path='+ data.rest[i].path + '">'
+              + data.rest[i].description + '</a></li>');
+        });
+        return;
+      }
+    });
+  });
+});
+</script>
+</head>
+<body style="margin: 0 auto; max-width: 800px; border: 1px solid: silver;">
+
+<header>
+  <img src=img/logo/opencast.svg alt=Opencast style="width: 180px;" />
+</header>
+<h1>Opencast REST Service Documentation</h1>
+
+<ul id="docs1"> </ul>
+
+</body>
+</html>

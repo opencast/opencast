@@ -1,0 +1,130 @@
+[
+    {
+        "id": "title",
+        "readOnly": false,
+        "value": "Land and Vegetation: Key players on the Climate Scene",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.TITLE",
+        "type": "text"
+    },
+    {
+        "id": "uid",
+        "readOnly": true,
+        "value": "10.0000/1",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.UID",
+        "type": "text"
+    },
+    {
+        "id": "presenters",
+        "readOnly": false,
+        "value": [
+            
+        ],
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.PRESENTER",
+        "type": "text"
+    },
+    {
+        "id": "series",
+        "readOnly": false,
+        "value": "serie1",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.SERIES",
+        "type": "text"
+    },
+    {
+        "id": "recordingDate",
+        "readOnly": true,
+        "value": "",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.RECORDING_DATE",
+        "type": "date"
+    },
+    {
+        "id": "contributors",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.CONTRIBUTORS",
+        "type": "text"
+    },
+    {
+        "id": "subject",
+        "readOnly": false,
+        "value": "climate, land, vegetation",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.SUBJECT",
+        "type": "text"
+    },
+    {
+        "id": "language",
+        "readOnly": false,
+        "value": "eng",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.LANGUAGE",
+        "type": "text"
+    },
+    {
+        "id": "description",
+        "readOnly": false,
+        "value": "Introduction lecture from the Institute for\n    Atmospheric and Climate Science.",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.DESCRIPTION",
+        "type": "text"
+    },
+    {
+        "id": "startDate",
+        "readOnly": false,
+        "value": "2007-12-05",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
+        "type": "date"
+    },
+    {
+        "id": "startTime",
+        "readOnly": false,
+        "value": "02:40",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.START_TIME",
+        "type": "time"
+    },
+    {
+        "id": "duration",
+        "readOnly": true,
+        "value": "279:00:00",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.DURATION",
+        "type": "text"
+    },
+    {
+        "id": "agent",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.AGENT",
+        "type": "text"
+    },
+    {
+        "id": "source",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.SOURCE",
+        "type": "text"
+    },
+    {
+        "id": "created",
+        "readOnly": false,
+        "value": "2008-03-05",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.CREATED",
+        "type": "text"
+    },
+    {
+        "id": "createdBy",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.CREATED_BY",
+        "type": "text"
+    },
+    {
+        "id": "rightsHolder",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.RIGHTS",
+        "type": "text"
+    },
+    {
+        "id": "license",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.LICENSE",
+        "type": "text"
+    }
+]

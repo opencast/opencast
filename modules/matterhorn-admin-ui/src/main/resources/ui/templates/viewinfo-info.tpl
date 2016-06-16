@@ -4,16 +4,16 @@
     <table>
       <tr>
         <td class="td-key">Title:</td>
-        <td class="td-value"><%= data[j].workflow.info.title %></td>
+        <td class="td-value"><%! data[j].workflow.info.title %></td>
       </tr>
       <tr>
         <td class="td-key">Presenter:</td>
-        <td class="td-value"><%= data[j].workflow.info.creators %></td>
+        <td class="td-value"><%! data[j].workflow.info.creators %></td>
       </tr>
       <% if ( data[j].workflow.info.seriestitle) { %>
       <tr>
         <td class="td-key">Series:</td>
-        <td class="td-value"><%= data[j].workflow.info.seriestitle %></td>
+        <td class="td-value"><%! data[j].workflow.info.seriestitle %></td>
       </tr>
       <% } %>
       <tr>
@@ -90,7 +90,7 @@
         </tr>
         <tr>
           <td class="td-key">License:</td>
-          <td id="licenseField" class="td-value"><%= (data[j].workflow.config.license) ? data[j].workflow.config.license : '' %></td>
+          <td id="licenseField" class="td-value"><%! (data[j].workflow.config.license) ? data[j].workflow.config.license : '' %></td>
         </tr>
       </table>
     </div>

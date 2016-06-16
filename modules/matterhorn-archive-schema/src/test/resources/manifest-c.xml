@@ -1,0 +1,15 @@
+<mediapackage xmlns="http://mediapackage.opencastproject.org" id="mp-c" start="2007-12-05T13:40:00"
+  duration="1004400000">
+  <series>series-c</series>
+  <seriestitle>American literature</seriestitle>
+  <metadata>
+    <catalog id="catalog-1" type="dublincore/episode">
+      <mimetype>text/xml</mimetype>
+      <url>dublincore-c.xml</url>
+    </catalog>
+    <catalog id="catalog-2" type="dublincore/series" ref="series:series-c">
+      <mimetype>text/xml</mimetype>
+      <url>series-dublincore-c.xml</url>
+    </catalog>
+  </metadata>
+</mediapackage>

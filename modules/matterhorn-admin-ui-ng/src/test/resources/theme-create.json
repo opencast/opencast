@@ -1,0 +1,20 @@
+{
+  "titleSlideMetadata": "title-metadata",
+  "watermarkPosition": "watermark-position",
+  "watermarkFile": "watermark-file",
+  "licenseSlideActive": true,
+  "watermarkActive": true,
+  "creator": "Test User",
+  "id": 2,
+  "bumperActive": true,
+  "licenseSlideBackground": "license-background",
+  "default": true,
+  "titleSlideActive": true,
+  "licenseSlideDescription": "license-description",
+  "trailerFile": "trailer-file",
+  "description": "New Theme Description",
+  "name": "New Theme Name",
+  "titleSlideBackground": "title-background",
+  "trailerActive": true,
+  "bumperFile": "bumper-file"
+}

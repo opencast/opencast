@@ -1,22 +1,29 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.usertracking.impl;
 
 import org.opencastproject.usertracking.api.UserAction;
 import org.opencastproject.usertracking.api.UserActionList;
+import org.opencastproject.usertracking.api.UserSession;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,16 +38,24 @@ public class UserActionListImplTest {
    */
   @Test
   public void testBasicAddition() {
+    UserSession us1 = new UserSessionImpl();
+    us1.setSessionId("4");
+    us1.setUserId("testing user");
+    us1.setUserIp("127.0.0.1");
+
+    UserSession us2 = new UserSessionImpl();
+    us2.setSessionId("6");
+    us2.setUserId("testing user 2");
+    us2.setUserIp("127.0.0.5");
+
     UserAction ua1 = new UserActionImpl();
     ua1.setId(4L);
     ua1.setInpoint(90);
     ua1.setIsPlaying(true);
     ua1.setMediapackageId("false");
     ua1.setOutpoint(100);
-    ua1.setSessionId("4");
+    ua1.setSession(us1);
     ua1.setType("test");
-    ua1.setUserId("testing user");
-    ua1.setUserIp("127.0.0.1");
 
     UserAction ua2 = new UserActionImpl();
     ua2.setId(6L);
@@ -48,10 +63,8 @@ public class UserActionListImplTest {
     ua2.setIsPlaying(false);
     ua2.setMediapackageId("other");
     ua2.setOutpoint(20);
-    ua2.setSessionId("6");
+    ua2.setSession(us2);
     ua2.setType("other test");
-    ua2.setUserId("testing user 2");
-    ua2.setUserIp("127.0.0.5");
 
     UserActionList ual1 = new UserActionListImpl();
     ual1.add(ua1);
@@ -64,10 +77,10 @@ public class UserActionListImplTest {
     Assert.assertEquals(true, ual1.getUserActions().get(0).getIsPlaying());
     Assert.assertEquals("false", ual1.getUserActions().get(0).getMediapackageId());
     Assert.assertEquals(100, ual1.getUserActions().get(0).getOutpoint());
-    Assert.assertEquals("4", ual1.getUserActions().get(0).getSessionId());
+    Assert.assertEquals("4", ual1.getUserActions().get(0).getSession().getSessionId());
     Assert.assertEquals("test", ual1.getUserActions().get(0).getType());
-    Assert.assertEquals("testing user", ual1.getUserActions().get(0).getUserId());
-    Assert.assertEquals("127.0.0.1", ual1.getUserActions().get(0).getUserIp());
+    Assert.assertEquals("testing user", ual1.getUserActions().get(0).getSession().getUserId());
+    Assert.assertEquals("127.0.0.1", ual1.getUserActions().get(0).getSession().getUserIp());
     Assert.assertEquals(10, ual1.getUserActions().get(0).getLength());
 
     UserActionList ual2 = new UserActionListImpl();
@@ -81,10 +94,10 @@ public class UserActionListImplTest {
     Assert.assertEquals(false, ual2.getUserActions().get(0).getIsPlaying());
     Assert.assertEquals("other", ual2.getUserActions().get(0).getMediapackageId());
     Assert.assertEquals(20, ual2.getUserActions().get(0).getOutpoint());
-    Assert.assertEquals("6", ual2.getUserActions().get(0).getSessionId());
+    Assert.assertEquals("6", ual2.getUserActions().get(0).getSession().getSessionId());
     Assert.assertEquals("other test", ual2.getUserActions().get(0).getType());
-    Assert.assertEquals("testing user 2", ual2.getUserActions().get(0).getUserId());
-    Assert.assertEquals("127.0.0.5", ual2.getUserActions().get(0).getUserIp());
+    Assert.assertEquals("testing user 2", ual2.getUserActions().get(0).getSession().getUserId());
+    Assert.assertEquals("127.0.0.5", ual2.getUserActions().get(0).getSession().getUserIp());
     Assert.assertEquals(15, ual2.getUserActions().get(0).getLength());
   }
 
@@ -93,16 +106,24 @@ public class UserActionListImplTest {
    */
   @Test
   public void testListAddition() {
+    UserSession us1 = new UserSessionImpl();
+    us1.setSessionId("4");
+    us1.setUserId("testing user");
+    us1.setUserIp("127.0.0.1");
+
+    UserSession us2 = new UserSessionImpl();
+    us2.setSessionId("6");
+    us2.setUserId("testing user 2");
+    us2.setUserIp("127.0.0.5");
+
     UserAction ua1 = new UserActionImpl();
     ua1.setId(4L);
     ua1.setInpoint(90);
     ua1.setIsPlaying(true);
     ua1.setMediapackageId("false");
     ua1.setOutpoint(100);
-    ua1.setSessionId("4");
+    ua1.setSession(us1);
     ua1.setType("test");
-    ua1.setUserId("testing user");
-    ua1.setUserIp("127.0.0.1");
 
     UserAction ua2 = new UserActionImpl();
     ua2.setId(6L);
@@ -110,10 +131,8 @@ public class UserActionListImplTest {
     ua2.setIsPlaying(false);
     ua2.setMediapackageId("other");
     ua2.setOutpoint(20);
-    ua2.setSessionId("6");
+    ua2.setSession(us2);
     ua2.setType("other test");
-    ua2.setUserId("testing user 2");
-    ua2.setUserIp("127.0.0.5");
 
     List<UserAction> list = new LinkedList<UserAction>();
     list.add(ua1);
@@ -130,10 +149,10 @@ public class UserActionListImplTest {
     Assert.assertEquals(true, ual.getUserActions().get(0).getIsPlaying());
     Assert.assertEquals("false", ual.getUserActions().get(0).getMediapackageId());
     Assert.assertEquals(100, ual.getUserActions().get(0).getOutpoint());
-    Assert.assertEquals("4", ual.getUserActions().get(0).getSessionId());
+    Assert.assertEquals("4", ual.getUserActions().get(0).getSession().getSessionId());
     Assert.assertEquals("test", ual.getUserActions().get(0).getType());
-    Assert.assertEquals("testing user", ual.getUserActions().get(0).getUserId());
-    Assert.assertEquals("127.0.0.1", ual.getUserActions().get(0).getUserIp());
+    Assert.assertEquals("testing user", ual.getUserActions().get(0).getSession().getUserId());
+    Assert.assertEquals("127.0.0.1", ual.getUserActions().get(0).getSession().getUserIp());
 
 
     Assert.assertEquals(new Long(6), ual.getUserActions().get(1).getId());
@@ -141,10 +160,10 @@ public class UserActionListImplTest {
     Assert.assertEquals(false, ual.getUserActions().get(1).getIsPlaying());
     Assert.assertEquals("other", ual.getUserActions().get(1).getMediapackageId());
     Assert.assertEquals(20, ual.getUserActions().get(1).getOutpoint());
-    Assert.assertEquals("6", ual.getUserActions().get(1).getSessionId());
+    Assert.assertEquals("6", ual.getUserActions().get(1).getSession().getSessionId());
     Assert.assertEquals("other test", ual.getUserActions().get(1).getType());
-    Assert.assertEquals("testing user 2", ual.getUserActions().get(1).getUserId());
-    Assert.assertEquals("127.0.0.5", ual.getUserActions().get(1).getUserIp());
+    Assert.assertEquals("testing user 2", ual.getUserActions().get(1).getSession().getUserId());
+    Assert.assertEquals("127.0.0.5", ual.getUserActions().get(1).getSession().getUserIp());
     Assert.assertEquals(15, ual.getUserActions().get(1).getLength());
   }
 }

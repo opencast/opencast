@@ -1,0 +1,18 @@
+{
+  "blacklist": {
+    "end": "2029-12-24T12:12:12Z",
+    "start": "2028-12-12T12:12:12Z"
+  },
+  "email": "admin@example.com",
+  "manageable": true,
+  "name": "•mock• SystemAdmin",
+  "provider": "local",
+  "roles": [
+    "•mock• ROLE_ADMIN",
+    "•mock• ROLE_USER",
+    "•mock• ROLE_OAUTH_USER",
+    "•mock• MATTERHORN_ADMINISTRATOR",
+    "•mock• ROLE_ANONYMOUS"
+  ],
+  "username": "admin"
+}

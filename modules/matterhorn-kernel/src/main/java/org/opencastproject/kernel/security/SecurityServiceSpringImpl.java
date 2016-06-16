@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.kernel.security;
 
 import org.opencastproject.security.api.JaxbOrganization;
@@ -21,6 +27,7 @@ import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 
 import org.springframework.security.core.Authentication;
@@ -40,8 +47,14 @@ public class SecurityServiceSpringImpl implements SecurityService {
   /** Holds delegates users for new threads that have been spawned from authenticated threads */
   private static final ThreadLocal<User> delegatedUserHolder = new ThreadLocal<User>();
 
+  /** Holds the IP address for the delegated user for the current thread */
+  private static final ThreadLocal<String> delegatedUserIPHolder = new ThreadLocal<String>();
+
   /** Holds organization responsible for the current thread */
   private static final ThreadLocal<Organization> organization = new ThreadLocal<Organization>();
+
+  /** The user directory */
+  private UserDirectoryService userDirectory;
 
   /**
    * {@inheritDoc}
@@ -89,15 +102,20 @@ public class SecurityServiceSpringImpl implements SecurityService {
       }
       if (principal instanceof UserDetails) {
         UserDetails userDetails = (UserDetails) principal;
-
-        Set<JaxbRole> roles = new HashSet<JaxbRole>();
-        Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
-        if (authorities != null && authorities.size() > 0) {
-          for (GrantedAuthority ga : authorities) {
-            roles.add(new JaxbRole(ga.getAuthority(), jaxbOrganization));
+        if (userDirectory != null) {
+          User user = userDirectory.loadUser(userDetails.getUsername());
+          delegatedUserHolder.set(user);
+          return JaxbUser.fromUser(user);
+        } else {
+          Set<JaxbRole> roles = new HashSet<JaxbRole>();
+          Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+          if (authorities != null && authorities.size() > 0) {
+            for (GrantedAuthority ga : authorities) {
+              roles.add(new JaxbRole(ga.getAuthority(), jaxbOrganization));
+            }
           }
+          return new JaxbUser(userDetails.getUsername(), null, jaxbOrganization, roles);
         }
-        return new JaxbUser(userDetails.getUsername(), jaxbOrganization, roles);
       } else {
         return SecurityUtil.createAnonymousUser(jaxbOrganization);
       }
@@ -112,6 +130,33 @@ public class SecurityServiceSpringImpl implements SecurityService {
   @Override
   public void setUser(User user) {
     delegatedUserHolder.set(user);
+  }
+
+  @Override
+  public String getUserIP() {
+    return delegatedUserIPHolder.get();
+  }
+
+  @Override
+  public void setUserIP(String userIP) {
+    delegatedUserIPHolder.set(userIP);
+  }
+
+  /**
+   * OSGi callback for setting the user directory.
+   * 
+   * @param userDirectory
+   *          the user directory
+   */
+  void setUserDirectory(UserDirectoryService userDirectory) {
+    this.userDirectory = userDirectory;
+  }
+
+  /**
+   * OSGi callback for removing the user directory.
+   */
+  void removeUserDirectory() {
+    this.userDirectory = null;
   }
 
 }

@@ -1,21 +1,26 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.workspace.impl;
 
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.quartz.Job;
@@ -45,16 +50,19 @@ public class WorkspaceCleaner {
   private final org.quartz.Scheduler quartz;
 
   private final Workspace workspace;
-  private final Option<Integer> maxAge;
+  private final int maxAge;
   private int schedulerPeriod;
 
   protected WorkspaceCleaner(Workspace workspace, int schedulerPeriod, int maxAge) {
     this.workspace = workspace;
+    this.maxAge = maxAge;
     this.schedulerPeriod = schedulerPeriod;
-    if (maxAge > 0) {
-      this.maxAge = Option.some(maxAge);
-    } else {
-      this.maxAge = Option.<Integer> none();
+
+    // Continue only if we have a sensible period value
+    if (schedulerPeriod <= 0) {
+      logger.debug("No scheduler initialized due to invalid scheduling period ({})", schedulerPeriod);
+      quartz = null;
+      return;
     }
 
     try {
@@ -75,7 +83,7 @@ public class WorkspaceCleaner {
     return workspace;
   }
 
-  public Option<Integer> getMaxAge() {
+  public int getMaxAge() {
     return maxAge;
   }
 
@@ -83,7 +91,11 @@ public class WorkspaceCleaner {
    * Set the schedule and start or restart the scheduler.
    */
   public void schedule() {
-    logger.debug("Workspace cleaner is run every hour.");
+    if (quartz == null || schedulerPeriod <= 0) {
+      logger.debug("Cancel scheduling of workspace cleaner due to invalid scheduling period");
+      return;
+    }
+    logger.debug("Scheduling workspace cleaner to run every {} seconds.", schedulerPeriod);
     try {
       final Trigger trigger = TriggerUtils.makeSecondlyTrigger(schedulerPeriod);
       trigger.setStartTime(new Date());

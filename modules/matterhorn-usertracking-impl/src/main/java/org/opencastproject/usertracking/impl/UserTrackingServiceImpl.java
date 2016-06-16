@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.usertracking.impl;
 
 import org.opencastproject.usertracking.api.Footprint;
@@ -21,6 +27,7 @@ import org.opencastproject.usertracking.api.Report;
 import org.opencastproject.usertracking.api.ReportItem;
 import org.opencastproject.usertracking.api.UserAction;
 import org.opencastproject.usertracking.api.UserActionList;
+import org.opencastproject.usertracking.api.UserSession;
 import org.opencastproject.usertracking.api.UserTrackingException;
 import org.opencastproject.usertracking.api.UserTrackingService;
 import org.opencastproject.usertracking.endpoint.FootprintImpl;
@@ -29,7 +36,7 @@ import org.opencastproject.usertracking.endpoint.ReportImpl;
 import org.opencastproject.usertracking.endpoint.ReportItemImpl;
 import org.opencastproject.util.NotFoundException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
@@ -42,14 +49,13 @@ import java.util.Collection;
 import java.util.Dictionary;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
-import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Implementation of org.opencastproject.usertracking.api.UserTrackingService
@@ -57,6 +63,9 @@ import javax.persistence.spi.PersistenceProvider;
  * @see org.opencastproject.usertracking.api.UserTrackingService
  */
 public class UserTrackingServiceImpl implements UserTrackingService, ManagedService {
+
+  /** JPA persistence unit name */
+  public static final String PERSISTENCE_UNIT = "org.opencastproject.usertracking";
 
   public static final String FOOTPRINT_KEY = "FOOTPRINT";
 
@@ -72,47 +81,21 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
   private boolean logUser = true;
   private boolean logSession = true;
 
-  /**
-   * @param persistenceProvider
-   *          the persistenceProvider to set
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
-  }
-
-  protected Map<String, Object> persistenceProperties;
-
-  /**
-   * @param persistenceProperties
-   *          the persistenceProperties to set
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
-  }
-
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
 
-  /**
-   * The JPA provider
-   */
-  protected PersistenceProvider persistenceProvider;
+  /** OSGi DI */
+
+  /** OSGi DI */
+  void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
+  }
 
   /**
    * Activation callback to be executed once all dependencies are set
    */
   public void activate() {
     logger.debug("activate()");
-    emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.usertracking", persistenceProperties);
-  }
-
-  /**
-   * Deactivation callback
-   */
-  public void destroy() {
-    if (emf != null && emf.isOpen()) {
-      emf.close();
-    }
   }
 
   @Override
@@ -156,33 +139,38 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
   }
 
   @SuppressWarnings("unchecked")
-  public UserAction addUserFootprint(UserAction a) throws UserTrackingException {
+  public UserAction addUserFootprint(UserAction a, UserSession session) throws UserTrackingException {
     a.setType(FOOTPRINT_KEY);
     EntityManager em = null;
     EntityTransaction tx = null;
-    if (!logIp) a.setUserIp("-omitted-");
-    if (!logUser) a.setUserId("-omitted-");
-    if (!logSession) a.setSessionId("-omitted-");
+    if (!logIp) session.setUserIp("-omitted-");
+    if (!logUser) session.setUserId("-omitted-");
+    if (!logSession) session.setSessionId("-omitted-");
     try {
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
+      UserSession userSession = populateSession(em, session);
+
       Query q = em.createNamedQuery("findLastUserFootprintOfSession");
       q.setMaxResults(1);
-      q.setParameter("sessionId", a.getSessionId());
+      q.setParameter("session", userSession);
       Collection<UserAction> userActions = q.getResultList();
 
       if (userActions.size() >= 1) {
         UserAction last = userActions.iterator().next();
         if (last.getMediapackageId().equals(a.getMediapackageId()) && last.getType().equals(a.getType())
                 && last.getOutpoint() == a.getInpoint()) {
+          //We are assuming in this case that the sessions match and are unchanged (IP wise, for example)
           last.setOutpoint(a.getOutpoint());
           a = last;
           a.setId(last.getId());
         } else {
+          a.setSession(userSession);
           em.persist(a);
         }
       } else {
+        a.setSession(userSession);
         em.persist(a);
       }
       tx.commit();
@@ -199,16 +187,18 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
     }
   }
 
-  public UserAction addUserTrackingEvent(UserAction a) throws UserTrackingException {
+  public UserAction addUserTrackingEvent(UserAction a, UserSession session) throws UserTrackingException {
     EntityManager em = null;
     EntityTransaction tx = null;
-    if (!logIp) a.setUserIp("-omitted-");
-    if (!logUser) a.setUserId("-omitted-");
-    if (!logSession) a.setSessionId("-omitted-");
+    if (!logIp) session.setUserIp("-omitted-");
+    if (!logUser) session.setUserId("-omitted-");
+    if (!logSession) session.setSessionId("-omitted-");
     try {
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
+      UserSession userSession = populateSession(em, session);
+      a.setSession(userSession);
       em.persist(a);
       tx.commit();
       return a;
@@ -224,6 +214,21 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
     }
   }
 
+  private UserSession populateSession(EntityManager em, UserSession session) {
+    //Try and find the session.  If not found, persist it
+    Query q = em.createNamedQuery("findUserSessionBySessionId");
+    q.setMaxResults(1);
+    q.setParameter("sessionId", session.getSessionId());
+    UserSession userSession = null;
+    try {
+      userSession = (UserSession) q.getSingleResult();
+    } catch (NoResultException n) {
+      userSession = session;
+      em.persist(userSession);
+    }
+    return userSession;
+  }
+
   @SuppressWarnings("unchecked")
   public UserActionList getUserActions(int offset, int limit) {
     UserActionList result = new UserActionListImpl();
@@ -237,7 +242,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       em = emf.createEntityManager();
       Query q = em.createNamedQuery("findUserActions");
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
       Collection<UserAction> userActions = q.getResultList();
 
       for (UserAction a : userActions) {
@@ -279,7 +285,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       Query q = em.createNamedQuery("findUserActionsByType");
       q.setParameter("type", type);
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
       Collection<UserAction> userActions = q.getResultList();
 
       for (UserAction a : userActions) {
@@ -321,7 +328,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       q.setParameter("type", type);
       q.setParameter("mediapackageId", mediapackageId);
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
       @SuppressWarnings("unchecked")
       Collection<UserAction> userActions = q.getResultList();
 
@@ -361,7 +369,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       q.setParameter("begin", calBegin, TemporalType.TIMESTAMP);
       q.setParameter("end", calEnd, TemporalType.TIMESTAMP);
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
       Collection<UserAction> userActions = q.getResultList();
 
       for (UserAction a : userActions) {
@@ -390,7 +399,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       q.setParameter("type", type);
       q.setParameter("mediapackageId", mediapackageId);
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
       @SuppressWarnings("unchecked")
       Collection<UserAction> userActions = q.getResultList();
 
@@ -419,7 +429,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       q.setParameter("type", type);
       q.setParameter("mediapackageId", mediapackageId);
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
       @SuppressWarnings("unchecked")
       Collection<UserAction> userActions = q.getResultList();
 
@@ -428,33 +439,6 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       }
       return result;
     } finally {
-      if (em != null && em.isOpen()) {
-        em.close();
-      }
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public UserSummaryListImpl getUserSummaryByTypeAndMediaPackage(String type, String mediapackageId) {
-    UserSummaryListImpl result = new UserSummaryListImpl();
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query q = em.createNamedQuery("userSummaryByMediapackageByType");
-      q.setParameter("type", type);
-      q.setParameter("mediapackageId", mediapackageId);
-      List<Object[]> users = q.getResultList();
-      for (Object[] user : users) {
-        UserSummaryImpl userSummary = new UserSummaryImpl();
-        userSummary.ingest(user);
-        result.add(userSummary);
-      }
-      return result;
-    } catch (Exception e) {
-      logger.warn("Unable to return any results from mediapackage " + mediapackageId + " of type " + type + " because of ", e);
-      return result;
-    }
-    finally {
       if (em != null && em.isOpen()) {
         em.close();
       }
@@ -516,7 +500,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       q.setParameter("begin", calBegin, TemporalType.TIMESTAMP);
       q.setParameter("end", calEnd, TemporalType.TIMESTAMP);
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
       Collection<UserAction> userActions = q.getResultList();
 
       for (UserAction a : userActions) {
@@ -555,7 +540,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       em = emf.createEntityManager();
       Query q = em.createNamedQuery("countSessionsGroupByMediapackage");
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
 
       @SuppressWarnings("unchecked")
       List<Object[]> result = q.getResultList();
@@ -605,7 +591,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
       em = emf.createEntityManager();
       Query q = em.createNamedQuery("countSessionsGroupByMediapackageByIntervall");
       q.setFirstResult(offset);
-      q.setMaxResults(limit);
+      if (limit > 0)
+        q.setMaxResults(limit);
       q.setParameter("begin", calBegin, TemporalType.TIMESTAMP);
       q.setParameter("end", calEnd, TemporalType.TIMESTAMP);
 

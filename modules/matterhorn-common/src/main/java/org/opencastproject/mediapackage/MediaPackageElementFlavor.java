@@ -1,28 +1,36 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
 
 package org.opencastproject.mediapackage;
 
+import static java.lang.String.format;
+
 import org.opencastproject.util.data.Function;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * ELement flavors describe {@link MediaPackageElement}s in a semantic way. They reveal or give at least a hint about
@@ -31,11 +39,17 @@ import java.util.List;
  */
 @XmlJavaTypeAdapter(MediaPackageElementFlavor.FlavorAdapter.class)
 public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPackageElementFlavor>, Serializable {
+  public static final String WILDCARD = "*";
 
   /**
    * Serial version uid
    */
   private static final long serialVersionUID = 1L;
+
+  /**
+   * Character that separates both parts of a flavor
+   */
+  private static final String SEPARATOR = "/";
 
   /**
    * String representation of type
@@ -68,13 +82,36 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
    *          an optional description
    */
   public MediaPackageElementFlavor(String type, String subtype, String description) {
-    if (type == null)
-      throw new IllegalArgumentException("Argument 'type' of element type may not be null!");
-    if (subtype == null)
-      throw new IllegalArgumentException("Argument 'subtype' of element type may not be null!");
-    this.type = type.trim().toLowerCase();
-    this.subtype = subtype.trim().toLowerCase();
+    this.type = checkPartSyntax(type);
+    this.subtype = checkPartSyntax(subtype);
     this.description = description;
+  }
+
+  /**
+   * Checks that any of the parts this flavor consists of abide to the syntax restrictions
+   *
+   * @param part
+   * @return
+   */
+  private String checkPartSyntax(String part) {
+    // Parts may not be null
+    if (part == null)
+      throw new IllegalArgumentException("Flavor parts may not be null!");
+
+    // Parts may not contain the flavor separator character
+    if (part.contains(SEPARATOR))
+      throw new IllegalArgumentException(
+              format("Invalid flavor part \"%s\". Flavor parts may not contain '%s'!", part, SEPARATOR));
+
+    // Parts may not contain leading and trailing blanks, and may only consist of lowercase letters
+    String adaptedPart = part.trim().toLowerCase();
+
+    // Parts may not be empty
+    if (adaptedPart.isEmpty())
+      throw new IllegalArgumentException(
+              format("Invalid flavor part \"%s\". Flavor parts may not be blank or empty!", part));
+
+    return adaptedPart;
   }
 
   public MediaPackageElementFlavor() {
@@ -202,6 +239,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
   /**
    * @see java.lang.String#compareTo(java.lang.Object)
    */
+  @Override
   public int compareTo(MediaPackageElementFlavor m) {
     return toString().compareTo(m.toString());
   }
@@ -211,7 +249,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
    */
   @Override
   public String toString() {
-    return type + "/" + subtype;
+    return type + SEPARATOR + subtype;
   }
 
   /**
@@ -226,18 +264,28 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
   public static MediaPackageElementFlavor parseFlavor(String s) throws IllegalArgumentException {
     if (s == null)
       throw new IllegalArgumentException("Unable to create element flavor from 'null'");
-    String[] parts = s.split("/");
-    if (parts.length < 2)
-      throw new IllegalArgumentException("Unable to create element flavor from '" + s + "'");
+    String[] parts = s.split(SEPARATOR);
+    if (parts.length != 2)
+      throw new IllegalArgumentException(format("Unable to create element flavor from \"%s\"", s));
     return new MediaPackageElementFlavor(parts[0], parts[1]);
   }
 
-  public static final Function<String, MediaPackageElementFlavor> parseFlavor =
-          new Function<String, MediaPackageElementFlavor>() {
-            @Override public MediaPackageElementFlavor apply(String s) {
-              return parseFlavor(s);
-            }
-          };
+  public static final Function<String, MediaPackageElementFlavor> parseFlavor = new Function<String, MediaPackageElementFlavor>() {
+    @Override
+    public MediaPackageElementFlavor apply(String s) {
+      return parseFlavor(s);
+    }
+  };
+
+  /** Check if <code>type</code> is a {@link #WILDCARD wildcard}. */
+  public static boolean isWildcard(String type) {
+    return WILDCARD.equals(type);
+  }
+
+  /** Check if type or subtype of <code>flavor</code> is a wildcard. */
+  public static boolean hasWildcard(MediaPackageElementFlavor flavor) {
+    return isWildcard(flavor.getType()) || isWildcard(flavor.getSubtype());
+  }
 
   /**
    * Helper class to store type/subtype equivalents for a given element type.
@@ -328,14 +376,14 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
     if (this == other)
       return true;
     if (subtype == null) {
-      if (other.subtype != null && !"*".equals(other.subtype))
+      if (other.subtype != null && !isWildcard(other.subtype))
         return false;
-    } else if (!subtype.equals(other.subtype) && (!"*".equals(subtype) && !"*".equals(other.subtype)))
+    } else if (!subtype.equals(other.subtype) && (!isWildcard(subtype) && !isWildcard(other.subtype)))
       return false;
     if (type == null) {
-      if (other.type != null && !"*".equals(other.type))
+      if (other.type != null && !isWildcard(other.type))
         return false;
-    } else if (!type.equals(other.type) && (!"*".equals(type) && !"*".equals(other.type)))
+    } else if (!type.equals(other.type) && (!isWildcard(type) && !isWildcard(other.type)))
       return false;
     return true;
   }

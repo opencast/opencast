@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.ingest.api;
 
 import org.opencastproject.job.api.JobProducer;
@@ -34,6 +40,9 @@ import java.util.Map;
  * Generates {@link MediaPackage}s from media, metadata, and attachments.
  */
 public interface IngestService extends JobProducer {
+
+  String UTC_DATE_FORMAT = "yyyyMMdd'T'HHmmss'Z'";
+  String START_DATE_KEY = "ingest_start_date";
 
   /**
    * Ingests the compressed mediapackage and starts the default workflow as defined by the
@@ -176,6 +185,48 @@ public interface IngestService extends JobProducer {
    */
   MediaPackage addTrack(InputStream mediaFile, String fileName, MediaPackageElementFlavor flavor,
           MediaPackage mediaPackage) throws MediaPackageException, IOException, IngestException;
+
+  /**
+   * Adds a partial media track to the existing MediaPackage in the repository
+   * 
+   * @param uri
+   *          the URL of the file to add
+   * @param flavor
+   *          the flavor of the media that is being added
+   * @param startTime
+   *          the start time
+   * @param mediaPackage
+   *          the mediapackage
+   * @return the updated mediapackage
+   * @throws IOException
+   *           if reading or writing of the partial track fails
+   * @throws IngestException
+   *           if an unexpected error occurs
+   */
+  MediaPackage addPartialTrack(URI uri, MediaPackageElementFlavor flavor, long startTime, MediaPackage mediaPackage)
+          throws IOException, IngestException;
+
+  /**
+   * Adds a partial media track to the existing MediaPackage in the repository
+   *
+   * @param mediaFile
+   *          the media file to add
+   * @param fileName
+   *          the file name
+   * @param flavor
+   *          the flavor of the media that is being added
+   * @param startTime
+   *          the start time
+   * @param mediaPackage
+   *          the mediapackage
+   * @return the updated mediapackage
+   * @throws IOException
+   *           if reading or writing of the partial track fails
+   * @throws IngestException
+   *           if an unexpected error occurs
+   */
+  MediaPackage addPartialTrack(InputStream mediaFile, String fileName, MediaPackageElementFlavor flavor,
+          long startTime, MediaPackage mediaPackage) throws IOException, IngestException;
 
   /**
    * Add a [metadata catalog] to an existing MediaPackage in the repository
@@ -332,5 +383,4 @@ public interface IngestService extends JobProducer {
    *           if an unexpected error occurs
    */
   void discardMediaPackage(MediaPackage mediaPackage) throws IOException, IngestException;
-
 }

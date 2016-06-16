@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.workflow.api;
 
 import org.opencastproject.mediapackage.MediaPackage;
@@ -35,12 +41,6 @@ public interface WorkflowService {
 
   /** Identifier for workflow jobs */
   String JOB_TYPE = "org.opencastproject.workflow";
-
-  /** Identifier for read permissions */
-  String READ_PERMISSION = "read";
-
-  /** Identifier for write permissions */
-  String WRITE_PERMISSION = "write";
 
   /**
    * Adds a workflow listener to be notified when workflows are updated.
@@ -80,8 +80,7 @@ public interface WorkflowService {
   void unregisterWorkflowDefinition(String workflowDefinitionId) throws NotFoundException, WorkflowDatabaseException;
 
   /**
-   * Returns the {@link WorkflowDefinition} identified by <code>name</code> or <code>null</code> if no such definition
-   * was found.
+   * Returns the {@link WorkflowDefinition} identified by <code>name</code>.
    *
    * @param id
    *          the workflow definition id
@@ -237,15 +236,22 @@ public interface WorkflowService {
   WorkflowInstance stop(long workflowInstanceId) throws WorkflowException, NotFoundException, UnauthorizedException;
 
   /**
-   * Permenantly removes a workflow instance.
+   * Permanently removes a workflow instance. Only workflow instances with state {@link WorkflowState#SUCCEEDED},
+   * {@link WorkflowState#STOPPED} or {@link WorkflowState#FAILED} may be removed.
    *
    * @param workflowInstanceId
+   *          the workflow instance identifier
    * @throws WorkflowDatabaseException
+   *           if there is a problem writing to the database
    * @throws NotFoundException
+   *           if no workflow instance with the given identifier could be found
    * @throws UnauthorizedException
+   *           if the current user does not have {@link #WRITE_PERMISSION} on the workflow instance
+   * @throws WorkflowStateException
+   *           if the workflow instance is in a disallowed state
    */
   void remove(long workflowInstanceId) throws WorkflowDatabaseException, WorkflowParsingException, NotFoundException,
-          UnauthorizedException;
+          UnauthorizedException, WorkflowStateException;
 
   /**
    * Temporarily suspends a started workflow instance.
@@ -272,10 +278,13 @@ public interface WorkflowService {
    *           if no paused workflow with this identifier exists
    * @throws WorkflowException
    *           if there is a problem processing the workflow
+   * @throws IllegalStateException
+   *           if the workflow with this identifier is not in the paused state
    * @throws UnauthorizedException
    *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
    */
-  WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, WorkflowException, UnauthorizedException;
+  WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, WorkflowException, IllegalStateException,
+          UnauthorizedException;
 
   /**
    * Resumes a suspended workflow instance, applying new properties to the workflow.
@@ -318,4 +327,38 @@ public interface WorkflowService {
    *           if there is a problem storing the registered workflow definitions
    */
   List<WorkflowDefinition> listAvailableWorkflowDefinitions() throws WorkflowDatabaseException;
+
+  /**
+   * Move workflows where the capture should have started from upcoming into failure status.
+   *
+   * @param buffer
+   *          The amount of time in seconds to wait for a capture to move from Upcoming to Capturing
+   * @throws IllegalArgumentException
+   *           invalid buffer value, it must be equal or greater than 0
+   */
+  void moveMissingCapturesFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException,
+          IllegalArgumentException;
+
+  /**
+   * Move workflows where the ingest has not been successful or is taking longer than expected into a failure status.
+   *
+   * @param buffer
+   *          The amount of time in seconds to wait for an ingest to notify the workflow service.
+   * @throws IllegalArgumentException
+   *           invalid buffer value, it must be equal or greater than 0
+   */
+  void moveMissingIngestsFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException,
+          IllegalArgumentException;
+
+  /**
+   *
+   * Starts a cleanup of workflow instances with a given lifetime and a specific state
+   *
+   * @param lifetime
+   *          minimum lifetime of the workflow instances
+   * @param state
+   *          state of the workflow instances
+   */
+  void cleanupWorkflowInstances(int lifetime, WorkflowInstance.WorkflowState state) throws WorkflowDatabaseException,
+          UnauthorizedException;
 }

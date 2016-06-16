@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 
 package org.opencastproject.mediapackage.elementbuilder;
 
@@ -28,7 +34,7 @@ import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -61,6 +67,7 @@ public class CatalogBuilderPlugin implements MediaPackageElementBuilderPlugin {
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#accept(org.opencastproject.mediapackage.MediaPackageElement.Type,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
+  @Override
   public boolean accept(MediaPackageElement.Type type, MediaPackageElementFlavor flavor) {
     return type.equals(MediaPackageElement.Type.Catalog);
   }
@@ -68,6 +75,7 @@ public class CatalogBuilderPlugin implements MediaPackageElementBuilderPlugin {
   /**
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#accept(org.w3c.dom.Node)
    */
+  @Override
   public boolean accept(Node elementNode) {
     String name = elementNode.getNodeName();
     if (name.contains(":")) {
@@ -81,6 +89,7 @@ public class CatalogBuilderPlugin implements MediaPackageElementBuilderPlugin {
    *      org.opencastproject.mediapackage.MediaPackageElement.Type,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
+  @Override
   public boolean accept(URI uri, MediaPackageElement.Type type, MediaPackageElementFlavor flavor) {
     return MediaPackageElement.Type.Catalog.equals(type);
   }
@@ -88,6 +97,7 @@ public class CatalogBuilderPlugin implements MediaPackageElementBuilderPlugin {
   /**
    * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#elementFromURI(URI)
    */
+  @Override
   public MediaPackageElement elementFromURI(URI uri) throws UnsupportedElementException {
     logger.trace("Creating video track from " + uri);
     Catalog track = CatalogImpl.fromURI(uri);
@@ -136,7 +146,7 @@ public class CatalogBuilderPlugin implements MediaPackageElementBuilderPlugin {
       id = (String) xpath.evaluate("@id", elementNode, XPathConstants.STRING);
 
       // url
-      url = serializer.resolvePath(xpath.evaluate("url/text()", elementNode).trim());
+      url = serializer.decodeURI(new URI(xpath.evaluate("url/text()", elementNode).trim()));
 
       // flavor
       flavor = (String) xpath.evaluate("@type", elementNode, XPathConstants.STRING);

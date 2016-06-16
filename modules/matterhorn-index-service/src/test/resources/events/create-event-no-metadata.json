@@ -1,0 +1,17 @@
+{
+   "processing":{
+      "workflow":"full",
+      "configuration":{
+         "archiveOp":"true",
+         "publishEngage":"true",
+         "publishHarvesting":"true"
+      }
+   },
+   "access":{
+      "id":null,
+      "name":"acl"
+   },
+   "source":{
+      "type":"UPLOAD"
+   }
+}

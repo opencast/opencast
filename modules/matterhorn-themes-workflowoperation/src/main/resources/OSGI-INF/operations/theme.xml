@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.workflow.handler.themes.ThemeWorkflowOperationHandler" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.workflow.handler.themes.ThemeWorkflowOperationHandler" />
+  <property name="service.description" value="Theme Workflow Operation Handler" />
+  <property name="workflow.operation" value="theme" />
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+  </service>
+  <reference name="ServiceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    policy="static" cardinality="1..1" bind="setServiceRegistry" />
+  <reference name="SeriesService" interface="org.opencastproject.series.api.SeriesService"
+    policy="static" cardinality="1..1" bind="setSeriesService" />
+  <reference name="ThemesServiceDatabase" interface="org.opencastproject.themes.ThemesServiceDatabase"
+    policy="static" cardinality="1..1" bind="setThemesServiceDatabase" />
+  <reference name="Workspace" interface="org.opencastproject.workspace.api.Workspace"
+    policy="static" cardinality="1..1" bind="setWorkspace" />
+  <reference name="StaticFileService" interface="org.opencastproject.staticfiles.api.StaticFileService"
+    policy="static" cardinality="1..1" bind="setStaticFileService" />
+</scr:component>

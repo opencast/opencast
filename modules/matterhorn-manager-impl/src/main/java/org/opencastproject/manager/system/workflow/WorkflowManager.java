@@ -1,44 +1,53 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
 
+
 package org.opencastproject.manager.system.workflow;
-
-import java.io.IOException;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.io.FileInputStream;
-import java.io.BufferedInputStream;
-import java.util.HashMap;
-import java.io.File;
-import java.io.FileNotFoundException;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.opencastproject.manager.api.PluginManagerConstants;
 import org.opencastproject.manager.core.MetadataDocumentHandler;
 import org.opencastproject.manager.system.workflow.utils.JSONWorkflowBuilder;
-import org.osgi.framework.BundleContext;
-import org.xml.sax.SAXException;
+
 import org.apache.commons.io.FileUtils;
+import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.util.HashMap;
+
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 /**
  * This class represents the worflow's manager.
@@ -46,6 +55,7 @@ import org.apache.commons.io.FileUtils;
  * @author Leonid Oldenburger
  */
 public class WorkflowManager {
+  private static final Logger logger = LoggerFactory.getLogger(WorkflowManager.class);
 
   /**
    * The bundle context
@@ -166,9 +176,9 @@ public class WorkflowManager {
              inputStream.close();
              outputStream.close();
      } catch (FileNotFoundException e) {
-       System.err.println("FileStreamsTest: " + e);
+       logger.warn("FileStreamsTest: " + e);
      } catch (IOException e) {
-       System.err.println("FileStreamsTest: " + e);
+       logger.warn("FileStreamsTest: " + e);
      }
 
         if (counter == 0) {

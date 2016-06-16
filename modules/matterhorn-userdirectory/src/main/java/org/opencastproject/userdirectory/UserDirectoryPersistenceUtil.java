@@ -1,22 +1,31 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.userdirectory;
 
-import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.security.api.Role;
+import org.opencastproject.security.impl.jpa.JpaGroup;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
+import org.opencastproject.security.impl.jpa.JpaRole;
+import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.NotFoundException;
 
 import java.util.HashSet;
@@ -102,6 +111,40 @@ public final class UserDirectoryPersistenceUtil {
       }
       tx.commit();
       return organization;
+    } finally {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * Persist an user
+   * 
+   * @param user
+   *          the user to persist
+   * @param emf
+   *          the entity manager factory
+   * @return the persisted organization
+   */
+  public static JpaUser saveUser(JpaUser user, EntityManagerFactory emf) {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      JpaUser u = findUser(user.getUsername(), user.getOrganization().getId(), emf);
+      if (u == null) {
+        em.persist(user);
+      } else {
+        user.setId(u.getId());
+        user = em.merge(user);
+      }
+      tx.commit();
+      return user;
     } finally {
       if (tx.isActive()) {
         tx.rollback();
@@ -272,6 +315,55 @@ public final class UserDirectoryPersistenceUtil {
   }
 
   /**
+   * Returns the persisted user by the user id and organization id
+   *
+   * @param id
+   *          the user's unique id
+   * @param organizationId
+   *          the organization id
+   * @param emf
+   *          the entity manager factory
+   * @return the user or <code>null</code> if not found
+   */
+  public static JpaUser findUser(long id, String organizationId, EntityManagerFactory emf) {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("User.findByIdAndOrg");
+      q.setParameter("id", id);
+      q.setParameter("org", organizationId);
+      return (JpaUser) q.getSingleResult();
+    } catch (NoResultException e) {
+      return null;
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * Returns the total of users
+   *
+   * @param organizationId
+   *          the organization id
+   * @param emf
+   *          the entity manager factory
+   * @return the total number of users
+   */
+  public static long countUsers(String organizationId, EntityManagerFactory emf) {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("User.countAll");
+      q.setParameter("org", organizationId);
+      return ((Number) q.getSingleResult()).longValue();
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
    * Returns a list of users by a search query if set or all users if search query is <code>null</code>
    *
    * @param orgId
@@ -384,7 +476,7 @@ public final class UserDirectoryPersistenceUtil {
   }
 
   public static void removeGroup(String groupId, String orgId, EntityManagerFactory emf) throws NotFoundException,
-          Exception {
+  Exception {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
@@ -396,6 +488,44 @@ public final class UserDirectoryPersistenceUtil {
         throw new NotFoundException("Group with ID " + groupId + " does not exist");
       }
       em.remove(em.merge(group));
+      tx.commit();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      if (tx.isActive()) {
+        tx.rollback();
+      }
+      throw e;
+    } finally {
+      em.close();
+    }
+  }
+
+  /**
+   * Delete the user with given name in the given organization
+   * 
+   * @param username
+   *          the name of the user to delete
+   * @param orgId
+   *          the organization id
+   * @param emf
+   *          the entity manager factory
+   * @throws NotFoundException
+   * @throws Exception
+   */
+  public static void deleteUser(String username, String orgId, EntityManagerFactory emf) throws NotFoundException,
+  Exception {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      JpaUser user = findUser(username, orgId, emf);
+      if (user == null) {
+        throw new NotFoundException("User with name " + username + " does not exist");
+      }
+      em.remove(em.merge(user));
       tx.commit();
     } catch (NotFoundException e) {
       throw e;

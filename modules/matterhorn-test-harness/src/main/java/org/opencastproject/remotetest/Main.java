@@ -1,26 +1,30 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.remotetest;
 
 import org.opencastproject.remotetest.ui.NonExitingSeleniumServer;
 import org.opencastproject.remotetest.ui.SeleniumTestSuite;
 import org.opencastproject.remotetest.util.TrustedHttpClient;
 import org.opencastproject.remotetest.util.WorkflowUtils;
-
-import junit.framework.Assert;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -68,6 +72,8 @@ import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import junit.framework.Assert;
+
 /**
  * Runs JUnit and/or Selenium test suites against a Matterhorn server and/or capture agent.
  */
@@ -103,7 +109,6 @@ public class Main {
     options.addOption(new Option("help", false, "print this message"));
     options.addOption(new Option("withperf", false, "run the performance tests"));
     options.addOption(new Option("withserver", false, "run the tests for the server side components"));
-    options.addOption(new Option("withcapture", false, "run the tests for the capture agent"));
     options.addOption(new Option("withff", false, "run the selenium user interface tests with the firefox browser"));
     options.addOption(new Option("withchrome", false, "run the selenium user interface tests with the chrome browser"));
     options.addOption(new Option("withsafari", false, "run the selenium user interface tests with the safari browser"));
@@ -144,14 +149,6 @@ public class Main {
       if (line.hasOption("withperf")) {
         System.out.println("Running with the server performance test suite enabled");
         testClasses.add(ServerPerformanceTests.class);
-      }
-    }
-    if (line.hasOption("withcapture")) {
-      System.out.println("Running 'capture' test suite");
-      testClasses.add(CaptureAgentTests.class);
-      if (line.hasOption("withperf")) {
-        // TODO: Add capture agent performance tests
-        // System.out.println("Running with the 'capture' performance test suite enabled");
       }
     }
 

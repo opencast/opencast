@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.opencastproject.scheduler.impl.OldScheduledScanner"
+  activate="activate"
+  deactivate="deactivate"
+  immediate="true">
+  
+  <implementation class="org.opencastproject.scheduler.impl.OldScheduledScanner" />
+  <property name="service.description" value="Cleanup Finished Recordings from the Schedule Scanner" />
+  
+  <service>
+    <provide interface="org.osgi.service.cm.ManagedService" />
+  </service>
+  
+  <reference cardinality="1..1" interface="org.opencastproject.scheduler.api.SchedulerService" name="SchedulerService" policy="static" bind="setService"/>
+  <reference cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry" name="ServiceRegistry" policy="static" bind="bindServiceRegistry"/>
+  <reference cardinality="1..1" interface="org.opencastproject.security.api.OrganizationDirectoryService" name="OrganizationDirectoryService" policy="static" bind="bindOrganizationDirectoryService"/>
+  <reference cardinality="1..1" interface="org.opencastproject.security.api.SecurityService" name="SecurityService" policy="static" bind="bindSecurityService"/>
+ 
+</scr:component>

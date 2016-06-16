@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.kernel.security;
 
 import static org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint.INITIAL_REQUEST_PATH;
@@ -59,12 +65,13 @@ public class AuthenticationSuccessHandler implements
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
           Authentication authentication) throws IOException, ServletException {
 
-    // If the user originally attempted to access a specific URI other than /, but was forwarded to the login page,
-    // redirect the user back to that initial URI.
+    /* If the user originally attempted to access a specific URI other than /, but was forwarded to the login page,
+     * redirect the user back to that initial URI. But only if the request target was a user interface any not some kind
+     * of data. */
     HttpSession session = request.getSession();
     String initialRequestUri = (String) session.getAttribute(INITIAL_REQUEST_PATH);
     session.removeAttribute(INITIAL_REQUEST_PATH);
-    if (initialRequestUri != null) {
+    if (initialRequestUri != null && initialRequestUri.toLowerCase().contains(".htm")) {
       response.sendRedirect(initialRequestUri);
       return;
     }

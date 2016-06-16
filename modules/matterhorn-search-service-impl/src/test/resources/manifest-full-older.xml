@@ -1,0 +1,13 @@
+<mediapackage xmlns="http://mediapackage.opencastproject.org" id="id-older"
+                                   start="2005-02-01T00:00:00" duration="1004400000">
+<metadata>
+  <catalog id="catalog-1" type="dublincore/episode">
+    <mimetype>text/xml</mimetype>
+    <url>dublincore-older.xml</url>
+  </catalog>
+  <catalog id="catalog-2" type="dublincore/series" ref="series:foobar-serie">
+    <mimetype>text/xml</mimetype>
+    <url>series-dublincore.xml</url>
+  </catalog>
+</metadata>
+</mediapackage>

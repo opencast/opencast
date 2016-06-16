@@ -1,0 +1,107 @@
+site_name: Opencast - Administration Guide
+repo_url: https://bitbucket.org/opencast-community/matterhorn/src/develop/docs/guides/admin/docs
+
+# Default theme used is readthedocs
+theme: readthedocs
+
+# The directory that contain the source .md files
+docs_dir: 'docs'
+
+# The directory to which the site is built using mkdocs
+site_dir: 'site'
+
+# This needs to be listed in order to populate the left navigation and the TOC
+# Items will appear in this order
+
+pages:
+- Home: 'index.md'
+- Release Notes: 'release.notes.md'
+- Installation:
+   - Overview: 'installation/index.md'
+   - Multiple Servers: 'installation/multiple-servers.md'
+   - Installation from Source:
+      - Debian/Ubuntu: 'installation/source-debian-ubuntu.md'
+      - RHEL/CentOS: 'installation/source-rhel-sl-centos.md'
+      - MacOS X: 'installation/source-macosx.md'
+   - Installation from Package (RPM):
+      - Fedora: 'installation/rpm-fedora.md'
+      - RHEL/CentOS: 'installation/rpm-rhel-sl-centos.md'
+- Configuration:
+   - Overview: 'configuration/index.md'
+   - Basic: 'configuration/basic.md'
+   - Database: 'configuration/database.md'
+   - Message Broker: 'configuration/message-broker.md'
+   - Encoding: 'configuration/encoding.md'
+   - Load: 'configuration/load.md'
+   - Logging and Privacy: 'configuration/logging.and.privacy.md'
+   - Multi Tenancy: 'configuration/multi.tenancy.md'
+   - Security:
+      - General Security: 'configuration/security.md'
+      - Central Authentication Service (CAS): 'configuration/security.cas.md'
+      - LDAP Authentication and Authorization (without CAS): 'configuration/security.ldap.md'
+      - Stream Security: 'configuration/stream-security.md'
+   - Workflow: 'configuration/workflow.md'
+- Modules:
+   - Overview: 'modules/index.md'
+   - LTI Module: 'modules/ltimodule.md'
+   - Media Module: 'modules/mediamodule.configuration.md'
+   - Player:
+      - Architecture: 'modules/player.architecture.md'
+      - Configuration: 'modules/player.configuration.md'
+      - Core Reference: 'modules/player.core.reference.md'
+      - Events: 'modules/player.events.md'
+      - Storage: 'modules/player.storage.md'
+      - Plugins: 'modules/player.plugins.md'
+      - Plugin Development: 'modules/player.plugin.development.md'
+      - Testing: 'modules/player.testing.md'
+      - Configuration: 'modules/player.configuration.md'
+      - URL Parameters: 'modules/player.url.parameter.md'
+   - Search Index: 'modules/searchindex.md'
+   - Stream Security: 'modules/stream-security.md'
+   - Text Extraction: 'modules/textextraction.md'
+   - Video Editor:
+      - Overview: 'modules/videoeditor.manual.md'
+      - Setup: 'modules/videoeditor.setup.md'
+      - Architecture: 'modules/videoeditor.architecture.md'
+   - Video Segmentation: 'modules/videosegmentation.md'
+   - YouTube Publication: 'modules/youtubepublication.md'
+- Upgrade:
+   - Upgrading Home: 'upgrade/index.md'
+- Workflow Operation Handler:
+   - Overview: 'workflowoperationhandlers/index.md'
+   - Analyze Tracks: 'workflowoperationhandlers/analyze-tracks-woh.md'
+   - Analyze Audio: 'workflowoperationhandlers/analyzeaudio-woh.md'
+   - Append: 'workflowoperationhandlers/append-woh.md'
+   - Archive: 'workflowoperationhandlers/archive-woh.md'
+   - Caption: 'workflowoperationhandlers/caption-woh.md'
+   - Compose: 'workflowoperationhandlers/compose-woh.md'
+   - Composite: 'workflowoperationhandlers/composite-woh.md'
+   - Concat: 'workflowoperationhandlers/concat-woh.md'
+   - Cover Image: 'workflowoperationhandlers/coverimage-woh.md'
+   - Defaults: 'workflowoperationhandlers/defaults-woh.md'
+   - Editor: 'workflowoperationhandlers/editor-woh.md'
+   - Email: 'workflowoperationhandlers/email-woh.md'
+   - Encode: 'workflowoperationhandlers/encode-woh.md'
+   - Extract Text: 'workflowoperationhandlers/extracttext-woh.md'
+   - HTTP Notify: 'workflowoperationhandlers/httpnotify-woh.md'
+   - Image: 'workflowoperationhandlers/image-woh.md'
+   - Image to Video: 'workflowoperationhandlers/imagetovideo-woh.md'
+   - Incident: 'workflowoperationhandlers/incident-woh.md'
+   - Ingest-Download: 'workflowoperationhandlers/ingestdownload-woh.md'
+   - Inspect: 'workflowoperationhandlers/inspect-woh.md'
+   - Normalize Audio: 'workflowoperationhandlers/normalizeaudio-woh.md'
+   - Partial Import: 'workflowoperationhandlers/partial-import-woh.md'
+   - Post Media Package: 'workflowoperationhandlers/postmediapackage-woh.md'
+   - Prepare A/V: 'workflowoperationhandlers/prepareav-woh.md'
+   - Publish Configure: 'workflowoperationhandlers/publishconfigure-woh.md'
+   - Publish Engage: 'workflowoperationhandlers/publishengage-woh.md'
+   - Republish: 'workflowoperationhandlers/republish-woh.md'
+   - Retract Configure: 'workflowoperationhandlers/retractconfigure-woh.md'
+   - Segment Previews: 'workflowoperationhandlers/segmentpreviews-woh.md'
+   - Segment Video: 'workflowoperationhandlers/segmentvideo-woh.md'
+   - Series: 'workflowoperationhandlers/series-woh.md'
+   - Silence: 'workflowoperationhandlers/silence-woh.md'
+   - Tag: 'workflowoperationhandlers/tag-woh.md'
+   - Trim: 'workflowoperationhandlers/trim-woh.md'
+   - Waveform: 'workflowoperationhandlers/waveform-woh.md'
+   - Zip: 'workflowoperationhandlers/zip-woh.md'

@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.job.api;
 
 import java.net.URI;
@@ -24,9 +30,10 @@ import java.util.List;
  * the future, currently running, or has run in the past.
  */
 public interface Job {
+
   /** The status of the job that this receipt represents */
-  public static enum Status {
-    QUEUED, PAUSED, RUNNING, FINISHED, FAILED, DELETED, INSTANTIATED, DISPATCHING, RESTART, CANCELED;
+  enum Status {
+    QUEUED, PAUSED, RUNNING, FINISHED, FAILED, DELETED, INSTANTIATED, DISPATCHING, RESTART, CANCELED, WAITING;
 
     /** Return if the job is terminated. */
     public boolean isTerminated() {
@@ -48,7 +55,7 @@ public interface Job {
   }
 
   /** Reason for failure */
-  public static enum FailureReason {
+  enum FailureReason {
     NONE, DATA, PROCESSING
   }
 
@@ -67,12 +74,16 @@ public interface Job {
    */
   String getCreator();
 
+  void setCreator(String creator);
+
   /**
    * Returns the identifier of the organization that the creator is associated with.
    *
    * @return the organization
    */
   String getOrganization();
+
+  void setOrganization(String organization);
 
   /**
    * Gets the version of this job. Each time the job is updated, the version number is incremented. If a process
@@ -84,19 +95,13 @@ public interface Job {
   long getVersion();
 
   /**
-   * Sets the job identifier.
-   *
-   * @param id
-   *          the job identifier
-   */
-  void setId(long id);
-
-  /**
    * Gets the job type, which determines the type of service that runs the job.
    *
    * @return the job type
    */
   String getJobType();
+
+  void setJobType(String jobType);
 
   /**
    * The operation type, which can be used by the service responsible for the job to determine the service method to
@@ -106,12 +111,6 @@ public interface Job {
    */
   String getOperation();
 
-  /**
-   * Sets the operation name.
-   *
-   * @param operation
-   *          the operation
-   */
   void setOperation(String operation);
 
   /**
@@ -121,12 +120,6 @@ public interface Job {
    */
   List<String> getArguments();
 
-  /**
-   * Sets the argument list.
-   *
-   * @param arguments
-   *          the list of arguments
-   */
   void setArguments(List<String> arguments);
 
   /**
@@ -136,20 +129,6 @@ public interface Job {
    */
   Status getStatus();
 
-  /**
-   * In the case of failure, returns whether the failure had to do with data or with processing. Depending on the
-   * reason, processing services might be marked not to accept new jobs.
-   *
-   * @return the failure reason
-   */
-  FailureReason getFailureReason();
-
-  /**
-   * Sets the receipt's current {@link Status}.
-   *
-   * @param status
-   *          the status to set
-   */
   void setStatus(Status status);
 
   /**
@@ -158,10 +137,18 @@ public interface Job {
    *
    * @param status
    *          the status to set
-   * @param the
+   * @param reason
    *          failure reason
    */
   void setStatus(Status status, FailureReason reason);
+
+  /**
+   * In the case of failure, returns whether the failure had to do with data or with processing. Depending on the
+   * reason, processing services might be marked not to accept new jobs.
+   *
+   * @return the failure reason
+   */
+  FailureReason getFailureReason();
 
   /**
    * Gets the host that created this job.
@@ -177,12 +164,16 @@ public interface Job {
    */
   String getProcessingHost();
 
+  void setProcessingHost(String processingHost);
+
   /**
-   * The date this receipt was created.
+   * The date this job was created.
    *
    * @return the date the job was created
    */
   Date getDateCreated();
+
+  void setDateCreated(Date created);
 
   /**
    * The date this job was started. If the job was queued, this can be significantly later than the date created.
@@ -190,6 +181,8 @@ public interface Job {
    * @return the date the job was started
    */
   Date getDateStarted();
+
+  void setDateStarted(Date started);
 
   /**
    * The number of milliseconds that this job has waited in a queue before execution. This value will be null if the job
@@ -199,6 +192,8 @@ public interface Job {
    */
   Long getQueueTime();
 
+  void setQueueTime(Long queueTime);
+
   /**
    * The number of milliseconds that this job took to execute. This value will be null if the job has not yet finished
    * execution.
@@ -207,12 +202,16 @@ public interface Job {
    */
   Long getRunTime();
 
+  void setRunTime(Long runTime);
+
   /**
    * The date this job was completed
    *
    * @return the date completed
    */
   Date getDateCompleted();
+
+  void setDateCompleted(Date dateCompleted);
 
   /**
    * Gets the serialized output that was produced by this job, or null if nothing was produced, or if it has yet to be
@@ -222,20 +221,13 @@ public interface Job {
    */
   String getPayload();
 
-  /**
-   * Sets the payload produced by this job.
-   *
-   * @param payload
-   *          the result of the job to store in the job
-   */
   void setPayload(String payload);
 
   /**
-   * Gets the context for this job.
    *
-   * @return the context
+   * @return
    */
-  JobContext getContext();
+  int getSignature();
 
   /**
    * Gets the parent job identifier, or null if there is no parent.
@@ -243,6 +235,8 @@ public interface Job {
    * @return the parent identifier
    */
   Long getParentJobId();
+
+  void setParentJobId(Long parentJobId);
 
   /**
    * Gets the root job identifier, or null if this is the root job.
@@ -258,12 +252,6 @@ public interface Job {
    */
   boolean isDispatchable();
 
-  /**
-   * Sets whether this job can be dispatched.
-   *
-   * @param dispatchable
-   *          whether the job should be queueable for dispatch.
-   */
   void setDispatchable(boolean dispatchable);
 
   /**
@@ -273,6 +261,41 @@ public interface Job {
    */
   URI getUri();
 
-  /** Gets the job signature by calculating the hash code from the concatenation of the jobType + the job arguments */
-  int getSignature();
+  /**
+   * Gets the job's load.  For example, a job which uses four cores would have a load of 4.0. This should be roughly the
+   * number of cores that this job occupies while running.
+   *
+   * @return the job's load
+   */
+  Float getJobLoad();
+
+  void setJobLoad(Float load);
+
+  /**
+   * Gets the list of job IDs that are blocking this job from continuing
+   * 
+   * @return the list of Job IDs that are blocking this job
+   */
+  List<Long> getBlockedJobIds();
+
+  void setBlockedJobIds(List<Long> list);
+
+  /**
+   * Clears the list of jobs blocking this job from continuing
+   */
+  void removeBlockedJobsIds();
+
+  /**
+   * Gets which job, if any, this job is blocking
+   * 
+   * @return the Job ID this job is blocking, or null
+   */
+  Long getBlockingJobId();
+
+  void setBlockingJobId(Long jobId);
+
+  /**
+   * Clears the reference to the job which this job is blocking, if any
+   */
+  void removeBlockingJobId();
 }

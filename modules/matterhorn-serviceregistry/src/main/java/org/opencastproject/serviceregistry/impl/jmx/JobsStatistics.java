@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.serviceregistry.impl.jmx;
 
 import org.opencastproject.job.api.Job.Status;
@@ -48,7 +54,7 @@ public class JobsStatistics extends NotificationBroadcasterSupport implements Jo
   public void updateJobCount(List<Object[]> perHostServiceCount) {
     jobCounts.clear();
     for (Object[] result : perHostServiceCount) {
-      Status status = (Status) result[2];
+      Status status = Status.values()[((Number) result[2]).intValue()];
       jobCounts.put(Tuple3.tuple3((String) result[0], (String) result[1], status), (Long) result[3]);
     }
     sendNotification(JmxUtil.createUpdateNotification(this, sequenceNumber++, "Job updated"));

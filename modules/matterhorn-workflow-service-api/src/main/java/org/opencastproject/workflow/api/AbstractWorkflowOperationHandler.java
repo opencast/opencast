@@ -1,22 +1,30 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.workflow.api;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import static java.lang.String.format;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.job.api.JobContext;
@@ -27,6 +35,12 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+
+import com.entwinemedia.fn.data.Opt;
+import com.entwinemedia.fn.fns.Strings;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Constants;
 import org.osgi.service.component.ComponentContext;
 
@@ -35,9 +49,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 /**
  * Abstract base implementation for an operation handler, which implements a simple start operation that returns a
@@ -56,6 +67,9 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /** Optional service registry */
   protected ServiceRegistry serviceRegistry = null;
+
+  /** The JobBarrier polling interval */
+  private long jobBarrierPollingInterval = JobBarrier.DEFAULT_POLLING_INTERVAL;
 
   /**
    * Activates this component with its properties once all of the collaborating services have been set
@@ -316,26 +330,67 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * After that, the method returns with the actual outcomes of the jobs.
    *
    * @param timeout
-   *          the maximum amount of time in miliseconds to wait
+   *          the maximum amount of time in milliseconds to wait
    * @param jobs
    *          the jobs
    * @return the jobs and their outcomes
    * @throws IllegalStateException
    *           if the service registry has not been set
    * @throws IllegalArgumentException
-   *           if the jobs collecion is either <code>null</code> or empty
+   *           if the jobs collection is either <code>null</code> or empty
    */
   protected JobBarrier.Result waitForStatus(long timeout, Job... jobs) throws IllegalStateException,
           IllegalArgumentException {
     if (serviceRegistry == null)
       throw new IllegalStateException("Can't wait for job status without providing a service registry first");
-    JobBarrier barrier = new JobBarrier(serviceRegistry, jobs);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, jobs);
     return barrier.waitForJobs(timeout);
   }
 
-  /** Get a configuration option. */
+  /**
+   * Get a configuration option.
+   *
+   * @deprecated use {@link #getConfig(WorkflowInstance, String)} or {@link #getOptConfig(org.opencastproject.workflow.api.WorkflowInstance, String)}
+   */
   protected Option<String> getCfg(WorkflowInstance wi, String key) {
     return option(wi.getCurrentOperation().getConfiguration(key));
+  }
+
+  /**
+   * Get a mandatory configuration key. Values are returned trimmed.
+   *
+   * @throws WorkflowOperationException
+   *         if the configuration key is either missing or empty
+   */
+  protected String getConfig(WorkflowInstance wi, String key) throws WorkflowOperationException {
+    return getConfig(wi.getCurrentOperation(), key);
+  }
+
+  /**
+   * Get a mandatory configuration key. Values are returned trimmed.
+   *
+   * @throws WorkflowOperationException
+   *         if the configuration key is either missing or empty
+   */
+  protected String getConfig(WorkflowOperationInstance woi, String key) throws WorkflowOperationException {
+    for (final String cfg : getOptConfig(woi, key)) {
+      return cfg;
+    }
+    throw new WorkflowOperationException(format("Configuration key '%s' is either missing or empty", key));
+  }
+
+  /**
+   * Get an optional configuration key. Values are returned trimmed.
+   */
+  protected Opt<String> getOptConfig(WorkflowInstance wi, String key) {
+    return getOptConfig(wi.getCurrentOperation(), key);
+  }
+
+  /**
+   * Get an optional configuration key. Values are returned trimmed.
+   */
+  protected Opt<String> getOptConfig(WorkflowOperationInstance woi, String key) {
+    return Opt.nul(woi.getConfiguration(key)).flatMap(Strings.trimToNone);
   }
 
   /**
@@ -344,6 +399,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * Example usage: <code>getCfg(wi, "key").getOrElse(this.&lt;String&gt;cfgKeyMissing("key"))</code>
    *
    * @see #getCfg(WorkflowInstance, String)
+   * @deprecated see {@link #getCfg(WorkflowInstance, String)} for details
    */
   protected <A> Function0<A> cfgKeyMissing(final String key) {
     return new Function0<A>() {
@@ -351,6 +407,25 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
         return chuck(new WorkflowOperationException(key + " is missing or malformed"));
       }
     };
+  }
+
+  /**
+   * Set the @link org.opencastproject.job.api.JobBarrier polling interval.
+   * <p>
+   * While waiting for other jobs to finish, the barrier will poll the status of these jobs until they are finished. To
+   * reduce load on the system, the polling is done only every x milliseconds. This interval defines the sleep time
+   * between these polls.
+   * <p>
+   * If most cases you want to leave this at its default value. It will make sense, though, to adjust this time if you
+   * know that your job will be exceptionally short. An example of this might be the unit tests where other jobs are
+   * usually mocked. But this setting is not limited to tests and may be a sensible options for other jobs as well.
+   *
+   * @param interval the time in miliseconds between two polling operations
+   *
+   * @see org.opencastproject.job.api.JobBarrier#DEFAULT_POLLING_INTERVAL
+   */
+  public void setJobBarrierPollingInterval(long interval) {
+    this.jobBarrierPollingInterval = interval;
   }
 
   /**

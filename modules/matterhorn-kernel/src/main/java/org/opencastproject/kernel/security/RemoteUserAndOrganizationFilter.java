@@ -1,24 +1,38 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.kernel.security;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_SUDO_ROLE;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_SYSTEM_ROLES;
 import static org.opencastproject.security.api.SecurityConstants.ORGANIZATION_HEADER;
+import static org.opencastproject.security.api.SecurityConstants.ROLES_HEADER;
+import static org.opencastproject.security.api.SecurityConstants.RUN_AS_USER_HEADER;
+import static org.opencastproject.security.api.SecurityConstants.RUN_WITH_ROLES;
 import static org.opencastproject.security.api.SecurityConstants.USER_HEADER;
 
+import org.opencastproject.security.api.JaxbOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityConstants;
@@ -28,11 +42,16 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 
-import org.apache.commons.lang.StringUtils;
+import com.entwinemedia.fn.Fn2;
+import com.entwinemedia.fn.Stream;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -78,12 +97,12 @@ public class RemoteUserAndOrganizationFilter implements Filter {
     HttpServletRequest httpRequest = (HttpServletRequest) request;
 
     // Keep the original organization and user
-    Organization originalOrganization = securityService.getOrganization();
-    User originalUser = securityService.getUser();
+    final Organization originalOrganization = securityService.getOrganization();
+    final User originalUser = securityService.getUser();
 
     // Organization and user as specified by the request
-    Organization requestOrganization = originalOrganization;
-    User requestUser = originalUser;
+    Organization requestedOrganization = originalOrganization;
+    User requestedUser = originalUser;
 
     try {
 
@@ -91,8 +110,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
       String organizationHeader = httpRequest.getHeader(ORGANIZATION_HEADER);
       if (StringUtils.isNotBlank(organizationHeader)) {
 
-        // Organization switching is only allowed if the request is coming in with
-        // the global admin role enabled
+        // Organization switching is only allowed if the request is coming in with the global admin role enabled
         if (!originalUser.hasRole(GLOBAL_ADMIN_ROLE)) {
           logger.warn("An unauthorized request is trying to switch from organization '{}' to '{}'",
                   originalOrganization.getId(), organizationHeader);
@@ -101,9 +119,9 @@ public class RemoteUserAndOrganizationFilter implements Filter {
         }
 
         try {
-          requestOrganization = organizationDirectory.getOrganization(organizationHeader);
-          securityService.setOrganization(requestOrganization);
-          logger.trace("Switching to organization '{}' from request header {}", requestOrganization.getId(),
+          requestedOrganization = organizationDirectory.getOrganization(organizationHeader);
+          securityService.setOrganization(requestedOrganization);
+          logger.trace("Switching to organization '{}' from request header {}", requestedOrganization.getId(),
                   ORGANIZATION_HEADER);
         } catch (NotFoundException e) {
           logger.warn("Non-existing organization '{}' specified in request header {}", organizationHeader,
@@ -117,11 +135,13 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
       // See if there is a user provided in the request
       String userHeader = httpRequest.getHeader(USER_HEADER);
+      if (StringUtils.isBlank(userHeader)) {
+        userHeader = httpRequest.getHeader(RUN_AS_USER_HEADER);
+      }
       if (StringUtils.isNotBlank(userHeader)) {
 
-        // User switching is only allowed if the request is coming in with
-        // the global admin role enabled
-        if (!originalUser.hasRole(GLOBAL_ADMIN_ROLE)) {
+        // User switching is only allowed if the request is coming in with the global sudo role enabled
+        if (!originalUser.hasRole(GLOBAL_SUDO_ROLE)) {
           logger.warn("An unauthorized request is trying to switch from user '{}' to '{}'", originalUser.getUsername(),
                   userHeader);
           ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -129,31 +149,107 @@ public class RemoteUserAndOrganizationFilter implements Filter {
         }
 
         if (SecurityConstants.GLOBAL_ANONYMOUS_USERNAME.equals(userHeader)) {
-          requestUser = SecurityUtil.createAnonymousUser(requestOrganization);
-          logger.trace("Request user is switched to '{}'", requestUser.getUsername());
+          requestedUser = SecurityUtil.createAnonymousUser(requestedOrganization);
+          logger.trace("Request user is switched to '{}'", requestedUser.getUsername());
         } else {
-          requestUser = userDirectory.loadUser(userHeader);
-          if (requestUser != null) {
-            securityService.setUser(requestUser);
-            logger.trace("Switching to user '{}' from request header {}", userHeader, USER_HEADER);
-          } else {
-            logger.warn("Non-existing user '{}' specified in request header {}", userHeader, USER_HEADER);
+          requestedUser = userDirectory.loadUser(userHeader);
+
+          // Does the target user exist?
+          if (requestedUser == null) {
+            logger.warn("Unable to switch to non-existing user '{}' as specified in request header {}", userHeader,
+                    USER_HEADER);
+            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+          }
+
+          if (!originalUser.hasRole(GLOBAL_ADMIN_ROLE)) {
+            // if the original user did not have system privileges, the target user must not gain those, either.
+            for (String systemRole : GLOBAL_SYSTEM_ROLES) {
+              if (requestedUser.hasRole(systemRole)) {
+                logger.warn("An unauthorized request is trying to switch to an admin user, from '{}' to '{}'",
+                        originalUser.getUsername(), userHeader);
+                ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+              }
+            }
+
+            // make sure the user does not gain organization administrator privileges
+            String organizationAdminRole = requestedOrganization.getAdminRole();
+            if (requestedUser.hasRole(organizationAdminRole)) {
+              logger.warn("An unauthorized request is trying to switch to an admin user, from '{}' to '{}'",
+                      originalUser.getUsername(), userHeader);
+              ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
+              return;
+            }
+          }
+        }
+
+        logger.trace("Switching from user '{}' to user '{}' from request header '{}'",
+                new Object[] { originalUser.getUsername(), requestedUser.getUsername(), USER_HEADER });
+        securityService.setUser(requestedUser);
+      }
+
+      // See if there are roles provided in the request
+      String rolesHeader = httpRequest.getHeader(ROLES_HEADER);
+      if (StringUtils.isBlank(rolesHeader)) {
+        rolesHeader = httpRequest.getHeader(RUN_WITH_ROLES);
+      }
+      if (StringUtils.isNotBlank(rolesHeader)) {
+
+        // Role switching is only allowed if the request is coming in with the global sudo role enabled
+        if (!originalUser.hasRole(GLOBAL_SUDO_ROLE)) {
+          logger.warn("An unauthorized request is trying to switch roles from '{}' to '{}'", requestedUser.getRoles(),
+                  rolesHeader);
+          ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
+          return;
+        }
+
+        Collection<String> requestedRoles = Arrays.asList(StringUtils.split(rolesHeader, ","));
+
+        if (!originalUser.hasRole(GLOBAL_ADMIN_ROLE)) {
+          // Role switching is only allowed to non-system roles
+          for (String systemRole : GLOBAL_SYSTEM_ROLES) {
+            if (requestedRoles.contains(systemRole)) {
+              logger.warn("An unauthorized request by user '{}' is trying to gain admin role '{}'",
+                      originalUser.getUsername(), systemRole);
+              ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
+              return;
+            }
+          }
+
+          // Role switching is only allowed to non-organization administrator roles
+          String organizationAdminRole = requestedOrganization.getAdminRole();
+          if (requestedRoles.contains(organizationAdminRole)) {
+            logger.warn("An unauthorized request by user '{}' is trying to gain admin role '{}'",
+                    originalUser.getUsername(), organizationAdminRole);
             ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
           }
         }
+
+        // If no user has been provider by the request create a virtual user
+        if (StringUtils.isBlank(userHeader)) {
+          requestedUser = SecurityUtil.createAnonymousUser(requestedOrganization);
+        }
+
+        // Set roles to requested user
+        requestedUser = new JaxbUser(requestedUser.getUsername(), requestedUser.getPassword(), requestedUser.getName(),
+                requestedUser.getEmail(), requestedUser.getProvider(), requestedUser.canLogin(),
+                JaxbOrganization.fromOrganization(requestedUser.getOrganization()), Stream.$(requestedRoles)
+                        .map(toJaxbRole._2(requestedOrganization)).toSet());
+        logger.trace("Request roles '{}' are amended to user '{}'", rolesHeader, requestedUser.getUsername());
+        securityService.setUser(requestedUser);
       }
 
       // Execute the rest of the filter chain
-      logger.trace("Executing the filter chain with user '{}@{}'", requestUser.getUsername(),
-              requestOrganization.getId());
+      logger.trace("Executing the filter chain with user '{}@{}'", requestedUser.getUsername(),
+              requestedOrganization.getId());
       chain.doFilter(httpRequest, response);
 
     } finally {
       securityService.setOrganization(originalOrganization);
       securityService.setUser(originalUser);
     }
-
   }
 
   /**
@@ -192,5 +288,12 @@ public class RemoteUserAndOrganizationFilter implements Filter {
   void setUserDirectoryService(UserDirectoryService userDirectory) {
     this.userDirectory = userDirectory;
   }
+
+  private static final Fn2<String, Organization, JaxbRole> toJaxbRole = new Fn2<String, Organization, JaxbRole>() {
+    @Override
+    public JaxbRole ap(String role, Organization organization) {
+      return new JaxbRole(role, JaxbOrganization.fromOrganization(organization));
+    }
+  };
 
 }

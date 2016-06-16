@@ -1,23 +1,29 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.composer.impl;
 
 import org.opencastproject.composer.api.EmbedderEngine;
 import org.opencastproject.composer.api.EmbedderException;
-import org.opencastproject.composer.impl.qtembedder.QTSbtlEmbedderEngine;
+import org.opencastproject.composer.impl.ffmpeg.FFmpegEmbedderEngine;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.StreamHelper;
 
@@ -25,7 +31,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,13 +52,13 @@ public class EmbedderEngineTest {
   private File resultingFile;
 
   // default path to QT subtitle embedder
-  private static String defaultBinaryPath = QTSbtlEmbedderEngine.QTEMBEDDER_BINARY_DEFAULT;
+  private static String defaultBinaryPath = FFmpegEmbedderEngine.FFMPEG_BINARY_DEFAULT;
 
   // logger
   private static final Logger logger = LoggerFactory.getLogger(EmbedderEngineTest.class);
 
   /** True to run the tests */
-  private static boolean qtembedderInstalled = true;
+  private static boolean ffmpegInstalled = true;
 
   @BeforeClass
   public static void testGst() {
@@ -71,9 +76,9 @@ public class EmbedderEngineTest {
       if (status != 0)
         throw new IllegalStateException();
     } catch (Throwable t) {
-      logger.warn("Skipping qt embedder tests due to unsatisifed qtsbtlembedder installation");
+      logger.warn("Skipping qt embedder tests due to unsatisifed ffmpeg installation");
       logger.warn(errorBuffer.toString());
-      qtembedderInstalled = false;
+      ffmpegInstalled = false;
     } finally {
       IoSupport.closeQuietly(stdout);
       IoSupport.closeQuietly(stderr);
@@ -84,7 +89,7 @@ public class EmbedderEngineTest {
   @Before
   public void setUp() throws Exception {
     // create engine
-    engine = new QTSbtlEmbedderEngine();
+    engine = new FFmpegEmbedderEngine();
     // load captions and movie
     File engCaptions = new File(EmbedderEngineTest.class.getResource("/captions_test_eng.srt").toURI());
     Assert.assertNotNull(engCaptions);
@@ -97,9 +102,8 @@ public class EmbedderEngineTest {
   }
 
   @Test
-  @Ignore("The embedder does not work on Mac OS X (Segmentation fault, see MH-5415")
   public void testEmbedding() throws EmbedderException, URISyntaxException {
-    if (!qtembedderInstalled)
+    if (!ffmpegInstalled)
       return;
     resultingFile = engine.embed(movie, captions, languages, new HashMap<String, String>());
     // TODO: Is there a way to test whether embedding actually succeeded?

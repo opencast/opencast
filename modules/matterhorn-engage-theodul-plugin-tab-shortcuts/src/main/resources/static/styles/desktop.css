@@ -1,0 +1,21 @@
+#engage_shortcuts_tab_content {
+    width: 100%;
+    padding-top: 15px;
+    padding-right: 20px;
+}
+
+.shortcutsTab {
+    float: left;
+}
+
+.shortcuts-table {
+    min-width: 450px;
+}
+
+.shortcut-column {
+    width: 25%;
+}
+
+.clear {
+    clear: both;
+}

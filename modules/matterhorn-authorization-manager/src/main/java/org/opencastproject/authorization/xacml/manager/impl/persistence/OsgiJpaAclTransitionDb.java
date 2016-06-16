@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.authorization.xacml.manager.impl.persistence;
 
 import static org.opencastproject.util.data.Option.none;
@@ -44,7 +50,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -56,40 +61,21 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.spi.PersistenceProvider;
 
 public final class OsgiJpaAclTransitionDb implements AclTransitionDb {
 
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(OsgiJpaAclTransitionDb.class);
 
-  /** Persistence provider set by OSGi */
-  private PersistenceProvider persistenceProvider;
-
-  /** Persistence properties used to create {@link EntityManagerFactory} */
-  private Map<String, Object> persistenceProperties;
+  /** JPA persistence unit name */
+  public static final String PERSISTENCE_UNIT = "org.opencastproject.authorization.xacml.manager";
 
   /** Factory used to create {@link EntityManager}s for transactions */
   private EntityManagerFactory emf;
 
-  /**
-   * OSGi callback to set persistence properties.
-   *
-   * @param persistenceProperties
-   *          persistence properties
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
-  }
-
-  /**
-   * OSGi callback to set persistence provider.
-   *
-   * @param persistenceProvider
-   *          {@link PersistenceProvider} object
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
+  /** OSGi DI */
+  public void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
   }
 
   /**
@@ -99,17 +85,6 @@ public final class OsgiJpaAclTransitionDb implements AclTransitionDb {
    */
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for ACL manager");
-    final String emName = "org.opencastproject.authorization.xacml.manager";
-    emf = persistenceProvider.createEntityManagerFactory(emName, persistenceProperties);
-  }
-
-  /**
-   * Closes entity manager factory.
-   *
-   * @param cc
-   */
-  public void deactivate(ComponentContext cc) {
-    emf.close();
   }
 
   @Override

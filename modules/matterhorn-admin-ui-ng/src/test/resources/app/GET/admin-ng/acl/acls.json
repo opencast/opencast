@@ -1,0 +1,36 @@
+{
+    "count": 1,
+    "limit": 0,
+    "offset": 0,
+    "results": [
+        {
+            "acl": {
+                "ace": [
+                    {
+                        "action": "read",
+                        "allow": true,
+                        "role": "ROLE_ADMIN"
+                    },
+                    {
+                        "action": "write",
+                        "allow": true,
+                        "role": "ROLE_ADMIN"
+                    },
+                    {
+                        "action": "read",
+                        "allow": true,
+                        "role": "ROLE_ANONYMOUS"
+                    },
+                    {
+                        "action": "write",
+                        "allow": false,
+                        "role": "ROLE_ANONYMOUS"
+                    }
+                ]
+            },
+            "id": 31151,
+            "name": "\u2022mock\u2022 Sample ACL",
+            "organizationId": "mh_default_org"
+        }
+    ]
+}

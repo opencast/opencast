@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.workflow.api;
 
 /**
@@ -21,9 +27,6 @@ package org.opencastproject.workflow.api;
 public class WorkflowOperationException extends Exception {
 
   private static final long serialVersionUID = 5840096157653799867L;
-
-  /** The failing workflow operation */
-  private WorkflowOperationInstance operation = null;
 
   /**
    * Constructs a new {@link WorkflowOperationException} with a message and a root cause.
@@ -55,28 +58,6 @@ public class WorkflowOperationException extends Exception {
    */
   public WorkflowOperationException(Throwable cause) {
     super(cause);
-  }
-
-  /**
-   * Constructs a new {@link WorkflowOperationException} with a root cause.
-   *
-   * @param cause
-   *          The exception that caused this problem
-   * @param operation
-   *          the failing operation
-   */
-  public WorkflowOperationException(Throwable cause, WorkflowOperationInstance operation) {
-    super(cause);
-    this.operation = operation;
-  }
-
-  /**
-   * Returns the workflow operation instance which caused the failure.
-   *
-   * @return the operation
-   */
-  public WorkflowOperationInstance getOperation() {
-    return operation;
   }
 
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true"
+    name="org.opencastproject.serviceregistry.impl.endpoint.IncidentServiceEndpoint">
+  <implementation class="org.opencastproject.serviceregistry.impl.endpoint.IncidentServiceEndpoint" />
+  <property name="service.description" value="Incident Service REST Endpoint" />
+
+  <property name="opencast.service.type" value="org.opencastproject.incident" />
+  <property name="opencast.service.path" value="/incidents" />
+
+  <service>
+    <provide interface="org.opencastproject.serviceregistry.impl.endpoint.IncidentServiceEndpoint" />
+  </service>
+  <reference name="incidentService" interface="org.opencastproject.serviceregistry.api.IncidentService"
+    cardinality="1..1" policy="static" bind="setIncidentService" />
+</scr:component>

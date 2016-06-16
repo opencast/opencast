@@ -1,0 +1,28 @@
+{
+    "system_acls": [
+        {
+            "id": 43,
+            "name": "Public"
+        },
+        {
+            "id": 44,
+            "name": "Private"
+        }
+    ],
+    "series_access": {
+        "transitions": [
+            {
+                "id": 1,
+                "application_date": "2014-06-05T15:00:00Z",
+                "done": false,
+                "acl_id": 43,
+                "is_deleted": false
+            }
+        ],
+        "privileges": {
+            "ROLE_ANONYMOUS": {
+                "read": true
+            }
+        }
+    }
+}

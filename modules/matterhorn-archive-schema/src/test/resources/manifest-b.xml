@@ -1,0 +1,15 @@
+<mediapackage xmlns="http://mediapackage.opencastproject.org" id="mp-b" start="2007-12-05T13:40:00"
+  duration="1004400000">
+  <series>series-b</series>
+  <seriestitle>British literature</seriestitle>
+  <metadata>
+    <catalog id="catalog-1" type="dublincore/episode">
+      <mimetype>text/xml</mimetype>
+      <url>dublincore-b.xml</url>
+    </catalog>
+    <catalog id="catalog-2" type="dublincore/series" ref="series:series-b">
+      <mimetype>text/xml</mimetype>
+      <url>series-dublincore-b.xml</url>
+    </catalog>
+  </metadata>
+</mediapackage>

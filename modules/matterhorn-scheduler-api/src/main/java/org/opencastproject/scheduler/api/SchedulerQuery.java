@@ -1,21 +1,27 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.scheduler.api;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -68,6 +74,10 @@ public class SchedulerQuery {
   protected Date endsTo;
   /** Rights holder search */
   protected String rightsHolder;
+  /** Whether the event is opted out */
+  protected boolean optOut = false;
+  /** Whether the event is blacklisted */
+  protected boolean blacklisted = false;
   /** Sort by field */
   protected Sort sort = Sort.EVENT_START;
   /** Sort order */
@@ -211,7 +221,7 @@ public class SchedulerQuery {
    * @return
    */
   public SchedulerQuery setPublisher(String publisher) {
-    if (StringUtils.isNotBlank(subject)) {
+    if (StringUtils.isNotBlank(publisher)) {
       this.publisher = publisher;
     }
     return this;
@@ -224,7 +234,7 @@ public class SchedulerQuery {
    * @return
    */
   public SchedulerQuery setDescription(String description) {
-    if (StringUtils.isNotBlank(subject)) {
+    if (StringUtils.isNotBlank(description)) {
       this.description = description;
     }
     return this;
@@ -294,9 +304,31 @@ public class SchedulerQuery {
    * @return
    */
   public SchedulerQuery setRightsHolder(String rightsHolder) {
-    if (StringUtils.isNotBlank(subject)) {
+    if (StringUtils.isNotBlank(rightsHolder)) {
       this.rightsHolder = rightsHolder;
     }
+    return this;
+  }
+
+  /**
+   * Set search by opt out status
+   *
+   * @param optOut
+   * @return
+   */
+  public SchedulerQuery setOptOut(boolean optOut) {
+    this.optOut = optOut;
+    return this;
+  }
+
+  /**
+   * Set search by blacklist status
+   *
+   * @param blacklisted
+   * @return
+   */
+  public SchedulerQuery setBlacklisted(boolean blacklisted) {
+    this.blacklisted = blacklisted;
     return this;
   }
 
@@ -338,6 +370,7 @@ public class SchedulerQuery {
     }
     return this;
   }
+
   /**
    * Set sort field with ascending order
    *
@@ -534,6 +567,24 @@ public class SchedulerQuery {
    */
   public String getRightsHolder() {
     return rightsHolder;
+  }
+
+  /**
+   * Get opt out status
+   *
+   * @return
+   */
+  public boolean isOptOut() {
+    return optOut;
+  }
+
+  /**
+   * Get blacklist status
+   *
+   * @return
+   */
+  public boolean isBlacklisted() {
+    return blacklisted;
   }
 
   public String getIdentifier() {

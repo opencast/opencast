@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 
 package org.opencastproject.util;
 
@@ -28,6 +34,8 @@ import java.io.PrintWriter;
 
 /**
  * Helper class to handle Runtime.exec() output.
+ *
+ * @deprecated use {@link StreamConsumer} instead
  */
 public class StreamHelper extends Thread {
 
@@ -141,35 +149,30 @@ public class StreamHelper extends Thread {
   /**
    * Thread run
    */
+  @Override
   public void run() {
-
-    BufferedReader bufferedReader = null;
-    InputStreamReader streamReader = null;
-
+    BufferedReader reader = null;
     try {
       if (outputStream != null) {
         writer = new PrintWriter(outputStream);
       }
-      streamReader = new InputStreamReader(inputStream);
-      bufferedReader = new BufferedReader(streamReader);
-
+      reader = new BufferedReader(new InputStreamReader(inputStream));
       // Whether any content has been read
       boolean foundContent = false;
-
       // Keep reading either until there is nothing more to read from or we are told to stop waiting
       while (keepReading || foundContent) {
-        while (!bufferedReader.ready()) {
+        while (!reader.ready()) {
           try {
-            foundContent = false;
             Thread.sleep(100);
           } catch (InterruptedException e) {
             logger.debug("Closing process stream");
             return;
           }
-          if (!keepReading && !bufferedReader.ready())
+          if (!keepReading && !reader.ready()) {
             return;
+          }
         }
-        String line = bufferedReader.readLine();
+        final String line = reader.readLine();
         append(line);
         log(line);
         foundContent = true;
@@ -177,13 +180,13 @@ public class StreamHelper extends Thread {
       if (writer != null)
         writer.flush();
     } catch (IOException e) {
-      if (keepReading)
+      if (keepReading) {
         logger.error("Error reading process stream: {}", e.getMessage(), e);
+      }
     } catch (Throwable t) {
       logger.debug("Unknown error while reading from process input: {}", t.getMessage());
     } finally {
-      IoSupport.closeQuietly(streamReader);
-      IoSupport.closeQuietly(bufferedReader);
+      IoSupport.closeQuietly(reader);
       IoSupport.closeQuietly(writer);
     }
   }
@@ -220,5 +223,4 @@ public class StreamHelper extends Thread {
       processLogger.info(output);
     }
   }
-
 }

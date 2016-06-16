@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.search.endpoint;
 
 import org.opencastproject.job.api.JaxbJob;
@@ -31,7 +37,7 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +71,9 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 public class SearchRestService extends AbstractJobProducerEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(SearchRestService.class);
+
+  /** The constant used to switch the direction of the sorting querystring parameter. */
+  public static final String DESCENDING_SUFFIX = "_DESC";
 
   /** The search service */
   protected SearchServiceImpl searchService;
@@ -129,6 +138,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "Any series that matches this free-text query. If the additional boolean parameter \"episodes\" is \"true\", "
                   + "the result set will include this series episodes.", isRequired = false, name = "q", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "false", description = "Whether to include this series episodes. This can be used in combination with \"id\" or \"q\".", isRequired = false, name = "episodes", type = RestParameter.Type.STRING),
+          @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
+                  + "of the following: DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
+                  + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "20", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "false", description = "Whether this is an administrative query", isRequired = false, name = "admin", type = RestParameter.Type.BOOLEAN) }, reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, expressed as xml or json.")
@@ -136,6 +148,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       @QueryParam("id")       String  id,
       @QueryParam("q")        String  text,
       @QueryParam("episodes") boolean includeEpisodes,
+      @QueryParam("sort")     String sort,
       @QueryParam("limit")    int     limit,
       @QueryParam("offset")   int     offset,
       @QueryParam("admin")    boolean admin,
@@ -158,7 +171,27 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     if (StringUtils.isNotBlank(text))
       query.withText(text);
 
-    query.withPublicationDateSort(true);
+    query.withSort(SearchQuery.Sort.DATE_CREATED, false);
+    if (StringUtils.isNotBlank(sort)) {
+      // Parse the sort field and direction
+      SearchQuery.Sort sortField = null;
+      if (sort.endsWith(DESCENDING_SUFFIX)) {
+        String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
+        try {
+          sortField = SearchQuery.Sort.valueOf(enumKey);
+          query.withSort(sortField, false);
+        } catch (IllegalArgumentException e) {
+          logger.warn("No sort enum matches '{}'", enumKey);
+        }
+      } else {
+        try {
+          sortField = SearchQuery.Sort.valueOf(sort);
+          query.withSort(sortField);
+        } catch (IllegalArgumentException e) {
+          logger.warn("No sort enum matches '{}'", sort);
+        }
+      }
+    }
     query.withLimit(limit);
     query.withOffset(offset);
 
@@ -191,11 +224,14 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           // @RestParameter(defaultValue = "false", description =
           // "Whether to include this series episodes. This can be used in combination with \"id\" or \"q\".",
           // isRequired = false, name = "episodes", type = RestParameter.Type.STRING),
+          @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
+                  + "of the following: DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
+                  + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = RestParameter.Type.STRING),          
           @RestParameter(defaultValue = "20", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "false", description = "Whether this is an administrative query", isRequired = false, name = "admin", type = RestParameter.Type.BOOLEAN) }, reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, expressed as xml or json.")
   public Response getEpisode(@QueryParam("id") String id, @QueryParam("q") String text,
-          @QueryParam("sid") String seriesId, @QueryParam("tag") String[] tags, @QueryParam("flavor") String[] flavors,
+          @QueryParam("sid") String seriesId, @QueryParam("sort") String sort, @QueryParam("tag") String[] tags, @QueryParam("flavor") String[] flavors,
           @QueryParam("limit") int limit, @QueryParam("offset") int offset, @QueryParam("admin") boolean admin,
           @PathParam("format") String format) throws SearchException, UnauthorizedException {
     // CHECKSTYLE:ON
@@ -218,8 +254,28 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
     if (StringUtils.isNotBlank(text)) {
       search.withText(text);
-    } else {
-      search.withPublicationDateSort(true);
+    }
+
+    search.withSort(SearchQuery.Sort.DATE_CREATED, false);
+    if (StringUtils.isNotBlank(sort)) {
+      // Parse the sort field and direction
+      SearchQuery.Sort sortField = null;
+      if (sort.endsWith(DESCENDING_SUFFIX)) {
+        String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
+        try {
+          sortField = SearchQuery.Sort.valueOf(enumKey);
+          search.withSort(sortField, false);
+        } catch (IllegalArgumentException e) {
+          logger.warn("No sort enum matches '{}'", enumKey);
+        }
+      } else {
+        try {
+          sortField = SearchQuery.Sort.valueOf(sort);
+          search.withSort(sortField);
+        } catch (IllegalArgumentException e) {
+          logger.warn("No sort enum matches '{}'", sort);
+        }
+      }
     }
 
     // Build the response
@@ -245,17 +301,40 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
   @RestQuery(name = "lucene", description = "Search a lucene query.", pathParameters = { @RestParameter(description = "The output format (json or xml) of the response body.", isRequired = true, name = "format", type = RestParameter.Type.STRING) }, restParameters = {
           @RestParameter(defaultValue = "", description = "The lucene query.", isRequired = false, name = "q", type = RestParameter.Type.STRING),
+          @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
+                  + "of the following: DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
+                  + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "20", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "false", description = "Whether this is an administrative query", isRequired = false, name = "admin", type = RestParameter.Type.BOOLEAN) }, reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, expressed as xml or json")
-  public Response getByLuceneQuery(@QueryParam("q") String q, @QueryParam("limit") int limit,
+  public Response getByLuceneQuery(@QueryParam("q") String q, @QueryParam("sort") String sort, @QueryParam("limit") int limit,
           @QueryParam("offset") int offset, @QueryParam("admin") boolean admin, @PathParam("format") String format)
           throws SearchException, UnauthorizedException {
     SearchQuery query = new SearchQuery();
     if (!StringUtils.isBlank(q))
       query.withQuery(q);
-    else
-      query.withPublicationDateSort(true);
+
+    query.withSort(SearchQuery.Sort.DATE_CREATED, false);
+    if (StringUtils.isNotBlank(sort)) {
+      // Parse the sort field and direction
+      SearchQuery.Sort sortField = null;
+      if (sort.endsWith(DESCENDING_SUFFIX)) {
+        String enumKey = sort.substring(0, sort.length() - DESCENDING_SUFFIX.length()).toUpperCase();
+        try {
+          sortField = SearchQuery.Sort.valueOf(enumKey);
+          query.withSort(sortField, false);
+        } catch (IllegalArgumentException e) {
+          logger.warn("No sort enum matches '{}'", enumKey);
+        }
+      } else {
+        try {
+          sortField = SearchQuery.Sort.valueOf(sort);
+          query.withSort(sortField);
+        } catch (IllegalArgumentException e) {
+          logger.warn("No sort enum matches '{}'", sort);
+        }
+      }
+    }
     query.withLimit(limit);
     query.withOffset(offset);
 

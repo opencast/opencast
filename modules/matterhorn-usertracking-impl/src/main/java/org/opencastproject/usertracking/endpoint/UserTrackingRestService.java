@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.usertracking.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
@@ -20,11 +26,13 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.usertracking.api.UserSession;
 import org.opencastproject.usertracking.api.UserTrackingException;
 import org.opencastproject.usertracking.api.UserTrackingService;
 import org.opencastproject.usertracking.impl.UserActionImpl;
 import org.opencastproject.usertracking.impl.UserActionListImpl;
+import org.opencastproject.usertracking.impl.UserSessionImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -33,7 +41,7 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +118,7 @@ public class UserTrackingRestService {
     if (cc == null) {
       serverUrl = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
+      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
       logger.info("configured server url is {}", ccServerUrl);
       if (ccServerUrl == null) {
         serverUrl = UrlSupport.DEFAULT_BASE_URL;
@@ -247,8 +255,9 @@ public class UserTrackingRestService {
   @RestQuery(name = "add", description = "Record a user action", returnDescription = "An XML representation of the user action", restParameters = {
           @RestParameter(name = "id", description = "The episode identifier", isRequired = true, type = Type.STRING),
           @RestParameter(name = "type", description = "The episode identifier", isRequired = true, type = Type.STRING),
-          @RestParameter(name = "in", description = "The beginning of the time range", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "out", description = "The end of the time range", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_CREATED, description = "An XML representation of the user action") })
+          @RestParameter(name = "in", description = "The beginning of the time range", isRequired = true, type = Type.STRING),
+          @RestParameter(name = "out", description = "The end of the time range", isRequired = false, type = Type.STRING),
+          @RestParameter(name = "playing", description = "Whether the player is currently playing", isRequired = false, type = Type.STRING)}, reponses = { @RestResponse(responseCode = SC_CREATED, description = "An XML representation of the user action") })
   public Response addFootprint(@FormParam("id") String mediapackageId, @FormParam("in") String inString,
           @FormParam("out") String outString, @FormParam("type") String type, @FormParam("playing") String isPlaying,
           @Context HttpServletRequest request) {
@@ -275,33 +284,43 @@ public class UserTrackingRestService {
       try {
         out = Integer.parseInt(StringUtils.trim(outString));
       } catch (NumberFormatException e) {
-        throw new WebApplicationException(e, Response.status(Status.BAD_REQUEST).entity("in must be a non null integer").build());
+        throw new WebApplicationException(e, Response.status(Status.BAD_REQUEST).entity("out must be a non null integer").build());
       }
     }
 
-    UserActionImpl a = new UserActionImpl();
-    a.setMediapackageId(mediapackageId);
-    a.setUserId(userId);
-    a.setSessionId(sessionId);
-    a.setInpoint(in);
-    a.setOutpoint(out);
-    a.setType(type);
-    a.setIsPlaying(Boolean.valueOf(isPlaying));
-
-    // MH-8616 the connection might be via a proxy
+    //MH-8616 the connection might be via a proxy
     String clientIP = request.getHeader("X-FORWARDED-FOR");
 
     if (clientIP == null) {
       clientIP = request.getRemoteAddr();
     }
     logger.debug("Got client ip: {}", clientIP);
-    a.setUserIp(clientIP);
+
+    UserSession s = new UserSessionImpl();
+    s.setSessionId(sessionId);
+    s.setUserIp(clientIP);
+    s.setUserId(userId);
+    //Column length is currently 255, let's limit it to that.
+    String userAgent = StringUtils.trimToNull(request.getHeader("User-Agent"));
+    if (userAgent != null && userAgent.length() > 255) {
+      s.setUserAgent(userAgent.substring(0, 255));
+    } else {
+      s.setUserAgent(userAgent);
+    }
+
+    UserActionImpl a = new UserActionImpl();
+    a.setMediapackageId(mediapackageId);
+    a.setSession(s);
+    a.setInpoint(in);
+    a.setOutpoint(out);
+    a.setType(type);
+    a.setIsPlaying(Boolean.valueOf(isPlaying));
 
     try {
       if ("FOOTPRINT".equals(type)) {
-        a = (UserActionImpl) usertrackingService.addUserFootprint(a);
+        a = (UserActionImpl) usertrackingService.addUserFootprint(a, s);
       } else {
-        a = (UserActionImpl) usertrackingService.addUserTrackingEvent(a);
+        a = (UserActionImpl) usertrackingService.addUserTrackingEvent(a, s);
       }
     } catch (UserTrackingException e) {
       throw new WebApplicationException(e);

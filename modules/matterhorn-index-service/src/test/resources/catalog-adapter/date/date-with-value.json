@@ -1,0 +1,8 @@
+{
+   "readOnly":false,
+   "id":"TestInputID",
+   "label":"A_LABEL_FOR_THIS_PROPERTY",
+   "type":"date",
+   "value":"2014-11-07 09-49-30",
+   "required":false
+}

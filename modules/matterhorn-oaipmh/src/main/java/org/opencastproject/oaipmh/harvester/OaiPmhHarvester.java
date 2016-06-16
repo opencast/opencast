@@ -1,22 +1,36 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
 
+
 package org.opencastproject.oaipmh.harvester;
 
-import org.joda.time.DateTime;
+import static org.opencastproject.oaipmh.harvester.LastHarvested.cleanup;
+import static org.opencastproject.oaipmh.harvester.LastHarvested.getLastHarvestDate;
+import static org.opencastproject.oaipmh.harvester.LastHarvested.update;
+import static org.opencastproject.oaipmh.util.ConcurrencyUtil.shutdownAndAwaitTermination;
+import static org.opencastproject.oaipmh.util.OsgiUtil.checkDictionary;
+import static org.opencastproject.oaipmh.util.OsgiUtil.getCfg;
+import static org.opencastproject.oaipmh.util.OsgiUtil.getCfgAsInt;
+import static org.opencastproject.oaipmh.util.PersistenceUtil.newPersistenceEnvironment;
+
 import org.opencastproject.oaipmh.util.PersistenceEnv;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -26,6 +40,8 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
+
+import org.joda.time.DateTime;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -39,15 +55,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static org.opencastproject.oaipmh.harvester.LastHarvested.cleanup;
-import static org.opencastproject.oaipmh.harvester.LastHarvested.getLastHarvestDate;
-import static org.opencastproject.oaipmh.harvester.LastHarvested.update;
-import static org.opencastproject.oaipmh.util.ConcurrencyUtil.shutdownAndAwaitTermination;
-import static org.opencastproject.oaipmh.util.OsgiUtil.checkDictionary;
-import static org.opencastproject.oaipmh.util.OsgiUtil.getCfg;
-import static org.opencastproject.oaipmh.util.OsgiUtil.getCfgAsInt;
-import static org.opencastproject.oaipmh.util.PersistenceUtil.newEntityManagerFactory;
-import static org.opencastproject.oaipmh.util.PersistenceUtil.newPersistenceEnvironment;
+import javax.persistence.EntityManagerFactory;
 
 /**
  * The harvester queries OAI-PMH repositories for a certain metadata prefix and passes
@@ -81,10 +89,16 @@ public class OaiPmhHarvester implements ManagedService {
   private static final String REF_RECORD_HANDLER = "recordHandler";
 
   private ComponentContext componentContext;
+  private EntityManagerFactory emf;
 
   private ScheduledExecutorService scheduler;
 
   private PersistenceEnv penv;
+
+  /** OSGi DI */
+  void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
+  }
 
   /**
    * @see #activate(ComponentContext)
@@ -108,7 +122,7 @@ public class OaiPmhHarvester implements ManagedService {
       logger.info("Schedule harvesting " + urlsRaw + " at " + initialDelay + ", " + period + " (minutes)");
       final Function0<Void> secConf = createSecurityConfigurator(properties, componentContext);
       // get persistence provider
-      penv = newPersistenceEnvironment(newEntityManagerFactory(componentContext, "org.opencastproject.oaipmh.harvester"));
+      penv = newPersistenceEnvironment(emf);
       // create a new worker
       Worker worker = new Worker(urls, recordhandler, secConf, penv);
       scheduler.scheduleAtFixedRate(worker, initialDelay, period, TimeUnit.MINUTES);

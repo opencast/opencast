@@ -1,21 +1,48 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.fileupload.rest;
 
+import org.opencastproject.fileupload.api.FileUploadService;
+import org.opencastproject.fileupload.api.exception.FileUploadException;
+import org.opencastproject.fileupload.api.job.FileUploadJob;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.util.doc.rest.RestParameter;
+import org.opencastproject.util.doc.rest.RestQuery;
+import org.opencastproject.util.doc.rest.RestResponse;
+import org.opencastproject.util.doc.rest.RestService;
+
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.util.Streams;
+import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -28,23 +55,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.fileupload.util.Streams;
-import org.opencastproject.fileupload.api.FileUploadService;
-import org.opencastproject.fileupload.api.exception.FileUploadException;
-import org.opencastproject.fileupload.api.job.FileUploadJob;
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
-import org.opencastproject.util.doc.rest.RestParameter;
-import org.opencastproject.util.doc.rest.RestQuery;
-import org.opencastproject.util.doc.rest.RestResponse;
-import org.opencastproject.util.doc.rest.RestService;
-import org.osgi.service.component.ComponentContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** REST endpoint for large file uploads.
  *
@@ -63,13 +73,13 @@ import org.slf4j.LoggerFactory;
 public class FileUploadRestService {
 
   // message field names
-  final String REQUESTFIELD_FILENAME = "filename";
-  final String REQUESTFIELD_FILESIZE = "filesize";
-  final String REQUESTFIELD_DATA = "filedata";
-  final String REQUESTFIELD_CHUNKSIZE = "chunksize";
-  final String REQUESTFIELD_CHUNKNUM = "chunknumber";
-  final String REQUESTFIELD_MEDIAPACKAGE = "mediapackage";
-  final String REQUESTFIELD_FLAVOR = "flavor";
+  static final String REQUESTFIELD_FILENAME = "filename";
+  static final String REQUESTFIELD_FILESIZE = "filesize";
+  static final String REQUESTFIELD_DATA = "filedata";
+  static final String REQUESTFIELD_CHUNKSIZE = "chunksize";
+  static final String REQUESTFIELD_CHUNKNUM = "chunknumber";
+  static final String REQUESTFIELD_MEDIAPACKAGE = "mediapackage";
+  static final String REQUESTFIELD_FLAVOR = "flavor";
   private static final Logger log = LoggerFactory.getLogger(FileUploadRestService.class);
   private FileUploadService uploadService;
   private MediaPackageBuilderFactory factory = null;
@@ -116,7 +126,7 @@ public class FileUploadRestService {
           @FormParam(REQUESTFIELD_MEDIAPACKAGE) String mediapackage,
           @FormParam(REQUESTFIELD_FLAVOR) String flav) {
     try {
-      if (filename == null || filename.trim().length() == 0) {
+      if (StringUtils.isBlank(filename)) {
         filename = "john.doe";
       }
       if (filesize < 1) {
@@ -126,12 +136,12 @@ public class FileUploadRestService {
         chunksize = -1;
       }
       MediaPackage mp = null;
-      if (mediapackage != null && !mediapackage.equals("")) {
+      if (StringUtils.isNotBlank(mediapackage)) {
         mp = factory.newMediaPackageBuilder().loadFromXml(mediapackage);
       }
 
       MediaPackageElementFlavor flavor = null;
-      if (flav != null && !flav.equals("")) {
+      if (StringUtils.isNotBlank(flav)) {
         flavor = new MediaPackageElementFlavor(flav.split("/")[0], flav.split("/")[1]);
       }
 
@@ -284,7 +294,7 @@ public class FileUploadRestService {
     StringBuilder sb = new StringBuilder();
     sb.append("Unexpected error (").append(e.getClass().getName()).append(")");
     String message = e.getMessage();
-    if (message != null && message.length() > 0) {
+    if (StringUtils.isNotBlank(message)) {
       sb.append(": ").append(message);
     }
     return sb.toString();

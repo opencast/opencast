@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.caption.impl;
 
 import static org.opencastproject.util.MimeType.mimeType;
@@ -36,14 +42,17 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +65,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 
@@ -67,7 +77,7 @@ import javax.activation.FileTypeMap;
  * match for specified input or output format {@link UnsupportedCaptionFormatException} is thrown.
  *
  */
-public class CaptionServiceImpl extends AbstractJobProducer implements CaptionService {
+public class CaptionServiceImpl extends AbstractJobProducer implements CaptionService, ManagedService {
 
   /**
    * Creates a new caption service.
@@ -86,6 +96,15 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
 
   /** The collection name */
   public static final String COLLECTION = "captions";
+
+  /** The load introduced on the system by creating a caption job */
+  public static final float DEFAULT_CAPTION_JOB_LOAD = 0.1f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_CAPTION_JOB_LOAD} */
+  public static final String CAPTION_JOB_LOAD_KEY = "job.load.caption";
+
+  /** The load introduced on the system by creating a caption job */
+  private float captionJobLoad = DEFAULT_CAPTION_JOB_LOAD;
 
   /** Reference to workspace */
   protected Workspace workspace;
@@ -134,7 +153,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Convert.toString(),
-              Arrays.asList(MediaPackageElementParser.getAsXml(input), inputFormat, outputFormat));
+              Arrays.asList(MediaPackageElementParser.getAsXml(input), inputFormat, outputFormat), captionJobLoad);
     } catch (ServiceRegistryException e) {
       throw new CaptionConverterException("Unable to create a job", e);
     }
@@ -161,7 +180,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.ConvertWithLanguage.toString(),
-              Arrays.asList(MediaPackageElementParser.getAsXml(input), inputFormat, outputFormat, language));
+              Arrays.asList(MediaPackageElementParser.getAsXml(input), inputFormat, outputFormat, language), captionJobLoad);
     } catch (ServiceRegistryException e) {
       throw new CaptionConverterException("Unable to create a job", e);
     }
@@ -531,6 +550,11 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
   @Override
   protected ServiceRegistry getServiceRegistry() {
     return serviceRegistry;
+  }
+
+  @Override
+  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+    captionJobLoad = LoadUtil.getConfiguredLoadValue(properties, CAPTION_JOB_LOAD_KEY, DEFAULT_CAPTION_JOB_LOAD, serviceRegistry);
   }
 
 }

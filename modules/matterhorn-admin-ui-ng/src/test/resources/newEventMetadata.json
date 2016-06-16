@@ -1,0 +1,75 @@
+[
+    {
+        "id": "title",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.TITLE",
+        "type": "text"
+    },
+    {
+        "id": "presenters",
+        "readOnly": false,
+        "value": [
+            
+        ],
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.PRESENTER",
+        "type": "text"
+    },
+    {
+        "id": "series",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.SERIES",
+        "collection": {
+            "uuid-series2": "Series 2",
+            "uuid-series1": "Series 1"
+        },
+        "type": "text"
+    },
+    {
+        "id": "contributors",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.CONTRIBUTORS",
+        "type": "text"
+    },
+    {
+        "id": "subject",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.SUBJECT",
+        "type": "text"
+    },
+    {
+        "id": "language",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.LANGUAGE",
+        "type": "text"
+    },
+    {
+        "id": "description",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.DESCRIPTION",
+        "type": "text"
+    },
+    {
+        "id": "rightsHolder",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.RIGHTS",
+        "type": "text"
+    },
+    {
+        "id": "license",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.LICENSE",
+        "collection": {
+            "Creative Commons 3.0: Attribution-NonCommercial-NoDerivs": "Creative Commons 3.0: Attribution-NonCommercial-NoDerivs",
+            "All Rights Reserved": "All Rights Reserved"
+        },
+        "type": "text"
+    }
+]

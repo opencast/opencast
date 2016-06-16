@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.usertracking.api;
 
 import org.opencastproject.util.NotFoundException;
@@ -32,11 +38,13 @@ public interface UserTrackingService {
    *
    * @param a
    *          The UserAction that will be added to the database
+   * @param session
+   *          The UserSession associated with this footprint
    * @return the updated annotation, with a new ID. NULL if there are errors while adding the annotation.
    * @throws UserTrackingException
    *           if the user tracking service encounters an error
    */
-  UserAction addUserFootprint(UserAction a) throws UserTrackingException;
+  UserAction addUserFootprint(UserAction a, UserSession session) throws UserTrackingException;
 
   /**
    * Adds a new tracking event to the database and returns the event with an updated annotationId, to make sure the
@@ -44,11 +52,13 @@ public interface UserTrackingService {
    *
    * @param a
    *          The UserAction that will be added to the database
+   * @param session
+   *          The UserSession associated with this footprint
    * @return the updated annotation, with a new ID. NULL if there are errors while adding the annotation.
    * @throws UserTrackingException
    *           if the user tracking service encounters an error
    */
-  UserAction addUserTrackingEvent(UserAction a) throws UserTrackingException;
+  UserAction addUserTrackingEvent(UserAction a, UserSession session) throws UserTrackingException;
 
   /**
    * Returns annotations
@@ -205,21 +215,6 @@ public interface UserTrackingService {
    *           if the user tracking service encounters an error
    */
   Report getReport(int offset, int limit) throws UserTrackingException;
-
-  /**
-   * Gets the summary of user activity for a given media package and type of activity.
-   *
-   * @param key
-   *          The annotation key to look for.
-   * @param mediapackageId
-   *          The mediapackage to collect the summaries from.
-   * @param offset
-   *          The offset
-   * @param limit
-   *          The limit
-   * @return A summary of all user activity that the user is able to see.
-   */
-  UserSummaryList getUserSummaryByTypeAndMediaPackage(String key, String mediapackageId);
 
   /**
    * Returns a list of footprints, if a userId is passed only the footprints of that user are returned.

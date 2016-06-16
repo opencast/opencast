@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.mediapackage;
 
 import org.opencastproject.util.Checksum;
@@ -27,6 +33,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -81,7 +88,8 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   protected URI uri = null;
 
   /** Size in bytes */
-  protected long size = -1L;
+  @XmlElement(name = "size")
+  protected Long size = null;
 
   /** The element's checksum */
   @XmlElement(name = "checksum")
@@ -109,7 +117,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    *          the elements location
    */
   protected AbstractMediaPackageElement(Type elementType, MediaPackageElementFlavor flavor, URI uri) {
-    this(null, elementType, flavor, uri, -1, null, null);
+    this(null, elementType, flavor, uri, null, null, null);
   }
 
   /**
@@ -128,7 +136,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    * @param mimeType
    *          the element mime type
    */
-  protected AbstractMediaPackageElement(Type elementType, MediaPackageElementFlavor flavor, URI uri, long size,
+  protected AbstractMediaPackageElement(Type elementType, MediaPackageElementFlavor flavor, URI uri, Long size,
           Checksum checksum, MimeType mimeType) {
     this(null, elementType, flavor, uri, size, checksum, mimeType);
   }
@@ -152,7 +160,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    *          the element mime type
    */
   protected AbstractMediaPackageElement(String id, Type elementType, MediaPackageElementFlavor flavor, URI uri,
-          long size, Checksum checksum, MimeType mimeType) {
+          Long size, Checksum checksum, MimeType mimeType) {
     if (elementType == null)
       throw new IllegalArgumentException("Argument 'elementType' is null");
     this.id = id;
@@ -359,7 +367,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    */
   @Override
   public long getSize() {
-    return size;
+    return size != null ? size : -1;
   }
 
   /**
@@ -472,7 +480,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */
   @Override
-  public Node toManifest(Document document, MediaPackageSerializer serializer) {
+  public Node toManifest(Document document, MediaPackageSerializer serializer) throws MediaPackageException {
     Element node = document.createElement(elementType.toString().toLowerCase());
     if (id != null)
       node.setAttribute("id", id);
@@ -506,7 +514,12 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
 
     // Url
     Element urlNode = document.createElement("url");
-    String urlValue = (serializer != null) ? serializer.encodeURI(uri) : uri.toString();
+    String urlValue;
+    try {
+      urlValue = (serializer != null) ? serializer.encodeURI(uri).toString() : uri.toString();
+    } catch (URISyntaxException e) {
+      throw new MediaPackageException(e);
+    }
     urlNode.appendChild(document.createTextNode(urlValue));
     node.appendChild(urlNode);
 
@@ -518,7 +531,7 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
     }
 
     // Size
-    if (size != -1) {
+    if (size != null && size != -1) {
       Element sizeNode = document.createElement("size");
       sizeNode.appendChild(document.createTextNode(Long.toString(size)));
       node.appendChild(sizeNode);
@@ -545,8 +558,8 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   }
 
   /**
-   * Attention: The media package reference is not being cloned so that calling <code>getMediaPackage()</code>
-   * on the clone yields null.
+   * Attention: The media package reference is not being cloned so that calling <code>getMediaPackage()</code> on the
+   * clone yields null.
    */
   @Override
   public Object clone() {

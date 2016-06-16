@@ -1,28 +1,33 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.workflow.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.opencastproject.workflow.api.WorkflowService.READ_PERMISSION;
-import static org.opencastproject.workflow.api.WorkflowService.WRITE_PERMISSION;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -34,11 +39,13 @@ import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
@@ -116,16 +123,18 @@ public class WorkflowServiceImplAuthzTest {
 
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(defaultOrganization);
 
-    instructor1 = new JaxbUser("instructor1", jaxbOrganization, new JaxbRole("ROLE_INSTRUCTOR", jaxbOrganization));
-    instructor2 = new JaxbUser("instructor2", jaxbOrganization, new JaxbRole("ROLE_INSTRUCTOR", jaxbOrganization));
+    instructor1 = new JaxbUser("instructor1", "test", jaxbOrganization, new JaxbRole("ROLE_INSTRUCTOR",
+            jaxbOrganization));
+    instructor2 = new JaxbUser("instructor2", "test", jaxbOrganization, new JaxbRole("ROLE_INSTRUCTOR",
+            jaxbOrganization));
 
     JaxbOrganization differentOrg = new JaxbOrganization("differentorg");
-    instructorFromDifferentOrg = new JaxbUser("instructor3", differentOrg,
-            new JaxbRole("ROLE_INSTRUCTOR", differentOrg));
+    instructorFromDifferentOrg = new JaxbUser("instructor3", "test", differentOrg, new JaxbRole("ROLE_INSTRUCTOR",
+            differentOrg));
 
     JaxbOrganization doesntMatterOrg = new JaxbOrganization("org doesn't matter");
-    globalAdmin = new JaxbUser("global_admin", doesntMatterOrg, new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE,
-            doesntMatterOrg));
+    globalAdmin = new JaxbUser("global_admin", "test", doesntMatterOrg, new JaxbRole(
+            SecurityConstants.GLOBAL_ADMIN_ROLE, doesntMatterOrg));
 
     users = new HashMap<String, User>();
     users.put(instructor1.getUsername(), instructor1);
@@ -135,6 +144,7 @@ public class WorkflowServiceImplAuthzTest {
     users.put(globalAdmin.getUsername(), globalAdmin);
 
     service = new WorkflowServiceImpl() {
+      @Override
       public Set<HandlerRegistration> getRegisteredHandlers() {
         return new HashSet<WorkflowServiceImpl.HandlerRegistration>();
       }
@@ -199,9 +209,12 @@ public class WorkflowServiceImplAuthzTest {
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
 
+    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
+    EasyMock.replay(messageSender);
+
     // Service Registry
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
-            organizationDirectoryService);
+            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
     service.setServiceRegistry(serviceRegistry);
 
     // Search Index
@@ -215,6 +228,7 @@ public class WorkflowServiceImplAuthzTest {
     dao.solrRoot = sRoot + File.separator + "solr." + System.currentTimeMillis();
     dao.activate("System Admin");
     service.setDao(dao);
+    service.setMessageSender(messageSender);
 
     // Activate
     service.activate(null);
@@ -232,8 +246,8 @@ public class WorkflowServiceImplAuthzTest {
 
     // Create an ACL for the authorization service to return
     AccessControlList acl = new AccessControlList();
-    acl.getEntries().add(new AccessControlEntry("ROLE_INSTRUCTOR", READ_PERMISSION, true));
-    acl.getEntries().add(new AccessControlEntry("ROLE_INSTRUCTOR", WRITE_PERMISSION, true));
+    acl.getEntries().add(new AccessControlEntry("ROLE_INSTRUCTOR", Permissions.Action.READ.toString(), true));
+    acl.getEntries().add(new AccessControlEntry("ROLE_INSTRUCTOR", Permissions.Action.WRITE.toString(), true));
 
     // Mock up an authorization service that always returns "true" for hasPermission()
     AuthorizationService authzService = EasyMock.createNiceMock(AuthorizationService.class);

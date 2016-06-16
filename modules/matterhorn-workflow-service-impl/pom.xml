@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.6-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -24,6 +24,11 @@
       <artifactId>matterhorn-series-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-serviceregistry</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-dublincore</artifactId>
@@ -36,13 +41,26 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-message-broker-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-solr</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-json</artifactId>
+      <artifactId>matterhorn-kernel</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.entwinemedia.common</groupId>
+      <artifactId>functional</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>
@@ -97,6 +115,12 @@
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
+    </dependency>
+
+    <!-- Scope test -->
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -104,7 +128,6 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>3.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -129,6 +152,11 @@
       <type>bundle</type>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-workflow-workflowoperation</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -138,11 +166,13 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               org.opencastproject.workflow.api;version=${project.version},
               org.opencastproject.rest;version=${project.version},
               org.opencastproject.mediapackage;version=${project.version},
+              org.opencastproject.message.broker.api.index;version=${project.version},
               org.opencastproject.workspace.api;version=${project.version},
               *;resolution:=optional
             </Import-Package>
@@ -151,7 +181,10 @@
               org.opencastproject.workflow.endpoint;version=${project.version}
             </Export-Package>
             <Service-Component>
+              OSGI-INF/workflow-cleanup-scheduler-service.xml,
               OSGI-INF/workflow-definition-scanner.xml,
+              OSGI-INF/workflow-missed-capture-scanner-scheduler-service.xml,
+              OSGI-INF/workflow-missed-ingest-scanner-scheduler-service.xml,
               OSGI-INF/workflow-service.xml,
               OSGI-INF/workflow-service-index.xml,
               OSGI-INF/workflow-service-rest.xml

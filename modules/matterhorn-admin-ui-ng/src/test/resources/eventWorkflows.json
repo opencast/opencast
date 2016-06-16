@@ -1,0 +1,32 @@
+{
+    "total": 3,
+    "limit": 3,
+    "count": 3,
+    "results": [
+        {
+            "id": 1,
+            "series": "Serie 1",
+            "title": "Mediapackage 1",
+            "status": "INSTANTIATED",
+            "submitted": "2014-06-05T15:00:00Z",
+            "workflow": "Full"
+        },
+        {
+            "id": 2,
+            "series": "Serie 1",
+            "title": "Mediapackage 2",
+            "status": "INSTANTIATED",
+            "submitted": "2014-06-05T15:00:00Z",
+            "workflow": "Full"
+        },
+        {
+            "id": 3,
+            "series": "Serie 1",
+            "title": "Mediapackage 3",
+            "status": "INSTANTIATED",
+            "submitted": "2014-06-05T15:00:00Z",
+            "workflow": "Full"
+        }
+    ],
+    "offset": 0
+}

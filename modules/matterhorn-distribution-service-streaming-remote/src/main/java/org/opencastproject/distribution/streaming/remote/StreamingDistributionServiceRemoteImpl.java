@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.distribution.streaming.remote;
 
 import org.opencastproject.distribution.api.DistributionException;
@@ -24,6 +30,7 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
@@ -65,9 +72,10 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.distribution.api.DistributionService#distribute(String, org.opencastproject.mediapackage.MediaPackage, String)
-   *      java.lang.String)
+   * @see org.opencastproject.distribution.api.DistributionService#distribute(String,
+   *      org.opencastproject.mediapackage.MediaPackage, String) java.lang.String)
    */
+  @Override
   public Job distribute(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException {
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     params.add(new BasicNameValuePair("mediapackage", MediaPackageParser.getAsXml(mediaPackage)));
@@ -77,14 +85,19 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
     HttpResponse response = null;
     try {
       post.setEntity(new UrlEncodedFormEntity(params));
-      response = getResponse(post);
+      response = getResponse(post, HttpStatus.SC_OK, HttpStatus.SC_NO_CONTENT);
       if (response != null) {
-        logger.info("Distributing {} to {}", elementId, distributionChannel);
-        try {
-          return JobParser.parseJob(response.getEntity().getContent());
-        } catch (Exception e) {
-          throw new DistributionException("Unable to distribute mediapackage '" + elementId
-                  + "' using a remote distribution service", e);
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+          logger.info("Distributing {} to {}", elementId, distributionChannel);
+          try {
+            return JobParser.parseJob(response.getEntity().getContent());
+          } catch (Exception e) {
+            throw new DistributionException("Unable to distribute mediapackage '" + elementId
+                    + "' using a remote distribution service", e);
+          }
+        } else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) {
+          logger.info("No streaming service available for distribution");
+          return null;
         }
       }
     } catch (Exception e) {
@@ -100,7 +113,8 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.distribution.api.DistributionService#retract(String, org.opencastproject.mediapackage.MediaPackage, String)
+   * @see org.opencastproject.distribution.api.DistributionService#retract(String,
+   *      org.opencastproject.mediapackage.MediaPackage, String)
    */
   @Override
   public Job retract(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException {
@@ -112,14 +126,19 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
     HttpResponse response = null;
     try {
       post.setEntity(new UrlEncodedFormEntity(params));
-      response = getResponse(post);
+      response = getResponse(post, HttpStatus.SC_OK, HttpStatus.SC_NO_CONTENT);
       if (response != null) {
-        logger.info("Retracting {} from {}", mediaPackage, distributionChannel);
-        try {
-          return JobParser.parseJob(response.getEntity().getContent());
-        } catch (Exception e) {
-          throw new DistributionException("Unable to retract mediapackage '" + mediaPackage
-                  + "' using a remote distribution service", e);
+        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+          logger.info("Retracting {} from {}", mediaPackage, distributionChannel);
+          try {
+            return JobParser.parseJob(response.getEntity().getContent());
+          } catch (Exception e) {
+            throw new DistributionException("Unable to retract mediapackage '" + mediaPackage
+                    + "' using a remote distribution service", e);
+          }
+        } else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) {
+          logger.info("No streaming service available for retracting");
+          return null;
         }
       }
     } catch (Exception e) {

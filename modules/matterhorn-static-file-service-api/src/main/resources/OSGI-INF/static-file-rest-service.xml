@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.staticfiles.endpoint.StaticFileRestService" immediate="true">
+  <implementation class="org.opencastproject.staticfiles.endpoint.StaticFileRestService" />
+  <property name="service.description" value="Static File Service REST Endpoint" />
+
+  <property name="opencast.service.type" value="org.opencastproject.staticfiles" />
+  <property name="opencast.service.path" value="/staticfiles" />
+  <property name="opencast.service.jobproducer" value="false" />
+
+  <service>
+    <provide interface="org.opencastproject.staticfiles.endpoint.StaticFileRestService" />
+  </service>
+
+  <reference name="UploadStaticFileService" interface="org.opencastproject.staticfiles.api.StaticFileService"
+    cardinality="1..1" policy="static" bind="setStaticFileService" />
+  <reference name="SecurityService" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+</scr:component>

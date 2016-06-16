@@ -1,25 +1,40 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.util.persistence;
 
-import org.joda.time.base.AbstractInstant;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.Option.some;
+
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
+
+import org.joda.time.base.AbstractInstant;
+
+import java.util.Date;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -27,13 +42,6 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
-import java.util.Date;
-import java.util.List;
-
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
 
 /** JPA query constructors. */
 // CHECKSTYLE:OFF
@@ -69,11 +77,37 @@ public final class Queries {
     };
   }
 
+  /** {@link javax.persistence.EntityManager#remove(Object)} as a function. */
   public static <A> Function<EntityManager, A> remove(final A a) {
     return new Function<EntityManager, A>() {
       @Override public A apply(EntityManager em) {
         em.remove(a);
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
+      }
+    };
+  }
+
+  public static <A> A persistOrUpdate(final EntityManager em, final A a) {
+    final Object id = em.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(a);
+    if (id == null) {
+      em.persist(a);
+      return a;
+    } else {
+      @SuppressWarnings("unchecked")
+      final A dto = (A) em.find(a.getClass(), id);
+      if (dto == null) {
+        em.persist(a);
+        return a;
+      } else {
+        return em.merge(a);
+      }
+    }
+  }
+
+  public static <A> Function<EntityManager, A> persistOrUpdate(final A a) {
+    return new Function<EntityManager, A>() {
+      @Override public A apply(EntityManager em) {
+        return persistOrUpdate(em, a);
       }
     };
   }

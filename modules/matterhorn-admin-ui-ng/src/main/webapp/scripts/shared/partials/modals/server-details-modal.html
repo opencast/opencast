@@ -1,0 +1,98 @@
+<section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="server-details-modal">
+    <header>
+        <a class="fa fa-times close-modal" ng-click="close()"></a>
+        <h2>Testme1 Details</h2>
+    </header>
+
+    <div class="modal-content">
+        <div class="full-col">
+            <div class="tbl-container">
+                <header>Server Statistics <i class="fa fa-chevron-down"></i></header>
+                <div class="obj-container">
+                    <table cellpadding="0" cellspacing="0" class="main-tbl">
+                        <thead>
+                            <tr>
+                                <th>Services</th>
+                                <th>Jobs Running <i></i></th>
+                                <th>Jobs Queued <i></i></th>
+                                <th>Mean Run Time <i></i></th>
+                                <th>Mean Queue Time <i></i></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        <tr>
+                            <td>Encoding, image extraction and trimming</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>00:00</td>
+                            <td>00:00</td>
+                        </tr>
+                        <tr>
+                            <td>Media Distribution(Access Control Lists)</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>00:00</td>
+                            <td>00:00</td>
+                        </tr>
+                        <tr>
+                            <td>Media Distribution(local downloads)</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>00:00</td>
+                            <td>00:00</td>
+                        </tr>
+                        <tr>
+                            <td>GStreamer Launch Service</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>00:00</td>
+                            <td>00:00</td>
+                        </tr>
+                        <tr>
+                            <td>Video Segmentation</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>00:00</td>
+                            <td>00:00</td>
+                        </tr>
+                        <tr class="total">
+                            <td>Total</td>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>00:00</td>
+                            <td>00:00</td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+
+                </div><!-- obj-container -->
+
+            </div><!-- tbl-container -->
+
+            <div class="obj tbl-details">
+
+                <header>Server Details <i class="fa fa-chevron-down"></i></header>
+
+                <div class="obj-container">
+
+                    <table class="main-tbl">
+                        <tr>
+                            <td>Name</td>
+                            <td>Testallinone2</td>
+                        </tr>
+                        <tr>
+                            <td>Type</td>
+                            <td>Centos VM</td>
+                        </tr>
+                        <tr>
+                            <td>Notes</td>
+                            <td>You can type what ever you want here</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

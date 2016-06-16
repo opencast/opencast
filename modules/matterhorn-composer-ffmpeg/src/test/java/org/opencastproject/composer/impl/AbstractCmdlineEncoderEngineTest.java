@@ -1,26 +1,32 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.composer.impl;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Before;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -55,6 +61,13 @@ public class AbstractCmdlineEncoderEngineTest {
     final List<String> list = engine.buildArgumentList(null);
     assertEquals(17, list.size());
     assertEquals(lastArg, list.get(16));
+  }
+
+  @Test
+  public void testSpace() throws EncoderException {
+    engine.setCmdlineOptions("-i in.mp4 -filter:v boxblur=1:1,curves=all=0.4/0#{space}0.6/1 out.mkv");
+    final List<String> list = engine.buildCommand(null);
+    assertEquals("boxblur=1:1,curves=all=0.4/0 0.6/1", list.get(4));
   }
 
   @Test

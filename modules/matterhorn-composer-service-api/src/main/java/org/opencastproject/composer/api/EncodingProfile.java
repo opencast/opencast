@@ -1,23 +1,31 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
 
+
 package org.opencastproject.composer.api;
 
-import javax.xml.bind.annotation.XmlType;
+import java.util.List;
 import java.util.Map;
+
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * An encoding format encapsulates all the relevant configuration data for
@@ -29,7 +37,7 @@ public interface EncodingProfile {
    * Input and output formats.
    */
   @XmlType(name = "media-type", namespace = "http://composer.opencastproject.org")
-  public enum MediaType {
+  enum MediaType {
     // Nothing is a special type that indicates that the encoding process does not produce any media
     Audio, Visual, AudioVisual, Stream, EnhancedAudio, Image, ImageSequence, Cover, Nothing;
 
@@ -91,11 +99,25 @@ public interface EncodingProfile {
   MediaType getOutputType();
 
   /**
-   * Returns a suffix of the files.
+   * Returns a suffix of the files. First tag found used if tags are used but not provided in the request
    *
    * @return the suffix
    */
   String getSuffix();
+
+  /**
+   * Returns a suffix of the files for a certain tag.
+   *
+   * @param tag a tag that describes the aoutput file
+   * @return the suffix
+   */
+  String getSuffix(String tag);
+
+  /**
+   * Returns a list of the tags for output files used in this request
+   * @return a list of the used tags
+   */
+  List<String> getTags();
 
   /**
    * Returns the media type's mime type.
@@ -151,4 +173,11 @@ public interface EncodingProfile {
    */
   Map<String, String> getExtensions();
 
+  /**
+   * Returns an estimate of the load a single job with this profile causes.
+   * This should be roughly equal to the number of processor cores used at runtime.
+   *
+   * @return the load a single job with this profile causes
+   */
+  float getJobLoad();
 }

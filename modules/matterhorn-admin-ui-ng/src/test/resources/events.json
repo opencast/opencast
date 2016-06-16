@@ -1,0 +1,76 @@
+{
+    "total": 3,
+    "limit": 0,
+    "count": 3,
+    "results": [
+        {
+            "id": "10.0000-1",
+            "series": {
+                "id": "serie1",
+                "title": "Land and Vegetation: Key players on the Climate Scene"
+            },
+            "end_date": "2008-03-16T14:00:00Z",
+            "title": "Land and Vegetation: Key players on the Climate Scene",
+            "publications": {
+                "engage": "engage.html?e=p-1",
+                "oai-pmh": "oaipmh.html?e=p-1"
+            },
+            "presenters": [
+                
+            ],
+            "source": "ARCHIVE",
+            "status": "archived",
+            "start_date": "2008-03-04T23:00:00Z",
+            "comments": {
+                "resolved": 1,
+                "unresolved": 1
+            }
+        },
+        {
+            "id": "10.0000-1",
+            "series": {
+                "id": "serie1",
+                "title": "Land and Vegetation: Key players on the Climate Scene"
+            },
+            "end_date": "2008-03-16T14:00:00Z",
+            "title": "Land and Vegetation: Key players on the Climate Scene",
+            "publications": {
+                
+            },
+            "presenters": [
+                
+            ],
+            "source": "ARCHIVE",
+            "status": "archived",
+            "start_date": "2008-03-04T23:00:00Z",
+            "comments": {
+                "resolved": 1,
+                "unresolved": 1
+            }
+        },
+        {
+            "id": "10.0000-1",
+            "series": {
+                "id": "serie1",
+                "title": "Land and Vegetation: Key players on the Climate Scene"
+            },
+            "end_date": "2008-03-16T14:00:00Z",
+            "title": "Land and Vegetation: Key players on the Climate Scene",
+            "publications": {
+                "engage": "engage.html?e=p-1",
+                "oai-pmh": "oaipmh.html?e=p-1"
+            },
+            "presenters": [
+                
+            ],
+            "source": "ARCHIVE",
+            "status": "archived",
+            "start_date": "2008-03-04T23:00:00Z",
+            "comments": {
+                "resolved": 1,
+                "unresolved": 1
+            }
+        }
+    ],
+    "offset": 0
+}

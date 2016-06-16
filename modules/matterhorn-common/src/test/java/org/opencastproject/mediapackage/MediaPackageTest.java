@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 
 package org.opencastproject.mediapackage;
 
@@ -30,6 +36,8 @@ import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.util.ConfigurationException;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -51,6 +59,7 @@ import javax.xml.xpath.XPathFactory;
  * Test cases for the media package.
  */
 public class MediaPackageTest extends AbstractMediaPackageTest {
+  private static final Logger logger = LoggerFactory.getLogger(AbstractMediaPackageTest.class);
 
   @Test
   public void testEmptyMediaPackage() {
@@ -131,7 +140,7 @@ public class MediaPackageTest extends AbstractMediaPackageTest {
     mp.add(publication("1", "engage", new URI("http://localhost/1.html"), mimeType("text", "html")));
     assertEquals("Number of media package elements", 1, mp.getElements().length);
     final String xml = MediaPackageParser.getAsXml(mp);
-    System.out.println(xml);
+    logger.info(xml);
     assertEquals("Media package identifier", mp.getIdentifier().toString(), from(xml).get("mediapackage.@id"));
     assertEquals("Publication channel name", "engage", from(xml).get("mediapackage.publications.publication.@channel"));
   }

@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.workflow.impl;
 
 import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
@@ -89,13 +95,13 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
       def = parseWorkflowDefinitionFile(artifact);
 
       if (def == null) {
-        logger.warn("Unable to install workflow from {}", artifact.getAbsolutePath());
+        logger.warn("Unable to install workflow from '{}'", artifact.getName());
         artifactsWithError.add(artifact);
         return;
       }
     }
 
-    logger.info("Installing workflow from file {}", artifact.getAbsolutePath());
+    logger.debug("Installing workflow from file '{}'", artifact.getName());
     artifactsWithError.remove(artifact);
     artifactIds.put(artifact, def.getId());
     putWorkflowDefinition(def.getId(), def);
@@ -107,7 +113,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
       }
     });
 
-    logger.info("Worfkflow definition '{}' from file {} installed", def.getId(), artifact.getAbsolutePath());
+    logger.info("Worfkflow definition '{}' from file '{}' installed", def.getId(), artifact.getName());
 
     // Once all profiles have been loaded, announce readiness
     if ((filesInDirectory.length - artifactsWithError.size()) == artifactIds.size() && !isWFSinitiliazed) {
@@ -130,7 +136,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
     String id = artifactIds.remove(artifact);
     if (id != null) {
       WorkflowDefinition def = removeWorkflowDefinition(id);
-      logger.info("Uninstalling workflow definition '{}' from file {}", def.getId(), artifact.getAbsolutePath());
+      logger.info("Uninstalling workflow definition '{}' from file '{}'", def.getId(), artifact.getName());
     }
   }
 
@@ -165,7 +171,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
         logger.warn("Workflow '{}' has no operations", def.getId());
       return def;
     } catch (Exception e) {
-      logger.warn("Unable to parse workflow from file {}, {}", artifact.getAbsolutePath(), e.getMessage());
+      logger.warn("Unable to parse workflow from file '{}', {}", artifact.getName(), e.getMessage());
       return null;
     } finally {
       IOUtils.closeQuietly(stream);

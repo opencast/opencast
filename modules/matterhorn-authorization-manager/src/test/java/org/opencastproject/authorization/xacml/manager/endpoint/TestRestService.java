@@ -1,22 +1,38 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.authorization.xacml.manager.endpoint;
 
 import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
+import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
+import org.opencastproject.archive.api.Archive;
+import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
+import org.opencastproject.archive.api.Query;
+import org.opencastproject.archive.api.ResultSet;
+import org.opencastproject.archive.api.UriRewriter;
+import org.opencastproject.archive.api.Version;
+import org.opencastproject.archive.opencast.OpencastResultItem;
+import org.opencastproject.archive.opencast.OpencastResultSet;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.impl.AclDb;
@@ -25,19 +41,13 @@ import org.opencastproject.authorization.xacml.manager.impl.AclTransitionDb;
 import org.opencastproject.authorization.xacml.manager.impl.persistence.JpaAclDb;
 import org.opencastproject.authorization.xacml.manager.impl.persistence.OsgiJpaAclTransitionDb;
 import org.opencastproject.distribution.download.DownloadDistributionServiceImpl;
-import org.opencastproject.episode.api.EpisodeQuery;
-import org.opencastproject.episode.api.EpisodeService;
-import org.opencastproject.episode.api.HttpMediaPackageElementProvider;
-import org.opencastproject.episode.api.SearchResult;
-import org.opencastproject.episode.api.SearchResultItem;
-import org.opencastproject.episode.api.UriRewriter;
-import org.opencastproject.episode.api.Version;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
+import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AccessControlList;
@@ -53,28 +63,23 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workflow.api.WorkflowService;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
 import org.easymock.EasyMock;
-import org.eclipse.persistence.jpa.PersistenceProvider;
 import org.junit.Ignore;
 
-import java.beans.PropertyVetoException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
+import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.Path;
 
 // use base path /test to prevent conflicts with the production service
@@ -91,50 +96,34 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
   public static final SecurityService securityService;
   public static final SeriesService seriesService;
   public static final AuthorizationService authorizationService;
-  public static final EpisodeService episodeService;
+  public static final Archive<?> archive;
   public static final ServiceRegistry serviceRegistry;
   public static final DownloadDistributionServiceImpl distributionService = new DownloadDistributionServiceImpl();
-  private static final PersistenceProvider persistenceProvider = new PersistenceProvider();
-  private static Map<String, Object> persistenceProps = new HashMap<String, Object>();
+  public static final MessageSender messageSender;
+  public static final EntityManagerFactory authorizationEMF = newTestEntityManagerFactory(OsgiJpaAclTransitionDb.PERSISTENCE_UNIT);
 
   static {
     SecurityService testSecurityService = EasyMock.createNiceMock(SecurityService.class);
-    User user = new JaxbUser("admin", new DefaultOrganization(), new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE,
-            new DefaultOrganization()));
+    User user = new JaxbUser("admin", "test", new DefaultOrganization(), new JaxbRole(
+            SecurityConstants.GLOBAL_ADMIN_ROLE, new DefaultOrganization()));
     EasyMock.expect(testSecurityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(testSecurityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(testSecurityService);
     securityService = testSecurityService;
     authorizationService = newAuthorizationService();
     seriesService = newSeriesService();
-    episodeService = newEpisodeService();
+    archive = newArchive();
     serviceRegistry = newServiceRegistry();
+    messageSender = newMessageSender();
     aclServiceFactory = new AclServiceFactory() {
       @Override
       public AclService serviceFor(Organization org) {
         return new AclServiceImpl(new DefaultOrganization(), newAclPersistence(), newTransitionPersistence(),
-                seriesService, episodeService, newSearchService(), newWorkflowService(), securityService,
-                newHttpMediaPackageElementProvider(), authorizationService, distributionService, serviceRegistry);
+                seriesService, archive, newSearchService(), newWorkflowService(), securityService,
+                newHttpMediaPackageElementProvider(), authorizationService, distributionService, serviceRegistry,
+                messageSender);
       }
     };
-
-    long currentTime = System.currentTimeMillis();
-    String storage = PathSupport.concat("target", "db" + currentTime + ".h2.db");
-
-    ComboPooledDataSource pooledDataSource = new ComboPooledDataSource();
-    try {
-      pooledDataSource.setDriverClass("org.h2.Driver");
-    } catch (PropertyVetoException e) {
-      throw new RuntimeException(e);
-    }
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + currentTime);
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Collect the persistence properties
-    persistenceProps.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    persistenceProps.put("eclipselink.ddl-generation", "create-tables");
-    persistenceProps.put("eclipselink.ddl-generation.output-mode", "database");
   }
 
   @Override
@@ -157,7 +146,7 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     EasyMock.replay(organizationDirectoryService);
     try {
       return new ServiceRegistryInMemoryImpl(distributionService, securityService, userDirectoryService,
-              organizationDirectoryService);
+              organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
     } catch (ServiceRegistryException e) {
       throw new RuntimeException(e);
     }
@@ -174,18 +163,17 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
   }
 
   @Override
-  protected EpisodeService getEpisodeService() {
-    return episodeService;
+  protected Archive<?> getArchive() {
+    return archive;
   }
 
   @Override
   protected HttpMediaPackageElementProvider getHttpMediaPackageElementProvider() {
-    HttpMediaPackageElementProvider httpMediaPackageElementProvider = EasyMock
+    org.opencastproject.archive.api.HttpMediaPackageElementProvider httpMediaPackageElementProvider = EasyMock
             .createNiceMock(HttpMediaPackageElementProvider.class);
     EasyMock.expect(httpMediaPackageElementProvider.getUriRewriter()).andReturn(new UriRewriter() {
       @Override
       public URI apply(Version version, MediaPackageElement mediaPackageElement) {
-        // Do nothing
         return mediaPackageElement.getURI();
       }
     });
@@ -198,8 +186,12 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     return seriesService;
   }
 
-  private static HttpMediaPackageElementProvider newHttpMediaPackageElementProvider() {
-    return EasyMock.createNiceMock(HttpMediaPackageElementProvider.class);
+  private static org.opencastproject.archive.api.HttpMediaPackageElementProvider newHttpMediaPackageElementProvider() {
+    return EasyMock.createNiceMock(org.opencastproject.archive.api.HttpMediaPackageElementProvider.class);
+  }
+
+  private static MessageSender newMessageSender() {
+    return EasyMock.createNiceMock(MessageSender.class);
   }
 
   private static SearchService newSearchService() {
@@ -233,7 +225,7 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     }
     AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
     EasyMock.expect(authorizationService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
-            .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
+    .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
     EasyMock.expect(
             authorizationService.setAcl((MediaPackage) EasyMock.anyObject(), (AclScope) EasyMock.anyObject(),
                     (AccessControlList) EasyMock.anyObject())).andReturn(Tuple.tuple(mediapackage, attachment));
@@ -242,42 +234,69 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     return authorizationService;
   }
 
-  private static EpisodeService newEpisodeService() {
-    SearchResultItem searchResultItem = EasyMock.createNiceMock(SearchResultItem.class);
+  private static Archive<?> newArchive() {
+    OpencastResultItem searchResultItem = EasyMock.createNiceMock(OpencastResultItem.class);
     try {
       EasyMock.expect(searchResultItem.getMediaPackage()).andReturn(new MediaPackageBuilderImpl().createNew())
-              .anyTimes();
+      .anyTimes();
     } catch (MediaPackageException e) {
       throw new RuntimeException(e);
     }
     EasyMock.replay(searchResultItem);
 
-    ArrayList<SearchResultItem> list = new ArrayList<SearchResultItem>();
+    final List<OpencastResultItem> list = new ArrayList<OpencastResultItem>();
     list.add(searchResultItem);
 
-    SearchResult searchResult = EasyMock.createNiceMock(SearchResult.class);
-    EasyMock.expect(searchResult.getItems()).andReturn(list).anyTimes();
-    EasyMock.expect(searchResult.size()).andReturn(1L).anyTimes();
-    EasyMock.replay(searchResult);
+    OpencastResultSet searchResult = new OpencastResultSet() {
+      @Override
+      public List<OpencastResultItem> getItems() {
+        return list;
+      }
 
-    EpisodeService episodeService = EasyMock.createNiceMock(EpisodeService.class);
-    EasyMock.expect(episodeService.find((EpisodeQuery) EasyMock.anyObject(), (UriRewriter) EasyMock.anyObject()))
-            .andReturn(searchResult).anyTimes();
-    EasyMock.replay(episodeService);
-    return episodeService;
+      @Override
+      public String getQuery() {
+        return null;
+      }
+
+      @Override
+      public long getTotalSize() {
+        return -1;
+      }
+
+      @Override
+      public long getLimit() {
+        return -1;
+      }
+
+      @Override
+      public long getOffset() {
+        return -1;
+      }
+
+      @Override
+      public long getSearchTime() {
+        return -1;
+      }
+    };
+
+    Archive<ResultSet> archive = EasyMock.createNiceMock(Archive.class);
+    EasyMock.expect(
+            archive.find((Query) EasyMock.anyObject(),
+                    (org.opencastproject.archive.api.UriRewriter) EasyMock.anyObject())).andReturn(searchResult)
+                    .anyTimes();
+    EasyMock.replay(archive);
+    return archive;
   }
 
   private static AclTransitionDb newTransitionPersistence() {
     OsgiJpaAclTransitionDb aclManagerDatabase = new OsgiJpaAclTransitionDb();
-    aclManagerDatabase.setPersistenceProvider(persistenceProvider);
-    aclManagerDatabase.setPersistenceProperties(persistenceProps);
+    aclManagerDatabase.setEntityManagerFactory(authorizationEMF);
     aclManagerDatabase.activate(null);
     return aclManagerDatabase;
   }
 
   private static AclDb newAclPersistence() {
-    return new JpaAclDb(PersistenceUtil.newPersistenceEnvironment(persistenceProvider,
-            "org.opencastproject.authorization.xacml.manager", persistenceProps));
+    return new JpaAclDb(persistenceEnvironment(authorizationEMF));
   }
 
   private static SeriesService newSeriesService() {

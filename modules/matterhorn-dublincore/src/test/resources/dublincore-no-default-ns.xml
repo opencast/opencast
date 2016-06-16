@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- test case for CERV-482 -->
+<!-- setting the default namespace to nothing must not throw an exception -->
+<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/">
+  <dcterms:title xmlns="">Cutting Test 1</dcterms:title>
+  <dcterms:creator xmlns=""></dcterms:creator>
+  <dcterms:isPartOf xmlns=""></dcterms:isPartOf>
+  <dcterms:license xmlns="">Creative Commons 3.0: Attribution-NonCommercial-NoDerivs</dcterms:license>
+  <dcterms:license xmlns=""></dcterms:license>
+  <dcterms:recordDate xmlns="">2015-01-15</dcterms:recordDate>
+  <dcterms:contributor xmlns=""></dcterms:contributor>
+  <dcterms:subject xmlns=""></dcterms:subject>
+  <dcterms:language xmlns=""></dcterms:language>
+  <dcterms:description xmlns=""></dcterms:description>
+  <dcterms:rights xmlns=""></dcterms:rights>
+  <dcterms:created xmlns="">2015-01-15T08:57:00Z</dcterms:created>
+</dublincore>

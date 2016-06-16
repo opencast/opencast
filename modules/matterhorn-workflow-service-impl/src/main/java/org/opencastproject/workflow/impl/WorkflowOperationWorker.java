@@ -1,24 +1,30 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.workflow.impl;
 
-import static org.opencastproject.workflow.impl.WorkflowServiceImpl.NO;
-import static org.opencastproject.workflow.impl.WorkflowServiceImpl.PROPERTY_PATTERN;
-import static org.opencastproject.workflow.impl.WorkflowServiceImpl.YES;
+import static com.entwinemedia.fn.data.ListBuilders.LIA;
+import static java.lang.String.format;
 
+import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
@@ -31,23 +37,32 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
-import org.apache.commons.lang.StringUtils;
+import com.entwinemedia.fn.bool.Bool;
+import com.entwinemedia.fn.parser.Parsers;
+import com.entwinemedia.fn.parser.Result;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Handles execution of a workflow operation.
  */
 final class WorkflowOperationWorker {
-
   private static final Logger logger = LoggerFactory.getLogger(WorkflowOperationWorker.class);
 
-  protected WorkflowOperationHandler handler = null;
-  protected WorkflowInstance workflow = null;
-  protected WorkflowServiceImpl service = null;
-  protected Map<String, String> properties = null;
+  /**
+   * Boolean expression parser that interprets non replaced variable strings of pattern <code>${VAR}</code> as false.
+   */
+  private static final Bool booleanExpressionEvaluator = new Bool(LIA.mk(Parsers.token(Parsers.regex(Pattern.compile("\\$\\{.*?\\}")))
+          .bind(Parsers.ignorePrevious(Parsers.yield(false)))));
+
+  private WorkflowOperationHandler handler = null;
+  private WorkflowInstance workflow = null;
+  private WorkflowServiceImpl service = null;
+  private Map<String, String> properties = null;
 
   /**
    * Creates a worker that will execute the given handler and thereby the current operation of the workflow instance.
@@ -61,7 +76,7 @@ final class WorkflowOperationWorker {
    * @param service
    *          the workflow service.
    */
-  public WorkflowOperationWorker(WorkflowOperationHandler handler, WorkflowInstance workflow,
+  WorkflowOperationWorker(WorkflowOperationHandler handler, WorkflowInstance workflow,
           WorkflowServiceImpl service) {
     this.handler = handler;
     this.workflow = workflow;
@@ -82,7 +97,7 @@ final class WorkflowOperationWorker {
    * @param service
    *          the workflow service.
    */
-  public WorkflowOperationWorker(WorkflowOperationHandler handler, WorkflowInstance workflow,
+  WorkflowOperationWorker(WorkflowOperationHandler handler, WorkflowInstance workflow,
           Map<String, String> properties, WorkflowServiceImpl service) {
     this(handler, workflow, service);
     this.properties = properties;
@@ -99,7 +114,7 @@ final class WorkflowOperationWorker {
    * @param service
    *          the workflow service.
    */
-  public WorkflowOperationWorker(WorkflowInstance workflow, Map<String, String> properties, WorkflowServiceImpl service) {
+  WorkflowOperationWorker(WorkflowInstance workflow, Map<String, String> properties, WorkflowServiceImpl service) {
     this(null, workflow, service);
     this.properties = properties;
   }
@@ -113,7 +128,7 @@ final class WorkflowOperationWorker {
    * @param service
    *          the workflow service.
    */
-  public WorkflowOperationWorker(WorkflowInstance workflow, WorkflowServiceImpl service) {
+  WorkflowOperationWorker(WorkflowInstance workflow, WorkflowServiceImpl service) {
     this(null, workflow, service);
   }
 
@@ -161,8 +176,10 @@ final class WorkflowOperationWorker {
       } else {
         logger.error("Workflow operation '" + operation + "' failed", e);
       }
+      // the associated job shares operation's id
+      service.getServiceRegistry().incident().unhandledException(operation.getId(), Severity.FAILURE, e);
       try {
-        workflow = service.handleOperationException(workflow, new WorkflowOperationException(e, operation));
+        workflow = service.handleOperationException(workflow, operation);
       } catch (Exception e2) {
         logger.error("Error handling workflow operation '{}' failure: {}", new Object[] { operation, e2.getMessage(),
                 e2 });
@@ -181,19 +198,21 @@ final class WorkflowOperationWorker {
    *           if there is a problem processing the workflow
    */
   public WorkflowOperationResult start() throws WorkflowOperationException, WorkflowException, UnauthorizedException {
-    WorkflowOperationInstance operation = workflow.getCurrentOperation();
-
+    final WorkflowOperationInstance operation = workflow.getCurrentOperation();
     // Do we need to execute the operation?
-    String executeCondition = operation.getExecutionCondition(); // if
-    String skipCondition = operation.getSkipCondition(); // unless
-
-    boolean skip = false;
-    if (StringUtils.isNotBlank(executeCondition)
-            && (PROPERTY_PATTERN.matcher(executeCondition).matches() || NO.contains(executeCondition.toLowerCase()))) {
-      skip = true;
-    } else if (StringUtils.isNotBlank(skipCondition)
-            && (!PROPERTY_PATTERN.matcher(skipCondition).matches() || YES.contains(skipCondition.toLowerCase()))) {
-      skip = true;
+    final String executionCondition = operation.getExecutionCondition(); // if
+    final boolean execute;
+    if (executionCondition == null) {
+      execute = true;
+    } else {
+      final Result<Boolean> parsed = booleanExpressionEvaluator.eval(executionCondition);
+      if (parsed.isDefined() && parsed.getRest().isEmpty()) {
+        execute = parsed.getResult();
+      } else {
+        operation.setState(OperationState.FAILED);
+        throw new WorkflowOperationException(format("Unable to parse execution condition '%s'. Result is '%s'",
+                executionCondition, parsed.toString()));
+      }
     }
 
     operation.setState(OperationState.RUNNING);
@@ -201,19 +220,19 @@ final class WorkflowOperationWorker {
 
     try {
       WorkflowOperationResult result = null;
-      if (skip) {
-        // Allow for null handlers when we are skipping an operation
-        if (handler != null) {
-          result = handler.skip(workflow, null);
-          result.setAction(Action.SKIP);
-        }
-      } else {
+      if (execute) {
         if (handler == null) {
           // If there is no handler for the operation, yet we are supposed to run it, we must fail
           logger.warn("No handler available to execute operation '{}'", operation.getTemplate());
           throw new IllegalStateException("Unable to find a workflow handler for '" + operation.getTemplate() + "'");
         }
         result = handler.start(workflow, null);
+      } else {
+        // Allow for null handlers when we are skipping an operation
+        if (handler != null) {
+          result = handler.skip(workflow, null);
+          result.setAction(Action.SKIP);
+        }
       }
       return result;
     } catch (Exception e) {
@@ -263,5 +282,4 @@ final class WorkflowOperationWorker {
       throw new WorkflowOperationException(e);
     }
   }
-
 }

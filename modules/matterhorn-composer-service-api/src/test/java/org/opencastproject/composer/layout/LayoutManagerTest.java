@@ -1,21 +1,25 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
-package org.opencastproject.composer.layout;
 
-import org.junit.Test;
+package org.opencastproject.composer.layout;
 
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.composer.layout.AnchorOffset.anchorOffset;
@@ -25,6 +29,13 @@ import static org.opencastproject.composer.layout.LayoutManager.scaleToFit;
 import static org.opencastproject.composer.layout.Offset.offset;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Tuple.tuple;
+
+import org.opencastproject.util.JsonObj;
+import org.opencastproject.util.data.Tuple;
+
+import org.junit.Test;
+
+import java.util.List;
 
 public class LayoutManagerTest {
   private static final double TOLERANCE = 0.01;
@@ -217,5 +228,27 @@ public class LayoutManagerTest {
     assertEquals(dimension(50, 100), scaleToFit(dimension(100, 100), dimension(10, 20)));
     assertEquals(dimension(100, 50), scaleToFit(dimension(100, 100), dimension(20, 10)));
     assertEquals(dimension(100, 1), scaleToFit(dimension(100, 500), dimension(1000, 10)));
+  }
+
+  /** SWITCHP-337 */
+  @Test
+  public void testWatermarkLayout() {
+    final List<Tuple<Offset, String>> fixtures = list(
+            // top left
+            tuple(offset(20, 20), "{\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},\"offset\":{\"y\":20,\"x\":20},\"reference\":{\"left\":0.0,\"top\":0.0}}}"),
+            // top right
+            tuple(offset(1340, 20), "{\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":0.0},\"offset\":{\"y\":20,\"x\":-20},\"reference\":{\"left\":1.0,\"top\":0.0}}}"),
+            // bottom left
+            tuple(offset(20, 340), "{\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":1.0},\"offset\":{\"y\":-20,\"x\":20},\"reference\":{\"left\":0.0,\"top\":1.0}}}"),
+            // bottom right
+            tuple(offset(1340, 340), "{\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":1.0},\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":1.0,\"top\":1.0}}}"));
+    for (final Tuple<Offset, String> fixture : fixtures) {
+      final AbsolutePositionLayoutSpec spec = Serializer.absolutePositionLayoutSpec(JsonObj.jsonObj(fixture.getB()));
+      final MultiShapeLayout layout = LayoutManager.absoluteMultiShapeLayout(
+              Dimension.dimension(1900, 1080),
+              list(tuple(Dimension.dimension(540, 720), spec)));
+      assertEquals(1, layout.getShapes().size());
+      assertEquals(fixture.getA(), layout.getShapes().get(0).getOffset());
+    }
   }
 }

@@ -1,20 +1,27 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.util;
 
+import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Collections.toArray;
 import static org.opencastproject.util.data.Option.none;
@@ -22,19 +29,26 @@ import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.job.api.Job;
+import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
+
+import com.entwinemedia.fn.Fn2;
+import com.entwinemedia.fn.Pred;
+import com.entwinemedia.fn.data.Opt;
 
 import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.List;
 
 /** Job related utility functions. */
@@ -45,23 +59,48 @@ public final class JobUtil {
   private JobUtil() {
   }
 
+  /**
+   * Update the job from the service registry and get its payload.
+   *
+   * @return the payload or none, if either to job cannot be found or if the job has no or an empty payload
+   */
+  public static Opt<String> getPayload(ServiceRegistry reg, Job job) throws NotFoundException, ServiceRegistryException {
+    for (Job updated : update(reg, job)) {
+      return Opt.nul(updated.getPayload());
+    }
+    return Opt.none();
+  }
+
+  /**
+   * Get the latest state of a job. Does not modify the <code>job</code> parameter.
+   *
+   * @return the updated job or none, if it cannot be found
+   */
+  public static Opt<Job> update(ServiceRegistry reg, Job job) throws ServiceRegistryException {
+    try {
+      return Opt.some(reg.getJob(job.getId()));
+    } catch (NotFoundException e) {
+      return Opt.none();
+    }
+  }
+
   public static JobBarrier.Result waitForJobs(ServiceRegistry reg, long timeout, Job... jobs) {
-    JobBarrier barrier = new JobBarrier(reg, jobs);
+    JobBarrier barrier = new JobBarrier(null, reg, jobs);
     return barrier.waitForJobs(timeout);
   }
 
   public static JobBarrier.Result waitForJobs(ServiceRegistry reg, Job... jobs) {
-    JobBarrier barrier = new JobBarrier(reg, jobs);
+    JobBarrier barrier = new JobBarrier(null, reg, jobs);
     return barrier.waitForJobs();
   }
 
-  public static JobBarrier.Result waitForJobs(ServiceRegistry reg, long timeout, List<Job> jobs) {
-    JobBarrier barrier = new JobBarrier(reg, toArray(Job.class, jobs));
+  public static JobBarrier.Result waitForJobs(ServiceRegistry reg, long timeout, Collection<Job> jobs) {
+    JobBarrier barrier = new JobBarrier(null, reg, toArray(Job.class, jobs));
     return barrier.waitForJobs(timeout);
   }
 
-  public static JobBarrier.Result waitForJobs(ServiceRegistry reg, List<Job> jobs) {
-    JobBarrier barrier = new JobBarrier(reg, toArray(Job.class, jobs));
+  public static JobBarrier.Result waitForJobs(ServiceRegistry reg, Collection<Job> jobs) {
+    JobBarrier barrier = new JobBarrier(null, reg, toArray(Job.class, jobs));
     return barrier.waitForJobs();
   }
 
@@ -221,4 +260,25 @@ public final class JobUtil {
       }
     }
   };
+
+  /** Sum up the queue time of a list of jobs. */
+  public static long sumQueueTime(List<Job> jobs) {
+    return $(jobs).foldl(0L, new Fn2<Long, Job, Long>() {
+      @Override
+      public Long ap(Long sum, Job job) {
+        return sum + job.getQueueTime();
+      }
+    });
+  }
+
+  /** Get all jobs that are not in state {@link org.opencastproject.job.api.Job.Status#FINISHED}. */
+  public static List<Job> getNonFinished(List<Job> jobs) {
+    return $(jobs).filter(new Pred<Job>() {
+      @Override
+      public Boolean ap(Job job) {
+        return !job.getStatus().equals(Status.FINISHED);
+      }
+    }).toList();
+  }
+
 }

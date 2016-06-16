@@ -6,12 +6,12 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.6-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
-    <checkstyle.skip>true</checkstyle.skip>
+    <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -77,15 +77,12 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package> 
               org.opencastproject.fileupload.api;version=${project.version},
               org.opencastproject.fileupload.service;version=${project.version} 
             </Export-Package>
-            <Import-Package>
-               org.opencastproject.workspace.api;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
             <Service-Component>
               OSGI-INF/fileupload-service.xml,
               OSGI-INF/fileupload-service-rest.xml

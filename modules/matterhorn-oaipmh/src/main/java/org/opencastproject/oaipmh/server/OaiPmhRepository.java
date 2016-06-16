@@ -1,20 +1,37 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
 
+
 package org.opencastproject.oaipmh.server;
+
+import static org.opencastproject.oaipmh.OaiPmhUtil.toOaiRepresentation;
+import static org.opencastproject.oaipmh.OaiPmhUtil.toUtc;
+import static org.opencastproject.oaipmh.OaiPmhUtil.toUtcDay;
+import static org.opencastproject.oaipmh.OaiPmhUtil.toUtcSecond;
+import static org.opencastproject.oaipmh.server.Functions.isAfter;
+import static org.opencastproject.util.data.Collections.find;
+import static org.opencastproject.util.data.Collections.map;
+import static org.opencastproject.util.data.Collections.mkString;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.oaipmh.Granularity;
 import org.opencastproject.oaipmh.util.XmlGen;
@@ -27,6 +44,7 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Predicate;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -40,17 +58,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import static org.opencastproject.oaipmh.OaiPmhUtil.toOaiRepresentation;
-import static org.opencastproject.oaipmh.OaiPmhUtil.toUtc;
-import static org.opencastproject.oaipmh.OaiPmhUtil.toUtcDay;
-import static org.opencastproject.oaipmh.OaiPmhUtil.toUtcSecond;
-import static org.opencastproject.oaipmh.server.Functions.isAfter;
-import static org.opencastproject.util.data.Collections.find;
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Collections.mkString;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 /**
  * An OAI-PMH protocol compliant repository.

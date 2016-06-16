@@ -1,0 +1,13 @@
+{
+  "description": "Applying default configuration values",
+  "exception_handler_workflow": "",
+  "execution_host": "http:\/\/localhost:8080",
+  "fail_on_error": true,
+  "failed_attempts": 0,
+  "id": 1303,
+  "job": 8695,
+  "max_attempts": 1,
+  "name": "defaults",
+  "retry_strategy": "NONE",
+  "state": "SUCCEEDED"
+}

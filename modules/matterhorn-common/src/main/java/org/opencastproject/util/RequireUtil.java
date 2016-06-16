@@ -1,22 +1,28 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
 
+
 package org.opencastproject.util;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utility functions for handling common requirements.
@@ -24,6 +30,38 @@ import org.apache.commons.lang.StringUtils;
 public final class RequireUtil {
   private RequireUtil() {
 
+  }
+
+  /**
+   * Require an expression to hold true.
+   *
+   * @param expr
+   *          the expression
+   * @param exprName
+   *          the name of the expression used to create an error message in case <code>expr</code> evaluates to false
+   * @throws IllegalArgumentException
+   *          in case <code>expr</code> evaluates to false
+   */
+  public static void requireTrue(boolean expr, String exprName) {
+    if (!expr) {
+      throw new IllegalArgumentException("Requirement '" + exprName + "' must hold true");
+    }
+  }
+
+  /**
+   * Require an expression to be false.
+   *
+   * @param expr
+   *         the expression
+   * @param exprName
+   *         the name of the expression used to create an error message in case <code>expr</code> evaluates to false
+   * @throws IllegalArgumentException
+   *         in case <code>expr</code> evaluates to true
+   */
+  public static void requireFalse(boolean expr, String exprName) {
+    if (expr) {
+      throw new IllegalArgumentException("Requirement '" + exprName + "' must be false");
+    }
   }
 
   /**
@@ -81,6 +119,22 @@ public final class RequireUtil {
   public static String notEmpty(String value, String valueName) {
     if (StringUtils.isEmpty(value))
       throw new IllegalArgumentException(valueName + " must not be null or empty");
+    return value;
+  }
+
+  /**
+   * The given string value must not be blank, empty nor {@code null}. Otherwise, an {@link IllegalArgumentException} is
+   * thrown.
+   *
+   * @param value
+   *          the value to check for not being empty
+   * @param valueName
+   *          the name of the value
+   * @return the value, if not blank
+   */
+  public static String requireNotBlank(String value, String valueName) {
+    if (StringUtils.isBlank(value))
+      throw new IllegalArgumentException(valueName + " must not be null or blank");
     return value;
   }
 

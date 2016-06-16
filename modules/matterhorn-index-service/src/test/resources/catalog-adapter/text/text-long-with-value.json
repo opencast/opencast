@@ -1,0 +1,8 @@
+{
+   "readOnly":false,
+   "id":"TestOutputID",
+   "label":"A_LABEL_FOR_THIS_PROPERTY",
+   "type":"text_long",
+   "value":"This is the text value",
+   "required":false
+}

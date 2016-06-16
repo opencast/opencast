@@ -1,0 +1,8 @@
+<section ng-show="open" id="add-acl-modal" ng-keyup="keyUp($event)" tabindex="1" class="modal wizard modal-animation" ng-controller="NewAclCtrl">
+    <header>
+        <a class="fa fa-times close-modal" ng-click="close()"></a>
+        <h2 translate="USERS.ACLS.NEW.CAPTION"><!--Create New Event--></h2>
+    </header>
+   <admin-ng-wizard data-name="new-acl" data-states="states" data-submit="submit">
+   </admin-ng-wizard>
+</section>

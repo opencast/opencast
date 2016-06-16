@@ -1,16 +1,21 @@
 /**
- *  Copyright 2009 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
 var ocScheduler = (function() {
@@ -725,9 +730,6 @@ var ocScheduler = (function() {
         data.end = sched.components.recurrenceEnd.getValue();
         data.duration = sched.components.recurrenceDuration.getValue();
         data.rrule = sched.dublinCore.components.recurrence.getValue();
-        if(sched.timezone == ''){
-          return false;
-        }
         data.timezone = sched.timezone;
       } else {
         return false;
@@ -783,7 +785,7 @@ var ocScheduler = (function() {
       required: false,
       key: 'isPartOf',
       errors: {
-        missingRequired: new ocAdmin.Error('missingSeries', 'seriesLabel'),
+        missingRequired: new ocAdmin.Error('missingSeries', 'seriesSelectLabel'),
         seriesError: new ocAdmin.Error('errorSeries')
       },
       fields: {
@@ -819,7 +821,7 @@ var ocScheduler = (function() {
             error.push(this.errors.seriesError); //failed to create series for some reason.
           }
         }
-        if(this.fields.series.val() === '' && !window.checkForErrors && this.required) {
+        if(this.fields.seriesSelect.val() === '' && window.checkForErrors && this.required) {
           error.push(this.errors.missingRequired);
         }
         return error;
@@ -851,7 +853,7 @@ var ocScheduler = (function() {
           series = '<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oc="http://www.opencastproject.org/matterhorn/"><dcterms:title xmlns="">' + ocUtils.escapeXML(this.fields.seriesSelect.val()) + '</dcterms:title></dublincore>'
           seriesComponent = this;
           
-          var anonymous_role = 'anonymous';
+          var anonymous_role = 'ROLE_ANONYMOUS';
           $.ajax({
               url: ANOYMOUS_URL,
               type: 'GET',
@@ -1411,6 +1413,7 @@ var ocScheduler = (function() {
           var end = this.fields.recurEnd.datepicker('getDate') / 1000;
           end += this.fields.recurStartTimeHour.val() * 3600; // start hour
           end += this.fields.recurStartTimeMin.val() * 60; //start min, then add duration
+          end -= sched.tzDiff * 60; //Agent TZ offset
           end += this.fields.recurDurationHour.val() * 3600; // seconds per hour
           end += this.fields.recurDurationMin.val() * 60; // milliseconds per min
           end = end * 1000;

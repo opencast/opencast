@@ -1,0 +1,68 @@
+{
+  "count": 4,
+  "limit": 0,
+  "offset": 0,
+  "results": [
+    {
+      "Name": "•mock• agent4",
+      "Status": "ok",
+      "Update": "2014-05-26T15:37:02Z",
+      "blacklist": {
+        "start": "2014-08-10T22:00:00Z",
+        "end": "2014-08-15T21:59:00Z"
+      },
+      "inputs": [
+        {
+          "id": "video",
+          "value": "CAPTURE_AGENT.DEVICE.CAMERA"
+        },
+        {
+          "id": "desktop",
+          "value": "CAPTURE_AGENT.DEVICE.PRESENTATION"
+        }
+      ],
+      "roomId": 621
+    },
+    {
+      "Name": "•mock• agent3",
+      "Status": "ok",
+      "Update": "2014-05-26T15:37:02Z",
+      "blacklist": {
+        "start": "2014-08-10T22:00:00Z",
+        "end": "2014-08-15T21:59:00Z"
+      },
+      "inputs": [
+        {
+          "id": "video",
+          "value": "CAPTURE_AGENT.DEVICE.MICROPHONE"
+        }
+      ],
+      "roomId": 622
+    },
+    {
+      "Name": "•mock• agent2",
+      "Status": "ok",
+      "Update": "2014-05-26T15:37:02Z",
+      "blacklist": {
+        "start": "2014-08-10T22:00:00Z",
+        "end": "2014-08-15T21:59:00Z"
+      },
+      "inputs": [
+        {
+          "id": "video",
+          "value": "CAPTURE_AGENT.DEVICE.CAMERA"
+        },
+        {
+          "id": "desktop",
+          "value": "CAPTURE_AGENT.DEVICE.PRESENTATION"
+        },
+        {
+          "id": "video",
+          "value": "CAPTURE_AGENT.DEVICE.MICROPHONE"
+        }
+
+      ],
+      "roomId": -1
+    }],
+  "total": 4
+}

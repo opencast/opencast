@@ -1,0 +1,8 @@
+<div ng-form="innerForm">
+    <i class="edit fa fa-pencil-square"></i>
+    <i class="saved fa fa-check" ng-class="{ active: params.saved }"></i>
+
+    <input type="checkbox"
+        ng-model="params.value" ng-change="submit()"
+        ng-required="params.required" name="{{ params.name }}"/>
+</div>

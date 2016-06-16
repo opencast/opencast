@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.kernel.security;
 
 import static org.opencastproject.security.util.SecurityUtil.hostAndPort;
@@ -20,16 +26,17 @@ import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Collections.toList;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.kernel.security.persistence.JpaOrganization;
 import org.opencastproject.kernel.security.persistence.OrganizationDatabase;
 import org.opencastproject.kernel.security.persistence.OrganizationDatabaseException;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryListener;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
@@ -44,6 +51,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Implements the organizational directory. As long as no organizations are published in the service registry, the
@@ -81,7 +90,14 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
   /** The configuration admin service */
   protected ConfigurationAdmin configAdmin = null;
 
-  protected OrganizationDatabase persistence;
+  /** To enable threading when dispatching jobs */
+  private final ExecutorService executor = Executors.newCachedThreadPool();
+
+  /** The organization database */
+  private OrganizationDatabase persistence = null;
+
+  /** The list of directory listeners */
+  private final List<OrganizationDirectoryListener> listeners = new ArrayList<OrganizationDirectoryListener>();
 
   /**
    * The default organization. This is a hack needed by the capture agent implementation see MH-9363
@@ -164,6 +180,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
               + "' since an organization with that identifier has already been registered");
     persistence.storeOrganization(organization);
     cache.invalidate();
+    fireOrganizationRegistered(organization);
   }
 
   @Override
@@ -192,6 +209,8 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
     if (StringUtils.isBlank(server))
       throw new ConfigurationException(ORG_SERVER_KEY, ORG_SERVER_KEY + " must be set");
 
+    String[] serverUrls = StringUtils.split(server, ",");
+
     final String portAsString = StringUtils.trimToNull((String) properties.get(ORG_PORT_KEY));
     final int port = portAsString != null ? Integer.parseInt(portAsString) : 80;
     final String adminRole = (String) properties.get(ORG_ADMIN_ROLE_KEY);
@@ -213,16 +232,29 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
       try {
         org = (JpaOrganization) persistence.getOrganization(id);
         org.setName(name);
-        org.addServer(server, port);
+        for (String serverUrl : serverUrls) {
+          if (StringUtils.isNotBlank(serverUrl)) {
+            org.addServer(serverUrl, port);
+          }
+        }
         org.setAdminRole(adminRole);
         org.setAnonymousRole(anonRole);
         org.setProperties(orgProperties);
-        logger.info("Registering organization '{}'", id);
-      } catch (NotFoundException e) {
-        org = new JpaOrganization(id, name, server, port, adminRole, anonRole, orgProperties);
         logger.info("Updating organization '{}'", id);
+        persistence.storeOrganization(org);
+        fireOrganizationUpdated(org);
+      } catch (NotFoundException e) {
+        HashMap<String, Integer> servers = new HashMap<String, Integer>();
+        for (String serverUrl : serverUrls) {
+          if (StringUtils.isNotBlank(serverUrl)) {
+            servers.put(serverUrl, port);
+          }
+        }
+        org = new JpaOrganization(id, name, servers, adminRole, anonRole, orgProperties);
+        logger.info("Creating organization '{}'", id);
+        persistence.storeOrganization(org);
+        fireOrganizationRegistered(org);
       }
-      persistence.storeOrganization(org);
       cache.invalidate();
     } catch (OrganizationDatabaseException e) {
       logger.error("Unable to register organization '{}': {}", id, e);
@@ -232,11 +264,82 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
   @Override
   public void deleted(String pid) {
     try {
+      Organization organization = getOrganization(pid);
       persistence.deleteOrganization(pid);
       cache.invalidate();
+      fireOrganizationUnregistered(organization);
     } catch (NotFoundException e) {
       logger.warn("Can't delete organization with id {}, organization not found.", pid);
     }
+  }
+
+  @Override
+  public void addOrganizationDirectoryListener(OrganizationDirectoryListener listener) {
+    if (listener == null)
+      return;
+    if (!listeners.contains(listener))
+      listeners.add(listener);
+  }
+
+  @Override
+  public void removeOrganizationDirectoryListener(OrganizationDirectoryListener listener) {
+    if (listener == null)
+      return;
+    listeners.remove(listener);
+  }
+
+  /**
+   * Notifies registered listeners about a newly registered organization.
+   *
+   * @param organization
+   *          the organization
+   */
+  private void fireOrganizationRegistered(final Organization organization) {
+    executor.submit(new Runnable() {
+      @Override
+      public void run() {
+        for (OrganizationDirectoryListener listener : listeners) {
+          logger.debug("Notifying {} about newly registered organization '{}'", listener, organization);
+          listener.organizationRegistered(organization);
+        }
+      }
+    });
+  }
+
+  /**
+   * Notifies registered listeners about an unregistered organization.
+   *
+   * @param organization
+   *          the organization
+   */
+  private void fireOrganizationUnregistered(final Organization organization) {
+    executor.submit(new Runnable() {
+      @Override
+      public void run() {
+        for (OrganizationDirectoryListener listener : listeners) {
+          logger.debug("Notifying {} about unregistered organization '{}'", listener, organization);
+          listener.organizationUnregistered(organization);
+        }
+      }
+    });
+  }
+
+  /**
+   * Notifies registered listeners about an updated organization.
+   *
+   * @param organization
+   *          the organization
+   */
+  private void fireOrganizationUpdated(final Organization organization) {
+    executor.submit(new Runnable() {
+      @Override
+      public void run() {
+        for (OrganizationDirectoryListener listener : listeners) {
+          logger.debug("Notifying {} about updated organization '{}'", listener, organization);
+          listener.organizationUpdated(organization);
+        }
+      }
+    });
   }
 
   /**
@@ -256,7 +359,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
 
     private final OrganizationDatabase persistence;
 
-    public OrgCache(long refreshInterval, OrganizationDatabase persistence) {
+    OrgCache(long refreshInterval, OrganizationDatabase persistence) {
       this.refreshInterval = refreshInterval;
       this.persistence = persistence;
       invalidate();

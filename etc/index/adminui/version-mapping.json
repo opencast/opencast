@@ -1,0 +1,8 @@
+{
+	"version" : {
+	    "_source" : { "enabled" : false },
+	    "properties" : {
+	        "version" : { "type" : "integer", "index" : "not_analyzed" }
+	    }
+	}
+}

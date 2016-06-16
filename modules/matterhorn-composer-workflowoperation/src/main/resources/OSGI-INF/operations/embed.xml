@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.workflow.handler.composer.CaptionEmbedderWorkflowOperationHandler" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.workflow.handler.composer.CaptionEmbedderWorkflowOperationHandler" />
+  <property name="service.description" value="Caption Embedder Workflow Operation Handler" />
+  <property name="workflow.operation" value="embed" />
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+  </service>
+  <reference cardinality="1..1" interface="org.opencastproject.composer.api.ComposerService"
+    name="ComposerService" policy="static" bind="setComposerService"/>
+  <reference cardinality="1..1" interface="org.opencastproject.workspace.api.Workspace" name="Workspace"
+    policy="static" bind="setWorkspace" />
+  <reference cardinality="1..1" interface="org.opencastproject.caption.api.CaptionService" name="CaptionService"
+    policy="static" bind="setCaptionService" />
+  <reference name="ServiceRegistry" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    policy="static" bind="setServiceRegistry" />
+</scr:component>

@@ -1,20 +1,27 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.distribution.streaming.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.ws.rs.core.Response.status;
 
@@ -99,13 +106,19 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
   @RestQuery(name = "distribute", description = "Distribute a media package element to this distribution channel", returnDescription = "The job that can be used to track the distribution", restParameters = {
           @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
           @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
-          @RestParameter(name = "elementId", isRequired = true, description = "The element to distribute", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution job") })
+          @RestParameter(name = "elementId", isRequired = true, description = "The element to distribute", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution job"),
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "There is no streaming distribution service available") })
   public Response distribute(@FormParam("mediapackage") String mediaPackageXml,
           @FormParam("channelId") String channelId, @FormParam("elementId") String elementId) throws Exception {
     Job job = null;
     try {
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
       job = service.distribute(channelId, mediapackage, elementId);
+      if (job == null)
+        return Response.noContent().build();
+
+      return Response.ok(new JaxbJob(job)).build();
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to distribute element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();
@@ -113,7 +126,6 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
       logger.warn("Error distributing element", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
-    return Response.ok(new JaxbJob(job)).build();
   }
 
   @POST
@@ -122,13 +134,19 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
   @RestQuery(name = "retract", description = "Retract a media package element from this distribution channel", returnDescription = "The job that can be used to track the retraction", restParameters = {
           @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
           @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
-          @RestParameter(name = "elementId", isRequired = true, description = "The element to retract", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job") })
+          @RestParameter(name = "elementId", isRequired = true, description = "The element to retract", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job"),
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "There is no streaming distribution service available") })
   public Response retract(@FormParam("mediapackage") String mediaPackageXml, @FormParam("channelId") String channelId,
           @FormParam("elementId") String elementId) throws Exception {
     Job job = null;
     try {
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
       job = service.retract(channelId, mediapackage, elementId);
+      if (job == null)
+        return Response.noContent().build();
+
+      return Response.ok(new JaxbJob(job)).build();
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to distribute element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();
@@ -136,7 +154,6 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
       logger.warn("Unable to retract mediapackage '{}' from streaming channel: {}", new Object[] { mediaPackageXml, e });
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
-    return Response.ok(new JaxbJob(job)).build();
   }
 
   /**

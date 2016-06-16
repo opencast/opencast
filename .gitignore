@@ -1,34 +1,34 @@
 # Ignore file for Opencast Matterhorn project
 #
 
-# ignore runtime artifacts
-lib/matterhorn/*
-lib/ext/*
-inbox/*
-logs/*
-work/*
-
 # ignore maven target directories
 target/
+target-grunt/
+node_modules/
+node/
+/build/
 
 # ignore Eclipse project data
 .project
 .classpath
 .metadata/
 .settings/
+.recommenders/
 
 # ignore NetBeans project data
 */nbproject/*
 
-# just in case.. ignore SVN subdir
-*/.svn/*
-
 # Ignore all temporary editor files
 *.swp
+*.iml
+.idea
 
 # Ignore Maven files and local repository
 /.m2/
 /settings.xml
+
+# Ignore mkdocs sites
+docs/guides/*/site
 
 # Ignore Makefiles
 # Sometimes they help, but they should never be tracked

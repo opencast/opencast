@@ -1,0 +1,34 @@
+{
+   "series":{
+      "identifier":"10.0000-1",
+      "series":{
+         "id":"series-1",
+         "title":"Land and Vegetation: Key players on the Climate Scene"
+      },
+      "end_date":"2008-03-16T14:00:00Z",
+      "title":"Land and Vegetation: Key players on the Climate Scene",
+      "subject":"This is the subject",
+      "description":"This is the description for this series.",
+      "publications":{
+         "engage":"engage.html?e=p-1",
+         "oai-pmh":"oaipmh.html?e=p-1"
+      },
+      "organizers":[
+         "presenter-one",
+         "presenter-two",
+         "presenter-three"
+      ],
+      "contributors":[
+         "presenter-one",
+         "presenter-two",
+         "presenter-three"
+      ],
+      "source":"ARCHIVE",
+      "status":"archived",
+      "start_date":"2008-03-04T23:00:00Z",
+      "comments":{
+         "resolved":1,
+         "unresolved":1
+      }
+   }
+}

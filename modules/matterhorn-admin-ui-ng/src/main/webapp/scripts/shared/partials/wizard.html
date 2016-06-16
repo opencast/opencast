@@ -1,0 +1,31 @@
+<nav id="modal-nav" class="step-by-step">
+    <a ng-repeat="state in states"
+        ng-if="state.stateController.visible"
+        ng-click="wizard.toTab($event)"
+        ng-class="{ active: state.name === wizard.getCurrentStateName(), 'not-complete': !wizard.isCompleted(state.name) }"
+        data-modal-tab="{{ state.name }}"
+        translate="{{ state.translation }}">
+    </a>
+</nav>
+<nav id="breadcrumb"></nav>
+
+<ng-include src="'shared/partials/wizards/' + name + '.html'"></ng-include>
+
+<footer>
+    <a ng-if="!wizard.isLast()" ng-click="wizard.toTab($event)"
+        data-modal-tab="next" class="submit"
+        ng-class="{active: wizard.getCurrentState().stateController.isValid(), inactive: !wizard.getCurrentState().stateController.isValid()}">
+        {{ 'WIZARD.NEXT_STEP' | translate }}
+    </a>
+    <a ng-if="wizard.isLast()" ng-click="wizard.submit()"
+        data-modal-tab="next" class="submit"
+        ng-class="active">
+        {{ wizard.getFinalButtonTranslation() | translate}}
+    </a>
+    <a ng-if="wizard.hasPrevious()" ng-click="wizard.toTab($event)"
+        data-modal-tab="previous" class="cancel">
+        {{ 'WIZARD.BACK' | translate}}
+    </a>
+</footer>
+
+<div class="btm-spacer"></div>

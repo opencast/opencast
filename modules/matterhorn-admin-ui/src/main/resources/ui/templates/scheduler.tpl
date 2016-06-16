@@ -23,10 +23,10 @@
       </h3>
       <ul>
         <li id="missingTitle" class="ui-state-error-text single-error multiple-error">
-          <span class="ui-icon ui-icon-carat-1-e"></span>Please enter a <a href="javascript:$('#titleField')[0].focus();">title</a> for the recording.
+          <span class="ui-icon ui-icon-carat-1-e"></span>Please enter a <a href="javascript:$('#title')[0].focus();">title</a> for the recording.
         </li>
         <li id="missingSeries" class="ui-state-error-text multiple-error">
-          <span class="ui-icon ui-icon-carat-1-e"></span>Please enter a <a href="javascript:$('#isPartOf')[0].focus();">Series name</a> for this group of recordings.
+          <span class="ui-icon ui-icon-carat-1-e"></span>Please enter a <a href="javascript:$('#seriesSelect')[0].focus();">series name</a> for this group of recordings.  
         </li>
         <li id="errorRecurrence" class="ui-state-error-text multiple-error">
           <span class="ui-icon ui-icon-carat-1-e"></span>You must select at least one day of the week.

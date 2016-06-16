@@ -1,38 +1,52 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.util.data;
 
-import org.junit.Test;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.opencastproject.util.data.Arrays.array;
+import static org.opencastproject.util.data.Collections.iterator;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Collections.repeat;
+import static org.opencastproject.util.data.Iterators.constant;
+import static org.opencastproject.util.data.Iterators.intRangeE;
+import static org.opencastproject.util.data.Monadics.IteratorMonadic;
+import static org.opencastproject.util.data.Monadics.mlazy;
+import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.Option.none;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.Tuple.tuple;
+
 import org.opencastproject.util.data.functions.Booleans;
 import org.opencastproject.util.data.functions.Functions;
+
+import org.junit.Test;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
-import static org.opencastproject.util.data.Arrays.array;
-import static org.opencastproject.util.data.Collections.*;
-import static org.opencastproject.util.data.Iterators.constant;
-import static org.opencastproject.util.data.Iterators.intRangeE;
-import static org.opencastproject.util.data.Monadics.*;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 public class MonadicsTest {
 
@@ -122,6 +136,8 @@ public class MonadicsTest {
   public void testFlatten() {
     List<Integer> mapped = mlist(list(list(1, 2), list(3, 4))).flatMap(Functions.<List<Integer>>identity()).value();
     assertEquals(4, mapped.size());
+    List<Integer> mapped2 = mlist(some(1), Option.<Integer>option(null), some(3), Option.<Integer>none()).flatMap(Functions.<Option<Integer>>identity()).value();
+    assertEquals(2, mapped2.size());
   }
 
   @Test
@@ -146,6 +162,14 @@ public class MonadicsTest {
     assertEquals(3, mlist(asList(1, 2, 3, 4, 5).iterator()).take(3).value().size());
     assertEquals(5, mlist(asList(1, 2, 3, 4, 5).iterator()).take(5).value().size());
     assertEquals(5, mlist(asList(1, 2, 3, 4, 5).iterator()).take(10).value().size());
+  }
+
+  @Test
+  public void testDropArray() {
+    assertTrue(mlist(array(1, 2, 3, 4, 5)).drop(10).value().isEmpty());
+    assertEquals(3, mlist(array(1, 2, 3, 4, 5)).drop(2).value().size());
+    assertEquals(1, mlist(array(1, 2, 3, 4, 5)).drop(4).value().size());
+    assertEquals(5, mlist(array(1, 2, 3, 4, 5)).drop(0).value().size());
   }
 
   @Test

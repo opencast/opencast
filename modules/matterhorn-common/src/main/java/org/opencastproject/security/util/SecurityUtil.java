@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.security.util;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
@@ -36,7 +42,7 @@ import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 
 import java.net.URL;
@@ -77,7 +83,7 @@ public final class SecurityUtil {
    */
   public static User createSystemUser(String systemUserName, Organization org) {
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(org);
-    return new JaxbUser(systemUserName, jaxbOrganization, new JaxbRole(GLOBAL_ADMIN_ROLE, jaxbOrganization),
+    return new JaxbUser(systemUserName, null, jaxbOrganization, new JaxbRole(GLOBAL_ADMIN_ROLE, jaxbOrganization),
             new JaxbRole(org.getAdminRole(), jaxbOrganization));
   }
 
@@ -90,8 +96,8 @@ public final class SecurityUtil {
    */
   public static User createAnonymousUser(Organization org) {
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(org);
-    return new JaxbUser(GLOBAL_ANONYMOUS_USERNAME, jaxbOrganization, new JaxbRole(jaxbOrganization.getAnonymousRole(),
-            jaxbOrganization));
+    return new JaxbUser(GLOBAL_ANONYMOUS_USERNAME, null, jaxbOrganization, new JaxbRole(
+            jaxbOrganization.getAnonymousRole(), jaxbOrganization));
   }
 
   /**

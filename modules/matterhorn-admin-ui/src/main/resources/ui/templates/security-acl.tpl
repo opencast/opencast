@@ -12,7 +12,7 @@
 </div>
 <br />
 <% _.each(this.data, function(acl) { %>
-<h2><%= acl.name %></h2><span title="Delete ACL" id="<%= acl.id %>" class="ui-icon ui-icon-trash deleteAcl" alt="delete" style="display:inline-block"></span>
+<h2><%! acl.name %></h2><span title="Delete ACL" id="<%! acl.id %>" class="ui-icon ui-icon-trash deleteAcl" alt="delete" style="display:inline-block"></span>
 <table id="aclTable" class="ui-widget" width="600px" cellspacing="0" border="1">
 	<thead>
 		<tr>
@@ -25,7 +25,7 @@
 	<tbody>
 		<% _.each(acl.roles, function(role) { %>
 		<tr>
-			<td><input type="text" class="role_search ui-autocomplete-input" value="<%= role.name %>" id="<%= role.name %>"></td>
+			<td><input type="text" class="role_search ui-autocomplete-input" value="<%! role.name %>" id="<%! role.name %>"></td>
 			<td class="privilege_edit"><input type="checkbox" class="privilege_edit" name="priv_read" <% if (role.read) { %> checked="checked" <% } %>></td>
 			<td class="privilege_edit"><input type="checkbox" class="privilege_edit" name="priv_write" <% if (role.write) { %> checked="checked" <% } %>></td>
 			<td class="privilege_edit"><span class="ui-icon ui-icon-trash" title="Delete Role" alt="delete"></span></td>

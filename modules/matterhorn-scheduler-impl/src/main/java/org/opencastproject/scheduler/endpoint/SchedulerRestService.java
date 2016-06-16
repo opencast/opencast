@@ -1,16 +1,21 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
 package org.opencastproject.scheduler.endpoint;
@@ -27,18 +32,21 @@ import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogImpl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerQuery;
 import org.opencastproject.scheduler.api.SchedulerService;
+import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.scheduler.impl.CaptureNowProlongingService;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.systems.MatterhornConstans;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.SolrUtils;
@@ -53,7 +61,9 @@ import org.opencastproject.util.doc.rest.RestService;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
@@ -191,7 +201,7 @@ public class SchedulerRestService {
     if (cc == null) {
       serverUrl = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstans.SERVER_URL_PROPERTY);
+      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
       logger.debug("configured server url is {}", ccServerUrl);
       if (ccServerUrl == null) {
         serverUrl = UrlSupport.DEFAULT_BASE_URL;
@@ -201,7 +211,7 @@ public class SchedulerRestService {
       serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
       defaultWorkflowDefinitionId = StringUtils.trimToNull(cc.getBundleContext().getProperty(
 
-      DEFAULT_WORKFLOW_DEFINITION));
+              DEFAULT_WORKFLOW_DEFINITION));
       if (defaultWorkflowDefinitionId == null)
         throw new IllegalStateException("Default workflow definition is null: " + DEFAULT_WORKFLOW_DEFINITION);
     }
@@ -218,9 +228,10 @@ public class SchedulerRestService {
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("{id:.+}.xml")
-  @RestQuery(name = "recordingsasxml", description = "Retrieves DublinCore for specified event", returnDescription = "DublinCore in XML", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "ID of event for which DublinCore will be retrieved", type = Type.STRING) }, reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "DublinCore of event is in the body of response"),
-          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
+  @RestQuery(name = "recordingsasxml", description = "Retrieves DublinCore for specified event", returnDescription = "DublinCore in XML", pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "ID of event for which DublinCore will be retrieved", type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "DublinCore of event is in the body of response"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
   public Response getDublinCoreMetadataXml(@PathParam("id") long eventId) {
     try {
       DublinCoreCatalog result = service.getEventDublinCore(eventId);
@@ -245,9 +256,10 @@ public class SchedulerRestService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{id:.+}.json")
-  @RestQuery(name = "recordingsasjson", description = "Retrieves DublinCore for specified event", returnDescription = "DublinCore in JSON", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "ID of event for which DublinCore will be retrieved", type = Type.STRING) }, reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "DublinCore of event is in the body of response"),
-          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
+  @RestQuery(name = "recordingsasjson", description = "Retrieves DublinCore for specified event", returnDescription = "DublinCore in JSON", pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "ID of event for which DublinCore will be retrieved", type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "DublinCore of event is in the body of response"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
   public Response getDublinCoreMetadataJSON(@PathParam("id") long eventId) {
     try {
       DublinCoreCatalog result = service.getEventDublinCore(eventId);
@@ -271,9 +283,10 @@ public class SchedulerRestService {
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("{id:.+}/agent.properties")
-  @RestQuery(name = "recordingsagentproperties", description = "Retrieves Capture Agent properties for specified event", returnDescription = "Capture Agent properties in the form of key, value pairs", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "ID of event for which agent properties will be retrieved", type = Type.STRING) }, reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Capture Agent properties of event is in the body of response"),
-          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
+  @RestQuery(name = "recordingsagentproperties", description = "Retrieves Capture Agent properties for specified event", returnDescription = "Capture Agent properties in the form of key, value pairs", pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "ID of event for which agent properties will be retrieved", type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Capture Agent properties of event is in the body of response"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
   public Response getCaptureAgentMetadata(@PathParam("id") long eventId) {
     try {
       Properties result = service.getEventCaptureAgentConfiguration(eventId);
@@ -298,9 +311,9 @@ public class SchedulerRestService {
           @RestParameter(name = "agentparameters", isRequired = true, type = Type.TEXT, description = "Capture agent properties for event", defaultValue = "${this.sampleCAProperties}"),
           @RestParameter(name = "wfproperties", isRequired = false, type = Type.TEXT, description = "Workflow configuration properties"),
           @RestParameter(name = "event", isRequired = false, type = Type.TEXT, description = "Catalog containing information about the event that doesn't exist in DC (IE: Recurrence rule)") }, reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Event or events were successfully created"),
-          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to create the event. Maybe you need to authenticate."),
-          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid information for this request") })
+                  @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Event or events were successfully created"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to create the event. Maybe you need to authenticate."),
+                  @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid information for this request") })
   public Response addEvent(@FormParam("dublincore") String dublinCoreXml,
           @FormParam("agentparameters") String agentParameters, @FormParam("wfproperties") String workflowProperties,
           @FormParam("event") String event) throws UnauthorizedException {
@@ -345,7 +358,7 @@ public class SchedulerRestService {
     }
 
     try {
-      if (eventCatalog.hasValue(DublinCoreCatalogImpl.PROPERTY_RECURRENCE)) {
+      if (eventCatalog.hasValue(DublinCores.OC_PROPERTY_RECURRENCE)) {
         // try to create event and it's recurrences
         Long[] createdIDs = service.addReccuringEvent(eventCatalog, wfProperties);
         for (long id : createdIDs) {
@@ -370,10 +383,11 @@ public class SchedulerRestService {
   @GET
   @Path("capture/{agent}")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "currentcapture", description = "Get the current capture event catalog as JSON", returnDescription = "The current capture event catalog as JSON", pathParameters = { @RestParameter(name = "agent", isRequired = true, type = Type.STRING, description = "The agent identifier") }, reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "DublinCore of current capture event is in the body of response"),
-          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "There is no ongoing recording"),
-          @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
+  @RestQuery(name = "currentcapture", description = "Get the current capture event catalog as JSON", returnDescription = "The current capture event catalog as JSON", pathParameters = {
+          @RestParameter(name = "agent", isRequired = true, type = Type.STRING, description = "The agent identifier") }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "DublinCore of current capture event is in the body of response"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "There is no ongoing recording"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
   public Response currentCapture(@PathParam("agent") String agentId) throws NotFoundException {
     if (service == null || agentService == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE)
@@ -400,10 +414,11 @@ public class SchedulerRestService {
   @GET
   @Path("capture/{agent}/upcoming")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "upcomingcapture", description = "Get the upcoming capture event catalog as JSON", returnDescription = "The upcoming capture event catalog as JSON", pathParameters = { @RestParameter(name = "agent", isRequired = true, type = Type.STRING, description = "The agent identifier") }, reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "DublinCore of the upcomfing capture event is in the body of response"),
-          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "There is no upcoming recording"),
-          @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
+  @RestQuery(name = "upcomingcapture", description = "Get the upcoming capture event catalog as JSON", returnDescription = "The upcoming capture event catalog as JSON", pathParameters = {
+          @RestParameter(name = "agent", isRequired = true, type = Type.STRING, description = "The agent identifier") }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "DublinCore of the upcomfing capture event is in the body of response"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "There is no upcoming recording"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
   public Response upcomingCapture(@PathParam("agent") String agentId) throws NotFoundException {
     if (service == null || agentService == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE)
@@ -429,12 +444,14 @@ public class SchedulerRestService {
 
   @POST
   @Path("capture/{agent}")
-  @RestQuery(name = "startcapture", description = "Create an immediate event", returnDescription = "If events were successfully generated, status CREATED is returned", pathParameters = { @RestParameter(name = "agent", isRequired = true, type = Type.STRING, description = "The agent identifier") }, restParameters = { @RestParameter(name = "workflowDefinitionId", isRequired = false, type = Type.STRING, description = "The workflow definition id to use") }, reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Recording started"),
-          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "There is no such agent"),
-          @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "The agent is already recording"),
-          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to start this immediate capture. Maybe you need to authenticate."),
-          @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
+  @RestQuery(name = "startcapture", description = "Create an immediate event", returnDescription = "If events were successfully generated, status CREATED is returned", pathParameters = {
+          @RestParameter(name = "agent", isRequired = true, type = Type.STRING, description = "The agent identifier") }, restParameters = {
+                  @RestParameter(name = "workflowDefinitionId", isRequired = false, type = Type.STRING, description = "The workflow definition id to use") }, reponses = {
+                          @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Recording started"),
+                          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "There is no such agent"),
+                          @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "The agent is already recording"),
+                          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to start this immediate capture. Maybe you need to authenticate."),
+                          @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
   public Response startCapture(@PathParam("agent") String agentId, @FormParam("workflowDefinitionId") String wfId)
           throws NotFoundException, UnauthorizedException {
     if (service == null || agentService == null || prolongingService == null)
@@ -515,12 +532,13 @@ public class SchedulerRestService {
   @DELETE
   @Path("capture/{agent}")
   @Produces(MediaType.TEXT_PLAIN)
-  @RestQuery(name = "stopcapture", description = "Stops an immediate capture.", returnDescription = "OK if event were successfully stopped", pathParameters = { @RestParameter(name = "agent", isRequired = true, description = "The agent identifier", type = Type.STRING) }, reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Recording stopped"),
-          @RestResponse(responseCode = HttpServletResponse.SC_NOT_MODIFIED, description = "The recording was already stopped"),
-          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "There is no such agent"),
-          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to stop this immediate capture. Maybe you need to authenticate."),
-          @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
+  @RestQuery(name = "stopcapture", description = "Stops an immediate capture.", returnDescription = "OK if event were successfully stopped", pathParameters = {
+          @RestParameter(name = "agent", isRequired = true, description = "The agent identifier", type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Recording stopped"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_MODIFIED, description = "The recording was already stopped"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "There is no such agent"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to stop this immediate capture. Maybe you need to authenticate."),
+                  @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
   public Response stopCapture(@PathParam("agent") String agentId) throws NotFoundException, UnauthorizedException {
     if (service == null || agentService == null || prolongingService == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE)
@@ -565,11 +583,12 @@ public class SchedulerRestService {
   @PUT
   @Path("capture/{agent}/prolong")
   @Produces(MediaType.TEXT_PLAIN)
-  @RestQuery(name = "prolongcapture", description = "Prolong an immediate capture.", returnDescription = "OK if event were successfully prolonged", pathParameters = { @RestParameter(name = "agent", isRequired = true, description = "The agent identifier", type = Type.STRING) }, reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Recording prolonged"),
-          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "No recording found for prolonging"),
-          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to prolong this immediate capture. Maybe you need to authenticate."),
-          @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
+  @RestQuery(name = "prolongcapture", description = "Prolong an immediate capture.", returnDescription = "OK if event were successfully prolonged", pathParameters = {
+          @RestParameter(name = "agent", isRequired = true, description = "The agent identifier", type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Recording prolonged"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "No recording found for prolonging"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to prolong this immediate capture. Maybe you need to authenticate."),
+                  @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
   public Response prolongCapture(@PathParam("agent") String agentId) throws NotFoundException, UnauthorizedException {
     if (service == null || agentService == null || prolongingService == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE)
@@ -593,7 +612,8 @@ public class SchedulerRestService {
   @Path("bulkaction")
   @RestQuery(name = "bulkaction", description = "Updates the dublin core catalog of a set of recordings.", returnDescription = "No body returned.", restParameters = {
           @RestParameter(name = "idlist", description = "JSON Array of ids.", isRequired = true, type = Type.STRING),
-          @RestParameter(name = "dublinecore", description = "The dublin core catalog of updated fields", isRequired = true, type = Type.STRING) }, reponses = { @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "Events were updated successfully.") })
+          @RestParameter(name = "dublinecore", description = "The dublin core catalog of updated fields", isRequired = true, type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "Events were updated successfully.") })
   public Response bulkUpdate(@FormParam("idlist") String idList, @FormParam("dublincore") String dublinCore) {
     JSONParser parser = new JSONParser();
     JSONArray ids = new JSONArray();
@@ -641,10 +661,11 @@ public class SchedulerRestService {
   @DELETE
   @Path("{id:.+}")
   @Produces(MediaType.TEXT_PLAIN)
-  @RestQuery(name = "deleterecordings", description = "Removes scheduled event with specified ID.", returnDescription = "OK if event were successfully removed or NOT FOUND if event with specified ID does not exist", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "Event ID", type = Type.STRING) }, reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully removed"),
-          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
-          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to remove the event. Maybe you need to authenticate.") })
+  @RestQuery(name = "deleterecordings", description = "Removes scheduled event with specified ID.", returnDescription = "OK if event were successfully removed or NOT FOUND if event with specified ID does not exist", pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "Event ID", type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully removed"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to remove the event. Maybe you need to authenticate.") })
   public Response deleteEvent(@PathParam("id") long eventId) throws UnauthorizedException {
     try {
       service.removeEvent(eventId);
@@ -673,14 +694,15 @@ public class SchedulerRestService {
    */
   @PUT
   @Path("{id:[0-9]+}")
-  @RestQuery(name = "updaterecordings", description = "Updates Dublin Core of specified event", returnDescription = "Status OK is returned if event was successfully updated, NOT FOUND if specified event does not exist or BAD REQUEST if data is missing or invalid", pathParameters = { @RestParameter(name = "id", description = "ID of event to be updated", isRequired = true, type = Type.STRING) }, restParameters = {
-          @RestParameter(name = "dublincore", isRequired = false, description = "Updated Dublin Core for event", type = Type.TEXT),
-          @RestParameter(name = "agentparameters", isRequired = false, description = "Updated Capture Agent properties", type = Type.TEXT),
-          @RestParameter(name = "wfproperties", isRequired = false, description = "Workflow configuration properties", type = Type.TEXT) }, reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
-          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
-          @RestResponse(responseCode = HttpServletResponse.SC_FORBIDDEN, description = "Event with specified ID cannot be updated"),
-          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Data is missing or invalid") })
+  @RestQuery(name = "updaterecordings", description = "Updates Dublin Core of specified event", returnDescription = "Status OK is returned if event was successfully updated, NOT FOUND if specified event does not exist or BAD REQUEST if data is missing or invalid", pathParameters = {
+          @RestParameter(name = "id", description = "ID of event to be updated", isRequired = true, type = Type.STRING) }, restParameters = {
+                  @RestParameter(name = "dublincore", isRequired = false, description = "Updated Dublin Core for event", type = Type.TEXT),
+                  @RestParameter(name = "agentparameters", isRequired = false, description = "Updated Capture Agent properties", type = Type.TEXT),
+                  @RestParameter(name = "wfproperties", isRequired = false, description = "Workflow configuration properties", type = Type.TEXT) }, reponses = {
+                          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
+                          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
+                          @RestResponse(responseCode = HttpServletResponse.SC_FORBIDDEN, description = "Event with specified ID cannot be updated"),
+                          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Data is missing or invalid") })
   public Response updateEvent(@PathParam("id") String eventID, @FormParam("dublincore") String dublinCoreXml,
           @FormParam("agentparameters") String agentParameters, @FormParam("wfproperties") String workflowProperties)
           throws UnauthorizedException {
@@ -711,7 +733,8 @@ public class SchedulerRestService {
       try {
         caProperties = parseProperties(agentParameters);
         if (caProperties.size() == 0)
-          logger.info("Empty form param 'agentparameters'. This resets all CA parameters. Please make sure this is intended behaviour.");
+          logger.info(
+                  "Empty form param 'agentparameters'. This resets all CA parameters. Please make sure this is intended behaviour.");
 
       } catch (Exception e) {
         logger.warn("Could not parse capture agent properties: {}", agentParameters);
@@ -823,7 +846,8 @@ public class SchedulerRestService {
           @RestParameter(name = "abstract", description = "Search by abstract", isRequired = false, type = Type.STRING),
           @RestParameter(name = "description", description = "Search by description", isRequired = false, type = Type.STRING),
           @RestParameter(name = "spatial", description = "Search by device", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "sort", description = "The sort order.  May include any of the following: TITLE, SUBJECT, CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE, EVENT_START.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Search completed, results returned in body") })
+          @RestParameter(name = "sort", description = "The sort order.  May include any of the following: TITLE, SUBJECT, CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE, EVENT_START.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", isRequired = false, type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Search completed, results returned in body") })
   // CHECKSTYLE:OFF
   public Response getEventsAsXml(@QueryParam("q") String text, @QueryParam("eventid") String eventId,
           @QueryParam("eventtitle") String eventTitle, @QueryParam("seriesid") String seriesId,
@@ -918,7 +942,8 @@ public class SchedulerRestService {
           @RestParameter(name = "abstract", description = "Search by abstract", isRequired = false, type = Type.STRING),
           @RestParameter(name = "description", description = "Search by description", isRequired = false, type = Type.STRING),
           @RestParameter(name = "spatial", description = "Search by device", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "sort", description = "The sort order.  May include any of the following: TITLE, SUBJECT, CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE, EVENT_START.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Search completed, results returned in body") })
+          @RestParameter(name = "sort", description = "The sort order.  May include any of the following: TITLE, SUBJECT, CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE, EVENT_START.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", isRequired = false, type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Search completed, results returned in body") })
   // CHECKSTYLE:OFF
   public Response getEventsAsJson(@QueryParam("q") String text, @QueryParam("eventid") String eventId,
           @QueryParam("eventtitle") String eventTitle, @QueryParam("seriesid") String seriesId,
@@ -1072,9 +1097,9 @@ public class SchedulerRestService {
           @RestParameter(name = "duration", description = "If recurrence rule is specified duration of each conflicting period, in milliseconds", isRequired = false, type = Type.INTEGER),
           @RestParameter(name = "rrule", description = "Rule for recurrent conflicting, specified as: \"FREQ=WEEKLY;BYDAY=day(s);BYHOUR=hour;BYMINUTE=minute\". FREQ is required. BYDAY may include one or more (separated by commas) of the following: SU,MO,TU,WE,TH,FR,SA.", isRequired = false, type = Type.STRING),
           @RestParameter(name = "timezone", description = "The timezone of the capture device", isRequired = false, type = Type.STRING) }, reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No conflicting events found"),
-          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Found conflicting events, returned in body of response"),
-          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid parameters") })
+                  @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No conflicting events found"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Found conflicting events, returned in body of response"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid parameters") })
   public Response getConflictingEventsXml(@QueryParam("device") String device, @QueryParam("start") Long startDate,
           @QueryParam("end") Long endDate, @QueryParam("duration") Long duration, @QueryParam("rrule") String rrule,
           @QueryParam("timezone") String timezone) {
@@ -1109,9 +1134,9 @@ public class SchedulerRestService {
           @RestParameter(name = "duration", description = "If recurrence rule is specified duration of each conflicting period, in milliseconds", isRequired = false, type = Type.INTEGER),
           @RestParameter(name = "rrule", description = "Rule for recurrent conflicting, specified as: \"FREQ=WEEKLY;BYDAY=day(s);BYHOUR=hour;BYMINUTE=minute\". FREQ is required. BYDAY may include one or more (separated by commas) of the following: SU,MO,TU,WE,TH,FR,SA.", isRequired = false, type = Type.STRING),
           @RestParameter(name = "timezone", description = "The timezone of the capture device", isRequired = false, type = Type.STRING) }, reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No conflicting events found"),
-          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Found conflicting events, returned in body of response"),
-          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid parameters") })
+                  @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No conflicting events found"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Found conflicting events, returned in body of response"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid parameters") })
   public Response getConflictingEventsJSON(@QueryParam("device") String device, @QueryParam("start") Long startDate,
           @QueryParam("end") Long endDate, @QueryParam("duration") Long duration, @QueryParam("rrule") String rrule,
           @QueryParam("timezone") String timezone) {
@@ -1163,9 +1188,8 @@ public class SchedulerRestService {
         return Response.noContent().build();
       }
     } catch (Exception e) {
-      logger.error(
-              "Unable to find conflicting events for " + device + ", " + startDate.toString() + ", "
-                      + endDate.toString() + ", " + duration.toString() + ":", e.getMessage());
+      logger.error("Unable to find conflicting events for " + device + ", " + startDate.toString() + ", "
+              + endDate.toString() + ", " + duration.toString() + ":", e.getMessage());
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1188,42 +1212,329 @@ public class SchedulerRestService {
           @RestParameter(name = "agentid", description = "Filter events by capture agent", isRequired = false, type = Type.STRING),
           @RestParameter(name = "seriesid", description = "Filter events by series", isRequired = false, type = Type.STRING),
           @RestParameter(name = "cutoff", description = "A cutoff date at which the number of events returned in the calendar are limited.", isRequired = false, type = Type.STRING) }, reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_NOT_MODIFIED, description = "Events were not modified since last request"),
-          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Events were modified, new calendar is in the body") })
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "No calendar for agent found"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_MODIFIED, description = "Events were not modified since last request"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Events were modified, new calendar is in the body") })
   public Response getCalendar(@QueryParam("agentid") String captureAgentId, @QueryParam("seriesid") String seriesId,
-          @QueryParam("cutoff") String cutoff, @Context HttpServletRequest request) {
-    SchedulerQuery filter = new SchedulerQuery().setSpatial(captureAgentId).setSeriesId(seriesId);
+          @QueryParam("cutoff") String cutoff, @Context HttpServletRequest request) throws NotFoundException {
 
+    Date endDate = null;
     if (StringUtils.isNotEmpty(cutoff)) {
       try {
-        Date endDate = new Date(Long.valueOf(cutoff));
-        filter = new SchedulerQuery().setSpatial(captureAgentId).setSeriesId(seriesId)
-                .setEndsFrom(DateTime.now().minusHours(1).toDate()).setStartsTo(endDate);
+        endDate = new Date(Long.valueOf(cutoff));
       } catch (NumberFormatException e) {
         return Response.status(Status.BAD_REQUEST).build();
       }
     }
 
     try { // If the etag matches the if-not-modified header,return a 304
-      Date lastModified = service.getScheduleLastModified(filter);
-      if (lastModified == null) {
-        lastModified = new Date();
-      }
+      String lastModified = service.getScheduleLastModified(captureAgentId);
       String ifNoneMatch = request.getHeader(HttpHeaders.IF_NONE_MATCH);
-      if (StringUtils.isNotBlank(ifNoneMatch) && ifNoneMatch.equals("mod" + Long.toString(lastModified.getTime()))) {
-        return Response.notModified("mod" + Long.toString(lastModified.getTime())).expires(null).build();
+      if (StringUtils.isNotBlank(ifNoneMatch) && ifNoneMatch.equals(lastModified)) {
+        return Response.notModified(lastModified).expires(null).build();
       }
+      SchedulerQuery filter = new SchedulerQuery().setSpatial(captureAgentId).setSeriesId(seriesId)
+              .setEndsFrom(DateTime.now().minusHours(1).toDate());
+      if (endDate != null)
+        filter.setStartsTo(endDate);
+
       String result = service.getCalendar(filter);
       if (!result.isEmpty()) {
-        return Response.ok(result).header(HttpHeaders.ETAG, "mod" + Long.toString(lastModified.getTime()))
+        return Response.ok(result).header(HttpHeaders.ETAG, lastModified)
                 .header(HttpHeaders.CONTENT_TYPE, "text/calendar; charset=UTF-8").build();
       } else {
-        throw new NotFoundException();
+        throw new NotFoundException("No calendar for agent " + captureAgentId + " found!");
       }
+    } catch (NotFoundException e) {
+      throw e;
     } catch (Exception e) {
-      logger.error("Unable to get calendar for capture agent '{}': {}", captureAgentId, e.getMessage());
+      logger.error("Unable to get calendar for capture agent '{}': {}", captureAgentId,
+              ExceptionUtils.getStackTrace(e));
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  @PUT
+  @Path("{id}/acl")
+  @RestQuery(name = "updateaccesscontrollist", description = "Updates the access control list of the event with the given id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = {
+          @RestParameter(name = "id", description = "ID of event", isRequired = true, type = Type.STRING) }, restParameters = {
+                  @RestParameter(name = "acl", isRequired = false, description = "The access control list", type = Type.STRING) }, reponses = {
+                          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
+                          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
+                          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "access control list could not be parsed") })
+  public Response updateAccessControlList(@PathParam("id") long eventId, @FormParam("acl") String aclString) {
+    AccessControlList acl;
+    try {
+      acl = AccessControlParser.parseAcl(aclString);
+    } catch (Exception e) {
+      logger.debug("Unable to parse acl '{}': {}", aclString, ExceptionUtils.getStackTrace(e));
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+
+    try {
+      service.updateAccessControlList(eventId, acl);
+      return Response.ok().build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with id '{}' does not exist.", eventId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to update access control list of event with id '{}': {}", eventId,
+              ExceptionUtils.getStackTrace(e));
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("{id}/acl")
+  @RestQuery(name = "getaccesscontrollist", description = "Retrieves the access control list for specified event", returnDescription = "The access control list", pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "ID of event for which the access control list will be retrieved", type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The access control list as JSON "),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
+  public Response getAccessControlList(@PathParam("id") long eventId) {
+    try {
+      AccessControlList accessControlList = service.getAccessControlList(eventId);
+      return Response.ok(AccessControlParser.toJson(accessControlList)).type(MediaType.APPLICATION_JSON_TYPE).build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with id '{}' does not exist.", eventId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to retrieve access control list of event with id '{}': {}", eventId, e.getMessage());
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("{id}/mediapackageId")
+  @RestQuery(name = "recordingmediapackageid", description = "Retrieves the mediapackage identifier for specified event", returnDescription = "The mediapackage identifier", pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "ID of event for which the mediapackage identifier will be retrieved", type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The mediapackage identifier of event is in the body of response"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
+  public Response getMediaPackageId(@PathParam("id") long eventId) {
+    try {
+      String mediaPackageId = service.getMediaPackageId(eventId);
+      return Response.ok(mediaPackageId).build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with id '{}' does not exist.", eventId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to retrieve event with id '{}': {}", eventId, e.getMessage());
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("{id}/eventId")
+  @RestQuery(name = "recordingeventid", description = "Retrieves the event identifier of the event with the given mediapackage", returnDescription = "The event identifier", pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage identifier", type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The mediapackage identifier of event is in the body of response"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
+  public Response getEventId(@PathParam("id") String mediaPackageId) {
+    try {
+      long eventId = service.getEventId(mediaPackageId);
+      return Response.ok(Long.toString(eventId)).build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with mediapackage id '{}' does not exist.", mediaPackageId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to retrieve event with mediapackage id '{}': {}", mediaPackageId, e.getMessage());
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("{id}/optOut")
+  @RestQuery(name = "recordingoptoutstatus", description = "Retrieves the opt out status for specified event", returnDescription = "The opt out status", pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage id for which the opt out status will be retrieved", type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The opt out status of event is in the body of response"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist") })
+  public Response getOptOut(@PathParam("id") String mediaPackageId) {
+    try {
+      boolean optOut = service.isOptOut(mediaPackageId);
+      return Response.ok(Boolean.toString(optOut)).build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with mediapackage id '{}' does not exist.", mediaPackageId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to retrieve event with mediapackage id '{}': {}", mediaPackageId, e.getMessage());
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @PUT
+  @Path("{id}/optOut")
+  @RestQuery(name = "updateoptoutstatus", description = "Updates the opt out status of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = {
+          @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = {
+                  @RestParameter(name = "optOut", isRequired = false, description = "The opt out status to set", type = Type.STRING) }, reponses = {
+                          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
+                          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
+                          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "opt out value could not be parsed") })
+  public Response updateOptOut(@PathParam("id") String mpId, @FormParam("optOut") String optOutString) {
+    Boolean optedOut = BooleanUtils.toBooleanObject(optOutString);
+    if (optedOut == null)
+      return Response.status(Status.BAD_REQUEST).build();
+
+    try {
+      service.updateOptOutStatus(mpId, optedOut);
+      return Response.ok().build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with mediapackage id '{}' does not exist.", mpId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to update event with mediapackage id '{}': {}", mpId, ExceptionUtils.getStackTrace(e));
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("{id}/reviewStatus")
+  @RestQuery(name = "recordingreviewstatus", description = "Retrieves the review status for specified event", returnDescription = "The review status", pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage id for which the review status will be retrieved", type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The review status of event is in the body of response"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist") })
+  public Response getReviewStatus(@PathParam("id") String mediaPackageId) {
+    try {
+      ReviewStatus reviewStatus = service.getReviewStatus(mediaPackageId);
+      return Response.ok(reviewStatus.toString()).build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with mediapackage id '{}' does not exist.", mediaPackageId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to retrieve event with mediapackage id '{}': {}", mediaPackageId, e.getMessage());
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @PUT
+  @Path("{id}/reviewStatus")
+  @RestQuery(name = "updatereviewstatus", description = "Updates the review status of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = {
+          @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = {
+                  @RestParameter(name = "reviewStatus", isRequired = false, description = "The review status to set: [UNSENT, UNCONFIRMED, CONFIRMED]", type = Type.STRING) }, reponses = {
+                          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
+                          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
+                          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "review status could not be parsed") })
+  public Response updateReviewStatus(@PathParam("id") String mpId,
+          @FormParam("reviewStatus") String reviewStatusString) {
+
+    ReviewStatus reviewStatus;
+    try {
+      reviewStatus = ReviewStatus.valueOf(reviewStatusString);
+    } catch (Exception e) {
+      logger.warn("Unable to parse review status {}", reviewStatusString);
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+
+    try {
+      service.updateReviewStatus(mpId, reviewStatus);
+      return Response.ok().build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with mediapackage id '{}' does not exist.", mpId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to update event with mediapackage id '{}': {}", mpId, ExceptionUtils.getStackTrace(e));
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("{id}/blacklisted")
+  @RestQuery(name = "recordingblackliststatus", description = "Retrieves the blacklist status for specified event", returnDescription = "The blacklist status", pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage id for which the blacklist status will be retrieved", type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The blacklist status of event is in the body of response"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist") })
+  public Response getBlacklistStatus(@PathParam("id") String mediaPackageId) {
+    try {
+      boolean blacklisted = service.isBlacklisted(mediaPackageId);
+      return Response.ok(Boolean.toString(blacklisted)).build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with mediapackage id '{}' does not exist.", mediaPackageId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to retrieve event with mediapackage id '{}': {}", mediaPackageId, e.getMessage());
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @PUT
+  @Path("{id}/blacklisted")
+  @RestQuery(name = "updateblackliststatus", description = "Updates the blacklist status of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = {
+          @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = {
+                  @RestParameter(name = "blacklisted", isRequired = false, description = "The blacklist status to set", type = Type.STRING) }, reponses = {
+                          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
+                          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
+                          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "blacklist status could not be parsed") })
+  public Response updateBlacklistStatus(@PathParam("id") String mpId,
+          @FormParam("blacklisted") String blacklistString) {
+    Boolean blacklisted = BooleanUtils.toBooleanObject(blacklistString);
+    if (blacklisted == null)
+      return Response.status(Status.BAD_REQUEST).build();
+
+    try {
+      service.updateBlacklistStatus(mpId, blacklisted);
+      return Response.ok().build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with mediapackage id '{}' does not exist.", mpId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to update event with mediapackage id '{}': {}", mpId, ExceptionUtils.getStackTrace(e));
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @PUT
+  @Path("{id}/workflowConfig")
+  @RestQuery(name = "updateworkflowconfig", description = "Updates the worklfow config of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = {
+          @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = {
+                  @RestParameter(name = "workflowConfig", isRequired = false, description = "The workflow config to add", type = Type.STRING) }, reponses = {
+                          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
+                          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
+                          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "workflow config could not be parsed") })
+  public Response updateWorkflowConfig(@PathParam("id") String mpId,
+          @FormParam("workflowConfig") String workflowConfigString) {
+    Map<String, String> wfProperties = new HashMap<String, String>();
+    try {
+      Properties prop = parseProperties(workflowConfigString);
+      wfProperties.putAll((Map) prop);
+    } catch (IOException e) {
+      logger.warn("Could not parse workflow configuration properties: {}", workflowConfigString);
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+
+    try {
+      service.updateWorkflowConfig(mpId, wfProperties);
+      return Response.ok().build();
+    } catch (NotFoundException e) {
+      logger.warn("Event with mediapackage id '{}' does not exist.", mpId);
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.warn("Unable to update event with mediapackage id '{}': {}", mpId, ExceptionUtils.getStackTrace(e));
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @POST
+  @Path("/removeOldScheduledRecordings")
+  @RestQuery(name = "removeOldScheduledRecordings", description = "This will find and remove any scheduled events before the buffer time to keep performance in the scheduler optimum.", returnDescription = "No return value", reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Removed old scheduled recordings."),
+          @RestResponse(responseCode = HttpServletResponse.SC_PRECONDITION_FAILED, description = "Unable to parse buffer.") }, restParameters = {
+                  @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "604800", isRequired = true, description = "The amount of seconds before now that a capture has to have stopped capturing. It must be 0 or greater.") })
+  public Response removeOldScheduledRecordings(@FormParam("buffer") long buffer) {
+    if (buffer < 0) {
+      return Response.status(HttpServletResponse.SC_BAD_REQUEST).build();
+    }
+
+    try {
+      service.removeScheduledRecordingsBeforeBuffer(buffer);
+    } catch (SchedulerException e) {
+      logger.error("Error while trying to remove old scheduled recordings", e);
+      throw new WebApplicationException(e);
+    }
+    return Response.ok().build();
   }
 
   /**
@@ -1277,12 +1588,11 @@ public class SchedulerRestService {
   private DublinCoreCatalog parseDublinCore(String dcXML) throws IOException {
     // Trim XML string because parsing will fail if there are any chars before XML processing instruction
     String trimmedDcXml = StringUtils.trim(dcXML);
-    /* Warn the user if trimming was necessary as this meant that the XML
-     * string was technically invalid.
+    /*
+     * Warn the user if trimming was necessary as this meant that the XML string was technically invalid.
      */
     if (!trimmedDcXml.equals(dcXML)) {
-      logger.warn("Detected invalid XML data. Trying to fix this by "
-          + "removing spaces from beginning/end.");
+      logger.warn("Detected invalid XML data. Trying to fix this by removing spaces from beginning/end.");
     }
     return dcService.load(new ByteArrayInputStream(trimmedDcXml.getBytes("UTF-8")));
   }

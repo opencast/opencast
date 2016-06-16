@@ -1,34 +1,36 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.usertracking.impl;
+
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.usertracking.api.FootprintList;
 import org.opencastproject.usertracking.api.Report;
 import org.opencastproject.usertracking.api.UserAction;
 import org.opencastproject.usertracking.api.UserActionList;
-import org.opencastproject.usertracking.api.UserSummary;
-import org.opencastproject.usertracking.api.UserSummaryList;
+import org.opencastproject.usertracking.api.UserSession;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
-import junit.framework.Assert;
-
-import org.apache.commons.lang.StringUtils;
-import org.eclipse.persistence.jpa.PersistenceProvider;
-import org.junit.After;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,41 +38,17 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 public class UserTrackingServiceImplTest {
-  private ComboPooledDataSource pooledDataSource = null;
   private UserTrackingServiceImpl service = null;
 
   @Before
   public void setUp() throws Exception {
-    // Set up the database
-    pooledDataSource = new ComboPooledDataSource();
-    pooledDataSource.setDriverClass("org.h2.Driver");
-    pooledDataSource.setJdbcUrl("jdbc:h2:./target/db" + System.currentTimeMillis());
-    pooledDataSource.setUser("sa");
-    pooledDataSource.setPassword("sa");
-
-    // Set up the persistence properties
-    Map<String, Object> props = new HashMap<String, Object>();
-    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
-    props.put("eclipselink.ddl-generation", "create-tables");
-    props.put("eclipselink.ddl-generation.output-mode", "database");
-
     // Set up the annotation service
     service = new UserTrackingServiceImpl();
-    service.setPersistenceProvider(new PersistenceProvider());
-    service.setPersistenceProperties(props);
+    service.setEntityManagerFactory(newTestEntityManagerFactory(UserTrackingServiceImpl.PERSISTENCE_UNIT));
     service.activate();
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    service.destroy();
-    service = null;
   }
 
   /**
@@ -663,50 +641,6 @@ public class UserTrackingServiceImplTest {
     verifyUserActionLists(0, 1, 0, 1);
     verifyUserActionLists(0, 1, 1, 1);
     verifyUserActionLists(1, 0, 10, 1);
-  }
-
-  /**
-   * Tests user summaries
-   * @throws Exception
-   */
-  @Test
-  public void testUserSummary() throws Exception {
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "mp", "me", "127.0.0.1", 20, 30);
-    Assert.assertEquals(1, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
-
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session2", "mp", "me", "127.0.0.1", 40, 50);
-    Assert.assertEquals(2, service.getViews("mp"));
-    Assert.assertEquals(0, service.getViews("other"));
-
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "other", "me", "127.0.0.1", 60, 70);
-    Assert.assertEquals(2, service.getViews("mp"));
-    Assert.assertEquals(1, service.getViews("other"));
-
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session3", "mp", "someone else", "127.0.01", 20, 30);
-    Assert.assertEquals(3, service.getViews("mp"));
-    Assert.assertEquals(1, service.getViews("other"));
-
-    UserSummaryList list = service.getUserSummaryByTypeAndMediaPackage(UserTrackingServiceImpl.FOOTPRINT_KEY, "empty");
-    Assert.assertEquals(0, list.getTotal());
-
-    list = service.getUserSummaryByTypeAndMediaPackage(UserTrackingServiceImpl.FOOTPRINT_KEY, "mp");
-    Assert.assertEquals(2, list.getTotal());
-    List<UserSummary> summaries = list.getUserSummaries();
-    //Urgh, lame.  Not sure what the order I'm getting is going to be.
-    for (UserSummary summary : summaries) {
-      if ("me".equals(summary.getUserId())) {
-        Assert.assertEquals(2, summary.getSessionCount());
-        Assert.assertEquals(1, summary.getUniqueMediapackages());
-        Assert.assertEquals(20,  summary.getLength());
-      } else if ("someone else".equals(summary.getUserId())) {
-        Assert.assertEquals(1, summary.getSessionCount());
-        Assert.assertEquals(1, summary.getUniqueMediapackages());
-        Assert.assertEquals(10, summary.getLength());
-      } else {
-        Assert.fail("There should not be another username in this summary!");
-      }
-    }
   }
 
   /**
@@ -1321,11 +1255,12 @@ public class UserTrackingServiceImplTest {
    * @throws Exception
    */
   private UserAction createAndVerifyUserAction(String type, String sessionId, String mediapackageId, String userId, String userIp, int inpoint, int outpoint, Date createdDate) throws Exception {
-    UserAction userAction = createUserAction(type, sessionId, mediapackageId, userId, userIp, inpoint, outpoint, createdDate);
+    UserSession userSession = createUserSession(sessionId, userId, userIp);
+    UserAction userAction = createUserAction(type, mediapackageId, inpoint, outpoint, createdDate, userSession);
     if (UserTrackingServiceImpl.FOOTPRINT_KEY.equals(type)) {
-      userAction = service.addUserFootprint(userAction);
+      userAction = service.addUserFootprint(userAction, userSession);
     } else {
-      userAction = service.addUserTrackingEvent(userAction);
+      userAction = service.addUserTrackingEvent(userAction, userSession);
     }
     Long id = userAction.getId();
 
@@ -1338,29 +1273,39 @@ public class UserTrackingServiceImplTest {
     Assert.assertNotNull(fromDb.getCreated());
     Assert.assertEquals(id, fromDb.getId());
     Assert.assertEquals(userAction.getMediapackageId(), fromDb.getMediapackageId());
-    Assert.assertEquals(userAction.getSessionId(), fromDb.getSessionId());
+    Assert.assertEquals(userAction.getSession().getSessionId(), fromDb.getSession().getSessionId());
     Assert.assertEquals(userAction.getType(), fromDb.getType());
-    Assert.assertEquals(userAction.getUserId(), fromDb.getUserId());
-    Assert.assertEquals(userAction.getUserIp(), fromDb.getUserIp());
+    Assert.assertEquals(userAction.getSession().getUserId(), fromDb.getSession().getUserId());
+    Assert.assertEquals(userAction.getSession().getUserIp(), fromDb.getSession().getUserIp());
     Assert.assertEquals(userAction.getInpoint(), fromDb.getInpoint());
     Assert.assertEquals(userAction.getOutpoint(), fromDb.getOutpoint());
     Assert.assertEquals(userAction.getIsPlaying(), fromDb.getIsPlaying());
-    Assert.assertEquals(userAction.getUserIp(), fromDb.getUserIp());
+    Assert.assertEquals(userAction.getSession().getUserIp(), fromDb.getSession().getUserIp());
     return userAction;
+  }
+
+  /**
+   * Creates a user session
+   * @throws Exception
+   */
+  private UserSession createUserSession(String sessionId, String userId, String userIp) {
+    UserSession userSession = new UserSessionImpl();
+    userSession.setSessionId(sessionId);
+    userSession.setUserId(userId);
+    userSession.setUserIp(userIp);
+    return userSession;
   }
 
   /**
    * Creates a user action with an arbitrary date
    * @throws Exception
    */
-  private UserAction createUserAction(String type, String sessionId, String mediapackageId, String userId, String userIp, int inpoint, int outpoint, Date createdDate) {
+  private UserAction createUserAction(String type, String mediapackageId, int inpoint, int outpoint, Date createdDate, UserSession userSession) {
     UserAction userAction = new UserActionImpl();
     userAction.setInpoint(inpoint);
     userAction.setOutpoint(outpoint);
     userAction.setMediapackageId(mediapackageId);
-    userAction.setSessionId(sessionId);
-    userAction.setUserId(userId);
-    userAction.setUserIp(userIp);
+    userAction.setSession(userSession);
     userAction.setType(type);
     ((UserActionImpl) userAction).setCreated(createdDate);
     return userAction;

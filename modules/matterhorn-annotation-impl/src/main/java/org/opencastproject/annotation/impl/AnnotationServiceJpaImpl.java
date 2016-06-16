@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.annotation.impl;
 
 import org.opencastproject.annotation.api.Annotation;
@@ -21,58 +27,33 @@ import org.opencastproject.annotation.api.AnnotationService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
-import org.osgi.service.component.ComponentContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
-import javax.persistence.spi.PersistenceProvider;
 
 /**
  * JPA-based implementation of the {@link AnnotationService}
  */
 public class AnnotationServiceJpaImpl implements AnnotationService {
 
-  /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(AnnotationRestService.class);
-
-  /** The persistence unit properties */
-  protected Map<String, Object> persistenceProperties;
+  /** JPA persistence unit name */
+  public static final String PERSISTENCE_UNIT = "org.opencastproject.annotation";
 
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
 
-  /**
-   * The JPA provider
-   */
-  protected PersistenceProvider persistenceProvider;
-
   /** Matterhorn's security service */
   protected SecurityService securityService;
 
-  /**
-   * @param persistenceProvider
-   *          the persistenceProvider to set
-   */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
-  }
-
-  /**
-   * @param persistenceProperties
-   *          the persistenceProperties to set
-   */
-  public void setPersistenceProperties(Map<String, Object> persistenceProperties) {
-    this.persistenceProperties = persistenceProperties;
+  /** OSGi DI */
+  void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
   }
 
   /**
@@ -83,22 +64,6 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
    */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
-  }
-
-  /**
-   * OSGI declarative services callback for component activation
-   *
-   * @param componentContext
-   *          the OSGI declarative services component context
-   */
-  protected void activate(ComponentContext componentContext) {
-    emf = persistenceProvider.createEntityManagerFactory("org.opencastproject.annotation", persistenceProperties);
-  }
-
-  protected void deactivate() {
-    if (emf != null && emf.isOpen()) {
-      emf.close();
-    }
   }
 
   private int getTotal() {

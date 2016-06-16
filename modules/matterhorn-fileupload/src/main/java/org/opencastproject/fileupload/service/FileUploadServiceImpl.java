@@ -1,18 +1,24 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
+
 package org.opencastproject.fileupload.service;
 
 import static java.lang.String.format;
@@ -66,24 +72,23 @@ import javax.xml.bind.Unmarshaller;
 public class FileUploadServiceImpl implements FileUploadService, ManagedService {
 
   private static final Logger logger = LoggerFactory.getLogger(FileUploadServiceImpl.class);
-  final String PROPKEY_STORAGE_DIR = "org.opencastproject.storage.dir";
-  final String PROPKEY_CLEANER_MAXTTL = "org.opencastproject.upload.cleaner.maxttl";
-  final String PROPKEY_UPLOAD_WORKDIR = "org.opencastproject.upload.workdir";
-  final String DEFAULT_UPLOAD_WORKDIR = "fileupload-tmp"; /* The default location is the storage dir */
-  final String UPLOAD_COLLECTION = "uploaded";
-  final String FILEEXT_DATAFILE = ".payload";
-  final String FILENAME_CHUNKFILE = "chunk.part";
-  final String FILENAME_JOBFILE = "job.xml";
-  final int READ_BUFFER_LENGTH = 512;
-  final int DEFAULT_CLEANER_MAXTTL = 6;
-  private static final Logger log = LoggerFactory.getLogger(FileUploadServiceImpl.class);
+  static final String PROPKEY_KARAF_DATA = "karaf.data";
+  static final String PROPKEY_CLEANER_MAXTTL = "org.opencastproject.upload.cleaner.maxttl";
+  static final String PROPKEY_UPLOAD_WORKDIR = "org.opencastproject.upload.workdir";
+  static final String DEFAULT_UPLOAD_WORKDIR = "tmp/fileupload"; /* The default location is the storage dir */
+  static final String UPLOAD_COLLECTION = "uploaded";
+  static final String FILEEXT_DATAFILE = ".payload";
+  static final String FILENAME_CHUNKFILE = "chunk.part";
+  static final String FILENAME_JOBFILE = "job.xml";
+  static final int READ_BUFFER_LENGTH = 512;
+  static final int DEFAULT_CLEANER_MAXTTL = 6;
+
   private File workRoot = null;
   private IngestService ingestService;
   private Workspace workspace;
   private Marshaller jobMarshaller;
   private Unmarshaller jobUnmarshaller;
   private HashMap<String, FileUploadJob> jobCache = new HashMap<String, FileUploadJob>();
-  private byte[] readBuffer = new byte[READ_BUFFER_LENGTH];
   private FileUploadServiceCleaner cleaner;
   private int jobMaxTTL = DEFAULT_CLEANER_MAXTTL;
 
@@ -91,15 +96,12 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   protected synchronized void activate(ComponentContext cc) throws Exception {
     /* Ensure a working directory is set */
     if (workRoot == null) {
-      /* Use the default location: STORAGE_DIR / DEFAULT_UPLOAD_WORKDIR */
-      String dir = cc.getBundleContext().getProperty(PROPKEY_STORAGE_DIR);
+      String dir = cc.getBundleContext().getProperty(PROPKEY_KARAF_DATA);
       if (dir == null) {
-        throw new RuntimeException("Storage directory not defined. " + "Use " + PROPKEY_STORAGE_DIR
-                + " to set the property.");
+        throw new RuntimeException("Storage directory not defined.");
       }
-      dir += File.separator + DEFAULT_UPLOAD_WORKDIR;
-      workRoot = new File(dir);
-      log.info("Storage directory set to {}.", workRoot.getAbsolutePath());
+      workRoot = new File(dir, DEFAULT_UPLOAD_WORKDIR);
+      logger.info("Chunk file upload directory set to {}.", workRoot.getAbsolutePath());
     }
 
     // set up de-/serialization
@@ -111,11 +113,11 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     cleaner = new FileUploadServiceCleaner(this);
     cleaner.schedule();
 
-    log.info("File Upload Service activated.");
+    logger.info("File Upload Service activated.");
   }
 
   protected void deactivate(ComponentContext cc) {
-    log.info("File Upload Service deactivated");
+    logger.info("File Upload Service deactivated");
     cleaner.shutdown();
   }
 
@@ -126,15 +128,15 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     String dir = (String) properties.get(PROPKEY_UPLOAD_WORKDIR);
     if (dir != null) {
       workRoot = new File(dir);
-      log.info("Configuration updated. Upload working directory set to {}.", dir);
+      logger.info("Configuration updated. Upload working directory set to `{}`.", dir);
     }
     try {
       jobMaxTTL = Integer.parseInt(((String) properties.get(PROPKEY_CLEANER_MAXTTL)).trim());
     } catch (Exception e) {
       jobMaxTTL = DEFAULT_CLEANER_MAXTTL;
-      log.warn("Unable to update configuration. {}", e.getMessage());
+      logger.warn("Unable to update configuration. {}", e.getMessage());
     }
-    log.info("Configuration updated. Jobs older than {} hours are deleted.", jobMaxTTL);
+    logger.info("Configuration updated. Jobs older than {} hours are deleted.", jobMaxTTL);
   }
 
   protected void setWorkspace(Workspace workspace) {
@@ -157,7 +159,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   public FileUploadJob createJob(String filename, long filesize, int chunksize, MediaPackage mp,
           MediaPackageElementFlavor flavor) throws FileUploadException {
     FileUploadJob job = new FileUploadJob(filename, filesize, chunksize, mp, flavor);
-    log.info("Creating new upload job: {}", job);
+    logger.info("Creating new upload job: {}", job);
 
     try {
       File jobDir = getJobDir(job.getId()); // create working dir
@@ -190,7 +192,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
         return jobFile.exists();
       }
     } catch (Exception e) {
-      log.warn("Error while looking for upload job: " + e.getMessage());
+      logger.warn("Error while looking for upload job: " + e.getMessage());
       return false;
     }
   }
@@ -241,12 +243,12 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
             if (job.lastModified() < cal.getTimeInMillis()) {
               FileUtils.forceDelete(dir);
               jobCache.remove(id);
-              log.info("Deleted outdated job {}", id);
+              logger.info("Deleted outdated job {}", id);
             }
           }
         } catch (Exception e) { // something went wrong, so we assume the dir is corrupted
           FileUtils.forceDelete(dir); // ..and delete it right away
-          log.info("Deleted corrupted job {}", dir.getName());
+          logger.info("Deleted corrupted job {}", dir.getName());
         }
       }
     }
@@ -261,7 +263,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   @Override
   public void storeJob(FileUploadJob job) throws FileUploadException {
     try {
-      log.debug("Attempting to store job {}", job.getId());
+      logger.debug("Attempting to store job {}", job.getId());
       File jobFile = ensureExists(getJobFile(job.getId()));
       jobMarshaller.marshal(job, jobFile);
     } catch (Exception e) {
@@ -277,7 +279,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   @Override
   public void deleteJob(String id) throws FileUploadException {
     try {
-      log.debug("Attempting to delete job " + id);
+      logger.debug("Attempting to delete job " + id);
       if (isLocked(id)) {
         jobCache.remove(id);
       }
@@ -317,7 +319,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
       throw fileUploadException(Severity.error,
               format("Wrong chunk number. Awaiting #%d but #%d was offered.", supposedChunk, chunkNumber));
     }
-    log.debug("Receiving chunk #" + chunkNumber + " of job {}", job);
+    logger.debug("Receiving chunk #" + chunkNumber + " of job {}", job);
 
     // write chunk to temp file
     job.getCurrentChunk().incrementNumber();
@@ -329,9 +331,10 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     }
     OutputStream out = null;
     try {
+      byte[] readBuffer = new byte[READ_BUFFER_LENGTH];
       out = new FileOutputStream(chunkFile, false);
       int bytesRead = 0;
-      long bytesReadTotal = 0l;
+      long bytesReadTotal = 0L;
       Chunk currentChunk = job.getCurrentChunk(); // copy manually (instead of using IOUtils.copy()) so we can count the
       // number of bytes
       do {
@@ -396,7 +399,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     // update job
     if (chunkNumber == job.getChunksTotal() - 1) { // upload is complete
       finalizeJob(job);
-      log.info("Upload job completed: {}", job);
+      logger.info("Upload job completed: {}", job);
     } else {
       job.setState(FileUploadJob.JobState.READY); // upload still incomplete
     }
@@ -496,7 +499,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
         // can be obtained from upload job)
         return Option.some(uri);
       } catch (IOException e) {
-        log.error("Could not add file to collection.", e);
+        logger.error("Could not add file to collection.", e);
         return Option.none();
       }
     }
@@ -510,7 +513,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
    * @throws FileUploadException
    */
   private URL putPayloadIntoCollection(FileUploadJob job) throws FileUploadException {
-    log.info("Moving payload of job " + job.getId() + " to collection " + UPLOAD_COLLECTION);
+    logger.info("Moving payload of job " + job.getId() + " to collection " + UPLOAD_COLLECTION);
     Option<URI> result = IoSupport.withFile(getPayloadFile(job.getId()), putInCollection).flatMap(
             Functions.<Option<URI>> identity());
     if (result.isSome()) {
@@ -564,9 +567,9 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
    */
   private void deleteChunkFile(String id) {
     final File chunkFile = getChunkFile(id);
-    log.debug("Attempting to delete chunk file of job " + id);
+    logger.debug("Attempting to delete chunk file of job " + id);
     if (!chunkFile.delete()) {
-      log.warn("Could not delete chunk file " + chunkFile.getAbsolutePath());
+      logger.warn("Could not delete chunk file " + chunkFile.getAbsolutePath());
     }
   }
 
@@ -578,9 +581,9 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
    */
   private void deletePayloadFile(String id) {
     final File payloadFile = getPayloadFile(id);
-    log.debug("Attempting to delete payload file of job " + id);
+    logger.debug("Attempting to delete payload file of job " + id);
     if (!payloadFile.delete()) {
-      log.warn("Could not delete payload file " + payloadFile.getAbsolutePath());
+      logger.warn("Could not delete payload file " + payloadFile.getAbsolutePath());
     }
   }
 
@@ -648,10 +651,10 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
   private FileUploadException fileUploadException(Severity severity, String msg) throws FileUploadException {
     switch (severity) {
       case warn:
-        log.warn(msg);
+        logger.warn(msg);
         break;
       case error:
-        log.error(msg);
+        logger.error(msg);
         break;
       default:
         unexhaustiveMatch();
@@ -663,10 +666,10 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
           throws FileUploadException {
     switch (severity) {
       case warn:
-        log.warn(msg, cause);
+        logger.warn(msg, cause);
         break;
       case error:
-        log.error(msg, cause);
+        logger.error(msg, cause);
         break;
       default:
         unexhaustiveMatch();

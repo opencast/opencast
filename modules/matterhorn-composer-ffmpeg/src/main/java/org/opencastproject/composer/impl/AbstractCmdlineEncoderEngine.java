@@ -1,21 +1,28 @@
 /**
- *  Copyright 2009, 2010 The Regents of the University of California
- *  Licensed under the Educational Community License, Version 2.0
- *  (the "License"); you may not use this file except in compliance
- *  with the License. You may obtain a copy of the License at
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
- *  http://www.osedu.org/licenses/ECL-2.0
  *
- *  Unless required by applicable law or agreed to in writing,
- *  software distributed under the License is distributed on an "AS IS"
- *  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- *  or implied. See the License for the specific language governing
- *  permissions and limitations under the License.
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  *
  */
 
+
 package org.opencastproject.composer.impl;
 
+import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 
@@ -27,7 +34,7 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,10 +62,7 @@ import javax.activation.MimetypesFileTypeMap;
  * only <em>one</em> file will be the result of the encoding. Imagine encoding to an image series.
  */
 public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine implements EncoderEngine {
-
-  /**
-   * If true STDERR and STDOUT of the spawned process will be mixed so that both can be read via STDIN
-   */
+  /** If true STDERR and STDOUT of the spawned process will be mixed so that both can be read via STDIN */
   private static final boolean REDIRECT_ERROR_STREAM = true;
 
   /** the encoder binary */
@@ -90,6 +94,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
    *
    * @see org.opencastproject.composer.api.EncoderEngine#needsLocalWorkCopy()
    */
+  @Override
   public boolean needsLocalWorkCopy() {
     return false;
   }
@@ -109,7 +114,8 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.composer.api.EncoderEngine#trim(File, EncodingProfile, double, double, Map)
+   * @see org.opencastproject.composer.api.EncoderEngine#trim(java.io.File,
+   *      org.opencastproject.composer.api.EncodingProfile, long, long, java.util.Map)
    */
   @Override
   public Option<File> trim(File mediaSource, EncodingProfile format, long start, long duration,
@@ -139,27 +145,34 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
           throws EncoderException {
 
     List<File> extractedImages = new LinkedList<File>();
-    for (double time : times) {
-      Map<String, String> params = new HashMap<String, String>();
-      if (properties != null) {
-        params.putAll(properties);
-      }
+    try {
+      if (times != null && times.length > 0) {
+        for (double time : times) {
+          Map<String, String> params = new HashMap<String, String>();
+          if (properties != null) {
+            params.putAll(properties);
+          }
 
-      DecimalFormatSymbols ffmpegFormat = new DecimalFormatSymbols();
-      ffmpegFormat.setDecimalSeparator('.');
-      DecimalFormat df = new DecimalFormat("0.000", ffmpegFormat);
-      params.put("time", df.format(time));
-      try {
-        for (File image : process(null, mediaSource, format, params)) {
+          DecimalFormatSymbols ffmpegFormat = new DecimalFormatSymbols();
+          ffmpegFormat.setDecimalSeparator('.');
+          DecimalFormat df = new DecimalFormat("0.000", ffmpegFormat);
+          params.put("time", df.format(time));
+
+          for (File image : process(null, mediaSource, format, params)) {
+            extractedImages.add(image);
+          }
+        }
+      } else {
+        for (File image : process(null, mediaSource, format, properties)) {
           extractedImages.add(image);
         }
-      } catch (Exception e) {
-        cleanup(extractedImages);
-        if (e instanceof EncoderException) {
-          throw (EncoderException) e;
-        } else {
-          throw new EncoderException("Image extraction failed", e);
-        }
+      }
+    } catch (Exception e) {
+      cleanup(extractedImages);
+      if (e instanceof EncoderException) {
+        throw (EncoderException) e;
+      } else {
+        throw new EncoderException("Image extraction failed", e);
       }
     }
 
@@ -188,62 +201,49 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
     if (properties != null)
       params.putAll(properties);
     // build command
-    BufferedReader in = null;
-    Process encoderProcess = null;
     if (videoSource == null && audioSource == null) {
       throw new IllegalArgumentException("At least one track must be specified.");
     }
+    // Set encoding parameters
+    if (audioSource != null) {
+      final String audioInput = FilenameUtils.normalize(audioSource.getAbsolutePath());
+      params.put("in.audio.path", audioInput);
+      params.put("in.audio.name", FilenameUtils.getBaseName(audioInput));
+      params.put("in.audio.suffix", FilenameUtils.getExtension(audioInput));
+      params.put("in.audio.filename", FilenameUtils.getName(audioInput));
+      params.put("in.audio.mimetype", MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(audioInput));
+    }
+    if (videoSource != null) {
+      final String videoInput = FilenameUtils.normalize(videoSource.getAbsolutePath());
+      params.put("in.video.path", videoInput);
+      params.put("in.video.name", FilenameUtils.getBaseName(videoInput));
+      params.put("in.video.suffix", FilenameUtils.getExtension(videoInput));
+      params.put("in.video.filename", FilenameUtils.getName(videoInput));
+      params.put("in.video.mimetype", MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(videoInput));
+    }
+    final File parentFile = videoSource != null ? videoSource : audioSource;
+
+    final String outDir = parentFile.getAbsoluteFile().getParent();
+    final String outSuffix = processParameters(profile.getSuffix());
+    final String outFileName = FilenameUtils.getBaseName(parentFile.getName())
+            + (params.containsKey("time") ? "_" + properties.get("time").replace('.', '_') : "")
+            // generate random name if multiple jobs are producing file with identical name (MH-7673)
+            + "_" + UUID.randomUUID().toString();
+    params.put("out.dir", outDir);
+    params.put("out.name", outFileName);
+    params.put("out.suffix", outSuffix);
+
+    // create encoder process.
+    // no special working dir is set which means the working dir of the
+    // current java process is used.
+    // TODO: Parallelisation (threading)
+    final List<String> command = buildCommand(profile);
+    final String commandStr = mlist(command).mkString(" ");
+    logger.info("Executing encoding command: {}", commandStr);
+
+    BufferedReader in = null;
+    Process encoderProcess = null;
     try {
-      // Set encoding parameters
-      String audioInput = null;
-      if (audioSource != null) {
-        audioInput = FilenameUtils.normalize(audioSource.getAbsolutePath());
-        params.put("in.audio.path", audioInput);
-        params.put("in.audio.name", FilenameUtils.getBaseName(audioInput));
-        params.put("in.audio.suffix", FilenameUtils.getExtension(audioInput));
-        params.put("in.audio.filename", FilenameUtils.getName(audioInput));
-        params.put("in.audio.mimetype", MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(audioInput));
-      }
-      if (videoSource != null) {
-        String videoInput = FilenameUtils.normalize(videoSource.getAbsolutePath());
-        params.put("in.video.path", videoInput);
-        params.put("in.video.name", FilenameUtils.getBaseName(videoInput));
-        params.put("in.video.suffix", FilenameUtils.getExtension(videoInput));
-        params.put("in.video.filename", FilenameUtils.getName(videoInput));
-        params.put("in.video.mimetype", MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(videoInput));
-      }
-      File parentFile;
-      if (videoSource == null) {
-        parentFile = audioSource;
-      } else {
-        parentFile = videoSource;
-      }
-      String outDir = parentFile.getAbsoluteFile().getParent();
-      String outFileName = FilenameUtils.getBaseName(parentFile.getName());
-      String outSuffix = processParameters(profile.getSuffix());
-
-      if (params.containsKey("time")) {
-        outFileName += "_" + properties.get("time");
-      }
-
-      // generate random name if multiple jobs are producing file with identical name (MH-7673)
-      outFileName += "_" + UUID.randomUUID().toString();
-
-      params.put("out.dir", outDir);
-      params.put("out.name", outFileName);
-      params.put("out.suffix", outSuffix);
-
-      // create encoder process.
-      // no special working dir is set which means the working dir of the
-      // current java process is used.
-      // TODO: Parallelisation (threading)
-      List<String> command = buildCommand(profile);
-      StringBuilder sb = new StringBuilder();
-      for (String cmd : command) {
-        sb.append(cmd);
-        sb.append(" ");
-      }
-      logger.info("Executing encoding command: {}", sb);
       ProcessBuilder pbuilder = new ProcessBuilder(command);
       pbuilder.redirectErrorStream(REDIRECT_ERROR_STREAM);
       encoderProcess = pbuilder.start();
@@ -259,7 +259,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
       encoderProcess.waitFor();
       int exitCode = encoderProcess.exitValue();
       if (exitCode != 0) {
-        throw new EncoderException(this, "Encoder exited abnormally with status " + exitCode);
+        throw new CmdlineEncoderException(this, "Encoder exited abnormally with status " + exitCode, commandStr);
       }
 
       if (audioSource != null) {
@@ -292,7 +292,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
               new Object[] { (audioSource == null ? "N/A" : audioSource.getName()),
                       (videoSource == null ? "N/A" : videoSource.getName()), profile.getName(), e.getMessage() });
       fireEncodingFailed(this, profile, e, audioSource, videoSource);
-      throw new EncoderException(this, e.getMessage(), e);
+      throw new CmdlineEncoderException(this, e.getMessage(), commandStr, e);
     } finally {
       IoSupport.closeQuietly(in);
       IoSupport.closeQuietly(encoderProcess);
@@ -368,11 +368,18 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
     List<String> arguments = buildArgumentList(profile);
     for (String arg : arguments) {
       String result = arg;
+      // TODO Handle several passes of embedded parameters in case a substitution results in another variable.
       for (Map.Entry<String, String> e : params.entrySet()) {
         result = result.replace("#{" + e.getKey() + "}", e.getValue());
       }
       result = result.replace("#{space}", " ");
-      command.add(result);
+
+      /* Remove unused commandline parts */
+      result = result.replaceAll("#\\{.*?\\}", "");
+
+      if (StringUtils.trimToNull(result) != null) {
+        command.add(result);
+      }
     }
     return command;
   }
@@ -469,6 +476,120 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
         }
       }
     }
+  }
+
+  /**
+   * Executes the command line encoder with the given set of files and properties and using the provided encoding
+   * profile.
+   *
+   * @param mediaSource
+   *          the video file
+   * @param profile
+   *          the profile identifier
+   * @param properties
+   *          the encoding properties to be interpreted by the actual encoder implementation
+   * @return a list of the processed Tracks
+   * @throws EncoderException
+   *           if processing fails
+   */
+  public List<File> parallelEncode(File mediaSource, EncodingProfile profile, Map<String, String> properties)
+          throws EncoderException {
+    if (mediaSource == null) {
+      throw new IllegalArgumentException("At least one track must be specified.");
+    }
+    // Fist, update the parameters
+    if (properties != null)
+      params.putAll(properties);
+    // build command
+    BufferedReader in = null;
+    Process encoderProcess = null;
+    try {
+      // Set encoding parameters
+      if (mediaSource != null) {
+        String mediaInput = FilenameUtils.normalize(mediaSource.getAbsolutePath());
+        params.put("in.video.path", mediaInput);
+        params.put("in.video.name", FilenameUtils.getBaseName(mediaInput));
+        params.put("in.video.suffix", FilenameUtils.getExtension(mediaInput));
+        params.put("in.video.filename", FilenameUtils.getName(mediaInput));
+      }
+      String outDir = mediaSource.getAbsoluteFile().getParent();
+      String outFileName = FilenameUtils.getBaseName(mediaSource.getName());
+
+
+      if (params.containsKey("time")) {
+        outFileName += "_" + properties.get("time");
+      }
+
+      // generate random name if multiple jobs are producing file with identical name (MH-7673)
+      outFileName += "_" + UUID.randomUUID().toString();
+
+      params.put("out.dir", outDir);
+      params.put("out.name", outFileName);
+
+      ArrayList<String> suffixes = new ArrayList<String>();
+
+      for (String tag : profile.getTags()) {
+        String outSuffix = processParameters(profile.getSuffix(tag));
+        params.put("out.suffix" + "." + tag, outSuffix);
+        suffixes.add(outSuffix);
+      }
+
+      // create encoder process.
+      // no special working dir is set which means the working dir of the
+      // current java process is used.
+      List<String> command = buildCommand(profile);
+      StringBuilder sb = new StringBuilder();
+      for (String cmd : command) {
+        sb.append(cmd);
+        sb.append(" ");
+      }
+      logger.info("Executing encoding command: {}", sb);
+      ProcessBuilder pbuilder = new ProcessBuilder(command);
+      pbuilder.redirectErrorStream(REDIRECT_ERROR_STREAM);
+      encoderProcess = pbuilder.start();
+
+      // tell encoder listeners about output
+      in = new BufferedReader(new InputStreamReader(encoderProcess.getInputStream()));
+      String line;
+      while ((line = in.readLine()) != null) {
+        handleEncoderOutput(profile, line, mediaSource);
+      }
+
+      // wait until the task is finished
+      encoderProcess.waitFor();
+      int exitCode = encoderProcess.exitValue();
+      if (exitCode != 0) {
+        throw new EncoderException(this, "Encoder exited abnormally with status " + exitCode);
+      }
+
+      logger.info("Media track {} successfully encoded using profile '{}'", new String[] { mediaSource.getName(),
+             profile.getIdentifier() });
+      fireEncoded(this, profile, mediaSource);
+      ArrayList<File> tracks = new ArrayList<File>();
+      for (String outSuffix : suffixes) {
+          tracks.add(new File(mediaSource.getParent(), outFileName + outSuffix));
+      }
+      return tracks;
+    } catch (EncoderException e) {
+      logger.warn("Error while encoding video track {} using '{}': {}", new String[] {
+             (mediaSource == null ? "N/A" : mediaSource.getName()), profile.getIdentifier(), e.getMessage() });
+      fireEncodingFailed(this, profile, e, mediaSource);
+      throw e;
+    } catch (Exception e) {
+      logger.warn("Error while encoding media {} to {}:{}, {}",
+              new Object[] { (mediaSource == null ? "N/A" : mediaSource.getName()), profile.getName(), e.getMessage() });
+      fireEncodingFailed(this, profile, e, mediaSource);
+      throw new EncoderException(this, e.getMessage(), e);
+    } finally {
+      IoSupport.closeQuietly(in);
+      IoSupport.closeQuietly(encoderProcess);
+    }
+  }
+
+  protected List<String> getTags(EncodingProfile profile) {
+    ArrayList<String> tags = new ArrayList<String>();
+
+    return tags;
   }
 
 }

@@ -1,0 +1,182 @@
+[{
+  "flavor": "dublincore/episode",
+  "title": "EVENTS.EVENTS.DETAILS.CATALOG.EPISODE",
+  "locked": "EVENTS.EVENTS.DETAILS.METADATA.LOCKED.RUNNING",
+  "fields": [
+        {
+          "id": "title",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.TITLE",
+          "value": "•mock• Test Title",
+          "type": "text",
+          "readOnly": false
+        }, {
+          "id": "uid",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.UID",
+          "value": "78753d04-18a4-4327-9a61-b6d93816a7d2",
+          "type": "text",
+          "readOnly": true
+        }, {
+          "id": "presenters",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.PRESENTERS",
+          "value": ["matt.smith", "chuck.norris"],
+          "type": "text",
+          "collection": "users",
+          "readOnly": false
+        }, {
+          "id": "series",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.SERIES",
+          "value": "phy325",
+          "type": "text",
+          "collection": {
+            "phy325": "Physics325",
+            "edu123": "Education123"
+          },
+          "readOnly": false
+        }, {
+          "id": "recordingDate",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.RECORDING_DATE",
+          "value": "2012-11-20",
+          "type": "date",
+          "readOnly": false
+        }, {
+          "id": "contributors",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.CONTRIBUTORS",
+          "value": ["franz.kafka", "a.morris"],
+          "type": "text",
+          "collection": "users",
+          "readOnly": false
+        }, {
+          "id": "subject",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.SUBJECT",
+          "value": ["Test Subject", "Second Subject"],
+          "type": "text",
+          "readOnly": false
+        }, {
+          "id": "language",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.LANGUAGE",
+          "value": "fr",
+          "type": "text",
+          "collection": {
+            "en": "English",
+            "de": "German",
+            "fr": "French"
+          },
+          "readOnly": false
+        }, {
+          "id": "description",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.DESCRIPTION",
+          "value": "A mocked event description.",
+          "type": "text",
+          "readOnly": false
+        }, {
+          "id": "startDate",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
+          "value": "2012-12-01",
+          "type": "date",
+          "readOnly": false
+        }, {
+          "id": "startTime",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.START_TIME",
+          "value": "09:30",
+          "type": "time",
+          "readOnly": false
+        }, {
+          "id": "duration",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.DURATION",
+          "value": "01:05:00",
+          "type": "text",
+          "readOnly": true
+        }, {
+          "id": "agent",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.AGENT",
+          "value": "epi001",
+          "type": "text",
+          "collection": {
+            "ahg008": "AHG 008",
+            "epi001": "EPI 001"
+          },
+          "readOnly": false
+        }, {
+          "id": "source",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.SOURCE",
+          "value": "Manual",
+          "type": "text",
+          "readOnly": true
+        }, {
+          "id": "created",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.CREATED",
+          "value": "2014-04-15",
+          "type": "date",
+          "readOnly": true
+        }, {
+          "id": "createdBy",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.CREATED_BY",
+          "value": "Matt Smith",
+          "type": "text",
+          "readOnly": true
+        }, {
+          "id": "license",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.LICENSE",
+          "value": "ccnd",
+          "type": "text",
+          "collection": {
+            "gpl": "GPL",
+            "ccnd": "CCND",
+            "bsd": "BSD"
+          },
+          "readOnly": false
+        }, {
+          "id": "show",
+          "label": "BOOLEAN",
+          "value": true,
+          "type": "boolean",
+          "readOnly": false
+        }, {
+          "id": "show",
+          "label": "BOOLEAN READONLY",
+          "value": false,
+          "type": "boolean",
+          "readOnly": true
+        }
+    ]
+  },
+  {
+  "flavor": "dublincore/extended-1",
+  "title" : "EVENTS.EVENTS.DETAILS.CATALOG.EXTENDED-1",
+  "fields": [
+        {
+          "id": "title",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.VISIBILITY",
+          "value": "To everyone.",
+          "type": "text",
+          "readOnly": false
+        }, {
+          "id": "uid",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.PUBLIC",
+          "value": "Students",
+          "type": "text",
+          "readOnly": true
+        }, {
+          "id": "iid",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.PUBLIC",
+          "value": "Lectures",
+          "type": "text_long",
+          "readOnly": false
+        }
+    ]
+  },
+  {
+  "flavor": "dublincore/extended-2",
+  "title" : "EVENTS.EVENTS.DETAILS.CATALOG.EXTENDED-2",
+  "fields": [
+        {
+          "id": "title",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.OS",
+          "value": "CentOS 7",
+          "type": "text",
+          "readOnly": false
+        }
+    ]
+  }
+]
+

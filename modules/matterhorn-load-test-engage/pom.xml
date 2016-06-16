@@ -4,12 +4,12 @@
   <artifactId>matterhorn-load-test-engage</artifactId>
   <packaging>jar</packaging>
   <name>matterhorn-load-test-engage</name>
-  <version>1.6-SNAPSHOT</version>
+  <version>2.3-SNAPSHOT</version>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
+    <checkstyle.skip>true</checkstyle.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -93,29 +93,4 @@
       </plugin>
     </plugins>
   </build>
-  <!-- This gets a pass for MH-1810 since it does not inherit the base POM -AZ -->
-  <repositories>
-    <repository>
-      <id>opencast</id>
-      <name>Opencast Repo</name>
-      <url>http://repository.opencastproject.org/nexus/content/groups/public</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </repository>
-    <repository>
-      <id>opencast.snapshots</id>
-      <name>Opencast SNAPSHOTS</name>
-      <url>http://repository.opencastproject.org/nexus/content/groups/public-snapshots</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-  </repositories>
 </project>

@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>1.6-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -51,8 +51,22 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-kernel</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-solr</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-message-broker-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.json-simple</groupId>
+      <artifactId>json-simple</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -99,7 +113,6 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>3.1</version>
       <scope>test</scope>
     </dependency>
     <!--    <dependency>-->
@@ -125,11 +138,6 @@
     <dependency>
       <groupId>net.fortuna.ical4j</groupId>
       <artifactId>ical4j</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-json</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
@@ -174,12 +182,17 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>de.empulse.eclipselink</groupId>
+        <artifactId>staticweave-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.scheduler.impl;version=${project.version},
               org.opencastproject.scheduler.impl.solr;version=${project.version},
@@ -187,24 +200,23 @@
               org.opencastproject.scheduler.endpoint;version=${project.version}
             </Export-Package>
             <Import-Package>
-              org.opencastproject.rest;version=${project.version},
-              org.opencastproject.metadata.dublincore;version=${project.version},
-              org.opencastproject.scheduler.api;version=${project.version},
-              *;resolution:=optional
+              org.w3c.dom;version=0,
+              *
             </Import-Package>
             <Private-Package>
               net.fortuna.ical4j.*;-split-package:=merge-last
             </Private-Package>
             <Service-Component>
               OSGI-INF/capture-prolonging-service.xml,
+              OSGI-INF/scheduler-service-cleanup-finished-recordings-scanner.xml,
               OSGI-INF/scheduler-service-index.xml,
               OSGI-INF/scheduler-service-persistence.xml,
               OSGI-INF/scheduler-service.xml,
               OSGI-INF/scheduler-service-rest.xml
             </Service-Component>
-            <JPA-PersistenceUnits>
-              org.opencastproject.scheduler.impl.persistence
-            </JPA-PersistenceUnits>
+            <Meta-Persistence>
+              META-INF/persistence.xml
+            </Meta-Persistence>
           </instructions>
         </configuration>
       </plugin>

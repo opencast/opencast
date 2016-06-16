@@ -1,0 +1,9 @@
+{
+   "readOnly":false,
+   "id":"TestOutputID",
+   "label":"A_LABEL_FOR_THIS_PROPERTY",
+   "type":"text",
+   "value":"",
+   "required":false,
+   "collection":"Collection_ID"
+}
