@@ -56,6 +56,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -112,7 +113,7 @@ public class ServerEndpoint {
           result = ((Integer) host1.get(KEY_CORES)).compareTo((Integer) host2.get(KEY_CORES));
           break;
         case COMPLETED:
-          result = ((Integer) host1.get(KEY_COMPLETED)).compareTo((Integer) host2.get(KEY_COMPLETED));
+          result = ((Long) host1.get(KEY_COMPLETED)).compareTo((Long) host2.get(KEY_COMPLETED));
           break;
         case QUEUED:
           result = ((Integer) host1.get(KEY_QUEUED)).compareTo((Integer) host2.get(KEY_QUEUED));
@@ -126,10 +127,10 @@ public class ServerEndpoint {
           result = ((Integer) host1.get(KEY_RUNNING)).compareTo((Integer) host2.get(KEY_RUNNING));
           break;
         case MEANQUEUETIME:
-          result = ((Integer) host1.get(KEY_MEAN_QUEUE_TIME)).compareTo((Integer) host2.get(KEY_MEAN_QUEUE_TIME));
+          result = ((Long) host1.get(KEY_MEAN_QUEUE_TIME)).compareTo((Long) host2.get(KEY_MEAN_QUEUE_TIME));
           break;
         case MEANRUNTIME:
-          result = ((Integer) host1.get(KEY_MEAN_RUN_TIME)).compareTo((Integer) host2.get(KEY_MEAN_RUN_TIME));
+          result = ((Long) host1.get(KEY_MEAN_RUN_TIME)).compareTo((Long) host2.get(KEY_MEAN_RUN_TIME));
           break;
         case HOSTNAME:
         default:
@@ -186,11 +187,12 @@ public class ServerEndpoint {
       // Get all the services statistics pro host
       // TODO improve the service registry to get service statistics by host
       List<ServiceStatistics> servicesStatistics = serviceRegistry.getServiceStatistics();
-      int jobsCompleted = 0;
+      // may become very big
+      long jobsCompleted = 0;
       int jobsRunning = 0;
       int jobsQueued = 0;
-      int sumMeanRuntime = 0;
-      int sumMeanQueueTime = 0;
+      long sumMeanRuntime = 0;
+      long sumMeanQueueTime = 0;
       int totalServiceOnHost = 0;
       int offlineJobProducerServices = 0;
       int totalJobProducerServices = 0;
@@ -201,8 +203,11 @@ public class ServerEndpoint {
           jobsCompleted += serviceStat.getFinishedJobs();
           jobsRunning += serviceStat.getRunningJobs();
           jobsQueued += serviceStat.getQueuedJobs();
-          sumMeanRuntime += serviceStat.getMeanRunTime();
-          sumMeanQueueTime += serviceStat.getMeanQueueTime();
+          // mean time values are given in milliseconds,
+          // we should convert them to seconds,
+          // because the adminNG UI expect it in this format
+          sumMeanRuntime += TimeUnit.MILLISECONDS.toSeconds(serviceStat.getMeanRunTime());
+          sumMeanQueueTime += TimeUnit.MILLISECONDS.toSeconds(serviceStat.getMeanQueueTime());
           if (!serviceStat.getServiceRegistration().isOnline()
                   && serviceStat.getServiceRegistration().isJobProducer()) {
             offlineJobProducerServices++;
@@ -213,8 +218,8 @@ public class ServerEndpoint {
           serviceTypes.add(serviceStat.getServiceRegistration().getServiceType());
         }
       }
-      int meanRuntime = totalServiceOnHost > 0 ? sumMeanRuntime / totalServiceOnHost : 0;
-      int meanQueueTime = totalServiceOnHost > 0 ? sumMeanQueueTime / totalServiceOnHost : 0;
+      long meanRuntime = totalServiceOnHost > 0 ? Math.round((double)sumMeanRuntime / totalServiceOnHost) : 0L;
+      long meanQueueTime = totalServiceOnHost > 0 ? Math.round((double)sumMeanQueueTime / totalServiceOnHost) : 0L;
 
       boolean vOnline = server.isOnline();
       boolean vMaintenance = server.isMaintenanceMode();
@@ -307,9 +312,9 @@ public class ServerEndpoint {
       Integer vCores = (Integer) server.get(KEY_CORES);
       Integer vRunning = (Integer) server.get(KEY_RUNNING);
       Integer vQueued = (Integer) server.get(KEY_QUEUED);
-      Integer vCompleted = (Integer) server.get(KEY_COMPLETED);
-      Integer vMeanRunTime = (Integer) server.get(KEY_MEAN_RUN_TIME);
-      Integer vMeanQueueTime = (Integer) server.get(KEY_MEAN_QUEUE_TIME);
+      Long vCompleted = (Long) server.get(KEY_COMPLETED);
+      Long vMeanRunTime = (Long) server.get(KEY_MEAN_RUN_TIME);
+      Long vMeanQueueTime = (Long) server.get(KEY_MEAN_QUEUE_TIME);
 
       jsonServers.add(j(f(KEY_ONLINE, v(vOnline)),
               f(KEY_MAINTENANCE, v(vMaintenance)),
