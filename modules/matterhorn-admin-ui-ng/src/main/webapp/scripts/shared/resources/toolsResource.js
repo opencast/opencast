@@ -35,6 +35,7 @@ angular.module('adminNg.resources')
                     });
                 }
                 // Fill gaps between segments
+                //dont use angular.forEach here see MH-11169
                 for (var index=0;index<data.segments.length;index++) {
                     var previous = data.segments[index - 1];
                     var segmentStart=data.segments[index].start-1;
