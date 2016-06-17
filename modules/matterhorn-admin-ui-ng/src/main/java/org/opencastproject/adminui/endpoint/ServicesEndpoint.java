@@ -56,6 +56,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -204,19 +205,19 @@ public class ServicesEndpoint {
     }
 
     /**
-     * Returns service mean queue time.
-     * @return service mean queue time
+     * Returns service mean queue time in seconds.
+     * @return service mean queue time in seconds
      */
     public long getMeanQueueTime() {
-      return serviceStatistics.getMeanQueueTime();
+      return TimeUnit.MILLISECONDS.toSeconds(serviceStatistics.getMeanQueueTime());
     }
 
     /**
-     * Returns service mean run time.
-     * @return service mean run time
+     * Returns service mean run time in seconds.
+     * @return service mean run time in seconds
      */
     public long getMeanRunTime() {
-      return serviceStatistics.getMeanRunTime();
+      return TimeUnit.MILLISECONDS.toSeconds(serviceStatistics.getMeanRunTime());
     }
 
     /**
@@ -335,7 +336,7 @@ public class ServicesEndpoint {
       int result = 0;
       switch (sortBy) {
         case Service.COMPLETED_NAME:
-          result = s1.getCompletedJobs() - s2.getCompletedJobs();
+          result = (int)(s1.getCompletedJobs() - s2.getCompletedJobs());
           break;
         case Service.HOST_NAME:
           result = s1.getHost().compareToIgnoreCase(s2.getHost());

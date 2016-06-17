@@ -71,7 +71,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   private static final String LOCALHOST = "localhost";
 
   /** The hosts */
-  protected Map<String, HostRegistrationInMemory> hosts = new HashMap<String,  HostRegistrationInMemory>();
+  protected Map<String, HostRegistrationInMemory> hosts = new HashMap<String, HostRegistrationInMemory>();
 
   /** The service registrations */
   protected Map<String, List<ServiceRegistrationInMemoryImpl>> services = new HashMap<String, List<ServiceRegistrationInMemoryImpl>>();
@@ -115,8 +115,8 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.QUEUED);
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.DISPATCHING);
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.RUNNING);
-    JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.WAITING);
   }
+
   public ServiceRegistryInMemoryImpl(JobProducer service, float maxLoad, SecurityService securityService,
           UserDirectoryService userDirectoryService, OrganizationDirectoryService organizationDirectoryService,
           IncidentService incidentService) throws ServiceRegistryException {
@@ -336,7 +336,6 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     return createJob(type, operation, null, null, true);
   }
 
-
   /**
    * {@inheritDoc}
    *
@@ -512,8 +511,8 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
         ServiceRegistrationInMemoryImpl inMemoryRegistration = (ServiceRegistrationInMemoryImpl) registration;
         JobProducer service = inMemoryRegistration.getService();
 
-        //Add the job to the list of jobs so that it gets counted in the load.
-        //This is the same way that the JPA impl does it
+        // Add the job to the list of jobs so that it gets counted in the load.
+        // This is the same way that the JPA impl does it
         Set<Job> jobs = jobHosts.get(inMemoryRegistration);
         if (jobs == null) {
           jobs = new LinkedHashSet<Job>();
@@ -840,6 +839,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countByOperation(java.lang.String, java.lang.String,
    *      org.opencastproject.job.api.Job.Status)
    */
+  @Override
   public long countByOperation(String serviceType, String operation, Status status) throws ServiceRegistryException {
     return count(serviceType, null, operation, status);
   }
@@ -850,6 +850,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countByHost(java.lang.String, java.lang.String,
    *      org.opencastproject.job.api.Job.Status)
    */
+  @Override
   public long countByHost(String serviceType, String host, Status status) throws ServiceRegistryException {
     return count(serviceType, host, null, status);
   }
@@ -860,6 +861,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#count(java.lang.String, java.lang.String,
    *      java.lang.String, org.opencastproject.job.api.Job.Status)
    */
+  @Override
   public long count(String serviceType, String host, String operation, Status status) throws ServiceRegistryException {
     int count = 0;
     synchronized (jobs) {

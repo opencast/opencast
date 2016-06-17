@@ -154,8 +154,9 @@ VideoSegmenterService, ManagedService {
     this.binary = FFMPEG_BINARY_DEFAULT;
   }
 
-
+  @Override
   public void activate(ComponentContext cc) {
+    super.activate(cc);
     /* Configure segmenter */
     final String path = cc.getBundleContext().getProperty(FFMPEG_BINARY_CONFIG);
     this.binary = path == null ? FFMPEG_BINARY_DEFAULT : path;

@@ -78,7 +78,7 @@ public class ExecuteServiceImplTest {
     EasyMock.expect(bundleContext.getProperty(configKey1)).andReturn(configValue1).anyTimes();
     EasyMock.replay(bundleContext);
     cc = EasyMock.createNiceMock(ComponentContext.class);
-    EasyMock.expect(cc.getBundleContext()).andReturn(bundleContext);
+    EasyMock.expect(cc.getBundleContext()).andReturn(bundleContext).anyTimes();
     configKey2 = "edu.harvard.dce.param2";
     String configValue2 = baseDir.getAbsolutePath() + "/test.txt";
     Properties props = new Properties();

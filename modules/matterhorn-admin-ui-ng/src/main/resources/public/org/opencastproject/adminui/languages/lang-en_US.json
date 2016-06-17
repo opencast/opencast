@@ -1650,7 +1650,7 @@
      },
      "SERVICES": {
         "ACTIONS": {
-            "LABEL": "Has actions"
+            "LABEL": "Actions available"
         },
         "HOSTNAME": {
             "LABEL": "Host name"

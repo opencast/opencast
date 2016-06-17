@@ -444,15 +444,16 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     return organizationDirectoryService;
   }
 
-  protected void activate(ComponentContext context) {
+  @Override
+  public void activate(ComponentContext context) {
     logger.debug("activating...");
+    super.activate(context);
     FFmpegEdit.init(context.getBundleContext());
   }
 
   protected void deactivate(ComponentContext context) {
     logger.debug("deactivating...");
   }
-
 
   @Override
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {

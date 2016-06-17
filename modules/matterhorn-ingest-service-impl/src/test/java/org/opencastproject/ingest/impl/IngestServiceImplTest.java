@@ -119,6 +119,7 @@ public class IngestServiceImplTest {
   private static File packageFile;
 
   private static long workflowInstanceID = 1L;
+  private ServiceRegistryInMemoryImpl serviceRegistry;
 
   @BeforeClass
   public static void beforeClass() throws URISyntaxException {
@@ -303,8 +304,8 @@ public class IngestServiceImplTest {
     service.setSecurityService(securityService);
     service.setSchedulerService(schedulerService);
     service.setMediaInspectionService(mediaInspectionService);
-    ServiceRegistryInMemoryImpl serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService,
-            userDirectoryService, organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
+    serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
+            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
     serviceRegistry.registerService(service);
     service.setServiceRegistry(serviceRegistry);
     service.defaultWorkflowDefinionId = "sample";
@@ -488,6 +489,23 @@ public class IngestServiceImplTest {
     isOverwriteSeries = false;
     properties.put(IngestServiceImpl.PROPKEY_OVERWRITE_SERIES, String.valueOf(isOverwriteSeries));
     testSeriesUpdateNewAndExisting(properties);
+  }
+
+  @Test
+  public void testFailedJobs() throws Exception {
+    Assert.assertEquals(0, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FINISHED).size());
+    Assert.assertEquals(0, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FAILED).size());
+    service.addTrack(urlTrack, MediaPackageElements.PRESENTATION_SOURCE, service.createMediaPackage());
+    Assert.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FINISHED).size());
+    Assert.assertEquals(0, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FAILED).size());
+    try {
+      service.addTrack(URI.create("file//baduri"), MediaPackageElements.PRESENTATION_SOURCE,
+              service.createMediaPackage());
+    } catch (Exception e) {
+      // Ignore exception
+    }
+    Assert.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FINISHED).size());
+    Assert.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FAILED).size());
   }
 
   /**
