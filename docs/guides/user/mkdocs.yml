@@ -29,3 +29,6 @@ pages:
 - Configure the UI: 'configure.md'
 - Glossary: 'glossary.md'
 - Internationalization: 'i18n.md'
+- Advanced:
+  - Overview: 'advanced/index.md'
+  - Role-Based Visibility: 'advanced/role-based-visibility.md'
