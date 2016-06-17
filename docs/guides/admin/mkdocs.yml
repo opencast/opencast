@@ -33,6 +33,7 @@ pages:
    - Basic: 'configuration/basic.md'
    - Database: 'configuration/database.md'
    - Message Broker: 'configuration/message-broker.md'
+   - Metadata: 'configuration/metadata.md'
    - Encoding: 'configuration/encoding.md'
    - Load: 'configuration/load.md'
    - Logging and Privacy: 'configuration/logging.and.privacy.md'
