@@ -77,7 +77,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${build.number}</Build-Number>
+            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.security.urlsigning,
               org.opencastproject.security.urlsigning.provider.impl,
