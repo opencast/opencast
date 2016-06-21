@@ -48,7 +48,10 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
-public class SmilServiceMock {
+public final class SmilServiceMock {
+
+  private SmilServiceMock() {
+  }
 
   public static SmilService createSmilServiceMock(URI mpSmilURI)
           throws IOException, SmilException, URISyntaxException, JAXBException, SAXException {
