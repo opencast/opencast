@@ -18,8 +18,7 @@ __Response__
     "roles": {
       "role": [
         "ROLE_ADMIN",
-        "ROLE_SUDO",
-        "MATTERHORN_ADMINISTRATOR"
+        "ROLE_SUDO"
       ]
     },
     "name": "Default System Administrators",
@@ -63,8 +62,7 @@ __Response__
   "roles": {
     "role": [
       "ROLE_ADMIN",
-      "ROLE_SUDO",
-      "MATTERHORN_ADMINISTRATOR"
+      "ROLE_SUDO"
     ]
   },
   "name": "Default System Administrators",

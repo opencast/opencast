@@ -2,7 +2,7 @@
 
 The Application API can be accessed in two different ways: Either using a single dedicated user with access to everything (“super user”) or by implementing more fine grained access through user and role switching upon every request (“user switching” or “sudo” execution mode), where the request is executed in the name and using the roles of the specified user.
 
-The first method is ideal for scenarios where the end users of the external application are not managed in Matterhorn. The downside of this approach is a potential security risk as well as the inability to audit and track changes made by the external applications back to the actual user who actually triggered the changes. The second method is more cumbersome to implement but leads a much improved control and assessment of security.
+The first method is ideal for scenarios where the end users of the external application are not managed in Opencast. The downside of this approach is a potential security risk as well as the inability to audit and track changes made by the external applications back to the actual user who actually triggered the changes. The second method is more cumbersome to implement but leads a much improved control and assessment of security.
 
 # Delegation of Authorization
 
