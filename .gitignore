@@ -18,6 +18,9 @@ node/
 # ignore NetBeans project data
 */nbproject/*
 
+# ingore OS artifacts
+.DS_Store
+
 # Ignore all temporary editor files
 *.swp
 *.iml

@@ -19,24 +19,11 @@
  *
  */
 
-package org.opencastproject.adminui.endpoint;
+package org.opencastproject.workflow.handler.videoeditor;
 
-import static com.entwinemedia.fn.data.Opt.some;
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.same;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.opencastproject.util.data.Tuple.tuple;
-
-import org.opencastproject.adminui.endpoint.ToolsEndpoint.EditingInfo;
-import org.opencastproject.adminui.impl.AdminUIConfiguration;
-import org.opencastproject.archive.api.Archive;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.mediapackage.identifier.IdImpl;
+import org.opencastproject.mediapackage.Track;
+import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilResponse;
 import org.opencastproject.smil.api.SmilService;
 import org.opencastproject.smil.entity.api.Smil;
@@ -47,39 +34,30 @@ import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
-import org.opencastproject.util.data.Tuple;
-import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.xml.sax.SAXException;
 
-import java.io.InputStream;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.UUID;
 
-/** Test class for {@link ToolsEndpoint} */
-public class ToolsEndpointTest {
+import javax.xml.bind.JAXBException;
 
-  private static ToolsEndpoint endpoint;
-  private static Smil smil;
+public final class SmilServiceMock {
 
-  @BeforeClass
-  public static void setUpClass() throws Exception {
+  private SmilServiceMock() {
+  }
 
+  public static SmilService createSmilServiceMock(URI mpSmilURI)
+          throws IOException, SmilException, URISyntaxException, JAXBException, SAXException {
     /* Start of Smil mockups */
-    // Ugly, but strictly the smil APIs
-
-    String trackSrc = "http://mh-allinone.localdomain/archive/archive/mediapackage/0f2a2ada-0584-4d4d-a248-111f654aa217/6ec443e7-b097-4470-a618-5e0d848f5252/0/track.mp4";
-    URL smilUrl = ToolsEndpoint.class.getResource("/tools/smil1.xml");
-    String smilString = IOUtils.toString(smilUrl);
+    String smilString = IOUtils.toString(mpSmilURI);
+    String trackSrc = "abc";
 
     String trackParamGroupId = "pg-a6d8e576-495f-44c7-8ed7-b5b47c807f0f";
 
@@ -159,24 +137,28 @@ public class ToolsEndpointTest {
     EasyMock.expect(objectContainer1.isContainer()).andReturn(true).anyTimes();
     EasyMock.expect(objectContainer1.getContainerType()).andReturn(SmilMediaContainer.ContainerType.PAR).anyTimes();
     EasyMock.expect(objectContainer1.getElements()).andReturn(objects1).anyTimes();
+    EasyMock.expect(objectContainer1.getId()).andReturn("container1").anyTimes();
     EasyMock.replay(objectContainer1);
 
     SmilMediaContainer objectContainer2 = EasyMock.createNiceMock(SmilMediaContainer.class);
     EasyMock.expect(objectContainer2.isContainer()).andReturn(true).anyTimes();
     EasyMock.expect(objectContainer2.getContainerType()).andReturn(SmilMediaContainer.ContainerType.PAR).anyTimes();
     EasyMock.expect(objectContainer2.getElements()).andReturn(objects2).anyTimes();
+    EasyMock.expect(objectContainer2.getId()).andReturn("container2").anyTimes();
     EasyMock.replay(objectContainer2);
 
     SmilMediaContainer objectContainer3 = EasyMock.createNiceMock(SmilMediaContainer.class);
     EasyMock.expect(objectContainer3.isContainer()).andReturn(true).anyTimes();
     EasyMock.expect(objectContainer3.getContainerType()).andReturn(SmilMediaContainer.ContainerType.PAR).anyTimes();
     EasyMock.expect(objectContainer3.getElements()).andReturn(objects3).anyTimes();
+    EasyMock.expect(objectContainer3.getId()).andReturn("container3").anyTimes();
     EasyMock.replay(objectContainer3);
 
     SmilMediaContainer objectContainer4 = EasyMock.createNiceMock(SmilMediaContainer.class);
     EasyMock.expect(objectContainer4.isContainer()).andReturn(true).anyTimes();
     EasyMock.expect(objectContainer4.getContainerType()).andReturn(SmilMediaContainer.ContainerType.PAR).anyTimes();
     EasyMock.expect(objectContainer4.getElements()).andReturn(objects4).anyTimes();
+    EasyMock.expect(objectContainer4.getId()).andReturn("container4").anyTimes();
     EasyMock.replay(objectContainer4);
 
     List<SmilMediaObject> containerObjects = new ArrayList<SmilMediaObject>();
@@ -189,7 +171,7 @@ public class ToolsEndpointTest {
     EasyMock.expect(body.getMediaElements()).andReturn(containerObjects).anyTimes();
     EasyMock.replay(body);
 
-    smil = EasyMock.createNiceMock(Smil.class);
+    Smil smil = EasyMock.createNiceMock(Smil.class);
     EasyMock.expect(smil.get(trackParamGroupId)).andReturn(group1).anyTimes();
     EasyMock.expect(smil.getBody()).andReturn(body).anyTimes();
     EasyMock.expect(smil.getHead()).andReturn(head).anyTimes();
@@ -199,98 +181,22 @@ public class ToolsEndpointTest {
 
     SmilResponse response = EasyMock.createNiceMock(SmilResponse.class);
     EasyMock.expect(response.getSmil()).andReturn(smil).anyTimes();
+    EasyMock.expect(response.getEntity()).andReturn(object4).anyTimes();
     EasyMock.replay(response);
 
     SmilService smilService = EasyMock.createNiceMock(SmilService.class);
-    EasyMock.expect(smilService.fromXml((String) EasyMock.anyObject())).andReturn(response).anyTimes();
+    EasyMock.expect(smilService.createNewSmil((MediaPackage) EasyMock.anyObject())).andReturn(response).anyTimes();
+    EasyMock.expect(smilService.fromXml(EasyMock.anyString())).andReturn(response).anyTimes();
+    EasyMock.expect(smilService.fromXml((File) EasyMock.anyObject())).andReturn(response).anyTimes();
+    EasyMock.expect(smilService.removeSmilElement((Smil) EasyMock.anyObject(), EasyMock.anyString()))
+            .andReturn(response).anyTimes();
+    EasyMock.expect(smilService.addParallel(smil)).andReturn(response).anyTimes();
+    EasyMock.expect(smilService.addClips((Smil) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (Track[]) EasyMock.anyObject(), EasyMock.anyLong(), EasyMock.anyLong())).andReturn(response).anyTimes();
+
     EasyMock.replay(smilService);
-    /* End of Smil API mockups */
+    return smilService;
 
-    endpoint = new ToolsEndpoint();
-    endpoint.setSmilService(smilService);
-
-    AdminUIConfiguration adminUIConfiguration = new AdminUIConfiguration();
-    Hashtable<String, String> dictionary = new Hashtable<String, String>();
-    dictionary.put(AdminUIConfiguration.OPT_PREVIEW_SUBTYPE, "preview");
-    dictionary.put(AdminUIConfiguration.OPT_WAVEFORM_SUBTYPE, "waveform");
-    dictionary.put(AdminUIConfiguration.OPT_SMIL_CATALOG_FLAVOR, "smil/cutting");
-    dictionary.put(AdminUIConfiguration.OPT_SMIL_SILENCE_FLAVOR, "*/silence");
-    adminUIConfiguration.updated(dictionary);
-    endpoint.setAdminUIConfiguration(adminUIConfiguration);
-
-  }
-
-  /** Test method for {@link ToolsEndpoint#getSegmentsFromSmil(Smil)} */
-  @Test
-  public void testGetSegmentsFromSmil() throws Exception {
-
-    List<Tuple<Long, Long>> segments = endpoint.getSegmentsFromSmil(smil);
-    assertEquals(4, segments.size());
-    assertTrue(segments.contains(Tuple.tuple(0L, 2449L)));
-    assertTrue(segments.contains(Tuple.tuple(4922L, 11284L)));
-    assertTrue(segments.contains(Tuple.tuple(14721L, 15963L)));
-    assertTrue(segments.contains(Tuple.tuple(15963L, 20132L)));
-  }
-
-  /** Test method for {@link ToolsEndpoint#mergeSegments(List, List))} */
-  @Test
-  public void testMergeSegments() throws Exception {
-    List<Tuple<Long, Long>> segments = new ArrayList<>();
-    segments.add(tuple(0L, 2449L));
-    segments.add(tuple(4922L, 11284L));
-    segments.add(tuple(14000L, 15000L));
-    List<Tuple<Long, Long>> segments2 = new ArrayList<>();
-    segments2.add(tuple(1449L, 3449L));
-    segments2.add(tuple(11285L, 11290L));
-    segments2.add(tuple(15000L, 16000L));
-    List<Tuple<Long, Long>> mergedSegments = endpoint.mergeSegments(segments, segments2);
-    assertEquals(5, mergedSegments.size());
-  }
-
-  /** Test method for {@link ToolsEndpoint.EditingInfo#parse(JSONObject)} */
-  @Test
-  public void testEditingInfoParse() throws Exception {
-    JSONParser parser = new JSONParser();
-    final EditingInfo editingInfo = ToolsEndpoint.EditingInfo.parse((JSONObject) parser.parse(IOUtils
-            .toString(getClass().getResourceAsStream("/tools/POST-editor.json"))));
-
-    final List<Tuple<Long, Long>> segments = editingInfo.getConcatSegments();
-    assertEquals(4, segments.size());
-    assertTrue(segments.contains(Tuple.tuple(0L, 2449L)));
-    assertTrue(segments.contains(Tuple.tuple(4922L, 11284L)));
-    assertTrue(segments.contains(Tuple.tuple(14721L, 15963L)));
-    assertTrue(segments.contains(Tuple.tuple(15963L, 20132L)));
-
-    final List<String> tracks = editingInfo.getConcatTracks();
-    assertEquals(1, tracks.size());
-
-    assertEquals(some("cut-workflow"), editingInfo.getPostProcessingWorkflow());
-  }
-
-  /** Test method for {@link ToolsEndpoint#addSmilToArchive(org.opencastproject.mediapackage.MediaPackage, Smil)} */
-  @Test
-  public void testAddSmilToArchive() throws Exception {
-    final String mpId = UUID.randomUUID().toString();
-    final URI archiveElementURI = new URI("http://host.tld/archive/cut.smil");
-    final String smilId = "s-afe311c6-9161-41f4-98d0-e951fe66d89e";
-
-    Workspace workspace = createNiceMock(Workspace.class);
-    expect(workspace.put(same(mpId), same(smilId), same("cut.smil"), anyObject(InputStream.class))).andReturn(
-            archiveElementURI);
-    replay(workspace);
-    endpoint.setWorkspace(workspace);
-
-    Archive<?> archive = createNiceMock(Archive.class);
-    replay(archive);
-    endpoint.setArchive(archive);
-
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew(new IdImpl(mpId));
-
-    endpoint.addSmilToArchive(mp, smil);
-
-    assertEquals(1, mp.getCatalogs().length);
-    assertEquals("editor-cutting-information", mp.getCatalogs()[0].getIdentifier());
-    assertEquals("smil/cutting", mp.getCatalogs()[0].getFlavor().toString());
   }
 
 }

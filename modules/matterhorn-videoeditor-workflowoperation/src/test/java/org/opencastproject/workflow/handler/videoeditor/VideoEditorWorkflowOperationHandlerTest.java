@@ -34,9 +34,9 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilService;
 import org.opencastproject.smil.entity.api.Smil;
-import org.opencastproject.smil.impl.SmilServiceImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.videoeditor.api.ProcessFailedException;
 import org.opencastproject.videoeditor.api.VideoEditorService;
@@ -53,6 +53,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,6 +66,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.bind.JAXBException;
 
 /**
  * Test class for {@link VideoEditorWorkflowOperationHandler}
@@ -82,16 +85,18 @@ public class VideoEditorWorkflowOperationHandlerTest {
   private MediaPackage mpSmil = null;
 
   @Before
-  public void setUp() throws MediaPackageException, IOException, NotFoundException, URISyntaxException {
+  public void setUp() throws MediaPackageException, IOException, NotFoundException, URISyntaxException, SmilException,
+          JAXBException, SAXException {
 
     MediaPackageBuilder mpBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
     mpURI = VideoEditorWorkflowOperationHandlerTest.class.getResource("/editor_mediapackage.xml").toURI();
     mp = mpBuilder.loadFromXml(mpURI.toURL().openStream());
     mpSmilURI = VideoEditorWorkflowOperationHandlerTest.class.getResource("/editor_smil_mediapackage.xml").toURI();
     mpSmil = mpBuilder.loadFromXml(mpSmilURI.toURL().openStream());
-    smilService = new SmilServiceImpl();
     videoEditorServiceMock = EasyMock.createNiceMock(VideoEditorService.class);
     workspaceMock = EasyMock.createNiceMock(Workspace.class);
+
+    smilService = SmilServiceMock.createSmilServiceMock(mpSmilURI);
 
     videoEditorWorkflowOperationHandler = new VideoEditorWorkflowOperationHandler();
     videoEditorWorkflowOperationHandler.setJobBarrierPollingInterval(0);

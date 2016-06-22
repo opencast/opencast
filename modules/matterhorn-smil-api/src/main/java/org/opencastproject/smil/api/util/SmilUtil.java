@@ -18,20 +18,14 @@
  * the License.
  *
  */
-package org.opencastproject.smil.util;
+package org.opencastproject.smil.api.util;
 
 import static org.opencastproject.util.IoSupport.withResource;
-import static org.opencastproject.util.data.Monadics.mlist;
 
-import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.util.XmlUtil;
 import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Misc;
-import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import com.android.mms.dom.smil.parser.SmilXmlParser;
 import com.entwinemedia.fn.Fn;
@@ -39,7 +33,7 @@ import com.entwinemedia.fn.FnX;
 
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -91,30 +85,13 @@ public final class SmilUtil {
   }
 
   /**
-   * Load a SMIL document of a media package.
-   *
-   * @return the document or none if no media package element found.
-   */
-  public static Option<Document> loadSmilDocument(final WorkingFileRepository workingFileRepository, MediaPackage mp) {
-    return mlist(mp.getElements()).filter(MediaPackageSupport.Filters.isSmilCatalog).headOpt()
-            .map(new Function<MediaPackageElement, Document>() {
-              @Override
-              public Document apply(MediaPackageElement mpe) {
-                return loadSmilDocument(workingFileRepository, mpe);
-              }
-            });
-  }
-
-  /**
    * Load the SMIL document identified by <code>mpe</code>. Throws an exception if it does not exist or cannot be loaded
    * by any reason.
    *
    * @return the document
    */
-  public static Document loadSmilDocument(WorkingFileRepository workingFileRepository, MediaPackageElement mpe) {
-    InputStream in = null;
+  public static Document loadSmilDocument(InputStream in, MediaPackageElement mpe) {
     try {
-      in = workingFileRepository.get(mpe.getMediaPackage().getIdentifier().compact(), mpe.getIdentifier());
       Either<Exception, org.w3c.dom.Document> eitherDocument = XmlUtil.parseNs(new InputSource(in));
       if (eitherDocument.isRight())
         return eitherDocument.right().value();
@@ -123,16 +100,12 @@ public final class SmilUtil {
     } catch (Exception e) {
       logger.warn("Unable to load smil document from catalog '{}': {}", mpe, ExceptionUtils.getStackTrace(e));
       return Misc.chuck(e);
-    } finally {
-      IOUtils.closeQuietly(in);
     }
   }
 
   /**
-   * Creates a SMIL document with the given duration
+   * Creates a skeleton SMIL document
    *
-   * @param duration
-   *          the duration
    * @return the SMIL document
    */
   public static Document createSmil() {
