@@ -21,6 +21,8 @@
 package org.opencastproject.scheduler.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_PRECONDITION_FAILED;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CREATED;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_SPATIAL;
@@ -1199,9 +1201,9 @@ public class SchedulerRestService {
           @RestParameter(name = "agentid", description = "Filter events by capture agent", isRequired = false, type = Type.STRING),
           @RestParameter(name = "seriesid", description = "Filter events by series", isRequired = false, type = Type.STRING),
           @RestParameter(name = "cutoff", description = "A cutoff date at which the number of events returned in the calendar are limited.", isRequired = false, type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "No calendar for agent found"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_MODIFIED, description = "Events were not modified since last request"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Events were modified, new calendar is in the body") })
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "No calendar for agent found"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_MODIFIED, description = "Events were not modified since last request"),
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Events were modified, new calendar is in the body") })
   public Response getCalendar(@QueryParam("agentid") String captureAgentId, @QueryParam("seriesid") String seriesId,
           @QueryParam("cutoff") String cutoff, @Context HttpServletRequest request) throws NotFoundException {
 
@@ -1235,20 +1237,17 @@ public class SchedulerRestService {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to get calendar for capture agent '{}': {}", captureAgentId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to get calendar for capture agent '{}': {}", captureAgentId, ExceptionUtils.getStackTrace(e));
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
 
   @PUT
   @Path("{id}/acl")
-  @RestQuery(name = "updateaccesscontrollist", description = "Updates the access control list of the event with the given id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = {
-          @RestParameter(name = "id", description = "ID of event", isRequired = true, type = Type.STRING) }, restParameters = {
-                  @RestParameter(name = "acl", isRequired = false, description = "The access control list", type = Type.STRING) }, reponses = {
-                          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
-                          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
-                          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "access control list could not be parsed") })
+  @RestQuery(name = "updateaccesscontrollist", description = "Updates the access control list of the event with the given id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = { @RestParameter(name = "id", description = "ID of event", isRequired = true, type = Type.STRING) }, restParameters = { @RestParameter(name = "acl", isRequired = false, description = "The access control list", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "access control list could not be parsed") })
   public Response updateAccessControlList(@PathParam("id") long eventId, @FormParam("acl") String aclString) {
     AccessControlList acl;
     try {
@@ -1274,10 +1273,9 @@ public class SchedulerRestService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{id}/acl")
-  @RestQuery(name = "getaccesscontrollist", description = "Retrieves the access control list for specified event", returnDescription = "The access control list", pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "ID of event for which the access control list will be retrieved", type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The access control list as JSON "),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
+  @RestQuery(name = "getaccesscontrollist", description = "Retrieves the access control list for specified event", returnDescription = "The access control list", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "ID of event for which the access control list will be retrieved", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The access control list as JSON "),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
   public Response getAccessControlList(@PathParam("id") long eventId) {
     try {
       AccessControlList accessControlList = service.getAccessControlList(eventId);
@@ -1294,10 +1292,9 @@ public class SchedulerRestService {
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("{id}/mediapackageId")
-  @RestQuery(name = "recordingmediapackageid", description = "Retrieves the mediapackage identifier for specified event", returnDescription = "The mediapackage identifier", pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "ID of event for which the mediapackage identifier will be retrieved", type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The mediapackage identifier of event is in the body of response"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
+  @RestQuery(name = "recordingmediapackageid", description = "Retrieves the mediapackage identifier for specified event", returnDescription = "The mediapackage identifier", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "ID of event for which the mediapackage identifier will be retrieved", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The mediapackage identifier of event is in the body of response"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
   public Response getMediaPackageId(@PathParam("id") long eventId) {
     try {
       String mediaPackageId = service.getMediaPackageId(eventId);
@@ -1314,10 +1311,9 @@ public class SchedulerRestService {
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("{id}/eventId")
-  @RestQuery(name = "recordingeventid", description = "Retrieves the event identifier of the event with the given mediapackage", returnDescription = "The event identifier", pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage identifier", type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The mediapackage identifier of event is in the body of response"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
+  @RestQuery(name = "recordingeventid", description = "Retrieves the event identifier of the event with the given mediapackage", returnDescription = "The event identifier", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage identifier", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The mediapackage identifier of event is in the body of response"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist") })
   public Response getEventId(@PathParam("id") String mediaPackageId) {
     try {
       long eventId = service.getEventId(mediaPackageId);
@@ -1334,10 +1330,9 @@ public class SchedulerRestService {
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("{id}/optOut")
-  @RestQuery(name = "recordingoptoutstatus", description = "Retrieves the opt out status for specified event", returnDescription = "The opt out status", pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage id for which the opt out status will be retrieved", type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The opt out status of event is in the body of response"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist") })
+  @RestQuery(name = "recordingoptoutstatus", description = "Retrieves the opt out status for specified event", returnDescription = "The opt out status", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage id for which the opt out status will be retrieved", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The opt out status of event is in the body of response"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist") })
   public Response getOptOut(@PathParam("id") String mediaPackageId) {
     try {
       boolean optOut = service.isOptOut(mediaPackageId);
@@ -1353,12 +1348,10 @@ public class SchedulerRestService {
 
   @PUT
   @Path("{id}/optOut")
-  @RestQuery(name = "updateoptoutstatus", description = "Updates the opt out status of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = {
-          @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = {
-                  @RestParameter(name = "optOut", isRequired = false, description = "The opt out status to set", type = Type.STRING) }, reponses = {
-                          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
-                          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
-                          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "opt out value could not be parsed") })
+  @RestQuery(name = "updateoptoutstatus", description = "Updates the opt out status of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = { @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = { @RestParameter(name = "optOut", isRequired = false, description = "The opt out status to set", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "opt out value could not be parsed") })
   public Response updateOptOut(@PathParam("id") String mpId, @FormParam("optOut") String optOutString) {
     Boolean optedOut = BooleanUtils.toBooleanObject(optOutString);
     if (optedOut == null)
@@ -1379,10 +1372,9 @@ public class SchedulerRestService {
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("{id}/reviewStatus")
-  @RestQuery(name = "recordingreviewstatus", description = "Retrieves the review status for specified event", returnDescription = "The review status", pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage id for which the review status will be retrieved", type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The review status of event is in the body of response"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist") })
+  @RestQuery(name = "recordingreviewstatus", description = "Retrieves the review status for specified event", returnDescription = "The review status", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage id for which the review status will be retrieved", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The review status of event is in the body of response"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist") })
   public Response getReviewStatus(@PathParam("id") String mediaPackageId) {
     try {
       ReviewStatus reviewStatus = service.getReviewStatus(mediaPackageId);
@@ -1398,14 +1390,11 @@ public class SchedulerRestService {
 
   @PUT
   @Path("{id}/reviewStatus")
-  @RestQuery(name = "updatereviewstatus", description = "Updates the review status of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = {
-          @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = {
-                  @RestParameter(name = "reviewStatus", isRequired = false, description = "The review status to set: [UNSENT, UNCONFIRMED, CONFIRMED]", type = Type.STRING) }, reponses = {
-                          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
-                          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
-                          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "review status could not be parsed") })
-  public Response updateReviewStatus(@PathParam("id") String mpId,
-          @FormParam("reviewStatus") String reviewStatusString) {
+  @RestQuery(name = "updatereviewstatus", description = "Updates the review status of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = { @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = { @RestParameter(name = "reviewStatus", isRequired = false, description = "The review status to set: [UNSENT, UNCONFIRMED, CONFIRMED]", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "review status could not be parsed") })
+  public Response updateReviewStatus(@PathParam("id") String mpId, @FormParam("reviewStatus") String reviewStatusString) {
 
     ReviewStatus reviewStatus;
     try {
@@ -1430,10 +1419,9 @@ public class SchedulerRestService {
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("{id}/blacklisted")
-  @RestQuery(name = "recordingblackliststatus", description = "Retrieves the blacklist status for specified event", returnDescription = "The blacklist status", pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage id for which the blacklist status will be retrieved", type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The blacklist status of event is in the body of response"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist") })
+  @RestQuery(name = "recordingblackliststatus", description = "Retrieves the blacklist status for specified event", returnDescription = "The blacklist status", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage id for which the blacklist status will be retrieved", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The blacklist status of event is in the body of response"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist") })
   public Response getBlacklistStatus(@PathParam("id") String mediaPackageId) {
     try {
       boolean blacklisted = service.isBlacklisted(mediaPackageId);
@@ -1449,14 +1437,11 @@ public class SchedulerRestService {
 
   @PUT
   @Path("{id}/blacklisted")
-  @RestQuery(name = "updateblackliststatus", description = "Updates the blacklist status of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = {
-          @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = {
-                  @RestParameter(name = "blacklisted", isRequired = false, description = "The blacklist status to set", type = Type.STRING) }, reponses = {
-                          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
-                          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
-                          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "blacklist status could not be parsed") })
-  public Response updateBlacklistStatus(@PathParam("id") String mpId,
-          @FormParam("blacklisted") String blacklistString) {
+  @RestQuery(name = "updateblackliststatus", description = "Updates the blacklist status of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = { @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = { @RestParameter(name = "blacklisted", isRequired = false, description = "The blacklist status to set", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "blacklist status could not be parsed") })
+  public Response updateBlacklistStatus(@PathParam("id") String mpId, @FormParam("blacklisted") String blacklistString) {
     Boolean blacklisted = BooleanUtils.toBooleanObject(blacklistString);
     if (blacklisted == null)
       return Response.status(Status.BAD_REQUEST).build();
@@ -1475,12 +1460,10 @@ public class SchedulerRestService {
 
   @PUT
   @Path("{id}/workflowConfig")
-  @RestQuery(name = "updateworkflowconfig", description = "Updates the worklfow config of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = {
-          @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = {
-                  @RestParameter(name = "workflowConfig", isRequired = false, description = "The workflow config to add", type = Type.STRING) }, reponses = {
-                          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
-                          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
-                          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "workflow config could not be parsed") })
+  @RestQuery(name = "updateworkflowconfig", description = "Updates the worklfow config of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = { @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = { @RestParameter(name = "workflowConfig", isRequired = false, description = "The workflow config to add", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "workflow config could not be parsed") })
   public Response updateWorkflowConfig(@PathParam("id") String mpId,
           @FormParam("workflowConfig") String workflowConfigString) {
     Map<String, String> wfProperties = new HashMap<String, String>();
@@ -1507,9 +1490,8 @@ public class SchedulerRestService {
   @POST
   @Path("/removeOldScheduledRecordings")
   @RestQuery(name = "removeOldScheduledRecordings", description = "This will find and remove any scheduled events before the buffer time to keep performance in the scheduler optimum.", returnDescription = "No return value", reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Removed old scheduled recordings."),
-          @RestResponse(responseCode = HttpServletResponse.SC_PRECONDITION_FAILED, description = "Unable to parse buffer.") }, restParameters = {
-                  @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "604800", isRequired = true, description = "The amount of seconds before now that a capture has to have stopped capturing. It must be 0 or greater.") })
+          @RestResponse(responseCode = SC_OK, description = "Removed old scheduled recordings."),
+          @RestResponse(responseCode = SC_PRECONDITION_FAILED, description = "Unable to parse buffer.") }, restParameters = { @RestParameter(name = "buffer", type = RestParameter.Type.INTEGER, defaultValue = "604800", isRequired = true, description = "The amount of seconds before now that a capture has to have stopped capturing. It must be 0 or greater.") })
   public Response removeOldScheduledRecordings(@FormParam("buffer") long buffer) {
     if (buffer < 0) {
       return Response.status(SC_BAD_REQUEST).build();
@@ -1575,12 +1557,11 @@ public class SchedulerRestService {
   private DublinCoreCatalog parseDublinCore(String dcXML) throws IOException {
     // Trim XML string because parsing will fail if there are any chars before XML processing instruction
     String trimmedDcXml = StringUtils.trim(dcXML);
-    /* Warn the user if trimming was necessary as this meant that the XML
-     * string was technically invalid.
+    /*
+     * Warn the user if trimming was necessary as this meant that the XML string was technically invalid.
      */
     if (!trimmedDcXml.equals(dcXML)) {
-      logger.warn("Detected invalid XML data. Trying to fix this by "
-          + "removing spaces from beginning/end.");
+      logger.warn("Detected invalid XML data. Trying to fix this by removing spaces from beginning/end.");
     }
     return dcService.load(new ByteArrayInputStream(trimmedDcXml.getBytes("UTF-8")));
   }
