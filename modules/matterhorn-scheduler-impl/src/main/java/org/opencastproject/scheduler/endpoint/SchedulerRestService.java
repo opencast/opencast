@@ -163,15 +163,6 @@ public class SchedulerRestService {
   }
 
   /**
-   * Method to unset the prolonging service this REST endpoint uses
-   *
-   * @param prolongingService
-   */
-  public void unsetProlongingService(CaptureNowProlongingService prolongingService) {
-    this.prolongingService = null;
-  }
-
-  /**
    * Method to set the capture agent state service this REST endpoint uses
    *
    * @param agentService
@@ -449,7 +440,7 @@ public class SchedulerRestService {
           @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
   public Response startCapture(@PathParam("agent") String agentId, @FormParam("workflowDefinitionId") String wfId)
           throws NotFoundException, UnauthorizedException {
-    if (service == null || agentService == null || prolongingService == null)
+    if (service == null || agentService == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE)
               .entity("Scheduler service is unavailable, please wait...").build();
 
@@ -534,7 +525,7 @@ public class SchedulerRestService {
           @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to stop this immediate capture. Maybe you need to authenticate."),
           @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
   public Response stopCapture(@PathParam("agent") String agentId) throws NotFoundException, UnauthorizedException {
-    if (service == null || agentService == null || prolongingService == null)
+    if (service == null || agentService == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE)
               .entity("Scheduler service is unavailable, please wait...").build();
 
@@ -583,7 +574,7 @@ public class SchedulerRestService {
           @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to prolong this immediate capture. Maybe you need to authenticate."),
           @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "The agent is not ready to communicate") })
   public Response prolongCapture(@PathParam("agent") String agentId) throws NotFoundException, UnauthorizedException {
-    if (service == null || agentService == null || prolongingService == null)
+    if (service == null || agentService == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE)
               .entity("Scheduler service is unavailable, please wait...").build();
     try {
