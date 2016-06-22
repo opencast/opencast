@@ -16,47 +16,140 @@ A proposal is accepted when no veto (`-1`) is voted within a time spawn of 72 ho
 Passed Proposals
 ----------------
 
+
+### Opencast Community Repository Owners
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Fri, 13 May 2016 18:41:52 UTC
+
+```no-highlight
+Hi,
+today, in the technical meeting, we shortly discussed how to handle
+requests, problems, etc regarding the other repositories we are hosting
+under the umbrella of the Opencast community:
+
+  https://bitbucket.org/opencast-community/profile/repositories
+
+While we have people who care about the official Opencast repository as
+well as rules about what may be merged, who may merge things, … we do
+not have that for other repositories and for some it's very unclear.
+
+That is why I would like to propose that every repository under the
+umbrella of the Opencast community needs to have a “project owner”
+being responsible for that repository. Usually it should be the one
+requesting that repository, but of course it can be someone else known
+in the community.
+
+I would also like to propose that if there is no one willing to take up
+the responsibility to take care of a repository (ownership) if an old
+owner leaves, the repository should either be removed or marked as
+deprecated and moved to a separate section if so requested.
+
+Finally, I would like to propose that we use the new “project” feature
+of BitBucket to group the repositories into the groups:
+
+- Opencast
+- Contrib
+- Adopters
+- Deprecated (<- to be created if needed)
+
+Currently, all repositories are in one big project.
+
+Regards,
+Lars
+```
+
+### Rename Opencast Mailing Lists
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Thu, 14 Apr 2016 00:00:00 UTC
+
+```no-highlight
+Hi everyone,
+traditionally, we have the three mailing lists:
+
+ - matterhorn@opencast.org (development list)
+ - matterhorn-users@opencast.org (user list)
+ - community@opencast.org (more or less announcements)
+
+Recently, though, we have seen especially the last two list being used
+for user questions and problems. That is not surprising as we dropped
+the name “Matterhorn” and new users do not know what that the list
+matterhorn-users is meant for questions about Opencast.
+
+That is why I would like to rename these lists to
+
+ - dev@opencast.org or development@opencast.org (I prefer the short
+   name but don't have very strong feelings about that)
+ - users@opencast.org
+ - announcements@opencast.org
+
+Together with the already existing security-notices list, this gives
+these lists a very clear meaning. It would also have the benefit that
+users only interested in general announcements could subscribe to one
+list only which would likely be a very low-traffic mailing list.
+
+Additionally, this would make it sufficient to send announcements to
+one list, instead of sending it to all three lists.
+
+To prevent general questions on the announcements list, I suggest we
+grant posting rights to board members, committers or other people who
+have or had a role in our community only. I don't think we need to be
+too strict here but should make sure that people understand what this
+list is for.
+
+Finally, for the sake of our current members, I would suggest that we
+forward the mails to the old addresses for at least until the end of
+the year, if that is possible.
+
+Best regards,
+Lars
+```
+
+
 ### Documentation Pull Request Merge Order
 Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Thu, 25 Feb 2016 20:52:00 UTC
 
-    Hi everyone, 
-    as discussed in this weeks technical meeting, I hereby #propose to 
-    allow out-of-order merges of documentation pull requests in the same way 
-    we have this exception for bug-fixes. 
+```no-highlight
+Hi everyone,
+as discussed in this weeks technical meeting, I hereby #propose to
+allow out-of-order merges of documentation pull requests in the same way
+we have this exception for bug-fixes.
 
-    to be precise, I #propose to change the development process docs for 
-    reviewing and merging [1] in the following way: 
+to be precise, I #propose to change the development process docs for
+reviewing and merging [1] in the following way:
 
-    [old] 
+[old]
 
-     - Pull requests for bug fixes (t/MH-XXXXX-...) may be reviewed and 
-       merged out of order. 
+ - Pull requests for bug fixes (t/MH-XXXXX-...) may be reviewed and
+   merged out of order.
 
-    [new] 
+[new]
 
-     - Pull requests for bug fixes or documentation may be reviewed and 
-       merged out of order. 
+ - Pull requests for bug fixes or documentation may be reviewed and
+   merged out of order.
 
-    Regards, 
-    Lars 
+Regards,
+Lars
 
-    [1] https://docs.opencast.org/develop/developer/reviewing-and-merging/ 
+[1] https://docs.opencast.org/develop/developer/reviewing-and-merging/
+```
+
+
 
 ### Removing instances of print statements with a style rule #proposal
 Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Wed, 12 Feb 2016 12:00:00 UTC
 
     Hi folks,
 
-    I noticed in a recently review that there are still System.out.println 
+    I noticed in a recently review that there are still System.out.println
     statements in use in our codebase.  I was surprised, because thought we had
-    previously implemented a checkstyle rule which would have banned those 
-    statements!  I hereby #propose that we implement the changes outlined in 
-    https://opencast.jira.com/browse/MH-11222, and remove these statements in 
-    favour of logger statements.  I also propose that we add this rule to the 
-    checkstyle ruleset so that we don't have to deal with this again going 
+    previously implemented a checkstyle rule which would have banned those
+    statements!  I hereby #propose that we implement the changes outlined in
+    https://opencast.jira.com/browse/MH-11222, and remove these statements in
+    favour of logger statements.  I also propose that we add this rule to the
+    checkstyle ruleset so that we don't have to deal with this again going
     forward.  Proposal closes EOD 2016-02-03.
 
     G
+
+
 
 ### How to release a new Opencast version…
 Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Fri, 14 Aug 2015 12:54:51 UTC
