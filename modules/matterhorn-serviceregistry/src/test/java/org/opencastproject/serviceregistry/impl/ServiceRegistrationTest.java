@@ -21,6 +21,9 @@
 
 package org.opencastproject.serviceregistry.impl;
 
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.expect;
+
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -74,8 +77,7 @@ public class ServiceRegistrationTest {
 
     Organization organization = new DefaultOrganization();
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
-    EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
-    .andReturn(organization).anyTimes();
+    expect(organizationDirectoryService.getOrganization((String) anyObject())).andReturn(organization).anyTimes();
     EasyMock.replay(organizationDirectoryService);
     serviceRegistry.setOrganizationDirectoryService(organizationDirectoryService);
 
@@ -83,8 +85,8 @@ public class ServiceRegistrationTest {
     User anonymous = new JaxbUser("anonymous", "test", jaxbOrganization, new JaxbRole(
             jaxbOrganization.getAnonymousRole(), jaxbOrganization));
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    EasyMock.expect(securityService.getUser()).andReturn(anonymous).anyTimes();
-    EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
+    expect(securityService.getUser()).andReturn(anonymous).anyTimes();
+    expect(securityService.getOrganization()).andReturn(organization).anyTimes();
     EasyMock.replay(securityService);
     serviceRegistry.setSecurityService(securityService);
 
@@ -114,6 +116,38 @@ public class ServiceRegistrationTest {
   }
 
   @Test
+  public void testServiceRegistrationsByLoad() throws Exception {
+    List<ServiceRegistration> services = serviceRegistry.getServiceRegistrations();
+    List<HostRegistration> hosts = serviceRegistry.getHostRegistrations();
+    SystemLoad hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager(), true);
+    List<ServiceRegistration> availableServices = serviceRegistry.getServiceRegistrationsByLoad(JOB_TYPE_1, services,
+            hosts, hostLoads);
+
+    // Make sure all hosts are available for processing
+    Assert.assertEquals(3, availableServices.size());
+
+    // Create a job and mark it as running.
+    Job job = serviceRegistry.createJob(regType1Localhost.getHost(), regType1Localhost.getServiceType(),
+            OPERATION_NAME_1, null, null, false, null);
+    job.setStatus(Job.Status.RUNNING);
+    job = serviceRegistry.updateJob(job);
+
+    // Recalculate the number of available services
+    hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager(), true);
+    availableServices = serviceRegistry.getServiceRegistrationsByLoad(JOB_TYPE_1, services, hosts, hostLoads);
+
+    // Since the host load is not taken into account, still all tree services should show up
+    Assert.assertEquals(3, availableServices.size());
+
+    // Recalculate the number of available services after ignoring a host
+    hosts.remove(regType1Remotehost1.getHostRegistration());
+    availableServices = serviceRegistry.getServiceRegistrationsByLoad(JOB_TYPE_1, services, hosts, hostLoads);
+
+    // Since host 1 is now ignored, only two more services should show up
+    Assert.assertEquals(2, availableServices.size());
+  }
+
+  @Test
   public void testHostCapacity() throws Exception {
     List<ServiceRegistration> services = serviceRegistry.getServiceRegistrations();
     List<HostRegistration> hosts = serviceRegistry.getHostRegistrations();
@@ -134,8 +168,15 @@ public class ServiceRegistrationTest {
     hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager(), true);
     availableServices = serviceRegistry.getServiceRegistrationsWithCapacity(JOB_TYPE_1, services, hosts, hostLoads);
 
-    // Since host 1 is now maxed out, only two more hosts should show up
+    // Since host 1 is now maxed out, only two more services should show up
     Assert.assertEquals(2, availableServices.size());
+
+    // Recalculate the number of available services after ignoring a host
+    hosts.remove(regType1Remotehost1.getHostRegistration());
+    availableServices = serviceRegistry.getServiceRegistrationsWithCapacity(JOB_TYPE_1, services, hosts, hostLoads);
+
+    // Since remote host 1 is now ignored, only one more service should show up
+    Assert.assertEquals(1, availableServices.size());
   }
 
   @Test

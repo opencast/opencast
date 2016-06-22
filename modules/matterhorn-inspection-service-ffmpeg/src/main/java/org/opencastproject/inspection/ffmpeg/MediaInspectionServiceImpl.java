@@ -104,7 +104,9 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
     super(JOB_TYPE);
   }
 
+  @Override
   public void activate(ComponentContext cc) {
+    super.activate(cc);
     /* Configure analyzer */
     final String path = cc.getBundleContext().getProperty(FFmpegAnalyzer.FFPROBE_BINARY_CONFIG);
     final String ffprobeBinary;

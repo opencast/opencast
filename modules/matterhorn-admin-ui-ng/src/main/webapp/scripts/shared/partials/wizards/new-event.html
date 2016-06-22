@@ -55,7 +55,7 @@
     <div class="modal-body">
         <div class="full-col">
             <div data-admin-ng-notifications="" context="events-form"></div>
-            <table ng-show="wizard.step.conflicts.length > 0" class="main-tbl">
+            <table ng-show="wizard.step.conflicts.length > 0" class="main-tbl scheduling-conflict">
                 <tr ng-repeat="conflict in wizard.step.conflicts">
                     <td>{{ conflict.title }}</td>
                     <td>{{ conflict.start }}</td>

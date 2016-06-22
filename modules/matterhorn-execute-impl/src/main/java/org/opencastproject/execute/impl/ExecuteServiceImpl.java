@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.execute.impl;
 
 import org.opencastproject.execute.api.ExecuteException;
@@ -134,7 +133,9 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    * @param cc
    *          The component's context, containing the properties used for configuration
    */
+  @Override
   public void activate(ComponentContext cc) {
+    super.activate(cc);
 
     properties = cc.getProperties();
 

@@ -72,8 +72,8 @@ Start by naming the workflow and giving it a meaningful description:
 
     </definition>
 
-- The `id` is used in several Opencast endpoints to identify and select this workflow. Make sure that this identifier is
-  unique among all endpoints in the system.
+- The `id` is used in several Opencast endpoints to identify and select this workflow. Make sure that this identifier
+  is unique among all endpoints in the system.
 - The `tags` define where the user interfaces may use these workflows. Useful tags are:
     - *upload-ng*: Usable for uploaded media (new admin ui)
     - *schedule-ng*: Usable for scheduled events (new admin ui)
@@ -250,6 +250,9 @@ Here is an example of a configurable operation:
       ...
     </operation>
 
+The attribute `if` specifies the execution condition in means of the operation only being executed if that condition
+evaluates to true. You can find more details on conditional execution in the next section.
+
 Once the operation is configured to accept a variable, we need to describe how to gather the value from the
 administrative user. The `<configuration_panel>` element of a workflow definitions describes this user interface
 snippet.  A simple configuration panel could look like this:
@@ -261,12 +264,37 @@ snippet.  A simple configuration panel could look like this:
       ]]>
     </configuration_panel>
 
-The checkbox in this `<configuration_panel>` will now be displayed in the administrative tools, and the user's selection
-will be used to replace the `${review.hold}` variable in the workflow.
+The checkbox in this `<configuration_panel>` will now be displayed in the administrative tools, and the user's
+selection will be used to replace the `${review.hold}` variable in the workflow.
 
 This input can also be sent by capture agents, using the ingest endpoints. Please note that capture agents usually do
 not load the configuration panel. Hence defaults set in the user interface will not apply to ingests. To circumvent
 this, the [defaults operation](../workflowoperationhandlers/defaults-woh.md) can be used.
+
+## Conditional Execution
+
+The attribute `if` of the `operation` element can be used to specify a condition to control whether the workflow
+operation should be executed. This so-called execution condition is a boolean expression of the following form:
+
+    <expression> ::= <term> ["OR" <expression>]
+    <term> ::= <value> ["AND" <term>]
+    <value> ::= ["NOT"]* ( "(" <expression> ")" | <relation> | <bool-literal> )
+    <relation> ::= <relation-factor> <rel-literal> <relation-factor>
+    <relation-factor> ::= <operation> | <number>
+    <operation> ::= <number> <op-literal> <number>
+    <rel-literal> ::= ">=" | ">" | "<=" | "<" | "=" | "!="
+    <op-literal> ::= "+" | "-" | "*" | "/"
+    <bool-literal> ::= "true" | "false"
+
+As the formal description above explains, such boolean expressions may contain the booelan constants (`true` and
+`false`) and numbers, as well as references to the variables of the workflow instance that contain these data types.
+Workflow instance variables can be accessed by using `${variableName}`. 
+
+Example:
+
+    <operation id="..." if="${variableName1} AND NOT (${variableName2} OR ${variableName3})">
+      ...
+    </operation>
 
 ## Test the Workflow
 

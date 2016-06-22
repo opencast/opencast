@@ -155,13 +155,23 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
                 var segmentInformation = this.model.get("segments");
                 if (segmentInformation !== undefined) {
                     $(segmentInformation).each(function(index, element) {
+                      if (Engage.model.get("videoDataModel") && Engage.model.get("videoDataModel").get("duration") && 
+                              element.time <= parseInt(Engage.model.get("videoDataModel").get("duration"))) {
                         var segmentText = "No slide text available.";
 
                         if (element.text)
                             segmentText = element.text;
-
-                        var segmentPreview = element.previews.preview.$;
+                        
+                        var segmentPreview = undefined;
+                          if (element !== undefined && element.previews !== undefined &&
+                                element.previews.preview !== undefined && element.previews.preview.$ !== undefined) {
+                            segmentPreview = element.previews.preview.$;
+                          }  
                         segments.push(new Segment((element.time / 1000), segmentPreview, segmentText));
+                      } else {
+                        Engage.log("Tab:Slidetext: Detected Segment with start time " + element.time / 1000 + 
+                                " that exceeds the duration of the video ");
+                      }
                     });
                     if (segments.length > 0) {
                         // sort segments ascending by time

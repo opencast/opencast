@@ -64,7 +64,9 @@ public class CoverImageServiceOsgiImpl extends AbstractCoverImageService {
    * @param cc
    *          the OSGi component context
    */
-  protected void activate(ComponentContext cc) {
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
     // See
     // http://www.stichlberger.com/software/workaround-for-batiks-noclassdeffounderrorclassnotfoundexception-truncatedfileexception/
     // ---------------

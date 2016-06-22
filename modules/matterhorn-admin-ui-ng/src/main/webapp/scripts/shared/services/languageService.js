@@ -287,7 +287,8 @@ angular.module('adminNg.services.language')
         * @returns {string} The localized date for the given zuluTimeString
         */
         this.toLocalTime = function (zuluTimeString) {
-            return $filter('date')(zuluTimeString, 'EEE MMM dd HH:mm:ss yyyy');
+        //    return $filter('date')(zuluTimeString, 'dd MMM yyyy, HH:mm');
+            return $filter('date')(zuluTimeString, 'mediumDate');
         };
 
         /**
