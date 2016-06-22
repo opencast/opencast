@@ -434,8 +434,15 @@ public abstract class AbstractEventEndpoint {
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", eventId);
 
-    boolean hasActiveTransaction = getIndexService().hasActiveTransaction(eventId);
-    return Response.ok(hasActiveTransaction).build();
+    JSONObject json = new JSONObject();
+
+    if (WorkflowInstance.WorkflowState.RUNNING.toString().equals(optEvent.get().getWorkflowState())) {
+      json.put("active", true);
+    } else {
+      json.put("active", false);
+    }
+
+    return Response.ok(json.toJSONString()).build();
   }
 
   @GET

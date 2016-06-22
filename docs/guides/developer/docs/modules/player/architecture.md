@@ -7,7 +7,7 @@ been realized as OSGi modules. Each plugin can be separately build.
 
 The following figure shows the OSGi architecture of the player.
 
-![Architecture](player.architecture1.png)
+![Architecture](architecture.png)
 
 All Theodul OSGi modules are stored under:
 

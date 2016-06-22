@@ -42,5 +42,5 @@ The Opencast Release Documentation is the official Opencast documentation for ea
 Further Documentation
 ---------------------
 
-Apart from these official documentation, further guides and tips can be found in the [Opencast Adopter
-Wiki](https://opencast.jira.com/wiki), as well as on the mailing lists, the IRC channel and the regular meetings.
+In addition to this official documentation, further guides and tips can be found in the on the mailing lists, the IRC
+channel and at the regular meetings.

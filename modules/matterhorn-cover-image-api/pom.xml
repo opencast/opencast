@@ -52,7 +52,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${build.number}</Build-Number>
+            <Build-Number>${buildNumber}</Build-Number>
             <Mh-Db-Version>${mh.db.version}</Mh-Db-Version>
             <Import-Package>
               org.opencastproject.job.api;version=${project.version}

@@ -65,7 +65,7 @@ angular.module('adminNg.controllers')
         if (angular.isUndefined($rootScope.version)) {
             VersionResource.query(function(response) {
                 $rootScope.version = response.version ? response : (angular.isArray(response.versions)?response.versions[0]:{});
-                if (!response.consistent || angular.isUndefined($rootScope.version.buildNumber)) {
+                if (!response.consistent) {
                     $rootScope.version.buildNumber = 'inconsistent';
                 }
             });

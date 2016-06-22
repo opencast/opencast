@@ -180,12 +180,23 @@ angular.module('adminNg.controllers')
             checkForActiveTransactions = function () {
                 EventTransactionResource.hasActiveTransaction({id: $scope.resourceId }, function (data) {
                     $scope.transactions.read_only = angular.isUndefined(data.hasActiveTransaction) ? true : data.hasActiveTransaction;
+                    
+                    if ($scope.transactions.read_only) {
+                      if (!angular.isUndefined(me.transactionNotification)) {
+                          Notifications.remove(me.transactionNotification, NOTIFICATION_CONTEXT);
+                      }
+                      me.transactionNotification = Notifications.add('warning', 'ACTIVE_TRANSACTION', NOTIFICATION_CONTEXT, 3000);
+                    } else {
+                      if (!angular.isUndefined(me.transactionNotification)) {
+                          Notifications.remove(me.transactionNotification, NOTIFICATION_CONTEXT);
+                      }
+                    }
                 });
 
                 $scope.checkForActiveTransactionsTimer = $timeout(checkForActiveTransactions, 3000);
             },
             fetchChildResources = function (id) {
-                $scope.general        = EventGeneralResource.get({ id: id }, function () {
+                $scope.general = EventGeneralResource.get({ id: id }, function () {
                     angular.forEach($scope.general.publications, function (publication) {
                         publication.label = publication.name;
                     });

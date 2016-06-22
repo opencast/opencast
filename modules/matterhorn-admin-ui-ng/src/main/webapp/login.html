@@ -19,13 +19,14 @@
                             <p>
                                 <span translate='LOGIN.WELCOME'></span><br />
                                 <span class="subtle-text" ng-if="version.version">
-                                    Opencast (v.{{ version.version }} - build: {{ version.buildNumber }})
+                                    Opencast (v.{{ version.version }}<span ng-if=version.buildNumber> -
+                                        build: {{ version.buildNumber }}</span>)
                                 </span>
                             </p>
                         </div>
 
                         <div ng-show="isError" class="error-container" translate="LOGIN.ERROR">
-                            Incorrect email and / or password
+                            Incorrect username and / or password
                         </div>
 
                         <div class="row">
