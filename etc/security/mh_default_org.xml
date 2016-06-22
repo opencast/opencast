@@ -297,6 +297,10 @@
     <!-- Opencast is shipping its own implementation of the anonymous filter -->
     <sec:custom-filter ref="anonymousFilter" position="ANONYMOUS_FILTER" />
 
+    <!-- Basic authentication
+    <sec:custom-filter after="BASIC_AUTH_FILTER" ref="basicAuthenticationFilter" />
+    -->
+
     <!--
       2-legged oauth is used by trusted 3rd party applications, including LTI producers.
       If you do not plan to use OAuth, comment this out.
@@ -359,6 +363,12 @@
     <property name="nonceValiditySeconds" value="300" />
   </bean>
 
+  <!-- Basic authentication
+  <bean id="basicEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
+    <property name="realmName" value="Opencast"/>
+  </bean>
+  -->
+
   <bean id="authSuccessHandler" class="org.opencastproject.kernel.security.AuthenticationSuccessHandler">
     <property name="securityService" ref="securityService" />
     <property name="welcomePages">
@@ -388,6 +398,18 @@
       <bean class="org.springframework.security.core.userdetails.cache.NullUserCache" />
     </property>
   </bean>
+
+  <!-- ############################### -->
+  <!-- # Basic Authentication Filter # -->
+  <!-- ############################### -->
+
+  <!-- Handles the details of the basic authentication dance -->
+  <!-- Basic authentication
+  <bean id="basicAuthenticationFilter" class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
+    <property name="authenticationManager" ref="authenticationManager"/>
+    <property name="authenticationEntryPoint" ref="basicEntryPoint"/>
+  </bean>
+  -->
 
   <!-- ####################### -->
   <!-- # OAuth (LTI) Support # -->
