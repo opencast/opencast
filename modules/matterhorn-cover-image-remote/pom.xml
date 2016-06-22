@@ -40,7 +40,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${build.number}</Build-Number>
-            <Mh-Db-Version>${mh.db.version}</Mh-Db-Version>
             <Import-Package>
               org.apache.http,
               org.apache.http.client.entity,
