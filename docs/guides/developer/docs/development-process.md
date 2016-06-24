@@ -63,12 +63,23 @@ Coding Rules
 Maven will automatically check for coding style violations for Java and interrupt the build process if any are found,
 displaying a message about it. Apart from that, here are some general rules:
 
-Java:
+Java, HTML and JavaScript:
 
- - Indentation is done with exactly two spaces
- - No line of code should be wider than 120 columns
- - Avoid trailing spaces
- - Avoid unnecessary code style changes
+- Indentation is done with exactly two spaces
+- No line of code should be wider than 120 columns
+- Avoid trailing spaces
+- Avoid unnecessary code style changes
+
+Markdown:
+
+- Avoid lines wider than 120 columns
+- Avoid trailing spaces
+- Avoid unnecessary style changes
+
+Everything else:
+
+- Try applying the Java style rules
+- If in doubt, ask on list
 
 
 Git Repository Branching Model
