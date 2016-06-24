@@ -187,17 +187,20 @@ branch and the final release. The release manager should create a release schedu
 the release branch is cut and when the final release will happen. Additionally, he should coordinate with the QA manager
 to identify phases for internal and public testing.
 
-Usually a release schedule will look like this:
+Usually, a release schedule will look like this:
 
-    October 1st                     Cutting the release branch
-    October 1st - 22nd              Internal QA phase
-    October 22nd-November 5th       Public QA phase
-    November 5th - 26th             Additional bug fixing phase
-    November 26th - December 10th   Final QA phase (*)
-    December 15th                   Release of Opencast x.y
+|Date                          |What is happening
+|------------------------------|-------------------------------------------------
+|April 6th                     |Feature Freeze *(release branch is cut)*
+|April 6th - 24th              |Internal QA and bug fixing phase
+|&nbsp; *April 11th - 17th*    |Review Test Cases *(handles by a dedicated team)*
+|&nbsp; *April 18th - 24th*    |Documentation Review
+|April 25th - May 15th         |Public QA phase
+|May 15th - June 1st           |Additional bug fixing phase
+|&nbsp; *May 25th - June 1st*  |Translation week *(encourage translators to do their work)*
+|June 2nd - June 12th          |Final QA phase *(checking release readiness)*
+|June 15th                     |Final Release
 
-(*) marks the phase where the release is apparently ready to go and has no release blockers left. The additional time is
-to ensure that there is time to fix any serious bug found during this final phase.
 
 ### Release Branch
 
