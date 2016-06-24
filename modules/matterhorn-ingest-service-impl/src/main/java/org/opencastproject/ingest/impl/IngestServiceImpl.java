@@ -22,6 +22,7 @@
 package org.opencastproject.ingest.impl;
 
 import static org.opencastproject.util.JobUtil.waitForJob;
+import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 
 import org.opencastproject.capture.CaptureParameters;
@@ -64,7 +65,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.smil.util.SmilUtil;
+import org.opencastproject.smil.api.util.SmilUtil;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
@@ -73,6 +74,7 @@ import org.opencastproject.util.ProgressInputStream;
 import org.opencastproject.util.XmlUtil;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -189,7 +191,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   public static final float DEFAULT_INGEST_FILE_JOB_LOAD = 1.0f;
 
   /** The approximate load placed on the system by ingesting a zip file */
-  public static final float DEFAULT_INGEST_ZIP_JOB_LOAD = 2.0f;
+  public static final float DEFAULT_INGEST_ZIP_JOB_LOAD = 1.0f;
 
   /** The key to look for in the service configuration file to override the {@link DEFAULT_INGEST_FILE_JOB_LOAD} */
   public static final String FILE_JOB_LOAD_KEY = "job.load.ingest.file";
@@ -273,7 +275,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param cc
    *          the osgi component context
    */
-  protected void activate(ComponentContext cc) {
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
     logger.info("Ingest Service started.");
     defaultWorkflowDefinionId = StringUtils.trimToNull(cc.getBundleContext().getProperty(WORKFLOW_DEFINITION_DEFAULT));
     if (defaultWorkflowDefinionId == null) {
@@ -544,7 +548,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.info("Ingest of mediapackage {} done", mediaPackageId);
       job.setStatus(Job.Status.FINISHED);
       return workflowInstance;
-
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
     } catch (MediaPackageException e) {
@@ -577,10 +580,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       throw new IngestException(e);
     } finally {
       IOUtils.closeQuietly(zis);
+      finallyUpdateJob(job);
       for (String filename : collectionFilenames) {
         workingFileRepository.deleteFromCollection(Long.toString(job.getId()), filename);
       }
-      finallyUpdateJob(job);
     }
   }
 
@@ -676,8 +679,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               newUrl });
       return mp;
     } catch (IOException e) {
-      if (job != null)
-        job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
@@ -713,8 +714,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               newUrl });
       return mp;
     } catch (IOException e) {
-      if (job != null)
-        job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
@@ -751,8 +750,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               mediaPackage, newUrl });
       return mp;
     } catch (IOException e) {
-      if (job != null)
-        job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
@@ -785,8 +782,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               mediaPackage, newUrl });
       return mp;
     } catch (IOException e) {
-      if (job != null)
-        job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
@@ -826,8 +821,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               newUrl });
       return mp;
     } catch (IOException e) {
-      if (job != null)
-        job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
@@ -921,8 +914,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               newUrl });
       return mp;
     } catch (IOException e) {
-      if (job != null)
-        job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
@@ -959,8 +950,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               mediaPackage, newUrl });
       return mp;
     } catch (IOException e) {
-      if (job != null)
-        job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
@@ -996,8 +985,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               mediaPackage, newUrl });
       return mp;
     } catch (IOException e) {
-      if (job != null)
-        job.setStatus(Job.Status.FAILED);
       throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
@@ -1652,7 +1639,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   private MediaPackage addSmilCatalog(org.w3c.dom.Document smilDocument, MediaPackage mediaPackage) throws IOException,
           IngestException {
-    Option<org.w3c.dom.Document> optSmilDocument = SmilUtil.loadSmilDocument(workingFileRepository, mediaPackage);
+    Option<org.w3c.dom.Document> optSmilDocument = loadSmilDocument(workingFileRepository, mediaPackage);
     if (optSmilDocument.isSome())
       throw new IngestException("SMIL already exists!");
 
@@ -1670,6 +1657,32 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } finally {
       IoSupport.closeQuietly(in);
     }
+  }
+
+  /**
+   * Load a SMIL document of a media package.
+   *
+   * @return the document or none if no media package element found.
+   */
+  private Option<org.w3c.dom.Document> loadSmilDocument(final WorkingFileRepository workingFileRepository,
+          MediaPackage mp) {
+    return mlist(mp.getElements()).filter(MediaPackageSupport.Filters.isSmilCatalog).headOpt()
+            .map(new Function<MediaPackageElement, org.w3c.dom.Document>() {
+              @Override
+              public org.w3c.dom.Document apply(MediaPackageElement mpe) {
+                InputStream in = null;
+                try {
+                  in = workingFileRepository.get(mpe.getMediaPackage().getIdentifier().compact(), mpe.getIdentifier());
+                  return SmilUtil.loadSmilDocument(in, mpe);
+                } catch (Exception e) {
+                  logger.warn("Unable to load smil document from catalog '{}': {}", mpe,
+                          ExceptionUtils.getStackTrace(e));
+                  return Misc.chuck(e);
+                } finally {
+                  IOUtils.closeQuietly(in);
+                }
+              }
+            });
   }
 
   /**
@@ -1727,7 +1740,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   }
 
   /**
-   * Private utility to update Job, called from a finally block.
+   * Private utility to update and optionally fail job, called from a finally block.
    *
    * @param job
    *          to be updated, may be null
@@ -1735,12 +1748,16 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    *           when unable to update ingest job
    */
   private void finallyUpdateJob(Job job) throws IngestException {
+    if (job == null) {
+      logger.debug("Not updating null job.");
+      return;
+    }
+
+    if (!Job.Status.FINISHED.equals(job.getStatus()))
+      job.setStatus(Job.Status.FAILED);
+
     try {
-      if (job != null) {
-        serviceRegistry.updateJob(job);
-      } else {
-        logger.debug("Not updating null job.");
-      }
+      serviceRegistry.updateJob(job);
     } catch (Exception e) {
       throw new IngestException("Unable to update ingest job", e);
     }

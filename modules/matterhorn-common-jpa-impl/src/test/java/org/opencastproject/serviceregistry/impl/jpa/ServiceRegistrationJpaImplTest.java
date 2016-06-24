@@ -31,10 +31,14 @@ import org.opencastproject.util.persistencefn.PersistenceEnv;
 import org.opencastproject.util.persistencefn.PersistenceEnvs;
 import org.opencastproject.util.persistencefn.Queries;
 
+import com.entwinemedia.fn.ProductBuilder;
+
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +46,8 @@ import java.util.List;
 import javax.persistence.EntityManagerFactory;
 
 public class ServiceRegistrationJpaImplTest {
+
+  private static final ProductBuilder P = com.entwinemedia.fn.Products.E;
 
   private EntityManagerFactory emf;
   private PersistenceEnv env;
@@ -70,21 +76,34 @@ public class ServiceRegistrationJpaImplTest {
     env.close();
   }
 
+  private JpaJob createJob(Date dateCreated, ServiceRegistrationJpaImpl serviceRegistry) {
+    JpaJob job = new JpaJob(user, org, serviceRegistry, "NOP", null, null, true, 1.0F);
+    job.setProcessorServiceRegistration(serviceRegistry);
+    job.setQueueTime(500L);
+    job.setRunTime(1000L);
+    job.setDateCreated(dateCreated);
+    return job;
+  }
+
   @Test
   public void testQueryStatistics() throws Exception {
     HostRegistrationJpaImpl host = new HostRegistrationJpaImpl("http://localhost:8081", "http://localhost:8081", 1024L,
             1, 1, true, false);
     ServiceRegistrationJpaImpl serviceReg = new ServiceRegistrationJpaImpl(host, "NOP", "/nop", false);
-    JpaJob job = new JpaJob(user, org, serviceReg, "NOP", null, null, true, 1.0F);
-    job.setProcessorServiceRegistration(serviceReg);
-    job.setQueueTime(500L);
-    job.setRunTime(1000L);
+
+    Date now = new Date();
 
     host = env.tx(Queries.persistOrUpdate(host));
     serviceReg = env.tx(Queries.persistOrUpdate(serviceReg));
-    job = env.tx(Queries.persistOrUpdate(job));
 
-    List<Object> statistic = env.tx(Queries.named.findAll("ServiceRegistration.statistics"));
+    JpaJob job = env.tx(Queries.persistOrUpdate(createJob(now, serviceReg)));
+    JpaJob jobYesterday = env.tx(Queries.persistOrUpdate(createJob(DateUtils.addDays(now, -1), serviceReg)));
+
+    /* find the job created at 'now' should reveal exactly one job */
+    List<Object> statistic = env.tx(
+      Queries.named.findAll("ServiceRegistration.statistics",
+        P.p2("minDateCreated", now), P.p2("maxDateCreated", now)));
+
     Object[] stats = (Object[]) statistic.get(0);
     assertEquals(1, statistic.size());
     assertEquals(5, stats.length);
@@ -93,6 +112,14 @@ public class ServiceRegistrationJpaImplTest {
     assertEquals(1, ((Number) stats[2]).intValue());
     assertEquals(500L, ((Number) stats[3]).longValue());
     assertEquals(1000L, ((Number) stats[4]).longValue());
+
+    /* There are no jobs in the specific time interval */
+    statistic = env.tx(
+      Queries.named.findAll("ServiceRegistration.statistics",
+        P.p2("minDateCreated", DateUtils.addDays(now, -3)), P.p2("maxDateCreated", DateUtils.addDays(now, -2))));
+
+    assertEquals(0, statistic.size());
+
   }
 
 }

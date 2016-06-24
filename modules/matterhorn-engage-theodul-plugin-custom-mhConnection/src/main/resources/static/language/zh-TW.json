@@ -1,0 +1,6 @@
+{
+  "value_locale":"zh",
+  "error_mediaPackageInformationNotLoaded":"此錯誤有兩個可能的原因：<ul><li>請稍後再試<\/li> <li>媒體是受保護的，您需要登錄<\/li> <\/ul>",
+  "error_noMediaInformationAvailable":"沒有可用的媒體信息。",
+  "error_endpointNotAvailable":"搜索服務目前不可用。"
+}

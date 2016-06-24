@@ -87,7 +87,7 @@ public class JobEndpointTest {
   public void testSortCreator() {
     given().param("sort", "creator:ASC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(5))
+            .content("count", equalTo(4)).content("total", equalTo(4))
             .content("results[0].creator", equalTo("testuser1"))
             .content("results[1].creator", equalTo("testuser1"))
             .content("results[2].creator", equalTo("testuser2"))
@@ -96,7 +96,7 @@ public class JobEndpointTest {
 
     given().param("sort", "creator:DESC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(5))
+            .content("count", equalTo(4)).content("total", equalTo(4))
             .content("results[0].creator", equalTo("testuser3"))
             .content("results[1].creator", equalTo("testuser2"))
             .content("results[2].creator", equalTo("testuser1"))
@@ -108,7 +108,7 @@ public class JobEndpointTest {
   public void testSortOperation() {
     given().param("sort", "operation:ASC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(5))
+            .content("count", equalTo(4)).content("total", equalTo(4))
             .content("results[0].operation", equalTo("Encode"))
             .content("results[1].operation", equalTo("Inspect"))
             .content("results[2].operation", equalTo("RESUME"))
@@ -117,7 +117,7 @@ public class JobEndpointTest {
 
     given().param("sort", "operation:DESC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(5))
+            .content("count", equalTo(4)).content("total", equalTo(4))
             .content("results[0].operation", equalTo("test"))
             .content("results[1].operation", equalTo("RESUME"))
             .content("results[2].operation", equalTo("Inspect"))
@@ -129,7 +129,7 @@ public class JobEndpointTest {
   public void testSortProcessingHost() {
     given().param("sort", "processingHost:ASC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(5))
+            .content("count", equalTo(4)).content("total", equalTo(4))
             .content("results[0].processingHost", equalTo("host1"))
             .content("results[1].processingHost", equalTo("host1"))
             .content("results[2].processingHost", equalTo("host2"))
@@ -138,7 +138,7 @@ public class JobEndpointTest {
 
     given().param("sort", "processingHost:DESC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(5))
+            .content("count", equalTo(4)).content("total", equalTo(4))
             .content("results[0].processingHost", equalTo("host3"))
             .content("results[1].processingHost", equalTo("host2"))
             .content("results[2].processingHost", equalTo("host1"))
@@ -150,7 +150,7 @@ public class JobEndpointTest {
   public void testSortStarted() {
     given().param("sort", "started:ASC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(5))
+            .content("count", equalTo(4)).content("total", equalTo(4))
             .content("results[0].started", equalTo("2014-06-05T09:05:00Z"))
             .content("results[1].started", equalTo("2014-06-05T09:10:00Z"))
             .content("results[2].started", equalTo("2014-06-05T09:11:11Z"))
@@ -159,7 +159,7 @@ public class JobEndpointTest {
 
     given().param("sort", "started:DESC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(5))
+            .content("count", equalTo(4)).content("total", equalTo(4))
             .content("results[0].started", equalTo("2014-06-05T09:16:00Z"))
             .content("results[1].started", equalTo("2014-06-05T09:11:11Z"))
             .content("results[2].started", equalTo("2014-06-05T09:10:00Z"))
@@ -171,7 +171,7 @@ public class JobEndpointTest {
   public void testSortSubmitted() {
     given().param("sort", "submitted:ASC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(5))
+            .content("count", equalTo(4)).content("total", equalTo(4))
             .content("results[0].submitted", equalTo("2014-06-05T09:05:00Z"))
             .content("results[1].submitted", equalTo("2014-06-05T09:10:00Z"))
             .content("results[2].submitted", equalTo("2014-06-05T09:11:11Z"))
@@ -180,7 +180,7 @@ public class JobEndpointTest {
 
     given().param("sort", "started:DESC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(5))
+            .content("count", equalTo(4)).content("total", equalTo(4))
             .content("results[0].submitted", equalTo("2014-06-05T09:16:00Z"))
             .content("results[1].submitted", equalTo("2014-06-05T09:11:11Z"))
             .content("results[2].submitted", equalTo("2014-06-05T09:10:00Z"))
@@ -192,7 +192,7 @@ public class JobEndpointTest {
   public void testSortType() {
     given().param("sort", "type:ASC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(5))
+            .content("count", equalTo(4)).content("total", equalTo(4))
             .content("results[0].type", equalTo("org.opencastproject.composer"))
             .content("results[1].type", equalTo("org.opencastproject.composer"))
             .content("results[2].type", equalTo("org.opencastproject.inspection"))
@@ -201,7 +201,7 @@ public class JobEndpointTest {
 
     given().param("sort", "type:DESC").log().all().expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(5))
+            .content("count", equalTo(4)).content("total", equalTo(4))
             .content("results[0].type", equalTo("org.opencastproject.workflow"))
             .content("results[1].type", equalTo("org.opencastproject.inspection"))
             .content("results[2].type", equalTo("org.opencastproject.composer"))

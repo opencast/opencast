@@ -160,7 +160,9 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
    * @param cc
    *          the OSGi component context
    */
-  protected void activate(ComponentContext cc) {
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
     serviceUrl = cc.getBundleContext().getProperty("org.opencastproject.download.url");
     if (serviceUrl == null)
       throw new IllegalStateException("Download url must be set (org.opencastproject.download.url)");
@@ -241,22 +243,22 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
       }
 
       File destination = getDistributionFile(channelId, mediapackage, element);
+      if (!destination.equals(source)) {
+        // Put the file in place if sourcesfile differs destinationfile
+        try {
+          FileUtils.forceMkdir(destination.getParentFile());
+        } catch (IOException e) {
+          throw new DistributionException("Unable to create " + destination.getParentFile(), e);
+        }
+        logger.info(format("Distributing %s@%s for publication channel %s to %s", elementId, mediapackageId, channelId,
+                destination));
 
-      // Put the file in place
-      try {
-        FileUtils.forceMkdir(destination.getParentFile());
-      } catch (IOException e) {
-        throw new DistributionException("Unable to create " + destination.getParentFile(), e);
+        try {
+          FileSupport.link(source, destination, true);
+        } catch (IOException e) {
+          throw new DistributionException(format("Unable to copy %s to %s", source, destination), e);
+        }
       }
-      logger.info(format("Distributing %s@%s for publication channel %s to %s", elementId, mediapackageId, channelId,
-              destination));
-
-      try {
-        FileSupport.link(source, destination, true);
-      } catch (IOException e) {
-        throw new DistributionException(format("Unable to copy %s tp %s", source, destination), e);
-      }
-
       // Create a representation of the distributed file in the mediapackage
       MediaPackageElement distributedElement = (MediaPackageElement) element.clone();
       try {

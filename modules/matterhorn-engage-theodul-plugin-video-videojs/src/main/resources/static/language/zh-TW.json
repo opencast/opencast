@@ -1,0 +1,16 @@
+{
+  "value_locale":"en",
+  "error_AudioCodecNotSupported":"錯誤: 此瀏覽器不支援的音訊編解碼器",
+  "error_AudioElementNotSupported":"錯誤: 您的瀏覽器不支援音訊元素。",
+  "switchPlayer":"切換視訊播放器",
+  "video":"視訊",
+  "video_short":"影像",
+  "openInPlayer":"在播放機中打開",
+  "givenTime":"給定的時間",
+  "hasToBeSmallerThanDuration":"必須小於持續時間",
+  "msg_waitToSetTime":"請等待設置直到載入視頻的播放時間。",
+  "msg_startPlayingToSetTime":"請啟動之前設置播放時間播放視頻。",
+  "msg_waitToSeek":"直到載入視頻，尋找不是可能的。",
+  "msg_startPlayingToSeek":"至少一次點擊播放按鈕之前，尋求是不可能。",
+  "chromeBuffer":"由於鉻局限性，緩衝區檢查已被禁用。有可能你會遇到視頻播放問題。"
+}

@@ -56,7 +56,7 @@ public class ExecuteServiceImplTest {
 
   private static ExecuteServiceImpl executor;
   private static final String TEXT = "En un lugar de la Mancha de cuyo nombre no quiero acordarme...";
-  private static String PATTERN;
+  private static String pattern;
   private static URI baseDirURI;
   private static File baseDir;
 
@@ -78,7 +78,7 @@ public class ExecuteServiceImplTest {
     EasyMock.expect(bundleContext.getProperty(configKey1)).andReturn(configValue1).anyTimes();
     EasyMock.replay(bundleContext);
     cc = EasyMock.createNiceMock(ComponentContext.class);
-    EasyMock.expect(cc.getBundleContext()).andReturn(bundleContext);
+    EasyMock.expect(cc.getBundleContext()).andReturn(bundleContext).anyTimes();
     configKey2 = "edu.harvard.dce.param2";
     String configValue2 = baseDir.getAbsolutePath() + "/test.txt";
     Properties props = new Properties();
@@ -97,7 +97,7 @@ public class ExecuteServiceImplTest {
     executor.setWorkspace(workspace);
 
     // Set up the text pattern to test
-    PATTERN = String.format("The specified track (%s) is in the following location: %s",
+    pattern = String.format("The specified track (%s) is in the following location: %s",
             ExecuteService.INPUT_FILE_PATTERN, ExecuteService.INPUT_FILE_PATTERN);
   }
 
@@ -119,7 +119,7 @@ public class ExecuteServiceImplTest {
   public void testWithInputElement() throws ExecuteException, NotFoundException {
     List<String> params = new ArrayList<String>();
     params.add("echo");
-    params.add(PATTERN);
+    params.add(pattern);
     MediaPackageElement element = MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
             .elementFromURI(baseDirURI);
 

@@ -21,10 +21,10 @@
 
 package org.opencastproject.helloworld.impl;
 
+import org.opencastproject.helloworld.api.HelloWorldService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.opencastproject.helloworld.api.HelloWorldService;
 
 /**
  * A simple tutorial class to learn about Matterhorn Services

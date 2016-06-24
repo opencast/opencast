@@ -3,7 +3,7 @@ angular.module('adminNg.resources')
     var transform = function (data) {
         var result = {};
         try {
-            result.hasActiveTransaction =  JSON.parse(data);
+              result.hasActiveTransaction = JSON.parse(data).active;
         } catch (e) { }
         return result;
     };

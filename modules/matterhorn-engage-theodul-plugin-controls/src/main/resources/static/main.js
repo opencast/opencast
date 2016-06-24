@@ -1439,7 +1439,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
             controlsVisible = false;
           }
         });
-
+        
         // add first class to video wrapper
         $('#' + id_engage_controls).addClass('first');
       }
@@ -1481,7 +1481,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
       initPlugin();
     }
   });
-
+  
   // listen on a change/set of the InfoMe model
   Engage.model.on(infoMeChange, function () {
     initCount -= 1;
@@ -1547,22 +1547,22 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   }
 
   // load utils class
-  require([relative_plugin_path + 'utils'], function (utils) {
-    Engage.log('Controls: Utils class loaded');
-    Utils = new utils();
-    initTranslate(Utils.detectLanguage(), function () {
-      Engage.log('Controls: Successfully translated.');
-      initCount -= 1;
-      if (initCount <= 0) {
-        initPlugin();
-      }
-    }, function () {
-      Engage.log('Controls: Error translating...');
-      initCount -= 1;
-      if (initCount <= 0) {
-        initPlugin();
-      }
-    });
+  require([relative_plugin_path + "utils"], function(utils) {
+      Engage.log("Controls: Utils class loaded");
+      Utils = new utils();
+      initTranslate(Engage.model.get("language"), function() {
+          Engage.log("Controls: Successfully translated.");
+          initCount -= 1;
+          if (initCount <= 0) {
+              initPlugin();
+          }
+      }, function() {
+          Engage.log("Controls: Error translating...");
+          initCount -= 1;
+          if (initCount <= 0) {
+              initPlugin();
+          }
+      });
   });
 
   return plugin;

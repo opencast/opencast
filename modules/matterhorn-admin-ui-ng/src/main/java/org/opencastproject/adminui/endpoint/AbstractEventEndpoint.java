@@ -41,7 +41,7 @@ import static org.opencastproject.index.service.util.RestUtils.notFound;
 import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.RestUtil.R.badRequest;
-import static org.opencastproject.util.RestUtil.R.forbidden;
+import static org.opencastproject.util.RestUtil.R.conflict;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.R.serverError;
@@ -52,6 +52,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 import org.opencastproject.adminui.exception.JobEndpointException;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
+import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.archive.opencast.OpencastArchive;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
@@ -433,8 +434,15 @@ public abstract class AbstractEventEndpoint {
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", eventId);
 
-    boolean hasActiveTransaction = getIndexService().hasActiveTransaction(eventId);
-    return Response.ok(hasActiveTransaction).build();
+    JSONObject json = new JSONObject();
+
+    if (WorkflowInstance.WorkflowState.RUNNING.toString().equals(optEvent.get().getWorkflowState())) {
+      json.put("active", true);
+    } else {
+      json.put("active", false);
+    }
+
+    return Response.ok(json.toJSONString()).build();
   }
 
   @GET
@@ -552,7 +560,9 @@ public abstract class AbstractEventEndpoint {
         logger.warn("An ACL cannot be edited while an event is part of a current workflow because it might"
                 + " lead to inconsistent ACLs i.e. changed after distribution so that the old ACL is still "
                 + "being used by the distribution channel.");
-        return forbidden("Unable to edit an ACL for a current workflow.");
+        JSONObject json = new JSONObject();
+        json.put("Error", "Unable to edit an ACL for a current workflow.");
+        return conflict(json.toJSONString());
       } else {
         // The event doesn't exist as a mediapackage yet so use the scheduler service to update the ACL
         getSchedulerService().updateAccessControlList(getSchedulerService().getEventId(eventId), accessControlList);
@@ -1695,7 +1705,7 @@ public abstract class AbstractEventEndpoint {
       if (EventListQuery.FILTER_AGENT_NAME.equals(name))
         query.withAgentId(filters.get(name));
       if (EventListQuery.FILTER_TEXT_NAME.equals(name))
-        query.withText("*" + filters.get(name) + "*");
+        query.withText(QueryPreprocessor.sanitize(filters.get(name)));
       if (EventListQuery.FILTER_SERIES_NAME.equals(name))
         query.withSeriesId(filters.get(name));
       if (EventListQuery.FILTER_STATUS_NAME.equals(name))

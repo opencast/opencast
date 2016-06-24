@@ -3,7 +3,7 @@
    "limit":"Some(0)",
    "results":[
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"ERROR",
          "name":"•mock• ch.entwine.annotations",
@@ -13,7 +13,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.adminui.endpoint.JobEndpoint",
@@ -23,7 +23,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.adminui.endpoint.ListProvidersEndpoint",
@@ -33,7 +33,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.adminui.endpoint.ServicesEndpoint",
@@ -43,7 +43,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.adminui.endpoint.autocomplete",
@@ -53,7 +53,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.adminui.endpoint.seriesdetails",
@@ -63,7 +63,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.adminui.i18n",
@@ -73,7 +73,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.analytics",
@@ -83,7 +83,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.annotation",
@@ -93,7 +93,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.authorization.xacml.manager",
@@ -103,7 +103,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.caption",
@@ -113,7 +113,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.capture.admin",
@@ -123,7 +123,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.composer",
@@ -133,7 +133,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.coverimage",
@@ -143,7 +143,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.distribution.acl",
@@ -153,7 +153,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.distribution.download",
@@ -163,7 +163,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.distribution.streaming",
@@ -173,7 +173,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.episode",
@@ -183,7 +183,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.files",
@@ -193,7 +193,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.fileupload",
@@ -203,7 +203,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.groups",
@@ -213,7 +213,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.info",
@@ -223,7 +223,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.ingest",
@@ -233,7 +233,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.inspection",
@@ -243,7 +243,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.kernel.bundleinfo",
@@ -253,7 +253,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.manipulator",
@@ -263,7 +263,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.oaipmhinfo",
@@ -273,7 +273,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.organization",
@@ -283,7 +283,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.publication.oaipmh",
@@ -293,7 +293,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.publication.youtube",
@@ -303,7 +303,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.scheduler",
@@ -313,7 +313,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.search",
@@ -323,7 +323,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.series",
@@ -333,7 +333,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.serviceregistry",
@@ -343,7 +343,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.sox",
@@ -353,7 +353,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.textanalyzer",
@@ -363,7 +363,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.userdirectory.roles",
@@ -373,7 +373,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.userdirectory.users",
@@ -383,7 +383,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.usertracking",
@@ -393,7 +393,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.videosegmenter",
@@ -403,7 +403,7 @@
          "completed":0
       },
       {
-         "host":"http:\/\/mh-allinone.localdomain",
+         "hostname":"http:\/\/mh-allinone.localdomain",
          "queued":0,
          "status":"NORMAL",
          "name":"•mock• org.opencastproject.workflow",

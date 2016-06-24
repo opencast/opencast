@@ -108,8 +108,10 @@
                             </options>
                             <excludes>
                                 <exclude>**/lib/*.js</exclude>
-                                <exclude>**/lib/videojs/*.js</exclude>
-                                <exclude>**/lib/videojs/lang/*.js</exclude>
+                                <exclude>**/lib/video-js/*.js</exclude>
+                                <exclude>**/lib/video-js/lang/*.js</exclude>
+                                <exclude>**/lib/video-js/alt/*.js</exclude>
+                                <exclude>**/lib/video-js/ie8/*.js</exclude>
                             </excludes>
                             <sourceFolders>
                                 <folder>${project.basedir}/src/main/resources/static</folder>

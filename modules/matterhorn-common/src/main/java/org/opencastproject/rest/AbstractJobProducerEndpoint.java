@@ -22,16 +22,14 @@
 package org.opencastproject.rest;
 
 import org.opencastproject.job.api.Job;
-import org.opencastproject.job.api.JobParser;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
+import org.opencastproject.util.NotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.HEAD;
@@ -54,33 +52,34 @@ public abstract class AbstractJobProducerEndpoint {
    */
   @POST
   @Path("/dispatch")
-  public Response dispatchJob(@FormParam("job") String jobXml) throws ServiceRegistryException {
+  public Response dispatchJob(@FormParam("id") long jobId, @FormParam("operation") String jobOperation)
+          throws ServiceRegistryException {
     final JobProducer service = getService();
     if (service == null)
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
 
-    final Job job;
-    try {
-      job = JobParser.parseJob(jobXml);
-    } catch (IOException e) {
-      return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+    // See if the service is ready to accept anything
+    if (!service.isReadyToAcceptJobs(jobOperation)) {
+      logger.debug("Service {} is not ready to accept jobs with operation {}", new Object[] { service, jobOperation });
+      return Response.status(Status.SERVICE_UNAVAILABLE).build();
     }
 
-    // See if the service is ready to accept anything
-    String operation = job.getOperation();
-    if (!service.isReadyToAcceptJobs(operation)) {
-      logger.debug("Service {} is not ready to accept jobs with operation {}", new Object[] { service, job, operation });
-      return Response.status(Status.SERVICE_UNAVAILABLE).build();
+    Job job;
+    try {
+      job = getServiceRegistry().getJob(jobId);
+    } catch (NotFoundException e) {
+      logger.warn("Unable to find dispatched job {}", jobId);
+      return Response.status(Status.NOT_FOUND).build();
     }
 
     // See if the service has strong feelings about this particular job
     try {
       if (!service.isReadyToAccept(job)) {
-        logger.debug("Service {} temporarily refused to accept job {}", service, job);
+        logger.debug("Service {} temporarily refused to accept job {}", service, jobId);
         return Response.status(Status.SERVICE_UNAVAILABLE).build();
       }
     } catch (UndispatchableJobException e) {
-      logger.warn("Service {} permanently refused to accept job {}", service, job);
+      logger.warn("Service {} permanently refused to accept job {}", service, jobId);
       return Response.status(Status.PRECONDITION_FAILED).build();
     }
 

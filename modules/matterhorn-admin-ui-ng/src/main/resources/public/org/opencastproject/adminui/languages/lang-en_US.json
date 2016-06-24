@@ -2,6 +2,7 @@
    "MATTERHORN":   "Opencast",
    "NAV_HOME":     "Start",
    "NAV_ABOUT":    "About",
+   "NO":           "No",
    "SUBMIT":       "Submit",
    "UPDATE":       "Update",
    "CANCEL":       "Cancel",
@@ -36,11 +37,6 @@
       "CHINESE":"Chinese"
     },
    "PREFERENCES":  {
-      "CAPTION": "Preferences",
-      "PROFILE": "Profile",
-      "NAME": "Name",
-      "REPLYTO": "Reply-to email",
-      "SIGNATURE": "Email Signature",
       "TABLE": {
         "CAPTION": "Edit Table View",
         "SUBHEADING": "Select the default data you would like displayed in the {{ tableName }} view",
@@ -122,6 +118,8 @@
      "EMAIL_SENT": "The message has been sent",
      "EMAIL_NOT_SENT": "The message could not be sent",
      "CONFLICT_DETECTED":   "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
+     "CONFLICT_ALREADY_ENDED":   "Scheduling error: The event has already ended.",
+     "CONFLICT_END_BEFORE_START":   "Scheduling error: Schedule end has to be later than the start.",
      "INVALID_ACL_RULES":   "Rules have to contain a valid role and read or/and write right(s).",
      "MISSING_ACL_RULES":   "At least one role with Read and Write permissions is required!",
      "SAVED_ACL_RULES":   "The access rules have been saved.",
@@ -1526,6 +1524,9 @@
        "CREATOR": {
          "LABEL": "Creator"
        },
+       "HOSTNAME": {
+         "LABEL": "Host name"
+       },
        "LANGUAGE": {
          "LABEL": "Language"
        },
@@ -1595,6 +1596,18 @@
          "LABEL": "Workflow state"
        }
      },
+     "JOBS": {
+       "HOSTNAME": {
+           "LABEL": "Host name"
+       },
+       "STATUS": {
+           "LABEL": "Status",
+           "PAUSED": "Paused",
+           "QUEUED": "Queued",
+           "RUNNING": "Running",
+           "WAITING": "Waiting"
+       }
+     },
      "SERIES": {
       "TITLE": {
         "LABEL": "Name"
@@ -1623,6 +1636,34 @@
       "CREATION_DATE": {
         "LABEL": "Creation date"
       }
+     },
+     "SERVERS": {
+       "HOSTNAME": {
+           "LABEL": "Host name"
+       },
+       "STATUS": {
+         "LABEL": "Status",
+         "MAINTENANCE": "Maintenance",
+         "ONLINE": "Online",
+         "OFFLINE": "Offline"
+       }
+     },
+     "SERVICES": {
+        "ACTIONS": {
+            "LABEL": "Actions available"
+        },
+        "HOSTNAME": {
+            "LABEL": "Host name"
+        },
+        "NAME": {
+            "LABEL": "Name"
+        },
+        "STATUS": {
+            "LABEL": "Status",
+            "ERROR": "Error",
+            "NORMAL": "Normal",
+            "WARNING": "Warning"
+        }
      },
      "THEMES": {
       "NAME": {

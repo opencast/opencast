@@ -133,7 +133,7 @@ public class FileUploadJob {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder().append("FileUploadJob(id=").append(this.id).append(", filename=")
-            .append(this.payload.filename).append(")");
+            .append(this.payload.getFilename()).append(")");
     return sb.toString();
   }
 }

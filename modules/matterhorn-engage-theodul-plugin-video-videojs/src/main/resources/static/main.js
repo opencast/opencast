@@ -2237,8 +2237,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       $(mediaInfo.attachments).each(function (i, attachment) {
         if (attachment.mimetype &&
             attachment.type &&
+            attachment.url &&
             attachment.mimetype.match(/image/g) &&
-            attachment.type.match(/player/g)) {
+            attachment.type.match(/player/g) &&
+            videoSources[Utils.extractFlavorMainType(attachment.type)]) {
           // filter for different video sources
           videoSources[Utils.extractFlavorMainType(attachment.type)]['poster'] = attachment.url;
         }
@@ -2369,7 +2371,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   require([relative_plugin_path + 'utils'], function (utils) {
     Engage.log('Video: Utils class loaded');
     Utils = new utils();
-    initTranslate(Utils.detectLanguage(), function () {
+    initTranslate(Engage.model.get("language"), function () {
       Engage.log('Video: Successfully translated.');
       initCount -= 1;
       if (initCount <= 0) {

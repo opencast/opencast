@@ -41,9 +41,9 @@ installation of ActiveMQ:
 
 ### Security
 
-ActiveMQ can secure its message queues with user name and password access. This section will go through the steps of
-setting up a configured username and password. On the [ActiveMQ security site](http://activemq.apache.org/security.html)
-there are more details about using alternative authentication and authorization providers.
+ActiveMQ can secure its message queues by requiring login credentials. This section will go through the steps of setting
+up a username and a password. Have a look at the [ActiveMQ security site](http://activemq.apache.org/security.html) for
+details about using alternative authentication and authorization providers.
 
 #### Create ActiveMQ Admin User
 
@@ -68,7 +68,7 @@ To set-up our new user to be a part of the admins group:
 #### Configure Users and Groups Configuration Files
 
 Next, we need to make sure that ActiveMQ is using our `users.properties` and `groups.properties` files to authenticate
-and authorize users. The `login.config` file should be in the ActivemQ configuration directory and contain:
+and authorize users. The `login.config` file should be in the ActiveMQ configuration directory and contain:
 
     activemq {
         org.apache.activemq.jaas.PropertiesLoginModule required
@@ -78,40 +78,39 @@ and authorize users. The `login.config` file should be in the ActivemQ configura
 
 #### Configure Message Broker Security
 
-The final step to secure the ActiveMQ queues is to limit them with a group. This can be done by editing the
-`activemq.xml` configuration file in the ActiveMQ configuration directory. Inside this configuration file, we need to
-add some XML in between the tags:
+The final step to secure the ActiveMQ queues is to limit access to a specific group. This can be done by editing
+`activemq.xml` in the ActiveMQ configuration directory. In this file, we need to add some XML in between these tags:
 
     <broker></broker>
 
 We will add the following plugin configuration:
 
     <plugins>
-        <jaasAuthenticationPlugin configuration="activemq" />
-        <authorizationPlugin>
-            <map>
-                <authorizationMap>
-                    <authorizationEntries>
-                        <authorizationEntry queue=">" read="admins" write="admins" admin="admins" />
-                        <authorizationEntry topic=">" read="admins" write="admins" admin="admins" />
-                        <authorizationEntry topic="ActiveMQ.Advisory.>" read="admins" write="admins" admin="admins"/>
-                    </authorizationEntries>
-                </authorizationMap>
-            </map>
-        </authorizationPlugin>
+      <jaasAuthenticationPlugin configuration="activemq" />
+      <authorizationPlugin>
+        <map>
+          <authorizationMap>
+            <authorizationEntries>
+              <authorizationEntry queue=">" read="admins" write="admins" admin="admins" />
+              <authorizationEntry topic=">" read="admins" write="admins" admin="admins" />
+              <authorizationEntry topic="ActiveMQ.Advisory.>" read="admins" write="admins" admin="admins"/>
+            </authorizationEntries>
+          </authorizationMap>
+        </map>
+      </authorizationPlugin>
     </plugins>
 
-The `jaasAuthenticationPlugin` configures the broker to use our `login.config` file to do the authentication.
+- The `jaasAuthenticationPlugin` configures the broker to use our `login.config` file for the authentication.
 
-    <jaasAuthenticationPlugin configuration="activemq" />
+        <jaasAuthenticationPlugin configuration="activemq" />
 
- The property:
+- The property:
 
-    configuration=activemq
+        configuration=activemq
 
-needs to match the name given for surrounding object in `login.config` i.e. activemq{};
+  needs to match the name given for surrounding object in `login.config` i.e. activemq{};
 
-The `authorizationEntry` gives read, write and admin access to only those members in the group admins for queues and topics.
+- The `authorizationEntry` restricts read, write and admin access for queues and topics to members of the group admins.
 
 ##### Configure Opencast to Connect with Username and Password to Message Broker
 
@@ -124,6 +123,6 @@ two properties to set:
 
 ## Firewall
 
-Do not forget that ActiveMQ uses the TCP port 61616 (default configuration) for communication.  You probably want to
-allow communication over this port in your firewall on a distributed setup, or to explicitly forbid public access on an
+Do not forget that ActiveMQ uses the TCP port 61616 (default configuration) for communication. You probably want to
+allow communication over this port in your firewall on a distributed setup or explicitly forbid public access on an
 all-in-one installation.

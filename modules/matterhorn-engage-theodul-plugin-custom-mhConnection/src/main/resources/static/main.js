@@ -98,8 +98,7 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
     var SEARCH_ENDPOINT = "/search/episode.json";
 
     /* don't change these variables */
-    var Utils;
-    var initCount = 6;
+    var initCount = 5;
     var InfoMeModel;
     var MediaPackageModel;
     var ViewsModel;
@@ -110,7 +109,7 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
     var translations = new Array();
     var initialized = false;
 
-    function initTranslate(language, funcSuccess, funcError) {
+    function initTranslate(language) {
         var path = Engage.getPluginPath("EngagePluginCustomMhConnection").replace(/(\.\.\/)/g, "");
         var jsonstr = window.location.origin + "/engage/theodul/" + path; // this solution is really bad, fix it...
 
@@ -123,18 +122,6 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
                 if (data) {
                     data.value_locale = language;
                     translations = data;
-                    if (funcSuccess) {
-                        funcSuccess(translations);
-                    }
-                } else {
-                    if (funcError) {
-                        funcError();
-                    }
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                if (funcError) {
-                    funcError();
                 }
             }
         });
@@ -189,6 +176,7 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
     function initPlugin() {
         if (!initialized) {
             initialized = true;
+            initTranslate(Engage.model.get("language"));
             Engage.model.set("infoMe", new InfoMeModel());
             Engage.model.set("mediaPackage", new MediaPackageModel());
             Engage.model.set("views", new ViewsModel());
@@ -281,25 +269,6 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
         if (initCount <= 0) {
             initPlugin();
         }
-    });
-
-    // load utils class
-    require([relative_plugin_path + "utils"], function(utils) {
-        Engage.log("MhConnection: Utils class loaded");
-        Utils = new utils();
-        initTranslate(Utils.detectLanguage(), function() {
-            Engage.log("MHConnection: Successfully translated.");
-            initCount -= 1;
-            if (initCount <= 0) {
-                initPlugin();
-            }
-        }, function() {
-            Engage.log("MHConnection: Error translating...");
-            initCount -= 1;
-            if (initCount <= 0) {
-                initPlugin();
-            }
-        });
     });
 
     return plugin;
