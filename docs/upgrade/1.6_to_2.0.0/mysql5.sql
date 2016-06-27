@@ -12,6 +12,9 @@ INSERT INTO mh_user_session (session_id, user_ip, user_id) SELECT session, user_
 ALTER TABLE mh_user_action CHANGE session session_id VARCHAR(50);
 
 DROP INDEX IX_mh_user_action_user_id ON mh_user_action;
+#Fixing possible typo when upgrading from Opencast 1.4
+DROP INDEX IX_mh_user_action_user_d ON mh_user_action;
+
 DROP INDEX IX_mh_user_action_session_id ON mh_user_action;
 
 ALTER TABLE mh_user_action DROP COLUMN user_id;

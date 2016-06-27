@@ -7,7 +7,7 @@ What is Video Segmentation
 Video segmentation is a way of dividing a movie into meaningful segments. In the context of lecture capture,
 segmentation is best applied to captured screen presentation, that the presenter goes through slide after slide.
 
-As a result, video segmentation returns the exact timepoints of slide changes on the timeline, which allows for
+As a result, the video segmentation returns the exact times of slide changes on the timeline, which allows for
 sophisticated ways for the learner to browse the lecture content, as shown in the slides section of the Opencast Player.
 
 

@@ -77,9 +77,9 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -206,7 +206,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param ctx
    *          the bundle context
    */
-  void activate(BundleContext ctx) {
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
     logger.info("Activating composer service");
   }
 

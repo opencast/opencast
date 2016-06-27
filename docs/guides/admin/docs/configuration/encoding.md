@@ -18,46 +18,31 @@ at things you might want to change depending on your local set-up.
 
 ### A/V-Muxing: From lossless to safe
 
-The audio/video muxing (profile.mux-av.work) is applied if audio and video are send to Opencast separately. The basic
+The audio/video muxing (`profile.mux-av.work`) is applied if audio and video is sent to Opencast separately. The basic
 idea behind this is, to combine these separate files into one file which can later be converted in one step.
 
 Possible settings:
 
- - If you get an audio and a video file separately, it is possivle to just copy the streams and put them together into a
+ - If you get an audio and a video file separately, it is possible to just copy the streams and put them together into a
    new file. This is very fast (you only have to copy the streams) and most importantly, it is lossless, as no
    re-encoding is done. The question is: What a/v container format can/should you use for such an operation.
  - You can try to use the video container the input video came in and just add the audio. This means that you will never
    have an unexpected video container you don't know of. I.e. if you put an .mp4 video in, it still uses and .mp4
-   container after musing, etc. This might, however, lead to problems if you throw in an audio file that cannot be muxen
+   container after musing, etc. This might, however, lead to problems if you throw in an audio file that cannot be muxed
    in the specific container format (i.e. you have a FLAC audio file and an FLV container). This is, what Opencast
    does at the moment.
  - To circumvent the container problem, we could also use a container format which can hold almost everything (i.e. mkv)
-   regardless of the input. This would mean that MH can handle more combinations of a/v streams but you will always end
-   up with a Matroska file after muxing. Of cause you can then encode it to mp4, etc. later on.
+   regardless of the input. This would mean that Opencast can handle more combinations of a/v streams but you will
+   always end up with a Matroska file after muxing. Of cause, you can then encode it to mp4, etc. later on.
 
-The safest option for muxing is, of cause, to always re-encode the streams. It is far slower. It always means a quality
-loss. But it can handle everything FFmpeg can handle which (dependin on your FFmpeg configuration) is quite a lot.
-
-
-### Trimming: Fast and lossless VS accurate
-
-The profile trim.work is used after you send your recording to trim/hold and selected new start and end points. Here you
-have basically two choices:
-
- - As you only want to cut the video, you don't have to re-encode all of it. You just split the stream and put it into a
-   new file. This is fast. This is lossless. But depending on the video format this might not be accurate. You can only
-   cut a stream at an I-frame (a frame holding the full image). Doing this, FFmpeg will cut the video at the nearest
-   I-frame before the selected position meaning that you might end up with a bit more video than you thought you would
-   get. You can minimize this by making sure that the input video has a high I-frame frequency (probably a good idea
-   anyway). This is what Opencast does at the moment.
- - The alternative is to cut between two I-frames. This is possible, but requires the video to be re-encoded completely.
-   This means that you will spend a lot of time on this process and will always loose quality.
+The safest option for muxing is to always re-encode the streams. It is far slower than re-using the existing bit
+streams. It also, always means a quality loss.
 
 
 Create an Encoding Profile
 --------------------------
 
-This section will help you to understand how you can modify an existing profile or create a completly new one.
+This section will help you to understand how you can modify an existing profile or create a completely new one.
 
 Creating a new encoding profile is a matter of creating a configuration file and placing it in the encoding profiles
 watch folder.
@@ -127,4 +112,5 @@ Once defined, use your encoding profile in your workflow by setting the encoding
       </configuration>
     </operation>
 
-Have a look at the Workflow Configuration section for more details about this.
+Have a look at the [Workflow Configuration section](workflow.md) for more details about workflows and workflow
+operations.

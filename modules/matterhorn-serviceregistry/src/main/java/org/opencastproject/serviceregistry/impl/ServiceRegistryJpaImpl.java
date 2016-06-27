@@ -22,7 +22,10 @@
 package org.opencastproject.serviceregistry.impl;
 
 import static com.entwinemedia.fn.Stream.$;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.opencastproject.job.api.AbstractJobProducer.ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY;
+import static org.opencastproject.job.api.AbstractJobProducer.DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING;
 import static org.opencastproject.job.api.Job.FailureReason.DATA;
 import static org.opencastproject.job.api.Job.Status.FAILED;
 import static org.opencastproject.job.jpa.JpaJob.fnToJob;
@@ -31,11 +34,10 @@ import static org.opencastproject.security.api.SecurityConstants.USER_HEADER;
 import static org.opencastproject.serviceregistry.api.ServiceState.ERROR;
 import static org.opencastproject.serviceregistry.api.ServiceState.NORMAL;
 import static org.opencastproject.serviceregistry.api.ServiceState.WARNING;
+import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 
-import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
-import org.opencastproject.job.api.JobParser;
 import org.opencastproject.job.jpa.JpaJob;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.Organization;
@@ -63,9 +65,12 @@ import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.util.jmx.JmxUtil;
 
 import com.entwinemedia.fn.Fn;
+import com.entwinemedia.fn.Fn2;
+import com.entwinemedia.fn.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -86,7 +91,6 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -96,11 +100,11 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -242,10 +246,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.QUEUED);
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.DISPATCHING);
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.RUNNING);
-    JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.WAITING);
   }
 
-  private Fn<JpaJob, Job> toJob;
+  /** The dispatcher priority list */
+  protected final Map<Long, String> dispatchPriorityList = new HashMap<>();
+
+  /** Whether to accept a job whose load exceeds the host’s max load */
+  protected Boolean acceptJobLoadsExeedingMaxLoad = true;
 
   /** OSGi DI */
   void setEntityManagerFactory(EntityManagerFactory emf) {
@@ -300,7 +307,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       logger.info("Node maximum load set to {}", maxLoad);
 
-
       String address = InetAddress.getByName(URI.create(hostName).getHost()).getHostAddress();
       long maxMemory = Runtime.getRuntime().maxMemory();
       int cores = Runtime.getRuntime().availableProcessors();
@@ -321,6 +327,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
     }
 
+    // Whether a service accepts a job whose load exceeds the host’s max load
+    if (cc != null) {
+      acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY).map(Strings.toBool)
+              .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
+    }
+
     // Schedule the heartbeat with the default interval
     scheduledExecutor.scheduleWithFixedDelay(new JobProducerHeartbeat(), DEFAULT_HEART_BEAT, DEFAULT_HEART_BEAT,
             TimeUnit.SECONDS);
@@ -330,6 +342,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
             TimeUnit.MILLISECONDS);
   }
 
+  @Override
   public String getRegistryHostname() {
     return hostName;
   }
@@ -530,10 +543,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         jpaJob.setParentJob(jpaParentJob);
 
         // Get the JPA instance of the root job
-        JpaJob jpaRootJob;
-        if (parentJob.getRootJobId() == -1L) {
-          jpaRootJob = jpaParentJob;
-        } else {
+        JpaJob jpaRootJob = jpaParentJob;
+        if (parentJob.getRootJobId() != null) {
           try {
             jpaRootJob = getJpaJob(parentJob.getRootJobId());
           } catch (NotFoundException e) {
@@ -877,6 +888,15 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       logger.warn("Can not set the job URI", e);
     }
     return job;
+  }
+
+  private Fn<JpaJob, JpaJob> fnSetJobUri() {
+    return new Fn<JpaJob, JpaJob>() {
+      @Override
+      public JpaJob ap(JpaJob job) {
+        return setJobUri(job);
+      }
+    };
   }
 
   /**
@@ -1557,7 +1577,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getChildJobs(long)
    */
-  @SuppressWarnings("unchecked")
   @Override
   public List<Job> getChildJobs(long id) throws ServiceRegistryException {
     EntityManager em = null;
@@ -1568,17 +1587,17 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       List<JpaJob> jobs = query.getResultList();
       if (jobs.size() == 0) {
         jobs = getChildren(em, id);
-        Collections.sort(jobs, new Comparator<JpaJob>() {
-          @Override
-          public int compare(JpaJob job1, JpaJob job2) {
+      }
+      return $(jobs).sort(new Comparator<JpaJob>() {
+        @Override
+        public int compare(JpaJob job1, JpaJob job2) {
+          if (job1.getDateCreated() == null || job2.getDateCreated() == null) {
+            return 0;
+          } else {
             return job1.getDateCreated().compareTo(job2.getDateCreated());
           }
-        });
-      }
-      for (JpaJob job : jobs) {
-        setJobUri(job);
-      }
-      return $(jobs).map(fnToJob()).toList();
+        }
+      }).map(fnSetJobUri()).map(fnToJob()).toList();
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {
@@ -1602,10 +1621,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getJobs(java.lang.String,
-   *      Status)
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getJobs(java.lang.String, Status)
    */
-  @SuppressWarnings("unchecked")
   @Override
   public List<Job> getJobs(String type, Status status) throws ServiceRegistryException {
     TypedQuery<JpaJob> query = null;
@@ -1672,10 +1689,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * Get the list of jobs with status from the given statuses.
    *
-   * @param em the entity manager
-   * @param statuses variable sized array of status values to test on jobs
+   * @param em
+   *          the entity manager
+   * @param statuses
+   *          variable sized array of status values to test on jobs
    * @return list of jobs with status from statuses
-   * @throws ServiceRegistryException if there is a problem communicating with the jobs database
+   * @throws ServiceRegistryException
+   *           if there is a problem communicating with the jobs database
    */
   public List<JpaJob> getJobsByStatus(EntityManager em, Status... statuses) throws ServiceRegistryException {
     if (statuses == null || statuses.length < 1)
@@ -1708,7 +1728,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @throws ServiceRegistryException
    *           if there is a problem communicating with the jobs database
    */
-  @SuppressWarnings("unchecked")
   protected List<JpaJob> getDispatchableJobs(EntityManager em) throws ServiceRegistryException {
     TypedQuery<JpaJob> query = null;
     try {
@@ -1748,8 +1767,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#count(java.lang.String,
-   *      Status)
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#count(java.lang.String, Status)
    */
   @Override
   public long count(String serviceType, Status status) throws ServiceRegistryException {
@@ -1885,7 +1903,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceStatistics()
    */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public List<ServiceStatistics> getServiceStatistics() throws ServiceRegistryException {
     Date now = new Date();
@@ -2007,6 +2024,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getCurrentHostLoads(boolean)
    */
+  @Override
   public SystemLoad getCurrentHostLoads(boolean activeOnly) {
     EntityManager em = null;
     try {
@@ -2027,17 +2045,15 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *          if true, the map will include only hosts that are online and have non-maintenance mode services
    * @return the map of hosts to job counts
    */
-  @SuppressWarnings("unchecked")
   SystemLoad getHostLoads(EntityManager em, boolean activeOnly) {
-
-    Map<String, NodeLoad> loadByHost = new LinkedHashMap<String, NodeLoad>();
+    final SystemLoad systemLoad = new SystemLoad();
 
     // Find all jobs that are currently running on any given host, or get all of them
     Query q = em.createNamedQuery("ServiceRegistration.hostloads");
     List<Integer> statuses = new LinkedList<Integer>();
-    statuses.add(Status.QUEUED.ordinal());
-    statuses.add(Status.RUNNING.ordinal());
-    statuses.add(Status.DISPATCHING.ordinal());
+    for (Status status : JOB_STATUSES_INFLUENCING_LOAD_BALANCING) {
+      statuses.add(status.ordinal());
+    }
     q.setParameter("statuses", statuses);
 
     // Accumulate the numbers for relevant job statuses per host
@@ -2056,29 +2072,27 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         continue;
       }
 
-      // Only queued and running jobs are adding to the load, so every other status is discarded
+      // Only queued, running and dispatching jobs are adding to the load, so every other status is discarded
       if (status == null || !JOB_STATUSES_INFLUENCING_LOAD_BALANCING.contains(status)) {
         load = 0.0f;
       }
 
+      String host = service.getHost();
+
       // Add the service registration
-      if (loadByHost.containsKey(service.getHost())) {
-        NodeLoad serviceLoad = loadByHost.get(service.getHost());
-        float newLoad = serviceLoad.getLoadFactor() + load;
-        serviceLoad.setLoadFactor(newLoad);
-        loadByHost.put(service.getHost(), serviceLoad);
+      NodeLoad serviceLoad;
+      if (systemLoad.containsHost(host)) {
+        serviceLoad = systemLoad.get(host);
+        serviceLoad.setLoadFactor(serviceLoad.getLoadFactor() + load);
       } else {
-        loadByHost.put(service.getHost(), new NodeLoad(service.getHost(), load));
+        serviceLoad = new NodeLoad(host, load);
       }
+
+      systemLoad.addNodeLoad(serviceLoad);
     }
 
-    SystemLoad systemLoad = new SystemLoad();
-    systemLoad.setNodeLoads(loadByHost.values());
-
-    // Initialize the list of hosts
-    List<HostRegistration> hosts = em.createNamedQuery("HostRegistration.getAll").getResultList();
-    //This is important, otherwise services which have no current load are not listed in the output!
-    for (HostRegistration h : hosts) {
+    // This is important, otherwise services which have no current load are not listed in the output!
+    for (HostRegistration h : getHostRegistrations(em)) {
       if (!systemLoad.containsHost(h.getBaseUrl())) {
         systemLoad.addNodeLoad(new NodeLoad(h.getBaseUrl(), 0.0f));
       }
@@ -2265,127 +2279,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * Dispatches the job to the least loaded service that will accept the job, or throws a
-   * <code>ServiceUnavailableException</code> if there is no such service.
-   *
-   * @param em
-   *          the current entity manager
-   * @param job
-   *          the job to dispatch
-   * @param services
-   *          a list of service registrations
-   * @return the host that accepted the dispatched job, or <code>null</code> if no services took the job.
-   * @throws ServiceRegistryException
-   *           if the service registrations are unavailable
-   * @throws ServiceUnavailableException
-   *           if no service is available or if all available services refuse to take on more work
-   * @throws UndispatchableJobException
-   *           if the current job cannot be processed
-   */
-  protected String dispatchJob(EntityManager em, JpaJob job, List<ServiceRegistration> services)
-          throws ServiceRegistryException, ServiceUnavailableException, UndispatchableJobException {
-
-    if (services.size() == 0) {
-      logger.debug("No service is currently available to handle jobs of type '" + job.getJobType() + "'");
-      throw new ServiceUnavailableException("No service of type " + job.getJobType() + " available");
-    }
-
-    // Try the service registrations, after the first one finished, we quit;
-    job.setStatus(Status.DISPATCHING);
-
-    boolean triedDispatching = false;
-
-    for (ServiceRegistration registration : services) {
-      job.setProcessorServiceRegistration((ServiceRegistrationJpaImpl) registration);
-
-      try {
-        job = updateInternal(em, job);
-      } catch (Exception e) {
-        // In theory, we should catch javax.persistence.OptimisticLockException. Unfortunately, eclipselink throws
-        // org.eclipse.persistence.exceptions.OptimisticLockException. In order to avoid importing the implementation
-        // specific APIs, we just catch Exception.
-        logger.debug("Unable to dispatch {}.  This is likely caused by another service registry dispatching the job",
-                job);
-        throw new UndispatchableJobException("Job " + job.getId() + " is already being dispatched");
-      }
-
-      triedDispatching = true;
-
-      String serviceUrl = UrlSupport
-              .concat(new String[] { registration.getHost(), registration.getPath(), "dispatch" });
-      HttpPost post = new HttpPost(serviceUrl);
-
-      // Add current organization and user so they can be used during execution at the remote end
-      post.addHeader(ORGANIZATION_HEADER, securityService.getOrganization().getId());
-      post.addHeader(USER_HEADER, securityService.getUser().getUsername());
-
-      try {
-        String jobXml = JobParser.toXml(new JaxbJob(job.toJob()));
-        List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-        params.add(new BasicNameValuePair("job", jobXml));
-        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, "UTF-8");
-        post.setEntity(entity);
-      } catch (IOException e) {
-        logger.warn("Job parsing error on job {}", job, e);
-        job.setStatus(Status.FAILED);
-        job.setProcessorServiceRegistration(null);
-        job = updateJob(job);
-        throw new ServiceRegistryException("Can not serialize job " + job, e);
-      }
-
-      // Post the request
-      HttpResponse response = null;
-      int responseStatusCode;
-      try {
-        logger.debug("Trying to dispatch job {} of type '{}' to {}", new String[] { Long.toString(job.getId()),
-                job.getJobType(), registration.getHost() });
-        if (!START_WORKFLOW.equals(job.getOperation()))
-          setCurrentJob(job.toJob());
-        response = client.execute(post);
-        responseStatusCode = response.getStatusLine().getStatusCode();
-        if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
-          return registration.getHost();
-        } else if (responseStatusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
-          logger.debug("Service {} is currently refusing to accept jobs of type {}", registration, job.getOperation());
-          continue;
-        } else if (responseStatusCode == HttpStatus.SC_PRECONDITION_FAILED) {
-          job.setStatus(Status.FAILED);
-          job = updateJob(job);
-          logger.debug("Service {} refused to accept {}", registration, job);
-          throw new UndispatchableJobException(IOUtils.toString(response.getEntity().getContent()));
-        } else if (responseStatusCode == HttpStatus.SC_METHOD_NOT_ALLOWED) {
-          logger.debug("Service {} is not yet reachable", registration);
-          continue;
-        } else {
-          logger.warn("Service {} failed ({}) accepting {}", new Object[] { registration, responseStatusCode, job });
-          continue;
-        }
-      } catch (UndispatchableJobException e) {
-        throw e;
-      } catch (Exception e) {
-        logger.warn("Unable to dispatch job {}", job.getId(), e);
-      } finally {
-        client.close(response);
-        setCurrentJob(null);
-      }
-    }
-
-    // We've tried dispatching to every online service that can handle this type of job, with no luck.
-    if (triedDispatching) {
-      try {
-        job.setStatus(Status.QUEUED);
-        job.setProcessorServiceRegistration(null);
-        job = updateJob(job);
-      } catch (Exception e) {
-        logger.error("Unable to put job back into queue", e);
-      }
-    }
-
-    logger.debug("Unable to dispatch {}, no service is currently ready to accept the job", job);
-    throw new UndispatchableJobException("Job " + job.getId() + " is currently undispatchable");
-  }
-
-  /**
    * Update the jobs failure history and the service status with the given information. All these data are then use for
    * the jobs failover strategy. Only the terminated job (with FAILED or FINISHED status) are taken into account.
    *
@@ -2528,8 +2421,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *           if parameter is null
    * @throws ServiceRegistryException
    */
-  private int getHistorySize(ServiceRegistration serviceRegistration) throws IllegalArgumentException,
-  ServiceRegistryException {
+  private int getHistorySize(ServiceRegistration serviceRegistration)
+          throws IllegalArgumentException, ServiceRegistryException {
     if (serviceRegistration == null)
       throw new IllegalArgumentException("serviceRegistration must not be null!");
 
@@ -2562,8 +2455,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @throws ServiceRegistryException
    *           if the there was a problem with the query
    */
-  private List<ServiceRegistrationJpaImpl> getRelatedWarningServices(JpaJob job) throws IllegalArgumentException,
-  ServiceRegistryException {
+  private List<ServiceRegistrationJpaImpl> getRelatedWarningServices(JpaJob job)
+          throws IllegalArgumentException, ServiceRegistryException {
     if (job == null)
       throw new IllegalArgumentException("job must not be null!");
 
@@ -2655,7 +2548,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @param serviceRegistrations
    *          the complete list of service registrations
    * @param hostRegistrations
-   *          the complete list of host registrations
+   *          the complete list of available host registrations
    * @param systemLoad
    *          the map of hosts to the number of running jobs
    * @param jobType
@@ -2665,9 +2558,17 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           List<ServiceRegistration> serviceRegistrations, List<HostRegistration> hostRegistrations,
           final SystemLoad systemLoad) {
 
-    List<ServiceRegistration> filteredList = new ArrayList<ServiceRegistration>();
+    final List<String> hostBaseUrls = $(hostRegistrations).map(toBaseUrl).toList();
+    final List<ServiceRegistration> filteredList = new ArrayList<ServiceRegistration>();
 
     for (ServiceRegistration service : serviceRegistrations) {
+
+      // Skip service if host not available
+      if (!hostBaseUrls.contains(service.getHost())) {
+        logger.trace("Not considering {} because it's host {} is not available for dispatching", service,
+                service.getHost());
+        continue;
+      }
 
       // Skip services that are not of the requested type
       if (!jobType.equals(service.getServiceType())) {
@@ -2709,12 +2610,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       if (hostLoad == null)
         logger.warn("Unable to determine current load for host {}", service.getHost());
 
-      boolean canAcceptJobs = service.isOnline() && !service.isInMaintenanceMode()
-              && service.getServiceState() != ERROR;
-      boolean hasCapacity = hostLoad == null || hostLoadMax == null || hostLoad < hostLoadMax;
-
       // Is this host suited for processing?
-      if (canAcceptJobs && hasCapacity) {
+      if (hostLoad == null || hostLoadMax == null || hostLoad < hostLoadMax) {
         logger.debug("Adding candidate service {} for processing of jobs of type '{}'", service, jobType);
         filteredList.add(service);
       }
@@ -2736,7 +2633,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @param serviceRegistrations
    *          the complete list of service registrations
    * @param hostRegistrations
-   *          the complete list of host registrations
+   *          the complete list of available host registrations
    * @param systemLoad
    *
    */
@@ -2744,11 +2641,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           List<ServiceRegistration> serviceRegistrations, List<HostRegistration> hostRegistrations,
           final SystemLoad systemLoad) {
 
-    List<ServiceRegistration> filteredList = new ArrayList<ServiceRegistration>();
+    final List<String> hostBaseUrls = $(hostRegistrations).map(toBaseUrl).toList();
+    final List<ServiceRegistration> filteredList = new ArrayList<ServiceRegistration>();
 
     logger.debug("Finding services to dispatch job of type {}", jobType);
 
     for (ServiceRegistration service : serviceRegistrations) {
+
+      // Skip service if host not available
+      if (!hostBaseUrls.contains(service.getHost())) {
+        logger.trace("Not considering {} because it's host {} is not available for dispatching", service,
+                service.getHost());
+        continue;
+      }
 
       // Skip services that are not of the requested type
       if (!jobType.equals(service.getServiceType())) {
@@ -2792,26 +2697,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   @Override
   public SystemLoad getMaxLoads() throws ServiceRegistryException {
-    Query query = null;
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      query = em.createNamedQuery("HostRegistration.getAll");
-      SystemLoad loads = new SystemLoad();
-      @SuppressWarnings("unchecked")
-      Iterator<HostRegistration> hrIter = query.getResultList().iterator();
-      while (hrIter.hasNext()) {
-        HostRegistration hr = hrIter.next();
-        NodeLoad load = new NodeLoad(hr.getBaseUrl(), hr.getMaxLoad());
-        loads.addNodeLoad(load);
-      }
-      return loads;
-    } catch (Exception e) {
-      throw new ServiceRegistryException(e);
-    } finally {
-      if (em != null)
-        em.close();
+    final SystemLoad loads = new SystemLoad();
+    for (HostRegistration host : getHostRegistrations()) {
+      NodeLoad load = new NodeLoad(host.getBaseUrl(), host.getMaxLoad());
+      loads.addNodeLoad(load);
     }
+    return loads;
   }
 
   /**
@@ -2827,8 +2718,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       em = emf.createEntityManager();
       query = em.createNamedQuery("HostRegistration.getMaxLoadByHostName");
       query.setParameter("host", host);
-      NodeLoad load = new NodeLoad(host, ((Float) query.getSingleResult()).floatValue());
-      return load;
+      return new NodeLoad(host, ((Number) query.getSingleResult()).floatValue());
     } catch (NoResultException e) {
       throw new NotFoundException(e);
     } catch (Exception e) {
@@ -2838,6 +2728,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         em.close();
     }
   }
+
+  private final Fn<HostRegistration, String> toBaseUrl = new Fn<HostRegistration, String>() {
+    @Override
+    public String ap(HostRegistration h) {
+      return h.getBaseUrl();
+    }
+  };
 
   /**
    * This dispatcher implementation will check for jobs in the QUEUED {@link Status}. If
@@ -2855,7 +2752,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       EntityManager em = null;
       try {
         em = emf.createEntityManager();
-        List<JpaJob> jobsToDispatch = getDispatchableJobs(em);
+        Stream<JpaJob> jobsToDispatch = $(getDispatchableJobs(em));
         List<String> undispatchableJobTypes = new ArrayList<String>();
 
         // FIXME: the stats are not currently used and the queries are very
@@ -2866,16 +2763,23 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         }
 
         // Make sure dispatching is happening in an ideal order
-        Collections.sort(jobsToDispatch, new DispatchableComparator());
+        jobsToDispatch = jobsToDispatch.sort(new DispatchableComparator());
+
+        // Remove outdated jobs from priority list
+        Set<Long> jobIds = jobsToDispatch.map(toJobId).toSet();
+        for (Long jobId : new HashSet<>(dispatchPriorityList.keySet())) {
+          if (!jobIds.contains(jobId))
+            dispatchPriorityList.remove(jobId);
+        }
 
         for (JpaJob job : jobsToDispatch) {
 
           // Remember the job type
           String jobType = job.getJobType();
 
-          // Skip jobs that we already know can't be dispatched
+          // Skip jobs that we already know can't be dispatched except of jobs in the priority list
           String jobSignature = new StringBuilder(jobType).append('@').append(job.getOperation()).toString();
-          if (undispatchableJobTypes.contains(jobSignature)) {
+          if (undispatchableJobTypes.contains(jobSignature) && !dispatchPriorityList.keySet().contains(job.getId())) {
             logger.trace("Skipping dispatching of jobs {} with type '{}' for this round of dispatching", job.getId(),
                     jobType);
             continue;
@@ -2905,10 +2809,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
           // Start dispatching
           try {
-
             SystemLoad systemLoad = getHostLoads(em, true);
             List<ServiceRegistration> services = getServiceRegistrations(em);
-            List<HostRegistration> hosts = getHostRegistrations(em);
+            List<HostRegistration> hosts = $(getHostRegistrations(em)).filter(filterOutPriorityHosts._2(job.toJob()))
+                    .toList();
             List<ServiceRegistration> candidateServices = null;
 
             // Depending on whether this running job is trying to reach out to other services or whether this is an
@@ -2926,13 +2830,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
             // same time if there is processing capacity available.
             boolean parentHasRunningChildren = false;
             if (parentJob != null) {
-              List<Job> childJobs = getChildJobs(parentJob.getId());
-              if (childJobs != null) {
-                for (Job child : childJobs) {
-                  if (Status.RUNNING.equals(child.getStatus())) {
-                    parentHasRunningChildren = true;
-                    break;
-                  }
+              for (Job child : getChildJobs(parentJob.getId())) {
+                if (Status.RUNNING.equals(child.getStatus())) {
+                  parentHasRunningChildren = true;
+                  break;
                 }
               }
             }
@@ -2952,6 +2853,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
             String hostAcceptingJob = null;
             try {
               hostAcceptingJob = dispatchJob(em, job, candidateServices);
+              dispatchPriorityList.remove(job.getId());
             } catch (ServiceUnavailableException e) {
               logger.debug("Jobs of type {} currently cannot be dispatched", job.getOperation());
               // Don't mark workflow jobs as undispatchable to not impact worklfow operations
@@ -2964,15 +2866,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
             }
 
             logger.debug("Job {} dispatched to {}", job.getId(), hostAcceptingJob);
-            if (systemLoad.containsHost(hostAcceptingJob)) {
-              NodeLoad serviceLoad = systemLoad.get(hostAcceptingJob);
-              float newLoad = serviceLoad.getLoadFactor() + job.getJobLoad();
-              serviceLoad.setLoadFactor(newLoad);
-              systemLoad.addNodeLoad(serviceLoad);
-            } else {
-              systemLoad.addNodeLoad(new NodeLoad(hostAcceptingJob, job.getJobLoad()));
-            }
-
           } catch (ServiceRegistryException e) {
             Throwable cause = (e.getCause() != null) ? e.getCause() : e;
             logger.error("Error dispatching job " + job, cause);
@@ -2988,6 +2881,179 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           em.close();
       }
     }
+
+    /**
+     * Dispatches the job to the least loaded service that will accept the job, or throws a
+     * <code>ServiceUnavailableException</code> if there is no such service.
+     *
+     * @param em
+     *          the current entity manager
+     * @param job
+     *          the job to dispatch
+     * @param services
+     *          a list of service registrations
+     * @return the host that accepted the dispatched job, or <code>null</code> if no services took the job.
+     * @throws ServiceRegistryException
+     *           if the service registrations are unavailable
+     * @throws ServiceUnavailableException
+     *           if no service is available or if all available services refuse to take on more work
+     * @throws UndispatchableJobException
+     *           if the current job cannot be processed
+     */
+    protected String dispatchJob(EntityManager em, JpaJob job, List<ServiceRegistration> services)
+            throws ServiceRegistryException, ServiceUnavailableException, UndispatchableJobException {
+
+      if (services.size() == 0) {
+        logger.debug("No service is currently available to handle jobs of type '" + job.getJobType() + "'");
+        throw new ServiceUnavailableException("No service of type " + job.getJobType() + " available");
+      }
+
+      // Try the service registrations, after the first one finished, we quit;
+      job.setStatus(Status.DISPATCHING);
+
+      boolean triedDispatching = false;
+
+      boolean onlyHighestMaxLoadHosts = false;
+      final Float highestMaxLoad = $(services).map(toHostRegistration).map(toMaxLoad).sort(sortFloatValuesDesc).head2();
+      if (job.getJobLoad() > highestMaxLoad) {
+        // None of the available hosts is able to accept the job due to less host load
+        onlyHighestMaxLoadHosts = true;
+      }
+
+      for (ServiceRegistration registration : services) {
+        job.setProcessorServiceRegistration((ServiceRegistrationJpaImpl) registration);
+
+        // Skip registration of host with less max load than highest available max load
+        if (onlyHighestMaxLoadHosts
+                && job.getProcessorServiceRegistration().getHostRegistration().getMaxLoad() != highestMaxLoad) {
+          continue;
+        }
+
+        try {
+          job = updateInternal(em, job);
+        } catch (Exception e) {
+          // In theory, we should catch javax.persistence.OptimisticLockException. Unfortunately, eclipselink throws
+          // org.eclipse.persistence.exceptions.OptimisticLockException. In order to avoid importing the implementation
+          // specific APIs, we just catch Exception.
+          logger.debug("Unable to dispatch {}.  This is likely caused by another service registry dispatching the job",
+                  job);
+          throw new UndispatchableJobException("Job " + job.getId() + " is already being dispatched");
+        }
+
+        triedDispatching = true;
+
+        String serviceUrl = UrlSupport.concat(registration.getHost(), registration.getPath(), "dispatch");
+        HttpPost post = new HttpPost(serviceUrl);
+
+        // Add current organization and user so they can be used during execution at the remote end
+        post.addHeader(ORGANIZATION_HEADER, securityService.getOrganization().getId());
+        post.addHeader(USER_HEADER, securityService.getUser().getUsername());
+
+        List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+        params.add(new BasicNameValuePair("id", Long.toString(job.getId())));
+        params.add(new BasicNameValuePair("operation", job.getOperation()));
+        post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
+
+        // Post the request
+        HttpResponse response = null;
+        int responseStatusCode;
+        try {
+          logger.debug("Trying to dispatch job {} of type '{}' to {}",
+                  new String[] { Long.toString(job.getId()), job.getJobType(), registration.getHost() });
+          if (!START_WORKFLOW.equals(job.getOperation()))
+            setCurrentJob(job.toJob());
+          response = client.execute(post);
+          responseStatusCode = response.getStatusLine().getStatusCode();
+          if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
+            return registration.getHost();
+          } else if (responseStatusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
+            logger.debug("Service {} is currently refusing to accept jobs of type {}", registration,
+                    job.getOperation());
+            continue;
+          } else if (responseStatusCode == HttpStatus.SC_PRECONDITION_FAILED) {
+            job.setStatus(Status.FAILED);
+            job = updateJob(job);
+            logger.debug("Service {} refused to accept {}", registration, job);
+            throw new UndispatchableJobException(IOUtils.toString(response.getEntity().getContent()));
+          } else if (responseStatusCode == HttpStatus.SC_METHOD_NOT_ALLOWED) {
+            logger.debug("Service {} is not yet reachable", registration);
+            continue;
+          } else {
+            logger.warn("Service {} failed ({}) accepting {}", new Object[] { registration, responseStatusCode, job });
+            continue;
+          }
+        } catch (UndispatchableJobException e) {
+          throw e;
+        } catch (Exception e) {
+          logger.warn("Unable to dispatch job {}", job.getId(), e);
+        } finally {
+          client.close(response);
+          setCurrentJob(null);
+        }
+      }
+
+      // We've tried dispatching to every online service that can handle this type of job, with no luck.
+      if (triedDispatching) {
+        String host = job.getProcessorServiceRegistration().getHost();
+        // Workflow type jobs are not set to priority list, because they handle accepting jobs not based on the job load
+        // If the system don't accepts jobs whose load exceeds the host's max load we can't make use of the priority
+        // list
+        if (acceptJobLoadsExeedingMaxLoad && !dispatchPriorityList.containsKey(job.getId())
+                && !TYPE_WORKFLOW.equals(job.getJobType()))
+          dispatchPriorityList.put(job.getId(), host);
+
+        try {
+          job.setStatus(Status.QUEUED);
+          job.setProcessorServiceRegistration(null);
+          job = updateJob(job);
+        } catch (Exception e) {
+          logger.error("Unable to put job back into queue", e);
+        }
+      }
+
+      logger.debug("Unable to dispatch {}, no service is currently ready to accept the job", job);
+      throw new UndispatchableJobException("Job " + job.getId() + " is currently undispatchable");
+    }
+
+    private final Fn2<HostRegistration, Job, Boolean> filterOutPriorityHosts = new Fn2<HostRegistration, Job, Boolean>() {
+      @Override
+      public Boolean ap(HostRegistration host, Job job) {
+        if (dispatchPriorityList.values().contains(host.getBaseUrl())
+                && !host.getBaseUrl().equals(dispatchPriorityList.get(job.getId()))) {
+          return false;
+        }
+        return true;
+      }
+    };
+
+    private final Fn<ServiceRegistration, HostRegistration> toHostRegistration = new Fn<ServiceRegistration, HostRegistration>() {
+      @Override
+      public HostRegistration ap(ServiceRegistration s) {
+        return ((ServiceRegistrationJpaImpl) s).getHostRegistration();
+      }
+    };
+
+    private final Fn<HostRegistration, Float> toMaxLoad = new Fn<HostRegistration, Float>() {
+      @Override
+      public Float ap(HostRegistration h) {
+        return h.getMaxLoad();
+      }
+    };
+
+    private final Fn<JpaJob, Long> toJobId = new Fn<JpaJob, Long>() {
+      @Override
+      public Long ap(JpaJob job) {
+        return job.getId();
+      }
+    };
+
+    private final Comparator<Float> sortFloatValuesDesc = new Comparator<Float>() {
+      @Override
+      public int compare(Float o1, Float o2) {
+        return o2.compareTo(o1);
+      }
+    };
+
   }
 
   /** A periodic check on each service registration to ensure that it is still alive. */
@@ -3003,7 +3069,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
      */
     @Override
     public void run() {
-
       logger.debug("Checking for unresponsive services");
       List<ServiceRegistration> serviceRegistrations = getOnlineServiceRegistrations();
 
@@ -3016,8 +3081,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           continue;
 
         // We think this service is online and available. Prove it.
-        String[] urlParts = new String[] { service.getHost(), service.getPath(), "dispatch" };
-        String serviceUrl = UrlSupport.concat(urlParts);
+        String serviceUrl = UrlSupport.concat(service.getHost(), service.getPath(), "dispatch");
         HttpHead options = new HttpHead(serviceUrl);
         HttpResponse response = null;
         try {
@@ -3042,7 +3106,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
                 default:
                   if (!service.isOnline())
                     continue;
-                  logger.warn("Service {} is not working as expected: {}", service.toString(), response.getStatusLine());
+                  logger.warn("Service {} is not working as expected: {}", service, response.getStatusLine());
               }
             } else {
               logger.warn("Service {} does not respond: {}", service.toString());

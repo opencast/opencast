@@ -26,6 +26,13 @@ pages:
 - Proposal Log: 'proposal-log.md'
 - Modules:
    - Overview: 'modules/index.md'
+   - Player:
+      - Architecture: 'modules/player/architecture.md'
+      - Core Reference: 'modules/player/core.reference.md'
+      - Events: 'modules/player/events.md'
+      - Storage: 'modules/player/storage.md'
+      - Plugin Development: 'modules/player/plugin.development.md'
+      - Testing: 'modules/player/testing.md'
    - Admin UI: 'modules/admin-ui.md'
    - Stream Security: 'modules/stream-security.md'
 - Infrastructure:

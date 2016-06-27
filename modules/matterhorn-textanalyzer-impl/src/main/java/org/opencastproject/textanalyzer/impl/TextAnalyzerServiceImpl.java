@@ -56,9 +56,9 @@ import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,8 +133,10 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param ctx
    *          the bundle context
    */
-  void activate(BundleContext ctx) {
+  @Override
+  public void activate(ComponentContext cc) {
     logger.info("Activating Text analyser service");
+    super.activate(cc);
   }
 
   /**

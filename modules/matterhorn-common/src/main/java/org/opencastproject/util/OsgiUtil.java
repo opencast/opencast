@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.util;
 
 import static org.opencastproject.util.data.Monadics.mlist;
@@ -31,6 +30,7 @@ import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Strings;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -47,7 +47,7 @@ public final class OsgiUtil {
    * Get a mandatory, non-blank value from the <em>bundle</em> context.
    *
    * @throws RuntimeException
-   *         key does not exist or its value is blank
+   *           key does not exist or its value is blank
    */
   public static String getContextProperty(ComponentContext cc, String key) {
     String p = cc.getBundleContext().getProperty(key);
@@ -60,7 +60,7 @@ public final class OsgiUtil {
    * Get an optional, non-blank value from the <em>bundle</em> context.
    *
    * @throws RuntimeException
-   *         key does not exist or its value is blank
+   *           key does not exist or its value is blank
    */
   public static Option<String> getOptContextProperty(ComponentContext cc, String key) {
     return option(cc.getBundleContext().getProperty(key)).bind(Strings.trimToNone);
@@ -70,7 +70,7 @@ public final class OsgiUtil {
    * Get a mandatory, non-blank value from the <em>component</em> context.
    *
    * @throws RuntimeException
-   *         key does not exist or its value is blank
+   *           key does not exist or its value is blank
    */
   public static String getComponentContextProperty(ComponentContext cc, String key) {
     String p = (String) cc.getProperties().get(key);
@@ -83,7 +83,7 @@ public final class OsgiUtil {
    * Get a mandatory, non-blank value from a dictionary.
    *
    * @throws ConfigurationException
-   *         key does not exist or its value is blank
+   *           key does not exist or its value is blank
    */
   public static String getCfg(Dictionary d, String key) throws ConfigurationException {
     Object p = d.get(key);
@@ -101,10 +101,17 @@ public final class OsgiUtil {
   }
 
   /**
+   * Get an optional boolean from a dictionary.
+   */
+  public static Option<Boolean> getOptCfgAsBoolean(Dictionary d, String key) {
+    return option(d.get(key)).bind(Strings.asString()).map(Strings.toBool);
+  }
+
+  /**
    * Get a mandatory integer from a dictionary.
    *
    * @throws ConfigurationException
-   *         key does not exist or is not an integer
+   *           key does not exist or is not an integer
    */
   public static int getCfgAsInt(Dictionary d, String key) throws ConfigurationException {
     try {
@@ -112,6 +119,19 @@ public final class OsgiUtil {
     } catch (NumberFormatException e) {
       throw new ConfigurationException(key, "not an integer");
     }
+  }
+
+  /**
+   * Get a mandatory boolean from a dictionary.
+   *
+   * @throws ConfigurationException
+   *           key does not exist
+   */
+  public static boolean getCfgAsBoolean(Dictionary d, String key) throws ConfigurationException {
+    Object p = d.get(key);
+    if (p == null)
+      throw new ConfigurationException(key, "does not exist");
+    return BooleanUtils.toBoolean(p.toString());
   }
 
   /**
