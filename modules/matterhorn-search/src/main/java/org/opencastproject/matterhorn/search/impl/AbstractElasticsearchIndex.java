@@ -530,7 +530,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     if (query.getOffset() >= 0)
       requestBuilder.setFrom(query.getOffset());
 
-    if (query.getLimit() >= 0) {
+    if (query.getLimit() > 0) {
       // limit + offset may not exceed some limit
       // this limit seems to be Integer.MAX_VALUE in elasticsearch v1.3 (as we currently use)
       // elasticsearch version 2.1 onwards documented this behaviour by index.max_result_window
@@ -540,6 +540,8 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
         requestBuilder.setSize(ELASTICSEARCH_INDEX_MAX_RESULT_WINDOW - query.getOffset());
       else
         requestBuilder.setSize(query.getLimit());
+    } else {
+      requestBuilder.setSize(ELASTICSEARCH_INDEX_MAX_RESULT_WINDOW);
     }
 
     // Sort orders
