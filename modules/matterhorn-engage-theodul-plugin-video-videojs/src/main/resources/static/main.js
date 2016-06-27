@@ -538,6 +538,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
     /* Shows Minimap when it's not already displayed */
     function showMinimap() {
+      if ($(selector) === undefined || $(selector)[0] === undefined) {
+        return;
+      }
+      
       var zoom = $(selector)[0].style.transform.replace(/[a-z]*/, '');
       zoom = zoom.replace('(', '');
       zoom = zoom.replace(')', '');

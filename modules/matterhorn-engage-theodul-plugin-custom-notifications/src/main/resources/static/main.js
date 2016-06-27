@@ -190,7 +190,8 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
         Engage.on(plugin.events.isAudioOnly.getName(), function(audio) {
             isAudioOnly = audio;
         });
-        Engage.on(plugin.events.ready.getName(), function() {
+        Engage.on(plugin.events.ready.getName(), function(query) {
+            if (query === true) return;
             if (!videoLoaded && videoLoadMsgDisplayed && !mediapackageError && !codecError) {
                 if (!isAudioOnly) {
                     alertify.success(getAlertifyMessage(translate("msg_videoLoadedSuccessfully", "The video has been loaded successfully.")));

@@ -1004,6 +1004,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
 
   function ready() {
     if (videosReady) {
+      loadStoredInitialValues();
       Utils.greyIn(id_play_button);
       Utils.enable(id_play_button);
       Utils.greyIn(id_forward_button);
@@ -1280,7 +1281,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
           Engage.trigger(plugin.events.mute.getName());
         }
       });
-      Engage.on(plugin.events.ready.getName(), function () {
+      Engage.on(plugin.events.ready.getName(), function (query) {
+        if (query === true || videosReady === true) {
+          return;
+        }
         addZoomEvents();
         if (!mediapackageError) {
           videosReady = true;
@@ -1291,7 +1295,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         if (!mediapackageError && videosReady) {
           isPlaying = true;
           playPause();
-          loadStoredInitialValues();
 
           if (isMobileMode) {
             Engage.trigger(plugin.events.fullscreenEnable.getName());
