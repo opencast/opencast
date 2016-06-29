@@ -24,7 +24,7 @@ package org.opencastproject.smil.entity.media.api;
 import org.opencastproject.smil.entity.api.SmilObject;
 
 /**
- * Represent {@link Smil} media elements and containers. Media elements like
+ * Represent Smil media elements and containers. Media elements like
  * {@code audio}, {@code video}, ... and media containers like {@code par},
  * {@code seq} should implement this interface.
  */

@@ -105,7 +105,7 @@ public class ContributorsListProvider implements ResourceListProvider {
    *
    * @param query
    *          The query for the list including limit and offset.
-   * @return The {@link Map<String, String>} including all of the contributors.
+   * @return The {@link Map} including all of the contributors.
    */
   protected Map<String, String> getList(ResourceListQuery query) {
     Map<String, String> usersList = new HashMap<String, String>();
@@ -161,7 +161,7 @@ public class ContributorsListProvider implements ResourceListProvider {
    *
    * @param query
    *          The query for the list including limit and offset.
-   * @return The {@link Map<String, String>} including all of the contributors.
+   * @return The {@link Map} including all of the contributors.
    */
   protected Map<String, String> getListWithTechnicalPresenters(ResourceListQuery query) {
     int offset = 0;
@@ -214,7 +214,7 @@ public class ContributorsListProvider implements ResourceListProvider {
    *
    * @param query
    *          The query for the list including limit and offset.
-   * @return The {@link Map<String, String>} including all of the contributors.
+   * @return The {@link Map} including all of the contributors.
    */
   protected Map<String, String> getListWithUserNames(ResourceListQuery query) {
     int offset = 0;

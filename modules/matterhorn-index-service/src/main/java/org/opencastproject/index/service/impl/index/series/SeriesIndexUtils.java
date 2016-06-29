@@ -90,8 +90,6 @@ public final class SeriesIndexUtils {
    * @param series
    *          the series
    * @return the set of metadata
-   * @throws IOException
-   *           if marshalling fails
    */
   public static SearchMetadataCollection toSearchMetadata(Series series) {
     SearchMetadataCollection metadata = new SearchMetadataCollection(series.getIdentifier().concat(
@@ -195,7 +193,7 @@ public final class SeriesIndexUtils {
    * @param user
    *          the user
    * @param searchIndex
-   *          the {@link AdminUISearchIndex} to search in
+   *          the AdminUISearchIndex to search in
    * @return the series
    * @throws SearchIndexException
    *           if querying the search index fails

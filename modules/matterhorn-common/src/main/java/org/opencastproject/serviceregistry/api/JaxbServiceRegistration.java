@@ -111,7 +111,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
    *
    * @param host
    *          the host
-   * @param serviceId
+   * @param serviceType
    *          the job type
    */
   public JaxbServiceRegistration(String serviceType, String host, String path) {
@@ -126,7 +126,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
    *
    * @param host
    *          the host
-   * @param serviceId
+   * @param serviceType
    *          the job type
    * @param jobProducer
    */
@@ -361,7 +361,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
   /**
    * Sets the job which triggered the last error state
    *
-   * @param job
+   * @param jobSignature
    *          the job
    */
   public void setErrorStateTrigger(int jobSignature) {
@@ -381,7 +381,7 @@ public class JaxbServiceRegistration implements ServiceRegistration {
   /**
    * Sets the job which triggered the last warning state
    *
-   * @param job
+   * @param jobSignature
    *          the job
    */
   public void setWarningStateTrigger(int jobSignature) {

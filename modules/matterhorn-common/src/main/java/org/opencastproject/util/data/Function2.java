@@ -40,7 +40,7 @@ public abstract class Function2<A, B, C> {
     return Functions.curry(this, a);
   }
 
-  /** Currying. (a, b) -> c => a -> b -> c */
+  /** Currying. (a, b) -&gt; c =&gt; a -&gt; b -&gt; c */
   public Function<A, Function<B, C>> curry() {
     return Functions.curry(this);
   }

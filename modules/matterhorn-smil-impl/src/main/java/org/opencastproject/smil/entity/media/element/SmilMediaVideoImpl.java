@@ -26,7 +26,7 @@ import java.net.URI;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Represent video media element and implements {@link SmilMediaElement}.
+ * Represent video media element and implements SmilMediaElement.
  */
 @XmlRootElement(name = "video")
 public class SmilMediaVideoImpl extends SmilMediaElementImpl {

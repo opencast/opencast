@@ -87,7 +87,7 @@ public final class Monadics {
     }
 
     /**
-     * Monadic bind <code>m a -&gt; (a -&gt; m b) -&gt m b</code>. Apply <code>f</code> to each elements concatenating
+     * Monadic bind <code>m a -&gt; (a -&gt; m b) -&gt; m b</code>. Apply <code>f</code> to each elements concatenating
      * the results into a new list.
      */
     public abstract <B> ListMonadic<B> bind(Function<? super A, ? extends Iterable<B>> f);

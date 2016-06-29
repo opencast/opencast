@@ -45,9 +45,10 @@ public interface ComposerService {
    *          The source track
    * @param profileId
    *          The profile to use for encoding
-   * @return The receipt for this encoding job. The receipt can be used with {@link ComposerService#getJob(long)} to
+   * @return The receipt for this encoding job. The receipt can be used with ComposerService#getJob to
    *         obtain the status of an encoding job.
-   * @throws EncoderException, MediaPackageException
+   * @throws EncoderException
+   * @throws MediaPackageException
    */
   Job encode(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException;
 
@@ -141,7 +142,7 @@ public interface ComposerService {
    *          start time in miliseconds
    * @param duration
    *          duration in miliseconds
-   * @return The receipt for this encoding job. The receipt can be used with {@link ComposerService#getJob(long)} to
+   * @return The receipt for this encoding job. The receipt can be used with ComposerService#getJob to
    *         obtain the status of an encoding job.
    * @throws EncoderException
    *           if trimming fails
@@ -212,8 +213,6 @@ public interface ComposerService {
    *          media track to which captions will be embedded
    * @param captions
    *          captions to be inserted
-   * @param language
-   *          caption language
    * @return Receipt for this embedding job
    * @throws EmbedderException
    *           if exception occurs during embedding process
@@ -233,7 +232,7 @@ public interface ComposerService {
    * @param profileId
    *          identifier of the encoding profile
    * @return Receipt for this embedding job
-   * @throws EmbedderException
+   * @throws EncoderException
    *           if exception occurs during embedding process
    * @throws MediaPackageException
    *           if the track is invalid
@@ -261,9 +260,8 @@ public interface ComposerService {
    *          The source track
    * @param profileId
    *          The profile to use for encoding
-   * @return The receipt for this encoding job. The receipt can be used with {@link ComposerService#getJob(long)} to
-   *         obtain the status of an encoding job.
-   * @throws EncoderException, MediaPackageException
+   * @throws EncoderException
+   * @throws MediaPackageException
    */
   Job parallelEncode(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException;
 

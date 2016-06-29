@@ -360,7 +360,7 @@ public class MailService {
   /**
    * Get all of the message signatures for the current user.
    * @return A list of all of the message signatures.
-   * @throws UserSettingsServiceException
+   * @throws MailServiceException
    */
   public List<MessageSignature> getMessageSignaturesByUserName() throws MailServiceException {
     EntityManager em = null;
@@ -389,7 +389,8 @@ public class MailService {
   /**
    * Get the current logged in user's signature
    * @return The message signature
-   * @throws UserSettingsServiceException
+   * @throws MailServiceException
+   * @throws NotFoundException
    */
   public MessageSignature getCurrentUsersSignature() throws MailServiceException, NotFoundException {
     EntityManager em = null;
@@ -413,7 +414,7 @@ public class MailService {
 
   /**
    * @return Finds the total number of message signatures for the current user.
-   * @throws UserSettingsServiceException
+   * @throws MailServiceException
    */
   public int getSignatureTotalByUserName() throws MailServiceException {
     EntityManager em = null;

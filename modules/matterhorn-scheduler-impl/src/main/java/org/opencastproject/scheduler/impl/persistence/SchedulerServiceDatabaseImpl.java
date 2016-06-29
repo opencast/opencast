@@ -925,7 +925,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /**
    * Add the correct start and end value for the given daily count query.
-   * <p/>
+   * <p>
    * Please note that the start instant is inclusive while the end instant is exclusive.
    *
    * @param query
@@ -939,7 +939,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /**
    * Add the correct start and end value for the given quarter count query
-   * <p/>
+   * <p>
    * Please note that the start instant is inclusive while the end instant is exclusive.
    *
    * @param query

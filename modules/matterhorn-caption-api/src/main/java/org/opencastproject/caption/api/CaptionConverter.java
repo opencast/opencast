@@ -40,7 +40,7 @@ public interface CaptionConverter {
    * @param language
    *          (optional) captions' language
    * @return {@link List} List of captions
-   * @throws IllegalCaptionFormatException
+   * @throws CaptionConverterException
    *           if parser encounters an exception
    */
   List<Caption> importCaption(InputStream inputStream, String language) throws CaptionConverterException;
@@ -67,7 +67,7 @@ public interface CaptionConverter {
    * @param inputStream
    *          stream from where captions are read
    * @return Array containing languages in captions
-   * @throws IllegalCaptionFormatException
+   * @throws CaptionConverterException
    *           if parser encounters exception
    */
   String[] getLanguageList(InputStream inputStream) throws CaptionConverterException;

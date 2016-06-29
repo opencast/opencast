@@ -290,10 +290,9 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @throws ExecuteException
-   * @throws NotFoundException
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
    */
   @Override

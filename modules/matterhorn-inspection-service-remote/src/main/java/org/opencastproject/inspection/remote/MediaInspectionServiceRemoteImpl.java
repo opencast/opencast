@@ -88,9 +88,6 @@ public class MediaInspectionServiceRemoteImpl extends RemoteBase implements Medi
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.inspection.api.MediaInspectionService#enrich(org.opencastproject.mediapackage.AbstractMediaPackageElement,
-   *      boolean)
    */
   @Override
   public Job enrich(MediaPackageElement original, boolean override) throws MediaInspectionException {

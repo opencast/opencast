@@ -36,7 +36,7 @@ public class TesseractLine implements TextLine {
   /**
    * Creates a representation for a piece of text
    *
-   * @param word
+   * @param line
    *          the extracted text
    */
   public TesseractLine(String line) {

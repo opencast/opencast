@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.XmlValue;
 
 /**
  * JAXB DTO for a technical detail of a job incident. See {@link Incident#getDetails()}.
- * <p/>
+ * <p>
  * To read about why this class is necessary, see http://java.net/jira/browse/JAXB-223
  */
 @XmlAccessorType(XmlAccessType.NONE)

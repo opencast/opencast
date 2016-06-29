@@ -61,12 +61,12 @@ import java.util.List;
 
 /**
  * An OAI-PMH protocol compliant repository.
- * <p/>
+ * <p>
  * Currently supported:
  * <ul>
  * <li></li>
  * </ul>
- * <p/>
+ * <p>
  * Currently <em>not</em> supported:
  * <ul>
  * <li><a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#deletion">deletions</a></li>
@@ -78,7 +78,7 @@ import java.util.List;
  * see section <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#FlowControl">3.5. Flow Control</a>
  * </li>
  * </ul>
- * <p/>
+ * <p>
  * todo
  * - malformed date parameter must produce a BadArgument error
  * - if a date parameter has a finer granularity than supported by the repository this must produce a BadArgument error

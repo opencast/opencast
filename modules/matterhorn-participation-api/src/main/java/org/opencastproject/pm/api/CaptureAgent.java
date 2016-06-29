@@ -44,9 +44,9 @@ public class CaptureAgent {
 
   /**
    * Creates an capture agent
-   * 
-   * @param id
-   *          the id
+   *
+   * @param room
+   *          the room
    * @param agentId
    *          the agent id
    */

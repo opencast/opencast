@@ -36,9 +36,6 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This {@link SeriesCatalogUIAdapter} is the default implementation for series metadata.
- */
 public class CommonSeriesCatalogUIAdapter extends ConfigurableSeriesDCCatalogUIAdapter implements ManagedService {
 
   private static final Logger logger = LoggerFactory.getLogger(CommonSeriesCatalogUIAdapter.class);

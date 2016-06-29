@@ -40,7 +40,7 @@ public final class PasswordEncoder {
    * @param clearText
    *          the password
    * @param salt
-   *          the salt. See {@link http://en.wikipedia.org/wiki/Salt_%28cryptography%29}
+   *          the salt. See http://en.wikipedia.org/wiki/Salt_%28cryptography%29
    * @return the encoded password
    * @throws IllegalArgumentException
    *           if clearText or salt are null

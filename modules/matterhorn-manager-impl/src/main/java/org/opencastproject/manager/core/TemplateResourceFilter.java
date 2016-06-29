@@ -98,7 +98,7 @@ public class TemplateResourceFilter extends FilterWriter
 
     /**
      * Write a single character following the state machine:
-     * <table>
+     * <table summary="">
      * <tr><th>State</th><th>Character</th><th>Task</th><th>Next State</th></tr>
      * <tr><td>NULL</td><td>$</td><td>&nbsp;</td><td>DOLLAR</td></tr>
      * <tr><td>NULL</td><td>\</td><td>&nbsp;</td><td>ESCAPE</td></tr>

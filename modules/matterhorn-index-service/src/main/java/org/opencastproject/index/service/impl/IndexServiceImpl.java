@@ -1247,8 +1247,6 @@ public class IndexServiceImpl implements IndexService {
    * @param event
    *          the event
    * @return the source type
-   * @throws IndexServiceException
-   *           Thrown if there is an issue getting the workflow for the event.
    */
   @Override
   public Source getEventSource(Event event) {

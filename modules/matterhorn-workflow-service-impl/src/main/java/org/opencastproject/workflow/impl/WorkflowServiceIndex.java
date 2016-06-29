@@ -49,7 +49,6 @@ public interface WorkflowServiceIndex {
    *
    * @param id
    *          The workflow instance id
-   *          @return the job that was set to deleted
    * @throws WorkflowDatabaseException
    *           if there is a problem removing the workflow instance from persistence
    * @throws NotFoundException

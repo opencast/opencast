@@ -52,7 +52,7 @@ public interface Mpeg7 {
   Iterator<MultimediaContent<? extends MultimediaContentType>> multimediaContent();
 
   /**
-   * Returns the multimedia content container element for tracks of the given type (either <code>Audio></code>,
+   * Returns the multimedia content container element for tracks of the given type (either <code>Audio</code>,
    * <code>Video</code> or <code>Audiovisual</code>).
    *
    *

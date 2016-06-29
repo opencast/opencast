@@ -148,7 +148,7 @@ public final class MediaPackageParser {
 
   /**
    * Serializes the media package to a {@link org.w3c.dom.Document}.
-   * <p/>
+   * <p>
    * todo Implementation is currently defective since it misses various properties. See
    * http://opencast.jira.com/browse/MH-9489 Use {@link #getAsXmlDocument(MediaPackage)} instead if you do not need a
    * serializer.

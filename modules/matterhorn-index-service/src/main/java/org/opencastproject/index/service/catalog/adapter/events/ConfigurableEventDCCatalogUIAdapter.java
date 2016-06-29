@@ -64,7 +64,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 /**
- * Managed service implementation of a {@link AbstractEventsCatalogUIAdapter}
+ * Managed service implementation of a AbstractEventsCatalogUIAdapter
  */
 public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapter {
 

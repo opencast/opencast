@@ -188,13 +188,13 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
 
   /**
    * Run silence detection on the source track and returns
-   * {@see org.opencastproject.silencedetection.api.MediaSegments}
+   * {@link org.opencastproject.silencedetection.api.MediaSegments}
    * XML as string. Source track should have an audio stream. All detected
-   * {@see org.opencastproject.silencedetection.api.MediaSegment}s
+   * {@link org.opencastproject.silencedetection.api.MediaSegment}s
    * (one or more) are non silent sequences.
    *
    * @param track track where to run silence detection
-   * @return {@see MediaSegments} Xml as String
+   * @return {@link MediaSegments} Xml as String
    * @throws SilenceDetectionFailedException if an error occures
    */
   protected MediaSegments runDetection(Track track) throws SilenceDetectionFailedException {

@@ -32,7 +32,6 @@ public class JobEndpointException extends Exception {
    * Constructor without cause.
    * 
    * @param message
-   * @param cause
    */
   public JobEndpointException(String message) {
     super(message);

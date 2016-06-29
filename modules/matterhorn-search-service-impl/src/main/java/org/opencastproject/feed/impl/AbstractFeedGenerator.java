@@ -187,7 +187,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    * Creates a new abstract feed generator.
    * <p>
    * <b>Note:</b> Subclasses using this constructor need to set required member variables prior to calling
-   * {@link #createFeed(org.opencastproject.feed.api.Feed.Type, String[], int)} for the first time.
+   * createFeed for the first time.
    */
   protected AbstractFeedGenerator() {
     atomTrackFlavors = new HashSet<MediaPackageElementFlavor>();
@@ -522,9 +522,6 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.feed.api.FeedGenerator#createFeed(org.opencastproject.feed.api.Feed.Type,
-   *      java.lang.String[], int)
    */
   public final Feed createFeed(Feed.Type type, String[] query, int size, Organization organization) {
     logger.debug("Started to create {} feed", type);
@@ -1193,7 +1190,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /**
    * Generates a link for the current feed entry by using the entry identifier and the result of
-   * {@link #getLinkTemplate()} to create the url. Overwrite this method to provide your own way of generating links to
+   * getLinkTemplate() to create the url. Overwrite this method to provide your own way of generating links to
    * feed entries.
    *
    * @param feed
@@ -1209,7 +1206,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   }
 
   /**
-   * Generates a link for the current feed entry by using the entry identifier and the result of {@link #getLinkSelf()}
+   * Generates a link for the current feed entry by using the entry identifier and the result of #getLinkSelf()
    * to create the url. Overwrite this method to provide your own way of generating links to feed entries.
    *
    * @param feed

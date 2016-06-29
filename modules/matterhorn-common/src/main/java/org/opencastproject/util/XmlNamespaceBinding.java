@@ -31,7 +31,7 @@ import javax.annotation.concurrent.Immutable;
 
 /**
  * Declaration of an XML namespace binding which is the association of a prefix to a namespace URI (namespace name).
- * <p/>
+ * <p>
  * See <a href="http://www.w3.org/TR/xml-names11/#sec-namespaces">W3C specification</a> for details.
  */
 @Immutable

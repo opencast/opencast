@@ -149,7 +149,7 @@ public final class JSONUtils {
    *
    * @param query
    *          The {@link ResourceListQuery}
-   * @param listProviderService
+   * @param listProvidersService
    *          The {@link ListProvidersService} to get the possible values
    * @param org
    *          The {@link Organization}

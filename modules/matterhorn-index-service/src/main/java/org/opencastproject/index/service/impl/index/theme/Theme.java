@@ -332,9 +332,7 @@ public class Theme implements IndexObject {
    * @param xml
    *          the input stream
    * @return the deserialized theme
-   * @throws JSONException
-   * @throws XMLStreamException
-   * @throws JAXBException
+   * @throws IOException
    */
   public static Theme valueOf(InputStream xml) throws IOException {
     try {

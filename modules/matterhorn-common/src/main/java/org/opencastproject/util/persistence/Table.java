@@ -129,7 +129,7 @@ public abstract class Table<R extends Table<R>> {
 
   /**
    * Call this in the subclass's constructor!
-   * <p/>
+   * <p>
    * A call to init() can't happen in the abstract class's constructor
    * since field definitions haven't been initialized yet.
    */

@@ -60,7 +60,7 @@ import javax.persistence.EntityManagerFactory;
 /**
  * The harvester queries OAI-PMH repositories for a certain metadata prefix and passes
  * the retrieved records to the configured {@link RecordHandler} for the actual processing.
- * <p/>
+ * <p>
  * todo
  * <h3>Currently not supported</h3>
  * <ul>
