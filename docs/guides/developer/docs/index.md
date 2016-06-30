@@ -7,6 +7,7 @@ These guides will help you if you want to participate in Opencast development.
  - [Development Process](development-process.md)
     - [Reviewing, Merging and Declining Pull Requests](reviewing-and-merging.md)
     - [Release Manager](release-manager.md)
+ - [Decision Making](decision-making)
  - [Development Environment](development-environment.md)
  - [Proposal Log](proposal-log.md)
  - [Licenses and Legal Matters](license.md)
