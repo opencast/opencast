@@ -161,4 +161,7 @@ public interface MediaPackageElements {
   /** Partial SMIL flavor */
   MediaPackageElementFlavor SMIL = new MediaPackageElementFlavor("smil", "source+partial");
 
+  /** Processing properties flavor */
+  MediaPackageElementFlavor PROCESSING_PROPERTIES = new MediaPackageElementFlavor("processing", "defaults");
+
 }
