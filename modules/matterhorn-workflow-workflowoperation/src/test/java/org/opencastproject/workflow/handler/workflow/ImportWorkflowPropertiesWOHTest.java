@@ -24,9 +24,7 @@ package org.opencastproject.workflow.handler.workflow;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
@@ -37,9 +35,11 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
+import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,7 +48,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-
+import java.util.Map;
 
 public class ImportWorkflowPropertiesWOHTest {
 
@@ -86,12 +86,6 @@ public class ImportWorkflowPropertiesWOHTest {
     expect(wi.getCurrentOperation()).andStubReturn(woi);
     expect(wi.getMediaPackage()).andStubReturn(mp);
 
-    wi.setConfiguration(eq("chapter"), eq("true"));
-    expectLastCall().once();
-    wi.setConfiguration(eq("presenter_position"), eq("left"));
-    expectLastCall().once();
-    wi.setConfiguration(eq("cover_marker_in_s"), eq("30.674"));
-    expectLastCall().once();
     replay(wi);
 
     try (InputStream is = ImportWorkflowPropertiesWOHTest.class.getResourceAsStream("/workflow-properties.xml")) {
@@ -104,10 +98,20 @@ public class ImportWorkflowPropertiesWOHTest {
 
     final ImportWorkflowPropertiesWOH woh = new ImportWorkflowPropertiesWOH();
     woh.setWorkspace(workspace);
-    woh.start(wi, null);
+
+    WorkflowOperationResult result = woh.start(wi, null);
+    Map<String, String> properties = result.getProperties();
+
+    Assert.assertTrue(properties.containsKey("chapter"));
+    Assert.assertEquals("true", properties.get("chapter"));
+
+    Assert.assertTrue(properties.containsKey("presenter_position"));
+    Assert.assertEquals("left", properties.get("presenter_position"));
+
+    Assert.assertTrue(properties.containsKey("cover_marker_in_s"));
+    Assert.assertEquals("30.674", properties.get("cover_marker_in_s"));
 
     verify(wi);
   }
-
 
 }
