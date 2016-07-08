@@ -83,7 +83,7 @@ public class GroupsEndpoint {
 
   /** OSGi activation method */
   void activate() {
-    logger.info("Activating External API - Events Endpoint");
+    logger.info("Activating External API - Groups Endpoint");
   }
 
   @GET
