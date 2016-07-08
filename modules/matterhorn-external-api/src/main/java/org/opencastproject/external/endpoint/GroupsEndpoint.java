@@ -83,20 +83,20 @@ public class GroupsEndpoint {
 
   /** OSGi activation method */
   void activate() {
-    logger.info("Activating External API - Events Endpoint");
+    logger.info("Activating External API - Groups Endpoint");
   }
 
   @GET
-  @Path("groups")
+  @Path("")
   @Produces({ "application/json", "application/v1.0.0+json" })
   public Response getGroups(@HeaderParam("Accept") String acceptHeader, @QueryParam("id") String id,
           @QueryParam("filter") String filter, @QueryParam("sort") String sort, @QueryParam("offset") Integer offset,
           @QueryParam("limit") Integer limit) {
     Opt<Integer> optLimit = Opt.nul(limit);
-    if (limit <= 0)
+    if (optLimit.isSome() && limit <= 0)
       optLimit = Opt.none();
     Opt<Integer> optOffset = Opt.nul(offset);
-    if (offset < 0)
+    if (optOffset.isSome() && offset < 0)
       optOffset = Opt.none();
 
     SearchResult<Group> results;
@@ -117,7 +117,7 @@ public class GroupsEndpoint {
   }
 
   @GET
-  @Path("groups/{groupId}")
+  @Path("{groupId}")
   @Produces({ "application/json", "application/v1.0.0+json" })
   public Response getGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id)
           throws Exception {
@@ -128,7 +128,7 @@ public class GroupsEndpoint {
   }
 
   @DELETE
-  @Path("groups/{groupId}")
+  @Path("{groupId}")
   @Produces({ "application/json", "application/v1.0.0+json" })
   public Response deleteGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id)
           throws NotFoundException {
@@ -136,7 +136,7 @@ public class GroupsEndpoint {
   }
 
   @PUT
-  @Path("groups/{groupId}")
+  @Path("{groupId}")
   @Produces({ "application/json", "application/v1.0.0+json" })
   public Response updateGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id,
           @FormParam("name") String name, @FormParam("description") String description,
@@ -145,7 +145,7 @@ public class GroupsEndpoint {
   }
 
   @POST
-  @Path("groups")
+  @Path("")
   public Response createGroup(@HeaderParam("Accept") String acceptHeader, @FormParam("name") String name,
           @FormParam("description") String description, @FormParam("roles") String roles,
           @FormParam("members") String members) {
