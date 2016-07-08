@@ -93,10 +93,10 @@ public class GroupsEndpoint {
           @QueryParam("filter") String filter, @QueryParam("sort") String sort, @QueryParam("offset") Integer offset,
           @QueryParam("limit") Integer limit) {
     Opt<Integer> optLimit = Opt.nul(limit);
-    if (limit <= 0)
+    if (optLimit.isSome() && limit <= 0)
       optLimit = Opt.none();
     Opt<Integer> optOffset = Opt.nul(offset);
-    if (offset < 0)
+    if (optOffset.isSome() && offset < 0)
       optOffset = Opt.none();
 
     SearchResult<Group> results;
