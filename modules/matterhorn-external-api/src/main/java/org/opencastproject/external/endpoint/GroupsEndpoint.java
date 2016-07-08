@@ -161,7 +161,7 @@ public class GroupsEndpoint {
    */
   protected JValue groupToJSON(Group group) {
     List<JField> fields = new ArrayList<JField>();
-    fields.add(f("id", v(group.getIdentifier())));
+    fields.add(f("identifier", v(group.getIdentifier())));
     fields.add(f("organization", v(group.getOrganization())));
     fields.add(f("role", v(group.getRole())));
     fields.add(f("name", vN(group.getName())));
