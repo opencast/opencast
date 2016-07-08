@@ -1,12 +1,8 @@
 site_name: Opencast - API Documentation
-#repo_url: https://bitbucket.org/entwinemedia/opencast-api/
+#repo_url: https://bitbucket.org/opencast-community/matterhorn/src/develop/docs/guides/api/docs
 
 # Default theme used is readthedocs
 theme: readthedocs
-
-# Some of the themes elements can be overridded by elements in this folder
-# Note: this is currently not working in on ReadTheDocs
-#theme_dir: 'theme_override'
 
 # The directory that contain the source .md files
 docs_dir: 'docs'
@@ -18,25 +14,13 @@ site_dir: 'site'
 # Items will appear in this order
 
 pages:
-- ['index.md', 'Introduction']
-- ['usage.md', 'Usage']
-- ['authentication.md', 'Authentication']
-- ['authorization.md', 'Authorization']
-- ['glossary.md', 'Glossary']
-- ['base-api.md', 'Base API']
-- ['events-api.md', 'Events API']
-- ['series-api.md', 'Series API']
-#- ['users-api.md', 'Users API']
-#- ['groups-api.md', 'Groups API']
-- ['security-api.md', 'Security API']
-
-
-# Version number of the documentation
-# Note: It is currently not possible to use custom varibles into templates or md
-# files, hence this is currently commented out.
-# build_version: ''
-
-# Git commit hash of the documentation build
-# Note: It is currently not possible to use custom varibles into templates or md
-# files, hence this is currently commented out.
-# build_hash: ''
+- Introduction: 'index.md'
+- Usage: 'usage.md'
+- Authentication: 'authentication.md'
+- Authorization: 'authorization.md'
+- Glossary: 'glossary.md'
+- Base API: 'base-api.md'
+- Events API: 'events-api.md'
+- Series API: 'series-api.md'
+- Groups API: 'groups-api.md'
+- Security API: 'security-api.md'
