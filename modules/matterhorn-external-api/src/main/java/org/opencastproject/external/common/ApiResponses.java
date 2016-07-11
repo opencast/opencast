@@ -59,6 +59,10 @@ public final class ApiResponses {
     return Response.status(Status.NOT_FOUND).entity(format(message, args)).type(MediaType.TEXT_PLAIN_TYPE).build();
   }
 
+  public static Response serverError(String message, Object... args) {
+    return Response.serverError().entity(format(message, args)).type(MediaType.TEXT_PLAIN_TYPE).build();
+  }
+
   /**
    * Class that handles Json responses for the external API.
    */
