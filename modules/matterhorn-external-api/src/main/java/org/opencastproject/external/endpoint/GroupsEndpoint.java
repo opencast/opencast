@@ -35,7 +35,6 @@ import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.RestUtil;
 
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JField;
@@ -89,7 +88,7 @@ public class GroupsEndpoint {
   @GET
   @Path("")
   @Produces({ "application/json", "application/v1.0.0+json" })
-  public Response getGroups(@HeaderParam("Accept") String acceptHeader, @QueryParam("id") String id,
+  public Response getGroups(@HeaderParam("Accept") String acceptHeader,
           @QueryParam("filter") String filter, @QueryParam("sort") String sort, @QueryParam("offset") Integer offset,
           @QueryParam("limit") Integer limit) {
     Opt<Integer> optLimit = Opt.nul(limit);
@@ -105,7 +104,7 @@ public class GroupsEndpoint {
               externalIndex);
     } catch (SearchIndexException e) {
       logger.error("The External Search Index was not able to get the groups list: {}", ExceptionUtils.getStackTrace(e));
-      return RestUtil.R.serverError();
+      return ApiResponses.serverError("Could not retrieve groups, reason: '%s'", ExceptionUtils.getMessage(e));
     }
 
     // If the results list if empty, we return already a response.
@@ -122,7 +121,7 @@ public class GroupsEndpoint {
   public Response getGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id)
           throws Exception {
     for (final Group group : indexService.getGroup(id, externalIndex)) {
-      return ApiResponses.Json.ok(ApiVersion.CURRENT_VERSION, group.toJSON());
+      return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, groupToJSON(group));
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
   }
