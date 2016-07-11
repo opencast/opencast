@@ -105,6 +105,8 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
    *          the user credentials
    * @param roleAttributesGlob
    *          the comma separate list of ldap attributes to treat as roles
+   * @param rolePrefix
+   *          a prefix to be appended to all the roles read from the LDAP server
    * @param cacheSize
    *          the number of users to cache
    * @param cacheExpiration
@@ -112,7 +114,8 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
    */
   // CHECKSTYLE:OFF
   LdapUserProviderInstance(String pid, Organization organization, String searchBase, String searchFilter, String url,
-          String userDn, String password, String roleAttributesGlob, int cacheSize, int cacheExpiration) {
+          String userDn, String password, String roleAttributesGlob, String rolePrefix, int cacheSize,
+          int cacheExpiration) {
     // CHECKSTYLE:ON
     this.organization = organization;
     logger.debug("Creating LdapUserProvider instance with pid=" + pid + ", and organization=" + organization
@@ -140,6 +143,12 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
 
     if (StringUtils.isNotBlank(roleAttributesGlob)) {
       LdapUserDetailsMapper mapper = new LdapUserDetailsMapper();
+      if (rolePrefix != null) {
+        mapper.setRolePrefix(rolePrefix);
+        logger.debug("Role prefix set to: \"{}\"", rolePrefix);
+      } else {
+        logger.debug("Using default role prefix (\"ROLE_\")");
+      }
       mapper.setRoleAttributes(roleAttributesGlob.split(","));
       this.delegate.setUserDetailsMapper(mapper);
     }
