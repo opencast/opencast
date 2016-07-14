@@ -533,6 +533,11 @@ public class CaptureAgentStateServiceImplTest {
     service.setAgentState(name, IDLE);
     agent = service.getAgent(name);
     Assert.assertTrue(lastHeardFrom <= agent.getLastHeardFrom());
+
+    lastHeardFrom = agent.getLastHeardFrom();
+    service.setAgentState(name, UNKNOWN);
+    agent = service.getAgent(name);
+    Assert.assertTrue(lastHeardFrom.equals(agent.getLastHeardFrom()));
   }
 
 

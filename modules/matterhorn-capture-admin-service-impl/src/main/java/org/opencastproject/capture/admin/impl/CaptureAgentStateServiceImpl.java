@@ -25,7 +25,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.capture.admin.api.AgentState.KNOWN_STATES;
 import static org.opencastproject.capture.admin.api.AgentState.UNKNOWN;
 
+import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
+import org.opencastproject.capture.admin.api.AgentState;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.capture.admin.api.Recording;
 import org.opencastproject.capture.admin.api.RecordingState;
@@ -300,11 +302,8 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     AgentImpl agent;
     String orgId = securityService.getOrganization().getId();
     try {
-      String agentState = getAgentFromCache(agentName, orgId).getA();
-      if (agentState.equals(state)) {
-        Properties config = getAgentConfiguration(agentName);
-        agentCache.put(agentName.concat(DELIMITER).concat(orgId),
-                Tuple3.tuple3(getAgentState(agentName), config, Long.valueOf(System.currentTimeMillis())));
+      //Check the return code, if it's false then we don't need to update the DB, and we should also return false
+      if (!updateAgentInCache(agentName, state, orgId)) {
         return false;
       }
 
@@ -312,7 +311,12 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
       // the agent is known, so set the state
       logger.debug("Setting Agent {} to state {}.", agentName, state);
+      long lastHeardFrom = agent.getLastHeardFrom();
       agent.setState(state);
+      //If we're in the unknown state undo the timestamp updates
+      if (AgentState.UNKNOWN.equals(state)) {
+        agent.setLastHeardFrom(lastHeardFrom);
+      }
     } catch (NotFoundException e) {
       // If the agent doesn't exists, but the name is not null nor empty, create a new one.
       logger.debug("Creating Agent {} with state {}.", agentName, state);
@@ -320,6 +324,63 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     }
     updateAgentInDatabase(agent);
     return true;
+  }
+
+  /**
+   * Updates the agent cache, and tells you whether you need to update the database as well
+   *
+   * @param agentName
+   *             The name of the agent in thecache
+   * @param state
+   *             The new state for the agent
+   * @param orgId
+   *             The organization the agent is a part of
+   * @return
+   *             True if the agent state database needs to be updated, false otherwise
+   */
+  private boolean updateAgentInCache(String agentName, String state, String orgId) {
+    return updateAgentInCache(agentName, state, orgId, null);
+  }
+
+  /**
+   * Updates the agent cache, and tells you whether you need to update the database as well
+   *
+   * @param agentName
+   *             The name of the agent in thecache
+   * @param state
+   *             The new state for the agent
+   * @param orgId
+   *             The organization the agent is a part of
+   * @param configuration
+   *             The agent's configuration
+   * @return
+   *             True if the agent state database needs to be updated, false otherwise
+   */
+  private boolean updateAgentInCache(String agentName, String state, String orgId, Properties configuration) {
+    try {
+      String agentState = getAgentFromCache(agentName, orgId).getA();
+      if (agentState.equals(state)) {
+        Properties config = getAgentConfiguration(agentName);
+        if (configuration != null) {
+          config = configuration;
+        }
+        if (!AgentState.UNKNOWN.equals(state)) {
+          agentCache.put(agentName.concat(DELIMITER).concat(orgId),
+              Tuple3.tuple3(getAgentState(agentName), config, Long.valueOf(System.currentTimeMillis())));
+          return false;
+        } else {
+          //If we're putting the agent into an unknown state we're assuming that we didn't get a check in
+          // therefore we don't update the timestamp and persist to the DB
+          agentCache.put(agentName.concat(DELIMITER).concat(orgId),
+              Tuple3.tuple3(getAgentState(agentName), config, getAgentFromCache(agentName, orgId).getC()));
+        }
+      }
+      return true;
+    } catch (NotFoundException e) {
+      agentCache.put(agentName.concat(DELIMITER).concat(orgId),
+              Tuple3.tuple3(state, configuration, Long.valueOf(System.currentTimeMillis())));
+      return true;
+    }
   }
 
   /**
@@ -391,7 +452,13 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       // Build the map that the API defines as agent name->agent
       Map<String, Agent> map = new TreeMap<String, Agent>();
       for (AgentImpl agent : agents) {
-        map.put(agent.getName(), updateCachedLastHeardFrom(agent, org.getId()));
+        Agent a = updateCachedLastHeardFrom(agent, org.getId());
+        //FIXME: Revisit this once the CA can inform the core of how often it is configured to poll
+        if (a.getLastHeardFrom() <= System.currentTimeMillis() - CaptureParameters.HOURS) {
+          a.setState(AgentState.UNKNOWN);
+          setAgentState(a.getName(), AgentState.UNKNOWN);
+        }
+        map.put(agent.getName(), a);
       }
       return map;
     } finally {
@@ -497,15 +564,16 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
         em.persist(agent);
       } else {
         existing.setConfiguration(agent.getConfiguration());
-        existing.setLastHeardFrom(agent.getLastHeardFrom());
+        if (!AgentState.UNKNOWN.equals(agent.getState())) {
+          existing.setLastHeardFrom(agent.getLastHeardFrom());
+        }
         existing.setState(agent.getState());
         existing.setSchedulerRoles(agent.getSchedulerRoles());
         existing.setUrl(agent.getUrl());
         em.merge(existing);
       }
       tx.commit();
-      agentCache.put(agent.getName().concat(DELIMITER).concat(agent.getOrganization()),
-              Tuple3.tuple3(agent.getState(), agent.getConfiguration(), Long.valueOf(System.currentTimeMillis())));
+      updateAgentInCache(agent.getName(), agent.getState(), agent.getOrganization(), agent.getConfiguration());
     } catch (RollbackException e) {
       logger.warn("Unable to commit to DB in updateAgent.");
       throw e;
