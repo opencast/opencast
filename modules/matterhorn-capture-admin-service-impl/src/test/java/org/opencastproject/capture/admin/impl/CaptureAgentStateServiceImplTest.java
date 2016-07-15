@@ -52,6 +52,7 @@ import org.osgi.service.cm.ConfigurationException;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -540,5 +541,34 @@ public class CaptureAgentStateServiceImplTest {
     Assert.assertTrue(lastHeardFrom.equals(agent.getLastHeardFrom()));
   }
 
+  public void testAgentStateTimeout() throws Exception {
+    String name = "agent1";
+    Long lastHeardFrom = 0L;
+    Agent agent = null;
+    service.setAgentState(name, IDLE);
+    agent = service.getAgent(name);
 
+    Assert.assertTrue(lastHeardFrom <= agent.getLastHeardFrom());
+    Assert.assertTrue(agent.getLastHeardFrom() <= System.currentTimeMillis());
+
+    agent.setLastHeardFrom(System.currentTimeMillis() - 2 * CaptureParameters.HOURS);
+    String state = service.getAgentState(name);
+    Assert.assertEquals(UNKNOWN, state);
+  }
+
+  public void testAllAgentsStateTimeout() throws Exception {
+    String name = "agent1";
+    Long lastHeardFrom = 0L;
+    Agent agent = null;
+    service.setAgentState(name, IDLE);
+    agent = service.getAgent(name);
+
+    Assert.assertTrue(lastHeardFrom <= agent.getLastHeardFrom());
+    Assert.assertTrue(agent.getLastHeardFrom() <= System.currentTimeMillis());
+
+    agent.setLastHeardFrom(System.currentTimeMillis() - 2 * CaptureParameters.HOURS);
+    Map<String, Agent> agents = service.getKnownAgents();
+
+    Assert.assertEquals(UNKNOWN, agents.get(name).getState());
+  }
 }
