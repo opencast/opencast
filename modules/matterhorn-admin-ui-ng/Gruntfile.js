@@ -447,6 +447,7 @@ module.exports = function (grunt) {
         'copy:styles'
       ],
       test: [
+        'sass',
         'copy:styles'
       ],
       dist: [
@@ -528,7 +529,9 @@ module.exports = function (grunt) {
     'concurrent:test',
     'postcss',
     'connect:test',
-    'karma'
+    'karma',
+    'newer:jshint',
+    'newer:jscs'
   ]);
 
   grunt.registerTask('build', [
@@ -548,8 +551,6 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('default', [
-    'newer:jshint',
-    'newer:jscs',
     'test',
     'build'
   ]);
