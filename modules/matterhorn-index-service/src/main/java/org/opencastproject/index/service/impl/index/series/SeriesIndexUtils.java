@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.index.service.impl.index.series;
 
 import static org.opencastproject.index.service.util.ListProviderUtil.splitStringList;
@@ -51,7 +50,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,8 +90,8 @@ public final class SeriesIndexUtils {
    * @return the set of metadata
    */
   public static SearchMetadataCollection toSearchMetadata(Series series) {
-    SearchMetadataCollection metadata = new SearchMetadataCollection(series.getIdentifier().concat(
-            series.getOrganization()), Series.DOCUMENT_TYPE);
+    SearchMetadataCollection metadata = new SearchMetadataCollection(
+            series.getIdentifier().concat(series.getOrganization()), Series.DOCUMENT_TYPE);
     metadata.addField(SeriesIndexSchema.UID, series.getIdentifier(), true);
     metadata.addField(SeriesIndexSchema.ORGANIZATION, series.getOrganization(), false);
     metadata.addField(SeriesIndexSchema.OBJECT, series.toXML(), false);
@@ -229,9 +227,10 @@ public final class SeriesIndexUtils {
     series.setLanguage(dc.getFirst(DublinCoreCatalog.PROPERTY_LANGUAGE));
     series.setLicense(dc.getFirst(DublinCoreCatalog.PROPERTY_LICENSE));
     series.setRightsHolder(dc.getFirst(DublinCore.PROPERTY_RIGHTS_HOLDER));
-    Date createdDate = EncodingSchemeUtils.decodeDate(dc.getFirst(DublinCoreCatalog.PROPERTY_CREATED));
-    series.setCreatedDateTime(createdDate);
-
+    String createdDateStr = dc.getFirst(DublinCoreCatalog.PROPERTY_CREATED);
+    if (createdDateStr != null) {
+      series.setCreatedDateTime(EncodingSchemeUtils.decodeDate(createdDateStr));
+    }
     series.setPublishers(splitStringList(dc.get(DublinCore.PROPERTY_PUBLISHER, DublinCore.LANGUAGE_ANY)));
     series.setContributors(splitStringList(dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_ANY)));
     series.setOrganizers(splitStringList(dc.get(DublinCoreCatalog.PROPERTY_CREATOR, DublinCore.LANGUAGE_ANY)));
@@ -243,8 +242,8 @@ public final class SeriesIndexUtils {
     if (!series.isSeriesTitleUpdated())
       return;
 
-    SearchResult<Event> events = searchIndex.getByQuery(new EventSearchQuery(organization, user).withoutActions()
-            .withSeriesId(series.getIdentifier()));
+    SearchResult<Event> events = searchIndex
+            .getByQuery(new EventSearchQuery(organization, user).withoutActions().withSeriesId(series.getIdentifier()));
     for (SearchResultItem<Event> searchResultItem : events.getItems()) {
       Event event = searchResultItem.getSource();
       event.setSeriesName(series.getTitle());
@@ -270,11 +269,11 @@ public final class SeriesIndexUtils {
           User user, AbstractSearchIndex searchIndex) {
     SearchResult<Series> result = null;
     try {
-      result = searchIndex.getByQuery(new SeriesSearchQuery(organization, user).withoutActions().withManagedAcl(
-              currentManagedAcl));
+      result = searchIndex
+              .getByQuery(new SeriesSearchQuery(organization, user).withoutActions().withManagedAcl(currentManagedAcl));
     } catch (SearchIndexException e) {
-      logger.error("Unable to find the series in org '{}' with current managed acl name '{}' because {}", new Object[] {
-              organization, currentManagedAcl, ExceptionUtils.getStackTrace(e) });
+      logger.error("Unable to find the series in org '{}' with current managed acl name '{}' because {}",
+              new Object[] { organization, currentManagedAcl, ExceptionUtils.getStackTrace(e) });
     }
     if (result != null && result.getHitCount() > 0) {
       for (SearchResultItem<Series> seriesItem : result.getItems()) {
@@ -303,14 +302,15 @@ public final class SeriesIndexUtils {
    * @param searchIndex
    *          The search index to remove the managed acl from.
    */
-  public static void deleteManagedAcl(String managedAcl, String organization, User user, AbstractSearchIndex searchIndex) {
+  public static void deleteManagedAcl(String managedAcl, String organization, User user,
+          AbstractSearchIndex searchIndex) {
     SearchResult<Series> result = null;
     try {
-      result = searchIndex.getByQuery(new SeriesSearchQuery(organization, user).withoutActions().withManagedAcl(
-              managedAcl));
+      result = searchIndex
+              .getByQuery(new SeriesSearchQuery(organization, user).withoutActions().withManagedAcl(managedAcl));
     } catch (SearchIndexException e) {
-      logger.error("Unable to find the series in org '{}' with current managed acl name '{}' because {}", new Object[] {
-              organization, managedAcl, ExceptionUtils.getStackTrace(e) });
+      logger.error("Unable to find the series in org '{}' with current managed acl name '{}' because {}",
+              new Object[] { organization, managedAcl, ExceptionUtils.getStackTrace(e) });
     }
     if (result != null && result.getHitCount() > 0) {
       for (SearchResultItem<Series> seriesItem : result.getItems()) {
@@ -319,8 +319,8 @@ public final class SeriesIndexUtils {
         try {
           searchIndex.addOrUpdate(series);
         } catch (SearchIndexException e) {
-          logger.warn("Unable to update series '{}' to remove managed acl '{}' because {}", new Object[] { series,
-                  managedAcl, ExceptionUtils.getStackTrace(e) });
+          logger.warn("Unable to update series '{}' to remove managed acl '{}' because {}",
+                  new Object[] { series, managedAcl, ExceptionUtils.getStackTrace(e) });
         }
       }
     }
