@@ -311,11 +311,9 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
       // the agent is known, so set the state
       logger.debug("Setting Agent {} to state {}.", agentName, state);
-      long lastHeardFrom = agent.getLastHeardFrom();
       agent.setState(state);
-      //If we're in the unknown state undo the timestamp updates
-      if (AgentState.UNKNOWN.equals(state)) {
-        agent.setLastHeardFrom(lastHeardFrom);
+      if (!AgentState.UNKNOWN.equals(state)) {
+        agent.setLastHeardFrom(System.currentTimeMillis());
       }
     } catch (NotFoundException e) {
       // If the agent doesn't exists, but the name is not null nor empty, create a new one.
