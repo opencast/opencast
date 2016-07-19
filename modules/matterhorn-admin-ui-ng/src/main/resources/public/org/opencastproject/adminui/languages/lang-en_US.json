@@ -950,7 +950,8 @@
      },
      "ACTIONS": {
        "EXPORT": "Export",
-       "ADD_BLACKLIST": "Add blacklist"
+       "ADD_BLACKLIST": "Add blacklist",
+       "REMOVE": "Remove",
      },
      "RECORDINGS": {
        "TABLE": {

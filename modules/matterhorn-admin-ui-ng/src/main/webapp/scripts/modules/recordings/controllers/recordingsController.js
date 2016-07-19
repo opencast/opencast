@@ -42,10 +42,10 @@ angular.module('adminNg.controllers')
             //}, {
             //    name:  'blacklist_to',
             //    label: 'USERS.USERS.TABLE.BLACKLIST_TO'
-            //}, {
-            //    template: 'modules/recordings/partials/recordingActionsCell.html',
-            //    label:    'RECORDINGS.RECORDINGS.TABLE.ACTION',
-            //    dontSort: true
+            }, {
+                template: 'modules/recordings/partials/recordingActionsCell.html',
+                label:    'RECORDINGS.RECORDINGS.TABLE.ACTION',
+                dontSort: true
             }],
             caption:    'RECORDINGS.RECORDINGS.TABLE.CAPTION',
             resource:   'recordings',
