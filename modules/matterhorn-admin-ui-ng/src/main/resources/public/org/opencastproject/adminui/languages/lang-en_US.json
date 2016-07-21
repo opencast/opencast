@@ -102,6 +102,8 @@
      "USER_BLACKLIST_NOT_SAVED":  "The blacklist could not be saved",
      "USER_BLACKLIST_DELETED":  "The blacklist has been deleted",
      "USER_BLACKLIST_NOT_DELETED":  "The blacklist could not be deleted",
+     "LOCATION_DELETED": "The location has been deleted",
+     "LOCATION_NOT_DELETED": "The location could not be deleted",
      "LOCATION_BLACKLIST_CREATED": "The blacklist has been created",
      "LOCATION_BLACKLIST_NOT_CREATED":  "The blacklist could not be created",
      "LOCATION_BLACKLIST_SAVED": "The blacklist has been saved",
@@ -951,7 +953,7 @@
      "ACTIONS": {
        "EXPORT": "Export",
        "ADD_BLACKLIST": "Add blacklist",
-       "REMOVE": "Remove",
+       "REMOVE": "Remove"
      },
      "RECORDINGS": {
        "TABLE": {
