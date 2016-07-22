@@ -25,7 +25,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.capture.admin.api.AgentState.KNOWN_STATES;
 import static org.opencastproject.capture.admin.api.AgentState.UNKNOWN;
 
-import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentState;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
@@ -53,6 +52,9 @@ import com.entwinemedia.fn.data.Opt;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.cache.RemovalCause;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -62,9 +64,11 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -166,20 +170,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   }
 
   public void activate(ComponentContext cc) {
-    // Setup the agent cache
-    agentCache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build(new CacheLoader<String, Object>() {
-      @Override
-      public Object load(String id) {
-        String[] key = id.split(DELIMITER);
-        AgentImpl agent;
-        try {
-          agent = getAgent(key[0], key[1]);
-        } catch (NotFoundException e) {
-          return nullToken;
-        }
-        return Tuple3.tuple3(agent.getState(), agent.getConfiguration(), agent.getLastHeardFrom());
-      }
-    });
+    setupAgentCache(1, TimeUnit.HOURS);
   }
 
   public void deactivate() {
@@ -403,6 +394,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    */
   @Override
   public void removeAgent(String agentName) throws NotFoundException {
+    agentCache.invalidate(agentName);
     deleteAgentFromDatabase(agentName);
   }
 
@@ -450,13 +442,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       // Build the map that the API defines as agent name->agent
       Map<String, Agent> map = new TreeMap<String, Agent>();
       for (AgentImpl agent : agents) {
-        Agent a = updateCachedLastHeardFrom(agent, org.getId());
-        //FIXME: Revisit this once the CA can inform the core of how often it is configured to poll
-        if (a.getLastHeardFrom() <= System.currentTimeMillis() - CaptureParameters.HOURS) {
-          a.setState(AgentState.UNKNOWN);
-          setAgentState(a.getName(), AgentState.UNKNOWN);
-        }
-        map.put(agent.getName(), a);
+        map.put(agent.getName(), updateCachedLastHeardFrom(agent, org.getId()));
       }
       return map;
     } finally {
@@ -537,6 +523,19 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    *          The Agent you wish to modify or add in the database.
    */
   protected void updateAgentInDatabase(AgentImpl agent) {
+    updateAgentInDatabase(agent, true);
+  }
+
+  /**
+   * Updates or adds an agent to the database.
+   *
+   * @param agent
+   *          The Agent you wish to modify or add in the database.
+   * @param updateFromCache
+   *          True to update the last heard from timestamp from the agentCache, false to avoid this.
+   *          Note that you should nearly always update the cache, this was added to avoid deadlocks when removing agents from the cache. 
+   */
+  private void updateAgentInDatabase(AgentImpl agent, boolean updateFromCache) {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
@@ -546,7 +545,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       AgentImpl existing = getAgentEntity(agent.getName(), agent.getOrganization(), em);
 
       // Update the last seen property from the agent cache
-      if (existing != null) {
+      if (existing != null && updateFromCache) {
         try {
           Tuple3<String, Properties, Long> cachedAgent = getAgentFromCache(existing.getName(),
                   existing.getOrganization());
@@ -810,6 +809,43 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     return "org.opencastproject.capture.agent";
   }
 
+  protected void setupAgentCache(int count, TimeUnit unit) {
+ // Setup the agent cache
+    RemovalListener<String, Object> removalListener = new RemovalListener<String, Object>() {
+      private Set<String> ignoredStates = new LinkedHashSet<String>(Arrays.asList(AgentState.UNKNOWN, AgentState.OFFLINE));
+      @Override
+      public void onRemoval(RemovalNotification<String, Object> removal) {
+        if (RemovalCause.EXPIRED.equals(removal.getCause())) {
+          String org = securityService.getOrganization().getId();
+          try {
+            String agentName = removal.getKey().split(DELIMITER)[0];
+            AgentImpl agent = getAgent(agentName, org);
+            if (!ignoredStates.contains(agent.getState())) {
+              agent.setState(AgentState.OFFLINE);
+              updateAgentInDatabase(agent, false);
+            }
+          } catch (NotFoundException e) {
+            //Ignore this
+            //It should not happen, and if it does we just don't update the non-existant agent in the DB
+          }
+        }
+      }
+    };
+    agentCache = CacheBuilder.newBuilder().expireAfterWrite(count, unit).removalListener(removalListener).build(new CacheLoader<String, Object>() {
+      @Override
+      public Object load(String id) {
+        String[] key = id.split(DELIMITER);
+        AgentImpl agent;
+        try {
+          agent = getAgent(key[0], key[1]);
+        } catch (NotFoundException e) {
+          return nullToken;
+        }
+        return Tuple3.tuple3(agent.getState(), agent.getConfiguration(), agent.getLastHeardFrom());
+      }
+    });
+  }
+
   /**
    * {@inheritDoc}
    *
@@ -875,6 +911,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       logger.warn("{} was not a managed capture agent pid", pid);
     } else {
       try {
+        agentCache.invalidate(agentId);
         deleteAgentFromDatabase(agentId);
       } catch (NotFoundException e) {
         logger.warn("Unable to delete capture agent '{}'", agentId);

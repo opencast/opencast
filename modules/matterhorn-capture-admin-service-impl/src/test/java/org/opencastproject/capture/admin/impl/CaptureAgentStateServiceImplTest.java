@@ -23,6 +23,7 @@ package org.opencastproject.capture.admin.impl;
 
 import static org.junit.Assert.fail;
 import static org.opencastproject.capture.admin.api.AgentState.IDLE;
+import static org.opencastproject.capture.admin.api.AgentState.OFFLINE;
 import static org.opencastproject.capture.admin.api.AgentState.UNKNOWN;
 import static org.opencastproject.capture.admin.api.RecordingState.CAPTURING;
 import static org.opencastproject.capture.admin.api.RecordingState.UPLOADING;
@@ -56,6 +57,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class CaptureAgentStateServiceImplTest {
   private CaptureAgentStateServiceImpl service = null;
@@ -95,6 +97,7 @@ public class CaptureAgentStateServiceImplTest {
     service.setSecurityService(securityService);
 
     service.activate(null);
+    service.setupAgentCache(1, TimeUnit.HOURS);
   }
 
   @After
@@ -541,7 +544,9 @@ public class CaptureAgentStateServiceImplTest {
     Assert.assertTrue(lastHeardFrom.equals(agent.getLastHeardFrom()));
   }
 
+  @Test
   public void testAgentStateTimeout() throws Exception {
+    service.setupAgentCache(1, TimeUnit.SECONDS);
     String name = "agent1";
     Long lastHeardFrom = 0L;
     Agent agent = null;
@@ -551,12 +556,14 @@ public class CaptureAgentStateServiceImplTest {
     Assert.assertTrue(lastHeardFrom <= agent.getLastHeardFrom());
     Assert.assertTrue(agent.getLastHeardFrom() <= System.currentTimeMillis());
 
-    agent.setLastHeardFrom(System.currentTimeMillis() - 2 * CaptureParameters.HOURS);
+    Thread.sleep(5000);
     String state = service.getAgentState(name);
-    Assert.assertEquals(UNKNOWN, state);
+    Assert.assertEquals(OFFLINE, state);
   }
 
+  @Test
   public void testAllAgentsStateTimeout() throws Exception {
+    service.setupAgentCache(1, TimeUnit.SECONDS);
     String name = "agent1";
     Long lastHeardFrom = 0L;
     Agent agent = null;
@@ -566,9 +573,9 @@ public class CaptureAgentStateServiceImplTest {
     Assert.assertTrue(lastHeardFrom <= agent.getLastHeardFrom());
     Assert.assertTrue(agent.getLastHeardFrom() <= System.currentTimeMillis());
 
-    agent.setLastHeardFrom(System.currentTimeMillis() - 2 * CaptureParameters.HOURS);
+    Thread.sleep(5000);
     Map<String, Agent> agents = service.getKnownAgents();
 
-    Assert.assertEquals(UNKNOWN, agents.get(name).getState());
+    Assert.assertEquals(OFFLINE, agents.get(name).getState());
   }
 }
