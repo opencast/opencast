@@ -5,6 +5,9 @@ angular.module('adminNg.controllers')
         $scope.table = Table;
         $scope.table.configure({
             columns: [{
+                name:  'id',
+                label: 'SYSTEMS.JOBS.TABLE.ID'
+            }, {
                 name:  'status',
                 label: 'SYSTEMS.JOBS.TABLE.STATUS'
             }, {
@@ -25,10 +28,10 @@ angular.module('adminNg.controllers')
             }, {
                 name:  'creator',
                 label: 'SYSTEMS.JOBS.TABLE.CREATOR'
-            //}, {
-            //    template: 'modules/systems/partials/jobActionsCell.html',
-            //    label:    'SYSTEMS.JOBS.TABLE.ACTION',
-            //    dontSort: true
+            }, {
+                template: 'modules/systems/partials/jobActionsCell.html',
+                label:    'SYSTEMS.JOBS.TABLE.ACTION',
+                dontSort: true
             }],
             caption:    'SYSTEMS.JOBS.TABLE.CAPTION',
             resource:   'jobs',
