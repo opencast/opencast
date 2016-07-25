@@ -17,7 +17,7 @@ angular.module('adminNg.resources')
                     row.updated = Language.formatDateTime('short', r.Update);
                     row.inputs = r.inputs;
                     row.roomId = r.roomId;
-                    row.removable = 'unknown' == r.Status;
+                    row.removable = 'offline' == r.Status;
                     return row;
                 };
 
