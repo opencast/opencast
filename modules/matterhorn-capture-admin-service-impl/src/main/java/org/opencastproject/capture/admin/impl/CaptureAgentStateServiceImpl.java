@@ -405,6 +405,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    */
   @Override
   public Map<String, Agent> getKnownAgents() {
+    agentCache.cleanUp();
     EntityManager em = null;
     User user = securityService.getUser();
     Organization org = securityService.getOrganization();
@@ -570,7 +571,9 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
         em.merge(existing);
       }
       tx.commit();
-      updateAgentInCache(agent.getName(), agent.getState(), agent.getOrganization(), agent.getConfiguration());
+      if (updateFromCache) {
+        updateAgentInCache(agent.getName(), agent.getState(), agent.getOrganization(), agent.getConfiguration());
+      }
     } catch (RollbackException e) {
       logger.warn("Unable to commit to DB in updateAgent.");
       throw e;
