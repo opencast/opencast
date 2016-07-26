@@ -241,9 +241,7 @@ public class Group implements IndexObject {
    * @param xml
    *          the input stream
    * @return the deserialized group
-   * @throws JSONException
-   * @throws XMLStreamException
-   * @throws JAXBException
+   * @throws IOException
    */
   public static Group valueOf(InputStream xml) throws IOException {
     try {

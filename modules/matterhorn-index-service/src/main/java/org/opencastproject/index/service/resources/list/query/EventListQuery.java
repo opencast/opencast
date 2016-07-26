@@ -102,8 +102,8 @@ public class EventListQuery extends ResourceListQueryImpl {
     this.availableFilters.add(createStartDateFilter(Option.<Tuple<Date, Date>> none()));
     this.availableFilters.add(createStatusFilter(Option.<String> none()));
     this.availableFilters.add(createCommentsFilter(Option.<String> none()));
-    this.availableFilters.add(createOptedoutFilter(Option.<Boolean> none()));
-    this.availableFilters.add(createReviewStatusFilter(Option.<String> none()));
+//    this.availableFilters.add(createOptedoutFilter(Option.<Boolean> none()));
+//    this.availableFilters.add(createReviewStatusFilter(Option.<String> none()));
   }
 
   /**
@@ -147,7 +147,7 @@ public class EventListQuery extends ResourceListQueryImpl {
   /**
    * Add a {@link ResourceListFilter} filter to the query with the given review status
    *
-   * @param optedout
+   * @param reviewStatus
    *          the review status to filter with
    */
   public void withReviewStatus(String reviewStatus) {
@@ -185,7 +185,7 @@ public class EventListQuery extends ResourceListQueryImpl {
   /**
    * Add a {@link ResourceListFilter} filter to the query with the given technical presenter's username
    *
-   * @param technical
+   * @param presenter
    *          presenter's username the presenter's username to filter for
    */
   public void withTechnicalPresenter(String presenter) {
@@ -204,8 +204,8 @@ public class EventListQuery extends ResourceListQueryImpl {
   /**
    * Add a {@link ResourceListFilter} filter to the query with the given contributor
    *
-   * @param presenter
-   *          the presenter to filter for
+   * @param contributor
+   *          the contributor to filter for
    */
   public void withContributor(String contributor) {
     this.addFilter(createContributorsFilter(Option.option(contributor)));
@@ -457,8 +457,8 @@ public class EventListQuery extends ResourceListQueryImpl {
   /**
    * Create a new {@link ResourceListFilter} based on the opted-out status
    *
-   * @param opted
-   *          -out the opted-out to filter on wrapped in an {@link Option} or {@link Option#none()}
+   * @param optedout
+   *          the opted-out to filter on wrapped in an {@link Option} or {@link Option#none()}
    * @return a new {@link ResourceListFilter} for progress based query
    */
   public static ResourceListFilter<Boolean> createOptedoutFilter(Option<Boolean> optedout) {
@@ -469,8 +469,7 @@ public class EventListQuery extends ResourceListQueryImpl {
   /**
    * Create a new {@link ResourceListFilter} based on the opted-out status
    *
-   * @param opted
-   *          -out the opted-out to filter on wrapped in an {@link Option} or {@link Option#none()}
+   * @param reviewStatus
    * @return a new {@link ResourceListFilter} for progress based query
    */
   public static ResourceListFilter<String> createReviewStatusFilter(Option<String> reviewStatus) {

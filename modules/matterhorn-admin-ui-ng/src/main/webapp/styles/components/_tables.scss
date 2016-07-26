@@ -195,7 +195,7 @@
         color: $medium-prim-color;
         border-right: 1px solid #c9d0d6;
         line-height: 20px;
-        vertical-align: top;
+        vertical-align: middle;
 
         // Action icons
         > a {
@@ -276,7 +276,7 @@
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            margin: 13px -7px 0 0;
+            margin: 0;
 
             &.green {
                 background: $green;

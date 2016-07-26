@@ -163,7 +163,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
   /** Registers a <code>StaticResource</code> that serves the contents of the
    * plugins /static resource directory.
    *
-   * @returns ServiceRegistration for the StaticResource
+   * @return ServiceRegistration for the StaticResource
    */
   private ServiceRegistration installStaticResources(PluginData plugin) throws Exception {
     StaticResource staticResource = new StaticResource(
@@ -177,7 +177,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
 
   /** Publishes the REST endpoint implemented by the plugin bundle.
    *
-   * @returns ServiceRegistration for the REST endpoint
+   * @return ServiceRegistration for the REST endpoint
    */
   private ServiceRegistration installRestEndpoint(PluginData plugin) throws Exception {
     EngagePlugin service = (EngagePlugin) bundleContext.getService(plugin.getServiceReference());

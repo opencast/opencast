@@ -80,7 +80,7 @@ public class WorkflowManager {
   /**
    * Returns the workflow's variable in hash map.
    *
-   * @param hash map
+   * @param map hash map
    * @return hash map
    * @throws ServletException
    * @throws IOException
@@ -195,7 +195,7 @@ public class WorkflowManager {
   /**
    * Create a new workflow's file.
    *
-   * @param new workflow's file
+   * @param newWorkflowFile new workflow's file
    * @throws TransformerException
    * @throws IOException
    */
@@ -217,7 +217,7 @@ public class WorkflowManager {
   /**
    * Delete the workflow's file.
    *
-   * @param delete workflow's file
+   * @param deleteWorkflowFile
    * @throws TransformerException
    * @throws IOException
    */

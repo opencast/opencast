@@ -68,7 +68,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${build.number}</Build-Number>
+            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.urlsigning.common;version=${project.version},
               org.opencastproject.urlsigning.utils;version=${project.version}

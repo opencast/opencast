@@ -136,7 +136,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
 
   /**
    * Returns the major type of this element type. Major types are more of a technical description.
-   * <p/>
+   * <p>
    * For example, if the element type is a presentation movie which is represented as <code>presentation/source</code>,
    * this method will return <code>track</code>.
    *
@@ -148,7 +148,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
 
   /**
    * Returns the minor type of this element type. Minor types define the meaning.
-   * <p/>
+   * <p>
    * For example, if the element type is a presentation movie which is represented as <code>presentation/source</code>,
    * this method will return <code>presentation</code>.
    *
@@ -208,7 +208,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
 
   /**
    * Returns <code>true</code> if this element type is an equivalent for the specified type and subtype.
-   * <p/>
+   * <p>
    * For example, a gzipped file may have both of these element types defined, <code>application/x-compressed</code> or
    * <code>application/x-gzip</code>.
    *
@@ -259,7 +259,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
    *          the media package flavor
    * @return the media package element flavor object
    * @throws IllegalArgumentException
-   *           if the string <code>s</code> does not contain a <t>dash</t> to divide the type from subtype.
+   *           if the string <code>s</code> does not contain a <i>dash</i> to divide the type from subtype.
    */
   public static MediaPackageElementFlavor parseFlavor(String s) throws IllegalArgumentException {
     if (s == null)

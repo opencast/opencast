@@ -1649,7 +1649,7 @@
     },
     "SERVICES":{
       "ACTIONS":{
-        "LABEL":"Hat Aktionen"
+        "LABEL":"Aktionen"
       },
       "HOSTNAME":{
         "LABEL":"Hostname"

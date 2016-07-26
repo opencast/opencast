@@ -345,7 +345,7 @@ public class Series implements IndexObject {
   /**
    * Sets the series created date and time.
    *
-   * @param date
+   * @param createdDateTime
    *          the date and time the series was created.
    */
   public void setCreatedDateTime(Date createdDateTime) {
@@ -375,10 +375,10 @@ public class Series implements IndexObject {
   }
 
   /**
-   * Sets the list of presenters.
+   * Sets the list of organizers.
    *
-   * @param presenters
-   *          the presenters for this event
+   * @param organizers
+   *          the organizers for this event
    */
   public void setOrganizers(List<String> organizers) {
     this.organizers = organizers;
@@ -460,7 +460,7 @@ public class Series implements IndexObject {
   /**
    * Sets the series rights holder.
    *
-   * @param rights
+   * @param rightsHolder
    *          holder the rights holder
    */
   public void setRightsHolder(String rightsHolder) {
@@ -479,7 +479,7 @@ public class Series implements IndexObject {
   /**
    * Sets the opt out status for this series
    *
-   * @param optedOut
+   * @param optOut
    *          the opt out status, whether the series is opted-out or not opted-out
    */
   public void setOptOut(boolean optOut) {
@@ -524,9 +524,7 @@ public class Series implements IndexObject {
    * @param xml
    *          the input stream
    * @return the deserialized recording event
-   * @throws JSONException
-   * @throws XMLStreamException
-   * @throws JAXBException
+   * @throws IOException
    */
   public static Series valueOf(InputStream xml) throws IOException {
     try {

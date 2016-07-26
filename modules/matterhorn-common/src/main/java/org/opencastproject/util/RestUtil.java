@@ -174,7 +174,7 @@ public final class RestUtil {
 
   /**
    * Split a comma separated request param into a list of trimmed strings discarding any blank parts.
-   * <p/>
+   * <p>
    * x=comma,separated,,%20value -&gt; ["comma", "separated", "value"]
    */
   public static Monadics.ListMonadic<String> splitCommaSeparatedParam(Option<String> param) {
@@ -296,6 +296,9 @@ public final class RestUtil {
       return Response.status(Response.Status.FORBIDDEN).entity(msg).build();
     }
 
+    public static Response conflict(String msg) {
+      return Response.status(Response.Status.CONFLICT).entity(msg).build();
+    }
     /**
      * create a partial file response
      *

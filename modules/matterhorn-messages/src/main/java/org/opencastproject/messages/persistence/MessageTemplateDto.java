@@ -105,8 +105,6 @@ public class MessageTemplateDto {
    *          the body
    * @param creationDate
    *          the creation date
-   * @param comments
-   *          the comments
    */
   public MessageTemplateDto(String name, String organization, String creator, String subject, String body,
           TemplateType.Type type, Date creationDate) {
@@ -184,7 +182,7 @@ public class MessageTemplateDto {
   /**
    * Returns the creator
    *
-   * @returns the creator of the template
+   * @return the creator of the template
    */
   public String getCreator() {
     return this.creator;

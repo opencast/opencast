@@ -37,11 +37,11 @@ import javax.xml.namespace.NamespaceContext;
  * http://java.sun.com/j2se/1.5.0/docs/api/javax/xml/xpath/package-summary.html
  *
  * Example usage:
-<xmp>
+<code>
 XPath xPath = XPathFactory.newInstance().newXPath();
 xPath.setNamespaceContext(new UniversalNamespaceResolver(document));
 NodeList nodes = xPath.compile(path).evaluate(document, XPathConstants.NODESET);
-</xmp>
+</code>
  */
 public class UniversalNamespaceResolver implements NamespaceContext {
   private Document sourceDocument;

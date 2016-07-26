@@ -139,8 +139,6 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see org.opencastproject.matterhorn.search.SearchResult#getQuery()
    */
   public SearchQuery getQuery() {
     return query;

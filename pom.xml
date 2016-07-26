@@ -1370,6 +1370,20 @@
       </roles>
       <timezone>-5</timezone>
     </developer>
+    <developer>
+      <id>staubesv</id>
+      <name>Sven Stauber</name>
+      <email>sven.stauber@switch.ch</email>
+      <organization>SWITCH</organization>
+      <organizationUrl>http://www.switch.ch</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>Europe/Zurich</timezone>
+      <properties>
+        <irc.nick>stauber</irc.nick>
+      </properties>
+    </developer>
   </developers>
 
   <!-- People having significantly contributed to Opencast in the past -->
@@ -1519,7 +1533,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <!-- NOTE: this should match the settings for the build plugin above -->
-        <version>2.10.1</version>
+        <version>2.10.4</version>
         <configuration>
           <!-- <aggregate>true</aggregate> -->
           <!-- <detectLinks>true</detectLinks> -->

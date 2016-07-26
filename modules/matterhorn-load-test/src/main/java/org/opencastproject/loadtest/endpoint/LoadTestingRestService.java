@@ -79,9 +79,6 @@ public class LoadTestingRestService {
 
   /**
    * Set {@link org.opencastproject.loadtest.impl.LoadTestFactory} service.
-   *
-   * @param service
-   *          Service implemented {@link org.opencastproject.loadtest.impl.LoadTestFactory}
    */
   public void setService(LoadTestFactory loadTestFactory) {
     this.loadTestFactory = loadTestFactory;
@@ -89,9 +86,6 @@ public class LoadTestingRestService {
 
   /**
    * Unset {@link org.opencastproject.loadtest.impl.LoadTestFactory} service.
-   *
-   * @param service
-   *          Service implemented {@link org.opencastproject.loadtest.impl.LoadTestFactory}
    */
   public void unsetService(LoadTestFactory loadTestFactory) {
     this.loadTestFactory = null;

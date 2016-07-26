@@ -66,7 +66,7 @@ public class JSONWorkflowBuilder {
    * @return string writer object
    * @throws ParserConfigurationException
    * @throws IOException
-   * @throws SAXEception
+   * @throws SAXException
    */
   public StringWriter createHashMapWorkflowDataFromXML() throws ParserConfigurationException, IOException, SAXException {
 

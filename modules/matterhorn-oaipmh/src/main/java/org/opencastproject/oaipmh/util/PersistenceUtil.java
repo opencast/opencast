@@ -59,7 +59,7 @@ public final class PersistenceUtil {
 
   /**
    * Create a new, concurrently usable persistence environment which uses JPA local transactions.
-   * <p/>
+   * <p>
    * Please note that calling {@link PersistenceEnv#tx(Function)} always creates a <em>new</em> transaction. Transaction
    * propagation is <em>not</em> supported.
    */

@@ -42,8 +42,6 @@ public class CaptionImpl implements Caption {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.caption.api.Caption#getContent()
    */
   @Override
   public String[] getCaption() {
@@ -52,8 +50,6 @@ public class CaptionImpl implements Caption {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.caption.api.Caption#getStart()
    */
   @Override
   public Time getStartTime() {
@@ -62,8 +58,6 @@ public class CaptionImpl implements Caption {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.caption.api.Caption#getStop()
    */
   @Override
   public Time getStopTime() {

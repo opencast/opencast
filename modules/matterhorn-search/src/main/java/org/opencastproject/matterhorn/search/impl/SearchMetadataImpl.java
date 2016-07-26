@@ -171,8 +171,6 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
 
   /**
    * {@inheritDoc}
-   * 
-   * @see org.opencastproject.matterhorn.search.SearchMetadata#addToFulltext()
    */
   public boolean addToText() {
     return addToText;

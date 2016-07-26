@@ -95,12 +95,12 @@ public final class FileSupport {
   /**
    * Copies the specified file from <code>sourceLocation</code> to <code>targetLocation</code> and returns a reference
    * to the newly created file or directory.
-   * <p/>
+   * <p>
    * If <code>targetLocation</code> is an existing directory, then the source file or directory will be copied into this
    * directory, otherwise the source file will be copied to the file identified by <code>targetLocation</code>.
-   * <p/>
+   * <p>
    * Note that existing files and directories will be overwritten.
-   * <p/>
+   * <p>
    * Also note that if <code>targetLocation</code> is a directory than the directory itself, not only its content is
    * copied.
    *
@@ -119,13 +119,13 @@ public final class FileSupport {
   /**
    * Copies the specified <code>sourceLocation</code> to <code>targetLocation</code> and returns a reference to the
    * newly created file or directory.
-   * <p/>
+   * <p>
    * If <code>targetLocation</code> is an existing directory, then the source file or directory will be copied into this
    * directory, otherwise the source file will be copied to the file identified by <code>targetLocation</code>.
-   * <p/>
+   * <p>
    * If <code>overwrite</code> is set to <code>false</code>, this method throws an {@link IOException} if the target
    * file already exists.
-   * <p/>
+   * <p>
    * Note that if <code>targetLocation</code> is a directory than the directory itself, not only its content is copied.
    *
    * @param sourceFile
@@ -226,7 +226,7 @@ public final class FileSupport {
   /**
    * Copies recursively the <em>content</em> of the specified <code>sourceDirectory</code> to
    * <code>targetDirectory</code>.
-   * <p/>
+   * <p>
    * If <code>overwrite</code> is set to <code>false</code>, this method throws an {@link IOException} if the target
    * file already exists.
    *
@@ -257,7 +257,7 @@ public final class FileSupport {
   /**
    * Copies recursively the <em>content</em> of the specified <code>sourceDirectory</code> to
    * <code>targetDirectory</code>.
-   * <p/>
+   * <p>
    * Note that existing files and directories will be overwritten.
    *
    * @param sourceDirectory
@@ -352,8 +352,6 @@ public final class FileSupport {
    * @param targetLocation
    *          the target file
    * @return <code>true</code> if the link was created, <code>false</code> otherwhise
-   * @throws IOException
-   *           if linking of the file failed
    */
   public static boolean supportsLinking(File sourceLocation, File targetLocation) {
     final Path sourcePath = requireNonNull(sourceLocation).toPath();

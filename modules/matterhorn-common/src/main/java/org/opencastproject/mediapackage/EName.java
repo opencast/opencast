@@ -35,13 +35,13 @@ import javax.xml.XMLConstants;
 
 /**
  * An XML <dfn>Expanded Name</dfn>, cf. <a href="http://www.w3.org/TR/xml-names11/#dt-expname">W3C definition</a>.
- * <p/>
+ * <p>
  * Expanded names in XML consists of a namespace name (URI) and a local part.
  * In opposite to <dfn>Qualified Names</dfn>,
  * cf. <a href="http://www.w3.org/TR/xml-names11/#dt-qualname">W3C definition</a> -
  * which are made from an optional prefix and the local part - expanded names are <em>not</em> subject to
  * namespace interpretation.
- * <p/>
+ * <p>
  * Please see <a href="http://www.w3.org/TR/xml-names/">http://www.w3.org/TR/xml-names/</a> for a
  * complete definition and reference.
  */

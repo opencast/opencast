@@ -76,7 +76,7 @@ public interface ExecuteService {
    *          An {@link org.opencastproject.mediapackage.MediaPackageElement} object to be used as an input to the
    *          command
    * @return A {@link org.opencastproject.job.api.Job} representing the execution of the command. After a successful
-   *         execution, the {@Job} payload will contain a serialized mediapackage element.
+   *         execution, the {link @Job} payload will contain a serialized mediapackage element.
    * @throws ExecuteException
    *           if this method fails to create the {@code Job} correctly
    */
@@ -96,7 +96,7 @@ public interface ExecuteService {
    * @param load
    *          A floating point estimate of the load imposed on the node by executing the command
    * @return A {@link org.opencastproject.job.api.Job} representing the execution of the command. After a successful
-   *         execution, the {@Job} payload will contain a serialized mediapackage element.
+   *         execution, the {link @Job} payload will contain a serialized mediapackage element.
    * @throws ExecuteException
    *           if this method fails to create the {@code Job} correctly
    */
@@ -123,7 +123,7 @@ public interface ExecuteService {
    *          The {@link org.opencastproject.mediapackage.MediaPackageElement.Type} of the {@code MediaPackageElement}
    *          created by this command.
    * @return A {@link org.opencastproject.job.api.Job} representing the execution of the command. After a successful
-   *         execution, the {@Job} payload will contain a serialized mediapackage element.
+   *         execution, the {link @Job} payload will contain a serialized mediapackage element.
    * @throws ExecuteException
    *           if this method fails to create the {@code Job} correctly
    */
@@ -153,7 +153,7 @@ public interface ExecuteService {
    * @param load
    *          A floating point estimate of the load imposed on the node by executing the command
    * @return A {@link org.opencastproject.job.api.Job} representing the execution of the command. After a successful
-   *         execution, the {@Job} payload will contain a serialized mediapackage element.
+   *         execution, the {link @Job} payload will contain a serialized mediapackage element.
    * @throws ExecuteException
    *           if this method fails to create the {@code Job} correctly
    */
@@ -179,7 +179,7 @@ public interface ExecuteService {
    *          The {@link org.opencastproject.mediapackage.MediaPackageElement.Type} of the {@code MediaPackageElement}
    *          created by this command.
    * @return A {@link org.opencastproject.job.api.Job} representing the execution of the command. After a successful
-   *         execution, the {@Job} payload will contain a serialized mediapackage element.
+   *         execution, the {link @Job} payload will contain a serialized mediapackage element.
    * @throws ExecuteException
    *           if this method fails to create the {@code Job} correctly
    */
@@ -207,7 +207,7 @@ public interface ExecuteService {
    * @param load
    *          A floating point estimate of the load imposed on the node by executing the command
    * @return A {@link org.opencastproject.job.api.Job} representing the execution of the command. After a successful
-   *         execution, the {@Job} payload will contain a serialized mediapackage element.
+   *         execution, the {link @Job} payload will contain a serialized mediapackage element.
    * @throws ExecuteException
    *           if this method fails to create the {@code Job} correctly
    */

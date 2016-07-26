@@ -852,8 +852,6 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    * @param query
    *          the workflow query
    * @param action
-   *          one of {@link org.opencastproject.workflow.api.WorkflowService#READ_PERMISSION},
-   *          {@link org.opencastproject.workflow.api.WorkflowService#WRITE_PERMISSION}
    * @param applyPermissions
    *          whether to apply the permissions to the query. Set to false for administrative queries.
    * @return the solr query string

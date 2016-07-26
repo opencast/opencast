@@ -131,7 +131,7 @@ public final class HttpUtil {
   /**
    * Return the content of the response as a string if its status code equals one of the given statuses. Throw an
    * exception on an unexpected status.
-   * <p/>
+   * <p>
    * Function composition of {@link #getContentFn} and {@link #expect(int...)}.
    */
   public static Function<HttpResponse, String> getContentOn(final int... status) {

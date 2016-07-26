@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * An algebraic data type representing a disjoint union. By convention left is considered to represent an error while
  * right represents a value.
- * <p/>
+ *
  * This implementation of <code>Either</code> is much simpler than implementations you may know from other languages or
  * libraries.
  */

@@ -204,7 +204,7 @@ public abstract class SmilMediaElementImpl extends SmilMediaObjectImpl implement
   /**
    * Set paramGroup Id attribute.
    *
-   * @param paramGroup the paramGroup Id to set
+   * @param paramGroupId the paramGroup Id to set
    */
   public void setParamGroup(String paramGroupId) {
     this.paramGroupId = paramGroupId;

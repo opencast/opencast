@@ -23,6 +23,7 @@ describe('Services controller', function () {
 
     describe('#sanitize', function () {
         beforeEach(function () {
+            $httpBackend.whenGET('/admin-ng/resources/services/filters.json').respond('{}');
             spyOn($scope.table, 'fetch');
         });
 

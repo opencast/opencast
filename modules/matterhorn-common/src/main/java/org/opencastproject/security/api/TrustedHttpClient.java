@@ -51,14 +51,14 @@ public interface TrustedHttpClient {
    * either a result or any occurred exception.
    * @param httpUriRequest
    *          The http request
-   * @return <code>HttpUriRequest -> (HttpResponse -> A) -> Either Exception A</code>
+   * @return <code>HttpUriRequest -&gt; (HttpResponse -&gt; A) -&gt; Either Exception A</code>
    * @deprecated use {@link #runner(org.apache.http.client.methods.HttpUriRequest)}
    */
   <A> Function<Function<HttpResponse, A>, Either<Exception, A>> run(HttpUriRequest httpUriRequest);
 
   /**
    * Create a request runner to execute the request.
-   * <p/>
+   * <p>
    * This method replaces {@link #run(org.apache.http.client.methods.HttpUriRequest)} to avoid
    * type annotation mess. To actually run the request call the runners
    * {@linkplain org.opencastproject.security.api.TrustedHttpClient.RequestRunner#run(org.opencastproject.util.data.Function) run}

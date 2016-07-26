@@ -128,9 +128,6 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
    */
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)

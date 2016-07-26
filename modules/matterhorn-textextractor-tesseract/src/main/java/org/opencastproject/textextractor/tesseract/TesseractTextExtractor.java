@@ -100,7 +100,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
   /**
    * Sets additional options for tesseract calls.
    *
-   * @param binary
+   * @param addOptions
    */
   public void setAdditionalOptions(String addOptions) {
     this.addOptions = addOptions;

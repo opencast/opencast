@@ -76,7 +76,7 @@ import java.util.List;
  * <p>
  * This means that it is suited to run inside protected environments as long as there is an implementation of the
  * service running somwhere that provides the matching communication endpoint, which is the case with the default
- * implementation at {@link org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl}.
+ * implementation at org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.
  * <p>
  * Other than with the other <code>-remote</code> implementations, this one needs to be configured to find it's
  * counterpart implementation. It may either point to a load balancer hiding a number of running instances or to one

@@ -77,9 +77,9 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -203,10 +203,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /**
    * OSGi callback on component activation.
    *
-   * @param ctx
-   *          the bundle context
+   * @param cc
+   *          the component context
    */
-  void activate(BundleContext ctx) {
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
     logger.info("Activating composer service");
   }
 
@@ -358,10 +360,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * Encodes audio and video track to a file. If both an audio and a video track are given, they are muxed together into
    * one movie container.
    *
-   * @param videoTrack
-   *          the video track
-   * @param audioTrack
-   *          the audio track
+   * @param job
+   * @param mediaTrack
    * @param profileId
    *          the encoding profile
    * @param properties
@@ -630,10 +630,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.composer.api.ComposerService#composite(org.opencastproject.composer.layout.Dimension,
-   *      org.opencastproject.composer.api.LaidOutElement, org.opencastproject.composer.api.LaidOutElement,
-   *      org.opencastproject.util.data.Option, String, String) String, Option)
    */
   @Override
   public Job composite(Dimension compositeTrackSize, Option<LaidOutElement<Track>> upperTrack,

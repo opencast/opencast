@@ -29,7 +29,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 /**
  * Refined implementation of {@link org.opencastproject.job.api.AbstractJobProducer} suitable for use in an
  * OSGi environment.
- * <p/>
+ *
  * OSGi dependency injection methods are provided to reduce the amount of boilerplate code needed per
  * service implementation.
  */

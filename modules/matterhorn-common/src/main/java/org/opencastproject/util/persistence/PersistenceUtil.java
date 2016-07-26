@@ -160,10 +160,10 @@ public final class PersistenceUtil {
 
   /**
    * Create a new, concurrently usable persistence environment which uses JPA local transactions.
-   * <p/>
+   * <p>
    * Transaction propagation is supported on a per thread basis.
    *
-   * @deprecated use {@link PersistenceEnvs#persistenceEnvironment(EntityManagerFactory)}
+   * @deprecated
    */
   @Deprecated
   public static PersistenceEnv newPersistenceEnvironment(final EntityManagerFactory emf) {
@@ -200,7 +200,7 @@ public final class PersistenceUtil {
    * Create a named query with a list of parameters. Values of type {@link Date} are recognized and set as a timestamp (
    * {@link TemporalType#TIMESTAMP}.
    *
-   * @deprecated use {@link Queries#named#query(EntityManager, String, Class, Object[])}
+   * @deprecated
    */
   @Deprecated
   public static Query createNamedQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
@@ -219,7 +219,7 @@ public final class PersistenceUtil {
   /**
    * Run an update (UPDATE or DELETE) query and ensure that at least one row got affected.
    *
-   * @deprecated use {@link Queries#named#update(EntityManager, String, Object[])}
+   * @deprecated
    */
   @Deprecated
   public static boolean runUpdate(EntityManager em, String queryName, Tuple<String, ?>... params) {
@@ -229,7 +229,7 @@ public final class PersistenceUtil {
   /**
    * Run a query (SELECT) that should return a single result.
    *
-   * @deprecated use {@link Queries#named#findSingle(EntityManager, String, Object[])}
+   * @deprecated
    */
   @Deprecated
   public static <A> Option<A> runSingleResultQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
@@ -245,7 +245,7 @@ public final class PersistenceUtil {
   /**
    * Run a query that should return the first result of it.
    *
-   * @deprecated use {@link Queries#named#findFirst(EntityManager, String, Object[])}
+   * @deprecated
    */
   @Deprecated
   public static <A> Option<A> runFirstResultQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
@@ -261,14 +261,16 @@ public final class PersistenceUtil {
   /**
    * Execute a <code>COUNT(x)</code> query.
    *
-   * @deprecated use {@link Queries#named#count(EntityManager, String, Object[])}
+   * @deprecated
    */
   @Deprecated
   public static long runCountQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
     return ((Number) createNamedQuery(em, queryName, params).getSingleResult()).longValue();
   }
 
-  /** @deprecated use {@link Queries#find(Class, Object)} */
+  /**
+   * @deprecated
+   */
   @Deprecated
   public static <A> Function<EntityManager, Option<A>> findById(final Class<A> clazz, final Object primaryKey) {
     return new Function<EntityManager, Option<A>>() {
@@ -297,7 +299,7 @@ public final class PersistenceUtil {
   /**
    * Find multiple objects.
    *
-   * @deprecated use {@link Queries#named#findAll(EntityManager, String, Object[])}
+   * @deprecated
    */
   @Deprecated
   public static <A> List<A> findAll(EntityManager em, final String queryName, final Tuple<String, ?>... params) {
@@ -307,7 +309,7 @@ public final class PersistenceUtil {
   /**
    * Find multiple objects with optional pagination.
    *
-   * @deprecated use {@link Queries#named#findAll(EntityManager, String, Option, Option, Object[])}
+   * @deprecated
    */
   @Deprecated
   public static <A> List<A> findAll(EntityManager em, final String queryName, Option<Integer> offset,
@@ -327,7 +329,7 @@ public final class PersistenceUtil {
    *          the query parameters
    * @param toA
    *          map to the desired result object
-   * @deprecated use {@link Queries#named#findAll(EntityManager, String, Object[])} instead
+   * @deprecated
    */
   @Deprecated
   public static <A, B> List<A> findAll(EntityManager em, final Function<B, A> toA, final String queryName,
@@ -342,7 +344,7 @@ public final class PersistenceUtil {
    *          the query parameters
    * @param toA
    *          map to the desired result object
-   * @deprecated use {@link Queries#named#findAll(EntityManager, String, Option, Option, Object[])} instead
+   * @deprecated
    */
   @Deprecated
   public static <A, B> List<A> findAll(EntityManager em, final Function<B, A> toA, Option<Integer> offset,
@@ -357,8 +359,6 @@ public final class PersistenceUtil {
 
   /**
    * Create function to persist object <code>a</code> using {@link EntityManager#persist(Object)}.
-   *
-   * @deprecated use {@link Queries#persist(A)}
    */
   @Deprecated
   public static <A> Function<EntityManager, A> persist(final A a) {
@@ -373,8 +373,6 @@ public final class PersistenceUtil {
 
   /**
    * Create function to merge an object <code>a</code> with the persisten context of the given entity manage.
-   *
-   * @deprecated use {@link Queries#merge(A)}
    */
   @Deprecated
   public static <A> Function<EntityManager, A> merge(final A a) {
@@ -442,7 +440,7 @@ public final class PersistenceUtil {
    *
    * @param emName
    *          name of the persistence unit (see META-INF/persistence.xml)
-   * @deprecated use {@link PersistenceEnvs#testPersistenceEnv(String)}
+   * @deprecated
    */
   @Deprecated
   public static PersistenceEnv newTestPersistenceEnv(String emName) {

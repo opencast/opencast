@@ -32,7 +32,7 @@ import com.entwinemedia.fn.Fn;
 
 /**
  * Function of arity 1.
- * <p/>
+ *
  * A general note on function implementations: Each function has an associated X version with the only difference that a
  * checked exception may be thrown on application. This behaviour could be nicely combined into the main function class
  * but with the cost of having no abstract method. Some IDEs such as IntelliJ support nice code folding for SAM (single

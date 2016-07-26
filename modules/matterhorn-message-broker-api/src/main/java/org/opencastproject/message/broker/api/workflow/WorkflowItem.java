@@ -150,7 +150,7 @@ public class WorkflowItem implements MessageItem, Serializable {
   /**
    * Constructor to build a delete workflow {@link WorkflowItem}.
    *
-   * @param workflowDefinitionId
+   * @param workflowInstanceId
    *          The id of the workflow instance to delete.
    * @param workflowInstance
    *          The workflow instance to update.

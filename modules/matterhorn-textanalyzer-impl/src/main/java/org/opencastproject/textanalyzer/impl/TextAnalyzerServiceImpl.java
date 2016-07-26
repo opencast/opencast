@@ -56,9 +56,9 @@ import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,11 +130,13 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   /**
    * OSGi callback on component activation.
    *
-   * @param ctx
-   *          the bundle context
+   * @param cc
+   *          the component context
    */
-  void activate(BundleContext ctx) {
+  @Override
+  public void activate(ComponentContext cc) {
     logger.info("Activating Text analyser service");
+    super.activate(cc);
   }
 
   /**
@@ -273,7 +275,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param id
    *          the video text id
    * @return the video text found on the image
-   * @throws IOException
+   * @throws TextAnalyzerException
    *           if accessing the image fails
    */
   protected VideoText[] analyze(File imageFile, String id) throws TextAnalyzerException {

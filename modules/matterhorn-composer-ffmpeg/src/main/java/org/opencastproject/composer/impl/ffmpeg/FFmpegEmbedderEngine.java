@@ -81,8 +81,6 @@ public class FFmpegEmbedderEngine extends AbstractCmdlineEmbedderEngine {
    *
    * {@inheritDoc} Language attribute is normalized via <code>normalizeLanguage</code> method even if it is not present.
    * If normalized language returned is <code>null</code>, exception will be thrown.
-   *
-   * @see org.opencastproject.composer.api.EmbedderEngine#embed(java.io.File, java.io.File, java.util.Map)
    */
   @Override
   public File embed(File mediaSource, File[] captionSources, String[] captionLanguages, Map<String, String> properties)

@@ -22,7 +22,7 @@
 package org.opencastproject.event.comment;
 
 /**
- * Exception thrown in {@link CommentService}
+ * Exception thrown in CommentService
  */
 public class EventCommentException extends Exception {
 

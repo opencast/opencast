@@ -25,7 +25,7 @@ import static org.opencastproject.util.EqualsUtil.hash;
 
 /**
  * The version number of an archived media package or element.
- * <p/>
+ * <p>
  * This class encapsulates the actual data type used for identifying versions to minimize
  * API changes.
  */

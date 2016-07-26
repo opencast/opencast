@@ -66,8 +66,6 @@ public class StaticResource extends HttpServlet {
   /**
    * Constructs a static resources.
    *
-   * @param bundleContext
-   *          the bundle context of this servlet
    * @param classpath
    *          the classpath to the static resources
    * @param alias
@@ -85,7 +83,7 @@ public class StaticResource extends HttpServlet {
   /**
    * Activates the static resource when it is instantiated using Declarative Services.
    *
-   * @param componentContext
+   * @param componentProperties
    *          the DS component context
    */
   @SuppressWarnings("unchecked")

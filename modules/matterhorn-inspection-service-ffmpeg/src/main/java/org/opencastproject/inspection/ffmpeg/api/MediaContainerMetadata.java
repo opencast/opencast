@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * Encapsulates technical metadata of media containers, usually media files.
- * <p/>
+ * <p>
  * Each property may return null, which means that it could not be determined.
  */
 public class MediaContainerMetadata extends TemporalMetadata {

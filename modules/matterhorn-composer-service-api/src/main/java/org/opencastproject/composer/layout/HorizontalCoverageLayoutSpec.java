@@ -41,7 +41,7 @@ public final class HorizontalCoverageLayoutSpec {
    *          The distance of the anchor points of canvas and shape. The canvas is the "reference", the shape the
    *          "referring" part of the distance object.
    * @param horizontalCoverage
-   *          0 <= horizontalCoverage <= 1. How much space of the canvas should be covered.
+   *          0 &lt;= horizontalCoverage &lt;= 1. How much space of the canvas should be covered.
    */
   public HorizontalCoverageLayoutSpec(AnchorOffset anchorOffset, double horizontalCoverage) {
     this.anchorOffset = anchorOffset;

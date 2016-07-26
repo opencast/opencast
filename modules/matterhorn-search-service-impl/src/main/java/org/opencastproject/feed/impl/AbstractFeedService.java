@@ -47,7 +47,7 @@ import java.util.Properties;
  * <ul>
  * <li><code>feed.uri</code> - the feed uri</li>
  * <li><code>feed.selector</code> the pattern that is used to determine if the feed implementation wants to handle a
- * request, e. g. the selector {{latest}} in {{http://<servername>/feeds/atom/0.3/latest}} maps the latest feed handler
+ * request, e. g. the selector {{latest}} in {{http://servername/feeds/atom/0.3/latest}} maps the latest feed handler
  * to urls containing that selector</li>
  * <li><code>feed.name</code> - name of this feed</li>
  * <li><code>feed.description</code> - an abstract of this feed</li>
@@ -82,7 +82,7 @@ public abstract class AbstractFeedService extends AbstractFeedGenerator {
    * Creates a new abstract feed generator.
    * <p>
    * <b>Note:</b> Subclasses using this constructor need to set required member variables prior to calling
-   * {@link #createFeed(org.opencastproject.feed.api.Feed.Type, String[], int)} for the first time.
+   * createFeed for the first time.
    */
   protected AbstractFeedService() {
     super();

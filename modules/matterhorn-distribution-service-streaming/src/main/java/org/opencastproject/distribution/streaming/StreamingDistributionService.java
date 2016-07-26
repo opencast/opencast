@@ -133,7 +133,9 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     super(JOB_TYPE);
   }
 
-  protected void activate(ComponentContext cc) {
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
     // Get the configured streaming and server URLs
     if (cc != null) {
       for (final String streamingUrl : getOptContextProperty(cc, "org.opencastproject.streaming.url")) {
@@ -240,7 +242,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
               channelId, mp.getIdentifier().compact(), element.getIdentifier(), element.getURI());
 
       if (!destination.equals(source)) {
-        // Put the file in place if  sourcesfile differs destinationfile
+        // Put the file in place if sourcesfile differs destinationfile
         try {
           FileUtils.forceMkdir(destination.getParentFile());
         } catch (IOException e) {
@@ -672,7 +674,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     /**
      * Create a distribution URI for a media package element. This is the inverse function of
      * {@link #getDistributionFileFrom(java.net.URI)}.
-     * <p/>
+     * <p>
      * Distribution URIs look like this:
      *
      * <pre>

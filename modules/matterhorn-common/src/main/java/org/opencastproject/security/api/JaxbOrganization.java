@@ -91,10 +91,8 @@ public class JaxbOrganization implements Organization {
    *          the unique identifier
    * @param name
    *          the friendly name
-   * @param serverName
-   *          the host name
-   * @param serverPort
-   *          the host port
+   * @param servers
+   *          the hosts names and ports
    * @param adminRole
    *          name of the local admin role
    * @param anonymousRole

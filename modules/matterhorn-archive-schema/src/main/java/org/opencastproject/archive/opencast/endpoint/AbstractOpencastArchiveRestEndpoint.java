@@ -59,7 +59,7 @@ import javax.ws.rs.core.Response;
 
 /**
  * Opencast specific REST endpoint of the archive.
- * <p/>
+ * <p>
  * No @Path annotation here since this class cannot be created by JAX-RS. Put it on implementations.
  */
 public abstract class AbstractOpencastArchiveRestEndpoint extends ArchiveRestEndpointBase<OpencastResultSet> {

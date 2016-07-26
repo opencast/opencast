@@ -47,8 +47,8 @@ public class ThemeItem implements MessageItem, Serializable {
   };
 
   /**
-   * @param themeId
-   *          The id of the theme to update.
+   * @param theme
+   *          The theme to update.
    * @return Builds {@link ThemeItem} for creating or updating a theme.
    */
   public static ThemeItem update(SerializableTheme theme) {
@@ -79,8 +79,7 @@ public class ThemeItem implements MessageItem, Serializable {
   /**
    * Constructor to build a delete theme {@link ThemeItem}.
    *
-   * @param seriesId
-   *          The id of the series to delete.
+   * @param themeId
    */
   public ThemeItem(Long themeId) {
     this.id = themeId;

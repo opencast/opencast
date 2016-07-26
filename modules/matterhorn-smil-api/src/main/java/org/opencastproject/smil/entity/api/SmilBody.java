@@ -32,7 +32,7 @@ public interface SmilBody extends SmilObject {
 
   /**
    * Returns the SMIL elements inside the body. The {@link List} is immutable,
-   * use {@link SmilService} to modify it.
+   * use SmilService to modify it.
    *
    * @return the media elements
    */

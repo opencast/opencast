@@ -34,8 +34,7 @@ public interface VideoEditorService {
   String JOB_TYPE = "org.opencastproject.videoeditor";
 
   /**
-   * Create {@see org.opencastproject.smil.entity.Smil} processing
-   * {@see org.opencastproject.job.api.Job}s to edit Tracks.
+   * Create Smil processing {@link org.opencastproject.job.api.Job}s to edit Tracks.
    * Parse Smil document, extract Tracks to edit and split points where to cut.
    *
    * @param smil

@@ -106,9 +106,6 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
 
   /**
    * {@inheritDoc}
-   * 
-   * @see org.opencastproject.composer.api.ComposerService#paralellEncode(org.opencastproject.mediapackage.Track,
-   *      java.lang.String)
    */
   @Override
   public Job parallelEncode(Track sourceTrack, String profileId) throws EncoderException {
@@ -234,9 +231,6 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.composer.api.ComposerService#image(org.opencastproject.mediapackage.Track,
-   *      java.lang.String, long)
    */
   @Override
   public Job image(Track sourceTrack, String profileId, double... times) throws EncoderException {
@@ -338,9 +332,6 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.composer.api.ComposerService#captions(org.opencastproject.mediapackage.Track,
-   *      org.opencastproject.mediapackage.Attachment, java.lang.String)
    */
   @Override
   public Job captions(Track mediaTrack, Catalog[] captions) throws EmbedderException {

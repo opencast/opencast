@@ -26,7 +26,7 @@ import java.net.URI;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Represent ref media element and implement {@link SmilMediaElement}.
+ * Represent ref media element and implement SmilMediaElement.
  */
 @XmlRootElement(name = "ref")
 public class SmilMediaReferenceImpl extends SmilMediaElementImpl {

@@ -62,7 +62,7 @@ public interface SmilMediaElement extends SmilMediaObject {
   MediaType getMediaType();
 
   /**
-   * Returns {@link SmilMediaParamGroup} Id given with this element.
+   * Returns SmilMediaParamGroup Id given with this element.
    *
    * @return the paramGroup Id
    */
@@ -70,7 +70,7 @@ public interface SmilMediaElement extends SmilMediaObject {
 
   /**
    * Returns {@link SmilMediaParam}s for this media element. The {@link List} is
-   * immutable, use {@link SmilService} to modify it.
+   * immutable, use SmilService to modify it.
    *
    * @return the {@link List} with {@link SmilMediaParam}s
    */

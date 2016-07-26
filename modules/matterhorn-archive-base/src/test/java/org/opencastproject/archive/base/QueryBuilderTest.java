@@ -64,7 +64,7 @@ abstract class XyzQueryBuilderBase<A extends XyzQueryBuilderBase<A>> extends Que
 
 /**
  * Builder for Xyz queries that fixes type variable A to a concrete implementation.
- * <p/>
+ * <p>
  * Working with {@link XyzQueryBuilderBase} itself is not possible since
  * all setters of superclass {@link org.opencastproject.archive.base.QueryBuilderBase} then
  * return type {@link org.opencastproject.archive.base.QueryBuilderBase} instead of the desired Xyz version.
