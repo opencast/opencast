@@ -4,9 +4,6 @@ This guide is the official Opencast API documentation
 
 # Setup
 
-### Git Repository
-The source documentation is hosted on this Git repository: https://bitbucket.org/entwinemedia/opencast-api
-
 ### Building Locally
 The documentation is written in standard markdown. The tool that is used to build the documentation is [mkdocs.org](http://www.mkdocs.org/)
 
