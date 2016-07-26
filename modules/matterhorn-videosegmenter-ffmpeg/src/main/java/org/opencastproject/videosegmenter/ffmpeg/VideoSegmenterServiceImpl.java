@@ -33,6 +33,8 @@ import org.opencastproject.metadata.mpeg7.MediaLocator;
 import org.opencastproject.metadata.mpeg7.MediaLocatorImpl;
 import org.opencastproject.metadata.mpeg7.MediaRelTimeImpl;
 import org.opencastproject.metadata.mpeg7.MediaTime;
+import org.opencastproject.metadata.mpeg7.MediaTimePoint;
+import org.opencastproject.metadata.mpeg7.MediaTimePointImpl;
 import org.opencastproject.metadata.mpeg7.Mpeg7Catalog;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.metadata.mpeg7.Segment;
@@ -97,17 +99,35 @@ VideoSegmenterService, ManagedService {
   public static final String FFMPEG_BINARY_CONFIG = "org.opencastproject.composer.ffmpeg.path";
   public static final String FFMPEG_BINARY_DEFAULT = "ffmpeg";
 
-  /** Name of the constant used to retreive the stability threshold */
+  /** Name of the constant used to retrieve the stability threshold */
   public static final String OPT_STABILITY_THRESHOLD = "stabilitythreshold";
 
   /** The number of seconds that need to resemble until a scene is considered "stable" */
-  public static final int DEFAULT_STABILITY_THRESHOLD = 5;
+  public static final int DEFAULT_STABILITY_THRESHOLD = 60;
 
-  /** Name of the constant used to retreive the changes threshold */
+  /** Name of the constant used to retrieve the changes threshold */
   public static final String OPT_CHANGES_THRESHOLD = "changesthreshold";
 
   /** Default value for the number of pixels that may change between two frames without considering them different */
-  public static final float DEFAULT_CHANGES_THRESHOLD = 0.05f; // 5% change
+  public static final float DEFAULT_CHANGES_THRESHOLD = 0.025f; // 2.5% change
+
+  /** Name of the constant used to retrieve the preferred number of segments */
+  public static final String OPT_PREF_NUMBER = "prefNumber";
+
+  /** Default value for the preferred number of segments */
+  public static final int DEFAULT_PREF_NUMBER = 30;
+
+  /** Name of the constant used to retrieve the maximum number of cycles */
+  public static final String OPT_MAX_CYCLES = "maxCycles";
+
+  /** Default value for the maximum number of cycles */
+  public static final int DEFAULT_MAX_CYCLES = 3;
+
+  /** Name of the constant used to retrieve the maximum tolerance for result */
+  public static final String OPT_MAX_ERROR = "maxError";
+
+  /** Default value for the maximum tolerance for result */
+  public static final float DEFAULT_MAX_ERROR = 0.25f;
 
   /** The load introduced on the system by creating a caption job */
   public static final float DEFAULT_SEGMENTER_JOB_LOAD = 1.0f;
@@ -128,13 +148,25 @@ VideoSegmenterService, ManagedService {
   /** The number of seconds that need to resemble until a scene is considered "stable" */
   protected int stabilityThreshold = DEFAULT_STABILITY_THRESHOLD;
 
+  /** The minimum segment length in seconds for creation of segments from ffmpeg output */
+  protected int stabilityThresholdPrefilter = 1;
+
+  /** The number of segments that should be generated */
+  protected int prefNumber = DEFAULT_PREF_NUMBER;
+
+  /** The number of cycles after which the optimization of the number of segments is forced to end */
+  protected int maxCycles = DEFAULT_MAX_CYCLES;
+
+  /** The tolerance with which the optimization of the number of segments is considered successful */
+  protected float maxError = DEFAULT_MAX_ERROR;
+
   /** Reference to the receipt service */
   protected ServiceRegistry serviceRegistry = null;
 
   /** The mpeg-7 service */
   protected Mpeg7CatalogService mpeg7CatalogService = null;
 
-  /** The workspace to ue when retrieving remote media files */
+  /** The workspace to use when retrieving remote media files */
   protected Workspace workspace = null;
 
   /** The security service */
@@ -198,6 +230,28 @@ VideoSegmenterService, ManagedService {
       }
     }
 
+    // Preferred Number of Segments
+    if (properties.get(OPT_PREF_NUMBER) != null) {
+      String number = (String) properties.get(OPT_PREF_NUMBER);
+      try {
+        prefNumber = Integer.parseInt(number);
+        logger.info("Preferred number of segments set to {}", prefNumber);
+      } catch (Exception e) {
+        logger.warn("Found illegal value '{}' for videosegmenter's preferred number of segments", number);
+      }
+    }
+
+    // Maximum number of cycles
+    if (properties.get(OPT_MAX_CYCLES) != null) {
+      String number = (String) properties.get(OPT_MAX_CYCLES);
+      try {
+        maxCycles = Integer.parseInt(number);
+        logger.info("Maximum number of cycles set to {}", maxCycles);
+      } catch (Exception e) {
+        logger.warn("Found illegal value '{}' for videosegmenter's maximum number of cycles", number);
+      }
+    }
+
     segmenterJobLoad = LoadUtil.getConfiguredLoadValue(properties, SEGMENTER_JOB_LOAD_KEY, DEFAULT_SEGMENTER_JOB_LOAD, serviceRegistry);
   }
 
@@ -238,7 +292,7 @@ VideoSegmenterService, ManagedService {
     }
 
     try {
-      Mpeg7Catalog mpeg7 = mpeg7CatalogService.newInstance();
+      Mpeg7Catalog mpeg7;
 
       File mediaFile = null;
       URL mediaUrl = null;
@@ -262,82 +316,270 @@ VideoSegmenterService, ManagedService {
       MediaTime contentTime = new MediaRelTimeImpl(0,
           track.getDuration());
       MediaLocator contentLocator = new MediaLocatorImpl(track.getURI());
-      Video videoContent = mpeg7.addVideoContent("videosegment",
-          contentTime, contentLocator);
 
-      logger.info("Starting video segmentation of {}", mediaUrl);
-      String[] command = new String[] { binary, "-nostats", "-i",
-        mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
-        "-filter:v", "select=gt(scene\\," + changesThreshold + "),showinfo",
-        "-f", "null", "-"
-      };
-      String commandline = StringUtils.join(command, " ");
+      Video videoContent;
 
-      logger.info("Running {}", commandline);
+      logger.debug("changesThreshold: {}, stabilityThreshold: {}", changesThreshold, stabilityThreshold);
+      logger.debug("prefNumber: {}, maxCycles: {}", prefNumber, maxCycles);
 
-      ProcessBuilder pbuilder = new ProcessBuilder(command);
-      List<String> segmentsStrings = new LinkedList<String>();
-      Process process = pbuilder.start();
-      BufferedReader reader = new BufferedReader(
-              new InputStreamReader(process.getErrorStream()));
-      try {
-        LineReader lr = new LineReader(reader);
-        String line = lr.readLine();
-        while (null != line) {
-          if (line.startsWith("[Parsed_showinfo")) {
-            segmentsStrings.add(line);
+      boolean endOptimization = false;
+      int cycleCount = 0;
+      LinkedList<Segment> segments;
+      LinkedList<OptimizationStep> optimizationList = new LinkedList<OptimizationStep>();
+      LinkedList<OptimizationStep> unusedResultsList = new LinkedList<OptimizationStep>();
+      OptimizationStep stepBest = new OptimizationStep();
+
+      // local copy of changesThreshold, that can safely be changed over optimization iterations
+      float changesThresholdLocal = changesThreshold;
+
+
+      // optimization loop to get a segmentation with an amount of segments close
+      // to the desired number of segments
+      while (!endOptimization) {
+
+        mpeg7 = mpeg7CatalogService.newInstance();
+        videoContent = mpeg7.addVideoContent("videosegment",
+            contentTime, contentLocator);
+
+        logger.info("Starting video segmentation of {}", mediaUrl);
+        String[] command = new String[] { binary, "-nostats", "-i",
+          mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
+          "-filter:v", "select=gt(scene\\," + changesThresholdLocal + "),showinfo",
+          "-f", "null", "-"
+        };
+        String commandline = StringUtils.join(command, " ");
+
+        logger.info("Running {}", commandline);
+
+        ProcessBuilder pbuilder = new ProcessBuilder(command);
+        List<String> segmentsStrings = new LinkedList<String>();
+        Process process = pbuilder.start();
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(process.getErrorStream()));
+        try {
+          LineReader lr = new LineReader(reader);
+          String line = lr.readLine();
+          while (null != line) {
+            if (line.startsWith("[Parsed_showinfo")) {
+              segmentsStrings.add(line);
+            }
+            line = lr.readLine();
           }
-          line = lr.readLine();
+        } catch (IOException e) {
+          logger.error("Error executing ffmpeg: {}", e.getMessage());
+        } finally {
+          reader.close();
         }
-      } catch (IOException e) {
-        logger.error("Error executing ffmpeg: {}", e.getMessage());
-      } finally {
-        reader.close();
-      }
 
-      // [Parsed_showinfo_1 @ 0x157fb40] n:0 pts:12 pts_time:12 pos:227495
-      // fmt:rgb24 sar:0/1 s:320x240 i:P iskey:1 type:I checksum:8DF39EA9
-      // plane_checksum:[8DF39EA9]
+        // [Parsed_showinfo_1 @ 0x157fb40] n:0 pts:12 pts_time:12 pos:227495
+        // fmt:rgb24 sar:0/1 s:320x240 i:P iskey:1 type:I checksum:8DF39EA9
+        // plane_checksum:[8DF39EA9]
 
-      int segmentcount = 1;
-      List<Segment> segments = new LinkedList<Segment>();
-      if (segmentsStrings.size() == 0) {
-        Segment s = videoContent.getTemporalDecomposition()
-          .createSegment("segement-" + segmentcount);
-        s.setMediaTime(new MediaRelTimeImpl(0, track.getDuration()));
-        segments.add(s);
-      } else {
-        long starttime = 0;
-        long endtime = 0;
-        Pattern pattern = Pattern.compile("pts_time\\:\\d+(\\.\\d+)?");
-        for (String seginfo : segmentsStrings) {
-          Matcher matcher = pattern.matcher(seginfo);
-          String time = "0";
-          while (matcher.find()) {
-            time = matcher.group().substring(9);
+        int segmentcount = 1;
+        segments = new LinkedList<Segment>();
+
+        if (segmentsStrings.size() == 0) {
+          Segment s = videoContent.getTemporalDecomposition()
+              .createSegment("segment-" + segmentcount);
+          s.setMediaTime(new MediaRelTimeImpl(0, track.getDuration()));
+          segments.add(s);
+        } else {
+          long starttime = 0;
+          long endtime = 0;
+          Pattern pattern = Pattern.compile("pts_time\\:\\d+(\\.\\d+)?");
+          for (String seginfo : segmentsStrings) {
+            Matcher matcher = pattern.matcher(seginfo);
+            String time = "0";
+            while (matcher.find()) {
+              time = matcher.group().substring(9);
+            }
+            endtime = (long)(Float.parseFloat(time) * 1000);
+            long segmentLength = endtime - starttime;
+            if (1000 * stabilityThresholdPrefilter < segmentLength) {
+              Segment segment = videoContent.getTemporalDecomposition()
+                  .createSegment("segment-" + segmentcount);
+              segment.setMediaTime(new MediaRelTimeImpl(starttime,
+                  endtime - starttime));
+              segments.add(segment);
+              segmentcount++;
+              starttime = endtime;
+            }
           }
-          endtime = (long)(Float.parseFloat(time) * 1000);
-          long segmentLength = endtime - starttime;
-          if (1000 * stabilityThreshold < segmentLength) {
-            Segment segement = videoContent.getTemporalDecomposition()
-              .createSegment("segement-" + segmentcount);
-            segement.setMediaTime(new MediaRelTimeImpl(starttime,
-              endtime - starttime));
-            segments.add(segement);
-            segmentcount++;
-            starttime = endtime;
-          }
-        }
-        // Add last segment
-        Segment s = videoContent.getTemporalDecomposition()
-          .createSegment("segement-" + segmentcount);
-        s.setMediaTime(new MediaRelTimeImpl(endtime, track
+          // Add last segment
+          Segment s = videoContent.getTemporalDecomposition()
+              .createSegment("segment-" + segmentcount);
+          s.setMediaTime(new MediaRelTimeImpl(endtime, track
               .getDuration() - endtime));
-        segments.add(s);
+          segments.add(s);
+        }
+
+        logger.info("Segmentation of {} yields {} segments", mediaUrl,
+                segments.size());
+
+        // calculate errors for "normal" and filtered segmentation
+        // and compare them to find better optimization.
+        // "normal"
+        OptimizationStep currentStep = new OptimizationStep(stabilityThreshold,
+                changesThresholdLocal, segments.size(), prefNumber, mpeg7, segments);
+        // filtered
+        LinkedList<Segment> segmentsNew = new LinkedList<Segment>();
+        OptimizationStep currentStepFiltered = new OptimizationStep(
+                stabilityThreshold, changesThresholdLocal, segmentsNew.size(),
+                prefNumber, filterSegmentation(segments, track, segmentsNew, stabilityThreshold * 1000), segments);
+        currentStepFiltered.setSegmentNum(segmentsNew.size());
+        currentStepFiltered.calcErrors();
+
+        logger.info("Segmentation yields {} segments after filtering", segmentsNew.size());
+
+        OptimizationStep currentStepBest;
+
+        // save better optimization in optimizationList
+        //
+        // the unfiltered segmentation is better if
+        // - the error is smaller than the error of the filtered segmentation
+        // OR - the filtered number of segments is smaller than the preferred number
+        //    - and the unfiltered number of segments is bigger than a value that should roughly estimate how many
+        //          segments with the length of the stability threshold could maximally be in a video
+        //          (this is to make sure that if there are e.g. 1000 segments and the filtering would yield
+        //           smaller and smaller results, the stability threshold won't be optimized in the wrong direction)
+        //    - and the filtered segmentation is not already better than the maximum error
+        if (currentStep.getErrorAbs() <= currentStepFiltered.getErrorAbs() || (segmentsNew.size() < prefNumber
+                && currentStep.getSegmentNum() > (track.getDuration() / 1000.0f) / (stabilityThreshold / 2)
+                && !(currentStepFiltered.getErrorAbs() <= maxError))) {
+
+          addToOptimizedList(optimizationList, currentStep);
+          currentStepBest = currentStep;
+          unusedResultsList.add(currentStepFiltered);
+        } else {
+          addToOptimizedList(optimizationList, currentStepFiltered);
+          currentStepBest = currentStepFiltered;
+        }
+
+        cycleCount++;
+
+        logger.debug("errorAbs = {}, error = {}", currentStep.getErrorAbs(), currentStep.getError());
+        logger.debug("changesThreshold = {}", changesThresholdLocal);
+        logger.debug("cycleCount = {}", cycleCount);
+
+        // end optimization if maximum number of cycles is reached or if the segmentation is good enough
+        if (cycleCount >= maxCycles || currentStepBest.getErrorAbs() <= maxError) {
+          endOptimization = true;
+          if (optimizationList.size() > 0) {
+            if (optimizationList.getFirst().getErrorAbs() <= optimizationList.getLast().getErrorAbs()
+                && optimizationList.getFirst().getError() >= 0) {
+//              mpeg7 = optimizationList.getFirst().getMpeg7();
+              stepBest = optimizationList.getFirst();
+            } else {
+//              mpeg7 = optimizationList.getLast().getMpeg7(); todo
+              stepBest = optimizationList.getLast();
+            }
+          }
+
+          // just to be sure, check if one of the unused results was better
+          for (OptimizationStep currentUnusedStep : unusedResultsList) {
+            if (currentUnusedStep.getErrorAbs() < stepBest.getErrorAbs()) {
+              stepBest = unusedResultsList.getFirst();
+            }
+          }
+
+
+        // continue optimization, calculate new changes threshold for next iteration of optimization
+        } else {
+          OptimizationStep first = optimizationList.getFirst();
+          OptimizationStep last = optimizationList.getLast();
+          // if this was the first iteration or there are only positive or negative errors,
+          // estimate a new changesThreshold based on the one yielding the smallest error
+          if (optimizationList.size() == 1 || first.getError() < 0 || last.getError() > 0) {
+            if (currentStepBest.getError() >= 0) {
+              // if the error is smaller or equal to 1, increase changes threshold weighted with the error
+              if (currentStepBest.getError() <= 1) {
+                changesThresholdLocal += changesThresholdLocal * currentStepBest.getError();
+              } else {
+                  // if there are more than 2000 segments in the first iteration, set changes threshold to 0.2
+                  // to faster reach reasonable segment numbers
+                if (cycleCount <= 1 && currentStep.getSegmentNum() > 2000) {
+                  changesThresholdLocal = 0.2f;
+                // if the error is bigger than one, double the changes threshold, because multiplying
+                // with a large error can yield a much too high changes threshold
+                } else {
+                changesThresholdLocal *= 2;
+                }
+              }
+            } else {
+                changesThresholdLocal /= 2;
+            }
+
+            logger.debug("onesided optimization yields new changesThreshold = {}", changesThresholdLocal);
+          // if there are already iterations with positive and negative errors, choose a changesThreshold between those
+          } else {
+            // for simplicity a linear relationship between the changesThreshold
+            // and the number of generated segments is assumed and based on that
+            // the expected correct changesThreshold is calculated
+
+            // the new changesThreshold is calculated by averaging the the mean and the mean weighted with errors
+            // because this seemed to yield better results in several cases
+
+            float x = (first.getSegmentNum() - prefNumber) / (float)(first.getSegmentNum() - last.getSegmentNum());
+            float newX = ((x + 0.5f) * 0.5f);
+            changesThresholdLocal = first.getChangesThreshold() * (1 - newX) + last.getChangesThreshold() * newX;
+            logger.debug("doublesided optimization yields new changesThreshold = {}", changesThresholdLocal);
+          }
+        }
       }
 
-      logger.info("Segmentation of {} yields {} segments", mediaUrl,
-          segments.size());
+
+      // after optimization of the changes threshold, the minimum duration for a segment
+      // (stability threshold) is optimized if the result is still not good enough
+      int threshLow = stabilityThreshold * 1000;
+      int threshHigh = threshLow + (threshLow / 2);
+
+      LinkedList<Segment> tmpSegments;
+      float smallestError = Float.MAX_VALUE;
+      int bestI = threshLow;
+      segments = stepBest.getSegments();
+
+      // if the error is negative (which means there are already too few segments) or if the error
+      // is smaller than the maximum error, the stability threshold will not be optimized
+      if (stepBest.getError() <= maxError) {
+        threshHigh = stabilityThreshold * 1000;
+      }
+      for (int i = threshLow; i <= threshHigh; i = i + 1000) {
+        tmpSegments = new LinkedList<Segment>();
+        filterSegmentation(segments, track, tmpSegments, i);
+        float newError = OptimizationStep.calculateErrorAbs(tmpSegments.size(), prefNumber);
+        if (newError < smallestError) {
+          smallestError = newError;
+          bestI = i;
+        }
+      }
+      tmpSegments = new LinkedList<Segment>();
+      mpeg7 = filterSegmentation(segments, track, tmpSegments, bestI);
+
+      // for debugging: output of final segmentation after optimization
+      logger.debug("result segments:");
+      for (int i = 0; i < tmpSegments.size(); i++) {
+        int[] tmpLog2 = new int[7];
+        tmpLog2[0] = tmpSegments.get(i).getMediaTime().getMediaTimePoint().getHour();
+        tmpLog2[1] = tmpSegments.get(i).getMediaTime().getMediaTimePoint().getMinutes();
+        tmpLog2[2] = tmpSegments.get(i).getMediaTime().getMediaTimePoint().getSeconds();
+        tmpLog2[3] = tmpSegments.get(i).getMediaTime().getMediaDuration().getHours();
+        tmpLog2[4] = tmpSegments.get(i).getMediaTime().getMediaDuration().getMinutes();
+        tmpLog2[5] = tmpSegments.get(i).getMediaTime().getMediaDuration().getSeconds();
+        Object[] tmpLog1 = {tmpLog2[0], tmpLog2[1], tmpLog2[2], tmpLog2[3], tmpLog2[4], tmpLog2[5], tmpLog2[6]};
+        tmpLog1[6] = tmpSegments.get(i).getIdentifier();
+        logger.debug("s:{}:{}:{}, d:{}:{}:{}, {}", tmpLog1);
+      }
+
+      logger.info("Optimized Segmentation yields (after {} iteration" + (cycleCount == 1 ? "" : "s") + ") {} segments",
+          cycleCount, tmpSegments.size());
+
+      // if no reasonable segmentation could be found, instead return a uniform segmentation
+      if (tmpSegments.size() <= prefNumber / 10 || tmpSegments.size() > prefNumber * 5) {
+        mpeg7 = uniformSegmentation(track, tmpSegments);
+        logger.info("Since no reasonable segmentation could be found, a uniform segmentation was created");
+      }
+
+
 
       Catalog mpeg7Catalog = (Catalog) MediaPackageElementBuilderFactory
         .newInstance().newElementBuilder()
@@ -399,6 +641,240 @@ VideoSegmenterService, ManagedService {
       throw new ServiceRegistryException("Error handling operation '"
           + op + "'", e);
     }
+  }
+
+  /**
+   * Inserts an element into a list of OptimizationSteps, so that the smallest
+   * positive error is the first element of the list and the smallest negative
+   * error is the last element of the list
+   *
+   * @param list list of OptimizationSteps
+   * @param newItem OptimizationStep to be added to the list
+   */
+  protected static void addToOptimizedList(List<OptimizationStep> list, OptimizationStep newItem) {
+
+    boolean stop = false;
+    int i = 0;
+    if (list.isEmpty()) {
+      list.add(newItem);
+    } else {
+      // if positive error add new item to the left sorted half of the list
+      if (newItem.getError() >= 0) {
+        // go from left to right through the list until correct position is found
+        // or until end of list or end of the positive part of the list is reached
+        while (i < list.size() && !stop && list.get(i).getError() >= 0) {
+          if (newItem.getError() <= list.get(i).getError()) {
+            list.add(i, newItem);
+            stop = true;
+          }
+          i++;
+        }
+        if (!stop) {
+          list.add(i, newItem);
+        }
+      // if negative error add item to the right sorted half of the list
+      } else {
+        i = list.size() - 1;
+        // go from right to left through the list until correct position is found
+        // or until end of list or end of the negative part of the list is reached
+        while (i >= 0 && !stop && list.get(i).getError() < 0) {
+          if (newItem.getError() >= list.get(i).getError()) {
+            list.add(i + 1, newItem);
+            stop = true;
+          }
+          i--;
+        }
+        if (!stop) {
+          list.add(i + 1, newItem);
+        }
+      }
+    }
+  }
+
+  /**
+   * Merges small subsequent segments (with high difference) into a bigger one
+   *
+   * @param segments list of segments to be filtered
+   * @param track the track that is segmented
+   * @param segmentsNew will be set to list of new segments (pass null if not required)
+   * @return Mpeg7Catalog that can later be saved in a Catalog as endresult
+   */
+  protected Mpeg7Catalog filterSegmentation(
+          LinkedList<Segment> segments, Track track, LinkedList<Segment> segmentsNew) {
+    int mergeThresh = stabilityThreshold * 1000;
+    return filterSegmentation(segments, track, segmentsNew, mergeThresh);
+  }
+
+
+  /**
+   * Merges small subsequent segments (with high difference) into a bigger one
+   *
+   * @param segments list of segments to be filtered
+   * @param track the track that is segmented
+   * @param segmentsNew will be set to list of new segments (pass null if not required)
+   * @param mergeThresh minimum duration for a segment in milliseconds
+   * @return Mpeg7Catalog that can later be saved in a Catalog as endresult
+   */
+  protected Mpeg7Catalog filterSegmentation(
+          LinkedList<Segment> segments, Track track, LinkedList<Segment> segmentsNew, int mergeThresh) {
+    if (segmentsNew == null) {
+      segmentsNew = new LinkedList<Segment>();
+    }
+    boolean merging = false;
+    MediaTime contentTime = new MediaRelTimeImpl(0, track.getDuration());
+    MediaLocator contentLocator = new MediaLocatorImpl(track.getURI());
+    Mpeg7Catalog mpeg7 = mpeg7CatalogService.newInstance();
+    Video videoContent = mpeg7.addVideoContent("videosegment", contentTime, contentLocator);
+
+    int segmentcount = 1;
+
+    MediaTimePoint currentSegStart = new MediaTimePointImpl();
+
+    for (Segment o : segments) {
+
+      // if the current segment is shorter than merge treshold start merging
+      if (o.getMediaTime().getMediaDuration().getDurationInMilliseconds() <= mergeThresh) {
+        // start merging and save beginning of new segment that will be generated
+        if (!merging) {
+          currentSegStart = o.getMediaTime().getMediaTimePoint();
+          merging = true;
+        }
+
+      // current segment is longer than merge threshold
+      } else {
+        long currentSegDuration = o.getMediaTime().getMediaDuration().getDurationInMilliseconds();
+        long currentSegEnd = o.getMediaTime().getMediaTimePoint().getTimeInMilliseconds()
+                             + currentSegDuration;
+
+        if (merging) {
+          long newDuration = o.getMediaTime().getMediaTimePoint().getTimeInMilliseconds()
+                             - currentSegStart.getTimeInMilliseconds();
+
+          // if new segment would be long enough
+          // save new segment that merges all previously skipped short segments
+          if (newDuration >= mergeThresh) {
+            Segment s = videoContent.getTemporalDecomposition()
+                .createSegment("segment-" + segmentcount++);
+            s.setMediaTime(new MediaRelTimeImpl(currentSegStart.getTimeInMilliseconds(), newDuration));
+            segmentsNew.add(s);
+
+            // copy the following long segment to new list
+            Segment s2 = videoContent.getTemporalDecomposition()
+                .createSegment("segment-" + segmentcount++);
+            s2.setMediaTime(o.getMediaTime());
+            segmentsNew.add(s2);
+
+          // if too short split new segment in middle and merge halves to
+          // previous and following segments
+          } else {
+            long followingStartOld = o.getMediaTime().getMediaTimePoint().getTimeInMilliseconds();
+            long newSplit = (currentSegStart.getTimeInMilliseconds() + followingStartOld) / 2;
+            long followingEnd = followingStartOld + o.getMediaTime().getMediaDuration().getDurationInMilliseconds();
+            long followingDuration = followingEnd - newSplit;
+
+            // if at beginning, don't split, just merge to first large segment
+            if (segmentsNew.isEmpty()) {
+              Segment s = videoContent.getTemporalDecomposition()
+                  .createSegment("segment-" + segmentcount++);
+              s.setMediaTime(new MediaRelTimeImpl(0, followingEnd));
+              segmentsNew.add(s);
+            } else {
+
+              long previousStart = segmentsNew.getLast().getMediaTime().getMediaTimePoint().getTimeInMilliseconds();
+
+              // adjust end time of previous segment to split time
+              segmentsNew.getLast().setMediaTime(new MediaRelTimeImpl(previousStart, newSplit - previousStart));
+
+              // create new segment starting at split time
+              Segment s = videoContent.getTemporalDecomposition()
+                  .createSegment("segment-" + segmentcount++);
+              s.setMediaTime(new MediaRelTimeImpl(newSplit, followingDuration));
+              segmentsNew.add(s);
+            }
+          }
+          merging = false;
+
+        // copy segments that are long enough to new list (with corrected number)
+        } else {
+          Segment s = videoContent.getTemporalDecomposition()
+              .createSegment("segment-" + segmentcount++);
+          s.setMediaTime(o.getMediaTime());
+          segmentsNew.add(s);
+        }
+      }
+    }
+
+    // if there is an unfinished merging process after going through all segments
+    if (merging && !segmentsNew.isEmpty()) {
+
+      long newDuration = track.getDuration() - currentSegStart.getTimeInMilliseconds();
+      // if merged segment is long enough, create new segment
+      if (newDuration >= mergeThresh) {
+
+        Segment s = videoContent.getTemporalDecomposition()
+            .createSegment("segment-" + segmentcount);
+        s.setMediaTime(new MediaRelTimeImpl(currentSegStart.getTimeInMilliseconds(), newDuration));
+        segmentsNew.add(s);
+
+      // if not long enough, merge with previous segment
+      } else {
+        newDuration = track.getDuration() - segmentsNew.getLast().getMediaTime().getMediaTimePoint()
+            .getTimeInMilliseconds();
+        segmentsNew.getLast().setMediaTime(new MediaRelTimeImpl(segmentsNew.getLast().getMediaTime()
+            .getMediaTimePoint().getTimeInMilliseconds(), newDuration));
+
+      }
+    }
+
+    // if there is no segment in the list (to merge with), create new
+    // segment spanning the whole video
+    if (segmentsNew.isEmpty()) {
+      Segment s = videoContent.getTemporalDecomposition()
+          .createSegment("segment-" + segmentcount);
+      s.setMediaTime(new MediaRelTimeImpl(0, track.getDuration()));
+      segmentsNew.add(s);
+    }
+
+    return mpeg7;
+  }
+
+  /**
+   * Creates a uniform segmentation for a given track, with prefNumber as the amount of segments
+   * which will all have the same length
+   *
+   * @param track the track that is segmented
+   * @param segmentsNew will be set to list of new segments (pass null if not required)
+   * @return Mpeg7Catalog that can later be saved in a Catalog as endresult
+   */
+  protected Mpeg7Catalog uniformSegmentation(Track track, LinkedList<Segment> segmentsNew) {
+    if (segmentsNew == null) {
+      segmentsNew = new LinkedList<Segment>();
+    }
+    MediaTime contentTime = new MediaRelTimeImpl(0, track.getDuration());
+    MediaLocator contentLocator = new MediaLocatorImpl(track.getURI());
+    Mpeg7Catalog mpeg7 = mpeg7CatalogService.newInstance();
+    Video videoContent = mpeg7.addVideoContent("videosegment", contentTime, contentLocator);
+
+    long segmentDuration = track.getDuration() / prefNumber;
+    long currentSegStart = 0;
+
+    // create "prefNumber"-many segments that all have the same length
+    for (int i = 1; i < prefNumber; i++) {
+      Segment s = videoContent.getTemporalDecomposition()
+          .createSegment("segment-" + i);
+      s.setMediaTime(new MediaRelTimeImpl(currentSegStart, segmentDuration));
+      segmentsNew.add(s);
+
+      currentSegStart += segmentDuration;
+    }
+
+    // add last segment separately to make sure the last segment ends exactly at the end of the track
+    Segment s = videoContent.getTemporalDecomposition()
+          .createSegment("segment-" + prefNumber);
+      s.setMediaTime(new MediaRelTimeImpl(currentSegStart, track.getDuration() - currentSegStart));
+      segmentsNew.add(s);
+
+    return mpeg7;
   }
 
   /**
