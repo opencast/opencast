@@ -9,6 +9,8 @@ The Application API’s security layer is designed to support a multitude of mec
 The Application API is protected by basic authentication, requiring a user and a password be sent in the form of the standard HTTP `Authorization` header. (see [Figure 2](#figure_2)). In the header, the username and password are sent encoded in Base64 format.
 The incoming requests are matched against an existing user whose password needs to match with the one that is found in the Authorization request header.
 
+NOTE: Basic authentication is not activated by default, please active it before using the Application API in the security settings: `etc/security/mh_default_org.xml`!
+
 <center>
 ![][figure_2]
 </center>
