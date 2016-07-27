@@ -2,7 +2,7 @@ Reviewing, Merging and Declining Pull Requests
 ==============================================
 
 Before a patch is merged into an official branch, it needs to be reviewed by a committer. During a
-review, the reviewer is tries to make sure that the patch merges without conflicts, that it works as expected and that
+review, the reviewer tries to make sure that the patch merges without conflicts, that it works as expected and that
 it does not break anything else.
 
 If the reviewer discovers any kind of issue, he should leave a comment in the pull request view of BitBucket and let the
