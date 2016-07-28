@@ -378,19 +378,6 @@ module.exports = function (grunt) {
       }
     },
 
-    ngtemplates: {
-      dist: {
-        options: {
-          module: 'adminNg',
-          htmlmin: '<%= htmlmin.dist.options %>',
-          usemin: 'scripts/scripts.js'
-        },
-        cwd: '<%= yeoman.app %>',
-        src: 'views/{,*/}*.html',
-        dest: '.tmp/templateCache.js'
-      }
-    },
-
     // ng-annotate tries to make the code safe for minification automatically
     // by using the Angular long form for dependency injection.
     ngAnnotate: {
@@ -460,6 +447,7 @@ module.exports = function (grunt) {
         'copy:styles'
       ],
       test: [
+        'sass',
         'copy:styles'
       ],
       dist: [
@@ -541,7 +529,9 @@ module.exports = function (grunt) {
     'concurrent:test',
     'postcss',
     'connect:test',
-    'karma'
+    'karma',
+    'newer:jshint',
+    'newer:jscs'
   ]);
 
   grunt.registerTask('build', [
@@ -550,7 +540,6 @@ module.exports = function (grunt) {
     'useminPrepare',
     'concurrent:dist',
     'postcss',
-    'ngtemplates',
     'concat',
     'ngAnnotate',
     'copy:dist',
@@ -562,8 +551,6 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('default', [
-    'newer:jshint',
-    'newer:jscs',
     'test',
     'build'
   ]);
