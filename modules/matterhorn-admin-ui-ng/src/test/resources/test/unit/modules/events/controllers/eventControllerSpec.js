@@ -271,7 +271,7 @@ describe('Event controller', function () {
             }, {
                 acl: { ace: [ { action : 'read', allow : true, role : 'admin' }, { action : 'write', allow : true, role : 'admin' } ] },
                 override: true
-            });
+            }, jasmine.any(Function), jasmine.any(Function));
         });
     });
 
