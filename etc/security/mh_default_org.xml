@@ -169,9 +169,9 @@
     <sec:intercept-url pattern="/api/series" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_VIEW"/>
     <sec:intercept-url pattern="/api/series/*" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_VIEW"/>
     <sec:intercept-url pattern="/api/series/*/acl" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_ACL_VIEW"/>
-    <sec:intercept-url pattern="/api/series/*/metadata" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_VIEW"/>
-    <sec:intercept-url pattern="/api/series/*/metadata/*" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_VIEW"/>
-    <sec:intercept-url pattern="/api/series/*/properties" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_VIEW"/>
+    <sec:intercept-url pattern="/api/series/*/metadata" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_VIEW"/>
+    <sec:intercept-url pattern="/api/series/*/metadata/*" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_VIEW"/>
+    <sec:intercept-url pattern="/api/series/*/properties" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_PROPERTIES_VIEW"/>
     <sec:intercept-url pattern="/api/version" method="GET" access="ROLE_ADMIN, ROLE_API"/>
     <sec:intercept-url pattern="/api/version/*" method="GET" access="ROLE_ADMIN, ROLE_API"/>
     <!-- External API PUT Endpoints -->
@@ -183,9 +183,9 @@
     <sec:intercept-url pattern="/api/groups/*" method="PUT" access="ROLE_ADMIN, ROLE_API_GROUPS_EDIT"/>
     <sec:intercept-url pattern="/api/series/*" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_EDIT"/>
     <sec:intercept-url pattern="/api/series/*/acl" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_ACL_EDIT"/>
-    <sec:intercept-url pattern="/api/series/*/metadata" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_EDIT"/>
-    <sec:intercept-url pattern="/api/series/*/metadata/*" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_EDIT"/>
-    <sec:intercept-url pattern="/api/series/*/properties" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_EDIT"/>
+    <sec:intercept-url pattern="/api/series/*/metadata" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_EDIT"/>
+    <sec:intercept-url pattern="/api/series/*/metadata/*" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_EDIT"/>
+    <sec:intercept-url pattern="/api/series/*/properties" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_PROPERTIES_EDIT"/>
     <!-- External API POST Endpoints -->
     <sec:intercept-url pattern="/api/events" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_CREATE"/>
     <sec:intercept-url pattern="/api/events/*" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_EDIT"/>
@@ -205,8 +205,8 @@
     <sec:intercept-url pattern="/api/groups/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_GROUPS_DELETE"/>
     <sec:intercept-url pattern="/api/groups/*/members/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_GROUPS_EDIT"/>
     <sec:intercept-url pattern="/api/series/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_SERIES_DELETE"/>
-    <sec:intercept-url pattern="/api/series/*/metadata" method="DELETE" access="ROLE_ADMIN, ROLE_API_SERIES_DELETE"/>
-    <sec:intercept-url pattern="/api/series/*/metadata/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_SERIES_DELETE"/>
+    <sec:intercept-url pattern="/api/series/*/metadata" method="DELETE" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_DELETE"/>
+    <sec:intercept-url pattern="/api/series/*/metadata/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_DELETE"/>
 
     <sec:intercept-url pattern="/admin-ng/css/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/admin-ng/lib/**" access="ROLE_ANONYMOUS" />
