@@ -45,6 +45,7 @@ pages:
       - Stream Security: 'configuration/stream-security.md'
       - Access Control Lists: 'configuration/acl.md'
    - Workflow: 'configuration/workflow.md'
+   - External API: 'configuration/external-api.md'
 - Modules:
    - Overview: 'modules/index.md'
    - LTI Module: 'modules/ltimodule.md'
