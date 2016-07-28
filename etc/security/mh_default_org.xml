@@ -158,10 +158,6 @@
     <sec:intercept-url pattern="/api/events/*/metadata/*" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_METADATA_VIEW"/>
     <sec:intercept-url pattern="/api/events/*/publications" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_PUBLICATIONS_VIEW"/>
     <sec:intercept-url pattern="/api/events/*/publications/*" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_PUBLICATIONS_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*/workflows" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_WORKFLOWS_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*/workflows/*" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_WORKFLOWS_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*/workflows/*/errors" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_WORKFLOWS_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*/workflows/*/operations" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_WORKFLOWS_VIEW"/>
     <sec:intercept-url pattern="/api/groups" method="GET" access="ROLE_ADMIN, ROLE_API_GROUPS_VIEW"/>
     <sec:intercept-url pattern="/api/groups/*" method="GET" access="ROLE_ADMIN, ROLE_API_GROUPS_VIEW"/>
     <sec:intercept-url pattern="/api/info/*" method="GET" access="ROLE_ADMIN, ROLE_API" />
