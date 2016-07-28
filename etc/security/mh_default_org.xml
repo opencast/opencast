@@ -187,14 +187,14 @@
     <sec:intercept-url pattern="/api/series/*/metadata/*" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_EDIT"/>
     <sec:intercept-url pattern="/api/series/*/properties" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_EDIT"/>
     <!-- External API POST Endpoints -->
-    <sec:intercept-url pattern="/api/events" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_EDIT"/>
+    <sec:intercept-url pattern="/api/events" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_CREATE"/>
     <sec:intercept-url pattern="/api/events/*" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_EDIT"/>
     <sec:intercept-url pattern="/api/events/*/acl/*" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_ACL_EDIT"/>
     <sec:intercept-url pattern="/api/events/*/comments" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_COMMENTS_EDIT"/>
-    <sec:intercept-url pattern="/api/groups" method="POST" access="ROLE_ADMIN, ROLE_API_GROUPS_EDIT"/>
+    <sec:intercept-url pattern="/api/groups" method="POST" access="ROLE_ADMIN, ROLE_API_GROUPS_CREATE"/>
     <sec:intercept-url pattern="/api/groups/*/members/*" method="POST" access="ROLE_ADMIN, ROLE_API_GROUPS_EDIT"/>
     <sec:intercept-url pattern="/api/recreateIndex" method="POST" access="ROLE_ADMIN"/>
-    <sec:intercept-url pattern="/api/series" method="POST" access="ROLE_ADMIN, ROLE_API_SERIES_EDIT"/>
+    <sec:intercept-url pattern="/api/series" method="POST" access="ROLE_ADMIN, ROLE_API_SERIES_CREATE"/>
     <sec:intercept-url pattern="/api/security/sign" method="POST" access="ROLE_ADMIN, ROLE_API_SECURITY_EDIT"/>
     <!-- External API DELETE Endpoints -->
     <sec:intercept-url pattern="/api/events/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_EVENTS_DELETE"/>
