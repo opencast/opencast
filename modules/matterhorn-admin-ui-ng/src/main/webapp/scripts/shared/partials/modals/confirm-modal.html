@@ -4,6 +4,21 @@
         <h2 translate="CONFIRMATIONS.ACTIONS.CONFIRMATION">Confirm</h2>
     </header>
 
+    <div>
+        <p translate="CONFIRMATIONS.METADATA.NOTICE">The following element will be deleted</p>
+        <table class="main-tbl">
+            <tbody>
+                <tr>
+                    <td translate="CONFIRMATIONS.METADATA.ID">Id</td>
+                    <td translate="CONFIRMATIONS.METADATA.NAME">Name</td>
+                </tr>
+                <tr>
+                    <td>{{ id }}</td>
+                    <td ng-if="name">{{name}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     <p translate="CONFIRMATIONS.CONTINUE_ACTION">Are you sure you want to continue?</p>
 
     <div class="btn-container">

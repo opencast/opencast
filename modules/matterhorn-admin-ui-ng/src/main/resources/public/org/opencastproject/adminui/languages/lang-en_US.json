@@ -47,6 +47,11 @@
    },
    "CONFIRMATIONS": {
      "CONTINUE_ACTION" : "Are you sure you want to continue?",
+     "METADATA": {
+       "NOTICE" : "The following element will be deleted",
+       "ID" : "Id",
+       "NAME" : "Name"
+     },
      "ACTIONS": {
        "CONFIRMATION" : "Confirmation required"
      }
