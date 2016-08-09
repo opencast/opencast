@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -123,7 +124,7 @@ public class GroupsEndpoint {
     for (final Group group : indexService.getGroup(id, externalIndex)) {
       return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, groupToJSON(group));
     }
-    return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
+    return ApiResponses.notFound("Cannot find a group with id '%s'.", id);
   }
 
   @DELETE
@@ -145,10 +146,76 @@ public class GroupsEndpoint {
 
   @POST
   @Path("")
+  @Produces({ "application/json", "application/v1.0.0+json" })
   public Response createGroup(@HeaderParam("Accept") String acceptHeader, @FormParam("name") String name,
           @FormParam("description") String description, @FormParam("roles") String roles,
           @FormParam("members") String members) {
     return indexService.createGroup(name, description, roles, members);
+  }
+
+  @POST
+  @Path("{groupId}/members")
+  @Produces({ "application/json", "application/v1.0.0+json" })
+  public Response addGroupMember(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id,
+          @FormParam("member") String member) {
+    try {
+      Opt<Group> groupOpt = indexService.getGroup(id, externalIndex);
+      if (groupOpt.isSome()) {
+        Group group = groupOpt.get();
+        Set<String> members = group.getMembers();
+        if (!members.contains(member)) {
+          group.addMember(member);
+          return indexService.updateGroup(
+              group.getIdentifier(), group.getName(), group.getDescription(),
+              StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
+        } else {
+          return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, "Member is already member of group");
+        }
+      } else {
+        return ApiResponses.notFound("Cannot find group with id '%s'.", id);
+      }
+    } catch (SearchIndexException e) {
+      logger.warn("The external search index was not able to retrieve the group with id '%s', reason: ",
+          ExceptionUtils.getStackTrace(e));
+      return ApiResponses.serverError("Could not retrieve group with id '%s', reason: '%s'", id, ExceptionUtils.getMessage(e));
+    } catch (NotFoundException e) {
+      logger.warn("The external search index was not able to update the group with id {}, ",
+          ExceptionUtils.getStackTrace(e));
+      return ApiResponses.serverError("Could not update group with id '%s', reason: '%s'", id, ExceptionUtils.getMessage(e));
+    }
+  }
+
+  @DELETE
+  @Path("{groupId}/members/{memberId}")
+  @Produces({ "application/json", "application/v1.0.0+json" })
+  public Response removeGroupMember(@HeaderParam("Accept") String acceptHeader,
+          @PathParam("groupId") String id, @PathParam("memberId") String memberId) {
+    try {
+      Opt<Group> groupOpt = indexService.getGroup(id, externalIndex);
+      if (groupOpt.isSome()) {
+        Group group = groupOpt.get();
+        Set<String> members = group.getMembers();
+        if (members.contains(memberId)) {
+          members.remove(memberId);
+          group.setMembers(members);
+          return indexService.updateGroup(
+              group.getIdentifier(), group.getName(), group.getDescription(),
+              StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
+        } else {
+          return ApiResponses.notFound("Cannot find member '%s' in group '%s'.", memberId, id);
+        }
+      } else {
+        return ApiResponses.notFound("Cannot find group with id '%s'.", id);
+      }
+    } catch (SearchIndexException e) {
+      logger.warn("The external search index was not able to retrieve the group with id {}, ",
+          ExceptionUtils.getStackTrace(e));
+      return ApiResponses.serverError("Could not retrieve groups, reason: '%s'", ExceptionUtils.getMessage(e));
+    } catch (NotFoundException e) {
+      logger.warn("The external search index was not able to update the group with id {}, ",
+          ExceptionUtils.getStackTrace(e));
+      return ApiResponses.serverError("Could not update group with id '%s', reason: '%s'", id, ExceptionUtils.getMessage(e));
+    }
   }
 
   /**
