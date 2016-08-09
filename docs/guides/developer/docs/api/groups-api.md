@@ -137,7 +137,7 @@ TODO
 __Response__
 
 `200 (OK)`: The group has been updated.<br/>
-`404 (OK)`: The specified group does not exist.<br/>
+`404 (NOT FOUND)`: The specified group does not exist.<br/>
 
 ### DELETE /api/groups/{group_id}
 
@@ -146,7 +146,7 @@ Deletes a group.
 __Response__
 
 `204 (NO CONTENT)`: The group has been deleted.<br/>
-`404 (OK)`: The specified group does not exist.
+`404 (NOT FOUND)`: The specified group does not exist.
 
 # Members
 
@@ -154,30 +154,31 @@ __Response__
 
 Adds a member to a group.
 
-__Sample__
+Form Parameters            |Type            | Description
+:--------------------------|:---------------|:----------------------------
+`member`                   | `String`       | Member Name
 
+__Sample__
 ```
-TODO
+https://opencast.domain.com/api/groups/MH_DEFAULT_ORG_SYSTEM_ADMINS/members
 ```
 
 __Response__
 
-```
-TODO
-```
+`200 (OK)`: The member was already member of the group.<br/>
+`204 (NO CONTENT)`: The member has been added.<br/>
+`404 (NOT FOUND)`: The specified group does not exist.
 
 ### DELETE /api/groups/{group_id}/members/{user_id}
 
 Removes a member from a group
 
 __Sample__
-
 ```
-TODO
+https://opencast.domain.com/api/groups/MH_DEFAULT_ORG_SYSTEM_ADMINS/members/admin
 ```
 
 __Response__
 
-```
-TODO
-```
+`204 (NO CONTENT)`: The member has been removed.<br/>
+`404 (NOT FOUND)`: The specified group or member does not exist.

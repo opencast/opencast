@@ -1,15 +1,14 @@
 External API Configuration
 ==========================
 
-The External API is an integral part of Opencast and therefore does not need to be enabled. Since only users that are
-both authenticated and authorized are allow to access the External API, you will need a user that is allowed to access
-it.
+The External API is an integral part of Opencast and therefore does not need to be enabled. To be able to access the
+External API, you need to configure a user that is authorized to do so.
 
 Perform the following steps to get the External API running:
 
-1. Enable basic authentication (see section Authentication below) 
+1. Enable basic authentication (see section Authentication) 
 2. Create a new user or choose an existing user (administrative user interface)
-3. Authorize the user to access the External API (see section Authorization below)
+3. Authorize the user to access the External API (see section Authorization)
 4. Test whether access works (see section Testing)
 
 Authentication
@@ -41,13 +40,11 @@ recommended to use HTTPS.
 Authorization
 -------------
 
-The External API supports fine-grained access-control on requests level allowing it to be tailored to your
-specific needs. A number of roles are used to authorized access to individual enpoints. A user can call the requests
-only if owning the respective role.
+The External API supports fine-grained access control on request level allowing it to be tailored to your
+specific needs. A number of roles are used to authorize access to individual endpoints. Those roles can be configured
+directly in the Opencast administrative user interface.
 
-The roles can be configured directly in the Opencast administrative user interface.
-
-Note that users owning the role ROLE_ADMIN have full access to the External API.
+**Note:** Users owning the role ROLE_ADMIN have full access to the External API.
 
 **Base API**
 
@@ -114,29 +111,27 @@ Note that users owning the role ROLE_ADMIN have full access to the External API.
 |-----------|-------|-------------------|
 |ROLE_ADMIN |POST   |/api/recreateIndex |
 
-*ROLE_SUDO*
+**User- and Role-switching**
 
 The External API supports user- and role-switching, i.e. it is possible to perform requests on behalf of another
-user. The be able to perform this kind of requests, the user doing the actual requests needs to own ROLE_SUDO.
+user or role. The be able to perform this kind of requests, the user doing the actual requests needs to own ROLE_SUDO.
 
 Testing
 -------
 
     curl -u <api-user>:<api-user-passowrd> <admin-node>/api/info/me
 
-should return a JSON containing information about the user <api-user>.
+should return a JSON containing information about the user *api-user*.
 
 Accessing Distribution Artefacts
 --------------------------------
 
 A major use case of the External API is to provide External Applications secure access to distribution artefacts.
 
-**Note:** Secure access to distribution artefacts requires stream security to be enabled,
-see [Stream Security Configuration](stream-security.md).
-
 For this purpose, Opencast comes with a special workflow operation: WOH publish-configure
-(see [ConfigurablePublishWorkflowOperationHandler](../workflowoperationhandlers/publishconfigure-woh.md)).
-This workflow operation create publication elements that not just contain a single URL to the publication channel,
+(see [ConfigurablePublishWorkflowOperationHandler](../workflowoperationhandlers/publishconfigure-woh.md))
+creates publication elements that not just contain a single URL to the publication channel,
 but also contain URLs for each of the attachments and tracks that have been published.
 
-
+**Note:** Secure access to distribution artefacts requires stream security to be enabled,
+see [Stream Security Configuration](stream-security.md).
