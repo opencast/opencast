@@ -78,7 +78,7 @@ import javax.ws.rs.core.Variant;
  * If the feed could not be found because the query is unknown a HTTP error 404 is returned
  * If the feed could not be build (wrong RSS or Atom version, corrupt data, etc) an HTTP error 500 is returned.
  */
-public class FeedServlet {
+public class FeedServiceImpl {
 
   /** The serial version uid */
   private static final long serialVersionUID = -4623160106007127801L;
@@ -87,7 +87,7 @@ public class FeedServlet {
   private static final String PARAM_SIZE = "size";
 
   /** Logging facility */
-  private static Logger logger = LoggerFactory.getLogger(FeedServlet.class);
+  private static Logger logger = LoggerFactory.getLogger(FeedServiceImpl.class);
 
   /** List of feed generators */
   private List<FeedGenerator> feeds = new ArrayList<FeedGenerator>();
