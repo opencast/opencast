@@ -78,6 +78,23 @@
       </configurations>
     </operation>
 
+    <!-- Encode to feed cover images -->
+
+    <operation
+      id="image"
+      exception-handler-workflow="ng-partial-error"
+      description="Creating feed cover image">
+      <configurations>
+        <configuration key="source-flavor">*/trimmed</configuration>
+        <configuration key="source-tags"></configuration>
+        <configuration key="target-flavor">*/feed+preview</configuration>
+        <configuration key="target-tags">atom,rss</configuration>
+        <configuration key="encoding-profile">feed-cover.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+
     <!-- Create a cover image with the default template -->
 
     <operation
