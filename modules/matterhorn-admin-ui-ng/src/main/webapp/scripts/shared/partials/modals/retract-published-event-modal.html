@@ -1,18 +1,22 @@
 <section ng-form="retractPublishedEventForm" ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal wizard modal-animation ng-hide" ng-controller="RetractEventCtrl">
     <header>
         <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2 translate="EVENTS.RETRACT.CAPTION">Template</h2>
+        <h2 translate="EVENTS.RETRACT.CAPTION"><!-- Template --></h2>
     </header>
 
     <div class="modal-body">
         <div class="full-col">
             <div class="obj">
                 <div class="modal-alert danger">
-                    <p translate="EVENTS.RETRACT.WARNING">This event has been published to at least one publication channel so it has to be retracted before it can be deleted. Select from the tasks below to retract the publictions.</p>
+                    <p translate="EVENTS.RETRACT.WARNING">
+                        <!-- This event has been published to at least one publication channel so it has to be
+                             retracted before it can be deleted. Select from the tasks below to retract the
+                             publictions. -->
+                    </p>
                 </div>
             </div>
             <div class="obj">
-                <header translate="EVENTS.RETRACT.SELECT_TASK">Select Task</header>
+                <header translate="EVENTS.RETRACT.SELECT_TASK"><!-- Select Task --></header>
                 <select chosen pre-select-from="processing.workflows"
                     data-width="'100%'"
                     ng-change="processing.changeWorkflow(); valid();"
@@ -40,7 +44,11 @@
     </div><!-- modal-content -->
 
    <footer>
-        <a ng-click="submit()" ng-class="($valid && !submitButton) ? 'active' : 'disabled'" class="submit" translate="SUBMIT">Submit</a>
-        <a ng-click="close()" class="cancel" translate="CANCEL">Cancel</a>
+        <a ng-click="submit()" ng-class="($valid && !submitButton) ? 'active' : 'disabled'" class="submit" translate="SUBMIT">
+            <!-- Submit -->
+        </a>
+        <a ng-click="close()" class="cancel" translate="CANCEL">
+            <!-- Cancel -->
+        </a>
     </footer>
 </section>

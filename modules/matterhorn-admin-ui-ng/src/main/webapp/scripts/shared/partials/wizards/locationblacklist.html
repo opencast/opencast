@@ -2,7 +2,7 @@
     <div class="full-col">
         <div class="form-container">
             <div class="row">
-                <label translate="RECORDINGS.BLACKLISTS.DETAILS.LOCATIONS.ADD_LOCATION">Add Location</label>
+                <label translate="RECORDINGS.BLACKLISTS.DETAILS.LOCATIONS.ADD_LOCATION"><!-- Add Location --></label>
                 <select chosen pre-select-from="wizard.step.items"
                     ng-disabled="wizard.step.ud.items.length"
                     data-width="'200px'"
@@ -15,7 +15,7 @@
         </div>
 
         <div ng-if="wizard.step.ud.items.length > 0" class="obj">
-            <header translate="RECORDINGS.BLACKLISTS.DETAILS.TABS.LOCATIONS">Locations</header>
+            <header translate="RECORDINGS.BLACKLISTS.DETAILS.TABS.LOCATIONS"><!-- Locations --></header>
             <div class="obj-container">
                 <table class="main-tbl">
                     <!--
@@ -53,7 +53,7 @@
     <div class="full-col">
         <div class="form-container">
             <div class="row">
-                <label translate="RECORDINGS.BLACKLISTS.DETAILS.DATES.START_DATE">Start Date</label>
+                <label translate="RECORDINGS.BLACKLISTS.DETAILS.DATES.START_DATE"><!-- Start Date --></label>
                 <input type="date" ng-model="wizard.step.ud.fromDate"
                     ng-change="wizard.step.updateBlacklistCount()"
                     placeholder="{{ 'RECORDINGS.BLACKLISTS.DETAILS.DATES.START_DATE' | translate }}...">
@@ -62,7 +62,7 @@
                     placeholder="{{ 'RECORDINGS.BLACKLISTS.DETAILS.DATES.START_DATE' | translate }}...">
             </div>
             <div class="row">
-                <label translate="RECORDINGS.BLACKLISTS.DETAILS.DATES.END_DATE">End Date</label>
+                <label translate="RECORDINGS.BLACKLISTS.DETAILS.DATES.END_DATE"><!-- End Date --></label>
                 <input type="date" ng-model="wizard.step.ud.toDate"
                     ng-change="wizard.step.updateBlacklistCount()"
                     placeholder="{{ 'RECORDINGS.BLACKLISTS.DETAILS.DATES.END_DATE' | translate }}...">
@@ -81,7 +81,7 @@
     <div class="full-col">
         <div class="form-container">
             <div class="row">
-                <label translate="RECORDINGS.BLACKLISTS.DETAILS.REASON.REASON">Reason</label>
+                <label translate="RECORDINGS.BLACKLISTS.DETAILS.REASON.REASON"><!-- Reason --></label>
                 <select chosen pre-select-from="wizard.step.reasons"
                     data-width="'200px'"
                     data-disable-search-threshold="8"
@@ -90,7 +90,7 @@
                 />
             </div>
             <div class="row">
-                <label translate="RECORDINGS.BLACKLISTS.DETAILS.REASON.COMMENTS">Comments</label>
+                <label translate="RECORDINGS.BLACKLISTS.DETAILS.REASON.COMMENTS"><!-- Comments --></label>
                 <textarea ng-model="wizard.step.ud.comment"
                     placeholder="{{ 'RECORDINGS.BLACKLISTS.DETAILS.REASON.COMMENTS' | translate }}..." rows="5"></textarea>
             </div>
@@ -102,15 +102,15 @@
     <div class="full-col">
         <div data-admin-ng-notifications="" context="blacklist-form"></div>
         <div class="obj">
-            <header translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.SUMMARY">Summary</header>
+            <header translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.SUMMARY"><!-- Summary --></header>
             <div class="obj-container">
                 <table class="main-tbl">
                     <thead>
                         <tr>
-                            <th translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.LOCATION">Location</th>
-                            <th translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.DATE_FROM">From</th>
-                            <th translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.DATE_TO">Until</th>
-                            <th translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.REASON">Reason</th>
+                            <th translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.LOCATION"><!-- Location --></th>
+                            <th translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.DATE_FROM"><!-- From --></th>
+                            <th translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.DATE_TO"><!-- Until --></th>
+                            <th translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.REASON"><!-- Reason --></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -126,7 +126,7 @@
         </div>
 
         <div class="obj summary-view">
-            <header translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.COMMENTS">Comments</header>
+            <header translate="RECORDINGS.BLACKLISTS.DETAILS.SUMMARY.COMMENTS"><!-- Comments --></header>
             <div class="obj-container padded">
                 <p>{{ wizard.states[2].stateController.ud.comment }}</p>
             </div>

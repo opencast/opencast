@@ -6,15 +6,29 @@
     </header>
 
     <nav class="modal-nav" id="modal-nav">
-        <a ng-click="openTab('general')" data-modal-tab="general" ng-class="{ active: tab == 'general' }" translate="EVENTS.EVENTS.DETAILS.TABS.GENERAL" with-role="ROLE_UI_EVENTS_DETAILS_GENERAL_VIEW">General</a>
-        <a ng-click="openTab('metadata')" data-modal-tab="metadata" ng-class="{ active: tab == 'metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_VIEW">Metadata</a>
-        <a ng-if="metadata.entries.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.EXTENDED-METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_VIEW">Ext-Metadata</a>
+        <a ng-click="openTab('general')" data-modal-tab="general" ng-class="{ active: tab == 'general' }" translate="EVENTS.EVENTS.DETAILS.TABS.GENERAL" with-role="ROLE_UI_EVENTS_DETAILS_GENERAL_VIEW">
+            <!-- General -->
+        </a>
+        <a ng-click="openTab('metadata')" data-modal-tab="metadata" ng-class="{ active: tab == 'metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_VIEW">
+            <!-- Metadata -->
+        </a>
+        <a ng-if="metadata.entries.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.EXTENDED-METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_VIEW">
+            <!-- Ext-Metadata -->
+        </a>
 <!--         <a ng-click="openTab('media')" data-modal-tab="media" ng-class="{ active: tab == 'media' }" translate="EVENTS.EVENTS.DETAILS.TABS.MEDIA" with-role="ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW">Media</a> -->
-        <a ng-click="openTab('assets')" data-modal-tab="assets" ng-class="{ active: tab == 'assets' }" translate="EVENTS.EVENTS.DETAILS.TABS.ASSETS" with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW">Assets</a>
+        <a ng-click="openTab('assets')" data-modal-tab="assets" ng-class="{ active: tab == 'assets' }" translate="EVENTS.EVENTS.DETAILS.TABS.ASSETS" with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW">
+            <!-- Assets -->
+        </a>
 <!--        <a ng-click="openTab('scheduling')" data-modal-tab="scheduling" ng-class="{ active: tab == 'scheduling' }" translate="EVENTS.EVENTS.DETAILS.TABS.SCHEDULING" with-role="ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW">Scheduling</a> -->
-        <a ng-click="openTab('workflows')" data-modal-tab="workflows" ng-class="{ active: tab == 'workflows' }" translate="EVENTS.EVENTS.DETAILS.TABS.WORKFLOWS" with-role="ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW">Workflows</a>
-        <a ng-click="openTab('access')" data-modal-tab="access" ng-class="{ active: tab == 'access' }" translate="EVENTS.EVENTS.DETAILS.TABS.ACCESS" with-role="ROLE_UI_EVENTS_DETAILS_ACL_VIEW">Access</a>
-        <a ng-click="openTab('comments')" data-modal-tab="comments" ng-class="{ active: tab == 'comments' }" translate="EVENTS.EVENTS.DETAILS.TABS.COMMENTS" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW">Comments</a>
+        <a ng-click="openTab('workflows')" data-modal-tab="workflows" ng-class="{ active: tab == 'workflows' }" translate="EVENTS.EVENTS.DETAILS.TABS.WORKFLOWS" with-role="ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW">
+            <!-- Workflows -->
+        </a>
+        <a ng-click="openTab('access')" data-modal-tab="access" ng-class="{ active: tab == 'access' }" translate="EVENTS.EVENTS.DETAILS.TABS.ACCESS" with-role="ROLE_UI_EVENTS_DETAILS_ACL_VIEW">
+            <!-- Access -->
+        </a>
+        <a ng-click="openTab('comments')" data-modal-tab="comments" ng-class="{ active: tab == 'comments' }" translate="EVENTS.EVENTS.DETAILS.TABS.COMMENTS" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW">
+            <!-- Comments -->
+        </a>
     </nav>
 
     <nav id="breadcrumb"></nav>
@@ -27,8 +41,9 @@
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj list-obj">
-                    <header translate="EVENTS.EVENTS.DETAILS.GENERAL.PUBLICATION_STATUS">Publication Status</header>
-
+                    <header translate="EVENTS.EVENTS.DETAILS.GENERAL.PUBLICATION_STATUS">
+                        <!-- Publication Status -->
+                    </header>
                     <div class="obj-container">
                         <p></p>
                         <ul ng-repeat="publication in general.publications track by $index">
@@ -51,12 +66,12 @@
             <div data-admin-ng-notification="" data-type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
             <div class="full-col">
                 <div class="obj tbl-details">
-                    <header><span translate="EVENTS.EVENTS.DETAILS.HEADER">Event Details</span></header>
+                    <header><span translate="EVENTS.EVENTS.DETAILS.HEADER"><!-- Event Details --></span></header>
                     <div class="obj-container">
                         <table class="main-tbl">
                             <tr ng-repeat="row in episodeCatalog.fields track by $index">
                                 <td translate="{{ row.label }}"></td>
-                                <td ng-if="row.id === 'created' ">{{ row.value  | localizeDate : 'dateTime' : 'medium' }}</td>                            
+                                <td ng-if="row.id === 'created' ">{{ row.value  | localizeDate : 'dateTime' : 'medium' }}</td>
                                 <td ng-if="row.id !== 'created' "  admin-ng-editable
                                     required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
                                     params="row" save="getSaveFunction(episodeCatalog.flavor)"></td>
@@ -95,36 +110,58 @@
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
-                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CAPTION">Assets</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CAPTION"><!-- Assets --></header>
                     <div class="obj-container">
                         <table cellpadding="0" cellspacing="0" class="main-tbl">
                             <thead>
                                 <tr>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.TYPE">Type</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.SIZE">Size</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.TYPE"><!-- Type --></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.SIZE"><!-- Size --></th>
                                     <th class="medium"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.CAPTION">Attachments</td>
+                                    <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.CAPTION">
+                                        <!-- Attachments -->
+                                    </td>
                                     <td>{{ assets.attachments }}</td>
-                                    <td><a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.attachments > 0" ng-click="openSubTab('attachments', 'EventAttachmentsResource', 'attachment')">Details</a></td>
+                                    <td>
+                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.attachments > 0" ng-click="openSubTab('attachments', 'EventAttachmentsResource', 'attachment')">
+                                            <!-- Details -->
+                                        </a>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.CAPTION">Catalogs</td>
+                                    <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.CAPTION">
+                                        <!-- Catalogs -->
+                                    </td>
                                     <td>{{ assets.catalogs }}</td>
-                                    <td><a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.catalogs > 0" ng-click="openSubTab('catalogs', 'EventCatalogsResource', 'catalog')">Details</a></td>
+                                    <td>
+                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.catalogs > 0" ng-click="openSubTab('catalogs', 'EventCatalogsResource', 'catalog')">
+                                            <!-- Details -->
+                                        </a>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.CAPTION">Media</td>
+                                    <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.CAPTION"><!-- Media --></td>
                                     <td>{{ assets.media }}</td>
-                                    <td><a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.media > 0" ng-click="openSubTab('media', 'EventMediaResource', 'media')">Details</a></td>
+                                    <td>
+                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.media > 0" ng-click="openSubTab('media', 'EventMediaResource', 'media')">
+                                            <!-- Details -->
+                                        </a>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.CAPTION">Publications</td>
+                                    <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.CAPTION">
+                                        <!-- Publications -->
+                                    </td>
                                     <td>{{ assets.publications }}</td>
-                                    <td><a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.publications > 0" ng-click="openSubTab('publications', 'EventPublicationsResource', 'publication')">Details</a></td>
+                                    <td>
+                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.publications > 0" ng-click="openSubTab('publications', 'EventPublicationsResource', 'publication')">
+                                            <!-- Details -->
+                                        </a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -142,8 +179,11 @@
 
                 <!-- Scheduling configuration -->
                 <div class="obj tbl-details" ng-if="scheduling.hasProperties">
-                    <header><span translate="EVENTS.EVENTS.DETAILS.HEADER">Scheduling configuration</span></header>
-                  
+                    <header>
+                        <span translate="EVENTS.EVENTS.DETAILS.HEADER">
+                            <!-- Scheduling configuration -->
+                        </span>
+                    </header>
                     <div class="obj-container">
                         <table class="main-tbl">
                             <tr>
@@ -245,19 +285,28 @@
 
                 <!-- Participation status -->
                 <div class="obj">   
-                    <header  translate="EVENTS.EVENTS.DETAILS.SCHEDULING.CAPTION">Participation Status</header>
-
+                    <header translate="EVENTS.EVENTS.DETAILS.SCHEDULING.CAPTION">
+                        <!-- Participation Status -->
+                    </header>
                     <div class="obj-container padded">
-                        <p><span translate="EVENTS.EVENTS.DETAILS.SCHEDULING.REVIEW_STATUS.CAPTION">Review status</span>: {{ participation.review_status }}</p>
-                        
+                        <p>
+                            <span translate="EVENTS.EVENTS.DETAILS.SCHEDULING.REVIEW_STATUS.CAPTION">
+                                <!-- Review status -->
+                            </span>
+                            : {{ participation.review_status }}
+                        </p>
                         <div class="form-container">
                             <div class="row">
                                 <input type="radio" name="execute-toggle" id="executeNow-toggle" ng-disabled="participation.read_only || transactions.read_only" ng-model="participation.opt_out" ng-change="updateOptout(false)" value="false" >
-                                <label translate="EVENTS.EVENTS.DETAILS.SCHEDULING.OPTEDOUT.READY" for="executeNow-toggle">Ready for recording</label>
+                                <label translate="EVENTS.EVENTS.DETAILS.SCHEDULING.OPTEDOUT.READY" for="executeNow-toggle">
+                                    <!-- Ready for recording -->
+                                </label>
                             </div>
                             <div class="row">
                                 <input type="radio" name="execute-toggle" id="executeLater-toggle" ng-disabled="participation.read_only || transactions.read_only" ng-model="participation.opt_out" ng-change="updateOptout(true)" value="true" >
-                                <label translate="EVENTS.EVENTS.DETAILS.SCHEDULING.OPTEDOUT.OPTEDOUT" for="executeLater-toggle">Opted out</label>
+                                <label translate="EVENTS.EVENTS.DETAILS.SCHEDULING.OPTEDOUT.OPTEDOUT" for="executeLater-toggle">
+                                    <!-- Opted out -->
+                                </label>
                             </div>
                         </div>
                     </div>  
@@ -279,10 +328,12 @@
                                 <table class="main-tbl">
                                     <thead>
                                         <tr>
-                                            <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ID">ID</th>
-                                            <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TYPE">Type</th>
-                                            <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STATE">State</th>
-                                            <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTED">Submitted</th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ID"><!-- ID --></th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TYPE"><!-- Type --></th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STATE"><!-- State --></th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTED">
+                                                <!-- Submitted -->
+                                            </th>
                                             <th class="medium"></th>
                                         </tr>
                                     </thead>
@@ -292,7 +343,11 @@
                                             <td>{{ item.workflow }}</td>
                                             <td>{{ item.status }}</td>
                                             <td>{{ item.submitted | localizeDate : 'dateTime' : 'medium' }}</td>
-                                            <td><a class="details-link" ng-click="openSubTab('workflow-details', 'EventWorkflowDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">Details</a></td>
+                                            <td>
+                                                <a class="details-link" ng-click="openSubTab('workflow-details', 'EventWorkflowDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">
+                                                    <!-- Details -->
+                                                </a>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -307,7 +362,9 @@
                                     <table class="main-tbl">
                                         <thead>
                                             <tr>
-                                                <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.WORKFLOW"><!--Select Workflow--></th>
+                                                <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.WORKFLOW">
+                                                    <!--Select Workflow-->
+                                                </th>
                                             </tr>
                                         </thead>
 
@@ -339,7 +396,9 @@
                                     <table class="main-tbl">
                                         <thead>
                                             <tr>
-                                                <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.CONFIGURATION"><!--Select Configuration--></th>
+                                                <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.CONFIGURATION">
+                                                    <!-- Select Configuration -->
+                                                </th>
                                             </tr>
                                         </thead>
 
@@ -353,7 +412,9 @@
                                                              ng-bind-html="workflowConfiguration"
                                                              class="obj-container">
                                                         </div>
-                                                        <div ng-if="!workflowConfiguration" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.NO_CONFIGURATION"><!-- No config --></div>
+                                                        <div ng-if="!workflowConfiguration" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.NO_CONFIGURATION">
+                                                            <!-- No config -->
+                                                        </div>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -382,20 +443,24 @@
                 <ul>
                     <li>
                         <div class="obj list-obj">
-                            <header translate="EVENTS.EVENTS.DETAILS.TABS.ACCESS">Access Policy</header>
+                            <header translate="EVENTS.EVENTS.DETAILS.TABS.ACCESS"><!-- Access Policy --></header>
                             <div class="obj-container">
                                 <div class="obj tbl-list">
                                     <table class="main-tbl" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')">
                                     <thead>
                                         <tr>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ACCESS.TEMPLATES.TITLE">Templates</th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ACCESS.TEMPLATES.TITLE">
+                                                <!-- Templates -->
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td>
                                                 <div class="obj-container padded">
-                                                    <p translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.DESCRIPTION"></p>
+                                                    <p translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.DESCRIPTION">
+                                                      <!-- Description -->
+                                                    </p>
                                                     <div ng-show="!transactions.read_only">
                                                         <select chosen pre-select-from="acls"
                                                             data-width="'200px'"
@@ -421,16 +486,28 @@
                             change the format of the response. -->
                             <div class="obj-container">
                                 <div class="obj tbl-list">
-                                    <header translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.DETAILS">Details</header>
+                                    <header translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.DETAILS">
+                                        <!-- Details -->
+                                    </header>
                                     <div class="obj-container">
                                     <table class="main-tbl">
                                         <thead>
                                             <tr>
-                                                <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ROLE">Role</th>
-                                                <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.READ" class="fit">Read</th>
-                                                <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.WRITE" class="fit">Write</th>
-                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="hasActions"><!--Additional Actions--></th>
-                                                <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ACTION" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')" class="fit">Action</th>
+                                                <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ROLE">
+                                                    <!-- Role -->
+                                                </th>
+                                                <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.READ" class="fit">
+                                                    <!-- Read -->
+                                                </th>
+                                                <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.WRITE" class="fit">
+                                                    <!-- Write -->
+                                                </th>
+                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="hasActions">
+                                                    <!-- Additional Actions -->
+                                                </th>
+                                                <th translate="EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.ACTION" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')" class="fit">\
+                                                    <!-- Action -->
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -499,7 +576,9 @@
                     <p>The item update was rejected because 3 fields are missing or incomplete</p>
                 </div>-->
                 <div class="obj comments">
-                    <header class="no-expand" translate="EVENTS.EVENTS.DETAILS.COMMENTS.CAPTION">Comments</header>
+                    <header class="no-expand" translate="EVENTS.EVENTS.DETAILS.COMMENTS.CAPTION">
+                        <!-- Comments -->
+                    </header>
                     <div class="obj-container">
                         <div class="comment-container">
                             <div class="comment" ng-class="{ active : $parent.replyToId === comment.id }"
@@ -551,17 +630,25 @@
                                 <option value=""></option>
                               </select>
                           </div>
-                          <button ng-class="{ disabled: !myComment.text.length || !myComment.reason.length || myComment.saving }" class="save green" ng-click="comment()" translate="SUBMIT">Submit</button>
+                          <button ng-class="{ disabled: !myComment.text.length || !myComment.reason.length || myComment.saving }" class="save green" ng-click="comment()" translate="SUBMIT">
+                              <!-- Submit -->
+                          </button>
                         </form>
 
                         <form class="add-comment reply" ng-if="replyToId !== null">
                             <textarea ng-model="myComment.text"
                                 placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.REPLY_TO' | translate }} @{{ originalComment.author.name }}"></textarea>
                             <button ng-class="{ disabled: !myComment.text.length || myComment.saving }" class="save green" ng-click="reply()"
-                                translate="EVENTS.EVENTS.DETAILS.COMMENTS.REPLY">Reply</button>
-                            <button class="red" ng-click="exitReplyMode()" translate="EVENTS.EVENTS.DETAILS.COMMENTS.CANCEL_REPLY">Cancel</button>
+                                translate="EVENTS.EVENTS.DETAILS.COMMENTS.REPLY">
+                                <!-- Reply -->
+                            </button>
+                            <button class="red" ng-click="exitReplyMode()" translate="EVENTS.EVENTS.DETAILS.COMMENTS.CANCEL_REPLY">
+                                <!-- Cancel -->
+                            </button>
                             <input with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" type="checkbox" ng-model="myComment.resolved" id="resolved-checkbox" class="ios"/>
-                            <label with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" for="resolved-checkbox" translate="EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED">Resolved</label>
+                            <label with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" for="resolved-checkbox" translate="EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED">
+                                <!-- Resolved -->
+                            </label>
                       </form>
                     </div>
                 </div>
@@ -574,7 +661,9 @@
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj workflow-options">
-                    <header translate="EVENTS.EVENTS.DETAILS.QUICKACTION_WORKFLOW_DETAILS.TITLE">Workflow Details</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.QUICKACTION_WORKFLOW_DETAILS.TITLE">
+                        <!-- Workflow Details -->
+                    </header>
                     <div class="obj-container padded">
                         <p>This is filler text, please ignore me and don't bother reading. This section will be used to describe the workflow options section. This is filler text, please ignore me and don't bother reading. This section will be used to describe the workflow options section.</p>
                         <div class="checkbox-container">
@@ -597,14 +686,22 @@
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container">
-                    <header translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.HEADER">Errors &amp; Warnings</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.HEADER">
+                        <!-- Errors & Warnings -->
+                    </header>
                     <div class="obj-container">
                         <table class="main-tbl">
                             <thead>
                                 <tr>
                                     <th class="small"></th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DATE">Date / Time <i></i></th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE">Title <i></i></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DATE">
+                                        <!-- Date / Time -->
+                                        <i></i>
+                                    </th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE">
+                                        <!-- Title -->
+                                        <i></i>
+                                    </th>
                                     <th class="medium"></th>
                                 </tr>
                             </thead>
@@ -613,11 +710,15 @@
                                     <td><div ng-if="angular.isDefined(item.severity)" class="circle {{ severityColor(item.severity) }}"></div></td>
                                     <td>{{ item.timestamp | localizeDate : 'dateTime' : 'medium'}}</td>
                                     <td>{{ item.title }}</td>
-                                    <td><a class="details-link" ng-click="openSubTab('error-details', 'EventErrorDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS" data-modal-tab="error-details">Details</a></td>
+                                    <td>
+                                        <a class="details-link" ng-click="openSubTab('error-details', 'EventErrorDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS" data-modal-tab="error-details">
+                                            <!-- Details -->
+                                        </a>
+                                    </td>
                                 </tr>
                                 <tr ng-if="subNavData.entries.length === 0">
                                     <td colspan="4" translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.EMPTY">
-                                        No errors found.
+                                        <!-- No errors found. -->
                                     </td>
                                 </tr>
                             </tbody>
@@ -633,39 +734,57 @@
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                <div class="obj tbl-details">
-                   <header translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.HEADER">Error Details</header>
+                   <header translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.HEADER">
+                       <!-- Error Details -->
+                   </header>
                    <div class="obj-container">
                        <table class="main-tbl">
                            <tr>
-                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.SEVERITY">Title</td>
+                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.SEVERITY">
+                                   <!-- Severity -->
+                               </td>
                                <td>{{ subNavData.severity }}</td>
                            </tr>
                            <tr>
-                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.TITLE">Title</td>
+                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.TITLE">
+                                   <!-- Title -->
+                               </td>
                                <td>{{ subNavData.title }}</td>
                            </tr>
                            <tr>
-                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.DESCRIPTION">Description</td>
+                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.DESCRIPTION">
+                                   <!-- Description -->
+                               </td>
                                <td>{{ subNavData.description }}</td>
                            </tr>
                            <tr>
-                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.JOB_ID">Job ID</td>
+                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.JOB_ID">
+                                   <!-- Job ID -->
+                               </td>
                                <td>{{ subNavData.job_id }}</td>
                            </tr>
                            <tr>
-                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.DATE">Date / Time</td>
+                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.DATE">
+                                   <!-- Date / Time -->
+                               </td>
                                <td>{{ subNavData.timestamp | localizeDate : 'dateTime' : 'medium' }}</td>
                            </tr>
                            <tr>
-                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.HOST">processing_host</td>
+                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.HOST">
+                                   <!-- Host -->
+                               </td>
                                <td>{{ subNavData.processing_host }}</td>
                            </tr>
                            <tr>
-                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.TYPE">service_type</td>
+                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.TYPE">
+                                   <!-- Type -->
+                               </td>
                                <td>{{ subNavData.service_type }}</td>
                            </tr>
                            <tr>
-                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.TECHNICAL_DETAILS">Technical Details</td>
+                               <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.DETAILS.TECHNICAL_DETAILS">
+                                   <!-- Technical Details -->
+                               </td>
                                <td>
                                  <div ng-repeat="item in subNavData.details track by $index">
                                    <h3>{{ item.name }}</h3>
@@ -687,15 +806,17 @@
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
-                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.CAPTION">Attachments</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.CAPTION"><!-- Attachments --></header>
                     <div class="obj-container">
                         <table cellpadding="0" cellspacing="0" class="main-tbl">
                             <thead>
                                 <tr>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.ID">ID</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.TYPE">Type</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.MIMETYPE">Mimetype</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.TAGS">Tags</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.ID"><!-- ID --></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.TYPE"><!-- Type --></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.MIMETYPE">
+                                        <!-- Mimetype -->
+                                    </th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.TAGS"><!-- Tags --></th>
                                     <th class="medium"></th>
                                 </tr>
                             </thead>
@@ -705,7 +826,11 @@
                                     <td>{{ item.type }}</td>
                                     <td>{{ item.mimetype }}</td>
                                     <td>{{ item.tags|joinBy:', ' }}</td>
-                                    <td><a ng-click="openSubTab('attachment-details', 'EventAttachmentDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link"></a></td>
+                                    <td>
+                                        <a ng-click="openSubTab('attachment-details', 'EventAttachmentDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link">
+                                            <!-- Details -->
+                                        </a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -720,15 +845,17 @@
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
-                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.CAPTION">Catalogs</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.CAPTION"><!-- Catalogs --></header>
                     <div class="obj-container">
                         <table cellpadding="0" cellspacing="0" class="main-tbl">
                             <thead>
                                 <tr>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.ID">ID</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.TYPE">Type</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.MIMETYPE">Mimetype</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.TAGS">Tags</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.ID"><!-- ID --></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.TYPE"><!-- Type --></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.MIMETYPE">
+                                        <!-- Mimetype -->
+                                    </th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.TAGS"><!-- Tags --></th>
                                     <th class="medium"></th>
                                 </tr>
                             </thead>
@@ -738,7 +865,11 @@
                                     <td>{{ item.type }}</td>
                                     <td>{{ item.mimetype }}</td>
                                     <td>{{ item.tags|joinBy:', ' }}</td>
-                                    <td><a ng-click="openSubTab('catalog-details', 'EventCatalogDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link"></a></td>
+                                    <td>
+                                        <a ng-click="openSubTab('catalog-details', 'EventCatalogDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link">
+                                            <!-- Details -->
+                                        </a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -753,15 +884,15 @@
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
-                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.CAPTION">Media</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.CAPTION"><!-- Media --></header>
                     <div class="obj-container">
                         <table cellpadding="0" cellspacing="0" class="main-tbl">
                             <thead>
                                 <tr>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.ID">ID</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.TYPE">Type</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.MIMETYPE">Mimetype</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.TAGS">Tags</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.ID"><!-- ID --></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.TYPE"><!-- Type --></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.MIMETYPE"><!-- Mimetype --></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.TAGS"><!-- Tags --></th>
                                     <th class="medium"></th>
                                 </tr>
                             </thead>
@@ -771,7 +902,11 @@
                                     <td>{{ item.type }}</td>
                                     <td>{{ item.mimetype }}</td>
                                     <td>{{ item.tags|joinBy:', ' }}</td>
-                                    <td><a ng-click="openSubTab('media-details', 'EventMediaDetailsResource', item.id, false, true)" translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link"></a></td>
+                                    <td>
+                                        <a ng-click="openSubTab('media-details', 'EventMediaDetailsResource', item.id, false, true)" translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link">
+                                            <!-- Details -->
+                                        </a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -786,14 +921,18 @@
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
-                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.CAPTION">Publications</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.CAPTION">
+                        <!-- Publications -->
+                    </header>
                     <div class="obj-container">
                         <table cellpadding="0" cellspacing="0" class="main-tbl">
                             <thead>
                                 <tr>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.ID">ID</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.CHANNEL">Channel</th>
-                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.TAGS">Tags</th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.ID"><!-- ID --></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.CHANNEL">
+                                        <!-- Channel -->
+                                    </th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.TAGS"><!-- Tags --></th>
                                     <th class="medium"></th>
                                 </tr>
                             </thead>
@@ -802,7 +941,11 @@
                                     <td>{{ item.id }}</td>
                                     <td>{{ item.channel }}</td>
                                     <td>{{ item.tags|joinBy:', ' }}</td>
-                                    <td><a ng-click="openSubTab('publications-details', 'EventPublicationDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link"></a></td>
+                                    <td>
+                                        <a ng-click="openSubTab('publications-details', 'EventPublicationDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link">
+                                            <!-- Details -->
+                                        </a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -817,39 +960,57 @@
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
-                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.CAPTION">Attachment</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.CAPTION">
+                        <!-- Attachment -->
+                    </header>
                     <div class="obj-container">
                         <table class="main-tbl">
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.ID">Id</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.ID">
+                                <!-- Id -->
+                                </td>
                                 <td>{{ subNavData.id }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.TYPE">Type</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.TYPE">
+                                    <!-- Type -->
+                                </td>
                                 <td>{{ subNavData.type }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.MIMETYPE">Mimetype</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.MIMETYPE">
+                                    <!-- Mimetype -->
+                                </td>
                                 <td>{{ subNavData.mimetype }}</td>
                             </tr>
                             <tr ng-if="subNavData.size > 0">
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.SIZE">Size</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.SIZE">
+                                    <!-- Size -->
+                                </td>
                                 <td>{{ subNavData.size | humanBytes }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.CHECKSUM">Checksum</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.CHECKSUM">
+                                    <!-- Checksum -->
+                                </td>
                                 <td>{{ subNavData.checksum }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.REFERENCE">Reference</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.REFERENCE">
+                                    <!-- Reference -->
+                                </td>
                                 <td>{{ subNavData.reference }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.TAGS">Tags</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.TAGS">
+                                    <!-- Tags -->
+                                </td>
                                 <td>{{ subNavData.tags|joinBy:', ' }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.URL">Link</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.DETAILS.URL">
+                                    <!-- Link -->
+                                </td>
                                 <td><a href="{{ subNavData.url }}" class="fa fa-external-link"></a></td>
                             </tr>
                         </table>
@@ -864,39 +1025,57 @@
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
-                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.CAPTION">Catalogs</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.CAPTION">
+                        <!-- Catalogs -->
+                    </header>
                     <div class="obj-container">
                         <table class="main-tbl">
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.ID">Id</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.ID">
+                                    <!-- Id -->
+                                </td>
                                 <td>{{ subNavData.id }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.TYPE">Type</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.TYPE">
+                                    <!-- Type -->
+                                </td>
                                 <td>{{ subNavData.type }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.MIMETYPE">Mimetype</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.MIMETYPE">
+                                    <!-- Mimetype -->
+                                </td>
                                 <td>{{ subNavData.mimetype }}</td>
                             </tr>
                             <tr ng-if="subNavData.size > 0">
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.SIZE">Size</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.SIZE">
+                                    <!-- Size -->
+                                </td>
                                 <td>{{ subNavData.size | humanBytes }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.CHECKSUM">Checksum</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.CHECKSUM">
+                                    <!-- Checksum -->
+                                </td>
                                 <td>{{ subNavData.checksum }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.REFERENCE">Reference</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.REFERENCE">
+                                    <!-- Reference -->
+                                </td>
                                 <td>{{ subNavData.reference }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.TAGS">Tags</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.TAGS">
+                                    <!-- Tags -->
+                                </td>
                                 <td>{{ subNavData.tags|joinBy:', ' }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.URL">Link</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.DETAILS.URL">
+                                    <!-- Link -->
+                                </td>
                                 <td><a href="{{ subNavData.url }}" class="fa fa-external-link"></a></td>
                             </tr>
                         </table>
@@ -911,35 +1090,51 @@
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-details">
-                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TITLE">Media Details</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TITLE">
+                        <!-- Media Details -->
+                    </header>
                     <div class="obj-container">
                         <table class="main-tbl">
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.ID">ID</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.ID">
+                                    <!-- ID -->
+                                </td>
                                 <td>{{ subNavData.id }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TYPE">Type</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TYPE">
+                                    <!-- Type -->
+                                </td>
                                 <td>{{ subNavData.type }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.MIMETYPE">Mimetype</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.MIMETYPE">
+                                    <!-- Mimetype -->
+                                </td>
                                 <td>{{ subNavData.mimetype }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TAGS">Tags</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TAGS">
+                                    <!-- Tags -->
+                                </td>
                                 <td>{{ subNavData.tags|joinBy:', ' }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.DURATION">Duration</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.DURATION">
+                                    <!-- Duration -->
+                                </td>
                                 <td>{{ subNavData.duration | humanDuration }}</td>
                             </tr>
                             <tr ng-if="subNavData.size > 0">
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.SIZE">Size</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.SIZE">
+                                    <!-- Size -->
+                                </td>
                                 <td>{{ subNavData.size | humanBytes }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.URL">URL</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.URL">
+                                    <!-- URL -->
+                                </td>
                                 <td><a href="{{ subNavData.url }}">{{ subNavData.url | removeQueryParams }}</a></td>
                             </tr>
                         </table>
@@ -951,20 +1146,42 @@
                     <div class="obj-container">
                         <div class="table-series">
                             <div class="wrapper">
-                                <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.STREAM_AUDIO">Audio streams</header>
+                                <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.STREAM_AUDIO">
+                                    <!-- Audio streams -->
+                                </header>
                                 <table class="main-tbl">
                                     <thead>
                                         <tr>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.ID">ID</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TYPE">Type</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.CHANNELS">Channels</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.BITRATE">Bitrate</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.BITDEPTH">Bitdepth</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.SAMPLINGRATE">Samplingrate</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.FRAMECOUNT">Framecount</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.PEAKLEVELDB">Peak level DB</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.RMSLEVELDB">RMS level DB</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.RMSPEAKDB">RMS speak DB</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.ID">
+                                                <!-- ID -->
+                                            </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TYPE">
+                                                <!-- Type -->
+                                            </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.CHANNELS">
+                                                <!-- Channels -->
+                                            </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.BITRATE">
+                                                <!-- Bitrate -->
+                                            </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.BITDEPTH">
+                                                <!-- Bitdepth -->
+                                            </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.SAMPLINGRATE">
+                                                <!-- Samplingrate -->
+                                            </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.FRAMECOUNT">
+                                                <!-- Framecount -->
+                                            </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.PEAKLEVELDB">
+                                                <!-- Peak level DB -->
+                                            </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.RMSLEVELDB">
+                                                <!-- RMS level DB -->
+                                            </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.RMSPEAKDB">
+                                                <!-- RMS speak DB -->
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -984,18 +1201,36 @@
                                 </table>
                             </div>
                             <div class="wrapper">
-                                <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.STREAM_VIDEO">Video streams</header>
+                                <header translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.STREAM_VIDEO">
+                                    <!-- Video streams -->
+                                </header>
                                 <table class="main-tbl">
                                     <thead>
                                         <tr>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.ID">ID</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TYPE">Type</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.FRAMERATE">Framerate</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.BITRATE">Bitrate</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.RESOLUTION">Resolution</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.FRAMECOUNT">Framecount</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.SCANTYPE">Scantype</td>
-                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.SCANORDER">Scanorder</td>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.ID">
+                                                <!-- ID -->
+                                            </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.TYPE">
+                                                <!-- Type -->
+                                            </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.FRAMERATE">
+                                                <!-- Framerate -->
+                                            </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.BITRATE">
+                                                <!-- Bitrate -->
+                                            </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.RESOLUTION">
+                                                <!-- Resolution -->
+                                            </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.FRAMECOUNT">
+                                                <!-- Framecount -->
+                                            </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.SCANTYPE">
+                                                <!-- Scantype -->
+                                            </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.DETAILS.SCANORDER">
+                                                <!-- Scanorder -->
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1035,39 +1270,57 @@
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container operations-tbl">
-                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.CAPTION">Publications</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.CAPTION">
+                        <!-- Publications -->
+                    </header>
                     <div class="obj-container">
                         <table class="main-tbl">
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.ID">Id</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.ID">
+                                    <!-- Id -->
+                                </td>
                                 <td>{{ subNavData.id }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.TYPE">Type</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.TYPE">
+                                    <!-- Type -->
+                                </td>
                                 <td>{{ subNavData.type }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.MIMETYPE">Mimetype</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.MIMETYPE">
+                                    <!-- Mimetype -->
+                                </td>
                                 <td>{{ subNavData.mimetype }}</td>
                             </tr>
                             <tr ng-if="subNavData.size > 0">
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.SIZE">Size</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.SIZE">
+                                    <!-- Size -->
+                                </td>
                                 <td>{{ subNavData.size | humanBytes }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.CHANNEL">Channel</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.CHANNEL">
+                                    <!-- Channel -->
+                                </td>
                                 <td>{{ subNavData.channel }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.REFERENCE">Reference</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.REFERENCE">
+                                    <!-- Reference -->
+                                </td>
                                 <td>{{ subNavData.reference }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.TAGS">Tags</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.TAGS">
+                                    <!-- Tags -->
+                                </td>
                                 <td>{{ subNavData.tags|joinBy:', ' }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.URL">Link</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.DETAILS.URL">
+                                    <!-- Link -->
+                                </td>
                                 <td><a href="{{ subNavData.url }}" class="fa fa-external-link"></a></td>
                             </tr>
                         </table>
@@ -1083,27 +1336,27 @@
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-details">
-                    <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE">Workflow Details</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.TITLE"><!-- Workflow Details --></header>
                     <div class="obj-container">
                         <table class="main-tbl">
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ID">ID</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ID"><!-- ID --></td>
                                 <td>{{ subNavData.id }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TITLE">Title</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TITLE"><!-- Title --></td>
                                 <td>{{ subNavData.title }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TYPE">Type</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TYPE"><!-- Type --></td>
                                 <td>{{ subNavData.workflow }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STATE">State</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STATE"><!-- State --></td>
                                 <td>{{ subNavData.state }}</td>
                             </tr>
                             <tr>
-                                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STARTED">Started</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STARTED"><!-- Started --></td>
                                 <td>{{ subNavData.start | localizeDate : 'dateTime' : 'medium' }}</td>
                             </tr>
                         </table>
@@ -1111,7 +1364,9 @@
                 </div>
 
                 <div class="obj tbl-details">
-                    <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.CONFIGURATION">Workflow configuration</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.CONFIGURATION">
+                        <!-- Workflow configuration -->
+                    </header>
                     <div class="obj-container">
                         <table class="main-tbl">
                             <tr ng-repeat="(key, value) in subNavData.configuration">
@@ -1126,8 +1381,18 @@
                     <header>More Information &amp; Actions</header>
                     <div class="obj-container">
                         <ul>
-                            <li>Operations <a class="details-link" ng-click="openSubTab('workflow-operations', 'EventWorkflowOperationsResource', subNavData.id, true)" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS">Details</a></li>
-                            <li>Errors & Warnings <a class="details-link" ng-click="openSubTab('errors-and-warnings', 'EventErrorsResource', subNavData.id, true)" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS">Details</a></li>
+                            <li>
+                                Operations
+                                <a class="details-link" ng-click="openSubTab('workflow-operations', 'EventWorkflowOperationsResource', subNavData.id, true)" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS">
+                                    <!-- Details -->
+                                </a>
+                            </li>
+                            <li>
+                                Errors & Warnings
+                                <a class="details-link" ng-click="openSubTab('errors-and-warnings', 'EventErrorsResource', subNavData.id, true)" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS">
+                                    <!-- Details -->
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -1140,7 +1405,9 @@
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-container">
-                    <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TITLE">Workflow Operations</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TITLE">
+                        <!-- Workflow Operations -->
+                    </header>
                     <div class="obj-container">
                         <table class="main-tbl">
                             <thead>
@@ -1156,7 +1423,11 @@
                                     <td>{{ item.status }}</td>
                                     <td>{{ item.title }}</td>
                                     <td>{{ item.description }}</td>
-                                    <td><a class="details-link" ng-click="openSubTab('operation-details', 'EventWorkflowOperationDetailsResource', $index)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">Details</a></td>
+                                    <td>
+                                        <a class="details-link" ng-click="openSubTab('operation-details', 'EventWorkflowOperationDetailsResource', $index)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">
+                                            <!-- Details -->
+                                        </a>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1171,7 +1442,9 @@
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj tbl-details">
-                    <header translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TITLE">Operation Details</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TITLE">
+                        <!-- Operation Details -->
+                    </header>
                     <div class="obj-container">
                         <table class="main-tbl">
                              <tr>
