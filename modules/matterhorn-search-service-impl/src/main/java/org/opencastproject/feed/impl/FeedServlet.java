@@ -26,31 +26,23 @@ import org.opencastproject.feed.api.Feed;
 import org.opencastproject.feed.api.FeedGenerator;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.SyndFeedOutput;
-import com.sun.syndication.io.WireFeedOutput;
+import com.rometools.rome.io.FeedException;
+import com.rometools.rome.io.SyndFeedOutput;
+import com.rometools.rome.io.WireFeedOutput;
 
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.http.HttpContext;
-import org.osgi.service.http.HttpService;
-import org.osgi.service.http.NamespaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -86,7 +78,7 @@ import javax.ws.rs.core.Variant;
  * If the feed could not be found because the query is unknown a HTTP error 404 is returned
  * If the feed could not be build (wrong RSS or Atom version, corrupt data, etc) an HTTP error 500 is returned.
  */
-public class FeedServlet extends HttpServlet {
+public class FeedServlet {
 
   /** The serial version uid */
   private static final long serialVersionUID = -4623160106007127801L;
@@ -161,7 +153,7 @@ public class FeedServlet extends HttpServlet {
       if (feedInfo.getType().equals(Feed.Type.RSS)) {
         logger.debug("Creating RSS feed output.");
         SyndFeedOutput output = new SyndFeedOutput();
-          outputString = output.outputString(new RomeRssFeed(feed, feedInfo));
+        outputString = output.outputString(new RomeRssFeed(feed, feedInfo));
       } else {
         logger.debug("Creating Atom feed output.");
         WireFeedOutput output = new WireFeedOutput();
