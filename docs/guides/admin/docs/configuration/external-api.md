@@ -130,7 +130,7 @@ A major use case of the External API is to provide External Applications secure 
 
 For this purpose, Opencast comes with a special workflow operation: WOH publish-configure
 (see [ConfigurablePublishWorkflowOperationHandler](../workflowoperationhandlers/publishconfigure-woh.md))
-creates publication elements that not just contain a single URL to the publication channel,
+creates publication elements that do not just contain a single URL to the publication channel,
 but also contain URLs for each of the attachments and tracks that have been published.
 
 **Note:** Secure access to distribution artefacts requires stream security to be enabled,
