@@ -31,8 +31,7 @@ The API features a dedicated security layer that is in charge of providing suppo
 and authorization mechanisms. Additionally, the security layer provides means for delegation of authorization to
 the client application in cases where the API client needs to manage its own set of assets with implicit access
 control.
-These concepts are documented in greater detail in the following chapters “Authentication” and “Authorization”,
-respectively.
+These concepts are documented in greater detail in the following [Authentication](authentication.md) and [Authorization](authorization.md) chapters.
 
 
 ### Requests for data
@@ -40,15 +39,15 @@ The abstraction layer is backed by a dedicated index, which is kept up-to-date u
 broker. When a request to an API method is received (1), the data is compiled using the index and returned to
 the client (2). Since the index is scalable and optimized for performance, a large number of requests can be
 processed per time interval.
-The corresponding requests along with the potential responses are defined later on in chapter “API”.
+The corresponding requests along with the potential responses are defined later on in the [API](usage.md) chapter.
 
 ### Processing of updates
 Whenever a client sends updated information to the Application API, it will forward that information to the
 corresponding Opencast services (3), which in turn will process the data and send messages to the
 message bus accordingly (4). The messages are consumed by the Application API’s data store and can be
-served to its clients from now on.
+served to its clients from then on.
 The corresponding requests along with the data structures and potential responses are defined later on in
-chapter “API”.
+the [API](usage.md) chapter.
 
 
 ![][figure_1]
@@ -86,4 +85,4 @@ Patch        | Bugfixes applied in a backwards-compatible manner.
 As a consequence, the API is expected to be backwards compatible between minor version upgrades, including the patch level. This means that a client that has been developed against version 1.0.0 of the api will work with version 1.1.3 as well. This however may not be true going from version 1.1.0 to 2.0.0
 
 ### Multi tenancy
-With Opencast being a multi tenant application, the application API reflects that characteristics as well. Requests are mapped to individual tenants by matching the requests’s hostname against a tenants set of configured hostnames.
+With Opencast being a multi tenant application, the application API reflects that characteristics as well. Requests are mapped to individual tenants by matching the requests’s target hostname against the list of tenant hostnames.

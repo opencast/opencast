@@ -6,9 +6,9 @@ The first method is ideal for scenarios where the end users of the external appl
 
 # Delegation of Authorization
 
-In situation where the provider of the API offers a super user who is allowed “sudo” requests that are executed on behalf of another user, the API is actually delegating authorization to the client application, since now authorization is performed upon login of the super user, but then the super user can switch to any other user or any set of roles (with a few exceptions for security reasons).
+In situations where the provider of the API offers a super user who is allowed “sudo” requests that are executed on behalf of another user, the API is actually delegating authorization to the client application. In this cause authorization is performed upon login of the super user, but then the super user can switch to any other user or any set of roles (with a few exceptions for security reasons).
 
-Note that in order to allow for user switching, a specific role needs to be assigned to the user super, and that role cannot be obtained by manipulating the role set (see [Role switching](#role-switching)).
+Note that in order to allow for user switching, a specific role needs to be assigned to the super user, and that role cannot be obtained by manipulating the role set (see [Role switching](#role-switching)).
 
 ## User switching
 

@@ -42,7 +42,7 @@ Sort Name           | Description
 __Sample request__
 
 ```
-https://opencast.domain.com/api/events?sort=title:DESC&limit=5&offset=1&filter=location:ca-01
+https://opencast.example.org/api/events?sort=title:DESC&limit=5&offset=1&filter=location:ca-01
 ```
 
 __Response__

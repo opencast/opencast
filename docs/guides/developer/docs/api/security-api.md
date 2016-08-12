@@ -8,7 +8,7 @@ As a consequence, users of the API who are presenting URLs to distributed media 
 
 ## Best practices
 
-The use of signed URLs requires a set of best practices to be followed when clients interact with the API, most notably in the are of performance and caching.
+The use of signed URLs requires a set of best practices to be followed when clients interact with the API, most notably in the area of performance and caching.
 
 ### Performance
 
@@ -20,7 +20,7 @@ One obvious caveat when using pre-signed URLs is the use of cached responses. As
 
 ### Secure access by source IP
 
-The signing facility of the security API provides the ability to sign URLs including the IP address of the device that is allowed to access the stream. 
+The signing facility of the security API provides the ability to sign URLs and restrict that URL to a given IP address.
 
 Even though this greatly increases security in sense that signed URLs can only be accessed from that device, it is important to note that in many network setups, source IP addresses of network packets will undergo network address translation (NAT) with NAT replacing the original source address from private networks with a single public address, thereby diminishing the security impact of adding the source IP address immensely.
 
