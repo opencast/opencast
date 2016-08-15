@@ -22,21 +22,21 @@ The catalog contains the following default feeds:
 
 ### Latest
 
-    http://nightly.opencastproject.org/feeds/[atom|rss|*]/<version_number>/latest
+    http://demo.opencastproject.org/feeds/[atom|rss|*]/<version_number>/latest
 
 Need an example? Visit http://demo.opencastproject.org/feeds/atom/1.0/latest
 
 ### Series
 
-    http://nightly.opencastproject.org/feeds/[atom|rss|*]/<version_number>/series/<series_id>
+    http://demo.opencastproject.org/feeds/[atom|rss|*]/<version_number>/series/<series_id>
 
 ### Aggregation (of a set of series)
 
-    http://nightly.opencastproject.org/feeds/[atom|rss|*]/<version_number>/aggregated/<name_of_configured_aggregation>
+    http://demo.opencastproject.org/feeds/[atom|rss|*]/<version_number>/aggregated/<name_of_configured_aggregation>
 
 ### Custom
 
-    http://nightly.opencastproject.org/feeds/[atom|rss|*]/<version_number>/custom/<query>
+    http://demo.opencastproject.org/feeds/[atom|rss|*]/<version_number>/custom/<query>
 
 Aggregation
 -----------
@@ -65,19 +65,18 @@ Below is custom.properties, the default specification for an example custom feed
 
     feed.class=org.opencastproject.feed.impl.CustomFeedService
     feed.uri=custom
-    feed.size=25
-    feed.selector=custom
-    feed.query=dc_title:{0}
+    feed.size=20
+    feed.query=dc_title-sum:{0}
     feed.name=Special episodes
     feed.description=Special collection of episodes
     feed.copyright=All rights reserved by The Opencast Project
     feed.home=/engage/ui
     feed.entry=/engage/ui/embed.html?id={0}
     feed.cover=/engage/feed-cover.png
-    feed.rssflavors=presentation/delivery,presenter/delivery
+    feed.rssflavors=presentation/delivery,presenter/delivery,presenter/feed+preview,presenter/search+preview
     feed.rsstags=rss
     feed.rssmediatype=video,audio
-    feed.atomflavors=presenter/delivery,presentation/delivery
+    feed.atomflavors=presentation/delivery,presenter/delivery,presenter/feed+preview,presenter/search+preview
     feed.atomtags=atom
 
 ### Properties
