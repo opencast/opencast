@@ -195,6 +195,7 @@
       "SCHEDULE_TASK": {
           "CAPTION": "Start Task",
           "GENERAL": {
+             "CAPTION": "General",
              "SUMMARY": "({{ count }} events selected)",
              "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it/them or try again later."
           },
