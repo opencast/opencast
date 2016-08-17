@@ -385,7 +385,7 @@ describe('adminNg.services.language', function () {
                     minute : 0
                 });
 
-            expect(Language.toLocalTime(localTime)).toEqual('Sat Jul 12 12:00:00 2014');
+            expect(Language.toLocalTime(localTime)).toEqual('Jul 12, 2014');
         });
     });
 });

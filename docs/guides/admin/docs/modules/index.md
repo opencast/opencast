@@ -2,6 +2,7 @@
 
 Documentation for modules included in Opencast.
 
+- [Atom and RSS Feed](atomrss.md)
 - [Media Module](mediamodule.configuration.md)
 - [LTI Module](ltimodule.md)
 - Player
