@@ -30,11 +30,13 @@ angular.module('adminNg.services.modal')
             me.$scope.confirm  = me.confirm;
             me.$scope.callback = callback;
             me.$scope.object   = object;
-            me.$scope.id = object.id;
-            if (object.title) {
-                me.$scope.name = object.title;
-            } else if (object.name) {
-                me.$scope.name = object.name;
+            if (!angular.isUndefined(object)) {
+                me.$scope.id = object.id;
+                if (object.title) {
+                    me.$scope.name = object.title;
+                } else if (object.name) {
+                    me.$scope.name = object.name;
+                }
             }
         };
 
