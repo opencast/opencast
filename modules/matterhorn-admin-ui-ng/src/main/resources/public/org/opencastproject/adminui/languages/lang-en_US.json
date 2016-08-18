@@ -48,7 +48,19 @@
    "CONFIRMATIONS": {
      "CONTINUE_ACTION" : "Are you sure you want to continue?",
      "METADATA": {
-       "NOTICE" : "The following element will be deleted",
+       "NOTICE" : {
+         "UNKNOWN"            : "The following element will be deleted",
+         "EVENT"              : "The following event will be deleted",
+         "SERIES"             : "The following series will be deleted",
+         "ACL"                : "The following ACL will be deleted",
+         "GROUP"              : "The following group will be deleted",
+         "USER"               : "The following user will be deleted",
+         "USER_BLACKLIST"     : "The following user blacklist will be deleted",
+         "THEME"              : "The following theme will be deleted",
+         "EMAIL"              : "The following email template will be deleted",
+         "LOCATION"           : "The following location will be deleted",
+         "LOCATION_BLACKLIST" : "The following location blacklist will be deleted"
+       },
        "ID" : "Id",
        "NAME" : "Name"
      },

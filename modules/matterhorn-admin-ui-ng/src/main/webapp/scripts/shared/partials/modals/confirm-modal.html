@@ -5,16 +5,16 @@
     </header>
 
     <div>
-        <p translate="CONFIRMATIONS.METADATA.NOTICE">The following element will be deleted</p>
+        <p translate="CONFIRMATIONS.METADATA.NOTICE.{{type}}">The following element will be deleted</p>
         <table class="main-tbl">
             <tbody>
                 <tr>
-                    <td translate="CONFIRMATIONS.METADATA.ID">Id</td>
                     <td translate="CONFIRMATIONS.METADATA.NAME">Name</td>
+                    <!--<td translate="CONFIRMATIONS.METADATA.ID">Id</td>-->
                 </tr>
                 <tr>
-                    <td>{{ id }}</td>
                     <td ng-if="name">{{name}}</td>
+                    <!--<td>{{ id }}</td>-->
                 </tr>
             </tbody>
         </table>

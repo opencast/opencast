@@ -13,6 +13,7 @@ angular.module('adminNg.resources')
                 row.updated = Language.formatDateTime('short', r.Update);
                 row.inputs = r.inputs;
                 row.roomId = r.roomId;
+                row.type = "LOCATION";
                 return row;
             };
 
