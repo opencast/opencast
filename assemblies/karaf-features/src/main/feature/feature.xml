@@ -142,7 +142,6 @@
     <feature version="${project.version}">opencast-core</feature>
 
     <bundle>mvn:org.opencastproject/matterhorn-admin-ui-ng/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-admin-ui/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-annotation-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-annotation-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-archive-base/${project.version}</bundle>
@@ -248,7 +247,6 @@
     <feature version="${project.version}">opencast-core</feature>
 
     <bundle>mvn:org.opencastproject/matterhorn-admin-ui-ng/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-admin-ui/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-archive-base/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-archive-schema/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-archive-storage-fs/${project.version}</bundle>
@@ -389,7 +387,6 @@
     <feature version="${project.version}">opencast-core</feature>
 
     <bundle>mvn:org.opencastproject/matterhorn-admin-ui-ng/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-admin-ui/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-archive-base/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-archive-schema/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-archive-storage-fs/${project.version}</bundle>
