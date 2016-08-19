@@ -173,7 +173,7 @@ public class EventsEndpoint implements ManagedService {
   private IngestService ingestService;
   private SecurityService securityService;
   private CommonEventCatalogUIAdapter eventCatalogUIAdapter;
-  private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<EventCatalogUIAdapter>();
+  private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<>();
   private UrlSigningService urlSigningService;
 
   /** OSGi DI */
@@ -238,14 +238,11 @@ public class EventsEndpoint implements ManagedService {
 
   /** OSGi activation method */
   void activate(ComponentContext cc) {
-    if (cc == null) {
-      this.serverUrl = "http://localhost:8080";
-    } else {
+    this.serverUrl = "http://localhost:8080";
+    if (cc != null) {
       String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstants.EXTERNAL_API_URL_ORG_PROPERTY);
-      logger.debug("Configured server url is {}", ccServerUrl);
-      if (ccServerUrl == null)
-        this.serverUrl = "http://localhost:8080";
-      else {
+      if (ccServerUrl != null) {
+        logger.debug("Configured server url is {}", ccServerUrl);
         this.serverUrl = ccServerUrl;
       }
     }
@@ -346,7 +343,6 @@ public class EventsEndpoint implements ManagedService {
   @Produces({ "application/json", "application/v1.0.0+json" })
   public Response deleteEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws NotFoundException, UnauthorizedException {
-    // Check the request for a valid version.
     if (!indexService.removeEvent(id))
       return Response.serverError().build();
 
@@ -1002,7 +998,6 @@ public class EventsEndpoint implements ManagedService {
   @Produces({ "application/json", "application/v1.0.0+json" })
   public Response deleteEventMetadataByType(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type) throws SearchIndexException {
-    // Check the request for a valid version.
     for (final Event event : indexService.getEvent(id, externalIndex)) {
       Opt<MediaPackageElementFlavor> flavor = getFlavor(type);
       if (flavor.isNone()) {
