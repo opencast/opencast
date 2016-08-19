@@ -34,7 +34,7 @@ Sort Name           | Description
 `title`             | By the title of the series.
 
 __Sample request__
-```
+```xml
 https://opencast.domain.com/api/series?filter=creator:Default Administrator&sort=title:ASC&limit=2&offset=1
 ```
 
@@ -157,7 +157,7 @@ __Response__
 `400 (BAD REQUEST)`: The request is invalid or inconsistent.<br/>
 `401 (UNAUTHORIZED)`: The user doesn't have the rights to create the series.
 
-```
+```xml
 Location: http://api.opencast.org/api/series/4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f
 ```
 ```

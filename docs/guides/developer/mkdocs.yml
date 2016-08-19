@@ -39,8 +39,7 @@ pages:
    - Overview: 'infrastructure/index.md'
    - Nexus Maven Repository: 'infrastructure/nexus.md'
 - API:
-   - Overview: 'api/index.md'
-   - Introduction: 'api/introduction.md'
+   - Introduction: 'api/index.md'
    - Usage: 'api/usage.md'
    - Authentication: 'api/authentication.md'
    - Authorization: 'api/authorization.md'

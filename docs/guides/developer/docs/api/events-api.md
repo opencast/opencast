@@ -41,7 +41,7 @@ Sort Name           | Description
 
 __Sample request__
 
-```
+```xml
 https://opencast.example.org/api/events?sort=title:DESC&limit=5&offset=1&filter=location:ca-01
 ```
 
@@ -168,7 +168,7 @@ __Response__
 `201 (CREATED)`: A new event is created and its identifier is returned in the `Location` header.<br/>
 `400 (BAD REQUEST)`: The request is invalid or inconsistent.
 
-```
+```xml
 Location: http://api.opencast.org/api/events/e6aeb8df-a852-46cd-8128-b89de696f20e
 ```
 ```

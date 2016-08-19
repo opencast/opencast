@@ -26,7 +26,7 @@ Sort Name        | Description
 `roles`          | By the group roles
 
 __Sample request__
-```
+```xml
 https://opencast.domain.com/api/groups?sort=name:ASC&limit=2&offset=1
 ```
 
@@ -74,7 +74,7 @@ __Response__
 Returns a single group.
 
 __Sample request__
-```
+```xml
 https://opencast.domain.com/api/groups/MH_DEFAULT_ORG_SYSTEM_ADMINS
 ```
 
@@ -130,7 +130,7 @@ Form Parameters            |Type            | Description
 
 __Sample__
 
-```
+```xml
 TODO
 ```
 
@@ -159,7 +159,7 @@ Form Parameters            |Type            | Description
 `member`                   | `String`       | Member Name
 
 __Sample__
-```
+```xml
 https://opencast.domain.com/api/groups/MH_DEFAULT_ORG_SYSTEM_ADMINS/members
 ```
 
@@ -174,7 +174,7 @@ __Response__
 Removes a member from a group
 
 __Sample__
-```
+```xml
 https://opencast.domain.com/api/groups/MH_DEFAULT_ORG_SYSTEM_ADMINS/members/admin
 ```
 

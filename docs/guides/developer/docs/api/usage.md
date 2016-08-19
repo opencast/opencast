@@ -127,7 +127,7 @@ __Example__
 
 Ordering the list of events by title:
 
-```
+```xml
 GET /api/events?sort=title
 ```
 
@@ -141,7 +141,7 @@ __Example__
 
 Ordering the list of events by title in ascending order:
 
-```
+```xml
 GET /api/events?sort=title&order=asc
 ```
 
@@ -159,7 +159,7 @@ __Example__
 
 Filter the list of events by status and by series.
 
-```
+```xml
 GET /api/events?filter=status%3dpublished&filter=series%3dmath
 ```
 
@@ -176,6 +176,6 @@ __Example__
 
 From the list of events, return items 50-74.
 
-```
+```xml
 GET /api/events?limit=25&offset=50
 ```
