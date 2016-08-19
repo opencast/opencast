@@ -142,14 +142,6 @@ modules/matterhorn-common/src/test/resources/InfusionAll.js
   Copyright (c) 2009 John Resig
   Dual licensed under the MIT and GPL licenses.
 
-modules/matterhorn-engage-player/src/main/flex/bridge/FABridge.as
-  Copyright � 2006 Adobe Systems Incorporated
-  MIT License
-
-modules/matterhorn-engage-player/src/main/flex/com/osmf/MediaContainerUIComponent.as
-  Copyright 2010 Adobe Systems Incorporated.  All Rights Reserved.
-  Mozilla Public License Version 1.1
-
 modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/backbone.js
   Backbone v1.2.3 (http://backbonejs.org)
   Copyright 2010-2016 Jeremy Ashkenas, DocumentCloud
