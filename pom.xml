@@ -68,7 +68,6 @@
     <module>modules/matterhorn-cover-image-workflowoperation</module>
     <module>modules/matterhorn-dataloader</module>
     <module>modules/matterhorn-db</module>
-    <module>modules/matterhorn-deprecated-workflowoperation</module>
     <module>modules/matterhorn-dictionary-api</module>
     <module>modules/matterhorn-dictionary-hunspell</module>
     <module>modules/matterhorn-dictionary-none</module>

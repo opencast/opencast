@@ -164,7 +164,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-cover-image-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-cover-image-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dataloader/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-deprecated-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dictionary-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dictionary-regexp/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-distribution-service-acl/${project.version}</bundle>
@@ -268,7 +267,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-cover-image-remote/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-cover-image-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dataloader/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-deprecated-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-distribution-service-acl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-distribution-service-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-distribution-service-download-remote/${project.version}</bundle>
@@ -409,7 +407,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-cover-image-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-cover-image-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dataloader/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-deprecated-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dictionary-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dictionary-regexp/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-distribution-service-acl/${project.version}</bundle>
