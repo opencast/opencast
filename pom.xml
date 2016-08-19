@@ -114,8 +114,6 @@
     <module>modules/matterhorn-inspection-service-remote</module>
     <module>modules/matterhorn-inspection-workflowoperation</module>
     <module>modules/matterhorn-kernel</module>
-    <module>modules/matterhorn-load-test</module>
-    <module>modules/matterhorn-load-test-engage</module>
     <module>modules/matterhorn-lti</module>
     <module>modules/matterhorn-mediapackage-manipulator</module>
     <module>modules/matterhorn-mediapackage-ui</module>
@@ -172,7 +170,6 @@
     <module>modules/matterhorn-static</module>
     <module>modules/matterhorn-static-file-service-api</module>
     <module>modules/matterhorn-static-file-service-impl</module>
-    <module>modules/matterhorn-test-harness</module>
     <module>modules/matterhorn-textanalyzer-api</module>
     <module>modules/matterhorn-textanalyzer-impl</module>
     <module>modules/matterhorn-textanalyzer-remote</module>
