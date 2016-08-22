@@ -197,7 +197,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-inspection-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-lti/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-mediapackage-manipulator/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-mediapackage-ui/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-messages/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-metadata-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-metadata/${project.version}</bundle>
@@ -285,7 +284,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-inspection-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-lti/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-mediapackage-manipulator/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-mediapackage-ui/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-messages/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-metadata-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-metadata/${project.version}</bundle>
@@ -427,7 +425,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-inspection-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-lti/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-mediapackage-manipulator/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-mediapackage-ui/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-messages/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-metadata-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-metadata/${project.version}</bundle>

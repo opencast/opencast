@@ -509,30 +509,6 @@ modules/matterhorn-kernel/src/test/resources/InfusionAll.js
   Copyright (c) 2009 John Resig
   Dual licensed under the MIT and GPL licenses.
 
-modules/matterhorn-mediapackage-ui/src/main/resources/ui/scripts/jquery.tmpl.min.js
-  jQuery Templates Plugin 1.0.0pre
-  http://github.com/jquery/jquery-tmpl
-  Copyright Software Freedom Conservancy, Inc.
-  Dual licensed under the MIT or GPL Version 2 licenses.
-
-modules/matterhorn-mediapackage-ui/src/main/resources/ui/scripts/jquery.validate.min.js
-  jQuery Validation Plugin 1.9.0
-  http://bassistance.de/jquery-plugins/jquery-plugin-validation/
-  http://docs.jquery.com/Plugins/Validation
-  Copyright (c) 2006 - 2011 Jörn Zaefferer
-  Dual licensed under the MIT and GPL licenses:
-
-modules/matterhorn-mediapackage-ui/src/main/resources/ui/scripts/jquery.xmlns.js
-  jquery.xmlns.js:  xml-namespace selector support for jQuery
-  Copyright (c) 2009, Ryan Kelly.
-  Dual licensed under the MIT and GPL licenses.
-
-modules/matterhorn-mediapackage-ui/src/main/resources/ui/tests/qunit.*
-  QUnit v1.3.0pre - A JavaScript Unit Testing Framework
-  http://docs.jquery.com/QUnit
-  Copyright (c) 2011 John Resig, Jörn Zaefferer
-  Dual licensed under the MIT or GPL licenses
-
 modules/matterhorn-videoeditor-workflowoperation/src/main/resources/ui/operation/editor/js/ObjTree.js
   XML.ObjTree -- XML source code from/to JavaScript object like E4X
   Author: Yusuke Kawasaki http://www.kawa.net/
@@ -1071,11 +1047,6 @@ matterhorn-mediapackage-manipulator
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
   org.slf4j                              slf4j-log4j12                                    MIT License
-
-
-matterhorn-mediapackage-ui
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
 
 
 matterhorn-message-broker-api
