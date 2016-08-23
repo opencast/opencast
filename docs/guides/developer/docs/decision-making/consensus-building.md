@@ -8,8 +8,8 @@ We want to avoid unnecessary discussion and the creation of significant amounts 
 community needs to read. That is not to say that we want to avoid constructive discussion. This is the lifeblood of a
 successful project. However, there is a shorthand notation for showing support, or otherwise, for a proposal.
 
-Sending out Proposal
---------------------
+Sending out a Proposal
+----------------------
 
 Proposals should be send to list, preferably the development list. It is common to indicate proposals by including the
 string `[#proposal]` at the beginning of the subject to make it easier for the community to identify that the mail
@@ -41,8 +41,8 @@ Consensus Building is Not Voting
 --------------------------------
 
 The confusing thing about this notation is that it is the same notation used in a [formal vote](voting.md). Knowing when
-something is a vote and when it is a preference is important. It is easy to tell though, if the subject does not start
-with `[#vote]` then it is just an opinion. We try not to call votes, consensus building is much more inclusive.
+something is a vote and when it is a preference is important. It is easy to tell though, if the email's subject does not
+start with `[#vote]` then it is just an opinion. We try not to call votes, consensus building is much more inclusive.
 
 The reasons for this notation being common is that when someone wants to summarise a discussion thread they can mentally
 add up the strength of feeling of the community and decide if there is consensus or not.

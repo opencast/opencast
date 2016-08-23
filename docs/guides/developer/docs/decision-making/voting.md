@@ -2,7 +2,7 @@ Voting
 ======
 
 Occasionally a *feel* for consensus is not enough. Sometimes we need to have a measurable consensus. For example, when
-voting in new committers or to approve a release.
+voting new committers in or to approve a release.
 
 Preparing for a Vote
 --------------------
@@ -39,13 +39,13 @@ Publishing Results
 
 A vote should run for at least 72h, giving everyone the chance to participate.  After the voting is done, the outcome
 should be published on the public developer list. A result may be kept private, if deemed necessary, for votes on
-security relevant or personal topics.
+security-relevant or personal topics.
 
 Binding Votes
 -------------
 
 In Opencast, only committers have binding votes. All others are either discouraged from voting (to keep the noise down)
-or else have their votes considered of an indicative or advisory nature only.
+or else have their votes considered in an advisory nature only.
 
 When to Vote
 ------------
@@ -63,18 +63,17 @@ By default, all committers have a veto right when voting, meaning that a `-1` wi
 for. After addressing the issue, a second vote may be called for. Depending on the discussion, at this point, the
 initiator may determine this to be a majority vote.
 
-In the rare case that a majority vote among committers is called for, the vote is a majority vote among participating
-committers.  The vote has passed positive if there were more positive (`+1`) votes then negative ones (`-1`).
-
-In any case, at least one committer needs to respond to the called voting to be considered valid.
+In the rare case that a majority vote among committers is called for, the vote is a simple majority vote among
+participating committers without regards to any form of quorum. The vote will pass if there were more positive (`+1`)
+votes then negative ones (`-1`), implying that at least one committer needs to respond.
 
 
 Formal Votes for Code Changes
 -----------------------------
 
-Usually, code changes should have consensus and there is no need for voting. If in doubt, people can [propose changes
-](consensus-building.md) on list in advance. Additionally, consensus may be reached though discussion as part of the
-review process.
+Usually, code changes have consensus and there should be no need for voting. If in doubt, contributors can [propose
+changes](consensus-building.md) on list in advance. Additionally, consensus may be reached though discussion as part of
+the review process.
 
 There might be the rare case of a dispute between reviewer(s) and contributor(s) during the review process which cannot
 be resolved easily. In such a case, both parties can call a formal majority vote to settle the issue.
