@@ -1,25 +1,13 @@
 <section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="confirm-modal">
     <header>
         <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2 translate="CONFIRMATIONS.ACTIONS.CONFIRMATION">Confirm</h2>
+        <h2 translate="CONFIRMATIONS.ACTIONS.CONFIRMATION"><!--Confirm--></h2>
     </header>
 
     <div>
-        <p translate="CONFIRMATIONS.METADATA.NOTICE.{{type}}">The following element will be deleted</p>
-        <table class="main-tbl">
-            <tbody>
-                <tr>
-                    <td translate="CONFIRMATIONS.METADATA.NAME">Name</td>
-                    <!--<td translate="CONFIRMATIONS.METADATA.ID">Id</td>-->
-                </tr>
-                <tr>
-                    <td ng-if="name">{{name}}</td>
-                    <!--<td>{{ id }}</td>-->
-                </tr>
-            </tbody>
-        </table>
+        <p><span translate="CONFIRMATIONS.METADATA.NOTICE.{{type}}"><!--The following element will be deleted--></span>: {{name}}</p>
     </div>
-    <p translate="CONFIRMATIONS.CONTINUE_ACTION">Are you sure you want to continue?</p>
+    <p translate="CONFIRMATIONS.CONTINUE_ACTION"><!--Are you sure you want to continue?--></p>
 
     <div class="btn-container">
         <a translate="CANCEL" class="cancel-btn close-modal" ng-click="close()"><i>Cancel</i></a>

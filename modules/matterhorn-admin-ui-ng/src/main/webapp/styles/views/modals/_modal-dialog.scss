@@ -43,18 +43,12 @@
         @extend .extra-small-modal;
 
         top: 35%;
-        height: 310px;
+        height: 240px;
 
         p {
             text-align: center;
             color: $dark-prim-color;
             margin:20px auto 30px;
-        }
-
-        table {
-            margin:20px auto 20px;
-            width: 85%;
-            text-align: center;
         }
 
         .btn-container {

@@ -61,7 +61,6 @@
          "LOCATION"           : "The following location will be deleted",
          "LOCATION_BLACKLIST" : "The following location blacklist will be deleted"
        },
-       "ID" : "Id",
        "NAME" : "Name"
      },
      "ACTIONS": {
