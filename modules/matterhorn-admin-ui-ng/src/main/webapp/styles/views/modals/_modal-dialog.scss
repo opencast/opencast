@@ -48,7 +48,11 @@
         p {
             text-align: center;
             color: $dark-prim-color;
-            margin:20px auto 30px;
+            margin:20px auto 20px;
+        }
+
+        .delete {
+            font-weight: bold;
         }
 
         .btn-container {
