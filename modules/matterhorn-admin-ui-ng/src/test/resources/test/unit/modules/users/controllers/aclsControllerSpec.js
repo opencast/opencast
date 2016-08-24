@@ -26,7 +26,7 @@ describe('ACL controller', function () {
 
         it('deletes the ACL', function () {
             $httpBackend.expectDELETE('/admin-ng/acl/454').respond();
-            $scope.table.delete(454);
+            $scope.table.delete({'id': 454});
             $httpBackend.flush();
         });
     });

@@ -36,19 +36,19 @@ describe('Themes Overview Controller', function () {
     describe('#delete', function () {
 
         it('delegates the delete to the resource', function () {
-            $scope.table.delete(12);
+            $scope.table.delete({'id': 12});
             expect(ThemeResourceMock.delete).toHaveBeenCalledWith({id: 12}, jasmine.any(Function), jasmine.any(Function));
         });
 
         it('reacts correctly upon success', function () {
-            $scope.table.delete(12);
+            $scope.table.delete({'id': 12});
             ThemeResourceMock.delete.calls.mostRecent().args[1].call();
             expect(Table.fetch).toHaveBeenCalled();
             expect(NotificationsMock.add).toHaveBeenCalledWith('success', 'THEME_DELETED');
         });
 
         it('reacts correctly upon failure', function () {
-            $scope.table.delete(12);
+            $scope.table.delete({'id': 12});
             ThemeResourceMock.delete.calls.mostRecent().args[2].call();
             expect(NotificationsMock.add).toHaveBeenCalledWith('error', 'THEME_NOT_DELETED', 'user-form');
         });
