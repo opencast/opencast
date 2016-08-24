@@ -26,27 +26,38 @@ import org.opencastproject.feed.api.Feed;
 import org.opencastproject.feed.api.FeedGenerator;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.util.doc.rest.RestParameter;
+import org.opencastproject.util.doc.rest.RestParameter.Type;
+import org.opencastproject.util.doc.rest.RestQuery;
+import org.opencastproject.util.doc.rest.RestResponse;
+import org.opencastproject.util.doc.rest.RestService;
 
-import com.sun.syndication.io.SyndFeedOutput;
-import com.sun.syndication.io.WireFeedOutput;
+import com.rometools.rome.io.FeedException;
+import com.rometools.rome.io.SyndFeedOutput;
+import com.rometools.rome.io.WireFeedOutput;
 
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.http.HttpContext;
-import org.osgi.service.http.HttpService;
-import org.osgi.service.http.NamespaceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Variant;
 
+@Path("/")
+@RestService(name = "feedservice", title = "Feed Service",
+    abstractText = "This class is responsible of creating RSS and Atom feeds.", notes = "")
 /**
  * This class is responsible of creating RSS and Atom feeds.
  * <p>
@@ -67,7 +78,7 @@ import javax.servlet.http.HttpServletResponse;
  * If the feed could not be found because the query is unknown a HTTP error 404 is returned
  * If the feed could not be build (wrong RSS or Atom version, corrupt data, etc) an HTTP error 500 is returned.
  */
-public class FeedServlet extends HttpServlet {
+public class FeedServiceImpl {
 
   /** The serial version uid */
   private static final long serialVersionUID = -4623160106007127801L;
@@ -76,7 +87,7 @@ public class FeedServlet extends HttpServlet {
   private static final String PARAM_SIZE = "size";
 
   /** Logging facility */
-  private static Logger logger = LoggerFactory.getLogger(FeedServlet.class);
+  private static Logger logger = LoggerFactory.getLogger(FeedServiceImpl.class);
 
   /** List of feed generators */
   private List<FeedGenerator> feeds = new ArrayList<FeedGenerator>();
@@ -84,40 +95,22 @@ public class FeedServlet extends HttpServlet {
   /** The security service */
   private SecurityService securityService = null;
 
-  /**
-   * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
-   *      javax.servlet.http.HttpServletResponse)
-   */
-  @Override
-  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-    /* Temporary unavailable until someone fixes the feed service
-    ClassLoader originalContextClassLoader = Thread.currentThread().getContextClassLoader();
-    try {
-      Thread.currentThread().setContextClassLoader(FeedServlet.class.getClassLoader());
-      doGetWithBundleClassloader(request, response);
-    } finally {
-      Thread.currentThread().setContextClassLoader(originalContextClassLoader);
-    }
-    */
-  }
+  @GET
+  @Produces(MediaType.TEXT_XML)
+  @Path("{type}/{version}/{query}")
+  @RestQuery(name = "getFeed", description = "Gets an Atom or RSS feed", pathParameters = {
+          @RestParameter(description = "The feed type", name = "type", type = Type.STRING, isRequired = true),
+          @RestParameter(description = "The feed version", name = "version", type = Type.STRING, isRequired = true),
+          @RestParameter(description = "The feed query", name = "query", type = Type.STRING, isRequired = true)
+      },
+      reponses = {
+          @RestResponse(description = "Return the feed of the appropriate type", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+  public Response getFeed(@PathParam("type") String type, @PathParam("version") String version, @PathParam("query") String query, @Context HttpServletRequest request) {
+    Float versionFloat = Float.parseFloat(version);
+    String contentType = null;
 
-  /**
-   * Handles HTTP GET requests after the context classloader has been set.
-   *
-   * See https://issues.apache.org/jira/browse/SMX4-510 for details
-   *
-   * @param request
-   *          the http request
-   * @param response
-   *          the http response
-   * @throws ServletException
-   *           if there is a problem handling the http exchange
-   * @throws IOException
-   *           if there is an exception reading or writing from / to the request and response streams
-   */
-  protected void doGetWithBundleClassloader(HttpServletRequest request, HttpServletResponse response)
-          throws ServletException, IOException {
     logger.debug("Requesting RSS or Atom feed.");
     FeedInfo feedInfo = null;
     Organization organization = securityService.getOrganization();
@@ -126,15 +119,14 @@ public class FeedServlet extends HttpServlet {
     try {
       feedInfo = extractFeedInfo(request);
     } catch (Exception e) {
-      response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-      return;
+      return Response.status(Status.BAD_REQUEST).build();
     }
 
     // Set the content type
     if (feedInfo.getType().equals(Feed.Type.Atom))
-      response.setContentType("application/atom+xml");
+      contentType = "application/atom+xml";
     else if (feedInfo.getType().equals(Feed.Type.RSS))
-      response.setContentType("application/rss+xml");
+      contentType = "application/rss+xml";
 
     // Have a feed generator create the requested feed
     Feed feed = null;
@@ -142,8 +134,7 @@ public class FeedServlet extends HttpServlet {
       if (generator.accept(feedInfo.getQuery())) {
         feed = generator.createFeed(feedInfo.getType(), feedInfo.getQuery(), feedInfo.getSize(), organization);
         if (feed == null) {
-          response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-          return;
+          return Response.serverError().build();
         }
         break;
       }
@@ -152,34 +143,27 @@ public class FeedServlet extends HttpServlet {
     // Have we found a feed generator?
     if (feed == null) {
       logger.debug("RSS/Atom feed could not be generated");
-      response.sendError(HttpServletResponse.SC_NOT_FOUND);
-      return;
+      return Response.status(Status.NOT_FOUND).build();
     }
 
     // Set character encoding
-    response.setCharacterEncoding(feed.getEncoding());
-
-    // Write back feed using Rome
-    Writer responseWriter = response.getWriter();
-    if (feedInfo.getType().equals(Feed.Type.RSS)) {
-      logger.debug("Creating RSS feed output.");
-      SyndFeedOutput output = new SyndFeedOutput();
-      try {
-        output.output(new RomeRssFeed(feed, feedInfo), responseWriter);
-      } catch (Exception e) {
-        logger.error("Error serializing RSS feed", e);
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+    Variant v = new Variant(MediaType.valueOf(contentType), null, feed.getEncoding());
+    String outputString = null;
+    try {
+      if (feedInfo.getType().equals(Feed.Type.RSS)) {
+        logger.debug("Creating RSS feed output.");
+        SyndFeedOutput output = new SyndFeedOutput();
+        outputString = output.outputString(new RomeRssFeed(feed, feedInfo));
+      } else {
+        logger.debug("Creating Atom feed output.");
+        WireFeedOutput output = new WireFeedOutput();
+        outputString = output.outputString(new RomeAtomFeed(feed, feedInfo));
       }
-    } else {
-      logger.debug("Creating Atom feed output.");
-      WireFeedOutput output = new WireFeedOutput();
-      try {
-        output.output(new RomeAtomFeed(feed, feedInfo), responseWriter);
-      } catch (Exception e) {
-        logger.error("Error serializing Atom feed", e);
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-      }
+    } catch (FeedException e) {
+      return Response.serverError().build();
     }
+
+    return Response.ok(outputString, v).build();
   }
 
   /**
@@ -229,24 +213,6 @@ public class FeedServlet extends HttpServlet {
       }
     } else {
       return new FeedInfo(type, version, query);
-    }
-  }
-
-  /**
-   * Sets the http service.
-   *
-   * @param httpService
-   *          the http service
-   */
-  public void setHttpService(HttpService httpService) {
-    try {
-      HttpContext httpContext = httpService.createDefaultHttpContext();
-      httpService.registerServlet("/feeds", FeedServlet.this, null, httpContext);
-      logger.debug("Feed servlet registered");
-    } catch (ServletException e) {
-      e.printStackTrace();
-    } catch (NamespaceException e) {
-      e.printStackTrace();
     }
   }
 

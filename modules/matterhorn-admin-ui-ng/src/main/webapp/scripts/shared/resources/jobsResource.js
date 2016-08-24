@@ -7,6 +7,7 @@ angular.module('adminNg.resources')
 
             parse = function (r) {
                 var row = {};
+                row.id = r.id
                 row.operation = r.operation;
                 row.type = r.type;
                 row.status = r.status;

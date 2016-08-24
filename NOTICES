@@ -1412,8 +1412,11 @@ matterhorn-search-service-impl
   org.apache.solr                        solr-core                                        Apache 2
   org.apache.solr                        solr-solrj                                       Apache 2
   org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  org.jdom                               com.springsource.org.jdom                        Similar to Apache License but with the acknowledgment clause removed	https://raw.github.com/hunterhacker/jdom/master/LICENSE.txt
   org.slf4j                              slf4j-api                                        MIT License
-  rome                                   rome                                             -
+  com.rometools                          rome                                             The Apache Software License, Version 2.0
+  com.rometools                          rome-modules                                     The Apache Software License, Version 2.0
+  com.rometools                          rome-utils                                       The Apache Software License, Version 2.0
 
 
 matterhorn-search-service-remote

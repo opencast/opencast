@@ -16,7 +16,10 @@
                     </div>
                     <div class="full-col">
                         <div class="obj tbl-list">
-                            <header>General <span class="header-value" translate="BULK_ACTIONS.SCHEDULE_TASK.GENERAL.SUMMARY" translate-values='{ count: rows.length}'></span></header>
+                            <header translate="BULK_ACTIONS.SCHEDULE_TASK.GENERAL.CAPTION">
+                                <span class="header-value" translate="BULK_ACTIONS.SCHEDULE_TASK.GENERAL.SUMMARY" translate-values='{ count: rows.length}'>
+                                </span>
+                            </header>
                             <div class="obj-container">
                                 <table class="main-tbl">
                                     <thead>
@@ -56,7 +59,7 @@
         </wz-step>
 
         <!-- Second Step: Task selection -->
-        <wz-step wz-title="Select Task" ng-form="taskForm" novalidate canexit="taskForm.$valid">
+        <wz-step wz-title="{{ 'BULK_ACTIONS.SCHEDULE_TASK.TASKS.CAPTION' | translate }}" ng-form="taskForm" novalidate canexit="taskForm.$valid">
             <div class="modal-content active">
 
                 <div class="modal-body">
@@ -103,12 +106,12 @@
         </wz-step>
 
         <!-- Third step: Summary -->
-        <wz-step wz-title="Select Task" novalidate canexit="true">
+        <wz-step wz-title="{{ 'BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.CAPTION' | translate }}" novalidate canexit="true">
             <div class="modal-content active">
                 <div class="modal-body">
                     <div class="full-col">
                         <div class="obj list-obj">
-                            <header translat="BULK_ACTIONS.SCHEDULE_TASK.SUMMARY">Summary</header>
+                            <header translate="BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.CAPTION">Summary</header>
                             <div class="obj-container">
                                 <ul>
                                     <li>

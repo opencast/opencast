@@ -102,6 +102,14 @@ angular.module('adminNg.controllers')
                             });
                         }
                     }
+
+                    angular.forEach(policy.actions.value, function(customAction){
+                      ace.push({
+                        'action' : customAction,
+                        'allow'  : true,
+                        'role'   : policy.role
+                      });
+                    });
                 });
 
                 userdata.access = {

@@ -31,17 +31,18 @@ import org.opencastproject.feed.api.FeedExtension;
 import org.opencastproject.feed.api.Link;
 import org.opencastproject.feed.api.Person;
 
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.module.DCModule;
-import com.sun.syndication.feed.module.DCModuleImpl;
-import com.sun.syndication.feed.module.DCSubject;
-import com.sun.syndication.feed.module.DCSubjectImpl;
-import com.sun.syndication.feed.module.Module;
-import com.sun.syndication.feed.module.itunes.EntryInformation;
-import com.sun.syndication.feed.module.itunes.EntryInformationImpl;
-import com.sun.syndication.feed.module.itunes.FeedInformation;
-import com.sun.syndication.feed.module.itunes.FeedInformationImpl;
-import com.sun.syndication.feed.module.itunes.types.Duration;
+import com.rometools.modules.itunes.EntryInformation;
+import com.rometools.modules.itunes.EntryInformationImpl;
+import com.rometools.modules.itunes.FeedInformation;
+import com.rometools.modules.itunes.FeedInformationImpl;
+import com.rometools.modules.itunes.types.Duration;
+import com.rometools.rome.feed.atom.Entry;
+import com.rometools.rome.feed.module.DCModule;
+import com.rometools.rome.feed.module.DCModuleImpl;
+import com.rometools.rome.feed.module.DCSubject;
+import com.rometools.rome.feed.module.DCSubjectImpl;
+import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.feed.synd.SyndPerson;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,7 +51,7 @@ import java.util.List;
 /**
  * Wrapper around the Rome Atom feed implementation
  */
-public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
+public class RomeAtomFeed extends com.rometools.rome.feed.atom.Feed {
 
   /** Serial version UID */
   private static final long serialVersionUID = -2449605551424421096L;
@@ -114,7 +115,7 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
         e.setTitleEx(toRomeAtomContent(entry.getTitle()));
         e.setUpdated(entry.getUpdatedDate());
         e.setId(entry.getUri());
-        List<com.sun.syndication.feed.atom.Link> links = toRomeAtomLinks(entry.getLinks());
+        List<com.rometools.rome.feed.atom.Link> links = toRomeAtomLinks(entry.getLinks());
         links.addAll(toRomeAtomEnclosures(entry.getEnclosures()));
         e.setOtherLinks(links);
         // todo this strategy seems to work but is unproven
@@ -133,12 +134,12 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
    *          original categories
    * @return <code>ROME</code> category list
    */
-  private List<com.sun.syndication.feed.atom.Category> toRomeAtomCategories(List<Category> categories) {
+  private List<com.rometools.rome.feed.atom.Category> toRomeAtomCategories(List<Category> categories) {
     if (categories == null)
       return Collections.emptyList();
-    List<com.sun.syndication.feed.atom.Category> romeCategories = new ArrayList<com.sun.syndication.feed.atom.Category>(categories.size());
+    List<com.rometools.rome.feed.atom.Category> romeCategories = new ArrayList<com.rometools.rome.feed.atom.Category>(categories.size());
     for (Category category : categories) {
-      com.sun.syndication.feed.atom.Category romeCategory = new com.sun.syndication.feed.atom.Category();
+      com.rometools.rome.feed.atom.Category romeCategory = new com.rometools.rome.feed.atom.Category();
       romeCategory.setLabel(category.getName());
       romeCategory.setScheme(category.getTaxonomyUri());
       romeCategories.add(romeCategory);
@@ -153,10 +154,10 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
    *          original content
    * @return <code>ROME</code> content object
    */
-  private com.sun.syndication.feed.atom.Content toRomeAtomContent(Content content) {
+  private com.rometools.rome.feed.atom.Content toRomeAtomContent(Content content) {
     if (content == null)
       return null;
-    com.sun.syndication.feed.atom.Content romeContent = new com.sun.syndication.feed.atom.Content();
+    com.rometools.rome.feed.atom.Content romeContent = new com.rometools.rome.feed.atom.Content();
     romeContent.setMode(content.getMode().toString().toLowerCase());
     romeContent.setType(content.getType());
     romeContent.setValue(content.getValue());
@@ -170,10 +171,10 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
    *          original contents
    * @return <code>ROME</code> content list
    */
-  private List<com.sun.syndication.feed.atom.Content> toRomeAtomContents(List<Content> contents) {
+  private List<com.rometools.rome.feed.atom.Content> toRomeAtomContents(List<Content> contents) {
     if (contents == null)
       return Collections.emptyList();
-    List<com.sun.syndication.feed.atom.Content> romeContents = new ArrayList<com.sun.syndication.feed.atom.Content>(contents.size());
+    List<com.rometools.rome.feed.atom.Content> romeContents = new ArrayList<com.rometools.rome.feed.atom.Content>(contents.size());
     for (Content content : contents) {
       romeContents.add(toRomeAtomContent(content));
     }
@@ -187,12 +188,12 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
    *          original enclosures
    * @return <code>ROME</code> enclosure list
    */
-  private List<com.sun.syndication.feed.atom.Link> toRomeAtomEnclosures(List<Enclosure> enclosures) {
+  private List<com.rometools.rome.feed.atom.Link> toRomeAtomEnclosures(List<Enclosure> enclosures) {
     if (enclosures == null)
       return Collections.emptyList();
-    List<com.sun.syndication.feed.atom.Link> romeEnclosures = new ArrayList<com.sun.syndication.feed.atom.Link>(enclosures.size());
+    List<com.rometools.rome.feed.atom.Link> romeEnclosures = new ArrayList<com.rometools.rome.feed.atom.Link>(enclosures.size());
     for (Enclosure enclosure : enclosures) {
-      com.sun.syndication.feed.atom.Link romeEnclosure = new com.sun.syndication.feed.atom.Link();
+      com.rometools.rome.feed.atom.Link romeEnclosure = new com.rometools.rome.feed.atom.Link();
       romeEnclosure.setLength(enclosure.getLength());
       romeEnclosure.setType(enclosure.getType());
       romeEnclosure.setHref(enclosure.getUrl());
@@ -210,12 +211,12 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
    *          original links
    * @return <code>ROME</code> link list
    */
-  private List<com.sun.syndication.feed.atom.Link> toRomeAtomLinks(List<Link> links) {
+  private List<com.rometools.rome.feed.atom.Link> toRomeAtomLinks(List<Link> links) {
     if (links == null)
       return Collections.emptyList();
-    List<com.sun.syndication.feed.atom.Link> romeLinks = new ArrayList<com.sun.syndication.feed.atom.Link>(links.size());
+    List<com.rometools.rome.feed.atom.Link> romeLinks = new ArrayList<com.rometools.rome.feed.atom.Link>(links.size());
     for (Link link : links) {
-      com.sun.syndication.feed.atom.Link romeLink = new com.sun.syndication.feed.atom.Link();
+      com.rometools.rome.feed.atom.Link romeLink = new com.rometools.rome.feed.atom.Link();
       romeLink.setHref(link.getHref());
       romeLink.setHreflang(link.getHreflang());
       romeLink.setLength(link.getLength());
@@ -236,12 +237,12 @@ public class RomeAtomFeed extends com.sun.syndication.feed.atom.Feed {
    *          original persons
    * @return <code>ROME</code> person list
    */
-  private List<com.sun.syndication.feed.atom.Person> toRomeAtomPersons(List<Person> persons) {
+  private List<SyndPerson> toRomeAtomPersons(List<Person> persons) {
     if (persons == null)
       return Collections.emptyList();
-    List<com.sun.syndication.feed.atom.Person> romePersons = new ArrayList<com.sun.syndication.feed.atom.Person>(persons.size());
+    List<SyndPerson> romePersons = new ArrayList<SyndPerson>(persons.size());
     for (Person person : persons) {
-      com.sun.syndication.feed.atom.Person romePerson = new com.sun.syndication.feed.atom.Person();
+      com.rometools.rome.feed.atom.Person romePerson = new com.rometools.rome.feed.atom.Person();
       romePerson.setEmail(person.getEmail());
       romePerson.setName(person.getName());
       romePerson.setUri(person.getUri());

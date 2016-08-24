@@ -73,7 +73,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   public static final String PROP_ORG_ENGAGE_UI_URL = "org.opencastproject.engage.ui.url";
 
   /** Property key for the organizations feed url */
-  public static final String PROP_ORG_FEED_URL = "feed.url";
+  public static final String PROP_ORG_FEED_URL = "org.opencastproject.feed.url";
 
   /** Property key for the feed uri */
   public static final String PROP_URI = "feed.uri";

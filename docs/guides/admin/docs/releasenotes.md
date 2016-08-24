@@ -67,6 +67,14 @@ New Features and Improvements
 * **New Distributions** - A combined admin-worker distribution has been added to make it possible to have a two-server
   installation as documented in our old docs.
 
+
+Additional Notes About 2.2.1
+----------------------------
+
+Opencast 2.2.1 is a bug fix release that fixes some minor issues of Opencast 2.2.0. For more details, please have a look
+at the [changelog](changelog.md).
+
+
 Release Process
 ---------------
 
