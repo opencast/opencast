@@ -47,7 +47,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -95,9 +94,18 @@ public class FeedServiceImpl {
   /** The security service */
   private SecurityService securityService = null;
 
+  /*
+   * Note: We're using Regex matching for the path here, instead of normal JAX-RS paths.  Previously this class was a servlet,
+   * which was fine except that it had auth issues.  Removing the servlet fixed the auth issues, but then the paths (as written
+   * in the RestQuery docs) don't work because  JAX-RS does not support having "/" characters as part of the variable's value.
+   *
+   * So, what we've done instead is match everything that comes in under the /feeds/ namespace, and then substring it out the way
+   * the old servlet code did.  But without the servlet, or auth issues :)
+   */
   @GET
   @Produces(MediaType.TEXT_XML)
-  @Path("{type}/{version}/{query}")
+  @Path("{query: .*}")
+  //FIXME: These Opencast REST classes do not support this path style, and need to have that support added
   @RestQuery(name = "getFeed", description = "Gets an Atom or RSS feed", pathParameters = {
           @RestParameter(description = "The feed type", name = "type", type = Type.STRING, isRequired = true),
           @RestParameter(description = "The feed version", name = "version", type = Type.STRING, isRequired = true),
@@ -107,8 +115,7 @@ public class FeedServiceImpl {
           @RestResponse(description = "Return the feed of the appropriate type", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
-  public Response getFeed(@PathParam("type") String type, @PathParam("version") String version, @PathParam("query") String query, @Context HttpServletRequest request) {
-    Float versionFloat = Float.parseFloat(version);
+  public Response getFeed(@Context HttpServletRequest request) {
     String contentType = null;
 
     logger.debug("Requesting RSS or Atom feed.");
