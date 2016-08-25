@@ -100,8 +100,8 @@ angular.module('adminNg.controllers')
 
         $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
 
-        $scope.table.delete = function (id) {
-            EventsResource.delete({id: id});
+        $scope.table.delete = function (row) {
+            EventsResource.delete({id: row.id});
         };
     }
 ]);

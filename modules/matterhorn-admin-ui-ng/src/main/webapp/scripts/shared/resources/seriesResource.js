@@ -15,6 +15,7 @@ angular.module('adminNg.resources')
                     row.contributors = r.contributors.join(', ');
                     row.createdDateTime = Language.formatDate('short', r.creation_date);
                     row.managed_acl = r.managedAcl;
+                    row.type = "SERIES";
                     return row;
                 });
             }

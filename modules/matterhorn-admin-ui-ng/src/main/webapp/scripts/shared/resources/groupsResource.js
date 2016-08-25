@@ -12,6 +12,7 @@ angular.module('adminNg.resources')
                   row.description = r.description;
                   row.name = r.name;
                   row.role = r.role;
+                  row.type = "GROUP";
                   return row;
               });
           }
