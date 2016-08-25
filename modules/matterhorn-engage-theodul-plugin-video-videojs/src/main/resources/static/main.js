@@ -374,7 +374,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       return foundQualities;
     }
     var tagsList = getTags(videoSources, '-quality');
-    var qualitiesList = _.map(tagsList, function(quality) {
+    var qualitiesList = _.map(Array.from(tagsList), function(quality) {
       return quality.substring(0, quality.indexOf('-quality'));
     });
     var tracks;
@@ -384,9 +384,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         break;
       }
     }
-    var sortedResolutionsList = _.map(qualitiesList, function(quality) {
+    var sortedResolutionsList = [];
+    sortedResolutionsList = _.map(qualitiesList, function(quality) {
       var currentTrack = filterTracksByTag(tracks, quality + '-quality')[0];
-      sortedResolutionsList.push([quality, currentTrack.resolution.substring(0, currentTrack.resolution.indexOf('x'))]);
+      return [quality, currentTrack.resolution.substring(0, currentTrack.resolution.indexOf('x'))];
     });
     sortedResolutionsList.sort(compareQuality);
     foundQualities = [];
