@@ -110,3 +110,5 @@ Make sure you have ActiveMQ running (unless you're running it on a different mac
     cd /your/path/to/opencast/
     cd build/opencast-dist-allinone-[...]
     ./bin/start-opencast
+
+As soon as Opencast is completely started, browse to [http://localhost:8080](http://localhost:8080) to get to the administration interface.

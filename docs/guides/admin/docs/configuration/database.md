@@ -8,7 +8,7 @@ a huge performance gain.
 > **Notice:** Opencast 2.2 is not compatible with MySQL 5.7 (and probably MariaDB 10.1). **Please use MariaDB 10.0 or MySQL
 5.5 or 5.6.**
 
-> **Notice:** In general, the use of MariaDB 10.0 instead of MySQL 5.5 is recommended, as MariaDB is fully compatible with
+> **Notice:** In general, it is recommended to use MariaDB 10.0 instead of MySQL 5.5, as MariaDB is fully compatible with
 MySQL 5.5 but not vice versa. MariaDB's extra features allow for robust migration scripts than with MySQL.
 
 > **Notice:** For a distributed setup of Opencast, you cannot use the internal H2 database.

@@ -138,9 +138,11 @@ public class SolrIndexManager {
 
   private SecurityService securitySvc;
 
+  private int searchResultLimit = Integer.MAX_VALUE;
+
   /**
    * Creates a new management instance for the search index.
-   * 
+   *
    * @param solrServer
    *          connection to the database
    */
@@ -199,7 +201,7 @@ public class SolrIndexManager {
 
   /**
    * Clears the search index. Make sure you know what you are doing.
-   * 
+   *
    * @throws SolrServerException
    *           if an errors occurs while talking to solr
    */
@@ -214,7 +216,7 @@ public class SolrIndexManager {
 
   /**
    * Returns number of episodes in search index, across all organizations.
-   * 
+   *
    * @return number of episodes in search index
    * @throws ArchiveDbException
    *           if count cannot be retrieved
@@ -230,7 +232,7 @@ public class SolrIndexManager {
 
   /**
    * Set the deleted flag of all versions of the media package with the given id.
-   * 
+   *
    * @param id
    *          identifier of the series or episode to delete
    * @param deletionDate
@@ -245,6 +247,10 @@ public class SolrIndexManager {
       try {
         SolrQuery query = new SolrQuery(Schema.DC_ID + ":" + ClientUtils.escapeQueryChars(id) + " AND "
                 + Schema.OC_DELETED + ":false");
+        // searchResultLimit is flexible for junit test
+        if (searchResultLimit > 0) {
+          query.setRows(searchResultLimit);
+        }
         solrResponse = solrServer.query(query);
       } catch (Exception e1) {
         throw new SolrServerException(e1);
@@ -272,6 +278,10 @@ public class SolrIndexManager {
     } catch (IOException e) {
       throw new SolrServerException(e);
     }
+  }
+
+  public void setSearchResultLimit(int searchResultLimit) {
+    this.searchResultLimit = searchResultLimit;
   }
 
   /** Set the "locked" flag of an index entry. */
@@ -334,9 +344,9 @@ public class SolrIndexManager {
   /**
    * Posts the media package to solr. Depending on what is referenced in the media package, the method might create one
    * or two entries: one for the episode and one for the series that the episode belongs to.
-   * 
+   *
    * Note: Media package element URIs need to be URLs pointing to existing locations.
-   * 
+   *
    * @param sourceMediaPackage
    *          the media package to post
    * @param acl
@@ -374,7 +384,7 @@ public class SolrIndexManager {
    * or two entries: one for the episode and one for the series that the episode belongs to.
    * <p>
    * Note: Media package element URIs need to be URLs pointing to existing locations.
-   * 
+   *
    * @param sourceMediaPackage
    *          the media package to post
    * @param acl
@@ -411,7 +421,7 @@ public class SolrIndexManager {
 
   /**
    * Creates a solr input document for the episode metadata of the media package.
-   * 
+   *
    * @param mediaPackage
    *          the media package
    * @param acl
@@ -765,7 +775,7 @@ public class SolrIndexManager {
 
   /**
    * Add the mpeg 7 catalog data to the solr document.
-   * 
+   *
    * @param doc
    *          the input document to the solr index
    * @param mpeg7
@@ -792,6 +802,7 @@ public class SolrIndexManager {
     SortedSet<TextAnnotation> sortedAnnotations = null;
     if (!"".equals(Schema.getOcKeywords(doc))) {
       sortedAnnotations = new TreeSet<TextAnnotation>(new Comparator<TextAnnotation>() {
+        @Override
         public int compare(TextAnnotation a1, TextAnnotation a2) {
           if ((RELEVANCE_BOOST * a1.getRelevance() + a1.getConfidence()) > (RELEVANCE_BOOST * a2.getRelevance() + a2
                   .getConfidence()))
@@ -907,7 +918,7 @@ public class SolrIndexManager {
 
   /**
    * Generates a string with the most important kewords from the text annotation.
-   * 
+   *
    * @param sortedAnnotations
    * @return The keyword string.
    */
@@ -981,7 +992,7 @@ public class SolrIndexManager {
 
   /**
    * Gets the maximum confidence for a given keyword in the text annotation.
-   * 
+   *
    * @param keyword
    * @param sortedAnnotations
    * @return The maximum confidence value.
@@ -1009,7 +1020,7 @@ public class SolrIndexManager {
 
   /**
    * Gets the maximum relevance for a given keyword in the text annotation.
-   * 
+   *
    * @param keyword
    * @param sortedAnnotations
    * @return The maximum relevance value.
