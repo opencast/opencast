@@ -22,9 +22,9 @@
 
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
-.controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource', 'SeriesThemeResource', 'ResourcesListResource', 'Notifications',
+.controller('SerieCtrl', ['$scope', '$q', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource', 'SeriesThemeResource', 'ResourcesListResource', 'Notifications',
         'OptoutSingleResource', 'SeriesParticipationResource',
-        function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, ResourcesListResource, Notifications, 
+        function ($scope, $q, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, ResourcesListResource, Notifications,
             OptoutSingleResource, SeriesParticipationResource) {
 
     var saveFns = {}, aclNotification,
@@ -167,8 +167,10 @@ angular.module('adminNg.controllers')
                 }
             });
         });
-        $scope.roles = ResourcesListResource.get({ resource: 'ROLES' });
 
+        $scope.roles = ResourcesListResource.get({ resource: 'ROLES' }, function (data) {
+            return data;
+        });
         $scope.theme = {};
 
         ResourcesListResource.get({ resource: 'THEMES.NAME' }, function (data) {
@@ -187,7 +189,14 @@ angular.module('adminNg.controllers')
                 });
             });
         });
-
+        var aclBits = {"acl": $scope.access.$promise, "roles": $scope.roles.$promise};
+        $q.all(aclBits).then(function (results) {
+            angular.forEach($scope.access.series_access.privileges, function(value, key) {
+                if (angular.isUndefined($scope.roles[key])) {
+                    $scope.roles[key] = key;
+                }
+            }, this);
+        }, this);
     };
 
       // Generate proxy function for the save metadata function based on the given flavor
