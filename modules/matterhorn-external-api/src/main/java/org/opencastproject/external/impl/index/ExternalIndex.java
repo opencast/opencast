@@ -59,7 +59,7 @@ public class ExternalIndex extends AbstractSearchIndex {
    *
    * @param ctx
    *          the component context
-   * @throws IOException
+   * @throws ComponentException
    *           if the search index cannot be initialized
    */
   @Override

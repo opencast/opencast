@@ -31,7 +31,6 @@ public class ListProviderException extends Exception {
    * Constructor without cause.
    *
    * @param message
-   * @param cause
    */
   public ListProviderException(String message) {
     super(message);

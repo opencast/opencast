@@ -29,9 +29,8 @@ public class ExternalServiceException extends Exception {
 
   /**
    * Constructor without cause.
-   * 
+   *
    * @param message
-   * @param cause
    */
   public ExternalServiceException(String message) {
     super(message);
@@ -39,7 +38,7 @@ public class ExternalServiceException extends Exception {
 
   /**
    * Full fledged constructor.
-   * 
+   *
    * @param message
    * @param cause
    */
