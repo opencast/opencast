@@ -93,6 +93,11 @@ public class MediaInspectionServiceImplTest {
   /** Setup test. */
   @Ignore
   private Option<MediaInspector> init(URI resource) throws Exception {
+    return init(resource, false);
+  }
+
+  @Ignore
+  private Option<MediaInspector> init(URI resource, boolean accurateFrameCount) throws Exception {
     for (String binary : ffprobePath) {
       final File f = new File(resource);
       Workspace workspace = EasyMock.createNiceMock(Workspace.class);
@@ -100,7 +105,7 @@ public class MediaInspectionServiceImplTest {
       EasyMock.expect(workspace.get(resource)).andReturn(f);
       EasyMock.expect(workspace.get(resource)).andReturn(f);
       EasyMock.replay(workspace);
-      return some(new MediaInspector(workspace, new AudioParser(), binary, true));
+      return some(new MediaInspector(workspace, new AudioParser(), binary, accurateFrameCount));
     }
     return none();
   }
@@ -156,6 +161,31 @@ public class MediaInspectionServiceImplTest {
       assertEquals(1L, videoStreams[0].getFrameCount().longValue());
       AudioStream[] audioStreams = TrackSupport.byType(newTrack.getStreams(), AudioStream.class);
       assertTrue(audioStreams[0].getFrameCount().longValue() > 0);
+      assertEquals(newTrack.getChecksum(), cs);
+      assertEquals(newTrack.getMimeType(), mt);
+      assertNotNull(newTrack.getDuration());
+      assertTrue(newTrack.getDuration() > 0);
+      // test the override scenario
+      newTrack = (Track) mi.enrich(track, true);
+      assertEquals(newTrack.getChecksum(), cs);
+      assertNotSame(newTrack.getMimeType(), mt);
+      assertTrue(newTrack.getDuration() > 0);
+    }
+
+    for (MediaInspector mi : init(trackUri, true)) {
+      Track track = mi.inspectTrack(trackUri);
+      // make changes to metadata
+      Checksum cs = track.getChecksum();
+      track.setChecksum(null);
+      MimeType mt = mimeType("video", "flash");
+      track.setMimeType(mt);
+      // test the enrich scenario
+      Track newTrack = (Track) mi.enrich(track, false);
+
+      VideoStream[] videoStreams = TrackSupport.byType(newTrack.getStreams(), VideoStream.class);
+      assertEquals(1L, videoStreams[0].getFrameCount().longValue());
+      AudioStream[] audioStreams = TrackSupport.byType(newTrack.getStreams(), AudioStream.class);
+      assertEquals(44L, audioStreams[0].getFrameCount().longValue());
       assertEquals(newTrack.getChecksum(), cs);
       assertEquals(newTrack.getMimeType(), mt);
       assertNotNull(newTrack.getDuration());
