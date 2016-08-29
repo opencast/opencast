@@ -111,7 +111,7 @@ public final class EndpointUtil {
    * @param list
    *          The source list for the JSON object
    * @return a JSON object containing the all the key-value as parameter
-   * @throws JSONException
+   * @throws JsonCreationException
    */
   public static <T> JSONObject generateJSONObject(Map<String, T> list) throws JsonCreationException {
     JSONObject jsonList = new JSONObject();

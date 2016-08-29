@@ -44,7 +44,6 @@ import freemarker.template.TemplateException;
  * could be used for other things as well
  *
  * @see DocData
- * @see org.opencastproject.runtimeinfo.rest.DocRestData
  */
 public final class DocUtil {
 
@@ -72,9 +71,9 @@ public final class DocUtil {
 
   /**
    * Handles the replacement of the variable strings within textual templates and also allows the setting of variables
-   * for the control of logical branching within the text template as well<br/>
+   * for the control of logical branching within the text template as well<br>
    * Uses and expects freemarker (http://freemarker.org/) style templates (that is using ${name} as the marker for a
-   * replacement)<br/>
+   * replacement)<br>
    * NOTE: These should be compatible with Velocity (http://velocity.apache.org/) templates if you use the formal
    * notation (formal: ${variable}, shorthand: $variable)
    *
@@ -83,9 +82,9 @@ public final class DocUtil {
    * @param textTemplate
    *          a freemarker/velocity style text template, cannot be null or empty string
    * @param data
-   *          a set of replacement values which are in the map like so:<br/>
-   *          key => value (String => Object)<br/>
-   *          "username" => "aaronz"<br/>
+   *          a set of replacement values which are in the map like so:<br>
+   *          key =&gt; value (String =&gt; Object)<br>
+   *          "username" =&gt; "aaronz"<br>
    * @return the processed template
    */
   public static String processTextTemplate(String templateName, String textTemplate, Map<String, Object> data) {
@@ -144,7 +143,6 @@ public final class DocUtil {
    * @throws IllegalArgumentException
    *           if the input data is invalid in some way
    * @see DocData
-   * @see org.opencastproject.runtimeinfo.rest.DocRestData
    */
   public static String generate(DocData data) {
     String template = loadTemplate(data.getDefaultTemplatePath());
@@ -163,7 +161,6 @@ public final class DocUtil {
    * @throws IllegalArgumentException
    *           if the input data is invalid in some way
    * @see DocData
-   * @see org.opencastproject.runtimeinfo.rest.DocRestData
    */
   public static String generate(DocData data, String template) {
     if (template == null) {

@@ -47,9 +47,9 @@ public interface ResourceListQuery {
 
   /**
    * Returns the filter with the given name
-   * 
-   * @param <A>
-   * 
+   *
+   * @param name
+   *
    * @return the query filter or null if the filter does not exist
    */
   ResourceListFilter<?> getFilter(String name);

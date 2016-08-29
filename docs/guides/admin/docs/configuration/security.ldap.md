@@ -155,7 +155,7 @@ list. The roles will be processed in the same way as the roles obtained from the
 
 > *This step is only necessary in Opencast deployments along multiple machines.*
 
-Edit the file `etc/factories/org.opencastproject.userdirectory.ldap.properties` and include the same authentication
+Edit the file `etc/org.opencastproject.userdirectory.ldap.cfg` and include the same authentication
 parameters as in the `security.xml` file. The contents should be self-explanatory:
 
     # In order to configure one or more LDAP configurations, set the "instances" field to the correct value

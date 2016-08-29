@@ -85,7 +85,7 @@ public interface User {
   Organization getOrganization();
 
   /**
-   * Gets the user's roles. For anonymous users, this will return {@link Anonymous}.
+   * Gets the user's roles. For anonymous users, this will return Anonymous.
    *
    * @return the user's roles
    */

@@ -72,7 +72,6 @@ public class TrustedHttpClient {
 
   /**
    * {@inheritDoc}
-   * @see org.opencastproject.remotetest.util.security.api.TrustedHttpClient#execute(org.apache.http.client.methods.HttpUriRequest)
    */
   public HttpResponse execute(HttpUriRequest httpUriRequest) {
     // Add the request header to elicit a digest auth response

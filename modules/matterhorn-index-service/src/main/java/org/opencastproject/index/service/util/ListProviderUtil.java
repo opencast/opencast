@@ -137,8 +137,8 @@ public final class ListProviderUtil {
   }
 
   /**
-   * Invert the key & value in the given map
-   * 
+   * Invert the key &amp; value in the given map
+   *
    * @param map
    *          the map to invert
    * @return an inverted map

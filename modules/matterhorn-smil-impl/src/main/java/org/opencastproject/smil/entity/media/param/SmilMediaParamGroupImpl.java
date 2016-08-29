@@ -175,9 +175,7 @@ public class SmilMediaParamGroupImpl extends SmilObjectImpl implements SmilMedia
   }
 
   /**
-   * {
-   *
-   * @inheritDocs}
+   * {@inheritDoc}
    */
   @Override
   public SmilObject getElementOrNull(String elementId) {

@@ -244,9 +244,6 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.security.api.UserReferenceProvider#addUserReference(org.opencastproject.security.api.User,
-   *      String)
    */
   public void addUserReference(JpaUserReference user, String mechanism) {
     // Create a JPA user with an encoded password.
@@ -280,9 +277,6 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
     }
   }
 
-  /**
-   * @see org.opencastproject.security.api.UserReferenceProvider#updateUserReference(org.opencastproject.security.api.User)
-   */
   public void updateUserReference(JpaUserReference user) {
     EntityManager em = null;
     EntityTransaction tx = null;

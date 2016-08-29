@@ -1,6 +1,39 @@
 Opencast 2.2.x
 ==============
 
+Opencast 2.2.1
+--------------
+
+- [[MH-11092]](https://opencast.jira.com/browse/MH-11092) - Every Browser has an other "Remember me" checkbox
+- [[MH-11169]](https://opencast.jira.com/browse/MH-11169) - Trimming points not set correctly after workflow is finished
+- [[MH-11538]](https://opencast.jira.com/browse/MH-11538) - "No compatible source was found for this video" videojs player error in iOS device
+- [[MH-11561]](https://opencast.jira.com/browse/MH-11561) - Style (CSS): Setting a server in Maintenance (srv-det-01)
+- [[MH-11598]](https://opencast.jira.com/browse/MH-11598) - Wizards should not re-use data that has entered before
+- [[MH-11644]](https://opencast.jira.com/browse/MH-11644) - Missing Admin Interface Mock Data
+- [[MH-11653]](https://opencast.jira.com/browse/MH-11653) - Jobs do not always proceed
+- [[MH-11655]](https://opencast.jira.com/browse/MH-11655) - Jobs with high job load never get processed
+- [[MH-11659]](https://opencast.jira.com/browse/MH-11659) - Warning is missing that metada and ACL cannot be edited while job is processing.
+- [[MH-11661]](https://opencast.jira.com/browse/MH-11661) - Link on logo on the media module points to admin ui or welcome page, instead of something that is accessable for every user
+- [[MH-11664]](https://opencast.jira.com/browse/MH-11664) - Incorrect Inconsistency status when built from tarball
+- [[MH-11665]](https://opencast.jira.com/browse/MH-11665) - Systems-\>Servers & Systems-\>Services show wrong mean runtime and mean queue time
+- [[MH-11667]](https://opencast.jira.com/browse/MH-11667) - Align main table content
+- [[MH-11668]](https://opencast.jira.com/browse/MH-11668) - Missing segment previews let to an erro in the player
+- [[MH-11669]](https://opencast.jira.com/browse/MH-11669) - Do not archive OCR texts
+- [[MH-11673]](https://opencast.jira.com/browse/MH-11673) - Add documentation for additional ACL actions
+- [[MH-11674]](https://opencast.jira.com/browse/MH-11674) - Add documentation for metadata configuration
+- [[MH-11679]](https://opencast.jira.com/browse/MH-11679) - Page size cannot be changed in any table
+- [[MH-11681]](https://opencast.jira.com/browse/MH-11681) - Add documentation for role-based visibility
+- [[MH-11682]](https://opencast.jira.com/browse/MH-11682) - Remove useless roles from roles.txt
+- [[MH-11686]](https://opencast.jira.com/browse/MH-11686) - Extended metadata tab not shown although user has the role ROLE\_UI\_EVENTS\_DETAILS\_METADATA\_VIEW
+- [[MH-11690]](https://opencast.jira.com/browse/MH-11690) - Various Documentation Improvements
+- [[MH-11692]](https://opencast.jira.com/browse/MH-11692) - Remove Superfluous Mh-Db-Version
+- [[MH-11693]](https://opencast.jira.com/browse/MH-11693) - Remove Superfluous Dependency Versions
+- [[MH-11694]](https://opencast.jira.com/browse/MH-11694) - JavaDoc Generation Broken
+- [[MH-11702]](https://opencast.jira.com/browse/MH-11702) - After an upgrade to 2.2.0, series are not displayed in the UI because the series creation date is now mandatory
+- [[MH-11720]](https://opencast.jira.com/browse/MH-11720) - Opencast 2.2 requires Git to be installed at build time
+- [[MH-11727]](https://opencast.jira.com/browse/MH-11727) - Fix unit test: adminNg.services.language #toLocalTime converts a zulu time string back to local time FAILED
+- [[MH-11730]](https://opencast.jira.com/browse/MH-11730) - Make the automatic role prefix in LDAPUserProvider configurable
+
 Opencast 2.2.0
 --------------
 

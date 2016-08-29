@@ -164,6 +164,29 @@ public class CaptureAgentsEndpointTest {
             .get(rt.host("/agents.json"));
   }
 
+  @Test
+  public void testSortAgentsByLastUpdatedTimestamp() throws ParseException, IOException {
+    int total = 4;
+
+    given().queryParam("sort", "updated:ASC").expect().statusCode(HttpStatus.SC_OK)
+            .contentType(ContentType.JSON).body("total", equalTo(total))
+            .body("results", hasSize(total))
+            .body("results[0].Update", equalTo("2014-05-26T15:37:02Z"))
+            .body("results[1].Update", equalTo("2016-05-26T07:07:07Z"))
+            .body("results[2].Update", equalTo("2016-06-09T06:00:00Z"))
+            .body("results[3].Update", equalTo("2016-06-09T18:00:00Z"))
+            .when().get(rt.host("/agents.json"));
+
+    given().queryParam("sort", "updated:DESC").expect().statusCode(HttpStatus.SC_OK)
+            .contentType(ContentType.JSON).body("total", equalTo(total))
+            .body("results", hasSize(total))
+            .body("results[3].Update", equalTo("2014-05-26T15:37:02Z"))
+            .body("results[2].Update", equalTo("2016-05-26T07:07:07Z"))
+            .body("results[1].Update", equalTo("2016-06-09T06:00:00Z"))
+            .body("results[0].Update", equalTo("2016-06-09T18:00:00Z"))
+            .when().get(rt.host("/agents.json"));
+  }
+
   @BeforeClass
   public static void oneTimeSetUp() {
     rt.setUpServer();

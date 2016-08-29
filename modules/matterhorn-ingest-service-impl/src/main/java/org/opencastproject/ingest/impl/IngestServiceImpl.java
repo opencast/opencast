@@ -1725,9 +1725,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * Interpret the payload of a completed Job as a MediaPackageElement. Wait for the job to complete if necessary.
-   *
-   * @throws MediaPackageException
-   *           in case the payload is not a mediapackage element
    */
   public static Function<Job, Track> payloadAsTrack(final ServiceRegistry reg) {
     return new Function.X<Job, Track>() {

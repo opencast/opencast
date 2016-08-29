@@ -61,14 +61,14 @@ public class KeywordAnnotationImpl implements KeywordAnnotation {
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.KeywordAnnotation#getKeyword()
+   * @see org.opencastproject.metadata.mpeg7.KeywordAnnotation#getKeyword()
    */
   public String getKeyword() {
     return keyword;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.KeywordAnnotation#getType()
+   * @see org.opencastproject.metadata.mpeg7.KeywordAnnotation#getType()
    */
   public Type getType() {
     return type;

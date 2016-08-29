@@ -173,7 +173,7 @@ public interface IndexService {
    * @throws ParseException
    *           Thrown if unable to parse the start and end UTC date and time.
    * @throws IOException
-   *           Thrown if unable to update the event's {@link DublinCoreCatalog}
+   *           Thrown if unable to update the event's DublinCoreCatalog
    * @throws MediaPackageException
    *           Thrown if unable to update the event's {@link MediaPackage}
    * @throws IngestException

@@ -198,7 +198,7 @@ public final class DublinCores {
   /**
    * Create a new empty catalog suitable to take properties from the standard DublinCore
    * namespaces {@link DublinCore#ELEMENTS_1_1_NS_URI} and {@link DublinCore#TERMS_NS_URI}.
-   * <p/>
+   * <p>
    * Please note that neither a flavor nor a root tag is set.
    */
   @Nonnull
@@ -219,9 +219,9 @@ public final class DublinCores {
   /**
    * Read a DublinCore catalog from a stream containing either JSON or XML. The method is
    * capable of detecting the used format.
-   * <p/>
+   * <p>
    * The reader is not capable of determining the catalog's flavor.
-   * <p/>
+   * <p>
    * <strong>Implementation note:</strong> In order to detect the format the whole stream is read into memory first. If you
    * know upfront whether JSON or XML is used you may want to choose {@link DublinCoreJsonFormat#read(java.io.InputStream)}
    * or {@link DublinCoreXmlFormat#read(java.io.InputStream)} for performance reasons.

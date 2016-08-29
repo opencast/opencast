@@ -42,7 +42,7 @@ public final class Misc {
 
   /**
    * Throw a checked exception like a RuntimeException removing any needs to declare a throws clause.
-   * <p/>
+   *
    * This technique has been described by James Iry at
    * http://james-iry.blogspot.de/2010/08/on-removing-java-checked-exceptions-by.html
    */

@@ -31,6 +31,7 @@ The Opencast Release Documentation is the official Opencast documentation for ea
     - [Encoding Configuration](configuration/encoding.md)
     - [more...](configuration/index.md)
  - [Module Documentation](modules/index.md)
+    - [Atom and RSS Feed](modules/atomrss.md)
     - [Media Module](modules/mediamodule.configuration.md)
     - [Stream Security](modules/stream-security.md)
     - [Text Extraction](modules/textextraction.md)

@@ -395,7 +395,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * Create an error function.
-   * <p/>
+   * <p>
    * Example usage: <code>getCfg(wi, "key").getOrElse(this.&lt;String&gt;cfgKeyMissing("key"))</code>
    *
    * @see #getCfg(WorkflowInstance, String)

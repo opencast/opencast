@@ -31,7 +31,7 @@ import org.openqa.selenium.server.htmlrunner.HTMLLauncher;
 import java.io.File;
 
 /**
- * Overrides {@link SeleniumServer#runHtmlTestSuite} to avoid calls to System.exit().
+ * Overrides {SeleniumServer#runHtmlTestSuite to avoid calls to System.exit().
  */
 public class NonExitingSeleniumServer extends SeleniumServer {
   /** The selenium test suite */
@@ -48,8 +48,8 @@ public class NonExitingSeleniumServer extends SeleniumServer {
    *
    * @param in
    *          the selenium test suite
-   * @param the
-   *          selenium report
+   * @param out
+   *          the selenium report
    * @throws Exception
    *           if the server can not be created
    */

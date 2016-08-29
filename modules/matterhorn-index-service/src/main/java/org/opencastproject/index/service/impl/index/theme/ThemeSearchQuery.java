@@ -557,7 +557,7 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
   }
 
   /**
-   * Defines the sort order for the theme created date & time.
+   * Defines the sort order for the theme created date &amp; time.
    *
    * @param order
    *          the order

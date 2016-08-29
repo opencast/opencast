@@ -44,9 +44,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 
-/**
- * Implementation of {@link AbstractWorkflowCleanupScheduler} to run in an OSGi environment
- */
 public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implements ManagedService {
   private static final String SCANNER_NAME = "Workflow Cleanup Scanner";
 

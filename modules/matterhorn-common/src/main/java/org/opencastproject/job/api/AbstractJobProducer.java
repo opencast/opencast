@@ -79,7 +79,12 @@ public abstract class AbstractJobProducer implements JobProducer {
   /** To enable threading when dispatching jobs */
   protected ExecutorService executor = Executors.newCachedThreadPool();
 
-  /** OSGI activate method. */
+  /**
+   * OSGI activate method.
+   *
+   * @param cc
+   *          OSGI component context
+   **/
   public void activate(ComponentContext cc) {
     acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY).map(Strings.toBool)
             .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);

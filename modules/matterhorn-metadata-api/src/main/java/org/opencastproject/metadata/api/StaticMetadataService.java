@@ -24,9 +24,9 @@ package org.opencastproject.metadata.api;
 
 /**
  * The service provides a set of common metadata describing the episode.
- * <p/>
+ * <p>
  * To get access to the series metadata -- if the episode belongs to a series --
- * please query the {@link org.opencastproject.series.api.SeriesService}.
+ * please query the SeriesService.
  */
 public interface StaticMetadataService extends MetadataService<StaticMetadata> {
 }

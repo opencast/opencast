@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Wrapper class for holding many {@see MediaSegment}s and implements XML serialization methods.
+ * Wrapper class for holding many {@link MediaSegment}s and implements XML serialization methods.
  */
 @XmlRootElement(name = "media-segments")
 @XmlAccessorType(XmlAccessType.NONE)
@@ -68,7 +68,7 @@ public class MediaSegments {
 
   /**
    * Returns a list with media segments, that holds start and stop positions or null.
-   * @return list with {@see MediaSegment}s or null
+   * @return list with {@link MediaSegment}s or null
    */
   public List<MediaSegment> getMediaSegments() {
     return mediaSegments;
@@ -105,8 +105,8 @@ public class MediaSegments {
 
   /**
    * Deserialize from XML.
-   * @param mediaSegmentsXml {@see MediaSegments} XML as String
-   * @return deserialized {@see MediaSegments}
+   * @param mediaSegmentsXml {@link MediaSegments} XML as String
+   * @return deserialized {@link MediaSegments}
    * @throws JAXBException if an error occures
    */
   public static MediaSegments fromXml(String mediaSegmentsXml) throws JAXBException {

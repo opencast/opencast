@@ -35,7 +35,6 @@ public class IllegalLanguageFilenameException extends Exception {
    * Constructor without cause.
    * 
    * @param message
-   * @param cause
    */
   public IllegalLanguageFilenameException(String message) {
     super(message);

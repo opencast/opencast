@@ -153,7 +153,7 @@ public final class ThemeIndexUtils {
    * @param user
    *          the user
    * @param searchIndex
-   *          the {@link AdminUISearchIndex} to search in
+   *          the AdminUISearchIndex to search in
    * @return the theme
    * @throws SearchIndexException
    *           if querying the search index fails

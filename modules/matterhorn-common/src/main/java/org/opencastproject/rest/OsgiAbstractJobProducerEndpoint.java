@@ -29,18 +29,18 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 /**
  * Refined implementation of {@link org.opencastproject.rest.AbstractJobProducerEndpoint} suitable for use in an
  * OSGi environment.
- * <p/>
+ * <p>
  * OSGi dependency injection methods are provided to reduce the amount of boilerplate code needed per
  * service implementation.
- * <p/>
+ * <p>
  * Declare as type variable the {@linkplain AbstractJobProducerEndpoint#getService() job producing service} on which the
  * endpoint depends.
- * <p/>
+ * <p>
  * <strong>Example:</strong> The endpoint for the WorkflowService can be declared like this:
  * <pre>
  *   public final class WorkflowServiceEndpoint extends OsgiAbstractJobProducerEndpoint&lt;WorkflowServiceImpl&gt;
  * </pre>
- * <p/>
+ * <p>
  * <strong>Implementation note:</strong> Type variable <code>A</code> <em>cannot</em> have upper bound
  * {@link org.opencastproject.job.api.JobProducer}. Even though this may seem reasonable it will cause trouble
  * with OSGi dependency injection. The dependency will most likely be declared on the service's <em>interface</em>

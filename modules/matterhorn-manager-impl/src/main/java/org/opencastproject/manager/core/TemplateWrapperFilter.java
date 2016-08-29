@@ -59,7 +59,6 @@ public class TemplateWrapperFilter extends HttpServletResponseWrapper {
      * translations.
      *
      * @param response the response to wrap
-     * @param locale a resource bundle, that will be used for translation of the strings
      * @param request the original request - used to obtain the variable resolver
      */
     public TemplateWrapperFilter(final HttpServletResponse response, final ServletRequest request) {

@@ -48,9 +48,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     play: new Engage.Event('Video:play', 'plays the video', 'both'),
     pause: new Engage.Event('Video:pause', 'pauses the video', 'both'),
     seek: new Engage.Event('Video:seek', 'seek video to a given position in seconds', 'both'),
-    aspectRatioSet: new Engage.Event('Video:aspectRatioSet', 'the aspect ratio has been calculated', 'both'),
-    setZoomLevel: new Engage.Event('Video:setZoomLevel', 'sets the zoom level', 'both'),
-    ready: new Engage.Event('Video:ready', 'all videos loaded successfully', 'trigger'),
+    ready: new Engage.Event('Video:ready', 'all videos loaded successfully', 'both'),
     ended: new Engage.Event('Video:ended', 'end of the video', 'trigger'),
     playerLoaded: new Engage.Event('Video:playerLoaded', 'player loaded successfully', 'trigger'),
     synchronizing: new Engage.Event('Video:synchronizing', 'synchronizing videos with the master video', 'trigger'),
@@ -64,10 +62,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     fullscreenChange: new Engage.Event('Video:fullscreenChange', 'fullscreen change happened', 'trigger'),
     usingFlash: new Engage.Event('Video:usingFlash', 'flash is being used', 'trigger'),
     numberOfVideodisplaysSet: new Engage.Event('Video:numberOfVideodisplaysSet', 'the number of videodisplays has been set', 'trigger'),
-    isAudioOnly: new Engage.Event('Video:isAudioOnly', 'whether it\'s audio only or not', 'trigger'),
+    aspectRatioSet: new Engage.Event('Video:aspectRatioSet', 'the aspect ratio has been calculated', 'both'),
+    isAudioOnly: new Engage.Event('Video:isAudioOnly', 'whether it´s audio only or not', 'trigger'),
     audioCodecNotSupported: new Engage.Event('Video:audioCodecNotSupported', 'when the audio codec seems not to be supported by the browser', 'trigger'),
-    videoFormatsFound: new Engage.Event('Video:videoFormatsFound', '', 'trigger'),
-    zoomChange: new Engage.Event('Video:zoomChange', 'zoom level has changed', 'trigger'),
+    videoFormatsFound: new Engage.Event('Video:videoFormatsFound', '', 'both'),
     playPause: new Engage.Event('Video:playPause', '', 'handler'),
     plugin_load_done: new Engage.Event('Core:plugin_load_done', '', 'handler'),
     fullscreenEnable: new Engage.Event('Video:fullscreenEnable', 'go to fullscreen', 'handler'),
@@ -94,11 +92,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     moveDown: new Engage.Event('Video:moveDown', 'moves video down', 'handler'),
     moveLeft: new Engage.Event('Video:moveLeft', 'moves video left', 'handler'),
     moveRight: new Engage.Event('Video:moveRight', 'moves video right', 'handler'),
+    setZoomLevel: new Engage.Event('Video:setZoomLevel', 'sets the zoom level', 'both'),
     zoomReset: new Engage.Event('Video:resetZoom', 'resets position and zoom level', 'handler'),
     moveHorizontal: new Engage.Event('Video:moveHorizontal', 'move video horizontal', 'handler'),
     moveVertical: new Engage.Event('Video:moveVertical', 'move video vertical', 'handler'),
     zoomIn: new Engage.Event('Video:zoomIn', 'zooms in video', 'handler'),
-    zoomOut: new Engage.Event('Video:zoomOut', 'zooms out video', 'handler')
+    zoomOut: new Engage.Event('Video:zoomOut', 'zooms out video', 'handler'),
+    zoomChange: new Engage.Event('Video:zoomChange', 'zoom level has changed', 'trigger'),
+    switchVideo: new Engage.Event('Video:switch', 'switch the video', 'handler')
   };
 
   var isDesktopMode = false;
@@ -177,12 +178,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var isAudioOnly = false;
   var isUsingFlash = false;
   var mastervideotype = '';
-  var aspectRatio = '';
+  var aspectRatio = null;
   var singleVideoPaddingTop = '';
   var initCount = 7;
   var infoMeChange = 'change:infoMe';
   var mediapackageError = false;
   var videoDisplayNamePrefix = 'videojs_videodisplay_';
+  var id_video_wrapper = 'video_wrapper';
   var id_engage_video = 'engage_video';
   var id_videojs_wrapper = 'videojs_wrapper';
   var id_videoDisplayClass = 'videoDisplay';
@@ -194,11 +196,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var id_generated_videojs_flash_component = 'videojs_videodisplay_0_flash_api';
   var id_btn_openInPlayer = 'btn_openInPlayer';
   var id_btn_switchPlayer = 'btn_switchPlayer';
-  var id_btn_video1 = 'btn-video1';
-  var id_btn_video2 = 'btn-video2';
   var id_switchPlayer_value = 'switchPlayer-value';
   var id_audioDisplay = 'audioDisplay';
-  var id_switchPlayers = 'switchPlayers';
   var class_vjs_switchPlayer = 'vjs-switchPlayer';
   var class_btn_video = 'btn-video';
   var class_vjs_switchPlayer_value = 'vjs-switchPlayer-value';
@@ -231,7 +230,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var currentlySelectedVideodisplay = 0;
   var globalVideoSource = [];
   var videoResultions = [];
-  var loadDash = false;
   var loadHls = false;
   var flavors = '';
   var mimetypes = '';
@@ -239,7 +237,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var videoDataView = undefined;
   var fullscreen = false;
   var videoDisplayClass = 'videoDisplay';
-
+  var qualities = null;
+  var videodisplayMaster = null;
   var videoDefaultLayoutClass = 'videoDefaultLayout';
   var videoUnfocusedClass = 'videoUnfocusedPiP';
   var videoFocusedClass = 'videoFocusedPiP';
@@ -255,9 +254,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
   function initTranslate(language, funcSuccess, funcError) {
     var path = Engage.getPluginPath('EngagePluginVideoVideoJS').replace(/(\.\.\/)/g, '');
-    var jsonstr = window.location.origin + '/engage/theodul/' + path; // this solution is really bad, fix it...
+    /* this solution is really bad, fix it... */
+    var jsonstr = window.location.origin + '/engage/theodul/' + path;
 
-    Engage.log('Video: selecting language ' + language);
+    Engage.log('Controls: selecting language ' + language);
     jsonstr += 'language/' + language + '.json';
     $.ajax({
       url: jsonstr,
@@ -269,10 +269,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
           if (funcSuccess) {
             funcSuccess(translations);
           }
-        } else {
-          if (funcError) {
-            funcError();
-          }
+        } else if (funcError) {
+          funcError();
         }
       },
       error: function () {
@@ -343,23 +341,23 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     if (videoSources === undefined) {
       return;
     }
-    var tagList = new Set();
+    var tagList = [];
 
     for (var v in videoSources) {
       for (var i = 0; i < videoSources[v].length; i++) {
         for (var j = 0; j < videoSources[v][i].tags.tag.length; j++) {
           if (keyword !== undefined) {
             if (videoSources[v][i].tags.tag[j].indexOf(keyword) > 0) {
-              tagList.add(videoSources[v][i].tags.tag[j]);
+              tagList.push(videoSources[v][i].tags.tag[j]);
             }
           } else {
-            tagList.add(videoSources[v][i].tags.tag[j]);
+            tagList.push(videoSources[v][i].tags.tag[j]);
           }
         }
       }
     }
 
-    return tagList;
+    return _.uniq(tagList);
   }
 
   /**
@@ -374,7 +372,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       return foundQualities;
     }
     var tagsList = getTags(videoSources, '-quality');
-    var qualitiesList = _.map(tagsList, function(quality) {
+    var qualitiesList = _.map(tagsList, function (quality) {
       return quality.substring(0, quality.indexOf('-quality'));
     });
     var tracks;
@@ -384,9 +382,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         break;
       }
     }
-    var sortedResolutionsList = _.map(qualitiesList, function(quality) {
+    var sortedResolutionsList = _.map(qualitiesList, function (quality) {
       var currentTrack = filterTracksByTag(tracks, quality + '-quality')[0];
-      sortedResolutionsList.push([quality, currentTrack.resolution.substring(0, currentTrack.resolution.indexOf('x'))]);
+      return [quality, currentTrack.resolution.substring(0, currentTrack.resolution.indexOf('x'))];
     });
     sortedResolutionsList.sort(compareQuality);
     foundQualities = [];
@@ -430,54 +428,64 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   function registerSynchronizeEvents() {
     // throw some important synchronize.js-events for other plugins
     $(document)
-        .on(event_sjs_allPlayersReady, function () {
-          videosReady = true;
-          Engage.trigger(plugin.events.ready.getName());
-        })
-        .on(event_sjs_playerLoaded, function () {
-          Engage.trigger(plugin.events.playerLoaded.getName());
-        })
-        .on(event_sjs_masterPlay, function () {
-          Engage.trigger(plugin.events.play.getName(), true);
-          pressedPlayOnce = true;
-        })
-        .on(event_sjs_masterPause, function () {
-          Engage.trigger(plugin.events.pause.getName(), true);
-        })
-        .on(event_sjs_masterEnded, function () {
-          Engage.trigger(plugin.events.ended.getName(), true);
-        })
-        .on(event_sjs_masterTimeupdate, function (event, time) {
-          Engage.trigger(plugin.events.timeupdate.getName(), time, true);
-        })
-        .on(event_sjs_synchronizing, function () {
-          Engage.trigger(plugin.events.synchronizing.getName());
-        })
-        .on(event_sjs_buffering, function () {
-          Engage.trigger(plugin.events.buffering.getName());
-        })
-        .on(event_sjs_bufferedAndAutoplaying, function () {
-          Engage.trigger(plugin.events.bufferedAndAutoplaying.getName());
-        })
-        .on(event_sjs_bufferedButNotAutoplaying, function () {
-          Engage.trigger(plugin.events.bufferedButNotAutoplaying.getName());
-        });
+      .on(event_sjs_allPlayersReady, function () {
+        videosReady = true;
+        Engage.trigger(plugin.events.ready.getName());
+      })
+      .on(event_sjs_playerLoaded, function () {
+        Engage.trigger(plugin.events.playerLoaded.getName());
+      })
+      .on(event_sjs_masterPlay, function () {
+        Engage.trigger(plugin.events.play.getName(), true);
+        pressedPlayOnce = true;
+      })
+      .on(event_sjs_masterPause, function () {
+        Engage.trigger(plugin.events.pause.getName(), true);
+      })
+      .on(event_sjs_masterEnded, function () {
+        Engage.trigger(plugin.events.ended.getName(), true);
+      })
+      .on(event_sjs_masterTimeupdate, function (event, time) {
+        Engage.trigger(plugin.events.timeupdate.getName(), time, true);
+      })
+      .on(event_sjs_synchronizing, function () {
+        Engage.trigger(plugin.events.synchronizing.getName());
+      })
+      .on(event_sjs_buffering, function () {
+        Engage.trigger(plugin.events.buffering.getName());
+      })
+      .on(event_sjs_bufferedAndAutoplaying, function () {
+        Engage.trigger(plugin.events.bufferedAndAutoplaying.getName());
+      })
+      .on(event_sjs_bufferedButNotAutoplaying, function () {
+        Engage.trigger(plugin.events.bufferedButNotAutoplaying.getName());
+      });
   }
 
   function initSynchronize() {
     $(document)
-        .trigger(event_sjs_debug, Engage.model.get('isDebug'))
-        .trigger(event_sjs_stopBufferChecker);
+      .trigger(event_sjs_debug, Engage.model.get('isDebug'))
+      .trigger(event_sjs_stopBufferChecker);
   }
 
-  function registerQualityChangeEvent() {
-    Engage.on(plugin.events.qualitySet.getName(), function (q) {
-      changeQuality(q);
-    });
+  function initQualities(videoDataView) {
+    qualities = getQualities(videoDataView.model.get('videoSources'));
+
+    if (qualities.length > 1) {
+      Engage.on(plugin.events.qualitySet.getName(), function (q) {
+        changeQuality(q);
+      });
+      Engage.trigger(plugin.events.videoFormatsFound.getName(), qualities);
+      if (isMobileMode) {
+        Engage.model.set('quality', 'low');
+      }
+      changeQuality(Engage.model.get('quality'));
+    }
   }
 
   function changeQuality(q) {
     if (q) {
+      var isPaused = videodisplayMaster.paused();
       Engage.trigger(plugin.events.pause.getName(), false);
       var quality = q + '-quality';
       Engage.model.set('quality', q);
@@ -496,7 +504,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         window.setTimeout(function () {
           initSynchronize(false);
           Engage.trigger(plugin.events.seek.getName(), currentTime);
-          if (!videojs(globalVideoSource[0][0]).paused()) {
+          if (!isPaused) {
             Engage.trigger(plugin.events.play.getName());
           }
         }, timer_qualitychange);
@@ -530,6 +538,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
     /* Shows Minimap when it's not already displayed */
     function showMinimap() {
+      if ($(selector) === undefined || $(selector)[0] === undefined) {
+        return;
+      }
+      
       var zoom = $(selector)[0].style.transform.replace(/[a-z]*/, '');
       zoom = zoom.replace('(', '');
       zoom = zoom.replace(')', '');
@@ -539,7 +551,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       }
 
       if ($(selector).length == 1) {
-        $(mapSelector).children().first().append("<canvas id='indicator'></canvas>");
+        $(mapSelector).children().first().append('<canvas id="indicator"></canvas>');
         var minimapWidth = $('#indicator').width();
 
         var c = document.getElementById('indicator');
@@ -771,10 +783,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         offset = Number(offset);
 
         if (step > 0 && Math.abs($(selector).position().left) < step) {
+          // Shift right, but too far
           step = Math.abs($(selector).position().left);
         }
 
         if (step < 0 && (offset + step < left)) {
+          // Shift left but too far
           step = (left - offset);
         }
 
@@ -925,12 +939,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     Engage.log('Video: Aspect ratio: ' + aspectRatio[1] + 'x' + aspectRatio[2] + ' == ' + ((aspectRatio[1] / aspectRatio[2]) * 100));
     Engage.trigger(plugin.events.aspectRatioSet.getName(), [aspectRatio[1], aspectRatio[2], (aspectRatio[1] / aspectRatio[2]) * 100]);
     $('.' + id_videoDisplayClass)
-        .css('width', (((1 / videoDisplays.length) * 100) - 0.5) + '%')
-        .each(function (index) {
-          if ((index % 2) == 1) {
-            $(videoDataView).css('float', 'right');
-          }
-        });
+      .css('width', (((1 / videoDisplays.length) * 100) - 0.5) + '%')
+      .each(function (index) {
+        if ((index % 2) === 1) {
+          $(videoDataView).css('float', 'right');
+        }
+      });
     for (var j = 0; j < videoDisplays.length; ++j) {
       $('#' + videoDisplays[j]).css('padding-top', (aspectRatio[2] / aspectRatio[1] * 100) + '%').addClass('auto-height');
       singleVideoPaddingTop = (aspectRatio[2] / aspectRatio[1] * 100) + '%';
@@ -959,13 +973,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
     initializeVideoJsGlobally(videoDataView, videoDisplays, tuples);
 
-    var qualities = getQualities(videoSources);
+    /* set first videoDisplay as master */
+    var videoDisplay = isAudioOnly ? id_audioDisplay : videoDisplays[0];
+    videodisplayMaster = videojs(videoDisplay);
 
-    if (qualities.length > 1) {
-      registerQualityChangeEvent();
-      Engage.trigger(plugin.events.videoFormatsFound.getName(), qualities);
-      changeQuality(Engage.model.get('quality'));
-    }
+    initQualities(videoDataView);
 
     if ((aspectRatio != null) && (videoDisplays.length > 0)) {
       calculateAspectRatioForVideos(videoDataView, videoDisplays, aspectRatio);
@@ -983,8 +995,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     if (videoDisplays.length > 0) {
       var nr = tuples.length;
 
-      // set first videoDisplay as master
-      registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], videoDisplays.length);
+      registerEvents(videoDisplay, videoDisplays.length);
 
       if (nr >= 2) {
         synchronizeVideos(videoDisplays);
@@ -1011,14 +1022,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       uls += "<li id=\"btn-video" + (i + 1) + "\" class=\"vjs-menu-item " + class_vjs_menu_item + " " + class_btn_video + "\" tabindex=\"-1\" role=\"menuitem\" aria-live=\"polite\">" + translate("video", "Video") + " " + (i + 1) + "</li>";
     }
 
-    $("#" + id_btn_switchPlayer).append(
-        "<div class=\"vjs-menu\" role=\"presentation\">" +
-        "<ul class=\"" + class_vjs_menu_content + "\" role=\"menu\">" +
-        uls +
-        "</ul>" +
-        "</div>" +
-        "<span class=\"" + class_vjs_control_text + "\">" + translate("switchPlayer", "Switch player") + "</span>" +
-        "<div id=\"" + id_switchPlayer_value + "\" class=\"" + class_vjs_switchPlayer_value + "\">" + "Vid. 1" + "</div>"
+    $('#' + id_btn_switchPlayer).append(
+      "<div class=\"vjs-menu\" role=\"presentation\">" +
+      "<ul class=\"" + class_vjs_menu_content + "\" role=\"menu\">" +
+      uls +
+      "</ul>" +
+      "</div>" +
+      "<span class=\"" + class_vjs_control_text + "\">" + translate("switchPlayer", "Switch player") + "</span>" +
+      "<div id=\"" + id_switchPlayer_value + "\" class=\"" + class_vjs_switchPlayer_value + "\">" + "Vid. 1" + "</div>"
     );
 
     for (var j = 0; j < videoDisplays.length; ++j) {
@@ -1033,8 +1044,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   }
 
   function appendEmbedPlayer_openInPlayer() {
-    $('.' + class_vjs_remaining_time).after("<button id=\"" + id_btn_openInPlayer + "\" class=\"" + class_vjs_openInPlayer + " vjs-control vjs-button\" type=\"button\" aria-live=\"polite\"></button>");
-    $('.' + class_vjs_openInPlayer).append("<span class=\"" + class_vjs_control_text + " vjs-control-text\">" + translate("openInPlayer", "Open in player") + "</span>");
+    $('.' + class_vjs_remaining_time).after('<button id="' + id_btn_openInPlayer + '" class="' + class_vjs_openInPlayer + ' vjs-control vjs-button" type="button" aria-live="polite"></button>');
+    $('.' + class_vjs_openInPlayer).append('<span class="' + class_vjs_control_text + ' vjs-control-text">' + translate('openInPlayer', 'Open in player') + '</span>');
 
     $('#' + id_btn_openInPlayer).click(function (e) {
       e.preventDefault();
@@ -1046,37 +1057,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       }
       Engage.trigger(plugin.events.pause.getName(), false);
       window.open(str, '_blank');
-    });
-  }
-
-  function appendMobilePlayer_switchPlayers() {
-    $('#' + id_switchPlayers).html(
-        translate('switchPlayer', 'Switch player') + ':' +
-        '<ul class="nav nav-pills">' +
-        '<li id="' + id_btn_video1 + '" role="presentation" class="active"><a href="#">' +
-        translate("video_short", "Vid.") + ' 1' +
-        '</a></li>' +
-        '<li id="' + id_btn_video2 + '" role="presentation"><a href="#">' +
-        translate("video_short", "Vid.") + ' 2' +
-        '</a></li>' +
-        '</ul>'
-    );
-
-    $('#' + id_btn_video1).click(function () {
-      if (currentlySelectedVideodisplay !== 0) {
-        $('#' + id_btn_video1).addClass('active');
-        $('#' + id_btn_video2).removeClass('active');
-        currentlySelectedVideodisplay = 0;
-        videojs(globalVideoSource[0].id).src(globalVideoSource[0].src);
-      }
-    });
-    $('#' + id_btn_video2).click(function () {
-      if (currentlySelectedVideodisplay !== 1) {
-        $('#' + id_btn_video1).removeClass('active');
-        $('#' + id_btn_video2).addClass('active');
-        currentlySelectedVideodisplay = 1;
-        videojs(globalVideoSource[1].id).src(globalVideoSource[1].src);
-      }
     });
   }
 
@@ -1097,6 +1077,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       });
     }
 
+    /* set first videoDisplay as master */
+    var videoDisplay = isAudioOnly ? id_audioDisplay : videoDisplays[0];
+    videodisplayMaster = videojs(videoDisplay);
+
     if ((videoDisplays.length > 1) && (globalVideoSource.length > 1)) {
       appendEmbedPlayer_switchPlayers(videoDisplays);
     }
@@ -1108,7 +1092,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       Engage.log('Video: Aspect ratio: ' + aspectRatio[1] + 'x' + aspectRatio[2] + ' == ' + ((aspectRatio[2] / aspectRatio[1]) * 100));
       Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
       $('.' + id_videoDisplayClass).css('width', '100%');
-      for (i = 0; i < videoDisplays.length; ++i) {
+      for (var i = 0; i < videoDisplays.length; ++i) {
         $('#' + videoDisplays[i]).css('padding-top', (aspectRatio[2] / aspectRatio[1] * 100) + '%').addClass('auto-height');
       }
     } else {
@@ -1120,8 +1104,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
 
     if (videoDisplays.length > 0) {
-      // set first videoDisplay as master
-      registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], 1);
+      registerEvents(videoDisplay, 1);
 
       videosReady = true;
       Engage.trigger(plugin.events.ready.getName());
@@ -1135,26 +1118,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   }
 
   function renderMobile(videoDataView, videoSources, videoDisplays, aspectRatio) {
-    var init = false;
-
     var tuples = getSortedVideosourcesArray(videoSources);
-    for (var i = 0; i < tuples.length; ++i) {
-      var value = tuples[i][1];
+    initializeVideoJsGlobally(videoDataView, videoDisplays, tuples);
 
-      if (!init) { // just init the first video
-        init = true;
-        initVideojsVideo(videoDisplays[i], value, videoDataView.videojs_swf);
-      }
-      globalVideoSource.push({
-        id: videoDisplays[0],
-        src: value
-      });
-    }
+    /* set first videoDisplay as master */
+    var videoDisplay = isAudioOnly ? id_audioDisplay : videoDisplays[0];
+    videodisplayMaster = videojs(videoDisplay);
 
-    if ((videoDisplays.length > 1) && (globalVideoSource.length > 1)) {
-      appendMobilePlayer_switchPlayers();
-    }
-    // appendEmbedPlayer_openInPlayer();
+    initQualities(videoDataView);
 
     if ((aspectRatio != null) && (videoDisplays.length > 0)) {
       aspectRatio[1] = parseInt(aspectRatio[1]);
@@ -1174,8 +1145,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
 
     if (videoDisplays.length > 0) {
-      // set first videoDisplay as master
-      registerEvents(isAudioOnly ? id_audioDisplay : videoDisplays[0], 1);
+      registerEvents(videoDisplay, videoDisplays.length);
 
       videosReady = true;
       Engage.trigger(plugin.events.ready.getName());
@@ -1190,7 +1160,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
   function calculateAspectRatio(videoSources) {
     Engage.log('Video: Calculating Aspect ratio');
-    aspectRatio = null;
     var as1 = 0;
     for (var flavor in videoResultions) {
       if ((aspectRatio == null) || (as1 < videoResultions[flavor])) {
@@ -1229,7 +1198,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       str_error_AudioCodecNotSupported: translate('error_AudioCodecNotSupported', 'Error: The audio codec is not supported by this browser.'),
       str_error_AudioElementNotSupported: translate('error_AudioElementNotSupported', 'Error: Your browser does not support the audio element.')
     };
-    if ((isEmbedMode || isMobileMode) && !isAudioOnly) {
+    if (isEmbedMode && !isAudioOnly) {
       tempVars.id = videoDataView.model.get('ids')[0];
     }
 
@@ -1289,7 +1258,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   });
 
   function initVideojsVideo(id, videoSource, videojs_swf) {
-    Engage.log('Video: Initializing video.js-display \'' + id + '\'');
+    Engage.log('Video: Initializing video.js-display ' + id);
 
     if (id) {
       if (videoSource) {
@@ -1303,11 +1272,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
             width: '100%',
             height: '100%'
           };
-          if (isEmbedMode || isMobileMode) {
+          if (isEmbedMode) {
             videoOptions.controls = true;
           }
-
-          Engage.log('Video: Initializing video with ID \'' + id + '\'');
 
           // init video.js
           videojs(id, videoOptions, function () {
@@ -1372,24 +1339,34 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     var $videoUnfocused = $('.' + videoUnfocusedClass);
 
     var videoHeight = $engageVideoId.height();
-    var controlsHeight = ($('#' + id_resize_container).height() - videoHeight) + 5;
-    if (controlsHeight <= 0) {
-      controlsHeight = $('#' + id_engageControls).height() + 30;
+
+    if (!isMobileMode) {
+      var controlsHeight = ($('#' + id_resize_container).height() - videoHeight) + 5;
+      if (controlsHeight <= 0) {
+        controlsHeight = $('#' + id_engageControls).height() + 30;
+      }
+      var maxVideoAreaHeight = $(window).height() - controlsHeight;
+    } else {
+      var maxVideoAreaHeight = $(window).height();
     }
 
-    var maxVideoAreaHeight = $(window).height() - controlsHeight;
-
-    if (videoAreaAspectRatio === undefined) {
+    if (videoAreaAspectRatio === undefined && !isMobileMode) {
       calculateVideoAreaAspectRatio();
     }
 
-    var maxVideoAreaWidth = parseInt(maxVideoAreaHeight * videoAreaAspectRatio);
-    var minVideoAreaHeight = parseInt(parseInt($engageVideoId.css('min-width')) / videoAreaAspectRatio);
+    if (!isMobileMode) {
+      var maxVideoAreaWidth = parseInt(maxVideoAreaHeight * videoAreaAspectRatio);
+      var minVideoAreaHeight = parseInt(parseInt($engageVideoId.css('min-width')) / videoAreaAspectRatio); 
+    } else {
+      var maxVideoAreaWidth = parseInt(maxVideoAreaHeight * (aspectRatio[1] / aspectRatio[2]));
+      var minVideoAreaHeight = parseInt(parseInt($engageVideoId.css('min-width')) / (aspectRatio[1] / aspectRatio[2]));
+    }
 
     var minWidth = parseInt($engageVideoId.css('min-width'));
     if (maxVideoAreaWidth > minWidth) {
       if (maxVideoAreaWidth > $(window).width()) {
-        $engageVideoId.css('max-width', ($(window).width() - 10) + 'px');
+        var maxWidth = !isMobileMode ? $(window).width() - 10 : $(window).width();
+        $engageVideoId.css('max-width', maxWidth + 'px');
       } else {
         $engageVideoId.css('max-width', maxVideoAreaWidth + 'px');
       }
@@ -1440,7 +1417,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       Engage.trigger(plugin.events.playbackRateChanged.getName(), (rate + value));
     }
   }
-  
+
   function startAudioPlayer(audio) {
     clearAutoplay();
     audio.play();
@@ -1597,7 +1574,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       }
     });
   }
-  
+
   function startVideoPlayer(video) {
     $('.' + class_vjsposter).detach();
     clearAutoplay();
@@ -1615,12 +1592,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       }
     });
 
-    var videodisplayMaster = videojs(videoDisplay);
     var $videoDisplay = $('#' + videoDisplay);
 
-    videodisplayMaster
+    if (!isMobileMode) {
+      videodisplayMaster
         .on('play', function () {
-            startVideoPlayer(videodisplayMaster);
+          startVideoPlayer(videodisplayMaster);
         })
         .on('pause', function () {
           Engage.trigger(plugin.events.pause.getName(), true);
@@ -1631,6 +1608,27 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         .on('timeupdate', function () {
           Engage.trigger(plugin.events.timeupdate.getName(), videodisplayMaster.currentTime(), true);
         });
+    } else {
+      // To get rid of the undesired "click on poster to play" functionality,
+      // we remove all event listeners attached to the vjs posters by cloning the dom element.
+      $('.' + class_vjsposter).replaceWith(function () {
+        return $(this).clone();
+      });
+
+      // register events on every video display in mobile mode
+      // because only one display is playing at the same time
+      Engage.model.get('videoDataModel').get('ids').forEach(function (id) {
+        videojs(id).on('play', function () {
+          Engage.trigger(plugin.events.play.getName(), true);
+        });
+        videojs(id).on('ended', function () {
+          Engage.trigger(plugin.events.ended.getName(), true);
+        });
+        videojs(id).on('timeupdate', function () {
+          Engage.trigger(plugin.events.timeupdate.getName(), videodisplayMaster.currentTime(), true);
+        });
+      });
+    }
 
     $('#' + id_btn_fullscreenCancel).click(function (e) {
       e.preventDefault();
@@ -1638,11 +1636,15 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     });
 
     Engage.on(plugin.events.fullscreenEnable.getName(), function () {
-      if (numberOfVideodisplays == 1) {
+      if (numberOfVideodisplays === 1) {
         videodisplayMaster.requestFullscreen();
         $('#' + videoDisplay).css('padding-top', '0px');
       } else if (!fullscreen) {
-        var viewer = document.getElementById(id_engage_video_fullsceen_wrapper);
+        if (!isMobileMode) {
+          var viewer = document.getElementById(id_engage_video_fullsceen_wrapper);
+        } else {
+          var viewer = document.getElementById(id_video_wrapper);
+        }
         if (viewer.mozRequestFullScreen) {
           viewer.mozRequestFullScreen();
         } else if (viewer.webkitRequestFullscreen) {
@@ -1662,12 +1664,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
           fullscreen = true;
         }
       }
-      $videoDisplay.removeClass('vjs-controls-disabled').addClass('vjs-controls-enabled');
-      $('.' + id_videoDisplayClass).css('max-width', $(window).height() * videoAreaAspectRatio);
+      if (!isMobileMode) {
+        $('#' + videoDisplay).removeClass('vjs-controls-disabled').addClass('vjs-controls-enabled');
+        $('.' + id_videoDisplayClass).css('max-width', $(window).height() * videoAreaAspectRatio);
+      }
     });
-
     Engage.on(plugin.events.fullscreenCancel.getName(), function () {
-      if (numberOfVideodisplays == 1) {
+      if (numberOfVideodisplays === 1) {
         $('#' + videoDisplay).css('padding-top', singleVideoPaddingTop);
       }
       if (fullscreen && (numberOfVideodisplays > 1)) {
@@ -1688,7 +1691,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
           fullscreen = false;
         }
       }
-      $videoDisplay.removeClass('vjs-controls-enabled').addClass('vjs-controls-disabled');
+      if(!isMobileMode) {
+        $('#' + videoDisplay).removeClass('vjs-controls-enabled').addClass('vjs-controls-disabled');
+      }
       $('.' + id_videoDisplayClass).css('max-width', '');
       checkVideoDisplaySize();
     });
@@ -1744,9 +1749,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         Engage.trigger(plugin.events.play.getName());
       } else {
         Engage.trigger(plugin.events.pause.getName());
+        if (isMobileMode && fullscreen) {
+          Engage.trigger(plugin.events.fullscreenCancel.getName());
+        }
       }
     });
-
     Engage.on(plugin.events.seekLeft.getName(), function () {
       if (pressedPlayOnce) {
         var currTime = videodisplayMaster.currentTime();
@@ -1798,8 +1805,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     Engage.on(plugin.events.seek.getName(), function (time) {
       Engage.log('Video: Seek to ' + time);
       if (videosReady) {
-        if (! pressedPlayOnce) {
-            startVideoPlayer(videodisplayMaster);
+        if (!pressedPlayOnce) {
+          startVideoPlayer(videodisplayMaster);
         }
         var duration = parseInt(Engage.model.get('videoDataModel').get('duration')) / 1000;
         if (duration && (time < duration)) {
@@ -1816,9 +1823,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
     Engage.on(plugin.events.sliderStop.getName(), function (time) {
       if (videosReady) {
-        if (! pressedPlayOnce) {
-            startVideoPlayer(videodisplayMaster);
-        }          
+        if (!pressedPlayOnce) {
+          Engage.trigger(plugin.events.play.getName(), false);
+        }
         var duration = parseInt(Engage.model.get('videoDataModel').get('duration'));
         var normTime = (time / 1000) * (duration / 1000);
         videodisplayMaster.currentTime(normTime);
@@ -1834,187 +1841,96 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         videodisplayMaster.pause();
         Engage.trigger(plugin.events.pause.getName());
         videodisplayMaster.currentTime(0);
+        if (isMobileMode) {
+          Engage.trigger(plugin.events.fullscreenCancel.getName());
+        }
       }
     });
 
     videodisplayMaster
-        .on(event_html5player_volumechange, function () {
-          Engage.trigger(plugin.events.volumechange.getName(), videodisplayMaster.volume());
-        })
-        .on(event_html5player_fullscreenchange, function () {
-          Engage.trigger(plugin.events.fullscreenChange.getName());
-        });
+      .on(event_html5player_volumechange, function () {
+        Engage.trigger(plugin.events.volumechange.getName(), videodisplayMaster.volume());
+      })
+      .on(event_html5player_fullscreenchange, function () {
+        Engage.trigger(plugin.events.fullscreenChange.getName());
+      });
 
     var $videoDisplayClass = $('.' + id_videoDisplayClass);
 
-    Engage.on(plugin.events.focusVideo.getName(), function (display) {
-      Engage.log('Video: received focusing video ' + display);
-      var videoDiv;
+    if (!isMobileMode) {
+      Engage.on(plugin.events.focusVideo.getName(), function (display) {
+        Engage.log('Video: received focusing video ' + display);
+        var videoDiv;
 
-      if (display === undefined || display === 'focus.none') {
-        Engage.trigger(plugin.events.resetLayout.getName());
-        return;
-      }
+        if (display === undefined || display === 'focus.none') {
+          Engage.trigger(plugin.events.resetLayout.getName());
+          return;
+        }
 
-      if (display === 'focus.next' || display === 'focus.prev') {
-        if (isDefaultLayout()) {
-          if (display === 'focus.next') {
-            Engage.trigger(plugin.events.focusVideo.getName(),
-                Utils.getFlavorForVideoDisplay($videoDisplayClass.first()));
-            return;
-          } else {
-            Engage.trigger(plugin.events.focusVideo.getName(),
-                Utils.getFlavorForVideoDisplay($videoDisplayClass.last()));
-            return;
-          }
-        } else {
-          var vidDisp = $videoDisplayClass;
-          var selectNext = false;
-          var last;
-          var i = 0;
-          for (var elem in vidDisp) {
-            if (selectNext) {
+        if (display === 'focus.next' || display === 'focus.prev') {
+          if (isDefaultLayout()) {
+            if (display === 'focus.next') {
               Engage.trigger(plugin.events.focusVideo.getName(),
-                  Utils.getFlavorForVideoDisplay($(vidDisp[elem])));
+                Utils.getFlavorForVideoDisplay($('.' + videoDisplayClass).first()));
               return;
-            } else if ($(vidDisp[elem]).hasClass(videoFocusedClass)) {
-              if ((display === 'focus.prev' && last === undefined) ||
-                  (display === 'focus.next' && i === vidDisp.length - 1)) {
-                Engage.log('Video: Resetting videodisplay layout');
-                Engage.trigger(plugin.events.resetLayout.getName());
-                return;
-              } else if (display === 'focus.next') {
-                selectNext = true;
-              } else if (last !== undefined) {
-                Engage.trigger(plugin.events.focusVideo.getName(),
-                    Utils.getFlavorForVideoDisplay(last));
-                return;
-              }
+            } else {
+              Engage.trigger(plugin.events.focusVideo.getName(),
+                Utils.getFlavorForVideoDisplay($('.' + videoDisplayClass).last()));
+              return;
             }
-            last = $(vidDisp[elem]);
-            i++;
+          } else {
+            var vidDisp = $videoDisplayClass;
+            var selectNext = false;
+            var last;
+            var i = 0;
+            for (var elem in vidDisp) {
+              if (selectNext) {
+                Engage.trigger(plugin.events.focusVideo.getName(),
+                  Utils.getFlavorForVideoDisplay($(vidDisp[elem])));
+                return;
+              } else if ($(vidDisp[elem]).hasClass(videoFocusedClass)) {
+                if ((display === 'focus.prev' && last === undefined) ||
+                  (display === 'focus.next' && i === vidDisp.length - 1)) {
+                  Engage.log('Video: Resetting videodisplay layout');
+                  Engage.trigger(plugin.events.resetLayout.getName());
+                  return;
+                } else if (display === 'focus.next') {
+                  selectNext = true;
+                } else {
+                  Engage.trigger(plugin.events.focusVideo.getName(),
+                    Utils.getFlavorForVideoDisplay(last));
+                  return;
+                }
+              }
+              last = $(vidDisp[elem]);
+              i++;
+            }
+          }
+        } else {
+          videoDiv = getDivForFlavor(display);
+          if (videoDiv === undefined) {
+            Engage.trigger(plugin.events.resetLayout.getName());
+            return;
+          }
+          if ($(videoDiv).hasClass(videoFocusedClass)) {
+            Engage.log('Video: Resetting videodisplay layout');
+            Engage.trigger(plugin.events.resetLayout.getName());
+            return;
           }
         }
-      } else {
-        videoDiv = getDivForFlavor(display);
-        if (videoDiv === undefined) {
-          Engage.trigger(plugin.events.resetLayout.getName());
-          return;
-        }
-        if ($(videoDiv).hasClass(videoFocusedClass)) {
-          Engage.log('Video: Resetting videodisplay layout');
-          Engage.trigger(plugin.events.resetLayout.getName());
-          return;
-        }
-      }
-      $videoDisplayClass.css({
-        'width': '',
-        'left': '',
-        'top': '',
-        'margin-left': ''
-      });
-      $('#engage_video').css('height', '');
-      $videoDisplayClass.removeClass(videoDefaultLayoutClass).addClass(videoUnfocusedClass);
-      $('.' + videoUnfocusedClass).removeClass(videoFocusedClass);
-      $(videoDiv).addClass(videoFocusedClass).removeClass(videoUnfocusedClass);
-
-
-      if (isPiP) {
-        var distance = 0;
-        $('.' + videoUnfocusedClass).each(function () {
-          var width = $(this).width();
-          var height = $(this).height();
-          $(this).css({
-            'left': 0 - (width / 2) + 'px',
-            'top': distance - (height / 2) + 'px'
-          });
-          distance = distance + height + 10;
+        $videoDisplayClass.css({
+          'width': '',
+          'left': '',
+          'top': '',
+          'margin-left': ''
         });
-        var marginLeft;
-        if (pipPos === 'left') {
-          marginLeft = 12;
-        } else {
-          marginLeft = 88;
-        }
-        $('.' + videoUnfocusedClass).css('margin-left', marginLeft + '%');
-      } else {
-        var height = $('.' + videoFocusedClass).height();
-        $('#engage_video').height(height + 10);
-      }
+        $('#engage_video').css('height', '');
+        $videoDisplayClass.removeClass(videoDefaultLayoutClass).addClass(videoUnfocusedClass);
+        $('.' + videoUnfocusedClass).removeClass(videoFocusedClass);
+        $(videoDiv).addClass(videoFocusedClass).removeClass(videoUnfocusedClass);
 
-      delayedCalculateVideoAreaAspectRatio();
-    });
 
-    Engage.on(plugin.events.resetLayout.getName(), function () {
-      Engage.log('Video: received resetting layout');
-      $('#engage_video').css('height', '');
-      $videoDisplayClass.css({
-        'width': '',
-        'left': '',
-        'top': '',
-        'margin-left': ''
-      });
-      $videoDisplayClass.removeClass(videoFocusedClass).removeClass(videoUnfocusedClass).addClass(videoDefaultLayoutClass);
-      var numberDisplays = $videoDisplayClass.length;
-      $videoDisplayClass.css('width', (((1 / numberDisplays) * 100) - 0.5) + '%');
-      delayedCalculateVideoAreaAspectRatio();
-    });
-
-    Engage.on(plugin.events.movePiP.getName(), function (pos) {
-      var numberDisplays = $videoDisplayClass.length;
-      if (numberDisplays <= 1) return;
-      if (pos !== undefined) {
-        pipPos = pos;
-      }
-      if (!isPiP) {
-        return;
-      }
-      Engage.log("Video: moving PiP");
-      var marginLeft;
-      if (pipPos === "right") {
-        marginLeft = 88;
-        pipPos = "right";
-      } else {
-        marginLeft = 12;
-        pipPos = "left";
-      }
-      $("." + videoUnfocusedClass).css("margin-left", marginLeft + "%");
-
-      delayedCalculateVideoAreaAspectRatio();
-    });
-
-    Engage.on(plugin.events.togglePiP.getName(), function (pip) {
-      var numberDisplays = $videoDisplayClass.length;
-      if (numberDisplays <= 1) return;
-
-      Engage.log('Video: setting PiP to ' + pip);
-      if ((pip && isPiP) || (!pip && !isPiP)) {
-        return;
-      }
-      if (!pip) {
-        videoUnfocusedClass = unfocusedClass;
-        videoFocusedClass = focusedClass;
-        isPiP = false;
-        if (!isDefaultLayout()) {
-          $videoDisplayClass.css({
-            'width': '',
-            'left': '',
-            'top': '',
-            'margin-left': ''
-          });
-          $('.' + unfocusedPiPClass).addClass(videoUnfocusedClass).removeClass(unfocusedPiPClass);
-          $('.' + focusedPiPClass).addClass(videoFocusedClass).removeClass(focusedPiPClass);
-          var height = $('.' + videoFocusedClass).height();
-          $('#engage_video').height(height + 10);
-        }
-      } else {
-        videoUnfocusedClass = unfocusedPiPClass;
-        videoFocusedClass = focusedPiPClass;
-        isPiP = true;
-        if (!isDefaultLayout()) {
-          $('.' + unfocusedClass).addClass(videoUnfocusedClass).removeClass(unfocusedClass);
-          $('.' + focusedClass).addClass(videoFocusedClass).removeClass(focusedClass);
-          $('#engage_video').css('height', '');
+        if (isPiP) {
           var distance = 0;
           $('.' + videoUnfocusedClass).each(function () {
             var width = $(this).width();
@@ -2032,9 +1948,147 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
             marginLeft = 88;
           }
           $('.' + videoUnfocusedClass).css('margin-left', marginLeft + '%');
+        } else {
+          var height = $('.' + videoFocusedClass).height();
+          $('#engage_video').height(height + 10);
+        }
+
+        delayedCalculateVideoAreaAspectRatio();
+      });
+
+      Engage.on(plugin.events.resetLayout.getName(), function () {
+        Engage.log('Video: received resetting layout');
+        $('#engage_video').css('height', '');
+        $videoDisplayClass.css({
+          'width': '',
+          'left': '',
+          'top': '',
+          'margin-left': ''
+        });
+        $videoDisplayClass.removeClass(videoFocusedClass).removeClass(videoUnfocusedClass).addClass(videoDefaultLayoutClass);
+        var numberDisplays = $videoDisplayClass.length;
+        $videoDisplayClass.css('width', (((1 / numberDisplays) * 100) - 0.5) + '%');
+        delayedCalculateVideoAreaAspectRatio();
+      });
+
+      Engage.on(plugin.events.movePiP.getName(), function (pos) {
+        var numberDisplays = $('.' + videoDisplayClass).length;
+        if (numberDisplays <= 1) return;
+        if (pos !== undefined) {
+          pipPos = pos;
+        }
+        if (!isPiP) {
+          return;
+        }
+        Engage.log('Video: moving PiP');
+        var marginLeft;
+        if (pipPos === 'right') {
+          marginLeft = 88;
+          pipPos = 'right';
+        } else {
+          marginLeft = 12;
+          pipPos = 'left';
+        }
+        $('.' + videoUnfocusedClass).css('margin-left', marginLeft + '%');
+        
+        delayedCalculateVideoAreaAspectRatio();
+      });
+
+      Engage.on(plugin.events.togglePiP.getName(), function (pip) {
+        var numberDisplays = $videoDisplayClass.length;
+        if (numberDisplays <= 1) return;
+
+        Engage.log('Video: setting PiP to ' + pip);
+        if ((pip && isPiP) || (!pip && !isPiP)) {
+          return;
+        }
+        if (!pip) {
+          videoUnfocusedClass = unfocusedClass;
+          videoFocusedClass = focusedClass;
+          isPiP = false;
+          if (!isDefaultLayout()) {
+            $videoDisplayClass.css({
+              'width': '',
+              'left': '',
+              'top': '',
+              'margin-left': ''
+            });
+            $('.' + unfocusedPiPClass).addClass(videoUnfocusedClass).removeClass(unfocusedPiPClass);
+            $('.' + focusedPiPClass).addClass(videoFocusedClass).removeClass(focusedPiPClass);
+            var height = $('.' + videoFocusedClass).height();
+            $('#engage_video').height(height + 10);
+          }
+        } else {
+          videoUnfocusedClass = unfocusedPiPClass;
+          videoFocusedClass = focusedPiPClass;
+          isPiP = true;
+          if (!isDefaultLayout()) {
+            $('.' + unfocusedClass).addClass(videoUnfocusedClass).removeClass(unfocusedClass);
+            $('.' + focusedClass).addClass(videoFocusedClass).removeClass(focusedClass);
+            $('#engage_video').css('height', '');
+            var distance = 0;
+            $('.' + videoUnfocusedClass).each(function () {
+              var width = $(this).width();
+              var height = $(this).height();
+              $(this).css({
+                'left': 0 - (width / 2) + 'px',
+                'top': distance - (height / 2) + 'px'
+              });
+              distance = distance + height + 10;
+            });
+            var marginLeft;
+            if (pipPos === 'left') {
+              marginLeft = 12;
+            } else {
+              marginLeft = 88;
+            }
+            $('.' + videoUnfocusedClass).css('margin-left', marginLeft + '%');
+          }
+        }
+        delayedCalculateVideoAreaAspectRatio();
+
+      });
+    }
+
+    /* event used to switch between videos in single video display (e.g. mobile) mode */
+    Engage.on(plugin.events.switchVideo.getName(), function (id) {
+      /* check if current video is paused */
+      var isPaused = videodisplayMaster.paused();
+
+      $('#' + id_videoDisplayClass + (currentlySelectedVideodisplay+1)).removeClass('active');
+
+      /* assign currentlySelectedVideodisplay in the available bounds */
+      var n = globalVideoSource.length;
+      currentlySelectedVideodisplay = Math.max(0, Math.min(id, n-1));
+
+      var oldVideodisplayMaster = videodisplayMaster;
+      videodisplayMaster = videojs(Engage.model.get('videoDataModel').get('ids')[currentlySelectedVideodisplay]);
+
+      /* synchronize videos */
+      if (pressedPlayOnce) {
+        Engage.trigger(plugin.events.seek.getName(), currentTime);
+        if (!isPaused) {
+          oldVideodisplayMaster.pause();
+          videodisplayMaster.play();
         }
       }
-      delayedCalculateVideoAreaAspectRatio();
+
+      $('#' + id_videoDisplayClass + (currentlySelectedVideodisplay+1)).addClass('active');
+
+      Engage.log('Switched to video ' + currentlySelectedVideodisplay);                
+    });
+
+    /* listen on ready event with query argument */
+    Engage.on(plugin.events.ready.getName(), function (query) {
+      if (query === true) {
+        Engage.trigger(plugin.events.ready.getName());
+      }
+    });
+    /* listen on videoFormatsFound event with query argument */
+    Engage.on(plugin.events.videoFormatsFound.getName(), function (query) {
+      if (query === true) {
+        Engage.trigger(plugin.events.videoFormatsFound.getName(), qualities);
+      }
     });
   }
 
@@ -2051,7 +2105,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   }
 
   function getDivForFlavor(flavor) {
-    var found = undefined;
+    var found;
     $('.' + videoDisplayClass).each(function () {
       if (Utils.getFlavorForVideoDisplay(this) === flavor) {
         found = this;
@@ -2248,8 +2302,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   }
 
   function compareVideoSources(a, b) {
-    if (a === undefined || b === undefined || a [1][0] === undefined ||
-        b[1][0] === undefined) {
+    if (a === undefined || b === undefined || a[1][0] === undefined ||
+      b[1][0] === undefined) {
       return 0;
     }
     var s1 = a[1][0].typemh;
@@ -2295,18 +2349,18 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
   // listen on a change/set of the mediaPackage model
   Engage.model
-      .on(mediapackageChange, function () {
-        initCount -= 1;
-        if (initCount <= 0) {
-          initPlugin();
-        }
-      })
-      .on(infoMeChange, function () {
-        initCount -= 1;
-        if (initCount <= 0) {
-          initPlugin();
-        }
-      });
+    .on(mediapackageChange, function () {
+      initCount -= 1;
+      if (initCount <= 0) {
+        initPlugin();
+      }
+    })
+    .on(infoMeChange, function () {
+      initCount -= 1;
+      if (initCount <= 0) {
+        initPlugin();
+      }
+    });
 
   // all plugins loaded
   Engage.on(plugin.events.plugin_load_done.getName(), function () {
@@ -2366,4 +2420,4 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   });
 
   return plugin;
-});
+})

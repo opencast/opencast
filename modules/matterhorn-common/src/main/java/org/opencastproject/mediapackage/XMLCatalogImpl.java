@@ -67,18 +67,18 @@ import javax.xml.transform.stream.StreamResult;
 /**
  * This is a basic implementation for handling simple catalogs of metadata. It provides utility methods to store
  * key-value data.
- * <p/>
- * For a definition of the terms <def>expanded name</def>, <def>qualified name</def> or <def>QName</def>, <def>namespace
- * prefix</def>, <def>local part</def> and <def>local name</def>, please see <a
+ * <p>
+ * For a definition of the terms <code>expanded name</code>, <code>qualified name</code> or <code>QName</code>,
+ * <code>namespace prefix</code>, <code>local part</code> and <code>local name</code>, please see <a
  * href="http://www.w3.org/TR/REC-xml-names">http://www.w3.org/TR/REC-xml-names</a>
- * <p/>
+ * <p>
  * By default the following namespace prefixes are bound:
  * <ul>
  * <li>xml - http://www.w3.org/XML/1998/namespace
  * <li>xmlns - http://www.w3.org/2000/xmlns/
  * <li>xsi - http://www.w3.org/2001/XMLSchema-instance
  * </ul>
- * <p/>
+ * <p>
  * <h3>Limitations</h3>
  * XMLCatalog supports only <em>one</em> prefix binding per namespace name, so you cannot create documents like the
  * following using XMLCatalog:
@@ -103,7 +103,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   /**
    * Expanded name of the XSI type attribute.
-   * <p/>
+   * <p>
    * See <a href="http://www.w3.org/TR/xmlschema-1/#xsi_type">http://www.w3.org/TR/xmlschema-1/#xsi_type</a> for the
    * definition.
    */

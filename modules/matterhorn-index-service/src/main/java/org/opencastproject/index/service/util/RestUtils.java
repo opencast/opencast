@@ -194,7 +194,7 @@ public final class RestUtils {
   /**
    * Parse the UTC format date range string to two Date objects to represent a range of dates.
    * <p>
-   * Sample UTC date range format string:<br />
+   * Sample UTC date range format string:<br>
    * i.e. yyyy-MM-ddTHH:mm:ssZ/yyyy-MM-ddTHH:mm:ssZ e.g. 2014-09-27T16:25Z/2014-09-27T17:55Z
    * </p>
    *

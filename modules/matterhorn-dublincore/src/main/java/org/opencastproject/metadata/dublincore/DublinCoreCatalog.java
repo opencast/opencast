@@ -59,7 +59,7 @@ import javax.xml.transform.TransformerException;
 
 /**
  * Catalog for DublinCore structured metadata to be serialized as XML.
- * <p/>
+ * <p>
  * Attention: Encoding schemes are not preserved! See http://opencast.jira.com/browse/MH-8759
  */
 @ParametersAreNonnullByDefault

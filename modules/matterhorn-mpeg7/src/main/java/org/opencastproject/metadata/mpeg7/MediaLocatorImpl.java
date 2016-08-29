@@ -55,7 +55,7 @@ public class MediaLocatorImpl implements MediaLocator {
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MediaLocator#getMediaURI()
+   * @see org.opencastproject.metadata.mpeg7.MediaLocator#getMediaURI()
    */
   public URI getMediaURI() {
     return mediaUri;

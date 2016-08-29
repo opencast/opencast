@@ -74,8 +74,6 @@ public final class SystemLoadParser {
    *
    * @param in
    *          The serialized data
-   * @param format
-   *          the serialization format
    * @return The SystemLoad
    */
   public static SystemLoad parse(InputStream in) throws IOException {

@@ -98,28 +98,28 @@ public class MultimediaContentTypeImpl<S extends Segment> implements MultimediaC
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MultimediaContentType#getId()
+   * @see org.opencastproject.metadata.mpeg7.MultimediaContentType#getId()
    */
   public String getId() {
     return id;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MultimediaContentType#getMediaLocator()
+   * @see org.opencastproject.metadata.mpeg7.MultimediaContentType#getMediaLocator()
    */
   public MediaLocator getMediaLocator() {
     return mediaLocator;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MultimediaContentType#getMediaTime()
+   * @see org.opencastproject.metadata.mpeg7.MultimediaContentType#getMediaTime()
    */
   public MediaTime getMediaTime() {
     return mediaTime;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MultimediaContentType#getTemporalDecomposition()
+   * @see org.opencastproject.metadata.mpeg7.MultimediaContentType#getTemporalDecomposition()
    */
   public TemporalDecomposition<S> getTemporalDecomposition() {
     return temporalDecomposition;

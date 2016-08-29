@@ -31,8 +31,6 @@ import java.util.Vector;
 
 /**
  * This is the document model class which is the basis for all doc data models
- *
- * @see DocRestData if you want to create rest endpoint docs
  */
 public class DocData {
   private static final Logger logger = LoggerFactory.getLogger(DocData.class);

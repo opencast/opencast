@@ -50,7 +50,7 @@ public class JobChecker implements Runnable {
    *
    * @param ingestJobs
    *          The ingest jobs that we are meant to check.
-   * @param newLoadTesting
+   * @param loadTesting
    *          The load testing context we will be checking these jobs in.
    */
   public JobChecker(LinkedList<IngestJob> ingestJobs, LoadTest loadTesting, TrustedHttpClient newClient) {

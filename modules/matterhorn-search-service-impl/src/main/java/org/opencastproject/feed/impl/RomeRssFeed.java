@@ -32,31 +32,30 @@ import org.opencastproject.feed.api.Image;
 import org.opencastproject.feed.api.Link;
 import org.opencastproject.feed.api.Person;
 
-import com.sun.syndication.feed.module.DCModule;
-import com.sun.syndication.feed.module.DCModuleImpl;
-import com.sun.syndication.feed.module.DCSubject;
-import com.sun.syndication.feed.module.DCSubjectImpl;
-import com.sun.syndication.feed.module.Module;
-import com.sun.syndication.feed.module.itunes.EntryInformation;
-import com.sun.syndication.feed.module.itunes.EntryInformationImpl;
-import com.sun.syndication.feed.module.itunes.FeedInformation;
-import com.sun.syndication.feed.module.itunes.FeedInformationImpl;
-import com.sun.syndication.feed.module.itunes.types.Duration;
-import com.sun.syndication.feed.synd.SyndCategory;
-import com.sun.syndication.feed.synd.SyndCategoryImpl;
-import com.sun.syndication.feed.synd.SyndContent;
-import com.sun.syndication.feed.synd.SyndContentImpl;
-import com.sun.syndication.feed.synd.SyndEnclosure;
-import com.sun.syndication.feed.synd.SyndEnclosureImpl;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndEntryImpl;
-import com.sun.syndication.feed.synd.SyndFeedImpl;
-import com.sun.syndication.feed.synd.SyndImage;
-import com.sun.syndication.feed.synd.SyndImageImpl;
-import com.sun.syndication.feed.synd.SyndLink;
-import com.sun.syndication.feed.synd.SyndLinkImpl;
-import com.sun.syndication.feed.synd.SyndPerson;
-import com.sun.syndication.feed.synd.SyndPersonImpl;
+import com.rometools.modules.itunes.EntryInformation;
+import com.rometools.modules.itunes.EntryInformationImpl;
+import com.rometools.modules.itunes.FeedInformation;
+import com.rometools.modules.itunes.FeedInformationImpl;
+import com.rometools.modules.itunes.types.Duration;
+import com.rometools.rome.feed.module.DCModule;
+import com.rometools.rome.feed.module.DCModuleImpl;
+import com.rometools.rome.feed.module.DCSubject;
+import com.rometools.rome.feed.module.DCSubjectImpl;
+import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.feed.synd.SyndCategory;
+import com.rometools.rome.feed.synd.SyndCategoryImpl;
+import com.rometools.rome.feed.synd.SyndContent;
+import com.rometools.rome.feed.synd.SyndContentImpl;
+import com.rometools.rome.feed.synd.SyndEnclosure;
+import com.rometools.rome.feed.synd.SyndEnclosureImpl;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndEntryImpl;
+import com.rometools.rome.feed.synd.SyndImage;
+import com.rometools.rome.feed.synd.SyndImageImpl;
+import com.rometools.rome.feed.synd.SyndLink;
+import com.rometools.rome.feed.synd.SyndLinkImpl;
+import com.rometools.rome.feed.synd.SyndPerson;
+import com.rometools.rome.feed.synd.SyndPersonImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,7 +64,7 @@ import java.util.List;
 /**
  * Wrapper around the Rome RSS feed implementation
  */
-public class RomeRssFeed extends SyndFeedImpl {
+public class RomeRssFeed extends com.rometools.rome.feed.synd.SyndFeedImpl {
 
   /** Serial version UID */
   private static final long serialVersionUID = -2449605551424421096L;

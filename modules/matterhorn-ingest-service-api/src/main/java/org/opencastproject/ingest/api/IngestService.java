@@ -130,10 +130,10 @@ public interface IngestService extends JobProducer {
    * @throws NotFoundException
    *           if either one of the workflow definition or workflow instance was not found
    * @throws UnauthorizedException
-   *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
+   *           if the current user does not have read permissions on the workflow instance's mediapackage.
    */
   WorkflowInstance addZippedMediaPackage(InputStream zippedMediaPackage, String workflowDefinitionID,
-          Map<String, String> wfConfig, Long worfklowId) throws MediaPackageException, IOException, IngestException,
+          Map<String, String> wfConfig, Long workflowId) throws MediaPackageException, IOException, IngestException,
           NotFoundException, UnauthorizedException;
 
   /**
@@ -369,7 +369,7 @@ public interface IngestService extends JobProducer {
    * @throws NotFoundException
    *           if either one of the workflow definition or workflow instance was not found
    * @throws UnauthorizedException
-   *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
+   *           if the current user does not have read permissions on the workflow instance's mediapackage.
    */
   WorkflowInstance ingest(MediaPackage mediaPackage, String workflowDefinitionID, Map<String, String> properties,
           Long workflowId) throws IllegalStateException, IngestException, NotFoundException, UnauthorizedException;

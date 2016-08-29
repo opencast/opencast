@@ -104,8 +104,6 @@ public final class EventIndexUtils {
    * @param event
    *          the recording event
    * @return the set of metadata
-   * @throws IOException
-   *           if marshalling fails
    */
   public static SearchMetadataCollection toSearchMetadata(Event event) {
     SearchMetadataCollection metadata = new SearchMetadataCollection(
@@ -751,7 +749,7 @@ public final class EventIndexUtils {
   /**
    * Returns <code>true</code> if the previewSubtype matches any of the publicationFlavors.
    *
-   * @param publicationFlavors
+   * @param publications
    * @param previewSubtype
    * @return
    */

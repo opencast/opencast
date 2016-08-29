@@ -102,7 +102,7 @@ public class AgentImpl implements Agent {
 
   /**
    * The capabilities the agent has Capabilities are the devices this agent can record from, with a friendly name
-   * associated to determine their nature (e.g. PRESENTER --> dev/video0)
+   * associated to determine their nature (e.g. PRESENTER --&gt; dev/video0)
    */
   @Lob
   @Column(name = "configuration", nullable = true, length = 65535)

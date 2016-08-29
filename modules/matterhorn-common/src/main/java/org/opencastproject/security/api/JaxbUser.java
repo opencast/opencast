@@ -159,8 +159,6 @@ public final class JaxbUser implements User {
    *          the password
    * @param provider
    *          the provider
-   * @param canLogin
-   *          <code>true</code> if able to login
    * @param organization
    *          the organization
    * @param roles
@@ -186,8 +184,6 @@ public final class JaxbUser implements User {
    *          the email
    * @param provider
    *          the provider
-   * @param canLogin
-   *          <code>true</code> if able to login
    * @param organization
    *          the organization
    * @param roles

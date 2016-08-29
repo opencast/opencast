@@ -178,7 +178,7 @@ public interface SchedulerServiceDatabase {
    * @return the event identifier
    * @throws NotFoundException
    *           if there is no event with the given mediapackage id
-   * @throws SchedulerException
+   * @throws SchedulerServiceDatabaseException
    *           if exception occurred
    */
   Long getEventId(String mediaPackageId) throws NotFoundException, SchedulerServiceDatabaseException;

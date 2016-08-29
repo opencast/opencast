@@ -26,7 +26,7 @@ import java.net.URI;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Represent audio media element and implement {@link SmilMediaElement}.
+ * Represent audio media element and implement SmilMediaElement.
  */
 @XmlRootElement(name = "audio")
 public class SmilMediaAudioImpl extends SmilMediaElementImpl {

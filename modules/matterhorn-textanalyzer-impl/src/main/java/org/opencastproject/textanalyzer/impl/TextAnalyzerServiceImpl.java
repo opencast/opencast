@@ -130,8 +130,8 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   /**
    * OSGi callback on component activation.
    *
-   * @param ctx
-   *          the bundle context
+   * @param cc
+   *          the component context
    */
   @Override
   public void activate(ComponentContext cc) {
@@ -275,7 +275,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
    * @param id
    *          the video text id
    * @return the video text found on the image
-   * @throws IOException
+   * @throws TextAnalyzerException
    *           if accessing the image fails
    */
   protected VideoText[] analyze(File imageFile, String id) throws TextAnalyzerException {

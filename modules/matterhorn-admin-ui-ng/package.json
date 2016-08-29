@@ -20,7 +20,6 @@
     "grunt-contrib-uglify": "^1.0.0",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-filerev": "^2.1.2",
-    "grunt-google-cdn": "^0.4.3",
     "grunt-jscs": "^2.8.0",
     "grunt-karma": "^0.12.1",
     "grunt-newer": "^1.1.0",
@@ -55,6 +54,6 @@
   },
   "scripts": {
     "test": "karma start test/karma.conf.js",
-    "build": "grunt build"
+    "build": "grunt"
   }
 }

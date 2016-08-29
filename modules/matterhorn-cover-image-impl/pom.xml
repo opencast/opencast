@@ -175,7 +175,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Mh-Db-Version>${mh.db.version}</Mh-Db-Version>
             <Import-Package>
               com.sun.image.codec.jpeg,
               javax.imageio,

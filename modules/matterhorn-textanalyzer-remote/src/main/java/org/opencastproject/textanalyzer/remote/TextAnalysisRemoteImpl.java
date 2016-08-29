@@ -50,8 +50,6 @@ public class TextAnalysisRemoteImpl extends RemoteBase implements TextAnalyzerSe
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.textanalyzer.api.TextAnalyzerService#extract(org.opencastproject.mediapackage.MediaPackageElement)
    */
   @Override
   public Job extract(final Attachment image) throws TextAnalyzerException {

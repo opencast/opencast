@@ -674,7 +674,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     /**
      * Create a distribution URI for a media package element. This is the inverse function of
      * {@link #getDistributionFileFrom(java.net.URI)}.
-     * <p/>
+     * <p>
      * Distribution URIs look like this:
      *
      * <pre>

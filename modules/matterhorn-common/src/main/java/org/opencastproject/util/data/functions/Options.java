@@ -39,7 +39,7 @@ public final class Options {
   private Options() {
   }
 
-  /** m (m a) -> m a */
+  /** m (m a) -&gt; m a */
   public static <A> Option<A> join(Option<Option<A>> a) {
     return a.bind(Functions.<Option<A>> identity());
   }

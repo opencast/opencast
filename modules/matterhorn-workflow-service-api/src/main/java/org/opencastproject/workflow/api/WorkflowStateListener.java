@@ -79,7 +79,7 @@ public class WorkflowStateListener implements WorkflowListener {
    *
    * @param workflowInstanceId
    *          the workflow identifier
-   * @param statess
+   * @param states
    *          the workflow state changes that should trigger this listener. If null, any state change will trigger the
    *          listener.
    */
@@ -103,7 +103,7 @@ public class WorkflowStateListener implements WorkflowListener {
    * Constructs a workflow listener for all workflow instances. The listener may be configured to be notified on a of
    * specific state changes.
    *
-   * @param staet
+   * @param state
    *          the workflow state change that should trigger this listener. If null, any state change will trigger the
    *          listener.
    */

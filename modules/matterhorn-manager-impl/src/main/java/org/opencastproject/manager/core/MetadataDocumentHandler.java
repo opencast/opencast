@@ -148,7 +148,7 @@ public class MetadataDocumentHandler {
    * Copy files.
    *
    * @param srcFile
-   * @param srcDir
+   * @param destDir
    */
   public void moveDocumentDirectory(File srcFile, File destDir) {
 
@@ -199,8 +199,8 @@ public class MetadataDocumentHandler {
   /**
    * Returns boolean if copying file is done.
    *
-   * @param file name
-   * @param file URL
+   * @param fileName file name
+   * @param fileUrl file URL
    * @return boolean
    * @throws IOException
    */
@@ -221,7 +221,7 @@ public class MetadataDocumentHandler {
   /**
    * Returns date.
    *
-   * @param file
+   * @param dateFile
    * @return date
    * @throws IOException
    * @throws FileNotFoundException

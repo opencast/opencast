@@ -203,7 +203,7 @@ public class SmilResponseImpl implements SmilResponse {
   /**
    * Deserialize {@link SmilResponse} from XML.
    *
-   * @param smilResponseXmlFile {@link SmilResponse} as XML {@link InputStream}
+   * @param smilResponseXml {@link SmilResponse} as XML {@link InputStream}
    * @return {@link SmilResponse} object
    * @throws JAXBException if deserialization fail
    */

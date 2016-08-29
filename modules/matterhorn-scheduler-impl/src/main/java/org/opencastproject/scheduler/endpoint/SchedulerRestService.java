@@ -396,7 +396,7 @@ public class SchedulerRestService {
    * @param eventID
    *          id of event to be updated
    *
-   * @param catalogs
+   * @param dublinCoreXml
    *          serialized DC representing event
    * @return
    */
@@ -902,7 +902,7 @@ public class SchedulerRestService {
   /**
    * Gets the iCalendar with all (even old) events for the specified filter.
    *
-   * @param captureAgentID
+   * @param captureAgentId
    *          The ID that specifies the capture agent.
    * @param seriesId
    *          The ID that specifies series.

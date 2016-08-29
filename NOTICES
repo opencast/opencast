@@ -245,15 +245,28 @@ modules/matterhorn-engage-theodul-plugin-archetype/src/main/resources/archetype-
   Available via the MIT or new BSD license.
   http://github.com/jrburke/requirejs
 
-modules/matterhorn-engage-theodul-plugin-controls/src/main/resources/static/lib/bootstrap/*
-  Bootstrap v3.3.6 (http://getbootstrap.com)
-  Copyright 2011-2015 Twitter, Inc.
-  Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
-
 modules/matterhorn-engage-theodul-plugin-controls/src/main/resources/static/lib/jqueryui/*
   jQuery UI v1.11.4 (http://jqueryui.com)
   Copyright jQuery Foundation and other contributors
   Licensed under MIT (https://github.com/jquery/jquery-ui/blob/master/LICENSE.txt)
+
+modules/matterhorn-engage-theodul-plugin-controls/src/main/resources/static/lib/jquery.ui.touch-punch.min.js
+  jQuery UI Touch Punch 0.2.3
+  http://touchpunch.furf.com/
+  Copyright 2011–2014, Dave Furfero
+  Dual licensed under the MIT or GPL Version 2 licenses.
+
+modules/matterhorn-engage-theodul-plugin-controls/src/main/resources/static/lib/hammer.min.js
+  Hammer.JS - v2.0.6 - 2016-01-06
+  http://hammerjs.github.io/
+  Copyright (c) 2016 Jorik Tangelder
+  Licensed under MIT (https://github.com/hammerjs/hammer.js/blob/master/LICENSE.md)
+
+modules/matterhorn-engage-theodul-plugin-controls/src/main/resources/static/lib/jquery.hammer.js
+  jquery.hammer.js - v2.0.0
+  https://github.com/hammerjs/jquery.hammer.js
+  Copyright (c) 2014 Hammer.js
+  Licensed under MIT (https://github.com/hammerjs/jquery.hammer.js/blob/master/LICENSE)
 
 modules/matterhorn-engage-theodul-plugin-controls/src/test/resources/js/lib/bootstrap.js
   Bootstrap v3.2.0 (http://getbootstrap.com)
@@ -1399,8 +1412,11 @@ matterhorn-search-service-impl
   org.apache.solr                        solr-core                                        Apache 2
   org.apache.solr                        solr-solrj                                       Apache 2
   org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  org.jdom                               com.springsource.org.jdom                        Similar to Apache License but with the acknowledgment clause removed	https://raw.github.com/hunterhacker/jdom/master/LICENSE.txt
   org.slf4j                              slf4j-api                                        MIT License
-  rome                                   rome                                             -
+  com.rometools                          rome                                             The Apache Software License, Version 2.0
+  com.rometools                          rome-modules                                     The Apache Software License, Version 2.0
+  com.rometools                          rome-utils                                       The Apache Software License, Version 2.0
 
 
 matterhorn-search-service-remote

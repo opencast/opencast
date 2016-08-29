@@ -57,7 +57,7 @@ public interface HandleBuilder extends IdBuilder {
    * @param value
    *          the handle value
    * @return the handle
-   * @throws HandleException
+   * @throws IllegalArgumentException
    *           if the value is malformatted
    */
   Handle fromString(String value) throws IllegalArgumentException;

@@ -133,21 +133,24 @@ public class AclScanner implements ArtifactInstaller {
     for (Organization org : organizations) {
       securityService.setOrganization(org);
       // If there are already (not-default) Acl defined for this organization, we skip this one.
+      boolean skip = false;
       for (ManagedAcl a : getAclService(org).getAcls()) {
         if (managedAcls.get(generateAclId(a.getName(), org)) == null) {
           logger.debug(
                   "The Acl {} will be not added to the organisation {} as it already contains other not-default Acls.",
                   fileName, org.getName());
+          skip = true;
           continue;
         }
       }
-
-      managedAcl = getAclService(org).createAcl(acl, fileName);
-      if (managedAcl.isSome()) {
-        managedAcls.put(generateAclId(fileName, org), managedAcl.get().getId());
-        logger.debug("Acl from XACML file {} has been added for the organisation {}", fileName, org.getName());
-      } else {
-        logger.info("The Acl from the file {} has already been added to the organisation {}.", fileName, org.getName());
+      if (!skip) {
+        managedAcl = getAclService(org).createAcl(acl, fileName);
+        if (managedAcl.isSome()) {
+          managedAcls.put(generateAclId(fileName, org), managedAcl.get().getId());
+          logger.debug("Acl from '{}' has been added for the organisation {}", fileName, org.getName());
+        } else {
+          logger.debug("Acl from '{}' has already been added to the organisation {}.", fileName, org.getName());
+        }
       }
     }
   }

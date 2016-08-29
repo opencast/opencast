@@ -177,7 +177,7 @@ public interface CaptureAgentStateService {
   /**
    * Gets a Set of ids of all known recordings.
    *
-   * @return Set<String> recording ids
+   * @return recording ids
    */
   List<String> getKnownRecordingsIds();
 

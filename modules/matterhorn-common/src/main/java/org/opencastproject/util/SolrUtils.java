@@ -103,7 +103,7 @@ public final class SolrUtils {
   }
 
   /**
-   * Returns an expression to search for any date that lies in between <code>startDate</date> and <code>endDate</date>.
+   * Returns an expression to search for any date that lies in between <code>startDate</code> and <code>endDate</code>.
    *
    * @param startDate
    *          the start date or none for an infinite left endpoint, "*" in solr query syntax

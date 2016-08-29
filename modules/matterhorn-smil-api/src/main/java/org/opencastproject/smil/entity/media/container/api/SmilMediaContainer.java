@@ -47,7 +47,7 @@ public interface SmilMediaContainer extends SmilMediaObject {
   /**
    * Returns media elements or containers inside as {@link List} of
    * {@link SmilMediaObject}s. The {@link List} is immutable, use
-   * {@link SmilService} to modify it.
+   * SmilService to modify it.
    *
    * @return
    */

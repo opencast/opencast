@@ -149,8 +149,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
    *          processing job
    * @param smil
    *          smil document with media segments description
-   * @param track
-   *          source track
+   * @param trackParamGroupId
    * @return processed track
    * @throws ProcessFailedException
    *           if an error occured

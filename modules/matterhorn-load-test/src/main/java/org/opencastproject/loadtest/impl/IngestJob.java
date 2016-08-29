@@ -85,7 +85,7 @@ public class IngestJob implements Runnable {
    *          The mediapackage id to ingest
    * @param startDelay
    *          The amount of time in minutes to wait until ingesting.
-   * @param newLoadTesting
+   * @param loadTest
    *          The LoadTesting instance that is running this ingest
    * @param newClient
    *          The client to use to connect to the core.

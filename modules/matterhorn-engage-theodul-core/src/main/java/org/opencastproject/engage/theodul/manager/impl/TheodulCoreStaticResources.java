@@ -27,7 +27,7 @@ import org.opencastproject.kernel.rest.RestPublisher;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.rest.StaticResource;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;

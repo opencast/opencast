@@ -704,7 +704,7 @@ public class Event implements IndexObject {
   /**
    * Sets the recording end date
    *
-   * @param recordingStartTime
+   * @param recordingEndTime
    *          the end date
    */
   public void setRecordingEndDate(String recordingEndTime) {
@@ -1300,9 +1300,7 @@ public class Event implements IndexObject {
    * @param xml
    *          the input stream
    * @return the deserialized recording event
-   * @throws JSONException
-   * @throws XMLStreamException
-   * @throws JAXBException
+   * @throws IOException
    */
   public static Event valueOf(InputStream xml) throws IOException {
     try {
@@ -1364,8 +1362,6 @@ public class Event implements IndexObject {
   /**
    * Serializes the recording event.
    *
-   * @param event
-   *          the recording event
    * @return the serialized recording event
    */
   @Override
