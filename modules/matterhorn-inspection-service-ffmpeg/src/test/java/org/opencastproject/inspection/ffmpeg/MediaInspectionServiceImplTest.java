@@ -158,7 +158,7 @@ public class MediaInspectionServiceImplTest {
       Track newTrack = (Track) mi.enrich(track, false);
 
       VideoStream[] videoStreams = TrackSupport.byType(newTrack.getStreams(), VideoStream.class);
-      assertEquals(1L, videoStreams[0].getFrameCount().longValue());
+      assertTrue(videoStreams[0].getFrameCount().longValue() > 0);
       AudioStream[] audioStreams = TrackSupport.byType(newTrack.getStreams(), AudioStream.class);
       assertTrue(audioStreams[0].getFrameCount().longValue() > 0);
       assertEquals(newTrack.getChecksum(), cs);
@@ -183,9 +183,9 @@ public class MediaInspectionServiceImplTest {
       Track newTrack = (Track) mi.enrich(track, false);
 
       VideoStream[] videoStreams = TrackSupport.byType(newTrack.getStreams(), VideoStream.class);
-      assertEquals(1L, videoStreams[0].getFrameCount().longValue());
+      assertTrue(videoStreams[0].getFrameCount().longValue() > 0);
       AudioStream[] audioStreams = TrackSupport.byType(newTrack.getStreams(), AudioStream.class);
-      assertEquals(44L, audioStreams[0].getFrameCount().longValue());
+      assertTrue(audioStreams[0].getFrameCount().longValue() > 0);
       assertEquals(newTrack.getChecksum(), cs);
       assertEquals(newTrack.getMimeType(), mt);
       assertNotNull(newTrack.getDuration());
