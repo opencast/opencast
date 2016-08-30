@@ -541,7 +541,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       if ($(selector) === undefined || $(selector)[0] === undefined) {
         return;
       }
-      
+
       var zoom = $(selector)[0].style.transform.replace(/[a-z]*/, '');
       zoom = zoom.replace('(', '');
       zoom = zoom.replace(')', '');
@@ -1186,7 +1186,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
   function renderVideoDisplay(videoDataView) {
     Engage.log('Video: Rendering video displays');
-
     var videoDisplays = videoDataView.model.get('ids');
     var videoSources = videoDataView.model.get('videoSources');
 
@@ -1225,6 +1224,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         }
       }
     }
+    console.log(videodisplayMaster);
+
+    loadAndAppendCaptions(videoDataView);
   }
 
   function prepareRenderingVideoDisplay(videoDataView) {
@@ -1356,7 +1358,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
     if (!isMobileMode) {
       var maxVideoAreaWidth = parseInt(maxVideoAreaHeight * videoAreaAspectRatio);
-      var minVideoAreaHeight = parseInt(parseInt($engageVideoId.css('min-width')) / videoAreaAspectRatio); 
+      var minVideoAreaHeight = parseInt(parseInt($engageVideoId.css('min-width')) / videoAreaAspectRatio);
     } else {
       var maxVideoAreaWidth = parseInt(maxVideoAreaHeight * (aspectRatio[1] / aspectRatio[2]));
       var minVideoAreaHeight = parseInt(parseInt($engageVideoId.css('min-width')) / (aspectRatio[1] / aspectRatio[2]));
@@ -1557,7 +1559,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       if (videosReady) {
         if (! pressedPlayOnce) {
             startAudioPlayer(audioPlayer);
-        }          
+        }
         var duration = parseInt(Engage.model.get('videoDataModel').get('duration'));
         audioPlayer.currentTime = (time / 1000) * (duration / 1000);
       } else {
@@ -1990,7 +1992,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
           pipPos = 'left';
         }
         $('.' + videoUnfocusedClass).css('margin-left', marginLeft + '%');
-        
+
         delayedCalculateVideoAreaAspectRatio();
       });
 
@@ -2075,7 +2077,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
       $('#' + id_videoDisplayClass + (currentlySelectedVideodisplay+1)).addClass('active');
 
-      Engage.log('Switched to video ' + currentlySelectedVideodisplay);                
+      Engage.log('Switched to video ' + currentlySelectedVideodisplay);
     });
 
     /* listen on ready event with query argument */
@@ -2317,6 +2319,48 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     return 0;
   }
 
+  /**
+   * Try to load captions for video
+   * @returns {undefined}
+   */
+  function loadAndAppendCaptions(videoDataView) {
+    console.log("Video: Loading Captions.");
+    var tracks        = Engage.model.get('mediaPackage').get('tracks');
+    var attachments   = Engage.model.get('mediaPackage').get('attachments')
+    var videoDisplays = videoDataView.model.get('ids');
+    var captionsURL   = null;
+
+    // Load from attachment
+    console.log(attachments);
+    for(var a in attachments) {
+      if(attachments[a].mimetype == "text/vtt") {
+        console.log("Found Caption");
+        captionsURL = attachments[a].url;
+      }
+    }
+
+    // Load from track
+    console.log(tracks);
+    for(var a in tracks) {
+      if(tracks[a].mimetype == "text/vtt") {
+        console.log("Found Caption");
+        captionsURL = attachments[a].url;
+      }
+    }
+    console.log(captionsURL);
+
+    // Load from Catalog
+
+    // Append caption
+    var caption = videodisplayMaster.addRemoteTextTrack({
+      kind: 'caption',
+      language: 'en',
+      label: 'Demo',
+      src: "http://localhost:8080/files/mediapackage/987d52af-8c04-44ff-92b1-0e3b76da6e5b/57551a0a-0ca4-4ecc-bfa8-5735adc024ce/demo.vtt"
+    });
+    caption.default = true;
+  }
+  
   function initPlugin() {
     Engage.log('Video: Init Plugin');
 
