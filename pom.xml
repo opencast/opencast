@@ -118,7 +118,6 @@
     <module>modules/matterhorn-load-test-engage</module>
     <module>modules/matterhorn-lti</module>
     <module>modules/matterhorn-mediapackage-manipulator</module>
-    <module>modules/matterhorn-mediapackage-ui</module>
     <module>modules/matterhorn-message-broker-api</module>
     <module>modules/matterhorn-message-broker-impl</module>
     <module>modules/matterhorn-messages</module>
