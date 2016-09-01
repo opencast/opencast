@@ -19,8 +19,12 @@
     <div class="controls-container">
         <div data-admin-ng-table-filter="" data-filters="filters" data-namespace="table.resource"></div>
 
-        <h1 translate="{{ table.caption }}"></h1>
-        <h4 translate="TABLE_SUMMARY" translate-values="{ numberOfRows: '{{ table.pagination.totalItems }}' }"></h4>
+        <h1 translate="{{ table.caption }}">
+            <!-- Jobs | Servers | Services -->
+        </h1>
+        <h4 translate="TABLE_SUMMARY" translate-values="{ numberOfRows: '{{ table.pagination.totalItems }}' }">
+            <!-- {{numberOfRows}} rows -->
+        </h4>
 
     </div>
     <div class="table-container top-addon" admin-ng-table="" table="table"></div>
