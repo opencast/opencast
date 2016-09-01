@@ -1416,6 +1416,7 @@
       },
      "JOBS": {
        "TABLE": {
+         "ID":        "Job Identifier",
          "ACTION":    "Actions",
          "CAPTION":   "Jobs",
          "CREATED":   "Created",
