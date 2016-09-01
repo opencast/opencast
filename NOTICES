@@ -1534,13 +1534,6 @@ matterhorn-videosegmenter-remote
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-webconsole
-  GroupId                                ArtifactId                                       License
-  org.apache.felix                       org.apache.felix.webconsole                      The Apache Software License, Version 2.0
-  org.json                               json                                             -
-  org.slf4j                              slf4j-api                                        MIT License
-
-
 matterhorn-workflow-service-api
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
