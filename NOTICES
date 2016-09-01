@@ -509,55 +509,6 @@ modules/matterhorn-kernel/src/test/resources/InfusionAll.js
   Copyright (c) 2009 John Resig
   Dual licensed under the MIT and GPL licenses.
 
-modules/matterhorn-manager-impl/src/main/resources/ui-files/css/jquery-ui-1.8.6.custom.css
-  jQuery UI CSS Framework 1.8.6
-  Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
-  Dual licensed under the MIT or GPL Version 2 licenses.
-
-modules/matterhorn-manager-impl/src/main/resources/ui-files/css/market-ui.css
-  jQuery UI CSS Framework 1.8.9
-  Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
-  Dual licensed under the MIT or GPL Version 2 licenses.
-  http://jquery.org/license
-
-modules/matterhorn-manager-impl/src/main/resources/ui-files/js/config-editor/jqueryFileTree.js
-  jQuery File Tree Plugin
-  Version 1.01
-  Dual licensed under the MIT or GPL licenses.
-  copyright 2008 A Beautiful Site, LLC.
-
-modules/matterhorn-manager-impl/src/main/resources/ui-files/lib/codemirror/*
-  Copyright (C) 2013 by Marijn Haverbeke <marijnh@gmail.com> and others
-  MIT License
-
-modules/matterhorn-manager-impl/src/main/resources/ui-files/lib/jquery-1.4.4.min.js
-  jQuery JavaScript Library v1.4.4
-  http://jquery.com/
-  Copyright 2010, John Resig
-  Dual licensed under the MIT or GPL Version 2 licenses.
-
-modules/matterhorn-manager-impl/src/main/resources/ui-files/lib/jquery.address-1.4.min.js
-  jQuery Address Plugin v1.4
-  http://www.asual.com/jquery/address/
-  Copyright (c) 2009-2010 Rostislav Hristov
-  Dual licensed under the MIT or GPL Version 2 licenses.
-
-modules/matterhorn-manager-impl/src/main/resources/ui-files/lib/jquery.cookie.js
-  jQuery Cookie plugin
-  Copyright (c) 2010 Klaus Hartl (stilbuero.de)
-  Dual licensed under the MIT and GPL licenses:
-
-modules/matterhorn-manager-impl/src/main/resources/ui-files/lib/jquery.jqote2.js
-  jQote2 - client-side Javascript templating engine
-  Copyright (C) 2010, aefxx
-  http://aefxx.com/
-  Dual licensed under the WTFPL v2 or MIT (X11) licenses
-
-modules/matterhorn-manager-impl/src/main/resources/ui-files/lib/jquery-ui-1.8.6.custom.min.js
-  jQuery UI 1.8.6
-  Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
-  Dual licensed under the MIT or GPL Version 2 licenses.
-
 modules/matterhorn-mediapackage-ui/src/main/resources/ui/scripts/jquery.tmpl.min.js
   jQuery Templates Plugin 1.0.0pre
   http://github.com/jquery/jquery-tmpl
@@ -1114,14 +1065,6 @@ matterhorn-load-test-engage
 matterhorn-lti
   GroupId                                ArtifactId                                       License
   org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
-
-
-matterhorn-manager-impl
-  GroupId                                ArtifactId                                       License
-  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
-  org.apache.felix                       org.apache.felix.webconsole                      The Apache Software License, Version 2.0
-  org.json                               json                                             -
-  org.slf4j                              slf4j-api                                        MIT License
 
 
 matterhorn-mediapackage-manipulator
