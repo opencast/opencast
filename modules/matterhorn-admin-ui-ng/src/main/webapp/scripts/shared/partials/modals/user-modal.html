@@ -2,12 +2,16 @@
 
     <header>
         <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2 translate="{{ caption }}">Create New User</h2>
+        <h2 translate="{{ caption }}"><!-- Create New User --></h2>
     </header>
 
     <nav class="modal-nav" id="modal-nav">
-        <a ng-click="openTab('user')" data-modal-tab="user" ng-class="{ active: tab == 'user' }" translate="USERS.USERS.DETAILS.TABS.USER">User</a>
-        <a ng-click="openTab('roles')" data-modal-tab="roles" ng-class="{ active: tab == 'roles' }" translate="USERS.USERS.DETAILS.TABS.ROLES">Roles</a>
+        <a ng-click="openTab('user')" data-modal-tab="user" ng-class="{ active: tab == 'user' }" translate="USERS.USERS.DETAILS.TABS.USER">
+            <!-- User -->
+        </a>
+        <a ng-click="openTab('roles')" data-modal-tab="roles" ng-class="{ active: tab == 'roles' }" translate="USERS.USERS.DETAILS.TABS.ROLES">
+            <!-- Roles -->
+        </a>
     </nav>
 
     <form name="userForm">
@@ -79,7 +83,9 @@
     </form>
 
     <footer>
-        <a ng-click="submit()" ng-class="userForm.$valid && manageable ? 'active' : 'disabled'" class="submit" translate="SUBMIT">Submit</a>
-        <a ng-click="close()" class="cancel" translate="CANCEL">Cancel</a>
+        <a ng-click="submit()" ng-class="userForm.$valid && manageable ? 'active' : 'disabled'" class="submit" translate="SUBMIT">
+            <!-- Submit -->
+        </a>
+        <a ng-click="close()" class="cancel" translate="CANCEL"><!-- Cancel --></a>
     </footer>
 </section>

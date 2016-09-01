@@ -2,13 +2,21 @@
 
     <header>
         <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2 translate="SYSTEMS.JOBS.DETAILS.HEADER" translate-values="{ resourceId: '{{ resourceId }}' }"></h2>
+        <h2 translate="SYSTEMS.JOBS.DETAILS.HEADER" translate-values="{ resourceId: '{{ resourceId }}' }">
+            <!-- Job details {{resourceId}} -->
+        </h2>
     </header>
 
     <nav class="modal-nav" id="modal-nav">
-        <a ng-click="openTab('general')" data-modal-tab="general" ng-class="{ active: tab == 'general' }" translate="SYSTEMS.JOBS.DETAILS.TABS.GENERAL">General</a>
-        <a ng-click="openTab('operations')" data-modal-tab="operations" ng-class="{ active: tab == 'operations' }" translate="SYSTEMS.JOBS.DETAILS.TABS.OPERATIONS">Operations</a>
-        <a ng-click="openTab('incidents')" data-modal-tab="incidents" ng-class="{ active: tab == 'incidents' }" translate="SYSTEMS.JOBS.DETAILS.TABS.INCIDENTS">Incidents</a>
+        <a ng-click="openTab('general')" data-modal-tab="general" ng-class="{ active: tab == 'general' }" translate="SYSTEMS.JOBS.DETAILS.TABS.GENERAL">
+            <!-- General -->
+        </a>
+        <a ng-click="openTab('operations')" data-modal-tab="operations" ng-class="{ active: tab == 'operations' }" translate="SYSTEMS.JOBS.DETAILS.TABS.OPERATIONS">
+            <!-- Operations -->
+        </a>
+        <a ng-click="openTab('incidents')" data-modal-tab="incidents" ng-class="{ active: tab == 'incidents' }" translate="SYSTEMS.JOBS.DETAILS.TABS.INCIDENTS">
+            <!-- Incidents -->
+        </a>
     </nav>
 
     <nav id="breadcrumb"></nav>

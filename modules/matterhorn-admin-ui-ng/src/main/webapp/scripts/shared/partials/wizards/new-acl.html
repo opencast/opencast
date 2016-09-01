@@ -31,21 +31,25 @@
             <ul>
                 <li>
                     <div class="obj list-obj">
-                        <header class="no-expand" translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.TITLE"></header>
+                        <header class="no-expand" translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.TITLE">
+                            <!-- Title -->
+                        </header>
                         <div class="obj-container">
                             <div class="obj tbl-list">
 
                                 <table class="main-tbl">
                                 <thead>
                                     <tr>
-                                        <th translate="USERS.ACLS.NEW.ACCESS.TEMPLATES.TITLE"><!--Templates--></th>
+                                        <th translate="USERS.ACLS.NEW.ACCESS.TEMPLATES.TITLE"><!-- Templates --></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td>
                                             <div class="obj-container padded">
-                                                <p translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION"></p>
+                                                <p translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION">
+                                                    <!-- Description -->
+                                                </p>
                                                 <select chosen pre-select-from="wizard.step.acls"
                                                     data-width="'200px'"
                                                     data-disable-search-threshold="8"
@@ -66,16 +70,28 @@
 
                         <div class="obj-container">
                             <div class="obj tbl-list">
-                                <header translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.DETAILS"><!--Details--></header>
+                                <header translate="USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.DETAILS">
+                                    <!-- Details -->
+                                </header>
                                 <div class="obj-container">
                                 <table class="main-tbl">
                                     <thead>
                                         <tr>
-                                            <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ROLE"><!--Role--></th>
-                                            <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.READ" class="fit"><!--Read--></th>
-                                            <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit"><!--Write--></th>
-                                            <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="wizard.step.hasActions"><!--Additional Actions--></th>
-                                            <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ACTION" class="fit"><!--Action--></th>
+                                            <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ROLE">
+                                                <!-- Role -->
+                                            </th>
+                                            <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.READ" class="fit">
+                                                <!-- Read -->
+                                            </th>
+                                            <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit">
+                                                <!--Write-->
+                                            </th>
+                                            <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="wizard.step.hasActions">
+                                                <!--Additional Actions-->
+                                            </th>
+                                            <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ACTION" class="fit">
+                                                <!--Action-->
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -119,7 +135,7 @@
         <div class="full-col">
             <div data-admin-ng-notifications="" context="acl-form"></div>
             <div class="obj tbl-list">
-                <header class="no-expand" translate="USERS.ACLS.NEW.METADATA.TITLE"><!--Metadata--></header>
+                <header class="no-expand" translate="USERS.ACLS.NEW.METADATA.TITLE"><!-- Metadata --></header>
                 <div class="obj-container">
                     <table class="main-tbl">
                         <tr>
@@ -131,14 +147,22 @@
             </div>
 
             <div class="obj tbl-list">
-                <header class="no-expand" translate="USERS.ACLS.NEW.ACCESS.CAPTION" ><!--Access Policy--></header>
+                <header class="no-expand" translate="USERS.ACLS.NEW.ACCESS.CAPTION" ><!-- Access Policy --></header>
                     <table class="main-tbl">
                         <thead>
                             <tr>
-                                <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ROLE" class="fit"><!--Role--></th>
-                                <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.READ" class="fit"><!--Read--></th>
-                                <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit"><!--Write--></th>
-                                <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="wizard.getStateControllerByName('access').hasActions"><!--Additional Actions--></th>
+                                <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ROLE" class="fit">
+                                    <!-- Role -->
+                                </th>
+                                <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.READ" class="fit">
+                                    <!-- Read -->
+                                </th>
+                                <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit">
+                                    <!-- Write -->
+                                </th>
+                                <th translate="USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="wizard.getStateControllerByName('access').hasActions">
+                                    <!-- Additional Actions -->
+                                </th>
                             </tr>
                         </thead>
                         <tr ng-repeat="policy in wizard.getStateControllerByName('access').ud.policies">

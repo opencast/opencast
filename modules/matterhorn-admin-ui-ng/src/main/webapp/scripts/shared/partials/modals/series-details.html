@@ -1,16 +1,26 @@
 <section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="series-details-modal" ng-controller="SerieCtrl">
     <header>
         <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2><span translate="EVENTS.SERIES.DETAILS.HEADER" translate-values="{{ titleParams }}"></h2>
+        <h2><span translate="EVENTS.SERIES.DETAILS.HEADER" translate-values="{{ titleParams }}">
+            <!-- Series details - {{resourceId}} -->
+        </h2>
     </header>
 
     <nav class="modal-nav" id="modal-nav">
-        <a ng-click="openTab('metadata')" data-modal-tab="metadata" ng-class="{ active: tab == 'metadata' }" translate="EVENTS.SERIES.DETAILS.TABS.METADATA" with-role="ROLE_UI_SERIES_DETAILS_METADATA_VIEW">Metadata</a>
-        <a ng-if="metadata.entries.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.SERIES.DETAILS.TABS.EXTENDED_METADATA" with-role="ROLE_UI_SERIES_DETAILS_EXTMETADATA_VIEW">Metadata</a>
+        <a ng-click="openTab('metadata')" data-modal-tab="metadata" ng-class="{ active: tab == 'metadata' }" translate="EVENTS.SERIES.DETAILS.TABS.METADATA" with-role="ROLE_UI_SERIES_DETAILS_METADATA_VIEW">
+          <!-- Metadata -->
+        </a>
+        <a ng-if="metadata.entries.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.SERIES.DETAILS.TABS.EXTENDED_METADATA" with-role="ROLE_UI_SERIES_DETAILS_EXTMETADATA_VIEW">
+          <!-- Metadata II -->
+        </a>
         <!--<a ng-click="openTab('participation')" data-modal-tab="participation" ng-class="{ active: tab == 'participation' }" translate="EVENTS.SERIES.DETAILS.TABS.PARTICIPATION" with-role="ROLE_UI_SERIES_DETAILS_EXTMETADATA_VIEW">Participation</a>-->
 <!--         <a ng-click="openTab('events')" data-modal-tab="events" ng-class="{ active: tab == 'events' }" translate="EVENTS.SERIES.DETAILS.TABS.EVENTS">Events</a> -->
-        <a ng-click="openTab('permissions')" data-modal-tab="permissions" ng-class="{ active: tab == 'permissions' }" translate="EVENTS.SERIES.DETAILS.TABS.PERMISSIONS" with-role="ROLE_UI_SERIES_DETAILS_ACL_VIEW">Access Policy</a>
-        <a ng-click="openTab('theme')" data-modal-tab="theme" ng-class="{ active: tab == 'theme' }" translate="EVENTS.SERIES.DETAILS.TABS.THEME" with-role="ROLE_UI_SERIES_DETAILS_THEMES_VIEW">Theme</a>
+        <a ng-click="openTab('permissions')" data-modal-tab="permissions" ng-class="{ active: tab == 'permissions' }" translate="EVENTS.SERIES.DETAILS.TABS.PERMISSIONS" with-role="ROLE_UI_SERIES_DETAILS_ACL_VIEW">
+          <!-- Access Policy -->
+        </a>
+        <a ng-click="openTab('theme')" data-modal-tab="theme" ng-class="{ active: tab == 'theme' }" translate="EVENTS.SERIES.DETAILS.TABS.THEME" with-role="ROLE_UI_SERIES_DETAILS_THEMES_VIEW">
+          <!-- Theme -->
+        </a>
     </nav>
 
     <a ng-click="showAdjacent(true)"><i class="arrow fa fa-chevron-left"></i></a>
@@ -22,7 +32,9 @@
             <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
             <div class="full-col">
                 <div class="obj tbl-list">
-                    <header class="no-expand" translate="EVENTS.SERIES.DETAILS.TABS.METADATA">Metadata</header>
+                    <header class="no-expand" translate="EVENTS.SERIES.DETAILS.TABS.METADATA">
+                      <!-- Metadata -->
+                    </header>
                     <div class="obj-container">
                         <table class="main-tbl">
                             <tr ng-repeat="row in seriesCatalog.fields">
@@ -163,20 +175,24 @@
                 <ul>
                     <li>
                         <div class="obj list-obj">
-                            <header translate="EVENTS.SERIES.DETAILS.TABS.PERMISSIONS">Access Policy</header>
+                            <header translate="EVENTS.SERIES.DETAILS.TABS.PERMISSIONS"><!-- Access Policy --></header>
                             <div class="obj-container">
                                 <div class="obj tbl-list">
                                     <table class="main-tbl" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')">
                                     <thead>
                                         <tr>
-                                            <th translate="EVENTS.SERIES.DETAILS.ACCESS.TEMPLATES.TITLE">Templates</th>
+                                            <th translate="EVENTS.SERIES.DETAILS.ACCESS.TEMPLATES.TITLE">
+                                                <!-- Templates -->
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td>
                                                 <div class="obj-container padded">
-                                                    <p translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION"></p>
+                                                    <p translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION">
+                                                        <!-- Description -->
+                                                    </p>
                                                     <select chosen pre-select-from="acls"
                                                         ng-disabled="(tab == 'permissions') && (!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked)"
                                                         data-width="'200px'"
@@ -199,16 +215,28 @@
                             change the format of the response. -->
                             <div class="obj-container">
                                 <div class="obj tbl-list">
-                                    <header translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.DETAILS">Details</header>
+                                    <header translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.DETAILS">
+                                        <!-- Details -->
+                                    </header>
                                     <div class="obj-container">
                                     <table class="main-tbl">
                                         <thead>
                                             <tr>
-                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ROLE">Role</th>
-                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.READ" class="fit">Read</th>
-                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.WRITE" class="fit">Write</th>
-                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="hasActions"><!--Additional Actions--></th>
-                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ACTION" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked" class="fit">Action</th>
+                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ROLE">
+                                                    <!-- Role -->
+                                                </th>
+                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.READ" class="fit">
+                                                    <!-- Read -->
+                                                </th>
+                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.WRITE" class="fit">
+                                                    <!-- Write -->
+                                                </th>
+                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="hasActions">
+                                                    <!--Additional Actions-->
+                                                </th>
+                                                <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ACTION" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked" class="fit">
+                                                    <!-- Action -->
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
