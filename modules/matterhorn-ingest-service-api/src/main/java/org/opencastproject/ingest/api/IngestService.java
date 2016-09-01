@@ -150,6 +150,22 @@ public interface IngestService extends JobProducer {
   MediaPackage createMediaPackage() throws MediaPackageException, ConfigurationException, HandleException, IOException,
           IngestException;
 
+ /**
+   * Create a new MediaPackage in the repository.
+   * @param  mediapackageID
+   *   The Id for the new Mediapackage 
+   * @return The created MediaPackage
+   * @throws MediaPackageException
+   * @throws HandleException
+   * @throws ConfigurationException
+   * @throws IOException
+   * @throws IngestException
+   *           if an unexpected error occurs
+   */
+  MediaPackage createMediaPackage(String mediaPackageID) throws MediaPackageException, ConfigurationException, HandleException, IOException,
+          IngestException;
+
+
   /**
    * Add a media track to an existing MediaPackage in the repository
    *

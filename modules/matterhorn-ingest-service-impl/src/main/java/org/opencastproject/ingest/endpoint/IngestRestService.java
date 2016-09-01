@@ -218,13 +218,18 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("createMediaPackage")
-  @RestQuery(name = "createMediaPackage", description = "Create an empty media package", reponses = {
+  @RestQuery(name = "createMediaPackage", description = "Create an empty media package", restParameters = {
+          @RestParameter(description = "The Id for the new Mediapackage", isRequired = false, name = "id", type = RestParameter.Type.STRING), }, reponses = {
           @RestResponse(description = "Returns media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
-  public Response createMediaPackage() {
+  public Response createMediaPackage(@FormParam("id") String mediaPackageId) {
     MediaPackage mp;
     try {
+      if (mediaPackageId.isEmpty()) {
       mp = ingestService.createMediaPackage();
+      } else
+        mp = ingestService.createMediaPackage(mediaPackageId);
+
       startCache.put(mp.getIdentifier().toString(), new Date());
       return Response.ok(mp).build();
     } catch (Exception e) {

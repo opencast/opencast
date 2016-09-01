@@ -654,6 +654,26 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /**
    * {@inheritDoc}
    *
+   * @see org.opencastproject.ingest.api.IngestService#createMediaPackage()
+   */
+  @Override
+  public MediaPackage createMediaPackage(String mediaPackageId) throws MediaPackageException,
+          org.opencastproject.util.ConfigurationException, HandleException {
+    MediaPackage mediaPackage;
+    try {
+      mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew(new UUIDIdBuilderImpl().fromString(mediaPackageId));
+    } catch (MediaPackageException e) {
+      logger.error("INGEST:Failed to create media package " + e.getLocalizedMessage());
+      throw e;
+    }
+    mediaPackage.setDate(new Date());
+    logger.info("Created mediapackage {}", mediaPackage);
+    return mediaPackage;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see org.opencastproject.ingest.api.IngestService#addTrack(java.net.URI,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor, org.opencastproject.mediapackage.MediaPackage)
    */

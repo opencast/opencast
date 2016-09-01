@@ -26,6 +26,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UploadJob;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -77,8 +78,10 @@ public class IngestRestServiceTest {
 
     // Create a mock ingest service
     IngestService ingestService = EasyMock.createNiceMock(IngestService.class);
-    EasyMock.expect(ingestService.createMediaPackage()).andReturn(
+    EasyMock.expect(ingestService.createMediaPackage(null)).andReturn(
             MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
+    EasyMock.expect(ingestService.createMediaPackage("1a6f70ab-4262-4523-9f8e-babce22a1ea8")).andReturn(
+            MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew(new UUIDIdBuilderImpl().fromString("1a6f70ab-4262-4523-9f8e-babce22a1ea8")));
     EasyMock.expect(
             ingestService.addAttachment((URI) EasyMock.anyObject(), (MediaPackageElementFlavor) EasyMock.anyObject(),
                     (MediaPackage) EasyMock.anyObject())).andReturn(
@@ -335,7 +338,7 @@ public class IngestRestServiceTest {
 
   @Test
   public void testCreateMediaPackage() throws Exception {
-    Response response = restService.createMediaPackage();
+    Response response = restService.createMediaPackage(null);
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
     MediaPackage mp = (MediaPackage) response.getEntity();
     Assert.assertNotNull(mp);
@@ -344,21 +347,21 @@ public class IngestRestServiceTest {
   @Test
   public void testAddMediaPackageTrack() throws Exception {
     Response response = restService.addMediaPackageTrack("http://foo/av.mov", "presenter/source",
-            MediaPackageParser.getAsXml(((MediaPackage) restService.createMediaPackage().getEntity())));
+            MediaPackageParser.getAsXml(((MediaPackage) restService.createMediaPackage(null).getEntity())));
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
   }
 
   @Test
   public void testAddMediaPackageCatalog() throws Exception {
     Response response = restService.addMediaPackageCatalog("http://foo/dc.xml", "dublincore/episode",
-            MediaPackageParser.getAsXml(((MediaPackage) restService.createMediaPackage().getEntity())));
+            MediaPackageParser.getAsXml(((MediaPackage) restService.createMediaPackage(null).getEntity())));
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
   }
 
   @Test
   public void testAddMediaPackageAttachment() throws Exception {
     Response response = restService.addMediaPackageAttachment("http://foo/cover.png", "image/cover",
-            MediaPackageParser.getAsXml(((MediaPackage) restService.createMediaPackage().getEntity())));
+            MediaPackageParser.getAsXml(((MediaPackage) restService.createMediaPackage(null).getEntity())));
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
   }
 
@@ -408,7 +411,7 @@ public class IngestRestServiceTest {
 
   @Test
   public void testAddMediaPackagePartialTrack() throws Exception {
-    String mediaPackage = MediaPackageParser.getAsXml(((MediaPackage) restService.createMediaPackage().getEntity()));
+    String mediaPackage = MediaPackageParser.getAsXml(((MediaPackage) restService.createMediaPackage(null).getEntity()));
 
     Response response = restService.addMediaPackagePartialTrack("http://foo/av.mov", "presenter/source+partial", 1000L,
             mediaPackage);
