@@ -37,7 +37,6 @@
   </properties>
 
   <modules>
-    <module>modules/matterhorn-admin-ui</module>
     <module>modules/matterhorn-admin-ui-ng</module>
     <module>modules/matterhorn-annotation-api</module>
     <module>modules/matterhorn-annotation-impl</module>

@@ -136,34 +136,6 @@ modules/matterhorn-admin-ui-ng/src/test/resources/test/lib/jquery-deparam.js
   https://github.com/AceMetrix/jquery-deparam
   MIT License
 
-modules/matterhorn-admin-ui/src/main/resources/ui/js/excanvas.js
-  Copyright 2006 Google Inc.
-  Licensed under the Apache License, Version 2.
-
-modules/matterhorn-admin-ui/src/main/resources/ui/js/jquery.address-1.4.min.js
-  jQuery Address Plugin v1.4
-  http://www.asual.com/jquery/address/
-  Copyright (c) 2009-2010 Rostislav Hristov
-  Dual licensed under the MIT or GPL Version 2 licenses.
-
-modules/matterhorn-admin-ui/src/main/resources/ui/js/jquery.cookie.js
-  jQuery Cookie Plugin v1.4.1
-  https://github.com/carhartl/jquery-cookie
-  Copyright 2013 Klaus Hartl
-  Released under the MIT license
-
-modules/matterhorn-admin-ui/src/main/resources/ui/js/jquery.jqote2.js
-  jQote2 - client-side Javascript templating engine
-  Copyright (C) 2010, aefxx
-  http://aefxx.com/
-  Dual licensed under the WTFPL v2 or MIT (X11) licenses
-
-modules/matterhorn-admin-ui/src/test/qunit/qunit/qunit.js
-  QUnit - A JavaScript Unit Testing Framework
-  http://docs.jquery.com/QUnit
-  Copyright (c) 2009 John Resig, Jörn Zaefferer
-  Dual licensed under the MIT and GPL licenses.
-
 modules/matterhorn-common/src/test/resources/InfusionAll.js
   jQuery JavaScript Library v1.3.2
   http://jquery.com/
@@ -701,11 +673,6 @@ assemblies
   org.apache.karaf.tooling               karaf-maven-plugin                               Apache License, Version 2.0
   org.apache.maven.plugins               maven-resources-plugin                           Apache License, Version 2.0
   org.codehaus.mojo                      build-helper-maven-plugin                        MIT License
-
-matterhorn-admin-ui
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
-  org.slf4j                              slf4j-api                                        MIT License
 
 
 matterhorn-admin-ui-ng
