@@ -19,7 +19,9 @@
         </div>
 
         <h1 translate="{{ table.caption }}"><!-- Themes --></h1>
-        <h4 translate="TABLE_SUMMARY" translate-values="{ numberOfRows: '{{ table.pagination.totalItems }}' }"></h4>
+        <h4 translate="TABLE_SUMMARY" translate-values="{ numberOfRows: '{{ table.pagination.totalItems }}' }">
+            <!-- {{numberOfRows}} rows -->
+        </h4>
 
     </div>
     <div class="table-container top-addon" admin-ng-table="" table="table"></div>
