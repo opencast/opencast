@@ -50,6 +50,7 @@ angular.module('adminNg.resources')
                 row.location = r.location;
                 row.agent_id = r.agent_id;
                 row.managed_acl = r.managedAcl;
+                row.type = "EVENT";
                 return row;
             });
 

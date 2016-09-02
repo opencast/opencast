@@ -2,7 +2,7 @@
     <div class="modal-body">
         <div class="full-col">
             <div class="obj">
-                <header class="no-expand" translate="EVENTS.SEND_MESSAGE.TABS.RECIPIENTS">Recipients</header>
+                <header class="no-expand" translate="EVENTS.SEND_MESSAGE.TABS.RECIPIENTS"><!-- Recipients --></header>
                 <div class="obj-container">
                     <table class="main-tbl">
                         <tbody>
@@ -15,14 +15,18 @@
             </div>
 
             <div class="obj">
-                <header class="no-expand" translate="EVENTS.SEND_MESSAGE.RECIPIENTS.AUDIT_TRAIL_CAPTION">Add to Audit Trail</header>
+                <header class="no-expand" translate="EVENTS.SEND_MESSAGE.RECIPIENTS.AUDIT_TRAIL_CAPTION">
+                    <!-- Add to Audit Trail -->
+                </header>
                 <div class="obj-container padded">
-                    <p translate="EVENTS.SEND_MESSAGE.RECIPIENTS.AUDIT_TRAIL_DESCRIPTION"></p>
+                    <p translate="EVENTS.SEND_MESSAGE.RECIPIENTS.AUDIT_TRAIL_DESCRIPTION"><!-- Description --></p>
                     <div class="form-container">
                         <div class="row no-padding">
                             <div class="inline-content pull-left">
                                 <input type="checkbox" id="audit_trail" ng-model="wizard.step.ud.audit_trail" class="ios">
-                                <label for="audit_trail" translate="EVENTS.SEND_MESSAGE.RECIPIENTS.AUDIT_TRAIL_LABEL"></label>
+                                <label for="audit_trail" translate="EVENTS.SEND_MESSAGE.RECIPIENTS.AUDIT_TRAIL_LABEL">
+                                    <!-- Label -->
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -37,7 +41,9 @@
         <div class="full-col">
             <div class="form-container">
                 <div class="row">
-                    <label class="required" translate="EVENTS.SEND_MESSAGE.MESSAGE.EMAIL_TEMPLATE">Select Email Template</label>
+                    <label class="required" translate="EVENTS.SEND_MESSAGE.MESSAGE.EMAIL_TEMPLATE">\
+                        <!-- Select Email Template -->
+                    </label>
                     <select chosen pre-select-from="wizard.step.templates"
                         data-width="'200px'"
                         data-disable-search-threshold="8"
@@ -49,13 +55,13 @@
                 </div>
 
                 <div class="row">
-                    <label class="required" translate="EVENTS.SEND_MESSAGE.MESSAGE.SUBJECT">Subject</label>
+                    <label class="required" translate="EVENTS.SEND_MESSAGE.MESSAGE.SUBJECT"><!-- Subject --></label>
                     <input type="text" ng-model="wizard.step.ud.subject"
                         placeholder="{{ 'EVENTS.SEND_MESSAGE.MESSAGE.SUBJECT' | translate }}...">
                 </div>
 
                 <div class="row">
-                    <label class="required" translate="EVENTS.SEND_MESSAGE.MESSAGE.MESSAGE">Message</label>
+                    <label class="required" translate="EVENTS.SEND_MESSAGE.MESSAGE.MESSAGE"><!-- Message --></label>
                     <div class="text-variables">
                         <label ng-repeat="variable in wizard.step.variables" ng-click="wizard.step.insertVariable(variable.VARIABLE)">{{ variable.VARIABLE }}<small>{{ variable['DESCRIPTION.EN'] }}</small></label>
                     </div>
@@ -66,7 +72,9 @@
                 <div class="row">
                     <div class="inline-content pull-left">
                         <input type="checkbox" id="include_signature" ng-model="wizard.step.ud.include_signature" class="ios">
-                        <label for="include_signature" translate="EVENTS.SEND_MESSAGE.MESSAGE.INCLUDE_SIGNATURE">Include in my email signature</label>
+                        <label for="include_signature" translate="EVENTS.SEND_MESSAGE.MESSAGE.INCLUDE_SIGNATURE">
+                            <!-- Include in my email signature -->
+                        </label>
                     </div>
                 </div>
             </div>
@@ -79,12 +87,14 @@
         <div class="full-col">
             <div data-admin-ng-notifications="" context="bulk-message-form"></div>
             <div class="obj summary-view">
-                <header class="no-expand" translate="EVENTS.SEND_MESSAGE.SUMMARY.MESSAGE_SUMMARY">Message Summary</header>
+                <header class="no-expand" translate="EVENTS.SEND_MESSAGE.SUMMARY.MESSAGE_SUMMARY">
+                    <!-- Message Summary -->
+                </header>
                 <div class="obj-container padded">
-                    <span translate="EVENTS.SEND_MESSAGE.MESSAGE.SUBJECT">Subject</span>
+                    <span translate="EVENTS.SEND_MESSAGE.MESSAGE.SUBJECT"><!-- Subject --></span>
                     <p>{{ wizard.states[1].stateController.preview.subject }}</p>
 
-                    <span translate="EVENTS.SEND_MESSAGE.MESSAGE.MESSAGE">Message Body</span>
+                    <span translate="EVENTS.SEND_MESSAGE.MESSAGE.MESSAGE"><!-- Message Body --></span>
                     <p>{{ wizard.states[1].stateController.preview.body }}</p>
                 </div>
             </div>

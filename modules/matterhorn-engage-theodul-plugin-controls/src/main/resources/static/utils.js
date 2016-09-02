@@ -203,7 +203,9 @@ define(["jquery"], function($) {
             }
             if (total < parseInt(duration)) {
                 var diff = parseInt(duration) - total;
-                result[result.length - 1].duration = parseInt(result[result.length - 1].duration) + diff;
+                if (result[result.length - 1]) {
+                    result[result.length - 1].duration = parseInt(result[result.length - 1].duration) + diff;
+                }
             }
         }
         return result;

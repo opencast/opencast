@@ -1,9 +1,9 @@
 <div class="modal-content" ng-class="{active: isCurrentTab('metadata')}" data-modal-tab-content="metadata" data-level="1">
-    <p class="tab-description" translate="EVENTS.SERIES.NEW.METADATA.DESCRIPTION"></p>
+    <p class="tab-description" translate="EVENTS.SERIES.NEW.METADATA.DESCRIPTION"><!-- Description --></p>
     <div class="modal-body">
         <div class="full-col">
             <div class="obj tbl-list">
-                <header class="no-expand" translate="EVENTS.SERIES.NEW.METADATA.METADATA.TITLE"></header>
+                <header class="no-expand" translate="EVENTS.SERIES.NEW.METADATA.METADATA.TITLE"><!-- Title --></header>
                 <div class="obj-container">
                     <form novalidate name="outerForm">
                         <table class="main-tbl">
@@ -48,7 +48,7 @@
 <div class="modal-content" data-modal-tab-content="access" data-level="1">
     <div class="modal-body">
 
-        <p class="tab-description" translate="EVENTS.SERIES.NEW.ACCESS.DESCRIPTION"></p>
+        <p class="tab-description" translate="EVENTS.SERIES.NEW.ACCESS.DESCRIPTION"><!-- Description --></p>
         <div data-admin-ng-notifications="" context="series-acl"></div>
         <div data-admin-ng-notifications="" type="warning" context="series-acl"></div>
 
@@ -56,7 +56,9 @@
             <ul>
                 <li>
                     <div class="obj list-obj">
-                        <header class="no-expand" translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.TITLE"></header>
+                        <header class="no-expand" translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.TITLE">
+                            <!-- Title -->
+                        </header>
                         <div class="obj-container">
 
                             <div class="obj tbl-list">
@@ -64,7 +66,9 @@
                                 <table class="main-tbl">
                                 <thead>
                                     <tr>
-                                        <th translate="EVENTS.SERIES.NEW.ACCESS.TEMPLATES.TITLE"><!--Templates--></th>
+                                        <th translate="EVENTS.SERIES.NEW.ACCESS.TEMPLATES.TITLE">
+                                            <!-- Templates -->
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -91,16 +95,28 @@
 
                         <div class="obj-container">
                             <div class="obj tbl-list">
-                                <header translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.DETAILS"><!--Details--></header>
+                                <header translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.DETAILS">
+                                    <!-- Details -->
+                                </header>
                                 <div class="obj-container">
                                 <table class="main-tbl">
                                     <thead>
                                         <tr>
-                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ROLE"><!--Role--></th>
-                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.READ" class="fit"><!--Read--></th>
-                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit"><!--Write--></th>
-                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="wizard.step.hasActions"><!--Additional Actions--></th>
-                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ACTION" class="fit"><!--Action--></th>
+                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ROLE">
+                                                <!-- Role -->
+                                            </th>
+                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.READ" class="fit">
+                                                <!-- Read -->
+                                            </th>
+                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit">
+                                                <!-- Write -->
+                                            </th>
+                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="wizard.step.hasActions">
+                                                <!-- Additional Actions -->
+                                            </th>
+                                            <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ACTION" class="fit">
+                                                <!-- Action -->
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -140,13 +156,13 @@
 </div>
 
 <div class="modal-content" data-modal-tab-content="theme" data-level="1">
-    <p class="tab-description" translate="EVENTS.SERIES.NEW.THEME.DESCRIPTION"></p>
+    <p class="tab-description" translate="EVENTS.SERIES.NEW.THEME.DESCRIPTION"><!-- Description --></p>
     <div class="modal-body">
         <div class="full-col">
             <div class="obj quick-actions">
-                <header class="no-expand" translate="EVENTS.SERIES.NEW.THEME.TITLE"></header>
+                <header class="no-expand" translate="EVENTS.SERIES.NEW.THEME.TITLE"><!-- Title --></header>
                 <div class="obj-container padded">
-                    <p translate="EVENTS.SERIES.NEW.THEME.DESCRIPTION"></p>
+                    <p translate="EVENTS.SERIES.NEW.THEME.DESCRIPTION"><!-- Description --></p>
                     <select chosen pre-select-from="wizard.step.themes"
                             allow-single-deselect="true"
                             data-width="'200px'"
@@ -170,7 +186,7 @@
         <div class="full-col">
             <div data-admin-ng-notifications="" context="series-form"></div>
             <div class="obj tbl-list">
-                <header class="no-expand" translate="EVENTS.SERIES.NEW.METADATA.CAPTION"></header>
+                <header class="no-expand" translate="EVENTS.SERIES.NEW.METADATA.CAPTION"><!-- Caption --></header>
                 <div class="obj-container">
                     <table class="main-tbl">
                         <tr ng-repeat="userEntry in wizard.states[0].stateController.getUserEntries()" ng-if="userEntry.presentableValue">
@@ -182,7 +198,9 @@
             </div>
 
             <div class="obj tbl-list" ng-if="wizard.getStateControllerByName('metadata-extended').visible && wizard.getStateControllerByName('metadata-extended').getFiledCatalogs().length > 0">
-                <header class="no-expand" translate="EVENTS.EVENTS.NEW.METADATA_EXTENDED.CAPTION"><!--Metadata Extended--></header>
+                <header class="no-expand" translate="EVENTS.EVENTS.NEW.METADATA_EXTENDED.CAPTION">
+                    <!--Metadata Extended-->
+                </header>
                 <div class="obj-container">
                     <table class="main-tbl" ng-repeat="(name, block) in wizard.getStateControllerByName('metadata-extended').getFiledCatalogs()">
                         <tr ng-repeat="field in block.fields" ng-if="field.presentableValue">
@@ -194,15 +212,23 @@
             </div>
 
             <div class="obj tbl-list">
-                <header class="no-expand" translate="EVENTS.SERIES.NEW.ACCESS.CAPTION"></header>
+                <header class="no-expand" translate="EVENTS.SERIES.NEW.ACCESS.CAPTION"><!-- Caption --></header>
                 <div class="obj-container">
                     <table class="main-tbl">
                         <thead>
                             <tr>
-                                <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ROLE"><!--Role--></th>
-                                <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.READ" class="fit"><!--Read--></th>
-                                <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit"><!--Write--></th>
-                                <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="wizard.getStateControllerByName('access').hasActions"><!--Additional Actions--></th>
+                                <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ROLE">
+                                    <!-- Role -->
+                                </th>
+                                <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.READ" class="fit">
+                                    <!-- Read -->
+                                </th>
+                                <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.WRITE" class="fit">
+                                    <!-- Write -->
+                                </th>
+                                <th translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS" class="fit" ng-if="wizard.getStateControllerByName('access').hasActions">
+                                    <!-- Additional Actions -->
+                                </th>
                             </tr>
                         </thead>
                         <tr ng-repeat="policy in wizard.getStateControllerByName('access').ud.policies">
@@ -216,11 +242,11 @@
             </div>
 
             <div class="obj tbl-list" ng-if="wizard.getStateControllerByName('theme').ud.theme && wizard.getStateControllerByName('theme').ud.theme !== ''">
-                <header class="no-expand" translate="EVENTS.SERIES.NEW.THEME.CAPTION"></header>
+                <header class="no-expand" translate="EVENTS.SERIES.NEW.THEME.CAPTION"><!-- Caption --></header>
                 <div class="obj-container">
                     <table class="main-tbl">
                         <tr>
-                            <td translate="EVENTS.SERIES.NEW.THEME.CAPTION"></td>
+                            <td translate="EVENTS.SERIES.NEW.THEME.CAPTION"><!-- Caption --></td>
                             <td ng-if="wizard.getStateControllerByName('theme').ud.theme">{{wizard.getStateControllerByName('theme').themes[wizard.getStateControllerByName('theme').ud.theme]}}</td>
                         </tr>
                     </table>
