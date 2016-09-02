@@ -1043,12 +1043,6 @@ matterhorn-lti
   org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
 
 
-matterhorn-mediapackage-manipulator
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
-  org.slf4j                              slf4j-log4j12                                    MIT License
-
-
 matterhorn-message-broker-api
   GroupId                                ArtifactId                                       License
   org.apache.geronimo.specs              geronimo-jms_1.1_spec                            The Apache Software License, Version 2.0
