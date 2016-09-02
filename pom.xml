@@ -84,6 +84,8 @@
     <module>modules/matterhorn-distribution-service-streaming-remote</module>
     <module>modules/matterhorn-distribution-workflowoperation</module>
     <module>modules/matterhorn-dublincore</module>
+    <module>modules/matterhorn-email-template-service-api</module>
+    <module>modules/matterhorn-email-template-service-impl</module>
     <module>modules/matterhorn-event-comment</module>
     <module>modules/matterhorn-engage-theodul-api</module>
     <module>modules/matterhorn-engage-theodul-core</module>
