@@ -53,7 +53,7 @@ module.exports = function (grunt) {
       },
       sass: {
         files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
-        tasks: ['sass:server', 'autoprefixer']
+        tasks: ['sass:server', 'postcss']
       },
       gruntfile: {
         files: ['Gruntfile.js']
@@ -75,7 +75,7 @@ module.exports = function (grunt) {
       options: {
         port: 9000,
         // Change this to '0.0.0.0' to access the server from outside.
-        hostname: 'localhost',
+        hostname: '0.0.0.0', //'localhost',
         livereload: 35729
       },
       livereload: {
@@ -112,7 +112,7 @@ module.exports = function (grunt) {
               port: '<%= proxyPort %>',
               https: false,
               changeOrigin: true
-          }],
+          }]
       },
       test: {
         options: {
@@ -478,6 +478,9 @@ module.exports = function (grunt) {
   ]);
 
   grunt.loadNpmTasks('grunt-connect-proxy');
+  grunt.loadNpmTasks('grunt-sass');
+  grunt.loadNpmTasks('grunt-postcss');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Base task for the development with proxy to a real backend
   grunt.registerTask('proxy', [
@@ -486,6 +489,7 @@ module.exports = function (grunt) {
     'concurrent:server',
     'postcss:server',
     'configureProxies:proxy',
-    'connect:proxy'
+    'connect:proxy',
+    'watch'
   ]);
 };

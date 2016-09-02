@@ -41,21 +41,28 @@ Your paths might look different.*
 Prerequisites for live working and debugging
 ------------------------------
 
-Checkout and build Opencast.
+1. Checkout and build Opencast.
 
-You need [Grunt][1] and [NodeJS][2].
-Either install it on your system or use the local version from the Opencast module:
+2. You will need to install [NodeJS][2] (which includes npm).
+
+3. Before setting up the local server ensure that your npm is up-to-date (this might require `sudo` on certain systems): 
+
+        npm update -g npm
+
+You can also run a local version of [Grunt][1] and [NodeJS][2] from the Opencast module:
 
 ```bash
 cd modules/matterhorn-admin-ui-ng
 export PATH=$PATH:node:node_modules/grunt-cli/bin:node_modules/karma/bin
 ```
+
 *Note: The node and node_modules folders are created during the Maven build process.*
 
 *Note: We already had reports of Grunt behaving differently on different systems.
 Watch out for local or system-wide installations of Grunt and/or NodeJS as they can
 change the build behavior of Admin UI NG.*
 
+<<<<<<< HEAD:docs/guides/developer/docs/modules/admin-ui/development.md
 Debugging Javascript unit tests
 ------------------------------------
 
@@ -100,12 +107,14 @@ Additional browsers are supported, the full list can be found at [here](https://
 
 Live working with running Opencast
 ----------------------------------
+=======
+Live working with a running Opencast
+------------------------------------
+>>>>>>> 04ef604... MH-11756: Updated Admin UI Node packages and Grunt configuration for dynamic reloading of pages and documentation to that effect.:docs/guides/developer/docs/modules/admin-ui.md
 
 In order to speed up the UI development process, you can test the code without
-building the module with Maven.
-There is a Grunt task for starting a standalone web server offering the UI from
-the source.
-Changes to the source will (after a page reload) be directly reflected in the browser.
+building the module with Maven. There is a Grunt task for starting a standalone web server offering the UI from
+the source and a separate task that will monitoring any change to the Sass, JavaScript and HTML files and reload the page dynamically.
 
 *Be warned that some functionality in this live setup can be limited.
 Before reporting an issue, please test if you can reproduced the issue with a built Opencast.*
@@ -114,31 +123,38 @@ This setup may be configured as follows:
 
 1. Follow the instructions in the Prerequisites section.
 
-2. Start your Opencast instance.
+1. Start your Opencast instance.
 
-3. Start the standalone webserver by running:
-```bash
-cd modules/matterhorn-admin-ui-ng
-grunt proxy --proxy.host=http://localhost:8080 --proxy.username=opencast_system_account --proxy.password=CHANGE_ME
+1. Change to the Admin UI module directory.
+
+        cd modules/matterhorn-admin-ui-ng
+
+1. Install project dependencies.
+
+        npm install
+
+1. Start the standalone web server by running:
+
+        grunt proxy --proxy.host=http://localhost:8080 --proxy.username=opencast_system_account --proxy.password=CHANGE_ME
+
+*Note: host, username and password have to match your configuration `../etc/custom.properties`*
+
+Grunt should print out the [URL][3] where you can see the standalone page running
+from source.
+```
+Started connect web server on http://localhost:9000
 ```
 
-*Note: host, username and password have to match your configuration
-`etc/custom.properties`*
-
-Grunt should print out the URL where you can see the standalone page running
-from sources.
-Example:
+To run the watcher that updates the displayed page dynamically, run in the same folder: 
 ```
-[I 160420 16:35:29 server:281] Serving on http://127.0.0.1:8000
+grunt watch
 ```
 
-If you make changes to the Admin UI NG sources, they should be visible in
-the browser after a page reload.
-You can still access the builtin UI by accessing
-`http://localhost:8080`.
-
-[1]: http://gruntjs.com
-[2]: https://nodejs.org
+Which should then display:
+```
+Running "watch" task
+Waiting...
+```
 
 Live working with a Mockup
 --------------------------
@@ -153,18 +169,27 @@ This setup may be configured as follows:
 
 1. Follow the instructions in the Prerequisites section.
 
-2. Start the mockup webserver by running:
-```bash
-cd modules/matterhorn-admin-ui-ng
-grunt serve
+1. Change to the Admin UI module directory.
+
+        cd modules/matterhorn-admin-ui-ng
+
+1. Install project dependencies.
+
+        npm install
+
+1. Start the mockup webserver by running:
+
+        grunt serve
+
+
+Grunt should print out the [URL][3] where you can see the standalone page running
+from source.
+```
+Started connect web server on http://localhost:9000
 ```
 
-Grunt should print out the URL where you can see the standalone page running
-from sources.
-Example:
-```
-[I 160420 16:35:29 server:281] Serving on http://127.0.0.1:8000
-```
+If you make changes to the Admin UI NG source files, the page should auto reload to display the changes.
 
-If you make changes to the Admin UI NG sources, they should be visible in
-the browser after a page reload.
+[1]: http://gruntjs.com
+[2]: https://nodejs.org
+[3]: http://localhost:9000
