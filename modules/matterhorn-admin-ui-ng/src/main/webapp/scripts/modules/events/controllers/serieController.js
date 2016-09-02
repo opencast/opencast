@@ -77,7 +77,6 @@ angular.module('adminNg.controllers')
                     }
                 }, this);
                 $scope.roles = roles;
-                //$scope.apply();
             }, this);
         };
 
@@ -182,7 +181,7 @@ angular.module('adminNg.controllers')
             });
         });
 
-        $scope.roles = updateRoles();
+        updateRoles();
         $scope.theme = {};
 
         ResourcesListResource.get({ resource: 'THEMES.NAME' }, function (data) {
@@ -335,7 +334,7 @@ angular.module('adminNg.controllers')
       switch (value) {
         case 'permissions':
             $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
-            $scope.roles = updateRoles();
+            updateRoles();
           break;
       }
     });
