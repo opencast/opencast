@@ -557,8 +557,7 @@ public class CaptureAgentStateServiceImplTest {
     Assert.assertTrue(agent.getLastHeardFrom() <= System.currentTimeMillis());
 
     Thread.sleep(5000);
-    String state = service.getAgentState(name);
-    Assert.assertEquals(OFFLINE, state);
+    Assert.assertEquals(OFFLINE, service.getAgentState(name));
   }
 
   @Test
@@ -578,4 +577,30 @@ public class CaptureAgentStateServiceImplTest {
 
     Assert.assertEquals(OFFLINE, agents.get(name).getState());
   }
-}
+
+  @Test
+  public void testAgentReturn() throws Exception {
+    service.setupAgentCache(1, TimeUnit.SECONDS);
+    String name = "agent1";
+    Long lastHeardFrom = 0L;
+    Agent agent = null;
+    service.setAgentState(name, IDLE);
+    agent = service.getAgent(name);
+
+    Assert.assertTrue(lastHeardFrom <= agent.getLastHeardFrom());
+    Assert.assertTrue(agent.getLastHeardFrom() <= System.currentTimeMillis());
+
+    Thread.sleep(5000);
+    Map<String, Agent> agents = service.getKnownAgents();
+
+    Assert.assertEquals(OFFLINE, agents.get(name).getState());
+    Assert.assertEquals(OFFLINE, service.getAgentState(name));
+
+
+    service.setAgentState(name, IDLE);
+    long time = System.currentTimeMillis();
+    agent = service.getAgent(name);
+
+    Assert.assertTrue(lastHeardFrom <= agent.getLastHeardFrom());
+    Assert.assertTrue(time - agent.getLastHeardFrom() <= 5);
+  }}
