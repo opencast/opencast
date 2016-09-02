@@ -261,17 +261,19 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "addTrackURL", description = "Add a media track to a given media package using an URL", restParameters = {
           @RestParameter(description = "The location of the media", isRequired = true, name = "url", type = RestParameter.Type.STRING),
           @RestParameter(description = "The kind of media", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "The Tags of the  media track", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
           @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, reponses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
-  public Response addMediaPackageTrack(@FormParam("url") String url, @FormParam("flavor") String flavor,
+  public Response addMediaPackageTrack(@FormParam("url") String url, @FormParam("flavor") String flavor,  @FormParam("tags")  String tags,
           @FormParam("mediaPackage") String mpx) {
     try {
       MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
       if (MediaPackageSupport.sanityCheck(mp).isSome())
         return Response.serverError().status(Status.BAD_REQUEST).build();
-      mp = ingestService.addTrack(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), mp);
+      String[] tag = tags.split(",");
+      mp = ingestService.addTrack(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), tag, mp);
       return Response.ok(mp).build();
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
