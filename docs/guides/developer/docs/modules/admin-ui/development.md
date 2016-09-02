@@ -1,3 +1,15 @@
+Coding Principles
+-----------------
+
+<dl>
+  <dt>Modularity</dt>
+  <dd>Reusable interface components to build out new views based on the existing code structure.</dd>
+  <dt>Validation</dt>
+  <dd>All code languages are HTML5 and CSS3 and adhere to W3C standards.</dd>
+  <dt>Extension</dt>
+  <dd>For ease of UI and UX changes the styling elements are driven by SASS CSS pre-compiler.</dd>
+</dl>
+
 Modifying Sources
 -----------------
 

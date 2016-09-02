@@ -1,0 +1,117 @@
+/*
+.wy-menu-vertical > ul > li {
+    border: 1px solid green;   
+}
+
+.wy-menu-vertical > ul > li ul.subnav {
+    border: 1px solid red;
+}
+
+.wy-menu-vertical > ul > li ul.subnav > li:first-child {
+    border: 1px solid blue;
+}
+
+.wy-menu-vertical > ul > li ul.subnav > li {
+    border: 1px solid blueviolet;
+}
+*/
+
+.wy-menu-vertical li a, 
+.wy-menu-vertical li span {
+    padding: 0.4045em 1.1em;
+}
+
+.wy-menu-vertical .subnav a {
+    padding-left: 2.2em;
+}
+
+.wy-menu-vertical ul li ul.subnav ul.subnav {
+    padding-left: 1em;
+}
+
+.wy-menu-vertical .subnav a.current {
+    padding-left: 2.2em;
+}
+
+.wy-menu-vertical ul.subnav li.current > ul a {
+    padding-left: 3.3em;
+}
+    
+.wy-menu-vertical li.current a {
+ /*   padding-left: 1.2em;*/
+}
+
+.wy-menu-vertical ul li.current a {
+    padding-left: 2.2em;
+}
+
+.wy-menu-vertical ul li.on a, .wy-menu-vertical ul li.current > a {
+    padding-left: 1.1em;
+}
+
+h6 {
+    margin: 0;
+}
+
+code, .rst-content tt {
+    padding: 2px 5px;
+    position: relative;
+    top: -1px;
+}
+
+h3, h4, h5, h6 {
+    color: #2980b9;
+    font-weight: 300;
+}
+h5 {
+    font-size: 110%;
+}
+h1, h2, h3, h4, h5, h6, legend {
+    font-family: "Roboto Slab","ff-tisa-web-pro","Georgia",Arial,sans-serif;
+    font-weight: 700;
+    margin-top: 0;
+}
+
+.rst-content .section dl > dt {
+    background: transparent;
+    border-width: 0px;
+    margin-bottom: 0px;
+    font-size: 16px;
+}
+
+.section .color {
+    background-color: #37c180;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    height: 40px;
+    line-height: 66px;
+    padding-right: 0.5em;
+    text-align: right;
+    width: 100%;
+}
+
+.section .green {
+    background-color: #37c180;
+    color: #fff;
+}
+
+.section .blue {
+    background-color: #378DD4;
+    color: #fff;
+}
+
+.section .dark-blue {
+    background-color: #24425C;
+    color: #fff;
+}
+
+.section .grey {
+    background-color: #8C939B;
+    color: #fff;
+}
+
+.section .highlight {
+    background-color: #FAFAFA;
+    color: #8C939B;
+}
