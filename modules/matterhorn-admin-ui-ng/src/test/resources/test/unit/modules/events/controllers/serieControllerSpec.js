@@ -163,13 +163,13 @@ describe('Serie controller', function () {
                     value : []
                 }
             };
-            
+
             spyOn(SeriesAccessResource, 'save');
             $scope.accessSave.call(this);
 
-            expect(SeriesAccessResource.save).toHaveBeenCalledWith({ id: '4581' }, 
-                { 
-                    acl : { ace : [ { action : 'read', allow : true, role : 'admin' }, { action : 'write', allow : true, role : 'admin' } ] }, 
+            expect(SeriesAccessResource.save).toHaveBeenCalledWith({ id: '4581' },
+                {
+                    acl : { ace : [ { action : 'read', allow : true, role : 'admin' }, { action : 'write', allow : true, role : 'admin' } ] },
                     override: true
                 }
             );
