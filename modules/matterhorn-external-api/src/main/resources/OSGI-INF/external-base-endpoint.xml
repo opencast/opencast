@@ -3,7 +3,7 @@
                name="org.opencastproject.external.endpoint.BaseEndpoint"
                immediate="true" activate="activate">
   <implementation class="org.opencastproject.external.endpoint.BaseEndpoint" />
-  <property name="service.description" value="External API - Index Endpoint" />
+  <property name="service.description" value="External API - Base Endpoint" />
   <property name="opencast.service.type" value="org.opencastproject.external" />
   <property name="opencast.service.path" value="/api" />
   <service>

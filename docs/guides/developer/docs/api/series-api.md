@@ -174,7 +174,7 @@ Deletes a series
 __Response__
 
 `204 (NO CONTENT)`: The series has been deleted.<br/>
-`404 (OK)`: The specified series does not exist.
+`404 (NOT FOUND)`: The specified series does not exist.
 
 # Metadata
 
@@ -326,7 +326,7 @@ __Response__
 
 `204 (NO CONTENT)`: The metadata have been deleted.<br/>
 `403 (FORBIDDEN)`: The main metadata catalog dublincore/series cannot be deleted as it has mandatory fields.<br/>
-`404 (OK)`: The specified series does not exist.
+`404 (NOT FOUND)`: The specified series does not exist.
 
 # Access Policy
 

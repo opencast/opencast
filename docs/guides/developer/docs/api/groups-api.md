@@ -110,7 +110,7 @@ Form Parameters            |Type            | Description
 `name`                     | `String`       | Group Name
 `description`              | `String`       | Group Description
 `roles`                    | `String`       | Comma-separated list of roles
-`users`                    | `String`       | Comma-separated list of users
+`members`                  | `String`       | Comma-separated list of members
 
 __Response__
 
@@ -126,7 +126,7 @@ Form Parameters            |Type            | Description
 `name`                     | `String`       | Group Name
 `description`              | `String`       | Group Description
 `roles`                    | `String`       | Comma-separated list of roles
-`users`                    | `String`       | Comma-separated list of users
+`members`                  | `String`       | Comma-separated list of members
 
 __Sample__
 
@@ -169,7 +169,7 @@ __Response__
 `204 (NO CONTENT)`: The member has been added.<br/>
 `404 (NOT FOUND)`: The specified group does not exist.
 
-### DELETE /api/groups/{group_id}/members/{user_id}
+### DELETE /api/groups/{group_id}/members/{member_id}
 
 Removes a member from a group
 

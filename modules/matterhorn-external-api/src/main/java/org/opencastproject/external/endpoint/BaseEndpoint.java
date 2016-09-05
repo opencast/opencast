@@ -117,6 +117,8 @@ public class BaseEndpoint {
   @GET
   @Path("")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "getendpointinfo", description = "Returns key characteristics of the API such as the server name and the default version.", returnDescription = "", reponses = {
+          @RestResponse(description = "The api information is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getEndpointInfo() {
     Organization organization = securityService.getOrganization();
     String orgExternalAPIUrl = organization.getProperties().get(MatterhornConstants.EXTERNAL_API_URL_ORG_PROPERTY);
@@ -135,6 +137,8 @@ public class BaseEndpoint {
   @GET
   @Path("info/me")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "getuserinfo", description = "Returns information on the logged in user.", returnDescription = "", reponses = {
+          @RestResponse(description = "The user information is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getUserInfo() {
     final User user = securityService.getUser();
 
@@ -146,10 +150,12 @@ public class BaseEndpoint {
   @GET
   @Path("info/me/roles")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "getuserroles", description = "Returns current user's roles.", returnDescription = "", reponses = {
+          @RestResponse(description = "The set of roles is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getUserRoles() {
     final User user = securityService.getUser();
 
-    List<JValue> roles = new ArrayList<JValue>();
+    List<JValue> roles = new ArrayList<>();
     for (final Role role : user.getRoles()) {
       roles.add(v(role.getName()));
     }
@@ -160,6 +166,8 @@ public class BaseEndpoint {
   @GET
   @Path("info/organization")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "getorganizationinfo", description = "Returns the current organization.", returnDescription = "", reponses = {
+          @RestResponse(description = "The organization details are returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getOrganizationInfo() {
     final Organization org = securityService.getOrganization();
 
@@ -172,10 +180,12 @@ public class BaseEndpoint {
   @GET
   @Path("info/organization/properties")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "getorganizationproperties", description = "Returns the current organization's properties.", returnDescription = "", reponses = {
+          @RestResponse(description = "The organization properties are returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getOrganizationProperties() {
     final Organization org = securityService.getOrganization();
 
-    List<JField> props = new ArrayList<JField>();
+    List<JField> props = new ArrayList<>();
     for (Entry<String, String> prop : org.getProperties().entrySet()) {
       props.add(f(prop.getKey(), vN(prop.getValue())));
     }
@@ -186,8 +196,10 @@ public class BaseEndpoint {
   @GET
   @Path("version")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "getversion", description = "Returns a list of available version as well as the default version.", returnDescription = "", reponses = {
+          @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getVersion() throws Exception {
-    List<JValue> versions = new ArrayList<JValue>();
+    List<JValue> versions = new ArrayList<>();
     versions.add(v(ApiVersion.VERSION_1_0_0.toString()));
     JValue json = j(f("versions", a(versions)), f("default", v(ApiVersion.CURRENT_VERSION.toString())));
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
@@ -196,6 +208,8 @@ public class BaseEndpoint {
   @GET
   @Path("version/default")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "getversiondefault", description = "Returns the default version.", returnDescription = "", reponses = {
+          @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getVersionDefault() throws Exception {
     JValue json = j(f("default", v(ApiVersion.CURRENT_VERSION.toString())));
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));

@@ -28,6 +28,7 @@ import static com.entwinemedia.fn.data.json.Jsons.v;
 import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_0_0;
+import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
@@ -91,6 +92,11 @@ import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Arrays;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.doc.rest.RestParameter;
+import org.opencastproject.util.doc.rest.RestParameter.Type;
+import org.opencastproject.util.doc.rest.RestQuery;
+import org.opencastproject.util.doc.rest.RestResponse;
+import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
 import com.entwinemedia.fn.Fn;
@@ -122,6 +128,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -140,6 +147,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/")
+@RestService(name = "externalapievents", title = "External API Events Service", notes = "", abstractText = "Provides resources and operations related to the events")
 public class EventsEndpoint implements ManagedService {
   private static final String METADATA_JSON_KEY = "metadata";
 
@@ -221,8 +229,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   private List<EventCatalogUIAdapter> getEventCatalogUIAdapters() {
-    return new ArrayList<EventCatalogUIAdapter>(
-            getEventCatalogUIAdapters(getSecurityService().getOrganization().getId()));
+    return new ArrayList<>(getEventCatalogUIAdapters(getSecurityService().getOrganization().getId()));
   }
 
   public List<EventCatalogUIAdapter> getEventCatalogUIAdapters(String organization) {
@@ -270,10 +277,18 @@ public class EventsEndpoint implements ManagedService {
   @GET
   @Path("{eventId}")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "getevent", description = "Returns a single event. By setting the optional sign parameter to true, the method will pre-sign distribution urls if signing is turned on in Opencast. Remember to consider the maximum validity of signed URLs when caching this response.", returnDescription = "", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, restParameters = {
+                  @RestParameter(name = "sign", isRequired = false, description = "Whether public distribution urls should be signed.", type = Type.BOOLEAN),
+                  @RestParameter(name = "withacl", isRequired = false, description = "Whether the acl metadata should be included in the response.", type = Type.BOOLEAN),
+                  @RestParameter(name = "withmetadata", isRequired = false, description = "Whether the metadata catalogs should be included in the response.", type = Type.BOOLEAN),
+                  @RestParameter(name = "withpublications", isRequired = false, description = "Whether the publication ids and urls should be included in the response.", type = Type.BOOLEAN), }, reponses = {
+                          @RestResponse(description = "The event is returned.", responseCode = HttpServletResponse.SC_OK),
+                          @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("sign") boolean sign, @QueryParam("withacl") Boolean withAcl,
           @QueryParam("withmetadata") Boolean withMetadata, @QueryParam("withpublications") Boolean withPublications)
-                  throws Exception {
+          throws Exception {
     for (final Event event : indexService.getEvent(id, externalIndex)) {
       return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0,
               eventToJSON(event, withAcl, withMetadata, withPublications, sign));
@@ -286,7 +301,7 @@ public class EventsEndpoint implements ManagedService {
   @Produces({ "application/json", "application/v1.0.0+json" })
   public Response getEventMedia(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws Exception {
-    ArrayList<TrackImpl> tracks = new ArrayList<TrackImpl>();
+    ArrayList<TrackImpl> tracks = new ArrayList<>();
 
     for (final Event event : indexService.getEvent(id, externalIndex)) {
       for (final MediaPackage mp : indexService.getEventMediapackage(event)) {
@@ -296,9 +311,9 @@ public class EventsEndpoint implements ManagedService {
           }
         }
 
-        List<JValue> tracksJson = new ArrayList<JValue>();
+        List<JValue> tracksJson = new ArrayList<>();
         for (Track track : tracks) {
-          List<JField> fields = new ArrayList<JField>();
+          List<JField> fields = new ArrayList<>();
           if (track.getChecksum() != null)
             fields.add(f("checksum", v(track.getChecksum().toString())));
           if (track.getDescription() != null)
@@ -315,14 +330,14 @@ public class EventsEndpoint implements ManagedService {
             fields.add(f("identifier", v(track.getMimeType().toString())));
           fields.add(f("size", v(track.getSize())));
           if (track.getStreams() != null) {
-            List<JField> streams = new ArrayList<JField>();
+            List<JField> streams = new ArrayList<>();
             for (Stream stream : track.getStreams()) {
               streams.add(f(stream.getIdentifier(), getJsonStream(stream)));
             }
             fields.add(f("streams", j(streams)));
           }
           if (track.getTags() != null) {
-            List<JValue> tags = new ArrayList<JValue>();
+            List<JValue> tags = new ArrayList<>();
             for (String tag : track.getTags()) {
               tags.add(v(tag));
             }
@@ -341,6 +356,10 @@ public class EventsEndpoint implements ManagedService {
   @DELETE
   @Path("{eventId}")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "deleteevent", description = "Deletes an event.", returnDescription = "", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, reponses = {
+                  @RestResponse(description = "The event has been deleted.", responseCode = HttpServletResponse.SC_NO_CONTENT),
+                  @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws NotFoundException, UnauthorizedException {
     if (!indexService.removeEvent(id))
@@ -352,6 +371,16 @@ public class EventsEndpoint implements ManagedService {
   @POST
   @Path("{eventId}")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "updateeventmetadata", description = "Updates an event.", returnDescription = "", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, restParameters = {
+                  @RestParameter(name = "acl", isRequired = false, description = "A collection of roles with their possible action", type = Type.STRING),
+                  @RestParameter(name = "metadata", isRequired = false, description = "Event metadata as Form param", type = Type.STRING),
+                  @RestParameter(name = "presenter", isRequired = false, description = "Presenter movie track", type = Type.FILE),
+                  @RestParameter(name = "presentation", isRequired = false, description = "Presentation movie track", type = Type.FILE),
+                  @RestParameter(name = "audio", isRequired = false, description = "Audio track", type = Type.FILE),
+                  @RestParameter(name = "processing", isRequired = false, description = "Processing instructions task configuration", type = Type.STRING), }, reponses = {
+                          @RestResponse(description = "The event has been updated.", responseCode = HttpServletResponse.SC_NO_CONTENT),
+                          @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateEventMetadata(@HeaderParam("Accept") String acceptHeader, @Context HttpServletRequest request,
           @PathParam("eventId") String eventId) {
     return updateEvent(eventId, request);
@@ -393,6 +422,15 @@ public class EventsEndpoint implements ManagedService {
   @Path("/")
   @Produces({ "application/json", "application/v1.0.0+json" })
   @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @RestQuery(name = "createevent", description = "Creates an event by sending metadata, access control list, processing instructions and files in a multipart request.", returnDescription = "", restParameters = {
+          @RestParameter(name = "acl", isRequired = false, description = "A collection of roles with their possible action", type = STRING),
+          @RestParameter(name = "metadata", description = "Event metadata as Form param", isRequired = false, type = STRING),
+          @RestParameter(name = "presenter", description = "Presenter movie track", isRequired = false, type = Type.FILE),
+          @RestParameter(name = "presentation", description = "Presentation movie track", isRequired = false, type = Type.FILE),
+          @RestParameter(name = "audio", description = "Audio track", isRequired = false, type = Type.FILE),
+          @RestParameter(name = "processing", description = "Processing instructions task configuration", isRequired = false, type = STRING) }, reponses = {
+                  @RestResponse(description = "A new event is created and its identifier is returned in the Location header.", responseCode = HttpServletResponse.SC_CREATED),
+                  @RestResponse(description = "The request is invalid or inconsistent..", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
   public Response createNewEvent(@HeaderParam("Accept") String acceptHeader, @Context HttpServletRequest request) {
     try {
       return createNewEvent(request);
@@ -429,6 +467,16 @@ public class EventsEndpoint implements ManagedService {
   @GET
   @Path("/")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "getevents", description = "Returns a list of events. By setting the optional sign parameter to true, the method will pre-sign distribution urls if signing is turned on in Opencast. Remember to consider the maximum validity of signed URLs when caching this response.", returnDescription = "", restParameters = {
+          @RestParameter(name = "sign", isRequired = false, description = "Whether public distribution urls should be signed.", type = Type.BOOLEAN),
+          @RestParameter(name = "withacl", isRequired = false, description = "Whether the acl metadata should be included in the response.", type = Type.BOOLEAN),
+          @RestParameter(name = "withmetadata", isRequired = false, description = "Whether the metadata catalogs should be included in the response.", type = Type.BOOLEAN),
+          @RestParameter(name = "withpublications", isRequired = false, description = "Whether the publication ids and urls should be included in the response.", type = Type.BOOLEAN),
+          @RestParameter(name = "filter", isRequired = false, description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.", type = STRING),
+          @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
+          @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "offset", description = "Number of results to skip based on the limit. 0 is the first set of results up to the limit, 1 is the second set of results after the first limit, 2 is third set of results after skipping the first two sets of results etc.", isRequired = false, type = RestParameter.Type.INTEGER) }, reponses = {
+                  @RestResponse(description = "A (potentially empty) list of events is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getEvents(@HeaderParam("Accept") String acceptHeader, @QueryParam("id") String id,
           @QueryParam("commentReason") String reasonFilter, @QueryParam("commentResolution") String resolutionFilter,
           @QueryParam("filter") String filter, @QueryParam("sort") String sort, @QueryParam("offset") Integer offset,
@@ -545,7 +593,7 @@ public class EventsEndpoint implements ManagedService {
     }
 
     SearchResultItem<Event>[] items = results.getItems();
-    List<IndexObject> events = new ArrayList<IndexObject>();
+    List<IndexObject> events = new ArrayList<>();
     for (SearchResultItem<Event> item : items) {
       Event source = item.getSource();
       events.add(source);
@@ -571,8 +619,8 @@ public class EventsEndpoint implements ManagedService {
    */
   protected Response getJsonEvents(String acceptHeader, List<IndexObject> events, Boolean withAcl, Boolean withMetadata,
           Boolean withPublications, Boolean withSignedUrls)
-                  throws IndexServiceException, SearchIndexException, NotFoundException {
-    List<JValue> eventsList = new ArrayList<JValue>();
+          throws IndexServiceException, SearchIndexException, NotFoundException {
+    List<JValue> eventsList = new ArrayList<>();
     for (IndexObject item : events) {
       eventsList.add(eventToJSON((Event) item, withAcl, withMetadata, withPublications, withSignedUrls));
     }
@@ -631,7 +679,7 @@ public class EventsEndpoint implements ManagedService {
    */
   protected JValue eventToJSON(Event event, Boolean withAcl, Boolean withMetadata, Boolean withPublications,
           Boolean withSignedUrls) throws IndexServiceException, SearchIndexException, NotFoundException {
-    List<JField> fields = new ArrayList<JField>();
+    List<JField> fields = new ArrayList<>();
     if (event.getArchiveVersion() != null)
       fields.add(f("archive_version", v(event.getArchiveVersion())));
     fields.add(f("created", vN(event.getCreated())));
@@ -642,7 +690,7 @@ public class EventsEndpoint implements ManagedService {
     fields.add(f("identifier", vN(event.getIdentifier())));
     fields.add(f("location", vN(event.getLocation())));
     fields.add(f("presenter", jsonArrayFromList(event.getPresenters())));
-    List<String> publicationIds = new ArrayList<String>();
+    List<String> publicationIds = new ArrayList<>();
     if (event.getPublications() != null) {
       for (Publication publication : event.getPublications()) {
         publicationIds.add(publication.getChannel());
@@ -697,6 +745,10 @@ public class EventsEndpoint implements ManagedService {
   @GET
   @Path("{eventId}/acl")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "geteventacl", description = "Returns an event's access policy.", returnDescription = "", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, reponses = {
+                  @RestResponse(description = "The access control list for the specified event is returned.", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws Exception {
     for (final Event event : indexService.getEvent(id, externalIndex)) {
@@ -709,6 +761,11 @@ public class EventsEndpoint implements ManagedService {
   @PUT
   @Path("{eventId}/acl")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "updateeventacl", description = "Update an event's access policy.", returnDescription = "", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, restParameters = {
+                  @RestParameter(name = "acl", isRequired = true, description = "Access policy", type = STRING) }, reponses = {
+                          @RestResponse(description = "The access control list for the specified event is updated.", responseCode = HttpServletResponse.SC_NO_CONTENT),
+                          @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateEventAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @FormParam("acl") String acl) throws Exception {
     if (indexService.getEvent(id, externalIndex).isSome()) {
@@ -738,9 +795,15 @@ public class EventsEndpoint implements ManagedService {
   @POST
   @Path("{eventId}/acl/{action}")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "addeventace", description = "Grants permission to execute action on the specified event to any user with role role. Note that this is a convenience method to avoid having to build and post a complete access control list.", returnDescription = "", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING),
+          @RestParameter(name = "action", description = "The action that is allowed to be executed", isRequired = true, type = STRING) }, restParameters = {
+                  @RestParameter(name = "role", isRequired = true, description = "The role that is granted permission", type = STRING) }, reponses = {
+                          @RestResponse(description = "The permission has been created in the access control list of the specified event.", responseCode = HttpServletResponse.SC_NO_CONTENT),
+                          @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response addEventAce(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @PathParam("action") String action, @FormParam("role") String role) throws Exception {
-    List<AccessControlEntry> entries = new ArrayList<AccessControlEntry>();
+    List<AccessControlEntry> entries = new ArrayList<>();
     for (final Event event : indexService.getEvent(id, externalIndex)) {
       AccessControlList accessControlList = getAclFromEvent(event);
       AccessControlEntry newAce = new AccessControlEntry(role, action, true);
@@ -780,9 +843,15 @@ public class EventsEndpoint implements ManagedService {
   @DELETE
   @Path("{eventId}/acl/{action}/{role}")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "deleteeventace", description = "Revokes permission to execute action on the specified event from any user with role role.", returnDescription = "", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING),
+          @RestParameter(name = "action", description = "The action that is no longer allowed to be executed", isRequired = true, type = STRING),
+          @RestParameter(name = "role", description = "The role that is no longer granted permission", isRequired = true, type = STRING) }, reponses = {
+                  @RestResponse(description = "The permission has been revoked from the access control list of the specified event.", responseCode = HttpServletResponse.SC_NO_CONTENT),
+                  @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEventAce(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @PathParam("action") String action, @PathParam("role") String role) throws Exception {
-    List<AccessControlEntry> entries = new ArrayList<AccessControlEntry>();
+    List<AccessControlEntry> entries = new ArrayList<>();
     for (final Event event : indexService.getEvent(id, externalIndex)) {
       AccessControlList accessControlList = getAclFromEvent(event);
       boolean foundDelete = false;
@@ -815,6 +884,11 @@ public class EventsEndpoint implements ManagedService {
   @GET
   @Path("{eventId}/metadata")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "geteventmetadata", description = "Returns the event's metadata of the specified type. For a metadata catalog there is the flavor such as 'dublincore/episode' and this is the unique type.", returnDescription = "", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, restParameters = {
+                  @RestParameter(name = "type", isRequired = false, description = "The type of metadata to get", type = STRING) }, reponses = {
+                          @RestResponse(description = "The metadata collection is returned.", responseCode = HttpServletResponse.SC_OK),
+                          @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getAllEventMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type) throws Exception {
     if (StringUtils.trimToNull(type) == null) {
@@ -894,6 +968,13 @@ public class EventsEndpoint implements ManagedService {
   @PUT
   @Path("{eventId}/metadata")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "updateeventmetadata", description = "Update the metadata with the matching type of the specified event. For a metadata catalog there is the flavor such as 'dublincore/episode' and this is the unique type.", returnDescription = "", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, restParameters = {
+                  @RestParameter(name = "type", isRequired = true, description = "The type of metadata to update", type = STRING),
+                  @RestParameter(name = "metadata", description = "Metadata catalog in JSON format", isRequired = true, type = STRING) }, reponses = {
+                          @RestResponse(description = "The metadata of the given namespace has been updated.", responseCode = HttpServletResponse.SC_OK),
+                          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+                          @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateEventMetadataByType(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type, @FormParam("metadata") String metadataJSON) throws Exception {
     Map<String, String> updatedFields;
@@ -994,8 +1075,14 @@ public class EventsEndpoint implements ManagedService {
   }
 
   @DELETE
-  @Path("{eventId}/metadata/")
+  @Path("{eventId}/metadata")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "deleteeventmetadata", description = "Delete the metadata namespace catalog of the specified event. This will remove all fields and values of the catalog.", returnDescription = "", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, restParameters = {
+                  @RestParameter(name = "type", isRequired = true, description = "The type of metadata to delete", type = STRING) }, reponses = {
+                          @RestResponse(description = "The metadata of the given namespace has been updated.", responseCode = HttpServletResponse.SC_NO_CONTENT),
+                          @RestResponse(description = "The main metadata catalog dublincore/episode cannot be deleted as it has mandatory fields.", responseCode = HttpServletResponse.SC_FORBIDDEN),
+                          @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEventMetadataByType(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type) throws SearchIndexException {
     for (final Event event : indexService.getEvent(id, externalIndex)) {
@@ -1033,6 +1120,10 @@ public class EventsEndpoint implements ManagedService {
   @GET
   @Path("{eventId}/publications")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "geteventpublications", description = "Returns an event's list of publications.", returnDescription = "", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, reponses = {
+                  @RestResponse(description = "The list of publications is returned.", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventPublications(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("sign") boolean sign) throws Exception {
     try {
@@ -1085,11 +1176,11 @@ public class EventsEndpoint implements ManagedService {
     }
 
     private List<JValue> getPublicationTracksJson(Publication publication, Boolean sign) {
-      List<JValue> tracks = new ArrayList<JValue>();
+      List<JValue> tracks = new ArrayList<>();
       for (Track track : publication.getTracks()) {
 
         VideoStream[] videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
-        List<JField> trackInfo = new ArrayList<JField>();
+        List<JField> trackInfo = new ArrayList<>();
 
         if (videoStreams.length > 0) {
           // Only supporting one stream, like in many other places...
@@ -1120,19 +1211,19 @@ public class EventsEndpoint implements ManagedService {
     }
 
     private List<JValue> getPublicationAttachmentsJson(Publication publication, Boolean sign) {
-      List<JValue> attachments = new ArrayList<JValue>();
+      List<JValue> attachments = new ArrayList<>();
       for (Attachment attachment : publication.getAttachments()) {
         attachments.add(j(f("id", vN(attachment.getIdentifier())), f("mediatype", vN(attachment.getMimeType())),
                 f("url", vN(getMediaPackageElementUri(attachment, sign))), f("flavor", vN(attachment.getFlavor())),
-                f("ref", vN(attachment.getReference())),
-                f("size", v(attachment.getSize())), f("checksum", vN(attachment.getChecksum())),
+                f("ref", vN(attachment.getReference())), f("size", v(attachment.getSize())),
+                f("checksum", vN(attachment.getChecksum())),
                 f("tags", jsonArrayFromList(Arrays.<String> toList().apply(attachment.getTags())))));
       }
       return attachments;
     }
 
     private List<JValue> getPublicationCatalogsJson(Publication publication, Boolean sign) {
-      List<JValue> catalogs = new ArrayList<JValue>();
+      List<JValue> catalogs = new ArrayList<>();
       for (Catalog catalog : publication.getCatalogs()) {
         catalogs.add(j(f("id", vN(catalog.getIdentifier())), f("mediatype", vN(catalog.getMimeType())),
                 f("url", vN(getMediaPackageElementUri(catalog, sign))), f("flavor", vN(catalog.getFlavor())),
@@ -1146,7 +1237,7 @@ public class EventsEndpoint implements ManagedService {
   private List<JValue> getPublications(String id, Boolean withSignedUrls)
           throws NotFoundException, SearchIndexException {
     for (final Event event : indexService.getEvent(id, externalIndex)) {
-      List<JValue> pubJSON = new ArrayList<JValue>();
+      List<JValue> pubJSON = new ArrayList<>();
       pubJSON = new ArrayList<JValue>(com.entwinemedia.fn.Stream.$(event.getPublications())
               .filter(EventUtils.internalChannelFilter).map(publicationToJson._2(withSignedUrls)).toList());
 
@@ -1158,6 +1249,11 @@ public class EventsEndpoint implements ManagedService {
   @GET
   @Path("{eventId}/publications/{publicationId}")
   @Produces({ "application/json", "application/v1.0.0+json" })
+  @RestQuery(name = "geteventpublication", description = "Returns a single publication.", returnDescription = "", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING),
+          @RestParameter(name = "publicationId", description = "The publication id", isRequired = true, type = STRING) }, reponses = {
+                  @RestResponse(description = "The track details are returned.", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "The specified event or publication does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventPublication(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String eventId,
           @PathParam("publicationId") String publicationId, @QueryParam("sign") boolean sign) throws Exception {
     try {
@@ -1262,7 +1358,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   private JValue getJsonStream(Stream stream) {
-    List<JField> fields = new ArrayList<JField>();
+    List<JField> fields = new ArrayList<>();
     if (stream instanceof AudioStream) {
       AudioStream audioStream = (AudioStream) stream;
       if (audioStream.getBitDepth() != null)

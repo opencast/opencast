@@ -286,7 +286,7 @@ Returns an event's access policy.
 __Response__
 
 `200 (OK)`: The access control list for the specified event is returned.<br/>
-`404 (OK)`: The specified event does not exist.
+`404 (NOT FOUND)`: The specified event does not exist.
 
 ```
 [
@@ -448,7 +448,7 @@ Query String Parameters    |Type            | Description
 __Response__
 
 `200 (OK)`: The metadata collection is returned.<br/>
-`404 (OK)`: The specified event does not exist.
+`404 (NOT FOUND)`: The specified event does not exist.
 
 ```
 [
