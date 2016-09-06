@@ -5,15 +5,18 @@ These guides will provide you information relevant for development of specific m
 or subsystems of Opencast.
 
 - Admin UI
-  - [Development](modules/admin-ui/development.md)
+  - [Development](admin-ui/development.md)
   - Style Guide
-      - [Color Palette]('modules/admin-ui/style/color-palette.md')
-      - [Typeface]('modules/admin-ui/style/typeface.md')
-      - [View Structure]('modules/admin-ui/style/view-structure.md')
-      - [Icons]('modules/admin-ui/style/icons.md')
-      - [Buttons]('modules/admin-ui/style/buttons.md')
-      - [Dropdowns]('modules/admin-ui/style/dropdowns.md')
-      - [Forms]('modules/admin-ui/style/forms.md')
+      - [Color Palette](admin-ui/style/color-palette.md)
+      - [View Structure](admin-ui/style/view-structure.md)
+      - [Navigation](admin-ui/style/navigation.md)
+      - [Typeface](admin-ui/style/typeface.md)
+      - [Icons](admin-ui/style/icons.md)
+      - [Buttons](admin-ui/style/buttons.md)
+      - [Dropdowns](admin-ui/style/dropdowns.md)
+      - [Modals](admin-ui/style/modals.md)
+      - [Alerts and Indicators](admin-ui/style/alerts-indicators.md)
+      - [Forms](admin-ui/style/forms.md)
 - Player
   - [Architecture](player/architecture.md)
   - [Core Reference](player/core.reference.md)
