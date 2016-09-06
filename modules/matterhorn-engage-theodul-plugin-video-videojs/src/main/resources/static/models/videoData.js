@@ -36,7 +36,8 @@ define(["backbone"], function(Backbone) {
             "videoSources": [],
             "isPlaying": false,
             "currentTime": -1,
-            "duration": -1
+            "duration": -1,
+            "ready": false
         }
     });
 

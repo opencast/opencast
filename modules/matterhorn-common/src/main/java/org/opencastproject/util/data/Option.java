@@ -57,7 +57,7 @@ public abstract class Option<A> implements Iterable<A> {
     return fmap(f);
   }
 
-  /** Monadic bind operation <code>m a -> (a -> m b) -> m b</code>. */
+  /** Monadic bind operation <code>m a -&gt; (a -&gt; m b) -&gt; m b</code>. */
   public abstract <B> Option<B> bind(Function<A, Option<B>> f);
 
   /** @see org.opencastproject.util.data.functions.Functions#bind(Function) */
@@ -391,7 +391,7 @@ public abstract class Option<A> implements Iterable<A> {
   /**
    * Create a none with the type of <code>example</code>. This saves some nasty typing, e.g.
    * <code>Option.&lt;String&gt;none()</code> vs. <code>none("")</code>.
-   * <p/>
+   *
    * Please note that this constructor is only due to Java's insufficient type inference.
    */
   public static <A> Option<A> none(A example) {

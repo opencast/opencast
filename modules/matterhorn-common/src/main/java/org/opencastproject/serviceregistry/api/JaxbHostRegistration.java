@@ -211,11 +211,6 @@ public class JaxbHostRegistration implements HostRegistration {
     return maxLoad;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.serviceregistry.api.HostRegistration#setMaxLoad(int)
-   */
   @Override
   public void setMaxLoad(float maxLoad) {
     this.maxLoad = maxLoad;

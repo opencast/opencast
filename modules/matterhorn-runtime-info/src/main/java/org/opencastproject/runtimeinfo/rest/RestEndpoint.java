@@ -94,7 +94,7 @@ public class RestEndpoint {
 
   /**
    * This is a special parameter which indicates that this value is to be sent as the body of the request, in general
-   * the type of this parameter should only be FILE or TEXT but nothing stops you from using the other types<br/>
+   * the type of this parameter should only be FILE or TEXT but nothing stops you from using the other types<br>
    * This is always a required parameter as you should never design an endpoint that takes a file sometimes but not
    * always
    *
@@ -143,7 +143,7 @@ public class RestEndpoint {
 
   /**
    * Adds a required form parameter for this endpoint, this would be a parameter which is passed encoded as part of the
-   * request body (commonly referred to as a post or form parameter) <br/>
+   * request body (commonly referred to as a post or form parameter) <br>
    * WARNING: This should generally be reserved for endpoints which are used for processing, it is better to use path
    * params unless the required parameter is not part of an identifier for the resource
    *
@@ -272,7 +272,7 @@ public class RestEndpoint {
 
   /**
    * Setting this to true will cause the path to be filled in with format extensions which will work with the {FORMAT}
-   * convention (which is automatically filled in with the selected or default format key - e.g. json) <br/>
+   * convention (which is automatically filled in with the selected or default format key - e.g. json) <br>
    * This will generate a path like /your/path.{FORMAT} and will show the following on screen GET /your/path.{xml|json}
    * if you have 2 formats in this endpoint
    *

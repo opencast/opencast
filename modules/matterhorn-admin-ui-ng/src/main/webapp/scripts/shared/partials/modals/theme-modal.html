@@ -1,7 +1,9 @@
 <section ng-form="theme-form" ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal wizard modal-animation ng-hide" ng-controller="ThemeFormCtrl">
     <header>
         <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2 translate="CONFIGURATION.THEMES.DETAILS.{{ action === 'edit' ? 'EDIT':'NEW' }}CAPTION">Template</h2>
+        <h2 translate="CONFIGURATION.THEMES.DETAILS.{{ action === 'edit' ? 'EDIT':'NEW' }}CAPTION">
+            <!-- Template -->
+        </h2>
     </header>
     <nav id="modal-nav" ng-class="{'step-by-step': action === 'add', 'modal-nav': action === 'edit'}">
         <a ng-click="navigateTo('generalForm', currentForm, [])" ng-class="{ active: currentForm === 'generalForm', 'not-complete': !generalForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.GENERAL.CAPTION' | translate }}</a>
@@ -20,12 +22,16 @@
                     <form name="generalForm">
                         <div class="row">
                             <div data-admin-ng-notifications="" context="new-theme-general"></div>
-                            <label class="required" for="generalName" translate="CONFIGURATION.THEMES.DETAILS.GENERAL.NAME">Name</label>
+                            <label class="required" for="generalName" translate="CONFIGURATION.THEMES.DETAILS.GENERAL.NAME">
+                                <!-- Name -->
+                            </label>
                             <input type="text" id="generalName" ng-model="general.name" required
                                 unique-theme-name="" placeholder="{{ 'CONFIGURATION.THEMES.DETAILS.GENERAL.NAME' | translate }}...">
                         </div>
                         <div class="row">
-                            <label for="description" translate="CONFIGURATION.THEMES.DETAILS.GENERAL.DESCRIPTION">Description</label>
+                            <label for="description" translate="CONFIGURATION.THEMES.DETAILS.GENERAL.DESCRIPTION">
+                                <!-- Description -->
+                            </label>
                             <textarea id="description" ng-model="general.description" 
                                 placeholder="{{ 'CONFIGURATION.THEMES.DETAILS.GENERAL.DESCRIPTION' | translate }}..."></textarea>
                         </div>
@@ -58,14 +64,18 @@
         <div class="modal-body">
             <div class="full-col">
                 <form name="bumperForm">
-                    <p class="tab-description" translate="CONFIGURATION.THEMES.DETAILS.BUMPER.DESCRIPTION">Typically pre-defined slide or video that is appended to the beginning of the video.</p>
+                    <p class="tab-description" translate="CONFIGURATION.THEMES.DETAILS.BUMPER.DESCRIPTION">
+                        <!-- Typically pre-defined slide or video that is appended to the beginning of the video.-->
+                    </p>
                     <div data-admin-ng-notifications="" context="new-theme-bumper"></div>
                     <div class="obj">
-                        <header translate="CONFIGURATION.THEMES.DETAILS.BUMPER.ACTIVE">Bumper</header>
+                        <header translate="CONFIGURATION.THEMES.DETAILS.BUMPER.ACTIVE"><!-- Bumper --></header>
                         <div class="obj-container content-list padded">
                             <div class="list-row">
                                 <div class="header-column">
-                                    <label class="large" for="bumper-toggle" translate="CONFIGURATION.THEMES.DETAILS.BUMPER.ENABLE">Enable</label>
+                                    <label class="large" for="bumper-toggle" translate="CONFIGURATION.THEMES.DETAILS.BUMPER.ENABLE">
+                                        <!-- Enable -->
+                                    </label>
                                 </div>
                                 <div class="content-column">
                                     <div class="content-container">
@@ -76,7 +86,7 @@
                         </div>
                     </div>
                     <div class="obj" ng-if="bumper.active">
-                        <header translate="CONFIGURATION.THEMES.DETAILS.BUMPER.SELECT">Select</header>
+                        <header translate="CONFIGURATION.THEMES.DETAILS.BUMPER.SELECT"><!-- Select --></header>
                         <div ng-messages="bumperForm.bumperfile.$error">
                             <div ng-message="file-upload">Error uploading file</div>
                             <div ng-message="required">You must upload a bumper</div>
@@ -109,14 +119,18 @@
         <div class="modal-body">
             <div class="full-col">
                 <form name="trailerForm">
-                    <p class="tab-description" translate="CONFIGURATION.THEMES.DETAILS.TRAILER.DESCRIPTION">Typically pre-defined slide or video that is appended to the beginning of the video.</p>
+                    <p class="tab-description" translate="CONFIGURATION.THEMES.DETAILS.TRAILER.DESCRIPTION">
+                        <!-- Typically pre-defined slide or video that is appended to the beginning of the video. -->
+                    </p>
                     <div data-admin-ng-notifications="" context="new-theme-trailer"></div>
                     <div class="obj">
-                        <header translate="CONFIGURATION.THEMES.DETAILS.TRAILER.ACTIVE">Trailer</header>
+                        <header translate="CONFIGURATION.THEMES.DETAILS.TRAILER.ACTIVE"><!-- Trailer --></header>
                         <div class="obj-container content-list padded">
                             <div class="list-row">
                                 <div class="header-column">
-                                    <label class="large" for="trailer-toggle" translate="CONFIGURATION.THEMES.DETAILS.TRAILER.ENABLE">Enable Trailer</label>
+                                    <label class="large" for="trailer-toggle" translate="CONFIGURATION.THEMES.DETAILS.TRAILER.ENABLE">
+                                        <!-- Enable Trailer -->
+                                    </label>
                                 </div>
                                 <div class="content-column">
                                     <div class="content-container">
@@ -293,12 +307,21 @@
                     <div class="obj-container summary-list padded">
                         <ul>
                             <li ng-if="bumper.file.id">
-                                <h4 translate="CONFIGURATION.THEMES.DETAILS.BUMPER.CAPTION">Bumper</h4>
-                                <p><span translate="CONFIGURATION.THEMES.DETAILS.BUMPER.FILE_UPLOADED">File Uploaded: </span>{{bumper.file.name}}</p>
+                                <h4 translate="CONFIGURATION.THEMES.DETAILS.BUMPER.CAPTION"><!-- Bumper --></h4>
+                                <p>
+                                    <span translate="CONFIGURATION.THEMES.DETAILS.BUMPER.FILE_UPLOADED">
+                                        <!-- File Uploaded: -->
+                                    </span>
+                                    {{bumper.file.name}}
+                                </p>
                             </li>
                             <li ng-if="trailer.file.id">
-                                <h4 translate="CONFIGURATION.THEMES.DETAILS.TRAILER.CAPTION">Trailer</h4>
-                                <p><span translate="CONFIGURATION.THEMES.DETAILS.TRAILER.FILE_UPLOADED">File Uploaded: </span>{{trailer.file.name}}</p>
+                                <h4 translate="CONFIGURATION.THEMES.DETAILS.TRAILER.CAPTION"><!-- Trailer --></h4>
+                                <p>
+                                    <span translate="CONFIGURATION.THEMES.DETAILS.TRAILER.FILE_UPLOADED">
+                                        <!-- File Uploaded: -->
+                                    </span>{{trailer.file.name}}
+                                </p>
                             </li>
 <!--                             <li ng-if="titleslide.file.id">
                                 <h4 translate="CONFIGURATION.THEMES.DETAILS.TITLE.CAPTION">Title Slide</h4>
@@ -337,7 +360,7 @@
                         <table class="main-tbl">
                             <thead>
                             <tr>
-                                <th translate="CONFIGURATION.THEMES.DETAILS.USAGE.SERIE">Serie</th>
+                                <th translate="CONFIGURATION.THEMES.DETAILS.USAGE.SERIE"><!-- Serie --></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -345,7 +368,7 @@
                                 <td ng-bind="row.title"></td>
                             </tr>
                             <tr ng-if="!usage.series.length">
-                                <td translate="CONFIGURATION.THEMES.DETAILS.USAGE.EMPTY"></td>
+                                <td translate="CONFIGURATION.THEMES.DETAILS.USAGE.EMPTY"><!-- Empty --></td>
                             </tr>
                             </tbody>
                         </table>

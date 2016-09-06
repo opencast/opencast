@@ -180,12 +180,23 @@ angular.module('adminNg.controllers')
             checkForActiveTransactions = function () {
                 EventTransactionResource.hasActiveTransaction({id: $scope.resourceId }, function (data) {
                     $scope.transactions.read_only = angular.isUndefined(data.hasActiveTransaction) ? true : data.hasActiveTransaction;
+                    
+                    if ($scope.transactions.read_only) {
+                      if (!angular.isUndefined(me.transactionNotification)) {
+                          Notifications.remove(me.transactionNotification, NOTIFICATION_CONTEXT);
+                      }
+                      me.transactionNotification = Notifications.add('warning', 'ACTIVE_TRANSACTION', NOTIFICATION_CONTEXT, 3000);
+                    } else {
+                      if (!angular.isUndefined(me.transactionNotification)) {
+                          Notifications.remove(me.transactionNotification, NOTIFICATION_CONTEXT);
+                      }
+                    }
                 });
 
                 $scope.checkForActiveTransactionsTimer = $timeout(checkForActiveTransactions, 3000);
             },
             fetchChildResources = function (id) {
-                $scope.general        = EventGeneralResource.get({ id: id }, function () {
+                $scope.general = EventGeneralResource.get({ id: id }, function () {
                     angular.forEach($scope.general.publications, function (publication) {
                         publication.label = publication.name;
                     });
@@ -229,7 +240,7 @@ angular.module('adminNg.controllers')
                     }
                 });
 
-                $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
+                $scope.acls = ResourcesListResource.get({ resource: 'ACL' });
                 $scope.actions = {};
                 $scope.hasActions = false;
                 ResourcesListResource.get({ resource: 'ACL.ACTIONS'}, function(data) {
@@ -242,7 +253,7 @@ angular.module('adminNg.controllers')
                 });
                 $scope.roles = ResourcesListResource.get({ resource: 'ROLES' });
 
-                $scope.assets      = EventAssetsResource.get({ id: id });
+                $scope.assets = EventAssetsResource.get({ id: id });
 
                 $scope.participation = EventParticipationResource.get({ id: id }, function (data) {
                     if (data.read_only) {
@@ -264,13 +275,13 @@ angular.module('adminNg.controllers')
                     }
                 });
 
-                $scope.access      = EventAccessResource.get({ id: id }, function (data) {
+                $scope.access = EventAccessResource.get({ id: id }, function (data) {
                     if (angular.isDefined(data.episode_access)) {
                         var json = angular.fromJson(data.episode_access.acl);
                         changePolicies(json.acl.ace, true);
                     }
                 });
-                $scope.comments    = CommentResource.query({ resource: 'event', resourceId: id, type: 'comments' });
+                $scope.comments = CommentResource.query({ resource: 'event', resourceId: id, type: 'comments' });
             },
             tzOffset = (new Date()).getTimezoneOffset() / -60;
 
@@ -562,6 +573,21 @@ angular.module('adminNg.controllers')
             $scope.exitReplyMode();
         };
 
+        this.accessSaved = function () {
+          Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 5000);
+        };
+
+        this.accessNotSaved = function () {
+          Notifications.add('error', 'ACL_NOT_SAVED', NOTIFICATION_CONTEXT, 30000);
+          
+          $scope.access = EventAccessResource.get({ id: $scope.resourceId }, function (data) {
+              if (angular.isDefined(data.episode_access)) {
+                  var json = angular.fromJson(data.episode_access.acl);
+                  changePolicies(json.acl.ace, true);
+              }
+          });          
+        };
+
         $scope.accessSave = function () {
             var ace = [],
                 hasRights = false,
@@ -632,9 +658,7 @@ angular.module('adminNg.controllers')
                         ace: ace
                     },
                     override: true
-                });
-
-                Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 1200);
+                }, me.accessSaved, me.accessNotSaved);                
             }
         };
 

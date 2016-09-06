@@ -17,15 +17,16 @@
                     <form action="j_spring_security_check" method="post">
                         <div class="row">
                             <p>
-                                <span translate='LOGIN.WELCOME'></span><br />
+                                <span translate='LOGIN.WELCOME'><!-- Welcome --></span><br />
                                 <span class="subtle-text" ng-if="version.version">
-                                    Opencast (v.{{ version.version }} - build: {{ version.buildNumber }})
+                                    Opencast (v.{{ version.version }}<span ng-if=version.buildNumber> -
+                                        build: {{ version.buildNumber }}</span>)
                                 </span>
                             </p>
                         </div>
 
                         <div ng-show="isError" class="error-container" translate="LOGIN.ERROR">
-                            Incorrect email and / or password
+                            <!-- Incorrect username and / or password -->
                         </div>
 
                         <div class="row">
@@ -35,18 +36,12 @@
                             <input ng-class="{error: isError}" name="j_password" type="password" id="password" placeholder="{{ 'LOGIN.PASSWORD' | translate }}" class="login-input">
                         </div>
 
-                        <div class="row">
-                            <div class="remember-me-toggle">
-                                <div class="remember-me-content">
-                                    <div class="check-toggle">
-                                        <input type="checkbox" id="remember" name="_spring_security_remember_me" checked>
-                                    </div>
-                                    <label for="remember" translate="LOGIN.REMEMBER">Remember me on this computer</label>
-                                </div>
-                            </div>
+                        <div class="row remember-me">
+                            <input type="checkbox" id="remember" name="_spring_security_remember_me" checked />
+                            <label for="remember" translate="LOGIN.REMEMBER"><!-- Remember --></label>
                         </div>
                         <div class="row">
-                            <button class="submit" translate="LOGIN.LOGIN">Login</button>
+                            <button class="submit" translate="LOGIN.LOGIN"><!-- Login --></label>
                         </div>
                     </form>
                 </div>

@@ -24,7 +24,7 @@ package org.opencastproject.smil.entity.media.container;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Represent SMIL par element and implement {@link SmilMediaContainer}.
+ * Represent SMIL par element and implement SmilMediaContainer.
  */
 @XmlRootElement(name = "par")
 public class SmilMediaParallelImpl extends SmilMediaContainerImpl {

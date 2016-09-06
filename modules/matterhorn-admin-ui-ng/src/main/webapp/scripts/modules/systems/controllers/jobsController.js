@@ -5,6 +5,9 @@ angular.module('adminNg.controllers')
         $scope.table = Table;
         $scope.table.configure({
             columns: [{
+                name:  'id',
+                label: 'SYSTEMS.JOBS.TABLE.ID'
+            }, {
                 name:  'status',
                 label: 'SYSTEMS.JOBS.TABLE.STATUS'
             }, {

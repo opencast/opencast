@@ -56,7 +56,7 @@ public class StatusData {
    * @param restResponse
    *          a RestResponse annotation type object that stores a response code and its description
    * @throws IllegalArgumentException
-   *           if the response code is out of range (e.g. <100 or > 1100)
+   *           if the response code is out of range (e.g. &lt;100 or &gt;1100)
    */
   public StatusData(RestResponse restResponse, RestDocData restDocData) throws IllegalArgumentException {
     this(restResponse.responseCode(), restDocData.processMacro(restResponse.description()));
@@ -73,7 +73,7 @@ public class StatusData {
    * @param description
    *          a description of the response
    * @throws IllegalArgumentException
-   *           if code is out of range (e.g. <100 or > 1100)
+   *           if code is out of range (e.g. &lt;100 or &gt;1100)
    */
   public StatusData(int code, String description, String xmlSchema) throws IllegalArgumentException {
     if (code < 100 || code > 1100) {
@@ -100,7 +100,7 @@ public class StatusData {
    * @param description
    *          a description of the response
    * @throws IllegalArgumentException
-   *           if code is out of range (e.g. <100 or > 1100)
+   *           if code is out of range (e.g. &lt;100 or &gt; 1100)
    */
   public StatusData(int code, String description) throws IllegalArgumentException {
     this(code, description, null);

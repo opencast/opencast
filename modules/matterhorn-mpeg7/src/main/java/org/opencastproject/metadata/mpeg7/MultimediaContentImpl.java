@@ -87,28 +87,28 @@ public class MultimediaContentImpl<T extends MultimediaContentType> implements M
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MultimediaContent#elements()
+   * @see org.opencastproject.metadata.mpeg7.MultimediaContent#elements()
    */
   public Iterator<T> elements() {
     return content.values().iterator();
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MultimediaContent#getElementById(java.lang.String)
+   * @see org.opencastproject.metadata.mpeg7.MultimediaContent#getElementById(java.lang.String)
    */
   public T getElementById(String id) {
     return content.get(id);
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MultimediaContent#getType()
+   * @see org.opencastproject.metadata.mpeg7.MultimediaContent#getType()
    */
   public MultimediaContent.Type getType() {
     return type;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MultimediaContent#size()
+   * @see org.opencastproject.metadata.mpeg7.MultimediaContent#size()
    */
   public int size() {
     return content.size();

@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * JaxB implementation of the entry of a Hashtable, so that the element can be serialized in the intendet way The Entry
- * now looks <item key="key"><value>value</value></item>
+ * now looks &lt;item key="key"&gt;&lt;value&gt;value&lt;/value&gt;&lt;/item&gt;
  *
  */
 @XmlType(name = "hash-entry", namespace = "http://util.opencastproject.org")

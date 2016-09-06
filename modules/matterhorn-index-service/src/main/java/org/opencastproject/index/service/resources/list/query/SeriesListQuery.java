@@ -106,8 +106,8 @@ public class SeriesListQuery extends ResourceListQueryImpl {
   /**
    * Add a {@link ResourceListFilter} filter to the query with the given contributor
    *
-   * @param presenter
-   *          the presenter to filter for
+   * @param contributor
+   *          the contributor to filter for
    */
   public void withContributor(String contributor) {
     this.addFilter(createContributorsFilter(Option.option(contributor)));

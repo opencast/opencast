@@ -66,7 +66,7 @@ public final class RequireUtil {
 
   /**
    * The given value must not be null.
-   * <p/>
+   * <p>
    * Example:
    *
    * <pre>
@@ -95,7 +95,7 @@ public final class RequireUtil {
 
   /**
    * The given value must not be null or empty.
-   * <p/>
+   * <p>
    * Example:
    *
    * <pre>

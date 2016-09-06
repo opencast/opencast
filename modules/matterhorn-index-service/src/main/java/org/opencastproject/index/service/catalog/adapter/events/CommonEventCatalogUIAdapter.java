@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 
 /**
- * Episode dublincore catalog implementation of a {@link AbstractEventsCatalogUIAdapter}
+ * Episode dublincore catalog implementation of a AbstractEventsCatalogUIAdapter
  */
 public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAdapter implements ManagedService {
 

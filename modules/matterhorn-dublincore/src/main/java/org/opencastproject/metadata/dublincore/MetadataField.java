@@ -282,7 +282,7 @@ public class MetadataField<A> {
   /**
    * Create a metadata field based on a {@link Boolean}.
    *
-   * @param id
+   * @param inputID
    *          The identifier of the new metadata field
    * @param label
    *          The label of the new metadata field
@@ -410,7 +410,7 @@ public class MetadataField<A> {
   /**
    * Create a metadata field based on a {@link Date}.
    *
-   * @param id
+   * @param inputID
    *          The identifier of the new metadata field
    * @param label
    *          The label of the new metadata field
@@ -418,8 +418,6 @@ public class MetadataField<A> {
    *          Define if the new metadata is or not a readonly field
    * @param required
    *          Define if the new metadata field is or not required
-   * @param type
-   *          The {@link Type} for the new field.
    * @param pattern
    *          The date pattern for {@link SimpleDateFormat}.
    * @param order
@@ -524,7 +522,7 @@ public class MetadataField<A> {
   /**
    * Create a metadata field of type iterable String
    *
-   * @param id
+   * @param inputID
    *          The identifier of the new metadata field
    * @param label
    *          The label of the new metadata field
@@ -602,7 +600,7 @@ public class MetadataField<A> {
   /**
    * Create a metadata field of type iterable String
    *
-   * @param id
+   * @param inputID
    *          The identifier of the new metadata field
    * @param label
    *          The label of the new metadata field
@@ -786,10 +784,9 @@ public class MetadataField<A> {
   /**
    * Add a temporal format {@link Date} field to the metadata
    *
-   * @param dublinCoreMetadata
-   *          The metadata to add the field to
    * @param metadataField
    *          The form of the field
+   * @param label
    * @param p
    *          The data to put into the field
    * @param outputID
@@ -852,7 +849,7 @@ public class MetadataField<A> {
   /**
    * Create a metadata field of type String with a single line in the front end.
    *
-   * @param id
+   * @param inputID
    *          The identifier of the new metadata field
    * @param label
    *          The label of the new metadata field
@@ -877,7 +874,7 @@ public class MetadataField<A> {
   /**
    * Create a metadata field of type String with many lines in the front end.
    *
-   * @param id
+   * @param inputID
    *          The identifier of the new metadata field
    * @param label
    *          The label of the new metadata field

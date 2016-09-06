@@ -149,8 +149,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
    *          processing job
    * @param smil
    *          smil document with media segments description
-   * @param track
-   *          source track
+   * @param trackParamGroupId
    * @return processed track
    * @throws ProcessFailedException
    *           if an error occured
@@ -444,15 +443,16 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     return organizationDirectoryService;
   }
 
-  protected void activate(ComponentContext context) {
+  @Override
+  public void activate(ComponentContext context) {
     logger.debug("activating...");
+    super.activate(context);
     FFmpegEdit.init(context.getBundleContext());
   }
 
   protected void deactivate(ComponentContext context) {
     logger.debug("deactivating...");
   }
-
 
   @Override
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {

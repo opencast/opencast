@@ -203,7 +203,7 @@ public final class LayoutManager {
     }
   }
 
-  /** a <= x <= b */
+  /** a &lt;= x &lt;= b */
   public static boolean between(int a, int b, int x) {
     return a <= x && x <= b;
   }

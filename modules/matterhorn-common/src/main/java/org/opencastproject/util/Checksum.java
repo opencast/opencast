@@ -175,8 +175,6 @@ public final class Checksum implements Serializable {
    * @param file
    *          the file
    * @return the checksum
-   * @throws NoSuchAlgorithmException
-   *           if the checksum of the specified type cannot be created
    * @throws IOException
    *           if the file cannot be accessed
    */

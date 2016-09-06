@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.search.impl;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
@@ -188,7 +187,9 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    * @param cc
    *          the component context
    */
+  @Override
   public void activate(final ComponentContext cc) throws IllegalStateException {
+    super.activate(cc);
     final String solrServerUrlConfig = StringUtils.trimToNull(cc.getBundleContext().getProperty(CONFIG_SOLR_URL));
 
     logger.info("Setting up solr server");

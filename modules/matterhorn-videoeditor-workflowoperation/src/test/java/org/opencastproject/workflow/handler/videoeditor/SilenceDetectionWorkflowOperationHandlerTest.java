@@ -36,7 +36,6 @@ import org.opencastproject.silencedetection.api.SilenceDetectionService;
 import org.opencastproject.smil.api.SmilException;
 import org.opencastproject.smil.api.SmilService;
 import org.opencastproject.smil.entity.api.Smil;
-import org.opencastproject.smil.impl.SmilServiceImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
@@ -80,8 +79,8 @@ public class SilenceDetectionWorkflowOperationHandlerTest {
   private URI smilURI;
 
   @Before
-  public void setUp() throws URISyntaxException, MediaPackageException,
-          MalformedURLException, IOException {
+  public void setUp() throws URISyntaxException, MediaPackageException, MalformedURLException, IOException,
+          SmilException, JAXBException, SAXException {
 
     MediaPackageBuilder mpBuilder = MediaPackageBuilderFactory.newInstance()
             .newMediaPackageBuilder();
@@ -91,8 +90,9 @@ public class SilenceDetectionWorkflowOperationHandlerTest {
     mp = mpBuilder.loadFromXml(mpURI.toURL().openStream());
     smilURI = SilenceDetectionWorkflowOperationHandlerTest.class
             .getResource("/silencedetection_smil_filled.smil").toURI();
-    smilService = new SmilServiceImpl();
+
     // create service mocks
+    smilService = SmilServiceMock.createSmilServiceMock(smilURI);
     silenceDetectionServiceMock = EasyMock.createNiceMock(SilenceDetectionService.class);
     workspaceMock = EasyMock.createNiceMock(Workspace.class);
     // setup SilenceDetectionWorkflowOperationHandler

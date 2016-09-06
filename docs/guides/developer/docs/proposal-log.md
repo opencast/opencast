@@ -16,47 +16,318 @@ A proposal is accepted when no veto (`-1`) is voted within a time spawn of 72 ho
 Passed Proposals
 ----------------
 
+
+### Opencast Next: Code Cleanup
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Thu, 7 July 2016 15:21:19 UTC
+
+```no-highlight
+Hi everyone,
+a while ago we discussed on the technical meeting that we would like to
+remove some old code from Opencast since these parts do not work
+properly (sometimes not at all) or are unused.
+
+Why cleaning up? To name some reasons:
+
+- Less code to run (less memory, faster start-up)
+- Less things to compile (faster build)
+- Less dependencies
+- People do not accidentally stumble upon broken things
+- Less work for maintenance
+
+And now here is what I #propose to remove and a reason why I think this
+should be removed. I already took the comments people made in the first
+draft [1] into account, although I still dared to include the two last
+items but this time, hopefully with a convincing reason for why they
+should be removed.
+
+1. Old Administrative User Interface (matterhorn-admin-ui)
+   The reason for this should be obvious: We got a new one. The old one
+   has not been tested for the last three releases, is not linked
+   anywhere anymore and is partly buggy due to changes to Opencast. To
+   maintain two interfaces for one thing do not make sense.
+
+2. Hold-state Workflow Operations
+   These do not work with the new interface any longer and the concept
+   has since been replaced by the actions you can perform on archived
+   material.
+
+3. CleanSessionsFilter
+   Old temporary bug fix. For more details read the thread on our
+   developer list.
+
+4. Republish Workflow Operation Handler
+   It can be removed since it has been replaced by a flag on
+   the publish operation in 2.x.
+
+5. Old workflows + encodings
+   We got new ones. These were only left because of the old ui.
+
+6. Old player (Flash in engage ui)
+   Flash is dead. We have the new player and Paella.
+
+7. Most of shared_ressources
+   Almost everything in here belongs to old user interfaces.
+
+8. matterhorn-engage-player
+   This is the old player Flex project. Iam not even sure it can still
+   be compiled.
+
+
+9. matterhorn-test-harness
+   Old integration tests
+
+10. matterhorn-mediapackage-ui
+    Old UI ressources
+
+11. matterhorn-manager-*
+    Old, outdated configuration modification via web ui. This was never
+    used and would need a major update to get it working again at all.
+
+12. matterhorn-load-test*
+    Some tests. I have never seen them executed by anyone.
+
+13. matterhorn-holdstate-workflowoperation
+    Workflow operations requiring a hold state which does not exist
+    anymore with the new admin interface.
+
+14. matterhorn-deprecated-workflowoperation
+    The name says everything. This includes the download DVD operation.
+
+15. matterhorn-annotation-*
+    This should not work with either of the current players anymore.
+
+16. docs/jmeter, docs/scripts/load_testing
+    Configuration for a performance testing tool. Not used for a long
+    time and not up-to-date.
+
+17. Everything unused from:
+    https://data.lkiesow.de/opencast/apidocs/deprecated-list.html
+    E.g. FunctionException and ProcessExecutor(Exception)
+
+18. matterhorn-webconsole
+    Karaf comes with a web console. We do not use our old implementation
+    anymore.
+
+19. matterhorn-mediapackage-manipulator
+    Rest endpoint for media package manipulation. It's not used anymore
+    except by components to be removed.
+
+
+20. matterhorn-search-service-feeds
+    Broken implementation for RSS/Atom feeds
+
+21. matterhorn-caption-* and embed operation
+    Service for converting different subtitle formats and operation to
+    embed these subtitles into the media files. This is *not* player
+    caption support. If required, FFmpeg can be used for conversion
+    between several subtitle formats. Asked on list [2], no one uses
+    this.
+
+
+As indicated before, points 20 and 21 had some comments for leaving them
+in which did not convince me to not propose this. “Instead of removing
+it, fix it” is an easy thing to say but sadly requires ressources.
+Keeping it, announcing it as features and then tell people that it is
+not working only afterwards is a bad thing and I would like to avoid
+that.
+
+Note that all the code is still in our history so that we loose nothing
+if we want the old code back.
+
+Please feel free to indicate if this action is fine for you or if you
+want to keep some of the marked code. Please provide a reason if you do.
+
+Best regards,
+Lars
+
+[1] http://bit.ly/28YOEZ1
+[2] http://bit.ly/28Ztlt8
+```
+
+This proposal has passed with these additional corrections:
+
+```no-highlight
+Hi,
+we discussed this on today's technical meeting and I'm slightly
+changing the proposal:
+
+20. Let's remove matterhorn-search-service-feeds only after September
+    1st which is a realistic time to get things into the next Opencast
+    release. If someone has fixed the issue by them, we will, of
+    course, keep it.
+    This change takes into account that some people have said they are
+    interested into fixing that module, but will make sure that it's
+    removed if no one fixes it to not have an advertised but broken
+    feature.
+
+21. I will be looking into adding subtitle support in a sensible way
+    before removing the matterhorn-caption-* modules or at least
+    clarify if they can still be used.
+
+Regards,
+Lars
+```
+
+```no-highlight
+Hi James,
+a couple of days, I talked to someone saying that he will soon provide
+a patch adding exactly this functionality. The holdstate operations are
+definitely broken due to their UI.
+
+My suggestion for a compromise here:
+ - Remove them if that patch for archiving the options is released
+ - Remove them if no one fixes them in time (September 1st) for 2.3
+
+If you want to bring them back later, we always keep the code in our
+history.
+
+Regards,
+Lars
+
+> Hi,
+> I would like to keep 2 and presumably 13. Both Manchester and AFAIK
+> Cape Town have use cases for hold states since there is still no
+> mechanism for passing WF configuration options from one WF to another.
+> Regards
+> James
+```
+
+The patch has [already been published](https://bitbucket.org/opencast-community/matterhorn/pull-requests/1104).
+
+
+### Opencast Community Repository Owners
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Fri, 13 May 2016 18:41:52 UTC
+
+```no-highlight
+Hi,
+today, in the technical meeting, we shortly discussed how to handle
+requests, problems, etc regarding the other repositories we are hosting
+under the umbrella of the Opencast community:
+
+  https://bitbucket.org/opencast-community/profile/repositories
+
+While we have people who care about the official Opencast repository as
+well as rules about what may be merged, who may merge things, … we do
+not have that for other repositories and for some it's very unclear.
+
+That is why I would like to propose that every repository under the
+umbrella of the Opencast community needs to have a “project owner”
+being responsible for that repository. Usually it should be the one
+requesting that repository, but of course it can be someone else known
+in the community.
+
+I would also like to propose that if there is no one willing to take up
+the responsibility to take care of a repository (ownership) if an old
+owner leaves, the repository should either be removed or marked as
+deprecated and moved to a separate section if so requested.
+
+Finally, I would like to propose that we use the new “project” feature
+of BitBucket to group the repositories into the groups:
+
+- Opencast
+- Contrib
+- Adopters
+- Deprecated (<- to be created if needed)
+
+Currently, all repositories are in one big project.
+
+Regards,
+Lars
+```
+
+### Rename Opencast Mailing Lists
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Thu, 14 Apr 2016 00:00:00 UTC
+
+```no-highlight
+Hi everyone,
+traditionally, we have the three mailing lists:
+
+ - matterhorn@opencast.org (development list)
+ - matterhorn-users@opencast.org (user list)
+ - community@opencast.org (more or less announcements)
+
+Recently, though, we have seen especially the last two list being used
+for user questions and problems. That is not surprising as we dropped
+the name “Matterhorn” and new users do not know what that the list
+matterhorn-users is meant for questions about Opencast.
+
+That is why I would like to rename these lists to
+
+ - dev@opencast.org or development@opencast.org (I prefer the short
+   name but don't have very strong feelings about that)
+ - users@opencast.org
+ - announcements@opencast.org
+
+Together with the already existing security-notices list, this gives
+these lists a very clear meaning. It would also have the benefit that
+users only interested in general announcements could subscribe to one
+list only which would likely be a very low-traffic mailing list.
+
+Additionally, this would make it sufficient to send announcements to
+one list, instead of sending it to all three lists.
+
+To prevent general questions on the announcements list, I suggest we
+grant posting rights to board members, committers or other people who
+have or had a role in our community only. I don't think we need to be
+too strict here but should make sure that people understand what this
+list is for.
+
+Finally, for the sake of our current members, I would suggest that we
+forward the mails to the old addresses for at least until the end of
+the year, if that is possible.
+
+Best regards,
+Lars
+```
+
+
 ### Documentation Pull Request Merge Order
 Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Thu, 25 Feb 2016 20:52:00 UTC
 
-    Hi everyone, 
-    as discussed in this weeks technical meeting, I hereby #propose to 
-    allow out-of-order merges of documentation pull requests in the same way 
-    we have this exception for bug-fixes. 
+```no-highlight
+Hi everyone,
+as discussed in this weeks technical meeting, I hereby #propose to
+allow out-of-order merges of documentation pull requests in the same way
+we have this exception for bug-fixes.
 
-    to be precise, I #propose to change the development process docs for 
-    reviewing and merging [1] in the following way: 
+to be precise, I #propose to change the development process docs for
+reviewing and merging [1] in the following way:
 
-    [old] 
+[old]
 
-     - Pull requests for bug fixes (t/MH-XXXXX-...) may be reviewed and 
-       merged out of order. 
+ - Pull requests for bug fixes (t/MH-XXXXX-...) may be reviewed and
+   merged out of order.
 
-    [new] 
+[new]
 
-     - Pull requests for bug fixes or documentation may be reviewed and 
-       merged out of order. 
+ - Pull requests for bug fixes or documentation may be reviewed and
+   merged out of order.
 
-    Regards, 
-    Lars 
+Regards,
+Lars
 
-    [1] https://docs.opencast.org/develop/developer/reviewing-and-merging/ 
+[1] https://docs.opencast.org/develop/developer/reviewing-and-merging/
+```
+
+
 
 ### Removing instances of print statements with a style rule #proposal
 Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Wed, 12 Feb 2016 12:00:00 UTC
 
     Hi folks,
 
-    I noticed in a recently review that there are still System.out.println 
+    I noticed in a recently review that there are still System.out.println
     statements in use in our codebase.  I was surprised, because thought we had
-    previously implemented a checkstyle rule which would have banned those 
-    statements!  I hereby #propose that we implement the changes outlined in 
-    https://opencast.jira.com/browse/MH-11222, and remove these statements in 
-    favour of logger statements.  I also propose that we add this rule to the 
-    checkstyle ruleset so that we don't have to deal with this again going 
+    previously implemented a checkstyle rule which would have banned those
+    statements!  I hereby #propose that we implement the changes outlined in
+    https://opencast.jira.com/browse/MH-11222, and remove these statements in
+    favour of logger statements.  I also propose that we add this rule to the
+    checkstyle ruleset so that we don't have to deal with this again going
     forward.  Proposal closes EOD 2016-02-03.
 
     G
+
+
 
 ### How to release a new Opencast version…
 Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Fri, 14 Aug 2015 12:54:51 UTC

@@ -118,7 +118,7 @@ public final class LanguageFileUtil {
    * {@link #safelyStripLanguageFromFilename(String)}. If the languageCode is
    * not composited, it will be returned as is.
    *
-   * @param compositedLanguageCode
+   * @param languageCode
    * @return The ISO part of a composited language code, if not composited,
    *         the languageCode.
    */

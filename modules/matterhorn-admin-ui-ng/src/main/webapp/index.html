@@ -2,7 +2,6 @@
 <html ng-app="adminNg">
     <head>
         <meta charset="utf-8">
-        <title></title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
@@ -43,7 +42,7 @@
                             ng-attr-alt="{{ currentLanguageCode }}" />
                     </div>
                     <ul class="dropdown-ul">
-                        <li><a href="#" ng-repeat="language in availableLanguages | orderBy:'displayLanguage'"
+                        <li><a ng-repeat="language in availableLanguages | orderBy:'displayLanguage'"
                             ng-click="changeLanguage(language.code)">
                             <img class=lang-flag ng-attr-src="img/lang/{{ language.code }}.svg"
                                 ng-attr-alt="{{ language.code }}" />
@@ -53,7 +52,7 @@
                 </div>
 
                 <div ng-if="mediaModuleUrl" class="nav-dd" title="{{ 'MEDIAMODULE' | translate}}">
-                    <a ng-click="toURL(mediaModuleUrl)" href="{{mediaModuleUrl}}">
+                    <a href="{{mediaModuleUrl}}">
                         <span class="fa fa-play-circle-o"><!-- Media Module --></span>
                     </a>
                 </div>
@@ -63,12 +62,12 @@
                     <div class="fa fa-question-circle"></div>
                     <ul class="dropdown-ul">
                         <li ng-if="documentationUrl">
-                        <a ng-click="toURL(documentationUrl)" href="{{documentationUrl}}">
+                        <a href="{{documentationUrl}}">
                           <span translate="HELP.DOCUMENTATION"><!-- Documentation Server --></span>
                         </a>
                         </li>
                         <li ng-if="restdocsUrl" with-role="ROLE_ADMIN">
-                        <a target="_self" ng-click="toURL(restdocsUrl)" href="{{restdocsUrl}}">
+                        <a target="_self" href="{{restdocsUrl}}">
                             <span translate="HELP.REST_DOC"><!-- REST Doc --></span>
                         </a>
                         </li>
@@ -80,7 +79,7 @@
                     <ul class="dropdown-ul">
                         <li>
                         <a ng-click="logout()">
-                            <span class="logout-icon" translate="LOGOUT">Logout</span>
+                            <span class="logout-icon" translate="LOGOUT"><!-- Logout--></span>
                         </a>
                         </li>
                     </ul>
@@ -94,7 +93,8 @@
         <footer id="main-footer" ng-controller="NavCtrl">
             <div class="default-footer">
                 <div ng-if="version.version" class="meta">
-                    Opencast Video Capture Software (v.{{ version.version }} - build: {{ version.buildNumber }})
+                    Opencast (v.{{ version.version }}<span ng-if=version.buildNumber> -
+                        build: {{ version.buildNumber }}</span>)
                 </div>
                 <div ng-if="feedbackUrl" class="feedback-btn" id="feedback-btn">
                     <a href="javascript:;">Feedback</a>

@@ -72,8 +72,6 @@ public final class HostRegistrationParser {
    *
    * @param in
    *          The serialized data
-   * @param format
-   *          the serialization format
    * @return The HostRegistration
    */
   public static HostRegistration parse(InputStream in) throws IOException {

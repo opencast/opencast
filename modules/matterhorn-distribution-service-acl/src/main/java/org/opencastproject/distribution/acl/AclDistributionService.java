@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.distribution.acl;
 
 import static org.opencastproject.util.RequireUtil.notNull;
@@ -134,7 +133,9 @@ public class AclDistributionService extends AbstractJobProducer implements Distr
    * @param cc
    *          the OSGi component context
    */
-  protected void activate(ComponentContext cc) {
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
     serviceUrl = cc.getBundleContext().getProperty("org.opencastproject.download.url");
     if (serviceUrl == null)
       throw new IllegalStateException("Download url must be set (org.opencastproject.download.url)");

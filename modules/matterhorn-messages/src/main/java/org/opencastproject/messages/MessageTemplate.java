@@ -91,8 +91,6 @@ public class MessageTemplate {
    *          the body
    * @param creationDate
    *          the creation date
-   * @param comments
-   *          the comments
    */
   public MessageTemplate(String name, User creator, String subject, String body, TemplateType type, Date creationDate) {
     this.name = notEmpty(name, "name");
@@ -175,7 +173,7 @@ public class MessageTemplate {
   /**
    * Returns the creator
    *
-   * @returns the creator of the template
+   * @return the creator of the template
    */
   public User getCreator() {
     return this.creator;

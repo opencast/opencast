@@ -151,9 +151,6 @@ public class Mpeg7CaptionConverter implements CaptionConverter {
     return captions;
   }
 
-  /**
-   * @see org.opencastproject.caption.api.CaptionConverter#exportCaption(java.io.OutputStream, java.lang.String)
-   */
   @Override
   public void exportCaption(OutputStream outputStream, List<Caption> captions, String language) throws IOException {
 

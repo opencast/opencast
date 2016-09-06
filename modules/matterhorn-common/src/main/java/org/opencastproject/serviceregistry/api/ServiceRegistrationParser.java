@@ -72,8 +72,6 @@ public final class ServiceRegistrationParser {
    *
    * @param in
    *          The serialized data
-   * @param format
-   *          the serialization format
    * @return The ServiceRegistration
    */
   public static ServiceRegistration parse(InputStream in) throws IOException {

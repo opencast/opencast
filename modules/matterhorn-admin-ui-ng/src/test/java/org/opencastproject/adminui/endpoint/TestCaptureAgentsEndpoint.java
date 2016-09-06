@@ -59,11 +59,11 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
     agents.put("agent1",
             new TestAgent("agent1", "ok", "http://agent1", DateTimeSupport.fromUTC("2014-05-26T15:37:02Z")));
     agents.put("agent2",
-            new TestAgent("agent2", "ok", "http://agent2", DateTimeSupport.fromUTC("2014-05-26T15:37:02Z")));
+            new TestAgent("agent2", "ok", "http://agent2", DateTimeSupport.fromUTC("2016-05-26T07:07:07Z")));
     agents.put("agent3",
-            new TestAgent("agent3", "ok", "http://agent3", DateTimeSupport.fromUTC("2014-05-26T15:37:02Z")));
+            new TestAgent("agent3", "ok", "http://agent3", DateTimeSupport.fromUTC("2016-06-09T18:00:00Z")));
     agents.put("agent4",
-            new TestAgent("agent4", "ok", "http://agent4", DateTimeSupport.fromUTC("2014-05-26T15:37:02Z")));
+            new TestAgent("agent4", "ok", "http://agent4", DateTimeSupport.fromUTC("2016-06-09T06:00:00Z")));
 
     expect(captureAgentService.getKnownAgents()).andStubReturn(agents);
     replay(captureAgentService);

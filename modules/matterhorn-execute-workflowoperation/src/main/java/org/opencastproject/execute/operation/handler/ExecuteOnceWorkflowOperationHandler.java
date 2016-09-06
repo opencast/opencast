@@ -167,7 +167,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
       if (!waitForStatus(job).isSuccess())
         throw new WorkflowOperationException("Execute operation failed");
 
-      if (StringUtils.isBlank(job.getPayload())) {
+      if (StringUtils.isNotBlank(job.getPayload())) {
 
         resultElement = MediaPackageElementParser.getFromXml(job.getPayload());
 

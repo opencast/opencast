@@ -308,7 +308,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /**
    * OSGi callback to set the dublin core catalog service.
    *
-   * @param index
+   * @param dcService
    */
   public void setDublinCoreCatalogService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
@@ -1267,8 +1267,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    *
    * @param buffer
    *          The number of seconds before now to start the cutoff date
-   * @param dateTimeZone
-   *          The time zone to use to get the current time.
+   * @param dateTime
    * @return A date that is the number of seconds in buffer before now in GMT.
    */
   public static org.joda.time.DateTime getCutoffDate(long buffer, org.joda.time.DateTime dateTime) {

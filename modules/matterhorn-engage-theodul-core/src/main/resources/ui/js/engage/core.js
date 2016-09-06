@@ -83,7 +83,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   var id_loading2 = "loading2";
   var id_loadingProgressbar2 = "loadingProgressbar2";
   var id_browserWarning = "browserWarning";
-  var id_volume = "volume";
+  var id_volumeSlider = "volumeSlider";
   var id_btn_reloadPage = "btn_reloadPage";
   var id_btn_login = "btn_login";
   var id_btn_tryAnyway = "btn_tryAnyway";
@@ -148,7 +148,8 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         (Bowser.opera && Bowser.version >= browser_minVersion_opera) ||
         (Bowser.safari && Bowser.version >= browser_minVersion_safari) ||
         (Bowser.msedge && Bowser.version >= browser_minVersion_msedge) ||
-        (Bowser.msie && Bowser.version >= browser_minVersion_msie);
+        (Bowser.msie && Bowser.version >= browser_minVersion_msie) ||
+        (Bowser.mobile) || (Bowser.ios);
   }
   
   function setMinBrowserVersions() {
@@ -177,6 +178,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
           case "ja": return "ja-JA";
           case "tlh": return "tlh-AA";
           case "no": return "no-NO";
+          case "pl": return "pl-PL";
           case "pt": return "pt-BR";
           case "ru": return "ru-RU";
           case "sv": return "sv-SE";
@@ -831,7 +833,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
               translateCoreHTML();
               if (engageCore.model.desktop) {
                 window.setTimeout(function () {
-                  if ($("#" + id_volume).html() === undefined) {
+                  if ($("#" + id_volumeSlider).html() === undefined) {
                     $("#" + id_btn_reloadPage).click(function (e) {
                       e.preventDefault();
                       location.reload();

@@ -77,14 +77,14 @@ public class MediaTimeImpl implements MediaTime {
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MediaTime#getMediaDuration()
+   * @see org.opencastproject.metadata.mpeg7.MediaTime#getMediaDuration()
    */
   public MediaDuration getMediaDuration() {
     return mediaDuration;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.MediaTime#getMediaTimePoint()
+   * @see org.opencastproject.metadata.mpeg7.MediaTime#getMediaTimePoint()
    */
   public MediaTimePoint getMediaTimePoint() {
     return mediaTimePoint;

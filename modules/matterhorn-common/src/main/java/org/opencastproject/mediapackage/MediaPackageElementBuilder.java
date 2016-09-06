@@ -43,7 +43,7 @@ public interface MediaPackageElementBuilder {
    * @param uri
    *          the element location
    * @return the new media package element
-   * @throws MediaPackageException
+   * @throws UnsupportedElementException
    *           if creating the media package element fails
    */
   MediaPackageElement elementFromURI(URI uri) throws UnsupportedElementException;
@@ -64,7 +64,7 @@ public interface MediaPackageElementBuilder {
    * @param flavor
    *          the element flavor
    * @return the new media package element
-   * @throws MediaPackageException
+   * @throws UnsupportedElementException
    *           if creating the media package element fails
    */
   MediaPackageElement elementFromURI(URI uri, MediaPackageElement.Type type, MediaPackageElementFlavor flavor)
@@ -78,7 +78,7 @@ public interface MediaPackageElementBuilder {
    * @param serializer
    *          the media package serializer
    * @return the media package element
-   * @throws MediaPackageException
+   * @throws UnsupportedElementException
    *           if reading the file from manifest fails
    */
   MediaPackageElement elementFromManifest(Node elementNode, MediaPackageSerializer serializer)

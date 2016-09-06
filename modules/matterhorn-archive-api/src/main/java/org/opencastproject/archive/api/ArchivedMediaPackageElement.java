@@ -47,7 +47,7 @@ public class ArchivedMediaPackageElement {
 
   /**
    * Return the element's mimetype as found in the ISO Mime Type Registrations.
-   * <p/>
+   * <p>
    * For example, in case of motion jpeg slides, this method will return the mime type for <code>video/mj2</code>.
    */
   public MimeType getMimeType() {

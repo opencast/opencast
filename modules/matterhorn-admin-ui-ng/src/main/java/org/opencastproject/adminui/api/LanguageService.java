@@ -29,7 +29,7 @@ import java.util.Locale;
 
 /**
  * A service which provides information about translations for the matterhorn-admin-ui-ng bundle. Usage: Configure the
- * directory which contains the translation files by invoking {@link #setLanguageFileFolder(String)} before
+ * directory which contains the translation files by invoking setLanguageFileFolder before
  * {@link #getAvailableLanguages()}.
  */
 public interface LanguageService {
@@ -68,7 +68,6 @@ public interface LanguageService {
   /**
    * Gets the second match between acceptable and available languages.
    *
-   * @param serversAvailableLanguages
    * @param clientsAcceptableLanguages
    *
    * @return The second best language.

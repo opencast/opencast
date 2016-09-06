@@ -41,7 +41,7 @@ public class MultiResourceLock {
   /**
    * Synchronize access to a given resource.
    * Execute function <code>function</code> only, if currently now other function accesses resource <code>resource</code>.
-   * <p/>
+   * <p>
    * Implementation note: The given resource is not used in any synchronization primitives, i.e. no monitor of
    * that object are being held.
    */

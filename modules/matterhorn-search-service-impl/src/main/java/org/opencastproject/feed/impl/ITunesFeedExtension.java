@@ -24,6 +24,8 @@ package org.opencastproject.feed.impl;
 
 import org.opencastproject.feed.api.FeedExtension;
 
+import com.rometools.modules.itunes.types.Category;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +59,7 @@ public class ITunesFeedExtension implements FeedExtension {
   /** The episode summary */
   private String summary = null;
 
-  private List<String> categories = null;
+  private List<Category> categories = null;
 
   private URL image = null;
 
@@ -69,7 +71,7 @@ public class ITunesFeedExtension implements FeedExtension {
    * Creates a new iTunes feed extension.
    */
   public ITunesFeedExtension() {
-    categories = new ArrayList<String>();
+    categories = new ArrayList<Category>();
   }
 
   /**
@@ -194,12 +196,14 @@ public class ITunesFeedExtension implements FeedExtension {
     this.summary = summary;
   }
 
-  public List<String> getCategories() {
+  public List<Category> getCategories() {
     return categories;
   }
 
   public void setCategories(List<String> categories) {
-    this.categories = categories;
+    for (String cat : categories) {
+      this.categories.add(new Category(cat));
+    }
   }
 
   public URL getImage() {

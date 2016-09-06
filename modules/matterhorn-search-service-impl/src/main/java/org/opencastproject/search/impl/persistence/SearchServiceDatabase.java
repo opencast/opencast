@@ -93,7 +93,7 @@ public interface SearchServiceDatabase {
    * @return the modification date
    * @throws NotFoundException
    *           if media package with specified id and version does not exist
-   * @throws EpisodeServiceDatabaseException
+   * @throws SearchServiceDatabaseException
    *           if an error occurs
    */
   Date getModificationDate(String mediaPackageId) throws NotFoundException, SearchServiceDatabaseException;
@@ -106,7 +106,7 @@ public interface SearchServiceDatabase {
    * @return the deletion date
    * @throws NotFoundException
    *           if media package with specified id does not exist
-   * @throws EpisodeServiceDatabaseException
+   * @throws SearchServiceDatabaseException
    *           if an error occurs
    */
   Date getDeletionDate(String mediaPackageId) throws NotFoundException, SearchServiceDatabaseException;

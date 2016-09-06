@@ -46,9 +46,11 @@ function   ($) {
     var msg_loginSuccessful = "Successfully logged in. Please reload the page if the page does not reload automatically.";
     var msg_not_logged_in = "Not logged in";
     var msg_loginFailed = "Failed to log in.";
-    var springLoggedInStrCheck = "<title>Opencast – Login Page</title>";
-
-    // jquery shortcuts
+    var infoMeURL = "/info/me.json";
+    var defaultPlayerURL = "/engage/ui/watch.html";
+    var springSecurityLoginURL = "/j_spring_security_check";
+    var springSecurityLogoutURL = "/j_spring_security_logout";
+    var springLoggedInStrCheck = "j_spring_security_check";
     var $navbarEpisodes = "#navbarEpisodes";
     var $navbarSeries = "#navbarSeries";
     var $headerLogo = "#headerLogo";
@@ -202,7 +204,7 @@ function   ($) {
     function initialize() {
         log("Start initialize.");
 
-        $("#" + id_mhlogolink).attr("href", location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : ''));
+        $("#" + id_mhlogolink).attr("href", location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + "/engage/ui");
         getInfo();
         registerHandler();
 
@@ -301,15 +303,16 @@ function   ($) {
             askedForLogin = true;
             var username = "User";
             var password = "Password";
-            bootbox.dialog({
+            var box = bootbox.dialog({
                 title: title_enterUsernamePassword,
-                message: '<form class="form-signin">' +
-                    '<h2 class="form-signin-heading">' + msg_enterUsernamePassword + '</h2>' +
-                    '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + placeholder_username + '" required="true" autofocus="" />' +
+                message: '<form class="form-signin" onsubmit="$(\'.btn-success\').click(); return false;">' +
+                    '<h3 class="form-signin-heading">' + msg_enterUsernamePassword + '</h3>' +
+                    '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + placeholder_username + '" required="true" />' +
                     '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + placeholder_password + '" required="true" />' +
                     '<label class="checkbox">' +
                     '<input type="checkbox" value="' + placeholder_rememberMe + '" id="rememberMe" name="rememberMe" checked> ' + placeholder_rememberMe +
                     '</label>' +
+                    '<input type=submit style="display: none;" />' +
                     '</form>',
                 buttons: {
                     cancel: {
@@ -360,6 +363,9 @@ function   ($) {
                     askedForLogin = false;
                 },
                 closeButton: false
+            });
+            box.bind('shown.bs.modal', function(){
+                box.find("input#username").focus();
             });
         }
     }

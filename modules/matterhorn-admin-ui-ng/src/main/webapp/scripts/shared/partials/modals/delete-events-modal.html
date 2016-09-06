@@ -1,7 +1,7 @@
 <section class="modal wizard active modal-open" id="delete-events-status-modal" style="display: block;" ng-controller="BulkDeleteCtrl">
     <header>
         <a ng-click="close()" class="fa fa-times close-modal"></a>
-        <h2 translate="BULK_ACTIONS.DELETE.EVENTS.CAPTION">Delete Events</h2>
+        <h2 translate="BULK_ACTIONS.DELETE.EVENTS.CAPTION"><!-- Delete Events --></h2>
     </header>
 
     <nav id="modal-nav" class="step-by-step">
@@ -19,19 +19,26 @@
             <div class="full-col">
                 <div class="obj list-obj" ng-form="deleteForm">
                     <div class="modal-alert danger" ng-if="events.unpublished.has">
-                        <p translate="BULK_ACTIONS.DELETE_EVENTS_WARNING_LINE1">You have chosen to delete an event. Once deleted all metadata, audio and video will be deleted and can not be retrieved.</p>
-                        <p translate="BULK_ACTIONS.DELETE_EVENTS_WARNING_LINE2">By pressing delete you understand that these files are unrecoverable.</p>
+                        <p translate="BULK_ACTIONS.DELETE_EVENTS_WARNING_LINE1">
+                            <!-- You have chosen to delete an event. Once deleted all metadata,
+                                 audio and video will be deleted and can not be retrieved. -->
+                        </p>
+                        <p translate="BULK_ACTIONS.DELETE_EVENTS_WARNING_LINE2">
+                            <!-- By pressing delete you understand that these files are unrecoverable. -->
+                        </p>
                     </div>
 
                     <div class="full-col" ng-if="events.unpublished.has">
                         <div class="obj">
-                            <header translate="BULK_ACTIONS.DELETE.EVENTS.DELETE_EVENTS">Delete Events</header>
+                            <header translate="BULK_ACTIONS.DELETE.EVENTS.DELETE_EVENTS">
+                                <!-- Delete Events -->
+                            </header>
                             <table class="main-tbl">
                                 <thead>
                                     <tr>
                                         <th class="small"><input type="checkbox" ng-model="unpublished.allSelected" ng-change="unpublished.allSelectedChanged()" class="select-all-cbox"/></th>
-                                        <th translate="EVENTS.EVENTS.TABLE.TITLE">Title</th>
-                                        <th translate="EVENTS.EVENTS.TABLE.CREATORS">Presenter</th>
+                                        <th translate="EVENTS.EVENTS.TABLE.TITLE"><!-- Title --></th>
+                                        <th translate="EVENTS.EVENTS.TABLE.CREATORS"><!-- Presenter --></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -47,7 +54,9 @@
 
                     <div class="full-col" ng-if="!events.unpublished.has">
                         <div class="obj">
-                            <p translate="BULK_ACTIONS.DELETE.EVENTS.UNPUBLISHED.NONE">None of the selected events can be deleted without leaving orphan files.</p>
+                            <p translate="BULK_ACTIONS.DELETE.EVENTS.UNPUBLISHED.NONE">
+                                <!-- None of the selected events can be deleted without leaving orphan files. -->
+                            </p>
                         </div>
                     </div>
 
@@ -75,18 +84,24 @@
                 <div class="obj list-obj" ng-form="retractForm">
 
                     <div class="modal-alert danger" ng-if="events.published.has">
-                        <p translate="BULK_ACTIONS.DELETE.EVENTS.PUBLISHED.WARNING">Some events can not be deleted as they have already been published and deleting them would leave the published files with no way to delete them. Instead run a start task to retract the events first and then delete them.</p>
+                        <p translate="BULK_ACTIONS.DELETE.EVENTS.PUBLISHED.WARNING">
+                            <!-- Some events can not be deleted as they have already been published and deleting
+                                 them would leave the published files with no way to delete them. Instead run a start
+                                 task to retract the events first and then delete them. -->
+                        </p>
                     </div>
 
                     <div class="obj tbl-details" ng-if="events.published.has">
                         <div class="obj">
-                            <header translate="BULK_ACTIONS.DELETE.EVENTS.RETRACT_EVENTS">Retract Events</header>
+                            <header translate="BULK_ACTIONS.DELETE.EVENTS.RETRACT_EVENTS">
+                                <!-- Retract Events -->
+                            </header>
                             <table class="main-tbl">
                                 <thead>
                                     <tr>
                                         <th class="small"><input type="checkbox" ng-model="published.allSelected" ng-change="published.allSelectedChanged()" class="select-all-cbox"/></th>
-                                        <th translate="EVENTS.EVENTS.TABLE.TITLE">Title</th>
-                                        <th translate="EVENTS.EVENTS.TABLE.CREATORS">Presenter</th>
+                                        <th translate="EVENTS.EVENTS.TABLE.TITLE"><!-- Title --></th>
+                                        <th translate="EVENTS.EVENTS.TABLE.CREATORS"><!-- Presenter --></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -101,7 +116,9 @@
                     </div>
 
                     <div class="obj tbl-details" ng-if="events.published.has">
-                        <header translate="BULK_ACTIONS.DELETE.EVENTS.SELECT_RETRACT_TASK">Select a Retract Task</header>
+                        <header translate="BULK_ACTIONS.DELETE.EVENTS.SELECT_RETRACT_TASK">
+                            <!-- Select a Retract Task -->
+                        </header>
                         <div class="obj-container">
                             <select chosen pre-select-from="processing.workflows"
                                 data-width="'100%'"
@@ -128,7 +145,9 @@
 
                     <div class="full-col" ng-if="!events.published.has">
                         <div class="obj">
-                            <p translate="BULK_ACTIONS.DELETE.EVENTS.PUBLISHED.NONE">None of the selected events need to be retracted before they can be deleted.</p>
+                            <p translate="BULK_ACTIONS.DELETE.EVENTS.PUBLISHED.NONE">
+                                <!-- None of the selected events need to be retracted before they can be deleted. -->
+                            </p>
                         </div>
                     </div>
 
@@ -153,23 +172,31 @@
         <div class="modal-body">
             <div class="full-col">
                 <div class="obj list-obj" ng-form="summaryForm">
-                    <header translat="EVENTS.RETRACT.SUMMARY">Summary</header>
+                    <header translate="EVENTS.RETRACT.SUMMARY">Summary</header>
                     <div class="obj-container">
                         <ul>
                             <li>
-                                <span translate="BULK_ACTIONS.DELETE.EVENTS.SUMMARY.EVENTS_DELETED">Events to be Deleted</span>
+                                <span translate="BULK_ACTIONS.DELETE.EVENTS.SUMMARY.EVENTS_DELETED">
+                                    <!-- Events to be Deleted -->
+                                </span>
                                 <p ng-repeat="row in getUnpublishedEvents()">{{ row.title }}</p>
                             </li>
                             <li>
-                                <span translate="BULK_ACTIONS.DELETE.EVENTS.SUMMARY.EVENTS_RETRACTED">Events to be Retracted</span>
+                                <span translate="BULK_ACTIONS.DELETE.EVENTS.SUMMARY.EVENTS_RETRACTED">
+                                    <!-- Events to be Retracted -->
+                                </span>
                                 <p ng-repeat="row in getPublishedEvents()">{{ row.title }}</p>
                             </li>
                             <li>
-                                <span translate="BULK_ACTIONS.DELETE.EVENTS.SUMMARY.RETRACT_WORKFLOW">Workflow to Retract Events</span>
+                                <span translate="BULK_ACTIONS.DELETE.EVENTS.SUMMARY.RETRACT_WORKFLOW">
+                                    <!-- Workflow to Retract Events -->
+                                </span>
                                 <p>{{processing.ud.workflow.id}}</p>
                             </li>
                             <li>
-                                <span translate="BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.CONFIGURATION"></span>
+                                <span translate="BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.CONFIGURATION">
+                                    <!-- Configuration -->
+                                </span>
                                 <p ng-repeat="(key, value) in processing.ud.workflow.selection.configuration">{{key}}: {{value}}</p>
                             </li>
                         </ul>

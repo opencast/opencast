@@ -51,7 +51,7 @@ public final class CaptureUtils {
   }
 
   /**
-   * Returns <code>true</code> if the capture agent with id <code>{@link #CAPTURE_AGENT_ID}</code> is online.
+   * Returns <code>true</code> if the capture agent with id <code>#CAPTURE_AGENT_ID</code> is online.
    *
    * @param agent
    *          the agent identifier

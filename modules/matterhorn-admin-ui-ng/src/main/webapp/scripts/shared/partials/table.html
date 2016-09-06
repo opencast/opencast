@@ -1,6 +1,6 @@
 <div class="action-bar">
     <ul>
-        <li><a data-open-modal="edit-table-view-modal" data-table="table" translate="TABLE_EDIT"></a></li>
+        <li><a data-open-modal="edit-table-view-modal" data-table="table" translate="TABLE_EDIT"><!-- Edit --></a></li>
     </ul>
 </div>
 <div id="length-div" style="position: absolute; visibility: hidden; height: auto; width: auto; white-space: nowrap;">
@@ -39,20 +39,17 @@
             </td>
         </tr>
         <tr ng-if="table.rows.length === 0 && table.loading === false">
-            <td colspan="{{table.columns.length}}" translate="TABLE_NO_RESULT"></td>
+            <td colspan="{{table.columns.length}}" translate="TABLE_NO_RESULT"><!-- No results found --></td>
         </tr>
     </tbody>
 </table>
 
 
 <div id="tbl-view-controls-container">
-    <div class="drop-down-container small flipped" old-admin-ng-dropdown fn="table.updatePageSize">
+    <div class="drop-down-container small flipped" old-admin-ng-dropdown>
         <span>{{ table.pagination.limit }}</span>
         <ul class="dropdown-ul">
-            <li><a>10</a></li>
-            <li><a>20</a></li>
-            <li><a>50</a></li>
-            <li><a>100</a></li>
+            <li ng-repeat="x in [10, 20, 50, 100]" ng-click="table.updatePageSize(x)"><a>{{x}}</a></li>
         </ul>
     </div>
 

@@ -47,12 +47,12 @@ import java.util.List;
 
 /**
  * An implementation of SimpleServicePublisher creates and registers another service with the OSGi environment.
- * <p/>
+ * <p>
  * Using this class helps to decouple business logic from the OSGi environment. The business class can be kept clean
  * from any OSGi specific needs like dependency setters, activate/deactivate methods or the implementation of OSGi
  * related interfaces like {@link ManagedService} to receive configuration data. This makes the business logic far
  * easier to test and results in a mucher cleaner design.
- * <p/>
+ * <p>
  * Another approach to decouple the service logic from the OSGi environment is to create an abstract service class which
  * declares all it's dependencies as abstract getter methods. The OSGi connection is then implemented in an inheriting
  * class. This method, however, has the drawback of having to renounce a constructor implementation since no

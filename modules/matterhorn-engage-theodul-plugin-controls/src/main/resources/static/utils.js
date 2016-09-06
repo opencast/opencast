@@ -61,7 +61,7 @@ define(["jquery"], function($) {
     }
 
     Utils.prototype.getFormattedPlaybackRate = function(rate) {
-	return (rate * 100) + "%";
+    return (rate * 100) + "%";
     }
 
     /**
@@ -173,35 +173,42 @@ define(["jquery"], function($) {
     Utils.prototype.repairSegmentLength = function(segments, duration, min_segment_duration) {
         if (segments && duration) {
             var total = 0;
+            var result = new Array();
             for (var i = 0; i < segments.length; i++) {
+              if (segments[i].time < parseInt(duration)) {
                 if (segments[i].duration) {
                     total += parseInt(segments[i].duration);
                     if (parseInt(segments[i].duration) < min_segment_duration) {
-                        if (i > 1 && segments[i-1].duration) {
-                            segments[i-1].duration = parseInt(segments[i].duration) + parseInt(segments[i-1].duration);
-                            segments.splice(i,1);
+                        if (result.length === 0) {
+                          result.push(segments[i]);
                         } else {
-                            if (segments.length > 1 && segments [i+1] !== undefined && segments[i+1].duration) {
-                                segments[i+1].duration = parseInt(segments[i].duration) + parseInt(segments[i+1].duration);
-                                segments.splice(i,1);
-                            }
+                          result[result.length - 1].duration = parseInt(result[result.length - 1].duration) + 
+                                  parseInt(segments[i].duration);
                         }
+                    } else {
+                      result.push(segments[i]);
                     }
                 }
+              }
             }
             
             if (total > parseInt(duration)) {
                 var diff = total - parseInt(duration);
-                for (var i = segments.length - 1; i >= 0; i-- ) {
-                    if (parseInt(segments[i].duration) > diff) {
-                        segments[i].duration = parseInt(segments[i].duration) - diff;
+                for (var i = result.length - 1; i >= 0; i-- ) {
+                    if (parseInt(result[i].duration) > diff) {
+                        result[i].duration = parseInt(result[i].duration) - diff;
                         break;
                     }
                 }
             }
-            
+            if (total < parseInt(duration)) {
+                var diff = parseInt(duration) - total;
+                if (result[result.length - 1]) {
+                    result[result.length - 1].duration = parseInt(result[result.length - 1].duration) + diff;
+                }
+            }
         }
-        return segments;
+        return result;
     }
 
     /**
@@ -232,6 +239,37 @@ define(["jquery"], function($) {
         }
         return 0; // jump only to the start
     }
+
+    /**
+     * Timer object, that can be renewed (to reset the delay).
+     * @type {Object}
+     */
+    Utils.prototype.timer = {
+        setup: function(callback, delay) {
+            this.callback = function() {
+                callback.call();
+                this.timeoutID = undefined;
+            }
+            this.delay = delay;
+
+            if (typeof this.timeoutID === "number") {
+                  this.cancel();
+            } else {
+                this.timeoutID = window.setTimeout(this.callback.bind(this), this.delay);
+            }
+            return this;
+        },
+
+        renew: function() {
+            window.clearTimeout(this.timeoutID);
+            this.timeoutID = window.setTimeout(this.callback.bind(this), this.delay);
+        },
+
+        cancel: function() {
+            window.clearTimeout(this.timeoutID);
+            this.timeoutID = undefined;
+        }
+    };
 
     return Utils;
 });

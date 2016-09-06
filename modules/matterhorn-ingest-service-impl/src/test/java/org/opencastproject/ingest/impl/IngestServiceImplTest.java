@@ -57,6 +57,7 @@ import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlUtil;
 import org.opencastproject.util.data.Either;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
@@ -64,7 +65,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
-import org.opencastproject.workingfilerepository.impl.WorkingFileRepositoryImpl;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -119,6 +119,7 @@ public class IngestServiceImplTest {
   private static File packageFile;
 
   private static long workflowInstanceID = 1L;
+  private ServiceRegistryInMemoryImpl serviceRegistry;
 
   @BeforeClass
   public static void beforeClass() throws URISyntaxException {
@@ -303,8 +304,8 @@ public class IngestServiceImplTest {
     service.setSecurityService(securityService);
     service.setSchedulerService(schedulerService);
     service.setMediaInspectionService(mediaInspectionService);
-    ServiceRegistryInMemoryImpl serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService,
-            userDirectoryService, organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
+    serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
+            organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
     serviceRegistry.registerService(service);
     service.setServiceRegistry(serviceRegistry);
     service.defaultWorkflowDefinionId = "sample";
@@ -411,22 +412,7 @@ public class IngestServiceImplTest {
 
   @Test
   public void testSmilCreation() throws Exception {
-    service.setWorkingFileRepository(new WorkingFileRepositoryImpl() {
-      @Override
-      public URI put(String mediaPackageID, String mediaPackageElementID, String filename, InputStream in)
-              throws IOException {
-        File file = new File(FileUtils.getTempDirectory(), mediaPackageElementID);
-        file.deleteOnExit();
-        FileUtils.write(file, IOUtils.toString(in), "UTF-8");
-        return file.toURI();
-      }
-
-      @Override
-      public InputStream get(String mediaPackageID, String mediaPackageElementID) throws NotFoundException, IOException {
-        File file = new File(FileUtils.getTempDirectory(), mediaPackageElementID);
-        return new FileInputStream(file);
-      }
-    });
+    service.setWorkingFileRepository(new WorkingFileRepositoryMockImpl());
 
     URI presenterUri = URI.create("http://localhost:8080/presenter.mp4");
     URI presenterUri2 = URI.create("http://localhost:8080/presenter2.mp4");
@@ -490,6 +476,23 @@ public class IngestServiceImplTest {
     testSeriesUpdateNewAndExisting(properties);
   }
 
+  @Test
+  public void testFailedJobs() throws Exception {
+    Assert.assertEquals(0, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FINISHED).size());
+    Assert.assertEquals(0, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FAILED).size());
+    service.addTrack(urlTrack, MediaPackageElements.PRESENTATION_SOURCE, service.createMediaPackage());
+    Assert.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FINISHED).size());
+    Assert.assertEquals(0, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FAILED).size());
+    try {
+      service.addTrack(URI.create("file//baduri"), MediaPackageElements.PRESENTATION_SOURCE,
+              service.createMediaPackage());
+    } catch (Exception e) {
+      // Ignore exception
+    }
+    Assert.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FINISHED).size());
+    Assert.assertEquals(1, serviceRegistry.getJobs(IngestServiceImpl.JOB_TYPE, Job.Status.FAILED).size());
+  }
+
   /**
    * Test method for {@link org.opencastproject.ingest.impl.IngestServiceImpl#updateSeries(java.net.URI)}
    */
@@ -549,5 +552,125 @@ public class IngestServiceImplTest {
 
   }
 
+  /**
+   * Mockup Impl stub of the WorkingFileRepository API for Ingest unit tests
+   *
+   */
+  class WorkingFileRepositoryMockImpl implements WorkingFileRepository {
+
+    @Override
+    public URI put(String mediaPackageID, String mediaPackageElementID, String filename, InputStream in)
+            throws IOException {
+      File file = new File(FileUtils.getTempDirectory(), mediaPackageElementID);
+      file.deleteOnExit();
+      FileUtils.write(file, IOUtils.toString(in), "UTF-8");
+      return file.toURI();
+    }
+
+    @Override
+    public InputStream get(String mediaPackageID, String mediaPackageElementID) throws NotFoundException, IOException {
+      File file = new File(FileUtils.getTempDirectory(), mediaPackageElementID);
+      return new FileInputStream(file);
+    }
+
+    @Override
+    public Option<Long> getTotalSpace() {
+      // TODO change mock stub as needed for future unit tests
+      return null;
+    }
+
+    @Override
+    public Option<Long> getUsableSpace() {
+      // TODO change mock stub as needed for future unit tests
+      return null;
+    }
+
+    @Override
+    public Option<Long> getUsedSpace() {
+      // TODO change mock stub as needed for future unit tests
+      return null;
+    }
+
+    @Override
+    public URI copyTo(String arg0, String arg1, String arg2, String arg3, String arg4)
+            throws NotFoundException, IOException {
+      // TODO change mock stub as needed for future unit tests
+      return null;
+    }
+
+    @Override
+    public boolean delete(String arg0, String arg1) throws IOException {
+      // TODO change mock stub as needed for future unit tests
+      return false;
+    }
+
+    @Override
+    public boolean deleteFromCollection(String arg0, String arg1) throws IOException {
+      // TODO change mock stub as needed for future unit tests
+      return false;
+    }
+
+    @Override
+    public URI getBaseUri() {
+      // TODO change mock stub as needed for future unit tests
+      return null;
+    }
+
+    @Override
+    public URI[] getCollectionContents(String arg0) throws NotFoundException {
+      // TODO change mock stub as needed for future unit tests
+      return null;
+    }
+
+    @Override
+    public long getCollectionSize(String arg0) throws NotFoundException {
+      // TODO change mock stub as needed for future unit tests
+      return 0;
+    }
+
+    @Override
+    public URI getCollectionURI(String arg0, String arg1) throws IllegalArgumentException {
+      // TODO change mock stub as needed for future unit tests
+      return null;
+    }
+
+    @Override
+    public String getDiskSpace() {
+      // TODO change mock stub as needed for future unit tests
+      return null;
+    }
+
+    @Override
+    public InputStream getFromCollection(String arg0, String arg1) throws NotFoundException, IOException {
+      // TODO change mock stub as needed for future unit tests
+      return null;
+    }
+
+    @Override
+    public URI getURI(String arg0, String arg1) throws IllegalArgumentException {
+      // TODO change mock stub as needed for future unit tests
+      return null;
+    }
+
+    @Override
+    public URI getURI(String arg0, String arg1, String arg2) throws IllegalArgumentException {
+      // TODO change mock stub as needed for future unit tests
+      return null;
+    }
+
+    @Override
+    public URI moveTo(String arg0, String arg1, String arg2, String arg3, String arg4)
+            throws NotFoundException, IOException {
+      // TODO change mock stub as needed for future unit tests
+      return null;
+    }
+
+    @Override
+    public URI putInCollection(String arg0, String arg1, InputStream arg2) throws IOException {
+      // TODO change mock stub as needed for future unit tests
+      return null;
+    }
+
+  }
 }
 

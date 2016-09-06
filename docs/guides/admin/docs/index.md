@@ -20,7 +20,9 @@ Release Documentation
 
 The Opencast Release Documentation is the official Opencast documentation for each release. It contains:
 
- - [Release Notes](release.notes.md)
+ - [Release Notes](releasenotes.md)
+ - [Upgrade](upgrade.md)
+ - [Changelog](changelog.md)
  - [Installation Guides](installation/index.md)
  - [Configuration Guides](configuration/index.md)
     - [Basic Configuration](configuration/basic.md)
@@ -29,6 +31,7 @@ The Opencast Release Documentation is the official Opencast documentation for ea
     - [Encoding Configuration](configuration/encoding.md)
     - [more...](configuration/index.md)
  - [Module Documentation](modules/index.md)
+    - [Atom and RSS Feed](modules/atomrss.md)
     - [Media Module](modules/mediamodule.configuration.md)
     - [Stream Security](modules/stream-security.md)
     - [Text Extraction](modules/textextraction.md)
@@ -40,5 +43,5 @@ The Opencast Release Documentation is the official Opencast documentation for ea
 Further Documentation
 ---------------------
 
-Apart from these official documentation, further guides and tips can be found in the [Opencast Adopter
-Wiki](https://opencast.jira.com/wiki), as well as on the mailing lists, the IRC channel and the regular meetings.
+In addition to this official documentation, further guides and tips can be found in the on the mailing lists, the IRC
+channel and at the regular meetings.

@@ -86,6 +86,9 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(AbstractElasticsearchIndex.class);
 
+  /** The Elasticsearch maximum results window size */
+  private static final int ELASTICSEARCH_INDEX_MAX_RESULT_WINDOW = Integer.MAX_VALUE;
+
   /** The Elasticsearch config directory key */
   public static final String ELASTICSEARCH_CONFIG_DIR_KEY = "org.opencastproject.elasticsearch.config.dir";
 
@@ -129,7 +132,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    *
    * @param ctx
    *          the component context
-   * @throws IOException
+   * @throws ComponentException
    *           if the search index cannot be initialized
    */
   public void activate(ComponentContext ctx) throws ComponentException {
@@ -151,8 +154,6 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
 
   /**
    * {@inheritDoc}
-   *
-   * @see ch.entwine.matterhorn.contentrepository.VersionedContentRepositoryIndex#getIndexVersion()
    */
   @Override
   public int getIndexVersion() {
@@ -161,8 +162,6 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.matterhorn.search.impl.SearchIndex#clear()
    */
   @Override
   public void clear() throws IOException {
@@ -527,8 +526,19 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     if (query.getOffset() >= 0)
       requestBuilder.setFrom(query.getOffset());
 
-    if (query.getLimit() >= 0)
-      requestBuilder.setSize(query.getLimit());
+    int limit = ELASTICSEARCH_INDEX_MAX_RESULT_WINDOW;
+    if (query.getLimit() > 0) {
+      // limit + offset may not exceed some limit
+      // this limit seems to be Integer.MAX_VALUE in elasticsearch v1.3 (as we currently use)
+      // elasticsearch version 2.1 onwards documented this behaviour by index.max_result_window
+      // see https://www.elastic.co/guide/en/elasticsearch/reference/2.1/index-modules.html
+      if (query.getOffset() > 0
+              && (long)query.getOffset() + (long)query.getLimit() > ELASTICSEARCH_INDEX_MAX_RESULT_WINDOW)
+        limit = ELASTICSEARCH_INDEX_MAX_RESULT_WINDOW - query.getOffset();
+      else
+        limit = query.getLimit();
+    }
+    requestBuilder.setSize(limit);
 
     // Sort orders
     Map<String, Order> sortCriteria = query.getSortOrders();

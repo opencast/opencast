@@ -42,8 +42,6 @@ public interface TextAnalyzerService {
    *
    * @param image
    *          element to analyze
-   * @param block
-   *          whether to block the calling thread until the analysis is complete
    * @return the metadata
    * @throws TextAnalyzerException
    *           if the text in this image can not be analyzed

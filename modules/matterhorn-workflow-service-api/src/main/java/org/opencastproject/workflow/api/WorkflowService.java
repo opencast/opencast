@@ -102,7 +102,7 @@ public interface WorkflowService {
    * @throws NotFoundException
    *           if there is no workflow instance with this identifier
    * @throws UnauthorizedException
-   *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
+   *           if the current user does not have read permissions on the workflow instance's mediapackage.
    */
   WorkflowInstance getWorkflowById(long workflowId) throws WorkflowDatabaseException, NotFoundException,
           UnauthorizedException;
@@ -231,7 +231,7 @@ public interface WorkflowService {
    * @throws WorkflowException
    *           if there is a problem processing the workflow
    * @throws UnauthorizedException
-   *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
+   *           if the current user does not have read permissions on the workflow instance's mediapackage.
    */
   WorkflowInstance stop(long workflowInstanceId) throws WorkflowException, NotFoundException, UnauthorizedException;
 
@@ -246,7 +246,7 @@ public interface WorkflowService {
    * @throws NotFoundException
    *           if no workflow instance with the given identifier could be found
    * @throws UnauthorizedException
-   *           if the current user does not have {@link #WRITE_PERMISSION} on the workflow instance
+   *           if the current user does not have write permissions on the workflow instance
    * @throws WorkflowStateException
    *           if the workflow instance is in a disallowed state
    */
@@ -264,7 +264,7 @@ public interface WorkflowService {
    * @throws WorkflowException
    *           if there is a problem processing the workflow
    * @throws UnauthorizedException
-   *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
+   *           if the current user does not have read permissions on the workflow instance's mediapackage.
    */
   WorkflowInstance suspend(long workflowInstanceId) throws WorkflowException, NotFoundException, UnauthorizedException;
 
@@ -281,7 +281,7 @@ public interface WorkflowService {
    * @throws IllegalStateException
    *           if the workflow with this identifier is not in the paused state
    * @throws UnauthorizedException
-   *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
+   *           if the current user does not have read permissions on the workflow instance's mediapackage.
    */
   WorkflowInstance resume(long workflowInstanceId) throws NotFoundException, WorkflowException, IllegalStateException,
           UnauthorizedException;
@@ -301,7 +301,7 @@ public interface WorkflowService {
    * @throws IllegalStateException
    *           if the workflow with this identifier is not in the paused state
    * @throws UnauthorizedException
-   *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
+   *           if the current user does not have read permissions on the workflow instance's mediapackage.
    */
   WorkflowInstance resume(long workflowInstanceId, Map<String, String> properties) throws NotFoundException,
           WorkflowException, IllegalStateException, UnauthorizedException;
@@ -314,7 +314,7 @@ public interface WorkflowService {
    * @throws WorkflowException
    *           if there is a problem processing the workflow
    * @throws UnauthorizedException
-   *           if the current user does not have {@link #READ_PERMISSION} on the workflow instance's mediapackage.
+   *           if the current user does not have read permissions on the workflow instance's mediapackage.
    */
   void update(WorkflowInstance workflowInstance) throws WorkflowException, UnauthorizedException;
 

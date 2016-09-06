@@ -74,7 +74,7 @@ angular.module('adminNg.controllers')
             (e || window.event).returnValue = confirmationMessage;     //Gecko + IE
             return confirmationMessage;                                //Webkit, Safari, Chrome etc.
         };
-        
+
         angular.forEach($scope.states, function (state) {
 
             if (state.stateController.isMetadataState) {
@@ -102,6 +102,14 @@ angular.module('adminNg.controllers')
                             });
                         }
                     }
+
+                    angular.forEach(policy.actions.value, function(customAction){
+                      ace.push({
+                        'action' : customAction,
+                        'allow'  : true,
+                        'role'   : policy.role
+                      });
+                    });
                 });
 
                 userdata.access = {
@@ -131,4 +139,9 @@ angular.module('adminNg.controllers')
         // add message that never disappears
         messageId = Notifications.add('success', 'EVENTS_UPLOAD_STARTED', 'global', -1);
     };
+
+    $scope.close = function () {
+        resetStates();
+        Modal.$scope.close();
+    }
 }]);

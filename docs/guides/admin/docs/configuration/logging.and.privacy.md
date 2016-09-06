@@ -4,8 +4,8 @@ Logging and Privacy
 The Opencast User-Tracking service stores user actions of the Opencast players in the database. This data is used for
 the footprint feature of the player and for the optional analytics component.
 
-> *Note that enabling all of the logging option may result in legal problems depending on your contries privacy laws
-> andthe type of service you are running.*
+> *Note that enabling all of the logging options may result in legal problems depending on your country's privacy laws
+> and the type of service you are running.*
 
 The settings for logging user data can be found in:
 
@@ -18,8 +18,8 @@ if it is activated, the data being logged can be defined.
 user actions are being sent to and stored by Opencast. Deactivating this will effectively stop all logging. This may
 effect features like the footprints in the Opencast player.  Default: `true`.
 
-If logging is still activated in general, the following keys may be used to define the kind of data that is being
-logged. The keys have no effect if logging is turned off.
+If logging is still activated, the following keys may be used to define the kind of data that is being logged. The keys
+have no effect if logging is turned off.
 
 Key                                           | Data to be logged    | Default value
 ----------------------------------------------|----------------------|--------------
@@ -28,4 +28,4 @@ Key                                           | Data to be logged    | Default v
 `org.opencastproject.usertracking.log.session`| Browser session-IDs  | `true`
 
 If you want to use the footprint feature but do not want to store any user specific data you can turn the logging of IP
-addresses, user names and session-IDs off.
+addresses, usernames and session-IDs off.

@@ -452,9 +452,7 @@ public class EncodingProfileImpl implements EncodingProfile {
     /**
      * Constructs an extension property with a map entry.
      *
-     * @param key
-     *          the key
-     * @param value
+     * @param e
      *          the value
      */
     public Extension(Map.Entry<String, String> e) {

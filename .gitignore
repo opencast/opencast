@@ -18,6 +18,9 @@ node/
 # ignore NetBeans project data
 */nbproject/*
 
+# ingore OS artifacts
+.DS_Store
+
 # Ignore all temporary editor files
 *.swp
 *.iml
@@ -33,3 +36,7 @@ docs/guides/*/site
 # Ignore Makefiles
 # Sometimes they help, but they should never be tracked
 Makefile
+
+# Ignore OS artifacts
+.DS_Store
+

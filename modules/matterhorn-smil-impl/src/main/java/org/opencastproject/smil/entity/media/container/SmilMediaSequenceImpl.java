@@ -24,7 +24,7 @@ package org.opencastproject.smil.entity.media.container;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Represent SMIL seq element and implement {@link SmilMediaContainer}.
+ * Represent SMIL seq element and implement SmilMediaContainer.
  */
 @XmlRootElement(name = "seq")
 public class SmilMediaSequenceImpl extends SmilMediaContainerImpl {

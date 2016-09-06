@@ -50,8 +50,6 @@ public class CaptureWorkflowOperationHandler extends ResumableWorkflowOperationH
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#activate(org.osgi.service.component.ComponentContext)
    */
   @Override
   public void activate(ComponentContext componentContext) {
@@ -70,8 +68,6 @@ public class CaptureWorkflowOperationHandler extends ResumableWorkflowOperationH
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.handler.ResumableWorkflowOperationHandlerBase#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
