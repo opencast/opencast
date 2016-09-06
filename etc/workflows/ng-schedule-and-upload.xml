@@ -49,6 +49,10 @@
                   <label for="publishToEngage">Opencast Media Module</label>
                 </li>
                 <li>
+                  <input id="publishToApi" name="publishToApi" type="checkbox" checked="checked" class="configField" value="true" />
+                  <label for="publishToApi">External Applications</label>
+                </li>
+                <li>
                   <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
                   <label for="publishToYouTube">YouTube</label>
                 </li>
@@ -83,6 +87,7 @@
         <configuration key="flagForCutting">false</configuration>
         <configuration key="flagForReview">false</configuration>
         <configuration key="publishToEngage">true</configuration>
+        <configuration key="publishToApi">true</configuration>
         <configuration key="publishToYouTube">false</configuration>
       </configurations>
     </operation>

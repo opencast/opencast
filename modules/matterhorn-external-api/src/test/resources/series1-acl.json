@@ -1,0 +1,1 @@
+{"acl":{"ace":[{"allow":true,"action":"read","role":"ROLE_ADMIN"},{"allow":true,"action":"write","role":"ROLE_ADMIN"},{"allow":true,"action":"read","role":"ROLE_ANONYMOUS"}]}}

@@ -1,0 +1,17 @@
+{
+  "archive_version": 2,
+  "created": "2015-03-12T10:38:54Z",
+  "creator": "Opencast Administrator",
+  "contributors": ["Physics Department"],
+  "description": "Cooling without moving parts and using only heat as an input",
+  "duration": 7200000,
+  "has_previews": true,
+  "identifier": "e6aeb8df-a852-46cd-8128-b89de696f20e",
+  "location": "physics-e-01",
+  "presenters": ["Prof. A. Einstein"],
+  "publication_status": [ "youtube", "internal" ],
+  "processing_state": "SUCCEEDED",
+  "start_time": "2015-03-20T04:00:00Z",
+  "subjects": ["Space Final Frontier", "Chemistry"],
+  "title": "Einstein refrigerator"
+}

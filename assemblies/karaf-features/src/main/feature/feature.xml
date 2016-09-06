@@ -184,6 +184,7 @@
     <bundle>mvn:org.opencastproject/matterhorn-engage-theodul-plugin-video-videojs/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-engage-ui/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-external-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-holdstate-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>
@@ -269,6 +270,7 @@
     <bundle>mvn:org.opencastproject/matterhorn-distribution-service-streaming-remote/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-distribution-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-external-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-holdstate-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>
@@ -408,6 +410,7 @@
     <bundle>mvn:org.opencastproject/matterhorn-distribution-service-streaming-remote/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-distribution-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-external-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-holdstate-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>

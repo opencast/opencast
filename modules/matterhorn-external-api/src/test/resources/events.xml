@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<events xmlns:ns2="http://index.matterhorn.opencastproject.org">
+    <ns2:event>
+        <ns2:title>Event 1</ns2:title>
+        <ns2:has_comments>false</ns2:has_comments>
+        <ns2:has_open_comments>false</ns2:has_open_comments>
+    </ns2:event>
+    <ns2:event>
+        <ns2:title>Event 2</ns2:title>
+        <ns2:has_comments>false</ns2:has_comments>
+        <ns2:has_open_comments>false</ns2:has_open_comments>
+    </ns2:event>
+</events>

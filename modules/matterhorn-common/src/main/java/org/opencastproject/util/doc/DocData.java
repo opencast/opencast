@@ -116,7 +116,7 @@ public class DocData {
     if (isBlank(name)) {
       valid = false;
     } else {
-      if (!name.matches("^\\w+$")) {
+      if (!name.matches("^(\\w|-)+$")) {
         valid = false;
       }
     }

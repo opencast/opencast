@@ -1,0 +1,42 @@
+[
+  {
+    "group": {
+      "identifier": "Group_1",
+      "organization": "Group1-Org",
+         "roles":{
+            "role":[
+               "Role 1-1",
+               "Role 1-2"
+            ]
+         },
+         "members":{
+            "member":[
+               "Member 1-1",
+               "Member 1-2"
+            ]
+         },
+      "name": "Group 1",
+      "description": "Group 1 Description"
+    }
+  },
+  {
+    "group": {
+      "identifier": "Group_2",
+      "organization": "Group2-Org",
+         "roles":{
+            "role":[
+               "Role 2-1",
+               "Role 2-2"
+            ]
+         },
+         "members":{
+            "member":[
+               "Member 2-1",
+               "Member 2-2"
+            ]
+         },
+      "name": "Group 2",
+      "description": "Group 2 Description"
+    }
+  }
+]
