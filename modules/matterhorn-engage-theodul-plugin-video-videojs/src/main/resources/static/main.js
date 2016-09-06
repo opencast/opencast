@@ -2359,8 +2359,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       src: "http://localhost:8080/files/mediapackage/987d52af-8c04-44ff-92b1-0e3b76da6e5b/57551a0a-0ca4-4ecc-bfa8-5735adc024ce/demo.vtt"
     });
     caption.default = true;
+    console.log(videoDisplays);
+    Engage.on(plugin.events.focusVideo.getName(), function (data) {
+      console.log("Focus");
+      console.log(data);
+    });
   }
-  
+
   function initPlugin() {
     Engage.log('Video: Init Plugin');
 
