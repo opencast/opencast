@@ -182,6 +182,17 @@
 /* border-bottom: 1px solid #cccccc; */
 }
 
+.segmentTooltip {
+    position: absolute;
+    background-color: #1C94C4;
+    visibility: hidden;
+}
+
+.segmentTooltipHover {
+    bottom: 82px;
+    visibility: visible;
+}
+
 .dropdown-submenu {
     position: relative;
 }

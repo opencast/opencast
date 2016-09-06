@@ -1388,6 +1388,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
       Engage.on(plugin.events.segmentMouseover.getName(), function (no) {
         if (!mediapackageError) {
           $('#' + id_segmentNo + no).addClass('segmentHover');
+          $("#segment_preview").addClass("segmentTooltipHover");
+          $("#segment_preview_img").attr('src', segments[no].image_url);
         }
       });
       Engage.on(plugin.events.segmentMouseout.getName(), function (no) {
