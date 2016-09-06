@@ -62,7 +62,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * {@link DublinCoreCatalog} wrapper to deal with DublinCore metadata according to the Opencast schema.
- * <p/>
+ * <p>
  * <h3>General behaviour</h3>
  * <ul>
  * <li>Set methods that take a string parameter only execute if the string is not blank.

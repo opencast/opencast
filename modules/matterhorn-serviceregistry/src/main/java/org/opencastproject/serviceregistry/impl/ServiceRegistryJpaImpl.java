@@ -113,6 +113,7 @@ import javax.management.ObjectInstance;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
@@ -1399,6 +1400,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       tx = em.getTransaction();
       tx.begin();
       TypedQuery<JpaJob> query = em.createNamedQuery("Job.processinghost.status", JpaJob.class);
+      query.setLockMode(LockModeType.PESSIMISTIC_WRITE);
       List<Integer> statuses = new ArrayList<Integer>();
       statuses.add(Status.RUNNING.ordinal());
       statuses.add(Status.DISPATCHING.ordinal());
@@ -1720,7 +1722,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * Gets jobs of all types that are in the {@value Status#QUEUED} and {@value Status#RESTART} state.
+   * Gets jobs of all types that are in the QUEUED and RESTART state.
    *
    * @param em
    *          the entity manager

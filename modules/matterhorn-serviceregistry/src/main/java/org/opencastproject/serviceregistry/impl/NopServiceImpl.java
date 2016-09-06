@@ -31,7 +31,7 @@ import org.opencastproject.util.Log;
 
 /**
  * No operation service.
- * <p/>
+ * <p>
  * This dummy service just exists for creating jobs for testing purposes.
  */
 public final class NopServiceImpl extends OsgiAbstractJobProducer implements NopService {

@@ -63,7 +63,7 @@ public class SystemLoad {
   /**
    * Sets the list of nodes and their current loadfactor.
    *
-   * @param nodeLoads
+   * @param newLoads
    *          the nodeLoads to set
    */
   public void setNodeLoads(Collection<NodeLoad> newLoads) {

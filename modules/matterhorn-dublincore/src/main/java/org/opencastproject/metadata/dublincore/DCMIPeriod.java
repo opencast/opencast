@@ -26,7 +26,7 @@ import java.util.Date;
 
 /**
  * A time interval, representing a DCMI period. They may be open.
- * <p/>
+ * <p>
  * For further information on DCMI periods please refer to <a
  * href="http://dublincore.org/documents/dcmi-period/">http://dublincore.org/documents/dcmi-period/</a>.
  */

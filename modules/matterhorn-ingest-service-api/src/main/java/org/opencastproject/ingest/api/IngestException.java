@@ -54,7 +54,7 @@ public class IngestException extends Exception {
    *
    * @param message
    *          the failure message
-   * @param cause
+   * @param t
    *          the original cause
    */
   public IngestException(String message, Throwable t) {

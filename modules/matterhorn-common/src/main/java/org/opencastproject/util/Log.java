@@ -40,7 +40,7 @@ import java.util.UUID;
 
 /**
  * A logger that maintains a "unit of work" context to facilitate the grouping of log statements.
- * <p/>
+ * <p>
  * Log methods that take message formats and arguments use the
  * {@link String#format(java.util.Locale, String, Object...)} string format syntax.
  */

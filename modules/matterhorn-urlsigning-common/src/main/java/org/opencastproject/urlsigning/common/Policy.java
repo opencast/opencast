@@ -86,8 +86,6 @@ public final class Policy {
    *          The url to the resource that will be signed.
    * @param validUntil
    *          The date and time the resource will be available until
-   * @param resourceStrategy
-   *          The strategy for getting the resource from the policy.
    * @return A new {@link Policy} with the parameters set.
    */
   public static Policy mkSimplePolicy(String baseUrl, DateTime validUntil) {
@@ -103,8 +101,6 @@ public final class Policy {
    *          The date and time the resource is available until.
    * @param validFrom
    *          The date and time the resource will become available.
-   * @param resourceStrategy
-   *          The strategy for getting the resource from the policy.
    * @return A new {@link Policy} for limiting access to the resource.
    */
   public static Policy mkPolicyValidFrom(String baseUrl, DateTime validUntil, DateTime validFrom) {
@@ -120,8 +116,6 @@ public final class Policy {
    *          The date the resource will be available until.
    * @param ipAddress
    *          The ip of the client that will be allowed to view the resource.
-   * @param resourceStrategy
-   *          The strategy for getting the resource from the policy.
    * @return A new {@link Policy} for limiting access to the resource.
    */
   public static Policy mkPolicyValidWithIP(String baseUrl, DateTime validUntil, String ipAddress) {
@@ -140,8 +134,6 @@ public final class Policy {
    *          The date and time the resource will become available.
    * @param ipAddress
    *          The ip of the client that will be allowed to view the resource.
-   * @param resourceStrategy
-   *          The strategy for getting the resource from the policy.
    * @return A new {@link Policy} for limiting access to the resource.
    */
   public static Policy mkPolicyValidFromWithIP(String baseUrl, DateTime validUntil, DateTime validFrom,

@@ -76,7 +76,7 @@ public class AgentsListQuery extends ResourceListQueryImpl {
   /**
    * Add a {@link ResourceListFilter} filter to the query with the given status
    *
-   * @param name
+   * @param status
    *          the status to filter for
    */
   public void withStatus(String status) {

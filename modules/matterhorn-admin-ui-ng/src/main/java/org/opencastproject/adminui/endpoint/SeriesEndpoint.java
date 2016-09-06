@@ -73,6 +73,7 @@ import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.util.AccessInformationUtil;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.matterhorn.search.SortCriterion;
@@ -496,6 +497,10 @@ public class SeriesEndpoint {
   @RestQuery(name = "getNewThemes", description = "Returns all the data related to the themes tab in the new series modal as JSON", returnDescription = "All the data related to the series themes tab as JSON", reponses = { @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the series themes tab as JSON") })
   public Response getNewThemes() {
     ThemeSearchQuery query = new ThemeSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
+    // need to set limit because elasticsearch limit results by 10 per default
+    query.withLimit(Integer.MAX_VALUE);
+    query.withOffset(0);
+    query.sortByName(SearchQuery.Order.Ascending);
     SearchResult<Theme> results = null;
     try {
       results = searchIndex.getByQuery(query);

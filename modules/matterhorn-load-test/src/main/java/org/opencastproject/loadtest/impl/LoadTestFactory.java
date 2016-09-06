@@ -122,7 +122,7 @@ public class LoadTestFactory implements ManagedService {
   /**
    * Callback from the OSGi container once this service is started. This is where we register our shell commands.
    *
-   * @param ctx
+   * @param componentContext
    *          the component context
    */
   public void activate(ComponentContext componentContext) {

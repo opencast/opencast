@@ -87,7 +87,7 @@ public final class JobUtil {
 
   /**
    * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
-   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}. The
+   * outcome of the monitored jobs using the default polling interval. The
    * <code>waiter</code> is the job which is waiting for the other jobs to finish.
    *
    * @param waiter
@@ -110,7 +110,7 @@ public final class JobUtil {
 
   /**
    * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
-   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}. The
+   * outcome of the monitored jobs using the default polling interval. The
    * <code>waiter</code> is the job which is waiting for the other jobs to finish.
    *
    * @param waiter
@@ -129,7 +129,7 @@ public final class JobUtil {
 
   /**
    * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
-   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}. The
+   * outcome of the monitored jobs using the default polling interval. The
    * <code>waiter</code> is the job which is waiting for the other jobs to finish.
    *
    * @param waiter
@@ -146,7 +146,7 @@ public final class JobUtil {
 
   /**
    * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
-   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}.
+   * outcome of the monitored jobs using the default polling interval.
    *
    * @param reg
    *          the service registry
@@ -162,7 +162,7 @@ public final class JobUtil {
 
   /**
    * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
-   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}.
+   * outcome of the monitored jobs using the default polling interval.
    *
    * @param reg
    *          the service registry
@@ -176,7 +176,7 @@ public final class JobUtil {
 
   /**
    * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
-   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}. The
+   * outcome of the monitored jobs using the default polling interval. The
    * <code>waiter</code> is the job which is waiting for the other jobs to finish.
    *
    * @param waiter
@@ -195,7 +195,7 @@ public final class JobUtil {
 
   /**
    * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
-   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}.
+   * outcome of the monitored jobs using the default polling interval.
    *
    * @param reg
    *          the service registry
@@ -211,7 +211,7 @@ public final class JobUtil {
 
   /**
    * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
-   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}. The
+   * outcome of the monitored jobs using the default polling interval. The
    * <code>waiter</code> is the job which is waiting for the other jobs to finish.
    *
    * @param waiter
@@ -228,7 +228,7 @@ public final class JobUtil {
 
   /**
    * Waits for the result of a created barrier for <code>jobs</code>, using <code>registry</code> to poll for the
-   * outcome of the monitored jobs using the default polling interval {@link #DEFAULT_POLLING_INTERVAL}.
+   * outcome of the monitored jobs using the default polling interval.
    *
    * @param reg
    *          the service registry
@@ -353,8 +353,6 @@ public final class JobUtil {
    * Interpret the payload of a completed {@link Job} as a {@link MediaPackageElement}. Wait for the job to complete if
    * necessary.
    *
-   * @throws MediaPackageException
-   *           in case the payload is not a mediapackage element
    */
   public static Function<Job, MediaPackageElement> payloadAsMediaPackageElement(final Job waiter,
           final ServiceRegistry reg) {
@@ -370,9 +368,6 @@ public final class JobUtil {
   /**
    * Interpret the payload of a completed {@link Job} as a {@link MediaPackageElement}. Wait for the job to complete if
    * necessary.
-   *
-   * @throws MediaPackageException
-   *           in case the payload is not a mediapackage element
    */
   public static Function<Job, MediaPackageElement> payloadAsMediaPackageElement(final ServiceRegistry reg) {
     return payloadAsMediaPackageElement(null, reg);

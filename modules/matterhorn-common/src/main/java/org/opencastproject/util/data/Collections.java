@@ -47,7 +47,7 @@ import java.util.TreeMap;
 /**
  * This class provides functions to ease and secure the handling of collections by supporting a type safe -- at least to
  * the extent Java's type system allows -- immutable and more functional style.
- * <p/>
+ *
  * Note that all functions do <i>not</i> mutate input collections unless otherwise stated.
  */
 public final class Collections {
@@ -94,7 +94,7 @@ public final class Collections {
   /**
    * Apply a function <code>f</code> to all elements of collection <code>as</code> to produce a new collection
    * <code>bs</code>.
-   * <p/>
+   *
    * An (empty) instance of the target collection has to be provided explicitly.
    *
    * @param as
@@ -115,8 +115,8 @@ public final class Collections {
 
   /**
    * Apply a binary function (operator) to a start value and all elements of the list in turn.
-   * <p/>
-   * Example: (+) 0 [1, 2, 3] -> (((0 + 1) + 2) + 3)
+   *
+   * Example: (+) 0 [1, 2, 3] -&gt; (((0 + 1) + 2) + 3)
    *
    * @deprecated use {@link Monadics}
    */
@@ -132,9 +132,9 @@ public final class Collections {
   /**
    * Apply a function <code>f</code> to all elements of collection <code>as</code> to produce a new collection
    * <code>bs</code>.
-   * <p/>
+   *
    * The type of collection <code>as</code> needs a parameterless constructor.
-   * <p/>
+   *
    * Please note that since java does not support higher-order polymorphism -- which is needed to capture the type of
    * the collection -- some casting on the client side may still be necessary.
    *
@@ -154,9 +154,9 @@ public final class Collections {
   /**
    * Apply a function <code>f</code> to all elements of collection <code>as</code> to produce a new collection
    * <code>bs</code> by concatenating the results.
-   * <p/>
+   *
    * The type of collection <code>as</code> needs a parameterless constructor.
-   * <p/>
+   *
    * Please note that since java does not support higher-order polymorphism -- which is needed to capture the type of
    * the collection -- some casting on the client side may still be necessary.
    *
@@ -217,7 +217,7 @@ public final class Collections {
 
   /**
    * Return a new collection containing only the elements that satisfy predicate <code>p</code>.
-   * <p/>
+   *
    * The type of collection <code>as</code> needs a parameterless constructor.
    *
    * @deprecated use {@link Monadics}
@@ -484,7 +484,7 @@ public final class Collections {
 
   /**
    * Partition a list after some predicate <code>group</code> into <code>map</code>.
-   * <p/>
+   *
    * Use e.g. <code>ArrayListMultimap.create()</code> to create a multimap.
    *
    * @see #groupBy(Iterable, Function)
@@ -558,7 +558,7 @@ public final class Collections {
   /**
    * Partition a list after some predicate <code>keyGen</code>. The partition function has to make sure that keys are
    * unique per list element because each key holds only one value. Later values overwrite newer ones.
-   * <p/>
+   *
    * The resulting map is an immutable {@link java.util.HashMap}.
    *
    * @see #asMap(java.util.Map, java.util.List, Function)
@@ -738,7 +738,6 @@ public final class Collections {
     };
   }
 
-  /** Functional version of {@link org.opencastproject.util.data.Arrays#head(A[])}. */
   public static <A> Function<List<A>, Option<A>> head() {
     return new Function<List<A>, Option<A>>() {
       @Override
@@ -789,7 +788,7 @@ public final class Collections {
     };
   }
 
-  /** Concat (aka flatten) a collection of collections by concatenating them all. [[a]] -> [a] */
+  /** Concat (aka flatten) a collection of collections by concatenating them all. [[a]] -&gt; [a] */
   public static <A, M extends Collection<? extends Collection<A>>> List<A> concat(M as) {
     final List<A> target = new ArrayList<>(as.size());
     for (Collection<A> a : as) {
@@ -798,7 +797,7 @@ public final class Collections {
     return target;
   }
 
-  /** Return a function to get data from a map. <code>map -> key -> value</code> */
+  /** Return a function to get data from a map. <code>map -&gt; key -&gt; value</code> */
   public static <A, B> Function<A, Option<B>> getMap(final Map<A, B> map) {
     return new Function<A, Option<B>>() {
       @Override

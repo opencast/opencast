@@ -68,49 +68,49 @@ public class SegmentImpl implements Segment, AudioSegment, VideoSegment, AudioVi
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.Segment#getIdentifier()
+   * @see org.opencastproject.metadata.mpeg7.Segment#getIdentifier()
    */
   public String getIdentifier() {
     return id;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.Segment#setMediaTime(org.opencastproject.mediapackage.mpeg7.MediaTime)
+   * @see org.opencastproject.metadata.mpeg7.Segment#setMediaTime(org.opencastproject.metadata.mpeg7.MediaTime)
    */
   public void setMediaTime(MediaTime mediaTime) {
     this.mediaTime = mediaTime;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.Segment#getMediaTime()
+   * @see org.opencastproject.metadata.mpeg7.Segment#getMediaTime()
    */
   public MediaTime getMediaTime() {
     return mediaTime;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.Segment#hasTextAnnotations()
+   * @see org.opencastproject.metadata.mpeg7.Segment#hasTextAnnotations()
    */
   public boolean hasTextAnnotations() {
     return annotations.size() > 0;
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.Segment#hasTextAnnotations(java.lang.String)
+   * @see org.opencastproject.metadata.mpeg7.Segment#hasTextAnnotations(java.lang.String)
    */
   public boolean hasTextAnnotations(String language) {
     return hasTextAnnotations(0.0f, 0.0f, language);
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.Segment#hasTextAnnotations(float, float)
+   * @see org.opencastproject.metadata.mpeg7.Segment#hasTextAnnotations(float, float)
    */
   public boolean hasTextAnnotations(float relevance, float confidence) {
     return hasTextAnnotations(relevance, confidence, null);
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.Segment#hasTextAnnotations(float, float, java.lang.String)
+   * @see org.opencastproject.metadata.mpeg7.Segment#hasTextAnnotations(float, float, java.lang.String)
    */
   public boolean hasTextAnnotations(float relevance, float confidence, String language) {
     for (TextAnnotation annotation : annotations) {
@@ -127,14 +127,14 @@ public class SegmentImpl implements Segment, AudioSegment, VideoSegment, AudioVi
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.Segment#getTextAnnotationCount()
+   * @see org.opencastproject.metadata.mpeg7.Segment#getTextAnnotationCount()
    */
   public int getTextAnnotationCount() {
     return annotations.size();
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.Segment#textAnnotationsByConfidence()
+   * @see org.opencastproject.metadata.mpeg7.Segment#textAnnotationsByConfidence()
    */
   public Iterator<TextAnnotation> textAnnotationsByConfidence() {
     SortedSet<TextAnnotation> set = new TreeSet<TextAnnotation>(new Comparator<TextAnnotation>() {
@@ -151,7 +151,7 @@ public class SegmentImpl implements Segment, AudioSegment, VideoSegment, AudioVi
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.Segment#textAnnotationsByRelevance()
+   * @see org.opencastproject.metadata.mpeg7.Segment#textAnnotationsByRelevance()
    */
   public Iterator<TextAnnotation> textAnnotationsByRelevance() {
     SortedSet<TextAnnotation> set = new TreeSet<TextAnnotation>(new Comparator<TextAnnotation>() {
@@ -168,7 +168,7 @@ public class SegmentImpl implements Segment, AudioSegment, VideoSegment, AudioVi
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.Segment#createTextAnnotation(float, float, String)
+   * @see org.opencastproject.metadata.mpeg7.Segment#createTextAnnotation(float, float, String)
    */
   public TextAnnotation createTextAnnotation(float relevance, float confidence, String language) {
     TextAnnotationImpl annotation = new TextAnnotationImpl(relevance, confidence, language);
@@ -177,7 +177,7 @@ public class SegmentImpl implements Segment, AudioSegment, VideoSegment, AudioVi
   }
 
   /**
-   * @see org.opencastproject.mediapackage.mpeg7.Segment#textAnnotations()
+   * @see org.opencastproject.metadata.mpeg7.Segment#textAnnotations()
    */
   public Iterator<TextAnnotation> textAnnotations() {
     return annotations.iterator();

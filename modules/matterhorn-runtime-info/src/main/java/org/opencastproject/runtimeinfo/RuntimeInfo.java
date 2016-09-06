@@ -68,7 +68,7 @@ import javax.ws.rs.core.MediaType;
  * deployed and the current login context.
  *
  * If the 'org.opencastproject.anonymous.feedback.url' is set in config.properties, this service will also update the
- * opencast project with the contents of the {@link #getRuntimeInfo()} json feed.
+ * opencast project with the contents of the getRuntimeInfo() json feed.
  */
 @Path("/")
 @RestService(name = "RuntimeInfo", title = "Runtime Information", notes = "", abstractText = "This service provides information about the runtime environment, including the servives that are deployed and the current user context.")
@@ -274,7 +274,7 @@ public class RuntimeInfo {
   }
 
   /**
-   * Returns the array of references sorted by their {@link Constants.SERVICE_DESCRIPTION} property.
+   * Returns the array of references sorted by their Constants.SERVICE_DESCRIPTION property.
    *
    * @param references
    *          the referencens

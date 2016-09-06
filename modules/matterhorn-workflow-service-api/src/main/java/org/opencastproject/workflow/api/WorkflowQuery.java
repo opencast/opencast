@@ -104,7 +104,7 @@ public class WorkflowQuery {
 
   /**
    * Limit results to workflow instances in a specific state. This method overrides and will be overridden by future
-   * calls to {@link #withoutState(String)}
+   * calls to {@link #withoutState(WorkflowState)}
    *
    * @param state
    *          the workflow state
@@ -118,7 +118,7 @@ public class WorkflowQuery {
 
   /**
    * Limit results to workflow instances not in a specific state. This method overrides and will be overridden by future
-   * calls to {@link #withState(String)}
+   * calls to {@link #withState(WorkflowState)}
    *
    * @param state
    *          the workflow state

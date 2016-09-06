@@ -32,7 +32,6 @@ public class IndexServiceException extends Exception {
    * Constructor without cause.
    *
    * @param message
-   * @param cause
    */
   public IndexServiceException(String message) {
     super(message);

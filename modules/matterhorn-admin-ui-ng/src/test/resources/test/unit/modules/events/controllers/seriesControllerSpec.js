@@ -28,8 +28,8 @@ describe('Series controller', function () {
             $httpBackend.expectGET('/admin-ng/resources/series/filters.json').respond('[]');
             $httpBackend.expectDELETE('/admin-ng/series/12').respond('12');
 
-            $scope.table.delete(12);
- 
+            $scope.table.delete({'id': 12});
+
             $httpBackend.flush();
         });
     });

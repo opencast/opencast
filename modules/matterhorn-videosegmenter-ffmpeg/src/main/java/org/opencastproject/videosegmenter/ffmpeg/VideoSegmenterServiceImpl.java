@@ -77,7 +77,7 @@ import java.util.regex.Pattern;
  * This plugin runs
  *
  * <pre>
- * ffmpeg -nostats -i in.mp4 -filter:v 'select=gt(scene\,0.04),showinfo' -f null - 2>&1 | grep Parsed_showinfo_1
+ * ffmpeg -nostats -i in.mp4 -filter:v 'select=gt(scene\,0.04),showinfo' -f null - 2&gt;&amp;1 | grep Parsed_showinfo_1
  * </pre>
  */
 public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
@@ -112,7 +112,7 @@ VideoSegmenterService, ManagedService {
   /** The load introduced on the system by creating a caption job */
   public static final float DEFAULT_SEGMENTER_JOB_LOAD = 1.0f;
 
-  /** The key to look for in the service configuration file to override the {@link DEFAULT_CAPTION_JOB_LOAD} */
+  /** The key to look for in the service configuration file to override the DEFAULT_CAPTION_JOB_LOAD */
   public static final String SEGMENTER_JOB_LOAD_KEY = "job.load.videosegmenter";
 
   /** The load introduced on the system by creating a caption job */

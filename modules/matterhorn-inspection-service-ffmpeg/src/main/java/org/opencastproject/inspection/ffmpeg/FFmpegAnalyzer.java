@@ -229,6 +229,13 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
           obj = stream.get("nb_read_frames");
           if (obj != null) {
             aMetadata.setFrames(Long.parseLong((String) obj));
+          } else {
+
+            /* alternate JSON element if accurate frame count is not requested from ffmpeg */
+            obj = stream.get("nb_frames");
+            if (obj != null) {
+              aMetadata.setFrames(Long.parseLong((String) obj));
+            }
           }
 
           /* Add video stream metadata to overall metadata */
@@ -298,6 +305,13 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
           obj = stream.get("nb_read_frames");
           if (obj != null) {
             vMetadata.setFrames(Long.parseLong((String) obj));
+          } else {
+
+            /* alternate JSON element if accurate frame count is not requested from ffmpeg */
+            obj = stream.get("nb_frames");
+            if (obj != null) {
+              vMetadata.setFrames(Long.parseLong((String) obj));
+            }
           }
 
           /* Add video stream metadata to overall metadata */

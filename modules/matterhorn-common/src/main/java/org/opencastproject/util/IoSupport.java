@@ -192,7 +192,7 @@ public final class IoSupport {
    *          The {@code URL} of the local file you wish to write to.
    * @param contents
    *          The contents of the file you wish to create.
-   * @throws URISyntaxException
+   * @throws IOException
    */
   public static void writeUTF8File(URL file, String contents) throws IOException {
     try {
@@ -465,10 +465,10 @@ public final class IoSupport {
 
   /**
    * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
-   * <p/>
+   * <p>
    * <strong>Please note:</strong> The outcome of <code>f</code> is wrapped into a some. Therefore <code>f</code> is
-   * <em>not</em> allowed to return <code>null</code>. Use an <code>Option</code> instead and
-   * {@link org.opencastproject.util.data.Option#flatten() flatten} the overall result.
+   * <em>not</em> allowed to return <code>null</code>. Use an <code>Option</code> instead and flatten the overall
+   * result.
    *
    * @return none, if the file does not exist
    */
@@ -634,10 +634,10 @@ public final class IoSupport {
 
   /**
    * Run function <code>f</code> having exclusive read/write access to the given file.
-   * <p/>
+   * <p>
    * Please note that the implementation uses Java NIO {@link java.nio.channels.FileLock} which only guarantees that two
    * Java processes cannot interfere with each other.
-   * <p/>
+   * <p>
    * The implementation blocks until a lock can be acquired.
    */
   public static synchronized <A> A locked(File file, Function<File, A> f) {

@@ -40,8 +40,6 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.mediapackage.MediaPackageMetadata#getTitle()
    */
   public String getTitle() {
     return title;
@@ -59,8 +57,6 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.mediapackage.MediaPackageMetadata#getSeriesTitle()
    */
   public String getSeriesTitle() {
     return seriesTitle;
@@ -78,8 +74,6 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.mediapackage.MediaPackageMetadata#getSeriesIdentifier()
    */
   public String getSeriesIdentifier() {
     return seriesIdentifier;
@@ -97,8 +91,6 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.mediapackage.MediaPackageMetadata#getCreators()
    */
   public String[] getCreators() {
     if (creators == null)
@@ -134,8 +126,6 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.mediapackage.MediaPackageMetadata#getSubjects()
    */
   public String[] getSubjects() {
     if (subjects == null)
@@ -155,8 +145,6 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.mediapackage.MediaPackageMetadata#getLanguage()
    */
   public String getLanguage() {
     return language;
@@ -174,8 +162,6 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.mediapackage.MediaPackageMetadata#getLicense()
    */
   public String getLicense() {
     return license;
@@ -193,8 +179,6 @@ public class MediapackageMetadataImpl implements MediaPackageMetadata {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.mediapackage.MediaPackageMetadata#getDate()
    */
   public Date getDate() {
     return date;

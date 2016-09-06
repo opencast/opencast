@@ -77,7 +77,6 @@ public interface SearchQuery {
    * @param offset
    *          the starting offset
    * @return the search query
-   * @see
    */
   SearchQuery withOffset(int offset);
 

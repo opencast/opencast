@@ -169,7 +169,7 @@ public final class PolicyUtils {
   /**
    * Create a {@link Policy} in Json format and Base 64 encoded.
    *
-   * @param encodedPolicy
+   * @param policy
    *          The String representation of the {@link Policy} in Json format and encoded into Base 64
    * @return The {@link Policy} data
    */

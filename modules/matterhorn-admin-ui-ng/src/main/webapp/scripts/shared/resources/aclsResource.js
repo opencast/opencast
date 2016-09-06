@@ -13,6 +13,7 @@ angular.module('adminNg.resources')
                   row.created = 'TBD';
                   row.creator = 'TBD';
                   row.in_use  = 'TBD';
+                  row.type    = "ACL";
 
                   return row;
               });

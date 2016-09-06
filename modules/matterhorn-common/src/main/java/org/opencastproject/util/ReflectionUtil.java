@@ -60,7 +60,7 @@ public final class ReflectionUtil {
 
     /**
      * Call all parameterless methods of <code>c</code> on object <code>o</code>.
-     * <p/>
+     * <p>
      * Does not call any bridge, synthetic or native methods and also no methods declared in Object.
      */
     public static <A, B extends A> void run(Class<A> c, B o) {
@@ -69,7 +69,7 @@ public final class ReflectionUtil {
 
     /**
      * Call all parameterless methods of object <code>a</code>.
-     * <p/>
+     * <p>
      * Does not call any bridge, synthetic or native methods and also no methods declared in Object.
      */
     public static <A> void run(A a) {
@@ -93,11 +93,11 @@ public final class ReflectionUtil {
 
     /**
      * Helper method for the transfer idiom.
-     * <p/>
+     * <p>
      * Take <code>target</code> and apply it to <code>f</code>. Take the result and call all
      * parameterless methods on it that are described by class <code>source</code>. This way <code>f</code>
      * is able to create a transfer object that sets all properties of <code>target</code>.
-     * <p/>
+     * <p>
      * The advantage of this style is that each time the <code>source</code> class changes the compiler
      * will yield an error if a field is missed in the transfer. The common getter/setter or constructor idiom
      * does not detect errors of this kind at compile time.

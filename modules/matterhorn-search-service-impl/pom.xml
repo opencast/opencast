@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>2.2-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -77,15 +77,25 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
-    <dependency>
-      <groupId>rome</groupId>
+   <dependency>
+      <groupId>com.rometools</groupId>
       <artifactId>rome</artifactId>
-      <version>1.0</version>
+      <version>1.7.0</version>
+    </dependency>
+   <dependency>
+      <groupId>com.rometools</groupId>
+      <artifactId>rome-modules</artifactId>
+      <version>1.7.0</version>
+    </dependency>
+   <dependency>
+      <groupId>com.rometools</groupId>
+      <artifactId>rome-utils</artifactId>
+      <version>1.7.0</version>
     </dependency>
     <dependency>
-      <groupId>com.sun.syndication.feed.module</groupId>
-      <artifactId>itunes</artifactId>
-      <version>0.4</version>
+      <groupId>org.jdom</groupId>
+      <artifactId>com.springsource.org.jdom</artifactId>
+      <version>2.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -172,17 +182,10 @@
               org.opencastproject.search.impl.*;version=${project.version},
               org.opencastproject.search.endpoint;version=${project.version}
             </Export-Package>
-            <Private-Package>
-              com.sun.syndication.feed,
-              com.sun.syndication.feed.impl,
-              com.sun.syndication.feed.synd,
-              com.sun.syndication.feed.synd.impl,
-              com.sun.syndication.feed.module,
-              com.sun.syndication.feed.module.impl,
-              com.sun.syndication.feed.module.itunes
-            </Private-Package>
             <Embed-Dependency>
               rome;inline=true,
+              rome-modules;inline=true,
+              rome-utils;inline=true,
               itunes;inline=true
             </Embed-Dependency>
             <Service-Component>

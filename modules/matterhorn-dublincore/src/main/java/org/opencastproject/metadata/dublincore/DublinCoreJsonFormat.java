@@ -47,7 +47,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Parse a DublinCore catalog from JSON.
- * <p/>
+ * <p>
  * <strong>Known limitations:</strong> Encoding schemas can currently only be from the
  * {@link DublinCore#TERMS_NS_URI} namespace using the {@link DublinCore#TERMS_NS_PREFIX}
  * since the JSON format does not serialize namespace bindings. Example: <code>dcterms:W3CDTF</code>

@@ -56,7 +56,7 @@ import javax.activation.MimetypesFileTypeMap;
 
 /**
  * Wrapper around any kind of command line controllable encoder.
- * <p/>
+ * <p>
  * <strong>Note:</strong> Registered {@link EncoderListener}s <em>won't</em> receive a file in method
  * {@link EncoderListener#fileEncoded(EncoderEngine, EncodingProfile, File...)} because it cannot be guaranteed that
  * only <em>one</em> file will be the result of the encoding. Imagine encoding to an image series.

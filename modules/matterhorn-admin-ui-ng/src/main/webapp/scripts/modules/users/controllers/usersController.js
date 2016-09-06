@@ -39,7 +39,7 @@ angular.module('adminNg.controllers')
         $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
 
         $scope.table.delete = function (row) {
-            UserResource.delete({username: row}, function () {
+            UserResource.delete({username: row.id}, function () {
                 Table.fetch();
                 Modal.$scope.close();
                 Notifications.add('success', 'USER_DELETED');

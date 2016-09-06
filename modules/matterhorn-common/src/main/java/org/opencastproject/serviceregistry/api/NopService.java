@@ -25,7 +25,7 @@ import org.opencastproject.job.api.Job;
 
 /**
  * No operation service.
- * <p/>
+ * <p>
  * This dummy service just exists for creating jobs for testing purposes.
  */
 public interface NopService {

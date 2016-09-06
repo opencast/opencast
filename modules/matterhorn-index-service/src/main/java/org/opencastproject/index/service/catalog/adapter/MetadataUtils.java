@@ -165,13 +165,13 @@ public final class MetadataUtils {
   }
 
   /**
-   * Get the value of a {@link MetadataField} that is an {@link Iterable<String>}
+   * Get the value of a {@link MetadataField} that is an {@link Iterable}
    *
    * @param abstractMetadataCollection
    *          The {@link AbstractMetadataCollection} to search for the {@link MetadataField}
    * @param outputID
    *          The key in the UI that ids the relevant {@link MetadataField}
-   * @return The {@link Iterable<String>} value if available.
+   * @return The {@link Iterable} value if available.
    */
   public static Iterable<String> getIterableStringMetadataByOutputID(
           MetadataCollection abstractMetadataCollection, String outputID) {
@@ -183,13 +183,13 @@ public final class MetadataUtils {
   }
 
   /**
-   * Get an {@link Iterable<String>} value from a {@link MetadataField} if it has been updated.
+   * Get an {@link Iterable} value from a {@link MetadataField} if it has been updated.
    *
    * @param metadata
    *          The {@link AbstractMetadataCollection} to search for the {@link MetadataField}
    * @param outputID
    *          The key in the UI that ids the relevant {@link MetadataField}
-   * @return An optional {@link Iterable<String>} returned if updated.
+   * @return An optional {@link Iterable} returned if updated.
    */
   public static Opt<List<String>> getUpdatedIterableStringMetadata(MetadataCollection metadata, String outputID) {
     Opt<List<String>> iterableString = Opt.<List<String>> none();
@@ -204,11 +204,11 @@ public final class MetadataUtils {
   }
 
   /**
-   * Get a @ List<String>} from a {@link MetadataField<?>} if available.
+   * Get a List from a {@link MetadataField} if available.
    *
    * @param metadataField
    *          The {@link MetadataField} to get the value from.
-   * @return A @ List<String>} (empty if not available)
+   * @return A @ List} (empty if not available)
    */
   public static List<String> getListFromIterableStringMetadata(MetadataField<?> metadataField) {
     List<String> strings = new ArrayList<String>();
@@ -229,11 +229,11 @@ public final class MetadataUtils {
   }
 
   /**
-   * Get a @ Iterable<String>} from a {@link MetadataField<?>} if available.
+   * Get an Iterable from a {@link MetadataField} if available.
    *
    * @param metadataField
    *          The {@link MetadataField} to get the value from.
-   * @return A @ Iterable<String>} (empty if not available)
+   * @return A Iterable (empty if not available)
    */
   public static Iterable<String> getIterableStringMetadata(MetadataField<?> metadataField) {
     return getListFromIterableStringMetadata(metadataField);

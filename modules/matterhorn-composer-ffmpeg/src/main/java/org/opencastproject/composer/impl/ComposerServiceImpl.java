@@ -203,8 +203,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /**
    * OSGi callback on component activation.
    *
-   * @param ctx
-   *          the bundle context
+   * @param cc
+   *          the component context
    */
   @Override
   public void activate(ComponentContext cc) {
@@ -360,10 +360,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * Encodes audio and video track to a file. If both an audio and a video track are given, they are muxed together into
    * one movie container.
    *
-   * @param videoTrack
-   *          the video track
-   * @param audioTrack
-   *          the audio track
+   * @param job
+   * @param mediaTrack
    * @param profileId
    *          the encoding profile
    * @param properties
@@ -632,10 +630,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.composer.api.ComposerService#composite(org.opencastproject.composer.layout.Dimension,
-   *      org.opencastproject.composer.api.LaidOutElement, org.opencastproject.composer.api.LaidOutElement,
-   *      org.opencastproject.util.data.Option, String, String) String, Option)
    */
   @Override
   public Job composite(Dimension compositeTrackSize, Option<LaidOutElement<Track>> upperTrack,

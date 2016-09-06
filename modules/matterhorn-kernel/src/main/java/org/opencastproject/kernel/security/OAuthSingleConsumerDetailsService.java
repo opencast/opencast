@@ -42,7 +42,11 @@ import java.util.List;
 /**
  * A sample OAuth consumer details service, hard coded to authenticate a consumer with the following information:
  *
- * <li>key=consumerkey <li>name=consumername <li>secret=consumersecret
+ * <ul>
+ *  <li>key=consumerkey</li>
+ *  <li>name=consumername</li>
+ *  <li>secret=consumersecret</li>
+ * </ul>
  *
  * A UserDetailsService must be provided for delegating user lookup requests.
  */

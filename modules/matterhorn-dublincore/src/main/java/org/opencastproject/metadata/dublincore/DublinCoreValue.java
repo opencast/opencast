@@ -37,7 +37,7 @@ import javax.annotation.concurrent.Immutable;
 
 /**
  * Representation of a DublinCore conforming property value.
- * <p/>
+ * <p>
  * See <a
  * href="http://dublincore.org/documents/dc-xml-guidelines/">http://dublincore.org/documents/dc-xml-guidelines/</a> for
  * further details.

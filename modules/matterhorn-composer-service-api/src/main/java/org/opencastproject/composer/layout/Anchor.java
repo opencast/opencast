@@ -35,9 +35,9 @@ public final class Anchor {
    * Create a new anchor point.
    *
    * @param left
-   *          width ratio measured from the left. 0 <= left <= 1
+   *          width ratio measured from the left. 0 &lt;= left &lt;= 1
    * @param top
-   *          height ratio measured from the top. 0 <= top <= 1
+   *          height ratio measured from the top. 0 &lt;= top &lt;= 1
    */
   public Anchor(double left, double top) {
     this.left = RequireUtil.between(left, 0.0, 1.0);

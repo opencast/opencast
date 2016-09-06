@@ -64,7 +64,7 @@
             <div ng-show="mode == 1" class="filters-list">
                 <header>
                     <a class="icon close" ng-click="closeProfile()"></a>
-                    <h4 translate="TABLE_FILTERS.PROFILES.FILTERS_HEADER"><!--Saved Filter Sets--></h4>
+                    <h4 translate="TABLE_FILTERS.PROFILES.FILTERS_HEADER"><!-- Saved Filter Sets --></h4>
                 </header>
                 <ul>
                     <li ng-repeat="profile in profiles">
@@ -77,7 +77,7 @@
                         <a ng-click="removeFilterProfile($index)" class="icon remove"></a>
                     </li>
                     <li ng-show="profiles.length == 0"
-                    translate="TABLE_FILTERS.PROFILES.EMPTY"><!--No saved filters yet--></li>
+                    translate="TABLE_FILTERS.PROFILES.EMPTY"><!-- No saved filters yet --></li>
                 </ul>
 
                 <div class="input-container">
@@ -92,7 +92,7 @@
             <div ng-show="mode == 2" class="filter-details">
                 <header>
                     <a class="icon close" ng-click="cancelProfileEditing()"></a>
-                    <h4 translate="TABLE_FILTERS.PROFILES.FILTER_HEADER"><!--Save Filter Set--></h4>
+                    <h4 translate="TABLE_FILTERS.PROFILES.FILTER_HEADER"><!-- Save Filter Set --></h4>
                 </header>
                 <div ng-form="profileForm" ng-model="profile" class="input-container">
                     <label>{{ 'TABLE_FILTERS.PROFILES.NAME' | translate }} <i class="required">*</i></label>
@@ -101,17 +101,17 @@
                         type="text"
                         placeholder="{{ 'TABLE_FILTERS.PROFILES.NAME_PLACEHOLDER' | translate }}">
 
-                    <label translate="TABLE_FILTERS.PROFILES.DESCRIPTION"><!--Description--></label>
+                    <label translate="TABLE_FILTERS.PROFILES.DESCRIPTION"><!-- Description --></label>
                     <textarea ng-model="profile.description"
                         placeholder="{{ 'TABLE_FILTERS.PROFILES.DESCRIPTION_PLACEHOLDER' | translate }}"></textarea>
                 </div>
                 <div class="input-container">
                     <div class="btn-container">
                         <a ng-click="cancelProfileEditing()" class="cancel"
-                            translate="CANCEL"><!--Cancel--></a>
+                            translate="CANCEL"><!-- Cancel --></a>
                         <a ng-click="saveProfile()"
                             ng-class="{ disabled: !profileForm.$valid }"
-                            class="save" translate="SAVE"><!--Save--></a>
+                            class="save" translate="SAVE"><!-- Save --></a>
                     </div>
                 </div>
             </div>

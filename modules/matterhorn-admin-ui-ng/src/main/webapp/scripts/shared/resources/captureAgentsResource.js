@@ -9,17 +9,18 @@ angular.module('adminNg.resources')
                 var result = [], i = 0, parse, data;
                 data = JSON.parse(json);
 
-                parse = function (r) {
-                    var row = {};
-                    row.id = r.Name;
-                    row.status = r.Status;
-                    row.name = r.Name;
-                    row.updated = Language.formatDateTime('short', r.Update);
-                    row.inputs = r.inputs;
-                    row.roomId = r.roomId;
-                    row.removable = 'offline' == r.Status;
-                    return row;
-                };
+            parse = function (r) {
+                var row = {};
+                row.id = r.Name;
+                row.status = r.Status;
+                row.name = r.Name;
+                row.updated = Language.formatDateTime('short', r.Update);
+                row.inputs = r.inputs;
+                row.roomId = r.roomId;
+                row.type = "LOCATION";
+                row.removable = 'offline' == r.Status;
+                return row;
+            };
 
                 for (; i < data.results.length; i++) {
                     result.push(parse(data.results[i]));

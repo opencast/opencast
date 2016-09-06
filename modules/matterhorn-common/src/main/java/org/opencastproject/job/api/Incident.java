@@ -102,7 +102,7 @@ public interface Incident {
    * Named parameters describing the incident in more detail. These parameters may be used to
    * construct a description message.
    *
-   * @return the message parameters; parameter_name -> parameter_value
+   * @return the message parameters; parameter_name -&gt; parameter_value
    */
   Map<String, String> getDescriptionParameters();
 }

@@ -210,7 +210,7 @@ public final class ResourceRequestUtil {
   /**
    * @param queryString
    *          The query string for this request to determine its validity.
-   * @param clientIP
+   * @param clientIp
    *          The IP of the client requesting the resource.
    * @param resourceUri
    *          The base uri for the resource.
@@ -219,6 +219,7 @@ public final class ResourceRequestUtil {
    * @param strict
    *          If false it will only compare the path to the resource instead of the entire URL including scheme,
    *          hostname, port etc.
+   * @return ResourceRequest
    */
   public static ResourceRequest resourceRequestFromQueryString(String queryString, String clientIp, String resourceUri,
           Properties encryptionKeys, boolean strict) {

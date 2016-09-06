@@ -264,8 +264,6 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
    *
    * {@inheritDoc}
    *
-   * @see org.opencastproject.caption.api.CaptionService#getLanguageList(org.opencastproject.mediapackage.MediaPackageElement,
-   *      java.lang.String)
    */
   @Override
   public String[] getLanguageList(Catalog input, String format) throws UnsupportedCaptionFormatException,
@@ -303,7 +301,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
   }
 
   /**
-   * Returns all registered {@link CaptionFormat}s.
+   * Returns all registered CaptionFormats.
    */
   protected HashMap<String, CaptionConverter> getAvailableCaptionConverters() {
     HashMap<String, CaptionConverter> captionConverters = new HashMap<String, CaptionConverter>();

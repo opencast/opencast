@@ -35,7 +35,6 @@ public class IllegalPathException extends Exception {
    * Constructor without cause.
    * 
    * @param message
-   * @param cause
    */
   public IllegalPathException(String message) {
     super(message);

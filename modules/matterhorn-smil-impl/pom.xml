@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>2.2-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -42,11 +42,6 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>android-mms</artifactId>
-      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
@@ -87,8 +82,7 @@
             </Import-Package>
             <Export-Package>
               org.opencastproject.smil.endpoint.*;version=${project.version},
-              org.opencastproject.smil.impl.*;version=${project.version},
-              org.opencastproject.smil.util;version=${project.version}
+              org.opencastproject.smil.impl.*;version=${project.version}
             </Export-Package>
             <Service-Component>
               OSGI-INF/smil-service.xml

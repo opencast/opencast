@@ -78,7 +78,7 @@ public final class JsonConv {
 
   /**
    * Nest an object under key <code>propName</code>.
-   * <p/>
+   * <p>
    * Example: key = acl, {id:1, name:"bla"} -&gt; {acl:{id:1, name:"bla"}}
    */
   public static Function<Obj, Obj> nest(final String key) {

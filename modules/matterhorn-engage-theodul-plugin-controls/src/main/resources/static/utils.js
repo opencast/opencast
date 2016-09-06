@@ -61,7 +61,7 @@ define(["jquery"], function($) {
     }
 
     Utils.prototype.getFormattedPlaybackRate = function(rate) {
-	return (rate * 100) + "%";
+    return (rate * 100) + "%";
     }
 
     /**
@@ -203,7 +203,9 @@ define(["jquery"], function($) {
             }
             if (total < parseInt(duration)) {
                 var diff = parseInt(duration) - total;
-                result[result.length - 1].duration = parseInt(result[result.length - 1].duration) + diff;
+                if (result[result.length - 1]) {
+                    result[result.length - 1].duration = parseInt(result[result.length - 1].duration) + diff;
+                }
             }
         }
         return result;
@@ -237,6 +239,37 @@ define(["jquery"], function($) {
         }
         return 0; // jump only to the start
     }
+
+    /**
+     * Timer object, that can be renewed (to reset the delay).
+     * @type {Object}
+     */
+    Utils.prototype.timer = {
+        setup: function(callback, delay) {
+            this.callback = function() {
+                callback.call();
+                this.timeoutID = undefined;
+            }
+            this.delay = delay;
+
+            if (typeof this.timeoutID === "number") {
+                  this.cancel();
+            } else {
+                this.timeoutID = window.setTimeout(this.callback.bind(this), this.delay);
+            }
+            return this;
+        },
+
+        renew: function() {
+            window.clearTimeout(this.timeoutID);
+            this.timeoutID = window.setTimeout(this.callback.bind(this), this.delay);
+        },
+
+        cancel: function() {
+            window.clearTimeout(this.timeoutID);
+            this.timeoutID = undefined;
+        }
+    };
 
     return Utils;
 });

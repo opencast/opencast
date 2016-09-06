@@ -133,8 +133,8 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   /**
    * OSGi callback to set the organization directory service.
    *
-   * @param userDirectoryService
-   *          the user directory service
+   * @param organizationDirectoryService
+   *          the organization directory service
    */
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;

@@ -84,9 +84,6 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
    */
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
@@ -271,7 +268,7 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /**
    * Callback from the OSGi environment that will pass a reference to the workflow service upon component activation.
    *
-   * @param service
+   * @param eventCommentService
    *          the workflow service
    */
   public void setEventCommentService(EventCommentService eventCommentService) {

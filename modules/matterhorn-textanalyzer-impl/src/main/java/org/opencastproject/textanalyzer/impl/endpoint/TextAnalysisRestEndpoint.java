@@ -50,7 +50,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 /**
- * The REST endpoint for {@link MediaAnalysisService}s
+ * The REST endpoint for MediaAnalysisServices
  */
 @Path("")
 @RestService(name = "textanalysis", title = "Text Analysis Service",

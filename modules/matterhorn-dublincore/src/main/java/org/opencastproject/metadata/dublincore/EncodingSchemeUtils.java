@@ -66,9 +66,9 @@ public final class EncodingSchemeUtils {
    * UTC timezone is used for all precisions from {@link Precision#Minute} to {@link Precision#Fraction}. For years,
    * months and days the local timezone is used instead to ensure that the given date enters the DublinCore as is. If
    * UTC was used it may happen that you get the previous or next day, month or year respectively
-   * <p/>
+   * <p>
    * The language of the returned value is {@link DublinCore#LANGUAGE_UNDEFINED}.
-   * <p/>
+   * <p>
    * See <a href="http://www.w3.org/TR/NOTE-datetime">http://www.w3.org/TR/NOTE-datetime</a> for more information about
    * W3C-DTF.
    *
@@ -96,11 +96,11 @@ public final class EncodingSchemeUtils {
   /**
    * Encode a period with the given precision into a Dublin Core string value using the recommended DCMI Period scheme.
    * For the usage of the UTC timezone please refer to {@link #encodeDate(Date, Precision)} for further information.
-   * <p/>
+   * <p>
    * One of the dates may be null to create an open interval.
-   * <p/>
+   * <p>
    * The language of the returned value is {@link DublinCore#LANGUAGE_UNDEFINED}.
-   * <p/>
+   * <p>
    * See <a href="http://dublincore.org/documents/dcmi-period/">http://dublincore.org/documents/dcmi-period/</a> for
    * more information about DCMI Period.
    *
@@ -134,9 +134,9 @@ public final class EncodingSchemeUtils {
   /**
    * Encode a duration measured in milliseconds into a Dublin Core string using the
    * {@link DublinCore#ENC_SCHEME_ISO8601} encoding scheme <code>PTnHnMnS</code>.
-   * <p/>
+   * <p>
    * The language of the returned value is {@link DublinCore#LANGUAGE_UNDEFINED}.
-   * <p/>
+   * <p>
    * See <a href="http://en.wikipedia.org/wiki/ISO_8601#Durations"> ISO8601 Durations</a> for details.
    *
    * @param duration
@@ -149,9 +149,9 @@ public final class EncodingSchemeUtils {
 
   /**
    * Decode a string encoded in the ISO8601 encoding scheme.
-   * <p/>
+   * <p>
    * Also supports the REPLAY legacy format <code>hh:mm:ss</code>.
-   * <p/>
+   * <p>
    * See <a href="http://en.wikipedia.org/wiki/ISO_8601#Durations"> ISO8601 Durations</a> for details.
    *
    * @param value

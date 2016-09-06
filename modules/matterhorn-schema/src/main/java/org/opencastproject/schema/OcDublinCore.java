@@ -27,9 +27,9 @@ import java.util.Date;
 
 /**
  * Opencast Dublin Core schema.
- * <p/>
+ * <p>
  * Fields may have at most <em>one</em> value and do <em>not</em> have any language annotation.
- * <p/>
+ * <p>
  * For more information about the exposed field see the
  * <a href="http://dublincore.org/documents/dcmi-type-vocabulary/#H2">DublinCore /terms/ namespace</a>.
  */

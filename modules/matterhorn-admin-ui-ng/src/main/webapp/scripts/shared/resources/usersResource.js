@@ -22,6 +22,7 @@ angular.module('adminNg.resources')
                         row.blacklist_from = Language.formatDateTime('short', r.blacklist.start);
                         row.blacklist_to   = Language.formatDateTime('short', r.blacklist.end);
                     }
+                    row.type = "USER";
                     return row;
                 };
 

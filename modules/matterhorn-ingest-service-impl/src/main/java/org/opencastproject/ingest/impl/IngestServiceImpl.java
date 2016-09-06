@@ -22,6 +22,7 @@
 package org.opencastproject.ingest.impl;
 
 import static org.opencastproject.util.JobUtil.waitForJob;
+import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 
 import org.opencastproject.capture.CaptureParameters;
@@ -64,7 +65,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.smil.util.SmilUtil;
+import org.opencastproject.smil.api.util.SmilUtil;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
@@ -73,6 +74,7 @@ import org.opencastproject.util.ProgressInputStream;
 import org.opencastproject.util.XmlUtil;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -1637,7 +1639,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   private MediaPackage addSmilCatalog(org.w3c.dom.Document smilDocument, MediaPackage mediaPackage) throws IOException,
           IngestException {
-    Option<org.w3c.dom.Document> optSmilDocument = SmilUtil.loadSmilDocument(workingFileRepository, mediaPackage);
+    Option<org.w3c.dom.Document> optSmilDocument = loadSmilDocument(workingFileRepository, mediaPackage);
     if (optSmilDocument.isSome())
       throw new IngestException("SMIL already exists!");
 
@@ -1655,6 +1657,32 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } finally {
       IoSupport.closeQuietly(in);
     }
+  }
+
+  /**
+   * Load a SMIL document of a media package.
+   *
+   * @return the document or none if no media package element found.
+   */
+  private Option<org.w3c.dom.Document> loadSmilDocument(final WorkingFileRepository workingFileRepository,
+          MediaPackage mp) {
+    return mlist(mp.getElements()).filter(MediaPackageSupport.Filters.isSmilCatalog).headOpt()
+            .map(new Function<MediaPackageElement, org.w3c.dom.Document>() {
+              @Override
+              public org.w3c.dom.Document apply(MediaPackageElement mpe) {
+                InputStream in = null;
+                try {
+                  in = workingFileRepository.get(mpe.getMediaPackage().getIdentifier().compact(), mpe.getIdentifier());
+                  return SmilUtil.loadSmilDocument(in, mpe);
+                } catch (Exception e) {
+                  logger.warn("Unable to load smil document from catalog '{}': {}", mpe,
+                          ExceptionUtils.getStackTrace(e));
+                  return Misc.chuck(e);
+                } finally {
+                  IOUtils.closeQuietly(in);
+                }
+              }
+            });
   }
 
   /**
@@ -1697,9 +1725,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /**
    * Interpret the payload of a completed Job as a MediaPackageElement. Wait for the job to complete if necessary.
-   *
-   * @throws MediaPackageException
-   *           in case the payload is not a mediapackage element
    */
   public static Function<Job, Track> payloadAsTrack(final ServiceRegistry reg) {
     return new Function.X<Job, Track>() {

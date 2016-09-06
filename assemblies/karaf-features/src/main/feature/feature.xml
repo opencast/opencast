@@ -83,6 +83,7 @@
     <bundle>mvn:org.apache.tika/tika-core/1.1</bundle>
     <bundle>mvn:org.codehaus.jettison/jettison/1.3.1</bundle>
     <bundle>mvn:org.jdom/com.springsource.org.jdom/1.0.0</bundle>
+    <bundle>mvn:org.jdom/com.springsource.org.jdom/2.0.1</bundle>
     <bundle>wrap:mvn:org.opencastproject/android-mms/1.0</bundle>
     <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
 
@@ -141,7 +142,6 @@
     <feature version="${project.version}">opencast-core</feature>
 
     <bundle>mvn:org.opencastproject/matterhorn-admin-ui-ng/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-admin-ui/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-annotation-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-annotation-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-archive-base/${project.version}</bundle>
@@ -163,7 +163,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-cover-image-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-cover-image-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dataloader/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-deprecated-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dictionary-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dictionary-regexp/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-distribution-service-acl/${project.version}</bundle>
@@ -196,8 +195,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-inspection-service-ffmpeg/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-inspection-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-lti/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-mediapackage-manipulator/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-mediapackage-ui/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-messages/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-metadata-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-metadata/${project.version}</bundle>
@@ -247,7 +244,6 @@
     <feature version="${project.version}">opencast-core</feature>
 
     <bundle>mvn:org.opencastproject/matterhorn-admin-ui-ng/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-admin-ui/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-archive-base/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-archive-schema/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-archive-storage-fs/${project.version}</bundle>
@@ -267,7 +263,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-cover-image-remote/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-cover-image-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dataloader/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-deprecated-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-distribution-service-acl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-distribution-service-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-distribution-service-download-remote/${project.version}</bundle>
@@ -285,8 +280,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-inspection-service-remote/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-inspection-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-lti/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-mediapackage-manipulator/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-mediapackage-ui/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-messages/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-metadata-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-metadata/${project.version}</bundle>
@@ -388,7 +381,6 @@
     <feature version="${project.version}">opencast-core</feature>
 
     <bundle>mvn:org.opencastproject/matterhorn-admin-ui-ng/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-admin-ui/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-archive-base/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-archive-schema/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-archive-storage-fs/${project.version}</bundle>
@@ -408,7 +400,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-cover-image-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-cover-image-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dataloader/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-deprecated-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dictionary-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-dictionary-regexp/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-distribution-service-acl/${project.version}</bundle>
@@ -428,8 +419,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-inspection-service-ffmpeg/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-inspection-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-lti/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-mediapackage-manipulator/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-mediapackage-ui/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-messages/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-metadata-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-metadata/${project.version}</bundle>

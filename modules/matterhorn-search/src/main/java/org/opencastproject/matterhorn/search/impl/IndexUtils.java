@@ -52,7 +52,7 @@ public final class IndexUtils {
 
   /**
    * Clean up the user query input string to avoid invalid input parameters.
-   * 
+   *
    * @param q
    *          The input String.
    * @return The cleaned string.
@@ -67,7 +67,7 @@ public final class IndexUtils {
   /**
    * Returns a serialized version of the date or <code>null</code> if
    * <code>null</code> was passed in for the date.
-   * 
+   *
    * @param date
    *          the date
    * @return the serialized date
@@ -80,8 +80,8 @@ public final class IndexUtils {
 
   /**
    * Returns an expression to search for any date that lies in between
-   * <code>startDate</date> and <code>endDate</date>.
-   * 
+   * <code>startDate</code> and <code>endDate</code>.
+   *
    * @param startDate
    *          the start date
    * @param endDate
@@ -103,7 +103,7 @@ public final class IndexUtils {
 
   /**
    * Returns the date with all time related fields set to the start of the day.
-   * 
+   *
    * @param date
    *          the date
    * @return the date with its time component set to the beginning of the day
@@ -122,7 +122,7 @@ public final class IndexUtils {
 
   /**
    * Returns the date with all time related fields set to the end of the day.
-   * 
+   *
    * @param date
    *          the date
    * @return the date with its time component set to the beginning of the day

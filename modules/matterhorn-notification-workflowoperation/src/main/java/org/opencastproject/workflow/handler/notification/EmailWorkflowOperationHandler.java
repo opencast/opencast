@@ -67,8 +67,6 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance)
    */
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)

@@ -98,7 +98,7 @@ public abstract class SmilObjectImpl implements SmilObject {
   /**
    * Put all containing elements into {@link List} given as parameter.
    *
-   * @param a {@link List} where to pul child elements to
+   * @param elements {@link List} where to pul child elements to
    */
   public abstract void putAllChilds(List<SmilObject> elements);
 

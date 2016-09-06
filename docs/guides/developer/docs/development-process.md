@@ -7,7 +7,7 @@ contributed, how they are merged and how releases are done.
 *If this document does not answer all of your questions, here is how you can get further help:*
 
  - *Ask on the [Opencast Development List](https://groups.google.com/a/opencast.org/forum/#!forum/matterhorn)*
- - *Chat with developers on [IRC (#opencast on freenode)](http://webchat.freenode.net/?channels=opencast)*
+ - *Chat with developers on [IRC (#opencast on Freenode)](http://webchat.freenode.net/?channels=opencast)*
  - *Join our weekly technical meeting (see lists or IRC)*
 
 
@@ -60,15 +60,26 @@ Requests](reviewing-and-merging.md).
 Coding Rules
 ------------
 
-Maven will automatically check for coding style violations and interrupt the process if it founds any, displaying a
-message about it. Apart from that, here are some general rules:
+Maven will automatically check for coding style violations for Java and interrupt the build process if any are found,
+displaying a message about it. Apart from that, here are some general rules:
 
-Java:
+Java, HTML and JavaScript:
 
- - Indentation is done with exactly two spaces
- - No line of code should be wider than 120 columns
- - Avoid trailing spaces
- - Avoid unnecessary code style changes
+- Indentation is done with exactly two spaces
+- No line of code should be wider than 120 columns
+- Avoid trailing spaces
+- Avoid unnecessary code style changes
+
+Markdown:
+
+- Avoid lines wider than 120 columns
+- Avoid trailing spaces
+- Avoid unnecessary style changes
+
+Everything else:
+
+- Try applying the Java style rules
+- If in doubt, ask on list
 
 
 Git Repository Branching Model
@@ -116,7 +127,7 @@ After the release branch is cut, the development on the `develop` branch may con
 should) be merged without waiting for the next version to be released. Thus, the creation of a release branch also marks
 the beginning of the development for the next version.
 
-In contrast to that, only bug fixes can be merged in the release branch. At this point, the code contained in this
+In contrast to that, only bug fixes may be merged into the release branch. At this point, the code contained in this
 branch should be tested, so that bugs can be identified and fixed. The release manager can tag different beta versions
 during the QA process (such as `1.6.0-beta1`) to mark the code evolution as bug fixes are merged. Once the branch status
 seems to be stable enough to be released, a release candidate (RC) is tagged and tested (`1.6.0-rc1`). New RCs can be
@@ -127,12 +138,12 @@ fixes from the release branch will automatically become part of `develop` and th
 to create an additional pull request. This is continued until the release branch for the next version is cut.
 
 The releases themselves are not part of the release branch. Instead, the release manager branches off, makes the
-necessary changes to the pom files (and possibly the UI) and creates a separate tagged commit.
+necessary changes to the pom files (and possibly the UI) and creates a separately tagged commit.
 
 Finally, after a release is done, more bug fixes may be added to the release branch. The release manager should identify
 if there are enough commits to be put into a maintenance release.
 
-Even after an Opencast version has been released, more bugs may be found and fixes for them merged in the release
+Even after an Opencast version has been released, more bugs may be found and fixes for them merged into the release
 branch. When the release manager considers that the number or importance of such bug fixes is sufficient, he may decide
 to create a new maintenance release. The version `1.6.1` above is an example of that.
 
@@ -176,17 +187,20 @@ branch and the final release. The release manager should create a release schedu
 the release branch is cut and when the final release will happen. Additionally, he should coordinate with the QA manager
 to identify phases for internal and public testing.
 
-Usually a release schedule will look like this:
+Usually, a release schedule will look like this:
 
-    October 1st                     Cutting the release branch
-    October 1st - 22nd              Internal QA phase
-    October 22nd-November 5th       Public QA phase
-    November 5th - 26th             Additional bug fixing phase
-    November 26th - December 10th   Final QA phase (*)
-    December 15th                   Release of Opencast x.y
+|Date                          |What is happening
+|------------------------------|-------------------------------------------------
+|April 6th                     |Feature Freeze *(release branch is cut)*
+|April 6th - 24th              |Internal QA and bug fixing phase
+|&nbsp; *April 11th - 17th*    |Review Test Cases *(handles by a dedicated team)*
+|&nbsp; *April 18th - 24th*    |Documentation Review
+|April 25th - May 15th         |Public QA phase
+|May 15th - June 1st           |Additional bug fixing phase
+|&nbsp; *May 25th - June 1st*  |Translation week *(encourage translators to do their work)*
+|June 2nd - June 12th          |Final QA phase *(checking release readiness)*
+|June 15th                     |Final Release
 
-(*) marks the phase where the release is apparently ready to go and has no release blockers left. The additional time is
-to ensure that there is time to fix any serious bug found during this final phase.
 
 ### Release Branch
 
@@ -211,7 +225,7 @@ To create a version based on a given state of the release branch (commit A), the
 this commit, make the necessary version changes to all `pom.xml` files and to the UI and create a commit and a *signed*
 git tag on this commit. He would then push the commit and the tag (not the branch) to the community repository.
 
-Fore more details about how to create release, have a look at the [Release Manager Guide](release-manager.md).
+For more details about how to create a release, have a look at the [Release Manager Guide](release-manager.md).
 
 #### Beta Versions/Release Candidates
 
@@ -260,7 +274,7 @@ quality assurance manager. They will check the issue fields and adjust *fix vers
 
 #### Security Issues
 
-If you discover a problem that has severe implications for system security, please do not publish these information on
+If you discover a problem that has severe implications for system security, please do not publish this information on
 list. Instead, send a report of the problem to *security@opencast.org*. The message will be forwarded to the private
 committers list, where the issue will be discussed. Once a patch for the problem is ready, a security notice will be
 released along with it.

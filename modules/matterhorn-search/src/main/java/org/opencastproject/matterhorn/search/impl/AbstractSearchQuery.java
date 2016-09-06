@@ -98,8 +98,6 @@ public class AbstractSearchQuery implements SearchQuery {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.matterhorn.search.SearchQuery#withTypes(java.lang.String)
    */
   @Override
   public SearchQuery withTypes(String... types) {
