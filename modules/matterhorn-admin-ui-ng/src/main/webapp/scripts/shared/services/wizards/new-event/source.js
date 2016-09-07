@@ -138,13 +138,13 @@ angular.module('adminNg.services')
             var result = isDefined(data) && isDefined(data.start) &&
                 isDefined(data.start.date) && data.start.date.length > 0 &&
                 angular.isDefined(data.duration) &&
-                angular.isDefined(data.duration.hour) && angular.isDefined(data.duration.minute) &&                
+                angular.isDefined(data.duration.hour) && angular.isDefined(data.duration.minute) &&
                 isDefined(data.device) &&
                 isDefined(data.device.id) && data.device.id.length > 0;
 
             if (self.isScheduleMultiple() && result) {
                 return angular.isDefined(data.end) &&
-                    data.end.length > 0 && 
+                    data.end.length > 0 &&
                     self.atLeastOneRepetitionDayMarked();
             } else {
                 return result;
@@ -164,7 +164,7 @@ angular.module('adminNg.services')
               while (self.conflicts.length > 0) { // remove displayed conflicts, existing ones will be added again in
                 self.conflicts.pop();             // the next step.
               }
-              
+
               if (self.hasConflicts) {
                 angular.forEach(conflicts, function (d) {
                     self.conflicts.push({
@@ -173,9 +173,9 @@ angular.module('adminNg.services')
                         end: Language.formatDateTime('medium', d.end)
                     });
                     console.log ("Conflict: " + d.title + " Start: " + d.start + " End:" + d.end);
-                });  
-              } 
-              
+                });
+              }
+
               self.updateWeekdays();
               self.checkValidity();
             };
@@ -190,7 +190,7 @@ angular.module('adminNg.services')
                     Notifications.remove(self.notification, NOTIFICATION_CONTEXT);
                     self.notification = undefined;
                   }
-                  release(); 
+                  release();
                 };
                 var onError = function (response) {
 
