@@ -122,6 +122,7 @@
     <module>modules/inspection-service-remote</module>
     <module>modules/inspection-workflowoperation</module>
     <module>modules/kernel</module>
+    <module>modules/logging-workflowoperation</module>
     <module>modules/lti</module>
     <module>modules/message-broker-api</module>
     <module>modules/message-broker-impl</module>
