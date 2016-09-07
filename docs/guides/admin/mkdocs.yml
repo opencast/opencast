@@ -109,6 +109,7 @@ pages:
    - Include: 'workflowoperationhandlers/include-woh.md'
    - Ingest-Download: 'workflowoperationhandlers/ingestdownload-woh.md'
    - Inspect: 'workflowoperationhandlers/inspect-woh.md'
+   - Log: 'workflowoperationhandlers/log-woh.md'
    - Normalize Audio: 'workflowoperationhandlers/normalizeaudio-woh.md'
    - Partial Import: 'workflowoperationhandlers/partial-import-woh.md'
    - Post Media Package: 'workflowoperationhandlers/postmediapackage-woh.md'
