@@ -223,7 +223,7 @@ angular.module('adminNg.services')
                 && angular.isDefined(data.duration) && angular.isDefined(data.duration.hour)
                 && angular.isDefined(data.duration.minute)) {
                 var startDate = new Date(data.start.date);
-                startDate.setHours(data.start.hour + data.duration.hour, data.start.minute + data.duration.minute,
+                startDate.setHours(startDate.hour + data.duration.hour, startDate.minute + data.duration.minute,
                     0, 0);
                 var nowDate = new Date();
                 if (startDate < nowDate) {
