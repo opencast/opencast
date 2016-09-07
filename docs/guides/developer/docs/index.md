@@ -16,9 +16,11 @@ These guides will help you if you want to participate in Opencast development.
  - [Modules](modules/index.md)
     - Admin UI
         - [Development](modules/admin-ui/development.md)
+<!--        - [Sass](modules/admin-ui/sass.md)-->
         - Style Guide
             - [Color Palette](modules/admin-ui/style/color-palette.md)
             - [View Structure](modules/admin-ui/style/view-structure.md)
+            - [Positioning and Spacing](modules/admin-ui/style/spacing.md)            
             - [Navigation](modules/admin-ui/style/navigation.md)
             - [Typeface](modules/admin-ui/style/typeface.md)
             - [Icons](modules/admin-ui/style/icons.md)

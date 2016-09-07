@@ -1,7 +1,7 @@
 ## Navigation Tab
 
-The section navigation tab is placed for a user to easily access
-other sections of the Admin UI software easily.
+The section navigation tab is placed on the left side of the viewing area
+for a user to easily access other sections of the Admin UI.
 
 <div class="row-flex">
   <img src="../../../../img/navigation-1.png" alt="Navigation Menu Hidden" />
@@ -25,5 +25,3 @@ other sections of the Admin UI software easily.
   </p>
 </div>
 <br/>
-
-The navigation tab also contains the sub-menu which displays the links to sub sections of the system.

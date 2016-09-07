@@ -11,6 +11,7 @@ professional environment for users.
 <div class="color dark-blue">#24425C</div>
 <div class="color grey">#8C939B</div>
 <div class="color highlight">#FAFAFA</div>
+<br/>
 
 <!--
 #### Secondary Color Palette

@@ -1,11 +1,10 @@
 ## Icons
 
-The icon set is a carefully designed set that utilizes
-simplicity to convey a clear and concise user experience.
-Having a simple but effective icon set is crucial for ease
+The icon set is carefully designed for simplicity to convey a clear
+and concise user experience. Having a simple but effective icon set is crucial for ease
 of use within sophisticated software environments.
 
-Some icons are saved as pre-rendered images and can be found in the resource folder (.../src/main/webapp/img). Other icons are based on [Font Awesome](http://fontawesome.io/) which gives us scalable vector icons that can be customized by size, color, drop shadow, and anything that is provided by CSS.
+Some icons are saved as pre-rendered images and can be found in the resource folder (`.../src/main/webapp/img`). Other icons are based on [Font Awesome](http://fontawesome.io/) which gives us scalable vector icons that can be customized by size, color, drop shadow, and anything that is provided by CSS.
 
 **Note:** Font Awesome contains over 630 icons, [the cheat sheet of icons](http://fontawesome.io/cheatsheet/) lists the icons and corresponding CSS class.
 
@@ -96,6 +95,7 @@ beside the user dropdown to indicate language that the UI is
 represented in.
 
 Each flag should:
+
  - be public domain
  - be an svg image
  - have an aspect ratio of 3:2
