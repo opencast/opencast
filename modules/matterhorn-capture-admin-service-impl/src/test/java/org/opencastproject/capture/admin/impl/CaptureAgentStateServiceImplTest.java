@@ -556,7 +556,7 @@ public class CaptureAgentStateServiceImplTest {
     Assert.assertTrue(lastHeardFrom <= agent.getLastHeardFrom());
     Assert.assertTrue(agent.getLastHeardFrom() <= System.currentTimeMillis());
 
-    Thread.sleep(5000);
+    Thread.sleep(1500);
     Assert.assertEquals(OFFLINE, service.getAgentState(name));
   }
 
@@ -572,7 +572,7 @@ public class CaptureAgentStateServiceImplTest {
     Assert.assertTrue(lastHeardFrom <= agent.getLastHeardFrom());
     Assert.assertTrue(agent.getLastHeardFrom() <= System.currentTimeMillis());
 
-    Thread.sleep(5000);
+    Thread.sleep(1500);
     Map<String, Agent> agents = service.getKnownAgents();
 
     Assert.assertEquals(OFFLINE, agents.get(name).getState());
@@ -590,7 +590,7 @@ public class CaptureAgentStateServiceImplTest {
     Assert.assertTrue(lastHeardFrom <= agent.getLastHeardFrom());
     Assert.assertTrue(agent.getLastHeardFrom() <= System.currentTimeMillis());
 
-    Thread.sleep(5000);
+    Thread.sleep(1500);
     Map<String, Agent> agents = service.getKnownAgents();
 
     Assert.assertEquals(OFFLINE, agents.get(name).getState());
