@@ -47,6 +47,22 @@
   },
   "CONFIRMATIONS":{
     "CONTINUE_ACTION":"你確定要繼續嗎?",
+    "METADATA":{
+      "NOTICE":{
+        "UNKNOWN":"The following element will be deleted",
+        "EVENT":"The following event will be deleted",
+        "SERIES":"The following series will be deleted",
+        "ACL":"The following ACL will be deleted",
+        "GROUP":"The following group will be deleted",
+        "USER":"The following user will be deleted",
+        "USER_BLACKLIST":"The following user blacklist will be deleted",
+        "THEME":"The following theme will be deleted",
+        "EMAIL":"The following email template will be deleted",
+        "LOCATION":"The following location will be deleted",
+        "LOCATION_BLACKLIST":"The following location blacklist will be deleted"
+      },
+      "NAME":"Name"
+    },
     "ACTIONS":{
       "CONFIRMATION":"需要確認"
     }
@@ -194,6 +210,7 @@
     "SCHEDULE_TASK":{
       "CAPTION":"啟動任務",
       "GENERAL":{
+        "CAPTION":"General",
         "SUMMARY":"({{ count }} 個選定的事件)",
         "CANNOTSTART":"標示的事件無法在此刻進行處理, 你可以取消選擇或稍後再試。"
       },
@@ -1398,6 +1415,7 @@
     },
     "JOBS":{
       "TABLE":{
+        "ID":"Job Identifier",
         "ACTION":"操作",
         "CAPTION":"工作",
         "CREATED":"創建",
