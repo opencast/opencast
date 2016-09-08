@@ -1,11 +1,11 @@
 Introduction
-================================
+============
 
 The Opencast project uses the
 [Crowdin Localization Management Platform](https://crowdin.com/project/opencast-matterhorn) for translating
 Opencast into a variety of languages.
 
-The English translation (en-US) acts as master language that is translated to other languages using Crowdin.
+The English translation (en-US) acts as source language that is translated to other languages using Crowdin.
 While all translation files are located in the Opencast code repository, only the English translation should
 be modified in the code repository - all other translation files are downloaded from Crowdin.
 
@@ -13,7 +13,7 @@ be modified in the code repository - all other translation files are downloaded 
 Modifications to the translation files in the Opencast code repository will be regularly overwritten and
 therefore will be lost!*
 
-Note that Crowdin managers take care of uploading the English translations to Crowdin and download the
+Note that Crowdin managers take care of uploading the English source and translations to Crowdin and download the
 others translations from Crowdin.
 
 Crowdin Managers
@@ -33,11 +33,21 @@ The Opencast branch `r/a.b.x` corresponds to Crowdin branch `a.b.x`.
 Crowdin does automatically detect equal strings across branches so there is no need to configure anything when
 a new branch is created.
 
+When releasing a new version `a.b.c` of Opencast, the following actions must be performed to keep the Opencast code
+repository in sync with Crowdin:
+
+1. Download the translations from Crowdin branch `a.b.x`
+2. Commit the downloaded translations into the Opencast branch `r/a.b.x`
+3. Release Opencast `a.b.c`
+4. Merge Opencast branch `r/a.b.x` into Opencast branch `develop`
+5. Upload sources of Opencast branch `develop` to Crowdin branch `develop`
+6. Upload translations of Opencast branch `develop` to Crodwin branch `develop`
+
 Working with Crowdin CLI
 ------------------------
 
-The Crowdin CLI command line tool is used to synchronize the master language files and translations between
-the Opencast code repository and the Crowdin project *Opencast*. 
+The Crowdin CLI command line tool is used to synchronize the source language files and
+translations between the Opencast code repository and the Crowdin project *Opencast*. 
 
 The Crowdin CLI configuration can be found in `/.crowdin.yaml`
 
@@ -51,18 +61,21 @@ the first line:
 
         api_key: <secret key>
 
-Now you can use the Crowdin CLI command line tool to upload master language files and download translations.
+Now you can use the Crowdin CLI command line tool to upload source language files and download translations.
 
-To upload the master translations from the Opencast code repository to Crowdin, use the following command:
+To upload the sources from the Opencast code repository to Crowdin, use the following command:
 
     java -jar crowdin-cli.jar --config .crowdin.yaml upload sources -b <branch>
 
-Note that the branch `<branch>` will be automatically created if it is not yet existing.
+In case you need to upload the translations from the Opencast code repository branch `<branch>`, use the command:
 
+    java -jar crowdin-cli.jar --config .crowdin.yaml upload translations -b <branch>
+
+Note that the branch `<branch>` will be automatically created if it is not yet existing.
 
 To download the translations from Crowdin, use the following command:
 
-    java -jar crowdin-cli.jar --config .crowdin.yaml download translations -b <branch>
+    java -jar crowdin-cli.jar --config .crowdin.yaml download -b <branch>
 
 References
 ----------
