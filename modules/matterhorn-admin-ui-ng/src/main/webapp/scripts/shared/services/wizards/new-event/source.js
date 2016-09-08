@@ -35,8 +35,8 @@ angular.module('adminNg.services')
         };
 
         /* Get the current client timezone */
-        var tzOffset = (new Date()).getTimezoneOffset() / -60;
-        self.tz = 'UTC' + (tzOffset < 0 ? '-' : '+') + tzOffset;
+        self.tzOffset = (new Date()).getTimezoneOffset() / -60;
+        self.tz = 'UTC' + (self.tzOffset < 0 ? '' : '+') + self.tzOffset;
 
         this.loadCaptureAgents = function () {
             CaptureAgentsResource.query({inputs: true}).$promise.then(function (data) {
@@ -222,11 +222,12 @@ angular.module('adminNg.services')
                 && angular.isDefined(data.start.minute) && angular.isDefined(data.start.date)
                 && angular.isDefined(data.duration) && angular.isDefined(data.duration.hour)
                 && angular.isDefined(data.duration.minute)) {
-                var startDate = new Date(data.start.date);
-                startDate.setHours(startDate.hour + data.duration.hour, startDate.minute + data.duration.minute,
-                    0, 0);
+                var dateArray = data.start.date.split("-");
+                var startDate = new Date(dateArray[0], parseInt(dateArray[1]) - 1, dateArray[2], data.start.hour, data.start.minute);
+                var endDate = new Date(startDate.getTime());
+                endDate.setHours(endDate.getHours() + data.duration.hour, endDate.getMinutes() + data.duration.minute, 0, 0);
                 var nowDate = new Date();
-                if (startDate < nowDate) {
+                if (endDate < nowDate) {
                     self.alreadyEndedNotification = Notifications.add('error', 'CONFLICT_ALREADY_ENDED',
                         NOTIFICATION_CONTEXT, -1);
                     self.hasConflicts = true;
