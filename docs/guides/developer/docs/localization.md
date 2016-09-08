@@ -13,7 +13,7 @@ be modified in the code repository - all other translation files are downloaded 
 Modifications to the translation files in the Opencast code repository will be regularly overwritten and
 therefore will be lost!*
 
-Note that Crowdin managers take care of uploading the English source and translations to Crowdin and download the
+Note that Crowdin managers take care of uploading the English sources and translations to Crowdin and download the
 others translations from Crowdin.
 
 Crowdin Managers
