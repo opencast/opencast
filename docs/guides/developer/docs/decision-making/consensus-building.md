@@ -11,9 +11,15 @@ successful project. However, there is a shorthand notation for showing support, 
 Sending out a Proposal
 ----------------------
 
-Proposals should be send to list, preferably the development list. It is common to indicate proposals by including the
+Proposals should be send to list. It is common to indicate proposals by including the
 string `[#proposal]` at the beginning of the subject to make it easier for the community to identify that the mail
 contains an important proposal.
+
+The list used should usually be the development list. In very rare cases, other lists may also be used: The users list
+when the matter discussed only targets adopters/uses. The committers list if the matter discussed needs to be kept
+private e.g. for personal or security reasons.
+
+Please avoid cross-posting a proposal on multiple lists. It will usually fracture the discussion.
 
 Expressing Approval or Disapproval
 ----------------------------------

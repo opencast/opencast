@@ -8,8 +8,8 @@ Preparing for a Vote
 --------------------
 
 Before calling a vote it is important to ensure that the community is given time to discuss the upcoming vote. This will
-be done by posting an email to the list indicating the intention to call a vote and the options available. By the time a
-vote is called there should already be consensus in the community. The vote itself is, normally, a formality.
+be done by posting an email to the developers list indicating the intention to call a vote and the options available. By
+the time a vote is called there should already be consensus in the community. The vote itself is, normally, a formality.
 
 Calling a Vote
 --------------
@@ -37,9 +37,8 @@ participate regardless of their geographic locations.
 Publishing Results
 ------------------
 
-A vote should run for at least 72h, giving everyone the chance to participate.  After the voting is done, the outcome
-should be published on the public developer list. A result may be kept private, if deemed necessary, for votes on
-security-relevant or personal topics.
+After the voting is done, the outcome should be published on the public developer list. A result may be kept private, if
+deemed necessary, for votes on security-relevant or personal topics.
 
 Binding Votes
 -------------
