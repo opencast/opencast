@@ -1,6 +1,22 @@
 Opencast 2.2.x
 ==============
 
+Opencast 2.2.2
+--------------
+
+- [[MH-11194]](https://opencast.jira.com/browse/MH-11194) - created themes not showing up in series branding tab
+- [[MH-11572]](https://opencast.jira.com/browse/MH-11572) - FFmpeg Inspection Service Test - accurateFrameCount
+- [[MH-11587]](https://opencast.jira.com/browse/MH-11587) - SQL Error
+- [[MH-11714]](https://opencast.jira.com/browse/MH-11714) - Fix unit test: Event controller #accessSave saves the event access
+- [[MH-11724]](https://opencast.jira.com/browse/MH-11724) - Additional actions not available in create event wizard anymore
+- [[MH-11734]](https://opencast.jira.com/browse/MH-11734) - Fix el7 RPM docs
+- [[MH-11735]](https://opencast.jira.com/browse/MH-11735) - Fix Stream Security Documentation
+- [[MH-11744]](https://opencast.jira.com/browse/MH-11744) - Actions-\>Start Task: Various localization bugs
+- [[MH-11748]](https://opencast.jira.com/browse/MH-11748) - Inconsistent and incorrect use of translate directive
+- [[MH-11751]](https://opencast.jira.com/browse/MH-11751) - Player won't work if there are no segments
+- [[MH-11755]](https://opencast.jira.com/browse/MH-11755) - No quality selection in Theodul Player
+- [[MH-11759]](https://opencast.jira.com/browse/MH-11759) - Make Inspector Unit Tests More Robust
+
 Opencast 2.2.1
 --------------
 
