@@ -172,8 +172,8 @@
                                     data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                                 >
-				<option value=""></option>
-				</select>
+                                    <option value=""></option>
+                                </select>
                                 <select chosen
                                     data-width="'100px'"
                                     ng-disabled="wizard.step.checkingConflicts"
@@ -182,8 +182,8 @@
                                     data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                                 >
-				<option value=""></option>
-				</select>
+                                    <option value=""></option>
+                                </select>
                             </td>
                         </tr>
                         <tr>
@@ -197,8 +197,8 @@
                                     data-placeholder="{{ 'WIZARD.DURATION.HOURS' | translate }}"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                                 >
-				<option value=""></option>
-				</select>
+                                    <option value=""></option>
+                                </select>
                                 <select chosen
                                     data-width="'100px'"
                                     ng-disabled="wizard.step.checkingConflicts"
@@ -207,8 +207,8 @@
                                     data-placeholder="{{ 'WIZARD.DURATION.MINUTES' | translate }}"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                                 >
-				<option value=""></option>
-				</select>
+                                    <option value=""></option>
+                                </select>
                             </td>
                         </tr>
                         <tr>
@@ -281,7 +281,9 @@
                                     ng-change="wizard.step.checkConflicts()"
                                     data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
-                                />
+                                >
+                                    <option value=""></option>
+                                </select>
                                 <select chosen
                                     data-width="'100px'"
                                     ng-disabled="wizard.step.checkingConflicts"
@@ -290,7 +292,9 @@
                                     ng-change="wizard.step.checkConflicts()"
                                     data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
-                                />
+                                >
+                                    <option value=""></option>
+                                </select>
                             </td>
                         </tr>
                         <tr>
@@ -304,7 +308,9 @@
                                     ng-change="wizard.step.checkConflicts()"
                                     data-placeholder="{{ 'WIZARD.DURATION.HOURS' | translate }}"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
-                                />
+                                >
+                                    <option value=""></option>
+                                </select>
                                 <select chosen
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-width="'100px'"
@@ -313,7 +319,9 @@
                                     ng-change="wizard.step.checkConflicts()"
                                     data-placeholder="{{ 'WIZARD.DURATION.MINUTES' | translate }}"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
-                                />
+                                >
+                                    <option value=""></option>
+                                </select>
                             </td>
                         </tr>
                         <tr>
