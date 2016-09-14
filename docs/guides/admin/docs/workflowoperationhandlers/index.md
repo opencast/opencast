@@ -52,7 +52,6 @@ The following table contains the workflow operations that are available in an ou
 |prepare-av        |Preparing audio and video work versions                        |[Documentation](prepareav-woh.md)|
 |publish-configure |Distribute and publish media to the configured publication     |[Documentation](publishconfigure-woh.md)|
 |publish-engage    |Distribute and publish media to the engage player              |[Documentation](publishengage-woh.md)|
-|republish         |Republishes elements to search                                 |[Documentation](republish-woh.md)|
 |retract-configure |Retracts media from configured publication                     |[Documentation](retractconfigure-woh.md)|
 |segment-video     |Extracting segments from presentation                          |[Documentation](segmentvideo-woh.md)|
 |segmentpreviews   |Extract segment images from a video using FFmpeg               |[Documentation](segmentpreviews-woh.md)|

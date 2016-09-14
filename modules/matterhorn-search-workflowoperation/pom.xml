@@ -62,7 +62,6 @@
               org.opencastproject.workflow.handler.search;version=${project.version}
             </Export-Package>
             <Service-Component>
-              OSGI-INF/operations/republish.xml,
               OSGI-INF/operations/searchindex-remove.xml
             </Service-Component>
           </instructions>
