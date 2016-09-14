@@ -19,6 +19,11 @@ pages:
    - Development: 'development-process.md'
    - Reviewing, Merging and Declining Pull Requests: 'reviewing-and-merging.md'
    - Release Manager: 'release-manager.md'
+- Decision Making:
+   - Overview: 'decision-making/index.md'
+   - Lazy Consensus: 'decision-making/lazy-consensus.md'
+   - Consensus Building: 'decision-making/consensus-building.md'
+   - Voting: 'decision-making/voting.md'
 - Development Environment: 'development-environment.md'
 - Licenses and Legal Matters: 'license.md'
 - Localization: 'localization.md'
