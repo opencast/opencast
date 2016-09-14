@@ -354,12 +354,12 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       }
       if (!AgentState.UNKNOWN.equals(state)) {
         agentCache.put(agentName.concat(DELIMITER).concat(orgId),
-            Tuple3.tuple3(getAgentState(agentName), config, Long.valueOf(System.currentTimeMillis())));
+            Tuple3.tuple3(state, config, Long.valueOf(System.currentTimeMillis())));
       } else {
         //If we're putting the agent into an unknown state we're assuming that we didn't get a check in
         // therefore we don't update the timestamp and persist to the DB
         agentCache.put(agentName.concat(DELIMITER).concat(orgId),
-            Tuple3.tuple3(getAgentState(agentName), config, getAgentFromCache(agentName, orgId).getC()));
+            Tuple3.tuple3(state, config, getAgentFromCache(agentName, orgId).getC()));
       }
       if (agentState.equals(state)) {
         return false;
