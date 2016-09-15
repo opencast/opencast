@@ -47,7 +47,7 @@ describe('Source Step in New Event Wizard', function () {
         });
 
         describe('with the source toggle set to single', function () {
-            var ud, 
+            var ud,
                 insertValidValues = function () {
                     ud.SCHEDULE_SINGLE.start.date      = new Date();
                     ud.SCHEDULE_SINGLE.start.hour      = '10';
@@ -96,7 +96,7 @@ describe('Source Step in New Event Wizard', function () {
                 ud.SCHEDULE_MULTIPLE.end = {};
                 ud.SCHEDULE_MULTIPLE.duration = {};
             });
-            
+
             it('validates repetitions', function () {
                 ud.SCHEDULE_MULTIPLE.start.date = new Date();
                 ud.SCHEDULE_MULTIPLE.start.hour = '10';
