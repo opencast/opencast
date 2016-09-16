@@ -9,6 +9,10 @@
   HTML {
     font: 13px/1.231 arial,helvetica,clean,sans-serif;
   }
+  body {
+    margin: 0 auto;
+    max-width: 1200px;
+  }
   FIELDSET {
     margin-bottom: 2em;
     margin-top: 0.5em;
@@ -35,10 +39,6 @@
   }
   DIV.table_spacer {
     height: 2em;
-  }
-  DIV.footer {
-    padding-top: 1em;
-    font-weight: bold;
   }
   .method_set_header {
     padding-left: 0.5em;
@@ -107,11 +107,7 @@
 </head>
 <body>
 <div style="margin-top: .5em">
-  <a href=/>
-    <h1 style="color: black; font-size:138.5%; text-decoration: none;">
-      <img src="/img/logo/opencast-icon.svg" alt="Opencast" border=0 width=80 />
-      Opencast</h1>
-  </a>
+  <a href=/><img src="/img/logo/opencast.svg" alt="Opencast" border=0 height=60 /></a>
 </div>
 
 <h2>${meta.title} REST Documentation</h2>
@@ -119,6 +115,21 @@
 <#if meta.abstract??>
 <div class="meta_abstract">${meta.abstract}</div>
 </#if>
+
+<!-- GENERAL NOTES -->
+<#if (notes?size <= 0)>
+<#else>
+<fieldset>
+<legend class="method_set_header">General Notes</legend>
+<ul>
+  <#list notes as note>
+  <li>${note}</li>
+  </#list>
+</ul>
+</fieldset>
+</#if>
+
+<!-- ENDPOINTS -->
 
 <#list endpointHolders as endpointHolder>
 <fieldset id="endpoint_holder_${endpointHolder.name}">
@@ -257,7 +268,7 @@
         <#else>
         <a href="#" class="show_form_link">Testing form (click to reveal)</a>
         <div class="hidden_form hidden">
-          <form id="form_${endpoint.name}" class="form_test_form" action="${meta.url}${endpoint.path}" 
+          <form id="form_${endpoint.name}" class="form_test_form" action="${meta.url}${endpoint.path}"
                 method="${endpoint.method?lower_case}"<#if endpoint.form.fileUpload> enctype="multipart/form-data"</#if>>
             <input class="form_action_holder" type="hidden" value="${meta.url}${endpoint.path}" />
             <input class="form_endpoint_name" type="hidden" value="${endpoint.name}" />
@@ -274,7 +285,7 @@
                 <#if item.type == "text">
                 <td class="form_textarea" colspan="3">
                   <label for="${endpoint.name}_${item.name}">${item.name}</label>:<br/>
-                  <textarea id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field_text form_param_submit<#if item.required> form_param_required</#if>" 
+                  <textarea id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field_text form_param_submit<#if item.required> form_param_required</#if>"
                     rows="<#if item.attributes.rows??>${item.attributes.rows}<#else><#if item.name == "BODY">8<#else>3</#if></#if>" cols="${(item.attributes.cols)!'80'}">${item.defaultValue!}</textarea>
                   <div class="form_field_description">${item.description!}</div>
                 </td>
@@ -283,7 +294,7 @@
                   <#if item.required>* </#if><label for="${endpoint.name}_${item.name}">${item.name}</label>:
                 </td>
                 <td>
-                  <input id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>" 
+                  <input id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>"
                     type="checkbox" value="true" <#if item.defaultValue??>checked="${item.defaultValue}" defaultChecked="${item.defaultValue}"</#if> />
                 </td>
                 <td class="form_field_description">${item.description!}</td>
@@ -300,7 +311,7 @@
                   <#if item.required>* </#if><label for="${endpoint.name}_${item.name}">${item.name}</label>:
                 </td>
                 <td>
-                  <input id="${endpoint.name}_${item.name}" class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>" name="${item.name}" 
+                  <input id="${endpoint.name}_${item.name}" class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>" name="${item.name}"
                     type="text" value="${item.defaultValue!}" size="${(item.attributes.size)!'30'}" />
                 </td>
                 <td class="form_field_description">${item.description!}</td>
@@ -341,24 +352,6 @@
 </#if>
 </fieldset>
 </#list>
-
-
-<fieldset>
-<legend class="method_set_header">General Notes</legend>
-<#if (notes?size <= 0)>
-<em>NONE</em>
-<#else>
-<ul>
-  <#list notes as note>
-  <li>${note}</li>
-  </#list>
-</ul>
-</#if>
-</fieldset>
-
-<div class="footer">Service of 
-    <a href="http://opencast.org/" title="Opencast">Opencast</a>
-</div>
 
 <!-- JAVASCRIPT below here -->
 <script type="text/javascript" src="js/jquery/jquery.js"></script>
@@ -410,7 +403,7 @@
 					// The Regex here handles syntax like /episode.{format:xml|json}.
 					// In this case, the {format:xml|json} part is extracted, then
 					// the xml|json part is used as the second regex to verify user's input.
-					// If the input is valid, the path /episode.{format:xml|json} would be 
+					// If the input is valid, the path /episode.{format:xml|json} would be
 					// replaced by /episode.xml for example.
                     var regex = new RegExp( "{" + key + "(:[^}]*|)}", "");
                     if (regex.test(newPath))
@@ -433,7 +426,7 @@
         }
         return newPath;
     }
- 
+
     function checkPath($form) {
         var params = [];
         $form.find(".form_param_path").each( function() {
@@ -515,7 +508,7 @@
                           $(this).parent.hide();
                           $this.parent().find("a.hide_form_link").hide();
                       });
-                      
+
                       // clear previous responses
                       var responseBody = $form.parent().find(".test_form_response");
                       responseBody.hide();
