@@ -22,8 +22,8 @@
 
 // Controller for all event screens.
 angular.module('adminNg.controllers')
-.controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource',
-    function ($scope, Stats, Table, EventsResource, ResourcesFilterResource) {
+.controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource', 'ResourcesListResource',
+    function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource) {
         // Configure the table service
         $scope.stats = Stats;
         $scope.stats.configure({
@@ -95,10 +95,24 @@ angular.module('adminNg.controllers')
             resource:   'events',
             category:   'events',
             apiService: EventsResource,
-            multiSelect: true
+            multiSelect: true,
+            postProcessRow: function (row) {
+                angular.forEach(row.publications, function (publication) {
+                    if(angular.isDefined($scope.publicationChannelLabels[publication.id])) {
+                        publication.label = $scope.publicationChannelLabels[publication.id];
+                    } else {
+                        publication.label = publication.name;
+                    }
+                    if(angular.isDefined($scope.publicationChannelIcons[publication.id])) {
+                        publication.icon = $scope.publicationChannelIcons[publication.id];
+                    }
+                });
+            }
         });
 
         $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
+        $scope.publicationChannelLabels = ResourcesListResource.get({ resource: 'PUBLICATION.CHANNEL.LABELS' });
+        $scope.publicationChannelIcons = ResourcesListResource.get({ resource: 'PUBLICATION.CHANNEL.ICONS' });
 
         $scope.table.delete = function (row) {
             EventsResource.delete({id: row.id});
