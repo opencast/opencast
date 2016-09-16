@@ -19,59 +19,49 @@
  *
  */
 .stats-container {
+  text-align: right;
+
   .col {
     $num-cols: 8;
-    $padding: .5%;
+    $stat-color: lighten($header-link-color, 15%);
 
     box-sizing: border-box;
     display: inline-block;
     vertical-align: top;
-    width: (79.8% / $num-cols);  
+    min-width: (40% / $num-cols);
     margin-bottom: 20px;
-    margin-top: 1px;
+    margin-top: 12px;
+    padding: 0 5px;
 
-    padding: 0 $padding;
-    &:first-child{
-        margin-left: 18%;
-    }
-
-    &:nth-of-type(#{$num-cols}n) {
-      padding-left: 0;
-      margin-left: 0;
-    }
-
-    &:nth-of-type(#{$num-cols}n+11) {
-      padding-right: 0;
+    &:last-child{
+      margin-right: 50px;
     }
 
     .stat {
       text-align: center;
-        @include linear-gradient(top, #388ed6, #2075b1)
       cursor: pointer;
-      border-radius: $main-border-radius;
-      border: $thin-border-stroke $main-border-color;
       overflow: hidden;
+      color: $stat-color;
 
       &:hover {
-        border: $thin-border-stroke darken($main-border-color, 20%);
+        color: lighten($stat-color, 25%);
       }
 
       h1 {
         font-weight: 100;
-        font-size: 30px;
-        color: $body-background;
-        @include linear-gradient(top, #388ed6, #2075b1)
+        font-size: 24px;
         margin: 0 0 5px 0;
         padding: 2px 0;
-        border-bottom: $thin-border-stroke darken($body-background, 8%);
+        border-bottom: $thin-border-stroke $stat-color;
       }
 
       span {
         display: block;
         margin-bottom: 5px;
         font-size: 13px;
-        height:30px;
-        color: $body-background;
+        height: 20px;
+        max-width: 100px;
+        white-space: nowrap;
       }
     }
   }
