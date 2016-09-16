@@ -86,7 +86,7 @@
                     float: right;
                     font-size: 10px;
                     color: $light-prim-color;
-                    @include fa-icon($fa-clock-o, before, inline-block, 0 5px 0 0, 0, inherit, 10px);
+                    @include fa-icon($fa-var-clock-o, before, inline-block, 0 5px 0 0, 0, inherit, 10px);
                 }
 
                 > p {
@@ -275,7 +275,7 @@
         color: $l-blue;
         position: relative;
         white-space: nowrap;
-        @include fa-icon($fa-chevron-right, after, inline-block, 0, 0, inherit, 8px);
+        @include fa-icon($fa-var-chevron-right, after, inline-block, 0, 0, inherit, 8px);
 
         &:hover {
             color: darken($l-blue, 20%);
@@ -374,7 +374,7 @@
             border-top-right-radius: 10px;
             border-bottom-right-radius: 10px;
 
-            @include fa-icon($fa-close, after, inline-block, 0, 0, $main-border-color, 10px);
+            @include fa-icon($fa-var-close, after, inline-block, 0, 0, $main-border-color, 10px);
 
             &::after {
                 position: relative;

@@ -105,7 +105,7 @@ $df-saved-actions-padding: null;
 $df-saved-actions-font-size: 11px;
 
 .df-saved-edit {
-    @include fa-icon($fa-pencil, $df-saved-actions-pseudo-position, $df-saved-actions-position, $df-saved-actions-margin, $df-saved-actions-padding, $bright-blue, $df-saved-actions-font-size);
+    @include fa-icon($fa-var-pencil, $df-saved-actions-pseudo-position, $df-saved-actions-position, $df-saved-actions-margin, $df-saved-actions-padding, $bright-blue, $df-saved-actions-font-size);
 
     &:hover {
         @include fa-icon-color($df-saved-actions-pseudo-position, darken($bright-blue, 5%));
@@ -113,7 +113,7 @@ $df-saved-actions-font-size: 11px;
 }
 
 .df-saved-delete {
-    @include fa-icon($fa-close, $df-saved-actions-pseudo-position, $df-saved-actions-position, 0 0 0 5px, $df-saved-actions-padding, $medium-prim-color, $df-saved-actions-font-size);
+    @include fa-icon($fa-var-close, $df-saved-actions-pseudo-position, $df-saved-actions-position, 0 0 0 5px, $df-saved-actions-padding, $medium-prim-color, $df-saved-actions-font-size);
 
     &:hover {
         @include fa-icon-color($df-saved-actions-pseudo-position, $alt-red);

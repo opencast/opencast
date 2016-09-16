@@ -36,7 +36,8 @@ docs/guides/*/site
 # Ignore Makefiles
 # Sometimes they help, but they should never be tracked
 Makefile
+/modules/matterhorn-admin-ui-ng/bower_components/
+modules/matterhorn-admin-ui-ng/nb-configuration.xml
 
 # Ignore OS artifacts
 .DS_Store
-

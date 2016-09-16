@@ -39,11 +39,11 @@
     $action-icon-margin: 0 4px 0 0;
 
     .table-edit-action {
-        @include fa-icon($fa-pencil, before, inline-block, $action-icon-margin);
+        @include fa-icon($fa-var-pencil, before, inline-block, $action-icon-margin);
     }
 
     .table-export-action {
-        @include fa-icon($fa-external-link, before, inline-block, $action-icon-margin);
+        @include fa-icon($fa-var-external-link, before, inline-block, $action-icon-margin);
     }
 
     ul {
@@ -90,7 +90,7 @@
     @include btn(white);
     box-shadow: none;
 
-    @include fa-icon($fa-ellipsis-v, before, inline-block);
+    @include fa-icon($fa-var-ellipsis-v, before, inline-block);
     &:before {
         position: relative;
         top: -13px;

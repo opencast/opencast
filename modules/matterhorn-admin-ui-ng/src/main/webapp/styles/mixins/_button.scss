@@ -19,7 +19,6 @@
  *
  */
 
-
 // Button mixin
 @mixin btn($color) {
     font-family: $font-stack;
@@ -29,69 +28,76 @@
     position: relative;
 
     @if $color == green-dark-bg {
-        box-shadow: inset 0px 1px 0px 0px #48dc97, 0px 2px 3px 1px rgba(0,0,0,.05);
+        box-shadow: inset 0px 1px 0px 0px $primary-color-green-light-1, 0px 2px 3px 1px rgba(0,0,0,.05);
+       
+        @include linear-gradient($primary-color-green, $primary-color-green-dark-1);
 
-        @include linear-gradient(#39c985, #2d9b67);
-
-        border: $thin-border-stroke #193043;
+        border: $thin-border-stroke $dark-bg-border-color;
 
         &:hover {
-            border: $thin-border-stroke darken(#193043, 5%);
-            @include linear-gradient(lighten(#39c985, 5%), darken(#2d9b67, 5%));
+            cursor: pointer;
+            @include linear-gradient($primary-color-green-light-2, $primary-color-green-dark-2);
         }
 
         &:active {
-            box-shadow: inset 0px 3px 10px 1px darken(#2d9b67, 5%);
+            cursor: pointer;
+            box-shadow: inset 0px 3px 10px 1px $primary-color-green-dark-2;
+            background-color: $primary-color-green-dark-1 !important;
         }
     }
 
     @else if $color == blue-dark-bg {
         box-shadow: inset 0px 1px 0px 0px #456c8e, 0px 2px 3px 1px rgba(0,0,0,.05);
 
-        @include linear-gradient(#3a5e7e, #274661);
+        @include linear-gradient(#3a5e7e, #2c9966);
 
-        border: $thin-border-stroke #193043;
+        border: $thin-border-stroke $dark-bg-border-color;
 
         &:hover {
-            border: $thin-border-stroke darken(#193043, 5%);
-            @include linear-gradient(lighten(#3a5e7e, 5%), darken(#274661, 2%));
+            cursor: pointer;
+            @include linear-gradient(lighten(#3a5e7e, 5%), darken(#2c9966, 2%));
         }
 
         &:active {
-            box-shadow: inset 0px 3px 10px 1px darken(#274661, 3%);
+            cursor: pointer;
+            box-shadow: inset 0px 3px 10px 1px darken(#2c9966, 3%);
         }
     }
 
     @else if $color == green {
-        box-shadow: inset 0px 1px 0px 0px #48dc97, 0px 2px 3px 1px rgba(0,0,0,.05);
+        box-shadow: inset 0px 1px 0px 0px $primary-color-green-light-1, 0px 2px 3px 1px rgba(0,0,0,.05);
+       
+        @include linear-gradient($primary-color-green, $primary-color-green-dark-1);
 
-        @include linear-gradient(#39c985, #2d9b67);
-
-        border: $thin-border-stroke darken($green, 20%);
+        border: $thin-border-stroke $primary-color-green-dark-3;
 
         &:hover {
-            border: $thin-border-stroke darken($green, 25%);
-            @include linear-gradient(lighten(#39c985, 5%), darken(#2d9b67, 5%));
+            cursor: pointer;
+            @include linear-gradient($primary-color-green-light-2, $primary-color-green-dark-2);
         }
 
         &:active {
-            box-shadow: inset 0px 3px 10px 1px darken(#2d9b67, 5%);
-        }
+            cursor: pointer;
+            box-shadow: inset 0px 3px 10px 1px $primary-color-green-dark-2;
+            background-color: $primary-color-green-dark-1 !important;
+        }        
     }
 
     @else if $color == blue {
         box-shadow: inset 0px 1px 0px 0px #456c8e, 0px 2px 3px 1px rgba(0,0,0,.05);
 
-        @include linear-gradient(#3a5e7e, #274661);
+        @include linear-gradient(#3a5e7e, #2c9966);
 
-        border: $thin-border-stroke #193043;
+        border: $thin-border-stroke $dark-bg-border-color;
 
         &:hover {
-            @include linear-gradient(darken(#3a5e7e, 1%), darken(#274661, 2%));
+            cursor: pointer;
+            @include linear-gradient(darken(#3a5e7e, 1%), darken(#2c9966, 2%));
         }
 
         &:active {
-            box-shadow: inset 0 3px 10px 1px darken(#274661, 3%);
+            cursor: pointer;
+            box-shadow: inset 0 3px 10px 1px darken(#2c9966, 3%);
         }
     }
 
@@ -104,10 +110,12 @@
         border: $thin-border-stroke darken(#2b77b9, 5%);
 
         &:hover {
+            cursor: pointer;
             @include linear-gradient(lighten(#388ed6, 5%), darken(#2b77b9, 5%));
         }
 
         &:active {
+            cursor: pointer;
             box-shadow: inset 0px 3px 10px 1px darken(#2b77b9, 5%);
         }
     }
@@ -121,10 +129,12 @@
         border: $thin-border-stroke darken(#4da1f7, 10%);
 
         &:hover {
+            cursor: pointer;
             @include linear-gradient(lighten(#55cef2, 5%), darken(#4da1f7, 5%));
         }
 
         &:active {
+            cursor: pointer;
             box-shadow: inset 0px 3px 10px 1px darken(#4da1f7, 5%);
         }
     }
@@ -137,11 +147,13 @@
         border: $thin-border-stroke darken($alt-red, 20%);
 
         &:hover {
+            cursor: pointer;
             border: $thin-border-stroke darken($alt-red, 30%);
             @include linear-gradient(lighten($alt-red, 10%), darken($alt-red, 10%));
         }
 
         &:active {
+            cursor: pointer;
             box-shadow: inset 0px 3px 10px 1px darken($alt-red, 5%);
         }
     }
@@ -156,12 +168,14 @@
         text-shadow: 0px 1px 0px #fff;
 
         &:hover {
+            cursor: pointer;
             border: $thin-border-stroke darken($main-border-color, 2%);
             @include linear-gradient(darken(#fff, 1%), darken(#f7f7f7, 1%));
             color: $medium-prim-color;
         }
 
         &:active {
+            cursor: pointer;
             box-shadow: inset 0px 1px 6px 2px rgba(0,0,0,.05);
         }
     }

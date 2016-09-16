@@ -39,6 +39,8 @@
 
     #nav-container {
         display: none;
+        margin-top: -1px;
+        padding-top: 1px;
     }
 
     // Nav icons.
@@ -60,18 +62,21 @@
             position: relative;
             line-height: $height;
             @include transition(all .2s);
-
-            &[data-title]:hover:after {
+            color: #c9c9c9;
+            
+            &[data-title]:after {
+                display: none;
                 position: absolute;
                 content: attr(data-title);
                 z-index: $max-z;
                 border: $thin-border-stroke #c3cbd0;
-                opacity: 0.9;
-                @include transition(all .2s);
+                opacity: 0;
+                //@include transition(all .2s);
                 @include linear-gradient(top, #fff, #f3f4f4);
                 padding: 0 10px;
                 line-height: 25px;
                 left: 40px;
+                top: 18px;
                 border-radius: 4px;
                 color: $dark-prim-color;
                 font-size: 10px;
@@ -79,68 +84,68 @@
                 text-transform: uppercase;
             }
         }
-
-        .dashboard {
-            @include build-icon(auto, auto, dashboard, 30px, 20px);
-
-            &:hover,
-            &.active {
-                @include build-icon(auto, auto, dashboard-on, 30px, 20px);
+        
+        &:active > i {
+            color: #A1A1A1;
+        }
+        
+        &:hover > i {
+           color: #A1A1A1;
+           
+           &[data-title]:after {
+               display: block;
+               opacity: 0.9;
+               animation: fadeIn 1s ease;
+           }
+        }
+        
+        @key_frames fadeIn {
+            0% {
+                opacity: 0;
             }
+            80% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 0.9;
+            }
+        }
+        
+        $icon-color:        inherit;
+        $icon-position:     before;
+        $icon-display:      inherit;
+        $icon-font-size:    28px;
+        $icon-margin:       inherit;
+        $icon-padding:      inherit;
+        $icon-weight:       inherit;
+        $icon-line:         inherit;
+        
+        .dashboard {
+            @include fa-icon($fa-var-desktop, $icon-position, $icon-display, $icon-margin, $icon-padding, $icon-color, $icon-font-size, $icon-weight, $icon-line);
         }
 
         .events {
-            @include build-icon(auto, auto, events, 27px, 27px);
-
-            &:hover,
-            &.active {
-                @include build-icon(auto, auto, events-on, 27px, 27px);
-            }
+            @include fa-icon($fa-var-calendar-o, $icon-position, $icon-display, $icon-margin, $icon-padding, $icon-color, $icon-font-size, $icon-weight, $icon-line);
         }
 
         .systems {
-            @include build-icon(auto, auto, servers, 29px, 20px);
-
-            &:hover,
-            &.active {
-                @include build-icon(auto, auto, servers-on, 29px, 20px);
-            }
+            @include fa-icon($fa-var-server, $icon-position, $icon-display, $icon-margin, $icon-padding, $icon-color, $icon-font-size, $icon-weight, $icon-line);
         }
 
         .recordings {
-            @include build-icon(auto, auto, recordings, 29px, 18px);
-
-            &:hover,
-            &.active {
-                @include build-icon(auto, auto, recordings-on, 29px, 18px);
-            }
+            @include fa-icon($fa-var-video-camera, $icon-position, $icon-display, $icon-margin, $icon-padding, $icon-color, $icon-font-size, $icon-weight, $icon-line);
         }
 
         .users {
-            @include build-icon(auto, auto, user-group, 27px, 24px);
-
-            &:hover,
-            &.active {
-                @include build-icon(auto, auto, user-group-on, 27px, 24px);
-            }
+            @include fa-icon($fa-var-user, $icon-position, $icon-display, $icon-margin, $icon-padding, $icon-color, $icon-font-size, $icon-weight, $icon-line);
         }
 
         .integrations {
-            @include build-icon(auto, auto, integrations, 33px, 20px);
-
-            &:hover,
-            &.active {
-                @include build-icon(auto, auto, integrations-on, 33px, 20px);
-            }
+            @include fa-icon($fa-var-wrench, $icon-position, $icon-display, $icon-margin, $icon-padding, $icon-color, $icon-font-size, $icon-weight, $icon-line);
         }
 
         .configuration {
-            @include build-icon(auto, auto, configuration, 27px, 27px);
-
-            &:hover,
-            &.active {
-                @include build-icon(auto, auto, configuration-on, 27px, 27px);
-            }
+           @include fa-icon($fa-var-cogs, $icon-position, $icon-display, $icon-margin, $icon-padding, $icon-color, $icon-font-size, $icon-weight, $icon-line);
         }
     }
 }
