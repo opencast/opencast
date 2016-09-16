@@ -164,7 +164,7 @@ angular.module('adminNg.services')
             me.apiService = options.apiService;
             me.multiSelect = options.multiSelect;
             me.refreshDelay = options.refreshDelay || DEFAULT_REFRESH_DELAY;
-			me.postProcessRow = options.postProcessRow;
+            me.postProcessRow = options.postProcessRow;
 
             me.predicate = '';
             me.reverse = false;
