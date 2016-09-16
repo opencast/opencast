@@ -36,7 +36,6 @@ pages:
    - Overview: 'modules/index.md'
    - Admin UI:
       - Development: 'modules/admin-ui/development.md'
-#      - Sass: 'modules/admin-ui/sass.md'
       - Style Guide:
         - Color Palette: 'modules/admin-ui/style/color-palette.md'
         - View Structure: 'modules/admin-ui/style/view-structure.md'
@@ -49,6 +48,7 @@ pages:
         - Modals: 'modules/admin-ui/style/modals.md'
         - Alerts and Indicators: 'modules/admin-ui/style/alerts-indicators.md'
         - Forms: 'modules/admin-ui/style/forms.md'
+        - References: 'modules/admin-ui/style/references.md'
    - Player:
       - Architecture: 'modules/player/architecture.md'
       - Core Reference: 'modules/player/core.reference.md'

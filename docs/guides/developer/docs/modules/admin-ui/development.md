@@ -10,6 +10,13 @@ Coding Principles
   <dd>For ease of UI and UX changes the styling elements are driven by SASS CSS pre-compiler.</dd>
 </dl>
 
+Style Guide
+-----------
+
+The style guide defines a set of guidelines that the design follows to maintain a consistent look and feel.
+It is defined to be flexible, easily updateable and consistent. Before delving deeper into the UI or
+developing additional features we recommend familiarizing yourself with some of the items.
+
 Modifying Sources
 -----------------
 

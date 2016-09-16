@@ -6,7 +6,9 @@ of use within sophisticated software environments.
 
 Some icons are saved as pre-rendered images and can be found in the resource folder (`.../src/main/webapp/img`). Other icons are based on [Font Awesome](http://fontawesome.io/) which gives us scalable vector icons that can be customized by size, color, drop shadow, and anything that is provided by CSS.
 
-**Note:** Font Awesome contains over 630 icons, [the cheat sheet of icons](http://fontawesome.io/cheatsheet/) lists the icons and corresponding CSS class.
+For more links and license information refer to [References - Font Awesome](/modules/admin-ui/style/references/#font-awesome).
+
+**Note:** Font Awesome contains over 630 icons, [the cheat sheet of icons](http://fontawesome.io/cheatsheet/) lists the icons and the corresponding CSS class.
 
 <div class="row">
   <div class="col-4">

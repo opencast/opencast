@@ -6,7 +6,6 @@ or subsystems of Opencast.
 
 - Admin UI
   - [Development](admin-ui/development.md)
-  <!--    - [Sass](admin-ui/sass.md) -->
   - Style Guide
     - [Color Palette](admin-ui/style/color-palette.md)
     - [View Structure](admin-ui/style/view-structure.md)
@@ -19,6 +18,7 @@ or subsystems of Opencast.
     - [Modals](admin-ui/style/modals.md)
     - [Alerts and Indicators](admin-ui/style/alerts-indicators.md)
     - [Forms](admin-ui/style/forms.md)
+    - [References](admin-ui/style/references.md)
 - Player
   - [Architecture](player/architecture.md)
   - [Core Reference](player/core.reference.md)

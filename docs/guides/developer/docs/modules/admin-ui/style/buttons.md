@@ -40,7 +40,7 @@ an action like exporting or importing a list, creating a new event or series.
 Action buttons are used to allow the user to control steps in
 a process. Usually placed within a table view, actions include
 options to delete, process and view statistics. These action
-buttons will generally open a modal for further action and should be placed in a specific hierarchical orders.
+buttons will generally open a modal and should be placed in a specific hierarchical order for consistency.
 
 1. Detail Actions
 2. Sub Actions

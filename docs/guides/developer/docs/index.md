@@ -16,7 +16,6 @@ These guides will help you if you want to participate in Opencast development.
  - [Modules](modules/index.md)
     - Admin UI
         - [Development](modules/admin-ui/development.md)
-<!--        - [Sass](modules/admin-ui/sass.md)-->
         - Style Guide
             - [Color Palette](modules/admin-ui/style/color-palette.md)
             - [View Structure](modules/admin-ui/style/view-structure.md)
@@ -29,6 +28,7 @@ These guides will help you if you want to participate in Opencast development.
             - [Modals](modules/admin-ui/style/modals.md)
             - [Alerts and Indicators](modules/admin-ui/style/alerts-indicators.md)
             - [Forms](modules/admin-ui/style/forms.md)
+            - [References](modules/admin-ui/style/references.md)
     - [Stream Security](modules/stream-security.md)
     - […](modules/index.md)
  - [Project Infrastructure](infrastructure/index.md)

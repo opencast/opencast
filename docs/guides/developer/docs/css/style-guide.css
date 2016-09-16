@@ -1,5 +1,5 @@
 /*==========================================================
-    Open Sans
+  Fonts
 ==========================================================*/
 
 @font-face {
@@ -102,27 +102,13 @@
     font-style: italic;
 }
 
+/*==========================================================
+  Theme Fixes
+==========================================================*/
+
 *, *::before, *::after {
     box-sizing: inherit;
 }
-
-/*
-.wy-menu-vertical > ul > li {
-    border: 1px solid green;
-}
-
-.wy-menu-vertical > ul > li ul.subnav {
-    border: 1px solid red;
-}
-
-.wy-menu-vertical > ul > li ul.subnav > li:first-child {
-    border: 1px solid blue;
-}
-
-.wy-menu-vertical > ul > li ul.subnav > li {
-    border: 1px solid blueviolet;
-}
-*/
 
 .wy-menu-vertical li a,
 .wy-menu-vertical li span {
@@ -179,6 +165,10 @@ h1, h2, h3, h4, h5, h6, legend {
     font-weight: 700;
     margin-top: 0;
 }
+
+/*==========================================================
+  Documentation Styles
+==========================================================*/
 
 .row-flex {
   display: -webkit-box;
@@ -238,8 +228,8 @@ h1, h2, h3, h4, h5, h6, legend {
     color: #fff;
     font-size: 18px;
     font-weight: bold;
-    height: 40px;
-    line-height: 66px;
+    height: 48px;
+    line-height: 75px;
     padding-right: 0.5em;
     text-align: right;
     width: 100%;
@@ -268,6 +258,128 @@ h1, h2, h3, h4, h5, h6, legend {
 .section .highlight {
     background-color: #FAFAFA;
     color: #8C939B;
+}
+
+
+.section div.palette {
+    display: inline-block;
+    max-width: 100%;
+    padding: 0;
+    text-align: center;
+}
+
+.section div.palette ul {
+    list-style: outside none none;
+    margin: 0;
+}
+
+.section div.palette ul.table > li {
+    list-style: outside none none;
+    float: none;
+    overflow: visible;
+    height: 32px;
+    margin-bottom: 2px;
+    border-bottom: 1px solid #eee;;
+}
+
+.section div.palette ul.table ul li {
+    display: inline-block;
+    margin: 0;
+    float: left;
+    width: 140px;
+    text-align: left;
+}
+
+.section div.palette ul.table ul li:first-child {
+    width: 100px;
+    text-align: center;
+    margin-right: 10px;
+}
+
+.section div.palette ul.table ul li a {
+    display: block;
+    font-weight: 500;
+    width: 100%;
+    height: 100%;
+    line-height: 30px;
+    opacity: 0;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+}
+
+.section div.palette ul.table ul li > span {
+    float: left;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 30px;
+    max-width: none;
+}
+
+.section div.palette ul.table ul li > span > span {
+    font-weight: 400;
+    text-transform: uppercase;
+}
+
+.section div.palette ul.table ul li > span > span.nocase {
+    text-transform: none;
+}
+
+.section div.palette ul.table ul li > span > span:first-child {
+    background: #f8f8f8 none repeat scroll 0 0;
+    border-radius: 2px;
+    color: rgba(0, 0, 0, 0.4);
+    display: inline-block;
+    font-size: 11px;
+    line-height: 20px;
+    margin-right: 3px;
+    margin-top: 5px;
+    padding: 0 5px;
+    vertical-align: top;
+}
+
+
+.section div.palette ul.line li {
+    display: inline-block;
+    font-size: 13px;
+    height: 100px;
+    padding: 0;
+    position: relative;
+    width: 70px;
+    margin: 0;
+    float: left;
+}
+
+.section div.palette ul.line li:first-child {
+    border-radius: 3px 0 0 3px;
+}
+
+.section div.palette ul.line li:last-child {
+    border-radius: 0 3px 3px 0;
+}
+
+.section div.palette ul.line li a {
+    display: block;
+    font-weight: 500;
+    width: 100%;
+    height: 100%;
+    line-height: 100px;
+    opacity: 1;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+}
+
+.section div.palette ul li a.dark {
+    color: #000;
+}
+
+.section div.palette ul li a:hover {
+    opacity: 1;
 }
 
 .typeface {
