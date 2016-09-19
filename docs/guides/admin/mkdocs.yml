@@ -45,6 +45,7 @@ pages:
       - Stream Security: 'configuration/stream-security.md'
       - Access Control Lists: 'configuration/acl.md'
    - Workflow: 'configuration/workflow.md'
+   - External API: 'configuration/external-api.md'
 - Modules:
    - Overview: 'modules/index.md'
    - Atom/RSS Feed: 'modules/atomrss.md'
@@ -92,7 +93,6 @@ pages:
    - Prepare A/V: 'workflowoperationhandlers/prepareav-woh.md'
    - Publish Configure: 'workflowoperationhandlers/publishconfigure-woh.md'
    - Publish Engage: 'workflowoperationhandlers/publishengage-woh.md'
-   - Republish: 'workflowoperationhandlers/republish-woh.md'
    - Retract Configure: 'workflowoperationhandlers/retractconfigure-woh.md'
    - Segment Previews: 'workflowoperationhandlers/segmentpreviews-woh.md'
    - Segment Video: 'workflowoperationhandlers/segmentvideo-woh.md'

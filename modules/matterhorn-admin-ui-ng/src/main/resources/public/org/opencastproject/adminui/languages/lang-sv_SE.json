@@ -47,6 +47,22 @@
   },
   "CONFIRMATIONS":{
     "CONTINUE_ACTION":"Är du säker på att du vill fortsätta?",
+    "METADATA":{
+      "NOTICE":{
+        "UNKNOWN":"The following element will be deleted",
+        "EVENT":"The following event will be deleted",
+        "SERIES":"The following series will be deleted",
+        "ACL":"The following ACL will be deleted",
+        "GROUP":"The following group will be deleted",
+        "USER":"The following user will be deleted",
+        "USER_BLACKLIST":"The following user blacklist will be deleted",
+        "THEME":"The following theme will be deleted",
+        "EMAIL":"The following email template will be deleted",
+        "LOCATION":"The following location will be deleted",
+        "LOCATION_BLACKLIST":"The following location blacklist will be deleted"
+      },
+      "NAME":"Name"
+    },
     "ACTIONS":{
       "CONFIRMATION":"Bekräftelse krävs"
     }
@@ -194,6 +210,7 @@
     "SCHEDULE_TASK":{
       "CAPTION":"Starta uppgift",
       "GENERAL":{
+        "CAPTION":"General",
         "SUMMARY":"({{ count }} händelser valda)",
         "CANNOTSTART":"Framhävda händelse(r) kan inte bearbetas just nu. Avmarkera den\/dem eller försök igen senare."
       },
@@ -1398,6 +1415,7 @@
     },
     "JOBS":{
       "TABLE":{
+        "ID":"Job Identifier",
         "ACTION":"Åtgärder",
         "CAPTION":"Jobb",
         "CREATED":"Skapad",

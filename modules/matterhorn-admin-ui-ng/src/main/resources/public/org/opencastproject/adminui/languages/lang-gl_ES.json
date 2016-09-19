@@ -47,6 +47,22 @@
   },
   "CONFIRMATIONS":{
     "CONTINUE_ACTION":"Está seguro de que desexa continuar?",
+    "METADATA":{
+      "NOTICE":{
+        "UNKNOWN":"Vaise borrar o seguinte elemento",
+        "EVENT":"Vaise borrar o seguinte evento",
+        "SERIES":"Vaise borrar a seguinte serie",
+        "ACL":"Vaise borrar o seguinte ACL",
+        "GROUP":"Vaise borrar o seguinte grupo",
+        "USER":"Vaise borrar o seguinte usuario",
+        "USER_BLACKLIST":"Vaise borrar a seguinte lista negra de usuarios",
+        "THEME":"Vaise borrar o seguinte estilo",
+        "EMAIL":"Vaise borrar o seguinte modelo de correo electrónico",
+        "LOCATION":"Vaise borrar a seguinte localización",
+        "LOCATION_BLACKLIST":"Vaise borrar a seguinte lista negra de localizacións"
+      },
+      "NAME":"Name"
+    },
     "ACTIONS":{
       "CONFIRMATION":"Requírese confirmación"
     }
@@ -194,6 +210,7 @@
     "SCHEDULE_TASK":{
       "CAPTION":"Iniciar Tarefa",
       "GENERAL":{
+        "CAPTION":"General",
         "SUMMARY":"({{ count }} eventos seleccionados)",
         "CANNOTSTART":"O(s) evento(s) destacado(s) non se poden procesar neste momento. Desmárqueo(s) ou volva intentalo máis tarde."
       },
@@ -1398,6 +1415,7 @@
     },
     "JOBS":{
       "TABLE":{
+        "ID":"Identificador do Traballo",
         "ACTION":"Accións",
         "CAPTION":"Traballos",
         "CREATED":"Creado",

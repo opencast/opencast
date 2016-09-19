@@ -1,0 +1,20 @@
+[
+  {
+    "id": "title",
+    "value": "",
+    "required": true
+  },
+  {
+    "id": "subject",
+    "value": "What this is about - edited"
+  },
+  {
+    "id": "description",
+    "value": ""
+  },
+  {
+    "id": "creator",
+    "required": false,
+    "value": []
+  }
+]

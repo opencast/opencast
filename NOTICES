@@ -947,6 +947,17 @@ matterhorn-execute-workflowoperation
   org.slf4j                              slf4j-api                                        MIT License
   org.slf4j                              slf4j-log4j12                                    MIT License
 
+matterhorn-external-api
+  GroupId                                ArtifactId                                       License
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  javax.ws.rs                            jsr311-api                                       -
+  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.codehaus.groovy                    groovy-all                                       The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+  org.slf4j                              slf4j-log4j12                                    MIT License
+  org.slf4j                              slf4j-simple                                     MIT License
+
 
 matterhorn-fileupload
   GroupId                                ArtifactId                                       License

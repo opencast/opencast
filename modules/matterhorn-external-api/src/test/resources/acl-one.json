@@ -1,0 +1,7 @@
+[
+  {
+    "allow": true,
+    "action": "write",
+    "role": "ROLE_ADMIN"
+  }
+]

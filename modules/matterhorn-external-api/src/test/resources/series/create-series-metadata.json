@@ -1,0 +1,20 @@
+[
+  {
+    "label": "Opencast Series DublinCore",
+    "flavor": "dublincore/series",
+    "fields": [
+      {
+        "id": "title",
+        "value": "Captivating title"
+      },
+      {
+        "id": "subject",
+        "value": ["Topic", "Screencast"]
+      },
+      {
+        "id": "description",
+        "value": "A great description"
+      }
+    ]
+  }
+]

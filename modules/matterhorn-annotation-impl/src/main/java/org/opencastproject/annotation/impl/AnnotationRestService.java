@@ -66,6 +66,9 @@ import javax.ws.rs.core.Response.Status;
 @RestService(name = "annotation", title = "Annotation Service",
   abstractText = "This service is used for managing user generated annotations.",
   notes = {
+        "<strong>Deprecated:</strong> "
+        + "<em>This module is deprecated. It may be removed at any time. Planned removal is the Opencast release in "
+        + "December 2017. Please do not use it for new development.</em>",
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
         + "not working and is either restarting or has failed",
