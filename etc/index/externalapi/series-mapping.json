@@ -1,0 +1,76 @@
+{
+    "series" : {
+        "_source" : { "enabled" : true },
+        "_timestamp" : { "enabled" : true },
+        "dynamic": "true",
+        "properties" : {
+
+            "uid": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+
+            "organization": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+
+            "object": { "type" : "string", "index" : "no", "store" : "yes" },
+
+            "title": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "series_json": { "type" : "string", "index" : "no", "store" : "no" },
+
+            "description": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "abstract": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "subject": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "language": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "creator": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "license": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "access_policy": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "managed_acl": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "createdDateTime": { "type" : "date", "format" : "YYYY-MM-DD'T'HH:mm:ssZ", "store" : "no" },
+
+            "organizers": { "index_name" : "organizer", "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "contributors": { "index_name" : "contributor", "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "publisher": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "rights_holder": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
+            "opt_out": { "type" : "boolean", "store" : "no" },
+
+            "theme": { "type" : "long", "store" : "no" },
+
+            "text": { "type" : "string", "index" : "analyzed", "store" : "no" },
+            "text_fuzzy": { "type" : "string", "index" : "analyzed", "store" : "no" }
+
+        },
+        "dynamic_templates" : [
+             {
+             "title_template" : {
+                 "match" : "title_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "text" : {
+                 "match" : "text_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "permission_template" : {
+                 "match" : "acl_permission_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             }
+         ]
+    }
+}

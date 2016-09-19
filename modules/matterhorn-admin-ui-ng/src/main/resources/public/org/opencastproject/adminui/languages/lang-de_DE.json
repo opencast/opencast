@@ -47,6 +47,22 @@
   },
   "CONFIRMATIONS":{
     "CONTINUE_ACTION":"Sind Sie sicher, dass Sie fortfahren möchten?",
+    "METADATA":{
+      "NOTICE":{
+        "UNKNOWN":"Das folgendes Element wird gelöscht",
+        "EVENT":"Die folgende Aufzeichnung wird gelöscht",
+        "SERIES":"Die folgende Serie wird gelöscht",
+        "ACL":"Folgende Zugriffsrichtlinie wird gelöscht",
+        "GROUP":"Die folgende Gruppe wird gelöscht",
+        "USER":"Der folgende Benutzer wird gelöscht",
+        "USER_BLACKLIST":"Die folgende Benutzer-Blacklist wird gelöscht",
+        "THEME":"Das folgende Branding wird gelöscht",
+        "EMAIL":"Das folgende E-Mail-Vorlage wird gelöscht",
+        "LOCATION":"Folgender Raum wird entfernt",
+        "LOCATION_BLACKLIST":"Die folgende Raum-Blacklist wird entfernt"
+      },
+      "NAME":"Name"
+    },
     "ACTIONS":{
       "CONFIRMATION":"Bestätigung erforderlich"
     }
@@ -194,6 +210,7 @@
     "SCHEDULE_TASK":{
       "CAPTION":"Task starten",
       "GENERAL":{
+        "CAPTION":"General",
         "SUMMARY":"({{ count }} Aufzeichnungen ausgewählt)",
         "CANNOTSTART":"Markierte Aufzeichnungen können im Moment nicht verarbeitet werden. Entfernen Sie diese aus der Auswahl oder versuchen Sie es später erneut."
       },
@@ -1398,6 +1415,7 @@
     },
     "JOBS":{
       "TABLE":{
+        "ID":"Job ID",
         "ACTION":"Aktionen",
         "CAPTION":"Aufgaben",
         "CREATED":"Erstellt am",

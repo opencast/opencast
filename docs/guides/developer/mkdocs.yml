@@ -19,6 +19,11 @@ pages:
    - Development: 'development-process.md'
    - Reviewing, Merging and Declining Pull Requests: 'reviewing-and-merging.md'
    - Release Manager: 'release-manager.md'
+- Decision Making:
+   - Overview: 'decision-making/index.md'
+   - Lazy Consensus: 'decision-making/lazy-consensus.md'
+   - Consensus Building: 'decision-making/consensus-building.md'
+   - Voting: 'decision-making/voting.md'
 - Development Environment: 'development-environment.md'
 - Licenses and Legal Matters: 'license.md'
 - Localization: 'localization.md'
@@ -38,3 +43,14 @@ pages:
 - Infrastructure:
    - Overview: 'infrastructure/index.md'
    - Nexus Maven Repository: 'infrastructure/nexus.md'
+- API:
+   - Introduction: 'api/index.md'
+   - Usage: 'api/usage.md'
+   - Authentication: 'api/authentication.md'
+   - Authorization: 'api/authorization.md'
+   - Glossary: 'api/glossary.md'
+   - Base API: 'api/base-api.md'
+   - Events API: 'api/events-api.md'
+   - Series API: 'api/series-api.md'
+   - Groups API: 'api/groups-api.md'
+   - Security API: 'api/security-api.md'

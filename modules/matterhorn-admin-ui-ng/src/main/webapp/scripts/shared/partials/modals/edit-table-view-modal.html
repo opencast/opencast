@@ -1,7 +1,7 @@
 <section translate-cloak class="modal active modal-open" ng-keyup="keyUp($event)" id="edit-table-view-modal" style="display: block;" ng-controller="TablePreferencesCtrl">
     <header>
         <a ng-click="close()" class="fa fa-times close-modal"></a>
-        <h2 translate="PREFERENCES.TABLE.CAPTION"><!--Edit Table View--></h2>
+        <h2 translate="PREFERENCES.TABLE.CAPTION"><!-- Edit Table View --></h2>
     </header>
     
     <div class="modal-content">
@@ -16,7 +16,7 @@
                 <div class="col">
                     <div class="obj drag-available-column">
                         <header>
-                            <h2 translate="PREFERENCES.TABLE.AVAILABLE_COLUMNS"><!--Available Columns--></h2>
+                            <h2 translate="PREFERENCES.TABLE.AVAILABLE_COLUMNS"><!-- Available Columns --></h2>
                         </header>
                         <ul class="drag-drop-items">
                             <li class="drag-item" ng-repeat="col in deactivatedColumns" ng-if="col.deactivated">
@@ -30,7 +30,7 @@
                 <div class="col" >
                     <div class="obj drag-selected-column">
                         <header>
-                            <h2 translate="PREFERENCES.TABLE.SELECTED_COLUMNS"><!--Selected Columns--></h2>
+                            <h2 translate="PREFERENCES.TABLE.SELECTED_COLUMNS"><!-- Selected Columns --></h2>
                         </header>
                         <ul class="drag-drop-items">
                             <li ui-sortable ng-model="activeColumns">
@@ -46,7 +46,10 @@
             </div>
         
             <div class="tab-description for-footer">
-                <p translate="PREFERENCES.TABLE.FOOTER_TEXT" translate-values="{resetTranslation: resetTranslation}"><!--The order and selection will be saved automatically. Press "Reset" to restore the default view.--></p>
+                <p translate="PREFERENCES.TABLE.FOOTER_TEXT" translate-values="{resetTranslation: resetTranslation}">
+                    <!-- The order and selection will be saved automatically.
+                        Press "Reset" to restore the default view. -->
+                </p>
             </div>
         
         </div>
@@ -55,8 +58,8 @@
     <footer>
         <a ng-click="close()" class="cancel" translate="CANCEL"><!--Cancel--></a>
         <div class="pull-right">
-            <!-- <a ng-click="initialize()" class="cancel" translate="RESET"><!--Reset--></a>
-            <a ng-click="save(); close()" class="submit" translate="SAVE"><!--Save As Default--></a>
+            <!-- <a ng-click="initialize()" class="cancel" translate="RESET">Reset</a> -->
+            <a ng-click="save(); close()" class="submit" translate="SAVE"><!-- Save As Default --></a>
         </div>
     </footer>
 </section>

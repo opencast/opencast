@@ -2,7 +2,7 @@
     <div class="multi-select-container offset-col-2">
         <div class="multi-select-col">
             <div class="row">
-                <label translate="{{ resource.i18n }}.LEFT"><i class="required">*</i></label>
+                <label translate="{{ resource.i18n }}.LEFT"><i class="required"><!-- * --></i></label>
                 <input type="text" id="search" class="search"
                     placeholder="{{ 'TABLE_FILTERS.PLACEHOLDER' | translate  }}"
                     ng-show="resource.searchable"
@@ -20,7 +20,9 @@
             </div>
             <div class="row">
                 <div class="button-container">
-                    <a ng-click="add()" ng-class="{ disabled: !markedForAddition.length }" class="submit" translate="{{ resource.i18n }}.ADD">Add</a>
+                    <a ng-click="add()" ng-class="{ disabled: !markedForAddition.length }" class="submit" translate="{{ resource.i18n }}.ADD">
+                        <!-- Add -->
+                    </a>
                 </div>
             </div>
         </div>
@@ -39,7 +41,9 @@
             </div>
             <div class="row">
                 <div class="button-container">
-                    <a ng-click="remove()" ng-class="{ disabled: !markedForRemoval.length }" class="remove" translate="{{ resource.i18n }}.REMOVE">Remove</a>
+                    <a ng-click="remove()" ng-class="{ disabled: !markedForRemoval.length }" class="remove" translate="{{ resource.i18n }}.REMOVE">
+                        <!-- Remove -->
+                    </a>
                 </div>
             </div>
         </div>

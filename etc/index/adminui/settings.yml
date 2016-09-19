@@ -29,7 +29,7 @@
 # Cluster name identifies your cluster for auto-discovery. If you're running
 # multiple clusters on the same network, make sure you're using unique names.
 #
-cluster.name: opencast-adminui
+cluster.name: opencast
 
 
 #################################### Node #####################################
@@ -152,7 +152,7 @@ path.conf: ${karaf.etc}/index/adminui
 # the locations (a la RAID 0) on a file level, favouring locations with most free
 # space on creation. For example:
 #
-path.data: ${karaf.data}/adminui/data
+path.data: ${karaf.data}/index/data
 
 # Path to temporary files:
 #

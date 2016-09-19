@@ -30,6 +30,24 @@ angular.module('adminNg.services.modal')
             me.$scope.confirm  = me.confirm;
             me.$scope.callback = callback;
             me.$scope.object   = object;
+            me.$scope.name = "undefined";
+            me.$scope.type = "UNKNOWN";
+            if (!angular.isUndefined(object)) {
+                me.$scope.id = object.id;
+                if (object.title) {
+                    me.$scope.name = object.title;
+                } else if (object.name) {
+                    me.$scope.name = object.name;
+                }
+                if (object.type) {
+                    me.$scope.type = object.type;
+                }
+            }
+            //64 picked by random experimentation
+            if (me.$scope.name.length > 64) {
+                me.$scope.name = me.$scope.name.substr(0,61);
+                me.$scope.name = me.$scope.name + "...";
+            }
         };
 
         this.confirm = function () {

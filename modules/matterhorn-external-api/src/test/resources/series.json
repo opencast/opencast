@@ -1,0 +1,14 @@
+[
+   {
+      "series":{
+         "opt_out":false,
+         "title":"Series 1"
+      }
+   },
+   {
+      "series":{
+         "opt_out":false,
+         "title":"Series 2"
+      }
+   }
+]

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<groups xmlns:ns2="http://index.matterhorn.opencastproject.org">
+    <ns2:group>
+        <ns2:identifier>Group_1</ns2:identifier>
+        <ns2:name>Group 1</ns2:name>
+        <ns2:description>Group 1 Description</ns2:description>
+        <ns2:organization>Group1-Org</ns2:organization>
+        <ns2:roles>
+          <ns2:role>Role 1-1</ns2:role>
+          <ns2:role>Role 1-2</ns2:role>
+        </ns2:roles>
+        <ns2:members>
+          <ns2:member>Member 1-1</ns2:member>
+          <ns2:member>Member 1-2</ns2:member>
+        </ns2:members>
+    </ns2:group>
+    <ns2:group>
+        <ns2:identifier>Group_2</ns2:identifier>
+        <ns2:name>Group 2</ns2:name>
+        <ns2:description>Group 2 Description</ns2:description>
+        <ns2:organization>Group2-Org</ns2:organization>
+        <ns2:roles>
+          <ns2:role>Role 2-1</ns2:role>
+          <ns2:role>Role 2-2</ns2:role>
+        </ns2:roles>
+        <ns2:members>
+          <ns2:member>Member 2-1</ns2:member>
+          <ns2:member>Member 2-2</ns2:member>
+        </ns2:members>
+    </ns2:group>
+</groups>

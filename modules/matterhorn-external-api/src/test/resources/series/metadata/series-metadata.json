@@ -1,0 +1,105 @@
+[
+  {
+    "title": "Opencast Series DublinCore",
+    "flavor": "dublincore/series",
+    "fields": [
+      {
+        "id": "title",
+        "readOnly": false,
+        "value": "Via API",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.TITLE",
+        "type": "text",
+        "required": true
+      },
+      {
+        "id": "subjects",
+        "readOnly": false,
+        "value": ["Topic"],
+        "label": "EVENTS.SERIES.DETAILS.METADATA.SUBJECT",
+        "type": "text",
+        "required": false
+      },
+      {
+        "id": "description",
+        "readOnly": false,
+        "value": "A series created over the external API",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.DESCRIPTION",
+        "type": "text",
+        "required": false
+      },
+      {
+        "id": "language",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.LANGUAGE",
+        "type": "text",
+        "required": false
+      },
+      {
+        "id": "rightsHolder",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.RIGHTS",
+        "type": "text",
+        "required": false
+      },
+      {
+        "id": "license",
+        "readOnly": false,
+        "value": "",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.LICENSE",
+        "type": "text",
+        "required": false
+      },
+      {
+        "id": "creator",
+        "readOnly": false,
+        "value": [
+          "Peter Feierabend",
+          " Florian Naumann",
+          " Niklas Vogler"
+        ],
+        "label": "EVENTS.SERIES.DETAILS.METADATA.ORGANIZERS",
+        "type": "mixed_text",
+        "required": false
+      },
+      {
+        "id": "contributor",
+        "readOnly": false,
+        "value": [
+          "Nu'man Farooq Morcos",
+          " Alfie Gibbons"
+        ],
+        "label": "EVENTS.SERIES.DETAILS.METADATA.CONTRIBUTORS",
+        "type": "mixed_text",
+        "required": false
+      },
+      {
+        "id": "publisher",
+        "readOnly": false,
+        "value": [
+          "Sophie Chandler"
+        ],
+        "label": "EVENTS.SERIES.DETAILS.METADATA.PUBLISHERS",
+        "type": "mixed_text",
+        "required": false
+      },
+      {
+        "id": "createdBy",
+        "readOnly": true,
+        "value": "Gracie Walsh",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.CREATED_BY",
+        "type": "text",
+        "required": false
+      },
+      {
+        "id": "identifier",
+        "readOnly": true,
+        "value": "4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.ID",
+        "type": "text",
+        "required": false
+      }
+    ]
+  }
+]

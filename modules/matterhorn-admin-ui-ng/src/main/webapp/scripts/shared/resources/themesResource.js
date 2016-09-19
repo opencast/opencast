@@ -15,6 +15,7 @@ angular.module('adminNg.resources')
                 row.creator = r.creator;
                 row.creation_date = Language.formatDate('short', r.creationDate);
                 row.usage = r.usage;
+                row.type = "THEME";
                 return row;
             };
 
