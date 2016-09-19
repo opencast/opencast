@@ -170,7 +170,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   }
 
   public void activate(ComponentContext cc) {
-    setupAgentCache(1, TimeUnit.HOURS);
+    setupAgentCache(2, TimeUnit.HOURS);
   }
 
   public void deactivate() {
@@ -878,6 +878,16 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     if (isBlank(schedulerRolesConfig))
       throw new ConfigurationException("schedulerRoles", "must be specified");
     String[] schedulerRoles = schedulerRolesConfig.trim().split(",");
+
+    String cacheLifetime = (String) properties.get("cacheLifetime");
+    if (StringUtils.isNotBlank(cacheLifetime)) {
+      try {
+        int cacheLife = Integer.parseInt(cacheLifetime);
+        setupAgentCache(cacheLife, TimeUnit.HOURS);
+      } catch (NumberFormatException e) {
+        throw new ConfigurationException("cacheLifetime", "is invalid");
+      }
+    }
 
     // If we don't already have a mapping for this PID, create one
     if (!pidMap.containsKey(pid)) {
