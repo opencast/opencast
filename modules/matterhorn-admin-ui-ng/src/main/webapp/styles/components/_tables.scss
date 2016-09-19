@@ -213,7 +213,7 @@
                 color: $color-silver;
                 @include build-icon(auto, auto, play-icon, 17px, 17px);
                 //@include fa-icon($fa-var-play-circle-o, before, block, 0, 0, inherit, 22px, normal, inherit);
-                
+
                 &.on {
                    color: $primary-color-green;
                    @include build-icon(auto, auto, play-icon-on, 17px, 17px);

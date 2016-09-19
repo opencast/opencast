@@ -27,12 +27,12 @@
   @font-face {
     font-family: $font-family;
       src: url('#{$font-path}#{$file}.eot');
-      src: url('#{$font-path}#{$file}.eot?#iefix') format('embedded-opentype'),          
+      src: url('#{$font-path}#{$file}.eot?#iefix') format('embedded-opentype'),
            url('#{$font-path}#{$file}.woff') format('woff'),
            url('#{$font-path}#{$file}.ttf') format('truetype');
     font-weight: $font-weight;
     font-style: $font-style;
-  }  
+  }
 }
 
 // Include Fonts

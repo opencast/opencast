@@ -47,8 +47,8 @@ $off-white:                    $primary-color-white;
 // Secondary Colors
 // ----------------------------------------
 
-$bright-blue:                  #4da1f7; 
-$red:                          #fa1919; 
+$bright-blue:                  #4da1f7;
+$red:                          #fa1919;
 $alt-red:                      #e45253;
 $yellow:                       #e4d12e;
 $black:                        #000;
@@ -58,7 +58,7 @@ $color-black:               #000;
 $color-darkgray:            #444;
 $color-gray:                #898989;
 $color-silver:              #CCC;
-$color-lightgray:           #F8F8F8; 
+$color-lightgray:           #F8F8F8;
 $color-white:               #fff;
 
 
@@ -67,7 +67,7 @@ $color-white:               #fff;
 $prim-color:                   darken(#fff, 50%);
 $light-prim-color:             lighten($prim-color, 15%);
 $medium-prim-color:            darken($prim-color, 10%);
-$dark-prim-color:              darken($prim-color, 30%); 
+$dark-prim-color:              darken($prim-color, 30%);
 
 $global-text-color:            $medium-prim-color;
 
@@ -88,7 +88,7 @@ $color-link-hover:              $dark-prim-color;
 // ----------------------------------------
 $primary-color-green-light-3: lighten($primary-color-green, 24%);   // #92e0bb
 $primary-color-green-light-2: lighten($primary-color-green, 12%);   // #63d29e
-$primary-color-green-light-1: lighten($primary-color-green, 6%);    // #4bcc8f 
+$primary-color-green-light-1: lighten($primary-color-green, 6%);    // #4bcc8f
 
 $primary-color-green-dark-1: darken($primary-color-green, 9%);      // #2d9d68
 $primary-color-green-dark-2: darken($primary-color-green, 15%);     // #268558

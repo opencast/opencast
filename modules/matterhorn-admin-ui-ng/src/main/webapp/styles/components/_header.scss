@@ -35,17 +35,17 @@
     .header-branding {
         //width: 200px;
         float: left;
-        
+
         a.logo {
             display: block;
             padding: 14px 20px 13px;
-            
+
             img {
                 width: $logo-width;
                 height: $logo-height;
             }
         }
-    }   
+    }
 
     /*
     .text-logo {
@@ -129,7 +129,7 @@
         width: 150px;
         top: 31px;
         right: -11px;
-    }    
+    }
 
     .nav-dd .dropdown-ul {
         width: 150px;
@@ -291,7 +291,7 @@
         left: $side-margin;
 
         @include fa-icon($fa-var-bars, 'before', inline-block, 10px 0 0 30px, 0, #3F5E78, 22px);
-        @include fa-icon($fa-var-bars, 'hover:before', inline-block, 10px 0 0 30px, 0, #5B7B96, 22px);     
+        @include fa-icon($fa-var-bars, 'hover:before', inline-block, 10px 0 0 30px, 0, #5B7B96, 22px);
     }
 
     // Subpage Navigation

@@ -19,12 +19,12 @@
  *
  */
 .modal .list-obj .obj-container {
-    
+
     // Main Properties
     // ----------------------------------------
-    
+
     padding: $modal-container-padding;
-    
+
     .obj-container {
         padding: 0;
     }
@@ -37,13 +37,13 @@
             width: 70%;
             font-size: 11px;
             color: $medium-prim-color;
-        } 
-        
+        }
+
         > ul li {
             margin: 0;
             line-height: 16px;
             font-size: 11px;
-            color: $medium-prim-color; 
+            color: $medium-prim-color;
         }
 
     }
@@ -79,14 +79,14 @@
 
     // Right side icons / elements
     // ----------------------------------------
-    
+
     .play {
         display: inline-block;
         float: right;
         //@include build-icon(auto, auto, play-icon-on, 17px, 17px);
-        
+
         @include fa-icon($fa-var-play-circle-o, before, inherit, 0, 0, $primary-color-green-light-2, 24px);
-        
+
         &:active:before,
         &:hover:before {
             color: $primary-color-green;
@@ -110,9 +110,9 @@
         height: 50px;
         float: left;
     }
-    
+
     input[type="radio"] {
         margin-right: 10px;
     }
-        
+
 }

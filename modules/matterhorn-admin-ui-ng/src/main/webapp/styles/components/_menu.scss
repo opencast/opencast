@@ -62,7 +62,7 @@
             line-height: 50px;
             @include transition(all .2s);
             color: #c9c9c9;
-            
+
             &[data-title]:hover:after {
                 display: block;
                 position: absolute;
@@ -83,15 +83,15 @@
                 text-transform: uppercase;
             }
         }
-        
+
         &:active > i {
             color: #A1A1A1;
         }
-        
+
         &:hover > i {
            color: #A1A1A1;
         }
-        
+
         @key_frames fadeIn {
             0% {
                 opacity: 0;
@@ -103,7 +103,7 @@
                 opacity: 0.9;
             }
         }
-        
+
         $icon-color:        inherit;
         $icon-position:     before;
         $icon-display:      inherit;
@@ -112,7 +112,7 @@
         $icon-padding:      inherit;
         $icon-weight:       inherit;
         $icon-line:         inherit;
-        
+
         .dashboard {
             @include fa-icon($fa-var-desktop, $icon-position, $icon-display, $icon-margin, $icon-padding, $icon-color, $icon-font-size, $icon-weight, $icon-line);
         }
