@@ -19,7 +19,6 @@
  *
  */
 
-
 // Roll Up Menu
 // ----------------------------------------
 
@@ -60,23 +59,23 @@
             margin: 0 auto;
             vertical-align: middle;
             position: relative;
-            line-height: $height;
+            line-height: 50px;
             @include transition(all .2s);
             color: #c9c9c9;
             
-            &[data-title]:after {
-                display: none;
+            &[data-title]:hover:after {
+                display: block;
                 position: absolute;
                 content: attr(data-title);
                 z-index: $max-z;
                 border: $thin-border-stroke #c3cbd0;
-                opacity: 0;
-                //@include transition(all .2s);
+                opacity: 0.9;
+                @include transition(all .2s);
                 @include linear-gradient(top, #fff, #f3f4f4);
                 padding: 0 10px;
                 line-height: 25px;
                 left: 40px;
-                top: 18px;
+                top: 13px;
                 border-radius: 4px;
                 color: $dark-prim-color;
                 font-size: 10px;
@@ -91,12 +90,6 @@
         
         &:hover > i {
            color: #A1A1A1;
-           
-           &[data-title]:after {
-               display: block;
-               opacity: 0.9;
-               animation: fadeIn 1s ease;
-           }
         }
         
         @key_frames fadeIn {

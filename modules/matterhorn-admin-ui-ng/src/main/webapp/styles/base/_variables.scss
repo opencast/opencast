@@ -86,13 +86,13 @@ $color-link-hover:              $dark-prim-color;
 
 // Highlights and Lowlights
 // ----------------------------------------
-$primary-color-green-light-3: lighten($green, 24%);   // #92e0bb
-$primary-color-green-light-2: lighten($green, 12%);   // #63d29e
-$primary-color-green-light-1: lighten($green, 6%);    // #4bcc8f 
+$primary-color-green-light-3: lighten($primary-color-green, 24%);   // #92e0bb
+$primary-color-green-light-2: lighten($primary-color-green, 12%);   // #63d29e
+$primary-color-green-light-1: lighten($primary-color-green, 6%);    // #4bcc8f 
 
-$primary-color-green-dark-1: darken($green, 9%);      // #2d9d68
-$primary-color-green-dark-2: darken($green, 15%);     // #268558
-$primary-color-green-dark-3: darken($green, 20%);     // #20724b
+$primary-color-green-dark-1: darken($primary-color-green, 9%);      // #2d9d68
+$primary-color-green-dark-2: darken($primary-color-green, 15%);     // #268558
+$primary-color-green-dark-3: darken($primary-color-green, 20%);     // #20724b
 
 // Border
 // ----------------------------------------

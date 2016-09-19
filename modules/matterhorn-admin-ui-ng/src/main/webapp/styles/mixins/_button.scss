@@ -36,7 +36,7 @@
 
         &:hover {
             cursor: pointer;
-            @include linear-gradient($primary-color-green-light-2, $primary-color-green-dark-2);
+            @include linear-gradient($primary-color-green-light-1, $primary-color-green-dark-2);
         }
 
         &:active {
@@ -73,7 +73,7 @@
 
         &:hover {
             cursor: pointer;
-            @include linear-gradient($primary-color-green-light-2, $primary-color-green-dark-2);
+            @include linear-gradient($primary-color-green-light-1, $primary-color-green-dark-2);
         }
 
         &:active {
