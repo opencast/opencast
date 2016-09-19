@@ -98,13 +98,10 @@ angular.module('adminNg.controllers')
             multiSelect: true,
             postProcessRow: function (row) {
                 angular.forEach(row.publications, function (publication) {
-                    if(angular.isDefined($scope.publicationChannelLabels[publication.id])) {
+                    if (angular.isDefined($scope.publicationChannelLabels[publication.id])) {
                         publication.label = $scope.publicationChannelLabels[publication.id];
                     } else {
                         publication.label = publication.name;
-                    }
-                    if(angular.isDefined($scope.publicationChannelIcons[publication.id])) {
-                        publication.icon = $scope.publicationChannelIcons[publication.id];
                     }
                 });
             }
@@ -112,7 +109,6 @@ angular.module('adminNg.controllers')
 
         $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
         $scope.publicationChannelLabels = ResourcesListResource.get({ resource: 'PUBLICATION.CHANNEL.LABELS' });
-        $scope.publicationChannelIcons = ResourcesListResource.get({ resource: 'PUBLICATION.CHANNEL.ICONS' });
 
         $scope.table.delete = function (row) {
             EventsResource.delete({id: row.id});
