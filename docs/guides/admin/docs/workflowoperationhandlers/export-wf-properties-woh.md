@@ -9,8 +9,8 @@ properties can later be imported using the [ImportWfPropertiesWorkflowOperation]
 
 |Configuration Key|Example                     |Description                                            |
 |-----------------|----------------------------|-------------------------------------------------------|
-|target-flavor*   |"processing/defaults"       |The flavor to apply to the exported workflow properties|
-|target-tags      |"archive"                   |The tags to apply to the exported workflow properties  |
+|target-flavor*   |processing/defaults         |The flavor to apply to the exported workflow properties|
+|target-tags      |archive                     |The tags to apply to the exported workflow properties  |
 |keys             |variableName1, variableName2|The workflow property keys that need to be persisted. If the option is not specified, all defined properties should be persisted.|
 
 \* mandatory configuration key

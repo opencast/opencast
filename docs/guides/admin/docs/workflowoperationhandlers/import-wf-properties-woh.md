@@ -12,7 +12,7 @@ Note that the [ExportWfPropertiesWorkflowOperationHandler](export-wf-properties-
 
 |Configuration Key|Example                      |Description                                                          |
 |-----------------|-----------------------------|---------------------------------------------------------------------|
-|source-flavor*   |"processing/defaults"        |Flavor of the attachment that contains the serialized workflow instance properties|
+|source-flavor*   |processing/defaults          |Flavor of the attachment that contains the serialized workflow instance properties|
 |keys             |variableName1, variableName2 |The workflow property keys to retrieve (comma separated list). If the option has not been specified, all keys will be retrieved|
 
 \* mandatory configuration key
