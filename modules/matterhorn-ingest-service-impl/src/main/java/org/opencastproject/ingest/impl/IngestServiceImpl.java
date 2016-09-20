@@ -126,6 +126,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -709,6 +710,59 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
   }
 
+  
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.ingest.api.IngestService#addTrack(java.net.URI,
+   *      org.opencastproject.mediapackage.MediaPackageElementFlavor, String[] , org.opencastproject.mediapackage.MediaPackage)
+   */
+  @Override
+  public MediaPackage addTrack(URI uri, MediaPackageElementFlavor flavor, String[] tags, MediaPackage mediaPackage)
+          throws IOException, IngestException {
+    Job job = null;
+    try {
+      job = serviceRegistry.createJob(
+              JOB_TYPE,
+              INGEST_TRACK_FROM_URI,
+              Arrays.asList(uri.toString(), flavor == null ? null : flavor.toString(),
+                      MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
+      job.setStatus(Status.RUNNING);
+      job = serviceRegistry.updateJob(job);
+      String elementId = UUID.randomUUID().toString();
+      logger.info("Start adding track {} from URL {} on mediapackage {}", new Object[] { elementId, uri, mediaPackage });
+      URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
+      MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
+              flavor);
+
+     MediaPackageElement TrackElement = mediaPackage.getTrack(elementId);
+     for (String tag : tags) {
+           TrackElement.addTag(tag);
+     }
+
+    job.setStatus(Job.Status.FINISHED);
+      logger.info("Successful added track {} on mediapackage {} at URL {}", new Object[] { elementId, mediaPackage,
+              newUrl });
+      return mp;
+    } catch (IOException e) {
+      throw e;
+    } catch (ServiceRegistryException e) {
+      throw new IngestException(e);
+    } catch (NotFoundException e) {
+      throw new IngestException("Unable to update ingest job", e);
+    } finally {
+      finallyUpdateJob(job);
+    }
+  }
+  
+    
+  
+  
+ 
+      
+    
+  
   /**
    * {@inheritDoc}
    *

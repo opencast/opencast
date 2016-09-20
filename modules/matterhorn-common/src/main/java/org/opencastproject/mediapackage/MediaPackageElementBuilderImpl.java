@@ -104,7 +104,6 @@ public class MediaPackageElementBuilderImpl implements MediaPackageElementBuilde
     MediaPackageElementBuilderPlugin builderPlugin = candidates.get(0);
     MediaPackageElement element = builderPlugin.elementFromURI(uri);
     element.setFlavor(flavor);
-    element.se
     builderPlugin.destroy();
     return element;
   }
