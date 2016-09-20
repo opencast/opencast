@@ -278,7 +278,7 @@ public class CaptureNowProlongingService implements ManagedService {
 
     private void prolong(final CaptureNowProlongingService prolongingService, final DublinCoreCatalog eventCatalog,
             final String agentId) throws NotFoundException, ServiceRegistryException {
-      long eventId = Integer.parseInt(eventCatalog.getFirst(PROPERTY_IDENTIFIER));
+      long eventId = Long.parseLong(eventCatalog.getFirst(PROPERTY_IDENTIFIER));
       org.opencastproject.job.api.Job job = prolongingService.getServiceRegistry().getJob(eventId);
       Organization organization = prolongingService.getOrgDirectoryService().getOrganization(job.getOrganization());
 
