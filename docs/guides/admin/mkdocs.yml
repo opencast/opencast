@@ -100,5 +100,6 @@ pages:
    - Silence: 'workflowoperationhandlers/silence-woh.md'
    - Tag: 'workflowoperationhandlers/tag-woh.md'
    - Trim: 'workflowoperationhandlers/trim-woh.md'
+   - Watermark: 'workflowoperationhandlers/watermark-woh.md'
    - Waveform: 'workflowoperationhandlers/waveform-woh.md'
    - Zip: 'workflowoperationhandlers/zip-woh.md'

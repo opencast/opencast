@@ -59,5 +59,6 @@ The following table contains the workflow operations that are available in an ou
 |silence           |Silence detection on audio of the mediapackage                 |[Documentation](silence-woh.md)|
 |tag               |Modify the tag sets of media package elements                  |[Documentation](tag-woh.md)|
 |trim              |Waiting for user to review, then trim the recording            |[Documentation](trim-woh.md)|
+|watermark         |Create a video with watermark                                  |[Documentation](watermark-woh.md)|
 |waveform          |Create a waveform image of the audio of the mediapackage       |[Documentation](waveform-woh.md)|
 |zip               |Create zipped archive of the current state of the mediapackage |[Documentation](zip-woh.md)|
