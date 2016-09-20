@@ -164,7 +164,6 @@ angular.module('adminNg.services')
             me.apiService = options.apiService;
             me.multiSelect = options.multiSelect;
             me.refreshDelay = options.refreshDelay || DEFAULT_REFRESH_DELAY;
-            me.postProcessRow = options.postProcessRow;
 
             me.predicate = '';
             me.reverse = false;
@@ -290,11 +289,6 @@ angular.module('adminNg.services')
                         row.selected = true;
                     }
                 });
-                if (angular.isDefined(me.postProcessRow)) {
-                    angular.forEach(data.rows, function(row) {
-                        me.postProcessRow(row);
-                    });
-                }
                 me.rows = data.rows;
                 me.loading = false;
                 me.pagination.totalItems = data.total;
