@@ -43,7 +43,6 @@ public class HttpsRequestWrapper extends HttpServletRequestWrapper {
     StringBuffer url = super.getRequestURL();
     int protocolIndex = url.indexOf("://");
     originalURL = "https" + url.substring(protocolIndex);
-    originalURL = url.toString();
   }
 
   /**
