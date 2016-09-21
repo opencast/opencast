@@ -33,7 +33,6 @@
     @include linear-gradient(top, #388ed6, #2075b1);
 
     .header-branding {
-        //width: 200px;
         float: left;
 
         a.logo {
@@ -46,37 +45,6 @@
             }
         }
     }
-
-    /*
-    .text-logo {
-        display: inline-block;
-        padding-bottom: 2px;
-        float: left;
-        font-size: 18px;
-        font-weight: 600;
-        line-height: 17px;
-        color: darken($l-blue, 25%);
-        text-shadow: 0 1px 0 rgba($white, 0.2);
-        @include font-smoothing(on);
-    }
-
-    .logo-tag {
-        float: left;
-        margin-left: 8px;
-        margin-top: 1px;
-        background: darken($l-blue, 15%);
-        box-shadow: inset 0 1px 2px rgba($black, 0.2), 0 1px 0 rgba($white, 0.1);
-        border-radius: 3px;
-        display: inline-block;
-        padding: 3px 5px;
-        color: lighten($l-blue, 2%);
-        text-shadow: 0 1px 1px rgba($black, 0.2);
-        font-size: 10px;
-        font-weight: 400;
-        text-transform: uppercase;
-        cursor: default;
-    }
-    */
 }
 
 

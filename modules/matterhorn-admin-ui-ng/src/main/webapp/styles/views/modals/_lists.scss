@@ -83,8 +83,6 @@
     .play {
         display: inline-block;
         float: right;
-        //@include build-icon(auto, auto, play-icon-on, 17px, 17px);
-
         @include fa-icon($fa-var-play-circle-o, before, inherit, 0, 0, $primary-color-green-light-2, 24px);
 
         &:active:before,

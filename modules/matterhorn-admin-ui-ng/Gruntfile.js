@@ -75,7 +75,7 @@ module.exports = function (grunt) {
       options: {
         port: 9000,
         // Change this to '0.0.0.0' to access the server from outside.
-        hostname: '0.0.0.0', //'localhost',
+        hostname: 'localhost',
         livereload: 35729
       },
       livereload: {
@@ -355,7 +355,7 @@ module.exports = function (grunt) {
             '*.{ico,png,txt}',
             '*.html',
             'images/{,*/}*.{webp}',
-            'styles/fonts/{,*/}*.*',
+            'fonts/{,*/}*.*',
             'img/{,*/}*.*'
           ]
         }, {
@@ -369,14 +369,14 @@ module.exports = function (grunt) {
           dest: '<%= yeoman.dist %>/lib',
           src: [
             '**'
-          ],
+          ]
         }, {
           expand: true,
           cwd: 'src/main/resources/public',
           dest: '<%= yeoman.dist %>/public',
           src: [
             '**'
-          ],
+          ]
         }, {
           expand: true,
           cwd: '<%= yeoman.app %>/scripts',
@@ -411,7 +411,7 @@ module.exports = function (grunt) {
     // Test settings
     karma: {
       options: {
-        configFile: 'src/test/resources/karma.conf.js',
+        configFile: 'src/test/resources/karma.conf.js'
       },
       unit: {
         singleRun: true
