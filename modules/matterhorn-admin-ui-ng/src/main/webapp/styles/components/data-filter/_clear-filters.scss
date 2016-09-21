@@ -29,7 +29,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    @include background-image(linear-gradient(to left, #F7F7F7 50%, rgba(#F7F7F7, 0)));
+    @include background-image(linear-gradient(right, #F7F7F7 50%, rgba(#F7F7F7, 0)));
 
     .df-clear-button {
         display: block;

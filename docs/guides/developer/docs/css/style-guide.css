@@ -492,3 +492,12 @@ h1, h2, h3, h4, h5, h6, legend {
 .counter p {
     margin-left: 28px;
 }
+
+dl.images dd {
+  height: 230px;
+}
+
+dl.images img {
+    float: left;
+    margin-right: 15px;
+}

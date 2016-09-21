@@ -1,7 +1,10 @@
-## Main Action buttons
-Main Action buttons appear in the action bar. These buttons are generally to start
-an action like exporting or importing a list, creating a new event or series.
+## Main Action Buttons
 
+<div class="row-flex">
+  <img src="../../../../img/buttons-4.png" alt="Main Button - Spacing" />
+  <p>Main Action buttons appear in the action bar. These buttons are generally to start an action like exporting or importing a list, creating a new event or series.</p>
+</div>
+<br/>
 <div class="row-flex">
   <img src="../../../../img/buttons-1.png" alt="Main Button - Navigation" />
 <pre style="margin-bottom: 0px;"><code clas="css hljs" class="hljs css"><span class="hljs-comment">/* [ Main Button ] */</span>

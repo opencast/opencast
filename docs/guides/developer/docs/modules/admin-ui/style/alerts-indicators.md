@@ -2,7 +2,7 @@
 Alerts are used to tell users when actions are incomplete, or
 rejected. Alerts should be placed at the top of the display view
 to have an importance in hierarchy. Alerts are represented
-in "Success", "Info", "Warning" and "Error" states with their
+in "Success", "Info", "Warning" and "Danger" (Error) states with their
 corresponding colors below.
 
 ![Alert colors and usage](../../../img/alerts-1.png)
@@ -17,24 +17,44 @@ corresponding colors below.
     font-size: 20px;
 }
 
+/* $state-success-text - $state-success-bg - $state-success-border */
 .alert.success {
     background: #dff0d8 none repeat scroll 0 0;
     border: 1px solid #d4eacb;
 }
 
+.alert.success p {
+  color: #3c763d;
+}
+
+/* $state-info-text - $state-info-bg - $state-info-border */
 .alert.info {
     background: #d9edf7 none repeat scroll 0 0;
     border: 1px solid #c3e1f0;
 }
 
+.alert.info p {
+  color: #387fa2;
+}
+
+/* $state-warning-text - $state-warning-bg - $state-warning-border */
 .alert.warning {
     background: #fcf8e3 none repeat scroll 0 0;
     border: 1px solid #f5f0cc;
 }
 
-.alert.error {
+.alert.warning p {
+  color: #8a6d3b;
+}
+
+/* $state-danger-text - $state-danger-bg - $state-danger-border */
+.alert.danger {
     background: #f2dede none repeat scroll 0 0;
     border: 1px solid #ebd1d1;
+}
+
+.alert.danger p {
+  color: #a94442;
 }
 ```
 
