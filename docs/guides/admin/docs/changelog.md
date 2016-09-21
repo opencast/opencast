@@ -391,7 +391,7 @@ Opencast 2.0.x
 
 Opencast 2.0.2
 --------------
-*Release on December 22, 2015*
+*Released on December 22, 2015*
 
 - [[MH-10235]](https://opencast.jira.com/browse/MH-10235) - Users are unable to determine the Version of Matterhorn
 - [[MH-10484]](https://opencast.jira.com/browse/MH-10484) - Remove Mediainfo from 3rd-Party-Tools
@@ -425,7 +425,7 @@ Opencast 2.0.2
 
 Opencast 2.0.1
 --------------
-*Release on September 3, 2015*
+*Released on September 3, 2015*
 
 - [[MH-10822]](https://opencast.jira.com/browse/MH-10822) - Possible to create new access policy template without a role with read/write permissions
 - [[MH-10938]](https://opencast.jira.com/browse/MH-10938) - Missing views counter in player
