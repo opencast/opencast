@@ -68,7 +68,15 @@ the javascript minification - use this second tab for your debugging!
 Refreshing the debugging page will rerun the tests
 
 To run Karma for Chrome
-`karma start src/test/resources/karma.conf.js --browsers=Chrome --single-run=false`
+`npm run test-chrome`
+
+To run Karma for Firefox
+`npm run test-firefox`
+
+To run Karma for IE
+`npm run test-ie`
+
+Additional browsers are supported, the full list can be found at [here](https://karma-runner.github.io/1.0/config/browsers.html)
 
 
 Live working with running Opencast
