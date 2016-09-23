@@ -129,6 +129,18 @@ VideoSegmenterService, ManagedService {
   /** Default value for the maximum tolerance for result */
   public static final float DEFAULT_MAX_ERROR = 0.25f;
 
+  /** Name of the constant used to retrieve the absolute maximum number of segments */
+  public static final String OPT_ABSOLUTE_MAX = "absoluteMax";
+
+  /** Default value for the absolute maximum number of segments */
+  public static final int DEFAULT_ABSOLUTE_MAX = 150;
+
+  /** Name of the constant used to retrieve the absolute minimum number of segments */
+  public static final String OPT_ABSOLUTE_MIN = "absoluteMin";
+
+  /** Default value for the absolute minimum number of segments */
+  public static final int DEFAULT_ABSOLUTE_MIN = 3;
+
   /** The load introduced on the system by creating a caption job */
   public static final float DEFAULT_SEGMENTER_JOB_LOAD = 1.0f;
 
@@ -159,6 +171,12 @@ VideoSegmenterService, ManagedService {
 
   /** The tolerance with which the optimization of the number of segments is considered successful */
   protected float maxError = DEFAULT_MAX_ERROR;
+
+  /** The absolute maximum for the number of segments whose compliance will be enforced after the optimization*/
+  protected int absoluteMax = DEFAULT_ABSOLUTE_MAX;
+
+  /** The absolute minimum for the number of segments whose compliance will be enforced after the optimization*/
+  protected int absoluteMin = DEFAULT_ABSOLUTE_MIN;
 
   /** Reference to the receipt service */
   protected ServiceRegistry serviceRegistry = null;
@@ -249,6 +267,28 @@ VideoSegmenterService, ManagedService {
         logger.info("Maximum number of cycles set to {}", maxCycles);
       } catch (Exception e) {
         logger.warn("Found illegal value '{}' for videosegmenter's maximum number of cycles", number);
+      }
+    }
+
+    // Absolute maximum number of segments
+    if (properties.get(OPT_ABSOLUTE_MAX) != null) {
+      String number = (String) properties.get(OPT_ABSOLUTE_MAX);
+      try {
+        absoluteMax = Integer.parseInt(number);
+        logger.info("Absolute maximum number of segments set to {}", absoluteMax);
+      } catch (Exception e) {
+        logger.warn("Found illegal value '{}' for videosegmenter's absolute maximum number of segments", number);
+      }
+    }
+
+    // Absolute minimum number of segments
+    if (properties.get(OPT_ABSOLUTE_MIN) != null) {
+      String number = (String) properties.get(OPT_ABSOLUTE_MIN);
+      try {
+        absoluteMin = Integer.parseInt(number);
+        logger.info("Absolute minimum number of segments set to {}", absoluteMin);
+      } catch (Exception e) {
+        logger.warn("Found illegal value '{}' for videosegmenter's absolute minimum number of segments", number);
       }
     }
 
@@ -503,7 +543,7 @@ VideoSegmenterService, ManagedService {
           cycleCount, tmpSegments.size());
 
       // if no reasonable segmentation could be found, instead return a uniform segmentation
-      if (tmpSegments.size() <= prefNumber / 10 || tmpSegments.size() > prefNumber * 5) {
+      if (tmpSegments.size() < absoluteMin || tmpSegments.size() > absoluteMax) {
         mpeg7 = uniformSegmentation(track, tmpSegments);
         logger.info("Since no reasonable segmentation could be found, a uniform segmentation was created");
       }

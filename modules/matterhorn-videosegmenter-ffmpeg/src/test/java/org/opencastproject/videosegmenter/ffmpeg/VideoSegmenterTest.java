@@ -217,12 +217,14 @@ public class VideoSegmenterTest {
     // set parameters for segmentation because the default parameters are not suitable for too short videos
     vsegmenter.prefNumber = 2;
     vsegmenter.stabilityThreshold = 2;
+    vsegmenter.absoluteMin = 1;
 
     vsegmenter1.stabilityThreshold = 2;
     vsegmenter1.changesThreshold = 0.025f;
     vsegmenter1.prefNumber = 5;
     vsegmenter1.maxCycles = 5;
     vsegmenter1.maxError = 0.2f;
+    vsegmenter1.absoluteMin = 1;
   }
 
   /**

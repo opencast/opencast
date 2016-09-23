@@ -77,3 +77,13 @@ optimization will be ended (defaults to 0.25).
 The maximum number of times the optimization will call the FFmpeg select filter (defaults to 3).
 
     maxCycles = 3
+
+The absolute maximum number of segments. If at the end of the optimization more segments than this are found, instead a
+uniform segmentation will be generated (defaults to 150).
+
+    absoluteMax = 150
+
+The absolute minimum number of segments. If at the end of the optimization less segments than this are found, instead a
+uniform segmentation will be generated (defaults to 3).
+
+    absoluteMin = 3
