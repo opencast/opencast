@@ -27,8 +27,9 @@ import org.opencastproject.metadata.mpeg7.Segment;
 import java.util.LinkedList;
 
 /**
- * stores parameters of an optimization step of the optimization of the number
- * of segments and calculates error and absolute error of optimization
+ * An optimization step is one step in the optimization of the number of segments.
+ * This class stores parameters of such an optimization step and calculates error and
+ * absolute error of optimization
  *
  */
 public class OptimizationStep {
@@ -52,7 +53,8 @@ public class OptimizationStep {
    * @param mpeg7
    * @param segments unfiltered list of segments
    */
-  public OptimizationStep(int stabilityThreshold, float changesThreshold, int segNum, int prefNum, Mpeg7Catalog mpeg7, LinkedList<Segment> segments) {
+  public OptimizationStep(int stabilityThreshold, float changesThreshold, int segNum, int prefNum, Mpeg7Catalog mpeg7,
+          LinkedList<Segment> segments) {
     this.stabilityThreshold = stabilityThreshold;
     this.changesThreshold = changesThreshold;
     this.segmentNum = segNum;
@@ -77,18 +79,8 @@ public class OptimizationStep {
 
   /**
    * calculate error of optimization and absolute error of optimization
-   *
-   * @param prefNumber preferred number of segments
    */
-  public void calcErrors(int prefNumber) {
-    error = (float)(segmentNum - prefNumber) / (float)prefNumber;
-    errorAbs = Math.abs(error);
-  }
-
-  /**
-   * calculate error of optimization and absolute error of optimization
-   */
-  public final void calcErrors() {
+  private void calcErrors() {
     error = (float)(segmentNum - prefNum) / (float)prefNum;
     errorAbs = Math.abs(error);
   }
@@ -134,8 +126,9 @@ public class OptimizationStep {
    *
    * @param segNum number of segments
    */
-  public void setSegmentNum(int segNum) {
+  public void setSegmentNumAndRecalcErrors(int segNum) {
     segmentNum = segNum;
+    calcErrors();
   }
 
   /**

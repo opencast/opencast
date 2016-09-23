@@ -426,8 +426,7 @@ VideoSegmenterService, ManagedService {
         OptimizationStep currentStepFiltered = new OptimizationStep(
                 stabilityThreshold, changesThresholdLocal, segmentsNew.size(),
                 prefNumber, filterSegmentation(segments, track, segmentsNew, stabilityThreshold * 1000), segments);
-        currentStepFiltered.setSegmentNum(segmentsNew.size());
-        currentStepFiltered.calcErrors();
+        currentStepFiltered.setSegmentNumAndRecalcErrors(segmentsNew.size());
 
         logger.info("Segmentation yields {} segments after filtering", segmentsNew.size());
 
