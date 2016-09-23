@@ -332,8 +332,10 @@ VideoSegmenterService, ManagedService {
       // local copy of changesThreshold, that can safely be changed over optimization iterations
       float changesThresholdLocal = changesThreshold;
 
+      logger.info("Starting video segmentation of {}", mediaUrl);
 
-      // optimization loop to get a segmentation with an amount of segments close
+
+      // optimization loop to get a segmentation with a number of segments close
       // to the desired number of segments
       while (!endOptimization) {
 
@@ -341,80 +343,10 @@ VideoSegmenterService, ManagedService {
         videoContent = mpeg7.addVideoContent("videosegment",
             contentTime, contentLocator);
 
-        logger.info("Starting video segmentation of {}", mediaUrl);
-        String[] command = new String[] { binary, "-nostats", "-i",
-          mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
-          "-filter:v", "select=gt(scene\\," + changesThresholdLocal + "),showinfo",
-          "-f", "null", "-"
-        };
-        String commandline = StringUtils.join(command, " ");
 
-        logger.info("Running {}", commandline);
+        // run the segmentation with FFmpeg
+        segments = runSegmentationFFmpeg(track, videoContent, mediaFile, changesThresholdLocal);
 
-        ProcessBuilder pbuilder = new ProcessBuilder(command);
-        List<String> segmentsStrings = new LinkedList<String>();
-        Process process = pbuilder.start();
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getErrorStream()));
-        try {
-          LineReader lr = new LineReader(reader);
-          String line = lr.readLine();
-          while (null != line) {
-            if (line.startsWith("[Parsed_showinfo")) {
-              segmentsStrings.add(line);
-            }
-            line = lr.readLine();
-          }
-        } catch (IOException e) {
-          logger.error("Error executing ffmpeg: {}", e.getMessage());
-        } finally {
-          reader.close();
-        }
-
-        // [Parsed_showinfo_1 @ 0x157fb40] n:0 pts:12 pts_time:12 pos:227495
-        // fmt:rgb24 sar:0/1 s:320x240 i:P iskey:1 type:I checksum:8DF39EA9
-        // plane_checksum:[8DF39EA9]
-
-        int segmentcount = 1;
-        segments = new LinkedList<Segment>();
-
-        if (segmentsStrings.size() == 0) {
-          Segment s = videoContent.getTemporalDecomposition()
-              .createSegment("segment-" + segmentcount);
-          s.setMediaTime(new MediaRelTimeImpl(0, track.getDuration()));
-          segments.add(s);
-        } else {
-          long starttime = 0;
-          long endtime = 0;
-          Pattern pattern = Pattern.compile("pts_time\\:\\d+(\\.\\d+)?");
-          for (String seginfo : segmentsStrings) {
-            Matcher matcher = pattern.matcher(seginfo);
-            String time = "0";
-            while (matcher.find()) {
-              time = matcher.group().substring(9);
-            }
-            endtime = (long)(Float.parseFloat(time) * 1000);
-            long segmentLength = endtime - starttime;
-            if (1000 * stabilityThresholdPrefilter < segmentLength) {
-              Segment segment = videoContent.getTemporalDecomposition()
-                  .createSegment("segment-" + segmentcount);
-              segment.setMediaTime(new MediaRelTimeImpl(starttime,
-                  endtime - starttime));
-              segments.add(segment);
-              segmentcount++;
-              starttime = endtime;
-            }
-          }
-          // Add last segment
-          Segment s = videoContent.getTemporalDecomposition()
-              .createSegment("segment-" + segmentcount);
-          s.setMediaTime(new MediaRelTimeImpl(endtime, track
-              .getDuration() - endtime));
-          segments.add(s);
-        }
-
-        logger.info("Segmentation of {} yields {} segments", mediaUrl,
-                segments.size());
 
         // calculate errors for "normal" and filtered segmentation
         // and compare them to find better optimization.
@@ -466,10 +398,8 @@ VideoSegmenterService, ManagedService {
           if (optimizationList.size() > 0) {
             if (optimizationList.getFirst().getErrorAbs() <= optimizationList.getLast().getErrorAbs()
                 && optimizationList.getFirst().getError() >= 0) {
-//              mpeg7 = optimizationList.getFirst().getMpeg7();
               stepBest = optimizationList.getFirst();
             } else {
-//              mpeg7 = optimizationList.getLast().getMpeg7(); todo
               stepBest = optimizationList.getLast();
             }
           }
@@ -603,6 +533,86 @@ VideoSegmenterService, ManagedService {
         throw new VideoSegmenterException(e);
       }
     }
+  }
+
+  private LinkedList<Segment> runSegmentationFFmpeg(Track track, Video videoContent, File mediaFile,
+          float changesThresholdLocal) throws IOException {
+
+    String[] command = new String[] { binary, "-nostats", "-i",
+      mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
+      "-filter:v", "select=gt(scene\\," + changesThresholdLocal + "),showinfo",
+      "-f", "null", "-"
+    };
+    String commandline = StringUtils.join(command, " ");
+
+    logger.info("Running {}", commandline);
+
+    ProcessBuilder pbuilder = new ProcessBuilder(command);
+    List<String> segmentsStrings = new LinkedList<String>();
+    Process process = pbuilder.start();
+    BufferedReader reader = new BufferedReader(
+            new InputStreamReader(process.getErrorStream()));
+    try {
+      LineReader lr = new LineReader(reader);
+      String line = lr.readLine();
+      while (null != line) {
+        if (line.startsWith("[Parsed_showinfo")) {
+          segmentsStrings.add(line);
+        }
+        line = lr.readLine();
+      }
+    } catch (IOException e) {
+      logger.error("Error executing ffmpeg: {}", e.getMessage());
+    } finally {
+      reader.close();
+    }
+
+    // [Parsed_showinfo_1 @ 0x157fb40] n:0 pts:12 pts_time:12 pos:227495
+    // fmt:rgb24 sar:0/1 s:320x240 i:P iskey:1 type:I checksum:8DF39EA9
+    // plane_checksum:[8DF39EA9]
+
+    int segmentcount = 1;
+    LinkedList<Segment> segments = new LinkedList<Segment>();
+
+    if (segmentsStrings.size() == 0) {
+      Segment s = videoContent.getTemporalDecomposition()
+          .createSegment("segment-" + segmentcount);
+      s.setMediaTime(new MediaRelTimeImpl(0, track.getDuration()));
+      segments.add(s);
+    } else {
+      long starttime = 0;
+      long endtime = 0;
+      Pattern pattern = Pattern.compile("pts_time\\:\\d+(\\.\\d+)?");
+      for (String seginfo : segmentsStrings) {
+        Matcher matcher = pattern.matcher(seginfo);
+        String time = "0";
+        while (matcher.find()) {
+          time = matcher.group().substring(9);
+        }
+        endtime = (long)(Float.parseFloat(time) * 1000);
+        long segmentLength = endtime - starttime;
+        if (1000 * stabilityThresholdPrefilter < segmentLength) {
+          Segment segment = videoContent.getTemporalDecomposition()
+              .createSegment("segment-" + segmentcount);
+          segment.setMediaTime(new MediaRelTimeImpl(starttime,
+              endtime - starttime));
+          segments.add(segment);
+          segmentcount++;
+          starttime = endtime;
+        }
+      }
+      // Add last segment
+      Segment s = videoContent.getTemporalDecomposition()
+          .createSegment("segment-" + segmentcount);
+      s.setMediaTime(new MediaRelTimeImpl(endtime, track
+          .getDuration() - endtime));
+      segments.add(s);
+    }
+
+   logger.info("Segmentation of {} yields {} segments",
+           mediaFile.toURI().toURL(), segments.size());
+
+    return segments;
   }
 
   /**
@@ -838,7 +848,7 @@ VideoSegmenterService, ManagedService {
   }
 
   /**
-   * Creates a uniform segmentation for a given track, with prefNumber as the amount of segments
+   * Creates a uniform segmentation for a given track, with prefNumber as the number of segments
    * which will all have the same length
    *
    * @param track the track that is segmented

@@ -85,12 +85,10 @@ public class VideoSegmenterTest {
 
   /** Video file to test the optimization */
   protected static final String mediaResource1 = "/test-optimization.mp4";
-//  protected static final String mediaResource1 = "/WebTech2.mp4"; todo
 
   /** Duration of whole movie */
   protected static final long mediaDuration = 20000L;
   protected static final long mediaDuration1 = 30000L;
-//  protected static final long mediaDuration1 = 57487600L; todo
 
   /** Duration of the first segment */
   protected static final long firstSegmentDuration = 12000L;
