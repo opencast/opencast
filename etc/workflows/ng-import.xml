@@ -2,7 +2,7 @@
 <definition xmlns="http://workflow.opencastproject.org">
 
   <id>import</id>
-  <title>Imports Mediapacke and Publish without reendcode</title>
+  <title>Imports Mediapacke and Publish without reencode</title>
   <tags>
     <tag>upload-ng</tag>
     <tag>schedule-ng</tag>
