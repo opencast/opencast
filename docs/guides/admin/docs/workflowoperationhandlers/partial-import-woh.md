@@ -77,7 +77,7 @@ In our example, this SMIL file would like something like:
           </par>
         </body>
       </smil>
-      
+
 What we finally want, however, is a single presenter and a single presentation track that can be processed by Opencast workflow operations.
 To achieve this, the PartialImportWorkflowOperation is used to post-process the files as described in the SMIL file:
 
