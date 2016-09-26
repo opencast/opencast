@@ -184,6 +184,26 @@ public interface IngestService extends JobProducer {
   MediaPackage addTrack(URI uri, MediaPackageElementFlavor flavor, MediaPackage mediaPackage)
           throws MediaPackageException, IOException, IngestException;
 
+    /**
+   * Add a media track to an existing MediaPackage in the repository
+   *
+   * @param uri
+   *          The URL of the file to add
+   * @param flavor
+   *          The flavor of the media that is being added
+   * @param tags
+   *           Tags to add to the Track [] 
+   * @param mediaPackage
+   *          The specific Matterhorn MediaPackage to which Media is being added
+   * @return MediaPackageManifest The manifest of a specific Matterhorn MediaPackage element
+   * @throws MediaPackageException
+   * @throws IOException
+   * @throws IngestException
+   *           if an unexpected error occurs
+   */
+  MediaPackage addTrack(URI uri, MediaPackageElementFlavor flavor,String[] tags, MediaPackage mediaPackage)
+          throws MediaPackageException, IOException, IngestException;
+
   /**
    * Add a media track to an existing MediaPackage in the repository
    *
@@ -200,6 +220,24 @@ public interface IngestService extends JobProducer {
    *           if an unexpected error occurs
    */
   MediaPackage addTrack(InputStream mediaFile, String fileName, MediaPackageElementFlavor flavor,
+          MediaPackage mediaPackage) throws MediaPackageException, IOException, IngestException;
+
+   /**
+   * Add a media track to an existing MediaPackage in the repository
+   *
+   * @param mediaFile
+   *          The media file to add
+   * @param flavor
+   *          The flavor of the media that is being added
+   * @param mediaPackage
+   *          The specific Matterhorn MediaPackage to which Media is being added
+   * @return MediaPackage The updated Matterhorn MediaPackage element
+   * @throws MediaPackageException
+   * @throws IOException
+   * @throws IngestException
+   *           if an unexpected error occurs
+   */
+  MediaPackage addTrack(InputStream mediaFile, String fileName, MediaPackageElementFlavor flavor, String [] tags,
           MediaPackage mediaPackage) throws MediaPackageException, IOException, IngestException;
 
   /**
@@ -280,6 +318,26 @@ public interface IngestService extends JobProducer {
   MediaPackage addCatalog(InputStream catalog, String fileName, MediaPackageElementFlavor flavor,
           MediaPackage mediaPackage) throws MediaPackageException, IOException, IngestException;
 
+    /**
+   * Add a [metadata catalog] to an existing MediaPackage in the repository
+   *
+   * @param catalog
+   *          The catalog file to add
+   * @param flavor
+   *          The flavor of the media that is being added
+   *@param  tags
+   *         The tags for the media that is being added:
+   * @param mediaPackage
+   *          The specific Matterhorn MediaPackage to which Media is being added
+   * @return MediaPackage The updated Matterhorn MediaPackage element
+   * @throws MediaPackageException
+   * @throws IOException
+   * @throws IngestException
+   *           if an unexpected error occurs
+   */
+  MediaPackage addCatalog(InputStream catalog, String fileName, MediaPackageElementFlavor flavor, String[] tags,
+          MediaPackage mediaPackage) throws MediaPackageException, IOException, IngestException;
+
   /**
    * Add an attachment to an existing MediaPackage in the repository
    *
@@ -314,6 +372,26 @@ public interface IngestService extends JobProducer {
    *           if an unexpected error occurs
    */
   MediaPackage addAttachment(InputStream file, String fileName, MediaPackageElementFlavor flavor,
+          MediaPackage mediaPackage) throws MediaPackageException, IOException, IngestException;
+
+    /**
+   * Add an attachment to an existing MediaPackage in the repository
+   *
+   * @param file
+   *          The file to add
+   * @param flavor
+   *          The flavor of the media that is being added
+   * @ param tags
+   *          The tags of the media thas is being added
+   * @param mediaPackage
+   *          The specific Matterhorn MediaPackage to which Media is being added
+   * @return MediaPackage The updated Matterhorn MediaPackage element
+   * @throws MediaPackageException
+   * @throws IOException
+   * @throws IngestException
+   *           if an unexpected error occurs
+   */
+  MediaPackage addAttachment(InputStream file, String fileName, MediaPackageElementFlavor flavor, String[] tags,
           MediaPackage mediaPackage) throws MediaPackageException, IOException, IngestException;
 
   /**

@@ -346,7 +346,7 @@ public class IngestRestServiceTest {
 
   @Test
   public void testAddMediaPackageTrack() throws Exception {
-    Response response = restService.addMediaPackageTrack("http://foo/av.mov", "presenter/source",
+    Response response = restService.addMediaPackageTrack("http://foo/av.mov", "presenter/source","testag",
             MediaPackageParser.getAsXml(((MediaPackage) restService.createMediaPackage(null).getEntity())));
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
   }
