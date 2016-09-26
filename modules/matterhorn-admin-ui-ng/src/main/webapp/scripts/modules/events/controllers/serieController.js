@@ -22,9 +22,9 @@
 
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
-.controller('SerieCtrl', ['$scope', '$q', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource', 'SeriesThemeResource', 'ResourcesListResource', 'Notifications',
+.controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource', 'SeriesThemeResource', 'ResourcesListResource', 'Notifications',
         'OptoutSingleResource', 'SeriesParticipationResource',
-        function ($scope, $q, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, ResourcesListResource, Notifications,
+        function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, ResourcesListResource, Notifications,
             OptoutSingleResource, SeriesParticipationResource) {
 
     var saveFns = {}, aclNotification,
@@ -69,14 +69,16 @@ angular.module('adminNg.controllers')
         updateRoles = function() {
             //MH-11716: We have to wait for both the access (series ACL), and the roles (list of system roles)
             //to resolve before we can add the roles that are present in the series but not in the system
-            ResourcesListResource.get({ resource: 'ROLES' }, function (results) {
+            return ResourcesListResource.get({ resource: 'ROLES' }, function (results) {
                 var roles = results;
-                angular.forEach($scope.access.series_access.privileges, function(value, key) {
+                return $scope.access.$promise.then(function () {
+                  angular.forEach($scope.access.series_access.privileges, function(value, key) {
                     if (angular.isUndefined(roles[key])) {
                         roles[key] = key;
                     }
-                }, this);
-                $scope.roles = roles;
+                  }, this);
+		  return roles;
+		});
             }, this);
         };
 
@@ -181,7 +183,7 @@ angular.module('adminNg.controllers')
             });
         });
 
-        updateRoles();
+        $scope.roles = updateRoles();
         $scope.theme = {};
 
         ResourcesListResource.get({ resource: 'THEMES.NAME' }, function (data) {
@@ -334,7 +336,7 @@ angular.module('adminNg.controllers')
       switch (value) {
         case 'permissions':
             $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
-            updateRoles();
+            $scope.roles = updateRoles();
           break;
       }
     });
