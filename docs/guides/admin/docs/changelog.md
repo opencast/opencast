@@ -3,6 +3,7 @@ Opencast 2.2.x
 
 Opencast 2.2.2
 --------------
+*Released on September 14, 2016*
 
 - [[MH-11194]](https://opencast.jira.com/browse/MH-11194) - created themes not showing up in series branding tab
 - [[MH-11572]](https://opencast.jira.com/browse/MH-11572) - FFmpeg Inspection Service Test - accurateFrameCount
@@ -19,6 +20,7 @@ Opencast 2.2.2
 
 Opencast 2.2.1
 --------------
+*Released on July 30, 2016*
 
 - [[MH-11092]](https://opencast.jira.com/browse/MH-11092) - Every Browser has an other "Remember me" checkbox
 - [[MH-11169]](https://opencast.jira.com/browse/MH-11169) - Trimming points not set correctly after workflow is finished
@@ -52,6 +54,7 @@ Opencast 2.2.1
 
 Opencast 2.2.0
 --------------
+*Released on June 15, 2016*
 
 - [[MH-9511]](https://opencast.jira.com/browse/MH-9511) - Wrong log level in Tesseract
 - [[MH-9831]](https://opencast.jira.com/browse/MH-9831) - ehcache and quartz phones home
@@ -253,6 +256,7 @@ Opencast 2.1.x
 
 Opencast 2.1.2
 --------------
+*Released on May 10, 2016*
 
 - [[MH-9831]](https://opencast.jira.com/browse/MH-9831) - ehcache and quartz phones home
 - [[MH-11121]](https://opencast.jira.com/browse/MH-11121) - MacOS X Installation Guide Needs 2.1 Update
@@ -275,6 +279,7 @@ Opencast 2.1.2
 
 Opencast 2.1.1
 --------------
+*Released on January 22, 2016*
 
 - [[MH-11107]](https://opencast.jira.com/browse/MH-11107) - Group list pagination not working
 - [[MH-11265]](https://opencast.jira.com/browse/MH-11265) - Ensure configuration files end with newline characters
@@ -284,6 +289,7 @@ Opencast 2.1.1
 
 Opencast 2.1.0
 --------------
+*Released on December 22, 2015*
 
 - [[MH-10637]](https://opencast.jira.com/browse/MH-10637) - Hello World service
 - [[MH-10651]](https://opencast.jira.com/browse/MH-10651) - Workspace cleaner job param in wrong units (ms vs s) and wrong logic
@@ -385,6 +391,7 @@ Opencast 2.0.x
 
 Opencast 2.0.2
 --------------
+*Released on December 22, 2015*
 
 - [[MH-10235]](https://opencast.jira.com/browse/MH-10235) - Users are unable to determine the Version of Matterhorn
 - [[MH-10484]](https://opencast.jira.com/browse/MH-10484) - Remove Mediainfo from 3rd-Party-Tools
@@ -418,6 +425,7 @@ Opencast 2.0.2
 
 Opencast 2.0.1
 --------------
+*Released on September 3, 2015*
 
 - [[MH-10822]](https://opencast.jira.com/browse/MH-10822) - Possible to create new access policy template without a role with read/write permissions
 - [[MH-10938]](https://opencast.jira.com/browse/MH-10938) - Missing views counter in player
@@ -430,6 +438,7 @@ Opencast 2.0.1
 
 Opencast 2.0.0
 --------------
+*Released on July 17, 2015*
 
 - [[MH-9950]](https://opencast.jira.com/browse/MH-9950) - "Clean up"/Split up nested functions in the core routine (core.js)
 - [[MH-9950]](https://opencast.jira.com/browse/MH-9950) - Load CSS files in the core HTML file, not the JavaScript
