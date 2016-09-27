@@ -200,8 +200,8 @@ angular.module('adminNg.controllers')
               //to resolve before we can add the roles that are present in the series but not in the system
               return ResourcesListResource.get({ resource: 'ROLES' }, function (results) {
                 var roles = results;
-                return $scope.acls.$promise.then(function () {
-                    angular.forEach($scope.access.series_access.privileges, function(value, key) {
+                return $scope.access.$promise.then(function () {
+                    angular.forEach($scope.access.episode_access.privileges, function(value, key) {
                         if (angular.isUndefined(roles[key])) {
                             roles[key] = key;
                         }
