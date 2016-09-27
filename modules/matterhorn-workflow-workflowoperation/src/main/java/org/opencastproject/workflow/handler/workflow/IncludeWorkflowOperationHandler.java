@@ -59,7 +59,6 @@ public final class IncludeWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * {@inheritDoc}
    *
-   * @see ResumableWorkflowOperationHandlerBase#activate(org.osgi.service.component.ComponentContext)
    */
   @Override
   public void activate(ComponentContext componentContext) {
@@ -71,8 +70,6 @@ public final class IncludeWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * {@inheritDoc}
    *
-   * @see ResumableWorkflowOperationHandlerBase#start(org.opencastproject.workflow.api.WorkflowInstance,
-   * org.opencastproject.job.api.JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance wi, final JobContext context)
