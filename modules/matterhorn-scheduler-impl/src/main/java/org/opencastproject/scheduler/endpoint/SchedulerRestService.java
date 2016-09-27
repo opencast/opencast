@@ -541,7 +541,7 @@ public class SchedulerRestService {
         return Response.notModified().build();
       } else {
         eventCatalog = search.getCatalogList().get(0);
-        eventId = Integer.parseInt(eventCatalog.getFirst(PROPERTY_IDENTIFIER));
+        eventId = Long.parseLong(eventCatalog.getFirst(PROPERTY_IDENTIFIER));
       }
     } catch (Exception e) {
       logger.warn("Unable to get the immediate recording for agent '{}': {}", agentId, e);

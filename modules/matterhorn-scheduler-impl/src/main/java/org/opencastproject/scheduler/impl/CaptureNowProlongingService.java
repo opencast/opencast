@@ -319,7 +319,7 @@ public class CaptureNowProlongingService implements ManagedService {
 
   public void prolongEvent(DublinCoreCatalog eventCatalog, String agentId)
           throws UnauthorizedException, NotFoundException, SchedulerException {
-    long eventId = Integer.parseInt(eventCatalog.getFirst(PROPERTY_IDENTIFIER));
+    long eventId = Long.parseLong(eventCatalog.getFirst(PROPERTY_IDENTIFIER));
 
     DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(eventCatalog.getFirst(DublinCore.PROPERTY_TEMPORAL));
 
@@ -330,7 +330,7 @@ public class CaptureNowProlongingService implements ManagedService {
 
     DublinCoreCatalogList events = schedulerService.findConflictingEvents(agentId, period.getStart(), prolongedEndDate);
     for (DublinCoreCatalog conflictCatalog : events.getCatalogList()) {
-      if (eventId == Integer.parseInt(conflictCatalog.getFirst(PROPERTY_IDENTIFIER)))
+      if (eventId == Long.parseLong(conflictCatalog.getFirst(PROPERTY_IDENTIFIER)))
         continue;
 
       Date conflictingStartDate = EncodingSchemeUtils
