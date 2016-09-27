@@ -72,13 +72,13 @@ angular.module('adminNg.controllers')
             return ResourcesListResource.get({ resource: 'ROLES' }, function (results) {
                 var roles = results;
                 return $scope.access.$promise.then(function () {
-                  angular.forEach($scope.access.series_access.privileges, function(value, key) {
-                    if (angular.isUndefined(roles[key])) {
-                        roles[key] = key;
-                    }
-                  }, this);
-		  return roles;
-		});
+                    angular.forEach($scope.access.series_access.privileges, function(value, key) {
+                        if (angular.isUndefined(roles[key])) {
+                            roles[key] = key;
+                        }
+                    }, this);
+		            return roles;
+		        });
             }, this);
         };
 
