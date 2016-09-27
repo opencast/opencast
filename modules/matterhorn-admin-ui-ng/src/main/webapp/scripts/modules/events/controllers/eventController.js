@@ -26,7 +26,7 @@ angular.module('adminNg.controllers')
     '$scope', 'Notifications', 'EventTransactionResource', 'EventMetadataResource', 'EventAssetsResource',
     'EventCatalogsResource', 'CommentResource', 'EventWorkflowsResource',
     'ResourcesListResource', 'EventAccessResource', 'EventGeneralResource',
-    'OptoutsResource', 'EventParticipationResource', 'NewEventProcessingResource', 
+    'OptoutsResource', 'EventParticipationResource', 'NewEventProcessingResource',
     'OptoutSingleResource', 'CaptureAgentsResource', 'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout',
     function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource, EventCatalogsResource, CommentResource,
         EventWorkflowsResource, ResourcesListResource, EventAccessResource, EventGeneralResource,
@@ -180,7 +180,7 @@ angular.module('adminNg.controllers')
             checkForActiveTransactions = function () {
                 EventTransactionResource.hasActiveTransaction({id: $scope.resourceId }, function (data) {
                     $scope.transactions.read_only = angular.isUndefined(data.hasActiveTransaction) ? true : data.hasActiveTransaction;
-                    
+
                     if ($scope.transactions.read_only) {
                       if (!angular.isUndefined(me.transactionNotification)) {
                           Notifications.remove(me.transactionNotification, NOTIFICATION_CONTEXT);
@@ -194,6 +194,21 @@ angular.module('adminNg.controllers')
                 });
 
                 $scope.checkForActiveTransactionsTimer = $timeout(checkForActiveTransactions, 3000);
+            },
+            updateRoles = function() {
+              //MH-11716: We have to wait for both the access (series ACL), and the roles (list of system roles)
+              //to resolve before we can add the roles that are present in the series but not in the system
+              return ResourcesListResource.get({ resource: 'ROLES' }, function (results) {
+                var roles = results;
+                return $scope.acls.$promise.then(function () {
+                    angular.forEach($scope.access.series_access.privileges, function(value, key) {
+                        if (angular.isUndefined(roles[key])) {
+                            roles[key] = key;
+                        }
+                    }, this);
+		            return roles;
+		        });
+              }, this);
             },
             fetchChildResources = function (id) {
                 $scope.general = EventGeneralResource.get({ id: id }, function () {
@@ -251,7 +266,7 @@ angular.module('adminNg.controllers')
                         }
                     });
                 });
-                $scope.roles = ResourcesListResource.get({ resource: 'ROLES' });
+                $scope.roles = updateRoles();
 
                 $scope.assets = EventAssetsResource.get({ id: id });
 
@@ -579,13 +594,13 @@ angular.module('adminNg.controllers')
 
         this.accessNotSaved = function () {
           Notifications.add('error', 'ACL_NOT_SAVED', NOTIFICATION_CONTEXT, 30000);
-          
+
           $scope.access = EventAccessResource.get({ id: $scope.resourceId }, function (data) {
               if (angular.isDefined(data.episode_access)) {
                   var json = angular.fromJson(data.episode_access.acl);
                   changePolicies(json.acl.ace, true);
               }
-          });          
+          });
         };
 
         $scope.accessSave = function () {
@@ -658,7 +673,7 @@ angular.module('adminNg.controllers')
                         ace: ace
                     },
                     override: true
-                }, me.accessSaved, me.accessNotSaved);                
+                }, me.accessSaved, me.accessNotSaved);
             }
         };
 
