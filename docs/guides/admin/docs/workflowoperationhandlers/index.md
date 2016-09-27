@@ -25,9 +25,7 @@ The following table contains the workflow operations that are available in an ou
 |--------------------|---------------------------------------------------------------|------------------------------------|
 |analyze-tracks      |Analyze tracks in media package                                |[Documentation](analyze-tracks-woh.md)|
 |analyze-audio       |Analyze first audio stream                                     |[Documentation](analyzeaudio-woh.md)|
-|append              |Hold for user to select workflow to continue with              |[Documentation](append-woh.md)|
 |archive             |Archive the current state of the mediapackage                  |[Documentation](archive-woh.md)|
-|caption             |Waiting for user to upload captions                            |[Documentation](caption-woh.md)|
 |cleanup             |Cleanup the working file repository                            |[Documentation](cleanup-woh.md)|
 |comment             |Add, resolve or delete a comment                               |[Documentation](comment-woh.md)|
 |compose             |Encode media files using FFmpeg                                |[Documentation](compose-woh.md)|
@@ -60,7 +58,5 @@ The following table contains the workflow operations that are available in an ou
 |series              |Apply series to the mediapackage                               |[Documentation](series-woh.md)|
 |silence             |Silence detection on audio of the mediapackage                 |[Documentation](silence-woh.md)|
 |tag                 |Modify the tag sets of media package elements                  |[Documentation](tag-woh.md)|
-|trim                |Waiting for user to review, then trim the recording            |[Documentation](trim-woh.md)|
-|watermark           |Create a video with watermark                                  |[Documentation](watermark-woh.md)|
 |waveform            |Create a waveform image of the audio of the mediapackage       |[Documentation](waveform-woh.md)|
 |zip                 |Create zipped archive of the current state of the mediapackage |[Documentation](zip-woh.md)|

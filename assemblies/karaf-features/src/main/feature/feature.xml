@@ -186,7 +186,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-external-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-holdstate-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-index-service/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-ingest-service-api/${project.version}</bundle>
@@ -272,7 +271,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-external-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-holdstate-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-index-service/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-ingest-service-api/${project.version}</bundle>
@@ -371,7 +369,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-external-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-holdstate-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-index-service/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-ingest-service-api/${project.version}</bundle>
@@ -511,7 +508,6 @@
     <bundle>mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-external-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
-    <bundle>mvn:org.opencastproject/matterhorn-holdstate-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-index-service/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-ingest-service-api/${project.version}</bundle>
