@@ -142,14 +142,6 @@ modules/matterhorn-common/src/test/resources/InfusionAll.js
   Copyright (c) 2009 John Resig
   Dual licensed under the MIT and GPL licenses.
 
-modules/matterhorn-engage-player/src/main/flex/bridge/FABridge.as
-  Copyright � 2006 Adobe Systems Incorporated
-  MIT License
-
-modules/matterhorn-engage-player/src/main/flex/com/osmf/MediaContainerUIComponent.as
-  Copyright 2010 Adobe Systems Incorporated.  All Rights Reserved.
-  Mozilla Public License Version 1.1
-
 modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/backbone.js
   Backbone v1.2.3 (http://backbonejs.org)
   Copyright 2010-2016 Jeremy Ashkenas, DocumentCloud
@@ -1028,27 +1020,6 @@ matterhorn-kernel
   org.springframework.security.oauth     spring-security-oauth                            -
 
 
-matterhorn-load-test
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.apache.felix.karaf.shell           org.apache.felix.karaf.shell.console             The Apache Software License, Version 2.0
-  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.quartz             The Apache Software License, Version 2.0
-
-
-matterhorn-load-test-engage
-  GroupId                                ArtifactId                                       License
-  commons-cli                            commons-cli                                      The Apache Software License, Version 2.0
-  dom4j                                  dom4j                                            -
-  log4j                                  log4j                                            The Apache Software License, Version 2.0
-  org.reflections                        reflections                                      -
-  org.seleniumhq.selenium                selenium-java                                    The Apache Software License, Version 2.0
-  org.slf4j                              slf4j-api                                        -
-  org.slf4j                              slf4j-log4j12                                    -
-
-
 matterhorn-lti
   GroupId                                ArtifactId                                       License
   org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
@@ -1438,26 +1409,6 @@ matterhorn-static-file-service-impl
   org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
   org.jdom                               com.springsource.org.jdom                        -
   org.slf4j                              slf4j-api                                        MIT License
-
-
-matterhorn-test-harness
-  GroupId                                ArtifactId                                       License
-  com.google.collections                 google-collections                               The Apache Software License, Version 2.0
-  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
-  commons-cli                            commons-cli                                      The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
-  dom4j                                  dom4j                                            -
-  junit                                  junit                                            Common Public License Version 1.0
-  log4j                                  log4j                                            The Apache Software License, Version 2.0
-  net.oauth.core                         oauth-httpclient4                                The Apache Software License, Version 2.0
-  org.databene                           contiperf                                        GNU Lesser General Public License-Apache License-Eclipse Public License-BSD License
-  org.reflections                        reflections                                      -
-  org.seleniumhq.selenium                selenium-server                                  The Apache Software License, Version 2.0
-  org.seleniumhq.selenium.client-drivers selenium-java-client-driver                      -
-  org.slf4j                              slf4j-api                                        -
-  org.slf4j                              slf4j-log4j12                                    -
-  org.springframework                    org.springframework.core                         -
 
 
 matterhorn-textanalyzer-impl

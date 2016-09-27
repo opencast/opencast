@@ -61,7 +61,7 @@ Encoding profiles consist of a set of key-value pairs that conform to the follow
 
 For example:
 
-    profile.flash.http.name = flash download
+    profile.mp4.http.name = Enocde Mp4 files for download
 
 All profiles should have the following properties:
 

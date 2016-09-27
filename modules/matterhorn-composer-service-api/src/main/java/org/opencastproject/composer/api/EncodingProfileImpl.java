@@ -51,7 +51,7 @@ import javax.xml.bind.annotation.XmlValue;
 @XmlRootElement(name = "profile", namespace = "http://composer.opencastproject.org")
 public class EncodingProfileImpl implements EncodingProfile {
 
-  /** The profile identifier, e. g. flash.http */
+  /** The profile identifier */
   @XmlAttribute(name = "id")
   @XmlID
   protected String identifier = null;
