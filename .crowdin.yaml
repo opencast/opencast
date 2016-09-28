@@ -17,4 +17,4 @@ files:
 
   -
     source: '/modules/matterhorn-engage-ui/src/main/resources/ui/language/en-US.json'
-    translation: '/modules/matterhorn-engage-ui/src/main/resources/ui/language/%two_letters_code%.json'
+    translation: '/modules/matterhorn-engage-ui/src/main/resources/ui/language/%locale%.json'
