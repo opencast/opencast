@@ -170,14 +170,19 @@
         <div class="modal-body">
             <div class="full-col">
                 <form name="titleslideForm">
-                    <p class="tab-description" translate="CONFIGURATION.THEMES.DETAILS.TITLE.DESCRIPTION">Add descriptive text about each video at either the beginning / end of video. Include the following metadata:</p>
+                    <p class="tab-description" translate="CONFIGURATION.THEMES.DETAILS.TITLE.DESCRIPTION">
+                        <!-- Add descriptive text about each video at either the beginning / end of video.
+                             Include the following metadata: -->
+                    </p>
                     <div data-admin-ng-notifications="" context="new-theme-titleslide"></div>
                     <div class="obj">
-                        <header translate="CONFIGURATION.THEMES.DETAILS.TITLE.ACTIVE">Active</header>
+                        <header translate="CONFIGURATION.THEMES.DETAILS.TITLE.ACTIVE"><!--Active--></header>
                         <div class="obj-container content-list padded">
                             <div class="list-row">
                                 <div class="header-column">
-                                    <label class="large" for="titleslide-toggle" translate="CONFIGURATION.THEMES.DETAILS.TITLE.ENABLE">Enable</label>
+                                    <label class="large" for="titleslide-toggle" translate="CONFIGURATION.THEMES.DETAILS.TITLE.ENABLE">
+                                        <!-- Enable -->
+                                    </label>
                                 </div>
                                 <div class="content-column">
                                     <div class="content-container">
@@ -188,7 +193,7 @@
                         </div>
                     </div>
                     <div class="obj" ng-show="titleslide.active">
-                        <header translate="CONFIGURATION.THEMES.DETAILS.TITLE.BACKGROUND">Background</header>
+                        <header translate="CONFIGURATION.THEMES.DETAILS.TITLE.BACKGROUND"><!-- Background --></header>
                         <div class="obj-container padded">
     
                             <div class="file-upload">
@@ -196,11 +201,15 @@
                                 <div class="form-container">
                                     <div class="row">
                                         <input type="radio" ng-model="titleslide.mode" ng-required="titleslide.active" value="extract" id="background-extract">
-                                        <label for="background-extract" translate="CONFIGURATION.THEMES.DETAILS.TITLE.EXTRACT">Extract</label>
+                                        <label for="background-extract" translate="CONFIGURATION.THEMES.DETAILS.TITLE.EXTRACT">
+                                            <!-- Extract -->
+                                        </label>
                                     </div>
                                     <div class="row">
                                         <input type="radio" ng-model="titleslide.mode" ng-required="titleslide.active" value="upload" id="background-upload">
-                                        <label for="background-upload" translate="CONFIGURATION.THEMES.DETAILS.TITLE.UPLOAD">Upload</label>
+                                        <label for="background-upload" translate="CONFIGURATION.THEMES.DETAILS.TITLE.UPLOAD">
+                                            <!-- Upload -->
+                                        </label>
                                     </div>
                                 </div>
                                 <div file-upload="" acceptable-types="image/*" ng-if="titleslide.mode == 'upload'"
