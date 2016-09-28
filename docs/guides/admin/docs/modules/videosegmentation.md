@@ -87,3 +87,9 @@ The absolute minimum number of segments. If at the end of the optimization less 
 uniform segmentation will be generated (defaults to 3).
 
     absoluteMin = 3
+
+This parameter controls whether the options prefNumber, absoluteMax and absoluteMin are interpreted as absolute
+segment numbers or relative to track duration. If this is set to true, prefNumber, absoluteMax and absoluteMin will be
+interpreted as number of segments per hour. (defaults to false)
+
+    durationDependent = false

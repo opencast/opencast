@@ -142,6 +142,12 @@ VideoSegmenterService, ManagedService {
   /** Default value for the absolute minimum number of segments */
   public static final int DEFAULT_ABSOLUTE_MIN = 3;
 
+  /** Name of the constant used to retrieve the option whether segments numbers depend on track duration */
+  public static final String OPT_DURATION_DEPENDENT = "durationDependent";
+
+  /** Default value for the option whether segments numbers depend on track duration */
+  public static final boolean DEFAULT_DURATION_DEPENDENT = false;
+
   /** The load introduced on the system by creating a caption job */
   public static final float DEFAULT_SEGMENTER_JOB_LOAD = 1.0f;
 
@@ -178,6 +184,9 @@ VideoSegmenterService, ManagedService {
 
   /** The absolute minimum for the number of segments whose compliance will be enforced after the optimization*/
   protected int absoluteMin = DEFAULT_ABSOLUTE_MIN;
+
+  /** The boolean that defines whether segment numbers are interpreted as absolute or relative to track duration */
+  protected boolean durationDependent = DEFAULT_DURATION_DEPENDENT;
 
   /** Reference to the receipt service */
   protected ServiceRegistry serviceRegistry = null;
@@ -293,6 +302,17 @@ VideoSegmenterService, ManagedService {
       }
     }
 
+    // Dependency on video duration
+    if (properties.get(OPT_DURATION_DEPENDENT) != null) {
+      String value = (String) properties.get(OPT_DURATION_DEPENDENT);
+      try {
+        durationDependent = Boolean.parseBoolean(value);
+        logger.info("Dependency on video duration is set to {}", durationDependent);
+      } catch (Exception e) {
+        logger.warn("Found illegal value '{}' for videosegmenter's dependency on video duration", value);
+      }
+    }
+
     segmenterJobLoad = LoadUtil.getConfiguredLoadValue(properties, SEGMENTER_JOB_LOAD_KEY, DEFAULT_SEGMENTER_JOB_LOAD, serviceRegistry);
   }
 
@@ -373,6 +393,28 @@ VideoSegmenterService, ManagedService {
       // local copy of changesThreshold, that can safely be changed over optimization iterations
       float changesThresholdLocal = changesThreshold;
 
+      // local copies of prefNumber, absoluteMin and absoluteMax, to make a dependency on track length possible
+      int prefNumberLocal = prefNumber;
+      int absoluteMaxLocal = absoluteMax;
+      int absoluteMinLocal = absoluteMin;
+
+      // if the number of segments should depend on the duration of the track, calculate new values for prefNumber,
+      // absoluteMax and absoluteMin with the duration of the track
+      if (durationDependent) {
+        double trackDurationInHours = track.getDuration() / 3600000.0;
+        prefNumberLocal = (int) Math.round(trackDurationInHours * prefNumberLocal);
+        absoluteMaxLocal = (int) Math.round(trackDurationInHours * absoluteMax);
+        absoluteMinLocal = (int) Math.round(trackDurationInHours * absoluteMin);
+
+        //make sure prefNumberLocal will never be 0 or negative
+        if (prefNumberLocal <= 0) {
+          prefNumberLocal = 1;
+        }
+
+        logger.info("Numbers of segments are set to be relative to track duration. Therefore for {} the preferred "
+                + "number of segments is {}", mediaUrl, prefNumberLocal);
+      }
+
       logger.info("Starting video segmentation of {}", mediaUrl);
 
 
@@ -393,12 +435,12 @@ VideoSegmenterService, ManagedService {
         // and compare them to find better optimization.
         // "normal"
         OptimizationStep currentStep = new OptimizationStep(stabilityThreshold,
-                changesThresholdLocal, segments.size(), prefNumber, mpeg7, segments);
+                changesThresholdLocal, segments.size(), prefNumberLocal, mpeg7, segments);
         // filtered
         LinkedList<Segment> segmentsNew = new LinkedList<Segment>();
         OptimizationStep currentStepFiltered = new OptimizationStep(
                 stabilityThreshold, changesThresholdLocal, 0,
-                prefNumber, filterSegmentation(segments, track, segmentsNew, stabilityThreshold * 1000), segments);
+                prefNumberLocal, filterSegmentation(segments, track, segmentsNew, stabilityThreshold * 1000), segments);
         currentStepFiltered.setSegmentNumAndRecalcErrors(segmentsNew.size());
 
         logger.info("Segmentation yields {} segments after filtering", segmentsNew.size());
@@ -415,7 +457,7 @@ VideoSegmenterService, ManagedService {
         //          (this is to make sure that if there are e.g. 1000 segments and the filtering would yield
         //           smaller and smaller results, the stability threshold won't be optimized in the wrong direction)
         //    - and the filtered segmentation is not already better than the maximum error
-        if (currentStep.getErrorAbs() <= currentStepFiltered.getErrorAbs() || (segmentsNew.size() < prefNumber
+        if (currentStep.getErrorAbs() <= currentStepFiltered.getErrorAbs() || (segmentsNew.size() < prefNumberLocal
                 && currentStep.getSegmentNum() > (track.getDuration() / 1000.0f) / (stabilityThreshold / 2)
                 && !(currentStepFiltered.getErrorAbs() <= maxError))) {
 
@@ -491,7 +533,7 @@ VideoSegmenterService, ManagedService {
             // the new changesThreshold is calculated by averaging the the mean and the mean weighted with errors
             // because this seemed to yield better results in several cases
 
-            float x = (first.getSegmentNum() - prefNumber) / (float)(first.getSegmentNum() - last.getSegmentNum());
+            float x = (first.getSegmentNum() - prefNumberLocal) / (float)(first.getSegmentNum() - last.getSegmentNum());
             float newX = ((x + 0.5f) * 0.5f);
             changesThresholdLocal = first.getChangesThreshold() * (1 - newX) + last.getChangesThreshold() * newX;
             logger.debug("doublesided optimization yields new changesThreshold = {}", changesThresholdLocal);
@@ -518,7 +560,7 @@ VideoSegmenterService, ManagedService {
       for (int i = threshLow; i <= threshHigh; i = i + 1000) {
         tmpSegments = new LinkedList<Segment>();
         filterSegmentation(segments, track, tmpSegments, i);
-        float newError = OptimizationStep.calculateErrorAbs(tmpSegments.size(), prefNumber);
+        float newError = OptimizationStep.calculateErrorAbs(tmpSegments.size(), prefNumberLocal);
         if (newError < smallestError) {
           smallestError = newError;
           bestI = i;
@@ -546,8 +588,8 @@ VideoSegmenterService, ManagedService {
           cycleCount, tmpSegments.size());
 
       // if no reasonable segmentation could be found, instead return a uniform segmentation
-      if (tmpSegments.size() < absoluteMin || tmpSegments.size() > absoluteMax) {
-        mpeg7 = uniformSegmentation(track, tmpSegments);
+      if (tmpSegments.size() < absoluteMinLocal || tmpSegments.size() > absoluteMaxLocal) {
+        mpeg7 = uniformSegmentation(track, tmpSegments, prefNumberLocal);
         logger.info("Since no reasonable segmentation could be found, a uniform segmentation was created");
       }
 
@@ -585,16 +627,16 @@ VideoSegmenterService, ManagedService {
    * @param track the element to analyze
    * @param videoContent the videoContent of the Mpeg7Catalog that the segments should be added to
    * @param mediaFile the file of the track to analyze
-   * @param changesThresholdLocal the changesThreshold that is used as option for the FFmpeg call
+   * @param changesThreshold the changesThreshold that is used as option for the FFmpeg call
    * @return a list of the resulting segments
    * @throws IOException
    */
   protected LinkedList<Segment> runSegmentationFFmpeg(Track track, Video videoContent, File mediaFile,
-          float changesThresholdLocal) throws IOException {
+          float changesThreshold) throws IOException {
 
     String[] command = new String[] { binary, "-nostats", "-i",
       mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
-      "-filter:v", "select=gt(scene\\," + changesThresholdLocal + "),showinfo",
+      "-filter:v", "select=gt(scene\\," + changesThreshold + "),showinfo",
       "-f", "null", "-"
     };
     String commandline = StringUtils.join(command, " ");
@@ -859,9 +901,10 @@ VideoSegmenterService, ManagedService {
    *
    * @param track the track that is segmented
    * @param segmentsNew will be set to list of new segments (pass null if not required)
+   * @param prefNumber number of generated segments
    * @return Mpeg7Catalog that can later be saved in a Catalog as endresult
    */
-  protected Mpeg7Catalog uniformSegmentation(Track track, LinkedList<Segment> segmentsNew) {
+  protected Mpeg7Catalog uniformSegmentation(Track track, LinkedList<Segment> segmentsNew, int prefNumber) {
     if (segmentsNew == null) {
       segmentsNew = new LinkedList<Segment>();
     }
