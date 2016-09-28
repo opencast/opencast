@@ -35,8 +35,8 @@ angular.module('adminNg.services')
         };
 
         /* Get the current client timezone */
-        var tzOffset = (new Date()).getTimezoneOffset() / -60;
-        self.tz = 'UTC' + (tzOffset < 0 ? '-' : '+') + tzOffset;
+        self.tzOffset = (new Date()).getTimezoneOffset() / -60;
+        self.tz = 'UTC' + (self.tzOffset < 0 ? '' : '+') + self.tzOffset;
 
         this.loadCaptureAgents = function () {
             CaptureAgentsResource.query({inputs: true}).$promise.then(function (data) {
@@ -138,13 +138,13 @@ angular.module('adminNg.services')
             var result = isDefined(data) && isDefined(data.start) &&
                 isDefined(data.start.date) && data.start.date.length > 0 &&
                 angular.isDefined(data.duration) &&
-                angular.isDefined(data.duration.hour) && angular.isDefined(data.duration.minute) &&                
+                angular.isDefined(data.duration.hour) && angular.isDefined(data.duration.minute) &&
                 isDefined(data.device) &&
                 isDefined(data.device.id) && data.device.id.length > 0;
 
             if (self.isScheduleMultiple() && result) {
                 return angular.isDefined(data.end) &&
-                    data.end.length > 0 && 
+                    data.end.length > 0 &&
                     self.atLeastOneRepetitionDayMarked();
             } else {
                 return result;
@@ -164,7 +164,7 @@ angular.module('adminNg.services')
               while (self.conflicts.length > 0) { // remove displayed conflicts, existing ones will be added again in
                 self.conflicts.pop();             // the next step.
               }
-              
+
               if (self.hasConflicts) {
                 angular.forEach(conflicts, function (d) {
                     self.conflicts.push({
@@ -173,9 +173,9 @@ angular.module('adminNg.services')
                         end: Language.formatDateTime('medium', d.end)
                     });
                     console.log ("Conflict: " + d.title + " Start: " + d.start + " End:" + d.end);
-                });  
-              } 
-              
+                });
+              }
+
               self.updateWeekdays();
               self.checkValidity();
             };
@@ -190,7 +190,7 @@ angular.module('adminNg.services')
                     Notifications.remove(self.notification, NOTIFICATION_CONTEXT);
                     self.notification = undefined;
                   }
-                  release(); 
+                  release();
                 };
                 var onError = function (response) {
 
@@ -222,11 +222,12 @@ angular.module('adminNg.services')
                 && angular.isDefined(data.start.minute) && angular.isDefined(data.start.date)
                 && angular.isDefined(data.duration) && angular.isDefined(data.duration.hour)
                 && angular.isDefined(data.duration.minute)) {
-                var startDate = new Date(data.start.date);
-                startDate.setHours(data.start.hour + data.duration.hour, data.start.minute + data.duration.minute,
-                    0, 0);
+                var dateArray = data.start.date.split("-");
+                var startDate = new Date(dateArray[0], parseInt(dateArray[1]) - 1, dateArray[2], data.start.hour, data.start.minute);
+                var endDate = new Date(startDate.getTime());
+                endDate.setHours(endDate.getHours() + data.duration.hour, endDate.getMinutes() + data.duration.minute, 0, 0);
                 var nowDate = new Date();
-                if (startDate < nowDate) {
+                if (endDate < nowDate) {
                     self.alreadyEndedNotification = Notifications.add('error', 'CONFLICT_ALREADY_ENDED',
                         NOTIFICATION_CONTEXT, -1);
                     self.hasConflicts = true;
