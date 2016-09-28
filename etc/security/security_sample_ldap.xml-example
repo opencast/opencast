@@ -38,13 +38,14 @@
     <sec:intercept-url pattern="/admin-ng/acl/acls.json" method="GET" access="ROLE_ADMIN, ROLE_UI_ACLS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/acl/*" method="GET" access="ROLE_ADMIN, ROLE_UI_ACLS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/capture-agents/agents.json" method="GET" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_VIEW, ROLE_UI_EVENTS_CREATE" />
+    <sec:intercept-url pattern="/admin-ng/event/*/asset/assets.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/catalogAdapters" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/events.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/new/metadata" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/new/processing" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/*/attachments.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ATTACHMENTS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/*/comments" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_COMMENTS_VIEW"/>
-    <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_COMMENTS_VIEW"/>
+    <sec:intercept-url pattern="/admin-ng/event/*/comments" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW"/>
+    <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW"/>
     <sec:intercept-url pattern="/admin-ng/event/*/general.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_GENERAL_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/*/media.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW"/>
     <sec:intercept-url pattern="/admin-ng/event/*/media/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW"/>
