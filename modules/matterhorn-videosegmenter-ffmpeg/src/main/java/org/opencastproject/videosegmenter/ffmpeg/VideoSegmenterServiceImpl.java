@@ -396,7 +396,7 @@ VideoSegmenterService, ManagedService {
         // filtered
         LinkedList<Segment> segmentsNew = new LinkedList<Segment>();
         OptimizationStep currentStepFiltered = new OptimizationStep(
-                stabilityThreshold, changesThresholdLocal, segmentsNew.size(),
+                stabilityThreshold, changesThresholdLocal, 0,
                 prefNumber, filterSegmentation(segments, track, segmentsNew, stabilityThreshold * 1000), segments);
         currentStepFiltered.setSegmentNumAndRecalcErrors(segmentsNew.size());
 
@@ -575,7 +575,18 @@ VideoSegmenterService, ManagedService {
     }
   }
 
-  private LinkedList<Segment> runSegmentationFFmpeg(Track track, Video videoContent, File mediaFile,
+  /**
+   * Does the actual segmentation with an FFmpeg call, adds the segments to the given videoContent of a catalog and
+   * returns a list with the resulting segments
+   *
+   * @param track the element to analyze
+   * @param videoContent the videoContent of the Mpeg7Catalog that the segments should be added to
+   * @param mediaFile the file of the track to analyze
+   * @param changesThresholdLocal the changesThreshold that is used as option for the FFmpeg call
+   * @return a list of the resulting segments
+   * @throws IOException
+   */
+  protected LinkedList<Segment> runSegmentationFFmpeg(Track track, Video videoContent, File mediaFile,
           float changesThresholdLocal) throws IOException {
 
     String[] command = new String[] { binary, "-nostats", "-i",
