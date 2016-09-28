@@ -65,15 +65,15 @@ Note that this really just controls the navigation menu and its menu entries. No
 
 ### Recordings: Events
 
-|Role                        |User Interface                                     |
-|----------------------------|---------------------------------------------------|
-|ROLE_UI_EVENTS_VIEW         |Display *Events* page                              |
-|ROLE_UI_EVENTS_COUNTERS     |Display the *Counters* on the *Events* page        |
-|ROLE_UI_EVENTS_CREATE       |Display *Add Event* button on *Events* page        |
-|ROLE_UI_EVENTS_DELETE       |Display *Delete* action in *Events* table          |
-|ROLE_UI_EVENTS_EDITOR_VIEW  |Display *Playback/Editor* action in *Events* table |
-|ROLE_UI_EVENTS_DETAILS_VIEW |Display *Event Details* action in *Events* table   |
-|ROLE_UI_TASKS_CREATE        |Display *Actions* on *Events* page                 |
+|Role                         |User Interface                                     |
+|-----------------------------|---------------------------------------------------|
+|ROLE_UI_EVENTS_VIEW          |Display *Events* page                              |
+|ROLE_UI_EVENTS_COUNTERS_VIEW |Display the *Counters* on the *Events* page        |
+|ROLE_UI_EVENTS_CREATE        |Display *Add Event* button on *Events* page        |
+|ROLE_UI_EVENTS_DELETE        |Display *Delete* action in *Events* table          |
+|ROLE_UI_EVENTS_EDITOR_VIEW   |Display *Playback/Editor* action in *Events* table |
+|ROLE_UI_EVENTS_DETAILS_VIEW  |Display *Event Details* action in *Events* table   |
+|ROLE_UI_TASKS_CREATE         |Display *Actions* on *Events* page                 |
 
 For the *Playback/Editor* tool, further access can be provided:
 
