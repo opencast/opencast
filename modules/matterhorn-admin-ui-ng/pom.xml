@@ -14,6 +14,7 @@
         <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
         <checkstyle.skip>false</checkstyle.skip>
         <skipTests>false</skipTests>
+        <nexus.npm>${opencast.nexus.url}/nexus/content/repositories/npmjs/</nexus.npm>
     </properties>
     <dependencies>
 
@@ -331,7 +332,7 @@
                                     <goal>npm</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>install</arguments>
+                                  <arguments>install --registry ${nexus.npm}</arguments>
                                 </configuration>
                             </execution>
 
