@@ -71,6 +71,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -329,10 +330,11 @@ public class VideoSegmenterTest {
     float error3 = (44 - 41) / (float)41; // ~  0.073
     float error4 = (23 - 41) / (float)41; // ~ -0.439
 
-    VideoSegmenterServiceImpl.addToOptimizedList(optimizedList, firstStep);
-    VideoSegmenterServiceImpl.addToOptimizedList(optimizedList, secondStep);
-    VideoSegmenterServiceImpl.addToOptimizedList(optimizedList, thirdStep);
-    VideoSegmenterServiceImpl.addToOptimizedList(optimizedList, fourthStep);
+    optimizedList.add(firstStep);
+    optimizedList.add(secondStep);
+    optimizedList.add(thirdStep);
+    optimizedList.add(fourthStep);
+    Collections.sort(optimizedList);
 
     // check if the errors were calculated correctly and  whether the elements are in the correct order
     assertEquals("first element of optimized list incorrect",  error3, optimizedList.get(0).getError(), 0.0001f);

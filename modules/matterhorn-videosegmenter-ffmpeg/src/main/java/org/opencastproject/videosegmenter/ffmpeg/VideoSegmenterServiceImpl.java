@@ -66,6 +66,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.LinkedList;
 import java.util.List;
@@ -418,11 +419,13 @@ VideoSegmenterService, ManagedService {
                 && currentStep.getSegmentNum() > (track.getDuration() / 1000.0f) / (stabilityThreshold / 2)
                 && !(currentStepFiltered.getErrorAbs() <= maxError))) {
 
-          addToOptimizedList(optimizationList, currentStep);
+          optimizationList.add(currentStep);
+          Collections.sort(optimizationList);
           currentStepBest = currentStep;
           unusedResultsList.add(currentStepFiltered);
         } else {
-          addToOptimizedList(optimizationList, currentStepFiltered);
+          optimizationList.add(currentStepFiltered);
+          Collections.sort(optimizationList);
           currentStepBest = currentStepFiltered;
         }
 
@@ -700,54 +703,6 @@ VideoSegmenterService, ManagedService {
     } catch (Exception e) {
       throw new ServiceRegistryException("Error handling operation '"
           + op + "'", e);
-    }
-  }
-
-  /**
-   * Inserts an element into a list of OptimizationSteps, so that the smallest
-   * positive error is the first element of the list and the smallest negative
-   * error is the last element of the list
-   *
-   * @param list list of OptimizationSteps
-   * @param newItem OptimizationStep to be added to the list
-   */
-  protected static void addToOptimizedList(List<OptimizationStep> list, OptimizationStep newItem) {
-
-    boolean stop = false;
-    int i = 0;
-    if (list.isEmpty()) {
-      list.add(newItem);
-    } else {
-      // if positive error add new item to the left sorted half of the list
-      if (newItem.getError() >= 0) {
-        // go from left to right through the list until correct position is found
-        // or until end of list or end of the positive part of the list is reached
-        while (i < list.size() && !stop && list.get(i).getError() >= 0) {
-          if (newItem.getError() <= list.get(i).getError()) {
-            list.add(i, newItem);
-            stop = true;
-          }
-          i++;
-        }
-        if (!stop) {
-          list.add(i, newItem);
-        }
-      // if negative error add item to the right sorted half of the list
-      } else {
-        i = list.size() - 1;
-        // go from right to left through the list until correct position is found
-        // or until end of list or end of the negative part of the list is reached
-        while (i >= 0 && !stop && list.get(i).getError() < 0) {
-          if (newItem.getError() >= list.get(i).getError()) {
-            list.add(i + 1, newItem);
-            stop = true;
-          }
-          i--;
-        }
-        if (!stop) {
-          list.add(i + 1, newItem);
-        }
-      }
     }
   }
 

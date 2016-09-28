@@ -32,7 +32,7 @@ import java.util.LinkedList;
  * absolute error of optimization
  *
  */
-public class OptimizationStep {
+public class OptimizationStep implements Comparable<OptimizationStep> {
 
   private int stabilityThreshold;
   private float changesThreshold;
@@ -171,5 +171,48 @@ public class OptimizationStep {
    */
   public static float calculateErrorAbs(int segmentNum, int prefNum) {
     return Math.abs((float)(segmentNum - prefNum) / (float)prefNum);
+  }
+
+/**
+ * With this method a list of OptimizationSteps can be sorted such that the smallest
+ * positive error is the first element of the list and the smallest negative
+ * error is the last element of the list
+ *
+ * @param o the OptimizationStep to be compared.
+ * @return a negative integer or a positive integer as this OptimizationStep should be placed to the left or right of
+ * the specified OptimizationStep or zero if their errors are equal.
+ */
+  @Override
+  public int compareTo(OptimizationStep o) {
+    if (error == o.getError()) {
+      return 0;
+    }
+    // positive
+    if (error >= 0) {
+      // if other error is negative put to the left of it
+      if (o.getError() < 0) {
+        return -1;
+      } else {
+        // if other error is also positive, compare errors, so that smaller positive error will be left
+        if (error < o.getError()) {
+          return -1;
+        } else {
+          return 1;
+        }
+      }
+    // negative
+    } else {
+      // if other error is positive put to the right of it
+      if (o.getError() >= 0) {
+        return 1;
+      } else {
+        // if other error is also negative, compare errors, so that smaller negative error will be right
+        if (error < o.getError()) {
+          return -1;
+        } else {
+          return 1;
+        }
+      }
+    }
   }
 }
