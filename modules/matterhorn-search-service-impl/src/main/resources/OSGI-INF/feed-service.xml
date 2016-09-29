@@ -3,11 +3,12 @@
  name="org.opencastproject.feed.impl.FeedServlet" immediate="true">
   <implementation class="org.opencastproject.feed.impl.FeedServiceImpl" />
   <property name="service.description" value="Feed Service" />
-  <property name="alias" value="/feeds" />
-  <property name="httpContext.id" value="opencast.httpcontext" />
-  <property name="httpContext.shared" value="true" />
+  <property name="opencast.service.type" value="org.opencastproject.feed.impl.FeedServiceImpl" />
+  <property name="opencast.service.path" value="/feeds" />
+  <property name="opencast.service.jobproducer" value="false" />
+
   <service>
-    <provide interface="javax.servlet.Servlet" />
+    <provide interface="org.opencastproject.feed.impl.FeedServiceImpl" />
   </service>
   <reference name="feed" interface="org.opencastproject.feed.api.FeedGenerator" cardinality="0..n" policy="dynamic" bind="addFeedGenerator" unbind="removeFeedGenerator"/>
   <reference name="security" interface="org.opencastproject.security.api.SecurityService" cardinality="1..1" policy="static" bind="setSecurityService"/>

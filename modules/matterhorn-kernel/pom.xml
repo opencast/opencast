@@ -325,7 +325,6 @@
               OSGI-INF/http-context.xml,
               OSGI-INF/https-filter.xml,
               OSGI-INF/jsonp.xml,
-              OSGI-INF/opencast-lti.xml,
               OSGI-INF/organization-directory-service.xml,
               OSGI-INF/organization-persistence.xml,
               OSGI-INF/organization-filter.xml,

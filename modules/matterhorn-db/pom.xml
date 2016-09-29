@@ -88,6 +88,7 @@
             <Build-Number>${buildNumber}</Build-Number>
             <Bundle-Activator>org.opencastproject.db.Activator</Bundle-Activator>
             <Import-Package>
+              !com.vividsolutions.jts.*,
               !org.apache.lucene.*,
               !org.jboss.resource.adapter.jdbc.*,
               !org.hibernate.*,
