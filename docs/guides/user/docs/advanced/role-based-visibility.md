@@ -165,7 +165,7 @@ On those pages, it is possible to further provide access:
 |Role                                  |User Interface                                   |
 |--------------------------------------|-------------------------------------------------|
 |ROLE_UI_GROUPS_VIEW                   |Display *Groups* page                            |
-|ROLE_UI_GROUPS_CREATE                 |Display *Add groups on *Groups* page             |
+|ROLE_UI_GROUPS_CREATE                 |Display *Add groups* on *Groups* page            |
 |ROLE_UI_GROUPS_DELETE                 |Display *Delete* action in *Groups* table        |
 |ROLE_UI_GROUPS_EDIT                   |Display *Group Details* action in *Groups* table |
 
@@ -174,7 +174,7 @@ On those pages, it is possible to further provide access:
 |Role                                  |User Interface                                            |
 |--------------------------------------|----------------------------------------------------------|
 |ROLE_UI_ACLS_VIEW                     |Display *Access Policies* page                            |
-|ROLE_UI_ACLS_CREATE                   |Display *Add access policy on *Access Policies* page      |
+|ROLE_UI_ACLS_CREATE                   |Display *Add access policy* on *Access Policies* page     |
 |ROLE_UI_ACLS_DELETE                   |Display *Delete* action in *Access Policies* table        |
 |ROLE_UI_ACLS_EDIT                     |Display *Group Details* action in *Access Policies* table |
 
