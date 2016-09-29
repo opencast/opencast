@@ -168,9 +168,8 @@ VideoSegmenterService, ManagedService {
    *
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
    */
-  @SuppressWarnings("unchecked")
   @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     if (properties == null) {
       return;
     }

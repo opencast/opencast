@@ -74,9 +74,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
               org.opencastproject.pm.api;version=${project.version},
               org.opencastproject.pm.api.persistence;version=${project.version},

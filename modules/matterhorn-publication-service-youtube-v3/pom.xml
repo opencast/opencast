@@ -1,7 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.opencastproject</groupId>
   <artifactId>matterhorn-publication-service-youtube-v3</artifactId>
   <packaging>bundle</packaging>
   <name>matterhorn-publication-service-youtube-v3</name>
@@ -52,7 +51,7 @@
 
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
 
     <dependency>
@@ -139,6 +138,7 @@
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.http.bundle</artifactId>
       <classifier>opencast</classifier>
+      <version>2.2.0</version>
     </dependency>
 
     <!-- testing -->
@@ -184,6 +184,9 @@
             <Export-Package>
               org.opencastproject.publication.youtube.*;version=${project.version}
             </Export-Package>
+            <_exportcontents>
+              com.google.api.*
+            </_exportcontents>
             <Import-Package>
               !oracle.xml.parser.*,
               !org.jaxen.*,

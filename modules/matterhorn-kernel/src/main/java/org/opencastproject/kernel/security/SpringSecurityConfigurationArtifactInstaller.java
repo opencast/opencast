@@ -21,22 +21,16 @@
 
 package org.opencastproject.kernel.security;
 
-import org.opencastproject.rest.RestConstants;
-import org.opencastproject.security.api.SecurityService;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
 
 import java.io.File;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
 import javax.servlet.Filter;
@@ -44,7 +38,7 @@ import javax.servlet.Filter;
 /**
  * Registers a security filter, which delegates to the spring filter chain appropriate for the current request's
  * organization. Organizational security configurations may be added to the security watch directory, and should be
- * named organization_id.xml.
+ * named <organization_id>.xml.
  */
 public class SpringSecurityConfigurationArtifactInstaller implements ArtifactInstaller {
   protected static final Logger logger = LoggerFactory.getLogger(SpringSecurityConfigurationArtifactInstaller.class);
@@ -55,39 +49,20 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
   /** The security filter */
   protected SecurityFilter securityFilter = null;
 
-  /** The security filter's service registration */
-  protected ServiceRegistration filterRegistration = null;
-
-  /** The security service */
-  protected SecurityService securityService = null;
-
   /** Spring application contexts */
   protected Map<String, OsgiBundleXmlApplicationContext> appContexts = null;
+
+  /** OSGi DI. */
+  public void setSecurityFilter(SecurityFilter securityFilter) {
+    this.securityFilter = securityFilter;
+  }
 
   /**
    * OSGI activation callback
    */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   protected void activate(ComponentContext cc) {
     this.bundleContext = cc.getBundleContext();
-    this.appContexts = new HashMap<String, OsgiBundleXmlApplicationContext>();
-
-    // Register the security filter
-    securityFilter = new SecurityFilter(securityService);
-    Dictionary props = new Hashtable<String, Boolean>();
-    props.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
-    props.put("urlPatterns", "*");
-    props.put("service.ranking", "2");
-    filterRegistration = bundleContext.registerService(Filter.class.getName(), securityFilter, props);
-  }
-
-  /**
-   * OSGI deactivation callback
-   */
-  protected void deactivate() {
-    if (filterRegistration != null) {
-      filterRegistration.unregister();
-    }
+    this.appContexts = new HashMap<>();
   }
 
   /**
@@ -115,8 +90,8 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
       orgAppContext.close();
     }
 
-    OsgiBundleXmlApplicationContext springContext = new OsgiBundleXmlApplicationContext(new String[] { "file:"
-            + artifact.getAbsolutePath() });
+    OsgiBundleXmlApplicationContext springContext = new OsgiBundleXmlApplicationContext(
+            new String[] { "file:" + artifact.getAbsolutePath() });
     springContext.setBundleContext(bundleContext);
     logger.info("registered {} for {}", springContext, orgId);
 
@@ -159,16 +134,6 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
   @Override
   public void update(File artifact) throws Exception {
     install(artifact);
-  }
-
-  /**
-   * Sets the security service.
-   *
-   * @param securityService
-   *          the securityService to set
-   */
-  public void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
   }
 
 }

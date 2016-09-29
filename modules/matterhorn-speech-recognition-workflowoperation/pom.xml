@@ -41,7 +41,7 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
-              org.opencastproject.workflow.handler.speech-recognition;version=${project.version}
+              org.opencastproject.workflow.handler.speechrecognition;version=${project.version}
             </Export-Package>
             <Service-Component>
               OSGI-INF/operations/speech-recognition.xml

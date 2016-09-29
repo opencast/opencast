@@ -24,15 +24,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
+import javax.servlet.ReadListener;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
+import javax.servlet.http.Part;
 
 /**
  * This is a slightly modified version of the test contained in commons-fileupload's unit tests. I've changed the
@@ -63,6 +74,16 @@ public class MockHttpServletRequest implements HttpServletRequest {
     length = requestLength;
     mStrContentType = strContentType;
     mHeaders.put(FileUploadBase.CONTENT_TYPE, strContentType);
+  }
+
+  @Override
+  public void login(String arg0, String arg1) throws ServletException {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
+  public void logout() throws ServletException {
+    // TODO Auto-generated method stub
   }
 
   /**
@@ -514,6 +535,71 @@ public class MockHttpServletRequest implements HttpServletRequest {
     return null;
   }
 
+  @Override
+  public AsyncContext getAsyncContext() {
+    return null;
+  }
+
+  @Override
+  public DispatcherType getDispatcherType() {
+    return null;
+  }
+
+  @Override
+  public ServletContext getServletContext() {
+    return null;
+  }
+
+  @Override
+  public boolean isAsyncStarted() {
+    return false;
+  }
+
+  @Override
+  public boolean isAsyncSupported() {
+    return false;
+  }
+
+  @Override
+  public AsyncContext startAsync() {
+    return null;
+  }
+
+  @Override
+  public AsyncContext startAsync(ServletRequest arg0, ServletResponse arg1) {
+    return null;
+  }
+
+  @Override
+  public boolean authenticate(HttpServletResponse arg0) throws IOException, ServletException {
+    return false;
+  }
+
+  @Override
+  public Part getPart(String arg0) throws IOException, ServletException {
+    return null;
+  }
+
+  @Override
+  public Collection<Part> getParts() throws IOException, ServletException {
+    return null;
+  }
+
+  @Override
+  public long getContentLengthLong() {
+    return 0;
+  }
+
+  @Override
+  public String changeSessionId() {
+    return null;
+  }
+
+  @Override
+  public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass) throws IOException, ServletException {
+    return null;
+  }
+
   /**
    *
    *
@@ -539,5 +625,20 @@ public class MockHttpServletRequest implements HttpServletRequest {
     public int read(byte[] b, int off, int len) throws IOException {
       return in.read(b, off, len);
     }
+
+    @Override
+    public boolean isFinished() {
+      return false;
+    }
+
+    @Override
+    public boolean isReady() {
+      return false;
+    }
+
+    @Override
+    public void setReadListener(ReadListener readListener) {
+    }
   }
+
 }

@@ -1,8 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
-  <groupId>org.opencastproject</groupId>
   <artifactId>matterhorn-videoeditor-ffmpeg-impl</artifactId>
   <packaging>bundle</packaging>
   <name>matterhorn-videoeditor-ffmpeg-impl</name>
@@ -29,13 +27,10 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
-              org.opencastproject.videoeditor-ffmpeg.impl.*;version=${project.version},
-              org.opencastproject.videoeditor-ffmpeg.endpoint.*;version=${project.version},
-              org.opencastproject.videoeditor-ffmpeg.ffmpeg.*;version=${project.version},
+              org.opencastproject.videoeditor.endpoint;version=${project.version},
+              org.opencastproject.videoeditor.ffmpeg;version=${project.version},
+              org.opencastproject.videoeditor.impl;version=${project.version}
             </Export-Package>
             <Embed-Dependency>
               jna;inline=true
@@ -90,7 +85,7 @@
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

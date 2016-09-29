@@ -5,6 +5,7 @@
     <implementation class="org.opencastproject.kernel.filter.https.HttpsFilter" />
     <property name="service.description" value="Https Filter" />
     <property name="httpContext.id" value="opencast.httpcontext" />
+    <property name="httpContext.shared" value="true" />
     <!-- The CleanSessionsFilter must have the highest service.ranking value. See CleanSessionsFilter.java for details. -->
     <property name="service.ranking" value="9" />
     <property name="urlPatterns" value="*" />

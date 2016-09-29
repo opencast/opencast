@@ -64,6 +64,7 @@ public class StaticResourceServlet extends HttpServlet {
     FULL_RANGE = new ArrayList<Range>();
     MIME_TYPES_MAP = new MimetypesFileTypeMap();
   }
+
   /** The filesystem directory to serve files fro */
   protected String distributionDirectory;
 
@@ -103,12 +104,6 @@ public class StaticResourceServlet extends HttpServlet {
     } catch (IOException ex) {
       java.util.logging.Logger.getLogger(StaticResourceServlet.class.getName()).log(Level.SEVERE, null, ex);
     }
-  }
-
-  /**
-   * OSGI Deactivation callback
-   */
-  public void deactivate() {
   }
 
   /**
@@ -256,6 +251,7 @@ public class StaticResourceServlet extends HttpServlet {
       throw exception;
     }
   }
+
   /**
    * MIME multipart separation string
    */
