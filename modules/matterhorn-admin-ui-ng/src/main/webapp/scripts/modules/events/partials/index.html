@@ -10,8 +10,8 @@
             <!-- Series -->
         </a>
     </nav>
-    <div ng-if="table.resource == 'events'" class="stats-container">
-            <div admin-ng-stats="" stats="stats"></div>
+    <div ng-if="table.resource == 'events'" class="stats-container" with-role="ROLE_UI_EVENTS_COUNTERS_VIEW">
+        <div admin-ng-stats="" stats="stats"></div>
     </div>
 </section>
 
