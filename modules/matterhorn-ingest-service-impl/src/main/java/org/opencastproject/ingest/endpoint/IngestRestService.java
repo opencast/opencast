@@ -498,18 +498,22 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       switch (type) {
         case Attachment:
           if (tags != null) {
-          mp = ingestService.addAttachment(in, fileName, flavor, tags, mp);
-          } else  ingestService.addAttachment(in, fileName, flavor, mp);
+            mp = ingestService.addAttachment(in, fileName, flavor, tags, mp);
+          } else  {
+            ingestService.addAttachment(in, fileName, flavor, mp);
+          }
           break;
         case Catalog:
           if (tags != null) {
-          mp = ingestService.addCatalog(in, fileName, flavor, tags, mp);
-          } else ingestService.addCatalog(in, fileName, flavor, mp);
+            mp = ingestService.addCatalog(in, fileName, flavor, tags, mp);
+          } else {
+            ingestService.addCatalog(in, fileName, flavor, mp);
+          }
           break;
         case Track:
           if (startTime == null) {
             if (tags != null) {
-            mp = ingestService.addTrack(in, fileName, flavor, tags, mp);
+              mp = ingestService.addTrack(in, fileName, flavor, tags, mp);
             } else  mp = ingestService.addTrack(in, fileName, flavor, mp);
           } else {
             mp = ingestService.addPartialTrack(in, fileName, flavor, startTime, mp);

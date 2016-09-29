@@ -201,7 +201,7 @@ public interface IngestService extends JobProducer {
    * @throws IngestException
    *           if an unexpected error occurs
    */
-  MediaPackage addTrack(URI uri, MediaPackageElementFlavor flavor,String[] tags, MediaPackage mediaPackage)
+  MediaPackage addTrack(URI uri, MediaPackageElementFlavor flavor, String[] tags, MediaPackage mediaPackage)
           throws MediaPackageException, IOException, IngestException;
 
   /**

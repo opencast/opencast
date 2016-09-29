@@ -1058,10 +1058,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               flavor);
 
       MediaPackageElement trackElement = mp.getCatalog(elementId);
-     for (String tag : tags) {
-       logger.info("Adding Tag: " + tag);
-           trackElement.addTag(tag);
-     }
+      for (String tag : tags) {
+        logger.info("Adding Tag: " + tag);
+        trackElement.addTag(tag);
+      }
 
       job.setStatus(Job.Status.FINISHED);
       logger.info("Successful added catalog {} on mediapackage {} at URL {}", new Object[] { elementId, mediaPackage,
@@ -1136,10 +1136,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               flavor);
 
       MediaPackageElement trackElement = mediaPackage.getAttachment(elementId);
-     for (String tag : tags) {
-       logger.info("Adding Tag: " + tag);
-           trackElement.addTag(tag);
-     }
+      for (String tag : tags) {
+        logger.info("Adding Tag: " + tag);
+        trackElement.addTag(tag);
+      }
       job.setStatus(Job.Status.FINISHED);
       logger.info("Successful added attachment {} on mediapackage {} at URL {}", new Object[] { elementId,
               mediaPackage, newUrl });
