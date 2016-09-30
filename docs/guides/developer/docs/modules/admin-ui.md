@@ -37,7 +37,7 @@ export PATH=$PATH:node:node_modules/grunt-cli/bin:node_modules/karma/bin
 Watch out for local or system-wide installations of Grunt and/or NodeJS as they can
 change the build behavior of Admin UI NG.*
 
-Debugging unit Javascript unit tests
+Debugging Javascript unit tests
 ------------------------------------
 
 Our Javascript unit tests are built in Jasmine, and live in `modules/matterhorn-admin-ui-ng/src/test/resources/test/unit`.
