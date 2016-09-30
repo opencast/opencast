@@ -134,6 +134,19 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
   }
 
   /**
+   * Creates a JpaOrganization from an organization
+   *
+   * @param org
+   *          the organization
+   */
+  private JpaOrganization fromOrganization(Organization org) {
+    if (org instanceof JpaOrganization)
+      return (JpaOrganization) org;
+    return new JpaOrganization(org.getId(), org.getName(), org.getServers(), org.getAdminRole(), org.getAnonymousRole(),
+            org.getProperties());
+  }
+
+  /**
    * Creates initial groups for system administrators per organization.
    *
    * @param organization
@@ -148,7 +161,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
       @Override
       protected void run() {
         try {
-          JpaOrganization org = (JpaOrganization) organizationDirectoryService.getOrganization(organization.getId());
+          JpaOrganization org = fromOrganization(organizationDirectoryService.getOrganization(organization.getId()));
           String adminUserId = null;
           if (StringUtils.isNotBlank(adminUserName))
             adminUserId = adminUserName;

@@ -101,7 +101,7 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-authorization-xacml/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-common/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-common-jpa-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-db/${project.version}</bundle>
+    <bundle start-level="81">mvn:org.opencastproject/matterhorn-db/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-dublincore/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-kernel/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-message-broker-api/${project.version}</bundle>
