@@ -29,7 +29,7 @@
     <fileSet>
       <directory>target/classes/etc</directory>
       <outputDirectory>etc</outputDirectory>
-      <lineEnding>unix</lineEnding>
+      <lineEnding>keep</lineEnding>
       <fileMode>0644</fileMode>
     </fileSet>
 
