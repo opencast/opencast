@@ -75,21 +75,12 @@
                 padding: 0 10px;
                 line-height: 25px;
                 left: 40px;
-                top: 13px;
                 border-radius: 4px;
                 color: $dark-prim-color;
                 font-size: 10px;
                 font-weight: 600;
                 text-transform: uppercase;
             }
-        }
-
-        &:active > i {
-            color: #A1A1A1;
-        }
-
-        &:hover > i {
-           color: #A1A1A1;
         }
 
         @key_frames fadeIn {
@@ -104,41 +95,68 @@
             }
         }
 
-        $icon-color:        inherit;
-        $icon-position:     before;
-        $icon-display:      inherit;
-        $icon-font-size:    28px;
-        $icon-margin:       inherit;
-        $icon-padding:      inherit;
-        $icon-weight:       inherit;
-        $icon-line:         inherit;
-
         .dashboard {
-            @include fa-icon($fa-var-desktop, $icon-position, $icon-display, $icon-margin, $icon-padding, $icon-color, $icon-font-size, $icon-weight, $icon-line);
+            @include build-icon(auto, auto, dashboard, 30px, 20px);
+        }
+
+        &:hover  > .dashboard,
+        &:active > .dashboard {
+             @include build-icon(auto, auto, dashboard-on, 30px, 20px);
         }
 
         .events {
-            @include fa-icon($fa-var-calendar-o, $icon-position, $icon-display, $icon-margin, $icon-padding, $icon-color, $icon-font-size, $icon-weight, $icon-line);
+            @include build-icon(auto, auto, events, 27px, 27px);
         }
 
+        &:hover > .events,
+        &:active > .events {
+             @include build-icon(auto, auto, events-on, 27px, 27px);
+        }
+
+
         .systems {
-            @include fa-icon($fa-var-server, $icon-position, $icon-display, $icon-margin, $icon-padding, $icon-color, $icon-font-size, $icon-weight, $icon-line);
+            @include build-icon(auto, auto, servers, 29px, 20px);
+        }
+
+        &:hover > .systems,
+        &:active > .systems {
+             @include build-icon(auto, auto, servers-on, 29px, 20px);
         }
 
         .recordings {
-            @include fa-icon($fa-var-video-camera, $icon-position, $icon-display, $icon-margin, $icon-padding, $icon-color, $icon-font-size, $icon-weight, $icon-line);
+            @include build-icon(auto, auto, recordings, 29px, 18px);
+        }
+
+        &:hover > .recordings,
+        &:active > .recordings {
+             @include build-icon(auto, auto, recordings-on, 29px, 18px);
         }
 
         .users {
-            @include fa-icon($fa-var-user, $icon-position, $icon-display, $icon-margin, $icon-padding, $icon-color, $icon-font-size, $icon-weight, $icon-line);
+            @include build-icon(auto, auto, user-group, 27px, 24px);
+        }
+
+        &:hover > .users,
+        &:active > .users {
+             @include build-icon(auto, auto, user-group-on, 27px, 24px);
         }
 
         .integrations {
-            @include fa-icon($fa-var-wrench, $icon-position, $icon-display, $icon-margin, $icon-padding, $icon-color, $icon-font-size, $icon-weight, $icon-line);
+            @include build-icon(auto, auto, integrations, 33px, 20px);
+        }
+
+        &:hover > .integrations,
+        &:active > .integrations {
+             @include build-icon(auto, auto, integrations-on, 33px, 20px);
         }
 
         .configuration {
-           @include fa-icon($fa-var-cogs, $icon-position, $icon-display, $icon-margin, $icon-padding, $icon-color, $icon-font-size, $icon-weight, $icon-line);
+            @include build-icon(auto, auto, configuration, 27px, 27px);
+        }
+
+        &:hover > .configuration,
+        &:active > .configuration {
+             @include build-icon(auto, auto, configuration-on, 27px, 27px);
         }
     }
 }
