@@ -12,7 +12,7 @@
 
   <artifactId>opencast-karaf-features</artifactId>
   <packaging>pom</packaging>
-  <name>Opencast // Assemblies // Apache Karaf Features</name>
+  <name>Assemblies // Apache Karaf Features</name>
 
   <build>
     <plugins>
