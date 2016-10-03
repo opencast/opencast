@@ -22,8 +22,8 @@
 
 // Controller for all recordings screens.
 angular.module('adminNg.controllers')
-.controller('RecordingsCtrl', ['$scope', 'Table', 'CaptureAgentsResource', 'ResourcesFilterResource',
-    function ($scope, Table, CaptureAgentsResource, ResourcesFilterResource) {
+.controller('RecordingsCtrl', ['$scope', 'Table', 'CaptureAgentsResource', 'ResourcesFilterResource', 'Notifications', 'Modal',
+    function ($scope, Table, CaptureAgentsResource, ResourcesFilterResource, Notifications, Modal) {
 
         $scope.table = Table;
         $scope.table.configure({
@@ -42,10 +42,10 @@ angular.module('adminNg.controllers')
             //}, {
             //    name:  'blacklist_to',
             //    label: 'USERS.USERS.TABLE.BLACKLIST_TO'
-            //}, {
-            //    template: 'modules/recordings/partials/recordingActionsCell.html',
-            //    label:    'RECORDINGS.RECORDINGS.TABLE.ACTION',
-            //    dontSort: true
+            }, {
+                template: 'modules/recordings/partials/recordingActionsCell.html',
+                label:    'RECORDINGS.RECORDINGS.TABLE.ACTION',
+                dontSort: true
             }],
             caption:    'RECORDINGS.RECORDINGS.TABLE.CAPTION',
             resource:   'recordings',
@@ -54,5 +54,15 @@ angular.module('adminNg.controllers')
         });
 
         $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
+
+        $scope.table.delete = function (row) {
+            CaptureAgentsResource.delete({target: row.name}, function () {
+                Table.fetch();
+                Modal.$scope.close();
+                Notifications.add('success', 'LOCATION_DELETED');
+            }, function () {
+                Notifications.add('error', 'LOCATION_NOT_DELETED');
+            });
+        };
     }
 ]);
