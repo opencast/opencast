@@ -141,3 +141,7 @@
 .browser-version {
     display:inline;
 }
+
+img.loadingImg {
+  max-width: 500px;
+}
