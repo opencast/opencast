@@ -123,7 +123,6 @@
     <module>modules/matterhorn-mpeg7</module>
     <module>modules/matterhorn-notification-workflowoperation</module>
     <module>modules/matterhorn-oaipmh</module>
-    <module>modules/matterhorn-participation-api</module>
     <module>modules/matterhorn-presets</module>
     <module>modules/matterhorn-publication-service-api</module>
     <module>modules/matterhorn-publication-service-youtube-remote</module>
