@@ -26,6 +26,7 @@ import static org.opencastproject.capture.admin.api.AgentState.KNOWN_STATES;
 import static org.opencastproject.capture.admin.api.AgentState.UNKNOWN;
 
 import org.opencastproject.capture.admin.api.Agent;
+import org.opencastproject.capture.admin.api.AgentState;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.capture.admin.api.Recording;
 import org.opencastproject.capture.admin.api.RecordingState;
@@ -51,6 +52,9 @@ import com.entwinemedia.fn.data.Opt;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.cache.RemovalCause;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -60,9 +64,11 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -164,20 +170,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   }
 
   public void activate(ComponentContext cc) {
-    // Setup the agent cache
-    agentCache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build(new CacheLoader<String, Object>() {
-      @Override
-      public Object load(String id) {
-        String[] key = id.split(DELIMITER);
-        AgentImpl agent;
-        try {
-          agent = getAgent(key[0], key[1]);
-        } catch (NotFoundException e) {
-          return nullToken;
-        }
-        return Tuple3.tuple3(agent.getState(), agent.getConfiguration(), agent.getLastHeardFrom());
-      }
-    });
+    setupAgentCache(2, TimeUnit.HOURS);
   }
 
   public void deactivate() {
@@ -300,11 +293,8 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     AgentImpl agent;
     String orgId = securityService.getOrganization().getId();
     try {
-      String agentState = getAgentFromCache(agentName, orgId).getA();
-      if (agentState.equals(state)) {
-        Properties config = getAgentConfiguration(agentName);
-        agentCache.put(agentName.concat(DELIMITER).concat(orgId),
-                Tuple3.tuple3(getAgentState(agentName), config, Long.valueOf(System.currentTimeMillis())));
+      //Check the return code, if it's false then we don't need to update the DB, and we should also return false
+      if (!updateAgentInCache(agentName, state, orgId)) {
         return false;
       }
 
@@ -313,6 +303,9 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       // the agent is known, so set the state
       logger.debug("Setting Agent {} to state {}.", agentName, state);
       agent.setState(state);
+      if (!AgentState.UNKNOWN.equals(state)) {
+        agent.setLastHeardFrom(System.currentTimeMillis());
+      }
     } catch (NotFoundException e) {
       // If the agent doesn't exists, but the name is not null nor empty, create a new one.
       logger.debug("Creating Agent {} with state {}.", agentName, state);
@@ -320,6 +313,63 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     }
     updateAgentInDatabase(agent);
     return true;
+  }
+
+  /**
+   * Updates the agent cache, and tells you whether you need to update the database as well
+   *
+   * @param agentName
+   *             The name of the agent in thecache
+   * @param state
+   *             The new state for the agent
+   * @param orgId
+   *             The organization the agent is a part of
+   * @return
+   *             True if the agent state database needs to be updated, false otherwise
+   */
+  private boolean updateAgentInCache(String agentName, String state, String orgId) {
+    return updateAgentInCache(agentName, state, orgId, null);
+  }
+
+  /**
+   * Updates the agent cache, and tells you whether you need to update the database as well
+   *
+   * @param agentName
+   *             The name of the agent in thecache
+   * @param state
+   *             The new state for the agent
+   * @param orgId
+   *             The organization the agent is a part of
+   * @param configuration
+   *             The agent's configuration
+   * @return
+   *             True if the agent state database needs to be updated, false otherwise
+   */
+  private boolean updateAgentInCache(String agentName, String state, String orgId, Properties configuration) {
+    try {
+      String agentState = getAgentFromCache(agentName, orgId).getA();
+      Properties config = getAgentConfiguration(agentName);
+      if (configuration != null) {
+        config = configuration;
+      }
+      if (!AgentState.UNKNOWN.equals(state)) {
+        agentCache.put(agentName.concat(DELIMITER).concat(orgId),
+            Tuple3.tuple3(state, config, Long.valueOf(System.currentTimeMillis())));
+      } else {
+        //If we're putting the agent into an unknown state we're assuming that we didn't get a check in
+        // therefore we don't update the timestamp and persist to the DB
+        agentCache.put(agentName.concat(DELIMITER).concat(orgId),
+            Tuple3.tuple3(state, config, getAgentFromCache(agentName, orgId).getC()));
+      }
+      if (agentState.equals(state)) {
+        return false;
+      }
+      return true;
+    } catch (NotFoundException e) {
+      agentCache.put(agentName.concat(DELIMITER).concat(orgId),
+              Tuple3.tuple3(state, configuration, Long.valueOf(System.currentTimeMillis())));
+      return true;
+    }
   }
 
   /**
@@ -344,6 +394,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    */
   @Override
   public void removeAgent(String agentName) throws NotFoundException {
+    agentCache.invalidate(agentName);
     deleteAgentFromDatabase(agentName);
   }
 
@@ -354,6 +405,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    */
   @Override
   public Map<String, Agent> getKnownAgents() {
+    agentCache.cleanUp();
     EntityManager em = null;
     User user = securityService.getUser();
     Organization org = securityService.getOrganization();
@@ -472,6 +524,19 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    *          The Agent you wish to modify or add in the database.
    */
   protected void updateAgentInDatabase(AgentImpl agent) {
+    updateAgentInDatabase(agent, true);
+  }
+
+  /**
+   * Updates or adds an agent to the database.
+   *
+   * @param agent
+   *          The Agent you wish to modify or add in the database.
+   * @param updateFromCache
+   *          True to update the last heard from timestamp from the agentCache, false to avoid this.
+   *          Note that you should nearly always update the cache, this was added to avoid deadlocks when removing agents from the cache. 
+   */
+  private void updateAgentInDatabase(AgentImpl agent, boolean updateFromCache) {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
@@ -481,7 +546,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       AgentImpl existing = getAgentEntity(agent.getName(), agent.getOrganization(), em);
 
       // Update the last seen property from the agent cache
-      if (existing != null) {
+      if (existing != null && updateFromCache) {
         try {
           Tuple3<String, Properties, Long> cachedAgent = getAgentFromCache(existing.getName(),
                   existing.getOrganization());
@@ -497,15 +562,18 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
         em.persist(agent);
       } else {
         existing.setConfiguration(agent.getConfiguration());
-        existing.setLastHeardFrom(agent.getLastHeardFrom());
+        if (!AgentState.UNKNOWN.equals(agent.getState())) {
+          existing.setLastHeardFrom(agent.getLastHeardFrom());
+        }
         existing.setState(agent.getState());
         existing.setSchedulerRoles(agent.getSchedulerRoles());
         existing.setUrl(agent.getUrl());
         em.merge(existing);
       }
       tx.commit();
-      agentCache.put(agent.getName().concat(DELIMITER).concat(agent.getOrganization()),
-              Tuple3.tuple3(agent.getState(), agent.getConfiguration(), Long.valueOf(System.currentTimeMillis())));
+      if (updateFromCache) {
+        updateAgentInCache(agent.getName(), agent.getState(), agent.getOrganization(), agent.getConfiguration());
+      }
     } catch (RollbackException e) {
       logger.warn("Unable to commit to DB in updateAgent.");
       throw e;
@@ -744,6 +812,43 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     return "org.opencastproject.capture.agent";
   }
 
+  protected void setupAgentCache(int count, TimeUnit unit) {
+ // Setup the agent cache
+    RemovalListener<String, Object> removalListener = new RemovalListener<String, Object>() {
+      private Set<String> ignoredStates = new LinkedHashSet<String>(Arrays.asList(AgentState.UNKNOWN, AgentState.OFFLINE));
+      @Override
+      public void onRemoval(RemovalNotification<String, Object> removal) {
+        if (RemovalCause.EXPIRED.equals(removal.getCause())) {
+          String org = securityService.getOrganization().getId();
+          try {
+            String agentName = removal.getKey().split(DELIMITER)[0];
+            AgentImpl agent = getAgent(agentName, org);
+            if (!ignoredStates.contains(agent.getState())) {
+              agent.setState(AgentState.OFFLINE);
+              updateAgentInDatabase(agent, false);
+            }
+          } catch (NotFoundException e) {
+            //Ignore this
+            //It should not happen, and if it does we just don't update the non-existant agent in the DB
+          }
+        }
+      }
+    };
+    agentCache = CacheBuilder.newBuilder().expireAfterWrite(count, unit).removalListener(removalListener).build(new CacheLoader<String, Object>() {
+      @Override
+      public Object load(String id) {
+        String[] key = id.split(DELIMITER);
+        AgentImpl agent;
+        try {
+          agent = getAgent(key[0], key[1]);
+        } catch (NotFoundException e) {
+          return nullToken;
+        }
+        return Tuple3.tuple3(agent.getState(), agent.getConfiguration(), agent.getLastHeardFrom());
+      }
+    });
+  }
+
   /**
    * {@inheritDoc}
    *
@@ -773,6 +878,16 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     if (isBlank(schedulerRolesConfig))
       throw new ConfigurationException("schedulerRoles", "must be specified");
     String[] schedulerRoles = schedulerRolesConfig.trim().split(",");
+
+    String cacheLifetime = (String) properties.get("cacheLifetime");
+    if (StringUtils.isNotBlank(cacheLifetime)) {
+      try {
+        int cacheLife = Integer.parseInt(cacheLifetime);
+        setupAgentCache(cacheLife, TimeUnit.HOURS);
+      } catch (NumberFormatException e) {
+        throw new ConfigurationException("cacheLifetime", "is invalid");
+      }
+    }
 
     // If we don't already have a mapping for this PID, create one
     if (!pidMap.containsKey(pid)) {
@@ -809,6 +924,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       logger.warn("{} was not a managed capture agent pid", pid);
     } else {
       try {
+        agentCache.invalidate(agentId);
         deleteAgentFromDatabase(agentId);
       } catch (NotFoundException e) {
         logger.warn("Unable to delete capture agent '{}'", agentId);

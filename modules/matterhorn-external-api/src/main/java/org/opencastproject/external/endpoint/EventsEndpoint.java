@@ -73,7 +73,6 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
-import org.opencastproject.pm.api.persistence.ParticipationManagementDatabaseException;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.security.api.AccessControlEntry;
@@ -628,7 +627,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   private void extendEventsStatusOverview(List<JField> fields, Series series)
-          throws SearchIndexException, ParticipationManagementDatabaseException {
+          throws SearchIndexException {
     EventSearchQuery query = new EventSearchQuery(getSecurityService().getOrganization().getId(),
             getSecurityService().getUser()).withoutActions().withSeriesId(series.getIdentifier());
     SearchResult<Event> result = externalIndex.getByQuery(query);
