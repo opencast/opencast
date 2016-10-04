@@ -1,14 +1,33 @@
 {
-  "system_acls": [{
-    "id": 43,
-    "name": "Public"
-  },{
-    "id": 44,
-    "name": "Private"
-  }],
-  "episode_access": {
-    "acl": "{\"acl\":{\"ace\":[{\"allow\":true,\"action\":\"read\",\"role\":\"ROLE_ADMIN_UI\"},{\"allow\":true,\"action\":\"write\",\"role\":\"ROLE_ADMIN_UI\"}]}}",
-    "current_acl":44,
-    "transitions":[],
-    "privileges":{}}
+    "episode_access": {
+        "privileges": {
+            "ROLE_USER_ADMIN": {
+                "read": "true",
+                "write": "true"
+            },
+            "ROLE_ADMIN": {
+                "read": "true",
+                "write": "true"
+            },
+            "ROLE_EXTERNAL": {
+                "read": "true"
+            },
+            "ROLE_ANONYMOUS": {
+                "read": "true"
+            }
+        },
+        "acl": "{\"acl\":{\"ace\":[{\"allow\":true,\"role\":\"ROLE_USER_ADMIN\",\"action\":\"read\"},{\"allow\":true,\"role\":\"ROLE_USER_ADMIN\",\"action\":\"write\"},{\"allow\":true,\"role\":\"ROLE_ADMIN\",\"action\":\"read\"},{\"allow\":true,\"role\":\"ROLE_ADMIN\",\"action\":\"write\"},{\"allow\":true,\"role\":\"ROLE_ANONYMOUS\",\"action\":\"read\"},{\"allow\":true,\"role\":\"ROLE_EXTERNAL\",\"action\":\"read\"}]}}",
+        "transitions": [ ],
+        "current_acl": 0
+    },
+    "system_acls": [
+        {
+            "id": "402",
+            "name": "private"
+        },
+        {
+            "id": "401",
+            "name": "public"
+        }
+    ]
 }
