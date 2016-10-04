@@ -46,6 +46,10 @@
         <div class="form-group">
           <input id="searchInput" type="text" class="form-control" placeholder="Search" name="q" tabindex="3">
         </div>
+        <button id="oc-search-btn" type="submit"
+          class="btn btn-default" tabindex="5" formenctype="multipart/form-data">
+        <%= search %>
+        </button>
         <div class="btn-group">
           <button id="buttonSorting" class="btn btn-default dropdown-toggle" type="button"
             data-toggle="dropdown" class="btn btn-default dropdown-toggle" aria-label="Sorting"
@@ -55,7 +59,7 @@
           </button>
           <ul id="dropdownMenuSorting" class="dropdown-menu" role="menu" tabindex="-1">
             <li role="presentation">
-              <input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_CREATED_DESC" value="DATE_CREATED_DESC" checked="checked">
+              <input type="radio" class="oc-sort-dropdown" name="sort" id="DATE_CREATED_DESC" value="DATE_CREATED_DESC">
               <label for="DATE_CREATED_DESC">
               <%= recording_date_new %>
               </label>
@@ -160,10 +164,6 @@
             </li>
           </ul>
         </div>
-        <button id="oc-search-btn" type="submit"
-          class="btn btn-default" tabindex="5" formenctype="multipart/form-data">
-        <%= search %>
-        </button>
       </form>
     </div>
   </div>
@@ -173,10 +173,10 @@
   <div class="container-fluid" id="main-container" role="menu"></div>
 </div>
 <ul class="pager" role="menu">
-  <li class="first previous disabled"><a role="menuitem" tabindex="10" >&#8676; <%= first %></a></li>
-  <li class="previous disabled"><a role="menuitem" tabindex="9" >&larr; <%= prev %></a></li>
-  <li class="last next"><a role="menuitem" tabindex="8" ><%= last %> &#8677;</a></li>
-  <li class="next"><a role="menuitem" tabindex="7" ><%= next %> &rarr;</a></li>
+  <li class="first previous"><a id="firstPage" role="menuitem" tabindex="10" >&#8676; <%= first %></a></li>
+  <li class="previous"><a id="prevPage" role="menuitem" tabindex="9" >&larr; <%= prev %></a></li>
+  <li class="last next"><a id="lastPage" role="menuitem" tabindex="8" ><%= last %> &#8677;</a></li>
+  <li class="next"><a id="nextPage" role="menuitem" tabindex="7" ><%= next %> &rarr;</a></li>
 </ul>
 <div id="more" class="scroll-indicator">Loading More Content</div>
 <div id="no-more" class="scroll-indicator">No More Content</div>
