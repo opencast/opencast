@@ -16,7 +16,7 @@
 
   <artifactId>opencast-dist-allinone</artifactId>
   <packaging>karaf-assembly</packaging>
-  <name>Opencast // Assemblies // Distribution All-In-One</name>
+  <name>Assemblies // Distribution All-In-One</name>
 
   <dependencies>
     <dependency>

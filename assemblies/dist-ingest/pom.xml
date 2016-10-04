@@ -16,7 +16,7 @@
 
   <artifactId>opencast-dist-ingest</artifactId>
   <packaging>karaf-assembly</packaging>
-  <name>Opencast // Assemblies // Distribution Ingest</name>
+  <name>Assemblies // Distribution Ingest</name>
 
   <dependencies>
     <dependency>

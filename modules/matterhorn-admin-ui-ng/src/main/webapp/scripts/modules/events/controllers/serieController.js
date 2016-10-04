@@ -24,7 +24,7 @@
 angular.module('adminNg.controllers')
 .controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource', 'SeriesThemeResource', 'ResourcesListResource', 'Notifications',
         'OptoutSingleResource', 'SeriesParticipationResource',
-        function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, ResourcesListResource, Notifications, 
+        function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, ResourcesListResource, Notifications,
             OptoutSingleResource, SeriesParticipationResource) {
 
     var saveFns = {}, aclNotification,
@@ -65,6 +65,21 @@ angular.module('adminNg.controllers')
             if (!loading) {
                 $scope.accessSave();
             }
+        },
+        updateRoles = function() {
+            //MH-11716: We have to wait for both the access (series ACL), and the roles (list of system roles)
+            //to resolve before we can add the roles that are present in the series but not in the system
+            return ResourcesListResource.get({ resource: 'ROLES' }, function (results) {
+                var roles = results;
+                return $scope.access.$promise.then(function () {
+                    angular.forEach($scope.access.series_access.privileges, function(value, key) {
+                        if (angular.isUndefined(roles[key])) {
+                            roles[key] = key;
+                        }
+                    }, this);
+		            return roles;
+		        });
+            }, this);
         };
 
     $scope.aclLocked = false,
@@ -87,7 +102,7 @@ angular.module('adminNg.controllers')
 
         angular.forEach($scope.policies, function (policy, idx) {
             if (policy.role === policyToDelete.role &&
-                policy.write === policyToDelete.write && 
+                policy.write === policyToDelete.write &&
                 policy.read === policyToDelete.read) {
                 index = idx;
             }
@@ -144,7 +159,7 @@ angular.module('adminNg.controllers')
                 changePolicies(json.acl.ace, true);
 
                 $scope.aclLocked = data.series_access.locked;
-                    
+
                 if ($scope.aclLocked) {
                     aclNotification = Notifications.add('warning', 'SERIES_ACL_LOCKED', 'series-acl-' + id, -1);
                 } else if (aclNotification) {
@@ -167,8 +182,8 @@ angular.module('adminNg.controllers')
                 }
             });
         });
-        $scope.roles = ResourcesListResource.get({ resource: 'ROLES' });
 
+        $scope.roles = updateRoles();
         $scope.theme = {};
 
         ResourcesListResource.get({ resource: 'THEMES.NAME' }, function (data) {
@@ -187,7 +202,6 @@ angular.module('adminNg.controllers')
                 });
             });
         });
-
     };
 
       // Generate proxy function for the save metadata function based on the given flavor
@@ -289,7 +303,7 @@ angular.module('adminNg.controllers')
                 if (!angular.isUndefined(me.notificationRules)) {
                     Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);
                 }
-                me.notificationRules = Notifications.add('warning', 'INVALID_ACL_RULES', NOTIFICATION_CONTEXT);  
+                me.notificationRules = Notifications.add('warning', 'INVALID_ACL_RULES', NOTIFICATION_CONTEXT);
             } else if (!angular.isUndefined(me.notificationRules)) {
                 Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);
                 me.notificationRules = undefined;
@@ -299,7 +313,7 @@ angular.module('adminNg.controllers')
                 if (!angular.isUndefined(me.notificationRights)) {
                     Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
                 }
-                me.notificationRights = Notifications.add('warning', 'MISSING_ACL_RULES', NOTIFICATION_CONTEXT);  
+                me.notificationRights = Notifications.add('warning', 'MISSING_ACL_RULES', NOTIFICATION_CONTEXT);
             } else if (!angular.isUndefined(me.notificationRights)) {
                 Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
                 me.notificationRights = undefined;
@@ -311,9 +325,9 @@ angular.module('adminNg.controllers')
                         ace: ace
                     },
                     override: true
-                });  
+                });
 
-                Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 1200);              
+                Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 1200);
             }
     };
 
@@ -322,7 +336,7 @@ angular.module('adminNg.controllers')
       switch (value) {
         case 'permissions':
             $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
-            $scope.roles = ResourcesListResource.get({ resource: 'ROLES' });
+            $scope.roles = updateRoles();
           break;
       }
     });

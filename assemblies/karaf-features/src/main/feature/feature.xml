@@ -189,7 +189,6 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-metadata/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-notification-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-participation-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-presets/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-youtube-v3/${project.version}</bundle>
@@ -273,7 +272,6 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-metadata/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-notification-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-participation-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-presets/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-youtube-remote/${project.version}</bundle>
@@ -370,7 +368,6 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-metadata/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-notification-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-participation-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-presets/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-youtube-remote/${project.version}</bundle>
@@ -506,7 +503,6 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-metadata/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-notification-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-participation-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-presets/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-youtube-v3/${project.version}</bundle>

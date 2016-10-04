@@ -40,6 +40,10 @@ angular.module('adminNg.services')
                 if (acl.role === AuthService.getUserRole()) {
                     foundUserRole = true;
                 }
+
+                if (angular.isUndefined(me.roles[acl.role])) {
+                    me.roles[acl.role] = acl.role;
+                }
             });
 
             me.ud.policies = [];
@@ -146,7 +150,7 @@ angular.module('adminNg.services')
 
             angular.forEach(me.ud.policies, function (policy, idx) {
                 if (policy.role === policyToDelete.role &&
-                    policy.write === policyToDelete.write && 
+                    policy.write === policyToDelete.write &&
                     policy.read === policyToDelete.read) {
                     index = idx;
                 }
@@ -175,12 +179,12 @@ angular.module('adminNg.services')
 
             me.unvalidRule = !rulesValid;
             me.hasRights = hasRights;
-            
+
             return rulesValid && hasRights;
         };
 
         checkNotification();
-        
+
         me.acls  = ResourcesListResource.get({ resource: 'ACL' });
         me.actions = {};
         me.hasActions = false;
@@ -192,7 +196,7 @@ angular.module('adminNg.services')
                 }
             });
         });
-        me.roles = ResourcesListResource.get({ resource: 'ROLES' }); 
+        me.roles = ResourcesListResource.get({ resource: 'ROLES' });
 
         this.reset = function () {
             me.ud = {

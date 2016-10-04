@@ -65,6 +65,7 @@ public class AgentTest {
 
     Thread.sleep(1);
     agent.setState(CAPTURING);
+    agent.setLastHeardFrom(System.currentTimeMillis());
 
     Assert.assertEquals("test", agent.getName());
     Assert.assertEquals(CAPTURING, agent.getState());

@@ -18,7 +18,7 @@
   <groupId>org.opencastproject.assemblies</groupId>
   <artifactId>opencast-assemblies</artifactId>
   <packaging>pom</packaging>
-  <name>Opencast // Assemblies</name>
+  <name>Assemblies</name>
 
   <modules>
     <module>karaf-features</module>

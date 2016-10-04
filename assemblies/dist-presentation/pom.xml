@@ -16,7 +16,7 @@
 
   <artifactId>opencast-dist-presentation</artifactId>
   <packaging>karaf-assembly</packaging>
-  <name>Opencast // Assemblies // Distribution Presentation</name>
+  <name>Assemblies // Distribution Presentation</name>
 
   <dependencies>
     <dependency>

@@ -16,7 +16,7 @@
 
   <artifactId>opencast-dist-adminworker</artifactId>
   <packaging>karaf-assembly</packaging>
-  <name>Opencast // Assemblies // Distribution Admin/Worker</name>
+  <name>Assemblies // Distribution Admin/Worker</name>
 
   <dependencies>
     <dependency>
