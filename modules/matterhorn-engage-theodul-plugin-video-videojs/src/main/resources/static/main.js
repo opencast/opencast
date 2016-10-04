@@ -1082,6 +1082,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   }
 
   function renderEmbed(videoDataView, videoSources, videoDisplays, aspectRatio) {
+    Engage.log('Video: Rendering for embeded view');
     var init = false;
 
     var tuples = getSortedVideosourcesArray(videoSources);
@@ -1107,10 +1108,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       aspectRatio[1] = parseInt(aspectRatio[1]);
       aspectRatio[2] = parseInt(aspectRatio[2]);
       Engage.log('Video: Aspect ratio: ' + aspectRatio[1] + 'x' + aspectRatio[2] + ' == ' + ((aspectRatio[2] / aspectRatio[1]) * 100));
-      Engage.trigger(plugin.events.aspectRatioSet.getName(), aspectRatio[1], aspectRatio[2], (aspectRatio[2] / aspectRatio[1]) * 100);
+      Engage.trigger(plugin.events.aspectRatioSet.getName(), [aspectRatio[1], aspectRatio[2], (aspectRatio[1] / aspectRatio[2]) * 100]);
       $('.' + id_videoDisplayClass).css('width', '100%');
       for (i = 0; i < videoDisplays.length; ++i) {
         $('#' + videoDisplays[i]).css('padding-top', (aspectRatio[2] / aspectRatio[1] * 100) + '%').addClass('auto-height');
+        singleVideoPaddingTop = (aspectRatio[2] / aspectRatio[1] * 100) + '%';
       }
     } else {
       Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
@@ -1355,7 +1357,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
     var videoHeight = $engageVideoId.height();
     var videoWidth = $engageVideoId.width();
-    if (!isDefaultLayout()) {
+    if (isEmbedMode) {
+      if (videoWidth !== undefined && videoHeight !== undefined &&
+          videoWidth > 0 && videoHeight > 0) {
+        videoAreaAspectRatio = videoWidth / videoHeight;
+      }
+    } else if (!isDefaultLayout()) {
       videoHeight = $('.' + videoFocusedClass).height();
       if (isPiP) {
         videoWidth = $('.' + videoFocusedClass).width();
@@ -1367,6 +1374,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     }
     checkVideoDisplaySize();
   }
+
 
   function checkVideoDisplaySize() {
     var $engageVideoId = $('#' + id_engage_video);
@@ -1380,6 +1388,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
     var maxVideoAreaHeight = $(window).height() - controlsHeight;
 
+    if (isEmbedMode) {
+      maxVideoAreaHeight = $(window).height();
+    }
+
     if (videoAreaAspectRatio === undefined) {
       calculateVideoAreaAspectRatio();
     }
@@ -1390,7 +1402,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     var minWidth = parseInt($engageVideoId.css('min-width'));
     if (maxVideoAreaWidth > minWidth) {
       if (maxVideoAreaWidth > $(window).width()) {
-        $engageVideoId.css('max-width', ($(window).width() - 10) + 'px');
+          $engageVideoId.css('max-width', $(window).width() + 'px');
       } else {
         $engageVideoId.css('max-width', maxVideoAreaWidth + 'px');
       }
@@ -1441,7 +1453,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       Engage.trigger(plugin.events.playbackRateChanged.getName(), (rate + value));
     }
   }
-  
+
   function startAudioPlayer(audio) {
     clearAutoplay();
     audio.play();
@@ -1581,7 +1593,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       if (videosReady) {
         if (! pressedPlayOnce) {
             startAudioPlayer(audioPlayer);
-        }          
+        }
         var duration = parseInt(Engage.model.get('videoDataModel').get('duration'));
         audioPlayer.currentTime = (time / 1000) * (duration / 1000);
       } else {
@@ -1598,7 +1610,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       }
     });
   }
-  
+
   function startVideoPlayer(video) {
     $('.' + class_vjsposter).detach();
     clearAutoplay();
@@ -1819,7 +1831,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       if (videosReady) {
         if (! pressedPlayOnce) {
             startVideoPlayer(videodisplayMaster);
-        }          
+        }
         var duration = parseInt(Engage.model.get('videoDataModel').get('duration'));
         var normTime = (time / 1000) * (duration / 1000);
         videodisplayMaster.currentTime(normTime);
