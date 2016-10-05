@@ -6,13 +6,27 @@
         </h2>
     </header>
     <nav id="modal-nav" ng-class="{'step-by-step': action === 'add', 'modal-nav': action === 'edit'}">
-        <a ng-click="navigateTo('generalForm', currentForm, [])" ng-class="{ active: currentForm === 'generalForm', 'not-complete': !generalForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.GENERAL.CAPTION' | translate }}</a>
-        <a ng-click="navigateTo('bumperForm', currentForm, [generalForm])" ng-class="{ active: currentForm === 'bumperForm', 'not-complete': !bumperForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.BUMPER.CAPTION' | translate }}</a>
-        <a ng-click="navigateTo('trailerForm', currentForm, [generalForm, bumperForm])" ng-class="{ active: currentForm === 'trailerForm', 'not-complete': !trailerForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.TRAILER.CAPTION' | translate }}</a>
-        <a ng-click="navigateTo('titleslideForm', currentForm, [generalForm, bumperForm, trailerForm])" ng-class="{ active: currentForm === 'titleslideForm', 'not-complete': !titleslideForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.TITLE.CAPTION' | translate }}</a>
-        <a ng-click="navigateTo('watermarkForm', currentForm, [generalForm, bumperForm, trailerForm, summaryForm])" ng-class="{ active: currentForm === 'watermarkForm', 'not-complete': !watermarkForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION' | translate }}</a>
-        <a ng-if="action === 'add'" ng-click="navigateTo('summary', currentForm, [generalForm, bumperForm, trailerForm])" ng-class="{ active: currentForm === 'summary'}">{{ 'CONFIGURATION.THEMES.DETAILS.SUMMARY.CAPTION' | translate }}</a>
-        <a ng-if="action === 'edit'" ng-click="navigateTo('usage', currentForm, [generalForm, bumperForm, trailerForm])" ng-class="{ active: currentForm === 'usage'}">{{ 'CONFIGURATION.THEMES.DETAILS.USAGE.CAPTION' | translate }}</a>
+        <a ng-click="navigateTo('generalForm', currentForm, [])" ng-class="{ active: currentForm === 'generalForm', 'not-complete': !generalForm.$valid}">
+            {{ 'CONFIGURATION.THEMES.DETAILS.GENERAL.CAPTION' | translate }}
+        </a>
+        <a ng-click="navigateTo('bumperForm', currentForm, [generalForm])" ng-class="{ active: currentForm === 'bumperForm', 'not-complete': !bumperForm.$valid}">
+            {{ 'CONFIGURATION.THEMES.DETAILS.BUMPER.CAPTION' | translate }}
+        </a>
+        <a ng-click="navigateTo('trailerForm', currentForm, [generalForm, bumperForm])" ng-class="{ active: currentForm === 'trailerForm', 'not-complete': !trailerForm.$valid}">
+            {{ 'CONFIGURATION.THEMES.DETAILS.TRAILER.CAPTION' | translate }}
+        </a>
+        <a ng-click="navigateTo('titleslideForm', currentForm, [generalForm, bumperForm, trailerForm])" ng-class="{ active: currentForm === 'titleslideForm', 'not-complete': !titleslideForm.$valid}">
+            {{ 'CONFIGURATION.THEMES.DETAILS.TITLE.CAPTION' | translate }}
+        </a>
+        <a ng-click="navigateTo('watermarkForm', currentForm, [generalForm, bumperForm, trailerForm, titleslideForm])" ng-class="{ active: currentForm === 'watermarkForm', 'not-complete': !watermarkForm.$valid}">
+            {{ 'CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION' | translate }}
+        </a>
+        <a ng-if="action === 'add'" ng-click="navigateTo('summary', currentForm, [generalForm, bumperForm, trailerForm, titleslideForm, watermarkForm])" ng-class="{ active: currentForm === 'summary'}">
+            {{ 'CONFIGURATION.THEMES.DETAILS.SUMMARY.CAPTION' | translate }}
+        </a>
+        <a ng-if="action === 'edit'" ng-click="navigateTo('usage', currentForm, [generalForm])" ng-class="{ active: currentForm === 'usage'}">
+            {{ 'CONFIGURATION.THEMES.DETAILS.USAGE.CAPTION' | translate }}
+        </a>
     </nav>
     
     <div class="modal-content" ng-class="{active: currentForm === 'generalForm'}" data-modal-tab-content="general" data-level="1">
@@ -338,17 +352,28 @@
                                 <p>
                                     <span translate="CONFIGURATION.THEMES.DETAILS.TRAILER.FILE_UPLOADED">
                                         <!-- File Uploaded: -->
-                                    </span>{{trailer.file.name}}
+                                    </span>
+                                    {{trailer.file.name}}
                                 </p>
                             </li>
-<!--                             <li ng-if="titleslide.file.id">
-                                <h4 translate="CONFIGURATION.THEMES.DETAILS.TITLE.CAPTION">Title Slide</h4>
-                                <p><span translate="CONFIGURATION.THEMES.DETAILS.TITLE.FILE_UPLOADED">File Uploaded: </span>{{titleslide.file.name}}</p>
+                            <li ng-if="titleslide.file.id">
+                                <h4 translate="CONFIGURATION.THEMES.DETAILS.TITLE.CAPTION"><!-- Title Slide --></h4>
+                                <p>
+                                    <span translate="CONFIGURATION.THEMES.DETAILS.TITLE.FILE_UPLOADED">
+                                        <!-- File Uploaded: -->
+                                    </span>
+                                    {{titleslide.file.name}}
+                                </p>
                             </li>
                             <li ng-if="watermark.file.id">
-                                <h4 translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION">Watermark</h4>
-                                <p><span translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.FILE_UPLOADED">File Uploaded: </span>{{watermark.file.name}}</p>
-                            </li> -->
+                                <h4 translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION"><!-- Watermark --></h4>
+                                <p>
+                                    <span translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.FILE_UPLOADED">
+                                        <!-- File Uploaded: -->
+                                    </span>
+                                    {{watermark.file.name}}
+                                </p>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -365,7 +390,7 @@
            ng-class="{active: theme-form.$valid, inactive: theme-form.$invalid}">
            {{ 'SUBMIT' | translate }}
         </a>
-        <a ng-click="navigateTo('trailerForm', currentForm, [generalForm, bumperForm,  trailerForm])"
+        <a ng-click="navigateTo('watermarkForm', currentForm, [generalForm, bumperForm, trailerForm, titleslideForm, watermarkForm])"
            data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
         </a>
     </footer>
