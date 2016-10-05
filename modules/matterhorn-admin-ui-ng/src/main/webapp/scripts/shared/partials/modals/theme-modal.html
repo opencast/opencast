@@ -228,7 +228,7 @@
         <a class="cancel" ng-click="cancel()">{{ 'CANCEL' | translate }}</a>
     </footer>
     <footer ng-if="action === 'add' && currentForm === 'titleslideForm'">
-        <a ng-click="navigateTo('summary', [generalForm, bumperForm, trailerForm, titleslideForm])"
+        <a ng-click="navigateTo('watermarkForm', [generalForm, bumperForm, trailerForm, titleslideForm])"
             data-modal-tab="next" class="submit"
             ng-class="{active: titleslideForm.$valid, inactive: titleslideForm.$invalid}">
             {{ 'WIZARD.NEXT_STEP' | translate }}
@@ -238,7 +238,7 @@
         </a>
     </footer>
     
-<!--     <div class="modal-content" ng-class="{active: currentForm === 'watermarkForm'}" data-modal-tab-content="watermark" data-level="1">
+    <div class="modal-content" ng-class="{active: currentForm === 'watermarkForm'}" data-modal-tab-content="watermark" data-level="1">
         <div class="modal-body">
             <div class="full-col">
                 <form name="watermarkForm">
@@ -305,8 +305,7 @@
         <a ng-click="navigateTo('titleslideForm', [generalForm, bumperForm, trailerForm, titleslideForm])"
            data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
         </a>
-    </footer> -->
-
+    </footer>
 
     <div class="modal-content" ng-class="{active: currentForm === 'summary'}" data-modal-tab-content="summary" data-level="1">
         <div class="modal-body">
