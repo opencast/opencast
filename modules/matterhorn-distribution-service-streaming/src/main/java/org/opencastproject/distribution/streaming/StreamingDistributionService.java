@@ -702,7 +702,6 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       if (!isDistributionUrl(mpeUri)) {
         final String ext = FilenameUtils.getExtension(mpeUri.toString());
         final String fileName = FilenameUtils.getBaseName(mpeUri.toString());
-        //String tag = "flv".equals(ext) ? "" : ext + ":"; //Breaks FLV Streaming compatibility
         String tag = ext + ":";
 
         // removes the tag for flv files, but keeps it for all others (mp4 needs it)
