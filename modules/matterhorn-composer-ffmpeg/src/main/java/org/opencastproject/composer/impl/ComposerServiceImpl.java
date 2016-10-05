@@ -77,6 +77,7 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -97,6 +98,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -837,6 +839,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   @Override
   public Job concat(String profileId, Dimension outputDimension, Track... tracks) throws EncoderException,
           MediaPackageException {
+    return concat(profileId, outputDimension, -1.0f, tracks);
+  }
+
+  @Override
+  public Job concat(String profileId, Dimension outputDimension, float outputFrameRate, Track... tracks) throws EncoderException,
+          MediaPackageException {
     ArrayList<String> arguments = new ArrayList<String>();
     arguments.add(0, profileId);
     if (outputDimension != null) {
@@ -844,8 +852,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     } else {
       arguments.add(1, "");
     }
+    arguments.add(2, String.format(Locale.US, "%f", outputFrameRate));
     for (int i = 0; i < tracks.length; i++) {
-      arguments.add(i + 2, MediaPackageElementParser.getAsXml(tracks[i]));
+      arguments.add(i + 3, MediaPackageElementParser.getAsXml(tracks[i]));
     }
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Concat.toString(), arguments);
@@ -854,7 +863,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     }
   }
 
-  protected Option<Track> concat(Job job, List<Track> tracks, String profileId, Dimension outputDimension)
+  protected Option<Track> concat(Job job, List<Track> tracks, String profileId, Dimension outputDimension, float outputFrameRate)
           throws EncoderException, MediaPackageException {
     if (job == null)
       throw new EncoderException("The job parameter must not be null");
@@ -926,7 +935,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       }
 
       // Creating video filter command for concat
-      String concatCommand = buildConcatCommand(onlyAudio, outputDimension, trackFiles, tracks);
+      String concatCommand = buildConcatCommand(onlyAudio, outputDimension, outputFrameRate, trackFiles, tracks);
 
       Map<String, String> properties = new HashMap<String, String>();
       properties.put("concatCommand", concatCommand);
@@ -1714,14 +1723,16 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         case Concat:
           encodingProfile = arguments.get(0);
           String dimensionString = arguments.get(1);
+          String frameRateString = arguments.get(2);
           Dimension outputDimension = null;
           if (StringUtils.isNotBlank(dimensionString))
             outputDimension = Serializer.dimension(JsonObj.jsonObj(dimensionString));
+          float outputFrameRate = NumberUtils.toFloat(frameRateString, -1.0f);
           List<Track> tracks = new ArrayList<Track>();
-          for (int i = 2; i < arguments.size(); i++) {
-            tracks.add(i - 2, (Track) MediaPackageElementParser.getFromXml(arguments.get(i)));
+          for (int i = 3; i < arguments.size(); i++) {
+            tracks.add(i - 3, (Track) MediaPackageElementParser.getFromXml(arguments.get(i)));
           }
-          serialized = concat(job, tracks, encodingProfile, outputDimension).map(
+          serialized = concat(job, tracks, encodingProfile, outputDimension, outputFrameRate).map(
                   MediaPackageElementParser.<Track> getAsXml()).getOrElse("");
           break;
         case ImageToVideo:
@@ -1947,7 +1958,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     return cmd.toString();
   }
 
-  private String buildConcatCommand(boolean onlyAudio, Dimension dimension, List<File> files, List<Track> tracks) {
+  private String buildConcatCommand(boolean onlyAudio, Dimension dimension, float outputFrameRate, List<File> files, List<Track> tracks) {
     StringBuilder sb = new StringBuilder();
 
     // Add input file paths
@@ -1958,12 +1969,18 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
     boolean hasAudio = false;
     if (!onlyAudio) {
+      // fps video filter if outputFrameRate is valid
+      String fpsFilter = StringUtils.EMPTY;
+      if (outputFrameRate > 0) {
+        fpsFilter = String.format(Locale.US, "fps=fps=%f,", outputFrameRate);
+      }
       // Add video scaling and check for audio
       int characterCount = 0;
       for (int i = 0; i < files.size(); i++) {
         if ((i % 25) == 0)
           characterCount++;
-        sb.append("[").append(i).append(":v]scale=iw*min(").append(dimension.getWidth()).append("/iw\\,")
+        sb.append("[").append(i).append(":v]").append(fpsFilter)
+                .append("scale=iw*min(").append(dimension.getWidth()).append("/iw\\,")
                 .append(dimension.getHeight()).append("/ih):ih*min(").append(dimension.getWidth()).append("/iw\\,")
                 .append(dimension.getHeight()).append("/ih),pad=").append(dimension.getWidth()).append(":")
                 .append(dimension.getHeight()).append(":(ow-iw)/2:(oh-ih)/2").append(",setdar=")

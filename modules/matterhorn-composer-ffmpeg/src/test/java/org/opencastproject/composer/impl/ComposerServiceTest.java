@@ -63,6 +63,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
@@ -111,6 +112,8 @@ public class ComposerServiceTest {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ComposerServiceTest.class);
+  private Track sourceAudioTrack;
+  private Track sourceVideoTrack;
   private Track inspectedTrack;
 
   /** Encoding profile scanner */
@@ -213,11 +216,12 @@ public class ComposerServiceTest {
     EncoderEngineFactoryImpl encoderEngineFactory = new EncoderEngineFactoryImpl();
     encoderEngineFactory.activate(cc);
 
-    String sourceTrackXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "       <track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
-            + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
-            + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>" + "       </track>";
-    inspectedTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
+    inspectedTrack = (Track) MediaPackageElementParser.getFromXml(IOUtils.toString(
+            ComposerServiceTest.class.getResourceAsStream("/composer_test_source_track_video.xml")));
+    sourceAudioTrack = (Track) MediaPackageElementParser.getFromXml(IOUtils.toString(
+            ComposerServiceTest.class.getResourceAsStream("/composer_test_source_track_audio.xml")));
+    sourceVideoTrack = (Track) MediaPackageElementParser.getFromXml(IOUtils.toString(
+            ComposerServiceTest.class.getResourceAsStream("/composer_test_source_track_video.xml")));
 
     // Create and populate the composer service
     composerService = new ComposerServiceImpl() {
@@ -258,13 +262,8 @@ public class ComposerServiceTest {
       return;
 
     assertTrue(source.isFile());
-    String sourceTrackXml = "<track xmlns=\"http://mediapackage.opencastproject.org\" id=\"track-1\" type=\"presentation/source\"><mimetype>video/quicktime</mimetype>"
-            + "<url>http://localhost:8080/workflow/samples/camera.mpg</url>"
-            + "<checksum type=\"md5\">43b7d843b02c4a429b2f547a4f230d31</checksum><duration>14546</duration>"
-            + "<video><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
-            + "<encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" /><resolution>640x480</resolution>"
-            + "<scanType type=\"progressive\" /><bitrate>540520</bitrate><frameRate>2</frameRate></video></track>";
-    Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
+    Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(IOUtils.toString(
+            ComposerServiceTest.class.getResourceAsStream("/composer_test_source_track1.xml")));
     List<Job> jobs = new ArrayList<Job>();
     for (int i = 0; i < 10; i++) {
       jobs.add(composerService.image(sourceTrack, "player-preview.http", 1D));
@@ -298,14 +297,8 @@ public class ComposerServiceTest {
     .andThrow(new MediaInspectionException("test complete")).anyTimes();
     EasyMock.replay(workspace, inspect);
 
-    // build a single media package to test with
-    String sourceTrackXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "       <track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
-            + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
-            + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>" + "       </track>";
-    Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
     try {
-      composerService.encode(sourceTrack, "av.work");
+      composerService.encode(sourceVideoTrack, "av.work");
     } catch (EncoderException e) {
       assertTrue("test complete".equals(e.getMessage()));
     }
@@ -331,19 +324,8 @@ public class ComposerServiceTest {
     .andThrow(new MediaInspectionException("test complete")).anyTimes();
     EasyMock.replay(workspace, inspect);
 
-    String sourceTrackVideoXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "       <track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
-            + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
-            + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>" + "       </track>";
-    Track sourceTrackVideo = (Track) MediaPackageElementParser.getFromXml(sourceTrackVideoXml);
-    String sourceTrackAudioXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "       <track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
-            + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2b'>"
-            + "       <mimetype>audio/mp3</mimetype>" + "       <url>audio.mp3</url>" + "       </track>";
-    Track sourceTrackAudio = (Track) MediaPackageElementParser.getFromXml(sourceTrackAudioXml);
-
     try {
-      composerService.encode(null, sourceTrackVideo, sourceTrackAudio, "av.work", null);
+      composerService.encode(null, sourceVideoTrack, sourceAudioTrack, "av.work", null);
     } catch (IllegalArgumentException e) {
       assertTrue("The Job parameter must not be null".equals(e.getMessage()));
     }
@@ -369,14 +351,8 @@ public class ComposerServiceTest {
     .andThrow(new MediaInspectionException("test complete")).anyTimes();
     EasyMock.replay(workspace, inspect);
 
-    // build a single media package to test with
-    String sourceTrackXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "       <track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
-            + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
-            + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>" + "       </track>";
-    Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
     try {
-      composerService.parallelEncode(sourceTrack, "parallel.http");
+      composerService.parallelEncode(sourceVideoTrack, "parallel.http");
     } catch (EncoderException e) {
       assertTrue("test complete".equals(e.getMessage()));
     }
@@ -390,13 +366,6 @@ public class ComposerServiceTest {
   public void testComposite() throws Exception {
     if (!ffmpegInstalledGreaterVersion2)
       return;
-
-    // build a single media package to test with
-    String sourceTrackXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "       <track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
-            + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
-            + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>" + "       </track>";
-    Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
 
     Dimension outputDimension = new Dimension(500, 500);
 
@@ -415,9 +384,9 @@ public class ComposerServiceTest {
     MultiShapeLayout multiShapeLayout = LayoutManager.multiShapeLayout(outputDimension, shapes);
 
     Option<LaidOutElement<Attachment>> watermarkOption = Option.<LaidOutElement<Attachment>> none();
-    LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<Track>(sourceTrack, multiShapeLayout.getShapes()
+    LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<Track>(sourceVideoTrack, multiShapeLayout.getShapes()
             .get(0));
-    LaidOutElement<Track> upperLaiedOutElement = new LaidOutElement<Track>(sourceTrack, multiShapeLayout.getShapes()
+    LaidOutElement<Track> upperLaiedOutElement = new LaidOutElement<Track>(sourceVideoTrack, multiShapeLayout.getShapes()
             .get(1));
 
     Job composite = composerService.composite(outputDimension, Option.option(lowerLaidOutElement), upperLaiedOutElement,
@@ -442,28 +411,33 @@ public class ComposerServiceTest {
     if (!ffmpegInstalledGreaterVersion2)
       return;
 
-    // build two media package to test with
-    String sourceTrack1Xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "       <track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
-            + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
-            + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>"
-            + "<video><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
-            + "<encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" /><resolution>640x480</resolution>"
-            + "<scanType type=\"progressive\" /><bitrate>540520</bitrate><frameRate>2</frameRate></video></track>";
-    Track sourceTrack1 = (Track) MediaPackageElementParser.getFromXml(sourceTrack1Xml);
+    Dimension outputDimension = new Dimension(500, 500);
 
-    String sourceTrack2Xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "       <track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
-            + "       id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>"
-            + "       <mimetype>video/mpeg</mimetype>" + "       <url>slidechanges.mov</url>"
-            + "<video><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
-            + "<encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" /><resolution>640x480</resolution>"
-            + "<scanType type=\"progressive\" /><bitrate>540520</bitrate><frameRate>2</frameRate></video></track>";
-    Track sourceTrack2 = (Track) MediaPackageElementParser.getFromXml(sourceTrack2Xml);
+    Job concat = composerService.concat("concat.work", outputDimension, sourceVideoTrack, sourceVideoTrack);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, concat);
+    if (!barrier.waitForJobs().isSuccess()) {
+      Assert.fail("Concat job did not success!");
+    }
+
+    Track concatTrack = (Track) MediaPackageElementParser.getFromXml(concat.getPayload());
+    Assert.assertNotNull(concatTrack);
+    inspectedTrack.setIdentifier(concatTrack.getIdentifier());
+    inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
+    Assert.assertEquals(inspectedTrack, concatTrack);
+  }
+
+  /**
+   * Test method for {@link ComposerServiceImpl#concat(String, Dimension, float, Track...)}
+   */
+  @Test
+  public void testConcatWithFrameRate() throws Exception {
+    if (!ffmpegInstalledGreaterVersion2) {
+      return;
+    }
 
     Dimension outputDimension = new Dimension(500, 500);
 
-    Job concat = composerService.concat("concat.work", outputDimension, sourceTrack1, sourceTrack2);
+    Job concat = composerService.concat("concat.work", outputDimension, 20.0f, sourceVideoTrack, sourceVideoTrack);
     JobBarrier barrier = new JobBarrier(null, serviceRegistry, concat);
     if (!barrier.waitForJobs().isSuccess()) {
       Assert.fail("Concat job did not success!");
