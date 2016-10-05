@@ -2,15 +2,13 @@
 <definition xmlns="http://workflow.opencastproject.org">
 
   <id>import</id>
-  <title>Imports Mediapacke and Publish without reencode</title>
+  <title>Import Mediapackage and Publish without reencode</title>
   <tags>
   </tags>
   <description>
   A minimal Workflow that only publishes a Mediapackage
   </description>
 
-  <configuration_panel>
-  </configuration_panel>
 
   <operations>
 

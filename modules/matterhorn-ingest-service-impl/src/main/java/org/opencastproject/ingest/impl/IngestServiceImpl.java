@@ -1114,7 +1114,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
   }
 
-   /**
+  /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.ingest.api.IngestService#addAttachment(java.io.InputStream, java.lang.String,
