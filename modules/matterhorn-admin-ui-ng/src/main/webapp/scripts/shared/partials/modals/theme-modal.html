@@ -242,7 +242,9 @@
         <div class="modal-body">
             <div class="full-col">
                 <form name="watermarkForm">
-                    <p class="tab-description" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.DESCRIPTION">Typically a transparent logo that is overlaid on every frame of the video.</p>
+                    <p class="tab-description" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.DESCRIPTION">
+                        <!-- Typically a transparent logo that is overlaid on every frame of the video. -->
+                    </p>
                     <div data-admin-ng-notifications="" context="new-theme-watermark"></div>
                     <div ng-show="watermarkForm.watermarkfile.$error.required || watermarkForm.watermarkfile.$error['file-upload']" ng-messages="watermarkForm.watermarkfile.$error" class="alert sticky error">
                         <a ng-show="watermarkForm.watermarkfile.$error.required || watermarkForm.watermarkfile.$error['file-upload']" ng-click="hide = true" class="autonomous fa fa-times close"></a>
@@ -251,7 +253,7 @@
                     </div>
                         
                     <div class="obj">
-                        <header translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION">Watermark</header>
+                        <header translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION"><!-- Watermark --></header>
                         <div class="obj-container content-list padded">
                             <div class="list-row">
                                 <div class="header-column">
@@ -266,7 +268,7 @@
                         </div>
                     </div>
                     <div class="obj" ng-if="watermark.active">
-                        <header translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.UPLOAD">Upload</header>
+                        <header translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.UPLOAD"><!-- Upload --></header>
                         <div class="obj-container padded" file-upload="" acceptable-types="image/*"
                              ng-required="watermark.active" existing="watermark.file" ng-model="watermark.file" name="watermarkfile"
                              label-key="CONFIGURATION.THEMES.DETAILS.WATERMARK.UPLOAD_LABEL"
@@ -274,15 +276,23 @@
                              button-key="CONFIGURATION.THEMES.DETAILS.WATERMARK.UPLOAD_BUTTON"/>
                     </div>
                     <div class="obj" ng-if="watermark.file">
-                        <header  translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.POSITION">Position</header>
+                        <header  translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.POSITION"><!-- Position --></header>
                         <div class="obj-container padded">
                             <div class="video-container">
                                 <div class="watermark-config">
                                     <div class="position-selection">
-                                        <button class="position-button position-top-left" ng-click="watermark.position = 'topLeft'" ng-class="{active:watermark.position=='topLeft'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.TOP_LEFT">top left</button>
-                                        <button class="position-button position-top-right" ng-click="watermark.position = 'topRight'" ng-class="{active:watermark.position=='topRight'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.TOP_RIGHT">top right</button>
-                                        <button class="position-button position-bottom-left" ng-click="watermark.position = 'bottomLeft'" ng-class="{active:watermark.position=='bottomLeft'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.BOTTOM_LEFT">bottom left</button>
-                                        <button class="position-button position-bottom-right" ng-click="watermark.position = 'bottomRight'" ng-class="{active:watermark.position=='bottomRight'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.BOTTOM_RIGHT">bottom right</button>
+                                        <button class="position-button position-top-left" ng-click="watermark.position = 'topLeft'" ng-class="{active:watermark.position=='topLeft'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.TOP_LEFT">
+                                            <!-- top left -->
+                                        </button>
+                                        <button class="position-button position-top-right" ng-click="watermark.position = 'topRight'" ng-class="{active:watermark.position=='topRight'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.TOP_RIGHT">
+                                            <!-- top right -->
+                                        </button>
+                                        <button class="position-button position-bottom-left" ng-click="watermark.position = 'bottomLeft'" ng-class="{active:watermark.position=='bottomLeft'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.BOTTOM_LEFT">
+                                            <!-- bottom left -->
+                                        </button>
+                                        <button class="position-button position-bottom-right" ng-click="watermark.position = 'bottomRight'" ng-class="{active:watermark.position=='bottomRight'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.BOTTOM_RIGHT">
+                                            <!-- bottom right -->
+                                        </button>
                                     </div>
                                 </div>
                             </div>
