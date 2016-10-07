@@ -153,6 +153,10 @@
         <configuration key="trailer-tags">archive</configuration>
         <configuration key="title-slide-flavor">branding/titleslide</configuration>
         <configuration key="title-slide-tags">archive</configuration>
+        <configuration key="watermark-flavor">branding/watermark</configuration>
+        <configuration key="watermark-tags">archive</configuration>
+        <configuration key="watermark-layout">theme_watermark_layout</configuration>
+        <configuration key="watermark-layout-variable">theme_watermark_layout_variable</configuration>
       </configurations>
     </operation>
 
@@ -180,24 +184,24 @@
 
     <!-- Add bumper and trailer part to the presenter track -->
 
-      <operation
-        id="concat"
-        exception-handler-workflow="ng-partial-error"
-        description="Concatenate presenter track with intro and outro videos">
-        <configurations>
-          <configuration key="source-flavor-part-0">branding/bumper</configuration>
-          <configuration key="source-flavor-part-0-mandatory">${theme_bumper_active}</configuration>
-          <configuration key="source-flavor-part-1">branding/titleslide+video</configuration>
-          <configuration key="source-flavor-part-1-mandatory">${theme_title_slide_active}</configuration>
-          <configuration key="source-flavor-part-2">presenter/trimmed</configuration>
-          <configuration key="source-flavor-part-2-mandatory">true</configuration>
-          <configuration key="source-flavor-part-3">branding/trailer</configuration>
-          <configuration key="source-flavor-part-3-mandatory">${theme_trailer_active}</configuration>
-          <configuration key="target-flavor">presenter/themed</configuration>
-          <configuration key="encoding-profile">concat.work</configuration>
-          <configuration key="output-resolution">part-2</configuration>
-        </configurations>
-      </operation>
+    <operation
+      id="concat"
+      exception-handler-workflow="ng-partial-error"
+      description="Concatenate presenter track with intro and outro videos">
+      <configurations>
+        <configuration key="source-flavor-part-0">branding/bumper</configuration>
+        <configuration key="source-flavor-part-0-mandatory">${theme_bumper_active}</configuration>
+        <configuration key="source-flavor-part-1">branding/titleslide+video</configuration>
+        <configuration key="source-flavor-part-1-mandatory">${theme_title_slide_active}</configuration>
+        <configuration key="source-flavor-part-2">presenter/trimmed</configuration>
+        <configuration key="source-flavor-part-2-mandatory">true</configuration>
+        <configuration key="source-flavor-part-3">branding/trailer</configuration>
+        <configuration key="source-flavor-part-3-mandatory">${theme_trailer_active}</configuration>
+        <configuration key="target-flavor">presenter/themed</configuration>
+        <configuration key="encoding-profile">concat.work</configuration>
+        <configuration key="output-resolution">part-2</configuration>
+      </configurations>
+    </operation>
 
     <!-- Add bumper and trailer part to the presentation track -->
 
