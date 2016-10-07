@@ -26,6 +26,7 @@ describe('Events controller', function () {
 
         it('deletes the event', function () {
             $httpBackend.expectGET('/admin-ng/resources/events/filters.json').respond('[]');
+            $httpBackend.expectGET('/admin-ng/resources/PUBLICATION.CHANNEL.LABELS.json').respond('{}');
             $httpBackend.expectDELETE('/admin-ng/event/12').respond('12');
 
             $scope.table.delete({'id': 12});
