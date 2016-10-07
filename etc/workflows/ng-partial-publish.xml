@@ -218,6 +218,7 @@
         <configuration key="target-flavor">presentation/themed</configuration>
         <configuration key="encoding-profile">concat.work</configuration>
         <configuration key="output-resolution">part-2</configuration>
+        <configuration key="output-framerate">part-2</configuration>
       </configurations>
     </operation>
 
