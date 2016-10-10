@@ -46,10 +46,13 @@
     "url-parse": "^1.0.5"
   },
   "engines": {
-    "node": ">=0.10.0"
+    "node": "4.4.0",
+    "npm": "2.14.20"
   },
   "scripts": {
-    "test": "karma start test/karma.conf.js",
+    "test-chrome": "karma start src/test/resources/karma.conf.js --browsers=Chrome --single-run=false",
+    "test-firefox": "karma start src/test/resources/karma.conf.js --browsers=Firefox --single-run=false",
+    "test-ie": "karma start src/test/resources/karma.conf.js --browsers=IE --single-run=false",
     "build": "grunt"
   }
 }

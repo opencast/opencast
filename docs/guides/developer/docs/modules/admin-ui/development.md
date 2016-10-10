@@ -38,7 +38,7 @@ at some point.*
 *Note: In the example above, the paths are for a specific Opencast version.
 Your paths might look different.*
 
-Prerequisites for live working
+Prerequisites for live working and debugging
 ------------------------------
 
 Checkout and build Opencast.
@@ -48,13 +48,55 @@ Either install it on your system or use the local version from the Opencast modu
 
 ```bash
 cd modules/matterhorn-admin-ui-ng
-export PATH=$PATH:node:node_modules/grunt-cli/bin
+export PATH=$PATH:node:node_modules/grunt-cli/bin:node_modules/karma/bin
 ```
 *Note: The node and node_modules folders are created during the Maven build process.*
 
 *Note: We already had reports of Grunt behaving differently on different systems.
 Watch out for local or system-wide installations of Grunt and/or NodeJS as they can
 change the build behavior of Admin UI NG.*
+
+Debugging Javascript unit tests
+------------------------------------
+
+Our Javascript unit tests are built in Jasmine, and live in `modules/matterhorn-admin-ui-ng/src/test/resources/test/unit`.
+Occasionally something breaks, or you need to disable or focus on a single test.
+While reading the Jasmine (and Karma, and Grunt) docs is encouraged, here are a
+few common recipies that might be useful:
+
+### Disabling a unit test temporarily
+Add `x` to the broken test.  For example:
+
+|Before|After|
+|------|-----|
+|`it('runs a test', function () {`|`xit('runs a test', function () {`|
+
+### Running a single unit test
+
+Add `f` (for focus) to the relevant test.  For example:
+
+|Before|After|
+|------|-----|
+|`it('runs a test', function () {`|`fit('runs a test', function () {`|
+
+### Triggering a browser debugging session
+
+This triggers an instance of the selected browser(s) to open and begin running
+the tests.  There will be a `Debug` button which will open another tab without
+the javascript minification - use this second tab for your debugging!
+Refreshing the debugging page will rerun the tests
+
+To run Karma for Chrome
+`npm run test-chrome`
+
+To run Karma for Firefox
+`npm run test-firefox`
+
+To run Karma for IE
+`npm run test-ie`
+
+Additional browsers are supported, the full list can be found at [here](https://karma-runner.github.io/1.0/config/browsers.html)
+
 
 Live working with running Opencast
 ----------------------------------
