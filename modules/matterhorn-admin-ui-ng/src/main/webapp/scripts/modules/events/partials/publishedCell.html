@@ -8,7 +8,9 @@
         <div class="popover__content">
             <div ng-repeat="publication in row.publications" model="publication">
                 <!-- WARNING! translate directive + ng-include may lead to untranslated codes -->
-                <a href="{{publication.url}}" class="popover__list-item" target="_blank">{{publication.name | translate}}</a>
+                <a href="{{publication.url}}" class="popover__list-item" target="_blank">
+                    {{publication.label | translate}}
+                </a>
             </div>
         </div>
     </div>
