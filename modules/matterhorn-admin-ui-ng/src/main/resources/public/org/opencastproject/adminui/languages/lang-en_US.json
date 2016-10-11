@@ -47,6 +47,22 @@
    },
    "CONFIRMATIONS": {
      "CONTINUE_ACTION" : "Are you sure you want to continue?",
+     "METADATA": {
+       "NOTICE" : {
+         "UNKNOWN"            : "The following element will be deleted",
+         "EVENT"              : "The following event will be deleted",
+         "SERIES"             : "The following series will be deleted",
+         "ACL"                : "The following ACL will be deleted",
+         "GROUP"              : "The following group will be deleted",
+         "USER"               : "The following user will be deleted",
+         "USER_BLACKLIST"     : "The following user blacklist will be deleted",
+         "THEME"              : "The following theme will be deleted",
+         "EMAIL"              : "The following email template will be deleted",
+         "LOCATION"           : "The following location will be deleted",
+         "LOCATION_BLACKLIST" : "The following location blacklist will be deleted"
+       },
+       "NAME" : "Name"
+     },
      "ACTIONS": {
        "CONFIRMATION" : "Confirmation required"
      }
@@ -102,6 +118,8 @@
      "USER_BLACKLIST_NOT_SAVED":  "The blacklist could not be saved",
      "USER_BLACKLIST_DELETED":  "The blacklist has been deleted",
      "USER_BLACKLIST_NOT_DELETED":  "The blacklist could not be deleted",
+     "LOCATION_DELETED": "The location has been deleted",
+     "LOCATION_NOT_DELETED": "The location could not be deleted",
      "LOCATION_BLACKLIST_CREATED": "The blacklist has been created",
      "LOCATION_BLACKLIST_NOT_CREATED":  "The blacklist could not be created",
      "LOCATION_BLACKLIST_SAVED": "The blacklist has been saved",
@@ -195,6 +213,7 @@
       "SCHEDULE_TASK": {
           "CAPTION": "Start Task",
           "GENERAL": {
+             "CAPTION": "General",
              "SUMMARY": "({{ count }} events selected)",
              "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it/them or try again later."
           },
@@ -950,7 +969,8 @@
      },
      "ACTIONS": {
        "EXPORT": "Export",
-       "ADD_BLACKLIST": "Add blacklist"
+       "ADD_BLACKLIST": "Add blacklist",
+       "REMOVE": "Remove"
      },
      "RECORDINGS": {
        "TABLE": {
@@ -1399,6 +1419,7 @@
       },
      "JOBS": {
        "TABLE": {
+         "ID":        "Job Identifier",
          "ACTION":    "Actions",
          "CAPTION":   "Jobs",
          "CREATED":   "Created",
@@ -1720,7 +1741,7 @@
        "RUNNING":   "Running",
        "FINISHED":  "Finished",
        "FAILED" :   "Failed",
-       "FINISHED_WITH_COMMENTS": "Finished with open comments",
+       "FINISHED_WITH_COMMENTS": "Todo",
        "SCHEDULED" : "Scheduled"
    }
 }

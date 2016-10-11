@@ -7,6 +7,7 @@
     <AD id="organization" type="String" default="mh_default_org" name="organization" description="Organization" />
     <AD id="url" type="String" default="" name="url" description="Capture Agent Base URL" />
     <AD id="schedulerRoles" type="String" default="" name="schedulerRoles" description="Roles authorized to schedule this agent" />
+    <AD id="cacheLifetime" type="String" default="2" name="cacheLifetime" description="The length of time in hours that the service cache keeps an agent which has not checked in" />
   </OCD>
 
   <Designate pid="org.opencastproject.capture.agent">

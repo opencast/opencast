@@ -6,13 +6,13 @@
   <parent>
     <groupId>org.opencastproject.assemblies</groupId>
     <artifactId>opencast-assemblies</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <version>2.4-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>opencast-karaf-features</artifactId>
   <packaging>pom</packaging>
-  <name>Opencast // Assemblies // Apache Karaf Features</name>
+  <name>Assemblies // Apache Karaf Features</name>
 
   <build>
     <plugins>

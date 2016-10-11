@@ -1,6 +1,6 @@
 <div class="action-bar">
     <ul>
-        <li><a data-open-modal="edit-table-view-modal" data-table="table" translate="TABLE_EDIT"></a></li>
+        <li><a data-open-modal="edit-table-view-modal" data-table="table" translate="TABLE_EDIT"><!-- Edit --></a></li>
     </ul>
 </div>
 <div id="length-div" style="position: absolute; visibility: hidden; height: auto; width: auto; white-space: nowrap;">
@@ -39,7 +39,7 @@
             </td>
         </tr>
         <tr ng-if="table.rows.length === 0 && table.loading === false">
-            <td colspan="{{table.columns.length}}" translate="TABLE_NO_RESULT"></td>
+            <td colspan="{{table.columns.length}}" translate="TABLE_NO_RESULT"><!-- No results found --></td>
         </tr>
     </tbody>
 </table>

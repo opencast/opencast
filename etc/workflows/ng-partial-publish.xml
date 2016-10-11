@@ -78,6 +78,23 @@
       </configurations>
     </operation>
 
+    <!-- Encode to feed cover images -->
+
+    <operation
+      id="image"
+      exception-handler-workflow="ng-partial-error"
+      description="Creating feed cover image">
+      <configurations>
+        <configuration key="source-flavor">*/trimmed</configuration>
+        <configuration key="source-tags"></configuration>
+        <configuration key="target-flavor">*/feed+preview</configuration>
+        <configuration key="target-tags">atom,rss</configuration>
+        <configuration key="encoding-profile">feed-cover.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+
     <!-- Create a cover image with the default template -->
 
     <operation
@@ -134,6 +151,8 @@
         <configuration key="bumper-tags">archive</configuration>
         <configuration key="trailer-flavor">branding/trailer</configuration>
         <configuration key="trailer-tags">archive</configuration>
+        <configuration key="title-slide-flavor">branding/titleslide</configuration>
+        <configuration key="title-slide-tags">archive</configuration>
       </configurations>
     </operation>
 
@@ -149,6 +168,16 @@
       </configurations>
     </operation>
 
+    <!-- Create a title slide video if theme has active title slide -->
+    <operation
+      id="include"
+      description="Prepare title slide video"
+      if="${theme_title_slide_active}">
+      <configurations>
+        <configuration key="workflow-id">ng-partial-title-slide</configuration>
+      </configurations>
+    </operation>
+
     <!-- Add bumper and trailer part to the presenter track -->
 
       <operation
@@ -157,31 +186,39 @@
         description="Concatenate presenter track with intro and outro videos">
         <configurations>
           <configuration key="source-flavor-part-0">branding/bumper</configuration>
-          <configuration key="source-flavor-part-1">presenter/trimmed</configuration>
-          <configuration key="source-flavor-part-1-mandatory">true</configuration>
-          <configuration key="source-flavor-part-2">branding/trailer</configuration>
+          <configuration key="source-flavor-part-0-mandatory">${theme_bumper_active}</configuration>
+          <configuration key="source-flavor-part-1">branding/titleslide+video</configuration>
+          <configuration key="source-flavor-part-1-mandatory">${theme_title_slide_active}</configuration>
+          <configuration key="source-flavor-part-2">presenter/trimmed</configuration>
+          <configuration key="source-flavor-part-2-mandatory">true</configuration>
+          <configuration key="source-flavor-part-3">branding/trailer</configuration>
+          <configuration key="source-flavor-part-3-mandatory">${theme_trailer_active}</configuration>
           <configuration key="target-flavor">presenter/themed</configuration>
           <configuration key="encoding-profile">concat.work</configuration>
-          <configuration key="output-resolution">part-1</configuration>
+          <configuration key="output-resolution">part-2</configuration>
         </configurations>
       </operation>
 
     <!-- Add bumper and trailer part to the presentation track -->
 
-      <operation
-        id="concat"
-        exception-handler-workflow="ng-partial-error"
-        description="Concatenate presentation track with intro and outro videos">
-        <configurations>
-          <configuration key="source-flavor-part-0">branding/bumper</configuration>
-          <configuration key="source-flavor-part-1">presentation/trimmed</configuration>
-          <configuration key="source-flavor-part-1-mandatory">true</configuration>
-          <configuration key="source-flavor-part-2">branding/trailer</configuration>
-          <configuration key="target-flavor">presentation/themed</configuration>
-          <configuration key="encoding-profile">concat.work</configuration>
-          <configuration key="output-resolution">part-1</configuration>
-        </configurations>
-      </operation>
+    <operation
+      id="concat"
+      exception-handler-workflow="ng-partial-error"
+      description="Concatenate presenter track with intro and outro videos">
+      <configurations>
+        <configuration key="source-flavor-part-0">branding/bumper</configuration>
+        <configuration key="source-flavor-part-0-mandatory">${theme_bumper_active}</configuration>
+        <configuration key="source-flavor-part-1">branding/titleslide+video</configuration>
+        <configuration key="source-flavor-part-1-mandatory">${theme_title_slide_active}</configuration>
+        <configuration key="source-flavor-part-2">presentation/trimmed</configuration>
+        <configuration key="source-flavor-part-2-mandatory">true</configuration>
+        <configuration key="source-flavor-part-3">branding/trailer</configuration>
+        <configuration key="source-flavor-part-3-mandatory">${theme_trailer_active}</configuration>
+        <configuration key="target-flavor">presentation/themed</configuration>
+        <configuration key="encoding-profile">concat.work</configuration>
+        <configuration key="output-resolution">part-2</configuration>
+      </configurations>
+    </operation>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Encode for publication to Engage                                  -->
@@ -300,6 +337,20 @@
         <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
         <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="check-availability">true</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="publish-configure"
+      if="${publishToApi}"
+      exception-handler-workflow="ng-partial-error"
+      description="Publish to external api publication channel">
+      <configurations>
+        <configuration key="channel-id">api</configuration>
+        <configuration key="mimetype">application/json</configuration>
+        <configuration key="source-tags">engage-download,engage-streaming</configuration>
+        <configuration key="url-pattern">http://localhost:8080/api/events/${event_id}</configuration>
+        <configuration key="with-published-elements">true</configuration>
       </configurations>
     </operation>
 

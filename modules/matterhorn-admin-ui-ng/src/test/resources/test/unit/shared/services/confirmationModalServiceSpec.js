@@ -29,10 +29,11 @@ describe('ConfirmationModal service', function () {
         });
 
         it('sets properties', function () {
-            ConfirmationModal.show('test-modal', 'callback', 29);
+            ConfirmationModal.show('test-modal', 'callback', {'id': 29, 'title': 'test'});
 
             expect(ConfirmationModal.$scope.callback).toEqual('callback');
-            expect(ConfirmationModal.$scope.object).toBe(29);
+            expect(ConfirmationModal.$scope.id).toBe(29);
+            expect(ConfirmationModal.$scope.name).toBe('test');
         });
     });
 

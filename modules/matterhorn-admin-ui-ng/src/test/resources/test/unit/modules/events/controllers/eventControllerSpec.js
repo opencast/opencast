@@ -37,7 +37,8 @@ describe('Event controller', function () {
         $httpBackend.whenGET('/admin-ng/event/40518/asset/publication/publications.json').respond({});
         $httpBackend.whenGET('/admin-ng/event/40518/asset/assets.json').respond({});
         $httpBackend.whenGET('/admin-ng/event/40518/workflows.json').respond({});
-        $httpBackend.whenGET('/admin-ng/event/40518/access.json').respond({});
+        $httpBackend.whenGET('/admin-ng/event/40518/access.json')
+            .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/access.json')));
         $httpBackend.whenGET('/admin-ng/event/40518/participation.json').respond({});
         $httpBackend.whenGET('/admin-ng/resources/components.json').respond({});
         $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond({});
@@ -271,7 +272,7 @@ describe('Event controller', function () {
             }, {
                 acl: { ace: [ { action : 'read', allow : true, role : 'admin' }, { action : 'write', allow : true, role : 'admin' } ] },
                 override: true
-            });
+            }, jasmine.any(Function), jasmine.any(Function));
         });
     });
 

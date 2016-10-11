@@ -313,54 +313,6 @@ module.exports = function (grunt) {
       }
     },
 
-    // The following *-min tasks will produce minified files in the dist folder
-    // By default, your `index.html`'s <!-- Usemin block --> will take care of
-    // minification. These next options are pre-configured if you do not wish
-    // to use the Usemin blocks.
-    // cssmin: {
-    //   dist: {
-    //     files: {
-    //       '<%= yeoman.dist %>/styles/main.css': [
-    //         '.tmp/styles/{,*/}*.css'
-    //       ]
-    //     }
-    //   }
-    // },
-    // uglify: {
-    //   dist: {
-    //     files: {
-    //       '<%= yeoman.dist %>/scripts/scripts.js': [
-    //         '<%= yeoman.dist %>/scripts/scripts.js'
-    //       ]
-    //     }
-    //   }
-    // },
-    // concat: {
-    //   dist: {}
-    // },
-
-    imagemin: {
-      dist: {
-        files: [{
-          expand: true,
-          cwd: '<%= yeoman.app %>/images',
-          src: '{,*/}*.{png,jpg,jpeg,gif}',
-          dest: '<%= yeoman.dist %>/images'
-        }]
-      }
-    },
-
-    svgmin: {
-      dist: {
-        files: [{
-          expand: true,
-          cwd: '<%= yeoman.app %>/images',
-          src: '{,*/}*.svg',
-          dest: '<%= yeoman.dist %>/images'
-        }]
-      }
-    },
-
     htmlmin: {
       dist: {
         options: {
@@ -375,19 +327,6 @@ module.exports = function (grunt) {
           src: ['*.html'],
           dest: '<%= yeoman.dist %>'
         }]
-      }
-    },
-
-    ngtemplates: {
-      dist: {
-        options: {
-          module: 'adminNg',
-          htmlmin: '<%= htmlmin.dist.options %>',
-          usemin: 'scripts/scripts.js'
-        },
-        cwd: '<%= yeoman.app %>',
-        src: 'views/{,*/}*.html',
-        dest: '.tmp/templateCache.js'
       }
     },
 
@@ -460,13 +399,12 @@ module.exports = function (grunt) {
         'copy:styles'
       ],
       test: [
+        'sass',
         'copy:styles'
       ],
       dist: [
         'sass',
-        'copy:styles',
-        'imagemin',
-        'svgmin'
+        'copy:styles'
       ]
     },
 
@@ -483,35 +421,7 @@ module.exports = function (grunt) {
         reporters : ['dots', 'coverage'],
         browsers  : ['PhantomJS']
       }
-    },
-
-    /** Protractor options */
-    protractor: {
-      options: {
-        configFile: 'src/test/resources/protractor.conf.js',
-        keepAlive: true,
-        noColor: false
-      },
-      dev: {
-        options: {
-        }
-      },
-      continuous: {
-        options: {
-          configFile: 'src/test/resources/protractor.phantomjs.conf.js'
-        }
-      },
-      mh: {
-        options: {
-          configFile: 'src/test/resources/protractor.mh.conf.js'
-        }
-      },
-      debug: {
-        options: {
-          debug: true
-        }
-      }
-    },
+    }
   });
 
 
@@ -541,7 +451,9 @@ module.exports = function (grunt) {
     'concurrent:test',
     'postcss',
     'connect:test',
-    'karma'
+    'karma',
+    'newer:jshint',
+    'newer:jscs'
   ]);
 
   grunt.registerTask('build', [
@@ -550,7 +462,6 @@ module.exports = function (grunt) {
     'useminPrepare',
     'concurrent:dist',
     'postcss',
-    'ngtemplates',
     'concat',
     'ngAnnotate',
     'copy:dist',
@@ -562,8 +473,6 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('default', [
-    'newer:jshint',
-    'newer:jscs',
     'test',
     'build'
   ]);
@@ -576,9 +485,7 @@ module.exports = function (grunt) {
     'wiredep',
     'concurrent:server',
     'postcss:server',
-//    'connect:livereload',
     'configureProxies:proxy',
     'connect:proxy'
-//      'watch'
   ]);
 };

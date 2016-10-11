@@ -81,6 +81,9 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
   /** The key to look up the number of minutes to cache users */
   private static final String CACHE_EXPIRATION = "org.opencastproject.userdirectory.ldap.cache.expiration";
 
+  /** The key to indicate a prefix that will be added to every role read from the LDAP */
+  private static final String ROLE_PREFIX_KEY = "org.opencastproject.userdirectory.ldap.roleprefix";
+
   /** A map of pid to ldap user provider instance */
   private Map<String, ServiceRegistration> providerRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
 
@@ -139,6 +142,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     String userDn = (String) properties.get(SEARCH_USER_DN);
     String password = (String) properties.get(SEARCH_PASSWORD);
     String roleAttributesGlob = (String) properties.get(ROLE_ATTRIBUTES_KEY);
+    String rolePrefix = (String) properties.get(ROLE_PREFIX_KEY);
 
     int cacheSize = 1000;
     logger.debug("Using cache size " + properties.get(CACHE_SIZE) + " for " + LdapUserProviderFactory.class.getName());
@@ -179,7 +183,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
       throw new ConfigurationException(ORGANIZATION_KEY, "not found");
     }
     LdapUserProviderInstance provider = new LdapUserProviderInstance(pid, org, searchBase, searchFilter, url, userDn,
-            password, roleAttributesGlob, cacheSize, cacheExpiration);
+            password, roleAttributesGlob, rolePrefix, cacheSize, cacheExpiration);
     providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
 
   }

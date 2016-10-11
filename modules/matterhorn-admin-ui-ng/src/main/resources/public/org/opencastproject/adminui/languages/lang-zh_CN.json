@@ -47,6 +47,22 @@
   },
   "CONFIRMATIONS":{
     "CONTINUE_ACTION":"您确定要继续吗?",
+    "METADATA":{
+      "NOTICE":{
+        "UNKNOWN":"The following element will be deleted",
+        "EVENT":"The following event will be deleted",
+        "SERIES":"The following series will be deleted",
+        "ACL":"The following ACL will be deleted",
+        "GROUP":"The following group will be deleted",
+        "USER":"The following user will be deleted",
+        "USER_BLACKLIST":"The following user blacklist will be deleted",
+        "THEME":"The following theme will be deleted",
+        "EMAIL":"The following email template will be deleted",
+        "LOCATION":"The following location will be deleted",
+        "LOCATION_BLACKLIST":"The following location blacklist will be deleted"
+      },
+      "NAME":"Name"
+    },
     "ACTIONS":{
       "CONFIRMATION":"需要确认"
     }
@@ -194,6 +210,7 @@
     "SCHEDULE_TASK":{
       "CAPTION":"启动任务",
       "GENERAL":{
+        "CAPTION":"General",
         "SUMMARY":"({{ count }} 个选定的事件)",
         "CANNOTSTART":"标示的事件无法在此刻进行处理, 您可以取消选择或稍后再试。"
       },
@@ -332,7 +349,7 @@
             "END_DATE_FORMAT":"yyyy-mm-dd"
           },
           "UPLOAD":{
-            "CAPTION":"上载",
+            "CAPTION":"上传",
             "RECORDING_ELEMENTS":"录制内容",
             "SEGMENTABLE":{
               "SHORT":"幻灯片",
@@ -430,7 +447,7 @@
         "OPTEDOUT":"选择退出",
         "BLACKLISTED":"列入黑名单",
         "RECORDING":"录制",
-        "UPLOADING":"上载",
+        "UPLOADING":"正在上传",
         "INGESTING":"抓取",
         "PENDING":"待决",
         "PROCESSING":"运行中",
@@ -458,7 +475,7 @@
           "READY_FOR_RECORDING":"准备录制",
           "OPTED_OUT":"选择退出",
           "CUSTOM":"自定义",
-          "ENGAGE":"参与",
+          "ENGAGE":"播放",
           "EXTERNAL_API":"外部API发布",
           "YOUTUBE":"YouTube 的影音视频",
           "OAIPMH":"OAI-PMH",
@@ -1335,7 +1352,7 @@
         },
         "BUMPER":{
           "CAPTION":"Bumper（开始）",
-          "FILE_UPLOADED":"文件上传: ",
+          "FILE_UPLOADED":"已上传的文件: ",
           "DESCRIPTION":"附加到一个录制开始预定义的视频。",
           "ACTIVE":"启动",
           "ENABLE":"启用BUMPER",
@@ -1345,7 +1362,7 @@
         },
         "TRAILER":{
           "CAPTION":"Bumper（结束）",
-          "FILE_UPLOADED":"文件上传: ",
+          "FILE_UPLOADED":"已上传的文件: ",
           "DESCRIPTION":"附加到一个录制结束预定义的视频。",
           "ACTIVE":"启动",
           "ENABLE":"启用BUMPER",
@@ -1354,7 +1371,7 @@
         },
         "TITLE":{
           "CAPTION":"标题",
-          "FILE_UPLOADED":"文件上传: ",
+          "FILE_UPLOADED":"已上传的文件: ",
           "DESCRIPTION":"包括说明性元数据的预定义的幻灯片，这些元数据会被附加到一项录制的开头或结尾。",
           "ACTIVE":"启动",
           "ENABLE":"启用标题幻灯片",
@@ -1366,7 +1383,7 @@
         },
         "WATERMARK":{
           "CAPTION":"水印",
-          "FILE_UPLOADED":"文件上传 ",
+          "FILE_UPLOADED":"已上传的文件: ",
           "DESCRIPTION":"是覆盖在录制上的每一帧半透明图像。",
           "ACTIVE":"启动",
           "TOP_LEFT":"左上",
@@ -1398,6 +1415,7 @@
     },
     "JOBS":{
       "TABLE":{
+        "ID":"Job Identifier",
         "ACTION":"操作",
         "CAPTION":"作业",
         "CREATED":"创建",

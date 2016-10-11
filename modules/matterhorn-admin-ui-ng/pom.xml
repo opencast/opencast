@@ -7,13 +7,14 @@
     <parent>
         <groupId>org.opencastproject</groupId>
         <artifactId>base</artifactId>
-        <version>2.3-SNAPSHOT</version>
+        <version>2.4-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <properties>
         <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
         <checkstyle.skip>false</checkstyle.skip>
         <skipTests>false</skipTests>
+        <nexus.npm>${opencast.nexus.url}/nexus/content/repositories/npmjs/</nexus.npm>
     </properties>
     <dependencies>
 
@@ -232,7 +233,6 @@
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
-            <version>2.7.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -332,7 +332,7 @@
                                     <goal>npm</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>install</arguments>
+                                  <arguments>install --registry ${nexus.npm}</arguments>
                                 </configuration>
                             </execution>
 

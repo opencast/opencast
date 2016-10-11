@@ -36,3 +36,7 @@ docs/guides/*/site
 # Ignore Makefiles
 # Sometimes they help, but they should never be tracked
 Makefile
+
+# Ignore OS artifacts
+.DS_Store
+

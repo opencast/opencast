@@ -60,6 +60,22 @@ angular.module('adminNg.controllers')
             if (!loading) {
                 $scope.save();
             }
+        },
+        updateRoles = function() {
+            //MH-11716: We have to wait for both the access (series ACL), and the roles (list of system roles)
+            //to resolve before we can add the roles that are present in the series but not in the system
+            return ResourcesListResource.get({ resource: 'ROLES' }, function (results) {
+                var roles = results;
+                return $scope.acl.$promise.then(function () {
+                    angular.forEach(angular.fromJson($scope.acl.acl.ace), function(value, key) {
+                        var rolename = value["role"];
+                        if (angular.isUndefined(roles[rolename])) {
+                            roles[rolename] = rolename;
+                       }
+                    }, this);
+                    return roles;
+                });
+            }, this);
         };
 
     $scope.policies = [];
@@ -82,7 +98,7 @@ angular.module('adminNg.controllers')
 
         angular.forEach($scope.policies, function (policy, idx) {
             if (policy.role === policyToDelete.role &&
-                policy.write === policyToDelete.write && 
+                policy.write === policyToDelete.write &&
                 policy.read === policyToDelete.read) {
                 index = idx;
             }
@@ -95,9 +111,8 @@ angular.module('adminNg.controllers')
         $scope.save();
     };
 
-
     fetchChildResources = function (id) {
-        AclResource.get({id: id}, function (data) {
+        $scope.acl = AclResource.get({id: id}, function (data) {
             $scope.metadata.name = data.name;
 
             if (angular.isDefined(data.acl)) {
@@ -117,7 +132,7 @@ angular.module('adminNg.controllers')
                 }
             });
         });
-        $scope.roles = ResourcesListResource.get({ resource: 'ROLES' });
+        $scope.roles = updateRoles();
     };
 
 
@@ -149,7 +164,7 @@ angular.module('adminNg.controllers')
                         'action' : 'write',
                         'allow'  : policy.write,
                         'role'   : policy.role
-                    });   
+                    });
                 }
 
                 angular.forEach(policy.actions.value, function(customAction){

@@ -28,6 +28,7 @@ import org.opencastproject.index.service.impl.index.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.matterhorn.search.SearchIndexException;
+import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.security.api.Organization;
@@ -81,6 +82,10 @@ public class ThemesListProvider implements ResourceListProvider {
     if (NAME.equals(listName)) {
       ThemeSearchQuery themeQuery = new ThemeSearchQuery(securityService.getOrganization().getId(),
               securityService.getUser());
+      themeQuery.withOffset(query.getOffset().getOrElse(0));
+      int limit = query.getLimit().getOrElse(Integer.MAX_VALUE - themeQuery.getOffset());
+      themeQuery.withLimit(limit);
+      themeQuery.sortByName(SearchQuery.Order.Ascending);
       SearchResult<Theme> results = null;
       try {
         results = searchIndex.getByQuery(themeQuery);

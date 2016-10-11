@@ -11,13 +11,12 @@ by the RPM repository.
 Currently supported are are
 ---------------------------
 
- - CentOS 6.x, 7.x (x86_64)
- - RedHat Enterprise Linux 6.x, 7.x (x86_64)
- - Scientific Linux 6.x, 7.x (x86_64)
+ - CentOS 7.x (x86\_64)
+ - RedHat Enterprise Linux 7.x (x86\_64)
+ - Scientific Linux 7.x (x86\_64)
 
 > *Other architectures like i386, i686, arm, … are not supported!*
 
-CentOS, SL, RHEL 7.x is recommended over 6.x.
 
 Registration
 ------------
@@ -26,7 +25,7 @@ Before you can start you need to get an account for the repository. You will nee
 after the registration to successfully complete this manual. The placeholders `[your_username]` and `[your_password]`
 are used in this manual wherever the credentials are needed.
 
- - [http://repo.virtuos.uos.de](http://repo.virtuos.uos.de)
+ - [http://pkg.opencast.org](http://pkg.opencast.org)
 
 
 Activate Repository
@@ -37,11 +36,10 @@ First you have to install the necessary repositories so that your package manage
  - Add Opencast repository:
 
         cd /etc/yum.repos.d
-        curl -O http://repo.virtuos.uos.de/opencast.repo \
-           -d os=el -d version=7 \
-           -u [YOUR_USERNAME]:[YOUR_PASSWORD]
+        curl -O https://pkg.opencast.org/opencast.repo \
+           -d os=el -d version=7 -u [YOUR_USERNAME]
 
-    *Note: For RHEL/CentOS/SL 6.x use `version=6`*
+    You will be asked for your password.
 
     It might take some time after the final version is released before the RPMs are moved to the stable repository.
     Before that, you can use `.../opencast-testing.repo` instead to get the latest version.
@@ -86,15 +84,15 @@ documentation](../configuration/message-broker.md).
 Install Opencast
 ------------------
 
-For this guide, `opencast21-*` is used as placeholder for the package name. It will install the latest version of the
-Opencast 2.1.x branch. If you want to install another version, please change the name accordingly.
+For this guide, `opencast22-*` is used as placeholder for the package name. It will install the latest version of the
+Opencast 2.2.x branch. If you want to install another version, please change the name accordingly.
 
 
 ### Basic Installation
 
 For a basic installation (All-In-One) just run:
 
-    yum install opencast21-allinone
+    yum install opencast22-allinone
 
 This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.
 
@@ -119,17 +117,19 @@ While the basic installation will give you an all-in-one Opencast distribution w
 want to have more control over your system and deploy it over several machines by choosing which parts of Opencast you
 want to install. You can list all Opencast packages with:
 
-    dnf search opencast
+    yum search opencast
 
-Starting with Opencast 2.1, this will list all available Opencast distributions in the form
+Starting with Opencast 2.2, this will list all available Opencast distributions in the form
 `opencast<version>-<dist-type>`
 
 Current available distributions are:
 
- - opencast21-allinone
- - opencast21-admin
- - opencast21-worker
- - opencast21-presentation
+ - opencast22-admin
+ - opencast22-adminworker
+ - opencast22-allinone
+ - opencast22-ingest
+ - opencast22-presentation
+ - opencast22-worker
 
 
 Uninstall Opencast
@@ -137,10 +137,10 @@ Uninstall Opencast
 
 Sometimes you want to uninstall Opencast. For example to do a clean reinstall. You can do that by executing:
 
-    yum remove opencast
+    yum remove 'opencast*'
 
 This will not touch your created media files or modified configuration files.  If you want to remove them as well, you
-have to to that by yourself.
+have to do that by yourself.
 
     # Remove media files
     sudo rm -rf /srv/opencast
@@ -151,5 +151,26 @@ have to to that by yourself.
     # Remove configuration files
     sudo rm -rf /etc/opencast
 
-    # Remove system logfiles
+    # Remove logs
     sudo rm -rf /var/log/opencast
+
+
+Troubleshooting
+---------------
+
+### Missing Dependencies
+
+If you try to install Opencast but yum is complaining about missing dependencies, please check if the epel repository is
+really activated on your system. Some distributions come with epel preinstalled but disabled. The installation of the
+epel-release package will not fix this. You can check what repositories are installed and enabled by executing `yum
+repolist enabled` which should give you a list with epel, opencast and opencast-noarch in it. To enable a repository,
+edit the configuration file in `/etc/yum.repos.d/`.
+
+### Conflicting Libvpx
+
+CentOS comes with an old version of `libvpx`. This version is required by some packages like GStreamer. The FFmpeg we
+use requires a new version. It is a known risk but since the new version performs significantly better, we decided to go
+that way.
+
+You do not need GStreamer or any of the other packages requiring libvpx for an Opencast server. You can just remove them
+from your system by running `yum remove libvpx` before installing Opencast.

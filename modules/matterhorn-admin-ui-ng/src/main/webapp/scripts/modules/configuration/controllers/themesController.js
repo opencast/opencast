@@ -38,8 +38,8 @@ angular.module('adminNg.controllers')
 
         $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
 
-        $scope.table.delete = function (id) {
-            ThemeResource.delete({id: id}, function () {
+        $scope.table.delete = function (row) {
+            ThemeResource.delete({id: row.id}, function () {
                 Table.fetch();
                 Notifications.add('success', 'THEME_DELETED');
             }, function () {

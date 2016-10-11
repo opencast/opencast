@@ -27,6 +27,7 @@ import static com.entwinemedia.fn.data.json.Jsons.j;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
+import static org.apache.http.HttpStatus.SC_OK;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
@@ -39,6 +40,7 @@ import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.matterhorn.search.SearchQuery.Order;
 import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SmartIterator;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -62,8 +64,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -183,6 +187,22 @@ public class CaptureAgentsEndpoint {
     }
 
     return okJsonList(agentsJSON, offset, limit, total);
+  }
+
+  @DELETE
+  @Path("{name}")
+  @Produces({ MediaType.APPLICATION_JSON })
+  @RestQuery(name = "removeAgent", description = "Remove record of a given capture agent", pathParameters = { @RestParameter(name = "name", description = "The name of a given capture agent", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = {}, reponses = {
+          @RestResponse(description = "{agentName} removed", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "The agent {agentname} does not exist", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "")
+  public Response removeAgent(@PathParam("name") String agentName) throws NotFoundException {
+    if (service == null)
+      return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
+
+    service.removeAgent(agentName);
+
+    logger.debug("The agent {} was successfully removed", agentName);
+    return Response.status(SC_OK).build();
   }
 
   private JValue generateJsonAgent(Agent agent, boolean withInputs) {

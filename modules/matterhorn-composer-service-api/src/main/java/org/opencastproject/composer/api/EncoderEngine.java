@@ -153,7 +153,7 @@ public interface EncoderEngine {
    * profile.
    *
    * @param profile
-   *          name of the encoding profile, e. g. <code>flash.http</code>
+   *          name of the encoding profile
    * @param type
    *          track type
    *

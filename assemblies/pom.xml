@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <version>2.4-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -18,11 +18,12 @@
   <groupId>org.opencastproject.assemblies</groupId>
   <artifactId>opencast-assemblies</artifactId>
   <packaging>pom</packaging>
-  <name>Opencast // Assemblies</name>
+  <name>Assemblies</name>
 
   <modules>
     <module>karaf-features</module>
     <module>dist-admin</module>
+    <module>dist-adminpresentation</module>
     <module>dist-adminworker</module>
     <module>dist-allinone</module>
     <module>dist-ingest</module>

@@ -1,8 +1,8 @@
 angular.module('adminNg.resources')
-.factory('BlacklistsResource', ['$resource', 'Language', 'JsHelper',
-function ($resource, Language, JsHelper) {
+.factory('BlacklistsResource', ['$resource', '$filter', 'Language', 'JsHelper',
+function ($resource, $filter, Language, JsHelper) {
 
-    var parse = function (r) {
+    var parse = function (r, type) {
         var row = {};
         row.id            = r.id;
         row.resourceName  = r.resource.name;
@@ -13,6 +13,7 @@ function ($resource, Language, JsHelper) {
         row.date_to_raw   = Language.formatDateTimeRaw('short', r.end);
         row.reason        = r.purpose;
         row.comment       = r.comment;
+        row.type          = $filter('uppercase')(type);
 
         return row;
     };
@@ -25,8 +26,8 @@ function ($resource, Language, JsHelper) {
                 params: { type: type, id: 'blacklists.json' },
                 transformResponse: function (data) {
                     var result = [];
-                    angular.forEach(JSON.parse(data), function (item) {
-                        result.push(parse(item));
+                    angular.forEach(JSON.parse(data), function (item, type) {
+                        result.push(parse(item, type));
                     });
 
                     return {

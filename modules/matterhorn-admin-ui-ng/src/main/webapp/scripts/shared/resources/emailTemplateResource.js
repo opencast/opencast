@@ -9,6 +9,7 @@ function ($resource, Language, ResourceHelper) {
                 row.name = r.name;
                 row.created = Language.formatDate('short', r.creationDate);
                 row.creator = r.creator.username;
+                row.type = "EMAIL";
                 return row;
             });
         }}

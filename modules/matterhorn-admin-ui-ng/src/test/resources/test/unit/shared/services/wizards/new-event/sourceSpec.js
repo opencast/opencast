@@ -47,7 +47,7 @@ describe('Source Step in New Event Wizard', function () {
         });
 
         describe('with the source toggle set to single', function () {
-            var ud, 
+            var ud,
                 insertValidValues = function () {
                     ud.SCHEDULE_SINGLE.start.date      = new Date();
                     ud.SCHEDULE_SINGLE.start.hour      = '10';
@@ -96,7 +96,7 @@ describe('Source Step in New Event Wizard', function () {
                 ud.SCHEDULE_MULTIPLE.end = {};
                 ud.SCHEDULE_MULTIPLE.duration = {};
             });
-            
+
             it('validates repetitions', function () {
                 ud.SCHEDULE_MULTIPLE.start.date = new Date();
                 ud.SCHEDULE_MULTIPLE.start.hour = '10';
@@ -152,7 +152,7 @@ describe('Source Step in New Event Wizard', function () {
         });
 
         it('notifies the user when a conflict is detected', function () {
-            expect(Notifications.add.calls.count()).toBe(1);
+            expect(Notifications.add.calls.count()).toBeGreaterThan(0);
         });
 
         it('becomes invalid if a conflict is detected', function () {
@@ -165,6 +165,9 @@ describe('Source Step in New Event Wizard', function () {
 
         it('becomes valid again if the conflict is removed', function () {
             $httpBackend.expectPOST('/admin-ng/event/new/conflicts').respond(203);
+            var tomorrow = new Date();
+            tomorrow.setDate(new Date().getDate() + 1);
+            NewEventSource.ud.SCHEDULE_SINGLE.start.date = tomorrow.toISOString().substring(0, 10);
             NewEventSource.checkConflicts();
             $httpBackend.flush();
             expect(NewEventSource.hasConflictingSettings()).toBeFalsy();

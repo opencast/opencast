@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject.assemblies</groupId>
     <artifactId>opencast-assemblies</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <version>2.4-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -16,7 +16,7 @@
 
   <artifactId>opencast-dist-presentation</artifactId>
   <packaging>karaf-assembly</packaging>
-  <name>Opencast // Assemblies // Distribution Presentation</name>
+  <name>Assemblies // Distribution Presentation</name>
 
   <dependencies>
     <dependency>

@@ -159,6 +159,8 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
     String sourceFlavorOption = StringUtils.trimToNull(operation.getConfiguration("source-flavor"));
     String sourceFlavorsOption = StringUtils.trimToNull(operation.getConfiguration("source-flavors"));
     String targetFlavorOption = StringUtils.trimToNull(operation.getConfiguration("target-flavor"));
+    boolean tagsAndFlavorsOption = Boolean
+            .parseBoolean(StringUtils.trimToNull(operation.getConfiguration("tags-and-flavors")));
 
     AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
 
@@ -237,7 +239,7 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
     }
 
     // Look for elements matching the tag
-    Collection<Track> elements = elementSelector.select(mediaPackage, false);
+    Collection<Track> elements = elementSelector.select(mediaPackage, tagsAndFlavorsOption);
 
     // Encode all tracks found
     long totalTimeInQueue = 0;
