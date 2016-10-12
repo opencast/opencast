@@ -7,9 +7,9 @@ The "concat" operation handler has been created to concatenate multiple video tr
 
 ![Concat](workflowoperationhandlers/Concat.png)
 
-The internal ffmpeg command is using the following filters:  scale, pad and setdar for scaling all videos to a similar size including letterboxing, aevalsrc for creating silent audio streams and of course the concat for the actual concatenation step. More info can be found here: https://trac.ffmpeg.org/wiki/FilteringGuide
+The internal ffmpeg command is using the following filters: fps, scale, pad and setdar for scaling all videos to a similar size including letterboxing, aevalsrc for creating silent audio streams and of course the concat for the actual concatenation step. More info can be found here: https://trac.ffmpeg.org/wiki/FilteringGuide
 ### Sample complex concat filter command
-    -filter_complex "[0:v]scale=iw*min(640/iw\,480/ih):ih*min(640/iw\,480/ih),pad=640:480:(ow-iw)/2:(oh-ih)/2,setdar=4:3[b];[1:v]scale=iw*min(640/iw\,480/ih):ih*min(640/iw\,480/ih),pad=640:480:(ow-iw)/2:(oh-ih)/2,setdar=4:3[c];[2:v]scale=iw*min(640/iw\,480/ih):ih*min(640/iw\,480/ih),pad=640:480:(ow-iw)/2:(oh-ih)/2,setdar=4:3[d];aevalsrc=0::d=1[silent];[b][0:a][c][silent][d][2:a]concat=n=3:v=1:a=1[v][a]" -map '[v]' -map '[a]'
+    -filter_complex "[0:v]fps=fps=25.0,scale=iw*min(640/iw\,480/ih):ih*min(640/iw\,480/ih),pad=640:480:(ow-iw)/2:(oh-ih)/2,setdar=4:3[b];[1:v]fps=fps=25.0,scale=iw*min(640/iw\,480/ih):ih*min(640/iw\,480/ih),pad=640:480:(ow-iw)/2:(oh-ih)/2,setdar=4:3[c];[2:v]fps=fps=25.0,scale=iw*min(640/iw\,480/ih):ih*min(640/iw\,480/ih),pad=640:480:(ow-iw)/2:(oh-ih)/2,setdar=4:3[d];aevalsrc=0::d=1[silent];[b][0:a][c][silent][d][2:a]concat=n=3:v=1:a=1[v][a]" -map '[v]' -map '[a]'
 
 ##Usage
 This operation is quite similar to the compose operation. The only difference is that the input properties are not only limited to one "source-flavor" and "source-tag". The operation supports multiple flavor and tags as input.  To add multiple source, add different key with the prefix "source-flavor-"/"source-tag-" and an incremental number starting with 0. For example:
@@ -30,6 +30,7 @@ This operation is quite similar to the compose operation. The only difference is
 |target-flavor|**true**|Define the flavor(s) to add to the output track. |NULL|presenter/concat|
 |target-tags|false|Define the tag(s) to add to the output track|NULL|engage-download|
 |output-resolution|**true**|Define the output resolution in width, height or take it from one of the given parts|NULL|1900x1080, part-1|
+|output-framerate|false|Define the output frame rate in frames per second or take it from one of the given parts|-1.0|25, 23.976, part-1|
 
 ##Example
 Example of an concat operation in a workflow definition.
@@ -49,6 +50,7 @@ Example of an concat operation in a workflow definition.
         <configuration key="target-tags">engage-download,engage-streaming</configuration>
         <configuration key="encoding-profile">concat</configuration>
         <configuration key="output-resolution">1920x1080</configuration>
+        <configuration key="output-framerate">part-1</configuration>
       </configurations>
     </operation>
 

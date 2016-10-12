@@ -55,6 +55,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -486,14 +487,21 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   }
 
   @Override
-  public Job concat(String profileId, Dimension outputDimension, Track... tracks) throws EncoderException,
-          MediaPackageException {
+  public Job concat(String profileId, Dimension outputDimension, Track... tracks)
+          throws EncoderException, MediaPackageException {
+    return concat(profileId, outputDimension, -1.0f, tracks);
+  }
+
+  @Override
+  public Job concat(String profileId, Dimension outputDimension, float outputFrameRate, Track... tracks)
+          throws EncoderException, MediaPackageException {
     HttpPost post = new HttpPost("/concat");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("profileId", profileId));
       if (outputDimension != null)
         params.add(new BasicNameValuePair("outputDimension", Serializer.json(outputDimension).toJson()));
+      params.add(new BasicNameValuePair("outputFrameRate", String.format(Locale.US, "%f", outputFrameRate)));
       params.add(new BasicNameValuePair("sourceTracks", MediaPackageElementParser.getArrayAsXml(Arrays.asList(tracks))));
       post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {

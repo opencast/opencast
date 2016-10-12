@@ -105,7 +105,7 @@
         <configuration key="target-tags">-engage-download</configuration>
       </configurations>
     </operation>
-    
+
     <operation
       id="image"
       exception-handler-workflow="ng-partial-error"
@@ -196,6 +196,7 @@
           <configuration key="target-flavor">presenter/themed</configuration>
           <configuration key="encoding-profile">concat.work</configuration>
           <configuration key="output-resolution">part-2</configuration>
+          <configuration key="output-framerate">part-2</configuration>
         </configurations>
       </operation>
 
@@ -217,6 +218,7 @@
         <configuration key="target-flavor">presentation/themed</configuration>
         <configuration key="encoding-profile">concat.work</configuration>
         <configuration key="output-resolution">part-2</configuration>
+        <configuration key="output-framerate">part-2</configuration>
       </configurations>
     </operation>
 
