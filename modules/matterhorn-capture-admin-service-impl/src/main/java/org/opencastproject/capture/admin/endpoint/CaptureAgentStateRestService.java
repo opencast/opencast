@@ -127,13 +127,38 @@ public class CaptureAgentStateRestService {
   @Path("agents/{name}")
   // Todo: Capture agent may send an optional FormParam containing it's configured address.
   // If this exists don't use request.getRemoteHost() for the URL
-  @RestQuery(name = "setAgentState", description = "Set the status of a given capture agent", pathParameters = { @RestParameter(name = "name", description = "The name of a given capture agent", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = {
-          @RestParameter(description = "The address of a given capture agent", isRequired = true, name = "address", type = Type.STRING),
-          @RestParameter(description = "The state of the capture agent", isRequired = true, name = "state", type = Type.STRING) }, reponses = {
-          @RestResponse(description = "{agentName} set to {state}", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "{state} is empty or not known", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "The agent {agentName} does not exist", responseCode = HttpServletResponse.SC_NOT_FOUND),
-          @RestResponse(description = "If no capture agent state service is available", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
+  @RestQuery(
+    name = "setAgentState",
+    description = "Set the status of a given capture agent",
+    pathParameters = {
+      @RestParameter(
+        name = "name",
+        description = "The name of a given capture agent",
+        isRequired = true,
+        type = RestParameter.Type.STRING)
+    }, restParameters = {
+      @RestParameter(
+        description = "The address of a given capture agent",
+        isRequired = false,
+        name = "address",
+        type = Type.STRING),
+      @RestParameter(
+        description = "The state of the capture agent. "
+          + "Known states are: idle, shutting_down, capturing, uploading, unknown, offline",
+        isRequired = true,
+        name = "state",
+        type = Type.STRING)
+    }, reponses = {
+      @RestResponse(
+        description = "{agentName} set to {state}",
+        responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(
+        description = "{state} is empty or not known",
+        responseCode = HttpServletResponse.SC_BAD_REQUEST),
+      @RestResponse(
+        description = "If no capture agent state service is available",
+        responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE)
+    }, returnDescription = "")
   public Response setAgentState(@Context HttpServletRequest request, @FormParam("address") String address,
           @PathParam("name") String agentName, @FormParam("state") String state) throws NotFoundException {
     if (service == null)
