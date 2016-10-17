@@ -53,7 +53,7 @@ module.exports = function (grunt) {
       },
       sass: {
         files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
-        tasks: ['sass:server', 'autoprefixer']
+        tasks: ['sass:server', 'postcss']
       },
       gruntfile: {
         files: ['Gruntfile.js']
@@ -112,7 +112,7 @@ module.exports = function (grunt) {
               port: '<%= proxyPort %>',
               https: false,
               changeOrigin: true
-          }],
+          }]
       },
       test: {
         options: {
@@ -355,7 +355,7 @@ module.exports = function (grunt) {
             '*.{ico,png,txt}',
             '*.html',
             'images/{,*/}*.{webp}',
-            'styles/fonts/{,*/}*.*',
+            'fonts/{,*/}*.*',
             'img/{,*/}*.*'
           ]
         }, {
@@ -369,14 +369,14 @@ module.exports = function (grunt) {
           dest: '<%= yeoman.dist %>/lib',
           src: [
             '**'
-          ],
+          ]
         }, {
           expand: true,
           cwd: 'src/main/resources/public',
           dest: '<%= yeoman.dist %>/public',
           src: [
             '**'
-          ],
+          ]
         }, {
           expand: true,
           cwd: '<%= yeoman.app %>/scripts',
@@ -411,7 +411,7 @@ module.exports = function (grunt) {
     // Test settings
     karma: {
       options: {
-        configFile: 'src/test/resources/karma.conf.js',
+        configFile: 'src/test/resources/karma.conf.js'
       },
       unit: {
         singleRun: true
@@ -478,6 +478,9 @@ module.exports = function (grunt) {
   ]);
 
   grunt.loadNpmTasks('grunt-connect-proxy');
+  grunt.loadNpmTasks('grunt-sass');
+  grunt.loadNpmTasks('grunt-postcss');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Base task for the development with proxy to a real backend
   grunt.registerTask('proxy', [
@@ -486,6 +489,7 @@ module.exports = function (grunt) {
     'concurrent:server',
     'postcss:server',
     'configureProxies:proxy',
-    'connect:proxy'
+    'connect:proxy',
+    'watch'
   ]);
 };

@@ -19,7 +19,6 @@
  *
  */
 
-
 // Roll Up Menu
 // ----------------------------------------
 
@@ -39,6 +38,8 @@
 
     #nav-container {
         display: none;
+        margin-top: -1px;
+        padding-top: 1px;
     }
 
     // Nav icons.
@@ -58,10 +59,12 @@
             margin: 0 auto;
             vertical-align: middle;
             position: relative;
-            line-height: $height;
+            line-height: 50px;
             @include transition(all .2s);
+            color: #c9c9c9;
 
             &[data-title]:hover:after {
+                display: block;
                 position: absolute;
                 content: attr(data-title);
                 z-index: $max-z;
@@ -80,67 +83,80 @@
             }
         }
 
+        @key_frames fadeIn {
+            0% {
+                opacity: 0;
+            }
+            80% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 0.9;
+            }
+        }
+
         .dashboard {
             @include build-icon(auto, auto, dashboard, 30px, 20px);
+        }
 
-            &:hover,
-            &.active {
-                @include build-icon(auto, auto, dashboard-on, 30px, 20px);
-            }
+        &:hover  > .dashboard,
+        &:active > .dashboard {
+             @include build-icon(auto, auto, dashboard-on, 30px, 20px);
         }
 
         .events {
             @include build-icon(auto, auto, events, 27px, 27px);
-
-            &:hover,
-            &.active {
-                @include build-icon(auto, auto, events-on, 27px, 27px);
-            }
         }
+
+        &:hover > .events,
+        &:active > .events {
+             @include build-icon(auto, auto, events-on, 27px, 27px);
+        }
+
 
         .systems {
             @include build-icon(auto, auto, servers, 29px, 20px);
+        }
 
-            &:hover,
-            &.active {
-                @include build-icon(auto, auto, servers-on, 29px, 20px);
-            }
+        &:hover > .systems,
+        &:active > .systems {
+             @include build-icon(auto, auto, servers-on, 29px, 20px);
         }
 
         .recordings {
             @include build-icon(auto, auto, recordings, 29px, 18px);
+        }
 
-            &:hover,
-            &.active {
-                @include build-icon(auto, auto, recordings-on, 29px, 18px);
-            }
+        &:hover > .recordings,
+        &:active > .recordings {
+             @include build-icon(auto, auto, recordings-on, 29px, 18px);
         }
 
         .users {
             @include build-icon(auto, auto, user-group, 27px, 24px);
+        }
 
-            &:hover,
-            &.active {
-                @include build-icon(auto, auto, user-group-on, 27px, 24px);
-            }
+        &:hover > .users,
+        &:active > .users {
+             @include build-icon(auto, auto, user-group-on, 27px, 24px);
         }
 
         .integrations {
             @include build-icon(auto, auto, integrations, 33px, 20px);
+        }
 
-            &:hover,
-            &.active {
-                @include build-icon(auto, auto, integrations-on, 33px, 20px);
-            }
+        &:hover > .integrations,
+        &:active > .integrations {
+             @include build-icon(auto, auto, integrations-on, 33px, 20px);
         }
 
         .configuration {
             @include build-icon(auto, auto, configuration, 27px, 27px);
+        }
 
-            &:hover,
-            &.active {
-                @include build-icon(auto, auto, configuration-on, 27px, 27px);
-            }
+        &:hover > .configuration,
+        &:active > .configuration {
+             @include build-icon(auto, auto, configuration-on, 27px, 27px);
         }
     }
 }

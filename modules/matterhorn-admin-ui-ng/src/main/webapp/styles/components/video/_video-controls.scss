@@ -39,7 +39,7 @@
     padding: 9px 0;
 
     .volume-toggle-button {
-        @include fa-icon($fa-volume-up, after, inline-block, 0 10px 0 0, 0, $grey, 16px);
+        @include fa-icon($fa-var-volume-up, after, inline-block, 0 10px 0 0, 0, $grey, 16px);
         display: inline-block;
         vertical-align: top;
         margin-top: 8px;
@@ -102,7 +102,7 @@ $playback-icon-color: $grey;
 $playback-icon-font-size: 16px;
 
 .playback-jump-to-start {
-    @include fa-icon($fa-fast-backward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+    @include fa-icon($fa-var-fast-backward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
     @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
     @extend .playback-control-icon;
     &:hover {
@@ -111,7 +111,7 @@ $playback-icon-font-size: 16px;
 }
 
 .playback-rewind {
-    @include fa-icon($fa-backward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+    @include fa-icon($fa-var-backward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
     @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
     @extend .playback-control-icon;
     &:hover {
@@ -120,7 +120,7 @@ $playback-icon-font-size: 16px;
 }
 
 .playback-toggle-play {
-    @include fa-icon($fa-play,$playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+    @include fa-icon($fa-var-play,$playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
     @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
     @extend .playback-control-icon;
     &:hover {
@@ -129,7 +129,7 @@ $playback-icon-font-size: 16px;
 }
 
 .playback-toggle-pause {
-  @include fa-icon($fa-pause,$playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+  @include fa-icon($fa-var-pause,$playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
   @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
   @extend .playback-control-icon;
   &:hover {
@@ -138,7 +138,7 @@ $playback-icon-font-size: 16px;
 }
 
 .playback-fast-forward {
-    @include fa-icon($fa-forward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+    @include fa-icon($fa-var-forward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
     @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
     @extend .playback-control-icon;
     &:hover {
@@ -147,7 +147,7 @@ $playback-icon-font-size: 16px;
 }
 
 .playback-jump-to-end {
-    @include fa-icon($fa-fast-forward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+    @include fa-icon($fa-var-fast-forward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
     @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
     @extend .playback-control-icon;
     &:hover {
