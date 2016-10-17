@@ -62,7 +62,6 @@ export PATH=$PATH:node:node_modules/grunt-cli/bin:node_modules/karma/bin
 Watch out for local or system-wide installations of Grunt and/or NodeJS as they can
 change the build behavior of Admin UI NG.*
 
-<<<<<<< HEAD:docs/guides/developer/docs/modules/admin-ui/development.md
 Debugging Javascript unit tests
 ------------------------------------
 
@@ -104,13 +103,8 @@ To run Karma for IE
 
 Additional browsers are supported, the full list can be found at [here](https://karma-runner.github.io/1.0/config/browsers.html)
 
-
-Live working with running Opencast
-----------------------------------
-=======
 Live working with a running Opencast
 ------------------------------------
->>>>>>> 04ef604... MH-11756: Updated Admin UI Node packages and Grunt configuration for dynamic reloading of pages and documentation to that effect.:docs/guides/developer/docs/modules/admin-ui.md
 
 In order to speed up the UI development process, you can test the code without
 building the module with Maven. There is a Grunt task for starting a standalone web server offering the UI from
