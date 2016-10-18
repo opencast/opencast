@@ -332,6 +332,7 @@
               OSGI-INF/current-job-filter.xml,
               OSGI-INF/pingback.xml,
               OSGI-INF/rest.xml,
+              OSGI-INF/security-filter.xml,
               OSGI-INF/security-service.xml,
               OSGI-INF/smtp-service.xml,
               OSGI-INF/remote-user-and-role-filter.xml,
