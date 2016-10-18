@@ -55,6 +55,7 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -495,11 +496,14 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "concat", description = "Starts a video concating process from multiple videos, based on the specified encoding profile ID and the source tracks", restParameters = {
           @RestParameter(description = "The source tracks to concat as XML", isRequired = true, name = "sourceTracks", type = Type.TEXT),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING),
-          @RestParameter(description = "The resolution dimension of the concat video as JSON", isRequired = false, name = "outputDimension", type = Type.STRING) }, reponses = {
-          @RestResponse(description = "Results in an xml document containing the video track", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "If required parameters aren't set or if sourceTracks aren't from the type Track or not at lest two tracks are present", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+    @RestParameter(description = "The resolution dimension of the concat video as JSON", isRequired = false, name = "outputDimension", type = Type.STRING),
+    @RestParameter(description = "The  frame rate of the concat video (should be positive, e.g. 25.0). Negative values and zero will deactivate frame rate operation.",
+            isRequired = false, name = "outputFrameRate", type = Type.STRING)}, reponses = {
+    @RestResponse(description = "Results in an xml document containing the video track", responseCode = HttpServletResponse.SC_OK),
+    @RestResponse(description = "If required parameters aren't set or if sourceTracks aren't from the type Track or not at least two tracks are present",
+            responseCode = HttpServletResponse.SC_BAD_REQUEST)}, returnDescription = "")
   public Response concat(@FormParam("sourceTracks") String sourceTracksXml, @FormParam("profileId") String profileId,
-          @FormParam("outputDimension") String outputDimension) throws Exception {
+          @FormParam("outputDimension") String outputDimension, @FormParam("outputFrameRate") String outputFrameRate) throws Exception {
     // Ensure that the POST parameters are present
     if (StringUtils.isBlank(sourceTracksXml) || StringUtils.isBlank(profileId))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceTracks and profileId must not be null").build();
@@ -513,13 +517,20 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       if (!Track.TYPE.equals(elem.getElementType()))
         return Response.status(Response.Status.BAD_REQUEST).entity("sourceTracks must be of type track").build();
     }
-
+    float fps = NumberUtils.toFloat(outputFrameRate, -1.0f);
     try {
       // Asynchronously concat the specified tracks together
       Dimension dimension = null;
-      if (StringUtils.isNotBlank(outputDimension))
+      if (StringUtils.isNotBlank(outputDimension)) {
         dimension = Serializer.dimension(JsonObj.jsonObj(outputDimension));
-      Job job = composerService.concat(profileId, dimension, tracks.toArray(new Track[tracks.size()]));
+      }
+
+      Job job = null;
+      if (fps > 0) {
+        job = composerService.concat(profileId, dimension, fps, tracks.toArray(new Track[tracks.size()]));
+      } else {
+        job = composerService.concat(profileId, dimension, tracks.toArray(new Track[tracks.size()]));
+      }
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (EncoderException e) {
       logger.warn("Unable to concat videos: " + e.getMessage());

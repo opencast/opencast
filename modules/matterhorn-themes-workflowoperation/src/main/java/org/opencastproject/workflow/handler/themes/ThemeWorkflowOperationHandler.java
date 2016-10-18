@@ -93,6 +93,12 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
   private static final String WATERMARK_LAYOUT = "watermark-layout";
   private static final String WATERMARK_LAYOUT_VARIABLE = "watermark-layout-variable";
 
+  /** Workflow property names */
+  private static final String THEME_BUMPER_ACTIVE = "theme_bumper_active";
+  private static final String THEME_TRAILER_ACTIVE = "theme_trailer_active";
+  private static final String THEME_TITLE_SLIDE_ACTIVE = "theme_title_slide_active";
+  private static final String THEME_TITLE_SLIDE_UPLOADED = "theme_title_slide_uploaded";
+
   /** The series theme property name */
   private static final String THEME_PROPERTY_NAME = "theme";
 
@@ -227,6 +233,12 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
       logger.info("Applying theme {} to mediapackage {}", themeId, mediaPackage.getIdentifier());
 
+      /* Make theme settings available to workflow instance */
+      workflowInstance.setConfiguration(THEME_BUMPER_ACTIVE, Boolean.toString(theme.isBumperActive()));
+      workflowInstance.setConfiguration(THEME_TRAILER_ACTIVE, Boolean.toString(theme.isTrailerActive()));
+      workflowInstance.setConfiguration(THEME_TITLE_SLIDE_ACTIVE, Boolean.toString(theme.isTitleSlideActive()));
+      workflowInstance.setConfiguration(THEME_TITLE_SLIDE_UPLOADED, Boolean.toString(StringUtils.isNotBlank(theme.getTitleSlideBackground())));
+
       if (theme.isBumperActive() && StringUtils.isNotBlank(theme.getBumperFile())) {
         try (InputStream bumper = staticFileService.getFile(theme.getBumperFile())) {
           addElement(mediaPackage, bumperFlavor, bumperTags, bumper,
@@ -254,8 +266,6 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
             logger.warn("Title slide file {} not found in static file service, skip applying it",
                     theme.getTitleSlideBackground());
           }
-        } else {
-          // TODO define what to do here (maybe extract image as background)
         }
 
         // TODO add the title slide metadata to the workflow properties to be used by the cover-image WOH

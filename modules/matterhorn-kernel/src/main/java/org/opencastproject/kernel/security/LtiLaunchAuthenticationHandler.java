@@ -153,7 +153,7 @@ public class LtiLaunchAuthenticationHandler implements
       //If supplied we use the human readable name
       String suppliedEid = request.getParameter("lis_person_sourcedid");
       //This is an optional field it could be null
-      if (suppliedEid != null) {
+      if (StringUtils.isNotBlank(suppliedEid)) {
         userIdFromConsumer = suppliedEid;
       } else {
         //if no eid is set we use the supplied ID
