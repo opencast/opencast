@@ -1,5 +1,5 @@
 describe('Series controller', function () {
-    var $scope, $httpBackend;
+    var $scope, $httpBackend, SeriesResource;
 
     beforeEach(module('adminNg'));
     beforeEach(module(function ($provide) {
@@ -11,10 +11,11 @@ describe('Series controller', function () {
         $provide.value('Language', service);
     }));
 
-    beforeEach(inject(function ($rootScope, $controller, _$httpBackend_) {
+    beforeEach(inject(function ($rootScope, $controller, _$httpBackend_, _SeriesResource_) {
         $scope = $rootScope.$new();
         $controller('SeriesCtrl', {$scope: $scope});
         $httpBackend = _$httpBackend_;
+        SeriesResource = _SeriesResource_;
     }));
 
     it('instantiates', function () {
@@ -25,12 +26,20 @@ describe('Series controller', function () {
     describe('#delete', function () {
 
         it('deletes the series', function () {
+            spyOn(SeriesResource, 'delete');
+            $scope.table.delete({'id': 12});
+            expect(SeriesResource.delete).toHaveBeenCalled();
+        });
+
+        it('reloads series after deletion', function () {
             $httpBackend.expectGET('/admin-ng/resources/series/filters.json').respond('[]');
             $httpBackend.expectDELETE('/admin-ng/series/12').respond('12');
+            $httpBackend.expectGET('/admin-ng/series/series.json?limit=10&offset=0').respond(JSON.stringify(getJSONFixture('admin-ng/series/series.json')));
 
             $scope.table.delete({'id': 12});
 
             $httpBackend.flush();
         });
+
     });
 });
