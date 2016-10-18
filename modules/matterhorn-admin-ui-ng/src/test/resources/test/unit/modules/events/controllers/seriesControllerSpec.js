@@ -28,7 +28,7 @@ describe('Series controller', function () {
         it('deletes the series', function () {
             spyOn(SeriesResource, 'delete');
             $scope.table.delete({'id': 12});
-            expect(SeriesResource.delete).toHaveBeenCalled();
+            expect(SeriesResource.delete).toHaveBeenCalledWith({id: 12}, jasmine.any(Function), jasmine.any(Function));
         });
 
         it('reloads series after deletion', function () {

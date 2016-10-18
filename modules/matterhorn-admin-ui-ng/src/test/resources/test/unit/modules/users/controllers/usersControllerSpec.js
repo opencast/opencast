@@ -28,7 +28,7 @@ describe('Users controller', function () {
         it('deletes the user', function () {
             spyOn(UserResource, 'delete');
             $scope.table.delete({'id': 12});
-            expect(UserResource.delete).toHaveBeenCalled();
+            expect(UserResource.delete).toHaveBeenCalledWith({username: 12}, jasmine.any(Function), jasmine.any(Function));
         });
 
     });

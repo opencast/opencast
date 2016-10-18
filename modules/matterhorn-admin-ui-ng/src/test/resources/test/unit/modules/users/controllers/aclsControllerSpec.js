@@ -28,7 +28,7 @@ describe('ACL controller', function () {
         it('deletes the ACL', function () {
             spyOn(AclResource, 'delete');
             $scope.table.delete({'id': 454});
-            expect(AclResource.delete).toHaveBeenCalled();
+            expect(AclResource.delete).toHaveBeenCalledWith({id: 454}, jasmine.any(Function), jasmine.any(Function));
         });
 
         it('reloads acls after deletion', function () {

@@ -28,7 +28,7 @@ describe('Groups controller', function () {
         it('deletes the group', function () {
             spyOn(GroupResource, 'delete');
             $scope.table.delete({'id': 12});
-            expect(GroupResource.delete).toHaveBeenCalled();
+            expect(GroupResource.delete).toHaveBeenCalledWith({id: 12}, jasmine.any(Function), jasmine.any(Function));
         });
 
     });
