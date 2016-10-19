@@ -1,6 +1,6 @@
 angular.module('adminNg.controllers')
-.controller('NewGroupCtrl', ['$scope', 'NewGroupStates', 'ResourcesListResource', 'GroupsResource', 'Notifications', 'Modal',
-    function ($scope, NewGroupStates, ResourcesListResource, GroupsResource, Notifications, Modal) {
+.controller('NewGroupCtrl', ['$scope', '$timeout', 'Table', 'NewGroupStates', 'ResourcesListResource', 'GroupsResource', 'Notifications', 'Modal',
+    function ($scope, $timeout, Table, NewGroupStates, ResourcesListResource, GroupsResource, Notifications, Modal) {
 
         $scope.states = NewGroupStates.get();
 
@@ -21,8 +21,12 @@ angular.module('adminNg.controllers')
           });
 
           GroupsResource.create($scope.group, function () {
-              Notifications.add('success', 'GROUP_ADDED');
+              // Fetching immediately does not work
+              $timeout(function () {
+                  Table.fetch();
+              }, 500);
               Modal.$scope.close();
+              Notifications.add('success', 'GROUP_ADDED');
           }, function (response) {
         	  if(response.status === 409) {
                   Notifications.add('error', 'GROUP_CONFLICT', 'add-group-form');
