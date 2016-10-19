@@ -372,8 +372,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       return foundQualities;
     }
     var tagsList = getTags(videoSources, '-quality');
-    var qualitiesList = _.map(Array.from(tagsList), function(quality) {
-      return quality.substring(0, quality.indexOf('-quality'));
+    var qualitiesList = [];
+    tagsList.forEach(function(quality) {
+      qualitiesList.push(quality.substring(0, quality.indexOf('-quality')));
     });
     var tracks;
     for (var source in videoSources) {
