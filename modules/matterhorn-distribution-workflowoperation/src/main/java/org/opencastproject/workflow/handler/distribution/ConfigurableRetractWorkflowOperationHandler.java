@@ -191,8 +191,7 @@ public class ConfigurableRetractWorkflowOperationHandler extends AbstractWorkflo
     }).toList();
     int retractedElementsCount = 0;
     for (Publication publication : publications) {
-      int nofElementsRetracted = retractPublicationElements(channelId, publication, mediapackageWithPublicationElements);
-      retractedElementsCount += nofElementsRetracted;
+      retractedElementsCount += retractPublicationElements(channelId, publication, mediapackageWithPublicationElements);
       mp.remove(publication);
     }
 
