@@ -147,6 +147,8 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
             "engage-download,engage-streaming");
     EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.STRATEGY)).andStubReturn(
             "retract");
+    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.MODE)).andStubReturn(
+            "single");
     EasyMock.replay(op);
 
     WorkflowInstance workflowInstance = EasyMock.createNiceMock(WorkflowInstance.class);
