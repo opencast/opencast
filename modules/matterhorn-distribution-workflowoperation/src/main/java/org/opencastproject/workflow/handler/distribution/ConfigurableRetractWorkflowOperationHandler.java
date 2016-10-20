@@ -47,7 +47,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * WOH that retracts elements from an internal distribution channel and removes the reflective publication elements from
@@ -126,44 +128,42 @@ public class ConfigurableRetractWorkflowOperationHandler extends AbstractWorkflo
    * @throws WorkflowOperationException
    *           Thrown if unable to retract the {@link MediaPackageElement}s.
    */
-  private List<Job> retractPublicationElements(String channelId, Publication publication, MediaPackage mp)
+  private int retractPublicationElements(String channelId, Publication publication, MediaPackage mp)
           throws WorkflowOperationException {
     // Add the publications to the mediapackage so that we can use the standard retract
     addPublicationElementsToMediaPackage(publication, mp);
 
+    Set<String> elementIds = new HashSet<String>();
+
     List<Job> jobs = new ArrayList<Job>();
-    Job job;
     for (Attachment attachment : publication.getAttachments()) {
-      job = retractPublicationElement(channelId, attachment, mp);
-      if (job != null) {
-        jobs.add(job);
-      }
+      elementIds.add(attachment.getIdentifier());
     }
-
     for (Catalog catalog : publication.getCatalogs()) {
-      job = retractPublicationElement(channelId, catalog, mp);
-      if (job != null) {
-        jobs.add(job);
-      }
+      elementIds.add(catalog.getIdentifier());
     }
-
     for (Track track : publication.getTracks()) {
-      job = retractPublicationElement(channelId, track, mp);
-      if (job != null) {
-        jobs.add(job);
+      elementIds.add(track.getIdentifier());
+    }
+
+    if (elementIds.size() > 0) {
+      Job job = null;
+      try {
+        job = distributionService.retract(channelId, mp, elementIds);
+      } catch (DistributionException e) {
+        logger.error("Error while retracting '{}' elements from channel '{}' of distribution '{}': {}", new Object[] {
+                elementIds.size(), channelId, distributionService, getStackTrace(e) });
+        throw new WorkflowOperationException(e);
       }
-    }
-
-    if (jobs.size() < 1) {
+      // Wait until all retraction jobs have returned
+      if (!waitForStatus(job).isSuccess()) {
+        throw new WorkflowOperationException("One of the retraction jobs did not complete successfully");
+      }
+    } else {
       logger.debug("No publication elements were found for retraction");
-      return jobs;
     }
 
-    // Wait until all retraction jobs have returned
-    if (!waitForStatus(jobs.toArray(new Job[jobs.size()])).isSuccess())
-      throw new WorkflowOperationException("One of the retraction jobs did not complete successfully");
-
-    return jobs;
+    return elementIds.size();
   }
 
   @Override
@@ -191,8 +191,8 @@ public class ConfigurableRetractWorkflowOperationHandler extends AbstractWorkflo
     }).toList();
     int retractedElementsCount = 0;
     for (Publication publication : publications) {
-      List<Job> jobs = retractPublicationElements(channelId, publication, mediapackageWithPublicationElements);
-      retractedElementsCount += jobs.size();
+      int nofElementsRetracted = retractPublicationElements(channelId, publication, mediapackageWithPublicationElements);
+      retractedElementsCount += nofElementsRetracted;
       mp.remove(publication);
     }
 
