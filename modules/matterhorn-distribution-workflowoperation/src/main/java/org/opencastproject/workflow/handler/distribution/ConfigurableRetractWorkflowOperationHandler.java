@@ -155,9 +155,8 @@ public class ConfigurableRetractWorkflowOperationHandler extends AbstractWorkflo
                 elementIds.size(), channelId, distributionService, getStackTrace(e) });
         throw new WorkflowOperationException(e);
       }
-      // Wait until all retraction jobs have returned
       if (!waitForStatus(job).isSuccess()) {
-        throw new WorkflowOperationException("One of the retraction jobs did not complete successfully");
+        throw new WorkflowOperationException("The retraction job did not complete successfully");
       }
     } else {
       logger.debug("No publication elements were found for retraction");
