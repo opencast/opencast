@@ -112,20 +112,10 @@
                     match="^karaf.clean.cache .*=.*$"
                     replace="karaf.clean.cache = true"
                     byline="true" />
-                  <!-- Prevent some libs from phoning home -->
-                  <echo file="target/assembly/etc/system.properties" append="true"
-                    >${line.separator}# Prevent certain libraries from phoning home</echo>
-                  <echo file="target/assembly/etc/system.properties" append="true"
-                    >${line.separator}net.sf.ehcache.skipUpdateCheck=true</echo>
-                  <echo file="target/assembly/etc/system.properties" append="true"
-                    >${line.separator}org.terracotta.quartz.skipUpdateCheck=true</echo>
-                  <!-- Adding DocumentBuilderFactory and TransformerFactory configuration -->
-                  <echo file="target/assembly/etc/system.properties" append="true"
-                    >${line.separator}# Configuring DocumentBuilderFactory and TransformerFactory </echo>
-                  <echo file="target/assembly/etc/system.properties" append="true"
-                    >${line.separator}javax.xml.parsers.DocumentBuilderFactory=org.apache.xerces.jaxp.DocumentBuilderFactoryImpl</echo>
-                  <echo file="target/assembly/etc/system.properties" append="true"
-                    >${line.separator}javax.xml.transform.TransformerFactory=org.apache.xalan.processor.TransformerFactoryImpl</echo>
+                  <!-- Additional config lines to system.properties -->
+                  <concat destfile="target/assembly/etc/system.properties" append="true">
+                    <filelist dir="../resources" files="system.properties.append"/>
+                  </concat>
                   <!-- Special configuration for development -->
                   <replaceregexp
                     file="target/classes/package.xml"

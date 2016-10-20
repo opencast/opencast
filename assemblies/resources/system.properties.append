@@ -1,0 +1,8 @@
+
+# Prevent certain libraries from phoning home
+net.sf.ehcache.skipUpdateCheck=true
+org.terracotta.quartz.skipUpdateCheck=true
+
+# Configuring DocumentBuilderFactory and TransformerFactory
+javax.xml.parsers.DocumentBuilderFactory=org.apache.xerces.jaxp.DocumentBuilderFactoryImpl
+javax.xml.transform.TransformerFactory=org.apache.xalan.processor.TransformerFactoryImpl

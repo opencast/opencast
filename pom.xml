@@ -1578,9 +1578,7 @@
               <report>cim</report>
               <report>dependencies</report>
               <report>dependency-convergence</report>
-              <!--3.3              <report>dependency-info</report>-->
               <report>dependency-management</report>
-              <!--3.3              <report>distribution-management</report>-->
               <report>index</report>
               <report>issue-tracking</report>
               <!--              <report>license</report>-->
