@@ -87,7 +87,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
   // service references
   private DownloadDistributionService distributionService;
 
-  /* workflow configuration options */
+  /** Workflow configuration options */
   static final String CHANNEL_ID_KEY = "channel-id";
   static final String MIME_TYPE = "mimetype";
   static final String SOURCE_TAGS = "source-tags";
@@ -96,7 +96,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
   static final String STRATEGY = "strategy";
   static final String MODE = "mode";
 
-  /** Known modes **/
+  /** Known values for mode **/
   static final String MODE_SINGLE = "single";
   static final String MODE_MIXED = "mixed";
   static final String MODE_BULK = "bulk";
