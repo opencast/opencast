@@ -37,10 +37,14 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpPost;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /** A remote distribution service invoker. */
 public class DownloadDistributionServiceRemoteImpl extends RemoteBase
@@ -74,34 +78,49 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
   }
 
   @Override
-  public Job distribute(String channelId, final MediaPackage mediaPackage, final String elementId,
+  public Job distribute(String channelId, MediaPackage mediaPackage, String elementId, boolean checkAvailability)
+          throws DistributionException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return distribute(channelId, mediaPackage, elementIds, checkAvailability);
+  }
+
+  @Override
+  public Job distribute(String channelId, final MediaPackage mediaPackage, Set<String> elementIds,
                         boolean checkAvailability)
           throws DistributionException {
-    logger.info(format("Distributing %s to %s@%s", elementId, channelId, distributionChannel));
+    logger.info(format("Distributing %s elements to %s@%s", elementIds.size(), channelId, distributionChannel));
     final HttpPost req = post(param(PARAM_CHANNEL_ID, channelId),
                               param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
-                              param(PARAM_ELEMENT_ID, elementId),
+                              param(PARAM_ELEMENT_ID, StringUtils.join(elementIds, ',')),
                               param(PARAM_CHECK_AVAILABILITY, Boolean.toString(checkAvailability)));
     for (Job job : join(runRequest(req, jobFromHttpResponse))) {
       return job;
     }
-    throw new DistributionException(format("Unable to distribute element '%s' of "
+    throw new DistributionException(format("Unable to distribute '%s' elements of "
                                                    + "mediapackage '%s' using a remote destribution service proxy",
-                                           elementId, mediaPackage.getIdentifier().toString()));
+                                           elementIds.size(), mediaPackage.getIdentifier().toString()));
   }
 
   @Override
   public Job retract(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException {
-    logger.info(format("Retracting %s from %s@%s", elementId, channelId, distributionChannel));
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return retract(channelId, mediaPackage, elementIds);
+  }
+
+  @Override
+  public Job retract(String channelId, MediaPackage mediaPackage, Set<String> elementIds) throws DistributionException {
+    logger.info(format("Retracting %s elements from %s@%s", elementIds.size(), channelId, distributionChannel));
     final HttpPost req = post("/retract",
                               param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
-                              param(PARAM_ELEMENT_ID, elementId),
+                              param(PARAM_ELEMENT_ID, StringUtils.join(elementIds, ',')),
                               param(PARAM_CHANNEL_ID, channelId));
     for (Job job : join(runRequest(req, jobFromHttpResponse))) {
       return job;
     }
-    throw new DistributionException(format("Unable to retract element '%s' of "
+    throw new DistributionException(format("Unable to retract '%s' elements of "
                                                    + "mediapackage '%s' using a remote destribution service proxy",
-                                           elementId, mediaPackage.getIdentifier().toString()));
+                                           elementIds.size(), mediaPackage.getIdentifier().toString()));
   }
 }
