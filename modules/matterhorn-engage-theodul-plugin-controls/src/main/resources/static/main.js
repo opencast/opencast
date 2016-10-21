@@ -69,6 +69,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     sliderMousein: new Engage.Event('Slider:mouseIn', 'the mouse entered the slider', 'trigger'),
     sliderMouseout: new Engage.Event('Slider:mouseOut', 'the mouse is off the slider', 'trigger'),
     sliderMousemove: new Engage.Event('Slider:mouseMoved', 'the mouse is moving over the slider', 'trigger'),
+    sliderMousemovePreview: new Engage.Event('Slider:mouseMovedPreview', 'the mouse is moving over the slider', 'trigger'),
     seek: new Engage.Event('Video:seek', 'seek video to a given position in seconds', 'trigger'),
     seekLeft: new Engage.Event('Video:seekLeft', '', 'trigger'),
     seekRight: new Engage.Event('Video:seekRight', '', 'trigger'),
@@ -251,6 +252,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   var usingFlash = false;
   var isAudioOnly = false;
   var segments = {};
+  var mediaPackageModel;
+  var timelinePreview;
   var mediapackageError = false;
   var aspectRatioTriggered = false;
   var aspectRatioWidth;
@@ -416,9 +419,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
 
   var ControlsView = Backbone.View.extend({
     el: $('#' + id_engage_controls), // every view has an element associated with it
-    initialize: function (videoDataModel, template, plugin_path) {
+    initialize: function (videoDataModel, mediaPackageModel, template, plugin_path) {
       this.setElement($(plugin.container));
       this.model = videoDataModel;
+      this.mediaPackageModel = mediaPackageModel;
       this.template = template;
       this.pluginPath = plugin_path;
 
@@ -439,6 +443,40 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         }
 
         segments = Utils.repairSegmentLength(segments, duration, min_segment_duration);
+        
+        var attachments = Engage.model.get('mediaPackage').get('attachments');
+        console.log(attachments);
+        timelinePreview = $(attachments).filter(function(index) {
+          return $(attachments[index]).attr('type') == 'presentation/timeline-preview';
+          //return $(this).attr('type') == 'presentation/timeline-preview';
+        })
+        console.log(timelinePreview);
+        console.log($(attachments).filter(function(index) {
+          return $(attachments[index]).attr('type') == 'presentation/timeline-preview';
+          //return $(this).attr('type') == 'presentation/timeline-preview';
+        }).get(0));
+        console.log($(attachments).filter(function(index) {
+          return $(attachments[index]).attr('type') == 'presentation/timeline-preview';
+          //return $(this).attr('type') == 'presentation/timeline-preview';
+        }).get(0).url);
+//        console.log($($(attachments).filter(function(index) {
+//          return $(attachments[index]).attr('type') == 'presentation/timeline-preview';
+//          //return $(this).attr('type') == 'presentation/timeline-preview';
+//        }).get(0)).find('url'));
+        console.log($(attachments).filter(function(index) {
+          return $(attachments[index]).attr('type') == 'presentation/segment+preview';
+          //return $(this).attr('type') == 'presentation/timeline-preview';
+        }));
+        console.log(timelinePreview.find('url'));
+        console.log($(attachments).filter(function(index) {
+          return $(attachments[index]).attr('type') == 'presentation/timeline-preview';
+          //return $(this).attr('type') == 'presentation/timeline-preview';
+        }).children());
+        console.log(timelinePreview.children());
+        console.log(attachments[6]);
+        console.log($(attachments[6]).attr('type'));
+        console.log($(attachments[6]).attr('type') == 'presentation/timeline-preview');
+        console.log($(attachments[6]).attr('type') === 'presentation/timeline-preview');
 
         if (Engage.model.get('meInfo')) {
           if (Engage.model.get('meInfo').get('logo_player')) {
@@ -551,9 +589,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   // provide this additional view if the controls are below the video to have content above the video
   var ControlsViewTop_ifBottom = Backbone.View.extend({
     el: $('#' + id_engage_controls_topIfBottom), // every view has an element associated with it
-    initialize: function (videoDataModel, template, plugin_path) {
+    initialize: function (videoDataModel, mediaPackageModel, template, plugin_path) {
       this.setElement($(plugin.containerSecondIfBottom));
       this.model = videoDataModel;
+      this.mediaPackageModel = mediaPackageModel;
       this.template = template;
       this.pluginPath = plugin_path;
 
@@ -915,6 +954,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         var dur = (duration && (duration > 0)) ? duration : 1;
         currPos = (currPos < 0) ? 0 : ((currPos > 1) ? 1 : currPos);
         Engage.trigger(plugin.events.sliderMousemove.getName(), currPos * dur);
+        Engage.trigger(plugin.events.sliderMousemovePreview.getName(), [currPos * dur, e.clientX, e.clientY]);
       });
       // volume event
       $('#' + id_volumeSlider).on(event_slide, function (event, ui) {
@@ -1388,13 +1428,58 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
       Engage.on(plugin.events.segmentMouseover.getName(), function (no) {
         if (!mediapackageError) {
           $('#' + id_segmentNo + no).addClass('segmentHover');
-          $("#segment_preview").addClass("segmentTooltipHover");
-          $("#segment_preview_img").attr('src', segments[no].image_url);
+//          $('#segment_preview').addClass('segmentTooltipHover');
+          //console.log(timelinePreview);
+//          $('#segment_preview_img').attr('src', timelinePreview.get(0).url);
+//          $('#segment_preview_img').css({'clip':'rect(0px 160px 90px 0px)'});
         }
       });
       Engage.on(plugin.events.segmentMouseout.getName(), function (no) {
         if (!mediapackageError) {
           $('#' + id_segmentNo + no).removeClass('segmentHover');
+//          $('#segment_preview').removeClass('segmentTooltipHover');
+        }
+      });
+      Engage.on(plugin.events.sliderMousein.getName(), function () {
+        if (!mediapackageError) {
+          $('#segment_preview').addClass('segmentTooltipHover');
+          $('#segment_preview_img').attr('src', timelinePreview.get(0).url);
+          //$('#segment_preview_img').css({'clip':'rect(0px 320px 90px 160px)'});
+        }
+      });
+      Engage.on(plugin.events.sliderMouseout.getName(), function () {
+        if (!mediapackageError) {
+          $('#segment_preview').removeClass('segmentTooltipHover');
+        }
+      });
+      Engage.on(plugin.events.sliderMousemovePreview.getName(), function (pos) {
+        if (!mediapackageError) {
+          $('#segment_preview').addClass('segmentTooltipHover');
+          $('#segment_preview_img').attr('src', timelinePreview.get(0).url);
+          
+          var width = 160;
+          var height = 90;
+          var num =  16 * ((30 / (30000 / pos[0])) / 30);
+          var offsetX = width * Math.floor(num % 4);
+          var offsetY = height * Math.floor(num / 4);
+          var pageWidth = $(window).width();
+//          console.log(pageWidth);
+//          console.log(pos[1]);
+//          console.log(pos[2]);
+          // rect(top, right, bottom, left)
+          $('#segment_preview_img').css({'clip':'rect(' + offsetY + 'px ' + (offsetX + width) + 'px ' + (offsetY + height) + 'px ' + offsetX + 'px)'});
+//          $('#segment_preview_img').css({'clip-path':'inset(100px 50px)'});
+          //$('#segment_preview_img').css({'clip':'rect(0px 320px 90px 160px)'});
+//          $('#segment_preview_img').css({'bottom': offsetY + 'px'});
+//          $('#segment_preview_img').css({'rigth': (pageWidth) + 'px'});
+            
+          var wrapperHeight = $('#navigation_wrapper').height();
+//          console.log(wrapperHeight);
+
+          $('#segment_preview_img').css({'top': Math.round(-10 + (-height) + (-wrapperHeight) + (-offsetY)) + 'px'});
+          $('#segment_preview_img').css({'left': Math.round((pos[1] - offsetX) - (width / 2)) + 'px'});
+//          $('#segment_preview_img').css({'bottom': offsetY + 'px'});
+//          $('#segment_preview_img').css({'right': Math.floor(pageWidth - pos[1]) + 'px'});
         }
       });
 
@@ -1500,9 +1585,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
       });
 
       if (!Engage.controls_top && plugin.template_topIfBottom && (plugin.template_topIfBottom != 'none')) {
-        controlsViewTopIfBottom = new ControlsViewTop_ifBottom(Engage.model.get('videoDataModel'), plugin.template_topIfBottom, plugin.pluginPath_topIfBottom);
+        controlsViewTopIfBottom = new ControlsViewTop_ifBottom(Engage.model.get('videoDataModel'), Engage.model.get('mediaPackage'), plugin.template_topIfBottom, plugin.pluginPath_topIfBottom);
       }
-      controlsView = new ControlsView(Engage.model.get('videoDataModel'), plugin.template, plugin.pluginPath);
+      controlsView = new ControlsView(Engage.model.get('videoDataModel'), Engage.model.get('mediaPackage'), plugin.template, plugin.pluginPath);
 
       loadStoredInitialValues();
     }
