@@ -709,6 +709,7 @@
            }
          },
          "METADATA": {
+           "CAPTION": "Event details",
            "TITLE":          "Title",
            "ID":            "UID",
            "SERIES":         "Series",
