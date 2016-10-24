@@ -122,7 +122,7 @@
     <operation
       id="cover-image"
       fail-on-error="true"
-      exception-handler-workflow="error"
+      exception-handler-workflow="ng-partial-error"
       description="Create a cover image">
       <configurations>
         <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
