@@ -99,7 +99,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     zoomIn: new Engage.Event('Video:zoomIn', 'zooms in video', 'handler'),
     zoomOut: new Engage.Event('Video:zoomOut', 'zooms out video', 'handler'),
     zoomChange: new Engage.Event('Video:zoomChange', 'zoom level has changed', 'trigger'),
-    switchVideo: new Engage.Event('Video:switch', 'switch the video', 'handler')
+    switchVideo: new Engage.Event('Video:switch', 'switch the video', 'handler'),
+    toggleCaptions: new Engage.Event('Video:toggleCaptions', 'toggle captions', 'handler'),
   };
 
   var isDesktopMode = false;
@@ -167,6 +168,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var timer_qualitychange = 1000;
   var zoom_step_size = 0.05;
   var decimal_places = 3;
+  var defaultCaptionURL = "http://localhost:8080/staticfiles/3feb303a-a5c2-4895-abbf-301c7ba9c786";
 
   /* don't change these variables */
   var currentTime = 0;
@@ -248,6 +250,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var focusedClass = 'videoFocused';
   var isPiP = true;
   var pipPos = 'left';
+  var activeCaption = undefined;
 
   var foundQualities = undefined;
   var zoomTimeout = 500;
@@ -1344,7 +1347,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     checkVideoDisplaySize();
   }
 
-
   function checkVideoDisplaySize() {
     var $engageVideoId = $('#' + id_engage_video);
     var $videoUnfocused = $('.' + videoUnfocusedClass);
@@ -2343,38 +2345,62 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     var captionsURL   = null;
 
     // Load from attachment
-    console.log(attachments);
     for(var a in attachments) {
       if(attachments[a].mimetype == "text/vtt") {
-        console.log("Found Caption");
+        console.log("Found caption in attachments.");
         captionsURL = attachments[a].url;
       }
     }
 
     // Load from track
-    console.log(tracks);
     for(var a in tracks) {
       if(tracks[a].mimetype == "text/vtt") {
-        console.log("Found Caption");
+        console.log("Found caption in tracks");
         captionsURL = attachments[a].url;
       }
     }
-    console.log(captionsURL);
 
-    // Load from Catalog
+    // TODO Load from Catalog
 
-    // Append caption
-    var caption = videodisplayMaster.addRemoteTextTrack({
-      kind: 'caption',
-      language: 'en',
-      label: 'Demo',
-      src: "http://localhost:8080/files/mediapackage/987d52af-8c04-44ff-92b1-0e3b76da6e5b/57551a0a-0ca4-4ecc-bfa8-5735adc024ce/demo.vtt"
+    if(captionsURL == null && defaultCaptionURL != undefined) {
+      console.warn("Loading default captions file");
+      captionsURL = defaultCaptionURL;
+    }
+
+    if(captionsURL == null) {
+      return;
+    }
+
+    $.each(videoDisplays, function(i, j){
+      var caption = videojs(j).addRemoteTextTrack({
+        kind: 'caption',
+        language: 'en',
+        label: 'Caption',
+        src: captionsURL,
+        mode: "hidden"
+      });
     });
-    caption.default = true;
-    console.log(videoDisplays);
+
+    activeCaption = videojs(videoDisplays[0]).remoteTextTracks()[0];
+
+    Engage.on(plugin.events.toggleCaptions.getName(), function(data) {
+      if(data) {
+        activeCaption.mode = "showing";
+      } else {
+        activeCaption.mode = "hidden";
+      }
+    });
+
     Engage.on(plugin.events.focusVideo.getName(), function (data) {
-      console.log("Focus");
-      console.log(data);
+      var captionMode = activeCaption.mode;
+      activeCaption.mode = "hidden";
+      activeCaption = videojs("videojs_videodisplay_" + data).textTracks()[0];
+      activeCaption.mode = captionMode;
+      if(data == "none") {
+        console.warn("none " + data);
+      } else {
+        console.warn("else " + data);
+      }
     });
   }
 
