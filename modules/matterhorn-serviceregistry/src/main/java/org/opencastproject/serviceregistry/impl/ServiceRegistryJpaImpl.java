@@ -70,7 +70,6 @@ import org.opencastproject.util.jmx.JmxUtil;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -95,6 +94,7 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -188,6 +188,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** Default delay between job dispatching attempts, in milliseconds */
   static final long DEFAULT_DISPATCH_INTERVAL = 5000;
+
+  /** Default jobs limit during dispatching
+   * (larger value will fetch more entries from the database at the same time and increase RAM usage) */
+  static final int DEFAULT_DISPATCH_JOBS_LIMIT = 100;
 
   /** Default setting on job statistics collection */
   static final boolean DEFAULT_JOB_STATISTICS = true;
@@ -1722,22 +1726,58 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * Gets jobs of all types that are in the QUEUED and RESTART state.
+   * Gets jobs of all types that are in the given state.
    *
-   * @param em
-   *          the entity manager
+   * @param em the entity manager
+   * @param offset apply offset to the db query if offset > 0
+   * @param limit apply limit to the db query if limit > 0
+   * @param statuses the job status should be one from the given statuses
    * @return the list of jobs waiting for dispatch
-   * @throws ServiceRegistryException
-   *           if there is a problem communicating with the jobs database
+   * @throws ServiceRegistryException if there is a problem communicating with the jobs database
    */
-  protected List<JpaJob> getDispatchableJobs(EntityManager em) throws ServiceRegistryException {
+  protected List<JpaJob> getDispatchableJobsWithStatus(EntityManager em, int offset, int limit, Status... statuses)
+          throws ServiceRegistryException {
+    if (statuses == null)
+      return Collections.EMPTY_LIST;
+
+    List<Integer> statusesOrdinal = new ArrayList<>(statuses.length);
+    for (Status status : statuses) {
+      statusesOrdinal.add(status.ordinal());
+    }
+
     TypedQuery<JpaJob> query = null;
     try {
       query = em.createNamedQuery("Job.dispatchable.status", JpaJob.class);
-      List<Integer> statuses = new ArrayList<Integer>();
-      statuses.add(Status.QUEUED.ordinal());
-      statuses.add(Status.RESTART.ordinal());
-      query.setParameter("statuses", statuses);
+      query.setParameter("statuses", statusesOrdinal);
+      if (offset > 0)
+        query.setFirstResult(offset);
+      if (limit > 0)
+        query.setMaxResults(limit);
+      return query.getResultList();
+    } catch (Exception e) {
+      throw new ServiceRegistryException(e);
+    }
+  }
+
+  /**
+   * Return dispatchable job ids, where the job status is {@value RESTART} or {@value QUEUED}
+   * and the job id is listed in the given set.
+   *
+   * @param em the entity manager
+   * @param jobIds set with job id's interested in
+   * @return list with dispatchable job id's from the given set, with job status {@value RESTART} or {@value QUEUED}
+   * @throws ServiceRegistryException if there is a problem communicating with the jobs database
+   */
+  protected List<Long> getDispatchableJobsWithIdFilter(EntityManager em, Set<Long> jobIds)
+          throws ServiceRegistryException {
+    if (jobIds == null || jobIds.isEmpty())
+      return Collections.EMPTY_LIST;
+
+    Query query = null;
+    try {
+      query = em.createNamedQuery("Job.dispatchable.status.idfilter");
+      query.setParameter("jobids", dispatchPriorityList.keySet());
+      query.setParameter("statuses", Arrays.asList(Status.RESTART.ordinal(), Status.QUEUED.ordinal()));
       return query.getResultList();
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
@@ -2744,6 +2784,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   class JobDispatcher implements Runnable {
 
+    /** List with job types, that are not able to dispatch per round */
+    private List<String> undispatchableJobTypes = null;
+
     /**
      * {@inheritDoc}
      *
@@ -2751,11 +2794,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
      */
     @Override
     public void run() {
+      undispatchableJobTypes = new ArrayList<String>();
       EntityManager em = null;
       try {
         em = emf.createEntityManager();
-        Stream<JpaJob> jobsToDispatch = $(getDispatchableJobs(em));
-        List<String> undispatchableJobTypes = new ArrayList<String>();
 
         // FIXME: the stats are not currently used and the queries are very
         // expense in database time.
@@ -2764,123 +2806,179 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           jobsStatistics.updateJobCount(getCountPerHostService(em));
         }
 
-        // Make sure dispatching is happening in an ideal order
-        jobsToDispatch = jobsToDispatch.sort(new DispatchableComparator());
-
-        // Remove outdated jobs from priority list
-        Set<Long> jobIds = jobsToDispatch.map(toJobId).toSet();
-        for (Long jobId : new HashSet<>(dispatchPriorityList.keySet())) {
-          if (!jobIds.contains(jobId))
-            dispatchPriorityList.remove(jobId);
-        }
-
-        for (JpaJob job : jobsToDispatch) {
-
-          // Remember the job type
-          String jobType = job.getJobType();
-
-          // Skip jobs that we already know can't be dispatched except of jobs in the priority list
-          String jobSignature = new StringBuilder(jobType).append('@').append(job.getOperation()).toString();
-          if (undispatchableJobTypes.contains(jobSignature) && !dispatchPriorityList.keySet().contains(job.getId())) {
-            logger.trace("Skipping dispatching of jobs {} with type '{}' for this round of dispatching", job.getId(),
-                    jobType);
-            continue;
-          }
-
-          // Set the job's user and organization prior to dispatching
-          String creator = job.getCreator();
-          String creatorOrganization = job.getOrganization();
-
-          // Try to load the organization.
-          Organization organization = null;
-          try {
-            organization = organizationDirectoryService.getOrganization(creatorOrganization);
-            securityService.setOrganization(organization);
-          } catch (NotFoundException e) {
-            logger.debug("Skipping dispatching of job for non-existing organization '{}'", creatorOrganization);
-            continue;
-          }
-
-          // Try to load the user
-          User user = userDirectoryService.loadUser(creator);
-          if (user == null) {
-            logger.warn("Unable to dispatch job {}: creator '{}' is not available", job.getId(), creator);
-            continue;
-          }
-          securityService.setUser(user);
-
-          // Start dispatching
-          try {
-            SystemLoad systemLoad = getHostLoads(em, true);
-            List<ServiceRegistration> services = getServiceRegistrations(em);
-            List<HostRegistration> hosts = $(getHostRegistrations(em)).filter(filterOutPriorityHosts._2(job.toJob()))
-                    .toList();
-            List<ServiceRegistration> candidateServices = null;
-
-            // Depending on whether this running job is trying to reach out to other services or whether this is an
-            // attempt to execute the next operation in a workflow, choose either from a limited or from the full list
-            // of services
-            Job parentJob = null;
-            try {
-              if (job.getParentJob() != null)
-                parentJob = getJob(job.getParentJob().getId());
-            } catch (NotFoundException e) {
-              // That's ok
+        if (!dispatchPriorityList.isEmpty()) {
+          // Remove outdated jobs from priority list
+          List<Long> jobIds = getDispatchableJobsWithIdFilter(em, dispatchPriorityList.keySet());
+          for (Long jobId : new HashSet<>(dispatchPriorityList.keySet())) {
+            if (!jobIds.contains(jobId)) {
+              dispatchPriorityList.remove(jobId);
             }
-
-            // When a job A starts a series of child jobs, then those child jobs should only be dispatched at the
-            // same time if there is processing capacity available.
-            boolean parentHasRunningChildren = false;
-            if (parentJob != null) {
-              for (Job child : getChildJobs(parentJob.getId())) {
-                if (Status.RUNNING.equals(child.getStatus())) {
-                  parentHasRunningChildren = true;
-                  break;
-                }
-              }
-            }
-
-            // If this is a root job (a new workflow or a new workflow operation), then only dispatch if there is
-            // capacity, i. e. the workflow service is ok dispatching the next workflow or the next workflow operation.
-            if (parentJob == null || TYPE_WORKFLOW.equals(jobType) || parentHasRunningChildren) {
-              logger.trace("Using available capacity only for dispatching of {} to a service of type '{}'", job,
-                      jobType);
-              candidateServices = getServiceRegistrationsWithCapacity(jobType, services, hosts, systemLoad);
-            } else {
-              logger.trace("Using full list of services for dispatching of {} to a service of type '{}'", job, jobType);
-              candidateServices = getServiceRegistrationsByLoad(jobType, services, hosts, systemLoad);
-            }
-
-            // Try to dispatch the job
-            String hostAcceptingJob = null;
-            try {
-              hostAcceptingJob = dispatchJob(em, job, candidateServices);
-              dispatchPriorityList.remove(job.getId());
-            } catch (ServiceUnavailableException e) {
-              logger.debug("Jobs of type {} currently cannot be dispatched", job.getOperation());
-              // Don't mark workflow jobs as undispatchable to not impact worklfow operations
-              if (!TYPE_WORKFLOW.equals(jobType))
-                undispatchableJobTypes.add(jobSignature);
-              continue;
-            } catch (UndispatchableJobException e) {
-              logger.debug("Job {} currently cannot be dispatched", job.getId());
-              continue;
-            }
-
-            logger.debug("Job {} dispatched to {}", job.getId(), hostAcceptingJob);
-          } catch (ServiceRegistryException e) {
-            Throwable cause = (e.getCause() != null) ? e.getCause() : e;
-            logger.error("Error dispatching job " + job, cause);
-          } finally {
-            securityService.setUser(null);
-            securityService.setOrganization(null);
           }
         }
+
+        final int jobsLimit = DEFAULT_DISPATCH_JOBS_LIMIT;
+        int jobsOffset = 0;
+        List<JpaJob> dispatchableJobs = null;
+        List<JpaJob> workflowJobs = new ArrayList();
+        boolean jobsFound = false;
+        do {
+          // dispatch all dispatchable jobs with status restarted
+          dispatchableJobs = getDispatchableJobsWithStatus(em, jobsOffset, jobsLimit, Status.RESTART);
+          jobsOffset += jobsLimit;
+          jobsFound = !dispatchableJobs.isEmpty();
+
+          // skip all jobs of type workflow, we will handle them next
+          for (JpaJob job : dispatchableJobs) {
+            if (TYPE_WORKFLOW.equals(job.getJobType())) {
+              workflowJobs.add(job);
+            }
+          }
+          if (dispatchableJobs.removeAll(workflowJobs) && dispatchableJobs.isEmpty())
+            continue;
+
+          dispatchDispatchableJobs(em, dispatchableJobs);
+        } while (jobsFound);
+
+        jobsOffset = 0;
+        jobsFound = false;
+        do {
+          // dispatch all dispatchable jobs with status queued
+          dispatchableJobs = getDispatchableJobsWithStatus(em, jobsOffset, jobsLimit, Status.QUEUED);
+          jobsOffset += jobsLimit;
+          jobsFound = !dispatchableJobs.isEmpty();
+
+          // skip all jobs of type workflow, we will handle them next
+          for (JpaJob job : dispatchableJobs) {
+            if (TYPE_WORKFLOW.equals(job.getJobType())) {
+              workflowJobs.add(job);
+            }
+          }
+          if (dispatchableJobs.removeAll(workflowJobs) && dispatchableJobs.isEmpty())
+            continue;
+
+          dispatchDispatchableJobs(em, dispatchableJobs);
+        } while (jobsFound);
+
+        if (!workflowJobs.isEmpty())
+          dispatchDispatchableJobs(em, workflowJobs);
+
       } catch (Throwable t) {
         logger.warn("Error dispatching jobs", t);
       } finally {
+        undispatchableJobTypes = null;
         if (em != null)
           em.close();
+      }
+    }
+
+    /**
+     * Dispatch the given jobs.
+     *
+     * @param em the entity manager
+     * @param jobsToDispatch list with dispatchable jobs to dispatch
+     */
+    private void dispatchDispatchableJobs(EntityManager em, List<JpaJob> jobsToDispatch) {
+      for (JpaJob job : jobsToDispatch) {
+
+        // Remember the job type
+        String jobType = job.getJobType();
+
+        // Skip jobs that we already know can't be dispatched except of jobs in the priority list
+        String jobSignature = new StringBuilder(jobType).append('@').append(job.getOperation()).toString();
+        if (undispatchableJobTypes.contains(jobSignature) && !dispatchPriorityList.keySet().contains(job.getId())) {
+          logger.trace("Skipping dispatching of jobs {} with type '{}' for this round of dispatching", job.getId(),
+                  jobType);
+          continue;
+        }
+
+        // Set the job's user and organization prior to dispatching
+        String creator = job.getCreator();
+        String creatorOrganization = job.getOrganization();
+
+        // Try to load the organization.
+        Organization organization = null;
+        try {
+          organization = organizationDirectoryService.getOrganization(creatorOrganization);
+          securityService.setOrganization(organization);
+        } catch (NotFoundException e) {
+          logger.debug("Skipping dispatching of job for non-existing organization '{}'", creatorOrganization);
+          continue;
+        }
+
+        // Try to load the user
+        User user = userDirectoryService.loadUser(creator);
+        if (user == null) {
+          logger.warn("Unable to dispatch job {}: creator '{}' is not available", job.getId(), creator);
+          continue;
+        }
+        securityService.setUser(user);
+
+        // Start dispatching
+        try {
+          SystemLoad systemLoad = getHostLoads(em, true);
+          List<ServiceRegistration> services = getServiceRegistrations(em);
+          List<HostRegistration> hosts = $(getHostRegistrations(em)).filter(filterOutPriorityHosts._2(job.getId()))
+                  .toList();
+          List<ServiceRegistration> candidateServices = null;
+
+          // Depending on whether this running job is trying to reach out to other services or whether this is an
+          // attempt to execute the next operation in a workflow, choose either from a limited or from the full list
+          // of services
+          Job parentJob = null;
+          try {
+            if (job.getParentJob() != null)
+              parentJob = getJob(job.getParentJob().getId());
+          } catch (NotFoundException e) {
+            // That's ok
+          }
+
+          // When a job A starts a series of child jobs, then those child jobs should only be dispatched at the
+          // same time if there is processing capacity available.
+          boolean parentHasRunningChildren = false;
+          if (parentJob != null) {
+            for (Job child : getChildJobs(parentJob.getId())) {
+              if (Status.RUNNING.equals(child.getStatus())) {
+                parentHasRunningChildren = true;
+                break;
+              }
+            }
+          }
+
+          // If this is a root job (a new workflow or a new workflow operation), then only dispatch if there is
+          // capacity, i. e. the workflow service is ok dispatching the next workflow or the next workflow operation.
+          if (parentJob == null || TYPE_WORKFLOW.equals(jobType) || parentHasRunningChildren) {
+            logger.trace("Using available capacity only for dispatching of {} to a service of type '{}'", job,
+                    jobType);
+            candidateServices = getServiceRegistrationsWithCapacity(jobType, services, hosts, systemLoad);
+          } else {
+            logger.trace("Using full list of services for dispatching of {} to a service of type '{}'", job, jobType);
+            candidateServices = getServiceRegistrationsByLoad(jobType, services, hosts, systemLoad);
+          }
+
+          // Try to dispatch the job
+          String hostAcceptingJob = null;
+          try {
+            hostAcceptingJob = dispatchJob(em, job, candidateServices);
+            dispatchPriorityList.remove(job.getId());
+          } catch (ServiceUnavailableException e) {
+            logger.debug("Jobs of type {} currently cannot be dispatched", job.getOperation());
+            // Don't mark workflow jobs as undispatchable to not impact worklfow operations
+            if (!TYPE_WORKFLOW.equals(jobType))
+              undispatchableJobTypes.add(jobSignature);
+            continue;
+          } catch (UndispatchableJobException e) {
+            logger.debug("Job {} currently cannot be dispatched", job.getId());
+            continue;
+          }
+
+          logger.debug("Job {} dispatched to {}", job.getId(), hostAcceptingJob);
+        } catch (ServiceRegistryException e) {
+          Throwable cause = (e.getCause() != null) ? e.getCause() : e;
+          logger.error("Error dispatching job " + job, cause);
+        } finally {
+          securityService.setUser(null);
+          securityService.setOrganization(null);
+        }
       }
     }
 
@@ -3017,11 +3115,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       throw new UndispatchableJobException("Job " + job.getId() + " is currently undispatchable");
     }
 
-    private final Fn2<HostRegistration, Job, Boolean> filterOutPriorityHosts = new Fn2<HostRegistration, Job, Boolean>() {
+    private final Fn2<HostRegistration, Long, Boolean> filterOutPriorityHosts = new Fn2<HostRegistration, Long, Boolean>() {
       @Override
-      public Boolean ap(HostRegistration host, Job job) {
+      public Boolean ap(HostRegistration host, Long jobId) {
         if (dispatchPriorityList.values().contains(host.getBaseUrl())
-                && !host.getBaseUrl().equals(dispatchPriorityList.get(job.getId()))) {
+                && !host.getBaseUrl().equals(dispatchPriorityList.get(jobId))) {
           return false;
         }
         return true;
@@ -3039,13 +3137,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       @Override
       public Float ap(HostRegistration h) {
         return h.getMaxLoad();
-      }
-    };
-
-    private final Fn<JpaJob, Long> toJobId = new Fn<JpaJob, Long>() {
-      @Override
-      public Long ap(JpaJob job) {
-        return job.getId();
       }
     };
 
