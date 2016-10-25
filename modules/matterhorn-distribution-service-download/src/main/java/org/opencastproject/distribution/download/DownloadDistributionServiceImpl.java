@@ -297,14 +297,13 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
           throw new DistributionException(format("Unable to copy %s to %s", source, destination), e);
         }
       }
-      // Create a representation of the distributed file in the mediapackage
+      // Create a media package element representation of the distributed file
       MediaPackageElement distributedElement = (MediaPackageElement) element.clone();
       try {
         distributedElement.setURI(getDistributionUri(channelId, mediapackageId, element));
       } catch (URISyntaxException e) {
         throw new DistributionException("Distributed element produces an invalid URI", e);
       }
-      distributedElement.setIdentifier(null);
 
       logger.info(format("Finished distributing element %s@%s for publication channel %s", elementId, mediapackageId,
               channelId));
