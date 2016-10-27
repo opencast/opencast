@@ -41,6 +41,9 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
@@ -300,11 +303,11 @@ public class CaptureAgentStateRestService {
     pathParameters = {
       @RestParameter(description = "Name of the capture agent", isRequired = true, name = "name", type = Type.STRING)
     }, restParameters = {
-      @RestParameter(description = "An XML representation of the capabilities, as specified in "
+      @RestParameter(description = "An XML or JSON representation of the capabilities. XML as specified in "
         + "http://java.sun.com/dtd/properties.dtd (friendly names as keys, device locations as corresponding values)",
         type = Type.TEXT, isRequired = true, name = "configuration")
     }, reponses = {
-      @RestResponse(description = "{name} set to {state}", responseCode = SC_OK),
+      @RestResponse(description = "An XML or JSON representation of the agent configuration", responseCode = SC_OK),
       @RestResponse(description = "The configuration format is incorrect OR the agent name is blank or null",
         responseCode = SC_BAD_REQUEST)
     }, returnDescription = "")
@@ -317,23 +320,43 @@ public class CaptureAgentStateRestService {
       return Response.serverError().status(Response.Status.BAD_REQUEST).build();
     }
 
-    Properties caps = new Properties();
-    ByteArrayInputStream bais = null;
-    try {
-      bais = new ByteArrayInputStream(configuration.getBytes());
-      caps.loadFromXML(bais);
-      if (!service.setAgentConfiguration(agentName, caps))
-        logger.debug("'{}''s configuration has not been updated because nothing has been changed", agentName);
+    Properties caps;
 
-      // Prepares the value to return
-      PropertiesResponse r = new PropertiesResponse(caps);
-      logger.debug("{}'s configuration updated", agentName);
-      return Response.ok(r).build();
-    } catch (IOException e) {
-      logger.debug("Unexpected I/O Exception when unmarshalling the capabilities: {}", e.getMessage());
-      return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).build();
-    } finally {
-      IOUtils.closeQuietly(bais);
+    if (StringUtils.startsWith(configuration, "{")) {
+      // JSON
+      Gson gson = new Gson();
+      try {
+        caps = gson.fromJson(configuration, Properties.class);
+        if (!service.setAgentConfiguration(agentName, caps)) {
+          logger.debug("'{}''s configuration has not been updated because nothing has been changed", agentName);
+        }
+        return Response.ok(gson.toJson(caps)).build();
+      } catch (JsonSyntaxException e) {
+        logger.debug("Exception when deserializing capabilities: {}", e.getMessage());
+        return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).build();
+      }
+
+    } else {
+      // XML
+      caps = new Properties();
+      ByteArrayInputStream bais = null;
+      try {
+        bais = new ByteArrayInputStream(configuration.getBytes());
+        caps.loadFromXML(bais);
+        if (!service.setAgentConfiguration(agentName, caps)) {
+          logger.debug("'{}''s configuration has not been updated because nothing has been changed", agentName);
+        }
+
+        // Prepares the value to return
+        PropertiesResponse r = new PropertiesResponse(caps);
+        logger.debug("{}'s configuration updated", agentName);
+        return Response.ok(r).build();
+      } catch (IOException e) {
+        logger.debug("Unexpected I/O Exception when unmarshalling the capabilities: {}", e.getMessage());
+        return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).build();
+      } finally {
+        IOUtils.closeQuietly(bais);
+      }
     }
   }
 
