@@ -153,7 +153,7 @@ module.exports = function (grunt) {
     jscs: {
       options: {
         config: '.jscsrc',
-        verbose: true,
+        fix: true, // Autofix code style violations when possible.
         excludeFiles: ['src/main/webapp/scripts/lib/**']
       },
       all: {
@@ -481,7 +481,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-postcss');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks("grunt-reload");
+  grunt.loadNpmTasks('grunt-reload');
 
   // Base task for the development with proxy to a real backend
   grunt.registerTask('proxy', [

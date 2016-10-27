@@ -14,7 +14,7 @@ Style Guide
 -----------
 
 The style guide defines a set of guidelines that the design follows to maintain a consistent look and feel.
-It is defined to be flexible, easily updateable and consistent. Before delving deeper into the UI or
+It is defined to be flexible, easy to update and consistent. Before delving deeper into the UI or
 developing additional features we recommend familiarizing yourself with some of the items.
 
 Modifying Sources
@@ -65,10 +65,11 @@ change the build behavior of Admin UI NG.*
 Debugging Javascript unit tests
 ------------------------------------
 
-Our Javascript unit tests are built in [Jasmine](http://jasmine.github.io/) (a behavior-driven development framework for testing JavaScript code), and live in `modules/matterhorn-admin-ui-ng/src/test/resources/test/unit`.
+Our Javascript unit tests are built in [Jasmine](http://jasmine.github.io/) (a behavior-driven development framework for
+testing JavaScript code), and live in `modules/matterhorn-admin-ui-ng/src/test/resources/test/unit`.
 
 Occasionally something breaks, or you need to disable or focus on a single test.
-While reading the Jasmine (and Karma, and Grunt) docs is encouraged, here are a
+While reading the Jasmine, Karma and Grunt docs are encouraged, here are a
 few common recipes that might be useful:
 
 ### Disabling a unit test temporarily
@@ -110,7 +111,8 @@ Live working with a running Opencast
 
 In order to speed up the UI development process, you can test the code without
 building the module with Maven. There is a Grunt task for starting a standalone web server offering the UI from
-the source and a separate task that will monitoring any change to the Sass, JavaScript and HTML files and reload the page dynamically.
+the source and a separate task that will monitoring any change to the Sass, JavaScript and HTML files and reload the
+page dynamically.
 
 *Be warned that some functionality in this live setup can be limited.
 Before reporting an issue, please test if you can reproduced the issue with a built Opencast.*
@@ -196,7 +198,11 @@ If you make changes to the Admin UI NG source files, the page should auto reload
 Update Node Dependencies
 ------------------------
 
-Installing `npm-check-updates` and running it at the start of developing / improving a component can ensure that the interface stays up-to-date and dependency bugs are reduced.
+Installing `npm-check-updates` and running it at the start of developing / improving a component can ensure that the
+node modules stays up-to-date and dependency bugs are reduced.
+
+*Note: Test the build (`mvn install`, `npm install`, `grunt`) thoroughly when upgrading modules as this might cause some
+unexpected build failures (e.g. "grunt": "^0.4.0").*
 
 1. Installation.
 
@@ -210,4 +216,5 @@ Installing `npm-check-updates` and running it at the start of developing / impro
 
         ncu -u
 
-A detailed reference of the command-line tool can be found at [https://www.npmjs.com/package/npm-check-updates](https://www.npmjs.com/package/npm-check-updates).
+A detailed reference of the command-line tool can be found at
+[https://www.npmjs.com/package/npm-check-updates](https://www.npmjs.com/package/npm-check-updates).

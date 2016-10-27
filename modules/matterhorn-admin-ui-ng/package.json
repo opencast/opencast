@@ -4,7 +4,7 @@
   "devDependencies": {
     "autoprefixer": "^6.5.1",
     "chromedriver": "^2.24.1",
-    "grunt": "^1.0.1",
+    "grunt": "^0.4.0",
     "grunt-angular-templates": "^1.1.0",
     "grunt-cli": "~1.2.0",
     "grunt-concurrent": "^2.3.1",
@@ -56,8 +56,5 @@
     "test-firefox": "karma start src/test/resources/karma.conf.js --browsers=Firefox --single-run=false",
     "test-ie": "karma start src/test/resources/karma.conf.js --browsers=IE --single-run=false",
     "build": "grunt"
-  },
-  "dependencies": {
-    "grunt-contrib-watch": "^1.0.0"
   }
 }
