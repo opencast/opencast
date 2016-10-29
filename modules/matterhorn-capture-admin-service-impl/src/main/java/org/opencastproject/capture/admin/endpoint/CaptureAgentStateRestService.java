@@ -295,7 +295,7 @@ public class CaptureAgentStateRestService {
   }
 
   @POST
-  @Produces(MediaType.TEXT_XML)
+  @Produces({ MediaType.TEXT_XML, MediaType.APPLICATION_JSON })
   @Path("agents/{name}/configuration")
   @RestQuery(
     name = "setAgentStateConfiguration",
@@ -330,7 +330,7 @@ public class CaptureAgentStateRestService {
         if (!service.setAgentConfiguration(agentName, caps)) {
           logger.debug("'{}''s configuration has not been updated because nothing has been changed", agentName);
         }
-        return Response.ok(gson.toJson(caps)).build();
+        return Response.ok(gson.toJson(caps)).type(MediaType.APPLICATION_JSON).build();
       } catch (JsonSyntaxException e) {
         logger.debug("Exception when deserializing capabilities: {}", e.getMessage());
         return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).build();
@@ -353,7 +353,7 @@ public class CaptureAgentStateRestService {
         return Response.ok(r).build();
       } catch (IOException e) {
         logger.debug("Unexpected I/O Exception when unmarshalling the capabilities: {}", e.getMessage());
-        return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).build();
+        return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).type(MediaType.TEXT_XML).build();
       } finally {
         IOUtils.closeQuietly(bais);
       }
