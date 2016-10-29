@@ -350,10 +350,10 @@ public class CaptureAgentStateRestService {
         // Prepares the value to return
         PropertiesResponse r = new PropertiesResponse(caps);
         logger.debug("{}'s configuration updated", agentName);
-        return Response.ok(r).build();
+        return Response.ok(r).type(MediaType.TEXT_XML)..build();
       } catch (IOException e) {
         logger.debug("Unexpected I/O Exception when unmarshalling the capabilities: {}", e.getMessage());
-        return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).type(MediaType.TEXT_XML).build();
+        return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST)build();
       } finally {
         IOUtils.closeQuietly(bais);
       }
