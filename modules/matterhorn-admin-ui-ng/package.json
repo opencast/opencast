@@ -25,6 +25,7 @@
     "grunt-newer": "^1.2.0",
     "grunt-ng-annotate": "^2.0.2",
     "grunt-postcss": "^0.8.0",
+    "grunt-reload": "^0.2.0",
     "grunt-sass": "^1.2.1",
     "grunt-svgmin": "^4.0.0",
     "grunt-usemin": "^3.1.1",

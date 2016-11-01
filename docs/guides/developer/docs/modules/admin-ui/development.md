@@ -155,7 +155,7 @@ Waiting...
 ```
 The watch process monitors the `js`,`scss` and `sass` files for changes and should dynamically reload the page.
 
-*Note: a refresh of the page might be required to start the live reload script*
+*Note: A refresh of the page might be required to start the live reload script*
 
 Live working with a Mockup
 --------------------------
@@ -202,7 +202,7 @@ Installing `npm-check-updates` and running it at the start of developing / impro
 node modules stays up-to-date and dependency bugs are reduced.
 
 *Note: Test the build (`mvn install`, `npm install`, `grunt`) thoroughly when upgrading modules as this might cause some
-unexpected build failures (e.g. "grunt": "^0.4.0").*
+unexpected build failures (resetting the grunt version to "grunt": "^0.4.0" might resolve some of the initial issues).*
 
 1. Installation.
 
