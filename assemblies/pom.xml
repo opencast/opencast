@@ -116,6 +116,17 @@
                   <concat destfile="target/assembly/etc/system.properties" append="true">
                     <filelist dir="../resources" files="system.properties.append"/>
                   </concat>
+                  <!-- Adding extra OSGi system packages to configuration -->
+                  <replace
+                    file="target/assembly/etc/config.properties"
+                    token="org.osgi.framework.system.packages= \"
+                    value="org.osgi.framework.system.packages= \ com.sun.image.codec.jpeg, \" />
+                  <!-- Disabled write permissions on karaf configuration by deactivating config saves -->
+                  <replaceregexp
+                    file="target/assembly/etc/config.properties"
+                    match="^felix.fileinstall.enableConfigSave .*=.*$"
+                    replace="felix.fileinstall.enableConfigSave = false"
+                    byline="true" />
                   <!-- Special configuration for development -->
                   <replaceregexp
                     file="target/classes/package.xml"
