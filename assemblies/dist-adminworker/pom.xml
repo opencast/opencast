@@ -97,16 +97,19 @@
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>karaf-maven-plugin</artifactId>
-        <version>${karaf.version}</version>
-        <extensions>true</extensions>
         <configuration>
-          <installedFeatures>
-            <feature>wrapper</feature>
-            <feature>opencast-migration</feature>
-          </installedFeatures>       
           <bootFeatures>
-            <feature>eventadmin</feature>
-            <feature>standard</feature>
+            <!-- Karaf internal features -->
+            <feature>aries-blueprint</feature>
+            <feature>bundle</feature>
+            <feature>feature</feature>
+            <feature>deployer</feature>
+            <feature>log</feature>
+            <feature>shell</feature>
+            <feature>package</feature>
+            <feature>service</feature>
+            <feature>system</feature>
+            <feature>config</feature>
             <!-- Opencast external features -->
             <feature>jpa</feature>
             <feature>http</feature>
@@ -121,23 +124,6 @@
             <!-- Opencast features -->
             <feature>opencast-adminworker</feature>
           </bootFeatures>
-          <libraries>
-            <library>xerces-2.11.0.jar;url:="wrap:mvn:xerces/xercesImpl/2.11.0$Export-Package=org.apache.*;version=2.11.0";type:=endorsed;export:=true;delegate:=true</library>
-
-            <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxp-api-1.4/2.5.0;type:=endorsed;export:=true</library>
-            <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.2/2.5.0;type:=endorsed;export:=true</library>
-            <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxws-api-2.2/2.5.0;type:=endorsed;export:=true</library>
-            <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.3/2.5.0;type:=endorsed;export:=true</library>
-            <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activation-api-1.1/2.5.0;type:=endorsed;export:=true</library>
-            <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.stax-api-1.2/2.5.0;type:=endorsed;export:=true</library>
-            <library>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan/2.7.2_3;type:=endorsed;export:=true</library>
-            <library>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan-serializer/2.7.2_1;type:=endorsed;export:=true</library>
-            <library>mvn:javax.annotation/javax.annotation-api/1.2;type:=endorsed;export:=true</library>
-
-            <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activator/2.5.0;type:=default;export:=true</library>
-            <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.locator/2.5.0;type:=default;export:=true</library>
-          </libraries>
-          <archiveZip>false</archiveZip>
         </configuration>
       </plugin>
       <plugin>

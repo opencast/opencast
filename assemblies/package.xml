@@ -24,6 +24,9 @@
     <fileSet>
       <directory>../resources</directory>
       <outputDirectory></outputDirectory>
+      <excludes>
+        <exclude>*.append</exclude>
+      </excludes>
     </fileSet>
 
     <fileSet>
@@ -42,6 +45,9 @@
         <exclude>**/README</exclude>
         <exclude>etc/equinox-debug.properties</exclude>
         <exclude>etc/keys.properties</exclude>
+        <exclude>etc/org.apache.karaf.management.cfg</exclude>
+        <exclude>etc/org.apache.karaf.shell.cfg</exclude>
+        <exclude>package.xml</exclude>
       </excludes>
     </fileSet>
 
