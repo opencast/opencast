@@ -219,7 +219,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 @PUT
   @Produces(MediaType.TEXT_XML)
   @Path("createMediaPackageWithID/{id}")
-  @RestQuery(name = "createMediaPackageWithID", description = "Create an empty media package with ID", pathParameters = {
+  @RestQuery(name = "createMediaPackageWithID", description = "Create an empty media package with ID /n Overrides Existing Mediapackage ", pathParameters = {
           @RestParameter(description = "The Id for the new Mediapackage", isRequired = true, name = "id", type = RestParameter.Type.STRING) }, reponses = {
           @RestResponse(description = "Returns media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
@@ -514,7 +514,9 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           if (startTime == null) {
             if (tags != null) {
               mp = ingestService.addTrack(in, fileName, flavor, tags, mp);
-            } else  mp = ingestService.addTrack(in, fileName, flavor, mp);
+            } else  {
+              mp = ingestService.addTrack(in, fileName, flavor, mp);
+            }
           } else {
             mp = ingestService.addPartialTrack(in, fileName, flavor, startTime, mp);
           }

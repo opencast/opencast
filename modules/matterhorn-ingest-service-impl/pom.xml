@@ -166,6 +166,18 @@
       <groupId>org.jdom</groupId>
       <artifactId>com.springsource.org.jdom</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-archive-workflowoperation</artifactId>
+      <version>2.3-SNAPSHOT</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-archive-api</artifactId>
+      <version>2.3-SNAPSHOT</version>
+      <type>jar</type>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

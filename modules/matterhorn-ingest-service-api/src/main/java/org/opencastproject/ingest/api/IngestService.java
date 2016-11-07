@@ -153,7 +153,7 @@ public interface IngestService extends JobProducer {
  /**
    * Create a new MediaPackage in the repository.
    * @param  mediapackageID
-   *   The Id for the new Mediapackage 
+   *   The Id for the new Mediapackage
    * @return The created MediaPackage
    * @throws MediaPackageException
    * @throws HandleException
@@ -174,8 +174,8 @@ public interface IngestService extends JobProducer {
    * @param flavor
    *          The flavor of the media that is being added
    * @param mediaPackage
-   *          The specific Matterhorn MediaPackage to which Media is being added
-   * @return MediaPackageManifest The manifest of a specific Matterhorn MediaPackage element
+   *          The specific Opencast MediaPackage to which Media is being added
+   * @return MediaPackageManifest The manifest of a specific Opencast MediaPackage element
    * @throws MediaPackageException
    * @throws IOException
    * @throws IngestException
@@ -192,10 +192,10 @@ public interface IngestService extends JobProducer {
    * @param flavor
    *          The flavor of the media that is being added
    * @param tags
-   *           Tags to add to the Track [] 
+   *           Tags to add to the Track []
    * @param mediaPackage
-   *          The specific Matterhorn MediaPackage to which Media is being added
-   * @return MediaPackageManifest The manifest of a specific Matterhorn MediaPackage element
+   *          The specific Opencast MediaPackage to which Media is being added
+   * @return MediaPackageManifest The manifest of a specific Opencast MediaPackage element
    * @throws MediaPackageException
    * @throws IOException
    * @throws IngestException
@@ -212,8 +212,8 @@ public interface IngestService extends JobProducer {
    * @param flavor
    *          The flavor of the media that is being added
    * @param mediaPackage
-   *          The specific Matterhorn MediaPackage to which Media is being added
-   * @return MediaPackage The updated Matterhorn MediaPackage element
+   *          The specific Opencast MediaPackage to which Media is being added
+   * @return MediaPackage The updated Opencast MediaPackage element
    * @throws MediaPackageException
    * @throws IOException
    * @throws IngestException
@@ -230,8 +230,8 @@ public interface IngestService extends JobProducer {
    * @param flavor
    *          The flavor of the media that is being added
    * @param mediaPackage
-   *          The specific Matterhorn MediaPackage to which Media is being added
-   * @return MediaPackage The updated Matterhorn MediaPackage element
+   *          The specific Opencast MediaPackage to which Media is being added
+   * @return MediaPackage The updated Opencast MediaPackage element
    * @throws MediaPackageException
    * @throws IOException
    * @throws IngestException
@@ -242,7 +242,7 @@ public interface IngestService extends JobProducer {
 
   /**
    * Adds a partial media track to the existing MediaPackage in the repository
-   * 
+   *
    * @param uri
    *          the URL of the file to add
    * @param flavor
@@ -290,8 +290,8 @@ public interface IngestService extends JobProducer {
    * @param flavor
    *          The flavor of the media that is being added
    * @param mediaPackage
-   *          The specific Matterhorn MediaPackage to which Media is being added
-   * @return MediaPackage The updated Matterhorn MediaPackage element
+   *          The specific Opencast MediaPackage to which Media is being added
+   * @return MediaPackage The updated Opencast MediaPackage element
    * @throws MediaPackageException
    * @throws IOException
    * @throws IngestException
@@ -308,8 +308,8 @@ public interface IngestService extends JobProducer {
    * @param flavor
    *          The flavor of the media that is being added
    * @param mediaPackage
-   *          The specific Matterhorn MediaPackage to which Media is being added
-   * @return MediaPackage The updated Matterhorn MediaPackage element
+   *          The specific Opencast MediaPackage to which Media is being added
+   * @return MediaPackage The updated Opencast MediaPackage element
    * @throws MediaPackageException
    * @throws IOException
    * @throws IngestException
@@ -328,8 +328,8 @@ public interface IngestService extends JobProducer {
    *@param  tags
    *         The tags for the media that is being added:
    * @param mediaPackage
-   *          The specific Matterhorn MediaPackage to which Media is being added
-   * @return MediaPackage The updated Matterhorn MediaPackage element
+   *          The specific Opencast MediaPackage to which Media is being added
+   * @return MediaPackage The updated Opencast MediaPackage element
    * @throws MediaPackageException
    * @throws IOException
    * @throws IngestException
@@ -346,8 +346,8 @@ public interface IngestService extends JobProducer {
    * @param flavor
    *          The flavor of the media that is being added
    * @param mediaPackage
-   *          The specific Matterhorn MediaPackage to which Media is being added
-   * @return MediaPackage The updated Matterhorn MediaPackage element
+   *          The specific Opencast MediaPackage to which Media is being added
+   * @return MediaPackage The updated Opencast MediaPackage element
    * @throws MediaPackageException
    * @throws IOException
    * @throws IngestException
@@ -364,8 +364,8 @@ public interface IngestService extends JobProducer {
    * @param flavor
    *          The flavor of the media that is being added
    * @param mediaPackage
-   *          The specific Matterhorn MediaPackage to which Media is being added
-   * @return MediaPackage The updated Matterhorn MediaPackage element
+   *          The specific Opencast MediaPackage to which Media is being added
+   * @return MediaPackage The updated Opencast MediaPackage element
    * @throws MediaPackageException
    * @throws IOException
    * @throws IngestException
@@ -384,8 +384,8 @@ public interface IngestService extends JobProducer {
    * @ param tags
    *          The tags of the media thas is being added
    * @param mediaPackage
-   *          The specific Matterhorn MediaPackage to which Media is being added
-   * @return MediaPackage The updated Matterhorn MediaPackage element
+   *          The specific Opencast MediaPackage to which Media is being added
+   * @return MediaPackage The updated Opencast MediaPackage element
    * @throws MediaPackageException
    * @throws IOException
    * @throws IngestException
@@ -399,7 +399,7 @@ public interface IngestService extends JobProducer {
    * <code>org.opencastproject.workflow.default.definition</code> key, found in the system configuration.
    *
    * @param mediaPackage
-   *          The specific Matterhorn MediaPackage being ingested
+   *          The specific Opencast MediaPackage being ingested
    * @return Workflow instance id.
    * @throws IngestException
    *           if an unexpected error occurs
@@ -410,7 +410,7 @@ public interface IngestService extends JobProducer {
    * Ingests the mediapackage and starts the workflow as defined by <code>workflowDefinitionID</code>.
    *
    * @param mediaPackage
-   *          The specific Matterhorn MediaPackage being ingested
+   *          The specific Opencast MediaPackage being ingested
    * @param workflowDefinitionID
    *          workflow to be used with this media package
    * @return Workflow instance id.
@@ -427,7 +427,7 @@ public interface IngestService extends JobProducer {
    * specified in <code>properties</code> will be submitted as configuration data to the workflow.
    *
    * @param mediaPackage
-   *          The specific Matterhorn MediaPackage being ingested
+   *          The specific Opencast MediaPackage being ingested
    * @param workflowDefinitionID
    *          workflow to be used with this media package
    * @param properties
@@ -450,7 +450,7 @@ public interface IngestService extends JobProducer {
    * <code>workflowId</code> is null, a new {@link WorkflowInstance} is created.
    *
    * @param mediaPackage
-   *          The specific Matterhorn MediaPackage being ingested
+   *          The specific Opencast MediaPackage being ingested
    * @param workflowDefinitionID
    *          workflow to be used with this media package
    * @param properties
@@ -472,7 +472,7 @@ public interface IngestService extends JobProducer {
    * Delete an existing MediaPackage and any linked files from the temporary ingest filestore.
    *
    * @param mediaPackage
-   *          The specific Matterhorn MediaPackage
+   *          The specific Opencast MediaPackage
    * @throws IngestException
    *           if an unexpected error occurs
    */

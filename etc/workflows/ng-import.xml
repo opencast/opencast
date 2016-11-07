@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>import</id>
+  <id>ng-import</id>
   <title>Import Mediapackage and Publish without reencode</title>
   <tags>
   </tags>
@@ -12,14 +12,6 @@
 
   <operations>
 
-    <operation
-      id="defaults"
-      description="Applying default configuration values">
-      <configurations>
-        <configuration key="comment">false</configuration>
-        <configuration key="publish">true</configuration>
-      </configurations>
-    </operation>
 
     <!-- Ingest elements from external working file repositories and file servers -->
 
@@ -74,7 +66,6 @@
 
     <operation
       id="publish-engage"
-      if="${publish}"
       max-attempts="2"
       fail-on-error="true"
       exception-handler-workflow="error"
@@ -95,7 +86,7 @@
       exception-handler-workflow="error"
       description="Archiving">
       <configurations>
-        <configuration key="source-flavors">*/preview,*/work,dublincore/*,mpeg-7/text</configuration>
+        <configuration key="source-tags">archive</configuration>
       </configurations>
     </operation>
 
@@ -106,7 +97,6 @@
       fail-on-error="false"
       description="Cleaning up">
       <configurations>
-        <configuration key="preserve-flavors"></configuration>
         <configuration key="delete-external">true</configuration>
       </configurations>
     </operation>
