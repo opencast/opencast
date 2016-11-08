@@ -149,7 +149,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
       logger.info("Tne administrator user and group loader is disabled.");
        return;
     }
- 
+
     SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(componentCtx, organization), new Effect0() {
       @Override
       protected void run() {
