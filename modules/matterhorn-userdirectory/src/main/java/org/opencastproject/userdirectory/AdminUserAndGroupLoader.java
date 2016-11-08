@@ -144,20 +144,21 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
    *           if the specified role list is unavailable
    */
   private void createSystemAdministratorUserAndGroup(final Organization organization) {
+
+    if ((adminUserName == null) || (adminPassword == null)) {
+      logger.info("Tne administrator user and group loader is disabled.");
+       return;
+    }
+ 
     SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(componentCtx, organization), new Effect0() {
       @Override
       protected void run() {
         try {
           JpaOrganization org = (JpaOrganization) organizationDirectoryService.getOrganization(organization.getId());
-          String adminUserId = null;
-          if (StringUtils.isNotBlank(adminUserName))
-            adminUserId = adminUserName;
-          else
-            adminUserId = org.getId();
 
           // Make sure the administrator exists for this organization. Note that the user will gain its roles through
           // membership in the administrator group
-          JpaUser adminUser = (JpaUser) userAndRoleProvider.loadUser(adminUserId);
+          JpaUser adminUser = (JpaUser) userAndRoleProvider.loadUser(adminUserName);
           if (adminUser == null) {
             Set<JpaRole> adminRolesSet = new HashSet<JpaRole>();
             // Add roles according to the system configuration
@@ -169,7 +170,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
               }
             }
             String adminUserName = organization.getName().concat(" Administrator");
-            adminUser = new JpaUser(adminUserId, adminPassword, org, adminUserName, adminEmail, PROVIDER_NAME,
+            adminUser = new JpaUser(adminUserName, adminPassword, org, adminUserName, adminEmail, PROVIDER_NAME,
                     false, adminRolesSet);
             userAndRoleProvider.addUser(adminUser);
             logger.info("Administrator user for '{}' created", org.getId());
@@ -216,7 +217,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
 
           // Make sure the organization administrator is part of this group
           Set<String> groupMembers = new HashSet<String>();
-          groupMembers.add(adminUserId);
+          groupMembers.add(adminUserName);
 
           // Create the group
           String adminGroupName = org.getName().concat(" System Administrators");
