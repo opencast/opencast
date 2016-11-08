@@ -680,36 +680,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   @Override
   public MediaPackage addTrack(URI uri, MediaPackageElementFlavor flavor, MediaPackage mediaPackage)
           throws IOException, IngestException {
-    Job job = null;
-    try {
-      job = serviceRegistry.createJob(
-              JOB_TYPE,
-              INGEST_TRACK_FROM_URI,
-              Arrays.asList(uri.toString(), flavor == null ? null : flavor.toString(),
-                      MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
-      job.setStatus(Status.RUNNING);
-      job = serviceRegistry.updateJob(job);
-      String elementId = UUID.randomUUID().toString();
-      logger.info("Start adding track {} from URL {} on mediapackage {}", new Object[] { elementId, uri, mediaPackage });
-      URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
-      MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
-              flavor);
-      job.setStatus(Job.Status.FINISHED);
-      logger.info("Successful added track {} on mediapackage {} at URL {}", new Object[] { elementId, mediaPackage,
-              newUrl });
-      return mp;
-    } catch (IOException e) {
-      throw e;
-    } catch (ServiceRegistryException e) {
-      throw new IngestException(e);
-    } catch (NotFoundException e) {
-      throw new IngestException("Unable to update ingest job", e);
-    } finally {
-      finallyUpdateJob(job);
-    }
+    String[] tags = {};
+    return this.addTrack(uri, flavor, tags, mediaPackage);
+
   }
-
-
 
   /**
    * {@inheritDoc}
@@ -735,11 +709,11 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
               flavor);
 
-     MediaPackageElement trackElement = mediaPackage.getTrack(elementId);
-     for (String tag : tags) {
-       logger.info("Adding Tag: " + tag);
-           trackElement.addTag(tag);
-     }
+      MediaPackageElement trackElement = mediaPackage.getTrack(elementId);
+      for (String tag : tags) {
+        logger.info("Adding Tag: " + tag);
+        trackElement.addTag(tag);
+      }
 
     job.setStatus(Job.Status.FINISHED);
       logger.info("Successful added track {} on mediapackage {} at URL {}", new Object[] { elementId, mediaPackage,
@@ -765,30 +739,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   @Override
   public MediaPackage addTrack(InputStream in, String fileName, MediaPackageElementFlavor flavor,
           MediaPackage mediaPackage) throws IOException, IngestException {
-    Job job = null;
-    try {
-      job = serviceRegistry.createJob(JOB_TYPE, INGEST_TRACK, null, null, false, ingestFileJobLoad);
-      job.setStatus(Status.RUNNING);
-      job = serviceRegistry.updateJob(job);
-      String elementId = UUID.randomUUID().toString();
-      logger.info("Start adding track {} from input stream on mediapackage {}",
-              new Object[] { elementId, mediaPackage });
-      URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
-      MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
-              flavor);
-      job.setStatus(Job.Status.FINISHED);
-      logger.info("Successful added track {} on mediapackage {} at URL {}", new Object[] { elementId, mediaPackage,
-              newUrl });
-      return mp;
-    } catch (IOException e) {
-      throw e;
-    } catch (ServiceRegistryException e) {
-      throw new IngestException(e);
-    } catch (NotFoundException e) {
-      throw new IngestException("Unable to update ingest job", e);
-    } finally {
-      finallyUpdateJob(job);
-    }
+    String[] tags = {};
+    return this.addTrack(in, fileName, flavor, tags, mediaPackage);
   }
 
   /**
@@ -1004,33 +956,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   @Override
   public MediaPackage addCatalog(InputStream in, String fileName, MediaPackageElementFlavor flavor,
           MediaPackage mediaPackage) throws IOException, IngestException {
-    Job job = null;
-    try {
-      job = serviceRegistry.createJob(JOB_TYPE, INGEST_CATALOG, null, null, false, ingestFileJobLoad);
-      job.setStatus(Status.RUNNING);
-      job = serviceRegistry.updateJob(job);
-      String elementId = UUID.randomUUID().toString();
-      logger.info("Start adding catalog {} from input stream on mediapackage {}", new Object[] { elementId,
-              mediaPackage });
-      URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
-      if (MediaPackageElements.SERIES.equals(flavor)) {
-        updateSeries(newUrl);
-      }
-      MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Catalog,
-              flavor);
-      job.setStatus(Job.Status.FINISHED);
-      logger.info("Successful added catalog {} on mediapackage {} at URL {}", new Object[] { elementId, mediaPackage,
-              newUrl });
-      return mp;
-    } catch (IOException e) {
-      throw e;
-    } catch (ServiceRegistryException e) {
-      throw new IngestException(e);
-    } catch (NotFoundException e) {
-      throw new IngestException("Unable to update ingest job", e);
-    } finally {
-      finallyUpdateJob(job);
-    }
+   String[] tags = {};
+   return addCatalog(in, fileName, flavor, tags, mediaPackage);
   }
 
   /**
@@ -1165,31 +1092,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   @Override
   public MediaPackage addAttachment(InputStream in, String fileName, MediaPackageElementFlavor flavor,
           MediaPackage mediaPackage) throws IOException, IngestException {
-    Job job = null;
-    try {
-      job = serviceRegistry.createJob(JOB_TYPE, INGEST_ATTACHMENT, null, null, false, ingestFileJobLoad);
-      job.setStatus(Status.RUNNING);
-      job = serviceRegistry.updateJob(job);
-      String elementId = UUID.randomUUID().toString();
-      logger.info("Start adding attachment {} from input stream on mediapackage {}", new Object[] { elementId,
-              mediaPackage });
-      URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
-      MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Attachment,
-              flavor);
-      job.setStatus(Job.Status.FINISHED);
-      logger.info("Successful added attachment {} on mediapackage {} at URL {}", new Object[] { elementId,
-              mediaPackage, newUrl });
-      return mp;
-    } catch (IOException e) {
-      throw e;
-    } catch (ServiceRegistryException e) {
-      throw new IngestException(e);
-    } catch (NotFoundException e) {
-      throw new IngestException("Unable to update ingest job", e);
-    } finally {
-      finallyUpdateJob(job);
-    }
-
+    String[] tags = {};
+    return addAttachment(in, fileName, flavor, tags, mediaPackage);
   }
 
   /**
