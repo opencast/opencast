@@ -1517,7 +1517,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
               console.log(offsetX);
           }
 
-          var offsetBottom = c.height + wrapperHeight + 10;
+          var offsetBottom = Engage.controls_top? 0 : c.height + wrapperHeight + 10;
 
 //          $('#segment_preview_img').css({'top': Math.round(offsetTop) + 'px'});
 //          $('#segment_preview_img').css({'left': Math.round(offsetLeft) + 'px'});

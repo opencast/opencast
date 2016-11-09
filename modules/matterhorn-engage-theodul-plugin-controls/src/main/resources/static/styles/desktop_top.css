@@ -182,6 +182,25 @@
 /* border-bottom: 1px solid #cccccc; */
 }
 
+.timelinePreview {
+    position: absolute;
+    background-color: #1C94C4;
+    visibility: hidden;
+    margin-left: 20px;
+    display: none;
+}
+
+.timelinePreviewHover {
+    visibility: visible;
+    position: relative;
+    margin-left: 20px;
+    display: block;
+}
+
+.timeline_preview_container {
+    height: 0px;
+}
+
 .dropdown-submenu {
     position: relative;
 }
