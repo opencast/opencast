@@ -319,9 +319,11 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     CommentItem update;
     if (comments.size() > 0) {
       int openCommentSize = Stream.$(comments).filter(filterOpenComments).toList().size();
-      update = CommentItem.update(eventId, true, openCommentSize > 0 ? true : false);
+      int needsCuttingSize = Stream.$(comments).filter(filterNeedsCuttingComment).toList().size();
+      update = CommentItem.update(eventId, true, openCommentSize > 0 ? true : false,
+              needsCuttingSize > 0 ? true : false);
     } else {
-      update = CommentItem.update(eventId, false, false);
+      update = CommentItem.update(eventId, false, false, false);
     }
     messageSender.sendObjectMessage(CommentItem.COMMENT_QUEUE, MessageSender.DestinationType.Queue, update);
   }
@@ -330,6 +332,13 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     @Override
     public Boolean ap(EventComment comment) {
       return !comment.isResolvedStatus();
+    }
+  };
+
+  private static final Fn<EventComment, Boolean> filterNeedsCuttingComment = new Fn<EventComment, Boolean>() {
+    @Override
+    public Boolean ap(EventComment comment) {
+      return EventComment.REASON_NEEDS_CUTTING.equals(comment.getReason()) && !comment.isResolvedStatus();
     }
   };
 
@@ -350,7 +359,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
           @Override
           protected void run() {
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                    CommentItem.update(comment.getEventId(), true, !comment.isResolvedStatus()));
+                    CommentItem.update(comment.getEventId(), true, !comment.isResolvedStatus(),
+                            (!comment.isResolvedStatus()
+                                    && EventComment.REASON_NEEDS_CUTTING.equals(comment.getReason()))));
             messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                     IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Comments, total,
                             current[0]));

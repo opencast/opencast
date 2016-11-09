@@ -1,4 +1,4 @@
-<!-- 
+<!--
 <a class="play" ng-class="{ on: row.publications.Engage }"></a>
 -->
 <a data-open-modal="event-details"
@@ -22,7 +22,12 @@
     with-role="ROLE_UI_EVENTS_DELETE"
 ></a>
 
-<a ng-if="row.has_preview" href="#/events/events/{{row.id}}/tools/playback"
+<a ng-if="row.has_preview && row.needs_cutting" href="#/events/events/{{row.id}}/tools/editor"
+	class="preview"
+	with-role="ROLE_UI_EVENTS_EDITOR_VIEW">
+</a>
+
+<a ng-if="row.has_preview && !row.needs_cutting" href="#/events/events/{{row.id}}/tools/playback"
 	class="preview"
 	with-role="ROLE_UI_EVENTS_EDITOR_VIEW">
 </a>

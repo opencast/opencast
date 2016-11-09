@@ -52,6 +52,9 @@ import java.util.List;
  */
 public final class EventComment {
 
+  /** The key for the reason that the video needs cutting */
+  public static final String REASON_NEEDS_CUTTING = "EVENTS.COMMENTS.REASONS.CUTTING";
+
   /** The comment identifier */
   private Option<Long> id;
 

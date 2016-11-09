@@ -72,7 +72,7 @@ import javax.xml.transform.stream.StreamSource;
         "language", "source", "created", "creator", "license", "rights", "accessPolicy", "managedAcl", "workflowState",
         "workflowId", "workflowDefinitionId", "recordingStartTime", "recordingEndTime", "duration", "trackMimetypes",
         "trackStreamResolutions", "trackFlavors", "metadataFlavors", "metadataMimetypes", "attachmentFlavors",
-        "reviewStatus", "reviewDate", "optedOut", "blacklisted", "hasComments", "hasOpenComments", "hasPreview",
+        "reviewStatus", "reviewDate", "optedOut", "blacklisted", "hasComments", "hasOpenComments", "hasPreview", "needsCutting",
         "publications", "workflowScheduledDate", "archiveVersion", "schedulingStatus", "recordingStatus", "eventStatus",
         "agentId", "agentConfigurations", "technicalStartTime", "technicalEndTime", "technicalPresenters" })
 @XmlRootElement(name = "event", namespace = IndexObject.INDEX_XML_NAMESPACE)
@@ -274,6 +274,10 @@ public class Event implements IndexObject {
   /** Whether the event has preview files */
   @XmlElement(name = "has_preview")
   private Boolean hasPreview = false;
+
+  /** Whether the event has open needs cutting comment */
+  @XmlElement(name = "needs_cutting")
+  private Boolean needsCutting = false;
 
   /** The list of publications from this event */
   @XmlElementWrapper(name = "publications")
@@ -1038,6 +1042,25 @@ public class Event implements IndexObject {
    */
   public void updatePreview(String previewSubtype) {
     hasPreview = EventIndexUtils.subflavorMatches(publications, previewSubtype);
+  }
+
+  /**
+   * Sets the has open needs cutting comment for this event
+   *
+   * @param needsCutting
+   *          the has open comments status from this event
+   */
+  public void setNeedsCutting(boolean needsCutting) {
+    this.needsCutting = needsCutting;
+  }
+
+  /**
+   * Returns the has comment needs cutting for this event
+   *
+   * @return the has comments status from this event
+   */
+  public boolean needsCutting() {
+    return needsCutting;
   }
 
   /**

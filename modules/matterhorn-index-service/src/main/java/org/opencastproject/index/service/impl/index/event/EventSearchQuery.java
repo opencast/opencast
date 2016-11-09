@@ -82,6 +82,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private Boolean blacklisted = null;
   private Boolean hasComments = null;
   private Boolean hasOpenComments = null;
+  private Boolean needsCutting = null;
   private final List<String> publications = new ArrayList<String>();
   private String workflowScheduledDate = null;
   private Long archiveVersion = null;
@@ -1047,6 +1048,19 @@ public class EventSearchQuery extends AbstractSearchQuery {
   }
 
   /**
+   * Selects recordings with the given has comment need cutting status.
+   *
+   * @param needsCutting
+   *          the has comments status
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withNeedsCutting(boolean needsCutting) {
+    clearExpectations();
+    this.needsCutting = needsCutting;
+    return this;
+  }
+
+  /**
    * Returns the has comments status of the recording.
    *
    * @return the recording has comments status
@@ -1062,6 +1076,15 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public Boolean getHasOpenComments() {
     return hasOpenComments;
+  }
+
+  /**
+   * Returns the has open comments reason that it needs cutting of the recording.
+   *
+   * @return the recording has open comments status
+   */
+  public Boolean needsCutting() {
+    return needsCutting;
   }
 
   /**

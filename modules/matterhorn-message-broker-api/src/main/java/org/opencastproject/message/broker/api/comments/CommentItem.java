@@ -39,6 +39,7 @@ public class CommentItem implements MessageItem, Serializable {
   private final String eventId;
   private final boolean hasComments;
   private final boolean hasOpenComments;
+  private final boolean needsCutting;
   private final Type type;
 
   public enum Type {
@@ -52,19 +53,22 @@ public class CommentItem implements MessageItem, Serializable {
    *          Whether the event has comments
    * @param hasOpenComments
    *          Whether the event has open comments
+   * @param needsCutting
+   *          Whether the event hast an open comment that it needs cutting
    * @return Builds a {@link CommentItem} for updating a comment.
    */
-  public static CommentItem update(String eventId, boolean hasComments, boolean hasOpenComments) {
-    return new CommentItem(eventId, hasComments, hasOpenComments);
+  public static CommentItem update(String eventId, boolean hasComments, boolean hasOpenComments, boolean needsCutting) {
+    return new CommentItem(eventId, hasComments, hasOpenComments, needsCutting);
   }
 
   /**
    * Constructor to build an Update {@link CommentItem}
    */
-  public CommentItem(String eventId, boolean hasComments, boolean hasOpenComments) {
+  public CommentItem(String eventId, boolean hasComments, boolean hasOpenComments, boolean needsCutting) {
     this.eventId = eventId;
     this.hasComments = hasComments;
     this.hasOpenComments = hasOpenComments;
+    this.needsCutting = needsCutting;
     this.type = Type.Update;
   }
 
@@ -83,6 +87,10 @@ public class CommentItem implements MessageItem, Serializable {
 
   public boolean hasOpenComments() {
     return hasOpenComments;
+  }
+
+  public boolean needsCutting() {
+    return needsCutting;
   }
 
   public Type getType() {

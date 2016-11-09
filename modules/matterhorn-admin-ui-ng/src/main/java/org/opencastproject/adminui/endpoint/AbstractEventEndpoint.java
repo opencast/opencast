@@ -1868,6 +1868,7 @@ public abstract class AbstractEventEndpoint {
     fields.add(f("source", v(getIndexService().getEventSource(event).toString())));
     fields.add(f("has_comments", v(event.hasComments())));
     fields.add(f("has_open_comments", v(event.hasOpenComments())));
+    fields.add(f("needs_cutting", v(event.needsCutting())));
     fields.add(f("has_preview", v(event.hasPreview())));
     fields.add(f("agent_id", vN(event.getAgentId())));
     fields.add(f("technical_start", vN(event.getTechnicalStartTime())));
