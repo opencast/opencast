@@ -316,15 +316,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
 
   private void sendMessageUpdate(String eventId) throws EventCommentDatabaseException {
     List<EventComment> comments = getComments(eventId);
-    CommentItem update;
-    if (comments.size() > 0) {
-      int openCommentSize = Stream.$(comments).filter(filterOpenComments).toList().size();
-      int needsCuttingSize = Stream.$(comments).filter(filterNeedsCuttingComment).toList().size();
-      update = CommentItem.update(eventId, true, openCommentSize > 0 ? true : false,
-              needsCuttingSize > 0 ? true : false);
-    } else {
-      update = CommentItem.update(eventId, false, false, false);
-    }
+    boolean openComments = !Stream.$(comments).filter(filterOpenComments).toList().isEmpty();
+    boolean needsCutting = !Stream.$(comments).filter(filterNeedsCuttingComment).toList().isEmpty();
+    CommentItem update = CommentItem.update(eventId, !comments.isEmpty(), openComments, needsCutting);
     messageSender.sendObjectMessage(CommentItem.COMMENT_QUEUE, MessageSender.DestinationType.Queue, update);
   }
 
