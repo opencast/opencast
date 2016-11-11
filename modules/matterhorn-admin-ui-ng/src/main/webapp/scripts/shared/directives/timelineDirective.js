@@ -1,6 +1,6 @@
 angular.module('adminNg.directives')
-.directive('adminNgTimeline', ['PlayerAdapter', '$document', 'VideoService',
-function (PlayerAdapter, $document, VideoService) {
+.directive('adminNgTimeline', ['PlayerAdapter', '$document', 'VideoService', '$timeout',
+function (PlayerAdapter, $document, VideoService, $timeout) {
     return {
         templateUrl: 'shared/partials/timeline.html',
         priority: 0,
@@ -33,6 +33,7 @@ function (PlayerAdapter, $document, VideoService) {
             scope.to = 0;
 
             scope.formatMilliseconds = utils.formatMilliseconds;
+            console.log(scope);
 
             scope.player.adapter.addListener(PlayerAdapter.EVENTS.TIMEUPDATE, function () {
                 scope.position = scope.player.adapter.getCurrentTime() * 1000;
@@ -41,7 +42,9 @@ function (PlayerAdapter, $document, VideoService) {
                 var segment = VideoService.getCurrentSegment(scope.player, scope.video);
 
                 // Mark current segment as selected
-                //scope.selectSegment(segment);
+                scope.selectSegment(segment);
+
+                console.log('TIMEUPDATE: '+ scope.positionStyle);
 
                 // Stop play back when switching from a replayed segment to
                 // the next.
@@ -59,19 +62,8 @@ function (PlayerAdapter, $document, VideoService) {
                 if (segment.deleted && scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
                     scope.player.adapter.setCurrentTime(segment.end / 1000);
                 }
+
             });
-
-            /**
-             * Initialize the display values and set zoomLevel
-             */
-            scope.init = function () {
-                console.log('init');
-
-                scope.from = 0;
-                scope.to = scope.getZoomValue();
-
-                console.log(scope.zoomLevel + ' ' + scope.zoomValue + ' ' + scope.video.duration)
-            }
 
             scope.displayZoomLevel = function (ms) {
 
@@ -135,6 +127,13 @@ function (PlayerAdapter, $document, VideoService) {
                 return (10000 - scope.video.duration) / 100 * scope.zoomLevel +
                     scope.video.duration;
             };
+
+            scope.$watch(function (scope) { return scope.video.duration },
+               function () {
+                   scope.zoomValue = scope.getZoomValue();
+                   scope.zoomOffset = scope.getZoomOffset();
+                   scope.zoomFieldOffset = scope.getZoomFieldOffset();
+               });
 
             scope.$watch(function (scope) { return scope.position },
                function () {
@@ -211,6 +210,11 @@ function (PlayerAdapter, $document, VideoService) {
 
                 if (track.waveform) {
                     style['background-image'] = 'url(' + track.waveform + ')';
+
+                    // Load the waveform image into the zoom timeline if it exists
+                    jss.set('.field-of-vision::before', {
+                        'background-image': 'url(' + track.waveform + ')'
+                    });
                 }
 
                 return style;
@@ -255,21 +259,25 @@ function (PlayerAdapter, $document, VideoService) {
 
             scope.getZoomClass = function () {
 
-                var width = angular.element('.field').width();
+                var field = angular.element('.field'),
+                    width = field.width();
                 scope.fieldSmall = (width <= 190);
 
-                return { 'active': scope.field_active, 'small': scope.fieldSmall };
+                return { 'active': (field.data('active') == true), 'small': scope.fieldSmall };
             }
 
             /**
              * Removes the given segment.
              *
              * The previous or, failing that, the next segment will take up
-             * the sapce of the given segment.
+             * the space of the given segment.
              *
              * @param {Object} segment Segment object
              */
-            scope.mergeSegment = function (segment) {
+            scope.mergeSegment = function (event, segment) {
+                event.preventDefault();
+                event.stopPropagation();
+
                 var index = scope.video.segments.indexOf(segment);
                 if (scope.video.segments[index - 1]) {
                     scope.video.segments[index - 1].end = segment.end;
@@ -280,33 +288,44 @@ function (PlayerAdapter, $document, VideoService) {
                 }
             };
 
-            /**
-             * Sets the cursor position depending on the mouse coordinates.
-             *
-             * @param {Event} event Event that triggered this method.
-             */
-            scope.move = function (event) {
+            scope.toggleSegment = function (event, segment) {
                 event.preventDefault();
-                if (!scope.canMove) { return; }
+                event.stopPropagation();
 
-                var track = element.find('.timeline-track'),
-                    position = (event.clientX - track.offset().left) / track.width();
+                segment.deleted = !segment.deleted;
+            };
 
-                scope.position = position * scope.video.duration;
+            /**
+             * Split the segment at this position
+             *
+             * The previous or, failing that, the next segment will take up
+             * the space of the given segment.
+             *
+             * @param {Object} segment Segment object
+             */
+            scope.splitSegment = function () {
+              var segment = VideoService.getCurrentSegment(scope.player, scope.video),
+                  position = Math.floor(scope.player.adapter.getCurrentTime() * 1000),
+                  newSegment = angular.copy(segment);
 
-                // Limit position to the length of the video
-                if (scope.position > scope.video.duration) {
-                    scope.position = scope.video.duration;
-                }
-                if (scope.position < 0) {
-                    scope.position = 0;
-                }
+              // Shrink original segment
+              segment.end = position;
 
-                console.log(scope.zoomFieldOffset);
+              // Add additional segment containing the second half of the
+              // original segment.
+              newSegment.start = position;
 
-                scope.$apply(function () {
-                    scope.positionStyle = (scope.position * 100 / scope.video.duration) + '%';
-                });
+              // Deselect the previous segment as the cursor is at the start
+              // of the new one.
+              delete segment.selected;
+
+              // Insert new segment
+              scope.video.segments.push(newSegment);
+
+              // Sort array by start attribute
+              scope.video.segments.sort(function (a, b) {
+                  return a.start - b.start;
+              });
             };
 
             $document.mousemove(function(e) {
@@ -317,15 +336,173 @@ function (PlayerAdapter, $document, VideoService) {
             // Stop dragging the cursor as soon as the mouse button is
             // released.
             $document.mouseup(function () {
-                scope.canMove = false;
+
+              // timeline mouse events
                 scope.canMoveTimeline = false;
-                scope.movingSegment = null;
+                element.find('.field-of-vision .field').removeClass('active');
+
+              // timeline position - handle
+                if (scope.canMove) {
+                  scope.canMove = false;
+                  element.find('#cursor .handle').data('active', false);
+
+                  element.find('#cursor .arrow_box').show();
+
+                  if (scope.timer) $timeout.cancel( scope.timer );
+                  scope.timer = $timeout(
+                        function() {
+                            // hide cut window
+                            element.find('#cursor .arrow_box').hide();
+                        },
+                        60000 //  1 min
+                    );
+                }
+
+                if (scope.movingSegment) {
+
+                  var track = element.find('.segments'),
+                      topTrack = track.parent(),
+                      segment = scope.movingSegment.data('segment'),
+                      index = scope.video.segments.indexOf(segment);
+
+                  var pxPosition = scope.movingSegment.parent().offset().left + parseInt(scope.movingSegment.css('left'),10) - topTrack.offset().left + 3;
+                      position = Math.floor((pxPosition / track.width() * scope.video.duration) + scope.zoomFieldOffset);
+
+                  console.log(position +' '+ scope.position +' '+ scope.zoomValue +' '+ scope.zoomFieldOffset +' '+ scope.video.duration);
+
+                  if (position < 0) position = 0;
+                  if (position >= scope.video.duration) position = scope.video.duration;
+
+                  if (position >= segment.end) {
+                    // pulled start point of segment past end of start
+                    // so we flip it
+                    segment.start = segment.end;
+                    segment.end = position;
+                  } else {
+                    segment.start = position;
+                  }
+
+                  console.log('Range: '+ 0 +' '+  scope.video.duration);
+                  console.log('active: '+ segment.start +' '+  segment.end);
+
+                  // update the segments around the one that was changed
+                  if (index - 1 >= 0) {
+
+                      var before = scope.video.segments[index - 1];
+                      console.log('before: '+ before.start +' '+  before.end);
+                      before.end = segment.start;
+                      console.log('        '+ before.start +' '+  before.end);
+
+                      if (before.end - before.start <= 0) {
+                        // empty segment
+                        segment.start = before.start;
+                        scope.video.segments.splice(index - 1, 1);
+                      }
+
+                  }
+
+                  // Sort array by start attribute
+                  scope.video.segments.sort(function (a, b) {
+                      return a.start - b.start;
+                  });
+                  index = scope.video.segments.indexOf(segment);
+
+                  if (index + 1 < scope.video.segments.length) {
+                      var after = scope.video.segments[index + 1];
+                      console.log('after: '+ after.start +' '+  after.end);
+                      after.start = segment.end;
+                      console.log('       '+ after.start +' '+  after.end);
+
+                      if (after.end - after.start <= 0) {
+                        // empty segment
+                        segment.end = after.end;
+                        scope.video.segments.splice(index + 1, 1);
+                      }
+                  }
+
+                  scope.movingSegment.removeClass('active');
+                  scope.movingSegment.css('left', '-4px');
+                  scope.movingSegment = null;
+
+                  // Sort array by start attribute
+                  scope.video.segments.sort(function (a, b) {
+                      return a.start - b.start;
+                  });
+
+                  if (segment.end - segment.start <= 4) {
+                      // i'm really small so should probably not exist anymore
+                      scope.mergeSegment(segment);
+                  }
+
+                  console.log(scope.video.segments.length +' '+ index);
+                  console.log(scope.video.segments);
+                }
 
                 scope.player.adapter.setCurrentTime(scope.position / 1000);
-                $document.unbind('mousemove', scope.move);
+                $document.unbind('mousemove', scope.movePlayHead);
                 $document.unbind('mousemove', scope.moveTimeline);
-                $document.unbind('mousemove', scope.moveTimeline);
+                $document.unbind('mousemove', scope.moveSegment);
             });
+
+
+            scope.clickPlayTrack = function (event) {
+                event.preventDefault();
+                var el = $(event.target);
+
+                if (el.attr('id') == 'cursor-track') {
+
+                  var position = (event.clientX - el.offset().left) / el.width() * scope.video.duration;
+                  position += + scope.zoomFieldOffset;
+
+                  // Limit position to the length of the video
+                  if (position > scope.video.duration) {
+                      position = scope.video.duration;
+                  }
+                  if (position < 0) {
+                      position = 0;
+                  }
+
+                  scope.player.adapter.setCurrentTime(position / 1000);
+
+                  element.find('#cursor .arrow_box').show();
+
+                  if (scope.timer) $timeout.cancel( scope.timer );
+                  scope.timer = $timeout(
+                        function() {
+                            // hide cut window
+                            element.find('#cursor .arrow_box').hide();
+                        },
+                        60000 //  1 min
+                    );
+                }
+            }
+
+            /**
+             * Sets the cursor position depending on the mouse coordinates.
+             *
+             * @param {Event} event Event that triggered this method.
+             */
+            scope.movePlayHead = function (event) {
+                event.preventDefault();
+                if (!scope.canMove) { return; }
+
+                var track = element.find('.timeline-track'),
+                    handle = element.find('#cursor .handle'),
+                    position = ($document.mx - handle.data('dx') - track.offset().left) / track.width() * scope.video.duration;
+
+                // Limit position to the length of the video
+                if (position > scope.video.duration) {
+                    position = scope.video.duration;
+                }
+                if (position < 0) {
+                    position = 0;
+                }
+
+                scope.position = position;
+                scope.$apply(function () {
+                    scope.positionStyle = (scope.position * 100 / scope.video.duration) + '%';
+                });
+            };
 
             /**
              * Callback to a mouse-down event initiating a drag of the
@@ -333,12 +510,18 @@ function (PlayerAdapter, $document, VideoService) {
              *
              * @param {Event} event Event that triggered this method.
              */
-            scope.drag = function (event) {
+            scope.dragPlayhead = function (event) {
                 event.preventDefault();
                 scope.canMove = true;
 
+                var handle = element.find('#cursor .handle');
+
+                handle.data('dx', $document.mx - handle.offset().left);
+                handle.data('dy', $document.my - handle.offset().top);
+                handle.addClass('active');
+
                 // Register global mouse move callback
-                $document.mousemove(scope.move);
+                $document.mousemove(scope.movePlayHead);
             };
 
             /**
@@ -352,26 +535,29 @@ function (PlayerAdapter, $document, VideoService) {
 
                 var track = element.find('.field-of-vision'),
                     shuttle = element.find('.field-of-vision .field'),
-                    nx = $document.mx - shuttle.data('dx'),
-                    track_width = track.width(),
-                    shuttle_width = shuttle.width(),
-                    end = track_width - shuttle_width;
+                    nx = $document.mx - shuttle.data('dx');
 
                 if (nx <= 0) nx = 0;
-                if (nx >= end) nx = end;
+                if (nx >= shuttle.data('end')) nx = shuttle.data('end');
 
-                var per_display = nx / track_width * 100,
-                    per_position = (nx - (shuttle_width/2)) / track_width * 100;
+                var percentage = nx / shuttle.data('track_width') * 100;
 
-                shuttle.css('left', per_display +'%');
-
-                scope.zoomFieldOffset = (scope.video.duration * per_position) / 100;
+                shuttle.css('left', percentage +'%');
+                scope.zoomFieldOffset = (scope.video.duration * percentage) / 100;
                 scope.position = (scope.zoomFieldOffset * scope.video.duration) / (scope.video.duration - scope.zoomValue);
 
-                //scope.from = scope.zoomFieldOffset;
-                //scope.to = scope.zoomFieldOffset + scope.zoomValue;
+                console.log(scope.zoomFieldOffset +' '+ scope.zoomValue +' '+scope.video.duration)
+                console.log(scope.position);
 
-                console.log(scope.zoomFieldOffset +' '+ $document.mx +' '+ shuttle.data('dx') +' '+ nx);
+                if (isNaN(scope.position) || (scope.position < 0)) scope.position = 0;
+                if (scope.position > scope.video.duration) scope.position = scope.video.duration;
+
+                scope.from = scope.zoomFieldOffset;
+                scope.to = scope.zoomFieldOffset + scope.zoomValue;
+                shuttle.find(':first-child').html( scope.formatMilliseconds(scope.from) );
+                shuttle.find(':last-child').html( scope.formatMilliseconds(scope.to) );
+
+                //console.log(scope.zoomFieldOffset +' '+ scope.zoomValue);
             };
 
             scope.dragTimeline = function (event) {
@@ -384,6 +570,10 @@ function (PlayerAdapter, $document, VideoService) {
 
                 shuttle.data('dx', $document.mx - shuttle.offset().left);
                 shuttle.data('dy', $document.my - shuttle.offset().top);
+                shuttle.data('track_width', track.width());
+                shuttle.data('shuttle_width', shuttle.width());
+                shuttle.data('end', track.width() - shuttle.width());
+                shuttle.data('active', true);
 
                 // Register global mouse move callback
                 $document.mousemove(scope.moveTimeline);
@@ -404,10 +594,10 @@ function (PlayerAdapter, $document, VideoService) {
                 if (nx >= scope.movingSegment.data('end')) nx = scope.movingSegment.data('end');
 
                 scope.movingSegment.css('left', nx);
-                console.log (scope.movingSegment.data('end') +' '+ nx);
+                //console.log (nx);
             }
 
-            scope.dragSegement = function (event) {
+            scope.dragSegement = function (event, segment) {
               event.preventDefault();
 
               scope.movingSegment = true;
@@ -422,11 +612,15 @@ function (PlayerAdapter, $document, VideoService) {
               handle.data('track_left', (handle.data('px') *-1) + track.offset().left - 4);
               handle.data('track_width', track.width());
               handle.data('shuttle_width', handle.width());
-              handle.data('end', track.width() - handle.width() + track.offset().left - handle.parent().offset().left);
+              handle.data('end', track.width() + track.offset().left - handle.parent().offset().left);
+              handle.data('segment', segment);
+              handle.addClass('active');
 
               scope.movingSegment = handle;
 
-              console.log ($document.mx +' '+ scope.movingSegment.data('dx'));
+              //segment.start = 100000;
+              console.log (scope.video.segments);
+              console.log(segment);
 
               // Register global mouse move callback
               $document.mousemove(scope.moveSegment);
@@ -436,10 +630,18 @@ function (PlayerAdapter, $document, VideoService) {
              * Sets the position marker to the start of the given segment.
              *
              * @param {Object} segment Segment object
-             *
-            scope.skipToSegment = function (segment) {
+             */
+            scope.skipToSegment = function (event, segment) {
+                event.preventDefault();
+
+                console.log('select this segment');
+
                 if (!segment.selected) {
+                    console.log(segment.start / 1000);
                     scope.player.adapter.setCurrentTime(segment.start / 1000);
+                    scope.position = segment.start;
+                    scope.positionStyle = (scope.position * 100 / scope.video.duration) + '%';
+                    scope.selectSegment(segment);
                 }
             };
 
@@ -447,21 +649,21 @@ function (PlayerAdapter, $document, VideoService) {
              * Marks the given segment as selected.
              *
              * @param {Object} segment Segment object
-             *
+             */
             scope.selectSegment = function (segment) {
                 angular.forEach(scope.video.segments, function (segment) {
                     segment.selected = false;
                 });
                 segment.selected = true;
             };
-            */
 
             scope.$on('$destroy', function () {
                 $document.unbind('mouseup');
                 $document.unbind('mousemove');
+
+                if (scope.timer) $timeout.cancel( scope.timer );
             });
 
-            scope.init();
         }
     };
 }]);

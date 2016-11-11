@@ -86,8 +86,8 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
 
         .timeline-track {
             margin-bottom: 5px;
+            padding-bottom: 0;
             overflow: hidden;
-            padding-bottom: 10px;
 
             &>div:last-child {
                 border-left: 1px solid $dark-bg-border-color;
@@ -112,7 +112,7 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                     height: $segment-heidght;
 
                     .segment-seperator {
-                          background-color: red; /*transparent;*/
+                          background-color: transparent;
                           height: $segment-heidght;
                           width: 9px;
                           float: left;
@@ -149,20 +149,37 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
 
                         a {
                             color: $l-blue;
-                            line-height: 20px;
+                            background-color: inherit;
+                            
+                            color: #378dd4;
+                            line-height: 16px;
+                            padding: 6px 4px 0 6px;
+
+                            &.unused {
+                              @include fa-icon($fa-var-square-o , before, inline, 0 0 0 0, 0, $l-blue, 1em);
+                            }
+
+                            &.used {
+                              @include fa-icon($fa-var-check-square-o, before, inline, 0 0 0 0, 0, $l-blue, 1em);
+                            }
 
                             &.remove {
-                                @include fa-icon($fa-var-times, before, inline, 0 0 0 0, 0, $l-blue, 12px);
+                                @include fa-icon($fa-var-times, before, inline, 0 0 0 0, 0, $l-blue, 1em);
                             }
                         }
 
+                        a:last-child {
+                          margin-right: 10px;
+                        }
 
                         &.selected {
                             background: rgba(106, 183, 236, 0.5);
                             border: $thin-border-stroke darken(#71b1f3, 2%);
 
-                            a.remove {
-                                @include fa-icon($fa-var-times, before, inline, 0 0 0 0, 0, darken($l-blue, 2%), 12px);
+                            a {
+                                &:before {
+                                  color: darken($l-blue, 2%);
+                                }
                             }
                         }
 
@@ -170,8 +187,10 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                             background-color: rgba(243, 89, 82, 0.5);
                             border: $thin-border-stroke #f35952;
 
-                            a.remove {
-                                @include fa-icon($fa-var-times, before, inline, 0 0 0 0, 0, rgba(0,0,0,0.4), 12px);
+                            a {
+                                &:before {
+                                  color: rgba(0,0,0,0.4)
+                                }
                             }
                         }
                     }
@@ -187,8 +206,18 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
             }
         }
 
-        & > div:nth-last-of-type(2) {
-             border-bottom: 1px solid $main-border-color;
+        /*& > div:nth-last-of-type(2) {*/
+        #cursor-track {
+             padding: 8px 0px;
+             margin-bottom: 8px;
+
+             &:before {
+                 background: $main-border-color none repeat scroll 0 0;
+                 content: "";
+                 display: block;
+                 height: 1px;
+                 width: 100%;
+             }
         }
 
         #cursor {
@@ -196,7 +225,7 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
             height: 100%;
             background-color: #fb6257;
             position: absolute;
-            top: 0;
+            top: -8px;
             z-index: $z-80;
 
             $handle-size: 14px;
@@ -209,6 +238,57 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                 background-color: #c13832;
                 position: absolute;
                 cursor: grab;
+            }
+
+            .arrow_box {
+              background: $off-white none repeat scroll 0 0;
+              border: $thin-border-stroke $light-border-color;
+              border-radius: $main-border-radius;
+              bottom: -38px;
+              left: -13px;
+              position: absolute;
+
+              display: none;
+              @include transition(all 800ms);
+            }
+
+            .arrow_box:after, .arrow_box:before {
+            	bottom: 100%;
+            	left: 50%;
+            	border: solid transparent;
+            	content: " ";
+            	height: 0;
+            	width: 0;
+            	position: absolute;
+            	pointer-events: none;
+            }
+
+            .arrow_box:after {
+            	border-color: rgba(238, 238, 238, 0);
+            	border-bottom-color: #eee;
+            	border-width: 4px;
+            	margin-left: -4px;
+            }
+            .arrow_box:before {
+            	border-color: rgba(204, 204, 204, 0);
+            	border-bottom-color: #ccc;
+            	border-width: 5px;
+            	margin-left: -5px;
+            }
+
+            a.split {
+                width: 20px;
+                height: 20px;
+                display: block;
+                margin: 2px;
+                color: $color-gray;
+
+                &:hover,
+                &:active {
+                  color: $color-darkgray;
+                }
+
+                @include fa-icon($fa-var-scissors, before, block, 0, 2px 4px, inherit, 12px);
             }
 
             &.active {
@@ -267,7 +347,6 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
               height: 100%;
               opacity: .18;
               z-index: -1;
-              background-image: url("http://mediadev.uct.ac.za/static/mh_default_org/internal/fee2536b-5b14-4584-8d00-e986b3d934ef/7bc5fc71-10dc-445e-9fc1-395580f26261/waveform.png");
               background-size: 100% 25px;
               background-position: top left;
               background-repeat: no-repeat;

@@ -17,7 +17,7 @@
             </div>
         </div>
         <div class="field-of-vision">
-            <div class="field" ng-class="getZoomClass()" ng-mousedown="field_active=true; dragTimeline($event)" ng-mouseup="field_active=false" ng-style="getZoomStyle()">
+            <div class="field" ng-class="getZoomClass()" ng-mousedown="dragTimeline($event)" ng-style="getZoomStyle()">
                 <div class="boundary from">{{ formatMilliseconds(from) }}</div>
                 <div class="boundary to">{{ formatMilliseconds(to) }}</div>
             </div>
@@ -49,15 +49,22 @@
                     <div class="segments" ng-style="getSegmentStyle(track)">
                         <div class="segment-container"
                              ng-repeat="segment in video.segments | orderBy:'start'"
-                             ng-click="skipToSegment(segment)"
                              ng-style="{ width: getSegmentWidth(segment) }">
 
-                            <div class="segment-seperator" ng-class="{'active': active}" ng-mousedown="active=true; dragSegement($event)" ng-mouseup="active=false"></div>
+                            <div class="segment-seperator" ng-mousedown="dragSegement($event, segment)"></div>
                             <div class="segment"
-                                 ng-class="{ deleted: segment.deleted, selected: segment.selected }">
+                                  ng-click="skipToSegment($event, segment)"
+                                  ng-class="{ deleted: segment.deleted, selected: segment.selected }">
+
+                                <a title="Use this segment"
+                                   ng-class="{ unused: segment.deleted, used: !segment.deleted }"
+                                   ng-if="video.segments.length > 1"
+                                   ng-click="toggleSegment($event, segment)">
+                                </a>
+
                                 <a title="remove segment" class="remove"
                                    ng-if="video.segments.length > 1"
-                                   ng-click="mergeSegment(segment)">
+                                   ng-click="mergeSegment($event, segment)">
                                 </a>
                             </div>
 
@@ -65,9 +72,11 @@
                     </div>
                 </div>
             </div>
-
-            <div id="cursor" ng-class="{'active': active}" ng-mousedown="active=true; drag($event)" ng-mouseup="active=false" ng-style="{ left: positionStyle }">
-                <div class="handle"></div>
+            <div id="cursor-track" ng-click="clickPlayTrack($event)">
+              <div id="cursor" ng-mousedown="dragPlayhead($event)" ng-style="{ left: positionStyle }">
+                  <div class="handle"></div>
+                  <div class="arrow_box"><a class="split ng-scope" ng-click="splitSegment()"></a></div>
+              </div>
             </div>
         </div>
     </div>
