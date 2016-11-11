@@ -147,7 +147,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
 
     if ((adminUserName == null) || (adminPassword == null)) {
       logger.info("Tne administrator user and group loader is disabled.");
-       return;
+      return;
     }
 
     SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(componentCtx, organization), new Effect0() {
@@ -169,8 +169,8 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
                   adminRolesSet.add(new JpaRole(roleId, org));
               }
             }
-            String adminUserName = organization.getName().concat(" Administrator");
-            adminUser = new JpaUser(adminUserName, adminPassword, org, adminUserName, adminEmail, PROVIDER_NAME,
+            String adminUserFullName = organization.getName().concat(" Administrator");
+            adminUser = new JpaUser(adminUserName, adminPassword, org, adminUserFullName, adminEmail, PROVIDER_NAME,
                     false, adminRolesSet);
             userAndRoleProvider.addUser(adminUser);
             logger.info("Administrator user for '{}' created", org.getId());
