@@ -159,19 +159,24 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
           // Make sure the administrator exists for this organization. Note that the user will gain its roles through
           // membership in the administrator group
           JpaUser adminUser = (JpaUser) userAndRoleProvider.loadUser(adminUserName);
-          if (adminUser == null) {
-            Set<JpaRole> adminRolesSet = new HashSet<JpaRole>();
-            // Add roles according to the system configuration
-            if (adminRoles != null) {
-              for (String r : StringUtils.split(adminRoles, ',')) {
-                String roleId = StringUtils.trimToNull(r);
-                if (roleId != null)
-                  adminRolesSet.add(new JpaRole(roleId, org));
+          boolean userExists = adminUser != null;
+          // Add roles according to the system configuration
+          Set<JpaRole> adminRolesSet = new HashSet<JpaRole>();
+          if (adminRoles != null) {
+            for (String r : StringUtils.split(adminRoles, ',')) {
+              String roleId = StringUtils.trimToNull(r);
+              if (roleId != null) {
+                adminRolesSet.add(new JpaRole(roleId, org));
               }
             }
-            String adminUserFullName = organization.getName().concat(" Administrator");
-            adminUser = new JpaUser(adminUserName, adminPassword, org, adminUserFullName, adminEmail, PROVIDER_NAME,
-                    false, adminRolesSet);
+          }
+          String adminUserFullName = organization.getName().concat(" Administrator");
+          adminUser = new JpaUser(adminUserName, adminPassword, org, adminUserFullName, adminEmail, PROVIDER_NAME,
+                                  false, adminRolesSet);
+          if (userExists) {
+            userAndRoleProvider.updateUser(adminUser);
+            logger.info("Administrator user for '{}' updated", org.getId());
+          } else {
             userAndRoleProvider.addUser(adminUser);
             logger.info("Administrator user for '{}' created", org.getId());
           }
