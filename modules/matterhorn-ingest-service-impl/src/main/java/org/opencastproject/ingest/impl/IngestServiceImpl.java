@@ -680,7 +680,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   @Override
   public MediaPackage addTrack(URI uri, MediaPackageElementFlavor flavor, MediaPackage mediaPackage)
           throws IOException, IngestException {
-    String[] tags = {};
+    String[] tags = null;
     return this.addTrack(uri, flavor, tags, mediaPackage);
 
   }
@@ -708,14 +708,15 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
               flavor);
-
-      MediaPackageElement trackElement = mediaPackage.getTrack(elementId);
-      for (String tag : tags) {
-        logger.info("Adding Tag: " + tag);
-        trackElement.addTag(tag);
+      if (tags != null && tags.length > 0) {
+        MediaPackageElement trackElement = mp.getTrack(elementId);
+        for (String tag : tags) {
+          logger.info("Adding Tag: " + tag + " to Element: " + elementId);
+          trackElement.addTag(tag);
+        }
       }
 
-    job.setStatus(Job.Status.FINISHED);
+      job.setStatus(Job.Status.FINISHED);
       logger.info("Successful added track {} on mediapackage {} at URL {}", new Object[] { elementId, mediaPackage,
               newUrl });
       return mp;
@@ -739,7 +740,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   @Override
   public MediaPackage addTrack(InputStream in, String fileName, MediaPackageElementFlavor flavor,
           MediaPackage mediaPackage) throws IOException, IngestException {
-    String[] tags = {};
+    String[] tags = null;
     return this.addTrack(in, fileName, flavor, tags, mediaPackage);
   }
 
@@ -763,12 +764,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
               flavor);
-
-           MediaPackageElement trackElement = mediaPackage.getTrack(elementId);
-     for (String tag : tags) {
-       logger.info("Adding Tag: " + tag);
-           trackElement.addTag(tag);
-     }
+      if (tags != null && tags.length > 0) {
+        MediaPackageElement trackElement = mp.getTrack(elementId);
+        for (String tag : tags) {
+          logger.info("Adding Tag: " + tag + " to Element: " + elementId);
+          trackElement.addTag(tag);
+        }
+      }
 
       job.setStatus(Job.Status.FINISHED);
       logger.info("Successful added track {} on mediapackage {} at URL {}", new Object[] { elementId, mediaPackage,
@@ -956,8 +958,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   @Override
   public MediaPackage addCatalog(InputStream in, String fileName, MediaPackageElementFlavor flavor,
           MediaPackage mediaPackage) throws IOException, IngestException {
-   String[] tags = {};
-   return addCatalog(in, fileName, flavor, tags, mediaPackage);
+    String[] tags = null;
+    return addCatalog(in, fileName, flavor, tags, mediaPackage);
   }
 
   /**
@@ -983,11 +985,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       }
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Catalog,
               flavor);
-
-      MediaPackageElement trackElement = mp.getCatalog(elementId);
-      for (String tag : tags) {
-        logger.info("Adding Tag: " + tag);
-        trackElement.addTag(tag);
+      if (tags != null && tags.length > 0) {
+        MediaPackageElement trackElement = mp.getCatalog(elementId);
+        for (String tag : tags) {
+          logger.info("Adding Tag: " + tag + " to Element: " + elementId);
+          trackElement.addTag(tag);
+        }
       }
 
       job.setStatus(Job.Status.FINISHED);
@@ -1061,11 +1064,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Attachment,
               flavor);
-
-      MediaPackageElement trackElement = mediaPackage.getAttachment(elementId);
-      for (String tag : tags) {
-        logger.info("Adding Tag: " + tag);
-        trackElement.addTag(tag);
+      if (tags != null && tags.length > 0) {
+        MediaPackageElement trackElement = mp.getAttachment(elementId);
+        for (String tag : tags) {
+          logger.info("Adding Tag: " + tag + " to Element: " + elementId);
+          trackElement.addTag(tag);
+        }
       }
       job.setStatus(Job.Status.FINISHED);
       logger.info("Successful added attachment {} on mediapackage {} at URL {}", new Object[] { elementId,
@@ -1092,7 +1096,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   @Override
   public MediaPackage addAttachment(InputStream in, String fileName, MediaPackageElementFlavor flavor,
           MediaPackage mediaPackage) throws IOException, IngestException {
-    String[] tags = {};
+    String[] tags = null;
     return addAttachment(in, fileName, flavor, tags, mediaPackage);
   }
 

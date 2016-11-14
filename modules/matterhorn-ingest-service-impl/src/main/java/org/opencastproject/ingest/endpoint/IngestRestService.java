@@ -216,7 +216,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     }
   }
 
-@PUT
+  @PUT
   @Produces(MediaType.TEXT_XML)
   @Path("createMediaPackageWithID/{id}")
   @RestQuery(name = "createMediaPackageWithID", description = "Create an empty media package with ID /n Overrides Existing Mediapackage ", pathParameters = {
@@ -226,7 +226,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   public Response createMediaPackage(@PathParam("id") String mediaPackageId) {
     MediaPackage mp;
     try {
-        mp = ingestService.createMediaPackage(mediaPackageId);
+      mp = ingestService.createMediaPackage(mediaPackageId);
 
       startCache.put(mp.getIdentifier().toString(), new Date());
       return Response.ok(mp).build();
@@ -497,28 +497,16 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       }
       switch (type) {
         case Attachment:
-          if (tags != null) {
-            mp = ingestService.addAttachment(in, fileName, flavor, tags, mp);
-          } else  {
-            ingestService.addAttachment(in, fileName, flavor, mp);
-          }
+          mp = ingestService.addAttachment(in, fileName, flavor, tags, mp);
           break;
         case Catalog:
-          if (tags != null) {
-            mp = ingestService.addCatalog(in, fileName, flavor, tags, mp);
-          } else {
-            ingestService.addCatalog(in, fileName, flavor, mp);
-          }
+          mp = ingestService.addCatalog(in, fileName, flavor, tags, mp);
           break;
         case Track:
           if (startTime == null) {
-            if (tags != null) {
-              mp = ingestService.addTrack(in, fileName, flavor, tags, mp);
-            } else  {
-              mp = ingestService.addTrack(in, fileName, flavor, mp);
-            }
+            mp = ingestService.addTrack(in, fileName, flavor, tags, mp);
           } else {
-            mp = ingestService.addPartialTrack(in, fileName, flavor, startTime, mp);
+          mp = ingestService.addPartialTrack(in, fileName, flavor, startTime, mp);
           }
           break;
         default:

@@ -192,7 +192,7 @@ public interface IngestService extends JobProducer {
    * @param flavor
    *          The flavor of the media that is being added
    * @param tags
-   *           Tags to add to the Track []
+   *           Tags to add to the Track 
    * @param mediaPackage
    *          The specific Opencast MediaPackage to which Media is being added
    * @return MediaPackageManifest The manifest of a specific Opencast MediaPackage element
@@ -229,6 +229,8 @@ public interface IngestService extends JobProducer {
    *          The media file to add
    * @param flavor
    *          The flavor of the media that is being added
+   * @param tags
+   *          Tags to Add to the Track
    * @param mediaPackage
    *          The specific Opencast MediaPackage to which Media is being added
    * @return MediaPackage The updated Opencast MediaPackage element
@@ -325,8 +327,8 @@ public interface IngestService extends JobProducer {
    *          The catalog file to add
    * @param flavor
    *          The flavor of the media that is being added
-   *@param  tags
-   *         The tags for the media that is being added:
+   * @param  tags
+   *          The tags for the media that is being added:
    * @param mediaPackage
    *          The specific Opencast MediaPackage to which Media is being added
    * @return MediaPackage The updated Opencast MediaPackage element
@@ -381,7 +383,7 @@ public interface IngestService extends JobProducer {
    *          The file to add
    * @param flavor
    *          The flavor of the media that is being added
-   * @ param tags
+   * @param tags
    *          The tags of the media thas is being added
    * @param mediaPackage
    *          The specific Opencast MediaPackage to which Media is being added

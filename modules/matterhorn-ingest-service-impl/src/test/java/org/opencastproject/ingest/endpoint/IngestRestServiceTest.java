@@ -89,23 +89,39 @@ public class IngestRestServiceTest {
     EasyMock.expect(
             ingestService.addCatalog((URI) EasyMock.anyObject(), (MediaPackageElementFlavor) EasyMock.anyObject(),
                     (MediaPackage) EasyMock.anyObject())).andReturn(
-            MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
+                    MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
     EasyMock.expect(
             ingestService.addTrack((URI) EasyMock.anyObject(), (MediaPackageElementFlavor) EasyMock.anyObject(),
                     (MediaPackage) EasyMock.anyObject())).andReturn(
-            MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
+                    MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
+    EasyMock.expect(
+            ingestService.addTrack((URI) EasyMock.anyObject(), (MediaPackageElementFlavor) EasyMock.anyObject(),
+                    (String[]) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject())).andReturn(
+                    MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
     EasyMock.expect(
             ingestService.addAttachment((InputStream) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (MediaPackageElementFlavor) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject())).andReturn(
-            MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
+                    MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
+    EasyMock.expect(
+            ingestService.addAttachment((InputStream) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    (MediaPackageElementFlavor) EasyMock.anyObject(), (String[]) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject())).andReturn(
+                    MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
     EasyMock.expect(
             ingestService.addCatalog((InputStream) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (MediaPackageElementFlavor) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject())).andReturn(
-            MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
+                    MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
+    EasyMock.expect(
+            ingestService.addCatalog((InputStream) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    (MediaPackageElementFlavor) EasyMock.anyObject(), (String[]) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject())).andReturn(
+                    MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
     EasyMock.expect(
             ingestService.addTrack((InputStream) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (MediaPackageElementFlavor) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject())).andReturn(
-            MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
+                    MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
+    EasyMock.expect(
+            ingestService.addTrack((InputStream) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    (MediaPackageElementFlavor) EasyMock.anyObject(), (String[]) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject())).andReturn(
+                    MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
     EasyMock.expect(
             ingestService.addPartialTrack((InputStream) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (MediaPackageElementFlavor) EasyMock.anyObject(), EasyMock.anyLong(),
@@ -342,6 +358,7 @@ public class IngestRestServiceTest {
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
     MediaPackage mp = (MediaPackage) response.getEntity();
     Assert.assertNotNull(mp);
+
     response = restService.createMediaPackage("1a6f70ab-4262-4523-9f8e-babce22a1ea8");
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
     mp = (MediaPackage) response.getEntity();

@@ -9,9 +9,7 @@
   A minimal Workflow that only publishes a Mediapackage
   </description>
 
-
   <operations>
-
 
     <!-- Ingest elements from external working file repositories and file servers -->
 
@@ -47,7 +45,6 @@
         <configuration key="accept-no-media">false</configuration>
       </configurations>
     </operation>
-
 
     <!-- Publish preview internal -->
 
