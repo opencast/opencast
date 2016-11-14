@@ -72,7 +72,7 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
         @include btn(white);
         padding: 1px 4px;
         float: right;
-        @include fa-icon($fa-cog, before, inline-block, 0, 0, $medium-prim-color, 10px, normal, 0);
+        @include fa-icon($fa-var-cog, before, inline-block, 0, 0, $medium-prim-color, 10px, normal, 0);
         &:before {
             vertical-align: middle;
         }
@@ -166,7 +166,7 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                     line-height: 20px;
 
                     &.remove {
-                        @include fa-icon($fa-times, before, inline, 0 0 0 0, 0, $l-blue, 12px);
+                        @include fa-icon($fa-var-times, before, inline, 0 0 0 0, 0, $l-blue, 12px);
                     }
                 }
 
@@ -176,7 +176,7 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                     border: $thin-border-stroke darken(#71b1f3, 2%);
 
                     a.remove {
-                        @include fa-icon($fa-times, before, inline, 0 0 0 0, 0, darken($l-blue, 2%), 12px);
+                        @include fa-icon($fa-var-times, before, inline, 0 0 0 0, 0, darken($l-blue, 2%), 12px);
                     }
                 }
 
@@ -185,7 +185,7 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                     border: $thin-border-stroke #f35952;
 
                     a.remove {
-                        @include fa-icon($fa-times, before, inline, 0 0 0 0, 0, rgba(0,0,0,0.4), 12px);
+                        @include fa-icon($fa-var-times, before, inline, 0 0 0 0, 0, rgba(0,0,0,0.4), 12px);
                     }
                 }
             }

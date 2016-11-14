@@ -38,7 +38,7 @@
         right: 8px;
         cursor: pointer;
         pointer-events: auto;
-        @include fa-icon($fa-close, before, inline-block, 0, 0, $medium-prim-color, 10px);
+        @include fa-icon($fa-var-close, before, inline-block, 0, 0, $medium-prim-color, 10px);
         font-family: "Open Sans", sans-serif;
         color: #555;
 

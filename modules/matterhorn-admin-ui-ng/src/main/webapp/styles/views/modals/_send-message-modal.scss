@@ -57,12 +57,12 @@
         $arrow-display-value: inline-block;
 
         .next {
-            @include fa-icon($fa-angle-right, after, $arrow-display-value, 0 0 0 $arrow-horizontal-margin-from, 0, inherit, $arrow-font-size);
+            @include fa-icon($fa-var-angle-right, after, $arrow-display-value, 0 0 0 $arrow-horizontal-margin-from, 0, inherit, $arrow-font-size);
             float: right;
         }
 
         .prev {
-            @include fa-icon($fa-angle-left, before, $arrow-display-value, 0 $arrow-horizontal-margin-from 0 0, 0, inherit, $arrow-font-size);
+            @include fa-icon($fa-var-angle-left, before, $arrow-display-value, 0 $arrow-horizontal-margin-from 0 0, 0, inherit, $arrow-font-size);
         }
     }
 }

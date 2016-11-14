@@ -22,8 +22,8 @@
 
 // Controller for all event screens.
 angular.module('adminNg.controllers')
-.controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource', 'ResourcesListResource',
-    function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource) {
+.controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource', 'ResourcesListResource', 'Notifications',
+    function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications) {
         // Configure the table service
         $scope.stats = Stats;
         $scope.stats.configure({
@@ -111,7 +111,12 @@ angular.module('adminNg.controllers')
         $scope.publicationChannelLabels = ResourcesListResource.get({ resource: 'PUBLICATION.CHANNEL.LABELS' });
 
         $scope.table.delete = function (row) {
-            EventsResource.delete({id: row.id});
+            EventsResource.delete({id: row.id}, function () {
+                Table.fetch();
+                Notifications.add('success', 'EVENTS_DELETED');
+            }, function () {
+                Notifications.add('error', 'EVENTS_NOT_DELETED');
+            });
         };
     }
 ]);

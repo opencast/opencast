@@ -267,7 +267,7 @@
                 }
 
                 a.external-link {
-                    @include fa-icon($fa-external-link-square, before, inline-block, 4px, 0, inherit, 14px);
+                    @include fa-icon($fa-var-external-link-square, before, inline-block, 4px, 0, inherit, 14px);
                     float: right;
 
                     &:hover {

@@ -36,7 +36,14 @@ angular.module('adminNg.services')
                 if (angular.isUndefined(policy)) {
                     newPolicies[acl.role] = createPolicy(acl.role);
                 }
-                newPolicies[acl.role][acl.action] = acl.allow;
+
+                if (acl.action === 'read' || acl.action === 'write') {
+                    newPolicies[acl.role][acl.action] = acl.allow;
+                } else if (acl.allow === true || acl.allow === 'true'){
+                    // Handle additional ACL actions
+                    newPolicies[acl.role].actions.value.push(acl.action);
+                }
+
                 if (acl.role === AuthService.getUserRole()) {
                     foundUserRole = true;
                 }

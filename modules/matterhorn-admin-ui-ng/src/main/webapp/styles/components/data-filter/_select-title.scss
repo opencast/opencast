@@ -21,7 +21,7 @@
 
 
 .df-select-title {
-    @include fa-icon($fa-sort, after, inline-block, 0, 0 0 0 5px, inherit, 11px);
+    @include fa-icon($fa-var-sort, after, inline-block, 0, 0 0 0 5px, inherit, 11px);
 
     &:after {
         position: relative;

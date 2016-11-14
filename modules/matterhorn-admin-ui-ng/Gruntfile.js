@@ -52,8 +52,8 @@ module.exports = function (grunt) {
         tasks: ['newer:jshint:test', 'newer:jscs:test', 'karma']
       },
       sass: {
-        files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
-        tasks: ['sass:server', 'autoprefixer']
+        files: ['<%= yeoman.app %>/styles/**/*.{scss,sass}'],
+        tasks: ['sass:server', 'postcss']
       },
       gruntfile: {
         files: ['Gruntfile.js']
@@ -112,7 +112,7 @@ module.exports = function (grunt) {
               port: '<%= proxyPort %>',
               https: false,
               changeOrigin: true
-          }],
+          }]
       },
       test: {
         options: {
@@ -153,7 +153,7 @@ module.exports = function (grunt) {
     jscs: {
       options: {
         config: '.jscsrc',
-        verbose: true,
+        fix: true, // Autofix code style violations when possible.
         excludeFiles: ['src/main/webapp/scripts/lib/**']
       },
       all: {
@@ -355,7 +355,7 @@ module.exports = function (grunt) {
             '*.{ico,png,txt}',
             '*.html',
             'images/{,*/}*.{webp}',
-            'styles/fonts/{,*/}*.*',
+            'fonts/{,*/}*.*',
             'img/{,*/}*.*'
           ]
         }, {
@@ -369,14 +369,14 @@ module.exports = function (grunt) {
           dest: '<%= yeoman.dist %>/lib',
           src: [
             '**'
-          ],
+          ]
         }, {
           expand: true,
           cwd: 'src/main/resources/public',
           dest: '<%= yeoman.dist %>/public',
           src: [
             '**'
-          ],
+          ]
         }, {
           expand: true,
           cwd: '<%= yeoman.app %>/scripts',
@@ -411,7 +411,7 @@ module.exports = function (grunt) {
     // Test settings
     karma: {
       options: {
-        configFile: 'src/test/resources/karma.conf.js',
+        configFile: 'src/test/resources/karma.conf.js'
       },
       unit: {
         singleRun: true
@@ -478,6 +478,10 @@ module.exports = function (grunt) {
   ]);
 
   grunt.loadNpmTasks('grunt-connect-proxy');
+  grunt.loadNpmTasks('grunt-sass');
+  grunt.loadNpmTasks('grunt-postcss');
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-reload');
 
   // Base task for the development with proxy to a real backend
   grunt.registerTask('proxy', [
@@ -486,6 +490,7 @@ module.exports = function (grunt) {
     'concurrent:server',
     'postcss:server',
     'configureProxies:proxy',
-    'connect:proxy'
+    'connect:proxy',
+    'watch'
   ]);
 };
