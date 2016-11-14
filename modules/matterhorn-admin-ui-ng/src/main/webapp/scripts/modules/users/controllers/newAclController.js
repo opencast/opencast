@@ -1,6 +1,6 @@
 angular.module('adminNg.controllers')
-.controller('NewAclCtrl', ['$scope', 'NewAclStates', 'ResourcesListResource', 'AclsResource', 'Notifications', 'Modal',
-    function ($scope, NewAclStates, ResourcesListResource, AclsResource, Notifications, Modal) {
+.controller('NewAclCtrl', ['$scope', 'Table', 'NewAclStates', 'ResourcesListResource', 'AclsResource', 'Notifications', 'Modal',
+    function ($scope, Table, NewAclStates, ResourcesListResource, AclsResource, Notifications, Modal) {
 
         $scope.states = NewAclStates.get();
 
@@ -45,6 +45,7 @@ angular.module('adminNg.controllers')
           };
 
           AclsResource.create($scope.acl, function () {
+              Table.fetch();
               Modal.$scope.close();
 
               // Reset all states

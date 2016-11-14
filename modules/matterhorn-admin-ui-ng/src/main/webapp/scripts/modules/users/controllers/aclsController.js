@@ -29,6 +29,7 @@ angular.module('adminNg.controllers')
 
         $scope.table.delete = function (row) {
             AclResource.delete({id: row.id}, function () {
+                Table.fetch();
                 Notifications.add('success', 'ACL_DELETED');
             }, function () {
                 Notifications.add('error', 'ACL_NOT_DELETED');

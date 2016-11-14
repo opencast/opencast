@@ -17,6 +17,7 @@ node/
 
 # ignore NetBeans project data
 */nbproject/*
+*/nb-configuration.xml
 
 # ingore OS artifacts
 .DS_Store
@@ -36,6 +37,7 @@ docs/guides/*/site
 # Ignore Makefiles
 # Sometimes they help, but they should never be tracked
 Makefile
+/modules/matterhorn-admin-ui-ng/bower_components/
 
 # Ignore OS artifacts
 .DS_Store

@@ -206,12 +206,16 @@
 
             &.remove {
                 @include build-icon(auto, auto, remove-icon, 17px, 17px);
+                //@include fa-icon($fa-var-play-circle-o, before, block, 0, 0, inherit, 22px, normal, inherit);
             }
 
             &.play {
+                color: $color-silver;
                 @include build-icon(auto, auto, play-icon, 17px, 17px);
+                //@include fa-icon($fa-var-play-circle-o, before, block, 0, 0, inherit, 22px, normal, inherit);
 
                 &.on {
+                   color: $primary-color-green;
                    @include build-icon(auto, auto, play-icon-on, 17px, 17px);
                 }
             }
@@ -325,7 +329,7 @@
         }
 
         &.js-has-check {
-            @include fa-icon($fa-check, after, inline-block, 3px 0 0 0, 0, $green, 18px);
+            @include fa-icon($fa-var-check, after, inline-block, 3px 0 0 0, 0, $green, 18px);
 
             &:after {
                 opacity: 0;

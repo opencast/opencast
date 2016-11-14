@@ -139,7 +139,7 @@ $df-select-dropdown-horizontal-padding: 6px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 
-    @include fa-icon($fa-close, before, inline-block, 4px 0 0 0, 0, $medium-prim-color, 10px);
+    @include fa-icon($fa-var-close, before, inline-block, 4px 0 0 0, 0, $medium-prim-color, 10px);
 
     &.disabled {
         @include fa-icon-color(before, $light-prim-color);

@@ -1,6 +1,6 @@
 angular.module('adminNg.controllers')
-.controller('UserCtrl', ['$scope', 'UserRolesResource', 'UserResource', 'UsersResource', 'JsHelper', 'Notifications', 'Modal', 'underscore',
-    function ($scope, UserRolesResource, UserResource, UsersResource, JsHelper, Notifications, Modal, _) {
+.controller('UserCtrl', ['$scope', 'Table', 'UserRolesResource', 'UserResource', 'UsersResource', 'JsHelper', 'Notifications', 'Modal', 'underscore',
+    function ($scope, Table, UserRolesResource, UserResource, UsersResource, JsHelper, Notifications, Modal, _) {
         $scope.manageable = true;
 
         $scope.role = {
@@ -50,8 +50,9 @@ angular.module('adminNg.controllers')
                 });
             } else {
                 UsersResource.create({ }, $scope.user, function () {
-                    Notifications.add('success', 'USER_ADDED');
+                    Table.fetch();
                     Modal.$scope.close();
+                    Notifications.add('success', 'USER_ADDED');
                 }, function () {
                     Notifications.add('error', 'USER_NOT_SAVED', 'user-form');
                 });
