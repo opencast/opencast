@@ -7,39 +7,62 @@ admin node).
 
 ### Required Version
 
- - ActiveMQ 5.10 or above should work.
- - ActiveMQ 5.6 will not work.
- - Versions in between are untested.
+ - ActiveMQ 5.10 or above
 
 
-### Installation
+Installation
+------------
 
  - If you use the Opencast RPM repository, simply install the `activemq-dist` package.
  - If you are running RHEL, CentOS or Fedora you can use the [ActiveMQ-dist Copr RPM repository
    ](https://copr.fedoraproject.org/coprs/lkiesow/apache-activemq-dist/)
+ - Newer Debian based operating systems contain a sufficient new version.
  - You can download binary distributions from the [Apache ActiveMQ website](http://activemq.apache.org/download.html)
 
 
-### Configuration
+Configuration
+-------------
 
 What you need to do:
 
  - Set-up required message queues for Opencast
  - Point all your Opencast nodes to your message broker.
+ - Configure authentication and access control
 
 The first task is easy. Opencast comes with a ActiveMQ configuration file, located at
 `docs/scripts/activemq/activemq.xml` (RPM repo: `/usr/share/opencast/docs/scripts/activemq/activemq.xml`). This file
 will give you a basic configuration with all queues set-up and accepting connections from all hosts over TCP port
-`61616`. Simply replacing the default ActiveMQ configuration, usually located at `/etc/activemq/activemq.xml`, with this
-file will already give you a fully functional ActiveMQ set-up.
+`61616`.
 
-Then configure the ActiveMQ connection in the `custom.properties`. The default configuration points to a local
-installation of ActiveMQ:
+Replacing the default ActiveMQ configuration with this file will already give you a fully functional ActiveMQ set-up for
+an all-in-one server. You will find the configuration in the usually locations, e.g. `/etc/activemq/`. On Debian you
+first need to activate or create a new ActiveMQ instance. For more details on that see
+`/usr/share/doc/activemq/README.Debian`.
+
+Note that the default configuration needs to be adjusted for distributed set-ups since:
+
+ - ActiveMQ listens to localhost only (`activemq.xml`)
+ - Opencast tries to connect to ActiveMQ locally (`custom.properties`)
+ - No password is set (`activemq.xml`, `custom.properties`)
+
+
+### Connection
+
+The ActiveMQ connection is configured in the `custom.properties`. The default configuration points to a local
+installation of ActiveMQ. You can easily configure this to point somewhere else:
 
     activemq.broker.url = failover://tcp://example.opencast.org:61616
 
 
-### Security
+### Bind Host
+
+The default configuration tells ActiveMQ to listen to `127.0.0.1` only. On a distributed system, you want to set this to
+`0.0.0.0` to listen to all hosts by changing the `transportConnector`:
+
+    <transportConnector name="openwire" uri="tcp://127.0.0.1:61616?..."/>
+
+
+### Username and Password
 
 ActiveMQ can secure its message queues by requiring login credentials. This section will go through the steps of setting
 up a username and a password. Have a look at the [ActiveMQ security site](http://activemq.apache.org/security.html) for
@@ -112,7 +135,7 @@ We will add the following plugin configuration:
 
 - The `authorizationEntry` restricts read, write and admin access for queues and topics to members of the group admins.
 
-##### Configure Opencast to Connect with Username and Password to Message Broker
+#### Configure Opencast to Connect with Username and Password to Message Broker
 
 Now that we have secured the queues, Opencast will complain that it is unable to connect, using the current username and
 password. The username and password used above need to be added to the `custom.properties` file of Opencast.  There are
