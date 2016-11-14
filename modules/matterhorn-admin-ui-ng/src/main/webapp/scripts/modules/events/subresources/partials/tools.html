@@ -33,7 +33,7 @@
         <div class="video-container">
             <div data-video-player data-player="player" data-video="video" data-adapter="html5" data-player-ref="player" data-controls="{{ tab === 'playback' }}"/>
 
-            <nav class="view-controller" style="display:none">
+            <nav class="view-controller">
                 <a ng-class="{active: tab === 'playback'}"
                     ng-click="openTab('playback')" translate>VIDEO_TOOL.TABS.PLAY</a>
                 <a ng-class="{active: tab === 'editor'}"

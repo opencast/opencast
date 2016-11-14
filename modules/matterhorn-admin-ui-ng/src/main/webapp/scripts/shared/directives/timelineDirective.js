@@ -33,7 +33,6 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             scope.to = 0;
 
             scope.formatMilliseconds = utils.formatMilliseconds;
-            console.log(scope);
 
             scope.player.adapter.addListener(PlayerAdapter.EVENTS.TIMEUPDATE, function () {
                 scope.position = scope.player.adapter.getCurrentTime() * 1000;
@@ -43,8 +42,6 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                 // Mark current segment as selected
                 scope.selectSegment(segment);
-
-                console.log('TIMEUPDATE: '+ scope.positionStyle);
 
                 // Stop play back when switching from a replayed segment to
                 // the next.
@@ -65,6 +62,12 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
             });
 
+            /**
+             * Display the current zoom level ms value into human readable value
+             * in the existing drop down > overriding the display HTML
+             *
+             * @param {Number} the ms value of the current zoom level
+             */
             scope.displayZoomLevel = function (ms) {
 
                 var date = new Date(ms),
@@ -78,7 +81,6 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 } else {
                     st += date.getUTCSeconds() + ' s';
                 }
-                console.log('Display: ' + st);
 
                 var dropdown_text = element.find('.zoom-control .chosen-container > a > span');
                 if (dropdown_text) {
@@ -121,9 +123,6 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
              * @return {Number} Visible interval in milliseconds
              */
             scope.getZoomValue = function () {
-
-                console.log('ZV: ' + scope.zoomLevel + ' ' + scope.video.duration);
-
                 return (10000 - scope.video.duration) / 100 * scope.zoomLevel +
                     scope.video.duration;
             };
@@ -147,7 +146,6 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     scope.zoomOffset = scope.getZoomOffset();
                     scope.zoomFieldOffset = scope.getZoomFieldOffset();
 
-                    console.log('w ZV: ' + scope.zoomValue);
                     if (scope.zoomSelected == "") scope.displayZoomLevel(scope.zoomValue);
                 });
 
@@ -164,6 +162,9 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     }
                 });
 
+            /**
+             * On change of zoom range slider updates the appropriate zoom select option
+             */
             scope.changeZoomLevel = function () {
 
                 if (scope.zoomValue > 0) {
@@ -257,6 +258,11 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 return style;
             };
 
+            /**
+             * The display classes to use for the zoom range element.
+             *
+             * @return {Object} object with {class}: {boolean} values for CSS classes.
+             */
             scope.getZoomClass = function () {
 
                 var field = angular.element('.field'),
@@ -288,6 +294,12 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 }
             };
 
+            /**
+             * Toggle the deleted flag for a segment. Indicating if it should be used or not.
+             *
+             * @param {Event} click event for checkbox link - stop the propogation
+             * @param {Object} segment object on which the deleted variable will change
+             */
             scope.toggleSegment = function (event, segment) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -328,24 +340,38 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
               });
             };
 
+            /**
+             * Catch all method to track the mouse movement on the page,
+             * to calculate the movement of elements properly.
+             */
             $document.mousemove(function(e) {
                 $document.mx = document.all ? window.event.clientX : e.pageX;
                 $document.my = document.all ? window.event.clientY : e.pageY;
             });
 
-            // Stop dragging the cursor as soon as the mouse button is
-            // released.
+
+            /**
+             * Mouseup event handler to finish up the move action for:
+             * 1. Timeline handle
+             * 2. Zoom field
+             * 3. Segment start handle
+             */
             $document.mouseup(function () {
 
-              // timeline mouse events
-                scope.canMoveTimeline = false;
-                element.find('.field-of-vision .field').removeClass('active');
+              // Timeline mouse events
+                if (scope.canMove) {
+                  scope.canMoveTimeline = false;
+                  element.find('.field-of-vision .field').removeClass('active');
+                  scope.player.adapter.setCurrentTime(scope.position / 1000);
+                }
 
-              // timeline position - handle
+              // Timeline position - handle
                 if (scope.canMove) {
                   scope.canMove = false;
                   element.find('#cursor .handle').data('active', false);
+                  scope.player.adapter.setCurrentTime(scope.position / 1000);
 
+                  // show small cut button below timeline handle
                   element.find('#cursor .arrow_box').show();
 
                   if (scope.timer) $timeout.cancel( scope.timer );
@@ -358,6 +384,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     );
                 }
 
+              // Segment start handle
                 if (scope.movingSegment) {
 
                   var track = element.find('.segments'),
@@ -367,8 +394,6 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                   var pxPosition = scope.movingSegment.parent().offset().left + parseInt(scope.movingSegment.css('left'),10) - topTrack.offset().left + 3;
                       position = Math.floor((pxPosition / track.width() * scope.video.duration) + scope.zoomFieldOffset);
-
-                  console.log(position +' '+ scope.position +' '+ scope.zoomValue +' '+ scope.zoomFieldOffset +' '+ scope.video.duration);
 
                   if (position < 0) position = 0;
                   if (position >= scope.video.duration) position = scope.video.duration;
@@ -382,23 +407,17 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     segment.start = position;
                   }
 
-                  console.log('Range: '+ 0 +' '+  scope.video.duration);
-                  console.log('active: '+ segment.start +' '+  segment.end);
-
                   // update the segments around the one that was changed
                   if (index - 1 >= 0) {
 
                       var before = scope.video.segments[index - 1];
-                      console.log('before: '+ before.start +' '+  before.end);
                       before.end = segment.start;
-                      console.log('        '+ before.start +' '+  before.end);
 
                       if (before.end - before.start <= 0) {
                         // empty segment
                         segment.start = before.start;
                         scope.video.segments.splice(index - 1, 1);
                       }
-
                   }
 
                   // Sort array by start attribute
@@ -409,9 +428,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                   if (index + 1 < scope.video.segments.length) {
                       var after = scope.video.segments[index + 1];
-                      console.log('after: '+ after.start +' '+  after.end);
                       after.start = segment.end;
-                      console.log('       '+ after.start +' '+  after.end);
 
                       if (after.end - after.start <= 0) {
                         // empty segment
@@ -433,26 +450,26 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                       // i'm really small so should probably not exist anymore
                       scope.mergeSegment(segment);
                   }
-
-                  console.log(scope.video.segments.length +' '+ index);
-                  console.log(scope.video.segments);
                 }
 
-                scope.player.adapter.setCurrentTime(scope.position / 1000);
+                // Clean-up of mousemove handlers
                 $document.unbind('mousemove', scope.movePlayHead);
                 $document.unbind('mousemove', scope.moveTimeline);
                 $document.unbind('mousemove', scope.moveSegment);
             });
 
-
+            /**
+             * Clicking on the playtrack moves the timeline handle to that position.
+             *
+             * @param {Event} event Event that triggered this method.
+             */
             scope.clickPlayTrack = function (event) {
                 event.preventDefault();
                 var el = $(event.target);
 
                 if (el.attr('id') == 'cursor-track') {
 
-                  var position = (event.clientX - el.offset().left) / el.width() * scope.video.duration;
-                  position += + scope.zoomFieldOffset;
+                  var position = (event.clientX - el.offset().left) / el.width() * scope.zoomValue + scope.zoomFieldOffset;
 
                   // Limit position to the length of the video
                   if (position > scope.video.duration) {
@@ -464,6 +481,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                   scope.player.adapter.setCurrentTime(position / 1000);
 
+                  // show small cut button below timeline handle
                   element.find('#cursor .arrow_box').show();
 
                   if (scope.timer) $timeout.cancel( scope.timer );
@@ -478,9 +496,9 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             }
 
             /**
-             * Sets the cursor position depending on the mouse coordinates.
+             * Sets the timeline handle cursor position depending on the mouse coordinates.
              *
-             * @param {Event} event Event that triggered this method.
+             * @param {Event} the mousemove event details.
              */
             scope.movePlayHead = function (event) {
                 event.preventDefault();
@@ -505,10 +523,11 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             };
 
             /**
-             * Callback to a mouse-down event initiating a drag of the
-             * position handle.
+             * The mousedown event handler to initiate the dragging of the
+             * timeline handle.
+             * Adds a listener on mousemove (movePlayHead)
              *
-             * @param {Event} event Event that triggered this method.
+             * @param {Event} the mousedown events that inits the mousemove actions.
              */
             scope.dragPlayhead = function (event) {
                 event.preventDefault();
@@ -525,9 +544,10 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             };
 
             /**
-             * Sets the cursor position depending on the mouse coordinates.
+             * Sets the zoomFieldOffset corresponding to the position of the zoom field
+             * in the field-of-vision as the mouse drag event unfolds.
              *
-             * @param {Event} event Event that triggered this method.
+             * @param {Event} the mousemove event details.
              */
             scope.moveTimeline = function (event) {
                 event.preventDefault();
@@ -546,9 +566,6 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 scope.zoomFieldOffset = (scope.video.duration * percentage) / 100;
                 scope.position = (scope.zoomFieldOffset * scope.video.duration) / (scope.video.duration - scope.zoomValue);
 
-                console.log(scope.zoomFieldOffset +' '+ scope.zoomValue +' '+scope.video.duration)
-                console.log(scope.position);
-
                 if (isNaN(scope.position) || (scope.position < 0)) scope.position = 0;
                 if (scope.position > scope.video.duration) scope.position = scope.video.duration;
 
@@ -556,10 +573,15 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 scope.to = scope.zoomFieldOffset + scope.zoomValue;
                 shuttle.find(':first-child').html( scope.formatMilliseconds(scope.from) );
                 shuttle.find(':last-child').html( scope.formatMilliseconds(scope.to) );
-
-                //console.log(scope.zoomFieldOffset +' '+ scope.zoomValue);
             };
 
+            /**
+             * The mousedown event handler to initiate the dragging of the
+             * zoom timeline field.
+             * Adds a listener on mousemove (moveTimeline)
+             *
+             * @param {Event} the mousedown events that inits the mousemove actions.
+             */
             scope.dragTimeline = function (event) {
                 event.preventDefault();
 
@@ -580,9 +602,9 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             }
 
             /**
+             * Updates the segment start position indicator according to the mouse movement.
              *
-             *
-             * @param {Event} event Event that triggered this method.
+             * @param {Event} the mousemove event details.
              */
             scope.moveSegment= function (event) {
                 event.preventDefault();
@@ -594,9 +616,14 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 if (nx >= scope.movingSegment.data('end')) nx = scope.movingSegment.data('end');
 
                 scope.movingSegment.css('left', nx);
-                //console.log (nx);
             }
 
+            /**
+             * The mousedown event handler for the segment start handle of a segment.
+             * Adds a listener on mousemove (moveSegment)
+             *
+             * @param {Event} the mousedown events that inits the mousemove actions.
+             */
             scope.dragSegement = function (event, segment) {
               event.preventDefault();
 
@@ -618,10 +645,6 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
               scope.movingSegment = handle;
 
-              //segment.start = 100000;
-              console.log (scope.video.segments);
-              console.log(segment);
-
               // Register global mouse move callback
               $document.mousemove(scope.moveSegment);
             }
@@ -634,10 +657,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             scope.skipToSegment = function (event, segment) {
                 event.preventDefault();
 
-                console.log('select this segment');
-
                 if (!segment.selected) {
-                    console.log(segment.start / 1000);
                     scope.player.adapter.setCurrentTime(segment.start / 1000);
                     scope.position = segment.start;
                     scope.positionStyle = (scope.position * 100 / scope.video.duration) + '%';
@@ -661,6 +681,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 $document.unbind('mouseup');
                 $document.unbind('mousemove');
 
+                // cancel timer for the small cut button below timeline handle
                 if (scope.timer) $timeout.cancel( scope.timer );
             });
 
