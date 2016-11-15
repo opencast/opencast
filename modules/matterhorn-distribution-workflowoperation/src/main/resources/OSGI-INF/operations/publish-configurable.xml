@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.workflow.handler.distribution.ConfigurablePublishWorkflowOperationHandler" immediate="true" activate="activate">
-  
+ name="org.opencastproject.workflow.handler.distribution.ConfigurablePublishWorkflowOperationHandler" immediate="true">
   <implementation class="org.opencastproject.workflow.handler.distribution.ConfigurablePublishWorkflowOperationHandler" />
   <property name="service.description" value="Configurable Publication Workflow Handler" />
   <property name="workflow.operation" value="publish-configure" />
