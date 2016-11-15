@@ -71,7 +71,9 @@
     <bundle>mvn:org.apache.httpcomponents/httpcore-osgi/${httpcomponents-httpcore.version}</bundle>
     <bundle>mvn:org.apache.neethi/neethi/3.0.1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcel/5.2_3</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.cglib/3.2.4_1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/3.1_7</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-pool/1.5.4_4</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jakarta-regexp/1.4_1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/1.8.5_1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.wsdl4j/1.6.3_1</bundle>
@@ -125,6 +127,7 @@
     <bundle>mvn:org.opencastproject/matterhorn-static-file-service-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-static-file-service-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-userdirectory/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-userdirectory-ldap/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-urlsigning-common/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-urlsigning-service-api/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-urlsigning-service-impl/${project.version}</bundle>
