@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
   <version>2.8.0</version>
-  <nexusVersion>2.11.4-01</nexusVersion>
+  <nexusVersion>2.14.1-01</nexusVersion>
   <globalConnectionSettings>
     <connectionTimeout>20000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>
@@ -164,6 +164,34 @@
         <proxyMode>ALLOW</proxyMode>
       </externalConfiguration>
     </repository>
+    <repository>
+      <id>npmjs</id>
+      <name>NPM Registry</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>npm-proxy</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <localStorage>
+        <provider>file</provider>
+      </localStorage>
+      <remoteStorage>
+        <url>https://registry.npmjs.org</url>
+      </remoteStorage>
+      <externalConfiguration>
+        <repositoryPolicy>MIXED</repositoryPolicy>
+        <fileTypeValidation>true</fileTypeValidation>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <artifactMaxAge>0</artifactMaxAge>
+        <metadataMaxAge>0</metadataMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <autoBlockActive>true</autoBlockActive>
+      </externalConfiguration>
+    </repository>
   </repositories>
   <repositoryGrouping>
     <pathMappings>
@@ -263,7 +291,7 @@
     <hostname>smtp-host</hostname>
     <port>25</port>
     <username>smtp-username</username>
-    <password>{ZY6hxdDlmo8HoYnnaXpWejGZTucokKwBTNJGr6zUzYE=}</password>
+    <password>{+6ROX1reuLoH5R+MLR+OuKZBYFTct0nOLFaVMAH+YaY=}</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
   <notification />
