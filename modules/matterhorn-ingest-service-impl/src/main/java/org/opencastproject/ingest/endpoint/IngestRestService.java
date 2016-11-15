@@ -88,6 +88,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -215,10 +216,31 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     }
   }
 
+  @PUT
+  @Produces(MediaType.TEXT_XML)
+  @Path("createMediaPackageWithID/{id}")
+  @RestQuery(name = "createMediaPackageWithID", description = "Create an empty media package with ID /n Overrides Existing Mediapackage ", pathParameters = {
+          @RestParameter(description = "The Id for the new Mediapackage", isRequired = true, name = "id", type = RestParameter.Type.STRING) }, reponses = {
+          @RestResponse(description = "Returns media package", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+  public Response createMediaPackage(@PathParam("id") String mediaPackageId) {
+    MediaPackage mp;
+    try {
+      mp = ingestService.createMediaPackage(mediaPackageId);
+
+      startCache.put(mp.getIdentifier().toString(), new Date());
+      return Response.ok(mp).build();
+    } catch (Exception e) {
+      logger.warn(e.getMessage(), e);
+      return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("createMediaPackage")
-  @RestQuery(name = "createMediaPackage", description = "Create an empty media package", reponses = {
+  @RestQuery(name = "createMediaPackage", description = "Create an empty media package", restParameters = {
+         }, reponses = {
           @RestResponse(description = "Returns media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
   public Response createMediaPackage() {
@@ -256,17 +278,19 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "addTrackURL", description = "Add a media track to a given media package using an URL", restParameters = {
           @RestParameter(description = "The location of the media", isRequired = true, name = "url", type = RestParameter.Type.STRING),
           @RestParameter(description = "The kind of media", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "The Tags of the  media track", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
           @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, reponses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
-  public Response addMediaPackageTrack(@FormParam("url") String url, @FormParam("flavor") String flavor,
+  public Response addMediaPackageTrack(@FormParam("url") String url, @FormParam("flavor") String flavor,  @FormParam("tags")  String tags,
           @FormParam("mediaPackage") String mpx) {
     try {
       MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
       if (MediaPackageSupport.sanityCheck(mp).isSome())
         return Response.serverError().status(Status.BAD_REQUEST).build();
-      mp = ingestService.addTrack(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), mp);
+      String[] tagsArray = tags.split(",");
+      mp = ingestService.addTrack(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), tagsArray, mp);
       return Response.ok(mp).build();
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
@@ -283,6 +307,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     description = "Add a media track to a given media package using an input stream",
     restParameters = {
       @RestParameter(description = "The kind of media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+      @RestParameter(description = "The Tags of the  media track", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
       @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) },
     bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
     reponses = {
@@ -419,6 +444,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       String fileName = null;
       MediaPackage mp = null;
       Long startTime = null;
+      String[] tags = null;
       /* Only accept multipart/form-data */
       if (!ServletFileUpload.isMultipartContent(request)) {
         return Response.serverError().status(Status.BAD_REQUEST).build();
@@ -433,6 +459,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             if (flavorString != null) {
               flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
             }
+          } else if ("tags".equals(fieldName)) {
+              tags = Streams.asString(item.openStream()).split(",");
           } else if ("mediaPackage".equals(fieldName)) {
             try {
               mp = factory.newMediaPackageBuilder().loadFromXml(item.openStream());
@@ -469,16 +497,16 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       }
       switch (type) {
         case Attachment:
-          mp = ingestService.addAttachment(in, fileName, flavor, mp);
+          mp = ingestService.addAttachment(in, fileName, flavor, tags, mp);
           break;
         case Catalog:
-          mp = ingestService.addCatalog(in, fileName, flavor, mp);
+          mp = ingestService.addCatalog(in, fileName, flavor, tags, mp);
           break;
         case Track:
           if (startTime == null) {
-            mp = ingestService.addTrack(in, fileName, flavor, mp);
+            mp = ingestService.addTrack(in, fileName, flavor, tags, mp);
           } else {
-            mp = ingestService.addPartialTrack(in, fileName, flavor, startTime, mp);
+          mp = ingestService.addPartialTrack(in, fileName, flavor, startTime, mp);
           }
           break;
         default:
