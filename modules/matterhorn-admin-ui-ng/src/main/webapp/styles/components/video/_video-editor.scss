@@ -33,6 +33,7 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
 .video-timeline {
     background: #fff;
     border: $thin-border-stroke $main-border-color;
+    margin-top: 5px;
 
     &>div {
         margin-top: 5px;
@@ -96,24 +97,26 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
             }
 
             $segment-border-radius: 2px;
-            $segment-heidght: 50px;
+            $segment-height: 60px;
+            $segment-background: 50px;
 
             .segments {
                 // background image set inline
                 overflow: hidden;
                 background-repeat: no-repeat;
-                background-size: 100% $segment-heidght;
-                height: $segment-heidght;
+                background-size: 100% $segment-background;
+                background-position: bottom left;
+                height: $segment-height;
                 // needed for zoom offset
                 position: relative;
 
                 .segment-container {
                     float: left;
-                    height: $segment-heidght;
+                    height: $segment-height;
 
                     .segment-seperator {
                           background-color: transparent;
-                          height: $segment-heidght;
+                          height: $segment-height;
                           width: 9px;
                           float: left;
                           position: relative;
@@ -131,13 +134,13 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                         background: $color-black none repeat scroll 0 0;
                         content: "";
                         display: block;
-                        height: $segment-heidght;
+                        height: $segment-height;
                         margin-left: 4px;
                         width: 1px;
                     }
 
                     .segment {
-                        height: $segment-heidght;
+                        height: $segment-height;
                         color: #666666;
                         padding-right: 5px;
                         text-align: right;
@@ -208,24 +211,19 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
 
         /*& > div:nth-last-of-type(2) {*/
         #cursor-track {
-             padding: 8px 0px;
+             padding: 5px 0px;
              margin-bottom: 8px;
-
-             &:before {
-                 background: $main-border-color none repeat scroll 0 0;
-                 content: "";
-                 display: block;
-                 height: 1px;
-                 width: 100%;
-             }
+             background: #eee none repeat scroll 0 0;
+             cursor: pointer;
+             border-radius: 4px;
         }
 
         #cursor {
             width: 1px;
-            height: 100%;
+            height: calc(100% - 23px);
             background-color: #fb6257;
             position: absolute;
-            top: -8px;
+            top: 19px;
             z-index: $z-80;
 
             $handle-size: 14px;
@@ -281,11 +279,11 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                 height: 20px;
                 display: block;
                 margin: 2px;
-                color: $color-gray;
+                color: rgba(193,56,50,0.7);
 
                 &:hover,
                 &:active {
-                  color: $color-darkgray;
+                  color: rgba(193,56,50,1);
                 }
 
                 @include fa-icon($fa-var-scissors, before, block, 0, 2px 4px, inherit, 12px);

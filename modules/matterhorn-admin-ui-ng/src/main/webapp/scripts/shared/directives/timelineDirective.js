@@ -32,8 +32,6 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             scope.from = 0;
             scope.to = 0;
 
-            scope.formatMilliseconds = utils.formatMilliseconds;
-
             scope.player.adapter.addListener(PlayerAdapter.EVENTS.TIMEUPDATE, function () {
                 scope.position = scope.player.adapter.getCurrentTime() * 1000;
                 scope.positionStyle = (scope.position * 100 / scope.video.duration) + '%';
@@ -61,7 +59,36 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 }
 
             });
+            
+            /**
+            * Formats time stamps to HH:MM:SS.sss
+            *
+            * @param {Number} Time in milliseconds,
+            *        {Boolean} should the milliseconds be displayed
+            * @return {String} Formatted time string
+           */
+            scope.formatMilliseconds = function (ms, showMilliseconds) {
 
+               if (isNaN(ms)) {
+                   return '';
+               }
+
+               var date = new Date(ms),
+                   pad = function (number, padding) {
+                       return (new Array(padding + 1).join('0') + number)
+                           .slice(-padding);
+                   };
+
+               if (typeof showMilliseconds === 'undefined') {
+                   showMilliseconds = true;
+               }
+
+               return pad(date.getUTCHours(), 2) + ':' +
+                   pad(date.getUTCMinutes(), 2) + ':' +
+                   pad(date.getUTCSeconds(), 2) +
+                   (showMilliseconds ? '.' + pad(date.getUTCMilliseconds(), 3) : '');
+            }
+           
             /**
              * Display the current zoom level ms value into human readable value
              * in the existing drop down > overriding the display HTML
@@ -212,10 +239,14 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 if (track.waveform) {
                     style['background-image'] = 'url(' + track.waveform + ')';
 
-                    // Load the waveform image into the zoom timeline if it exists
-                    jss.set('.field-of-vision::before', {
-                        'background-image': 'url(' + track.waveform + ')'
-                    });
+                    var img = '.video-timeline .timeline-control .field-of-vision:before{'
+                               + 'background-image: url("'+ track.waveform +'");';
+                    
+                    if ($('#timeline-header').length) {
+                        $('#timeline-header').html(img);
+                    } else {
+                        angular.element('head').append('<style id="timeline-header">'+ img +'</style>');
+                    }
                 }
 
                 return style;
@@ -281,8 +312,10 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
              * @param {Object} segment Segment object
              */
             scope.mergeSegment = function (event, segment) {
-                event.preventDefault();
-                event.stopPropagation();
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }                
 
                 var index = scope.video.segments.indexOf(segment);
                 if (scope.video.segments[index - 1]) {
@@ -301,8 +334,10 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
              * @param {Object} segment object on which the deleted variable will change
              */
             scope.toggleSegment = function (event, segment) {
-                event.preventDefault();
-                event.stopPropagation();
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
 
                 segment.deleted = !segment.deleted;
             };
@@ -464,34 +499,38 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
              * @param {Event} event Event that triggered this method.
              */
             scope.clickPlayTrack = function (event) {
-                event.preventDefault();
-                var el = $(event.target);
+                
+                if (event) {
+                    event.preventDefault();
+                    
+                    var el = $(event.target);
 
-                if (el.attr('id') == 'cursor-track') {
+                    if (el.attr('id') == 'cursor-track') {
 
-                  var position = (event.clientX - el.offset().left) / el.width() * scope.zoomValue + scope.zoomFieldOffset;
+                      var position = (event.clientX - el.offset().left) / el.width() * scope.zoomValue + scope.zoomFieldOffset;
 
-                  // Limit position to the length of the video
-                  if (position > scope.video.duration) {
-                      position = scope.video.duration;
-                  }
-                  if (position < 0) {
-                      position = 0;
-                  }
+                      // Limit position to the length of the video
+                      if (position > scope.video.duration) {
+                          position = scope.video.duration;
+                      }
+                      if (position < 0) {
+                          position = 0;
+                      }
 
-                  scope.player.adapter.setCurrentTime(position / 1000);
+                      scope.player.adapter.setCurrentTime(position / 1000);
 
-                  // show small cut button below timeline handle
-                  element.find('#cursor .arrow_box').show();
+                      // show small cut button below timeline handle
+                      element.find('#cursor .arrow_box').show();
 
-                  if (scope.timer) $timeout.cancel( scope.timer );
-                  scope.timer = $timeout(
-                        function() {
-                            // hide cut window
-                            element.find('#cursor .arrow_box').hide();
-                        },
-                        60000 //  1 min
-                    );
+                      if (scope.timer) $timeout.cancel( scope.timer );
+                      scope.timer = $timeout(
+                            function() {
+                                // hide cut window
+                                element.find('#cursor .arrow_box').hide();
+                            },
+                            60000 //  1 min
+                        );
+                    }
                 }
             }
 
