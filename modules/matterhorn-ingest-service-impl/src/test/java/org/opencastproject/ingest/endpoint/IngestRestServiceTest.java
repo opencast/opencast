@@ -51,6 +51,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 
+import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
@@ -296,6 +297,20 @@ public class IngestRestServiceTest {
       @Override
       public int read() throws IOException {
         return 0;
+      }
+
+      @Override
+      public boolean isFinished() {
+        return false;
+      }
+
+      @Override
+      public boolean isReady() {
+        return false;
+      }
+
+      @Override
+      public void setReadListener(ReadListener readListener) {
       }
     };
     return servletInputStream;

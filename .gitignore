@@ -41,3 +41,6 @@ Makefile
 
 # Ignore OS artifacts
 .DS_Store
+
+# Ignore phantomjs logs
+phantomjsdriver.log

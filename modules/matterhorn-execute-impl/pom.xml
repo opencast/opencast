@@ -36,6 +36,10 @@
       <artifactId>matterhorn-common</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
     <!-- logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -77,9 +81,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
               org.opencastproject.execute.impl.*;version=${project.version}
             </Export-Package>

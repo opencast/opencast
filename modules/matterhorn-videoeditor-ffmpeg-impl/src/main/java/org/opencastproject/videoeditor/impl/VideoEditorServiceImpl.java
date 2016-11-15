@@ -455,12 +455,16 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
   }
 
   @Override
-  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     this.properties = new Properties();
-    @SuppressWarnings("rawtypes")
-    Enumeration keys = properties.keys();
+    if (properties == null) {
+      logger.info("No configuration available, using defaults");
+      return;
+    }
+
+    Enumeration<String> keys = properties.keys();
     while (keys.hasMoreElements()) {
-      Object key = keys.nextElement();
+      String key = keys.nextElement();
       this.properties.put(key, properties.get(key));
     }
     logger.debug("Properties updated!");

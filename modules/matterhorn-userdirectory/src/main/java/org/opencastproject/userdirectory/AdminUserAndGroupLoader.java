@@ -134,6 +134,19 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
   }
 
   /**
+   * Creates a JpaOrganization from an organization
+   *
+   * @param org
+   *          the organization
+   */
+  private JpaOrganization fromOrganization(Organization org) {
+    if (org instanceof JpaOrganization)
+      return (JpaOrganization) org;
+    return new JpaOrganization(org.getId(), org.getName(), org.getServers(), org.getAdminRole(), org.getAnonymousRole(),
+            org.getProperties());
+  }
+
+  /**
    * Creates initial groups for system administrators per organization.
    *
    * @param organization
@@ -146,7 +159,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
   private void createSystemAdministratorUserAndGroup(final Organization organization) {
 
     if ((adminUserName == null) || (adminPassword == null)) {
-      logger.info("Tne administrator user and group loader is disabled.");
+      logger.info("The administrator user and group loader is disabled.");
       return;
     }
 
@@ -154,7 +167,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
       @Override
       protected void run() {
         try {
-          JpaOrganization org = (JpaOrganization) organizationDirectoryService.getOrganization(organization.getId());
+          JpaOrganization org = fromOrganization(organizationDirectoryService.getOrganization(organization.getId()));
 
           // Make sure the administrator exists for this organization. Note that the user will gain its roles through
           // membership in the administrator group

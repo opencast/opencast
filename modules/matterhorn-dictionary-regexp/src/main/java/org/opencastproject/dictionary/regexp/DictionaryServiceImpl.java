@@ -74,7 +74,8 @@ public class DictionaryServiceImpl implements DictionaryService, ManagedService 
   /**
    * Load configuration
    */
-  public synchronized void updated(Dictionary properties) {
+  @Override
+  public synchronized void updated(Dictionary<String, ?> properties) {
     if (properties != null && properties.get(PATTERN_CONFIG_KEY) != null) {
       String pattern = properties.get(PATTERN_CONFIG_KEY).toString();
       /* Fix special characters */

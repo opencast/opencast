@@ -20,7 +20,7 @@
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.xml.bind</groupId>
@@ -49,7 +49,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Import-Package> org.opencastproject.rest;version=${project.version}</Import-Package>
             <Private-Package>ui.*</Private-Package>
             <Http-Alias>/engage/ui</Http-Alias>
             <Http-Classpath>/ui</Http-Classpath>

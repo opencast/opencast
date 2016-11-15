@@ -24,6 +24,8 @@ package org.opencastproject.util;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
 
+import org.opencastproject.rest.RestConstants;
+import org.opencastproject.rest.SharedHttpContext;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
@@ -32,10 +34,18 @@ import org.opencastproject.util.data.functions.Strings;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 
 import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+
+import javax.servlet.Servlet;
 
 /** Contains general purpose OSGi utility functions. */
 public final class OsgiUtil {
@@ -100,6 +110,29 @@ public final class OsgiUtil {
     return option(d.get(key)).bind(Strings.asString()).bind(Strings.trimToNone);
   }
 
+  /** Get a value from a dictionary. Return none if the key does either not exist or the value is blank. */
+  public static Option<Integer> getOptCfgAsInt(Dictionary d, String key) {
+    return option(d.get(key)).bind(Strings.asString()).bind(Strings.toInt);
+  }
+
+  /**
+   * Filter a dictionary by key prefix. For example the following map
+   * <code>{w.p.key1: "value1", w.p.key2: "value2", x: "1"}</code> filtered by <code>filterByPrefix(d, "w.p.")</code>
+   * returns <code>{key1: "value1", key2: "value"}</code>.
+   */
+  public static Map<String, String> filterByPrefix(Dictionary d, String prefix) {
+    final Map<String, String> filtered = new HashMap<>();
+    final int prefixLength = prefix.length();
+    final Enumeration keys = d.keys();
+    while (keys.hasMoreElements()) {
+      final String key = keys.nextElement().toString();
+      if (key.startsWith(prefix)) {
+        filtered.put(key.substring(prefixLength), d.get(key).toString());
+      }
+    }
+    return filtered;
+  }
+
   /**
    * Get an optional boolean from a dictionary.
    */
@@ -137,8 +170,8 @@ public final class OsgiUtil {
   /**
    * Check the existence of the given dictionary. Throw an exception if null.
    */
-  public static void checkDictionary(Dictionary properties,
-                                     ComponentContext componentContext) throws ConfigurationException {
+  public static void checkDictionary(Dictionary properties, ComponentContext componentContext)
+          throws ConfigurationException {
     if (properties == null) {
       String dicName = componentContext.getProperties().get("service.pid").toString();
       throw new ConfigurationException("*", "Dictionary for " + dicName + " does not exist");
@@ -147,12 +180,20 @@ public final class OsgiUtil {
 
   /** Create a config info string suitable for logging purposes. */
   public static String showConfig(Tuple<String, ?>... cfg) {
-    return "Config\n" + Collections.mkString(
-            mlist(cfg).map(new Function<Tuple<String, ?>, String>() {
-              @Override public String apply(Tuple<String, ?> t) {
-                return t.getA() + "=" + t.getB().toString();
-              }
-            }).value(),
-            "\n");
+    return "Config\n" + Collections.mkString(mlist(cfg).map(new Function<Tuple<String, ?>, String>() {
+      @Override
+      public String apply(Tuple<String, ?> t) {
+        return t.getA() + "=" + t.getB().toString();
+      }
+    }).value(), "\n");
   }
+
+  public static ServiceRegistration<?> registerServlet(BundleContext bundleContext, Object service, String alias) {
+    Dictionary<String, String> resourceProps = new Hashtable<>();
+    resourceProps.put(SharedHttpContext.CONTEXT_ID, RestConstants.HTTP_CONTEXT_ID);
+    resourceProps.put(SharedHttpContext.SHARED, "true");
+    resourceProps.put(SharedHttpContext.ALIAS, alias);
+    return bundleContext.registerService(Servlet.class.getName(), service, resourceProps);
+  }
+
 }

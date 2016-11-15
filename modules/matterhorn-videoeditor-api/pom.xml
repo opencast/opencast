@@ -29,9 +29,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package> 
               org.opencastproject.videoeditor.api;version=${project.version}
             </Export-Package>
@@ -49,6 +46,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <version>4.10</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

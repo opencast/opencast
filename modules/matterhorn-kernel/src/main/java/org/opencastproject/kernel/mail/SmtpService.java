@@ -57,9 +57,8 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    * @throws ConfigurationException
    *           if configuration fails
    */
-  @SuppressWarnings("rawtypes")
   @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
 
     // Production or test mode
     String optMode = StringUtils.trimToNull((String) properties.get(OPT_MAIL_MODE));

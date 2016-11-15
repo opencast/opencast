@@ -5,8 +5,9 @@
     <implementation class="org.opencastproject.kernel.rest.CleanSessionsFilter" />
     <property name="service.description" value="Clean Digest Sessions and Set Max Inactive Interval Filter" />
     <property name="httpContext.id" value="opencast.httpcontext" />
+    <property name="httpContext.shared" value="true" />
     <!-- This filter must have the highest service.ranking value to ensure that it is run last to invalidate sessions. -->
-    <property name="service.ranking" value="10" />
+    <property name="service.ranking" value="1" />
     <property name="urlPatterns" value="*" />
     <service>
       <provide interface="javax.servlet.Filter" />
