@@ -155,51 +155,58 @@ list. The roles will be processed in the same way as the roles obtained from the
 
 > *This step is only necessary in Opencast deployments along multiple machines.*
 
-Edit the file `etc/org.opencastproject.userdirectory.ldap.cfg` and include the same authentication
-parameters as in the `security.xml` file. The contents should be self-explanatory:
+Make a copy of the file `etc/org.opencastproject.userdirectory.ldap.cfg` in the same directory and name it as:
 
-    # In order to configure one or more LDAP configurations, set the "instances" field to the correct value
-    # and add the property keys by appending the respective number to it.
-    instances=0
+    org.opencastproject.userdirectory.ldap-<ID>.cfg
+
+, where `<ID>` is a unique indentifier for each LDAP connection. Edit the parameters in the file with the same
+information as in the `security.xml` file. The contents should be self-explanatory:
+
+    ##
+    ## ** PLEASE NOTE: EDITING THIS TEMPLATE HAS NO EFFECT!!! **
+    ##
+    ## In order to configure a new LDAP connection, please make a copy of this file in the same directory with the name:
+    ##
+    ##        org.opencastproject.userdirectory.ldap-<ID>.cfg
+    ##
+    ## , where "<ID>" is an identifier, unique for each configured LDAP instance.
+    ## Then, fill in the properties for the new LDAP connection below and ideally delete this header to avoid confusion
     
-    #
-    # The property keys that can be used when setting up LDAP connections.  Be careful not to include spaces.
-    #
-    keys=org.opencastproject.userdirectory.ldap.url,org.opencastproject.userdirectory.ldap.searchbase,\
-    org.opencastproject.userdirectory.ldap.searchfilter,org.opencastproject.userdirectory.ldap.cache.size,\
-     org.opencastproject.userdirectory.ldap.cache.expiration,org.opencastproject.userdirectory.ldap.roleattributes,\
-    org.opencastproject.userdirectory.ldap.org
     
-    #
-    # First sample configuration
-    #
+    ## The URL to the LDAP server
+    ## Example: ldap://ldap.berkeley.edu
+    org.opencastproject.userdirectory.ldap.url=
     
-    # The URL to the LDAP server
-    #org.opencastproject.userdirectory.ldap.url.1=ldap://ldap.berkeley.edu
+    ## The user and password used for LDAP authentication.  If left commented, the LDAP provider will use an anonymous bind.
+    #org.opencastproject.userdirectory.ldap.userDn=
+    #org.opencastproject.userdirectory.ldap.password=
     
-    # The user and password used for LDAP authentication.  If left commented, the LDAP provider will use an anonymous bind.
-    # If uncommenting these, add them to the keys at the bottom of this file.
-    #org.opencastproject.userdirectory.ldap.userDn.1=
-    #org.opencastproject.userdirectory.ldap.password.1=
+    ## The base path within LDAP to search for users
+    ## Example: ou=people,dc=berkeley,dc=edu
+    org.opencastproject.userdirectory.ldap.searchbase=
     
-    # The base path within LDAP to search for users
-    #org.opencastproject.userdirectory.ldap.searchbase.1=ou=people,dc=berkeley,dc=edu
+    ## The search filter to use for identifying users by ID
+    org.opencastproject.userdirectory.ldap.searchfilter=(uid={0})
     
-    # The search filter to use for identifying users by ID
-    #org.opencastproject.userdirectory.ldap.searchfilter.1=(uid={0})
+    ## The maximum number of users to cache
+    org.opencastproject.userdirectory.ldap.cache.size=1000
     
-    # The maximum number of users to cache
-    #org.opencastproject.userdirectory.ldap.cache.size.1=1000
+    ## The maximum number of minutes to cache a user
+    org.opencastproject.userdirectory.ldap.cache.expiration=5
     
-    # The maximum number of minutes to cache a user
-    #org.opencastproject.userdirectory.ldap.cache.expiration.1=5
+    ## The comma-separated list of attributes that will be translated into roles.
+    ## Note that the attributes will be converted to uppercase and that they may be prefixed with a string, as defined in the
+    ## configuration below, which is not blank by default. Please refer to the documentation of the "roleprefix" property
+    ## below.
+    ## Example: berkeleyEduAffiliations,departmentNumber
+    org.opencastproject.userdirectory.ldap.roleattributes=
     
-    # The comma-separated list of attributes that will be translated into roles. Note that the attributes will be prefixed
-    # with the string "ROLE_" and the attribute value will be transformed to upper case.
-    #org.opencastproject.userdirectory.ldap.roleattributes.1=berkeleyEduAffiliations,departmentNumber
+    ## The organization for this provider
+    org.opencastproject.userdirectory.ldap.org=mh_default_org
     
-    # The organization for this provider
-    #org.opencastproject.userdirectory.ldap.org.1=mh_default_org
+    ## A prefix to be added to all the roles read by this provider. It defaults to "ROLE_".
+    ## Please note that if no prefix (i.e. an empty prefix) is desired, it must be EXPLICITLY set to an EMPTY STRING
+    org.opencastproject.userdirectory.ldap.roleprefix=ROLE_
 
 Combination with Existing authorization Mechanisms
 --------------------------------------------------
