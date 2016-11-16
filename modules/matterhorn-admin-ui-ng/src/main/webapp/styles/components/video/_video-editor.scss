@@ -41,53 +41,26 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
         padding: 5px 10px;
     }
 
+    .tracks-wrapper {
+        margin-top: 10px;
+        padding-top: 10px;
+    }
+    
     label {
         color: $medium-prim-color;
         font-size: 10px;
         font-weight: $weight-semibold;
         line-height: 12px;
         display: inline-block;
+        text-transform: capitalize;
     }
 
     .track-container {
         position: relative;
 
-        .track-toolbar {
-            @include clearfix();
-            margin-bottom: 5px;
-
-            .track-label,
-            .track-options {
-                float: left;
-            }
-
-            .track-label {
-                width: $track-label-width;
-                margin-right: $right-margin;
-                font-size: 10px;
-                line-height: 12px;
-                font-weight: $weight-semibold;
-                color: $medium-prim-color;
-            }
-
-            .track-options {
-                width: $track-options-width;
-            }
-
-            .track-options-button {
-                @include btn(white);
-                padding: 1px 4px;
-                float: right;
-                @include fa-icon($fa-var-cog, before, inline-block, 0, 0, $medium-prim-color, 10px, normal, 0);
-                &:before {
-                    vertical-align: middle;
-                }
-            }
-        }
-
         .timeline-track {
-            margin-bottom: 5px;
-            padding-bottom: 0;
+            margin-top: -1px;
+            padding: 0;
             overflow: hidden;
 
             &>div:last-child {
@@ -96,10 +69,50 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                 overflow: hidden;
             }
 
-            $segment-border-radius: 2px;
-            $segment-height: 60px;
-            $segment-background: 50px;
+            .track-toolbar {
+                position: absolute;
+                @include clearfix();
 
+                label {
+                    padding-top: 6px; 
+                    padding-left: 6px;                    
+                }
+                
+                .track-label,
+                .track-options {
+                    float: left;
+                }
+
+                .track-label {
+                    width: $track-label-width;
+                    margin-right: $right-margin;
+                    font-size: 10px;
+                    line-height: 12px;
+                    font-weight: $weight-semibold;
+                    color: $medium-prim-color;
+                    z-index: $z-0;
+                }
+
+                .track-options {
+                    width: $track-options-width;
+                }
+
+                .track-options-button {
+                    @include btn(white);
+                    padding: 1px 4px;
+                    float: right;
+                    @include fa-icon($fa-var-cog, before, inline-block, 0, 0, $medium-prim-color, 10px, normal, 0);
+                    &:before {
+                        vertical-align: middle;
+                    }
+                }
+            }            
+            
+            $segment-height: 24px;
+            $segment-background: $segment-height;
+            $segment-main-height: 60px;
+            $segment-main-background: ($segment-main-height - 10);
+            
             .segments {
                 // background image set inline
                 overflow: hidden;
@@ -107,6 +120,7 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                 background-size: 100% $segment-background;
                 background-position: bottom left;
                 height: $segment-height;
+                
                 // needed for zoom offset
                 position: relative;
 
@@ -146,35 +160,15 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                         text-align: right;
                         background: rgba(193, 215, 238, 0.5);
                         border: $thin-border-stroke #71b1f3;
+                        border-right-width: 0 !important;
                         transition-property: background-color, background, border;
                         transition-duration: 250ms;
                         transition-timing-function: ease;
 
-                        a {
-                            color: $l-blue;
-                            background-color: inherit;
-                            
-                            color: #378dd4;
-                            line-height: 16px;
-                            padding: 6px 4px 0 6px;
-
-                            &.unused {
-                              @include fa-icon($fa-var-square-o , before, inline, 0 0 0 0, 0, $l-blue, 1em);
-                            }
-
-                            &.used {
-                              @include fa-icon($fa-var-check-square-o, before, inline, 0 0 0 0, 0, $l-blue, 1em);
-                            }
-
-                            &.remove {
-                                @include fa-icon($fa-var-times, before, inline, 0 0 0 0, 0, $l-blue, 1em);
-                            }
+                        a { 
+                            display:none;
                         }
-
-                        a:last-child {
-                          margin-right: 10px;
-                        }
-
+                        
                         &.selected {
                             background: rgba(106, 183, 236, 0.5);
                             border: $thin-border-stroke darken(#71b1f3, 2%);
@@ -201,24 +195,111 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                     &:first-child .segment {
                         border-left: none;
                     }
+                }
+            }
+            
+            &:first-child {
+                margin: 0;
 
-                    &:not(:last-child) .segment {
-                        border-right: none;
+                .track-toolbar {
+                    position: inherit;
+                    margin: 0 0 5px 0;
+                    
+                    label {
+                        padding: 0px;
+                    }
+                }
+                
+                .segments {
+                    background-size: 100% $segment-main-background;
+                    height: $segment-main-height;
+
+                    .segment-container {
+                        height: $segment-main-height;
+                        
+                        .segment-seperator {
+                            height: $segment-main-height;
+                        }
+
+                        .segment-seperator.active:before {
+                            height: $segment-main-height;
+                        }
+
+                        .segment {
+                            height: $segment-main-height;  
+                            
+                            a {
+                                display: inline;
+                                color: $l-blue;
+                                background-color: inherit;
+
+                                color: #378dd4;
+                                line-height: 16px;
+                                padding: 6px 4px 0 6px;
+
+                                &.unused {
+                                  @include fa-icon($fa-var-square-o , before, inline, 0 0 0 0, 0, $l-blue, 1em);
+                                }
+
+                                &.used {
+                                  @include fa-icon($fa-var-check-square-o, before, inline, 0 0 0 0, 0, $l-blue, 1em);
+                                }
+
+                                &.remove {
+                                    @include fa-icon($fa-var-times, before, inline, 0 0 0 0, 0, $l-blue, 1em);
+                                }
+                            }
+
+                            a:last-child {
+                                margin-right: 10px;
+                            }
+
+                            &.small {
+                                a { 
+                                    display:none;
+                                }
+                                a:first-child {
+                                    display: inline;
+                                }
+                            }   
+
+                            &.tiny {
+                                a { 
+                                    display:none;
+                                }
+                            }   
+                            
+                            &.selected {
+                                a {
+                                    &:before {
+                                      color: darken($l-blue, 2%);
+                                    }
+                                }
+                            }
+
+                            &.deleted {
+                                a {
+                                    &:before {
+                                      color: rgba(0,0,0,0.4)
+                                    }
+                                }
+                            }                            
+                        }
                     }
                 }
             }
         }
 
-        /*& > div:nth-last-of-type(2) {*/
         #cursor-track {
              padding: 5px 0px;
+             margin-top: 5px;
              margin-bottom: 8px;
              background: #eee none repeat scroll 0 0;
              cursor: pointer;
              border-radius: 4px;
         }
 
-        #cursor {
+        #cursor, #cursor_fake {
             width: 1px;
             height: calc(100% - 23px);
             background-color: #fb6257;
@@ -294,6 +375,12 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                     cursor: grabbing;
                 }
             }
+        }
+        
+        #cursor_fake {
+            opacity: 0.6;
+            display: none;
+            z-index: ($z-80 + 1);
         }
     }
 
