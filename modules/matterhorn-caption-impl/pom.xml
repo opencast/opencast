@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <version>2.4-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -48,7 +48,7 @@
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.ws.rs</groupId>
@@ -81,15 +81,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Import-Package>
-              org.opencastproject.caption.api;version=${project.version},
-              javax.xml.parsers;version=0,
-              javax.xml.transform;version=0,
-              org.w3c.dom;version=0,
-              org.xml.sax;version=0,
-              org.xml.sax.helpers;version=0,
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
               org.opencastproject.caption.impl;version=${project.version},
               org.opencastproject.caption.endpoint;version=${project.version},

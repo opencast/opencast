@@ -18,12 +18,10 @@
  * the License.
  *
  */
-
 package org.opencastproject.kernel.bundleinfo;
 
 import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.functions.Strings.asString;
 
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
@@ -68,6 +66,6 @@ public final class BundleInfos {
 
   /** Extract the build number of a bundle. */
   public static Option<String> getBuildNumber(Bundle bundle) {
-    return option(bundle.getHeaders().get(MANIFEST_BUILD_NUMBER)).bind(asString());
+    return option(bundle.getHeaders().get(MANIFEST_BUILD_NUMBER));
   }
 }

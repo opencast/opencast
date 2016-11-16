@@ -20,5 +20,18 @@
  */
 
 
-@import "fa-variables";
-@import "fa-mixins";
+@import "variables";
+@import "fa-variables"; // Our own version
+@import "mixins";
+@import "fa-mixins"; // Our own version
+//@import "path"; // already included
+@import "core";
+@import "larger";
+@import "fixed-width";
+@import "list";
+@import "bordered-pulled";
+@import "animated";
+@import "rotated-flipped";
+@import "stacked";
+@import "icons";
+@import "screen-reader";

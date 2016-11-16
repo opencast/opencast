@@ -227,9 +227,8 @@ public class LtiServlet extends HttpServlet {
    * @param req
    * @return
    */
-  @SuppressWarnings("unchecked")
   protected String getCustomParams(HttpServletRequest req) {
-    Map<String, String> paramMap = req.getParameterMap();
+    Map<String, String[]> paramMap = req.getParameterMap();
     StringBuilder builder = new StringBuilder();
     Set<String> entries = paramMap.keySet();
     Iterator<String> iterator = entries.iterator();

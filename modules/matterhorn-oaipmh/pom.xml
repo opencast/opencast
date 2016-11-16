@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>2.3-SNAPSHOT</version>
+    <version>2.4-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -18,6 +18,12 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-common</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient-osgi</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -26,7 +32,7 @@
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
@@ -89,7 +95,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>c3p0</groupId>
+      <groupId>com.mchange</groupId>
       <artifactId>c3p0</artifactId>
       <scope>test</scope>
     </dependency>
@@ -108,14 +114,12 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Import-Package>
-              org.opencastproject.search.impl;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
               org.opencastproject.oaipmh;version=${project.version},
-              <!--org.opencastproject.oaipmh.server.OaiDcMetadataProvider;version=${project.version},-->
-              <!--org.opencastproject.oaipmh.server.MetadataProvider;version=${project.version}-->
+              org.opencastproject.oaipmh.harvester;version=${project.version},
+              org.opencastproject.oaipmh.matterhorn;version=${project.version},
+              org.opencastproject.oaipmh.server;version=${project.version};-split-package:=merge-first,
+              org.opencastproject.oaipmh.util;version=${project.version}
             </Export-Package>
             <Service-Component>
               OSGI-INF/oai-pmh-server.xml,

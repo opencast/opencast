@@ -209,7 +209,7 @@ path.logs: ${karaf.data}/log/elasticsearch.log
 
 # Set both 'bind_host' and 'publish_host':
 #
-#network.host: 192.168.0.1
+network.host: 127.0.0.1
 
 # Set a custom port for the node to node communication (9300 by default):
 #
@@ -376,10 +376,16 @@ path.logs: ${karaf.data}/log/elasticsearch.log
 #monitor.jvm.gc.old.info: 5s
 #monitor.jvm.gc.old.debug: 2s
 
-################################## Security ################################
+################################## Security ###################################
 
 # Uncomment if you want to enable JSONP as a valid return transport on the
 # http server. With this enabled, it may pose a security risk, so disabling
 # it unless you need it is recommended (it is disabled by default).
 #
 #http.jsonp.enable: true
+
+
+################################## Shutdown ###################################
+
+# Disable the Elasticsearch Shutdown API (recomended).
+action.disable_shutdown: true

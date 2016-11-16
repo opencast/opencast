@@ -1,5 +1,5 @@
 describe('Users controller', function () {
-    var $scope, UsersResource, UserResource;
+    var $scope, $httpBackend, UsersResource, UserResource;
 
     beforeEach(module('adminNg'));
     beforeEach(module(function ($provide) {
@@ -11,11 +11,12 @@ describe('Users controller', function () {
         $provide.value('Language', service);
     }));
 
-    beforeEach(inject(function ($rootScope, $controller, _UsersResource_, _UserResource_) {
+    beforeEach(inject(function ($rootScope, $controller, _$httpBackend_, _UsersResource_, _UserResource_) {
         $scope = $rootScope.$new();
+        $controller('UsersCtrl', {$scope: $scope});
+        $httpBackend = _$httpBackend_;
         UsersResource = _UsersResource_;
         UserResource = _UserResource_;
-        $controller('UsersCtrl', {$scope: $scope});
     }));
 
     it('instantiates', function () {
@@ -25,12 +26,10 @@ describe('Users controller', function () {
     describe('#delete', function () {
 
         it('deletes the user', function () {
-            var user = {};
             spyOn(UserResource, 'delete');
-
-            $scope.table.delete(user);
-
-            expect(UserResource.delete).toHaveBeenCalled();
+            $scope.table.delete({'id': 12});
+            expect(UserResource.delete).toHaveBeenCalledWith({username: 12}, jasmine.any(Function), jasmine.any(Function));
         });
+
     });
 });

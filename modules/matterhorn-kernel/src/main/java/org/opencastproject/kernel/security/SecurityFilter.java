@@ -48,23 +48,17 @@ public final class SecurityFilter implements Filter {
   private static final Logger logger = LoggerFactory.getLogger(SecurityFilter.class);
 
   /** The filters for each organization */
-  private Map<String, Filter> orgSecurityFilters = null;
-
-  /** The security service */
-  protected SecurityService securityService = null;
+  private final Map<String, Filter> orgSecurityFilters = new HashMap<>();
 
   /** The filter configuration provided by the servlet container */
-  protected FilterConfig filterConfig = null;
+  protected FilterConfig filterConfig;
 
-  /**
-   * Construct a new security filter.
-   *
-   * @param securityService
-   *          the security service
-   */
-  public SecurityFilter(SecurityService securityService) {
+  /** The security service */
+  private SecurityService securityService;
+
+  /** OSGi DI. */
+  public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
-    this.orgSecurityFilters = new HashMap<String, Filter>();
   }
 
   /**
@@ -111,8 +105,8 @@ public final class SecurityFilter implements Filter {
    *      javax.servlet.FilterChain)
    */
   @Override
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-          ServletException {
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+          throws IOException, ServletException {
 
     // Make sure we have an organization
     Organization org = securityService.getOrganization();

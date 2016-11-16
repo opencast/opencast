@@ -1,5 +1,5 @@
 describe('Events controller', function () {
-    var $scope, EventsResource, $httpBackend;
+    var $scope, $httpBackend, EventsResource;
 
     beforeEach(module('adminNg'));
     beforeEach(module(function ($provide) {
@@ -11,11 +11,11 @@ describe('Events controller', function () {
         $provide.value('Language', service);
     }));
 
-    beforeEach(inject(function ($rootScope, $controller, _EventsResource_, _$httpBackend_) {
+    beforeEach(inject(function ($rootScope, $controller, _$httpBackend_, _EventsResource_) {
         $scope = $rootScope.$new();
-        EventsResource = _EventsResource_;
         $controller('EventsCtrl', {$scope: $scope});
         $httpBackend = _$httpBackend_;
+        EventsResource = _EventsResource_;
     }));
 
     it('instantiates', function () {
@@ -25,12 +25,21 @@ describe('Events controller', function () {
     describe('#delete', function () {
 
         it('deletes the event', function () {
+            spyOn(EventsResource, 'delete');
+            $scope.table.delete({'id': 12});
+            expect(EventsResource.delete).toHaveBeenCalledWith({id: 12}, jasmine.any(Function), jasmine.any(Function));
+        });
+
+        it('reloads events after deletion', function () {
             $httpBackend.expectGET('/admin-ng/resources/events/filters.json').respond('[]');
+            $httpBackend.expectGET('/admin-ng/resources/PUBLICATION.CHANNEL.LABELS.json').respond('{}');
             $httpBackend.expectDELETE('/admin-ng/event/12').respond('12');
+            $httpBackend.expectGET('/admin-ng/event/events.json?limit=10&offset=0').respond(JSON.stringify(getJSONFixture('admin-ng/event/events.json')));
 
             $scope.table.delete({'id': 12});
 
             $httpBackend.flush();
         });
+
     });
 });

@@ -146,7 +146,7 @@
         .nav-dd {
             color: $medium-prim-color;
             text-align: left;
-            @include fa-icon($fa-chevron-down, after, inline-block, 0 0 0 5px);
+            @include fa-icon($fa-var-chevron-down, after, inline-block, 0 0 0 5px);
 
             span {
                 font-size: 14px;

@@ -60,10 +60,6 @@ $disable-warnings: true !default; // disables deprecation warnings
 // Third Party Imports
 // ----------------------------------------
 
-// Font
-@import "vendor/google-fonts.scss";
-
-
 // Import custome
 #new-theme-modal, #theme-details {
 
@@ -473,18 +469,18 @@ input.disabled, select.disabled {
 
       &.prev {
         //override right margin with 0
-        @include fa-icon($fa-chevron-left, before, inline-block, 0 0 0 0, 0, inherit, 10px);
+        @include fa-icon($fa-var-chevron-left, before, inline-block, 0 0 0 0, 0, inherit, 10px);
       }
 
       &.next {
         //override left margin with 0
-        @include fa-icon($fa-chevron-right, after, inline-block, 0 0 0 0, 0, inherit, 10px);
+        @include fa-icon($fa-var-chevron-right, after, inline-block, 0 0 0 0, 0, inherit, 10px);
       }
 
       .active {
         border: 1px solid #616161;
       }
-      }
+    }
   }
 }
 
@@ -514,14 +510,14 @@ table.main-tbl {
 }
 
 //we introduced a separate layer in file-upload to support directive
-.modal .obj .obj-container > div.file-upload > p{
+.modal .obj .obj-container > div.file-upload > p {
   font-size: 11px;
   color: #999999;
   line-height: 18px;
   margin-bottom: 15px;
 }
 
-.hidden{
+.hidden {
   visibility: hidden;
 }
 
@@ -535,7 +531,7 @@ tr.error {
 * ----------------------------------------------------------------
 */
 .playback-toggle-pause {
-  @include fa-icon($fa-pause,$playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+  @include fa-icon($fa-var-pause,$playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
   @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
   @extend .playback-control-icon;
   &:hover {

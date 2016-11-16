@@ -39,8 +39,7 @@ public abstract class AbstractBufferScanner extends AbstractScanner {
 
   protected long buffer = -1;
 
-  @SuppressWarnings("rawtypes")
-  public void updated(Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     String cronExpression;
     boolean enabled;
 

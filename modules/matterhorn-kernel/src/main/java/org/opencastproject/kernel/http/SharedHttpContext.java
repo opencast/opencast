@@ -76,7 +76,7 @@ public class SharedHttpContext implements HttpContext {
    */
   @Override
   public URL getResource(String path) {
-    throw new UnsupportedOperationException("Resources should be mounted using the StaticResource class");
+    return null;
   }
 
   /**
@@ -88,9 +88,8 @@ public class SharedHttpContext implements HttpContext {
   @Override
   public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // Let the filters handle security. If there are none, don't let the request through
-    ServiceReference[] filterRefs;
     try {
-      filterRefs = bundleContext.getAllServiceReferences(Filter.class.getName(), null);
+      ServiceReference<?>[] filterRefs = bundleContext.getAllServiceReferences(Filter.class.getName(), null);
       return filterRefs != null && filterRefs.length > 0;
     } catch (InvalidSyntaxException e) {
       logger.error(e.getMessage(), e);

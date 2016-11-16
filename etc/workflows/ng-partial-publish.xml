@@ -122,7 +122,7 @@
     <operation
       id="cover-image"
       fail-on-error="true"
-      exception-handler-workflow="error"
+      exception-handler-workflow="ng-partial-error"
       description="Create a cover image">
       <configurations>
         <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
@@ -232,6 +232,7 @@
         <configuration key="target-flavor">presenter/themed</configuration>
         <configuration key="encoding-profile">concat.work</configuration>
         <configuration key="output-resolution">part-2</configuration>
+        <configuration key="output-framerate">part-2</configuration>
       </configurations>
     </operation>
 
@@ -253,6 +254,7 @@
         <configuration key="target-flavor">presentation/themed</configuration>
         <configuration key="encoding-profile">concat.work</configuration>
         <configuration key="output-resolution">part-2</configuration>
+        <configuration key="output-framerate">part-2</configuration>
       </configurations>
     </operation>
 

@@ -38,7 +38,7 @@
             <ul>
               <li>
                 <input id="publish" name="publish" type="checkbox" class="configField" value="true" checked=checked />
-                <label for=publish>Opencast Media Moduleng</label>
+                <label for=publish>Opencast Media Module</label>
               </li>
             </ul>
           </fieldset>
@@ -128,7 +128,7 @@
       if="${comment}"
       description="Mark the recording for review / cutting">
       <configurations>
-        <configuration key="description">Recording has not beeni reviewed / cut yet.</configuration>
+        <configuration key="description">Recording has not been reviewed / cut yet.</configuration>
         <configuration key="reason">EVENTS.COMMENTS.REASONS.REVIEW-OR-CUTTING</configuration>
         <configuration key="action">create</configuration>
       </configurations>

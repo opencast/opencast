@@ -22,7 +22,7 @@
 .df-add-button {
     box-sizing: border-box;
     @include btn(white);
-    @include fa-icon($fa-plus, before, inline-block, 0 8px 0 0, 0, inherit, 11px);
+    @include fa-icon($fa-var-plus, before, inline-block, 0 8px 0 0, 0, inherit, 11px);
 
     @include transition-property(width, padding, border-radius);
     @include transition-duration(200ms);
@@ -46,7 +46,7 @@
     }
 
     .js-df-state-new-filter & {
-        @include fa-icon($fa-plus, before, inline-block, 0, 0, #c9d0d3, 11px);
+        @include fa-icon($fa-var-plus, before, inline-block, 0, 0, #c9d0d3, 11px);
 
         width: 25px;
         padding: 12px 5px;
