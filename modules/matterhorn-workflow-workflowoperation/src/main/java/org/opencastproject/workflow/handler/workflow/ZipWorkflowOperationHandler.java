@@ -152,14 +152,22 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   protected void activate(ComponentContext cc) {
     tempStorageDir = StringUtils.isNotBlank(cc.getBundleContext().getProperty(ZIP_ARCHIVE_TEMP_DIR_CFG_KEY))
       ? new File(cc.getBundleContext().getProperty(ZIP_ARCHIVE_TEMP_DIR_CFG_KEY))
-      : new File(cc.getBundleContext().getProperty("karaf.data"), DEFAULT_ZIP_ARCHIVE_TEMP_DIR);
-    if (!tempStorageDir.isDirectory()) {
-      try {
-        FileUtils.forceMkdir(tempStorageDir);
-      } catch (IOException e) {
-        logger.error("Could not create temporary directory for ZIP archives: `{}`", tempStorageDir.getAbsolutePath());
-        throw new IllegalStateException(e);
-      }
+      : new File(cc.getBundleContext().getProperty("org.opencastproject.storage.dir"), DEFAULT_ZIP_ARCHIVE_TEMP_DIR);
+
+    // create directory
+    try {
+      FileUtils.forceMkdir(tempStorageDir);
+    } catch (IOException e) {
+      logger.error("Could not create temporary directory for ZIP archives: `{}`", tempStorageDir.getAbsolutePath());
+      throw new IllegalStateException(e);
+    }
+
+    // Clean up tmp dir on start-up
+    try {
+      FileUtils.cleanDirectory(tempStorageDir);
+    } catch (IOException e) {
+      logger.error("Could not clean temporary directory for ZIP archives: `{}`", tempStorageDir.getAbsolutePath());
+      throw new IllegalStateException(e);
     }
   }
 
