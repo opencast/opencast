@@ -155,7 +155,7 @@ list. The roles will be processed in the same way as the roles obtained from the
 
 > *This step is only necessary in Opencast deployments along multiple machines.*
 
-Make a copy of the file `etc/org.opencastproject.userdirectory.ldap.cfg` in the same directory and name it as:
+Make a copy of the file `etc/org.opencastproject.userdirectory.ldap.cfg.template` in the same directory and name it as:
 
     org.opencastproject.userdirectory.ldap-<ID>.cfg
 
