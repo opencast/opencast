@@ -38,8 +38,15 @@
     width: 20%;
     padding: 9px 0;
 
-    .volume-toggle-button {
+    .volume-toggle-unmuted {
         @include fa-icon($fa-var-volume-up, after, inline-block, 0 10px 0 0, 0, $grey, 16px);
+        display: inline-block;
+        vertical-align: top;
+        margin-top: 8px;
+    }
+
+    .volume-toggle-muted {
+        @include fa-icon($fa-var-volume-off , after, inline-block, 0 18px 0 0, 0, $grey, 16px);
         display: inline-block;
         vertical-align: top;
         margin-top: 8px;
@@ -51,9 +58,16 @@
         margin-top: 4px;
     }
 
+    .volume-slider-muted {
+        background: $grey;
+    }
+
+    .volume-slider-unmuted {
+        background: $bright-blue;
+    }
+
     input {
         @include appearance(none);
-        background: $bright-blue;
         border-radius: 4px;
         height: 2px;
     }

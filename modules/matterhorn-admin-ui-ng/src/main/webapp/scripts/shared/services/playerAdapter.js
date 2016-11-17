@@ -14,7 +14,7 @@ angular.module('adminNg.services')
         PLAYING: 4,
         ENDED: 5,
         ERROR_NETWORK: 6,
-        ERROR_UNSUPPORTED_MEDIA: 7
+        ERROR_UNSUPPORTED_MEDIA: 7,
     };
 
     /**
@@ -31,7 +31,8 @@ angular.module('adminNg.services')
         ERROR: 'error',
         ENDED: 'ended',
         CAN_PLAY: 'canplay',
-        DURATION_CHANGE: 'durationchange'
+        DURATION_CHANGE: 'durationchange',
+        VOLUMECHANGE: 'volumechange'
     };
 
     this.eventMapping = function () {
