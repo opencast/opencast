@@ -25,6 +25,7 @@ angular.module('adminNg.directives')
                 scope.positionEnd = false;
                 scope.muted = false;
                 scope.volume = 100;
+                scope.playButtonTooltip = 'VIDEO_TOOL.PLAYER.PLAY';
                 scope.time = {
                     hours: 0,
                     minutes: 0,
@@ -35,12 +36,14 @@ angular.module('adminNg.directives')
                 scope.player.adapter.addListener(PlayerAdapter.EVENTS.PAUSE, function () {
                     scope.$apply(function () {
                         scope.playing = false;
+                        scope.playButtonTooltip = 'VIDEO_TOOL.PLAYER.PLAY';
                     });
                 });
 
                 scope.player.adapter.addListener(PlayerAdapter.EVENTS.PLAY, function () {
                     scope.$apply(function () {
                         scope.playing = true;
+                        scope.playButtonTooltip = 'VIDEO_TOOL.PLAYER.PAUSE';
                     });
                 });
 

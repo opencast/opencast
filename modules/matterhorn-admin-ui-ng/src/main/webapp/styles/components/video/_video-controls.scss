@@ -124,8 +124,8 @@ $playback-icon-font-size: 16px;
     }
 }
 
-.playback-rewind {
-    @include fa-icon($fa-var-backward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+.playback-previous-frame {
+    @include fa-icon($fa-var-step-backward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
     @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
     @extend .playback-control-icon;
     &:hover {
@@ -151,8 +151,8 @@ $playback-icon-font-size: 16px;
   }
 }
 
-.playback-fast-forward {
-    @include fa-icon($fa-var-forward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+.playback-next-frame {
+    @include fa-icon($fa-var-step-forward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
     @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
     @extend .playback-control-icon;
     &:hover {
