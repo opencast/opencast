@@ -36,12 +36,14 @@ import static org.opencastproject.util.RestUtil.R.noContent;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.adminui.util.TextFilter;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.endpoint.JsonConv;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
+import org.opencastproject.index.service.resources.list.query.AclsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.matterhorn.search.SearchQuery.Order;
 import org.opencastproject.matterhorn.search.SortCriterion;
@@ -51,6 +53,7 @@ import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -65,6 +68,7 @@ import com.entwinemedia.fn.data.json.JObjectWrite;
 import com.entwinemedia.fn.data.json.JValue;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,22 +145,27 @@ public class AclEndpoint {
     if (limit < 1)
       limit = 100;
     Opt<String> optSort = Opt.nul(trimToNull(sort));
+    Option<String> filterName = Option.none();
+    Option<String> filterText = Option.none();
 
     Map<String, String> filters = RestUtils.parseFilter(filter);
     for (String name : filters.keySet()) {
-      // TODO
-      logger.debug("Acl filter name: {}", name);
-      logger.debug("Acl filter value: {}", filters.get(name));
+      String value = filters.get(name);
+      if (AclsListQuery.FILTER_NAME_NAME.equals(name)) {
+        filterName = Option.some(value);
+      } else if ((AclsListQuery.FILTER_TEXT_NAME.equals(name)) && (StringUtils.isNotBlank(value))) {
+        filterText = Option.some(value);
+      }
     }
 
     // Filter acls by filter criteria
     List<ManagedAcl> filteredAcls = new ArrayList<ManagedAcl>();
     for (ManagedAcl acl : aclService().getAcls()) {
-      // Filter acl
-      // if ((filterName.isSome() && !filterName.get().equals(agent.getName()))
-      // || (filterStatus.isSome() && !filterStatus.get().equals(agent.getState()))
-      // || (filterLastUpdated.isSome() && filterLastUpdated.get() != agent.getLastHeardFrom()))
-      // continue;
+      // Filter list
+      if ((filterName.isSome() && !filterName.get().equals(acl.getName()))
+              || (filterText.isSome() && !TextFilter.match(filterText.get(), acl.getName()))) {
+        continue;
+      }
       filteredAcls.add(acl);
     }
     int total = filteredAcls.size();
