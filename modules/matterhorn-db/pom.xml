@@ -58,12 +58,10 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.29</version>
     </dependency>
     <dependency>
       <groupId>postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>8.4-701.jdbc4</version>
     </dependency>
   </dependencies>
   <build>
@@ -78,11 +76,11 @@
             <Build-Number>${buildNumber}</Build-Number>
             <Bundle-Activator>org.opencastproject.db.Activator</Bundle-Activator>
             <Import-Package>
-                !org.apache.lucene.*,
-                !org.jboss.resource.adapter.jdbc.*,
-                org.w3c.dom;version=0,
-                *
-             </Import-Package>
+              !org.apache.lucene.*,
+              !org.jboss.resource.adapter.jdbc.*,
+              org.w3c.dom;version=0,
+              *
+            </Import-Package>
             <Embed-Dependency>
               c3p0;inline=true,
               h2;inline=true,
