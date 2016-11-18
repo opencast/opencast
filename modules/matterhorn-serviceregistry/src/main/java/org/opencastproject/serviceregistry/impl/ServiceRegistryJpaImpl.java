@@ -2784,7 +2784,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   class JobDispatcher implements Runnable {
 
-    /** List with job types, that are not able to dispatch per round */
+    /** A list with job types that cannot be dispatched in each interation */
     private List<String> undispatchableJobTypes = null;
 
     /**
@@ -2816,15 +2816,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           }
         }
 
-        final int jobsLimit = DEFAULT_DISPATCH_JOBS_LIMIT;
         int jobsOffset = 0;
         List<JpaJob> dispatchableJobs = null;
         List<JpaJob> workflowJobs = new ArrayList();
         boolean jobsFound = false;
         do {
           // dispatch all dispatchable jobs with status restarted
-          dispatchableJobs = getDispatchableJobsWithStatus(em, jobsOffset, jobsLimit, Status.RESTART);
-          jobsOffset += jobsLimit;
+          dispatchableJobs = getDispatchableJobsWithStatus(em, jobsOffset, DEFAULT_DISPATCH_JOBS_LIMIT, Status.RESTART);
+          jobsOffset += DEFAULT_DISPATCH_JOBS_LIMIT;
           jobsFound = !dispatchableJobs.isEmpty();
 
           // skip all jobs of type workflow, we will handle them next
@@ -2843,8 +2842,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         jobsFound = false;
         do {
           // dispatch all dispatchable jobs with status queued
-          dispatchableJobs = getDispatchableJobsWithStatus(em, jobsOffset, jobsLimit, Status.QUEUED);
-          jobsOffset += jobsLimit;
+          dispatchableJobs = getDispatchableJobsWithStatus(em, jobsOffset, DEFAULT_DISPATCH_JOBS_LIMIT, Status.QUEUED);
+          jobsOffset += DEFAULT_DISPATCH_JOBS_LIMIT;
           jobsFound = !dispatchableJobs.isEmpty();
 
           // skip all jobs of type workflow, we will handle them next
