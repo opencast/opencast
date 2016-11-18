@@ -1,24 +1,18 @@
 <div class="video-player">
     <div>
-        <video id="player" controls ng-if="controls === 'true'">
-            <source ng-repeat="preview in video.previews" ng-src="{{ preview.uri | trusted }}" type="video/mp4" />
-            Your browser does not support HTML5 video.
-        </video>
-        <video id="player" ng-if="controls === 'false'">
+        <video id="player">
             <source ng-repeat="preview in video.previews" ng-src="{{ preview.uri | trusted }}" type="video/mp4" />
             Your browser does not support HTML5 video.
         </video>
     </div>
 </div>
 
-<div class="video-controls" ng-show="subControls === 'true'">
+<div class="video-controls">
     <div class="volume-controls">
-    <!--
-        <div class="volume-toggle-button"></div>
+        <div class="mute-toggle-button" ng-class="{'volume-toggle-muted': muted, 'volume-toggle-unmuted': !muted}" ng-click="toggleMute()"></div>
         <div class="volume-slider">
-            <input type="range" value="100">
+          <input type="range" value="100" ng-class="{'volume-slider-muted': muted, 'volume-slider-unmuted': !muted}" ng-model="volume" ng-change="setVolume()">
         </div>
-    -->
     </div>
     <div class="playback-controls">
         <div class="playback-controls-wrapper">

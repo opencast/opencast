@@ -23,7 +23,8 @@ angular.module('adminNg.services')
                 .map(PlayerAdapter.EVENTS.READY, 'ready')
                 .map(PlayerAdapter.EVENTS.TIMEUPDATE, 'timeupdate')
                 .map(PlayerAdapter.EVENTS.DURATION_CHANGE, 'durationchange')
-                .map(PlayerAdapter.EVENTS.CAN_PLAY, 'canplay');
+                .map(PlayerAdapter.EVENTS.CAN_PLAY, 'canplay')
+                .map(PlayerAdapter.EVENTS.VOLUMECHANGE, 'volumechange');
 
             // Check if the given target Element is valid
             if (typeof targetElement === 'undefined' || targetElement === null) {
@@ -40,7 +41,7 @@ angular.module('adminNg.services')
             // =========================
             // INITIALIZATION
             // =========================
-            
+
             /**
              * Register a listener listening to events of type. The event name will be translated from
              * API event (@see PlayerAdapter) to native events of the player implementation.
