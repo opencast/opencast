@@ -61,6 +61,7 @@ import org.opencastproject.index.IndexProducer;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.archive.ArchiveItem;
@@ -96,6 +97,10 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.text.WordUtils;
@@ -114,11 +119,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
 
 /** Base implementation of the archive abstracting over search and index. */
 public abstract class ArchiveBase<RS extends ResultSet> extends AbstractIndexProducer implements Archive<RS> {
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(ArchiveBase.class);
+
+  private static final Integer DEFAULT_CACHE_EXPIRE = 24; // hours
 
   private final SecurityService secSvc;
   private final AuthorizationService authSvc;
@@ -132,6 +142,15 @@ public abstract class ArchiveBase<RS extends ResultSet> extends AbstractIndexPro
   private final MessageSender messageSender;
   private final MessageReceiver messageReceiver;
   private UriRewriter uriRewriter = null;
+
+  private final LoadingCache<Id, Object> mediapackageLockCache = CacheBuilder.newBuilder()
+          .expireAfterWrite(DEFAULT_CACHE_EXPIRE, TimeUnit.HOURS)
+          .build(new CacheLoader<Id, Object>() {
+            public Object load(Id id) {
+              logger.info("Adding lock object for mediapackage {} (cache size {})", id, mediapackageLockCache.size());
+              return new Object();
+            }
+          });
 
   public ArchiveBase(SecurityService secSvc, AuthorizationService authSvc, OrganizationDirectoryService orgDir,
           ServiceRegistry svcReg, WorkflowService workflowSvc, Workspace workspace, ArchiveDb persistence,
@@ -166,23 +185,33 @@ public abstract class ArchiveBase<RS extends ResultSet> extends AbstractIndexPro
 
   @Override
   /*
-   * todo adding to the archive needs to be synchronized because of the index. It resets the oc_latest_version flag and
-   * this must not happen concurrently. This approach works as long as the archive is not distributed.
+   * Sychronized per mediapackage
+   * It resets the oc_latest_version flag and this must not happen concurrently.
+   * This approach works as long as the archive is not distributed.
    */
-  public synchronized void add(final MediaPackage mp) throws ArchiveException {
-    handleException(new Effect0.X() {
-      @Override
-      public void xrun() throws Exception {
-        logger.debug("Attempting to add mediapackage {} to archive", mp.getIdentifier());
-        final AccessControlList acl = authSvc.getActiveAcl(mp).getA();
-        protect(acl, list(WRITE_PERMISSION), new Effect0.X() {
+  public void add(final MediaPackage mp) throws ArchiveException {
+    try {
+      Object lock = mediapackageLockCache.get(mp.getIdentifier());
+
+      synchronized (lock) {
+        handleException(new Effect0.X() {
           @Override
           public void xrun() throws Exception {
-            addInternal(copy(mp), acl);
+            logger.debug("Attempting to add mediapackage {} to archive", mp.getIdentifier());
+            final AccessControlList acl = authSvc.getActiveAcl(mp).getA();
+            protect(acl, list(WRITE_PERMISSION), new Effect0.X() {
+              @Override
+              public void xrun() throws Exception {
+                addInternal(copy(mp), acl);
+              }
+            });
           }
         });
       }
-    });
+
+    } catch (ExecutionException e) {
+      throw new ArchiveException("Couldn't get mediapackage lock: " + e.getMessage(), e);
+    }
   }
 
   // todo make archiving transactional
