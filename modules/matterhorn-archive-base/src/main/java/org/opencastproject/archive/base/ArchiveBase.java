@@ -147,7 +147,7 @@ public abstract class ArchiveBase<RS extends ResultSet> extends AbstractIndexPro
           .expireAfterWrite(DEFAULT_CACHE_EXPIRE, TimeUnit.HOURS)
           .build(new CacheLoader<Id, Object>() {
             public Object load(Id id) {
-              logger.info("Adding lock object for mediapackage {} (cache size {})", id, mediapackageLockCache.size());
+              logger.debug("Adding lock object for mediapackage {} (cache size {})", id, mediapackageLockCache.size());
               return new Object();
             }
           });
