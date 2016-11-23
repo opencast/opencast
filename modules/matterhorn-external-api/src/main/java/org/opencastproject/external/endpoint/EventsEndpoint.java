@@ -232,15 +232,14 @@ public class EventsEndpoint implements ManagedService {
   }
 
   public List<EventCatalogUIAdapter> getEventCatalogUIAdapters(String organization) {
-    return com.entwinemedia.fn.Stream.$(catalogUIAdapters).filter(organizationFilter._2(organization)).toList();
-  }
-
-  private static final Fn2<EventCatalogUIAdapter, String, Boolean> organizationFilter = new Fn2<EventCatalogUIAdapter, String, Boolean>() {
-    @Override
-    public Boolean ap(EventCatalogUIAdapter catalogUIAdapter, String organization) {
-      return organization.equals(catalogUIAdapter.getOrganization());
+    List<EventCatalogUIAdapter> adapters = new ArrayList<>();
+    for (EventCatalogUIAdapter adapter : catalogUIAdapters) {
+      if (organization.equals(adapter.getOrganization())) {
+        adapters.add(adapter);
+      }
     }
-  };
+    return adapters;
+  }
 
   /** OSGi activation method */
   void activate(ComponentContext cc) {
@@ -715,7 +714,7 @@ public class EventsEndpoint implements ManagedService {
     }
     if (withMetadata != null && withMetadata) {
       try {
-        Opt<MetadataList> metadata = getEventMetadata(event.getIdentifier());
+        Opt<MetadataList> metadata = getEventMetadata(event);
         if (metadata.isSome()) {
           fields.add(f("metadata", metadata.get().toJSON()));
         }
@@ -891,7 +890,7 @@ public class EventsEndpoint implements ManagedService {
   public Response getAllEventMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type) throws Exception {
     if (StringUtils.trimToNull(type) == null) {
-      Opt<MetadataList> metadataList = getEventMetadata(id);
+      Opt<MetadataList> metadataList = getEventMetadataById(id);
       if (metadataList.isSome())
         return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, metadataList.get().toJSON());
       else
@@ -901,26 +900,33 @@ public class EventsEndpoint implements ManagedService {
     }
   }
 
-  protected Opt<MetadataList> getEventMetadata(String id) throws IndexServiceException, Exception {
+  protected Opt<MetadataList> getEventMetadataById(String id) throws IndexServiceException, Exception {
     for (final Event event : indexService.getEvent(id, externalIndex)) {
-      MetadataList metadataList = new MetadataList();
-      List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
-      catalogUIAdapters.remove(this.eventCatalogUIAdapter);
-      Opt<MediaPackage> optMediaPackage = indexService.getEventMediapackage(event);
-      if (catalogUIAdapters.size() > 0 && optMediaPackage.isSome()) {
-        for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
-          metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(optMediaPackage.get()));
-        }
-      }
-      MetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
-      ExternalMetadataUtils.changeSubjectToSubjects(collection);
-      ExternalMetadataUtils.removeCollectionList(collection);
-      metadataList.add(eventCatalogUIAdapter, collection);
-      if (WorkflowInstance.WorkflowState.RUNNING.toString().equals(event.getWorkflowState()))
-        metadataList.setLocked(Locked.WORKFLOW_RUNNING);
-      return Opt.some(metadataList);
+      return getEventMetadata(event);
     }
     return Opt.<MetadataList> none();
+  }
+
+  protected Opt<MetadataList> getEventMetadata(Event event) throws IndexServiceException, Exception {
+    MetadataList metadataList = new MetadataList();
+    List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
+    catalogUIAdapters.remove(this.eventCatalogUIAdapter);
+    Opt<MediaPackage> optMediaPackage = indexService.getEventMediapackage(event);
+    if (catalogUIAdapters.size() > 0 && optMediaPackage.isSome()) {
+      for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
+        // TODO: This is very slow:
+        metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(optMediaPackage.get()));
+      }
+    }
+    // TODO: This is slow:
+    MetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
+    ExternalMetadataUtils.changeSubjectToSubjects(collection);
+    ExternalMetadataUtils.removeCollectionList(collection);
+    metadataList.add(eventCatalogUIAdapter, collection);
+    if (WorkflowInstance.WorkflowState.RUNNING.toString().equals(event.getWorkflowState())) {
+      metadataList.setLocked(Locked.WORKFLOW_RUNNING);
+    }
+    return Opt.some(metadataList);
   }
 
   private Opt<MediaPackageElementFlavor> getFlavor(String flavorString) {
