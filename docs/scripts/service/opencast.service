@@ -2,6 +2,7 @@
 Description=Opencast
 After=local-fs.target
 After=network.target
+After=remote-fs.target
 
 [Service]
 ExecStart=/opt/opencast/bin/start-opencast server

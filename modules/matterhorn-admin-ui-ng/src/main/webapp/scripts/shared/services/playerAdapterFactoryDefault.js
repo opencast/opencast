@@ -224,6 +224,40 @@ angular.module('adminNg.services')
                 return me.state.status;
             };
 
+            this.toggleMute = function () {
+              me.muted(! me.muted());
+            }
+
+            /**
+             * Turns audio on or off and returns current status
+             * @param {boolean} status if Audio is mute or not, if not set only status is returned
+             * @returns {boolean} muted status of the player
+             */
+            this.muted = function (status) {
+                if (status !== undefined) {
+                  targetElement.muted = status;
+                }
+                return targetElement.muted;
+            }
+
+            /**
+             * Set and get the volume of the player
+             * @param {int} volume volume of the player from 0 (mute) to 100 (max),
+             *              if not set only returns current volume
+             * @returns {int} value from 0 (mute) to 100 (max)
+             */
+            this.volume = function (volume) {
+                if (volume !== undefined) {
+                  if (volume === 0) {
+                    me.muted(true);
+                  } else {
+                    me.muted(false);
+                  }
+                  targetElement.volume = volume / 100.0;
+                }
+                return parseInt(targetElement.volume * 100);
+            }
+
             /**
              * Copies the API's default implementation methods to the target.
              */
@@ -239,7 +273,9 @@ angular.module('adminNg.services')
                 target.getCurrentTimeObject  = me.getCurrentTimeObject;
                 target.getDuration = me.getDuration;
                 target.getStatus = me.getStatus;
-            };
+                target.muted = me.muted;
+                target.volume = me.volume;
+              };
             return this;
         };
 

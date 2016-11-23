@@ -21,7 +21,8 @@ angular.module('adminNg.services')
                 .map(PlayerAdapter.EVENTS.READY, 'ready')
                 .map(PlayerAdapter.EVENTS.TIMEUPDATE, 'timeupdate')
                 .map(PlayerAdapter.EVENTS.DURATION_CHANGE, 'durationchange')
-                .map(PlayerAdapter.EVENTS.CAN_PLAY, 'canplay');
+                .map(PlayerAdapter.EVENTS.CAN_PLAY, 'canplay')
+                .map(PlayerAdapter.EVENTS.VOLUMECHANGE, 'volumechange');
 
             // Check if the given target Element is valid
             if (typeof targetElement === 'undefined' || targetElement === null) {

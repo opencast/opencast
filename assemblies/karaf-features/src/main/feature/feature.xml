@@ -35,6 +35,7 @@
     <bundle>mvn:com.entwinemedia.common/functional/1.1.1</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
     <bundle>mvn:com.google.guava/guava/18.0</bundle>
+    <bundle>mvn:com.google.code.gson/gson/2.7</bundle>
     <bundle>mvn:commons-collections/commons-collections/3.2.2</bundle>
     <bundle>mvn:commons-fileupload/commons-fileupload/1.2.1</bundle>
     <bundle>mvn:commons-io/commons-io/2.1</bundle>
