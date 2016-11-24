@@ -42,6 +42,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -50,7 +51,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 /** JPA link to {@link Episode}. */
-@Entity(name = "Episode")
+@Entity(name = "Episode") @IdClass(EpisodeDtoId.class)
 @Table(name = "mh_archive_episode")
 @NamedQueries({
         @NamedQuery(name = "Episode.countAll", query = "SELECT COUNT(e) FROM Episode e"),

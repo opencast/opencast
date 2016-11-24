@@ -34,6 +34,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.MapKeyColumn;
@@ -47,7 +48,7 @@ import javax.persistence.Table;
  * rules.
  *
  */
-@Entity(name = "SeriesEntity")
+@Entity(name = "SeriesEntity") @IdClass(SeriesEntityId.class)
 @Access(AccessType.FIELD)
 @Table(name = "mh_series")
 @NamedQueries({
