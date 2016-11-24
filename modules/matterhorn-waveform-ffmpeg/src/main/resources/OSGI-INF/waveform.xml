@@ -17,26 +17,24 @@
       cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
     <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace" cardinality="1..1"
       policy="static" bind="setWorkspace" />
-    <reference name="workingFileRepository" interface="org.opencastproject.workingfilerepository.api.WorkingFileRepository"
-               cardinality="1..1" policy="static" bind="setWorkingFileRepository" />
   </scr:component>
 
-<!--  <scr:component name="org.opencastproject.videosegmenter.ffmpeg.endpoint.VideoSegmenterRestEndpoint" immediate="true">
-    <implementation class="org.opencastproject.videosegmenter.ffmpeg.endpoint.VideoSegmenterRestEndpoint" />
-    <property name="service.description" value="Video Segmentation REST Endpoint" />
+  <scr:component name="org.opencastproject.waveform.endpoint.WaveformServiceEndpoint" immediate="true">
+    <implementation class="org.opencastproject.waveform.endpoint.WaveformServiceEndpoint" />
+    <property name="service.description" value="Waveform Service REST Endpoint" />
 
-    <property name="opencast.service.type" value="org.opencastproject.videosegmenter" />
-    <property name="opencast.service.path" value="/analysis/videosegmenter" />
+    <property name="opencast.service.type" value="org.opencastproject.waveform" />
+    <property name="opencast.service.path" value="/waveform" />
     <property name="opencast.service.jobproducer" value="true" />
 
     <service>
-      <provide interface="org.opencastproject.videosegmenter.ffmpeg.endpoint.VideoSegmenterRestEndpoint" />
+      <provide interface="org.opencastproject.waveform.endpoint.WaveformServiceEndpoint" />
     </service>
 
-    <reference name="segmenter" interface="org.opencastproject.videosegmenter.api.VideoSegmenterService"
-      cardinality="1..1" policy="static" bind="setVideoSegmenter" />
+    <reference name="WaveformService" interface="org.opencastproject.waveform.api.WaveformService"
+      cardinality="1..1" policy="static" bind="setWaveformService" />
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
       cardinality="1..1" policy="static" bind="setServiceRegistry" />
-  </scr:component>-->
+  </scr:component>
 
 </scr:components>

@@ -222,6 +222,7 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videosegmenter-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-waveform-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-waveform-ffmpeg/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-waveform-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-workflow-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-workflow-workflowoperation/${project.version}</bundle>
   </feature>
