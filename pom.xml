@@ -34,8 +34,8 @@
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
     <osgi.enterprise.version>5.0.0</osgi.enterprise.version>
-    <karaf.version>4.0.6</karaf.version>
-    <pax.web.version>4.2.8</pax.web.version>
+    <karaf.version>4.0.7</karaf.version>
+    <pax.web.version>4.3.0</pax.web.version>
     <cxf.version>3.1.7</cxf.version>
     <jackson.version>2.7.0</jackson.version>
   </properties>
