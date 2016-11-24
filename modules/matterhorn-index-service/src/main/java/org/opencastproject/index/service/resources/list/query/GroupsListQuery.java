@@ -42,6 +42,8 @@ public class GroupsListQuery extends ResourceListQueryImpl {
   public static final String FILTER_NAME_NAME = "Name";
   private static final String FILTER_NAME_LABEL = "FILTERS.USERS.NAME.LABEL";
 
+  public static final String FILTER_TEXT_NAME = "textFilter";
+
   public GroupsListQuery() {
     super();
     this.availableFilters.add(createNameFilter(Option.<String> none()));

@@ -37,17 +37,23 @@ import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
+import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.impl.index.group.Group;
+import org.opencastproject.index.service.impl.index.group.GroupIndexSchema;
+import org.opencastproject.index.service.impl.index.group.GroupSearchQuery;
+import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
+import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -67,6 +73,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.DELETE;
@@ -78,8 +85,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 @Path("/")
 @RestService(name = "groups", title = "Group service", notes = "This service offers the default groups CRUD Operations for the admin UI.", abstractText = "Provides operations for groups")
@@ -135,14 +144,61 @@ public class GroupsEndpoint {
           @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The groups.") })
   public Response getGroups(@QueryParam("filter") String filter, @QueryParam("sort") String sort,
           @QueryParam("offset") int offset, @QueryParam("limit") int limit) throws IOException {
-    if (limit < 1)
-      limit = 100;
+
+    GroupSearchQuery query = new GroupSearchQuery(securityService.getOrganization().getId(),
+            securityService.getUser());
 
     Opt<String> optSort = Opt.nul(trimToNull(sort));
+    Option<Integer> optOffset = Option.option(offset);
+    Option<Integer> optLimit = Option.option(limit);
+    // If the limit is set to 0, this is not taken into account
+    if (optLimit.isSome() && limit == 0) {
+      optLimit = Option.none();
+    }
+
+    Map<String, String> filters = RestUtils.parseFilter(filter);
+    for (String name : filters.keySet()) {
+      if (GroupsListQuery.FILTER_NAME_NAME.equals(name)) {
+        query.withName(filters.get(name));
+      } else if (GroupsListQuery.FILTER_TEXT_NAME.equals(name)) {
+        query.withText(QueryPreprocessor.sanitize(filters.get(name)));
+      }
+    }
+
+    if (optSort.isSome()) {
+      Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+      for (SortCriterion criterion : sortCriteria) {
+        switch (criterion.getFieldName()) {
+          case GroupIndexSchema.NAME:
+            query.sortByName(criterion.getOrder());
+            break;
+          case GroupIndexSchema.DESCRIPTION:
+            query.sortByDescription(criterion.getOrder());
+            break;
+          case GroupIndexSchema.ROLE:
+            query.sortByRole(criterion.getOrder());
+            break;
+          case GroupIndexSchema.MEMBERS:
+            query.sortByMembers(criterion.getOrder());
+            break;
+          case GroupIndexSchema.ROLES:
+            query.sortByRoles(criterion.getOrder());
+            break;
+          default:
+            throw new WebApplicationException(Status.BAD_REQUEST);
+        }
+      }
+    }
+
+    if (optLimit.isSome())
+      query.withLimit(optLimit.get());
+    if (optOffset.isSome())
+      query.withOffset(optOffset.get());
+
 
     SearchResult<Group> results;
     try {
-      results = indexService.getGroups(filter, Opt.some(limit), Opt.some(offset), optSort, searchIndex);
+      results = searchIndex.getByQuery(query);
     } catch (SearchIndexException e) {
       logger.error("The External Search Index was not able to get the groups list: {}", ExceptionUtils.getStackTrace(e));
       return RestUtil.R.serverError();
