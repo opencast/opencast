@@ -197,7 +197,7 @@
     <operation
       id="tag"
       description="Tagging presenter track as input for next operation"
-      if="NOT ${theme_watermark_active}">
+      if="NOT (${theme_watermark_active})">
       <configurations>
         <configuration key="source-flavors">presenter/trimmed</configuration>
         <configuration key="target-flavor">presenter/branded</configuration>
@@ -207,7 +207,7 @@
     <operation
       id="tag"
       description="Tagging presentation track as input for next operation"
-      if="NOT ${theme_watermark_active}">
+      if="NOT (${theme_watermark_active})">
       <configurations>
         <configuration key="source-flavors">presentation/trimmed</configuration>
         <configuration key="target-flavor">presentation/branded</configuration>
