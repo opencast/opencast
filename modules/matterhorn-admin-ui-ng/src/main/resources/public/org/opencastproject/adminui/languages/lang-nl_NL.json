@@ -1046,6 +1046,7 @@
         "EMAIL":"E-mail",
         "ROLES":"Rollen",
         "TYPE":"Type",
+        "PROVIDER":"Leverancier",
         "BLACKLIST_FROM":"Geblokkeerd van",
         "BLACKLIST_TO":"Geblokkeerd tot",
         "ACTION":"Acties"

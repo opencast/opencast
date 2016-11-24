@@ -1046,6 +1046,7 @@
         "EMAIL":"E-mail",
         "ROLES":"Rôles",
         "TYPE":"Type",
+        "PROVIDER":"Fournisseur",
         "BLACKLIST_FROM":"Bloqué de",
         "BLACKLIST_TO":"Bloqué jusqu'au",
         "ACTION":"Actions"
