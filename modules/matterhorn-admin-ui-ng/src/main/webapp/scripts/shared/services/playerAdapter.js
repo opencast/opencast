@@ -31,7 +31,8 @@ angular.module('adminNg.services')
         ERROR: 'error',
         ENDED: 'ended',
         CAN_PLAY: 'canplay',
-        DURATION_CHANGE: 'durationchange'
+        DURATION_CHANGE: 'durationchange',
+        VOLUMECHANGE: 'volumechange'
     };
 
     this.eventMapping = function () {
