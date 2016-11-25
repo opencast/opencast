@@ -26,7 +26,6 @@ import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
@@ -45,6 +44,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -75,35 +75,72 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   /** Path to the executable */
   protected String binary;
 
+  /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_JOB_LOAD */
+  public static final String WAVEFORM_JOB_LOAD_CONFIG_KEY = "job.load.waveform";
+
   /** The load introduced on the system by creating a waveform job */
   public static final float DEFAULT_WAVEFORM_JOB_LOAD = 1.0f;
 
-  /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_JOB_LOAD */
-  public static final String WAVEFORM_JOB_LOAD_KEY = "job.load.waveform";
+  /** Thekey to look for in the service configuration file to override the DEFAULT_FFMPEG_BINARY */
+  public static final String FFMPEG_BINARY_CONFIG_KEY = "org.opencastproject.composer.ffmpeg.path";
 
+  public static final String DEFAULT_FFMPEG_BINARY = "ffmpeg";
 
-  public static final String FFMPEG_BINARY_CONFIG = "org.opencastproject.composer.ffmpeg.path";
+  /** The default waveform image width in pixel */
+  public static final int DEFAULT_WAVEFORM_IMAGE_WIDTH = 5000;
 
-  public static final String FFMPEG_BINARY_DEFAULT = "ffmpeg";
+  /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_IMAGE_WIDTH */
+  public static final String WAVEFORM_IMAGE_WIDTH_CONFIG_KEY = "waveform.image.width";
+
+  /** The default waveform image height in pixel */
+  public static final int DEFAULT_WAVEFORM_IMAGE_HEIGHT = 500;
+
+  /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_IMAGE_HEIGHT */
+  public static final String WAVEFORM_IMAGE_HEIGHT_CONFIG_KEY = "waveform.image.height";
+
+  /** The default waveform image scale algorithm */
+  public static final String DEFAULT_WAVEFORM_SCALE = "lin";
+
+  /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_SCALE */
+  public static final String WAVEFORM_SCALE_CONFIG_KEY = "waveform.scale";
+
+  /** The default value for ovaerlapping waveforms per audio channel (if true) */
+  public static final boolean DEFAULT_WAVEFORM_SPLIT_CHANNELS = false;
+
+  /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_SPLIT_CHANNELS */
+  public static final String WAVEFORM_SPLIT_CHANNELS_CONFIG_KEY = "waveform.split.channels";
+
+  /** The default waveform colors per audio channel */
+  public static final String[] DEFAULT_WAVEFORM_COLOR = { "black" };
+
+  /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_COLOR */
+  public static final String WAVEFORM_COLOR_CONFIG_KEY = "waveform.color";
 
   /** Resulting collection in the working file repository */
   public static final String COLLECTION_ID = "waveform";
-
-  public static final int DEFAULT_WAVEFORM_IMAGE_WIDTH = 5000;
-
-  public static final int DEFAULTWAVEFORM_IMAGE_HEIGHT = 500;
-
-  private static final String WAVEFORM_FLAVOR_SUBTYPE = "waveform";
 
   /** List of available operations on jobs */
   private enum Operation {
     Waveform
   };
 
+  /** The waveform job load */
   private float waveformJobLoad = DEFAULT_WAVEFORM_JOB_LOAD;
 
+  /** The waveform image width in pixel */
   private int waveformImageWidth = DEFAULT_WAVEFORM_IMAGE_WIDTH;
-  private int waveformImageHeight = DEFAULTWAVEFORM_IMAGE_HEIGHT;
+
+  /** The waveform image height in pixel */
+  private int waveformImageHeight = DEFAULT_WAVEFORM_IMAGE_HEIGHT;
+
+  /** The waveform image scale algorithm */
+  private String waveformScale = DEFAULT_WAVEFORM_SCALE;
+
+  /** The value for ovaerlapping waveforms per audio channel (if true) */
+  private boolean waveformSplitChannels = DEFAULT_WAVEFORM_SPLIT_CHANNELS;
+
+  /** The waveform colors per audio channel */
+  private String[] waveformColor = DEFAULT_WAVEFORM_COLOR;
 
   /** Reference to the receipt service */
   private ServiceRegistry serviceRegistry = null;
@@ -127,10 +164,10 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   @Override
   public void activate(ComponentContext cc) {
     super.activate(cc);
-    logger.debug("Activate ffmpeg WaveformService");
+    logger.info("Activate ffmpeg waveform service");
     /* Configure segmenter */
-    final String path = cc.getBundleContext().getProperty(FFMPEG_BINARY_CONFIG);
-    binary = path == null ? FFMPEG_BINARY_DEFAULT : path;
+    final String path = cc.getBundleContext().getProperty(FFMPEG_BINARY_CONFIG_KEY);
+    binary = path == null ? DEFAULT_FFMPEG_BINARY : path;
     logger.debug("ffmpeg binary set to {}", binary);
   }
 
@@ -141,7 +178,47 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     }
     logger.debug("Configuring the waveform service");
     waveformJobLoad = LoadUtil.getConfiguredLoadValue(properties,
-            WAVEFORM_JOB_LOAD_KEY, DEFAULT_WAVEFORM_JOB_LOAD, serviceRegistry);
+            WAVEFORM_JOB_LOAD_CONFIG_KEY, DEFAULT_WAVEFORM_JOB_LOAD, serviceRegistry);
+
+    Object val = properties.get(WAVEFORM_IMAGE_WIDTH_CONFIG_KEY);
+    if (val != null) {
+      try {
+        waveformImageWidth = Integer.parseInt((String) val);
+      } catch (NumberFormatException ex) {
+        logger.warn("The configuration value for {} should be an integer but is {}",
+                WAVEFORM_IMAGE_WIDTH_CONFIG_KEY, val);
+      }
+    }
+
+    val = properties.get(WAVEFORM_IMAGE_HEIGHT_CONFIG_KEY);
+    if (val != null) {
+      try {
+        waveformImageHeight = Integer.parseInt((String) val);
+      } catch (NumberFormatException ex) {
+        logger.warn("The configuration value for {} should be an integer but is {}",
+                WAVEFORM_IMAGE_HEIGHT_CONFIG_KEY, val);
+      }
+    }
+
+    val = properties.get(WAVEFORM_SCALE_CONFIG_KEY);
+    if (val != null) {
+      if (StringUtils.isNotEmpty((String) val)) {
+        waveformScale = (String) val;
+      }
+    }
+
+    val = properties.get(WAVEFORM_SPLIT_CHANNELS_CONFIG_KEY);
+    if (val != null) {
+      waveformSplitChannels = Boolean.parseBoolean((String) val);
+    }
+
+    val = properties.get(WAVEFORM_COLOR_CONFIG_KEY);
+    if (val != null && StringUtils.isNotEmpty((String) val)) {
+      String colorValue = (String) val;
+      if (StringUtils.isNotEmpty(colorValue) && StringUtils.isNotBlank(colorValue)) {
+        waveformColor = StringUtils.split(colorValue, ", |:;");
+      }
+    }
   }
 
   /**
@@ -217,6 +294,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
       waveformFilePath.replaceAll(" ", "\\ ")
     };
     logger.debug("Start waveform ffmpeg process: {}", String.join(" ", command));
+    logger.info("Create waveform image file for track '{}' at {}", track.getIdentifier(), waveformFilePath);
 
     // run ffmpeg
     ProcessBuilder pb = new ProcessBuilder(command);
@@ -261,6 +339,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
       waveformFileInputStream = new FileInputStream(waveformFilePath);
       waveformFileUri = workspace.putInCollection(COLLECTION_ID,
               FilenameUtils.getName(waveformFilePath), waveformFileInputStream);
+      logger.info("Copied the created waveform to the workspace {}", waveformFileUri.toString());
     } catch (FileNotFoundException ex) {
       throw new WaveformServiceException(String.format("Waveform image file '%s' not found", waveformFilePath), ex);
     } catch (IOException ex) {
@@ -270,26 +349,31 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
       throw new WaveformServiceException(ex);
     } finally {
       IoSupport.closeQuietly(waveformFileInputStream);
+      logger.info("Deleted local waveform image file at {}", waveformFilePath);
       FileUtils.deleteQuietly(new File(waveformFilePath));
     }
 
     // create media package element
     MediaPackageElementBuilder mpElementBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-    MediaPackageElementFlavor waveformFlavor = MediaPackageElementFlavor.flavor(
-            track.getFlavor().getType(), WAVEFORM_FLAVOR_SUBTYPE);
+    // it is up to the workflow operation handler to set the attachment flavor
     Attachment waveformMpe = (Attachment) mpElementBuilder.elementFromURI(
-            waveformFileUri, Type.Attachment, waveformFlavor);
+            waveformFileUri, Type.Attachment, track.getFlavor());
     waveformMpe.setIdentifier(IdBuilderFactory.newInstance().newIdBuilder().createNew().compact());
     return waveformMpe;
   }
 
   private String createWaveformFilter() {
     StringBuilder filterBuilder = new StringBuilder("showwavespic=");
-    filterBuilder.append("split_channels=0");
+    filterBuilder.append("split_channels=");
+    filterBuilder.append(waveformSplitChannels ? 1 : 0);
     filterBuilder.append(":s=");
     filterBuilder.append(waveformImageWidth);
     filterBuilder.append("x");
     filterBuilder.append(waveformImageHeight);
+    filterBuilder.append(":scale=");
+    filterBuilder.append(waveformScale);
+    filterBuilder.append(":colors=");
+    filterBuilder.append(String.join("|", waveformColor));
     return filterBuilder.toString();
   }
 

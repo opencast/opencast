@@ -24,6 +24,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
@@ -183,12 +184,14 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
           }
 
           FileInputStream waveformInputStream = null;
-          URI waveformWfrUri;
+          logger.info("Put waveform image file {} from media package {} to the working file repository",
+                  waveformMpe.getURI(), mediaPackage.getIdentifier().compact());
           try {
             waveformInputStream = new FileInputStream(waveformFile);
-            waveformWfrUri = workingFileRepository.put(
+            URI waveformWfrUri = workingFileRepository.put(
                     mediaPackage.getIdentifier().compact(), waveformMpe.getIdentifier(),
                     "waveform.png", waveformInputStream);
+            waveformMpe.setURI(waveformWfrUri);
           } catch (FileNotFoundException ex) {
             throw new WorkflowOperationException("Waveform image file " + waveformFile.getPath() + " not found", ex);
           } catch (IOException ex) {
@@ -200,7 +203,15 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
             IoSupport.closeQuietly(waveformInputStream);
           }
 
-          waveformMpe.setURI(waveformWfrUri);
+          // set the waveform attachment flavor and add it to the mediapackage
+          MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorProperty);
+          if ("*".equals(targetFlavor.getType())) {
+            targetFlavor = new MediaPackageElementFlavor(waveformMpe.getFlavor().getType(), targetFlavor.getSubtype());
+          }
+          if ("*".equals(targetFlavor.getSubtype())) {
+            targetFlavor = new MediaPackageElementFlavor(targetFlavor.getType(), waveformMpe.getFlavor().getSubtype());
+          }
+          waveformMpe.setFlavor(targetFlavor);
           mediaPackage.add(waveformMpe);
         }
       }
@@ -209,11 +220,12 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
       cleanupWorkspace(waveformJobs);
     }
 
+    logger.info("Waveform workflow operation for mediapackage {} completed", mediaPackage.getIdentifier().compact());
     return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE);
   }
 
   /**
-   * Remove all files created by given jobs
+   * Remove all files created by the given jobs
    * @param jobs
    */
   private void cleanupWorkspace(List<Job> jobs) {
