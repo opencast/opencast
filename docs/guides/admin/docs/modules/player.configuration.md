@@ -18,14 +18,15 @@ To activate the player set:
 Configuration
 -------------
 
-|Property                       | Description                          | Options                                |
-|-------------------------------|--------------------------------------|----------------------------------------|
-|`prop.logo_player`             | Logo in the top right corner         | Any URL or local path to an image file |
-|`prop.player.positioncontrols` | Position of player controls          | `top`, `bottom` (default)              |
-|`prop.player.mastervideotype`  | Default flavor of the master video * | Any flavor or nothing                  |
-|`prop.show_embed_links`        | Show player embed code               | `true`, `false`                        |
-|`prop.link_mediamodule`        | If to link to the media module       | `true`, `false`                        |
-|`prop.player.shortcut.*`       | Keyboard shortcut specifications     | Any key                                |
+|Property                              | Description                          | Options                                |
+|--------------------------------------|--------------------------------------|----------------------------------------|
+|`prop.logo_player`                    | Logo in the top right corner         | Any URL or local path to an image file |
+|`prop.player.positioncontrols`        | Position of player controls          | `top`, `bottom` (default)              |
+|`prop.player.mastervideotype`         | Default flavor of the master video * | Any flavor or nothing                  |
+|`prop.player.hide_video_context_menu` | Hide browser context menu for videos | `true`, `false`                        |
+|`prop.show_embed_links`               | Show player embed code               | `true`, `false`                        |
+|`prop.link_mediamodule`               | If to link to the media module       | `true`, `false`                        |
+|`prop.player.shortcut.*`              | Keyboard shortcut specifications     | Any key                                |
 
 
 ### Master Video Flavor
