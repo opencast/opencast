@@ -1046,7 +1046,6 @@
         "EMAIL":"E-post",
         "ROLES":"Roller",
         "TYPE":"Typ",
-        "PROVIDER":"Leverantör",
         "BLACKLIST_FROM":"Svartlistad från",
         "BLACKLIST_TO":"Svartlistad tills",
         "ACTION":"Åtgärder"

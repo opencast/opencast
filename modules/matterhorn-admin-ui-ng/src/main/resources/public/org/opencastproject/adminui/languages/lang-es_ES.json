@@ -1046,7 +1046,6 @@
         "EMAIL":"Correo electrónico",
         "ROLES":"Roles",
         "TYPE":"Tipo",
-        "PROVIDER":"Proveedor",
         "BLACKLIST_FROM":"En la lista negra desde",
         "BLACKLIST_TO":"En la lista negra hasta",
         "ACTION":"Acciones"

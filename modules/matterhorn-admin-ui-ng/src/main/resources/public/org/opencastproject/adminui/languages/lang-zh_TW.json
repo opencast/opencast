@@ -1046,7 +1046,6 @@
         "EMAIL":"電子郵件",
         "ROLES":"角色",
         "TYPE":"類型",
-        "PROVIDER":"供應商",
         "BLACKLIST_FROM":"從黑名單",
         "BLACKLIST_TO":"直到黑名單",
         "ACTION":"操作"
