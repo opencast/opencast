@@ -1476,6 +1476,8 @@
      }
    },
    "VIDEO_TOOL": {
+     "TIMELINE": "Timeline",
+     "ZOOMLEVEL": "Zoom Level",
      "BUTTONS": {
        "COMMENTS": "View",
        "METADATA": "Edit",

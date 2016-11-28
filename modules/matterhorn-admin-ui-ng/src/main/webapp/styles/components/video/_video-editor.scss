@@ -406,6 +406,10 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                     padding-top: 2px;
                 }
 
+                &>label:after {
+                    content: ":";
+                }
+
                 input[type=range] {
                     width: 400px;
                 }
