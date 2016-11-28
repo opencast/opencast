@@ -32,6 +32,29 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             scope.from = 0;
             scope.to = 0;
 
+            scope.player.adapter.addListener(PlayerAdapter.EVENTS.DURATION_CHANGE, function () {
+
+                // reset then remove the items that are longer than the video duration
+                scope.ZoomSelectOptions = [
+                    { name: 'All', time: 0 }
+                    , { name: '10 m', time: 600000 }
+                    , { name: '5 m', time: 300000 }
+                    , { name: '1 m', time: 60000 }
+                    , { name: '30 s', time: 30000 }
+                ];
+
+                var i = scope.ZoomSelectOptions.length;
+                while (i--) {
+                    if (scope.ZoomSelectOptions[i].time > (scope.video.duration - 1000)) { 
+                        scope.ZoomSelectOptions.splice(i, 1);
+                    }
+                }
+
+                scope.zoomValue = scope.getZoomValue();
+                scope.zoomOffset = scope.getZoomOffset();
+                scope.zoomFieldOffset = scope.getZoomFieldOffset();
+            });
+
             scope.player.adapter.addListener(PlayerAdapter.EVENTS.TIMEUPDATE, function () {
                 scope.position = scope.player.adapter.getCurrentTime() * 1000;
                 scope.positionStyle = (scope.position * 100 / scope.video.duration) + '%';
@@ -154,52 +177,47 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     scope.video.duration;
             };
 
-            scope.$watch(function (scope) { return scope.video.duration; },
-               function () {
-                   scope.zoomValue = scope.getZoomValue();
-                   scope.zoomOffset = scope.getZoomOffset();
-                   scope.zoomFieldOffset = scope.getZoomFieldOffset();
-               });
-
-            scope.$watch(function (scope) { return scope.position; },
-               function () {
-                   scope.zoomOffset = scope.getZoomOffset();
-                   scope.zoomFieldOffset = scope.getZoomFieldOffset();
-               });
-
-            scope.$watch(function (scope) { return scope.zoomLevel; },
-                function () {
-                    scope.zoomValue = scope.getZoomValue();
-                    scope.zoomOffset = scope.getZoomOffset();
-                    scope.zoomFieldOffset = scope.getZoomFieldOffset();
-
-                    if (scope.zoomSelected === "") scope.displayZoomLevel(scope.zoomValue);
-                });
-
-            scope.$watch(function (scope) { return scope.zoomSelected; },
-                function () {
-
-                    if (typeof (scope.zoomSelected) === 'object') {
-
-                        if (scope.zoomSelected.time !== 0) {
-                            scope.zoomLevel = (scope.zoomSelected.time - scope.video.duration) / ((10000 - scope.video.duration) / 100);
-                        } else {
-                            scope.zoomLevel = 0;
-                        }
-                    }
-                });
-
             /**
              * On change of zoom range slider updates the appropriate zoom select option
+             * 
+             * @param {Event} event object
              */
-            scope.changeZoomLevel = function () {
+            scope.changeZoomLevel = function (event) {
+                
+                // Cache the zoom value and position
+                scope.zoomValue = scope.getZoomValue();
+                scope.zoomOffset = scope.getZoomOffset();
+                scope.zoomFieldOffset = scope.getZoomFieldOffset();
 
                 if (scope.zoomValue > 0) {
                     scope.zoomSelected = "";
+                    scope.displayZoomLevel(scope.zoomValue);
                 } else {
                     scope.zoomSelected = scope.ZoomSelectOptions[0];
                 }
             };
+
+            /**
+             * On change of the zoom selected drop-down
+             * 
+             * @param {Event} event object
+             */
+            scope.changeZoomSelected = function (event) {
+
+                if (typeof (scope.zoomSelected) === 'object') {
+
+                    if (scope.zoomSelected.time !== 0) {
+                        scope.zoomLevel = (scope.zoomSelected.time - scope.video.duration) / ((10000 - scope.video.duration) / 100);
+                    } else {
+                        scope.zoomLevel = 0;
+                    }
+
+                    // Cache the zoom value and position
+                    scope.zoomValue = scope.getZoomValue();
+                    scope.zoomOffset = scope.getZoomOffset();
+                    scope.zoomFieldOffset = scope.getZoomFieldOffset();
+                }
+            }
 
             /**
              * Returns the offset for the currently visible portion.
@@ -230,9 +248,17 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     return {};
                 }
 
+                var width = (scope.video.duration * 100 / scope.zoomValue),
+                    left = (scope.zoomOffset * -100 / scope.video.duration);
+
+                // if less than possible length then set to possible length
+                if (scope.video.duration <= scope.zoomValue) {
+                    width = 100;
+                }
+
                 var style = {
-                    width: (scope.video.duration * 100 / scope.zoomValue) + '%',
-                    left: (scope.zoomOffset * -100 / scope.video.duration) + '%',
+                    width: width + '%',
+                    left:  left + '%',
                     'overflow-x': 'hidden'
                 };
 
@@ -309,12 +335,26 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     return {};
                 }
 
+                // Cache the zoom value and position
+                scope.zoomValue = scope.getZoomValue();
+                scope.zoomOffset = scope.getZoomOffset();
+                scope.zoomFieldOffset = scope.getZoomFieldOffset();
+
                 scope.from = scope.zoomFieldOffset;
                 scope.to = scope.zoomFieldOffset + scope.zoomValue;
 
+                var width = (scope.zoomValue * 100 / scope.video.duration),
+                    left = (scope.zoomFieldOffset * 100 / scope.video.duration);
+
+                // if less than possible length then set to possible length
+                if (scope.video.duration <= scope.zoomValue) {
+                    width = 100;
+                    left = 0;
+                }
+                
                 var style = {
-                    width: (scope.zoomValue * 100 / scope.video.duration) + '%',
-                    left: (scope.zoomFieldOffset * 100 / scope.video.duration) + '%'
+                    width:  width + '%',
+                    left: left + '%'
                 };
 
                 return style;
@@ -814,6 +854,8 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 // cancel timer for the small cut button below timeline handle
                 if (scope.timer) $timeout.cancel( scope.timer );
             });
+
+            scope.$on
 
         }
     };
