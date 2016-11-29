@@ -472,8 +472,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
     for (Job entry : jobs) {
       Job job = serviceRegistry.getJob(entry.getId());
-      String sourceElementId = job.getArguments().get(2);
-      MediaPackageElement sourceElement = mp.getElementById(sourceElementId);
 
       // If there is no payload, then the item has not been distributed.
       if (job.getPayload() == null)
@@ -491,62 +489,54 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       if (distributedElements == null || distributedElements.size() < 1)
         continue;
 
-      // Make sure the mediapackage is prompted to create a new identifier for this element
-      for (int i = 0; i < distributedElements.size(); i++) {
-        if (distributedElements.get(i) instanceof MediaPackageElement)
-          ((MediaPackageElement) distributedElements.get(i)).setIdentifier(null);
-        else distributedElements.remove(i); // make sure no other Elements are in the list for future operations
-      }
+      for (MediaPackageElement distributedElement : distributedElements) {
 
-      // Adjust the flavor and tags for downloadable elements
-      if (downloadElementIds.contains(sourceElementId)) {
-        if (downloadSubflavor != null) {
-          MediaPackageElementFlavor flavor = sourceElement.getFlavor();
-          if (flavor != null) {
-            MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
-                    downloadSubflavor.getSubtype());
-            for (int i = 0; i < distributedElements.size(); i++)
-              ((MediaPackageElement)distributedElements.get(i)).setFlavor(newFlavor);
+        String sourceElementId = distributedElement.getIdentifier();
+        MediaPackageElement sourceElement = mp.getElementById(sourceElementId);
+
+        // Make sure the mediapackage is prompted to create a new identifier for this element
+        distributedElement.setIdentifier(null);
+
+        // Adjust the flavor and tags for downloadable elements
+        if (downloadElementIds.contains(sourceElementId)) {
+          if (downloadSubflavor != null) {
+            MediaPackageElementFlavor flavor = sourceElement.getFlavor();
+            if (flavor != null) {
+              MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
+                      downloadSubflavor.getSubtype());
+              distributedElement.setFlavor(newFlavor);
+            }
+          }
+          for (String tag : downloadTargetTags) {
+            distributedElement.addTag(tag);
           }
         }
-        for (String tag : downloadTargetTags) {
-          for (int i = 0; i < distributedElements.size(); i++)
-            ((MediaPackageElement)distributedElements.get(i)).addTag(tag);
-        }
-      }
-
-      // Adjust the flavor and tags for streaming elements
-      else if (streamingElementIds.contains(sourceElementId)) {
-        if (streamingSubflavor != null && streamingElementIds.contains(sourceElementId)) {
-          MediaPackageElementFlavor flavor = sourceElement.getFlavor();
-          if (flavor != null) {
-            MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
-                    streamingSubflavor.getSubtype());
-            for (int i = 0; i < distributedElements.size(); i++)
-              ((MediaPackageElement)distributedElements.get(i)).setFlavor(newFlavor);
+        // Adjust the flavor and tags for streaming elements
+        else if (streamingElementIds.contains(sourceElementId)) {
+          if (streamingSubflavor != null && streamingElementIds.contains(sourceElementId)) {
+            MediaPackageElementFlavor flavor = sourceElement.getFlavor();
+            if (flavor != null) {
+              MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
+                      streamingSubflavor.getSubtype());
+              distributedElement.setFlavor(newFlavor);
+            }
+          }
+          for (String tag : streamingTargetTags) {
+            distributedElement.addTag(tag);
           }
         }
-        for (String tag : streamingTargetTags) {
-          for (int i = 0; i < distributedElements.size(); i++)
-            ((MediaPackageElement)distributedElements.get(i)).addTag(tag);
+        // Copy references from the source elements to the distributed elements
+        MediaPackageReference ref = sourceElement.getReference();
+        if (ref != null && mp.getElementByReference(ref) != null) {
+          MediaPackageReference newReference = (MediaPackageReference) ref.clone();
+          distributedElement.setReference(newReference);
         }
-      }
 
-      // Copy references from the source elements to the distributed elements
-      MediaPackageReference ref = sourceElement.getReference();
-      if (ref != null && mp.getElementByReference(ref) != null) {
-        MediaPackageReference newReference = (MediaPackageReference) ref.clone();
-        for (int i = 0; i < distributedElements.size(); i++)
-            ((MediaPackageElement)distributedElements.get(i)).setReference(newReference);
+        // Add the new element to the mediapackage
+        mp.add(distributedElement);
+        elementsToPublish.add(distributedElement.getIdentifier());
+        distributedElementIds.put(sourceElementId, distributedElement.getIdentifier());
       }
-
-      // Add the new element to the mediapackage
-      for (int i = 0; i < distributedElements.size(); i++) {
-        mp.add((MediaPackageElement)distributedElements.get(i));
-        elementsToPublish.add(((MediaPackageElement)distributedElements.get(i)).getIdentifier());
-        distributedElementIds.put(sourceElementId, ((MediaPackageElement)distributedElements.get(i)).getIdentifier());
-      }
-
     }
 
     // Mark everything that is set for removal
