@@ -699,8 +699,8 @@ public class EventsEndpoint implements ManagedService {
     fields.add(f("processing_state", vN(event.getWorkflowState())));
     fields.add(f("start", vN(event.getTechnicalStartTime())));
     if (event.getTechnicalEndTime() != null) {
-      long duration = new DateTime(event.getTechnicalStartTime()).getMillis()
-              - new DateTime(event.getTechnicalEndTime()).getMillis();
+      long duration = new DateTime(event.getTechnicalEndTime()).getMillis()
+                    - new DateTime(event.getTechnicalStartTime()).getMillis();
       fields.add(f("duration", v(duration)));
     }
     if (StringUtils.trimToNull(event.getSubject()) != null) {
