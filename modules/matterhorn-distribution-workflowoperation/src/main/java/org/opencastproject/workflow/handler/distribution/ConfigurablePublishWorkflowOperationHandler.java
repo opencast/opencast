@@ -220,7 +220,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
 
     if (sourceFlavors.length > 0 || sourceTags.length > 0) {
       if (!withPublishedElements) {
-        List<MediaPackageElement> elements = distribute(selector.select(mp, false), mp, channelId, mode);
+        Set<MediaPackageElement> elements = distribute(selector.select(mp, false), mp, channelId, mode);
         if (elements.size() > 0) {
           for (MediaPackageElement element : elements) {
               // Make sure the mediapackage is prompted to create a new identifier for this element
@@ -253,10 +253,10 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
     return createResult(mp, Action.CONTINUE);
   }
 
-  private List<MediaPackageElement> distribute(Collection<MediaPackageElement> elements,
+  private Set<MediaPackageElement> distribute(Collection<MediaPackageElement> elements,
           MediaPackage mediapackage, String channelId, String mode) throws WorkflowOperationException {
 
-    List<MediaPackageElement> result = new ArrayList<MediaPackageElement>();
+    Set<MediaPackageElement> result = new HashSet<MediaPackageElement>();
 
     Set<String> bulkElementIds = new HashSet<String>();
     Set<String> singleElementIds = new HashSet<String>();
