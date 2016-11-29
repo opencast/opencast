@@ -73,7 +73,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   protected static final Logger logger = LoggerFactory.getLogger(WaveformServiceImpl.class);
 
   /** Path to the executable */
-  protected String binary;
+  protected String binary = DEFAULT_FFMPEG_BINARY;
 
   /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_JOB_LOAD */
   public static final String WAVEFORM_JOB_LOAD_CONFIG_KEY = "job.load.waveform";
@@ -120,7 +120,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   public static final String COLLECTION_ID = "waveform";
 
   /** List of available operations on jobs */
-  private enum Operation {
+  enum Operation {
     Waveform
   };
 
@@ -167,7 +167,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     logger.info("Activate ffmpeg waveform service");
     /* Configure segmenter */
     final String path = cc.getBundleContext().getProperty(FFMPEG_BINARY_CONFIG_KEY);
-    binary = path == null ? DEFAULT_FFMPEG_BINARY : path;
+    binary = (path == null ? DEFAULT_FFMPEG_BINARY : path);
     logger.debug("ffmpeg binary set to {}", binary);
   }
 
@@ -290,7 +290,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
       "-nostats",
       "-i", mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
       "-lavfi", createWaveformFilter(),
-      "-an", "-vn", "-sn",
+      "-an", "-vn", "-sn", "-y",
       waveformFilePath.replaceAll(" ", "\\ ")
     };
     logger.debug("Start waveform ffmpeg process: {}", String.join(" ", command));
