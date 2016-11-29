@@ -28,6 +28,8 @@ import static org.opencastproject.util.data.Tuple.tuple;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.archive.api.Archive;
+import org.opencastproject.archive.api.Query;
+import org.opencastproject.archive.api.ResultSet;
 import org.opencastproject.archive.api.UriRewriter;
 import org.opencastproject.archive.api.Version;
 import org.opencastproject.archive.base.ArchiveBase;
@@ -40,13 +42,14 @@ import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
-import org.opencastproject.metadata.api.StaticMetadataService;
+import org.opencastproject.message.broker.api.BaseMessage;
+import org.opencastproject.message.broker.api.MessageReceiver;
+import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
-import org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl;
-import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -73,6 +76,15 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.persistence.PersistenceEnv;
 import org.opencastproject.util.persistence.PersistenceUtil;
+import org.opencastproject.workflow.api.WorkflowDefinition;
+import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
+import org.opencastproject.workflow.api.WorkflowInstanceImpl;
+import org.opencastproject.workflow.api.WorkflowOperationInstance;
+import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
+import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
+
+import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
@@ -83,10 +95,15 @@ import org.easymock.IAnswer;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 
 public final class ArchiveTestEnv {
   /** The search service */
@@ -120,6 +137,10 @@ public final class ArchiveTestEnv {
   private SecurityService securityService;
   private PersistenceEnv penv;
   private String storage;
+
+  private WorkflowService workflowService;
+  private MessageSender messageSender;
+  private MessageReceiver messageReceiver;
 
   private UriRewriter rewriter = new UriRewriter() {
     @Override
@@ -188,8 +209,6 @@ public final class ArchiveTestEnv {
     EasyMock.expect(elementStore.copy(EasyMock.<StoragePath> anyObject(), EasyMock.<StoragePath> anyObject()))
             .andReturn(true).anyTimes();
     EasyMock.replay(elementStore);
-    // mpeg7 service
-    final Mpeg7CatalogService mpeg7CatalogService = new Mpeg7CatalogService();
     // security service
     userResponder = new Responder<User>(defaultUser);
     organizationResponder = new Responder<Organization>(defaultOrganization);
@@ -270,27 +289,54 @@ public final class ArchiveTestEnv {
       }
     };
     seriesService.setIndex(seriesServiceSolrIndex);
-    // episode service
-    // todo
-    // solrServer = EpisodeServicePublisher.setupSolr(new File(solrRoot));
-    // final StaticMetadataService mdService = newStaticMetadataService(workspace);
-    // service = new ArchiveBase(new SolrRequester(solrServer),
-    // new SolrIndexManager(solrServer,
-    // workspace,
-    // cell(Arrays.asList(mdService)),
-    // seriesService,
-    // mpeg7CatalogService,
-    // securityService),
-    // securityService,
-    // authorizationService,
-    // orgDirectory,
-    // serviceRegistry,
-    // null,
-    // workspace,
-    // mediaInspectionService,
-    // episodeDatabase,
-    // elementStore,
-    // "System Admin");
+
+    // ------- Updates for v2x -------------
+    WorkflowInstance workflowInstance = getSampleWorkflowInstance();
+    // workflow service
+    workflowService = EasyMock.createMock(WorkflowService.class);
+    EasyMock.expect(
+            workflowService.start((WorkflowDefinition) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject(),
+                    (Map<String, String>) EasyMock.anyObject())).andAnswer(new IAnswer<WorkflowInstance>() {
+      @Override
+      public WorkflowInstance answer() throws Throwable {
+        return getSampleWorkflowInstance();
+      }
+    }).anyTimes();
+    EasyMock.expect(workflowService.getWorkflowById(EasyMock.anyLong())).andReturn(workflowInstance).anyTimes();
+    EasyMock.expect(workflowService.stop(EasyMock.anyLong())).andReturn(workflowInstance).anyTimes();
+    // update may be called multiple times
+    workflowService.update((WorkflowInstance) EasyMock.anyObject());
+    EasyMock.expectLastCall().anyTimes();
+
+    workspace = EasyMock.createNiceMock(Workspace.class);
+    EasyMock.expect(
+            workspace.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    (InputStream) EasyMock.anyObject())).andReturn(new URI("http://localhost:8080/test")).anyTimes();
+
+    messageSender = EasyMock.createNiceMock(MessageSender.class);
+
+    final BaseMessage baseMessageMock = EasyMock.createNiceMock(BaseMessage.class);
+
+    messageReceiver = EasyMock.createNiceMock(MessageReceiver.class);
+    EasyMock.expect(
+            messageReceiver.receiveSerializable(EasyMock.anyString(),
+                    EasyMock.anyObject(MessageSender.DestinationType.class))).andStubReturn(
+                            new FutureTask<Serializable>(new Callable<Serializable>() {
+                              @Override
+                              public Serializable call() throws Exception {
+                                return baseMessageMock;
+                              }
+                            }));
+
+    EasyMock.replay(workflowService, workspace, messageSender, baseMessageMock, messageReceiver);
+
+    // ---- end updates for v2 ----------------
+
+    // episode service updated for v2's abstract ArchiveBase (archive index is in separate module in v2)
+    service = new MyArchiveBaseImpl(securityService, authorizationService, orgDirectory, serviceRegistry,
+            workflowService, workspace, (ArchiveDb) episodeDatabase, elementStore, "System Admin", messageSender,
+            messageReceiver);
+
   }
 
   @SuppressWarnings("unchecked")
@@ -298,12 +344,6 @@ public final class ArchiveTestEnv {
     Role role = Collections.toList(getUserWithPermissions().getRoles()).get(0);
     getAcl().getEntries().add(new AccessControlEntry(role.getName(), Archive.READ_PERMISSION, true));
     getAcl().getEntries().add(new AccessControlEntry(role.getName(), Archive.WRITE_PERMISSION, true));
-  }
-
-  private StaticMetadataService newStaticMetadataService(Workspace workspace) {
-    StaticMetadataServiceDublinCoreImpl service = new StaticMetadataServiceDublinCoreImpl();
-    service.setWorkspace(workspace);
-    return service;
   }
 
   public void tearDown() {
@@ -365,5 +405,73 @@ public final class ArchiveTestEnv {
 
   public UriRewriter getRewriter() {
     return rewriter;
+  }
+
+  public ArchiveDb getPersistence() {
+    return episodeDatabase;
+  }
+
+  protected WorkflowInstance getSampleWorkflowInstance() throws Exception {
+    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    Random gen = new Random(System.currentTimeMillis());
+    instance.setId(gen.nextInt());
+    instance.setMediaPackage(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
+    instance.setState(WorkflowState.PAUSED);
+
+    WorkflowOperationInstanceImpl op = new WorkflowOperationInstanceImpl("archive",
+            OperationState.PAUSED);
+    List<WorkflowOperationInstance> operations = new ArrayList<WorkflowOperationInstance>();
+    operations.add(op);
+    instance.setOperations(operations);
+    return instance;
+  }
+
+  @SuppressWarnings("rawtypes")
+  class MyArchiveBaseImpl extends ArchiveBase {
+
+    MyArchiveBaseImpl(SecurityService secSvc, AuthorizationService authSvc, OrganizationDirectoryService orgDir,
+            ServiceRegistry svcReg, WorkflowService workflowSvc, Workspace workspace, ArchiveDb persistence,
+            ElementStore elementStore, String systemUserName, MessageSender messageSender,
+            MessageReceiver messageReceiver) {
+      super(secSvc, authSvc, orgDir, svcReg, workflowSvc, workspace, persistence, elementStore, systemUserName,
+              messageSender, messageReceiver);
+      // TODO Auto-generated constructor stub
+    }
+
+    @Override
+    protected void index(MediaPackage mp, AccessControlList acl, Date timestamp, Version version) {
+      // does no work for this mock
+    }
+
+    @Override
+    protected void index(MediaPackage mediaPackage, AccessControlList acl, Version version, boolean deleted,
+            Date modificationDate, boolean latestVersion) {
+      // does no work for this mock
+    }
+
+    @Override
+    protected boolean indexDelete(String mediaPackageId, Date timestamp) {
+      // Always return true, index is not being tested in this module, and the other deletes are expected to work
+      return true;
+    }
+
+    @Override
+    protected ResultSet indexFind(Query q) {
+      // does no work for this mock
+      return null;
+    }
+
+    @Override
+    protected long indexSize() {
+      // does no work for this mock
+      return 0;
+    }
+
+    @Override
+    protected ResultSet newResultSet(List rs, String query, long totalSize, long offset, long limit, long searchTime) {
+      // does no work for this mock
+      return null;
+    }
+
   }
 }
