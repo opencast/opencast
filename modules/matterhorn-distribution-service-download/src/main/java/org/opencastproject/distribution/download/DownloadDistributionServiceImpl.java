@@ -50,10 +50,12 @@ import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -150,6 +152,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
   /** The trusted HTTP client */
   private TrustedHttpClient trustedHttpClient;
 
+  private Gson gson = new Gson();
+
   /**
    * Creates a new instance of the download distribution service.
    */
@@ -202,7 +206,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
       return serviceRegistry.createJob(
               JOB_TYPE,
               Operation.Distribute.toString(),
-              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), StringUtils.join(elementIds, ','),
+              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), gson.toJson(elementIds),
                       Boolean.toString(checkAvailability)), distributeJobLoad);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
@@ -347,7 +351,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
     notNull(channelId, "channelId");
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(),
-              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), StringUtils.join(elementIds, ',')),
+              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), gson.toJson(elementIds)),
                    retractJobLoad);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
@@ -457,7 +461,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
       op = Operation.valueOf(operation);
       String channelId = arguments.get(0);
       MediaPackage mediapackage = MediaPackageParser.getFromXml(arguments.get(1));
-      Set<String> elementIds = new HashSet<String>(Arrays.asList(arguments.get(2).split(",")));
+      Set<String> elementIds = gson.fromJson(arguments.get(2), new TypeToken<Set<String>>() { }.getType());
+
       switch (op) {
         case Distribute:
           Boolean checkAvailability = Boolean.parseBoolean(arguments.get(3));

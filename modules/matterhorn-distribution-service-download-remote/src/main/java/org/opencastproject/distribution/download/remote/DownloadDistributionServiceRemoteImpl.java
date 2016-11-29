@@ -37,7 +37,8 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 
-import org.apache.commons.lang3.StringUtils;
+import com.google.gson.Gson;
+
 import org.apache.http.client.methods.HttpPost;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -58,6 +59,8 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
   private static final String PARAM_MEDIAPACKAGE = "mediapackage";
   private static final String PARAM_ELEMENT_ID = "elementId";
   private static final String PARAM_CHECK_AVAILABILITY = "checkAvailability";
+
+  private final Gson gson = new Gson();
 
   /** The distribution channel identifier */
   private String distributionChannel;
@@ -92,7 +95,7 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
     logger.info(format("Distributing %s elements to %s@%s", elementIds.size(), channelId, distributionChannel));
     final HttpPost req = post(param(PARAM_CHANNEL_ID, channelId),
                               param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
-                              param(PARAM_ELEMENT_ID, StringUtils.join(elementIds, ',')),
+                              param(PARAM_ELEMENT_ID, gson.toJson(elementIds)),
                               param(PARAM_CHECK_AVAILABILITY, Boolean.toString(checkAvailability)));
     for (Job job : join(runRequest(req, jobFromHttpResponse))) {
       return job;
@@ -114,7 +117,7 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
     logger.info(format("Retracting %s elements from %s@%s", elementIds.size(), channelId, distributionChannel));
     final HttpPost req = post("/retract",
                               param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
-                              param(PARAM_ELEMENT_ID, StringUtils.join(elementIds, ',')),
+                              param(PARAM_ELEMENT_ID, gson.toJson(elementIds)),
                               param(PARAM_CHANNEL_ID, channelId));
     for (Job job : join(runRequest(req, jobFromHttpResponse))) {
       return job;
