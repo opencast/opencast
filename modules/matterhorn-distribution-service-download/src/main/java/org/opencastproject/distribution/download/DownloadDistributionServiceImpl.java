@@ -50,6 +50,9 @@ import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -75,7 +78,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -147,6 +152,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
   /** The trusted HTTP client */
   private TrustedHttpClient trustedHttpClient;
 
+  private Gson gson = new Gson();
+
   /**
    * Creates a new instance of the download distribution service.
    */
@@ -184,14 +191,22 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
   @Override
   public Job distribute(String channelId, MediaPackage mediapackage, String elementId, boolean checkAvailability)
           throws DistributionException, MediaPackageException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return distribute(channelId, mediapackage, elementIds, checkAvailability);
+  }
+
+  @Override
+  public Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds, boolean checkAvailability)
+          throws DistributionException, MediaPackageException {
     notNull(mediapackage, "mediapackage");
-    notNull(elementId, "elementId");
+    notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
     try {
       return serviceRegistry.createJob(
               JOB_TYPE,
               Operation.Distribute.toString(),
-              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), elementId,
+              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), gson.toJson(elementIds),
                       Boolean.toString(checkAvailability)), distributeJobLoad);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
@@ -199,10 +214,44 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
   }
 
   /**
+   * Distribute Mediapackage elements to the download distribution service.
+   *
+   * @param channelId
+   #          The id of the publication channel to be distributed to.
+   * @param mediapackage
+   *          The media package that contains the elements to be distributed.
+   * @param elementIds
+   *          The ids of the elements that should be distributed contained within the media package.
+   * @param checkAvailability
+   *          Check the availability of the distributed element via http.
+   * @return A reference to the MediaPackageElements that have been distributed.
+   * @throws DistributionException
+   *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
+   *           cannot be copied or another unexpected exception occurs.
+   */
+  public MediaPackageElement[] distributeElements(String channelId, MediaPackage mediapackage, Set<String> elementIds,
+          boolean checkAvailability) throws DistributionException {
+    notNull(mediapackage, "mediapackage");
+    notNull(elementIds, "elementIds");
+    notNull(channelId, "channelId");
+
+    final Set<MediaPackageElement> elements = getElements(mediapackage, elementIds);
+    List<MediaPackageElement> distributedElements = new ArrayList<MediaPackageElement>();
+
+    for (MediaPackageElement element : elements) {
+      MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, element, checkAvailability);
+      distributedElements.add(distributedElement);
+    }
+    return distributedElements.toArray(new MediaPackageElement[distributedElements.size()]);
+  }
+
+  /**
    * Distribute a Mediapackage element to the download distribution service.
    *
+   * @param channelId
+   #          The id of the publication channel to be distributed to.
    * @param mediapackage
-   *          The media package that contains the element to distribute.
+   *          The media package that contains the element to be distributed.
    * @param elementId
    *          The id of the element that should be distributed contained within the media package.
    * @param checkAvailability
@@ -212,18 +261,11 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
    *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
    *           cannot be copied or another unexpected exception occurs.
    */
-  public MediaPackageElement[] distributeElement(String channelId, MediaPackage mediapackage, String elementId,
+  public MediaPackageElement distributeElement(String channelId, MediaPackage mediapackage, MediaPackageElement element,
           boolean checkAvailability) throws DistributionException {
-    notNull(mediapackage, "mediapackage");
-    notNull(elementId, "elementId");
-    notNull(channelId, "channelId");
 
     final String mediapackageId = mediapackage.getIdentifier().compact();
-    final MediaPackageElement element = mediapackage.getElementById(elementId);
-
-    // Make sure the element exists
-    if (mediapackage.getElementById(elementId) == null)
-      throw new IllegalStateException(format("No element %s found in mediapackage %s", elementId, mediapackageId));
+    final String elementId = element.getIdentifier();
 
     try {
       File source;
@@ -259,14 +301,13 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
           throw new DistributionException(format("Unable to copy %s to %s", source, destination), e);
         }
       }
-      // Create a representation of the distributed file in the mediapackage
+      // Create a media package element representation of the distributed file
       MediaPackageElement distributedElement = (MediaPackageElement) element.clone();
       try {
         distributedElement.setURI(getDistributionUri(channelId, mediapackageId, element));
       } catch (URISyntaxException e) {
         throw new DistributionException("Distributed element produces an invalid URI", e);
       }
-      distributedElement.setIdentifier(null);
 
       logger.info(format("Finished distributing element %s@%s for publication channel %s", elementId, mediapackageId,
               channelId));
@@ -284,7 +325,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
                   }
                 });
       }
-      return new MediaPackageElement[] { distributedElement };
+      return distributedElement;
     } catch (Exception e) {
       logger.warn("Error distributing " + element, e);
       if (e instanceof DistributionException) {
@@ -297,12 +338,21 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
 
   @Override
   public Job retract(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException {
+    Set<String> elementIds = new HashSet();
+    elementIds.add(elementId);
+    return retract(channelId, mediapackage, elementIds);
+  }
+
+  @Override
+  public Job retract(String channelId, MediaPackage mediapackage, Set<String> elementIds)
+        throws DistributionException {
     notNull(mediapackage, "mediapackage");
-    notNull(elementId, "elementId");
+    notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(),
-              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), elementId), retractJobLoad);
+              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), gson.toJson(elementIds)),
+                   retractJobLoad);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -323,18 +373,46 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
    * @throws org.opencastproject.distribution.api.DistributionException
    *           in case of an error
    */
-  protected MediaPackageElement[] retractElement(String channelId, MediaPackage mediapackage, String elementId)
+  protected MediaPackageElement[] retractElements(String channelId, MediaPackage mediapackage, Set<String> elementIds)
           throws DistributionException {
     notNull(mediapackage, "mediapackage");
-    notNull(elementId, "elementId");
+    notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
 
-    // Make sure the element exists
-    MediaPackageElement element = mediapackage.getElementById(elementId);
-    if (element == null)
-      throw new IllegalStateException("No element " + elementId + " found in mediapackage");
+    Set<MediaPackageElement> elements = getElements(mediapackage, elementIds);
+    List<MediaPackageElement> retractedElements = new ArrayList<MediaPackageElement>();
+
+    for (MediaPackageElement element : elements) {
+      MediaPackageElement retractedElement = retractElement(channelId, mediapackage, element);
+      retractedElements.add(retractedElement);
+    }
+    return retractedElements.toArray(new MediaPackageElement[retractedElements.size()]);
+  }
+
+  /**
+   * Retract a media package element from the distribution channel. The retracted element must not necessarily be the
+   * one given as parameter <code>elementId</code>. Instead, the element's distribution URI will be calculated. This way
+   * you are able to retract elements by providing the "original" element here.
+   *
+   * @param channelId
+   *          the channel id
+   * @param mediapackage
+   *          the mediapackage
+   * @param elementId
+   *          the element identifier
+   * @return the retracted element or <code>null</code> if the element was not retracted
+   * @throws org.opencastproject.distribution.api.DistributionException
+   *           in case of an error
+   */
+  protected MediaPackageElement retractElement(String channelId, MediaPackage mediapackage, MediaPackageElement element)
+          throws DistributionException {
+    notNull(mediapackage, "mediapackage");
+    notNull(element, "element");
+    notNull(channelId, "channelId");
 
     String mediapackageId = mediapackage.getIdentifier().compact();
+    String elementId = element.getIdentifier();
+
     try {
       final File elementFile = getDistributionFile(channelId, mediapackage, element);
       final File mediapackageDir = getMediaPackageDirectory(channelId, mediapackage);
@@ -344,7 +422,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
         logger.info(
                 format("Element %s@%s has already been removed or has never been distributed for publication channel %s",
                         elementId, mediapackageId, channelId));
-        return new MediaPackageElement[] { element };
+        return element;
       }
 
       logger.info("Retracting element {} from {}", element, elementFile);
@@ -356,7 +434,7 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
 
       logger.info(format("Finished retracting element %s@%s for publication channel %s", elementId, mediapackageId,
               channelId));
-      return new MediaPackageElement[] { element };
+      return element;
     } catch (Exception e) {
       logger.warn(
               format("Error retracting element %s@%s for publication channel %s", elementId, mediapackageId, channelId),
@@ -383,17 +461,18 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
       op = Operation.valueOf(operation);
       String channelId = arguments.get(0);
       MediaPackage mediapackage = MediaPackageParser.getFromXml(arguments.get(1));
-      String elementId = arguments.get(2);
+      Set<String> elementIds = gson.fromJson(arguments.get(2), new TypeToken<Set<String>>() { }.getType());
+
       switch (op) {
         case Distribute:
           Boolean checkAvailability = Boolean.parseBoolean(arguments.get(3));
-          MediaPackageElement[] distributedElement = distributeElement(channelId, mediapackage, elementId,
+          MediaPackageElement[] distributedElements = distributeElements(channelId, mediapackage, elementIds,
                   checkAvailability);
-          return (distributedElement != null)
-                  ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(distributedElement)) : null;
+          return (distributedElements != null)
+                  ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(distributedElements)) : null;
         case Retract:
-          MediaPackageElement[] retractedElement = retractElement(channelId, mediapackage, elementId);
-          return (retractedElement != null) ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(retractedElement))
+          MediaPackageElement[] retractedElements = retractElements(channelId, mediapackage, elementIds);
+          return (retractedElements != null) ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(retractedElements))
                   : null;
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
@@ -405,6 +484,20 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
     } catch (Exception e) {
       throw new ServiceRegistryException("Error handling operation '" + op + "'", e);
     }
+  }
+
+  private Set<MediaPackageElement> getElements(MediaPackage mediapackage, Set<String> elementIds)
+          throws IllegalStateException {
+    final Set<MediaPackageElement> elements = new HashSet<MediaPackageElement>();
+    for (String elementId : elementIds) {
+       MediaPackageElement element = mediapackage.getElementById(elementId);
+       if (element != null) {
+         elements.add(element);
+       } else {
+         throw new IllegalStateException(format("No element %s found in mediapackage %s", elementId, mediapackage.getIdentifier()));
+       }
+    }
+    return elements;
   }
 
   /**
