@@ -20,8 +20,7 @@
  */
 package org.opencastproject.security.urlsigning.exception;
 
-import static com.google.common.base.Objects.toStringHelper;
-
+import static com.google.common.base.MoreObjects.toStringHelper;
 /**
  * An {@link Exception} thrown if there is a problem signing a URL.
  */
