@@ -94,6 +94,7 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
   private static final String WATERMARK_LAYOUT_VARIABLE = "watermark-layout-variable";
 
   /** Workflow property names */
+  private static final String THEME_ACTIVE = "theme_active";
   private static final String THEME_BUMPER_ACTIVE = "theme_bumper_active";
   private static final String THEME_TRAILER_ACTIVE = "theme_trailer_active";
   private static final String THEME_TITLE_SLIDE_ACTIVE = "theme_title_slide_active";
@@ -234,6 +235,7 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
       logger.info("Applying theme {} to mediapackage {}", themeId, mediaPackage.getIdentifier());
 
       /* Make theme settings available to workflow instance */
+      workflowInstance.setConfiguration(THEME_ACTIVE, Boolean.toString(true));
       workflowInstance.setConfiguration(THEME_BUMPER_ACTIVE, Boolean.toString(theme.isBumperActive()));
       workflowInstance.setConfiguration(THEME_TRAILER_ACTIVE, Boolean.toString(theme.isTrailerActive()));
       workflowInstance.setConfiguration(THEME_TITLE_SLIDE_ACTIVE, Boolean.toString(theme.isTitleSlideActive()));

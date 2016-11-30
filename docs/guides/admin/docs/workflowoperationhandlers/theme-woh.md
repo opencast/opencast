@@ -27,6 +27,7 @@ The ThemeWorkflowOperation will set the following workflow properties:
 
 |Property Name             |Description                                                          |
 |--------------------------|---------------------------------------------------------------------|
+|theme_active              |true if the theme has an active bumper video, undefined otherwise    |
 |theme_bumper_active       |true if the theme has an active bumper video, false otherwise        |
 |theme_trailer_active      |true if the theme has an active trailer video, false otherwise       |
 |theme_title_slide_active  |true if the theme has an active title slide, false otherwise         |
