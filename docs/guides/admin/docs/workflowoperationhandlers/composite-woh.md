@@ -32,7 +32,7 @@ Tags and flavors can be used in combination.
 |target-tags|String , { "," , String }	|composite,rss,atom,archive|The tags to apply to the compound video track.|EMPTY|
 |\* **target-flavor**|MediaPackageElementFlavor|	composite/delivery	|The flavor to apply to the compound video track.|EMPTY|
 |\* **encoding-profile**|String|	composite	|The encoding profile to use.|EMPTY|
-|\* **output-resolution**|width , "x" , height	|1900x1080|The resulting resolution of the compound video e.g. 1900x1080.|EMPTY|
+|\* **output-resolution**|width , "x" , height &#124; lower &#124; higher|1920x1080|The resulting resolution of the compound video e.g. 1920x1080.|EMPTY|
 |output-background|String	|red|The resulting background color of the compound video http://www.ffmpeg.org/ffmpeg-utils.html#Color.|black|
 |layout|name | Json , ";" , Json , [ ";" , Json ]|The layout name to use or a semi-colon separated JSON layout definition (lower video, upper video, optional watermark). If a layout name is given than the corresponding layout-{name} key must be defined.|EMPTY|
 |layout-single|name | Json , ";" , Json , [ ";" , Json ]|Layout to be used in case of one input video track (see *layout*)|EMPTY|
@@ -45,6 +45,12 @@ Tags and flavors can be used in combination.
 Notes:
 
 * At least one of the configuration keys *layout*, *layout-single*, or *layout-multiple* must be set
+
+## Output Resolution
+The output resolution must be specified using the configuration key *output-resolution*. The output resolution can be
+either explicitly specified (e.g. 1920x1080) or selected from the lower or upper input video (lower or higher).
+In case that only a single input track is available, both part-lower and part-higher will refer to that
+single input track.
 
 ## Layout Definition
 
@@ -140,7 +146,7 @@ A single layout is specified as follows:
         <configuration key="encoding-profile">composite</configuration>
         <configuration key="target-tags">composite,rss,atom,archive</configuration>
         <configuration key="target-flavor">composite/delivery</configuration>
-        <configuration key="output-resolution">1900x1080</configuration>
+        <configuration key="output-resolution">1920x1080</configuration>
         <configuration key="output-background">red</configuration>
         <configuration key="layout">topleft</configuration>
         <configuration key="layout-topleft">
