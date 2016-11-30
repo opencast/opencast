@@ -1,24 +1,29 @@
 # EmailWorkflowOperation
 ## Description
-The EmailWorkflowOperationHandler invokes the SMTP Service to send an email with the parameters provided. It is useful to send email notifications when some operation(s) have been completed or some error(s) have occurred in a workflow.
+The EmailWorkflowOperationHandler invokes the SMTP Service to send an email with the parameters provided. It is useful
+to send email notifications when some operation(s) have been completed or some error(s) have occurred in a workflow.
 
-The email body, if not specified by body or body-template-file, will consist of a single line of the form: ```<Recording Title> (<Mediapackage ID>)```.
+The email body, if not specified by body or body-template-file, will consist of a single line of the form:
+ ```<Recording Title> (<Mediapackage ID>)```.
 
-Freemarker templates can be used in the following fields to allow replacement with values obtained from the workflow or media package: to, subject, and body. If body-template-file is specified, the operation will use a Freemarker template file located in MH/etc/email to generate the email body.
+Freemarker templates can be used in the following fields to allow replacement with values obtained from the workflow 
+or media package: to, subject, and body. If body-template-file is specified, the operation will use a Freemarker
+template file located in `<config_dir>/etc/email` to generate the email body.
 
 ## Parameter Table
 
 |configuration keys|description|default value|example|
 |------------------|-------|-----------|-------------|
-|body|Email body content. Takes precedence over body-template-file.|```<Recording Title> (<Mediapackage ID>)```|Lecture 1 (4bf316fc-ea78-4903-b00e-9976b0912e4d)|
+|body|Email body content.<br>Takes precedence over body-template-file.|```<Recording Title> (<Mediapackage ID>)```|Lecture 1 (4bf316fc-ea78-4903-b00e-9976b0912e4d)|
 |body-template-file|Name of file that will be used as a template for the content of the email body.|EMPTY|templateName|
 |subject|Specifies the email subject.|EMPTY|Operation has been completed|
-|to|It specifies the field to of the email i.e. the email account the email will be sent to.|EMPTY|email-account@email-domain.org|
+|to|It specifies the field to of the email<br>i.e. the email account the email will be sent to.|EMPTY|email-account@email-domain.org|
 
 **Some other email parameters can be customized in the SMTP Service configuration**
 
 ##Variable Substitution
-The template will have access to the media package, workflow instance (including its configuration properties and last failed operation), catalogs, and any incidents. Fields should be tested for null/empty values before being used.
+The template will have access to the media package, workflow instance (including its configuration properties and last
+failed operation), catalogs, and any incidents. Fields should be tested for null/empty values before being used.
 
 ###Media Package Information
 Use ```${mediaPackage.FIELD}```
@@ -28,7 +33,7 @@ Use ```${mediaPackage.FIELD}```
 |-----|-------------|
 |media package id|${mediaPackage.identifier}|
 |recording title|${mediaPackage.title}|
-|recording date and time|${mediaPackage.date?datetime?iso_utc} - See Freemarker manual for date manipulation (extract date only, time only, format, etc)|
+|recording date and time|${mediaPackage.date?datetime?iso_utc} - See Freemarker manual for date manipulation <br>(extract date only, time only, format, etc)|
 |series title|${mediaPackage.seriesTitle}|
 |series id|${mediaPackage.series}|
 
@@ -83,14 +88,15 @@ Media package title in subject field, default email body.
        <configuration key="to">email-account@email-domain.org</configuration>
        <!-- This is going to be replaced with the media package title -->
        <configuration key="subject">${mediaPackage.title} has been published</configuration>
-       <!-- Neither body or body-template-file specified so default body <Recording Title> (<Mediapackage ID>) is sent -->
+       <!-- Neither body or body-template-file specified so default body <Recording Title> (<Mediapackage ID>)<br>is sent -->
     </configurations>
 </operation>
 ```
 
 Example 2
 ---------
-To and subject are inline templates; the email body uses a template file named sample stored in MH/etc/email:
+To and subject are inline templates; the email body uses a template file named sample stored in
+<config_dir>/etc/email:
 ```xml
 <operation
     id="send-email"
@@ -98,18 +104,19 @@ To and subject are inline templates; the email body uses a template file named s
     exception-handler-workflow="email-error"
     description="Sending email to user before holding for edit">
     <configurations>
-       <!-- This is going to be replaced with the episode catalog publisher field, which in this example it is assumed it contains a notification email address -->
+       <!-- This is going to be replaced with the episode catalog publisher field, which in this example it is assumed
+       it contains a notification email address -->
        <configuration key="to">${catalogs['episode']['publisher']}</configuration>
        <!-- This is going to be replaced with the episode catalog title field -->
        <configuration key="subject">${catalogs['episode']['title']} is ready for EDIT</configuration>
-       <!-- Email body is going to be built using the sample template found in MH/etc/email -->
+       <!-- Email body is going to be built using the sample template found in <config_dir>/etc/email -->
        <configuration key="body-template-file">sample</configuration>
     </configurations>
 </operation>
 ```
 
 ####Template: sample
-The contents of the MH/etc/email/sample email template:
+The contents of the <config_dir>/etc/email/sample email template:
 ```
 Event Details
 <#if catalogs['series']?has_content>
@@ -148,9 +155,12 @@ Workflow Configuration Panel:
       <legend>Notification</legend>
       <ul class="oc-ui-form-list">
         <li class="ui-helper-clearfix">
-          <label class="scheduler-label"><span class="color-red">* </span><span id="i18n_email_label">Email Address</span>:</label>
+          <label class="scheduler-label">
+            <span class="color-red">* </span><span id="i18n_email_label">Email Address</span>:
+          </label>
           <span id="emailconfig">
-            <input id="emailAddress" name="emailAddress" type="text" class="configField" value="my-email-account@my-email-domain.org"/>
+            <input id="emailAddress" name="emailAddress" type="text" class="configField" 
+                   value="my-email-account@my-email-domain.org"/>
           </span>
         </li>
       </ul>
@@ -179,7 +189,8 @@ Workflow Configuration Panel:
       }
       ocWorkflowPanel.setComponentValues = function(values, components){
         // After the other components (Hold, Archive, etc), add:
-        components['org.opencastproject.workflow.config.emailAddress'].setValue(values['org.opencastproject.workflow.config.emailAddress']);
+        components['org.opencastproject.workflow.config.emailAddress'].setValue(
+          values['org.opencastproject.workflow.config.emailAddress']);
       }
     </script>
 ]]>
@@ -196,7 +207,8 @@ In error handling workflow (email-error):
 	exception-handler-workflow="error"
 	description="Sends email">
       <configurations>
-        <!-- Note that you can use variable substitution in to, subject, body e.g. ${(catalogs['episode']['FIELD']!'root@localhost'}  -->
+        <!-- Note that you can use variable substitution in to, subject, body 
+             e.g. ${(catalogs['episode']['FIELD']!'root@localhost'}  -->
 		<configuration key="to">root@localhost</configuration>
 		<configuration key="subject">Failure processing a mediapackage</configuration>
 		<configuration key="body-template-file">errorDetails</configuration>
@@ -204,12 +216,12 @@ In error handling workflow (email-error):
     </operation>
 ```
 ####Template: errorDetails
-The contents of the MH/etc/email/errorDetails email template:
+The contents of the <config_dir>/etc/email/errorDetails email template:
 ```
 Error Details
 
 <#if catalogs['series']?has_content>
-Course: ${catalogs['series']['subject']!'series subject missing'} - ${catalogs['series']['title']!'series title missing'}
+Course: ${catalogs['series']['subject']!'series subject missing'}-${catalogs['series']['title']!'series title missing'}
 Instructor: ${catalogs['series']['contributor']!'instructor missing'}
 </#if>
 Title: ${catalogs['episode']['title']!'title missing'}

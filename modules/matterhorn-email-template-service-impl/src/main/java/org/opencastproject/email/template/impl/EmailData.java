@@ -35,16 +35,15 @@ import java.util.Map;
  * Holds data to be displayed in an email message. The following data will be available: mediaPackage, workflow,
  * workflowConfig: workflow configuration as key-value pairs, catalogs: hash of catalogs whose key is the catalog flavor
  * sub-type e.g. "series", "episode", failedOperation: the last operation marked as "failOnError" that failed.
- * 
- * @author Rute Santos
- * 
+ *
  */
 public class EmailData extends DocData {
 
   private final WorkflowInstance workflow;
   private final Map<String, String> workflowConfig;
   private final MediaPackage mediaPackage;
-  // "episode" --> { "creator": "Rute Santos", "type": "L05", "isPartOf": "20140224038"... }
+  // The hash map below looks like this:
+  // "episode" --> { "creator": "John Harvard", "type": "L05", "isPartOf": "20140224038"... }
   // "series" --> { "creator": "Harvard", "identifier": "20140224038"... }
   private final HashMap<String, HashMap<String, String>> catalogs;
   private final WorkflowOperationInstance failed;
@@ -52,7 +51,7 @@ public class EmailData extends DocData {
 
   /**
    * Create the base data object for populating email fields.
-   * 
+   *
    * @param name
    *          a name for this object
    * @param workflow
@@ -81,7 +80,7 @@ public class EmailData extends DocData {
 
   /**
    * Returns a string representation of this object.
-   * 
+   *
    * @return a string representation of this object
    */
   @Override

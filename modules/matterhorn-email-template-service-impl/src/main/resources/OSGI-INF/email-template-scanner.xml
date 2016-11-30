@@ -7,7 +7,6 @@
 	<property name="service.description" value="Email Template Scanner" />
 	<service>
 		<provide interface="org.apache.felix.fileinstall.ArtifactInstaller" />
-		<provide
-			interface="org.opencastproject.email.template.impl.EmailTemplateScanner" />
+		<provide interface="org.opencastproject.email.template.impl.EmailTemplateScanner" />
 	</service>
 </scr:component>

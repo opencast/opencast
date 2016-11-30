@@ -70,7 +70,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
   /**
    * Apply the template to the workflow instance.
-   * 
+   *
    * @param templateName
    *          template name
    * @param templateContent
@@ -100,7 +100,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
         IncidentTree incidents = incidentService.getIncidentsOfJob(failed.getId(), true);
         incidentList = generateIncidentList(incidents);
       } catch (Exception e) {
-        e.printStackTrace();
+        logger.error("Error when populating template with incidents", e);
         // Incidents in email will be empty
       }
     }
@@ -124,6 +124,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
         in = new FileInputStream(f);
         dc = DublinCores.read(in);
       } catch (Exception e) {
+        logger.warn("Error when populating catalog data", e);
         // Don't include the info
         continue;
       } finally {
@@ -146,7 +147,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
   /**
    * Traverses the workflow until it finds a failed operation that has failOnError=true
-   * 
+   *
    * @param workflow
    * @return the workflow operation that failed
    */
@@ -168,7 +169,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
   /**
    * Generates list of all incidents in the tree
-   * 
+   *
    * @param tree
    *          the incident tree
    * @return a flat list of incidents
@@ -186,7 +187,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
   /**
    * Callback for OSGi to set the {@link Workspace}.
-   * 
+   *
    * @param ws
    *          the workspace
    */
@@ -196,7 +197,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
   /**
    * Callback for OSGi to set the {@link EmailTemplateScanner}.
-   * 
+   *
    * @param templateScanner
    *          the template scanner service
    */
@@ -206,7 +207,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
   /**
    * Callback for OSGi to unset the {@link EmailTemplateScanner}.
-   * 
+   *
    * @param templateScanner
    *          the template scanner service
    */
@@ -216,7 +217,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
 
   /**
    * Callback for OSGi to unset the {@link IncidentService}.
-   * 
+   *
    * @param incidentService
    *          the incident service
    */
