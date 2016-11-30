@@ -235,7 +235,12 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
       logger.info("Applying theme {} to mediapackage {}", themeId, mediaPackage.getIdentifier());
 
       /* Make theme settings available to workflow instance */
-      workflowInstance.setConfiguration(THEME_ACTIVE, Boolean.toString(true));
+      workflowInstance.setConfiguration(THEME_ACTIVE, Boolean.toString(
+                 theme.isBumperActive()
+              || theme.isTrailerActive()
+              || theme.isTitleSlideActive()
+          )
+      );
       workflowInstance.setConfiguration(THEME_BUMPER_ACTIVE, Boolean.toString(theme.isBumperActive()));
       workflowInstance.setConfiguration(THEME_TRAILER_ACTIVE, Boolean.toString(theme.isTrailerActive()));
       workflowInstance.setConfiguration(THEME_TITLE_SLIDE_ACTIVE, Boolean.toString(theme.isTitleSlideActive()));
