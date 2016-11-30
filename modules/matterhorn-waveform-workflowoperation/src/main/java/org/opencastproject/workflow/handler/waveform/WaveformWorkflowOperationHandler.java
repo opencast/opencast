@@ -37,7 +37,6 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
-import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
@@ -57,7 +56,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
- *
+ * Workflow operation for the waveform service.
  */
 public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   private static final Logger logger = LoggerFactory.getLogger(WaveformWorkflowOperationHandler.class);
@@ -82,8 +81,10 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
     CONFIG_OPTIONS.put(TARGET_FLAVOR_PROPERTY, "The target waveform image flavor.");
   }
 
+  /** The waveform service. */
   private WaveformService waveformService = null;
-  private WorkingFileRepository workingFileRepository = null;
+
+  /** The workspace service. */
   private Workspace workspace = null;
 
   @Override
@@ -184,12 +185,11 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
           }
 
           FileInputStream waveformInputStream = null;
-          logger.info("Put waveform image file {} from media package {} to the working file repository",
+          logger.info("Put waveform image file {} from media package {} to the media package work space",
                   waveformMpe.getURI(), mediaPackage.getIdentifier().compact());
           try {
             waveformInputStream = new FileInputStream(waveformFile);
-            URI waveformWfrUri = workingFileRepository.put(
-                    mediaPackage.getIdentifier().compact(), waveformMpe.getIdentifier(),
+            URI waveformWfrUri = workspace.put(mediaPackage.getIdentifier().compact(), waveformMpe.getIdentifier(),
                     "waveform.png", waveformInputStream);
             waveformMpe.setURI(waveformWfrUri);
           } catch (FileNotFoundException ex) {
@@ -251,10 +251,6 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
 
   public void setWaveformService(WaveformService waveformService) {
     this.waveformService = waveformService;
-  }
-
-  public void setWorkingFileRepository(WorkingFileRepository workingFileRepository) {
-    this.workingFileRepository = workingFileRepository;
   }
 
   public void setWorkspace(Workspace workspace) {

@@ -11,8 +11,6 @@
     name="ServiceRegistry" policy="static" bind="setServiceRegistry" />
   <reference cardinality="1..1" interface="org.opencastproject.waveform.api.WaveformService"
     name="WaveformService" policy="static" bind="setWaveformService" />
-  <reference cardinality="1..1" interface="org.opencastproject.workingfilerepository.api.WorkingFileRepository"
-    name="WorkingFileRepository" policy="static" bind="setWorkingFileRepository" />
   <reference cardinality="1..1" interface="org.opencastproject.workspace.api.Workspace"
     name="Workspace" policy="static" bind="setWorkspace" />
 </scr:component>
