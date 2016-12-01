@@ -1048,7 +1048,7 @@ public class Event implements IndexObject {
    * Sets the has open needs cutting comment for this event
    *
    * @param needsCutting
-   *          the has open comments status from this event
+   *          this event has the open comments status that it needs cutting
    */
   public void setNeedsCutting(boolean needsCutting) {
     this.needsCutting = needsCutting;
@@ -1057,7 +1057,7 @@ public class Event implements IndexObject {
   /**
    * Returns the has comment needs cutting for this event
    *
-   * @return the has comments status from this event
+   * @return the event has the comments status that it needs cutting
    */
   public boolean needsCutting() {
     return needsCutting;

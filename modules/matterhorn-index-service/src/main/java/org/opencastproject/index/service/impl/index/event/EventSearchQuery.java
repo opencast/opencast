@@ -1051,7 +1051,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * Selects recordings with the given has comment need cutting status.
    *
    * @param needsCutting
-   *          the has comments status
+   *          the event has the comments status that it needs cutting
    * @return the enhanced search query
    */
   public EventSearchQuery withNeedsCutting(boolean needsCutting) {
@@ -1081,7 +1081,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
   /**
    * Returns the has open comments reason that it needs cutting of the recording.
    *
-   * @return the recording has open comments status
+   * @return the event has the open comments status that it needs cutting
    */
   public Boolean needsCutting() {
     return needsCutting;

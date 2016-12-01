@@ -54,7 +54,7 @@ public class CommentItem implements MessageItem, Serializable {
    * @param hasOpenComments
    *          Whether the event has open comments
    * @param needsCutting
-   *          Whether the event hast an open comment that it needs cutting
+   *          Whether the event has an open comment that it needs cutting
    * @return Builds a {@link CommentItem} for updating a comment.
    */
   public static CommentItem update(String eventId, boolean hasComments, boolean hasOpenComments, boolean needsCutting) {
