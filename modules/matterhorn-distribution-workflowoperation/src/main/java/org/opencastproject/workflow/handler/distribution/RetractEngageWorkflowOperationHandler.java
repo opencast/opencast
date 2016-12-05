@@ -145,7 +145,7 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     if (StringUtils.isNotBlank(bundleContext.getProperty(STREAMING_URL_PROPERTY))) {
       distributeStreaming = true;
     }
-  }
+    }
 
   /**
    * {@inheritDoc}

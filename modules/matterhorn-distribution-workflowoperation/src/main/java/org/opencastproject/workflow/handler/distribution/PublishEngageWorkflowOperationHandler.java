@@ -462,7 +462,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         } else {
           throw new WorkflowOperationException(t);
         }
-      }
+        }
     } catch (Exception e) {
       if (e instanceof WorkflowOperationException) {
         throw (WorkflowOperationException) e;
@@ -713,7 +713,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   }
 
   /**
-   * Removes every Publication for Searchindex from Mediapackage Removes
+ * Removes every Publication for Searchindex from Mediapackage Removes
    * Mediapackage from Searchindex
    *
    * @param mediaPackage Mediapackage
