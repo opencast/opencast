@@ -162,8 +162,7 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           retractElementIds.add(element.getIdentifier());
         }
         if (retractElementIds.size() > 0) {
-          Job retractDownloadDistributionJob = null;
-          retractDownloadDistributionJob = downloadDistributionService.retract(CHANNEL_ID, searchMediaPackage, retractElementIds);
+          Job retractDownloadDistributionJob = downloadDistributionService.retract(CHANNEL_ID, searchMediaPackage, retractElementIds);
           if (retractDownloadDistributionJob != null) {
             jobs.add(retractDownloadDistributionJob);
           }

@@ -333,13 +333,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       Set<String> distributetElementIds = new HashSet<String>();
 //distribute Elements
       try {
-        for (String elementId : downloadElementIds) {
-          distributetElementIds.add(elementId);
-        }
         if (distributetElementIds.size() > 0) {
           logger.info("Element distribution delay, sleeping for " + Integer.toString(distributionDelay));
-          Thread.sleep(distributionDelay);
-          Job job = downloadDistributionService.distribute(CHANNEL_ID, mediaPackage, distributetElementIds, checkAvailability);
+          Job job = downloadDistributionService.distribute(CHANNEL_ID, mediaPackage, downloadElementIds, checkAvailability);
           if (job != null) {
             jobs.add(job);
           }
@@ -351,8 +347,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
             if (job != null) {
               jobs.add(job);
             }
-            }
           }
+        }
       } catch (DistributionException e) {
         throw new WorkflowOperationException(e);
       }
