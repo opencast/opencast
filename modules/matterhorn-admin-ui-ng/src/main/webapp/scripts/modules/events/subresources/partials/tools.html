@@ -18,7 +18,9 @@
         <div class="video-header">
             <div class="main-video-details">
                 <h1 class="video-title">{{ video.title }}</h1>
-                <h4 class="video-upload-date">{{ video.date | localizeDate : 'date' : 'short'}}</h4>
+                <h4 class="video-details"><span class="video-details-date">{{ video.date | localizeDate : 'date' : 'short'}}</span>
+                  <span class="video-details-presenters">{{video.presenters  ?  " - " + video.presenters.join(', ') : "" }}</span>
+                  <span class="video-details-series">{{(video.series && video.series.title) ? " - " + video.series.title : "" }}</span></h4>
             </div>
             <div class="video-more-options">
                 <a class="view-comments-btn" data-open-modal="event-details" data-resource-id="{{ id }}" data-tab="comments" translate>VIDEO_TOOL.BUTTONS.COMMENTS</a>
