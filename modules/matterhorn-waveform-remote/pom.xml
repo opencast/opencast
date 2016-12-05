@@ -42,6 +42,9 @@
             <Export-Package>
               org.opencastproject.waveform.remote;version=${project.version}
             </Export-Package>
+            <Service-Component>
+              OSGI-INF/waveform.xml
+            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
