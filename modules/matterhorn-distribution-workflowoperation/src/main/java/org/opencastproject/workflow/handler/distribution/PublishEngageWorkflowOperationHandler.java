@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.handler.distribution;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -87,20 +88,14 @@ import java.util.UUID;
  */
 public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
-  /**
-   * The logging facility
-   */
+  /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(PublishEngageWorkflowOperationHandler.class);
 
-  /**
-   * Configuration properties id
-   */
+  /** Configuration properties id */
   private static final String ENGAGE_URL_PROPERTY = "org.opencastproject.engage.ui.url";
   private static final String STREAMING_URL_PROPERTY = "org.opencastproject.streaming.url";
 
-  /**
-   * Workflow configuration option keys
-   */
+  /** Workflow configuration option keys */
   private static final String DOWNLOAD_SOURCE_FLAVORS = "download-source-flavors";
   private static final String DOWNLOAD_TARGET_SUBFLAVOR = "download-target-subflavor";
   private static final String DOWNLOAD_SOURCE_TAGS = "download-source-tags";
@@ -113,51 +108,36 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String STRATEGY = "strategy";
 
   //itbwpdk start
-  /**
-   * Distribution delay between elements for engage
-   */
+  /** Distribution delay between elements for engage */
   private static final String DISTRIBUTION_DELAY_PROPERTY = "org.opencastproject.distribution.delay";
 
-  /**
-   * Distribution delay default value
-   */
+  /** Distribution delay default value */
   private static final int DISTRIBUTION_DELAY_DEFAULT = 1000;
 
-  /**
-   * Distribution delay between elements for engage
-   */
+  /** Distribution delay between elements for engage */
   private int distributionDelay = 0;
   //itbwpdk end
 
-  /**
-   * The streaming distribution service
-   */
+  /** The streaming distribution service */
   private DistributionService streamingDistributionService = null;
 
-  /**
-   * The download distribution service
-   */
+  /** The download distribution service */
   private DownloadDistributionService downloadDistributionService = null;
 
-  /**
-   * The search service
-   */
+  /** The search service */
   private SearchService searchService = null;
 
-  /**
-   * The server url
-   */
+  /** The server url */
   private URL serverUrl;
 
-  /**
-   * Whether to distribute to streaming server
-   */
+  /** Whether to distribute to streaming server */
   private boolean distributeStreaming = false;
 
   /**
    * Callback for the OSGi declarative services configuration.
    *
-   * @param streamingDistributionService the streaming distribution service
+   * @param streamingDistributionService
+   *          the streaming distribution service
    */
   protected void setStreamingDistributionService(DistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
@@ -166,26 +146,25 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * Callback for the OSGi declarative services configuration.
    *
-   * @param downloadDistributionService the download distribution service
+   * @param downloadDistributionService
+   *          the download distribution service
    */
   protected void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
     this.downloadDistributionService = downloadDistributionService;
   }
 
   /**
-   * Callback for declarative services configuration that will introduce us to
-   * the search service. Implementation assumes that the reference is configured
-   * as being static.
+   * Callback for declarative services configuration that will introduce us to the search service. Implementation
+   * assumes that the reference is configured as being static.
    *
-   * @param searchService an instance of the search service
+   * @param searchService
+   *          an instance of the search service
    */
   protected void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
 
-  /**
-   * The configuration options for this handler
-   */
+  /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
 
   static {
@@ -227,8 +206,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * {@inheritDoc}
    *
-   * @see
-   * org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
   public SortedMap<String, String> getConfigurationOptions() {
@@ -238,9 +216,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * {@inheritDoc}
    *
-   * @see
-   * org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   * JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
+   *      JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
@@ -374,8 +351,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
             if (job != null) {
               jobs.add(job);
             }
+            }
           }
-        }
       } catch (DistributionException e) {
         throw new WorkflowOperationException(e);
       }
@@ -386,9 +363,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       }
 
       // Wait until all distribution jobs have returned
-      if (!waitForStatus(jobs.toArray(new Job[jobs.size()])).isSuccess()) {
+      if (!waitForStatus(jobs.toArray(new Job[jobs.size()])).isSuccess())
         throw new WorkflowOperationException("One of the distribution jobs did not complete successfully");
-      }
 
       logger.debug("Distribute of mediapackage {} completed", mediaPackage);
 
@@ -412,9 +388,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           // nothing to do here
         }
 
-        if (!isPublishable(mediaPackageForSearch)) {
+        if (!isPublishable(mediaPackageForSearch))
           throw new WorkflowOperationException("Media package does not meet criteria for publication");
-        }
 
         logger.info("Publishing media package {} to search index", mediaPackageForSearch);
 
@@ -457,11 +432,10 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         logger.error("{} is malformed: {}", ENGAGE_URL_PROPERTY, engageUrlString);
         throw new WorkflowOperationException(e);
       } catch (Throwable t) {
-        if (t instanceof WorkflowOperationException) {
+        if (t instanceof WorkflowOperationException)
           throw (WorkflowOperationException) t;
-        } else {
+        else
           throw new WorkflowOperationException(t);
-        }
         }
     } catch (Exception e) {
       if (e instanceof WorkflowOperationException) {
@@ -473,23 +447,24 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   }
 
   /**
-   * Returns a mediapackage that only contains elements that are marked for
-   * distribution.
+   * Returns a mediapackage that only contains elements that are marked for distribution.
    *
-   * @param current the current mediapackage
-   * @param jobs the distribution jobs
-   * @param downloadSubflavor flavor to be applied to elements distributed to
-   * download
-   * @param downloadTargetTags tags to be applied to elements distributed to
-   * downloads
-   * @param downloadElementIds identifiers for elements that have been
-   * distributed to downloads
-   * @param streamingSubflavor flavor to be applied to elements distributed to
-   * streaming
-   * @param streamingElementIds identifiers for elements that have been
-   * distributed to streaming
-   * @param streamingTargetTags tags to be applied to elements distributed to
-   * streaming
+   * @param current
+   *          the current mediapackage
+   * @param jobs
+   *          the distribution jobs
+   * @param downloadSubflavor
+   *          flavor to be applied to elements distributed to download
+   * @param downloadTargetTags
+   *          tags to be applied to elements distributed to downloads
+   * @param downloadElementIds
+   *          identifiers for elements that have been distributed to downloads
+   * @param streamingSubflavor
+   *          flavor to be applied to elements distributed to streaming
+   * @param streamingElementIds
+   *          identifiers for elements that have been distributed to streaming
+   * @param streamingTargetTags
+   *          tags to be applied to elements distributed to streaming
    * @return the new mediapackage
    */
   protected MediaPackage getMediaPackageForSearchIndex(MediaPackage current, List<Job> jobs,
@@ -506,22 +481,20 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       Job job = serviceRegistry.getJob(entry.getId());
 
       // If there is no payload, then the item has not been distributed.
-      if (job.getPayload() == null) {
+      if (job.getPayload() == null)
         continue;
-      }
 
-      List<MediaPackageElement> distributedElements = null;
+      List <MediaPackageElement> distributedElements = null;
       try {
-        distributedElements = (List<MediaPackageElement>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
+        distributedElements = (List <MediaPackageElement>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
       } catch (MediaPackageException e) {
         throw new WorkflowOperationException(e);
       }
 
       // If the job finished successfully, but returned no new element, the channel simply doesn't support this
       // kind of element. So we just keep on looping.
-      if (distributedElements == null || distributedElements.size() < 1) {
+      if (distributedElements == null || distributedElements.size() < 1)
         continue;
-      }
 
       for (MediaPackageElement distributedElement : distributedElements) {
 
@@ -544,7 +517,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           for (String tag : downloadTargetTags) {
             distributedElement.addTag(tag);
           }
-        } // Adjust the flavor and tags for streaming elements
+        }
+        // Adjust the flavor and tags for streaming elements
         else if (streamingElementIds.contains(sourceElementId)) {
           if (streamingSubflavor != null && streamingElementIds.contains(sourceElementId)) {
             MediaPackageElementFlavor flavor = sourceElement.getFlavor();
@@ -583,21 +557,18 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     // Translate references to the distributed artifacts
     for (MediaPackageElement element : mp.getElements()) {
 
-      if (removals.contains(element)) {
+      if (removals.contains(element))
         continue;
-      }
 
       // Is the element referencing anything?
       MediaPackageReference reference = element.getReference();
-      if (reference == null) {
+      if (reference == null)
         continue;
-      }
 
       // See if the element has been distributed
       String distributedElementId = distributedElementIds.get(reference.getIdentifier());
-      if (distributedElementId == null) {
+      if (distributedElementId == null)
         continue;
-      }
 
       MediaPackageReference translatedReference = new MediaPackageReferenceImpl(mp.getElementById(distributedElementId));
       if (reference.getProperties() != null) {
@@ -616,19 +587,15 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     return mp;
   }
 
-  /**
-   * Media package must meet these criteria in order to be published.
-   */
+  /** Media package must meet these criteria in order to be published. */
   private boolean isPublishable(MediaPackage mp) {
     boolean hasTitle = !isBlank(mp.getTitle());
-    if (!hasTitle) {
+    if (!hasTitle)
       logger.warn("Media package does not meet criteria for publication: There is no title");
-    }
 
     boolean hasTracks = mp.hasTracks();
-    if (!hasTracks) {
+    if (!hasTracks)
       logger.warn("Media package does not meet criteria for publication: There are no tracks");
-    }
 
     return hasTitle && hasTracks;
   }
@@ -652,13 +619,13 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     return mediaPackage;
   }
 
+
   /**
    * MH-10216, method copied from the original RepublishWorkflowOperationHandler
    * Merges mediapackage with published mediapackage.
    *
    * @param mediaPackageForSearch
-   * @return merged mediapackage or null if a published medipackage was not
-   * found
+   * @return merged mediapackage or null if a published medipackage was not found
    * @throws WorkflowOperationException
    */
   protected MediaPackage merge(MediaPackage mediaPackageForSearch) throws WorkflowOperationException {
@@ -672,21 +639,21 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * MH-10216, Copied from the original RepublishWorkflowOperationHandler
    *
-   * Merges the updated mediapackage with the one that is currently published in
-   * a way where the updated elements replace existing ones in the published
-   * mediapackage based on their flavor.
+   * Merges the updated mediapackage with the one that is currently published in a way where the updated elements
+   * replace existing ones in the published mediapackage based on their flavor.
    * <p>
-   * If <code>publishedMp</code> is <code>null</code>, this method returns the
-   * updated mediapackage without any modifications.
+   * If <code>publishedMp</code> is <code>null</code>, this method returns the updated mediapackage without any
+   * modifications.
    *
-   * @param updatedMp the updated media package
-   * @param publishedMp the mediapackage that is currently published
+   * @param updatedMp
+   *          the updated media package
+   * @param publishedMp
+   *          the mediapackage that is currently published
    * @return the merged mediapackage
    */
   protected MediaPackage mergePackages(MediaPackage updatedMp, MediaPackage publishedMp) {
-    if (publishedMp == null) {
+    if (publishedMp == null)
       return updatedMp;
-    }
 
     MediaPackage mergedMediaPackage = (MediaPackage) updatedMp.clone();
     for (MediaPackageElement element : publishedMp.elements()) {
@@ -713,9 +680,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   }
 
   /**
- * Removes every Publication for Searchindex from Mediapackage Removes
-   * Mediapackage from Searchindex
-   *
+ * Removes every Publication for Searchindex from Mediapackage
+ * Removes Mediapackage from Searchindex
    * @param mediaPackage Mediapackage
    * @param mediaPackageForSearch Mediapackage prepared for searchIndex
    * @throws WorkflowOperationException

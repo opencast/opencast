@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.workflow.handler.distribution;
 
 import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
@@ -56,45 +57,32 @@ import java.util.TreeMap;
  */
 public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
-  /**
-   * The logging facility
-   */
+  /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(RetractEngageWorkflowOperationHandler.class);
 
-  /**
-   * Configuration property id
-   */
+  /** Configuration property id */
   private static final String STREAMING_URL_PROPERTY = "org.opencastproject.streaming.url";
 
-  /**
-   * The configuration options for this handler
-   */
+  /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS = new TreeMap<String, String>();
 
-  /**
-   * The streaming distribution service
-   */
+  /** The streaming distribution service */
   private DistributionService streamingDistributionService = null;
 
-  /**
-   * The download distribution service
-   */
+  /** The download distribution service */
   private DownloadDistributionService downloadDistributionService = null;
 
-  /**
-   * The search service
-   */
+  /** The search service */
   private SearchService searchService = null;
 
-  /**
-   * Whether to distribute to streaming server
-   */
+  /** Whether to distribute to streaming server */
   private boolean distributeStreaming = false;
 
   /**
    * Callback for the OSGi declarative services configuration.
    *
-   * @param streamingDistributionService the streaming distribution service
+   * @param streamingDistributionService
+   *          the streaming distribution service
    */
   protected void setStreamingDistributionService(DistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
@@ -103,18 +91,19 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * Callback for the OSGi declarative services configuration.
    *
-   * @param downloadDistributionService the download distribution service
+   * @param downloadDistributionService
+   *          the download distribution service
    */
   protected void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
     this.downloadDistributionService = downloadDistributionService;
   }
 
   /**
-   * Callback for declarative services configuration that will introduce us to
-   * the search service. Implementation assumes that the reference is configured
-   * as being static.
+   * Callback for declarative services configuration that will introduce us to the search service. Implementation
+   * assumes that the reference is configured as being static.
    *
-   * @param searchService an instance of the search service
+   * @param searchService
+   *          an instance of the search service
    */
   protected void setSearchService(SearchService searchService) {
     this.searchService = searchService;
@@ -123,8 +112,7 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * {@inheritDoc}
    *
-   * @see
-   * org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
   public SortedMap<String, String> getConfigurationOptions() {
@@ -134,25 +122,21 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * {@inheritDoc}
    *
-   * @see
-   * org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
+   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
    */
   @Override
   protected void activate(ComponentContext cc) {
     super.activate(cc);
     BundleContext bundleContext = cc.getBundleContext();
 
-    if (StringUtils.isNotBlank(bundleContext.getProperty(STREAMING_URL_PROPERTY))) {
+    if (StringUtils.isNotBlank(bundleContext.getProperty(STREAMING_URL_PROPERTY)))
       distributeStreaming = true;
-    }
     }
 
   /**
    * {@inheritDoc}
    *
-   * @see
-   * org.opencastproject.workflow.api.WorkflowOperationHandler#start(WorkflowInstance,
-   * JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
@@ -206,9 +190,8 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
       logger.info("Removing media package {} from the search index", mediaPackage);
       Job deleteFromSearch = searchService.delete(mediaPackage.getIdentifier().toString());
-      if (!waitForStatus(deleteFromSearch).isSuccess()) {
+      if (!waitForStatus(deleteFromSearch).isSuccess())
         throw new WorkflowOperationException("Removing media package from search did not complete successfully");
-      }
 
       logger.debug("Remove from search operation complete");
 
