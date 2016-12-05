@@ -49,19 +49,19 @@
     "CONTINUE_ACTION":"Είστε βέβαιοι ότι θέλετε να συνεχίσετε;",
     "METADATA":{
       "NOTICE":{
-        "UNKNOWN":"The following element will be deleted",
-        "EVENT":"The following event will be deleted",
-        "SERIES":"The following series will be deleted",
-        "ACL":"The following ACL will be deleted",
-        "GROUP":"The following group will be deleted",
-        "USER":"The following user will be deleted",
-        "USER_BLACKLIST":"The following user blacklist will be deleted",
-        "THEME":"The following theme will be deleted",
-        "EMAIL":"The following email template will be deleted",
-        "LOCATION":"The following location will be deleted",
-        "LOCATION_BLACKLIST":"The following location blacklist will be deleted"
+        "UNKNOWN":"Το ακόλουθο στοιχείο θα διαγραφεί",
+        "EVENT":"Το ακόλουθο στοιχείο θα διαγραφεί",
+        "SERIES":"Θα διαγραφεί η ακόλουθη σειρά",
+        "ACL":"H παρακάτω πολιτική πρόσβασης θα διαγραφεί",
+        "GROUP":"Η παρακάτω ομάδα θα διαγραφεί",
+        "USER":"Ο παρακάτω χρήστης θα διαγραφεί",
+        "USER_BLACKLIST":"Η παρακάτω μαύρη λίστα χρηστών θα διαγραφεί",
+        "THEME":"Το ακόλουθο θέμα θα διαγραφεί",
+        "EMAIL":"Το ακόλουθο πρότυπο ηλεκτρονικού ταχυδρομείου θα διαγραφεί",
+        "LOCATION":"Η ακόλουθη τοποθεσία θα διαγραφεί",
+        "LOCATION_BLACKLIST":"Η ακόλουθη μαύρη λίστα τοποθεσίας θα διαγραφεί"
       },
-      "NAME":"Name"
+      "NAME":"Όνομα"
     },
     "ACTIONS":{
       "CONFIRMATION":"Απαιτείται Επιβεβαίωση"
@@ -109,7 +109,7 @@
     "SERIES_NOT_UPDATED_ID":"Δεν ήταν δυνατή η αποθήκευση της σειράς {{ id }}",
     "SERIES_NOT_UPDATED_ALL":"Καμμία από τις σειρές δεν μπορούσε να αποθηκευτεί",
     "EVENTS_DELETED":"Η εκδήλωση έχει διαγραφεί",
-    "EVENTS_NOT_DELETED":"Δεν ήταν δυνατή η διαγραφή της\/των εκδήλωσης\/εων",
+    "EVENTS_NOT_DELETED":"Δεν ήταν δυνατή η διαγραφή της/των εκδήλωσης/εων",
     "SERIES_DELETED":"Η σειρά έχει διαγραφεί",
     "SERIES_NOT_DELETED":"Δεν ήταν δυνατή η διαγραφή της σειράς",
     "USER_BLACKLIST_CREATED":"Δημιουργήθηκε η μαύρη λίστα",
@@ -118,6 +118,8 @@
     "USER_BLACKLIST_NOT_SAVED":"Δεν ήταν δυνατή η αποθήκευση της μαύρης λίστας",
     "USER_BLACKLIST_DELETED":"Η μαύρη λίστα έχει διαγραφεί",
     "USER_BLACKLIST_NOT_DELETED":"Δεν ήταν δυνατή η διαγραφή της μαύρης λίστας",
+    "LOCATION_DELETED":"Η τοποθεσία έχει διαγραφεί",
+    "LOCATION_NOT_DELETED":"Δεν ήταν δυνατή η διαγραφή της τοποθεσίας",
     "LOCATION_BLACKLIST_CREATED":"Δημιουργήθηκε η μαύρη λίστα",
     "LOCATION_BLACKLIST_NOT_CREATED":"Δεν μπορεί να δημιουργηθεί η μαύρη λίστα",
     "LOCATION_BLACKLIST_SAVED":"Η μαύρη λίστα έχει αποθηκευτεί",
@@ -136,7 +138,7 @@
     "CONFLICT_DETECTED":"Σύγκρουση στον προγραμματισμό: η νέα εκδήλωση συμπίμπτει με μία υπάρχουσα. Παρακαλώ αλλάξτε την αίθουσα, τις ημερηνίες ή τις ημέρες.",
     "CONFLICT_ALREADY_ENDED":"Σφάλμα στον προγραμματισμό. Η εκδήλωση έχει ήδη λήξει.",
     "CONFLICT_END_BEFORE_START":"Σφάλμα στον προγραμματισμό. Η προγραμματισμένη λήξη πρέπει να είναι μεταγενέστερη από την προγραμματισμένη έναρξη.",
-    "INVALID_ACL_RULES":"Οι κανόνες πρέπει να περιέχουν έναν έγκυρο ρόλο και δικαίωμα(τα) ανάγνωσης ή\/και εγγραφής.",
+    "INVALID_ACL_RULES":"Οι κανόνες πρέπει να περιέχουν έναν έγκυρο ρόλο και δικαίωμα(τα) ανάγνωσης ή/και εγγραφής.",
     "MISSING_ACL_RULES":"Απαιτείται τουλάχιστον ένας ρόλος με δικαιώματα ανάγνωσης και εγγραφής!",
     "SAVED_ACL_RULES":"Οι κανόνες πρόσβασης έχουν αποθηκευτεί.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Οι υπάρχουσες εκδηλώσεις σε αυτή τη σειρά θα πρέπει να επεξεργαστών ξάνα",
@@ -210,7 +212,7 @@
     "SCHEDULE_TASK":{
       "CAPTION":"Έναρξη εργασίας",
       "GENERAL":{
-        "CAPTION":"General",
+        "CAPTION":"Γενικά",
         "SUMMARY":"({{ count }} εκδηλώσεις επιλεγμένες)",
         "CANNOTSTART":"Οι επιλεγμένες εκδηλώσεις δεν μπορούν αυτή την στιγμή να επεξεργαστούν. Καταργήστε την επιλογή τούς ή δοκιμάστε ξανά αργότερα."
       },
@@ -687,7 +689,7 @@
           "REASONS":{
             "CUTTING":"Απαιτείται μοντάζ",
             "REVIEW":"Απαιτείται προεπισκόπηση",
-            "ASYNC":"Ασύγχρονα κομμάτια εικόνας\/ήχου",
+            "ASYNC":"Ασύγχρονα κομμάτια εικόνας/ήχου",
             "AUDIO_ISSUE":"Χαμένο ή ελλατωματικό κομμάτι ήχου",
             "CANCELED":"Διαγραφείσα εκδήλωση",
             "CONFLICTING_METADATA":"Αντικρουόμενα μετα-δεδομένα",
@@ -706,6 +708,7 @@
           }
         },
         "METADATA":{
+          "CAPTION":"Λεπτομέριες εκδήλωσης",
           "TITLE":"Τίτλος",
           "ID":"UID",
           "SERIES":"Σειρά",
@@ -966,7 +969,8 @@
     },
     "ACTIONS":{
       "EXPORT":"Εξαγωγή",
-      "ADD_BLACKLIST":"Προσθέστε στην μαύρη λίστα"
+      "ADD_BLACKLIST":"Προσθέστε στην μαύρη λίστα",
+      "REMOVE":"Κατάργηση"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1046,6 +1050,7 @@
         "EMAIL":"Διεύθυνση ηλεκτρονικού ταχυδρομείου",
         "ROLES":"Ρόλοι",
         "TYPE":"Τύπος",
+        "PROVIDER":"Πάροχος",
         "BLACKLIST_FROM":"Στη μαύρη λίστα από",
         "BLACKLIST_TO":"Στη μαύρη λίστα μέχρι",
         "ACTION":"Ενέργειες"
@@ -1415,7 +1420,7 @@
     },
     "JOBS":{
       "TABLE":{
-        "ID":"Job Identifier",
+        "ID":"Αναγνωριστικό εργασίας",
         "ACTION":"Ενέργειες",
         "CAPTION":"Εργασίες",
         "CREATED":"Δημιουργήθηκε",
@@ -1490,6 +1495,16 @@
       "UNDO":"Αναίρεση",
       "REDO":"Ακύρωση Αναίρεσης",
       "CLEAR_SEGMENTS":"Καθαρισμός τμημάτων"
+    },
+    "PLAYER":{
+      "PLAY":"Play",
+      "PAUSE":"Pause",
+      "NEXT_FRAME":"Επόμενο καρέ",
+      "PREVIOUS_FRAME":"Προηγούμενο καρέ",
+      "NEXT_SEGMENT":"Επόμενο τμήμα / μετακίνηση στο τέλος",
+      "PREVIOUS_SEGMENT":"Προηγούμενο τμήμα / μετακίνηση στην αρχή",
+      "MUTE":"Σίγαση",
+      "VOLUME":"Ένταση ήχου"
     }
   },
   "LOGIN":{
@@ -1498,7 +1513,7 @@
     "USERNAME":"Όνομα χρήστη…",
     "PASSWORD":"Κωδικός πρόσβασης…",
     "LOGIN":"Σύνδεση",
-    "ERROR":"Εσφαλμένο όνομα χρήστη ή \/ και τον κωδικό πρόσβασης"
+    "ERROR":"Εσφαλμένο όνομα χρήστη ή / και τον κωδικό πρόσβασης"
   },
   "TABLE_FILTERS":{
     "CLEAR":"Απαλοιφή όλων των φίλτρων",
@@ -1737,7 +1752,7 @@
     "RUNNING":"Εκτελείται",
     "FINISHED":"Ολοκληρώθηκε",
     "FAILED":"Απέτυχε",
-    "FINISHED_WITH_COMMENTS":"Ολοκληρώθηκε με ανοιχτά σχόλια",
+    "FINISHED_WITH_COMMENTS":"Todo",
     "SCHEDULED":"Προγραμματισμένη"
   }
 }

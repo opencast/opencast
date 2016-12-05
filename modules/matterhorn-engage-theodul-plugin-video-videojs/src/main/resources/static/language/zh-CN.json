@@ -2,7 +2,6 @@
   "value_locale":"zh",
   "error_AudioCodecNotSupported":"错误: 此浏览器不支持当前用到的音频编码解码器",
   "error_AudioElementNotSupported":"错误: 您的浏览器不支持音频元素。",
-  "switchPlayer":"切换视频播放器",
   "video":"视频",
   "video_short":"视频",
   "openInPlayer":"在播放器中打开",

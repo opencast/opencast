@@ -109,7 +109,7 @@
     "SERIES_NOT_UPDATED_ID":"Nie można zapisać serii {{ id }}",
     "SERIES_NOT_UPDATED_ALL":"Żadna seria nie została zapisana",
     "EVENTS_DELETED":"Wydarzenie zostało usunięte",
-    "EVENTS_NOT_DELETED":"Wydarzenie\/wydarzenia nie mogły być usunięte",
+    "EVENTS_NOT_DELETED":"Wydarzenie/wydarzenia nie mogły być usunięte",
     "SERIES_DELETED":"Seria została skasowana",
     "SERIES_NOT_DELETED":"Seria nie mogła zostać usunięta",
     "USER_BLACKLIST_CREATED":"Czarna lista została utworzona",
@@ -118,6 +118,8 @@
     "USER_BLACKLIST_NOT_SAVED":"Czerna lista nie mogła być zapisana",
     "USER_BLACKLIST_DELETED":"Czarna lista została usunięta",
     "USER_BLACKLIST_NOT_DELETED":"Czarna lista nie mogła być usunięta",
+    "LOCATION_DELETED":"The location has been deleted",
+    "LOCATION_NOT_DELETED":"The location could not be deleted",
     "LOCATION_BLACKLIST_CREATED":"Czarna lista została utworzona",
     "LOCATION_BLACKLIST_NOT_CREATED":"Nie można utworzyć czarnej listy",
     "LOCATION_BLACKLIST_SAVED":"Czarna lista została zapisana",
@@ -136,7 +138,7 @@
     "CONFLICT_DETECTED":"Konflikt w harmonogramie: nowe wydarzenie pokrywa się z już zaplanowanym. Proszę zmienić salę lub termin wydarzenia.",
     "CONFLICT_ALREADY_ENDED":"Błąd w harmonogramie: Wydarzenie się już zakończyło.",
     "CONFLICT_END_BEFORE_START":"Błąd w harmonogramie: Rozpoczęcie zakończenie zdarzenia zaplanowano przed jego rozpoczęciem.",
-    "INVALID_ACL_RULES":"Reguły dostępu muszą zawierać poprawne role użytkownika z określonymi zasadami odczytu i\/lub zapisu.",
+    "INVALID_ACL_RULES":"Reguły dostępu muszą zawierać poprawne role użytkownika z określonymi zasadami odczytu i/lub zapisu.",
     "MISSING_ACL_RULES":"Przynajmniej jedna rola, z uprawnieniem do zapisu lub odczytu jest wymagana!",
     "SAVED_ACL_RULES":"Reguły dostępu zostały zapisane.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Wydarzenia w tej serii będą musiały być przetworzone ponownie",
@@ -687,7 +689,7 @@
           "REASONS":{
             "CUTTING":"Wymaga cięć",
             "REVIEW":"Wymaga przeglądu",
-            "ASYNC":"Ścieżki A\/V asynchroniczne",
+            "ASYNC":"Ścieżki A/V asynchroniczne",
             "AUDIO_ISSUE":"Brakująca lub uszkodzona ścieżka dżwiękowa",
             "CANCELED":"Anulowane wydarzenie",
             "CONFLICTING_METADATA":"Konflikt w metadanych",
@@ -706,6 +708,7 @@
           }
         },
         "METADATA":{
+          "CAPTION":"Event details",
           "TITLE":"Tytuł",
           "ID":"UID",
           "SERIES":"Serie",
@@ -966,7 +969,8 @@
     },
     "ACTIONS":{
       "EXPORT":"Eksportuj",
-      "ADD_BLACKLIST":"Dodaj czarną listę"
+      "ADD_BLACKLIST":"Dodaj czarną listę",
+      "REMOVE":"Usuń"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1046,6 +1050,7 @@
         "EMAIL":"Email",
         "ROLES":"Role",
         "TYPE":"Typ",
+        "PROVIDER":"Dostawca",
         "BLACKLIST_FROM":"Na czarnej liście od",
         "BLACKLIST_TO":"Na czarnej liście do",
         "ACTION":"Działania"
@@ -1490,6 +1495,16 @@
       "UNDO":"Cofnij",
       "REDO":"Wykonaj ponownie",
       "CLEAR_SEGMENTS":"Wyczyść segmenty"
+    },
+    "PLAYER":{
+      "PLAY":"Play",
+      "PAUSE":"Pause",
+      "NEXT_FRAME":"Next frame",
+      "PREVIOUS_FRAME":"Previous frame",
+      "NEXT_SEGMENT":"Next segment / Jump to end",
+      "PREVIOUS_SEGMENT":"Previous segment / Jump to start",
+      "MUTE":"Mute",
+      "VOLUME":"Volume"
     }
   },
   "LOGIN":{
@@ -1737,7 +1752,7 @@
     "RUNNING":"W toku",
     "FINISHED":"Zakończone",
     "FAILED":"Zakończone niepowodzeniem",
-    "FINISHED_WITH_COMMENTS":"Zakończono z otwartymi komentarzami",
+    "FINISHED_WITH_COMMENTS":"Todo",
     "SCHEDULED":"Zaplanowane"
   }
 }

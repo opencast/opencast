@@ -2,7 +2,6 @@
   "value_locale":"en",
   "error_AudioCodecNotSupported":"Fout: De audio codec wordt niet ondersteund door deze browser",
   "error_AudioElementNotSupported":"Fout: Uw browser biedt geen ondersteuning voor het audio element.",
-  "switchPlayer":"Wissel speler",
   "video":"Video",
   "video_short":"Vid.",
   "openInPlayer":"Open in de speler",
