@@ -36,6 +36,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.waveform.api.WaveformService;
 import org.opencastproject.waveform.api.WaveformServiceException;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,9 +59,9 @@ public class WaveformServiceEndpoint extends AbstractJobProducerEndpoint {
   private WaveformService waveformService = null;
 
   @POST
-  @Path("/generate")
+  @Path("/create")
   @Produces({MediaType.APPLICATION_XML})
-  @RestQuery(name = "generate", description = "Create a waveform image from the given track",
+  @RestQuery(name = "create", description = "Create a waveform image from the given track",
           returnDescription = "Media package attachment for the generated waveform.",
           restParameters = {
             @RestParameter(name = "track", type = RestParameter.Type.TEXT,
@@ -74,15 +75,16 @@ public class WaveformServiceEndpoint extends AbstractJobProducerEndpoint {
             @RestResponse(description = "Internal server error.",
                     responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
   })
-  public Response generateWaveformImage(@FormParam("track") String track) {
+  public Response createWaveformImage(@FormParam("track") String track) {
     try {
       MediaPackageElement sourceTrack = MediaPackageElementParser.getFromXml(track);
       if (!Track.TYPE.equals(sourceTrack.getElementType()))
         return Response.status(Response.Status.BAD_REQUEST).entity("Track element must be of type track").build();
 
-      Job job = waveformService.generateWaveformImage((Track) sourceTrack);
+      Job job = waveformService.createWaveformImage((Track) sourceTrack);
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (WaveformServiceException ex) {
+      logger.error("Creating waveform job for track {} failed: {}", track, ExceptionUtils.getStackTrace(ex));
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     } catch (MediaPackageException ex) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Track element parsing failure").build();

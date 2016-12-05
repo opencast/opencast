@@ -264,10 +264,10 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.waveform.api.WaveformService#generateWaveformImage(org.opencastproject.mediapackage.Track)
+   * @see org.opencastproject.waveform.api.WaveformService#createWaveformImage(org.opencastproject.mediapackage.Track)
    */
   @Override
-  public Job generateWaveformImage(Track sourceTrack) throws MediaPackageException, WaveformServiceException {
+  public Job createWaveformImage(Track sourceTrack) throws MediaPackageException, WaveformServiceException {
     try {
       return serviceRegistry.createJob(jobType, Operation.Waveform.toString(),
               Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack)), waveformJobLoad);

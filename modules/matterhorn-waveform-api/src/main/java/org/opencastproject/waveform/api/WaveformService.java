@@ -40,5 +40,5 @@ public interface WaveformService {
    * @throws MediaPackageException if the serialization of the given track fail
    * @throws WaveformServiceException if the job can't be created for any reasons
    */
-  Job generateWaveformImage(Track sourceTrack) throws MediaPackageException, WaveformServiceException;
+  Job createWaveformImage(Track sourceTrack) throws MediaPackageException, WaveformServiceException;
 }

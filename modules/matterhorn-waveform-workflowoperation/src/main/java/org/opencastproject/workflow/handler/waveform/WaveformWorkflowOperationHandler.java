@@ -146,7 +146,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
         logger.info("Create waveform job for track '{}' in mediapackage '{}'",
                 sourceTrack.getIdentifier(), mediaPackage.getIdentifier().compact());
 
-        Job waveformJob = waveformService.generateWaveformImage(sourceTrack);
+        Job waveformJob = waveformService.createWaveformImage(sourceTrack);
         waveformJobs.add(waveformJob);
       } catch (MediaPackageException | WaveformServiceException ex) {
         logger.error("Creating waveform extraction job for track '{}' in mediapackage '{}' failed with error {}",

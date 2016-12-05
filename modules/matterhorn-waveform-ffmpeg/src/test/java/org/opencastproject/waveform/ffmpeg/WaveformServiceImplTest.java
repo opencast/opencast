@@ -119,7 +119,7 @@ public class WaveformServiceImplTest {
   }
 
   /**
-   * Test of generateWaveformImage method, of class WaveformServiceImpl.
+   * Test of createWaveformImage method, of class WaveformServiceImpl.
    */
   @Test
   public void testGenerateWaveformImage() throws Exception {
@@ -134,7 +134,7 @@ public class WaveformServiceImplTest {
 
     WaveformServiceImpl instance = new WaveformServiceImpl();
     instance.setServiceRegistry(serviceRegistry);
-    Job job = instance.generateWaveformImage(dummyTrack);
+    Job job = instance.createWaveformImage(dummyTrack);
     assertEquals(expectedJob, job);
   }
 
