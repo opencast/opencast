@@ -61,6 +61,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -86,11 +87,24 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
 
   public static final String DEFAULT_FFMPEG_BINARY = "ffmpeg";
 
-  /** The default waveform image width in pixel */
-  public static final int DEFAULT_WAVEFORM_IMAGE_WIDTH = 5000;
+  /** The default minimum waveform image width in pixel */
+  public static final int DEFAULT_WAVEFORM_IMAGE_WIDTH_MIN = 5000;
 
-  /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_IMAGE_WIDTH */
-  public static final String WAVEFORM_IMAGE_WIDTH_CONFIG_KEY = "waveform.image.width";
+  /** The default maximum waveform image width in pixel */
+  public static final int DEFAULT_WAVEFORM_IMAGE_WIDTH_MAX = 20000;
+
+  /** The default waveform image width per minumte of video in pixel */
+  public static final int DEFAULT_WAVEFORM_IMAGE_WIDTH_PIXEL_PER_MINUTE = 200;
+
+
+  /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_IMAGE_WIDTH_MIN */
+  public static final String WAVEFORM_IMAGE_WIDTH_MIN_CONFIG_KEY = "waveform.image.width.min";
+
+  /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_IMAGE_WIDTH_MAX */
+  public static final String WAVEFORM_IMAGE_WIDTH_MAX_CONFIG_KEY = "waveform.image.width.max";
+
+  /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_IMAGE_WIDTH_PIXEL_PER_MINUTE */
+  public static final String WAVEFORM_IMAGE_WIDTH_PPM_CONFIG_KEY = "waveform.image.width.ppm";
 
   /** The default waveform image height in pixel */
   public static final int DEFAULT_WAVEFORM_IMAGE_HEIGHT = 500;
@@ -127,8 +141,14 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   /** The waveform job load */
   private float waveformJobLoad = DEFAULT_WAVEFORM_JOB_LOAD;
 
-  /** The waveform image width in pixel */
-  private int waveformImageWidth = DEFAULT_WAVEFORM_IMAGE_WIDTH;
+  /** The minimum waveform image width in pixel */
+  private int waveformImageWidthMin = DEFAULT_WAVEFORM_IMAGE_WIDTH_MIN;
+
+  /** The maximum waveform image width in pixel */
+  private int waveformImageWidthMax = DEFAULT_WAVEFORM_IMAGE_WIDTH_MAX;
+
+  /** The waveform image width per minute of video in pixel */
+  private int waveformImageWidthPPM = DEFAULT_WAVEFORM_IMAGE_WIDTH_PIXEL_PER_MINUTE;
 
   /** The waveform image height in pixel */
   private int waveformImageHeight = DEFAULT_WAVEFORM_IMAGE_HEIGHT;
@@ -180,13 +200,33 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     waveformJobLoad = LoadUtil.getConfiguredLoadValue(properties,
             WAVEFORM_JOB_LOAD_CONFIG_KEY, DEFAULT_WAVEFORM_JOB_LOAD, serviceRegistry);
 
-    Object val = properties.get(WAVEFORM_IMAGE_WIDTH_CONFIG_KEY);
+    Object val = properties.get(WAVEFORM_IMAGE_WIDTH_MIN_CONFIG_KEY);
     if (val != null) {
       try {
-        waveformImageWidth = Integer.parseInt((String) val);
+        waveformImageWidthMin = Integer.parseInt((String) val);
       } catch (NumberFormatException ex) {
         logger.warn("The configuration value for {} should be an integer but is {}",
-                WAVEFORM_IMAGE_WIDTH_CONFIG_KEY, val);
+                WAVEFORM_IMAGE_WIDTH_MIN_CONFIG_KEY, val);
+      }
+    }
+
+    val = properties.get(WAVEFORM_IMAGE_WIDTH_MAX_CONFIG_KEY);
+    if (val != null) {
+      try {
+        waveformImageWidthMax = Integer.parseInt((String) val);
+      } catch (NumberFormatException ex) {
+        logger.warn("The configuration value for {} should be an integer but is {}",
+                WAVEFORM_IMAGE_WIDTH_MAX_CONFIG_KEY, val);
+      }
+    }
+
+    val = properties.get(WAVEFORM_IMAGE_WIDTH_PPM_CONFIG_KEY);
+    if (val != null) {
+      try {
+        waveformImageWidthPPM = Integer.parseInt((String) val);
+      } catch (NumberFormatException ex) {
+        logger.warn("The configuration value for {} should be an integer but is {}",
+                WAVEFORM_IMAGE_WIDTH_PPM_CONFIG_KEY, val);
       }
     }
 
@@ -265,6 +305,13 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     }
   }
 
+  /**
+   * Create and run waveform extraction ffmpeg command.
+   *
+   * @param track source audio/video track with at least one audio channel
+   * @return waveform image attachment
+   * @throws WaveformServiceException if processing fail
+   */
   private Attachment extractWaveform(Track track) throws WaveformServiceException {
     if (!track.hasAudio()) {
       throw new WaveformServiceException("Track has no audio");
@@ -289,7 +336,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
       binary,
       "-nostats",
       "-i", mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
-      "-lavfi", createWaveformFilter(),
+      "-lavfi", createWaveformFilter(track),
       "-an", "-vn", "-sn", "-y",
       waveformFilePath.replaceAll(" ", "\\ ")
     };
@@ -362,12 +409,18 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     return waveformMpe;
   }
 
-  private String createWaveformFilter() {
+  /**
+   * Create an ffmpeg waveform filter with parameters based on input track and service configuration.
+   *
+   * @param track source audio/video track with at least one audio channel
+   * @return ffmpeg filter parameter
+   */
+  private String createWaveformFilter(Track track) {
     StringBuilder filterBuilder = new StringBuilder("showwavespic=");
     filterBuilder.append("split_channels=");
     filterBuilder.append(waveformSplitChannels ? 1 : 0);
     filterBuilder.append(":s=");
-    filterBuilder.append(waveformImageWidth);
+    filterBuilder.append(getWaveformImageWidth(track));
     filterBuilder.append("x");
     filterBuilder.append(waveformImageHeight);
     filterBuilder.append(":scale=");
@@ -375,6 +428,24 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     filterBuilder.append(":colors=");
     filterBuilder.append(String.join("|", waveformColor));
     return filterBuilder.toString();
+  }
+
+  /**
+   * Return the waveform image width build from input track and service configuration.
+   *
+   * @param track source audio/video track with at least one audio channel
+   * @return waveform image width
+   */
+  private int getWaveformImageWidth(Track track) {
+    int imageWidth = waveformImageWidthMin;
+    if (track.getDuration() > 0) {
+      int trackDurationMinutes = (int) TimeUnit.MILLISECONDS.toMinutes(track.getDuration());
+      if (waveformImageWidthPPM > 0 && trackDurationMinutes > 0) {
+        imageWidth = Math.max(waveformImageWidthMin, trackDurationMinutes * waveformImageWidthPPM);
+        imageWidth = Math.min(waveformImageWidthMax, imageWidth);
+      }
+    }
+    return imageWidth;
   }
 
   @Override

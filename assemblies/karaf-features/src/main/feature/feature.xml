@@ -403,6 +403,7 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videosegmenter-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-videosegmenter-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videosegmenter-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-waveform-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-waveform-remote/${project.version}</bundle>

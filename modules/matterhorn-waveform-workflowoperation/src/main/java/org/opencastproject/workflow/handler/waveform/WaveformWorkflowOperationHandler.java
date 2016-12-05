@@ -177,10 +177,9 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
             // unexpected job payload
             throw new WorkflowOperationException("Can not parse waveform attachment from job " + job.getId());
           } catch (NotFoundException ex) {
-            throw new WorkflowOperationException("Waveform image file '" + waveformMpe.getURI().toString()
-                    + "' not found", ex);
+            throw new WorkflowOperationException("Waveform image file '" + waveformMpe.getURI() + "' not found", ex);
           } catch (IOException ex) {
-            throw new WorkflowOperationException("Can not get workflow image file '" + waveformMpe.getURI().toString()
+            throw new WorkflowOperationException("Can not get workflow image file '" + waveformMpe.getURI()
                     + "' from workspace");
           }
 
