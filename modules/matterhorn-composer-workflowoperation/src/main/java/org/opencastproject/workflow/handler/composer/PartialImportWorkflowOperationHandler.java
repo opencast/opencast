@@ -975,7 +975,8 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     for (Track t : originalTracks) {
       if (t.getURI().toString().contains(uri)) {
         if (EMPTY_VALUE.equals(type.get())) {
-          type.set(t.getFlavor().getType());
+          String suffix = (t.hasAudio() && !t.hasVideo()) ? FLAVOR_AUDIO_SUFFIX : "";
+          type.set(t.getFlavor().getType() + suffix);
         }
         originalTracks.remove(t);
         return t;
