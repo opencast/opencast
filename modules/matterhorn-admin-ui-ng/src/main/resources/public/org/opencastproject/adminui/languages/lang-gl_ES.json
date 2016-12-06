@@ -61,7 +61,7 @@
         "LOCATION":"Vaise borrar a seguinte localización",
         "LOCATION_BLACKLIST":"Vaise borrar a seguinte lista negra de localizacións"
       },
-      "NAME":"Name"
+      "NAME":"Nome"
     },
     "ACTIONS":{
       "CONFIRMATION":"Requírese confirmación"
@@ -118,6 +118,8 @@
     "USER_BLACKLIST_NOT_SAVED":"Non se puido gardar a lista negra",
     "USER_BLACKLIST_DELETED":"Lista negra borrada",
     "USER_BLACKLIST_NOT_DELETED":"Non se puido borrar a lista negra",
+    "LOCATION_DELETED":"Ubicación borrada",
+    "LOCATION_NOT_DELETED":"Non se puido borrar a ubicación",
     "LOCATION_BLACKLIST_CREATED":"Lista negra creada",
     "LOCATION_BLACKLIST_NOT_CREATED":"Non se puido crear a lista negra",
     "LOCATION_BLACKLIST_SAVED":"Lista negra gardada",
@@ -136,7 +138,7 @@
     "CONFLICT_DETECTED":"Conflito de programación: o novo evento coincide con outro existente. Por favor, cambie a sala, as datas ou as horas.",
     "CONFLICT_ALREADY_ENDED":"Erro de programación: O evento xa rematou.",
     "CONFLICT_END_BEFORE_START":"Erro de programación: O final ten que ser máis tarde que o comezo.",
-    "INVALID_ACL_RULES":"As regras deben conter un nome de rol válido e permiso(s) de lectura e\/ou escritura.",
+    "INVALID_ACL_RULES":"As regras deben conter un nome de rol válido e permiso(s) de lectura e/ou escritura.",
     "MISSING_ACL_RULES":"Requírese, como mínimo, un rol con permisos de Lectura e Escritura!",
     "SAVED_ACL_RULES":"Regras de acceso gardadas.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Os eventos que contén esta serie terán que ser reprocesados",
@@ -210,7 +212,7 @@
     "SCHEDULE_TASK":{
       "CAPTION":"Iniciar Tarefa",
       "GENERAL":{
-        "CAPTION":"General",
+        "CAPTION":"Xeral",
         "SUMMARY":"({{ count }} eventos seleccionados)",
         "CANNOTSTART":"O(s) evento(s) destacado(s) non se poden procesar neste momento. Desmárqueo(s) ou volva intentalo máis tarde."
       },
@@ -687,7 +689,7 @@
           "REASONS":{
             "CUTTING":"Pendente de cortar",
             "REVIEW":"Pendente de revisar",
-            "ASYNC":"Pistas de A\/V asíncronas",
+            "ASYNC":"Pistas de A/V asíncronas",
             "AUDIO_ISSUE":"Pista de audio non dispoñible ou defectuosa",
             "CANCELED":"Evento cancelado",
             "CONFLICTING_METADATA":"Conflito de metadatos",
@@ -706,6 +708,7 @@
           }
         },
         "METADATA":{
+          "CAPTION":"Detalles do evento",
           "TITLE":"Título",
           "ID":"UID",
           "SERIES":"Serie",
@@ -966,7 +969,8 @@
     },
     "ACTIONS":{
       "EXPORT":"Exportar",
-      "ADD_BLACKLIST":"Engadir lista negra"
+      "ADD_BLACKLIST":"Engadir lista negra",
+      "REMOVE":"Eliminar"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1046,6 +1050,7 @@
         "EMAIL":"Correo electrónico",
         "ROLES":"Roles",
         "TYPE":"Tipo",
+        "PROVIDER":"Fornecedor",
         "BLACKLIST_FROM":"Na lista negra dende",
         "BLACKLIST_TO":"Na lista negra ata",
         "ACTION":"Accións"
@@ -1490,6 +1495,16 @@
       "UNDO":"Desfacer",
       "REDO":"Refacer",
       "CLEAR_SEGMENTS":"Borrar segmentos"
+    },
+    "PLAYER":{
+      "PLAY":"Reproducir",
+      "PAUSE":"Pausa",
+      "NEXT_FRAME":"Fotograma seguinte",
+      "PREVIOUS_FRAME":"Fotograma anterior",
+      "NEXT_SEGMENT":"Seguinte segmento / Saltar ó fin",
+      "PREVIOUS_SEGMENT":"Segmento anterior / Saltar ó inicio",
+      "MUTE":"Silenciar",
+      "VOLUME":"Volume"
     }
   },
   "LOGIN":{
@@ -1498,7 +1513,7 @@
     "USERNAME":"Nome de usuario…",
     "PASSWORD":"Contrasinal…",
     "LOGIN":"Iniciar sesión",
-    "ERROR":"Contrasinal e \/ ou nome de usuario incorrecto"
+    "ERROR":"Contrasinal e / ou nome de usuario incorrecto"
   },
   "TABLE_FILTERS":{
     "CLEAR":"Limpar todos os filtros",
@@ -1737,7 +1752,7 @@
     "RUNNING":"Procesando",
     "FINISHED":"Finalizado",
     "FAILED":"Errado",
-    "FINISHED_WITH_COMMENTS":"Rematado con comentarios pendentes",
+    "FINISHED_WITH_COMMENTS":"Pendente",
     "SCHEDULED":"Programado"
   }
 }

@@ -2,7 +2,6 @@
   "value_locale":"pl",
   "error_AudioCodecNotSupported":"Błąd: Format audio nie jest obsługiwany przez przeglądarkę",
   "error_AudioElementNotSupported":"Błąd: Twoja przeglądarka nie obsługuje elementu audio.",
-  "switchPlayer":"Zmień odtwarzacz",
   "video":"Wideo",
   "video_short":"Wid.",
   "openInPlayer":"Odtwórz",
