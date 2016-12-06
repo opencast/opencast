@@ -62,7 +62,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.client.utils.URIUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -106,17 +105,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String STREAMING_TARGET_SUBFLAVOR = "streaming-target-subflavor";
   private static final String CHECK_AVAILABILITY = "check-availability";
   private static final String STRATEGY = "strategy";
-
-  //itbwpdk start
-  /** Distribution delay between elements for engage */
-  private static final String DISTRIBUTION_DELAY_PROPERTY = "org.opencastproject.distribution.delay";
-
-  /** Distribution delay default value */
-  private static final int DISTRIBUTION_DELAY_DEFAULT = 1000;
-
-  /** Distribution delay between elements for engage */
-  private int distributionDelay = 0;
-  //itbwpdk end
 
   /** The streaming distribution service */
   private DistributionService streamingDistributionService = null;
@@ -197,8 +185,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     BundleContext bundleContext = cc.getBundleContext();
 
     // Get configuration
-    distributionDelay = NumberUtils.toInt(bundleContext.getProperty(DISTRIBUTION_DELAY_PROPERTY),
-            DISTRIBUTION_DELAY_DEFAULT);
     serverUrl = UrlSupport.url(bundleContext.getProperty(SERVER_URL_PROPERTY));
     distributeStreaming = StringUtils.isNotBlank(bundleContext.getProperty(STREAMING_URL_PROPERTY));
   }
@@ -334,7 +320,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 //distribute Elements
       try {
         if (distributetElementIds.size() > 0) {
-          logger.info("Element distribution delay, sleeping for " + Integer.toString(distributionDelay));
           Job job = downloadDistributionService.distribute(CHANNEL_ID, mediaPackage, downloadElementIds, checkAvailability);
           if (job != null) {
             jobs.add(job);

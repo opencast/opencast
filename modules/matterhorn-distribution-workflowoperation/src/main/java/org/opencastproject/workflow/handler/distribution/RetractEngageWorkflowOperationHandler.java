@@ -144,7 +144,6 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     try {
       List<Job> jobs = new ArrayList<Job>();
-      Set<String> retractElementIds = new HashSet<String>();
 
       SearchQuery query = new SearchQuery().withId(mediaPackage.getIdentifier().toString());
       SearchResult result = searchService.getByQuery(query);
@@ -156,6 +155,7 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         throw new WorkflowOperationException("More than one mediapackage with id " + mediaPackage.getIdentifier()
                 + " found");
       } else {
+        Set<String> retractElementIds = new HashSet<String>();
         MediaPackage searchMediaPackage = result.getItems()[0].getMediaPackage();
         logger.info("Retracting media package {} from download/streaming distribution channel", searchMediaPackage);
         for (MediaPackageElement element : searchMediaPackage.getElements()) {
