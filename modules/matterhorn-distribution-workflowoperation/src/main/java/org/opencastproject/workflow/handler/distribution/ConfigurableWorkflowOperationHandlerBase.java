@@ -109,6 +109,8 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
     }
 
     if (elementIds.size() > 0) {
+      logger.info("Retracting {} elements of media package {} from publication channel {}",
+              elementIds.size(), mp, channelId);
       Job job = null;
       try {
         job = getDistributionService().retract(channelId, mediapackageWithPublicationElements, elementIds);

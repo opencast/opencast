@@ -316,6 +316,8 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
           throw new WorkflowOperationException(e);
         }
       }
+      logger.info("Published {} elements of media package {} to publication channel {}",
+              bulkElementIds.size() + singleElementIds.size(), mediapackage, channelId);
     }
     return result;
   }
