@@ -3,6 +3,14 @@
 This guide describes how to upgrade Opencast 2.1.x to 2.2.x. In case you need information about how to upgrade older
 versions of Opencast, please refer to the [old release notes](https://docs.opencast.org).
 
+## Additional notes about 2.2.4
+
+Opencast 2.2.4 fixes a security issue related to the Solr search index which in some cases *ma*y cause authenticated
+users to get read access to content of other users. We recommend to re-build the Solr search index
+(`…/data/solr-indexes/search`). The easiest way is to just delete that directory and re-start Opencast which causes an
+automatic re-build.
+
+
 ## Database Migration
 
 You will find the database migration script in `/docs/upgrade/2.1_to_2.2/<vendor>.sql`

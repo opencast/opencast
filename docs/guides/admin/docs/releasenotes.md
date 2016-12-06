@@ -89,6 +89,14 @@ Opencast 2.2.3 is a bug fix release that fixes some minor issues of Opencast 2.2
 at the [changelog](changelog.md).
 
 
+Additional Notes About 2.2.4
+----------------------------
+
+Opencast 2.2.4 is a security bug fix release that fixes some issues of Opencast 2.2.x. For more details, please have a
+look at the [changelog](changelog.md). Note that an update is recommended. For details, have a look at the [upgrade
+guide](upgrade.md).
+
+
 Release Process
 ---------------
 

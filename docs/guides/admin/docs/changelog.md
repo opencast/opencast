@@ -2,6 +2,16 @@ Opencast 2.2.x
 ==============
 
 
+Opencast 2.2.4
+--------------
+*Released on October 13, 2016*
+
+- [[MH-11831]](https://opencast.jira.com/browse/MH-11831) - As a service provider, I want to configure whether Opencast creates an admin user automatically
+- [[MH-11851]](https://opencast.jira.com/browse/MH-11851) - org.opencastproject.security.admin/pass can't be changed
+- [[MH-11862]](https://opencast.jira.com/browse/MH-11862) - Search API handles roles wrong
+- [[MH-11875]](https://opencast.jira.com/browse/MH-11875) - ActiveMQ should not listen to all hosts by default
+
+
 Opencast 2.2.3
 --------------
 *Released on October 13, 2016*
