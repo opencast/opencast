@@ -64,8 +64,8 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
             overflow: hidden;
 
             &>div:last-child {
-                border-left: 1px solid $dark-bg-border-color;
-                border-right: 1px solid $dark-bg-border-color;
+                border-left: 1px solid $primary-color-blue;//$dark-bg-border-color;
+                border-right: 1px solid $primary-color-blue;//$dark-bg-border-color;
                 overflow: hidden;
             }
 
@@ -229,43 +229,53 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                             height: $segment-main-height;  
                             
                             a {
-                                display: inline;
+                                display: inline-block;
+                                float: right;
                                 color: $l-blue;
                                 background-color: inherit;
-
                                 color: #378dd4;
-                                line-height: 16px;
-                                padding: 6px 4px 0 6px;
+                                padding: 0.3em;
+
+                                &:before {
+                                    width: 1em;
+                                    text-align: center;
+                                }
+
+                                &:hover, &:active {
+                                    &:before {
+                                        color: $black !important; // force this for mouseover
+                                    }
+                                }
 
                                 &.unused {
-                                  @include fa-icon($fa-var-square-o , before, inline, 0 0 0 0, 0, $l-blue, 1em);
+                                  @include fa-icon($fa-var-square-o , before, inline-block, 0 0 0 0, 0, $l-blue, 1em);
                                 }
 
                                 &.used {
-                                  @include fa-icon($fa-var-check-square-o, before, inline, 0 0 0 0, 0, $l-blue, 1em);
+                                  @include fa-icon($fa-var-check-square-o, before, inline-block, 0 0 0 0, 0, $l-blue, 1em);
                                 }
 
                                 &.remove {
-                                    @include fa-icon($fa-var-times, before, inline, 0 0 0 0, 0, $l-blue, 1em);
+                                    @include fa-icon($fa-var-times, before, inline-block, 0 0 0 0, 0, $l-blue, 1em);
                                 }
                             }
 
                             a:last-child {
-                                margin-right: 10px;
+                                margin: 0px;
                             }
 
                             &.small {
                                 a { 
-                                    display:none;
+                                    display: none;
                                 }
-                                a:first-child {
-                                    display: inline;
+                                a:last-child {
+                                    display: inline-block;
                                 }
                             }   
 
                             &.tiny {
                                 a { 
-                                    display:none;
+                                    display: none;
                                 }
                             }   
                             
@@ -323,7 +333,7 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
               background: $off-white none repeat scroll 0 0;
               border: $thin-border-stroke $light-border-color;
               border-radius: $main-border-radius;
-              bottom: -38px;
+              bottom: -40px;
               left: -13px;
               position: absolute;
 

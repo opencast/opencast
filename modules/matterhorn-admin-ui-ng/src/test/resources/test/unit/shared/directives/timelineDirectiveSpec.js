@@ -91,7 +91,7 @@ describe('adminNg.directives.timelineDirective', function () {
         });
     });
 
-    describe('zoom controls and intereactions', function () {
+    describe('zoom controls and interactions', function () {
         afterEach(function () {
             element.isolateScope().zoomLevel = 0;
             element.isolateScope().zoomSelected = { name: 'All', time: 0 };

@@ -132,9 +132,15 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     st += date.getUTCSeconds() + ' s';
                 }
 
-                var dropdown_text = element.find('.zoom-control .chosen-container > a > span');
+                var dropdown_text = element.find('.zoom-control .chosen-container > a > span'),
+                    dropdown = element.find('.zoom-control #zoomSelect');
+
                 if (dropdown_text) {
                     dropdown_text.html(st);
+                }
+
+                if (dropdown) {
+                    dropdown.attr('data-placeholder', st);
                 }
             };
 
@@ -189,7 +195,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 scope.zoomOffset = scope.getZoomOffset();
                 scope.zoomFieldOffset = scope.getZoomFieldOffset();
 
-                if (scope.zoomValue > 0) {
+                if (scope.zoomValue >= 0) {
                     scope.zoomSelected = "";
                     scope.displayZoomLevel(scope.zoomValue);
                 } else {
@@ -216,6 +222,11 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     scope.zoomValue = scope.getZoomValue();
                     scope.zoomOffset = scope.getZoomOffset();
                     scope.zoomFieldOffset = scope.getZoomFieldOffset();
+
+                    var dropdown = element.find('.zoom-control #zoomSelect');
+                    if (dropdown) {
+                        dropdown.attr('data-placeholder', dropdown.data('data-translated'));
+                    }
                 }
             }
 
@@ -279,7 +290,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             };
             
             /**
-             * Returns a css classes for the given segment.
+             * Returns an object that describes the css classes for a given segment.
              *
              * @param {Object} segment object
              * @return {Object} object with {class}: {boolean} values for CSS classes.
@@ -291,21 +302,36 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     return result;
                 }
 
-                var container = angular.element('.segments'),
-                    absoluteSize = segment.end - segment.start,
-                    relativeSize = absoluteSize / scope.video.duration,
-                    scaledSize = relativeSize * container.width();
+                var element = angular.element('.segments .segment[data-start='+segment.start +']'),
+                    internal_widths = element.find('a').map( function(i,el){ return $(el).outerWidth(); }).toArray();
 
-                if (scaledSize <= 38) {
-                    result.tiny = true;
-                    
-                } else {
-                    
-                    if (scaledSize <= 66) {
-                        result.small = true;
-                    }
+                try {
+                    var total = internal_widths.reduce(function getSum(total, num) { return total + num; }),
+                        single = (total / element.find('a').length);
+                        segment_width = element.width();
+
+                    if ( segment_width <= (total + 10)) {
+                        
+                        if ( (single + 10) <= segment_width) {
+
+                            // a single element can be shown
+                            result.small = true;
+                        }   else {
+                            // smaller than a single element > show none 
+                            result.tiny = true;
+                        }
+                    } 
                 }
-                
+                catch(e) {
+
+                    // When splitting segments the angular digest updates the segments items, 
+                    // triggering the ng-class directive but the html does not exist yet and 
+                    // the internal_widths array is empty - for these cases we return tiny.
+                    // the digest will be called again and the class correctly assigned.
+
+                    result.tiny = true;
+                }
+
                 return result;
             };
 
@@ -464,24 +490,24 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
              */
             $document.mouseup(function () {
 
-              // Timeline mouse events
+                // Timeline mouse events
                 if (scope.canMoveTimeline) {
                   scope.canMoveTimeline = false;
                   element.find('.field-of-vision .field').removeClass('active');
                   scope.player.adapter.setCurrentTime(scope.position / 1000);
                 }
 
-              // Timeline position - handle
+                // Timeline position - handle
                 if (scope.canMove) {
-                  scope.canMove = false;
-                  
+                    scope.canMove = false;
+
                     if (scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
-                        
+
                         var cursor = element.find('#cursor_fake'),
-                            handle = element.find('#cursor_fake .handle');
-                        
+                        handle = element.find('#cursor_fake .handle');
+
                         cursor.hide();
-                        
+
                         scope.player.adapter.setCurrentTime(handle.data('position') / 1000);
                     } else {    
 
@@ -489,11 +515,17 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                         scope.player.adapter.setCurrentTime(scope.position / 1000);
                     }
 
-                  // show small cut button below timeline handle
-                  element.find('#cursor .arrow_box').show();
+                    if (scope.doSplitSegment) {
 
-                  if (scope.timer) $timeout.cancel( scope.timer );
-                  scope.timer = $timeout(
+                        scope.doSplitSegment = false;
+                        scope.splitSegment();
+                    }
+
+                    // show small cut button below timeline handle
+                    element.find('#cursor .arrow_box').show();
+
+                    if (scope.timer) $timeout.cancel( scope.timer );
+                    scope.timer = $timeout(
                         function() {
                             // hide cut window
                             element.find('#cursor .arrow_box').hide();
@@ -502,72 +534,72 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     );
                 }
 
-              // Segment start handle
+                // Segment start handle
                 if (scope.movingSegment) {
 
-                  var track = element.find('.segments'),
-                      topTrack = track.parent(),
-                      segment = scope.movingSegment.data('segment'),
-                      index = scope.video.segments.indexOf(segment);
+                    var track = element.find('.segments'),
+                        topTrack = track.parent(),
+                        segment = scope.movingSegment.data('segment'),
+                        index = scope.video.segments.indexOf(segment);
 
-                  var pxPosition = scope.movingSegment.parent().offset().left + parseInt(scope.movingSegment.css('left'),10) - topTrack.offset().left + 3;
-                      position = Math.floor((pxPosition / track.width() * scope.video.duration) + scope.zoomFieldOffset);
+                    var pxPosition = scope.movingSegment.parent().offset().left + parseInt(scope.movingSegment.css('left'),10) - topTrack.offset().left + 3;
+                        position = Math.floor((pxPosition / track.width() * scope.video.duration) + scope.zoomFieldOffset);
 
-                  if (position < 0) position = 0;
-                  if (position >= scope.video.duration) position = scope.video.duration;
+                    if (position < 0) position = 0;
+                    if (position >= scope.video.duration) position = scope.video.duration;
 
-                  if (position >= segment.end) {
-                    // pulled start point of segment past end of start
-                    // so we flip it
-                    segment.start = segment.end;
-                    segment.end = position;
-                  } else {
-                    segment.start = position;
-                  }
+                    if (position >= segment.end) {
+                        // pulled start point of segment past end of start
+                        // so we flip it
+                        segment.start = segment.end;
+                        segment.end = position;
+                    } else {
+                        segment.start = position;
+                    }
 
-                  // update the segments around the one that was changed
-                  if (index - 1 >= 0) {
+                    // update the segments around the one that was changed
+                    if (index - 1 >= 0) {
 
-                      var before = scope.video.segments[index - 1];
-                      before.end = segment.start;
+                        var before = scope.video.segments[index - 1];
+                        before.end = segment.start;
 
-                      if (before.end - before.start <= 0) {
-                        // empty segment
-                        segment.start = before.start;
-                        scope.video.segments.splice(index - 1, 1);
-                      }
-                  }
+                        if (before.end - before.start <= 0) {
+                            // empty segment
+                            segment.start = before.start;
+                            scope.video.segments.splice(index - 1, 1);
+                        }
+                    }
 
-                  // Sort array by start attribute
-                  scope.video.segments.sort(function (a, b) {
-                      return a.start - b.start;
-                  });
-                  index = scope.video.segments.indexOf(segment);
+                    // Sort array by start attribute
+                    scope.video.segments.sort(function (a, b) {
+                        return a.start - b.start;
+                    });
+                    index = scope.video.segments.indexOf(segment);
 
-                  if (index + 1 < scope.video.segments.length) {
-                      var after = scope.video.segments[index + 1];
-                      after.start = segment.end;
+                    if (index + 1 < scope.video.segments.length) {
+                        var after = scope.video.segments[index + 1];
+                        after.start = segment.end;
 
-                      if (after.end - after.start <= 0) {
-                        // empty segment
-                        segment.end = after.end;
-                        scope.video.segments.splice(index + 1, 1);
-                      }
-                  }
+                        if (after.end - after.start <= 0) {
+                            // empty segment
+                            segment.end = after.end;
+                            scope.video.segments.splice(index + 1, 1);
+                        }
+                    }
 
-                  scope.movingSegment.removeClass('active');
-                  scope.movingSegment.css('left', '-4px');
-                  scope.movingSegment = null;
+                    scope.movingSegment.removeClass('active');
+                    scope.movingSegment.css('left', '-4px');
+                    scope.movingSegment = null;
 
-                  // Sort array by start attribute
-                  scope.video.segments.sort(function (a, b) {
-                      return a.start - b.start;
-                  });
+                    if (segment.end - segment.start <= 4) {
+                        // i'm really small so should probably not exist anymore
+                        scope.mergeSegment(null, segment);
+                    }
 
-                  if (segment.end - segment.start <= 4) {
-                      // i'm really small so should probably not exist anymore
-                      scope.mergeSegment(segment);
-                  }
+                    // Sort array by start attribute
+                    scope.video.segments.sort(function (a, b) {
+                        return a.start - b.start;
+                    });
                 }
 
                 // Clean-up of mousemove handlers
@@ -596,6 +628,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                       if (position > scope.video.duration) {
                           position = scope.video.duration;
                       }
+
                       if (position < 0) {
                           position = 0;
                       }
@@ -611,7 +644,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                                 // hide cut window
                                 element.find('#cursor .arrow_box').hide();
                             },
-                            60000 //  1 min
+                            60000 // 1 min
                         );
                     }
                 }
@@ -680,9 +713,13 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             scope.dragPlayhead = function (event) {
                 event.preventDefault();
                 scope.canMove = true;
-                
+
                 var cursor = element.find('#cursor'); 
-                    handle = element.find('#cursor .handle'); 
+                    handle = element.find('#cursor .handle'),
+                    target = $(event.target);
+
+                // true if we clicked on the split button > so do split
+                scope.doSplitSegment = target.hasClass('split'); 
                     
                 // We are currently playing - use fake handle
                 if (scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
