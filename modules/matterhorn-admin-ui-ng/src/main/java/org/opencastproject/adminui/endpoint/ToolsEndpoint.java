@@ -66,7 +66,6 @@ import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.media.api.SmilMediaObject;
 import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
-import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil.R;
@@ -282,9 +281,9 @@ public class ToolsEndpoint implements ManagedService {
     if (!isEditorAvailable(mediaPackageId))
       return R.notFound();
 
-    final Event event = getEvent(mediaPackageId).get();
     // Select tracks
-    final MediaPackage mp = index.getEventMediapackage(getEvent(mediaPackageId).get()).orError(new NotFoundException())
+    final Event event = getEvent(mediaPackageId).get();
+    final MediaPackage mp = index.getEventMediapackage(event).orError(new NotFoundException())
             .get();
     List<MediaPackageElement> previewPublications = getPreviewElementsFromPublication(getInternalPublication(mp));
 
@@ -355,7 +354,7 @@ public class ToolsEndpoint implements ManagedService {
     }
 
     return RestUtils.okJson(j(f("title", vN(mp.getTitle())),
-            f("date", vN(DateTimeSupport.toUTC(mp.getDate().getTime()))),
+            f("date", vN(event.getRecordingStartDate())),
             f("series", j(f("id", vN(event.getSeriesId())), f("title", vN(event.getSeriesName())))),
             f("presenters", jsonArrayFromList(event.getPresenters())),
             f("previews", a(jPreviews)), f(TRACKS_KEY, a(jTracks)),
