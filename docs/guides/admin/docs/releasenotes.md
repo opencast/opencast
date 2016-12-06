@@ -1,3 +1,12 @@
+Opencast NEXT: Release Notes
+============================
+
+- MH-11861 needs the admin search index to be rebuilded
+
+
+
+
+
 Opencast 2.3: Release Notes
 ===========================
 
