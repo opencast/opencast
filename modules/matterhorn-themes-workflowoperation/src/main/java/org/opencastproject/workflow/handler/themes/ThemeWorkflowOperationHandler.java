@@ -98,6 +98,7 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
   private static final String THEME_TRAILER_ACTIVE = "theme_trailer_active";
   private static final String THEME_TITLE_SLIDE_ACTIVE = "theme_title_slide_active";
   private static final String THEME_TITLE_SLIDE_UPLOADED = "theme_title_slide_uploaded";
+  private static final String THEME_WATERMARK_ACTIVE = "theme_watermark_active";
 
   /** The series theme property name */
   private static final String THEME_PROPERTY_NAME = "theme";
@@ -238,6 +239,7 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
       workflowInstance.setConfiguration(THEME_TRAILER_ACTIVE, Boolean.toString(theme.isTrailerActive()));
       workflowInstance.setConfiguration(THEME_TITLE_SLIDE_ACTIVE, Boolean.toString(theme.isTitleSlideActive()));
       workflowInstance.setConfiguration(THEME_TITLE_SLIDE_UPLOADED, Boolean.toString(StringUtils.isNotBlank(theme.getTitleSlideBackground())));
+      workflowInstance.setConfiguration(THEME_WATERMARK_ACTIVE, Boolean.toString(theme.isWatermarkActive()));
 
       if (theme.isBumperActive() && StringUtils.isNotBlank(theme.getBumperFile())) {
         try (InputStream bumper = staticFileService.getFile(theme.getBumperFile())) {
