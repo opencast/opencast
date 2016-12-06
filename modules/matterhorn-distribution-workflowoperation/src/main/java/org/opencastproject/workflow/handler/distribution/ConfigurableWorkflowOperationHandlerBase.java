@@ -117,7 +117,7 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
                 elementIds.size(), channelId, getDistributionService(), getStackTrace(e) });
         throw new WorkflowOperationException("The retraction job did not complete successfully");
       }
-      if (waitForStatus(job).isSuccess()) {
+      if (!waitForStatus(job).isSuccess()) {
         throw new WorkflowOperationException("The retraction job did not complete successfully");
       }
     } else {
