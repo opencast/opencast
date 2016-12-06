@@ -316,7 +316,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       }
 
       List<Job> jobs = new ArrayList<Job>();
-//distribute Elements
+      //distribute Elements
       try {
         if (downloadElementIds.size() > 0) {
           Job job = downloadDistributionService.distribute(CHANNEL_ID, mediaPackage, downloadElementIds, checkAvailability);
@@ -678,8 +678,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         }
         //bulk retraction
         if (elementIds.size() > 0) {
-          Job retractDownloadDistributionJob = null;
-          retractDownloadDistributionJob = downloadDistributionService.retract(CHANNEL_ID, distributedMediaPackage, elementIds);
+          Job  retractDownloadDistributionJob = downloadDistributionService.retract(CHANNEL_ID, distributedMediaPackage, elementIds);
           if (retractDownloadDistributionJob != null) {
             jobs.add(retractDownloadDistributionJob);
           }
