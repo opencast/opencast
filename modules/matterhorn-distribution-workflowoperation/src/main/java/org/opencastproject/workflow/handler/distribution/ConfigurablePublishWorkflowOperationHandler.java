@@ -39,7 +39,6 @@ import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.doc.DocUtil;
-import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -69,7 +68,7 @@ import java.util.UUID;
  *  to the media package.
  */
 
-public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
+public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWorkflowOperationHandlerBase {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ConfigurablePublishWorkflowOperationHandler.class);
@@ -118,6 +117,12 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
   /** OSGi DI */
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  @Override
+  protected DownloadDistributionService getDistributionService() {
+    assert (distributionService != null);
+    return distributionService;
   }
 
   /**
@@ -181,7 +186,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
     final boolean withPublishedElements = Boolean.parseBoolean(StringUtils.trimToEmpty(op
             .getConfiguration(WITH_PUBLISHED_ELEMENTS)));
 
-    if (mp.getPublications().length > 0) {
+    if (getPublications(mp, channelId).size() > 0) {
       final String rePublishStrategy = StringUtils.trimToEmpty(op.getConfiguration(STRATEGY));
 
       switch (rePublishStrategy) {
@@ -315,36 +320,6 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
     return result;
   }
 
-  /**
-   * Removes publication for distributionChannel
-   *
-   * @param mp Mediapackage
-   * @param channelId Publication-Channel
-   * @throws org.opencastproject.workflow.api.WorkflowOperationException
-   */
-  private void retract(MediaPackage mp, String channelId) throws WorkflowOperationException {
-    Map<Job, MediaPackageElement> jobs = new HashMap<>();
-    for (final Publication publicationElement : mp.getPublications()) {
-      if (channelId.equals(publicationElement.getChannel())) {
-        logger.info("Start retracting element '{}' of media package '{}' from publication channel '{}'", new Object[]{
-          publicationElement, mp, channelId});
-        try {
-          final Job retractjob = distributionService.retract(channelId, mp, publicationElement.getChannel());
-          jobs.put(retractjob, publicationElement);
-          logger.debug("Retracting job '{}' for element '{}' of media package '{}' created.", new Object[]{retractjob,
-            publicationElement, mp});
-        } catch (DistributionException e) {
-          logger.error("Creating the retracting job for element '{}' of media package '{}' failed: {}",
-                  new Object[]{publicationElement, mp, getStackTrace(e)});
-          throw new WorkflowOperationException(e);
-        }
-      }
-    }
-    // Wait until all retraction jobs have returned
-    if (!waitForStatus(jobs.keySet().toArray(new Job[jobs.keySet().size()])).isSuccess()) {
-      throw new WorkflowOperationException("One of the retraction jobs did not complete successfully");
-    }
-  }
 /**
  * Dummy function for further publication strategies
  * @param mp
