@@ -1,51 +1,60 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" data-ng-app="runtimeNg">
 <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
-        <link rel="shortcut icon" href="../img/favicon.ico" />
-        <title>Opencast – Login Page</title>
-        <link href="../style.css" rel="stylesheet" type="text/css" />
-        <script type="text/javascript" src="../js/jquery/jquery.js"></script>
-        <script type="text/javascript">
-            function startup(){
-            	$.get("/info/me.json",
-            		    function (json)
-            		    {
-            		        if (json.org.properties["login.display_defaults"] == 'true') {
-            		            $("#defaults").show();
-            		        }
-            		    },
-            		    "json");
-            }
-        </script>
-    </head>
-    <body onload='startup()'>
-       <div id="wrapper">
-           <div id="headergraphic">
-               <a href="http://www.opencastproject.org"><img
-                 border="0" vspace="5" hspace="20" height="30" alt="Opencast"
-                 src="../img/logo/opencast.svg"></a>
-           </div>
-	       <div id="bottombanner">
-               <div id="col1-2">
-                   <div id="col1b">&nbsp</div>
-                   <div id="col2b">
-                       <h2>Welcome to Opencast</h2>
-                       <div id="error" style="display:none; background-color:#FFDDDC;">
-                            <div style="color:red; text-align:center;">Your login attempt was not successful, try again.</div>
-                        </div>
-                       <h3>Login with Username and Password</h3>
-                       <form name='f' action='/j_spring_security_check' method='POST'>
-                           <table>
-                               <tr><td>User:</td><td><input type='text' name='j_username' value='' autofocus="autofocus"></td></tr>
-                               <tr><td>Password:</td><td><input type='password' name='j_password'/></td></tr>
-                               <tr id="defaults" style="display: none;"><td>Default</td><td>admin / opencast</td></tr>
-                               <tr><td><input type='checkbox' name='_spring_security_remember_me'/></td><td>Remember me on this computer.</td></tr>
-                               <tr><td><input name="submit" type="submit" value="Login"/></td><td><input name="reset" type="reset"/></td></tr>
-                           </table>
-                       </form>
-                   </div>
-               </div>
-           </div>
-       </body>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="shortcut icon" href="../img/favicon.ico"/>
+    <title>Opencast</title>
+    <link href="../admin-ng/styles/login.css" rel="stylesheet" type="text/css"/>
+
+    <script type="text/javascript" src="../admin-ng/scripts/angular/angular.min.js"></script>
+    <script type="text/javascript" src="../admin-ng/scripts/angular-route/angular-route.js"></script>
+    <script type="text/javascript" src="../admin-ng/scripts/jquery.js"></script>
+    <script type="text/javascript" src="../admin-ng/scripts/app.js"></script>
+    <script type="text/javascript">
+        function startup() {
+            $.get("/info/me.json",
+                    function (json) {
+                        if (json.org.properties["login.display_defaults"] == 'true') {
+                            $("#defaults").show();
+                        }
+                    },
+                    "json");
+        }
+    </script>
+</head>
+
+<body class="login-body" data-ng-controller="LoginCtrl" data-ng-cloak>
+<section class="login-container">
+    <div class="login-form">
+        <div class="form-container">
+            <form name="runtimeLogin" action="/j_spring_security_check" method="POST">
+                <div class="row">
+                    <p>
+                        <span>Welcome to Opencast</span><br/>
+                    </p>
+                </div>
+                <div ng-show="isError" class="error-container ng-invalid">
+                    Incorrect username and / or password
+                </div>
+                <div class="row">
+                    <input ng-class="{error: isError}" name="j_username" type="text" id="email"
+                           placeholder="{{ username }}" class="login-input" autofocus="autofocus">
+                </div>
+                <div class="row">
+                    <input ng-class="{error: isError}" name="j_password" type="password" id="password"
+                           placeholder="{{ password }}" class="login-input">
+                </div>
+                <div class="row remember-me">
+                    <input type="checkbox" id="remember" name="_spring_security_remember_me" checked/>
+                    <label for="remember">Remember me</label>
+                </div>
+                <div class="row">
+                    <button class="submit">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+</body>
 </html>

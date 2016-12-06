@@ -20,7 +20,7 @@ body {
 	-moz-border-radius: .7em;
 	-webkit-border-radius: .7em;
 	}
-	
+
 #topbanner {
 	padding: 20px 0;
 	}
@@ -79,7 +79,7 @@ body {
 	float:left;
 	}
 
-#middlebanner #col1m, 
+#middlebanner #col1m,
 #middlebanner #col2m {
 	float:left;
 	width:425px;
@@ -124,8 +124,8 @@ h2 {
 	}
 
 #middlebanner h2,
-#middlebanner2 h2, 
-#middlebanner2 h3, 
+#middlebanner2 h2,
+#middlebanner2 h3,
 #middlebanner3 h2,
 #middlebanner3 h3 {
 	font-size:1.9em;
@@ -188,7 +188,7 @@ h2 {
 #middlebanner3 img {
 	position:absolute;
 	}
-	
+
 #middlebanner a.redbutton,
 #middlebanner2 a.redbutton,
 #middlebanner3 a.redbutton {
@@ -197,13 +197,13 @@ h2 {
 	color:#FFF;
 	font-size:1.17em;
 	padding:6px 10px;
-	-moz-border-radius:8px; /* Firefox */ 
-	-webkit-border-radius:8px; /* Safari and chrome */ 
-	-khtml-border-radius:8px; /* Linux browsers */ 
-	border-radius:8px; /* CSS3 */ 
+	-moz-border-radius:8px; /* Firefox */
+	-webkit-border-radius:8px; /* Safari and chrome */
+	-khtml-border-radius:8px; /* Linux browsers */
+	border-radius:8px; /* CSS3 */
 	}
 #middlebanner a.redbutton:hover,
-#middlebanner2 a.redbutton:hover, 
+#middlebanner2 a.redbutton:hover,
 #middlebanner3 a.redbutton:hover {
 	border:2px solid #F6921E;
 	background-color:#24425D;
@@ -215,7 +215,7 @@ h2 {
 	font-style:italic;
 	color:#F6921E;
 	}
-	
+
 a, a:link, a:visited {
 	color: #24425D;
 	text-decoration:none;
