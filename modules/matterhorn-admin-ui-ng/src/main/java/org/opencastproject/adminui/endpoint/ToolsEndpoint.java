@@ -25,6 +25,7 @@ import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.json.Jsons.a;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.jsonArrayFromList;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static java.lang.String.format;
@@ -281,7 +282,8 @@ public class ToolsEndpoint implements ManagedService {
       return R.notFound();
 
     // Select tracks
-    final MediaPackage mp = index.getEventMediapackage(getEvent(mediaPackageId).get()).orError(new NotFoundException())
+    final Event event = getEvent(mediaPackageId).get();
+    final MediaPackage mp = index.getEventMediapackage(event).orError(new NotFoundException())
             .get();
     List<MediaPackageElement> previewPublications = getPreviewElementsFromPublication(getInternalPublication(mp));
 
@@ -351,7 +353,11 @@ public class ToolsEndpoint implements ManagedService {
       jWorkflows.add(j(f("id", v(workflow.getId())), f("name", vN(workflow.getTitle()))));
     }
 
-    return RestUtils.okJson(j(f("previews", a(jPreviews)), f(TRACKS_KEY, a(jTracks)),
+    return RestUtils.okJson(j(f("title", vN(mp.getTitle())),
+            f("date", vN(event.getRecordingStartDate())),
+            f("series", j(f("id", vN(event.getSeriesId())), f("title", vN(event.getSeriesName())))),
+            f("presenters", jsonArrayFromList(event.getPresenters())),
+            f("previews", a(jPreviews)), f(TRACKS_KEY, a(jTracks)),
             f("duration", v(mp.getDuration())), f(SEGMENTS_KEY, a(jSegments)), f("workflows", a(jWorkflows))));
   }
 
