@@ -316,10 +316,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       }
 
       List<Job> jobs = new ArrayList<Job>();
-      Set<String> distributetElementIds = new HashSet<String>();
 //distribute Elements
       try {
-        if (distributetElementIds.size() > 0) {
+        if (downloadElementIds.size() > 0) {
           Job job = downloadDistributionService.distribute(CHANNEL_ID, mediaPackage, downloadElementIds, checkAvailability);
           if (job != null) {
             jobs.add(job);
