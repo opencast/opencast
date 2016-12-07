@@ -600,9 +600,7 @@ public abstract class ArchiveBase<RS extends ResultSet> extends AbstractIndexPro
           rewriteAssetsForDelivery(rewriter, item);
           return list(workflowSvc.start(workflow.getWorkflowDefinition(), item.getMediaPackage(),
                   workflow.getParameters()));
-        } catch (WorkflowDatabaseException e) {
-          logger.error("Error starting workflow", e);
-        } catch (WorkflowParsingException e) {
+        } catch (WorkflowDatabaseException | WorkflowParsingException | IllegalStateException e) {
           logger.error("Error starting workflow", e);
         }
         return nil();

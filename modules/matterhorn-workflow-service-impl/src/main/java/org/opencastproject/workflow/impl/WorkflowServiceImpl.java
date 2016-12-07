@@ -640,6 +640,18 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         } catch (UnauthorizedException e) {
           throw new IllegalArgumentException("Parent workflow " + parentWorkflowId + " not visible to this user");
         }
+      } else {
+        WorkflowQuery wfq = new WorkflowQuery().withMediaPackage(sourceMediaPackage.getIdentifier().compact());
+        WorkflowSet mpWorkflowInstances = getWorkflowInstances(wfq);
+        if (mpWorkflowInstances.size() > 0) {
+          for (WorkflowInstance wfInstance : mpWorkflowInstances.getItems()) {
+            if (wfInstance.isActive())
+              throw new IllegalStateException(String.format(
+                      "Can't start workflow '%s' for media package '%s' because another workflow is currently active.",
+                      workflowDefinition.getTitle(),
+                      sourceMediaPackage.getIdentifier().compact()));
+          }
+        }
       }
 
       // Get the current user
