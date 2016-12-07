@@ -10,15 +10,29 @@ The ConfigurablePublishWorkflowOperationHandler will distribute the given elemen
 
 These are the keys that are configured through the workflow definition (The files located in /opt/matterhorn/etc/workflows used to process files). At least one mediapackage element must match the supplied source-flavors or source-tags or else the operation won't know what to publish. The channel-id and url-pattern are also mandatory.
 
-|Configuration Key          |Description                                                                                             |Example                                        |
-|---------------------------|--------------------------------------------------------------------------------------------------------|-----------------------------------------------|
-|channel-id                 |Is the id of the channel that this publication will be published to.                                    |internal                                       |
-|mimetype                   |The Mimetype (file type) of the published element. If missing it will use the last distributed element. |text/html                                      |
-|source-flavors             |The flavors of the mediapackage elements to publish.                                                    |*/trimmed                                      |
-|source-tags                |The tags of the mediapackage elements to publish.                                                       |engage-download                                |
-|url-pattern                |The pattern to insert the variables into to create the uri for the published element.                   |http://api.opencast.org/api/events/${event_id} |
-|with-published-elements    |Use the current contents of the mediapackage instead of publishing elements to a channel                |true                                           |
-|strategy		    |Strategy if there is allready published material default is retract                                     |fail				             |
+|Configuration Key       |Description                                                                                             |Example                                        |
+|------------------------|--------------------------------------------------------------------------------------------------------|-----------------------------------------------|
+|channel-id              |Is the id of the channel that this publication will be published to.                                    |internal                                       |
+|mimetype                |The Mimetype (file type) of the published element. If missing it will use the last distributed element. |text/html                                      |
+|source-flavors          |The flavors of the mediapackage elements to publish.                                                    |*/trimmed                                      |
+|source-tags             |The tags of the mediapackage elements to publish.                                                       |engage-download                                |
+|url-pattern             |The pattern to insert the variables into to create the uri for the published element.                   |http://api.opencast.org/api/events/${event_id} |
+|with-published-elements |Use the current contents of the mediapackage instead of publishing elements to a channel                |true                                           |
+|strategy                |Strategy if there is allready published material default is retract                                     |fail                                           |
+|mode                    |Control how elements are distributed: single, mixed or bulk (default: bulk)                             |mixed                                          |
+
+## Mode
+
+The configuration key `mode` can be used to control how media package elements are being distributed:
+
+|Mode   |Description                                                                      |
+|-------|---------------------------------------------------------------------------------|
+|single |For each media package element, a job is created                                 |
+|mixed  |One job for all media package elements that are not tracks and one job per track |
+|bulk   |One job for all media package elements                                           |
+
+This allows you to choose a lot of jobs and parallelism (`single`), just one job and no parallelism (`bulk`)
+or something in between (`mixed`). The best choice depends on your setup.
 
 ## Url Pattern Variables
 

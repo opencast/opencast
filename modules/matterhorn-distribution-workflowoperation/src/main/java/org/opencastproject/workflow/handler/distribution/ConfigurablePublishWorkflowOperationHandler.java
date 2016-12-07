@@ -46,6 +46,7 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -55,10 +56,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -84,13 +87,23 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
   // service references
   private DownloadDistributionService distributionService;
 
-  // workflow configuration options
+  /** Workflow configuration options */
   static final String CHANNEL_ID_KEY = "channel-id";
   static final String MIME_TYPE = "mimetype";
   static final String SOURCE_TAGS = "source-tags";
   static final String SOURCE_FLAVORS = "source-flavors";
   static final String WITH_PUBLISHED_ELEMENTS = "with-published-elements";
   static final String STRATEGY = "strategy";
+  static final String MODE = "mode";
+
+  /** Known values for mode **/
+  static final String MODE_SINGLE = "single";
+  static final String MODE_MIXED = "mixed";
+  static final String MODE_BULK = "bulk";
+
+  static final String[] KNOWN_MODES = { MODE_SINGLE, MODE_MIXED, MODE_BULK };
+
+  static final String DEFAULT_MODE = MODE_BULK;
 
   /** The workflow configuration key for defining the url pattern. */
   static final String URL_PATTERN = "url-pattern";
@@ -182,6 +195,14 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
       }
     }
 
+    String mode = StringUtils.trimToEmpty(op.getConfiguration(MODE));
+    if ("".equals(mode)) {
+      mode = DEFAULT_MODE;
+    } else if (!ArrayUtils.contains(KNOWN_MODES, mode)) {
+      logger.error("Unknown value for configuration key mode: '{}'", mode);
+      throw new IllegalArgumentException("Unknown value for configuration key mode");
+    }
+
     final String[] sourceFlavors = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(SOURCE_FLAVORS)), ",");
     final String[] sourceTags = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(SOURCE_TAGS)), ",");
 
@@ -199,43 +220,16 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
 
     if (sourceFlavors.length > 0 || sourceTags.length > 0) {
       if (!withPublishedElements) {
-        Map<Job, MediaPackageElement> jobs = new HashMap<>();
-        for (final MediaPackageElement element : selector.select(mp, false)) {
-          logger.info("Start publishing element '{}' of media package '{}' to publication channel '{}'", new Object[] {
-                  element, mp, channelId });
-          try {
-            final Job job = distributionService.distribute(channelId, mp, element.getIdentifier(), true);
-            jobs.put(job, element);
-            logger.debug("Distribution job '{}' for element '{}' of media package '{}' created.", new Object[] { job,
-                    element, mp });
-          } catch (DistributionException | MediaPackageException e) {
-            logger.error("Creating the distribution job for element '{}' of media package '{}' failed: {}",
-                    new Object[] { element, mp, getStackTrace(e) });
-            throw new WorkflowOperationException(e);
+        Set<MediaPackageElement> elements = distribute(selector.select(mp, false), mp, channelId, mode);
+        if (elements.size() > 0) {
+          for (MediaPackageElement element : elements) {
+              // Make sure the mediapackage is prompted to create a new identifier for this element
+              element.setIdentifier(null);
+              PublicationImpl.addElementToPublication(publication, element);
           }
-        }
-
-        if (jobs.size() < 1) {
-          logger.info("No mediapackage element was found to distribute");
+        } else {
+          logger.info("No element found for distribution in media package '{}'", mp);
           return createResult(mp, Action.CONTINUE);
-        }
-
-        // Wait until all distribution jobs have returned
-        if (!waitForStatus(jobs.keySet().toArray(new Job[jobs.keySet().size()])).isSuccess())
-          throw new WorkflowOperationException("One of the distribution jobs did not complete successfully");
-
-        MediaPackageElement element = null;
-        for (Entry<Job, MediaPackageElement> job : jobs.entrySet()) {
-          try {
-            element = MediaPackageElementParser.getFromXml(job.getKey().getPayload());
-          } catch (MediaPackageException e) {
-            logger.error("Job '{}' returned payload ({}) that could not be parsed to media package element: {}",
-                    new Object[] { job, job.getKey().getPayload(), ExceptionUtils.getStackTrace(e) });
-            throw new WorkflowOperationException(e);
-          }
-          // Make sure the mediapackage is prompted to create a new identifier for this element
-          element.setIdentifier(null);
-          PublicationImpl.addElementToPublication(publication, element);
         }
       } else {
         List<MediaPackageElement> publishedElements = new ArrayList<MediaPackageElement>();
@@ -257,6 +251,68 @@ public class ConfigurablePublishWorkflowOperationHandler extends AbstractWorkflo
     }
     mp.add(publication);
     return createResult(mp, Action.CONTINUE);
+  }
+
+  private Set<MediaPackageElement> distribute(Collection<MediaPackageElement> elements,
+          MediaPackage mediapackage, String channelId, String mode) throws WorkflowOperationException {
+
+    Set<MediaPackageElement> result = new HashSet<MediaPackageElement>();
+
+    Set<String> bulkElementIds = new HashSet<String>();
+    Set<String> singleElementIds = new HashSet<String>();
+
+    for (MediaPackageElement element : elements) {
+      if (MODE_BULK.equals(mode) || (MODE_MIXED.equals(mode) && (element.getElementType() != MediaPackageElement.Type.Track))) {
+        bulkElementIds.add(element.getIdentifier());
+      } else {
+        singleElementIds.add(element.getIdentifier());
+      }
+    }
+
+    Set<Job> jobs = new HashSet<Job>();
+    if (bulkElementIds.size() > 0) {
+      logger.info("Start bulk publishing of {} elements of media package '{}' to publication channel '{}'",
+          new Object[] { bulkElementIds.size(), mediapackage, channelId });
+      try {
+        Job job = distributionService.distribute(channelId, mediapackage, bulkElementIds, true);
+        jobs.add(job);
+      } catch (DistributionException | MediaPackageException e) {
+        logger.error("Creating the distribution job for {} elements of media package '{}' failed: {}",
+                new Object[] { bulkElementIds.size(), mediapackage, getStackTrace(e) });
+        throw new WorkflowOperationException(e);
+      }
+    }
+    if (singleElementIds.size() > 0) {
+      logger.info("Start single publishing of {} elements of media package '{}' to publication channel '{}'",
+          new Object[] { singleElementIds.size(), mediapackage, channelId });
+      for (String elementId : singleElementIds) {
+        try {
+            Job job = distributionService.distribute(channelId, mediapackage, elementId, true);
+            jobs.add(job);
+          } catch (DistributionException | MediaPackageException e) {
+            logger.error("Creating the distribution job for element '{}' of media package '{}' failed: {}",
+                    new Object[] { elementId, mediapackage, getStackTrace(e) });
+            throw new WorkflowOperationException(e);
+          }
+      }
+    }
+
+    if (jobs.size() > 0) {
+      if (!waitForStatus(jobs.toArray(new Job[jobs.size()])).isSuccess()) {
+        throw new WorkflowOperationException("At least one of the distribution jobs did not complete successfully");
+      }
+      for (Job job : jobs) {
+        try {
+          List<? extends MediaPackageElement> elems = MediaPackageElementParser.getArrayFromXml(job.getPayload());
+          result.addAll(elems);
+        } catch (MediaPackageException e) {
+          logger.error("Job '{}' returned payload ({}) that could not be parsed to media package elements: {}",
+                  new Object[] { job, job.getPayload(), ExceptionUtils.getStackTrace(e) });
+          throw new WorkflowOperationException(e);
+        }
+      }
+    }
+    return result;
   }
 
   /**

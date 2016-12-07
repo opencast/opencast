@@ -136,6 +136,9 @@ public class ContributorsListProvider implements ResourceListProvider {
     contributorsList.addAll(splitStringList(searchIndex.getTermsForField(SeriesIndexSchema.PUBLISHERS,
             Option.some(new String[] { Series.DOCUMENT_TYPE }))));
 
+    // TODO: TThis is not a good idea.
+    // TODO: The search index can handle limit and offset.
+    // TODO: We should not request all data.
     if (query != null) {
       if (query.getLimit().isSome())
         limit = query.getLimit().get();

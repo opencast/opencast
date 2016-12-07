@@ -30,6 +30,19 @@
     padding: 0 15px;
 }
 
+.video-details {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.video-details-date {
+  font-style: italic;
+}
+
+.video-details-presenters {
+  font-weight: bold;
+}
+
 // Volume Controls
 // ----------------------------------------
 

@@ -107,9 +107,6 @@ public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapte
   private void populateEmptyFields(DublinCoreMetadataCollection dublinCoreMetadata, Set<String> emptyFields) {
     // Add all of the rest of the fields that didn't have values as empty.
     for (String field : emptyFields) {
-      if (dublinCoreProperties.get(field) == null) {
-        logger.warn("Skipping field {} because it is not defined in the properties file.", field);
-      }
       try {
         dublinCoreMetadata.addField(dublinCoreProperties.get(field), "", getListProvidersService());
       } catch (Exception e) {
