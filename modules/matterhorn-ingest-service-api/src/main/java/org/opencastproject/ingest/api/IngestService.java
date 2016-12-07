@@ -152,7 +152,7 @@ public interface IngestService extends JobProducer {
 
  /**
    * Create a new MediaPackage in the repository.
-   * @param  mediapackageID
+   * @param  mediaPackageID
    *   The Id for the new Mediapackage
    * @return The created MediaPackage
    * @throws MediaPackageException
