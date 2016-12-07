@@ -44,8 +44,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Abstract base class for configurable publish/retract workflow operation handlers.
- * Offers 
+ * Abstract base class of ConfigurablePublishWorkflerOperationHandler and ConfigurableRectractWorkflowOperationHandler.
+ *
+ * Both the ConfigurablePublishWorkflowOperationHandler and ConfigurableRetractWorkflowOperationHanlder are capable of
+ * retracting publications created by the ConfigurablePublishWorkflowOperationHandler.
+ * To avoid code duplication, this commonly used functionaly has been factored out into this class.
  */
 public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractWorkflowOperationHandler {
 
@@ -84,7 +87,7 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
    *          The {@link Publication} that is being removed.
    * @param mp
    *          The {@link MediaPackage} that the {@link Publication} is part of.
-   * @return the number of media package elements that have been retracted
+   * @return the number of {@link MediaPackageElement}s that have been retracted
    * @throws WorkflowOperationException
    *           Thrown if unable to retract the {@link MediaPackageElement}s.
    */
