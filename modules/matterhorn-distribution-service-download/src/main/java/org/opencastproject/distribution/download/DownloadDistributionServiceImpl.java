@@ -252,8 +252,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
    #          The id of the publication channel to be distributed to.
    * @param mediapackage
    *          The media package that contains the element to be distributed.
-   * @param elementId
-   *          The id of the element that should be distributed contained within the media package.
+   * @param element
+   *          The the element that should be distributed contained within the media package.
    * @param checkAvailability
    *          Check the availability of the distributed element via http.
    * @return A reference to the MediaPackageElement that has been distributed.
@@ -367,8 +367,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
    *          the channel id
    * @param mediapackage
    *          the mediapackage
-   * @param elementId
-   *          the element identifier
+   * @param elementIds
+   *          the element identifiers
    * @return the retracted element or <code>null</code> if the element was not retracted
    * @throws org.opencastproject.distribution.api.DistributionException
    *           in case of an error
@@ -398,8 +398,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
    *          the channel id
    * @param mediapackage
    *          the mediapackage
-   * @param elementId
-   *          the element identifier
+   * @param element
+   *          the element
    * @return the retracted element or <code>null</code> if the element was not retracted
    * @throws org.opencastproject.distribution.api.DistributionException
    *           in case of an error

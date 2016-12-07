@@ -1729,8 +1729,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * Gets jobs of all types that are in the given state.
    *
    * @param em the entity manager
-   * @param offset apply offset to the db query if offset > 0
-   * @param limit apply limit to the db query if limit > 0
+   * @param offset apply offset to the db query if offset &gt; 0
+   * @param limit apply limit to the db query if limit &gt; 0
    * @param statuses the job status should be one from the given statuses
    * @return the list of jobs waiting for dispatch
    * @throws ServiceRegistryException if there is a problem communicating with the jobs database
@@ -1760,12 +1760,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * Return dispatchable job ids, where the job status is {@value RESTART} or {@value QUEUED}
-   * and the job id is listed in the given set.
+   * Return dispatchable job ids, where the job status is RESTART or QUEUED and the job id is listed in the given set.
    *
    * @param em the entity manager
    * @param jobIds set with job id's interested in
-   * @return list with dispatchable job id's from the given set, with job status {@value RESTART} or {@value QUEUED}
+   * @return list with dispatchable job id's from the given set, with job status RESTART or QUEUED
    * @throws ServiceRegistryException if there is a problem communicating with the jobs database
    */
   protected List<Long> getDispatchableJobsWithIdFilter(EntityManager em, Set<Long> jobIds)
