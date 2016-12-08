@@ -170,8 +170,8 @@
         &:hover {
             cursor: pointer;
             border: $thin-border-stroke darken($main-border-color, 2%);
-            @include linear-gradient(darken(#fff, 2%), darken(#f7f7f7, 5%));
-            color: $primary-color-light-blue;
+            @include linear-gradient(darken(#fff, 4%), darken(#f7f7f7, 8%));
+            color: $medium-prim-color;
         }
 
         &:active {
