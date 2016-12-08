@@ -4,7 +4,7 @@
   <tools>
     <tool>
       <name>ffmpeg</name>
-      <minversion>3.0.1</minversion>
+      <minversion>3.1.4</minversion>
     </tool>
     <tool>
       <name>hunspell</name>
@@ -30,9 +30,6 @@
       <name>unzip</name>
     </tool>
     <tool>
-      <name>gcc-c++</name>
-    </tool>
-    <tool>
       <name>tar</name>
     </tool>
     <tool>
@@ -51,7 +48,6 @@
     <requirement>
       <module>admin-ui-ng</module>
       <build>unzip</build>
-      <build>gcc-c++</build>
       <build>tar</build>
       <build>bzip2</build>
     </requirement>
