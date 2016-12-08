@@ -91,7 +91,7 @@ public class WaveformServiceImplTest {
   }
 
   /**
-   * Test of updated method, of class WaveformServiceImpl.
+   * Test of updated method of class WaveformServiceImpl.
    */
   @Test
   public void testUpdated() throws Exception {
@@ -112,7 +112,7 @@ public class WaveformServiceImplTest {
     instance.setServiceRegistry(serviceRegistry);
     try {
       instance.updated(properties);
-      // we can not check private fields but it should not thow any exception
+      // we can not check private fields but it should not throw any exception
     } catch (Exception e) {
       fail("updated method should not throw any exceptions but has thrown: " + ExceptionUtils.getStackTrace(e));
     }
@@ -139,7 +139,7 @@ public class WaveformServiceImplTest {
   }
 
   /**
-   * Test of process method, of class WaveformServiceImpl.
+   * Test of process method of class WaveformServiceImpl.
    */
   @Test
   public void testProcess() throws Exception {

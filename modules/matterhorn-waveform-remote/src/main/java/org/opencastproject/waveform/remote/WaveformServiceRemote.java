@@ -41,7 +41,7 @@ import java.util.List;
 
 
 /**
- * This is a remote waveform service, that will call the waveform service implementation on a remote host.
+ * This is a remote waveform service that will call the waveform service implementation on a remote host.
  */
 public class WaveformServiceRemote extends RemoteBase implements WaveformService {
   private static final Logger logger = LoggerFactory.getLogger(WaveformServiceRemote.class);
@@ -56,8 +56,8 @@ public class WaveformServiceRemote extends RemoteBase implements WaveformService
    *
    * @param sourceTrack the track to create waveform image from
    * @return a job that will create a waveform image
-   * @throws MediaPackageException if the serialization of the given track fail
-   * @throws WaveformServiceException if the job can't be created for any reasons
+   * @throws MediaPackageException if the serialization of the given track fails
+   * @throws WaveformServiceException if the job can't be created for any reason
    */
   @Override
   public Job createWaveformImage(Track sourceTrack) throws MediaPackageException, WaveformServiceException {

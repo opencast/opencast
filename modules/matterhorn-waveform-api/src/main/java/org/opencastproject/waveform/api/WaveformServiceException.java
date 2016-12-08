@@ -26,7 +26,7 @@ package org.opencastproject.waveform.api;
 public class WaveformServiceException extends Exception {
 
   /**
-   * Creates a new waveform service exception with <code>message</code> as a reason.
+   * Creates a new waveform service exception with <code>message</code> as reason.
    *
    * @param message
    *          the reason of failure
@@ -39,20 +39,20 @@ public class WaveformServiceException extends Exception {
    * Creates a new waveform service exception where <code>cause</code> identifies the original reason of failure.
    *
    * @param cause
-   *          the root cause for the failure
+   *          the root cause of the failure
    */
   public WaveformServiceException(Throwable cause) {
     super(cause);
   }
 
   /**
-   * Creates a new waveform service exception with <code>message</code> as a reason and <code>cause</code> as the original
+   * Creates a new waveform service exception with <code>message</code> as reason and <code>cause</code> as the root
    * cause of failure.
    *
    * @param message
    *          the reason of failure
    * @param cause
-   *          the root cause for the failure
+   *          the root cause of the failure
    */
   public WaveformServiceException(String message, Throwable cause) {
     super(message, cause);

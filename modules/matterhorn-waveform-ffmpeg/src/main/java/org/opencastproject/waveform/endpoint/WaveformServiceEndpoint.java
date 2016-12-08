@@ -50,7 +50,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/")
 @RestService(name = "WaveformServiceEndpoint", title = "Waveform Service REST Endpoint",
-        abstractText = "Waveform Service generate a waveform image from a media file with at least one audio cannel.",
+        abstractText = "The Waveform Service generates a waveform image from a media file with at least one audio channel.",
         notes = {"All paths above are relative to the REST endpoint base (something like http://your.server/waveform)"})
 public class WaveformServiceEndpoint extends AbstractJobProducerEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(WaveformServiceEndpoint.class);

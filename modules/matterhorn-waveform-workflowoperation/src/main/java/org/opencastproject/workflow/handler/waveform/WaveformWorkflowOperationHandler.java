@@ -61,18 +61,13 @@ import java.util.TreeMap;
 public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   private static final Logger logger = LoggerFactory.getLogger(WaveformWorkflowOperationHandler.class);
 
-  /**
-   * Source flavor configuration property name.
-   */
+  /** Source flavor configuration property name. */
   private static final String SOURCE_FLAVOR_PROPERTY = "source-flavor";
-  /**
-   * Target flavor configuration property name.
-   */
+
+  /** Target flavor configuration property name. */
   private static final String TARGET_FLAVOR_PROPERTY = "target-flavor";
 
-  /**
-   * The configuration options for this handler
-   */
+  /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
 
   static {
@@ -175,11 +170,11 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
             waveformFile = workspace.get(waveformMpe.getURI());
           } catch (MediaPackageException ex) {
             // unexpected job payload
-            throw new WorkflowOperationException("Can not parse waveform attachment from job " + job.getId());
+            throw new WorkflowOperationException("Can't parse waveform attachment from job " + job.getId());
           } catch (NotFoundException ex) {
             throw new WorkflowOperationException("Waveform image file '" + waveformMpe.getURI() + "' not found", ex);
           } catch (IOException ex) {
-            throw new WorkflowOperationException("Can not get workflow image file '" + waveformMpe.getURI()
+            throw new WorkflowOperationException("Can't get workflow image file '" + waveformMpe.getURI()
                     + "' from workspace");
           }
 
@@ -194,7 +189,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
           } catch (FileNotFoundException ex) {
             throw new WorkflowOperationException("Waveform image file " + waveformFile.getPath() + " not found", ex);
           } catch (IOException ex) {
-            throw new WorkflowOperationException("Can not read just created waveform image file "
+            throw new WorkflowOperationException("Can't read just created waveform image file "
                     + waveformFile.getPath(), ex);
           } catch (IllegalArgumentException ex) {
             throw new WorkflowOperationException(ex);
@@ -215,7 +210,6 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
         }
       }
     } finally {
-      // cleanup workspace
       cleanupWorkspace(waveformJobs);
     }
 
@@ -237,7 +231,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
             workspace.delete(waveformUri);
           } catch (MediaPackageException ex) {
             // unexpected job payload
-            logger.error("Can not parse waveform attachment from job {}", job.getId());
+            logger.error("Can't parse waveform attachment from job {}", job.getId());
           } catch (NotFoundException ex) {
             // this is ok, because we want delete the file
           } catch (IOException ex) {

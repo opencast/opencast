@@ -65,8 +65,8 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * This service create a waveform image from a media file with at least one audio cannel.
- * This will be done by ffmpeg.
+ * This service creates a waveform image from a media file with at least one audio channel.
+ * This will be done using ffmpeg.
  */
 public class WaveformServiceImpl extends AbstractJobProducer implements WaveformService, ManagedService {
 
@@ -79,23 +79,23 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_JOB_LOAD */
   public static final String WAVEFORM_JOB_LOAD_CONFIG_KEY = "job.load.waveform";
 
-  /** The load introduced on the system by creating a waveform job */
+  /** The default job load of a waveform job */
   public static final float DEFAULT_WAVEFORM_JOB_LOAD = 1.0f;
 
-  /** Thekey to look for in the service configuration file to override the DEFAULT_FFMPEG_BINARY */
+  /** The key to look for in the service configuration file to override the DEFAULT_FFMPEG_BINARY */
   public static final String FFMPEG_BINARY_CONFIG_KEY = "org.opencastproject.composer.ffmpeg.path";
 
+  /** The default path to the ffmpeg binary */
   public static final String DEFAULT_FFMPEG_BINARY = "ffmpeg";
 
-  /** The default minimum waveform image width in pixel */
+  /** The default minimum waveform image width in pixels */
   public static final int DEFAULT_WAVEFORM_IMAGE_WIDTH_MIN = 5000;
 
-  /** The default maximum waveform image width in pixel */
+  /** The default maximum waveform image width in pixels */
   public static final int DEFAULT_WAVEFORM_IMAGE_WIDTH_MAX = 20000;
 
-  /** The default waveform image width per minumte of video in pixel */
+  /** The default waveform image width per minute of video in pixels */
   public static final int DEFAULT_WAVEFORM_IMAGE_WIDTH_PIXEL_PER_MINUTE = 200;
-
 
   /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_IMAGE_WIDTH_MIN */
   public static final String WAVEFORM_IMAGE_WIDTH_MIN_CONFIG_KEY = "waveform.image.width.min";
@@ -118,7 +118,8 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_SCALE */
   public static final String WAVEFORM_SCALE_CONFIG_KEY = "waveform.scale";
 
-  /** The default value for ovaerlapping waveforms per audio channel (if true) */
+  /** The default value if the waveforms (per audio channel) should be renderen next to each other (if true)
+   * or on top of each other (if false) */
   public static final boolean DEFAULT_WAVEFORM_SPLIT_CHANNELS = false;
 
   /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_SPLIT_CHANNELS */
@@ -162,7 +163,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   /** The waveform colors per audio channel */
   private String[] waveformColor = DEFAULT_WAVEFORM_COLOR;
 
-  /** Reference to the receipt service */
+  /** Reference to the service registry */
   private ServiceRegistry serviceRegistry = null;
 
   /** The workspace to use when retrieving remote media files */
@@ -185,7 +186,6 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   public void activate(ComponentContext cc) {
     super.activate(cc);
     logger.info("Activate ffmpeg waveform service");
-    /* Configure segmenter */
     final String path = cc.getBundleContext().getProperty(FFMPEG_BINARY_CONFIG_KEY);
     binary = (path == null ? DEFAULT_FFMPEG_BINARY : path);
     logger.debug("ffmpeg binary set to {}", binary);
@@ -243,6 +243,10 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     val = properties.get(WAVEFORM_SCALE_CONFIG_KEY);
     if (val != null) {
       if (StringUtils.isNotEmpty((String) val)) {
+        if (!"lin".equals(val) && !"log".equals(val)) {
+          logger.warn("Waveform scale configuration value '{}' is not in set of predefined values (lin, log). "
+                  + "The waveform image extraction job may fail.", val);
+        }
         waveformScale = (String) val;
       }
     }
@@ -310,7 +314,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
    *
    * @param track source audio/video track with at least one audio channel
    * @return waveform image attachment
-   * @throws WaveformServiceException if processing fail
+   * @throws WaveformServiceException if processing fails
    */
   private Attachment extractWaveform(Track track) throws WaveformServiceException {
     if (!track.hasAudio()) {
@@ -363,7 +367,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     } catch (IOException ex) {
       throw new WaveformServiceException("Start ffmpeg process failed", ex);
     } catch (InterruptedException ex) {
-      throw new WaveformServiceException("The thread managing encoder process was interrupted", ex);
+      throw new WaveformServiceException("Waiting for encoder process exited was interrupted unexpectly", ex);
     } finally {
       IoSupport.closeQuietly(ffmpegProcess);
       IoSupport.closeQuietly(errStream);
