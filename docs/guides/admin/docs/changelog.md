@@ -1,6 +1,29 @@
 Opencast 2.2.x
 ==============
 
+Opencast 2.2.4
+--------------
+*Released on October 13, 2016*
+
+- [[MH-11831]](https://opencast.jira.com/browse/MH-11831) - As a service provider, I want to configure whether Opencast creates an admin user automatically
+- [[MH-11851]](https://opencast.jira.com/browse/MH-11851) - org.opencastproject.security.admin/pass can't be changed
+- [[MH-11862]](https://opencast.jira.com/browse/MH-11862) - Search API handles roles wrong
+- [[MH-11875]](https://opencast.jira.com/browse/MH-11875) - ActiveMQ should not listen to all hosts by default
+
+Opencast 2.2.3
+--------------
+*Released on October 13, 2016*
+
+- [[MH-11285]](https://opencast.jira.com/browse/MH-11285) - Improve developers documentation: remote debugger with karaf
+- [[MH-11741]](https://opencast.jira.com/browse/MH-11741) - Admin UI has timezone issues
+- [[MH-11771]](https://opencast.jira.com/browse/MH-11771) - Improve section localization in developer guide
+- [[MH-11773]](https://opencast.jira.com/browse/MH-11773) - Embed player does not use space very well and has scaling problems
+- [[MH-11774]](https://opencast.jira.com/browse/MH-11774) - Admin UI Needs better documentation for debugging
+- [[MH-11777]](https://opencast.jira.com/browse/MH-11777) - Event Details-\>Comments and Event Details-\>Assets don't work for unprivileged users
+- [[MH-11787]](https://opencast.jira.com/browse/MH-11787) - Add release dates to changelog
+- [[MH-11800]](https://opencast.jira.com/browse/MH-11800) - LTI between Opencast and Moodle does not work
+- [[MH-11801]](https://opencast.jira.com/browse/MH-11801) - Wowza streaming server needs flv: prefix for flv files
+
 Opencast 2.2.2
 --------------
 *Released on September 14, 2016*

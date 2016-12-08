@@ -126,9 +126,17 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
 
     Capture<MediaPackageElement> capturePublication = Capture.newInstance();
 
+    MediaPackage mediapackageClone = EasyMock.createNiceMock(MediaPackage.class);
+    EasyMock.expect(mediapackageClone.getElements()).andStubReturn(
+            new MediaPackageElement[] { attachment, catalog, track, unrelatedTrack });
+    EasyMock.expect(mediapackageClone.getIdentifier()).andStubReturn(new IdImpl("mp-id-clone"));
+    EasyMock.expectLastCall();
+    EasyMock.replay(mediapackageClone);
+
     MediaPackage mediapackage = EasyMock.createNiceMock(MediaPackage.class);
     EasyMock.expect(mediapackage.getElements()).andStubReturn(
             new MediaPackageElement[] { attachment, catalog, track, unrelatedTrack });
+    EasyMock.expect(mediapackage.clone()).andStubReturn(mediapackageClone);
     EasyMock.expect(mediapackage.getIdentifier()).andStubReturn(new IdImpl("mp-id"));
     mediapackage.add(EasyMock.capture(capturePublication));
     mediapackage.add(publicationtest);
