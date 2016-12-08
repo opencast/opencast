@@ -39,5 +39,5 @@ This boolean value defines, whether multiple audio channels should be mixed in o
 
     waveform.scale = lin
 
-This value define the scale of the waveform. You can chose between `lin` for linear or `log` for logarithmic scale.
+This value defines the scale of the waveform. You can chose between `lin` for linear or `log` for logarithmic scale.
 

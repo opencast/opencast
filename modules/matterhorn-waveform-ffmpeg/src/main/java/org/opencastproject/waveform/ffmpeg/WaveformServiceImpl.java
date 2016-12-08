@@ -157,7 +157,8 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   /** The waveform image scale algorithm */
   private String waveformScale = DEFAULT_WAVEFORM_SCALE;
 
-  /** The value for ovaerlapping waveforms per audio channel (if true) */
+  /** The value if the waveforms (per audio channel) should be renderen next to each other (if true)
+   * or on top of each other (if false) */
   private boolean waveformSplitChannels = DEFAULT_WAVEFORM_SPLIT_CHANNELS;
 
   /** The waveform colors per audio channel */

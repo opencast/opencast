@@ -119,7 +119,7 @@ public class WaveformServiceImplTest {
   }
 
   /**
-   * Test of createWaveformImage method, of class WaveformServiceImpl.
+   * Test of createWaveformImage method of class WaveformServiceImpl.
    */
   @Test
   public void testGenerateWaveformImage() throws Exception {
