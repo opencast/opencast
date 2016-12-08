@@ -64,8 +64,14 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
   /** Source flavor configuration property name. */
   private static final String SOURCE_FLAVOR_PROPERTY = "source-flavor";
 
+  /** Source tags configuration property name. */
+  private static final String SOURCE_TAGS_PROPERTY = "source-tags";
+
   /** Target flavor configuration property name. */
   private static final String TARGET_FLAVOR_PROPERTY = "target-flavor";
+
+  /** Target tags configuration property name. */
+  private static final String TARGET_TAGS_PROPERTY = "target-tags";
 
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
@@ -73,7 +79,11 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
     CONFIG_OPTIONS.put(SOURCE_FLAVOR_PROPERTY, "The source media file flavor.");
+    CONFIG_OPTIONS.put(SOURCE_TAGS_PROPERTY, "Comma separated tags, source media files should have. "
+            + "Any media, that match " + SOURCE_FLAVOR_PROPERTY + " or " + SOURCE_TAGS_PROPERTY
+            + " will be processed.");
     CONFIG_OPTIONS.put(TARGET_FLAVOR_PROPERTY, "The target waveform image flavor.");
+    CONFIG_OPTIONS.put(TARGET_TAGS_PROPERTY, "The waveform image (comma separated) target tags.");
   }
 
   /** The waveform service. */
@@ -111,19 +121,30 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     logger.info("Start waveform workflow operation for mediapackage {}", mediaPackage.getIdentifier().compact());
 
-    String sourceFlavorProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(SOURCE_FLAVOR_PROPERTY));
-    if (sourceFlavorProperty == null) {
-      throw new WorkflowOperationException(String.format("Required property %s not set", SOURCE_FLAVOR_PROPERTY));
+    String sourceFlavorProperty = StringUtils.trimToNull(
+            workflowInstance.getCurrentOperation().getConfiguration(SOURCE_FLAVOR_PROPERTY));
+    String sourceTagsProperty = StringUtils.trimToNull(
+            workflowInstance.getCurrentOperation().getConfiguration(SOURCE_TAGS_PROPERTY));
+    if (StringUtils.isEmpty(sourceFlavorProperty) && StringUtils.isEmpty(sourceTagsProperty)) {
+      throw new WorkflowOperationException(String.format("Required property %s or %s not set",
+              SOURCE_FLAVOR_PROPERTY, SOURCE_TAGS_PROPERTY));
     }
 
-    String targetFlavorProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(TARGET_FLAVOR_PROPERTY));
+    String targetFlavorProperty = StringUtils.trimToNull(
+            workflowInstance.getCurrentOperation().getConfiguration(TARGET_FLAVOR_PROPERTY));
     if (targetFlavorProperty == null) {
       throw new WorkflowOperationException(String.format("Required property %s not set", TARGET_FLAVOR_PROPERTY));
     }
 
+    String targetTagsProperty = StringUtils.trimToNull(
+            workflowInstance.getCurrentOperation().getConfiguration(TARGET_TAGS_PROPERTY));
+
     TrackSelector trackSelector = new TrackSelector();
     for (String flavor : asList(sourceFlavorProperty)) {
       trackSelector.addFlavor(flavor);
+    }
+    for (String tag : asList(sourceTagsProperty)) {
+      trackSelector.addTag(tag);
     }
     Collection<Track> sourceTracks = trackSelector.select(mediaPackage, false);
     if (sourceTracks.isEmpty()) {
@@ -206,6 +227,11 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
             targetFlavor = new MediaPackageElementFlavor(targetFlavor.getType(), waveformMpe.getFlavor().getSubtype());
           }
           waveformMpe.setFlavor(targetFlavor);
+          if (!StringUtils.isEmpty(targetTagsProperty)) {
+            for (String tag : asList(targetTagsProperty)) {
+              waveformMpe.addTag(tag);
+            }
+          }
           mediaPackage.add(waveformMpe);
         }
       }

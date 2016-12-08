@@ -68,8 +68,6 @@
     <!-- Create the waveform.                                              -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
-    <!-- Create the audio waveform -->
-
     <operation
       id="waveform"
       fail-on-error="false"
@@ -77,18 +75,7 @@
       <configurations>
         <configuration key="source-flavor">*/preview</configuration>
         <configuration key="target-flavor">*/waveform</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Tag the waveform for internal publishing -->
-    <!-- Fixme: remove once "waveform" operation supports target-tags -->
-
-    <operation
-      id="tag"
-      description="Preparing waveform for publishing">
-      <configurations>
-        <configuration key="source-flavors">*/waveform</configuration>
-        <configuration key="target-tags">+preview</configuration>
+        <configuration key="target-tags">preview</configuration>
       </configurations>
     </operation>
 
