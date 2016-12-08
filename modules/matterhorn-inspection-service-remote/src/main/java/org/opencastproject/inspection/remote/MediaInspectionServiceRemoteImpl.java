@@ -29,6 +29,8 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 
+import com.google.gson.Gson;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -41,7 +43,9 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Proxies a remote media inspection service for use as a JVM-local service.
@@ -50,6 +54,12 @@ public class MediaInspectionServiceRemoteImpl extends RemoteBase implements Medi
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(MediaInspectionServiceRemoteImpl.class);
+
+  /** Value indicating the absence of options */
+  private static final Map<String, String> NO_OPTIONS = new HashMap<String, String>();
+
+  /** JSON marshalling/unmarshalling of parameters */
+  private final Gson gson = new Gson();
 
   /**
    * Constructs a new remote media inspection service proxy
@@ -65,9 +75,21 @@ public class MediaInspectionServiceRemoteImpl extends RemoteBase implements Medi
    */
   @Override
   public Job inspect(URI uri) throws MediaInspectionException {
-    List<NameValuePair> queryStringParams = new ArrayList<NameValuePair>();
-    queryStringParams.add(new BasicNameValuePair("uri", uri.toString()));
-    String url = "/inspect?" + URLEncodedUtils.format(queryStringParams, "UTF-8");
+    return inspect(uri, NO_OPTIONS);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.inspection.api.MediaInspectionService#inspect(java.net.URI)
+   */
+  @Override
+  public Job inspect(URI uri, final Map<String, String> options) throws MediaInspectionException {
+    assert (options != null);
+    List<NameValuePair> params = new ArrayList<NameValuePair>();
+    params.add(new BasicNameValuePair("uri", uri.toString()));
+    params.add(new BasicNameValuePair("options", gson.toJson(options)));
+    String url = "/inspect?" + URLEncodedUtils.format(params, "UTF-8");
     logger.info("Inspecting media file at {} using a remote media inspection service", uri);
     HttpResponse response = null;
     try {
@@ -91,10 +113,21 @@ public class MediaInspectionServiceRemoteImpl extends RemoteBase implements Medi
    */
   @Override
   public Job enrich(MediaPackageElement original, boolean override) throws MediaInspectionException {
+    return enrich(original, override, NO_OPTIONS);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Job enrich(MediaPackageElement original, boolean override, final Map<String, String> options)
+          throws MediaInspectionException {
+    assert (options != null);
     List<NameValuePair> params = new ArrayList<NameValuePair>();
     try {
       params.add(new BasicNameValuePair("mediaPackageElement", MediaPackageElementParser.getAsXml(original)));
       params.add(new BasicNameValuePair("override", new Boolean(override).toString()));
+      params.add(new BasicNameValuePair("options", gson.toJson(options)));
     } catch (Exception e) {
       throw new MediaInspectionException(e);
     }

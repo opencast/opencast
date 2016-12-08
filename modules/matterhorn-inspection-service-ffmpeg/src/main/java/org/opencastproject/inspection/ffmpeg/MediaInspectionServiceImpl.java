@@ -34,10 +34,11 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.LoadUtil;
-import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.lang3.BooleanUtils;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.apache.tika.parser.Parser;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -48,7 +49,9 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /** Inspects media via ffprobe. */
 public class MediaInspectionServiceImpl extends AbstractJobProducer implements MediaInspectionService, ManagedService {
@@ -73,8 +76,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
 
   private static final Logger logger = LoggerFactory.getLogger(MediaInspectionServiceImpl.class);
 
-  /** The accurate frame count configuration key */
-  private static final String CFG_KEY_ACCURATE_FRAME_COUNT = "accurate_frame_count";
+  private static final Map<String, String> NO_OPTIONS = new HashMap<String, String>();
 
   /** List of available operations on jobs */
   private enum Operation {
@@ -87,6 +89,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   private UserDirectoryService userDirectoryService = null;
   private OrganizationDirectoryService organizationDirectoryService = null;
   private Parser tikaParser;
+  private final Gson gson = new Gson();
 
   private volatile MediaInspector inspector;
 
@@ -117,7 +120,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
       logger.debug("FFprobe config binary: {}", path);
       ffprobeBinary = path;
     }
-    inspector = new MediaInspector(workspace, tikaParser, ffprobeBinary, false);
+    inspector = new MediaInspector(workspace, tikaParser, ffprobeBinary);
   }
 
   @Override
@@ -130,12 +133,11 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
             serviceRegistry);
     enrichJobLoad = LoadUtil.getConfiguredLoadValue(properties, ENRICH_JOB_LOAD_KEY, DEFAULT_ENRICH_JOB_LOAD,
             serviceRegistry);
+  }
 
-    for (String accurateFrameCountString : OsgiUtil.getOptCfg(properties, CFG_KEY_ACCURATE_FRAME_COUNT).toOpt()) {
-      boolean accurateFrameCount = BooleanUtils.toBoolean(accurateFrameCountString);
-      inspector.setAccurateFrameCount(accurateFrameCount);
-      logger.info("Set accurate frame count to {}", accurateFrameCount);
-    }
+  /* Convert JSON string to Map<String, String> */
+  private Map<String, String> parseOptions(String rawOptions) {
+    return gson.fromJson(rawOptions, new TypeToken<Map<String, String>>() { }.getType());
   }
 
   /**
@@ -151,15 +153,18 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
     try {
       op = Operation.valueOf(operation);
       MediaPackageElement inspectedElement = null;
+      Map<String, String> options = null;
       switch (op) {
         case Inspect:
           URI uri = URI.create(arguments.get(0));
-          inspectedElement = inspector.inspectTrack(uri);
+          options = parseOptions(arguments.get(1));
+          inspectedElement = inspector.inspectTrack(uri, options);
           break;
         case Enrich:
           MediaPackageElement element = MediaPackageElementParser.getFromXml(arguments.get(0));
           boolean overwrite = Boolean.parseBoolean(arguments.get(1));
-          inspectedElement = inspector.enrich(element, overwrite);
+          options = parseOptions(arguments.get(2));
+          inspectedElement = inspector.enrich(element, overwrite, options);
           break;
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
@@ -181,9 +186,20 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
    */
   @Override
   public Job inspect(URI uri) throws MediaInspectionException {
+    return inspect(uri, NO_OPTIONS);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.inspection.api.MediaInspectionService#inspect(java.net.URI, Map<String,String>)
+   */
+  @Override
+  public Job inspect(URI uri, final Map<String,String> options) throws MediaInspectionException {
+    assert (options != null);
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Inspect.toString(), Arrays.asList(uri.toString()),
-              inspectJobLoad);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Inspect.toString(), Arrays.asList(uri.toString(),
+              gson.toJson(options)), inspectJobLoad);
     } catch (ServiceRegistryException e) {
       throw new MediaInspectionException(e);
     }
@@ -198,9 +214,23 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   @Override
   public Job enrich(final MediaPackageElement element, final boolean override)
           throws MediaInspectionException, MediaPackageException {
+    return enrich(element, override, NO_OPTIONS);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.inspection.api.MediaInspectionService#enrich(org.opencastproject.mediapackage.MediaPackageElement,
+   *      boolean, Map<String,String>)
+   */
+  @Override
+  public Job enrich(final MediaPackageElement element, final boolean override, final Map<String,String> options)
+          throws MediaInspectionException, MediaPackageException {
+    assert (options != null);
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Enrich.toString(),
-              Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override)), enrichJobLoad);
+              Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override),
+              gson.toJson(options)), enrichJobLoad);
     } catch (ServiceRegistryException e) {
       throw new MediaInspectionException(e);
     }
