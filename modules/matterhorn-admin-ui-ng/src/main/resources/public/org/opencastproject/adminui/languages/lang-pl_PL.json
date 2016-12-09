@@ -49,19 +49,19 @@
     "CONTINUE_ACTION":"Czy na pewno chcesz kontynuować?",
     "METADATA":{
       "NOTICE":{
-        "UNKNOWN":"The following element will be deleted",
-        "EVENT":"The following event will be deleted",
-        "SERIES":"The following series will be deleted",
-        "ACL":"The following ACL will be deleted",
-        "GROUP":"The following group will be deleted",
-        "USER":"The following user will be deleted",
-        "USER_BLACKLIST":"The following user blacklist will be deleted",
-        "THEME":"The following theme will be deleted",
-        "EMAIL":"The following email template will be deleted",
-        "LOCATION":"The following location will be deleted",
-        "LOCATION_BLACKLIST":"The following location blacklist will be deleted"
+        "UNKNOWN":"Następujący element zostanie usunięty",
+        "EVENT":"Następujące wydarzenie zostanie usunięte",
+        "SERIES":"Następująca seria zostanie usunięta",
+        "ACL":"Następujące reguły kontroli dostępu (ACL) zostaną usunięte",
+        "GROUP":"Następująca grupa zostanie usunięta",
+        "USER":"Następujący użytkownik zostanie usunięty",
+        "USER_BLACKLIST":"Następująca czarna lista użytkowników zostanie usunięta",
+        "THEME":"Następujący motyw zostanie usunięty",
+        "EMAIL":"Następujący szablon wiadomości e-mail zostanie usunięty",
+        "LOCATION":"Następująca lokalizacja zostanie usunięta",
+        "LOCATION_BLACKLIST":"Następująca czarna lista lokalizacji zostanie usunięta"
       },
-      "NAME":"Name"
+      "NAME":"Imię"
     },
     "ACTIONS":{
       "CONFIRMATION":"Wymagane potwierdzenie"
@@ -118,8 +118,8 @@
     "USER_BLACKLIST_NOT_SAVED":"Czerna lista nie mogła być zapisana",
     "USER_BLACKLIST_DELETED":"Czarna lista została usunięta",
     "USER_BLACKLIST_NOT_DELETED":"Czarna lista nie mogła być usunięta",
-    "LOCATION_DELETED":"The location has been deleted",
-    "LOCATION_NOT_DELETED":"The location could not be deleted",
+    "LOCATION_DELETED":"Lokalizacja została usunięta",
+    "LOCATION_NOT_DELETED":"Nie udało się usunąć lokalizacji",
     "LOCATION_BLACKLIST_CREATED":"Czarna lista została utworzona",
     "LOCATION_BLACKLIST_NOT_CREATED":"Nie można utworzyć czarnej listy",
     "LOCATION_BLACKLIST_SAVED":"Czarna lista została zapisana",
@@ -212,7 +212,7 @@
     "SCHEDULE_TASK":{
       "CAPTION":"Uruchom Zadanie",
       "GENERAL":{
-        "CAPTION":"General",
+        "CAPTION":"Ogólne",
         "SUMMARY":"(wybrane zdarzenia{{ count }})",
         "CANNOTSTART":"Wyróżnione wydarzenia nie mogą być przetwarzane w tej chwili. Odznacz je lub spróbuj ponownie później."
       },
@@ -708,7 +708,7 @@
           }
         },
         "METADATA":{
-          "CAPTION":"Event details",
+          "CAPTION":"Szczegóły wydarzenia",
           "TITLE":"Tytuł",
           "ID":"UID",
           "SERIES":"Serie",
@@ -1420,7 +1420,7 @@
     },
     "JOBS":{
       "TABLE":{
-        "ID":"Job Identifier",
+        "ID":"Identyfikator zadania",
         "ACTION":"Działania",
         "CAPTION":"Zadania",
         "CREATED":"Utworzono",
@@ -1497,14 +1497,14 @@
       "CLEAR_SEGMENTS":"Wyczyść segmenty"
     },
     "PLAYER":{
-      "PLAY":"Play",
-      "PAUSE":"Pause",
-      "NEXT_FRAME":"Next frame",
-      "PREVIOUS_FRAME":"Previous frame",
-      "NEXT_SEGMENT":"Next segment / Jump to end",
-      "PREVIOUS_SEGMENT":"Previous segment / Jump to start",
-      "MUTE":"Mute",
-      "VOLUME":"Volume"
+      "PLAY":"Odtwarzaj",
+      "PAUSE":"Wstrzymaj",
+      "NEXT_FRAME":"Następna klatka",
+      "PREVIOUS_FRAME":"Poprzednia ramka",
+      "NEXT_SEGMENT":"Następny segment / skok do końca",
+      "PREVIOUS_SEGMENT":"Poprzedni segment/przeskocz do początku",
+      "MUTE":"Wycisz",
+      "VOLUME":"Głośność"
     }
   },
   "LOGIN":{
@@ -1752,7 +1752,7 @@
     "RUNNING":"W toku",
     "FINISHED":"Zakończone",
     "FAILED":"Zakończone niepowodzeniem",
-    "FINISHED_WITH_COMMENTS":"Todo",
+    "FINISHED_WITH_COMMENTS":"Do zrobienia",
     "SCHEDULED":"Zaplanowane"
   }
 }

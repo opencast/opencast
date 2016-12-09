@@ -8,8 +8,16 @@ method, you do not have to compile the software by yourself.
 It may also be interesting for developers as all dependencies for Opencast usage, testing and development are provided
 by the RPM repository.
 
-Currently supported are are
----------------------------
+
+Availability
+------------
+
+Note that it may take some time (usually about two weeks after a new release is out) before the RPMs are available.
+Watch for announcements on list or just check which versions are available in the repository.
+
+
+Currently Supported
+-------------------
 
  - CentOS 7.x (x86\_64)
  - RedHat Enterprise Linux 7.x (x86\_64)
@@ -25,7 +33,7 @@ Before you can start you need to get an account for the repository. You will nee
 after the registration to successfully complete this manual. The placeholders `[your_username]` and `[your_password]`
 are used in this manual wherever the credentials are needed.
 
- - [http://pkg.opencast.org](http://pkg.opencast.org)
+[Please visit https://pkg.opencast.org](https://pkg.opencast.org)
 
 
 Activate Repository
@@ -41,23 +49,13 @@ First you have to install the necessary repositories so that your package manage
 
     You will be asked for your password.
 
-    It might take some time after the final version is released before the RPMs are moved to the stable repository.
-    Before that, you can use `.../opencast-testing.repo` instead to get the latest version.
+    It might take some time after the release of a new Opencast version before the RPMs are moved to the stable
+    repository. Until then, you can use `.../opencast-testing.repo` instead to get the latest version. Note that the
+    testing repository is an additional repository and still requires the stable repository to be active.
 
 2. Add EPEL repository:
 
-    yum install epel-release
-
-
-Install 3rd-party-tools
------------------------
-
-This step is optional and only recommended for those who want to build Opencast from source. If you install Opencast
-from the repository, all necessary dependencies will be installed automatically.
-
-You can install all necessary 3rd-Party-Tools for Opencast like this:
-
-    yum install ffmpeg tesseract hunspell sox
+        yum install epel-release
 
 
 Install Apache ActiveMQ
@@ -100,11 +98,11 @@ Now you can start Opencast:
 
  - On a SysV-init based system
 
-    service opencast start
+        service opencast start
 
  - On a Systemd based system
 
-    systemctl start opencast.service
+        systemctl start opencast.service
 
 While Opencast is preconfigured, it is strongly recommended to follow at least the [Basic Configuration
 guide](../configuration/basic.md). It will help you to set your hostname, login information, …
@@ -119,23 +117,33 @@ want to install. You can list all Opencast packages with:
 
     yum search opencast
 
-Starting with Opencast 2.2, this will list all available Opencast distributions in the form
-`opencast<version>-<dist-type>`
+This will list all available Opencast distributions in the form `opencast<version>-<dist-type>`
 
-Current available distributions are:
+Some available distributions are:
 
- - opencast22-admin
- - opencast22-adminworker
- - opencast22-allinone
- - opencast22-ingest
- - opencast22-presentation
- - opencast22-worker
+ - opencastXX-allinone
+ - opencastXX-admin
+ - opencastXX-presentation
+ - opencastXX-worker
+
+…where `XX` stands for a specific Opencast version.
+
+
+Install 3rd-party-tools
+-----------------------
+
+This step is optional and only recommended for those who want to build Opencast from source. If you install Opencast
+from the repository, all necessary dependencies will be installed automatically.
+
+You can install all necessary 3rd-Party-Tools for Opencast like this:
+
+    yum install ffmpeg tesseract hunspell sox
 
 
 Uninstall Opencast
 --------------------
 
-Sometimes you want to uninstall Opencast. For example to do a clean reinstall. You can do that by executing:
+To uninstall Opencast, you can run:
 
     yum remove 'opencast*'
 
@@ -145,7 +153,7 @@ have to do that by yourself.
     # Remove media files
     sudo rm -rf /srv/opencast
 
-    # Remove local db, search index and working files
+    # Remove local db, search indexes and working files
     sudo rm -rf /var/lib/opencast
 
     # Remove configuration files
@@ -165,12 +173,3 @@ really activated on your system. Some distributions come with epel preinstalled 
 epel-release package will not fix this. You can check what repositories are installed and enabled by executing `yum
 repolist enabled` which should give you a list with epel, opencast and opencast-noarch in it. To enable a repository,
 edit the configuration file in `/etc/yum.repos.d/`.
-
-### Conflicting Libvpx
-
-CentOS comes with an old version of `libvpx`. This version is required by some packages like GStreamer. The FFmpeg we
-use requires a new version. It is a known risk but since the new version performs significantly better, we decided to go
-that way.
-
-You do not need GStreamer or any of the other packages requiring libvpx for an Opencast server. You can just remove them
-from your system by running `yum remove libvpx` before installing Opencast.
