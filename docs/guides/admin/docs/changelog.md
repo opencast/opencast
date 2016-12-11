@@ -1,3 +1,101 @@
+Opencast 2.3.x
+==============
+
+Opencast 2.3.0
+--------------
+*Released on December 13, 2016*
+
+- [[MH-10342]](https://opencast.jira.com/browse/MH-10342) - As an external device I want to immediate start and stop a capture
+- [[MH-11327]](https://opencast.jira.com/browse/MH-11327) - De-couple smilImpl/wfrImpl from ingestImpl
+- [[MH-11378]](https://opencast.jira.com/browse/MH-11378) - Conditionally synchronize Archive Service's add mediapackge
+- [[MH-11380]](https://opencast.jira.com/browse/MH-11380) - As a customer, I want to integrate my third party application to Opencast, so that I can use Opencast content in my application
+- [[MH-11381]](https://opencast.jira.com/browse/MH-11381) - Remove documentation of items that have never been implemented
+- [[MH-11411]](https://opencast.jira.com/browse/MH-11411) - move dashboard to header
+- [[MH-11675]](https://opencast.jira.com/browse/MH-11675) - Add documentation for External API to the Admin Guide
+- [[MH-11688]](https://opencast.jira.com/browse/MH-11688) - Set java file encoding on startup
+- [[MH-11718]](https://opencast.jira.com/browse/MH-11718) - As a producer, I want to be able to make workflow settings persistent so that I can reuse them later
+- [[MH-11725]](https://opencast.jira.com/browse/MH-11725) - Give users a starting point how to report bugs
+- [[MH-11726]](https://opencast.jira.com/browse/MH-11726) - Add AdminUI style guide to developer guide
+- [[MH-11728]](https://opencast.jira.com/browse/MH-11728) - Use Apache Commons Lang 3
+- [[MH-11729]](https://opencast.jira.com/browse/MH-11729) - External API: Add documentation for Groups Endpoint
+- [[MH-11731]](https://opencast.jira.com/browse/MH-11731) - Typofix Documentation
+- [[MH-11737]](https://opencast.jira.com/browse/MH-11737) - Comment (mh\_event\_comment and mh\_event\_comment\_reply) text field is VARCHAR(255) should be TEXT
+- [[MH-11740]](https://opencast.jira.com/browse/MH-11740) - optimization of segmentation
+- [[MH-11741]](https://opencast.jira.com/browse/MH-11741) - Admin UI has timezone issues
+- [[MH-11749]](https://opencast.jira.com/browse/MH-11749) - External API: Add REST documentation for Endpoints
+- [[MH-11750]](https://opencast.jira.com/browse/MH-11750) - Clean-Up Opencast Code Base
+- [[MH-11752]](https://opencast.jira.com/browse/MH-11752) - Upgrade Karaf to 3.0.8
+- [[MH-11756]](https://opencast.jira.com/browse/MH-11756) - Admin UI NG Update CSS+HTML (1): FontAwesome, improve HTML, remove redundant images
+- [[MH-11763]](https://opencast.jira.com/browse/MH-11763) - Counters hide series tab
+- [[MH-11772]](https://opencast.jira.com/browse/MH-11772) - Admin UI source dropdowns inappropriately advance
+- [[MH-11774]](https://opencast.jira.com/browse/MH-11774) - Admin UI Needs better documentation for debugging
+- [[MH-11775]](https://opencast.jira.com/browse/MH-11775) - Library Update
+- [[MH-11783]](https://opencast.jira.com/browse/MH-11783) - Custom publications labels not displayed when doing a mouse-over on Events-\>Published
+- [[MH-11784]](https://opencast.jira.com/browse/MH-11784) - Remove Participation Management Code Pieces
+- [[MH-11786]](https://opencast.jira.com/browse/MH-11786) - HttpsRequestWrapper wrongly sets the new URL
+- [[MH-11791]](https://opencast.jira.com/browse/MH-11791) - As service provider I want to configure which kind of users can see the event counters
+- [[MH-11792]](https://opencast.jira.com/browse/MH-11792) - NPM Proxy via Nexus
+- [[MH-11794]](https://opencast.jira.com/browse/MH-11794) - NPM fails on first build
+- [[MH-11795]](https://opencast.jira.com/browse/MH-11795) - Add support for title slides
+- [[MH-11799]](https://opencast.jira.com/browse/MH-11799) - Maven bundle names too long
+- [[MH-11800]](https://opencast.jira.com/browse/MH-11800) - LTI between Opencast and Moodle does not work
+- [[MH-11801]](https://opencast.jira.com/browse/MH-11801) - Wowza streaming server needs flv: prefix for flv files
+- [[MH-11802]](https://opencast.jira.com/browse/MH-11802) - Opencast Logo is missing in Player
+- [[MH-11803]](https://opencast.jira.com/browse/MH-11803) - Player redirect is missing
+- [[MH-11804]](https://opencast.jira.com/browse/MH-11804) - No video controls in embed mode
+- [[MH-11808]](https://opencast.jira.com/browse/MH-11808) - Pre-select workflow in case only one option is available
+- [[MH-11809]](https://opencast.jira.com/browse/MH-11809) - Fix syntax error in encoding profile composite.http
+- [[MH-11812]](https://opencast.jira.com/browse/MH-11812) - Fix security configuration for ROLE\_UI\_TASKS\_CREATE
+- [[MH-11813]](https://opencast.jira.com/browse/MH-11813) - Agent state REST endpoint documentation
+- [[MH-11815]](https://opencast.jira.com/browse/MH-11815) - As a user I expect changes to be reflected in the Admin UI immediately
+- [[MH-11817]](https://opencast.jira.com/browse/MH-11817) - Admin UI Video Editor - Bug Fixes
+- [[MH-11817]](https://opencast.jira.com/browse/MH-11817) - Display video details in preview player/ editor of the admin ui
+- [[MH-11817]](https://opencast.jira.com/browse/MH-11817) - Improve Button Hover Indication
+- [[MH-11817]](https://opencast.jira.com/browse/MH-11817) - Make Next/Last Frame controls in videoeditor better recognizeable
+- [[MH-11827]](https://opencast.jira.com/browse/MH-11827) - Recordings-\>Events-\>"Event Details"-\>Metadata: Incorrect translation used
+- [[MH-11828]](https://opencast.jira.com/browse/MH-11828) - exception-handler-workflow not set correctly
+- [[MH-11829]](https://opencast.jira.com/browse/MH-11829) - High memory usage on the admin server by dispatching jobs
+- [[MH-11831]](https://opencast.jira.com/browse/MH-11831) - As a service provider, I want to configure whether Opencast creates an admin user automatically
+- [[MH-11834]](https://opencast.jira.com/browse/MH-11834) - Unable to set capture agent configuration as JSON
+- [[MH-11836]](https://opencast.jira.com/browse/MH-11836) - Additional ACL actions of series are missing when creating a new event in that series
+- [[MH-11837]](https://opencast.jira.com/browse/MH-11837) - Unprivileged users have no access to fonts
+- [[MH-11839]](https://opencast.jira.com/browse/MH-11839) - typo in Event Details: Comments
+- [[MH-11841]](https://opencast.jira.com/browse/MH-11841) - Wait for NFS shares before start Opencast service
+- [[MH-11842]](https://opencast.jira.com/browse/MH-11842) - Revert accidental downgrade of grunt version
+- [[MH-11851]](https://opencast.jira.com/browse/MH-11851) - org.opencastproject.security.admin/pass can't be changed
+- [[MH-11857]](https://opencast.jira.com/browse/MH-11857) - Fix log output "Unable to delete non existing object %s/%s"
+- [[MH-11862]](https://opencast.jira.com/browse/MH-11862) - Search API handles roles wrong
+- [[MH-11863]](https://opencast.jira.com/browse/MH-11863) - WOH analyze-tracks & WOH failing cause exceptions when shutting down Opencast
+- [[MH-11864]](https://opencast.jira.com/browse/MH-11864) - WOH tag shall implement AbstractWorkflowOperationHandler
+- [[MH-11865]](https://opencast.jira.com/browse/MH-11865) - Videoeditor Preview mixes in 2 Audiofiles
+- [[MH-11866]](https://opencast.jira.com/browse/MH-11866) - Search box in Organization \>\> Groups not working
+- [[MH-11867]](https://opencast.jira.com/browse/MH-11867) - Filter box in Organization \>\> Groups not working
+- [[MH-11869]](https://opencast.jira.com/browse/MH-11869) - Deleting Series with 'Actions' is not working
+- [[MH-11870]](https://opencast.jira.com/browse/MH-11870) - Wordlength in other languages except english too long
+- [[MH-11871]](https://opencast.jira.com/browse/MH-11871) - ElasticSearch shall bind to 127.0.0.1
+- [[MH-11875]](https://opencast.jira.com/browse/MH-11875) - ActiveMQ should not listen to all hosts by default
+- [[MH-11880]](https://opencast.jira.com/browse/MH-11880) - Multiple issues with LDAP in branch 2.3.x
+- [[MH-11883]](https://opencast.jira.com/browse/MH-11883) - Larger files may remain in system temp directory
+- [[MH-11886]](https://opencast.jira.com/browse/MH-11886) - login pages throw errors on loading unnecessary scripts
+- [[MH-11888]](https://opencast.jira.com/browse/MH-11888) - Organization Filter uses Provider where table uses Type
+- [[MH-11889]](https://opencast.jira.com/browse/MH-11889) - Row size too large
+- [[MH-11890]](https://opencast.jira.com/browse/MH-11890) - MySQL Connector Version Should Be Consistent
+- [[MH-11891]](https://opencast.jira.com/browse/MH-11891) - Event counters query large amounts of useless data
+- [[MH-11895]](https://opencast.jira.com/browse/MH-11895) - “Add Event” Wizard Input Fields Broken
+- [[MH-11896]](https://opencast.jira.com/browse/MH-11896) - Java Warnings in AbstractEventEndpoint
+- [[MH-11897]](https://opencast.jira.com/browse/MH-11897) - Remove Deprecated StringHelper
+- [[MH-11898]](https://opencast.jira.com/browse/MH-11898) - Fix Technical Duration Calculation
+- [[MH-11899]](https://opencast.jira.com/browse/MH-11899) - Prevent Requesting Event Objects Multiple Times
+- [[MH-11900]](https://opencast.jira.com/browse/MH-11900) - Minor Index Service Fixes
+- [[MH-11905]](https://opencast.jira.com/browse/MH-11905) - Publish Configure WOH incorrectly retracts publications
+- [[MH-11912]](https://opencast.jira.com/browse/MH-11912) - No slider in playback video player
+- [[MH-11919]](https://opencast.jira.com/browse/MH-11919) - WOH image claims SUCCEEDED when actually skipping
+- [[MH-11920]](https://opencast.jira.com/browse/MH-11920) - WOH prepare-av: Misleading log message
+- [[MH-11921]](https://opencast.jira.com/browse/MH-11921) - WOH partial-import looses partial audio tracks in specific cases
+- [[MH-11950]](https://opencast.jira.com/browse/MH-11950) - Javadocs build error
+- [[MH-11955]](https://opencast.jira.com/browse/MH-11955) - Add en-GB to Languages
+
+
 Opencast 2.2.x
 ==============
 
