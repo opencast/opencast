@@ -21,7 +21,7 @@
 package org.opencastproject.waveform.api;
 
 /**
- * This exception is thrown during waveform extraction.
+ * This exception is thrown if errors occur during waveform extraction.
  */
 public class WaveformServiceException extends Exception {
 
@@ -36,7 +36,7 @@ public class WaveformServiceException extends Exception {
   }
 
   /**
-   * Creates a new waveform service exception where <code>cause</code> identifies the original reason of failure.
+   * Creates a new waveform service exception where <code>cause</code> identifies the root cause of failure.
    *
    * @param cause
    *          the root cause of the failure

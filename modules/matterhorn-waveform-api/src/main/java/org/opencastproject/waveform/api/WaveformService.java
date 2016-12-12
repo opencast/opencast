@@ -33,7 +33,7 @@ public interface WaveformService {
   String JOB_TYPE = "org.opencastproject.waveform";
 
   /**
-   * Takes the given track and returns the job that will create an waveform image.
+   * Takes the given track and returns the job that will create a waveform image.
    *
    * @param sourceTrack the track to create waveform image from
    * @return a job that will create a waveform image

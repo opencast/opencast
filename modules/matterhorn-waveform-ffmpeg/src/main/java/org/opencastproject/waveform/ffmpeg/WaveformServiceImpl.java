@@ -106,7 +106,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_IMAGE_WIDTH_PIXEL_PER_MINUTE */
   public static final String WAVEFORM_IMAGE_WIDTH_PPM_CONFIG_KEY = "waveform.image.width.ppm";
 
-  /** The default waveform image height in pixel */
+  /** The default waveform image height in pixels */
   public static final int DEFAULT_WAVEFORM_IMAGE_HEIGHT = 500;
 
   /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_IMAGE_HEIGHT */
@@ -142,22 +142,22 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   /** The waveform job load */
   private float waveformJobLoad = DEFAULT_WAVEFORM_JOB_LOAD;
 
-  /** The minimum waveform image width in pixel */
+  /** The minimum waveform image width in pixels */
   private int waveformImageWidthMin = DEFAULT_WAVEFORM_IMAGE_WIDTH_MIN;
 
-  /** The maximum waveform image width in pixel */
+  /** The maximum waveform image width in pixels */
   private int waveformImageWidthMax = DEFAULT_WAVEFORM_IMAGE_WIDTH_MAX;
 
-  /** The waveform image width per minute of video in pixel */
+  /** The waveform image width per minute of video in pixels */
   private int waveformImageWidthPPM = DEFAULT_WAVEFORM_IMAGE_WIDTH_PIXEL_PER_MINUTE;
 
-  /** The waveform image height in pixel */
+  /** The waveform image height in pixels */
   private int waveformImageHeight = DEFAULT_WAVEFORM_IMAGE_HEIGHT;
 
   /** The waveform image scale algorithm */
   private String waveformScale = DEFAULT_WAVEFORM_SCALE;
 
-  /** The value if the waveforms (per audio channel) should be renderen next to each other (if true)
+  /** The value if the waveforms (per audio channel) should be rendered next to each other (if true)
    * or on top of each other (if false) */
   private boolean waveformSplitChannels = DEFAULT_WAVEFORM_SPLIT_CHANNELS;
 

@@ -79,8 +79,8 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
     CONFIG_OPTIONS.put(SOURCE_FLAVOR_PROPERTY, "The source media file flavor.");
-    CONFIG_OPTIONS.put(SOURCE_TAGS_PROPERTY, "Comma separated tags, source media files should have. "
-            + "Any media, that match " + SOURCE_FLAVOR_PROPERTY + " or " + SOURCE_TAGS_PROPERTY
+    CONFIG_OPTIONS.put(SOURCE_TAGS_PROPERTY, "Comma-separated tags of the source media files. "
+            + "Any media that match " + SOURCE_FLAVOR_PROPERTY + " or " + SOURCE_TAGS_PROPERTY
             + " will be processed.");
     CONFIG_OPTIONS.put(TARGET_FLAVOR_PROPERTY, "The target waveform image flavor.");
     CONFIG_OPTIONS.put(TARGET_TAGS_PROPERTY, "The waveform image (comma separated) target tags.");
@@ -165,22 +165,21 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
         Job waveformJob = waveformService.createWaveformImage(sourceTrack);
         waveformJobs.add(waveformJob);
       } catch (MediaPackageException | WaveformServiceException ex) {
-        logger.error("Creating waveform extraction job for track '{}' in mediapackage '{}' failed with error {}",
+        logger.error("Creating waveform extraction job for track '{}' in media package '{}' failed with error {}",
                 sourceTrack.getIdentifier(), mediaPackage.getIdentifier().compact(), ex.getMessage());
       }
     }
 
     logger.info("Wait for waveform jobs for media package {}", mediaPackage.getIdentifier().compact());
     if (!waitForStatus(waveformJobs.toArray(new Job[waveformJobs.size()])).isSuccess()) {
-      // cleanup workspace and throw exception
       cleanupWorkspace(waveformJobs);
       throw new WorkflowOperationException(
-              String.format("Waveform extraction jobs for media mapckage '%s' are ended unsuccessfull",
+              String.format("Waveform extraction jobs for media mapckage '%s' have not completed successfully",
                       mediaPackage.getIdentifier().compact()));
     }
 
     try {
-      // copy waveform attachments into working file repository and add them to the media package
+      // copy waveform attachments into workspace and add them to the media package
       for (Job job : waveformJobs) {
         String jobPayload = job.getPayload();
         if (StringUtils.isNotEmpty(jobPayload)) {
