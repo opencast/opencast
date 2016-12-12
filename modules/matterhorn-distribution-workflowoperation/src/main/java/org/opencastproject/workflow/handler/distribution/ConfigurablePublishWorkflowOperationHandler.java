@@ -46,6 +46,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -184,10 +185,11 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
       }
     }
 
-    final boolean withPublishedElements = Boolean.parseBoolean(StringUtils.trimToEmpty(op
-            .getConfiguration(WITH_PUBLISHED_ELEMENTS)));
+    final boolean withPublishedElements = BooleanUtils.toBoolean(StringUtils.trimToEmpty(
+            op.getConfiguration(WITH_PUBLISHED_ELEMENTS)));
 
-    boolean checkAvailability = Boolean.parseBoolean(StringUtils.trimToEmpty(op.getConfiguration(CHECK_AVAILABILITY)));
+    boolean checkAvailability = BooleanUtils.toBoolean(StringUtils.trimToEmpty(
+            op.getConfiguration(CHECK_AVAILABILITY)));
 
     if (getPublications(mp, channelId).size() > 0) {
       final String rePublishStrategy = StringUtils.trimToEmpty(op.getConfiguration(STRATEGY));
