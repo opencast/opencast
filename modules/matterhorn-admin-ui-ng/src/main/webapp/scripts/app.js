@@ -30,6 +30,7 @@ angular.module('adminNg', [
     'ui.sortable',
     'LocalStorageModule',
     'ngRoute',
+    'cfp.hotkeys',
     'ngResource',
     'ngAnimate',
     'ngMessages',
@@ -103,6 +104,9 @@ angular.module('adminNg', [
         };
     }]);
 }])
+.config(function(hotkeysProvider) {
+    hotkeysProvider.includeCheatSheet = true;
+})
 .run(['$rootScope', function ($rootScope) {
     // Define wrappers around non-mockable native functions.
     $rootScope.location = {};

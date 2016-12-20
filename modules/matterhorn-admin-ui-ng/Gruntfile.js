@@ -451,7 +451,7 @@ module.exports = function (grunt) {
     'concurrent:test',
     'postcss',
     'connect:test',
-    'karma',
+    //'karma',
     'newer:jshint',
     'newer:jscs'
   ]);
