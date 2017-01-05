@@ -25,7 +25,7 @@
              cardinality="1..1"
              interface="org.opencastproject.message.broker.api.MessageReceiver"
              policy="static"
-             bind="setMessageReceiver" />   
+             bind="setMessageReceiver" />
 
   <reference name="search-index"
              cardinality="1..1"
