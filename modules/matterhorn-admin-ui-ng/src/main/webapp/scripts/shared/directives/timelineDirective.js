@@ -224,6 +224,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     scope.zoomFieldOffset = scope.getZoomFieldOffset();
 
                     var dropdown = element.find('.zoom-control #zoomSelect');
+                    
                     if (dropdown) {
                         dropdown.attr('data-placeholder', dropdown.data('data-translated'));
                     }
@@ -307,7 +308,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                 try {
                     var total = internal_widths.reduce(function getSum(total, num) { return total + num; }),
-                        single = (total / element.find('a').length);
+                        single = (total / element.find('a').length),
                         segment_width = element.width();
 
                     if ( segment_width <= (total + 10)) {
@@ -415,6 +416,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 }                
 
                 var index = scope.video.segments.indexOf(segment);
+
                 if (scope.video.segments[index - 1]) {
                     scope.video.segments[index - 1].end = segment.end;
                     scope.video.segments.splice(index, 1);
@@ -543,7 +545,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                         index = scope.video.segments.indexOf(segment);
 
                     var pxPosition = scope.movingSegment.parent().offset().left + parseInt(scope.movingSegment.css('left'),10) - topTrack.offset().left + 3;
-                        position = Math.floor((pxPosition / track.width() * scope.video.duration) + scope.zoomFieldOffset);
+                    var position = Math.floor((pxPosition / track.width() * scope.video.duration) + scope.zoomFieldOffset);
 
                     if (position < 0) position = 0;
                     if (position >= scope.video.duration) position = scope.video.duration;
@@ -561,6 +563,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     if (index - 1 >= 0) {
 
                         var before = scope.video.segments[index - 1];
+
                         before.end = segment.start;
 
                         if (before.end - before.start <= 0) {
@@ -578,6 +581,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                     if (index + 1 < scope.video.segments.length) {
                         var after = scope.video.segments[index + 1];
+
                         after.start = segment.end;
 
                         if (after.end - after.start <= 0) {
@@ -714,7 +718,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 event.preventDefault();
                 scope.canMove = true;
 
-                var cursor = element.find('#cursor'); 
+                var cursor = element.find('#cursor'),
                     handle = element.find('#cursor .handle'),
                     target = $(event.target);
 
@@ -724,7 +728,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 // We are currently playing - use fake handle
                 if (scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
                     
-                    var cursorFake = element.find('#cursor_fake'); 
+                    var cursorFake = element.find('#cursor_fake'),
                         handle = element.find('#cursor_fake .handle'); 
                     
                     cursorFake.css('left', cursor.css('left'));
@@ -739,6 +743,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 } else {
 
                     var handle = element.find('#cursor .handle');
+
                     handle.data('dx', $document.mx - handle.offset().left);
                     handle.data('dy', $document.my - handle.offset().top);
                     handle.addClass('active');
