@@ -292,8 +292,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
         } catch (IOException e) {
           throw new DistributionException("Unable to create " + destination.getParentFile(), e);
         }
-        logger.info(format("Distributing %s@%s for publication channel %s to %s", elementId, mediapackageId, channelId,
-                destination));
+        logger.debug("Distributing element {} of media package {} to publication channel {} ({})", elementId,
+            mediapackageId, channelId, destination);
 
         try {
           FileSupport.link(source, destination, true);
@@ -309,11 +309,11 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
         throw new DistributionException("Distributed element produces an invalid URI", e);
       }
 
-      logger.info(format("Finished distributing element %s@%s for publication channel %s", elementId, mediapackageId,
-              channelId));
+      logger.debug("Finished distributing element {} of media package {} to publication channel {}", elementId,
+          mediapackageId, channelId);
       final URI uri = distributedElement.getURI();
       if (checkAvailability) {
-        logger.info("Checking availability of distributed artifact {} at {}", distributedElement, uri);
+        logger.debug("Checking availability of distributed artifact {} at {}", distributedElement, uri);
         waitForResource(trustedHttpClient, uri, HttpServletResponse.SC_OK, TIMEOUT, INTERVAL)
                 .fold(Misc.<Exception, Void> chuck(), new Effect.X<Integer>() {
                   @Override
@@ -419,26 +419,24 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
       // Does the file exist? If not, the current element has not been distributed to this channel
       // or has been removed otherwise
       if (!elementFile.exists()) {
-        logger.info(
-                format("Element %s@%s has already been removed or has never been distributed for publication channel %s",
-                        elementId, mediapackageId, channelId));
+        logger.info("Element {} from media package {} has already been removed or has never been distributed to "
+            + "publication channel {}", elementId, mediapackageId, channelId);
         return element;
       }
 
-      logger.info("Retracting element {} from {}", element, elementFile);
+      logger.debug("Retracting element {} ({})", element, elementFile);
 
       // Try to remove the file and its parent folder representing the mediapackage element id
       FileUtils.forceDelete(elementFile.getParentFile());
       if (mediapackageDir.isDirectory() && mediapackageDir.list().length == 0)
         FileSupport.delete(mediapackageDir);
 
-      logger.info(format("Finished retracting element %s@%s for publication channel %s", elementId, mediapackageId,
-              channelId));
+      logger.debug("Finished retracting element {} of media package {} from publication channel {}", elementId,
+          mediapackageId, channelId);
       return element;
     } catch (Exception e) {
-      logger.warn(
-              format("Error retracting element %s@%s for publication channel %s", elementId, mediapackageId, channelId),
-              e);
+      logger.warn("Error retracting element {} of media package {} from publication channel {}", elementId,
+          mediapackageId, channelId, e);
       if (e instanceof DistributionException) {
         throw (DistributionException) e;
       } else {
@@ -494,7 +492,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
        if (element != null) {
          elements.add(element);
        } else {
-         throw new IllegalStateException(format("No element %s found in mediapackage %s", elementId, mediapackage.getIdentifier()));
+         throw new IllegalStateException(format("No element %s found in mediapackage %s", elementId,
+               mediapackage.getIdentifier()));
        }
     }
     return elements;
@@ -573,9 +572,8 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
     if (uriString.startsWith(serviceUrl)) {
       String[] splitUrl = uriString.substring(serviceUrl.length() + 1).split("/");
       if (splitUrl.length < 5) {
-        logger.warn(
-                format("Malformed URI %s. Must be of format .../{orgId}/{channelId}/{mediapackageId}/{elementId}/{fileName}."
-                        + " Trying URI without channelId", uriString));
+        logger.warn("Malformed URI {}. Format must be .../{orgId}/{channelId}/{mediapackageId}/{elementId}/{fileName}."
+                        + " Trying URI without channelId", uriString);
         return new File(path(directoryName, orgId, splitUrl[1], splitUrl[2], splitUrl[3]));
       } else {
         return new File(path(directoryName, orgId, splitUrl[1], splitUrl[2], splitUrl[3], splitUrl[4]));
