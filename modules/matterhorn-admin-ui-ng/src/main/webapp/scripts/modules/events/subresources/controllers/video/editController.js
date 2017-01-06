@@ -81,10 +81,11 @@ angular.module('adminNg.controllers')
             }
         };
 
-        $scope.replayPostRoll = function () {
+        $scope.replayPreRoll = function () {
             var segment = VideoService.getPreviousActiveSegment($scope.player, $scope.video);
             var currentSegment = VideoService.getCurrentSegment($scope.player, $scope.video);
             currentSegment.replay = true;
+            segment.replay = true;
             $scope.player.adapter.setCurrentTime((segment.end/1000) - 2);
             if ($scope.player.adapter.getStatus() !== PlayerAdapter.STATUS.PLAYING) {
                 $scope.player.adapter.play();
@@ -118,7 +119,7 @@ angular.module('adminNg.controllers')
         HotkeysService.activateHotkey($scope, "editor.play_current_segment_with_pre-roll",
           "Play current segment with pre-roll", function(event) {
               event.preventDefault();
-              $scope.replayPostRoll();
+              $scope.replayPreRoll();
         });
 
         HotkeysService.activateHotkey($scope, "editor.play_ending_of_current_segment",

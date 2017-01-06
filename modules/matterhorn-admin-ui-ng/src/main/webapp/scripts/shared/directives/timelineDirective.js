@@ -27,7 +27,8 @@ function (PlayerAdapter, $document, VideoService) {
 
                 // Stop play back when switching from a replayed segment to
                 // the next.
-                if (replaySegment.replay && !segment.replay) {
+                var nextActiveSegment = VideoService.getNextActiveSegment(scope.player, scope.video);
+                if (replaySegment.replay && !nextActiveSegment.replay) {
                     scope.player.adapter.pause();
                     scope.player.adapter.setCurrentTime(replaySegment.start/1000);
                     replaySegment.replay = false;
