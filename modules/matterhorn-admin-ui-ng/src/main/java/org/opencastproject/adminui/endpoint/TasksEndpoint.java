@@ -202,7 +202,7 @@ public class TasksEndpoint {
             httpMediaPackageElementProvider.getUriRewriter(), IteratorUtils.toList(eventIds.iterator()));
 
     if (eventIds.size() != instances.size()) {
-      logger.warn("Can't start one or more tasts.");
+      logger.warn("Can't start one or more tasks.");
       return Response.status(Status.BAD_REQUEST).build();
     }
 
