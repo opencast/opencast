@@ -1,5 +1,6 @@
 angular.module('adminNg.services')
-.factory('HotkeysService', ['IdentityResource', 'hotkeys', function (IdentityResource, hotkeys) {
+.factory('HotkeysService', ['$q', 'IdentityResource', 'hotkeys',
+        function ($q, IdentityResource, hotkeys) {
     var HotkeysService = function () {
       var me = this,
           identity,
@@ -9,7 +10,7 @@ angular.module('adminNg.services')
       this.keyBindings = {};
 
       this.loadHotkeys = function () {
-        return new Promise (function (resolve, reject) {
+        return $q(function (resolve, reject) {
           identity = IdentityResource.get();
           identity.$promise.then(function (info) {
             if (info && info.org && info.org.properties && info.org.properties) {

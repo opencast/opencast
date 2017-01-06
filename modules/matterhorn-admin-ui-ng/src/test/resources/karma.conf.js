@@ -14,7 +14,8 @@ module.exports = function (config) {
             '../../../bower_components/angular-animate/angular-animate.js',
             '../../../bower_components/angular-messages/angular-messages.js',
             '../../../bower_components/angular-wizard/dist/angular-wizard.js',
-            '../../../bower_components/angular-hotkeys/build/angular-hotkeys.js',
+            '../../../bower_components/angular-hotkeys/build/hotkeys.css',
+            '../../../bower_components/angular-hotkeys/build/hotkeys.js',
             // endbower
             '../../main/webapp/scripts/lib/angular/angular-translate-loader-static-files.js',
             '../../main/webapp/scripts/lib/angular/angular-local-storage.js',

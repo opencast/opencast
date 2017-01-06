@@ -105,7 +105,7 @@ angular.module('adminNg', [
     }]);
 }])
 .config(function(hotkeysProvider) {
-    hotkeysProvider.includeCheatSheet = true;
+    hotkeysProvider.includeCheatSheet = false;
 })
 .run(['$rootScope', function ($rootScope) {
     // Define wrappers around non-mockable native functions.
