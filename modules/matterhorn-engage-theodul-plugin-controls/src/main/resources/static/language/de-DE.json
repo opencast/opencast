@@ -4,7 +4,7 @@
   "loginInformation":"Einloggen mit einem Opencast-Benutzerkonto",
   "login":"Einloggen",
   "logout":"Ausloggen",
-  "loginLogout":"Einloggen\/Ausloggen",
+  "loginLogout":"Einloggen/Ausloggen",
   "enterUsernamePassword":"Bitte geben Sie ihren Nutzernamen und ihr Passwort ein:",
   "username":"Benutzername",
   "password":"Passwort",

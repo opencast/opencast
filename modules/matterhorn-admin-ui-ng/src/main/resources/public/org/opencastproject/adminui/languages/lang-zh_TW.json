@@ -49,19 +49,19 @@
     "CONTINUE_ACTION":"你確定要繼續嗎?",
     "METADATA":{
       "NOTICE":{
-        "UNKNOWN":"The following element will be deleted",
-        "EVENT":"The following event will be deleted",
-        "SERIES":"The following series will be deleted",
-        "ACL":"The following ACL will be deleted",
-        "GROUP":"The following group will be deleted",
-        "USER":"The following user will be deleted",
-        "USER_BLACKLIST":"The following user blacklist will be deleted",
-        "THEME":"The following theme will be deleted",
-        "EMAIL":"The following email template will be deleted",
-        "LOCATION":"The following location will be deleted",
-        "LOCATION_BLACKLIST":"The following location blacklist will be deleted"
+        "UNKNOWN":"下面的元素將被刪除",
+        "EVENT":"以下事件將被刪除",
+        "SERIES":"以下系列將被刪除",
+        "ACL":"以下ACL將被刪除",
+        "GROUP":"以下群組將被刪除",
+        "USER":"以下的使用者將被刪除",
+        "USER_BLACKLIST":"以下使用者黑名單將被刪除",
+        "THEME":"下列主題將被刪除",
+        "EMAIL":"將刪除以下電子郵件範本",
+        "LOCATION":"以下位置將被刪除",
+        "LOCATION_BLACKLIST":"以下位置黑名單將被刪除"
       },
-      "NAME":"Name"
+      "NAME":"名稱"
     },
     "ACTIONS":{
       "CONFIRMATION":"需要確認"
@@ -69,7 +69,7 @@
   },
   "MEDIAMODULE":"媒體模組",
   "HELP":{
-    "HELP":"說明",
+    "HELP":"幫助",
     "USERS_GUIDE":"使用說明",
     "DOCUMENTATION":"文件檔案",
     "REST_DOC":"REST API 文檔"
@@ -101,13 +101,13 @@
     "EVENTS_UPDATED_NB":"你的 {{ number }} 事件已經成功的更新了",
     "EVENTS_UPDATED_ALL":"已成功更新所有事件",
     "EVENTS_NOT_UPDATED":"事件無法儲存",
-    "EVENTS_NOT_UPDATED_ID":"無法儲存事件 {{ id }}",
+    "EVENTS_NOT_UPDATED_ID":"事件 {{ id }} 無法儲存",
     "EVENTS_NOT_UPDATED_ALL":"無可儲存的事件",
     "SERIES_UPDATED_NB":"{{ number }} 系列已成功更新",
     "SERIES_UPDATED_ALL":"已成功更新所有系列",
     "SERIES_NOT_UPDATED":"該系列無法儲存",
     "SERIES_NOT_UPDATED_ID":"無法儲存系列 {{ id }}",
-    "SERIES_NOT_UPDATED_ALL":"無可儲存的事件",
+    "SERIES_NOT_UPDATED_ALL":"無可儲存的系列",
     "EVENTS_DELETED":"事件已刪除",
     "EVENTS_NOT_DELETED":"事件無法刪除",
     "SERIES_DELETED":"該系列已被刪除",
@@ -118,6 +118,8 @@
     "USER_BLACKLIST_NOT_SAVED":"黑名單無法儲存",
     "USER_BLACKLIST_DELETED":"黑名單已刪除",
     "USER_BLACKLIST_NOT_DELETED":"黑名單無法刪除",
+    "LOCATION_DELETED":"位置已被刪除",
+    "LOCATION_NOT_DELETED":"無法刪除位置",
     "LOCATION_BLACKLIST_CREATED":"黑名單已創建",
     "LOCATION_BLACKLIST_NOT_CREATED":"黑名單無法創建",
     "LOCATION_BLACKLIST_SAVED":"黑名單已儲存",
@@ -136,7 +138,7 @@
     "CONFLICT_DETECTED":"工作流程衝突 ︰ 新的事件與現有的事件重疊。請更改位置、 日期或時間。",
     "CONFLICT_ALREADY_ENDED":"排程有誤，此一事件已經結束。",
     "CONFLICT_END_BEFORE_START":"排程有誤: 排程結束的時間，必須晚於開始時間。",
-    "INVALID_ACL_RULES":"規則必須包含一個有效的角色，讀 或\/和 寫的權利。",
+    "INVALID_ACL_RULES":"規則必須包含一個有效的角色，讀 或/和 寫的權利。",
     "MISSING_ACL_RULES":"至少有一個角色必須具有讀取和寫入權限。",
     "SAVED_ACL_RULES":"存取權限已儲存",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"這個系列的現有事件需要重新進入處理程序",
@@ -210,7 +212,7 @@
     "SCHEDULE_TASK":{
       "CAPTION":"啟動任務",
       "GENERAL":{
-        "CAPTION":"General",
+        "CAPTION":"一般",
         "SUMMARY":"({{ count }} 個選定的事件)",
         "CANNOTSTART":"標示的事件無法在此刻進行處理, 你可以取消選擇或稍後再試。"
       },
@@ -706,6 +708,7 @@
           }
         },
         "METADATA":{
+          "CAPTION":"事件詳細資訊",
           "TITLE":"標題",
           "ID":"UID",
           "SERIES":"系列",
@@ -966,7 +969,8 @@
     },
     "ACTIONS":{
       "EXPORT":"匯出",
-      "ADD_BLACKLIST":"加入黑名單"
+      "ADD_BLACKLIST":"加入黑名單",
+      "REMOVE":"刪除"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1046,6 +1050,7 @@
         "EMAIL":"電子郵件",
         "ROLES":"角色",
         "TYPE":"類型",
+        "PROVIDER":"供應商",
         "BLACKLIST_FROM":"從黑名單",
         "BLACKLIST_TO":"直到黑名單",
         "ACTION":"操作"
@@ -1415,7 +1420,7 @@
     },
     "JOBS":{
       "TABLE":{
-        "ID":"Job Identifier",
+        "ID":"作業的識別碼",
         "ACTION":"操作",
         "CAPTION":"工作",
         "CREATED":"創建",
@@ -1490,6 +1495,16 @@
       "UNDO":"還原",
       "REDO":"重做",
       "CLEAR_SEGMENTS":"清除片段"
+    },
+    "PLAYER":{
+      "PLAY":"開始",
+      "PAUSE":"暫停...",
+      "NEXT_FRAME":"下一格",
+      "PREVIOUS_FRAME":"上一格",
+      "NEXT_SEGMENT":"下一個片段/跳到結束",
+      "PREVIOUS_SEGMENT":"上一個片段 / 跳到開始",
+      "MUTE":"静音",
+      "VOLUME":"音量"
     }
   },
   "LOGIN":{
@@ -1498,7 +1513,7 @@
     "USERNAME":"使用者名稱...",
     "PASSWORD":"密碼...",
     "LOGIN":"登入",
-    "ERROR":"不正確的使用者名稱 和\/或 密碼"
+    "ERROR":"不正確的使用者名稱 和/或 密碼"
   },
   "TABLE_FILTERS":{
     "CLEAR":"清除所有搜尋過濾器",
@@ -1737,7 +1752,7 @@
     "RUNNING":"運行中",
     "FINISHED":"已完成",
     "FAILED":"失敗",
-    "FINISHED_WITH_COMMENTS":"完成與公開作出的評論",
+    "FINISHED_WITH_COMMENTS":"待辦事項",
     "SCHEDULED":"已排程"
   }
 }

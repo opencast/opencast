@@ -1,6 +1,11 @@
 {
-  "date": "2015-01-27",
+  "date": "2016-12-02T13:30:05Z",
   "title": "Opencast Community",
+  "series":{
+    "id":"fa987fd2-5719-459d-b066-adc5bb253721",
+    "title":"zwei"
+  },
+  "presenters":["somebody","somebody else","nobody","nobody else"],
   "previews": [{
     "uri": "\/videos\/sintel_trailer.mp4"
   }, {

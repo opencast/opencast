@@ -1051,6 +1051,7 @@
          "EMAIL":    "Email",
          "ROLES":    "Roles",
          "TYPE":     "Type",
+         "PROVIDER":  "Provider",
          "BLACKLIST_FROM": "Blacklisted from",
          "BLACKLIST_TO":   "Blacklisted until",
          "ACTION":   "Actions"

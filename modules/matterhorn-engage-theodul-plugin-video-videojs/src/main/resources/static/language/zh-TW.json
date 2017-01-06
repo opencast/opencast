@@ -2,7 +2,6 @@
   "value_locale":"en",
   "error_AudioCodecNotSupported":"錯誤: 此瀏覽器不支援的音訊編解碼器",
   "error_AudioElementNotSupported":"錯誤: 您的瀏覽器不支援音訊元素。",
-  "switchPlayer":"切換視訊播放器",
   "video":"視訊",
   "video_short":"影像",
   "openInPlayer":"在播放機中打開",

@@ -1,143 +1,49 @@
 Install from Repository (Fedora)
 ================================
 
-There is an RPM software repository available for RedHat-based Linux distributions provided by the University of
-Osnabrück. This repository provides preconfigured Opencast installations, including all 3rd-Party-Tools. Using this
-method, you do not have to compile the software by yourself.
+The Opencast RPM repository for Fedora has been discontinued since Fedora with RPMfusion now provides nearly all
+necessary dependencies for Opencast. Use the following steps to install them, then continue with the [installation from
+source](source-rhel-sl-centos.md).
 
-It may also be interesting for developers as all dependencies for Opencast usage, testing and development are provided
-by the RPM repository.
-
-
-Supported Versions
-------------------
-
-For Fedora usually the latest two versions are supported, meaning that the support is dependent on the status of the
-Fedora release. For architectures, *only* `x86_64` is supported. 32bit architectures are *not* supported.
+*This guide is to be merged into the guide for the installation from source.*
 
 
-Registration
-------------
+Add RPMfusion repository
+------------------------
 
-Before you can start you need to get an account for the repository. You will need the credentials that you get by mail
-after the registration to successfully complete this manual. The placeholders `[your_username]` and `[your_password]`
-are used in this manual wherever the credentials are needed.
+[RPMFusion](https://rpmfusion.org/) is a community-driven RPM repository for Fedora. It provides tools like FFmpeg. You
+can activate it using:
 
- - [http://repo.virtuos.uos.de](http://repo.virtuos.uos.de)
-
-
-Activate Repository
--------------------
-
-First you have to install the necessary repositories so that your package manager can access them:
-
- - Add Opencast repository:
-
-        cd /etc/yum.repos.d
-        curl -O http://repo.virtuos.uos.de/opencast-testing.repo \
-          -d 'version=$releasever' -d os=fc \
-          -u [your_username]:[your_password]
-
- - Add RPMfusion repository:
-
-        dnf install --nogpgcheck \
-          http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
-          http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+    dnf install --nogpgcheck \
+      http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+      http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
 
 Install 3rd-party-tools
 -----------------------
 
-This step is optional and only recommended for those who want to build Opencast from source. If you install Opencast
-from the repository, all necessary dependencies will be installed automatically.
-
 You can install all necessary 3rd-Party-Tools for Opencast like this:
 
-    dnf install ffmpeg-recent tesseract hunspell sox
+    dnf install maven ffmpeg tesseract hunspell sox
+
+For additional Unicode tests run during the build process, you can also install:
+
+    dnf install hunspell-de tesseract-langpack-deu
 
 
 Install Apache ActiveMQ
 -----------------------
 
-The Apache ActiveMQ message broker is required by Opencast since version 2.0. It does not necessarily have to be
-installed on the same machine as Opencast but would commonly for an all-in-one system. ActiveMQ is available from the
-Opencast RPM repository as well and can be installed by running:
+The Apache ActiveMQ message broker is commonly installed on the same machine as Opencast for an all-in-one system. The
+version of ActiveMQ shipped with Fedora is too old but you can use the [ActiveMQ-dist Copr RPM repository
+](https://copr.fedoraproject.org/coprs/lkiesow/apache-activemq-dist/)
 
-    dnf install activemq-dist
-
-A prepared configuration file for ActiveMQ can be found at `/usr/share/opencast/docs/scripts/activemq/activemq.xml`
-*after Opencast itself has been installed* and should replace `/etc/activemq/activemq.xml`. For an all-in-one
-installation the following command should suffice:
-
-    cp /usr/share/opencast/docs/scripts/activemq/activemq.xml /etc/activemq/activemq.xml
-
-ActiveMQ should be started *prior to* Opencast.
-
-More information about how to properly set up ActiveMQ for Opencast can be found in the [message broker configuration
-documentation](../configuration/message-broker.md).
+Make sure it is properly configured for Opencast. For more information about the setup, have a look at the
+[message broker configuration documentation](../configuration/message-broker.md).
 
 
 Install Opencast
-------------------
+----------------
 
-For this guide, `opencast21-*` is used as placeholder for the package name. It will install the latest version of the
-Opencast 2.1.x branch. If you want to install another version, please change the name accordingly.
-
-
-### Basic Installation
-
-For a basic installation (All-In-One) just run:
-
-    dnf install opencast21-allinone
-
-This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.
-
-Now you can start Opencast:
-
-    systemctl start opencast.service
-
-While Opencast is preconfigured, it is strongly recommended to follow at least the [Basic Configuration
-guide](../configuration/basic.md). It will help you to set your hostname, login information, …
-
-
-Advanced Installation
----------------------
-
-While the basic installation will give you an all-in-one Opencast distribution which is nice for testing, you might
-want to have more control over your system and deploy it over several machines by choosing which parts of Opencast you
-want to install. You can list all Opencast packages with:
-
-    dnf search opencast
-
-Starting with Opencast 2.1, this will list all available Opencast distributions in the form
-`opencast<version>-<dist-type>`
-
-Current available distributions are:
-
- - opencast21-allinone
- - opencast21-admin
- - opencast21-worker
- - opencast21-presentation
-
-
-Uninstall Opencast
---------------------
-
-Sometimes you want to uninstall Opencast. For example to do a clean reinstall. You can do that by executing:
-
-    dnf remove opencast
-
-This will not touch your created media files or modified configuration files.  If you want to remove them as well, you
-have to to that by yourself.
-
-    # Remove media files
-    sudo rm -rf /srv/opencast
-
-    # Remove local db, search index and working files
-    sudo rm -rf /var/lib/opencast
-
-    # Remove configuration files
-    sudo rm -rf /etc/opencast
-
-    # Remove system logfiles
-    sudo rm -rf /var/log/opencast
+For the installation of Opencast, please have a look at the [installation from source documentation
+](source-rhel-sl-centos.md).

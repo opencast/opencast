@@ -4,7 +4,7 @@
   "loginInformation":"Connectez-vous avec votre compte d'utilisateur Opencast",
   "login":"Connexion",
   "logout":"Se déconnecter",
-  "loginLogout":"Connexion \/ déconnexion",
+  "loginLogout":"Connexion / déconnexion",
   "enterUsernamePassword":"Entrez votre nom d'utilisateur et votre mot de passe:",
   "username":"Nom d'utilisateur",
   "password":"Mot de passe",

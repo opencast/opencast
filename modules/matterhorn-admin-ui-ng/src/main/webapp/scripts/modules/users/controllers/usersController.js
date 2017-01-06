@@ -18,7 +18,7 @@ angular.module('adminNg.controllers')
                 label: 'USERS.USERS.TABLE.ROLES'
             }, {
                 name:  'provider',
-                label: 'USERS.USERS.TABLE.TYPE'
+                label: 'USERS.USERS.TABLE.PROVIDER'
             }, {
             //     name:  'blacklist_from',
             //     label: 'USERS.USERS.TABLE.BLACKLIST_FROM'

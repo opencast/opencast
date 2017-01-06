@@ -85,10 +85,13 @@ public class GroupsListProvider implements ResourceListProvider {
     }
 
     for (JaxbGroup g : groups) {
-      if (DESCRIPTION.equals(listName))
-        groupsList.put(g.getDescription(), g.getDescription());
-      else
+      if (NAME.equals(listName)) {
         groupsList.put(g.getName(), g.getName());
+      } else if (DESCRIPTION.equals(listName)) {
+        groupsList.put(g.getDescription(), g.getDescription());
+      } else {
+        groupsList.put(g.getGroupId(), g.getName());
+      }
     }
 
     return groupsList;

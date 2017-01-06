@@ -49,19 +49,19 @@
     "CONTINUE_ACTION":"Czy na pewno chcesz kontynuować?",
     "METADATA":{
       "NOTICE":{
-        "UNKNOWN":"The following element will be deleted",
-        "EVENT":"The following event will be deleted",
-        "SERIES":"The following series will be deleted",
-        "ACL":"The following ACL will be deleted",
-        "GROUP":"The following group will be deleted",
-        "USER":"The following user will be deleted",
-        "USER_BLACKLIST":"The following user blacklist will be deleted",
-        "THEME":"The following theme will be deleted",
-        "EMAIL":"The following email template will be deleted",
-        "LOCATION":"The following location will be deleted",
-        "LOCATION_BLACKLIST":"The following location blacklist will be deleted"
+        "UNKNOWN":"Następujący element zostanie usunięty",
+        "EVENT":"Następujące wydarzenie zostanie usunięte",
+        "SERIES":"Następująca seria zostanie usunięta",
+        "ACL":"Następujące reguły kontroli dostępu (ACL) zostaną usunięte",
+        "GROUP":"Następująca grupa zostanie usunięta",
+        "USER":"Następujący użytkownik zostanie usunięty",
+        "USER_BLACKLIST":"Następująca czarna lista użytkowników zostanie usunięta",
+        "THEME":"Następujący motyw zostanie usunięty",
+        "EMAIL":"Następujący szablon wiadomości e-mail zostanie usunięty",
+        "LOCATION":"Następująca lokalizacja zostanie usunięta",
+        "LOCATION_BLACKLIST":"Następująca czarna lista lokalizacji zostanie usunięta"
       },
-      "NAME":"Name"
+      "NAME":"Imię"
     },
     "ACTIONS":{
       "CONFIRMATION":"Wymagane potwierdzenie"
@@ -109,7 +109,7 @@
     "SERIES_NOT_UPDATED_ID":"Nie można zapisać serii {{ id }}",
     "SERIES_NOT_UPDATED_ALL":"Żadna seria nie została zapisana",
     "EVENTS_DELETED":"Wydarzenie zostało usunięte",
-    "EVENTS_NOT_DELETED":"Wydarzenie\/wydarzenia nie mogły być usunięte",
+    "EVENTS_NOT_DELETED":"Wydarzenie/wydarzenia nie mogły być usunięte",
     "SERIES_DELETED":"Seria została skasowana",
     "SERIES_NOT_DELETED":"Seria nie mogła zostać usunięta",
     "USER_BLACKLIST_CREATED":"Czarna lista została utworzona",
@@ -118,6 +118,8 @@
     "USER_BLACKLIST_NOT_SAVED":"Czerna lista nie mogła być zapisana",
     "USER_BLACKLIST_DELETED":"Czarna lista została usunięta",
     "USER_BLACKLIST_NOT_DELETED":"Czarna lista nie mogła być usunięta",
+    "LOCATION_DELETED":"Lokalizacja została usunięta",
+    "LOCATION_NOT_DELETED":"Nie udało się usunąć lokalizacji",
     "LOCATION_BLACKLIST_CREATED":"Czarna lista została utworzona",
     "LOCATION_BLACKLIST_NOT_CREATED":"Nie można utworzyć czarnej listy",
     "LOCATION_BLACKLIST_SAVED":"Czarna lista została zapisana",
@@ -136,7 +138,7 @@
     "CONFLICT_DETECTED":"Konflikt w harmonogramie: nowe wydarzenie pokrywa się z już zaplanowanym. Proszę zmienić salę lub termin wydarzenia.",
     "CONFLICT_ALREADY_ENDED":"Błąd w harmonogramie: Wydarzenie się już zakończyło.",
     "CONFLICT_END_BEFORE_START":"Błąd w harmonogramie: Rozpoczęcie zakończenie zdarzenia zaplanowano przed jego rozpoczęciem.",
-    "INVALID_ACL_RULES":"Reguły dostępu muszą zawierać poprawne role użytkownika z określonymi zasadami odczytu i\/lub zapisu.",
+    "INVALID_ACL_RULES":"Reguły dostępu muszą zawierać poprawne role użytkownika z określonymi zasadami odczytu i/lub zapisu.",
     "MISSING_ACL_RULES":"Przynajmniej jedna rola, z uprawnieniem do zapisu lub odczytu jest wymagana!",
     "SAVED_ACL_RULES":"Reguły dostępu zostały zapisane.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Wydarzenia w tej serii będą musiały być przetworzone ponownie",
@@ -210,7 +212,7 @@
     "SCHEDULE_TASK":{
       "CAPTION":"Uruchom Zadanie",
       "GENERAL":{
-        "CAPTION":"General",
+        "CAPTION":"Ogólne",
         "SUMMARY":"(wybrane zdarzenia{{ count }})",
         "CANNOTSTART":"Wyróżnione wydarzenia nie mogą być przetwarzane w tej chwili. Odznacz je lub spróbuj ponownie później."
       },
@@ -687,7 +689,7 @@
           "REASONS":{
             "CUTTING":"Wymaga cięć",
             "REVIEW":"Wymaga przeglądu",
-            "ASYNC":"Ścieżki A\/V asynchroniczne",
+            "ASYNC":"Ścieżki A/V asynchroniczne",
             "AUDIO_ISSUE":"Brakująca lub uszkodzona ścieżka dżwiękowa",
             "CANCELED":"Anulowane wydarzenie",
             "CONFLICTING_METADATA":"Konflikt w metadanych",
@@ -706,6 +708,7 @@
           }
         },
         "METADATA":{
+          "CAPTION":"Szczegóły wydarzenia",
           "TITLE":"Tytuł",
           "ID":"UID",
           "SERIES":"Serie",
@@ -966,7 +969,8 @@
     },
     "ACTIONS":{
       "EXPORT":"Eksportuj",
-      "ADD_BLACKLIST":"Dodaj czarną listę"
+      "ADD_BLACKLIST":"Dodaj czarną listę",
+      "REMOVE":"Usuń"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1046,6 +1050,7 @@
         "EMAIL":"Email",
         "ROLES":"Role",
         "TYPE":"Typ",
+        "PROVIDER":"Dostawca",
         "BLACKLIST_FROM":"Na czarnej liście od",
         "BLACKLIST_TO":"Na czarnej liście do",
         "ACTION":"Działania"
@@ -1415,7 +1420,7 @@
     },
     "JOBS":{
       "TABLE":{
-        "ID":"Job Identifier",
+        "ID":"Identyfikator zadania",
         "ACTION":"Działania",
         "CAPTION":"Zadania",
         "CREATED":"Utworzono",
@@ -1490,6 +1495,16 @@
       "UNDO":"Cofnij",
       "REDO":"Wykonaj ponownie",
       "CLEAR_SEGMENTS":"Wyczyść segmenty"
+    },
+    "PLAYER":{
+      "PLAY":"Odtwarzaj",
+      "PAUSE":"Wstrzymaj",
+      "NEXT_FRAME":"Następna klatka",
+      "PREVIOUS_FRAME":"Poprzednia ramka",
+      "NEXT_SEGMENT":"Następny segment / skok do końca",
+      "PREVIOUS_SEGMENT":"Poprzedni segment/przeskocz do początku",
+      "MUTE":"Wycisz",
+      "VOLUME":"Głośność"
     }
   },
   "LOGIN":{
@@ -1737,7 +1752,7 @@
     "RUNNING":"W toku",
     "FINISHED":"Zakończone",
     "FAILED":"Zakończone niepowodzeniem",
-    "FINISHED_WITH_COMMENTS":"Zakończono z otwartymi komentarzami",
+    "FINISHED_WITH_COMMENTS":"Do zrobienia",
     "SCHEDULED":"Zaplanowane"
   }
 }
