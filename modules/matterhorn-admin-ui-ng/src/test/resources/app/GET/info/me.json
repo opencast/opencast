@@ -87,11 +87,6 @@
     "adminRole": "ROLE_ADMIN",
     "properties": {
       "adminui.chunksize": "2024",
-      "adminui.i18n_tab_episode.enable": "true",
-      "adminui.i18n_tab_users.enable": "false",
-      "adminui.minSegmentLength": "2",
-      "adminui.prePostRoll": "2",
-      "adminui.series_prepopulate.enable": "false",
       "engageui.annotations.enable": "false",
       "engageui.link_download.enable": "false",
       "engageui.link_mobile_redirect.description": "For more information have a look at the official site.",
