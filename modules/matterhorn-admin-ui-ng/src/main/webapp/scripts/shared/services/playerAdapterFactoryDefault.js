@@ -130,6 +130,11 @@ angular.module('adminNg.services')
              * @param {double} time The time to set in seconds
              */
             this.setCurrentTime = function (time) {
+                if (time < 0) {
+                  time = 0;
+                } else if (time > me.getDuration()) {
+                  time = me.getDuration();
+                }
                 targetElement.currentTime = time;
             };
 
