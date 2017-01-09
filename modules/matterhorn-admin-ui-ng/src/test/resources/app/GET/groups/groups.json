@@ -357,10 +357,6 @@
                     "$": "space"
                   },
                   {
-                    "key": "adminui.i18n_tab_users.enable",
-                    "$": "false"
-                  },
-                  {
                     "key": "engageui.annotations.enable",
                     "$": "false"
                   },
