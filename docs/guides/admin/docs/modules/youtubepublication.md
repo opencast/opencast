@@ -47,17 +47,17 @@ With the JSON file created and saved previously, you have to proceed as describe
 
 - In the command line, enter the command to view the extended status of the Opencast service:
 
-`bash
+```bash
 # systemctl status opencast -l
-`
+```
 This command will retrieve an URL that you have to copy in a browser in a pc with internet access.
 
 -The web page will ask for your google account, you have to use the account with you created the developer proyect in Google in the first place. The page will ask the selection to witch channel you want Opencast publish and if we grant access.
 -Once the access is granted, the browser will show a conecction error, this is normal, because it's asking to an inexsitence site inside the client. **You need to copy that invalid direction and execute**:
 
-`bash
+```bash
 # curl [Returned direction by the client's browser]
-`
+```
 -Once you have done that, you will receive an answer from Opencast
 `Received verification code. Closing... `
 
@@ -73,17 +73,17 @@ From Opencast 2.2.2 this feature is disabled, to enable ir, you need to follow t
 -Make a copy of the default workflow `etc/opencast/workflows/ng-schedule-and-upload.xml` and create a copy named `etc/opencast/workflows/ng-schedule-and-upload-youtube.xml`
 
 - To the copy, you have to modify this values:
-..- In `<configuration_panel>` enable the YouTube option, like this:
+	- In `<configuration_panel>` enable the YouTube option, like this:
 
-`xml
+```xml
 <input id="publishToYouTube" name="publishToYouTube" type="checkbox" checked="checked" class="configField" value="true" />
 <label for="publishToYouTube">YouTube</label>
-`
-..- In `<operation id="defaults" escription="Applying default configuration values">`, change to `true` the key `publishToYouTube`.
+```
+	- In `<operation id="defaults" escription="Applying default configuration values">`, change to `true` the key `publishToYouTube`.
 
-..- In the workflow `ng-partial-publish.xml` you have to comment the block called `<operation "publish-youtube">` and paste this code:
+	-In the workflow `ng-partial-publish.xml` you have to comment the block called `<operation "publish-youtube">` and paste this code:
 
-`xml
+```xml
 <operation
       id="publish-youtube"
       if="${publishToYouTube}"
@@ -95,7 +95,7 @@ From Opencast 2.2.2 this feature is disabled, to enable ir, you need to follow t
         <configuration key="source-flavors">presenter/trimmed</configuration>
       </configurations>
     </operation>
-`
+```
 
 This code has been configured to publish the records of the presenter stream, if you want to publish the presentation stream, you have to change the line from `presenter/trimmed` to `presentation/trimmed` 
 
