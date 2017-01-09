@@ -6,8 +6,9 @@ This page documents the configuration for Opencast module **matterhorn-publicati
 
 
 You need to meet this requeriments to make a Youtube Publication:
-- Google Account.
-- YouTube Channel to make the publication.
+
+- Google Account
+- YouTube Channel to make the publication
 
 ## Google Developers Configuration
 
@@ -58,7 +59,8 @@ This command will retrieve an URL that you have to copy in a browser in a pc wit
 ```bash
 # curl [Returned direction by the client's browser]
 ```
--Once you have done that, you will receive an answer from Opencast
+- Once you have done that, you will receive an answer from Opencast
+
 `Received verification code. Closing... `
 
 - Verify that the key have been saved in `work/opencast/youtube-v3/data-store/store.`
@@ -70,18 +72,19 @@ Opencast is enabled now to publish in YouTube, the last step is to activate this
 
 From Opencast 2.2.2 this feature is disabled, to enable ir, you need to follow this steps:
 
--Make a copy of the default workflow `etc/opencast/workflows/ng-schedule-and-upload.xml` and create a copy named `etc/opencast/workflows/ng-schedule-and-upload-youtube.xml`
+- Make a copy of the default workflow `etc/opencast/workflows/ng-schedule-and-upload.xml` and create a copy named `etc/opencast/workflows/ng-schedule-and-upload-youtube.xml`
 
 - To the copy, you have to modify this values:
-	- In `<configuration_panel>` enable the YouTube option, like this:
+
+ - In `<configuration_panel>` enable the YouTube option, like this:
 
 ```xml
 <input id="publishToYouTube" name="publishToYouTube" type="checkbox" checked="checked" class="configField" value="true" />
 <label for="publishToYouTube">YouTube</label>
 ```
-	- In `<operation id="defaults" escription="Applying default configuration values">`, change to `true` the key `publishToYouTube`.
+ - In `<operation id="defaults" escription="Applying default configuration values">`, change to `true` the key `publishToYouTube`.
 
-	-In the workflow `ng-partial-publish.xml` you have to comment the block called `<operation "publish-youtube">` and paste this code:
+ - In the workflow `ng-partial-publish.xml` you have to comment the block called `<operation "publish-youtube">` and paste this code:
 
 ```xml
 <operation
