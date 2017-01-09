@@ -39,9 +39,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.persistence.PersistenceUtil;
-import org.opencastproject.workflow.api.WorkflowQuery;
-import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workflow.api.WorkflowSetImpl;
 
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -78,12 +75,6 @@ public class CaptureAgentStateServiceImplTest {
 
     service = new CaptureAgentStateServiceImpl();
     service.setEntityManagerFactory(PersistenceUtil.newTestEntityManagerFactory(CaptureAgentStateServiceImpl.PERSISTENCE_UNIT));
-
-    WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
-    EasyMock.expect(workflowService.getWorkflowInstances((WorkflowQuery) EasyMock.anyObject()))
-    .andReturn(new WorkflowSetImpl()).anyTimes();
-    EasyMock.replay(workflowService);
-    service.setWorkflowService(workflowService);
 
     DefaultOrganization organization = new DefaultOrganization();
 
