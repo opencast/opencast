@@ -98,7 +98,7 @@ angular.module('adminNg.controllers')
               $scope.split();
         });
 
-        HotkeysService.activateHotkey($scope, "editor.delete_selected_segment",
+        HotkeysService.activateHotkey($scope, "editor.cut_selected_segment",
           "remove current segment", function(event) {
               event.preventDefault();
               $scope.cut();
