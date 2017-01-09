@@ -5,7 +5,7 @@ This page documents the configuration for Opencast module **matterhorn-publicati
 ## Before you start
 
 
-You need to meet this requeriments to make a Youtube Publication:
+You need to meet these requerirements to make a YouTube Publication:
 
 - Google Account
 - YouTube Channel to make the publication
@@ -38,7 +38,7 @@ You need to meet this requeriments to make a Youtube Publication:
 - Save the JSON file to `${karaf.etc}/youtube-v3/client-secrets-youtube-v3.json` (Usually this is
   `etc/youtube-v3/client-secrets-youtube-v3.json`)
 
-## Youtube configuration in Opencast
+## YouTube configuration in Opencast
 
 With the JSON file created and saved previously, you have to proceed as described:
 
@@ -53,8 +53,8 @@ With the JSON file created and saved previously, you have to proceed as describe
 ```
 This command will retrieve an URL that you have to copy in a browser in a pc with internet access.
 
-- The web page will ask for your google account, you have to use the account with you created the developer proyect in Google in the first place. The page will ask the selection to witch channel you want Opencast publish and if we grant access.
-- Once the access is granted, the browser will show a conecction error, this is normal, because it's asking to an inexsitence site inside the client. **You need to copy that invalid direction and execute**:
+- The web page will ask for your Google account; you have to use the account with you created the developer project in Google in the first place. The page will ask the selection to witch channel you want Opencast publish and if we grant access.
+- Once the access is granted, the browser will show a connection error, this is normal, because it's asking to an inexistence site inside the client. **You need to copy that invalid direction and execute this line**:
 
 ```bash
 # curl [Returned direction by the client's browser]
@@ -66,11 +66,11 @@ This command will retrieve an URL that you have to copy in a browser in a pc wit
 - Verify that the key have been saved in `work/opencast/youtube-v3/data-store/store.`
 - Restart Opencast
 
-##Activate Youtube publication in Opencast
+##Activate YouTube publication in Opencast
 
 Opencast is enabled now to publish in YouTube, the last step is to activate this feature. For this you have to create a new workflow that allow it.
 
-From Opencast 2.2.2 this feature is disabled, to enable ir, you need to follow this steps:
+From Opencast 2.2.2 this feature was disabled, to enable it, you need to follow this steps:
 
 - Make a copy of the default workflow `etc/opencast/workflows/ng-schedule-and-upload.xml` and create a copy named `etc/opencast/workflows/ng-schedule-and-upload-youtube.xml`
 
@@ -82,7 +82,7 @@ From Opencast 2.2.2 this feature is disabled, to enable ir, you need to follow t
 <input id="publishToYouTube" name="publishToYouTube" type="checkbox" checked="checked" class="configField" value="true" />
 <label for="publishToYouTube">YouTube</label>
 ```
- - In `<operation id="defaults" escription="Applying default configuration values">`, change to `true` the key `publishToYouTube`.
+ - In `<operation id="defaults" description="Applying default configuration values">`, change to `true` the key `publishToYouTube`.
 
  - In the workflow `ng-partial-publish.xml` you have to comment the block called `<operation "publish-youtube">` and paste this code:
 
@@ -102,6 +102,6 @@ From Opencast 2.2.2 this feature is disabled, to enable ir, you need to follow t
 
 This code has been configured to publish the records of the presenter stream, if you want to publish the presentation stream, you have to change the line from `presenter/trimmed` to `presentation/trimmed` 
 
-Opencast will dectect the new worflow without restart, with that you can select the new workflow with the YouTube option enabled.
+Opencast will detect the new workflow without restart, with that you can select the new workflow with the YouTube option enabled.
 
 [googledevconsole]: https://console.developers.google.com/project
