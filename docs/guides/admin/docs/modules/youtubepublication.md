@@ -5,7 +5,7 @@ This page documents the configuration for Opencast module **matterhorn-publicati
 ## Before you start
 
 
-You need to meet these requerirements to make a YouTube Publication:
+You need to meet these requirements to make a YouTube Publication:
 
 - Google Account
 - YouTube Channel to make the publication
@@ -44,26 +44,25 @@ With the JSON file created and saved previously, you have to proceed as describe
 
 - Start Opencast server (Restart Opencast in case was running)
 
-**ATTENTION: Until this operation is fully configured, Opencast will not read and write the database. In case you want to abort the configuration, you only need to delete the JSON file and restart Opencast.**
+`**ATTENTION:** 
+Until this operation is fully configured, Opencast will not read and write the database. In case you want to abort the configuration, you only need to delete the JSON file and restart Opencast.`
 
 - In the command line, enter the command to view the extended status of the Opencast service:
 
-```bash
-# systemctl status opencast -l
-```
+`# systemctl status opencast -l`
+
 This command will retrieve an URL that you have to copy in a browser in a pc with internet access.
 
 - The web page will ask for your Google account; you have to use the account with you created the developer project in Google in the first place. The page will ask the selection to witch channel you want Opencast publish and if we grant access.
 - Once the access is granted, the browser will show a connection error, this is normal, because it's asking to an inexistence site inside the client. **You need to copy that invalid direction and execute this line**:
 
-```bash
-# curl [Returned direction by the client's browser]
-```
+`# curl [Returned direction by the client's browser]`
+
 - Once you have done that, you will receive an answer from Opencast
 
 `Received verification code. Closing... `
 
-- Verify that the key have been saved in `work/opencast/youtube-v3/data-store/store.`
+- Verify that the key has been saved in `work/opencast/youtube-v3/data-store/store.`
 - Restart Opencast
 
 ##Activate YouTube publication in Opencast
