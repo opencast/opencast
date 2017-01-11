@@ -193,7 +193,13 @@ import javax.ws.rs.core.Response.Status;
  * the endpoint may abstract over the concrete archive.
  */
 @Path("/")
-@RestService(name = "eventservice", title = "Event Service", notes = "", abstractText = "Provides resources and operations related to the events")
+@RestService(name = "eventservice", title = "Event Service",
+  abstractText = "Provides resources and operations related to the events",
+  notes = { "This service offers the event CRUD Operations for the admin UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be stricly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public abstract class AbstractEventEndpoint {
 
   /** The logging facility */

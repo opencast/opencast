@@ -45,7 +45,13 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 @Path("/")
-@RestService(name = "LanguageService", title = "Language Information", notes = "", abstractText = "This service provides information about the currently available translations.")
+@RestService(name = "LanguageService", title = "Language Information",
+  abstractText = "This service provides information about the currently available translations.",
+  notes = { "This service offers information about the user locale and available languages for the admin UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be stricly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public class LanguageServiceEndpoint {
 
   /** The logging facility */

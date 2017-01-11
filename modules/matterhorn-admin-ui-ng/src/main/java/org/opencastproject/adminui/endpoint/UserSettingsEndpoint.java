@@ -59,7 +59,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@RestService(name = "usersettings", title = "User Settings service", notes = "This service offers the default CRUD Operations for user settings for the admin UI.", abstractText = "Provides operations for user settings")
+@RestService(name = "usersettings", title = "User Settings service",
+  abstractText = "Provides operations for user settings",
+  notes = { "This service offers the default CRUD Operations for user settings for the admin UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be stricly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public class UserSettingsEndpoint {
 
   /** The logging facility */

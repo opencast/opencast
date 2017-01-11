@@ -68,7 +68,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@RestService(name = "ServerProxyService", title = "UI Servers", notes = "These Endpoints deliver informations about the server required for the UI.", abstractText = "This service provides the server data for the UI.")
+@RestService(name = "ServerProxyService", title = "UI Servers",
+  abstractText = "This service provides the server data for the UI.",
+  notes = { "These Endpoints deliver informations about the server required for the UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be stricly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public class ServerEndpoint {
 
   private enum Sort {

@@ -97,7 +97,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@RestService(name = "JobProxyService", title = "UI Jobs", notes = "These Endpoints deliver informations about the job required for the UI.", abstractText = "This service provides the job data for the UI.")
+@RestService(name = "JobProxyService", title = "UI Jobs",
+  abstractText = "This service provides the job data for the UI.",
+  notes = { "These Endpoints deliver informations about the job required for the UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be stricly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public class JobEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(JobEndpoint.class);

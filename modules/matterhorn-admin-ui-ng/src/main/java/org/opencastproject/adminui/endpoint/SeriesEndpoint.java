@@ -141,7 +141,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/")
-@RestService(name = "SeriesProxyService", title = "UI Series", notes = "These Endpoints deliver informations about the series required for the UI.", abstractText = "This service provides the series data for the UI.")
+@RestService(name = "SeriesProxyService", title = "UI Series",
+  abstractText = "This service provides the series data for the UI.",
+  notes = { "This service offers the series CRUD Operations for the admin UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be stricly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public class SeriesEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesEndpoint.class);

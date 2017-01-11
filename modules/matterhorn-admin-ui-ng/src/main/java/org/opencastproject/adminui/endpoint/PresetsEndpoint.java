@@ -49,7 +49,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@RestService(name = "PresetsProxyService", title = "UI Presets", notes = "These Endpoints deliver informations about organization and series level presets for the UI.", abstractText = "This service provides the presets data for the UI.")
+@RestService(name = "PresetsProxyService", title = "UI Presets",
+  abstractText = "This service provides the presets data for the UI.",
+  notes = { "This service offers information about organizations and series for the admin UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be stricly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public class PresetsEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(PresetsEndpoint.class);

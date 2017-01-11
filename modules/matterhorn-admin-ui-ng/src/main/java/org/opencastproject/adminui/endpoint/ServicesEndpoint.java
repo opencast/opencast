@@ -68,8 +68,12 @@ import javax.ws.rs.core.Response;
 
 @Path("/")
 @RestService(name = "ServicesProxyService", title = "UI Services",
-        notes = "These Endpoints deliver informations about the services required for the UI.",
-        abstractText = "This service provides the services data for the UI.")
+  abstractText = "This service provides the services data for the UI.",
+  notes = { "These Endpoints deliver informations about the services required for the UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be stricly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public class ServicesEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(ServicesEndpoint.class);
   private ServiceRegistry serviceRegistry;
