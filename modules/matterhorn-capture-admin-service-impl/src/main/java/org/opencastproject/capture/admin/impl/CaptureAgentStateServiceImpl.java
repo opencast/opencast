@@ -123,6 +123,9 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   /** A cache of CA properties, which lightens the load on the SQL server */
   private LoadingCache<String, Object> agentCache = null;
 
+  /** Configuration key for capture agent timeout in minutes before being marked offline */
+  public static final String CAPTURE_AGENT_TIMEOUT_KEY = "org.opencastproject.capture.admin.timeout";
+
   /** A token to store in the miss cache */
   protected Object nullToken = new Object();
 
@@ -170,11 +173,38 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   }
 
   public void activate(ComponentContext cc) {
-    setupAgentCache(2, TimeUnit.HOURS);
+
+    // Set up the agent cache
+    int timeoutInMinutes = 120;
+
+    if (ensureContextProp(cc, CAPTURE_AGENT_TIMEOUT_KEY)) {
+      String timeout = cc.getBundleContext().getProperty(CAPTURE_AGENT_TIMEOUT_KEY);
+      try {
+        timeoutInMinutes = Integer.parseInt(timeout);
+      } catch (NumberFormatException e) {
+        logger.warn("Invalid configuration for capture agent status timeout (minutes) ({}={})",
+                CAPTURE_AGENT_TIMEOUT_KEY, timeout);
+      }
+    }
+
+    setupAgentCache(timeoutInMinutes, TimeUnit.MINUTES);
+    logger.info("Capture agent status timeout is {} minutes", timeoutInMinutes);
   }
 
   public void deactivate() {
     agentCache.invalidateAll();
+  }
+
+  /**
+   * Check if a property exists in a given bundle context.
+   *
+   * @param cc
+   *          the OSGi component context
+   * @param prop
+   *          property to check for.
+   */
+  private boolean ensureContextProp(ComponentContext cc, String prop) {
+    return cc != null && cc.getBundleContext().getProperty(prop) != null;
   }
 
   /**
@@ -813,7 +843,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   }
 
   protected void setupAgentCache(int count, TimeUnit unit) {
- // Setup the agent cache
+    // Setup the agent cache
     RemovalListener<String, Object> removalListener = new RemovalListener<String, Object>() {
       private Set<String> ignoredStates = new LinkedHashSet<String>(Arrays.asList(AgentState.UNKNOWN, AgentState.OFFLINE));
       @Override
@@ -878,16 +908,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     if (isBlank(schedulerRolesConfig))
       throw new ConfigurationException("schedulerRoles", "must be specified");
     String[] schedulerRoles = schedulerRolesConfig.trim().split(",");
-
-    String cacheLifetime = (String) properties.get("cacheLifetime");
-    if (StringUtils.isNotBlank(cacheLifetime)) {
-      try {
-        int cacheLife = Integer.parseInt(cacheLifetime);
-        setupAgentCache(cacheLife, TimeUnit.HOURS);
-      } catch (NumberFormatException e) {
-        throw new ConfigurationException("cacheLifetime", "is invalid");
-      }
-    }
 
     // If we don't already have a mapping for this PID, create one
     if (!pidMap.containsKey(pid)) {
