@@ -265,6 +265,21 @@
       </configurations>
     </operation>
 
+    <!-- Publish to OAI-PMH -->
+
+    <operation
+      id="publish-oaipmh"
+      if="${publishToHarvesting}"
+      exception-handler-workflow="error"
+      description="Publish to Metadata Harvesting Repository">
+      <configurations>
+        <configuration key="download-tags">engage-download,atom,rss,videolounge</configuration>
+        <configuration key="streaming-tags">engage-streaming</configuration>
+        <configuration key="check-availability">true</configuration>
+        <configuration key="repository">default</configuration>
+      </configurations>
+    </operation>
+
     <!-- Archive the current state of the mediapackage -->
 
     <operation
