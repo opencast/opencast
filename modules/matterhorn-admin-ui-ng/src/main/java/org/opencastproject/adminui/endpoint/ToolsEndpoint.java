@@ -130,7 +130,7 @@ import javax.xml.bind.JAXBException;
   notes = { "This service provides a location for the tools API for the admin UI.",
             "<strong>Important:</strong> "
               + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
-              + "anytime without prior notice. Any dependencies other than the admin UI will be stricly ignored. "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
 public class ToolsEndpoint implements ManagedService {
   /** The logging facility */
