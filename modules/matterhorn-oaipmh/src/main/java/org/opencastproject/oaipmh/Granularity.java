@@ -24,10 +24,10 @@ package org.opencastproject.oaipmh;
 
 /**
  * Describes the granularity of timestamps supported by the repository.
- * <p>
+ * <p/>
  * For further information please see
  * <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Identify">Identify</a>
- * and <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Datestamp">Datestamp</a>.
+ * and <a href="">http://www.openarchives.org/OAI/openarchivesprotocol.html#Datestamp</a>.
  */
 public enum Granularity {
   DAY, SECOND

@@ -23,6 +23,7 @@
 package org.opencastproject.oaipmh.harvester;
 
 import org.opencastproject.oaipmh.Granularity;
+import org.opencastproject.oaipmh.OaiPmhConstants;
 import org.opencastproject.oaipmh.OaiPmhUtil;
 
 import org.w3c.dom.Document;
@@ -31,7 +32,7 @@ import org.w3c.dom.Document;
  * The "Identify" response.
  * See <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Identify">4.2 Identify</a> for further
  * information.
- * <p>
+ * <p/>
  * todo implement missing element accessors
  */
 public class IdentifyResponse extends OaiPmhResponse {
@@ -47,5 +48,9 @@ public class IdentifyResponse extends OaiPmhResponse {
     } catch (IllegalArgumentException e) {
       throw new MalformedResponseException("Identify response does not contain granularity", e);
     }
+  }
+
+  public boolean isErrorBadArgument() {
+    return isError(OaiPmhConstants.ERROR_BAD_ARGUMENT);
   }
 }

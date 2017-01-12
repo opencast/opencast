@@ -32,8 +32,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Collection of general purpose functions.
@@ -55,6 +57,18 @@ public final class Functions {
       }
     }
   };
+
+  public static Function<Date, Date> addDay(final int days) {
+    return new Function<Date, Date>() {
+      @Override public Date apply(Date date) {
+        final Calendar c = Calendar.getInstance();
+        c.setTimeZone(TimeZone.getTimeZone("UTC"));
+        c.setTime(date);
+        c.add(Calendar.DAY_OF_MONTH, days);
+        return c.getTime();
+      }
+    };
+  }
 
   private Functions() {
   }

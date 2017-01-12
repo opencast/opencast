@@ -185,8 +185,14 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-metadata/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-notification-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-oaipmh/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-oaipmh-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-oaipmh-persistence/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-oaipmh-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-presets/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-oaipmh/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-oaipmh-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-youtube-v3/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-runtime-info-ui-ng/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-impl/${project.version}</bundle>

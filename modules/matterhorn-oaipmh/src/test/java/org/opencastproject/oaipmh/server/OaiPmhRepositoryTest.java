@@ -18,187 +18,335 @@
  * the License.
  *
  */
-
-
 package org.opencastproject.oaipmh.server;
 
+import static java.lang.String.format;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.opencastproject.oaipmh.server.OaiPmhRepositoryTest.OaiPmhResponseStatus.IsError;
+import static org.opencastproject.oaipmh.server.OaiPmhRepositoryTest.OaiPmhResponseStatus.IsValid;
+import static org.opencastproject.util.EqualsUtil.eq;
+import static org.opencastproject.util.IoSupport.withResource;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Option.some;
+import static org.opencastproject.util.data.functions.Misc.chuck;
+import static org.xmlmatchers.transform.XmlConverters.the;
+import static org.xmlmatchers.xpath.HasXPath.hasXPath;
+import static org.xmlmatchers.xpath.XpathReturnType.returningANumber;
+import static org.xmlmatchers.xpath.XpathReturnType.returningAString;
 
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.oaipmh.Granularity;
-import org.opencastproject.search.api.SearchQuery;
-import org.opencastproject.search.api.SearchResult;
-import org.opencastproject.search.api.SearchResultItem;
-import org.opencastproject.search.api.SearchResultItemImpl;
-import org.opencastproject.search.api.SearchService;
-import org.opencastproject.util.data.NonEmptyList;
+import org.opencastproject.oaipmh.OaiPmhConstants;
+import org.opencastproject.oaipmh.harvester.OaiPmhNamespaceContext;
+import org.opencastproject.oaipmh.matterhorn.MatterhornInlinedMetadataProvider;
+import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
+import org.opencastproject.oaipmh.persistence.OaiPmhDatabaseException;
+import org.opencastproject.oaipmh.persistence.Query;
+import org.opencastproject.oaipmh.persistence.SearchResult;
+import org.opencastproject.oaipmh.persistence.SearchResultItem;
+import org.opencastproject.oaipmh.util.XmlGen;
+import org.opencastproject.util.HttpUtil;
+import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.JsonObj;
+import org.opencastproject.util.JsonVal;
+import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.XmlUtil;
 import org.opencastproject.util.data.Option;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.easymock.EasyMock;
+import org.hamcrest.Matcher;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Timeout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.xml.namespace.QName;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.transform.Source;
 
 public class OaiPmhRepositoryTest {
-
+  private static final Logger logger = LoggerFactory.getLogger(OaiPmhRepositoryTest.class);
+  private static final NamespaceContext NS_CTX = OaiPmhNamespaceContext.getContext();
   private static final long RESULT_LIMIT = 3;
 
-  @Test
-  public void testVerbListSets() {
-    OaiPmhRepository repo = newRepo(null);
-    Document doc = repo.selectVerb(newParams("ListSets", null, null, null, null, null)).generate();
-    assertXpathExists(doc, "//ListSets/set/setSpec");
-    assertXpathExists(doc, "//ListSets/set/setName");
-    assertXpathExists(doc, "//ListSets/set/setDescription/*/*/text()");
-    assertXpathExists(doc, "//ListSets/set[setSpec=\"series\"]");
-    assertXpathExists(doc, "//ListSets/set[setSpec=\"episode\"]");
-    assertXpathExists(doc, "//ListSets/set[setSpec=\"episode:audio\"]");
-    assertXpathExists(doc, "//ListSets/set[setSpec=\"episode:video\"]");
+  private static final boolean DISABLE_VALIDATION = true;
+  private static boolean runValidation = false;
+
+  // CHECKSTYLE:OFF
+  @Rule
+  public Timeout globalTimeout = new Timeout(5000);
+  // CHECKSTYLE:ON
+
+  @BeforeClass
+  public static void checkHttpConnection() {
+    final CloseableHttpClient client = HttpClients.createDefault();
+    try {
+      runValidation = !DISABLE_VALIDATION && HttpUtil.isOk(client.execute(HttpUtil.get(VALIDATOR_SERVICE)));
+      logger.info("Using external OAI-PMH validator service (" + VALIDATOR_SERVICE + "): " + runValidation);
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      IoSupport.closeQuietly(client);
+    }
   }
 
   @Test
-  public void testVerbListIdentifiersBadArgument() {
-    OaiPmhRepository repo = newRepo(null);
-    Document doc = repo.selectVerb(newParams("ListIdentifiers", null, null, null, null, null)).generate();
-    assertXpathExists(doc, "//error[@code=\"badArgument\"]");
+  public void testVerbIdentify() throws Exception {
+    final OaiPmhRepository repo = repo(null, Granularity.DAY);
+    runChecks(OaiPmhConstants.VERB_IDENTIFY,
+              repo.selectVerb(params("Identify", null, null, null, null, null)),
+              some(IsValid),
+              list(hasXPath("//oai20:Identify[oai20:deletedRecord='transient']", NS_CTX)));
   }
 
   @Test
-  public void testVerbListIdentifiersAll() {
-    OaiPmhRepository repo = newRepo(newSearchServiceMock(newSearchResultItem("id-1", new Date(), new Date()),
-            newSearchResultItem("id-2", newDate(2011, 5, 30), newDate(2011, 6, 1))));
-    Document doc = repo.selectVerb(newParams("ListIdentifiers", null, "oai_dc", null, null, null)).generate();
-    assertXpathExists(doc, "//ListIdentifiers/header[identifier=\"id-1\"]");
-    assertXpathExists(doc, "//ListIdentifiers/header[identifier=\"id-2\"]");
-    assertXpathExists(doc, "//ListIdentifiers/header[datestamp=\"2011-06-01\"]");
-    assertEquals(2.0, xpath(doc, "count(//ListIdentifiers/header)", XPathConstants.NUMBER));
-    EasyMock.verify(repo.getSearchService());
+  public void testVerbListIdentifiersBadArgument() throws Exception {
+    final OaiPmhRepository repo = repo(null, Granularity.DAY);
+    runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
+              repo.selectVerb(params("ListIdentifiers", null, null, null, null, null)),
+              some(IsError),
+              list(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testVerbListIdentifiersAll() throws Exception {
+    final OaiPmhRepository repo = repo(
+            oaiPmhPersistenceMock(searchResultItem("id-1", new Date(), false),
+                                  searchResultItem("id-2", utcDate(2011, 6, 1), false)), Granularity.DAY);
+    runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
+              repo.selectVerb(params("ListIdentifiers", null, "oai_dc", null, null, null)),
+              some(IsValid),
+              list(hasXPath("//oai20:ListIdentifiers/oai20:header[oai20:identifier='id-1']", NS_CTX),
+                   hasXPath("//oai20:ListIdentifiers/oai20:header[oai20:identifier='id-2']", NS_CTX),
+                   hasXPath("//oai20:ListIdentifiers/oai20:header[oai20:datestamp='2011-06-01']", NS_CTX),
+                   hasXPath("count(//oai20:ListIdentifiers/oai20:header)", NS_CTX, returningANumber(), equalTo(2.0))));
   }
 
   /**
    * Date range queries are just checked for the error case, since it doesn't make much sense to test with a mocked
-   * search service.
+   * episode service.
    */
   @Test
-  public void testVerbListIdentifiersDateRangeError() {
-    OaiPmhRepository repo = newRepo(null);
-    Document doc1 = repo.selectVerb(newParams("ListIdentifiers", null, "oai_dc", "2011-01-02", "2011-01-01", null))
-            .generate();
-    assertXpathExists(doc1, "//error[@code=\"badArgument\"]");
-    Document doc2 = repo.selectVerb(
-            newParams("ListIdentifiers", null, "oai_dc", "2011-01-01T10:20:10Z", "2011-01-01T10:20:00Z", null))
-            .generate();
-    assertXpathExists(doc2, "//error[@code=\"badArgument\"]");
+  public void testVerbListIdentifiersDateRangeError() throws Exception {
+    runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
+              repo(null, Granularity.DAY)
+                      .selectVerb(params("ListIdentifiers", null, "oai_dc", "2011-01-02", "2011-01-01", null)),
+              some(IsError),
+              list(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
+    runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
+              repo(null, Granularity.SECOND)
+                      .selectVerb(params("ListIdentifiers", null, "oai_dc", "2011-01-01T10:20:10Z", "2011-01-01T10:20:00Z", null)),
+              some(IsError),
+              list(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
   }
 
   @Test
-  public void testVerbListRecordsAll() {
-    OaiPmhRepository repo = newRepo(newSearchServiceMock(newSearchResultItem("id-1", new Date(), new Date()),
-            newSearchResultItem("id-2", newDate(2011, 5, 30), newDate(2011, 6, 1))));
-    Document doc = repo.selectVerb(newParams("ListRecords", null, "oai_dc", null, null, null)).generate();
-    assertXpathExists(doc, "//ListRecords/record/header[identifier=\"id-1\"]");
-    assertXpathExists(doc, "//ListRecords/record/header[identifier=\"id-2\"]");
-    assertXpathExists(doc, "//ListRecords/record/header[datestamp=\"2011-06-01\"]");
-    assertEquals(2.0, xpath(doc, "count(//ListRecords/record)", XPathConstants.NUMBER));
-    assertEquals(2.0, xpath(doc, "count(//ListRecords/record/metadata)", XPathConstants.NUMBER));
-    EasyMock.verify(repo.getSearchService());
+  @SuppressWarnings("unchecked")
+  public void testVerbListRecordsAll() throws Exception {
+    runChecks(OaiPmhConstants.VERB_LIST_RECORDS,
+              repo(oaiPmhPersistenceMock(searchResultItem("id-1", utcDate(2011, 5, 1), false),
+                                         searchResultItem("id-2", utcDate(2011, 6, 1), true)), Granularity.DAY)
+                      .selectVerb(params("ListRecords", null, "oai_dc", null, null, null)),
+              some(IsValid),
+              list(hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
+                   hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:datestamp='2011-05-01']", NS_CTX),
+                   hasXPath("//oai20:ListRecords/oai20:record/oai20:header[@status='deleted']", NS_CTX),
+                   hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-2']", NS_CTX),
+                   hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:datestamp='2011-06-01']", NS_CTX),
+                   hasXPath("count(//oai20:ListRecords/oai20:record)", NS_CTX, returningANumber(), equalTo(2.0)),
+                   hasXPath("count(//oai20:ListRecords/oai20:record/oai20:metadata)", NS_CTX, returningANumber(), equalTo(1.0))));
   }
 
   @Test
-  public void testResumption() {
-    SearchResultItem[] items1 = new SearchResultItem[] {
-            newSearchResultItem("id-1", newDate(2011, 5, 10), newDate(2011, 5, 10)),
-            newSearchResultItem("id-2", newDate(2011, 5, 11), newDate(2011, 5, 11)),
-            newSearchResultItem("id-3", newDate(2011, 5, 12), newDate(2011, 5, 12)) };
-    SearchResultItem[] items2 = new SearchResultItem[] {
-            newSearchResultItem("id-4", newDate(2011, 5, 13), newDate(2011, 5, 13)),
-            newSearchResultItem("id-5", newDate(2011, 5, 14), newDate(2011, 5, 14)) };
-    // setup search service mock
+  @SuppressWarnings("unchecked")
+  public void testVerbGetRecord() throws Exception {
+    runChecks(OaiPmhConstants.VERB_GET_RECORD,
+              repo(oaiPmhPersistenceMock(searchResultItem("id-1", utcDate(2011, 6, 1), false)),
+                   Granularity.DAY)
+                      .selectVerb(params("GetRecord", "id-1", "oai_dc", null, null, null)),
+              Option.<OaiPmhResponseStatus>none(),
+              list(hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
+                   hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:datestamp='2011-06-01']", NS_CTX),
+                   hasXPath("//oai20:GetRecord/oai20:record/oai20:header[not(@status='deleted')]", NS_CTX),
+                   hasXPath("count(//oai20:GetRecord/oai20:record)", NS_CTX, returningANumber(), equalTo(1.0)),
+                   hasXPath("count(//oai20:GetRecord/oai20:record/oai20:metadata)", NS_CTX, returningANumber(), equalTo(1.0))));
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testVerbGetRecordDeleted() throws Exception {
+    runChecks(OaiPmhConstants.VERB_GET_RECORD,
+              repo(oaiPmhPersistenceMock(searchResultItem("id-1", utcDate(2011, 5, 1), true)),
+                   Granularity.DAY)
+                      .selectVerb(params("GetRecord", "id-1", "oai_dc", null, null, null)),
+              Option.<OaiPmhResponseStatus>none(),
+              list(hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
+                   hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:datestamp='2011-05-01']", NS_CTX),
+                   hasXPath("//oai20:GetRecord/oai20:record/oai20:header[@status='deleted']", NS_CTX),
+                   hasXPath("count(//oai20:GetRecord/oai20:record)", NS_CTX, returningANumber(), equalTo(1.0)),
+                   hasXPath("count(//oai20:GetRecord/oai20:record/oai20:metadata)", NS_CTX, returningANumber(), equalTo(0.0))));
+  }
+
+  @Test
+  public void testMatterhornInlinedMetadataProvider() throws Exception {
+    runChecks(OaiPmhConstants.VERB_LIST_RECORDS,
+              repo(oaiPmhPersistenceMock(searchResultItem("id-1", utcDate(2011, 5, 1), false),
+                                         searchResultItem("id-2", utcDate(2011, 6, 1), true)), Granularity.DAY)
+                      .selectVerb(params("ListRecords", null, "matterhorn-inlined", null, null, null)),
+              some(IsValid),
+              list(hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
+                   hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:datestamp='2011-05-01']", NS_CTX),
+                   hasXPath("//oai20:ListRecords/oai20:record/oai20:header[@status='deleted']", NS_CTX),
+                   hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-2']", NS_CTX),
+                   hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:datestamp='2011-06-01']", NS_CTX),
+                   hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:datestamp='2011-06-01']", NS_CTX),
+                   hasXPath("count(//oai20:ListRecords/oai20:record)", NS_CTX, returningANumber(), equalTo(2.0)),
+                   hasXPath("count(//oai20:ListRecords/oai20:record)", NS_CTX, returningANumber(), equalTo(2.0)),
+                   hasXPath("count(//oai20:ListRecords/oai20:record/oai20:metadata)", NS_CTX, returningANumber(), equalTo(1.0))));
+  }
+
+  @Ignore
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testResumption() throws Exception {
+    List<SearchResultItem> items1 = new ArrayList<SearchResultItem>();
+    items1.add(searchResultItem("id-1", utcDate(2011, 5, 10), false));
+    items1.add(searchResultItem("id-2", utcDate(2011, 5, 11), false));
+    items1.add(searchResultItem("id-3", utcDate(2011, 5, 12), false));
+
+    List<SearchResultItem> items2 = new ArrayList<SearchResultItem>();
+    items2.add(searchResultItem("id-4", utcDate(2011, 5, 13), false));
+    items2.add(searchResultItem("id-5", utcDate(2011, 5, 14), false));
+
+    // setup episode service mock
     // this setup is really ugly since it needs knowledge about implementation details
-    SearchService search = EasyMock.createMock(SearchService.class);
+    OaiPmhDatabase persistence = EasyMock.createMock(OaiPmhDatabase.class);
     SearchResult result = EasyMock.createMock(SearchResult.class);
-    EasyMock.expect(search.getByQuery(EasyMock.<SearchQuery> anyObject())).andReturn(result).anyTimes();
-    EasyMock.expect(search.getByQuery(EasyMock.<String> anyObject(), EasyMock.anyInt(), EasyMock.anyInt()))
-            .andReturn(result).anyTimes();
-    EasyMock.expect(result.getItems()).andReturn(items1).andReturn(items2);
-    EasyMock.expect(result.getQuery()).andReturn("").anyTimes();
+    EasyMock.expect(result.getItems()).andReturn(items1).times(3).andReturn(items2).times(3);
     EasyMock.expect(result.getLimit()).andReturn(RESULT_LIMIT).anyTimes();
-    EasyMock.expect(result.getOffset()).andReturn(0L).times(2).andReturn(RESULT_LIMIT).anyTimes();
-    EasyMock.expect(result.size()).andReturn((long) items1.length).times(2).andReturn((long) items2.length).times(2);
-    EasyMock.expect(result.getTotalSize()).andReturn((long) items1.length + items2.length).anyTimes();
-    EasyMock.replay(search);
+    EasyMock.expect(result.getOffset()).andReturn(0L).times(3).andReturn(RESULT_LIMIT).anyTimes();
+    EasyMock.expect(result.size()).andReturn((long) items1.size()).times(4).andReturn((long) items2.size()).times(4);
+    EasyMock.expect(persistence.search(EasyMock.<Query>anyObject())).andReturn(result).anyTimes();
+    EasyMock.replay(persistence);
     EasyMock.replay(result);
     // do testing
-    OaiPmhRepository repo = newRepo(search);
-    Document doc1 = repo.selectVerb(newParams("ListIdentifiers", null, "oai_dc", null, null, null)).generate();
-    assertEquals(3.0, xpath(doc1, "count(//ListIdentifiers/header)", XPathConstants.NUMBER));
-    assertXpathEquals(doc1, "r-token", "//ListIdentifiers/resumptionToken/text()");
-    assertXpathExists(doc1, "//ListIdentifiers/resumptionToken[@cursor=0]");
-    assertXpathExists(doc1, "//ListIdentifiers/resumptionToken[@completeListSize=" + (items1.length + items2.length)
-            + "]");
-    assertXpathEquals(doc1, "id-1", "//ListIdentifiers/header[1]/identifier/text()");
-    assertXpathEquals(doc1, "id-2", "//ListIdentifiers/header[2]/identifier/text()");
-    assertXpathEquals(doc1, "id-3", "//ListIdentifiers/header[3]/identifier/text()");
+    final OaiPmhRepository repo = repo(persistence, Granularity.DAY);
+    runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
+              repo.selectVerb(params("ListIdentifiers", null, "oai_dc", null, null, null)),
+              some(IsValid),
+              list(hasXPath("count(//oai20:ListIdentifiers/oai20:header)", NS_CTX, returningANumber(), equalTo(3.0)),
+                   hasXPath("//oai20:ListIdentifiers/oai20:resumptionToken/text()", NS_CTX, returningAString(), equalTo("r-token")),
+                   hasXPath("//oai20:ListIdentifiers/oai20:header[1]/oai20:identifier/text()", NS_CTX, returningAString(), equalTo("id-1")),
+                   hasXPath("//oai20:ListIdentifiers/oai20:header[2]/oai20:identifier/text()", NS_CTX, returningAString(), equalTo("id-2")),
+                   hasXPath("//oai20:ListIdentifiers/oai20:header[3]/oai20:identifier/text()", NS_CTX, returningAString(), equalTo("id-3"))));
     // resume query
-    Document doc2 = repo.selectVerb(newParams("ListIdentifiers", null, null, null, null, "r-token")).generate();
-    assertEquals(2.0, xpath(doc2, "count(//ListIdentifiers/header)", XPathConstants.NUMBER));
-    assertXpathEquals(doc2, "id-4", "//ListIdentifiers/header[1]/identifier/text()");
-    assertXpathEquals(doc2, "id-5", "//ListIdentifiers/header[2]/identifier/text()");
-    // token must be empty now since there are no more pages
-    assertXpathEquals(doc2, "", "//ListIdentifiers/resumptionToken/text()");
-    assertXpathExists(doc2, "//ListIdentifiers/resumptionToken[@cursor=" + RESULT_LIMIT + "]");
-    EasyMock.verify(repo.getSearchService());
+    runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
+              repo.selectVerb(params("ListIdentifiers", null, null, null, null, "r-token")),
+              some(IsValid),
+              list(hasXPath("count(//oai20:ListIdentifiers/oai20:header)", NS_CTX, returningANumber(), equalTo(2.0)),
+                   hasXPath("//oai20:ListIdentifiers/oai20:header[1]/oai20:identifier/text()", NS_CTX, returningAString(), equalTo("id-4")),
+                   hasXPath("//oai20:ListIdentifiers/oai20:header[2]/oai20:identifier/text()", NS_CTX, returningAString(), equalTo("id-5")),
+                   // token must be empty now since there are no more pages
+                   hasXPath("//oai20:ListIdentifiers/oai20:resumptionToken/text()", NS_CTX, returningAString(), equalTo(""))));
+    EasyMock.verify(repo.getPersistence());
+  }
+
+  @Test
+  public void testDateAdaption() {
+    final Date d = utcDate(2012, 5, 24, 13, 24, 0);
+    final Date expect = utcDate(2012, 5, 24, 0, 0, 0);
+    assertEquals(expect, OaiPmhRepository.granulate(Granularity.DAY, d));
   }
 
   // --
 
-  private static Object xpath(Document document, String path, QName returnType) {
-    try {
-      XPath xPath = XPathFactory.newInstance().newXPath();
-      xPath.setNamespaceContext(new UniversalNamespaceResolver(document));
-      return xPath.compile(path).evaluate(document, returnType);
-    } catch (XPathExpressionException e) {
-      throw new RuntimeException(e);
+  private void runChecks(String verb, XmlGen xmlGen, Option<OaiPmhResponseStatus> status, List<Matcher<Source>> matchers) throws Exception {
+    if (runValidation) {
+      for (OaiPmhResponseStatus s : status) {
+        assertTrue("http://validator.oaipmh.com/ reports errors", validate(verb, xmlGen, s));
+      }
+    }
+    final Document doc = xmlGen.generate();
+    final Source xml = the(doc);
+    logger.info(XmlUtil.toXmlString(doc));
+    for (Matcher<Source> m : matchers) {
+      assertThat(xml, m);
     }
   }
 
-  private static void assertXpathExists(Document doc, String path) {
+//  private static Source s(XmlGen g) {
+//    return new DOMSource(g.generate());
+//  }
+
+  private static final String VALIDATOR_SERVICE = "http://validator.oaipmh.com/analysers/validateDirectInput.json";
+
+  enum OaiPmhResponseStatus {
+    IsError, IsValid
+  }
+
+  private static boolean validate(String verb, XmlGen xmlgen, OaiPmhResponseStatus status) {
+    logger.info("--- TALKING TO EXTERNAL OAI-PMH VALIDATION SERVICE ---");
+    logger.info("--- " + VALIDATOR_SERVICE);
+    final CloseableHttpClient client = HttpClients.createDefault();
+    final String xml = xmlgen.generateAsString();
+    final HttpPost post = HttpUtil.post(VALIDATOR_SERVICE, HttpUtil.param("xml", xml));
+    logger.info("--- REQUEST ---");
+    logger.info(xml);
     try {
-      NodeList nodes = (NodeList) xpath(doc, path, XPathConstants.NODESET);
-      assertTrue("No nodes match", nodes.getLength() > 0);
+      final HttpResponse res = client.execute(post);
+      final String json = withResource(res.getEntity().getContent(), IoSupport.readToString);
+      logger.info("--- RESPONSE ---");
+      logger.info(json);
+      boolean ok = true;
+      for (JsonVal message : JsonObj.jsonObj(json).obj("json").arr("messages")) {
+        if (message.isObj()) {
+          final JsonObj messageObj = message.as(JsonVal.asJsonObj);
+          if (messageObj.has("className")) {
+            final String className = messageObj.val("className").as(JsonVal.asString).trim();
+            final String text = messageObj.val("text").as(JsonVal.asString).trim();
+            logger.info(format("[%s] %s", className, text));
+            ok = ok && (eq(className, "correct")
+                    // since the validator does not validate everything correctly here are some exclusions
+                    || (status == IsError && eq(text, "Could not find a valid OAI-PMH command.")))
+                    || (eq(verb, OaiPmhConstants.VERB_IDENTIFY) && eq(text, "Invalid OAI-PMH protocol version ."))
+                    || (eq(verb, OaiPmhConstants.VERB_IDENTIFY) && eq(text, "Invalid adminEmail ."));
+          }
+        }
+      }
+      return ok;
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      return (Boolean) chuck(e);
+    } finally {
+      IoSupport.closeQuietly(client);
     }
   }
 
-  private static void assertXpathEquals(Document doc, String expected, String path) {
-    try {
-      assertEquals(expected, ((String) xpath(doc, path, XPathConstants.STRING)).trim());
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private static Params newParams(final String verb,
-          final String identifier,
-          final String metadataPrefix,
-          final String from,
-          final String until,
-          final String resumptionToken) {
+  private static Params params(final String verb, final String identifier, final String metadataPrefix,
+                               final String from, final String until, final String resumptionToken) {
     return new Params() {
-      @Override
-      String getParameter(String key) {
+      @Override String getParameter(String key) {
         if ("verb".equals(key))
           return verb;
         if ("identifier".equals(key))
@@ -213,53 +361,81 @@ public class OaiPmhRepositoryTest {
           return resumptionToken;
         return null;
       }
+
+      @Override String getRepositoryUrl() {
+        return "http://localhost:8080/oaipmh";
+      }
     };
   }
 
-  private static Date newDate(int year, int month, int day) {
+  private static Date utcDate(int year, int month, int day) {
+    return utcDate(year, month, day, 0, 0, 0);
+  }
+
+  private static Date utcDate(int year, int month, int day, int hour, int minute, int second) {
     Calendar c = Calendar.getInstance();
     c.setTimeZone(TimeZone.getTimeZone("UTC"));
     c.set(Calendar.YEAR, year);
     c.set(Calendar.MONTH, month - 1);
     c.set(Calendar.DAY_OF_MONTH, day);
-    c.set(Calendar.HOUR_OF_DAY, 0);
-    c.set(Calendar.MINUTE, 0);
-    c.set(Calendar.SECOND, 0);
+    c.set(Calendar.HOUR_OF_DAY, hour);
+    c.set(Calendar.MINUTE, minute);
+    c.set(Calendar.SECOND, second);
     c.set(Calendar.MILLISECOND, 0);
     return c.getTime();
   }
 
-  private static SearchService newSearchServiceMock(SearchResultItem... items) {
-    SearchService search = EasyMock.createNiceMock(SearchService.class);
-    SearchResult result = EasyMock.createNiceMock(SearchResult.class);
-    EasyMock.expect(search.getByQuery(EasyMock.<SearchQuery> anyObject())).andReturn(result).anyTimes();
-    EasyMock.expect(search.getByQuery(EasyMock.<String> anyObject(), EasyMock.anyInt(), EasyMock.anyInt()))
-            .andReturn(result).anyTimes();
-    EasyMock.expect(result.getItems()).andReturn(items);
-    EasyMock.expect(result.size()).andReturn((long) items.length);
-    EasyMock.replay(search);
+  private static OaiPmhDatabase oaiPmhPersistenceMock(SearchResultItem... items) {
+    final SearchResult result = EasyMock.createNiceMock(SearchResult.class);
+    final List<SearchResultItem> db = list(items);
+    EasyMock.expect(result.getItems()).andReturn(db).anyTimes();
+    EasyMock.expect(result.size()).andReturn((long) items.length).anyTimes();
     EasyMock.replay(result);
-    return search;
-  }
-
-  private static SearchResultItemImpl newSearchResultItem(String id, Date created, Date modified) {
-    SearchResultItemImpl item = new SearchResultItemImpl();
-    item.setDcCreated(created);
-    item.setModified(modified);
-    item.setId(id);
-    return item;
-  }
-
-  private static OaiPmhRepository newRepo(final SearchService searchService) {
-    return new OaiPmhRepository() {
+    return new OaiPmhDatabase() {
       @Override
-      public Granularity getRepositoryTimeGranularity() {
-        return Granularity.DAY;
+      public void store(MediaPackage mediaPackage, String repository) throws OaiPmhDatabaseException {
+        // To change body of implemented methods use File | Settings | File Templates.
       }
 
       @Override
-      public String getBaseUrl() {
-        return "http://localhost.org/oaipmh";
+      public void delete(String mediaPackageId, String repository) throws OaiPmhDatabaseException, NotFoundException {
+        // To change body of implemented methods use File | Settings | File Templates.
+      }
+
+      @Override
+      public SearchResult search(Query q) {
+        return result;
+      }
+    };
+  }
+
+  private SearchResultItem searchResultItem(String id, Date modified, boolean deleted) {
+    final String seriesDcXml = IoSupport.loadFileFromClassPathAsString("/series-dublincore.xml").get();
+    final String episodeDcXml = IoSupport.loadFileFromClassPathAsString("/episode-dublincore.xml").get();
+    final DublinCoreCatalog seriesDc = DublinCores.read(IOUtils.toInputStream(seriesDcXml));
+    final DublinCoreCatalog episodeDc = DublinCores.read(IOUtils.toInputStream(episodeDcXml));
+    final String mpXml = IoSupport.loadFileFromClassPathAsString("/manifest-full.xml").get();
+    final String xacml = IoSupport.loadFileFromClassPathAsString("/xacml.xml").get();
+    //
+    SearchResultItem item = EasyMock.createNiceMock(SearchResultItem.class);
+    EasyMock.expect(item.getModificationDate()).andReturn(modified).anyTimes();
+    EasyMock.expect(item.getId()).andReturn(id).anyTimes();
+    EasyMock.expect(item.isDeleted()).andReturn(deleted).anyTimes();
+    EasyMock.expect(item.getEpisodeDublinCore()).andReturn(Option.option(episodeDc)).anyTimes();
+    EasyMock.expect(item.getEpisodeDublinCoreXml()).andReturn(Option.option(episodeDcXml)).anyTimes();
+    EasyMock.expect(item.getSeriesDublinCore()).andReturn(Option.option(seriesDc)).anyTimes();
+    EasyMock.expect(item.getSeriesDublinCoreXml()).andReturn(Option.option(seriesDcXml)).anyTimes();
+    EasyMock.expect(item.getSeriesAclXml()).andReturn(Option.option(xacml)).anyTimes();
+    EasyMock.expect(item.getMediaPackageXml()).andReturn(mpXml).anyTimes();
+    EasyMock.replay(item);
+    return item;
+  }
+
+  private static OaiPmhRepository repo(final OaiPmhDatabase persistence, final Granularity granularity) {
+    return new OaiPmhRepository() {
+      @Override
+      public Granularity getRepositoryTimeGranularity() {
+        return granularity;
       }
 
       @Override
@@ -268,8 +444,13 @@ public class OaiPmhRepositoryTest {
       }
 
       @Override
-      public SearchService getSearchService() {
-        return searchService;
+      public String getRepositoryId() {
+        return "test";
+      }
+
+      @Override
+      public OaiPmhDatabase getPersistence() {
+        return persistence;
       }
 
       @Override
@@ -284,7 +465,7 @@ public class OaiPmhRepositoryTest {
 
       @Override
       public Option<ResumableQuery> getSavedQuery(String resumptionToken) {
-        return Option.some(new ResumableQuery("", "oai_dc", 0, (int) RESULT_LIMIT));
+        return some(new ResumableQuery("oai_dc", new Date(), new Date(), Option.<String>none()));
       }
 
       @Override
@@ -292,9 +473,8 @@ public class OaiPmhRepositoryTest {
         return (int) RESULT_LIMIT;
       }
 
-      @Override
-      public List<MetadataProvider> getMetadataProviders() {
-        return new NonEmptyList<MetadataProvider>(new OaiDcMetadataProvider());
+      @Override public List<MetadataProvider> getRepositoryMetadataProviders() {
+        return Arrays.<MetadataProvider>asList(new MatterhornInlinedMetadataProvider());
       }
     };
   }

@@ -31,12 +31,11 @@ import java.util.List;
  * XML generator for a regular (non-error) OAI response.
  */
 public abstract class OaiVerbXmlGen extends OaiXmlGen {
+  protected final Params p;
 
-  protected final String verb;
-
-  public OaiVerbXmlGen(OaiPmhRepository repository, String verb) {
+  public OaiVerbXmlGen(OaiPmhRepository repository, Params p) {
     super(repository);
-    this.verb = verb;
+    this.p = p;
   }
 
   /**
@@ -46,21 +45,21 @@ public abstract class OaiVerbXmlGen extends OaiXmlGen {
    *        further attributes
    */
   Element request(Node... attrs) {
-    return $e("request", merge(attrs, $a("verb", verb), $txt(repository.getBaseUrl())));
+    return $e("request", merge(attrs, $aSome("verb", p.getVerb()), $txt(p.getRepositoryUrl())));
   }
 
   /**
    * Create the verb tag.
    */
   Element verb(Node... nodes) {
-    return $e(verb, nodes);
+    return $e(p.getVerb().getOrElse("NOVERB"), nodes);
   }
 
   /**
    * Create the verb tag.
    */
   Element verb(List<Node> nodes) {
-    return $e(verb, nodes);
+    return $e(p.getVerb().getOrElse("NOVERB"), nodes);
   }
 
 }
