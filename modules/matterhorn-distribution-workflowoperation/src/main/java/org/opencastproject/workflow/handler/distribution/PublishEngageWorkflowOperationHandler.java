@@ -479,44 +479,47 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       for (MediaPackageElement distributedElement : distributedElements) {
 
         String sourceElementId = distributedElement.getIdentifier();
-        MediaPackageElement sourceElement = mp.getElementById(sourceElementId);
+        if (sourceElementId != null) {
+          MediaPackageElement sourceElement = mp.getElementById(sourceElementId);
 
-        // Make sure the mediapackage is prompted to create a new identifier for this element
-        distributedElement.setIdentifier(null);
-
-        // Adjust the flavor and tags for downloadable elements
-        if (downloadElementIds.contains(sourceElementId)) {
-          if (downloadSubflavor != null) {
-            MediaPackageElementFlavor flavor = sourceElement.getFlavor();
-            if (flavor != null) {
-              MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
-                      downloadSubflavor.getSubtype());
-              distributedElement.setFlavor(newFlavor);
+          // Make sure the mediapackage is prompted to create a new identifier for this element
+          distributedElement.setIdentifier(null);
+          if (sourceElement != null) {
+            // Adjust the flavor and tags for downloadable elements
+            if (downloadElementIds.contains(sourceElementId)) {
+              if (downloadSubflavor != null) {
+                MediaPackageElementFlavor flavor = sourceElement.getFlavor();
+                if (flavor != null) {
+                  MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
+                          downloadSubflavor.getSubtype());
+                  distributedElement.setFlavor(newFlavor);
+                }
+              }
+              for (String tag : downloadTargetTags) {
+                distributedElement.addTag(tag);
+              }
+            }
+            // Adjust the flavor and tags for streaming elements
+            else if (streamingElementIds.contains(sourceElementId)) {
+              if (streamingSubflavor != null && streamingElementIds.contains(sourceElementId)) {
+                MediaPackageElementFlavor flavor = sourceElement.getFlavor();
+                if (flavor != null) {
+                  MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
+                          streamingSubflavor.getSubtype());
+                  distributedElement.setFlavor(newFlavor);
+                }
+              }
+              for (String tag : streamingTargetTags) {
+                distributedElement.addTag(tag);
+              }
+            }
+            // Copy references from the source elements to the distributed elements
+            MediaPackageReference ref = sourceElement.getReference();
+            if (ref != null && mp.getElementByReference(ref) != null) {
+              MediaPackageReference newReference = (MediaPackageReference) ref.clone();
+              distributedElement.setReference(newReference);
             }
           }
-          for (String tag : downloadTargetTags) {
-            distributedElement.addTag(tag);
-          }
-        }
-        // Adjust the flavor and tags for streaming elements
-        else if (streamingElementIds.contains(sourceElementId)) {
-          if (streamingSubflavor != null && streamingElementIds.contains(sourceElementId)) {
-            MediaPackageElementFlavor flavor = sourceElement.getFlavor();
-            if (flavor != null) {
-              MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
-                      streamingSubflavor.getSubtype());
-              distributedElement.setFlavor(newFlavor);
-            }
-          }
-          for (String tag : streamingTargetTags) {
-            distributedElement.addTag(tag);
-          }
-        }
-        // Copy references from the source elements to the distributed elements
-        MediaPackageReference ref = sourceElement.getReference();
-        if (ref != null && mp.getElementByReference(ref) != null) {
-          MediaPackageReference newReference = (MediaPackageReference) ref.clone();
-          distributedElement.setReference(newReference);
         }
 
         // Add the new element to the mediapackage
