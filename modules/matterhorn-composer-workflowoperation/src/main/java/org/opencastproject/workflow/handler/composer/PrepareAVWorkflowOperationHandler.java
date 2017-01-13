@@ -252,7 +252,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
     // Make sure we have a matching combination
     if (audioTrack == null && videoTrack != null) {
       if (rewrite) {
-        logger.info("Encoding audio only track {} to work version", videoTrack);
+        logger.info("Encoding video only track {} to work version", videoTrack);
         if (videoOnlyEncodingProfileName == null)
           videoOnlyEncodingProfileName = PREPARE_VONLY_PROFILE;
         // Find the encoding profile to make sure the given profile exists

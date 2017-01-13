@@ -51,12 +51,9 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
                 new ResourceListQueryImpl(), null, true);
         if (collection != null) {
           return Opt.some(collection);
-        } else {
-          return Opt.<Map<String, String>> none();
         }
-      } else {
-        return Opt.<Map<String, String>> none();
       }
+      return Opt.<Map<String, String>> none();
     } catch (ListProviderException e) {
       logger.warn("Unable to set collection on metadata because {}", ExceptionUtils.getStackTrace(e));
       return Opt.<Map<String, String>> none();

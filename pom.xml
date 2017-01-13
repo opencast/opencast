@@ -25,16 +25,16 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <opencast.nexus.url>http://nexus.opencast.org</opencast.nexus.url>
-    <eclipselink.version>2.6.1</eclipselink.version>
+    <eclipselink.version>2.6.4</eclipselink.version>
     <commons-collection.version>3.2.2</commons-collection.version>
-    <commons-compress.version>1.9</commons-compress.version>
+    <commons-compress.version>1.12</commons-compress.version>
     <httpcomponents-httpcore.version>4.4.1</httpcomponents-httpcore.version>
     <httpcomponents-httpclient.version>4.5</httpcomponents-httpclient.version>
     <jmeter.version>2.4</jmeter.version>
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
     <osgi.enterprise.version>5.0.0</osgi.enterprise.version>
-    <karaf.version>4.0.7</karaf.version>
+    <karaf.version>4.0.8</karaf.version>
     <pax.web.version>4.3.0</pax.web.version>
     <cxf.version>3.1.7</cxf.version>
     <jackson.version>2.7.0</jackson.version>
@@ -463,12 +463,12 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.19</version>
+          <version>2.19.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>2.13</version>
+          <version>2.17</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -729,7 +729,7 @@
       <dependency>
         <groupId>org.apache.felix</groupId>
         <artifactId>org.apache.felix.fileinstall</artifactId>
-        <version>3.1.10</version>
+        <version>3.5.6</version>
       </dependency>
 
       <dependency>
@@ -1538,7 +1538,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.19</version>
+        <version>2.19.1</version>
         <configuration>
           <aggregate>true</aggregate>
         </configuration>

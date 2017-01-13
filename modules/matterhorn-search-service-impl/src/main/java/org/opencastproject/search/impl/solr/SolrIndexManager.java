@@ -675,7 +675,7 @@ public class SolrIndexManager {
 
     // Write the permissions to the solr document
     for (Map.Entry<String, List<String>> entry : permissions.entrySet()) {
-      Schema.setOcAcl(doc, new DField<String>(mkString(entry.getValue(), ","), entry.getKey()));
+      Schema.setOcAcl(doc, new DField<String>(mkString(entry.getValue(), " "), entry.getKey()));
     }
   }
 

@@ -6,13 +6,27 @@
         </h2>
     </header>
     <nav id="modal-nav" ng-class="{'step-by-step': action === 'add', 'modal-nav': action === 'edit'}">
-        <a ng-click="navigateTo('generalForm', currentForm, [])" ng-class="{ active: currentForm === 'generalForm', 'not-complete': !generalForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.GENERAL.CAPTION' | translate }}</a>
-        <a ng-click="navigateTo('bumperForm', currentForm, [generalForm])" ng-class="{ active: currentForm === 'bumperForm', 'not-complete': !bumperForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.BUMPER.CAPTION' | translate }}</a>
-        <a ng-click="navigateTo('trailerForm', currentForm, [generalForm, bumperForm])" ng-class="{ active: currentForm === 'trailerForm', 'not-complete': !trailerForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.TRAILER.CAPTION' | translate }}</a>
-        <a ng-click="navigateTo('titleslideForm', currentForm, [generalForm, bumperForm, trailerForm])" ng-class="{ active: currentForm === 'titleslideForm', 'not-complete': !titleslideForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.TITLE.CAPTION' | translate }}</a>
-<!--        <a ng-click="navigateTo('watermarkForm', currentForm, [generalForm, bumperForm, trailerForm, summaryForm])" ng-class="{ active: currentForm === 'watermarkForm', 'not-complete': !watermarkForm.$valid}">{{ 'CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION' | translate }}</a> -->
-        <a ng-if="action === 'add'" ng-click="navigateTo('summary', currentForm, [generalForm, bumperForm, trailerForm])" ng-class="{ active: currentForm === 'summary'}">{{ 'CONFIGURATION.THEMES.DETAILS.SUMMARY.CAPTION' | translate }}</a>
-        <a ng-if="action === 'edit'" ng-click="navigateTo('usage', currentForm, [generalForm, bumperForm, trailerForm])" ng-class="{ active: currentForm === 'usage'}">{{ 'CONFIGURATION.THEMES.DETAILS.USAGE.CAPTION' | translate }}</a>
+        <a ng-click="navigateTo('generalForm', currentForm, [])" ng-class="{ active: currentForm === 'generalForm', 'not-complete': !generalForm.$valid}">
+            {{ 'CONFIGURATION.THEMES.DETAILS.GENERAL.CAPTION' | translate }}
+        </a>
+        <a ng-click="navigateTo('bumperForm', currentForm, [generalForm])" ng-class="{ active: currentForm === 'bumperForm', 'not-complete': !bumperForm.$valid}">
+            {{ 'CONFIGURATION.THEMES.DETAILS.BUMPER.CAPTION' | translate }}
+        </a>
+        <a ng-click="navigateTo('trailerForm', currentForm, [generalForm, bumperForm])" ng-class="{ active: currentForm === 'trailerForm', 'not-complete': !trailerForm.$valid}">
+            {{ 'CONFIGURATION.THEMES.DETAILS.TRAILER.CAPTION' | translate }}
+        </a>
+        <a ng-click="navigateTo('titleslideForm', currentForm, [generalForm, bumperForm, trailerForm])" ng-class="{ active: currentForm === 'titleslideForm', 'not-complete': !titleslideForm.$valid}">
+            {{ 'CONFIGURATION.THEMES.DETAILS.TITLE.CAPTION' | translate }}
+        </a>
+        <a ng-click="navigateTo('watermarkForm', currentForm, [generalForm, bumperForm, trailerForm, titleslideForm])" ng-class="{ active: currentForm === 'watermarkForm', 'not-complete': !watermarkForm.$valid}">
+            {{ 'CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION' | translate }}
+        </a>
+        <a ng-if="action === 'add'" ng-click="navigateTo('summary', currentForm, [generalForm, bumperForm, trailerForm, titleslideForm, watermarkForm])" ng-class="{ active: currentForm === 'summary'}">
+            {{ 'CONFIGURATION.THEMES.DETAILS.SUMMARY.CAPTION' | translate }}
+        </a>
+        <a ng-if="action === 'edit'" ng-click="navigateTo('usage', currentForm, [generalForm])" ng-class="{ active: currentForm === 'usage'}">
+            {{ 'CONFIGURATION.THEMES.DETAILS.USAGE.CAPTION' | translate }}
+        </a>
     </nav>
     
     <div class="modal-content" ng-class="{active: currentForm === 'generalForm'}" data-modal-tab-content="general" data-level="1">
@@ -228,7 +242,7 @@
         <a class="cancel" ng-click="cancel()">{{ 'CANCEL' | translate }}</a>
     </footer>
     <footer ng-if="action === 'add' && currentForm === 'titleslideForm'">
-        <a ng-click="navigateTo('summary', [generalForm, bumperForm, trailerForm, titleslideForm])"
+        <a ng-click="navigateTo('watermarkForm', [generalForm, bumperForm, trailerForm, titleslideForm])"
             data-modal-tab="next" class="submit"
             ng-class="{active: titleslideForm.$valid, inactive: titleslideForm.$invalid}">
             {{ 'WIZARD.NEXT_STEP' | translate }}
@@ -238,11 +252,13 @@
         </a>
     </footer>
     
-<!--     <div class="modal-content" ng-class="{active: currentForm === 'watermarkForm'}" data-modal-tab-content="watermark" data-level="1">
+    <div class="modal-content" ng-class="{active: currentForm === 'watermarkForm'}" data-modal-tab-content="watermark" data-level="1">
         <div class="modal-body">
             <div class="full-col">
                 <form name="watermarkForm">
-                    <p class="tab-description" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.DESCRIPTION">Typically a transparent logo that is overlaid on every frame of the video.</p>
+                    <p class="tab-description" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.DESCRIPTION">
+                        <!-- Typically a transparent logo that is overlaid on every frame of the video. -->
+                    </p>
                     <div data-admin-ng-notifications="" context="new-theme-watermark"></div>
                     <div ng-show="watermarkForm.watermarkfile.$error.required || watermarkForm.watermarkfile.$error['file-upload']" ng-messages="watermarkForm.watermarkfile.$error" class="alert sticky error">
                         <a ng-show="watermarkForm.watermarkfile.$error.required || watermarkForm.watermarkfile.$error['file-upload']" ng-click="hide = true" class="autonomous fa fa-times close"></a>
@@ -251,7 +267,7 @@
                     </div>
                         
                     <div class="obj">
-                        <header translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION">Watermark</header>
+                        <header translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION"><!-- Watermark --></header>
                         <div class="obj-container content-list padded">
                             <div class="list-row">
                                 <div class="header-column">
@@ -266,7 +282,7 @@
                         </div>
                     </div>
                     <div class="obj" ng-if="watermark.active">
-                        <header translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.UPLOAD">Upload</header>
+                        <header translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.UPLOAD"><!-- Upload --></header>
                         <div class="obj-container padded" file-upload="" acceptable-types="image/*"
                              ng-required="watermark.active" existing="watermark.file" ng-model="watermark.file" name="watermarkfile"
                              label-key="CONFIGURATION.THEMES.DETAILS.WATERMARK.UPLOAD_LABEL"
@@ -274,15 +290,23 @@
                              button-key="CONFIGURATION.THEMES.DETAILS.WATERMARK.UPLOAD_BUTTON"/>
                     </div>
                     <div class="obj" ng-if="watermark.file">
-                        <header  translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.POSITION">Position</header>
+                        <header  translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.POSITION"><!-- Position --></header>
                         <div class="obj-container padded">
                             <div class="video-container">
                                 <div class="watermark-config">
                                     <div class="position-selection">
-                                        <button class="position-button position-top-left" ng-click="watermark.position = 'topLeft'" ng-class="{active:watermark.position=='topLeft'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.TOP_LEFT">top left</button>
-                                        <button class="position-button position-top-right" ng-click="watermark.position = 'topRight'" ng-class="{active:watermark.position=='topRight'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.TOP_RIGHT">top right</button>
-                                        <button class="position-button position-bottom-left" ng-click="watermark.position = 'bottomLeft'" ng-class="{active:watermark.position=='bottomLeft'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.BOTTOM_LEFT">bottom left</button>
-                                        <button class="position-button position-bottom-right" ng-click="watermark.position = 'bottomRight'" ng-class="{active:watermark.position=='bottomRight'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.BOTTOM_RIGHT">bottom right</button>
+                                        <button class="position-button position-top-left" ng-click="watermark.position = 'topLeft'" ng-class="{active:watermark.position=='topLeft'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.TOP_LEFT">
+                                            <!-- top left -->
+                                        </button>
+                                        <button class="position-button position-top-right" ng-click="watermark.position = 'topRight'" ng-class="{active:watermark.position=='topRight'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.TOP_RIGHT">
+                                            <!-- top right -->
+                                        </button>
+                                        <button class="position-button position-bottom-left" ng-click="watermark.position = 'bottomLeft'" ng-class="{active:watermark.position=='bottomLeft'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.BOTTOM_LEFT">
+                                            <!-- bottom left -->
+                                        </button>
+                                        <button class="position-button position-bottom-right" ng-click="watermark.position = 'bottomRight'" ng-class="{active:watermark.position=='bottomRight'}" translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.BOTTOM_RIGHT">
+                                            <!-- bottom right -->
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -305,8 +329,7 @@
         <a ng-click="navigateTo('titleslideForm', [generalForm, bumperForm, trailerForm, titleslideForm])"
            data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
         </a>
-    </footer> -->
-
+    </footer>
 
     <div class="modal-content" ng-class="{active: currentForm === 'summary'}" data-modal-tab-content="summary" data-level="1">
         <div class="modal-body">
@@ -329,17 +352,28 @@
                                 <p>
                                     <span translate="CONFIGURATION.THEMES.DETAILS.TRAILER.FILE_UPLOADED">
                                         <!-- File Uploaded: -->
-                                    </span>{{trailer.file.name}}
+                                    </span>
+                                    {{trailer.file.name}}
                                 </p>
                             </li>
-<!--                             <li ng-if="titleslide.file.id">
-                                <h4 translate="CONFIGURATION.THEMES.DETAILS.TITLE.CAPTION">Title Slide</h4>
-                                <p><span translate="CONFIGURATION.THEMES.DETAILS.TITLE.FILE_UPLOADED">File Uploaded: </span>{{titleslide.file.name}}</p>
+                            <li ng-if="titleslide.file.id">
+                                <h4 translate="CONFIGURATION.THEMES.DETAILS.TITLE.CAPTION"><!-- Title Slide --></h4>
+                                <p>
+                                    <span translate="CONFIGURATION.THEMES.DETAILS.TITLE.FILE_UPLOADED">
+                                        <!-- File Uploaded: -->
+                                    </span>
+                                    {{titleslide.file.name}}
+                                </p>
                             </li>
                             <li ng-if="watermark.file.id">
-                                <h4 translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION">Watermark</h4>
-                                <p><span translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.FILE_UPLOADED">File Uploaded: </span>{{watermark.file.name}}</p>
-                            </li> -->
+                                <h4 translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.CAPTION"><!-- Watermark --></h4>
+                                <p>
+                                    <span translate="CONFIGURATION.THEMES.DETAILS.WATERMARK.FILE_UPLOADED">
+                                        <!-- File Uploaded: -->
+                                    </span>
+                                    {{watermark.file.name}}
+                                </p>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -356,7 +390,7 @@
            ng-class="{active: theme-form.$valid, inactive: theme-form.$invalid}">
            {{ 'SUBMIT' | translate }}
         </a>
-        <a ng-click="navigateTo('trailerForm', currentForm, [generalForm, bumperForm,  trailerForm])"
+        <a ng-click="navigateTo('watermarkForm', currentForm, [generalForm, bumperForm, trailerForm, titleslideForm, watermarkForm])"
            data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
         </a>
     </footer>

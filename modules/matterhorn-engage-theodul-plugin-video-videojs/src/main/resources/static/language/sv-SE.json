@@ -2,7 +2,6 @@
   "value_locale":"sv",
   "error_AudioCodecNotSupported":"Fel: Ljud-codec stöds inte av denna webbläsare",
   "error_AudioElementNotSupported":"Fel: Din webbläsare stöder inte audio-elementet.",
-  "switchPlayer":"Växla spelare",
   "video":"Video",
   "video_short":"Vid.",
   "openInPlayer":"Öppna i spelare",

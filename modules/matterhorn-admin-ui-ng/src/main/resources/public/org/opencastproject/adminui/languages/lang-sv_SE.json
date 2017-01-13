@@ -49,19 +49,19 @@
     "CONTINUE_ACTION":"Är du säker på att du vill fortsätta?",
     "METADATA":{
       "NOTICE":{
-        "UNKNOWN":"The following element will be deleted",
-        "EVENT":"The following event will be deleted",
-        "SERIES":"The following series will be deleted",
-        "ACL":"The following ACL will be deleted",
-        "GROUP":"The following group will be deleted",
-        "USER":"The following user will be deleted",
-        "USER_BLACKLIST":"The following user blacklist will be deleted",
-        "THEME":"The following theme will be deleted",
-        "EMAIL":"The following email template will be deleted",
-        "LOCATION":"The following location will be deleted",
-        "LOCATION_BLACKLIST":"The following location blacklist will be deleted"
+        "UNKNOWN":"Följande element tas bort",
+        "EVENT":"Följande händelse raderas",
+        "SERIES":"Följande serie raderas",
+        "ACL":"Följande ACL raderas",
+        "GROUP":"Följande grupp raderas",
+        "USER":"Följande användare kommer att raderas",
+        "USER_BLACKLIST":"Följande svarta användarelistan kommer att raderas",
+        "THEME":"Följande tema raderas",
+        "EMAIL":"Följande e-postmallen raderas",
+        "LOCATION":"Följande plats tas bort",
+        "LOCATION_BLACKLIST":"Den följande svarta platslistan kommer att raderas"
       },
-      "NAME":"Name"
+      "NAME":"Namn"
     },
     "ACTIONS":{
       "CONFIRMATION":"Bekräftelse krävs"
@@ -118,6 +118,8 @@
     "USER_BLACKLIST_NOT_SAVED":"Svartlistan kunde inte sparas",
     "USER_BLACKLIST_DELETED":"Svartlistan har tagits bort",
     "USER_BLACKLIST_NOT_DELETED":"Svartlistan kunde inte tas bort",
+    "LOCATION_DELETED":"The location has been deleted",
+    "LOCATION_NOT_DELETED":"The location could not be deleted",
     "LOCATION_BLACKLIST_CREATED":"Svartlistan har skapats",
     "LOCATION_BLACKLIST_NOT_CREATED":"Svartlistan kunde inte skapas",
     "LOCATION_BLACKLIST_SAVED":"Svartlistan har sparats",
@@ -136,7 +138,7 @@
     "CONFLICT_DETECTED":"Konflikt vid schemaläggning: Denna nya händelse överlappar med en annan. Ändra rum, datum eller tider.",
     "CONFLICT_ALREADY_ENDED":"Fel vid schemaläggning: Händelsen har redan avslutats.",
     "CONFLICT_END_BEFORE_START":"Fel vid schemaläggning: Slutet måste vara senare än början.",
-    "INVALID_ACL_RULES":"Regler måste innehålla en giltig roll och läs- eller\/och skrivrätt.",
+    "INVALID_ACL_RULES":"Regler måste innehålla en giltig roll och läs- eller/och skrivrätt.",
     "MISSING_ACL_RULES":"Åtminstone en roll med läs- och skrivrättigheter krävs!",
     "SAVED_ACL_RULES":"Reglerna för åtkomst har sparats.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Händelserna i denna serie kommer att behöva arbetas om",
@@ -210,9 +212,9 @@
     "SCHEDULE_TASK":{
       "CAPTION":"Starta uppgift",
       "GENERAL":{
-        "CAPTION":"General",
+        "CAPTION":"Allmänt",
         "SUMMARY":"({{ count }} händelser valda)",
-        "CANNOTSTART":"Framhävda händelse(r) kan inte bearbetas just nu. Avmarkera den\/dem eller försök igen senare."
+        "CANNOTSTART":"Framhävda händelse(r) kan inte bearbetas just nu. Avmarkera den/dem eller försök igen senare."
       },
       "TASKS":{
         "CAPTION":"Uppgifter",
@@ -687,7 +689,7 @@
           "REASONS":{
             "CUTTING":"Skärning krävs",
             "REVIEW":"Granskning krävs",
-            "ASYNC":"A\/V spår asynkron",
+            "ASYNC":"A/V spår asynkron",
             "AUDIO_ISSUE":"Ljudspår saknas eller är felaktig",
             "CANCELED":"Avbruten händelse",
             "CONFLICTING_METADATA":"Motstridiga metadata",
@@ -706,6 +708,7 @@
           }
         },
         "METADATA":{
+          "CAPTION":"Event details",
           "TITLE":"Titel",
           "ID":"UID",
           "SERIES":"Serie",
@@ -966,7 +969,8 @@
     },
     "ACTIONS":{
       "EXPORT":"Exportera",
-      "ADD_BLACKLIST":"Lägg till svartlista"
+      "ADD_BLACKLIST":"Lägg till svartlista",
+      "REMOVE":"Ta bort"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1046,6 +1050,7 @@
         "EMAIL":"E-post",
         "ROLES":"Roller",
         "TYPE":"Typ",
+        "PROVIDER":"Leverantör",
         "BLACKLIST_FROM":"Svartlistad från",
         "BLACKLIST_TO":"Svartlistad tills",
         "ACTION":"Åtgärder"
@@ -1415,7 +1420,7 @@
     },
     "JOBS":{
       "TABLE":{
-        "ID":"Job Identifier",
+        "ID":"Jobb-ID",
         "ACTION":"Åtgärder",
         "CAPTION":"Jobb",
         "CREATED":"Skapad",
@@ -1490,6 +1495,16 @@
       "UNDO":"Ångra",
       "REDO":"Gör om",
       "CLEAR_SEGMENTS":"Rensa segment"
+    },
+    "PLAYER":{
+      "PLAY":"Play",
+      "PAUSE":"Pause",
+      "NEXT_FRAME":"Next frame",
+      "PREVIOUS_FRAME":"Previous frame",
+      "NEXT_SEGMENT":"Next segment / Jump to end",
+      "PREVIOUS_SEGMENT":"Previous segment / Jump to start",
+      "MUTE":"Mute",
+      "VOLUME":"Volume"
     }
   },
   "LOGIN":{
@@ -1498,7 +1513,7 @@
     "USERNAME":"Användarnamn…",
     "PASSWORD":"Lösenord…",
     "LOGIN":"Logga in",
-    "ERROR":"Felaktigt användarnamn, e-post och\/eller lösenord"
+    "ERROR":"Felaktigt användarnamn, e-post och/eller lösenord"
   },
   "TABLE_FILTERS":{
     "CLEAR":"Rensa alla filter",
@@ -1737,7 +1752,7 @@
     "RUNNING":"På gång",
     "FINISHED":"Avslutade",
     "FAILED":"Misslyckad",
-    "FINISHED_WITH_COMMENTS":"Avslutade med öppna kommentarer",
+    "FINISHED_WITH_COMMENTS":"Todo",
     "SCHEDULED":"Schemalagd"
   }
 }

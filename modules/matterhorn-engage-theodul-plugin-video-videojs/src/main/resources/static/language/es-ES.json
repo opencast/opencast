@@ -2,7 +2,6 @@
   "value_locale":"es",
   "error_AudioCodecNotSupported":"Error: El códec de audio no es compatible con este navegador",
   "error_AudioElementNotSupported":"Error: Su navegador no soporta el elemento audio.",
-  "switchPlayer":"Cambiar reproductor",
   "video":"Vídeo",
   "video_short":"Vid.",
   "openInPlayer":"Abrir en el reproductor",

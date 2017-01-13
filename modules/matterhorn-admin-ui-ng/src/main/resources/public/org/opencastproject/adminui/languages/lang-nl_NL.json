@@ -49,19 +49,19 @@
     "CONTINUE_ACTION":"Weet u zeker dat u wilt doorgaan?",
     "METADATA":{
       "NOTICE":{
-        "UNKNOWN":"The following element will be deleted",
-        "EVENT":"The following event will be deleted",
-        "SERIES":"The following series will be deleted",
-        "ACL":"The following ACL will be deleted",
-        "GROUP":"The following group will be deleted",
-        "USER":"The following user will be deleted",
-        "USER_BLACKLIST":"The following user blacklist will be deleted",
-        "THEME":"The following theme will be deleted",
-        "EMAIL":"The following email template will be deleted",
-        "LOCATION":"The following location will be deleted",
-        "LOCATION_BLACKLIST":"The following location blacklist will be deleted"
+        "UNKNOWN":"Het volgende element wordt verwijderd",
+        "EVENT":"Het volgende evenement wordt verwijderd",
+        "SERIES":"De volgende serie wordt verwijderd",
+        "ACL":"De volgende permissie wordt verwijderd",
+        "GROUP":"De volgende groep wordt verwijderd",
+        "USER":"De volgende gebruiker wordt verwijderd",
+        "USER_BLACKLIST":"De volgende zwarte lijst voor gebruikers wordt verwijderd",
+        "THEME":"Het volgende thema wordt verwijderd",
+        "EMAIL":"Het volgende e-mailtemplate wordt verwijderd",
+        "LOCATION":"De volgende locatie wordt verwijderd",
+        "LOCATION_BLACKLIST":"De volgende zwarte lijst voor locaties wordt verwijderd"
       },
-      "NAME":"Name"
+      "NAME":"Naam"
     },
     "ACTIONS":{
       "CONFIRMATION":"Bevestiging vereist"
@@ -109,7 +109,7 @@
     "SERIES_NOT_UPDATED_ID":"De series {{ id }} konden niet worden opgeslagen",
     "SERIES_NOT_UPDATED_ALL":"Geen van de series konden opgeslagen worden",
     "EVENTS_DELETED":"Het event werd verwijderd",
-    "EVENTS_NOT_DELETED":"Het\/De event(s) konden niet verwijderd worden",
+    "EVENTS_NOT_DELETED":"Het/De event(s) konden niet verwijderd worden",
     "SERIES_DELETED":"De serie werd verwijderd",
     "SERIES_NOT_DELETED":"De serie kon niet verwijderd worden",
     "USER_BLACKLIST_CREATED":"De zwarte lijst werd aangemaakt",
@@ -118,6 +118,8 @@
     "USER_BLACKLIST_NOT_SAVED":"De zwarte lijst kon niet opgeslagen worden",
     "USER_BLACKLIST_DELETED":"De zwarte lijst werd verwijderd",
     "USER_BLACKLIST_NOT_DELETED":"De zwarte lijst kon niet verwijderd worden",
+    "LOCATION_DELETED":"De locatie werd verwijderd",
+    "LOCATION_NOT_DELETED":"De locatie kon niet verwijderd worden",
     "LOCATION_BLACKLIST_CREATED":"De zwarte lijst werd aangemaakt",
     "LOCATION_BLACKLIST_NOT_CREATED":"De zwarte lijst kon niet aangemaakt worden",
     "LOCATION_BLACKLIST_SAVED":"De zwarte lijst werd opgeslagen",
@@ -136,7 +138,7 @@
     "CONFLICT_DETECTED":"Plannings conflict: het nieuwe event overlapt met een reeds bestaand event. Gelieve de locatie, datum of tijd aan te passen.",
     "CONFLICT_ALREADY_ENDED":"Planningsfout: het evenement is reeds beëindigd.",
     "CONFLICT_END_BEFORE_START":"Planningsfout: eindtijd moet later zijn dan het begin.",
-    "INVALID_ACL_RULES":"Regels moeten een geldige rol en lees en \/ of schrijf rechten hebben.",
+    "INVALID_ACL_RULES":"Regels moeten een geldige rol en lees en / of schrijf rechten hebben.",
     "MISSING_ACL_RULES":"Ten minste 1 rol met schrijf en lees rechten is vereist!",
     "SAVED_ACL_RULES":"De toegangsregels zijn opgeslagen.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"De bestaande events in deze serie zullen opnieuw verwerkt moeten worden",
@@ -210,7 +212,7 @@
     "SCHEDULE_TASK":{
       "CAPTION":"Begin taak",
       "GENERAL":{
-        "CAPTION":"General",
+        "CAPTION":"Algemeen",
         "SUMMARY":"({{ count }} events geselecteerd)",
         "CANNOTSTART":"De gemarkeerde events kunnen momenteel niet verwerkt worden. Verwijder ze uit de selectie of probeer het later opnieuw."
       },
@@ -687,7 +689,7 @@
           "REASONS":{
             "CUTTING":"Snijden vereist",
             "REVIEW":"Beoordeling vereist",
-            "ASYNC":"A\/V tracks asynchrone",
+            "ASYNC":"A/V tracks asynchrone",
             "AUDIO_ISSUE":"Ontbrekende of gebrekkige audio-track",
             "CANCELED":"Evenement annuleren",
             "CONFLICTING_METADATA":"Conflicterende metagegevens",
@@ -706,6 +708,7 @@
           }
         },
         "METADATA":{
+          "CAPTION":"Evenement details",
           "TITLE":"Titel",
           "ID":"UID",
           "SERIES":"Reeks",
@@ -966,7 +969,8 @@
     },
     "ACTIONS":{
       "EXPORT":"Exporteren",
-      "ADD_BLACKLIST":"Zwarte lijst toevoegen"
+      "ADD_BLACKLIST":"Zwarte lijst toevoegen",
+      "REMOVE":"Verwijderen"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1046,6 +1050,7 @@
         "EMAIL":"E-mail",
         "ROLES":"Rollen",
         "TYPE":"Type",
+        "PROVIDER":"Leverancier",
         "BLACKLIST_FROM":"Geblokkeerd van",
         "BLACKLIST_TO":"Geblokkeerd tot",
         "ACTION":"Acties"
@@ -1415,7 +1420,7 @@
     },
     "JOBS":{
       "TABLE":{
-        "ID":"Job Identifier",
+        "ID":"Job ID",
         "ACTION":"Acties",
         "CAPTION":"Jobs",
         "CREATED":"Aangemaakt",
@@ -1490,6 +1495,16 @@
       "UNDO":"Ongedaan maken",
       "REDO":"Opnieuw toepassen",
       "CLEAR_SEGMENTS":"Segmenten verwijderen"
+    },
+    "PLAYER":{
+      "PLAY":"Afspelen",
+      "PAUSE":"Pauze",
+      "NEXT_FRAME":"Volgend frame",
+      "PREVIOUS_FRAME":"Vorig frame",
+      "NEXT_SEGMENT":"Volgende segment / Direct naar einde",
+      "PREVIOUS_SEGMENT":"Vorige segment / Direct naar begin",
+      "MUTE":"Stom",
+      "VOLUME":"Volume"
     }
   },
   "LOGIN":{
@@ -1498,7 +1513,7 @@
     "USERNAME":"Gebruikersnaam…",
     "PASSWORD":"Wachtwoord…",
     "LOGIN":"Aanmelden",
-    "ERROR":"Onjuiste gebruikersnaam en \/ of wachtwoord"
+    "ERROR":"Onjuiste gebruikersnaam en / of wachtwoord"
   },
   "TABLE_FILTERS":{
     "CLEAR":"Alle filters verwijderen",
@@ -1737,7 +1752,7 @@
     "RUNNING":"In uitvoering",
     "FINISHED":"Voltooid",
     "FAILED":"Mislukt",
-    "FINISHED_WITH_COMMENTS":"Afgewerkt met open opmerkingen",
+    "FINISHED_WITH_COMMENTS":"Taak",
     "SCHEDULED":"Gepland"
   }
 }

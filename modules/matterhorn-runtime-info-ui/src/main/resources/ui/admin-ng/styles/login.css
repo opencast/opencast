@@ -1,0 +1,525 @@
+html {
+    box-sizing: border-box;
+}
+
+*, *::after, *::before {
+    box-sizing: inherit;
+}
+
+body, html {
+    font-family: "Open Sans", Helvetica, sans-serif;
+}
+
+body {
+    background: #fafafa none repeat scroll 0 0;
+    font-size: 14px;
+    line-height: 1;
+}
+
+body, html {
+    min-height: 100%;
+    min-width: 100%;
+}
+
+body.login-body {
+    background-color: #fafafa;
+    background-image: radial-gradient(#fafafa, #d8dfe4);
+}
+
+a:hover {
+    color: #333;
+}
+
+button {
+    display: inline-block;
+    font-size: 12px;
+    height: 39px;
+    min-width: 120px;
+}
+
+.form-container .row::after, .form-container::after {
+    content: "";
+}
+
+.header-nav .dropdown-ul, .login-container .login-nav .dropdown-ul {
+    background: rgba(255, 255, 255, 0.98) none repeat scroll 0 0;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 1px 1px rgba(0, 0, 0, 0.1);
+    padding: 8px 0;
+}
+
+.header-nav .dropdown-ul a, .login-container .login-nav .dropdown-ul a {
+    display: block;
+    overflow: hidden;
+    padding: 8px 15px;
+    text-overflow: ellipsis;
+    transition-duration: 250ms;
+    transition-property: background, color;
+    transition-timing-function: ease-in;
+    white-space: nowrap;
+}
+
+.header-nav .dropdown-ul a:hover, .login-container .login-nav .dropdown-ul a:hover {
+    background: rgba(0, 0, 0, 0.05) none repeat scroll 0 0;
+}
+
+.header-nav .dropdown-ul::after, .header-nav .dropdown-ul::before, .login-container .login-nav .dropdown-ul::after, .login-container .login-nav .dropdown-ul::before {
+    border-style: solid;
+    border-width: 0 7px 7px;
+    content: "";
+    height: 0;
+    position: absolute;
+    right: 10px;
+    width: 0;
+}
+
+.header-nav .dropdown-ul::after, .login-container .login-nav .dropdown-ul::after {
+    border-color: transparent transparent rgba(0, 0, 0, 0.1);
+    top: -8px;
+}
+
+.header-nav .dropdown-ul::before, .login-container .login-nav .dropdown-ul::before {
+    border-color: transparent transparent rgba(255, 255, 255, 0.98);
+    top: -7px;
+    z-index: 1000;
+}
+
+.form-container {
+    margin: 15px 0;
+    max-width: 100%;
+    padding: 0;
+}
+
+.form-container::after {
+    clear: both;
+    display: table;
+}
+
+.form-container:first-child {
+    margin-top: 0;
+}
+
+.form-container:last-child {
+    margin-bottom: 0;
+}
+
+.form-container label {
+    color: #666;
+}
+
+.form-container input[type="date"], .form-container input[type="time"], .form-container input[type="checkbox"], .form-container input[type="text"], .form-container input[type="email"], .form-container input[type="password"], .form-container input[type="search"], .form-container textarea {
+    margin: 5px 0;
+    padding: 12px 20px;
+    width: 100%;
+}
+
+.form-container textarea {
+    padding: 15px 20px;
+    resize: none;
+}
+
+.form-container .row {
+    display: block;
+    margin: 15px 0;
+    width: 100%;
+}
+
+.form-container .row::after {
+    clear: both;
+    display: table;
+}
+
+.form-container .row:first-child {
+    margin-top: 0;
+}
+
+.form-container .row:last-child {
+    margin-bottom: 0;
+}
+
+.form-container .row input, .form-container .row label {
+    display: block;
+}
+
+.form-container .row input {
+    float: none;
+}
+
+.form-container .row .chosen-container, .form-container .row .drop-down-container, .form-container .row input, .form-container .row textarea {
+    margin-top: 10px;
+}
+
+.form-container .row .checkbox-container.one-line input[type="checkbox"], .form-container .row .checkbox-container.one-line label {
+    display: inline-block;
+    width: auto;
+}
+
+.form-container .row .checkbox-container.one-line input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+.form-container .row .inline-content > label {
+    display: inline-block;
+    float: left;
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-top: 14px;
+}
+
+.form-container .row .inline-content > input {
+    float: left;
+}
+
+.form-container .row .inline-content.inline-content-padded {
+    padding: 18px 0 0;
+}
+
+.form-container .row input[type="radio"] {
+    float: left;
+    margin: 1px 5px 0 0;
+}
+
+.form-container .row.no-padding {
+    margin-top: 0;
+}
+
+.form-container .row [class$="-column"] {
+    display: inline-block;
+}
+
+.form-container .row .small-column {
+    padding-right: 10px;
+    width: 25%;
+}
+
+.form-container .row .medium-column {
+    width: 40%;
+}
+
+.form-container .row .medium-column > .inline-content > label {
+    width: 50%;
+}
+
+.form-container > .drop-down-container, .multi-select-container select {
+    width: 100%;
+}
+
+.form-container .button-container {
+    padding: 10px 0;
+}
+
+.form-container .button-container a {
+    padding: 10px 20px;
+}
+
+.form-container .button-container.float-opposite a:first-child {
+    float: left;
+}
+
+.form-container .button-container.float-opposite a:last-child {
+    float: right;
+}
+
+.form-container.tiny-form {
+    max-width: 150px;
+}
+
+.form-container.smaller-form {
+    max-width: 280px;
+}
+
+.form-container.small-form {
+    max-width: 500px;
+}
+
+.form-container.medium-form {
+    max-width: 800px;
+}
+
+.form-container.large-form {
+    max-width: 1000px;
+}
+
+.form-container.compact {
+    margin: 0;
+}
+
+.date-picker {
+    box-sizing: content-box;
+}
+
+input[type="date"], input[type="time"], input[type="text"], input[type="email"], input[type="password"], input[type="search"], textarea {
+    background: #fff none repeat scroll 0 0;
+    border: 1px solid #c9d0d3;
+    border-radius: 4px;
+    color: #666;
+    font-family: "Open Sans", Helvetica, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    height: 40px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    width: 130px;
+}
+
+input.login-input[type="date"], input.login-input[type="time"], input.login-input[type="text"], input.login-input[type="email"], input.login-input[type="password"], input.login-input[type="search"], textarea.login-input {
+    height: 50px;
+    padding-left: 50px;
+    width: 350px;
+}
+
+input[type="date"]::-moz-placeholder, input[type="time"]::-moz-placeholder, input[type="text"]::-moz-placeholder, input[type="email"]::-moz-placeholder, input[type="password"]::-moz-placeholder, input[type="search"]::-moz-placeholder, textarea::-moz-placeholder {
+    color: #a6a6a6;
+}
+
+input[type="date"]:-moz-placeholder, input[type="time"]:-moz-placeholder, input[type="text"]:-moz-placeholder, input[type="email"]:-moz-placeholder, input[type="password"]:-moz-placeholder, input[type="search"]:-moz-placeholder, textarea:-moz-placeholder {
+    color: #a6a6a6;
+}
+
+input[type="date"]:hover, input[type="time"]:hover, input[type="text"]:hover, input[type="email"]:hover, input[type="password"]:hover, input[type="search"]:hover, textarea:hover {
+    border: 1px solid #919fa5;
+}
+
+input[type="date"]:focus, input[type="time"]:focus, input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="search"]:focus, textarea:focus {
+    border: 1px solid #378dd4;
+}
+
+input.error[type="date"], input.error[type="time"], input.error[type="text"], input.error[type="email"], input.error[type="password"], input.error[type="search"], textarea.error {
+    border: 1px solid #e45253;
+    color: #fa1919;
+}
+
+input#email[type="date"], input#email[type="time"], input#email[type="text"], input#email[type="email"], input#email[type="password"], input#email[type="search"], textarea#email {
+    background-image: url("../img/user-input-icon.png");
+    background-position: 14px center;
+    background-repeat: no-repeat;
+}
+
+input#password[type="date"], input#password[type="time"], input#password[type="text"], input#password[type="email"], input#password[type="password"], input#password[type="search"], textarea#password {
+    background-image: url("../img/key-icon.png");
+    background-position: 19px center;
+    background-repeat: no-repeat;
+}
+
+@media not all, only screen and (min--moz-device-pixel-ratio: 1.3), not all, only screen and (min-resolution: 125dpi), only screen and (min-resolution: 1.3dppx) {
+    input#email[type="date"], input#email[type="time"], input#email[type="text"], input#email[type="email"], input#email[type="password"], input#email[type="search"], textarea#email {
+        background-image: url("../img/user-input-icon_2x.png");
+        background-size: 23px 20px;
+    }
+
+    input#password[type="date"], input#password[type="time"], input#password[type="text"], input#password[type="email"], input#password[type="password"], input#password[type="search"], textarea#password {
+        background-image: url("../img/key-icon_2x.png");
+        background-size: 16px 20px;
+    }
+}
+
+input.ios[type="checkbox"], input.ios[type="radio"] {
+    background-color: #fafafa;
+    border: 1px solid #d3d3d3;
+    border-radius: 26px;
+    box-shadow: 0 0 0 1px #d3d3d3 inset;
+    cursor: pointer;
+    height: 28px;
+    outline: 0 none;
+    position: relative;
+    transition: border 250ms ease 150ms, box-shadow 250ms ease 0.3s, padding 250ms ease 0s;
+    vertical-align: top;
+    width: 44px;
+}
+
+input.ios[type="checkbox"]::after, input.ios[type="radio"]::after {
+    background-color: #fff;
+    border: 1px solid #d3d3d3;
+    border-radius: 24px;
+    box-shadow: 0 -3px 3px rgba(0, 0, 0, 0.024) inset, 0 1px 4px rgba(0, 0, 0, 0.15), 0 4px 4px rgba(0, 0, 0, 0.1);
+    content: "";
+    display: block;
+    height: 24px;
+    left: 0;
+    position: absolute;
+    right: 16px;
+    top: 0;
+    transition: border 250ms ease 150ms, left 250ms ease 0.1s, right 150ms ease 175ms;
+}
+
+.popover.popover-left::after, .popover.popover-right::after {
+    content: " ";
+    height: 0;
+    pointer-events: none;
+    top: 0;
+}
+
+input.ios[type="checkbox"]:checked, input.ios[type="radio"]:checked {
+    border-color: #37c180;
+    box-shadow: 0 0 0 13px #37c180 inset;
+    padding-left: 18px;
+    transition: border 250ms ease 0s, box-shadow 250ms ease 0s, padding 250ms ease 150ms;
+}
+
+input.ios[type="checkbox"]:checked::after, input.ios[type="radio"]:checked::after {
+    border-color: #37c180;
+    left: 16px;
+    right: 0;
+    transition: border 250ms ease 0s, left 150ms ease 250ms, right 250ms ease 175ms;
+}
+
+.login-container {
+    background: #fff none repeat scroll 0 0;
+    border: 1px solid #c9d0d3;
+    border-radius: 4px;
+    height: auto;
+    margin: 0 auto;
+    position: relative;
+    text-align: center;
+    top: 150px;
+    width: 490px;
+}
+
+.login-container .login-form form {
+    box-sizing: border-box;
+    display: inline-block;
+    float: right;
+    margin: 0 70px 0 0;
+    padding: 35px 0;
+    width: 350px;
+}
+
+.login-container .login-form form input {
+    margin: 0;
+}
+
+.login-container .login-form form p {
+    color: #666;
+    font-size: 25px;
+    font-weight: 100;
+    padding-bottom: 30px;
+    text-align: center;
+}
+
+.login-container .login-form form p .subtle-text {
+    color: #a6a6a6;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.login-container .login-form form .beta-flag {
+    border: 1px solid #378dd4;
+    border-radius: 2px;
+    color: #378dd4;
+    cursor: default;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 2px;
+    padding: 4px 5px 3px;
+    text-transform: uppercase;
+    vertical-align: top;
+}
+
+.login-container .login-form form .error-container {
+    background: #fb4b4b none repeat scroll 0 0;
+    border-radius: 4px;
+    color: #fff;
+    font-weight: 600;
+    margin: -10px 0 20px;
+    padding: 10px 0;
+}
+
+.login-container .login-form form .form-container label {
+    color: #666;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 18px;
+    margin-left: 10px;
+}
+
+.login-container .login-form form .forgot-pwd {
+    color: #a6a6a6;
+    display: block;
+    font-size: 10px;
+    margin: -15px 0 20px;
+    text-align: right;
+    width: 88%;
+}
+
+.login-container .login-form form .forgot-pwd:hover {
+    color: #666;
+}
+
+.login-container .login-form form .submit {
+    background: #378dd4 none repeat scroll 0 0;
+    border: medium none;
+    border-radius: 4px;
+    color: #fff;
+    display: block;
+    height: 48px;
+    text-align: center;
+    transition: all 0.2s ease 0s;
+    width: 100%;
+}
+
+.login-container .login-form form .submit:hover {
+    background: #4c99d9 none repeat scroll 0 0;
+}
+
+.login-container .login-nav {
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: -40px;
+}
+
+.login-container .login-nav .dropdown-ul {
+    opacity: 0;
+    position: absolute;
+    right: -11px;
+    top: 35px;
+    visibility: hidden;
+    z-index: 2147483557;
+}
+
+.login-container .login-nav .nav-dd {
+    color: #666;
+    text-align: left;
+}
+
+.login-container .login-nav .nav-dd::after {
+    -moz-osx-font-smoothing: grayscale;
+    color: inherit;
+    content: "";
+    display: inline-block;
+    font-family: FontAwesome;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+    margin: 0 0 0 5px;
+    padding: 0;
+}
+
+.login-container .login-nav .nav-dd span {
+    display: inline-block;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.login-container .login-nav .nav-dd.active .dropdown-ul {
+    opacity: 1;
+    visibility: visible;
+}
+
+.remember-me {
+    text-align: center;
+}
+
+.remember-me input#remember {
+    display: inline !important;
+    width: auto;
+}
+
+.remember-me label {
+    display: inline !important;
+    line-height: 20px;
+    margin: 4px 0 0 10px;
+}
