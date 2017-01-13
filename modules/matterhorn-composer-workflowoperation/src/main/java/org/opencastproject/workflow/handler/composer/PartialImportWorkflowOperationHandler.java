@@ -70,6 +70,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -108,6 +109,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String TARGET_PRESENTATION_FLAVOR = "target-presentation-flavor";
 
   private static final String CONCAT_ENCODING_PROFILE = "concat-encoding-profile";
+  private static final String CONCAT_OUTPUT_FRAMERATE = "concat-output-framerate";
   private static final String TRIM_ENCODING_PROFILE = "trim-encoding-profile";
   private static final String FORCE_ENCODING_PROFILE = "force-encoding-profile";
 
@@ -149,6 +151,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     CONFIG_OPTIONS.put(TARGET_PRESENTATION_FLAVOR,
             "The target flavor to apply to the standard media presentation video track");
     CONFIG_OPTIONS.put(CONCAT_ENCODING_PROFILE, "The concat encoding profile to use");
+    CONFIG_OPTIONS.put(CONCAT_OUTPUT_FRAMERATE, "Output framerate for concat operation");
     CONFIG_OPTIONS.put(FORCE_ENCODING_PROFILE, "The force encoding profile to use");
     CONFIG_OPTIONS.put(TRIM_ENCODING_PROFILE, "The trim encoding profile to use");
     CONFIG_OPTIONS.put(FORCE_ENCODING, "Whether to force the tracks to be encoded");
@@ -233,6 +236,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     final Opt<String> presentationFlavor = getOptConfig(operation, SOURCE_PRESENTATION_FLAVOR);
     final String smilFlavor = getConfig(operation, SOURCE_SMIL_FLAVOR);
     final String concatEncodingProfile = getConfig(operation, CONCAT_ENCODING_PROFILE);
+    final String concatOutputFramerate = getConfig(operation, CONCAT_OUTPUT_FRAMERATE);
     final String trimEncodingProfile = getConfig(operation, TRIM_ENCODING_PROFILE);
     final MediaPackageElementFlavor targetPresenterFlavor = parseTargetFlavor(
             getConfig(operation, TARGET_PRESENTER_FLAVOR), "presenter");
@@ -254,6 +258,17 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     if (concatProfile == null) {
       throw new WorkflowOperationException("Concat encoding profile '" + concatEncodingProfile + "' was not found");
     }
+
+    float outputFramerate = -1.0f;
+    if (StringUtils.isNotEmpty(concatOutputFramerate)) {
+      if (NumberUtils.isNumber(concatOutputFramerate)) {
+        logger.info("Using concat output framerate");
+        outputFramerate = NumberUtils.toFloat(concatOutputFramerate);
+      } else {
+        throw new WorkflowOperationException("Unable to parse concat output frame rate!");
+      }
+    }
+
     final EncodingProfile trimProfile = composerService.getProfile(trimEncodingProfile);
     if (trimProfile == null) {
       throw new WorkflowOperationException("Trim encoding profile '" + trimEncodingProfile + "' was not found");
@@ -339,10 +354,10 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
 
         if (sourceType.get().startsWith(PRESENTER_KEY)) {
           logger.info("Concatenating {} track", PRESENTER_KEY);
-          jobs.put(sourceType.get(), startConcatJob(concatProfile, tracks, forceDivisible));
+          jobs.put(sourceType.get(), startConcatJob(concatProfile, tracks, outputFramerate, forceDivisible));
         } else if (sourceType.get().startsWith(PRESENTATION_KEY)) {
           logger.info("Concatenating {} track", PRESENTATION_KEY);
-          jobs.put(sourceType.get(), startConcatJob(concatProfile, tracks, forceDivisible));
+          jobs.put(sourceType.get(), startConcatJob(concatProfile, tracks, outputFramerate, forceDivisible));
         } else {
           logger.warn("Can't handle unknown source type '{}'!", sourceType.get());
         }
@@ -543,10 +558,14 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param forceDivisible
    *          Whether to enforce the track's dimension to be divisible by two
    */
-  protected Job startConcatJob(EncodingProfile profile, List<Track> tracks, boolean forceDivisible)
+  protected Job startConcatJob(EncodingProfile profile, List<Track> tracks, float outputFramerate, boolean forceDivisible)
           throws MediaPackageException, EncoderException {
     final Dimension dim = determineDimension(tracks, forceDivisible);
-    return composerService.concat(profile.getIdentifier(), dim, Collections.toArray(Track.class, tracks));
+    if (outputFramerate > 0.0) {
+      return composerService.concat(profile.getIdentifier(), dim, outputFramerate, Collections.toArray(Track.class, tracks));
+    } else {
+      return composerService.concat(profile.getIdentifier(), dim, Collections.toArray(Track.class, tracks));
+    }
   }
 
   /**
