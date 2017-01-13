@@ -21,6 +21,7 @@ This will be fixed by the ticket: https://opencast.jira.com/browse/MH-11264
 |**target-presenter-flavor**\*| MediaPackageElementFlavor |The flavor to be used for the target presentation track.</br>Both the type and subtype must not be *\**||
 |**target-presentation-flavor**\*| MediaPackageElementFlavor |The flavor to be used for the target presentation track.</br>Both the type nor subtype must not be *\**||
 |**concat-encoding-profile**\*|String|Encoding profile used for concatenating audio or video files||
+|concat-output-framerate|Float|The optional output framerate for concatenated video files||
 |**trim-encoding-profile**\*|String|Encoding profile using for trimming tracks|
 |force-encoding|Boolean|If set to *true*, all generated target files will be encoded using the encoding profile *force-encoding-profile*|false|
 |**force-encoding-profile**\*|String|Encoding profile to be used when *force-encoding* is set to *true* or a given target track has a file extension not included in *required-extensions*||
