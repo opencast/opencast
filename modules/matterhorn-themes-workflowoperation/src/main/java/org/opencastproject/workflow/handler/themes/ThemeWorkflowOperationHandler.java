@@ -240,6 +240,7 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
                  theme.isBumperActive()
               || theme.isTrailerActive()
               || theme.isTitleSlideActive()
+              || theme.isWatermarkActive()
           )
       );
       workflowInstance.setConfiguration(THEME_BUMPER_ACTIVE, Boolean.toString(theme.isBumperActive()));
