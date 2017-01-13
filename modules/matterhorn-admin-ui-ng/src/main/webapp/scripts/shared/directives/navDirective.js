@@ -1,5 +1,5 @@
 angular.module('adminNg.directives')
-.directive('adminNgNav', function () {
+.directive('adminNgNav', ['HotkeysService', function (HotkeysService) {
     return {
         restrict: 'E',
         replace: true,
@@ -36,6 +36,11 @@ angular.module('adminNg.directives')
                     });
                 }
             };
+
+            HotkeysService.activateHotkey(scope, "general.main_menu", "Main Menu", function(event) {
+                event.preventDefault();
+                scope.toggleMenu();
+            });
         }
     };
-});
+}]);
