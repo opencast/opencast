@@ -2,7 +2,6 @@
   "value_locale":"en",
   "error_AudioCodecNotSupported":"Σφάλμα: Ο κωδικοποιητής ήχου δεν υποστηρίζεται από αυτό το πρόγραμμα περιήγησης",
   "error_AudioElementNotSupported":"Σφάλμα: Το πρόγραμμα περιήγησης δεν υποστηρίζει το στοιχείο ήχου.",
-  "switchPlayer":"Εναλαγγή προγράμματος αναπαραγωγής",
   "video":"Βίντεο",
   "video_short":"Vid.",
   "openInPlayer":"Άνοιγμα στο πρόγραμμα αναπαραγωγής",

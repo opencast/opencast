@@ -308,7 +308,7 @@
     <field name="fulltext" type="text" indexed="true" stored="false" multiValued="true"/>
 
     <!-- Authorization fields -->
-    <dynamicField name="oc_acl_*"  type="text" indexed="true"  stored="true" />
+    <dynamicField name="oc_acl_*" type="text_ws" indexed="true" stored="true" />
   </fields>
 
   <!-- Field to use to determine and enforce document uniqueness. 

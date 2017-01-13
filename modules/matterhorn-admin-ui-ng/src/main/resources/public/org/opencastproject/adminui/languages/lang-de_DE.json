@@ -118,6 +118,8 @@
     "USER_BLACKLIST_NOT_SAVED":"Die Sperrliste konnte nicht gespeichert werden",
     "USER_BLACKLIST_DELETED":"Die Sperrliste wurde gelöscht",
     "USER_BLACKLIST_NOT_DELETED":"Die Sperrliste konnte nicht gelöscht werden",
+    "LOCATION_DELETED":"Das Aufzeichnungsgerät wurde entfernt",
+    "LOCATION_NOT_DELETED":"Das Aufzeichnungsgerät konnte nicht entfernt werden",
     "LOCATION_BLACKLIST_CREATED":"Die Sperrliste wurde erstellt",
     "LOCATION_BLACKLIST_NOT_CREATED":"Die Sperrliste konnte nicht erstellt werden",
     "LOCATION_BLACKLIST_SAVED":"Die Sperrliste wurde gespeichert",
@@ -136,7 +138,7 @@
     "CONFLICT_DETECTED":"Planungskonflikt: Die neue Aufzeichnung überlappt zeitlich mit einer bereits bestehenden Aufzeichnung. Bitte Ort, Datum oder Zeit anpassen.",
     "CONFLICT_ALREADY_ENDED":"Planungskonflikt: Aufzeichnungen können nicht in der Vergangenheit geplant werden.",
     "CONFLICT_END_BEFORE_START":"Planungskonflikt: Die Aufzeichnungen können nicht enden bevor sie starten.",
-    "INVALID_ACL_RULES":"Regeln müssen eine gültige Rolle und Lese-\/Schreibrechte enthalten.",
+    "INVALID_ACL_RULES":"Regeln müssen eine gültige Rolle und Lese-/Schreibrechte enthalten.",
     "MISSING_ACL_RULES":"Es ist mindestens eine Rolle mit Lese- und Schreibberechtigungen erforderlich!",
     "SAVED_ACL_RULES":"Die Zugriffsregeln wurden gespeichert.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Die vorhandenen Aufzeichnungen in dieser Serie müssen neu verarbeitet werden",
@@ -210,7 +212,7 @@
     "SCHEDULE_TASK":{
       "CAPTION":"Task starten",
       "GENERAL":{
-        "CAPTION":"General",
+        "CAPTION":"Allgemein",
         "SUMMARY":"({{ count }} Aufzeichnungen ausgewählt)",
         "CANNOTSTART":"Markierte Aufzeichnungen können im Moment nicht verarbeitet werden. Entfernen Sie diese aus der Auswahl oder versuchen Sie es später erneut."
       },
@@ -687,7 +689,7 @@
           "REASONS":{
             "CUTTING":"Schneiden erforderlich",
             "REVIEW":"Überprüfung erforderlich",
-            "ASYNC":"A\/V Spuren asynchron",
+            "ASYNC":"A/V Spuren asynchron",
             "AUDIO_ISSUE":"Fehlende oder beschädigte Audiospur",
             "CANCELED":"Abgebrochene Aufzeichnung",
             "CONFLICTING_METADATA":"Widersprüchliche Metadaten",
@@ -706,6 +708,7 @@
           }
         },
         "METADATA":{
+          "CAPTION":"Aufzeichnungs-Details",
           "TITLE":"Titel",
           "ID":"UID",
           "SERIES":"Serien",
@@ -966,7 +969,8 @@
     },
     "ACTIONS":{
       "EXPORT":"Exportieren",
-      "ADD_BLACKLIST":"Sperrliste hinzufügen"
+      "ADD_BLACKLIST":"Sperrliste hinzufügen",
+      "REMOVE":"Entfernen"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1046,6 +1050,7 @@
         "EMAIL":"E-Mail",
         "ROLES":"Rollen",
         "TYPE":"Typ",
+        "PROVIDER":"Anbieter",
         "BLACKLIST_FROM":"Gesperrt von",
         "BLACKLIST_TO":"Gesperrt bis",
         "ACTION":"Aktionen"
@@ -1490,6 +1495,16 @@
       "UNDO":"Widerrufen",
       "REDO":"Wiederholen",
       "CLEAR_SEGMENTS":"Segmente löschen"
+    },
+    "PLAYER":{
+      "PLAY":"Abspielen",
+      "PAUSE":"Pause",
+      "NEXT_FRAME":"Nächstes Bild",
+      "PREVIOUS_FRAME":"Vorheriges Bild",
+      "NEXT_SEGMENT":"Nächstes Segment / Zum Ende springen",
+      "PREVIOUS_SEGMENT":"Vorheriges Segment / Zum Start springen",
+      "MUTE":"Stummschalten",
+      "VOLUME":"Lautstärke"
     }
   },
   "LOGIN":{
@@ -1498,7 +1513,7 @@
     "USERNAME":"Benutzername…",
     "PASSWORD":"Passwort…",
     "LOGIN":"Anmelden",
-    "ERROR":"Falscher Benutzername und\/oder Passwort"
+    "ERROR":"Falscher Benutzername und/oder Passwort"
   },
   "TABLE_FILTERS":{
     "CLEAR":"Alle Filter löschen",
@@ -1737,7 +1752,7 @@
     "RUNNING":"In Verarbeitung",
     "FINISHED":"Verarbeitet",
     "FAILED":"Fehlgeschlagen",
-    "FINISHED_WITH_COMMENTS":"Abgeschlossen mit Kommentaren",
+    "FINISHED_WITH_COMMENTS":"Offen",
     "SCHEDULED":"Geplant"
   }
 }

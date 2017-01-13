@@ -166,7 +166,7 @@
       description="Mark the recording for cutting">
       <configurations>
         <configuration key="description">Recording has not been cut yet.</configuration>
-        <configuration key="reason">EVENTS.COMMENTS.REASONS.CUTTING</configuration>
+        <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING</configuration>
         <configuration key="action">create</configuration>
       </configurations>
     </operation>

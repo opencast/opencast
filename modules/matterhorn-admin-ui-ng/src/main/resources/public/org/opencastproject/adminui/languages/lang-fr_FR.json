@@ -49,19 +49,19 @@
     "CONTINUE_ACTION":"Êtes-vous sûr de vouloir continuer ?",
     "METADATA":{
       "NOTICE":{
-        "UNKNOWN":"The following element will be deleted",
-        "EVENT":"The following event will be deleted",
-        "SERIES":"The following series will be deleted",
-        "ACL":"The following ACL will be deleted",
-        "GROUP":"The following group will be deleted",
-        "USER":"The following user will be deleted",
-        "USER_BLACKLIST":"The following user blacklist will be deleted",
-        "THEME":"The following theme will be deleted",
-        "EMAIL":"The following email template will be deleted",
-        "LOCATION":"The following location will be deleted",
-        "LOCATION_BLACKLIST":"The following location blacklist will be deleted"
+        "UNKNOWN":"L’élément suivant sera supprimé",
+        "EVENT":"L’événement suivant sera supprimé",
+        "SERIES":"Les séries suivantes seront supprimées",
+        "ACL":"L’ACL suivante sera supprimée",
+        "GROUP":"Le groupe suivant sera supprimé",
+        "USER":"L’utilisateur suivant sera supprimée",
+        "USER_BLACKLIST":"La présente liste noire d'utilisateurs sera supprimée",
+        "THEME":"Le thème suivant sera supprimé",
+        "EMAIL":"Le modèle d'email suivant sera supprimé",
+        "LOCATION":"L’emplacement suivant sera supprimé",
+        "LOCATION_BLACKLIST":"La présente liste noire d'emplacement sera supprimée"
       },
-      "NAME":"Name"
+      "NAME":"Nom"
     },
     "ACTIONS":{
       "CONFIRMATION":"Confirmation requise"
@@ -118,6 +118,8 @@
     "USER_BLACKLIST_NOT_SAVED":"La liste de blocage n'a pas pu être enregistrée",
     "USER_BLACKLIST_DELETED":"La liste noire a été supprimée",
     "USER_BLACKLIST_NOT_DELETED":"La liste de blocage n'a pas pu être supprimée",
+    "LOCATION_DELETED":"L’emplacement a été supprimé",
+    "LOCATION_NOT_DELETED":"L’emplacement n’a pas pu être supprimé",
     "LOCATION_BLACKLIST_CREATED":"La liste de blocage a été créée",
     "LOCATION_BLACKLIST_NOT_CREATED":"La liste de blocage n'a pas pu être créée",
     "LOCATION_BLACKLIST_SAVED":"La liste de blocage a été sauvée",
@@ -136,7 +138,7 @@
     "CONFLICT_DETECTED":"Conflit de programmation: le nouvel événement entre en conflit avec un événement existant. Veuillez changer l'emplacement ou les dates.",
     "CONFLICT_ALREADY_ENDED":"Erreur de programmation : l’événement est déjà terminée.",
     "CONFLICT_END_BEFORE_START":"Erreur de programmation : la fin de l’événement programmé doit être postérieure au début.",
-    "INVALID_ACL_RULES":"Les règles doivent contenir un rôle valide et un droit d'accès lecture et\/ou écriture.",
+    "INVALID_ACL_RULES":"Les règles doivent contenir un rôle valide et un droit d'accès lecture et/ou écriture.",
     "MISSING_ACL_RULES":"Il faut au moins un rôle avec droit d'accès Lecture et Ecriture !",
     "SAVED_ACL_RULES":"Les règles d'accès ont été enregistrées.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Les événements existants dans cette série devront être retraités",
@@ -210,7 +212,7 @@
     "SCHEDULE_TASK":{
       "CAPTION":"Démarrer tâche",
       "GENERAL":{
-        "CAPTION":"General",
+        "CAPTION":"Général",
         "SUMMARY":"({{ count }} événements sélectionnés)",
         "CANNOTSTART":"Les événements en surbrillance ne peuvent être traitées à l'heure actuelle. Désélectionnez-les ou réessayez plus tard."
       },
@@ -687,7 +689,7 @@
           "REASONS":{
             "CUTTING":"Coupe nécessaire",
             "REVIEW":"Vérification requise",
-            "ASYNC":"Pistes A\/V asynchrones",
+            "ASYNC":"Pistes A/V asynchrones",
             "AUDIO_ISSUE":"Piste audio manquante ou défectueuse",
             "CANCELED":"Événement annulé",
             "CONFLICTING_METADATA":"Conflit de métadonnées",
@@ -706,6 +708,7 @@
           }
         },
         "METADATA":{
+          "CAPTION":"Détails de l'événement",
           "TITLE":"Titre",
           "ID":"UID",
           "SERIES":"Série",
@@ -966,7 +969,8 @@
     },
     "ACTIONS":{
       "EXPORT":"Exporter",
-      "ADD_BLACKLIST":"Ajouter liste de blocage"
+      "ADD_BLACKLIST":"Ajouter liste de blocage",
+      "REMOVE":"Retirer"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1046,6 +1050,7 @@
         "EMAIL":"E-mail",
         "ROLES":"Rôles",
         "TYPE":"Type",
+        "PROVIDER":"Fournisseur",
         "BLACKLIST_FROM":"Bloqué de",
         "BLACKLIST_TO":"Bloqué jusqu'au",
         "ACTION":"Actions"
@@ -1415,7 +1420,7 @@
     },
     "JOBS":{
       "TABLE":{
-        "ID":"Job Identifier",
+        "ID":"Identifiant de la tâche",
         "ACTION":"Actions",
         "CAPTION":"Tâches",
         "CREATED":"Créée",
@@ -1490,6 +1495,16 @@
       "UNDO":"Annuler",
       "REDO":"Répéter",
       "CLEAR_SEGMENTS":"Effacer les segments"
+    },
+    "PLAYER":{
+      "PLAY":"Jouer",
+      "PAUSE":"Pause",
+      "NEXT_FRAME":"Image suivante",
+      "PREVIOUS_FRAME":"Image précédente",
+      "NEXT_SEGMENT":"Prochain segment / Aller à la fin",
+      "PREVIOUS_SEGMENT":"Segment précédent / Aller au début",
+      "MUTE":"Sourdine",
+      "VOLUME":"Volume"
     }
   },
   "LOGIN":{
@@ -1498,7 +1513,7 @@
     "USERNAME":"Nom d’utilisateur…",
     "PASSWORD":"Mot de passe…",
     "LOGIN":"Login",
-    "ERROR":"Nom d'utilisateur et\/ou mot de passe incorrects"
+    "ERROR":"Nom d'utilisateur et/ou mot de passe incorrects"
   },
   "TABLE_FILTERS":{
     "CLEAR":"Supprimer tous les filtres",
@@ -1737,7 +1752,7 @@
     "RUNNING":"En cours",
     "FINISHED":"Terminé",
     "FAILED":"Echoué",
-    "FINISHED_WITH_COMMENTS":"Fini avec les commentaires ouverts",
+    "FINISHED_WITH_COMMENTS":"À faire",
     "SCHEDULED":"Programmé"
   }
 }

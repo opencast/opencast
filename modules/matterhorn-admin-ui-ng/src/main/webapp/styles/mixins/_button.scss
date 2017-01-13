@@ -170,13 +170,13 @@
         &:hover {
             cursor: pointer;
             border: $thin-border-stroke darken($main-border-color, 2%);
-            @include linear-gradient(darken(#fff, 1%), darken(#f7f7f7, 1%));
+            @include linear-gradient(darken(#fff, 4%), darken(#f7f7f7, 8%));
             color: $medium-prim-color;
         }
 
         &:active {
             cursor: pointer;
-            box-shadow: inset 0px 1px 6px 2px rgba(0,0,0,.05);
+            box-shadow: inset 0px 1px 6px 2px rgba(0,0,0,.1);
         }
     }
 

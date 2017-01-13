@@ -42,6 +42,7 @@ import java.util.List;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -84,6 +85,8 @@ import javax.persistence.Version;
         @NamedQuery(name = "Job.all", query = "SELECT j FROM Job j order by j.dateCreated"),
         @NamedQuery(name = "Job.dispatchable.status", query = "SELECT j FROM Job j where j.dispatchable = true and "
                 + "j.status in :statuses order by j.dateCreated"),
+        @NamedQuery(name = "Job.dispatchable.status.idfilter", query = "SELECT j.id FROM Job j "
+                + "WHERE j.dispatchable = true AND j.status IN :statuses AND j.id IN :jobids ORDER BY j.dateCreated"),
         @NamedQuery(name = "Job.undispatchable.status", query = "SELECT j FROM Job j where j.dispatchable = false and "
                 + "j.status in :statuses order by j.dateCreated"),
         @NamedQuery(name = "Job.processinghost.status", query = "SELECT j FROM Job j "
@@ -178,6 +181,7 @@ public class JpaJob {
   private Long runTime = 0L;
 
   @Lob
+  @Basic(fetch = FetchType.LAZY)
   @Column(name = "payload", length = 16777215)
   private String payload;
 
@@ -294,10 +298,6 @@ public class JpaJob {
 
   @PostLoad
   public void postLoad() {
-    if (payload != null) {
-      payload.getBytes(); // force the clob to load
-    }
-
     if (creatorServiceRegistration == null) {
       logger.warn("creator service registration for job '{}' is null", id);
     } else {

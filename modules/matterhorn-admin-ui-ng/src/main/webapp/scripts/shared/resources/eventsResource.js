@@ -46,6 +46,7 @@ angular.module('adminNg.resources')
                 row.technical_end = Language.formatTime('short', r.technical_end);
                 row.has_comments = r.has_comments;
                 row.has_open_comments = r.has_open_comments;
+                row.needs_cutting = r.needs_cutting;
                 row.has_preview = r.has_preview;
                 row.location = r.location;
                 row.agent_id = r.agent_id;

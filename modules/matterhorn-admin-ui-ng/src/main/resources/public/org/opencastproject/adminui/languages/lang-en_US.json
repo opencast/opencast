@@ -1051,6 +1051,7 @@
          "EMAIL":    "Email",
          "ROLES":    "Roles",
          "TYPE":     "Type",
+         "PROVIDER":  "Provider",
          "BLACKLIST_FROM": "Blacklisted from",
          "BLACKLIST_TO":   "Blacklisted until",
          "ACTION":   "Actions"
@@ -1495,6 +1496,16 @@
        "UNDO": "Undo",
        "REDO": "Redo",
        "CLEAR_SEGMENTS": "Clear segments"
+     },
+     "PLAYER":{
+       "PLAY":              "Play",
+       "PAUSE":             "Pause",
+       "NEXT_FRAME":        "Next frame",
+       "PREVIOUS_FRAME":    "Previous frame",
+       "NEXT_SEGMENT":      "Next segment / Jump to end",
+       "PREVIOUS_SEGMENT":  "Previous segment / Jump to start",
+       "MUTE":              "Mute",
+       "VOLUME":            "Volume"
      }
    },
    "LOGIN": {

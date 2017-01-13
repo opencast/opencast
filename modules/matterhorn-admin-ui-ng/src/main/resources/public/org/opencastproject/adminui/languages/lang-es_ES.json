@@ -61,7 +61,7 @@
         "LOCATION":"Se va a borrar la siguiente localización",
         "LOCATION_BLACKLIST":"Se va a borrar la siguiente lista negra de localizaciones"
       },
-      "NAME":"Name"
+      "NAME":"Nombre"
     },
     "ACTIONS":{
       "CONFIRMATION":"Se requiere confirmación"
@@ -109,7 +109,7 @@
     "SERIES_NOT_UPDATED_ID":"No se ha podido guardar la serie {{ id }}",
     "SERIES_NOT_UPDATED_ALL":"No se ha podido guardar ninguna serie",
     "EVENTS_DELETED":"El evento ha sido eliminado",
-    "EVENTS_NOT_DELETED":"No se ha(n) podido eliminar el\/los evento(s)",
+    "EVENTS_NOT_DELETED":"No se ha(n) podido eliminar el/los evento(s)",
     "SERIES_DELETED":"Se ha borrado la serie",
     "SERIES_NOT_DELETED":"No se ha podido borrar la serie",
     "USER_BLACKLIST_CREATED":"Se ha creado la lista negra",
@@ -118,6 +118,8 @@
     "USER_BLACKLIST_NOT_SAVED":"No se ha podido guardar la lista negra",
     "USER_BLACKLIST_DELETED":"La lista negra ha sido eliminada",
     "USER_BLACKLIST_NOT_DELETED":"No se ha podido eliminar la lista negra",
+    "LOCATION_DELETED":"Se ha borrado la ubicación",
+    "LOCATION_NOT_DELETED":"No se ha podido borrar la ubicación",
     "LOCATION_BLACKLIST_CREATED":"Se ha creado la lista negra",
     "LOCATION_BLACKLIST_NOT_CREATED":"No se ha podido crear la lista negra",
     "LOCATION_BLACKLIST_SAVED":"Se ha guardado la lista negra",
@@ -136,7 +138,7 @@
     "CONFLICT_DETECTED":"Conflicto de programación: el nuevo evento se solapa con otro existente. Por favor, cambie la sala, las fechas o las horas.",
     "CONFLICT_ALREADY_ENDED":"Error de programación: El evento ya ha terminado.",
     "CONFLICT_END_BEFORE_START":"Error de programación: El final tiene que ser más tarde que el comienzo.",
-    "INVALID_ACL_RULES":"Las reglas deben contener un nombre de rol válido y permiso(s) de lectura y\/o escritura.",
+    "INVALID_ACL_RULES":"Las reglas deben contener un nombre de rol válido y permiso(s) de lectura y/o escritura.",
     "MISSING_ACL_RULES":"¡Se requiere al menos un rol con permisos de Lectura y Escritura!",
     "SAVED_ACL_RULES":"Se han guardado las reglas de acceso.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Los eventos que contiene esta serie deberán ser reprocesados",
@@ -212,7 +214,7 @@
       "GENERAL":{
         "CAPTION":"General",
         "SUMMARY":"({{ count }} eventos seleccionados)",
-        "CANNOTSTART":"El\/Los evento(s) indicados no pueden procesarse en este momento. Desmárquelo(s) o inténtelo de nuevo más tarde."
+        "CANNOTSTART":"El/Los evento(s) indicados no pueden procesarse en este momento. Desmárquelo(s) o inténtelo de nuevo más tarde."
       },
       "TASKS":{
         "CAPTION":"Tareas",
@@ -687,7 +689,7 @@
           "REASONS":{
             "CUTTING":"Pendiente de cortar",
             "REVIEW":"Pendiente de revisar",
-            "ASYNC":"Pistas de A\/V asíncronas",
+            "ASYNC":"Pistas de A/V asíncronas",
             "AUDIO_ISSUE":"Pista de audio no disponible o defectuosa",
             "CANCELED":"Evento cancelado",
             "CONFLICTING_METADATA":"Conflicto de metadatos",
@@ -706,6 +708,7 @@
           }
         },
         "METADATA":{
+          "CAPTION":"Detalles del evento",
           "TITLE":"Título",
           "ID":"UID",
           "SERIES":"Serie",
@@ -966,7 +969,8 @@
     },
     "ACTIONS":{
       "EXPORT":"Exportar",
-      "ADD_BLACKLIST":"Añadir lista negra"
+      "ADD_BLACKLIST":"Añadir lista negra",
+      "REMOVE":"Eliminar"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1046,6 +1050,7 @@
         "EMAIL":"Correo electrónico",
         "ROLES":"Roles",
         "TYPE":"Tipo",
+        "PROVIDER":"Proveedor",
         "BLACKLIST_FROM":"En la lista negra desde",
         "BLACKLIST_TO":"En la lista negra hasta",
         "ACTION":"Acciones"
@@ -1490,6 +1495,16 @@
       "UNDO":"Deshacer",
       "REDO":"Rehacer",
       "CLEAR_SEGMENTS":"Borrar segmentos"
+    },
+    "PLAYER":{
+      "PLAY":"Reproducir",
+      "PAUSE":"Pausa",
+      "NEXT_FRAME":"Siguiente fotograma",
+      "PREVIOUS_FRAME":"Fotograma anterior",
+      "NEXT_SEGMENT":"Siguiente segmento / Saltar al final",
+      "PREVIOUS_SEGMENT":"Segmento anterior / Saltar al principio",
+      "MUTE":"Silenciar",
+      "VOLUME":"Volumen"
     }
   },
   "LOGIN":{
@@ -1498,7 +1513,7 @@
     "USERNAME":"Nombre de usuario…",
     "PASSWORD":"Contraseña…",
     "LOGIN":"Identificarse",
-    "ERROR":"Nombre de usuario y\/o contraseña incorrecto(s)"
+    "ERROR":"Nombre de usuario y/o contraseña incorrecto(s)"
   },
   "TABLE_FILTERS":{
     "CLEAR":"Borrar todos los filtros",
@@ -1737,7 +1752,7 @@
     "RUNNING":"Procesando",
     "FINISHED":"Procesado",
     "FAILED":"Error",
-    "FINISHED_WITH_COMMENTS":"Finalizado con comentarios pendientes",
+    "FINISHED_WITH_COMMENTS":"Pendiente",
     "SCHEDULED":"Programado"
   }
 }

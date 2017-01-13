@@ -111,7 +111,7 @@ public class Ingestor {
 
   /** Asynchronous ingest of an artifact. */
   public void ingest(final File artifact) {
-    logger.info("Install {} {}", myInfo(), artifact.getName());
+    logger.info("Try ingest of file `{}`", artifact.getName());
     executorService.execute(getIngestRunnable(artifact));
   }
 
@@ -149,16 +149,16 @@ public class Ingestor {
               }
               in.close();
             } catch (IOException e) {
-              logger.error("Error accessing inbox file '{}', {}", artifact.getName());
+              logger.error("Error accessing inbox file '{}'", artifact.getName(), e);
             } catch (Exception e) {
-              logger.error("Error ingesting inbox file '{}', {}", artifact.getName());
+              logger.error("Error ingesting inbox file '{}'", artifact.getName(), e);
             } finally {
               IOUtils.closeQuietly(in);
             }
             try {
               FileUtils.forceDelete(artifact);
             } catch (IOException e) {
-              logger.error("Unable to delete file {}, {}", artifact.getAbsolutePath(), e);
+              logger.error("Unable to delete file {}", artifact.getAbsolutePath(), e);
             }
           }
         });

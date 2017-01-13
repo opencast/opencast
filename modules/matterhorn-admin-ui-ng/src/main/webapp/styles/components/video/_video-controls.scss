@@ -30,6 +30,19 @@
     padding: 0 15px;
 }
 
+.video-details {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.video-details-date {
+  font-style: italic;
+}
+
+.video-details-presenters {
+  font-weight: bold;
+}
+
 // Volume Controls
 // ----------------------------------------
 
@@ -38,8 +51,15 @@
     width: 20%;
     padding: 9px 0;
 
-    .volume-toggle-button {
+    .volume-toggle-unmuted {
         @include fa-icon($fa-var-volume-up, after, inline-block, 0 10px 0 0, 0, $grey, 16px);
+        display: inline-block;
+        vertical-align: top;
+        margin-top: 8px;
+    }
+
+    .volume-toggle-muted {
+        @include fa-icon($fa-var-volume-off , after, inline-block, 0 18px 0 0, 0, $grey, 16px);
         display: inline-block;
         vertical-align: top;
         margin-top: 8px;
@@ -51,9 +71,16 @@
         margin-top: 4px;
     }
 
+    .volume-slider-muted {
+        background: $grey;
+    }
+
+    .volume-slider-unmuted {
+        background: $bright-blue;
+    }
+
     input {
         @include appearance(none);
-        background: $bright-blue;
         border-radius: 4px;
         height: 2px;
     }
@@ -110,8 +137,8 @@ $playback-icon-font-size: 16px;
     }
 }
 
-.playback-rewind {
-    @include fa-icon($fa-var-backward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+.playback-previous-frame {
+    @include fa-icon($fa-var-step-backward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
     @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
     @extend .playback-control-icon;
     &:hover {
@@ -137,8 +164,8 @@ $playback-icon-font-size: 16px;
   }
 }
 
-.playback-fast-forward {
-    @include fa-icon($fa-var-forward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+.playback-next-frame {
+    @include fa-icon($fa-var-step-forward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
     @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
     @extend .playback-control-icon;
     &:hover {

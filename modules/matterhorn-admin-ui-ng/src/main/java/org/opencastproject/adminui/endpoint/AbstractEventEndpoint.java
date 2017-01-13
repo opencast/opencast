@@ -667,7 +667,7 @@ public abstract class AbstractEventEndpoint {
       throw e;
     } catch (Exception e) {
       logger.error("Unable to delete comment {} on event {}: {}",
-              new String[] { Long.toString(commentId), eventId, ExceptionUtils.getStackTrace(e) });
+              commentId, eventId, ExceptionUtils.getStackTrace(e));
       throw new WebApplicationException(e);
     }
   }
@@ -710,7 +710,7 @@ public abstract class AbstractEventEndpoint {
       throw e;
     } catch (Exception e) {
       logger.warn("Could not remove event comment reply {} from comment {}: {}",
-              new String[] { Long.toString(replyId), Long.toString(commentId), ExceptionUtils.getStackTrace(e) });
+              replyId, commentId, ExceptionUtils.getStackTrace(e));
       throw new WebApplicationException(e);
     }
   }
@@ -761,7 +761,7 @@ public abstract class AbstractEventEndpoint {
       throw e;
     } catch (Exception e) {
       logger.warn("Could not update event comment reply {} from comment {}: {}",
-              new String[] { Long.toString(replyId), Long.toString(commentId), ExceptionUtils.getStackTrace(e) });
+              replyId, commentId, ExceptionUtils.getStackTrace(e));
       throw new WebApplicationException(e);
     }
   }
@@ -1390,7 +1390,7 @@ public abstract class AbstractEventEndpoint {
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     } catch (AclServiceException e) {
       logger.error("Unable to update transtion {} of event {}: {}",
-              new String[] { Long.toString(transitionId), eventId, ExceptionUtils.getStackTrace(e) });
+              transitionId, eventId, ExceptionUtils.getStackTrace(e));
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     } catch (ParseException e) {
       // That should never happen
@@ -1480,7 +1480,7 @@ public abstract class AbstractEventEndpoint {
       return Response.noContent().build();
     } catch (AclServiceException e) {
       logger.error("Error while trying to delete transition '{}' from event '{}': {}",
-              new String[] { Long.toString(transitionId), eventId, ExceptionUtils.getStackTrace(e) });
+              transitionId, eventId, ExceptionUtils.getStackTrace(e));
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     }
   }
@@ -1644,7 +1644,7 @@ public abstract class AbstractEventEndpoint {
       return Response.noContent().build();
     } catch (Exception e) {
       logger.error("Unable to find conflicting events for {}, {}, {}: {}",
-              new String[] { device, startDate, endDate, ExceptionUtils.getStackTrace(e) });
+              device, startDate, endDate, ExceptionUtils.getStackTrace(e));
       return RestUtil.R.serverError();
     }
   }
@@ -1868,6 +1868,7 @@ public abstract class AbstractEventEndpoint {
     fields.add(f("source", v(getIndexService().getEventSource(event).toString())));
     fields.add(f("has_comments", v(event.hasComments())));
     fields.add(f("has_open_comments", v(event.hasOpenComments())));
+    fields.add(f("needs_cutting", v(event.needsCutting())));
     fields.add(f("has_preview", v(event.hasPreview())));
     fields.add(f("agent_id", vN(event.getAgentId())));
     fields.add(f("technical_start", vN(event.getTechnicalStartTime())));

@@ -15,8 +15,8 @@
   <sec:http pattern="/favicon.ico" security="none" />
   <sec:http pattern="/img/**" security="none" />
   <sec:http pattern="/js/**" security="none" />
-  <sec:http pattern="/style.css" security="none" />
   <sec:http pattern="/lib/**" security="none" />
+  <sec:http pattern="/admin-ng/fonts/**" security="none" />
   <sec:http pattern="/admin-ng/scripts/**" security="none" />
   <sec:http pattern="/admin-ng/styles/**" security="none" />
 
