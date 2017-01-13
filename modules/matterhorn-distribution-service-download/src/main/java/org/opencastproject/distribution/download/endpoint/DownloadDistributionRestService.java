@@ -40,9 +40,14 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Set;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
@@ -121,7 +126,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
                                     type = Type.TEXT),
                      @RestParameter(name = "elementId",
                                     isRequired = true,
-                                    description = "The element to distribute",
+                                    description = "The element to distribute. The Id or multiple Ids as JSON Array ( ['IdOne','IdTwo'] )",
                                     type = Type.STRING) },
              reponses = {
                      @RestResponse(responseCode = SC_OK,
@@ -132,8 +137,10 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
                              @DefaultValue("true") @FormParam("checkAvailability") boolean checkAvailability)
           throws Exception {
     try {
+      Gson gson = new Gson();
+      Set<String> setElementIds = gson.fromJson(elementId, new TypeToken<Set<String>>() { }.getType());
       final MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
-      final Job job = service.distribute(channelId, mediapackage, elementId, checkAvailability);
+      final Job job = service.distribute(channelId, mediapackage, setElementIds, checkAvailability);
       return ok(new JaxbJob(job));
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to distribute element: {}", e.getMessage());
@@ -159,7 +166,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
                                     type = Type.TEXT),
                      @RestParameter(name = "elementId",
                                     isRequired = true,
-                                    description = "The element to retract",
+                                    description = "The element to retract. The Id or multiple Ids as JSON Array ( ['IdOne','IdTwo'] )",
                                     type = Type.STRING) },
              reponses = {
                      @RestResponse(responseCode = SC_OK,
@@ -169,8 +176,10 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
                           @FormParam("channelId") String channelId)
           throws Exception {
     try {
+      Gson gson = new Gson();
+      Set<String> setElementIds = gson.fromJson(elementId, new TypeToken<Set<String>>() { }.getType());
       final MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
-      final Job job = service.retract(channelId, mediapackage, elementId);
+      final Job job = service.retract(channelId, mediapackage, setElementIds);
       return ok(new JaxbJob(job));
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to retract element: {}", e.getMessage());
