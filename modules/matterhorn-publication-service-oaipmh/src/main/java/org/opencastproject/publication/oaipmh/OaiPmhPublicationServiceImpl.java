@@ -20,6 +20,7 @@
  */
 package org.opencastproject.publication.oaipmh;
 
+import static com.entwinemedia.fn.Stream.$;
 import static java.lang.String.format;
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.ofChannel;
 import static org.opencastproject.util.JobUtil.waitForJobs;
@@ -61,6 +62,9 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Functions;
+
+import com.entwinemedia.fn.P2;
+import com.entwinemedia.fn.Products;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -306,20 +310,20 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
           Set<String> downloadIds, Set<String> streamingIds, boolean checkAvailability)
           throws PublicationException, MediaPackageException {
     // Distribute to download
-    final List<Job> jobs = new ArrayList<>();
+    final List<P2<Job, String>> jobs = new ArrayList<>();
     final String pubChannelId = publicationChannelId(repository);
     try {
       for (String elementId : downloadIds) {
         Job job = downloadDistributionService.distribute(pubChannelId, mediaPackage, elementId, checkAvailability);
         if (job == null)
           continue;
-        jobs.add(job);
+        jobs.add(Products.E.p2(job, elementId));
       }
       for (String elementId : streamingIds) {
         Job job = streamingDistributionService.distribute(pubChannelId, mediaPackage, elementId);
         if (job == null)
           continue;
-        jobs.add(job);
+        jobs.add(Products.E.p2(job, elementId));
       }
     } catch (DistributionException e) {
       throw new PublicationException(e);
@@ -331,7 +335,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     }
 
     // Wait until all distribution jobs have returned
-    if (!waitForJobs(parentJob, serviceRegistry, jobs).isSuccess())
+    final List<Job> waitForJobs = $(jobs).map(com.entwinemedia.fn.fns.Products.<Job>p2_1()).toList();
+    if (!waitForJobs(parentJob, serviceRegistry, waitForJobs).isSuccess())
       throw new PublicationException("One of the distribution jobs did not complete successfully");
 
     logger.debug("Distribute operation completed");
@@ -441,10 +446,10 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
    * @param current
    *          the current mediapackage
    * @param jobs
-   *          the distribution jobs
+   *          list of distribution jobs and their distributed element id
    * @return the new mediapackage
    */
-  protected MediaPackage getMediaPackageForOaiPmh(MediaPackage current, List<Job> jobs) throws MediaPackageException,
+  protected MediaPackage getMediaPackageForOaiPmh(MediaPackage current, List<P2<Job, String>> jobs) throws MediaPackageException,
           NotFoundException, ServiceRegistryException {
     MediaPackage mp = (MediaPackage) current.clone();
 
@@ -452,9 +457,9 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     List<String> elementsToPublish = new ArrayList<>();
     Map<String, String> distributedElementIds = new HashMap<>();
 
-    for (Job entry : jobs) {
-      Job job = serviceRegistry.getJob(entry.getId());
-      String sourceElementId = job.getArguments().get(2);
+    for (P2<Job, String> entry : jobs) {
+      Job job = serviceRegistry.getJob(entry.get1().getId());
+      String sourceElementId = entry.get2();
       MediaPackageElement sourceElement = mp.getElementById(sourceElementId);
 
       // If there is no payload, then the item has not been distributed.
