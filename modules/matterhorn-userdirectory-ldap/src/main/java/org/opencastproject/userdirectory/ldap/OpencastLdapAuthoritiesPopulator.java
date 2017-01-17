@@ -27,6 +27,7 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ldap.core.DirContextOperations;
@@ -35,6 +36,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,9 +44,13 @@ import java.util.Set;
 /** Map a series of LDAP attributes to user authorities in Opencast */
 public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
 
+  public static final String ROLE_CLEAN_REGEXP = "[\\s_]+";
+  public static final String ROLE_CLEAN_REPLACEMENT = "_";
+
   private Set<String> attributeNames;
   private String[] additionalAuthorities;
   private String prefix = "";
+  private Set<String> excludedPrefixes = new HashSet<String>();
   private boolean uppercase = true;
   private Organization organization;
   private SecurityService securityService;
@@ -54,9 +60,9 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
   /**
    * Activate component
    */
-  public OpencastLdapAuthoritiesPopulator(String attributeNames, String prefix, boolean uppercase,
-          Organization organization, SecurityService securityService, JpaGroupRoleProvider groupRoleProvider,
-          String... additionalAuthorities) {
+  public OpencastLdapAuthoritiesPopulator(String attributeNames, String prefix, String[] aExcludedPrefixes,
+          boolean uppercase, Organization organization, SecurityService securityService,
+          JpaGroupRoleProvider groupRoleProvider, String... additionalAuthorities) {
 
     debug("Creating new instance");
 
@@ -96,14 +102,29 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     }
     this.groupRoleProvider = groupRoleProvider;
 
-    this.prefix = prefix;
-    debug("Role prefix set to: {}", this.prefix);
-
     this.uppercase = uppercase;
     if (uppercase)
       debug("Roles will be converted to uppercase");
     else
       debug("Roles will NOT be converted to uppercase");
+
+    if (uppercase)
+      this.prefix = StringUtils.trimToEmpty(prefix).replaceAll(ROLE_CLEAN_REGEXP, ROLE_CLEAN_REPLACEMENT).toUpperCase();
+    else
+      this.prefix = StringUtils.trimToEmpty(prefix).replaceAll(ROLE_CLEAN_REGEXP, ROLE_CLEAN_REPLACEMENT);
+    debug("Role prefix set to: {}", this.prefix);
+
+    if (aExcludedPrefixes != null)
+      for (String origExcludedPrefix : aExcludedPrefixes) {
+        String excludedPrefix;
+        if (uppercase)
+          excludedPrefix = StringUtils.trimToEmpty(origExcludedPrefix).toUpperCase();
+        else
+          excludedPrefix = StringUtils.trimToEmpty(origExcludedPrefix);
+        if (!excludedPrefix.isEmpty()) {
+          excludedPrefixes.add(excludedPrefix);
+        }
+      }
 
     this.additionalAuthorities = additionalAuthorities;
     if (logger.isDebugEnabled() && (additionalAuthorities != null)) {
@@ -166,6 +187,15 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
   }
 
   /**
+   * Get the exclude prefixes being used by this object.
+   *
+   * @return the role prefix in use.
+   */
+  public String[] getExcludePrefixes() {
+    return excludedPrefixes.toArray(new String[0]);
+  }
+
+  /**
    * Get the property that defines whether or not the role names should be converted to uppercase.
    *
    * @return {@code true} if this class converts the role names to uppercase. {@code false} otherwise.
@@ -204,55 +234,68 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
       }
 
       for (String value : values) {
-        String authority = parseAuthority(value);
-        debug("Parsed LDAP role \"{}\" to \"{}\"", value, authority);
+        /*
+         * Please note the prefix logic for roles:
+         *
+         * - Group roles are left intact
+         * - Roles that start with any of the "exclude prefixes" are left intact
+         * - In any other case, the "role prefix" is appended to the roles read from LDAP
+         *
+         * This only applies to the prefix addition. The conversion to uppercase is independent from these
+         * considerations
+         */
+        String authority;
+        if (this.uppercase)
+          authority = StringUtils.trimToEmpty(value).replaceAll(ROLE_CLEAN_REGEXP, ROLE_CLEAN_REPLACEMENT)
+                  .toUpperCase();
+        else
+          authority = StringUtils.trimToEmpty(value).replaceAll(ROLE_CLEAN_REGEXP, ROLE_CLEAN_REPLACEMENT);
+
         // Ignore the empty parts
         if (!authority.isEmpty()) {
+          // Check if this role is a group role and assign the groups appropriately
+          List<Role> groupRoles;
+          if (groupRoleProvider != null)
+            groupRoles = groupRoleProvider.getRolesForGroup(authority);
+          else
+            groupRoles = Collections.emptyList();
+
+          if (!groupRoles.isEmpty()) {
+            // The authority is a group role
+            debug("Found group for the group with group role \"{}\": {}", authority, authority);
+            for (Role role : groupRoles) {
+              authorities.add(new SimpleGrantedAuthority(role.getName()));
+              logger.debug("\tAdded role from role \"{}\"'s group: {}", authority, role);
+            }
+          } else {
+            // The authority is not a group role
+            // Therefore try to add the prefix if appropriate
+            String prefix = this.prefix;
+
+            if (!prefix.isEmpty()) {
+              boolean hasExcludePrefix = false;
+              for (String excludePrefix : excludedPrefixes) {
+                if (authority.startsWith(excludePrefix)) {
+                  hasExcludePrefix = true;
+                  break;
+                }
+              }
+              if (hasExcludePrefix)
+                prefix = "";
+            }
+
+            authority = (prefix + authority).replaceAll(ROLE_CLEAN_REGEXP, ROLE_CLEAN_REPLACEMENT);
+            debug("Parsed LDAP role \"{}\" to non-group role \"{}\"", value, authority);
+          }
+
+          // Finally, add the authority itself
           authorities.add(new SimpleGrantedAuthority(authority));
 
-          // Check if this role is a group role and assign the groups appropriately
-          if (groupRoleProvider != null) {
-            List<Role> roles = groupRoleProvider.getRolesForGroup(authority);
-            if (!roles.isEmpty()) {
-              debug("Found group for the group role \"{}\": {}", authority);
-              for (Role role : roles) {
-                authorities.add(new SimpleGrantedAuthority(role.getName()));
-                logger.debug("\tAdded role from role \"{}\"'s group: {}", authority, role);
-              }
-            }
-          }
+        } else {
+          debug("Found empty authority. Ignoring...");
         }
       }
     }
-  }
-
-  /**
-   * Processes a {@link String} representing a {@link GrantedAuthority} to make it comply with the expected format
-   *
-   * In particular, the method adds a prefix (if defined), capitalises the {@String}, substitutes the white spaces by
-   * underscores ("_") and collapses any series of underscores into a single one.
-   *
-   * @param authority
-   *          A {@code String} representing the authority
-   * @return a {@code String} representing the authority in a standard format
-   */
-  private String parseAuthority(String authority) {
-    // Trim the authority
-    // We do not substitute the whitespace here because we must make sure that the prefix follows the spacing
-    // conventions, too
-    authority = authority.trim();
-    String prefix = (this.prefix == null) ? "" : this.prefix.trim();
-
-    // Add prefix only if the authority is not empty
-    if (!authority.isEmpty()) {
-      if (uppercase) {
-        return (prefix + authority).replaceAll("[\\s_]+", "_").toUpperCase();
-      } else {
-        return (prefix + authority).replaceAll("[\\s_]+", "_");
-      }
-    }
-
-    return authority;
   }
 
   /**

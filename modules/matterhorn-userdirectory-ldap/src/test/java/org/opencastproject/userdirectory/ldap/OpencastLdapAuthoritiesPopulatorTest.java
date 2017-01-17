@@ -24,7 +24,6 @@ import static java.lang.String.format;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
@@ -45,6 +44,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,10 +58,12 @@ public class OpencastLdapAuthoritiesPopulatorTest {
   private static final String DEFAULT_PREFIX = "ROLE_";
 
   private static final String[] DEFAULT_EXTRA_ROLES;
-  private static final String[] EMPTY_EXTRA_ROLES = new String[] {};
+
+  private static final String[] DEFAULT_EXCLUDE_PREFIXES = new String[] { "other", "ldap" };
 
   private static final String USERNAME = "username";
   private static final String ORG_NAME = "my_organization_id";
+  private static final String GROUP_ROLE = "THIS_IS_THE_GROUP_ROLE";
   private static final int N_GROUP_ROLES = 3;
   private static final int N_LDAP_ATTRIBUTES = 3;
   private static final int N_EXTRA_ROLES = 2;
@@ -84,11 +86,12 @@ public class OpencastLdapAuthoritiesPopulatorTest {
   private SecurityService securityService;
   private JpaGroupRoleProvider groupRoleProvider;
   private Organization org;
-  private Group group;
 
   private static final String[] PREFIX_TESTS = new String[] { null, "", DEFAULT_PREFIX };
   private static final boolean[] UPPERCASE_TESTS = new boolean[] { true, false };
-  private static final String[][] EXTRA_ROLES_TESTS = new String[][] { null, EMPTY_EXTRA_ROLES, DEFAULT_EXTRA_ROLES };
+  private static final String[][] EXTRA_ROLES_TESTS = new String[][] { null, new String[] {}, DEFAULT_EXTRA_ROLES };
+  private static final String[][] EXCLUDE_PREFIXES_TESTS = new String[][] { null, new String[] {},
+          new String[] { "extra" }, new String[] { "ldap" }, DEFAULT_EXCLUDE_PREFIXES };
   private final JpaGroupRoleProvider[] groupRoleProviderTests = new JpaGroupRoleProvider[] { null, groupRoleProvider };
 
   @Before
@@ -107,24 +110,21 @@ public class OpencastLdapAuthoritiesPopulatorTest {
       EasyMock.replay(r);
       groupRoles.add(r);
     }
-    group = EasyMock.createNiceMock(Group.class);
-    EasyMock.expect(group.getRoles()).andReturn(groupRoles).anyTimes();
 
     securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
 
     groupRoleProvider = EasyMock.createNiceMock(JpaGroupRoleProvider.class);
-    EasyMock.expect(groupRoleProvider.getRolesForGroup(EasyMock.anyString())).andReturn(new ArrayList<Role>(groupRoles))
-            .anyTimes();
+    EasyMock.expect(groupRoleProvider.getRolesForGroup(GROUP_ROLE)).andReturn(new ArrayList<>(groupRoles)).anyTimes();
 
-    EasyMock.replay(org, group, securityService, groupRoleProvider);
+    EasyMock.replay(org, securityService, groupRoleProvider);
   }
 
   @Test
   public void testNullAttributeNames() {
     try {
-      new OpencastLdapAuthoritiesPopulator(null, DEFAULT_PREFIX, false, org, securityService, groupRoleProvider,
-              DEFAULT_EXTRA_ROLES);
+      new OpencastLdapAuthoritiesPopulator(null, DEFAULT_PREFIX, DEFAULT_EXCLUDE_PREFIXES, false, org, securityService,
+              groupRoleProvider, DEFAULT_EXTRA_ROLES);
     } catch (NullPointerException e) {
       // OK
       return;
@@ -136,8 +136,8 @@ public class OpencastLdapAuthoritiesPopulatorTest {
   @Test
   public void testEmptyAttributeNames() {
     try {
-      new OpencastLdapAuthoritiesPopulator("", DEFAULT_PREFIX, false, org, securityService, groupRoleProvider,
-              DEFAULT_EXTRA_ROLES);
+      new OpencastLdapAuthoritiesPopulator("", DEFAULT_PREFIX, DEFAULT_EXCLUDE_PREFIXES, false, org, securityService,
+              groupRoleProvider, DEFAULT_EXTRA_ROLES);
     } catch (IllegalArgumentException e) {
       // OK
       return;
@@ -149,8 +149,8 @@ public class OpencastLdapAuthoritiesPopulatorTest {
   @Test
   public void testNullOrganization() {
     try {
-      new OpencastLdapAuthoritiesPopulator(DEFAULT_STR_ATTRIBUTE_NAMES, DEFAULT_PREFIX, false, null, securityService,
-              groupRoleProvider, DEFAULT_EXTRA_ROLES);
+      new OpencastLdapAuthoritiesPopulator(DEFAULT_STR_ATTRIBUTE_NAMES, DEFAULT_PREFIX, DEFAULT_EXCLUDE_PREFIXES, false,
+              null, securityService, groupRoleProvider, DEFAULT_EXTRA_ROLES);
     } catch (NullPointerException e) {
       // OK
       return;
@@ -162,8 +162,8 @@ public class OpencastLdapAuthoritiesPopulatorTest {
   @Test
   public void testNullSecurityService() {
     try {
-      new OpencastLdapAuthoritiesPopulator(DEFAULT_STR_ATTRIBUTE_NAMES, DEFAULT_PREFIX, false, org, null,
-              groupRoleProvider, DEFAULT_EXTRA_ROLES);
+      new OpencastLdapAuthoritiesPopulator(DEFAULT_STR_ATTRIBUTE_NAMES, DEFAULT_PREFIX, DEFAULT_EXCLUDE_PREFIXES, false,
+              org, null, groupRoleProvider, DEFAULT_EXTRA_ROLES);
     } catch (NullPointerException e) {
       // OK
       return;
@@ -183,12 +183,14 @@ public class OpencastLdapAuthoritiesPopulatorTest {
 
     // Test several argument combinations
     for (String prefix : PREFIX_TESTS) {
-      for (boolean upper : UPPERCASE_TESTS) {
-        for (JpaGroupRoleProvider groupRoleProvider : groupRoleProviderTests) {
-          for (String[] extraRoles : EXTRA_ROLES_TESTS) {
-            populator = new OpencastLdapAuthoritiesPopulator(attributes, prefix, upper, org, securityService,
-                    groupRoleProvider, extraRoles);
-            doTest(populator, mappings, groupRoleProvider);
+      for (String[] excludePrefixes : EXCLUDE_PREFIXES_TESTS) {
+        for (boolean upper : UPPERCASE_TESTS) {
+          for (JpaGroupRoleProvider groupRoleProvider : groupRoleProviderTests) {
+            for (String[] extraRoles : EXTRA_ROLES_TESTS) {
+              populator = new OpencastLdapAuthoritiesPopulator(attributes, prefix, excludePrefixes, upper, org,
+                      securityService, groupRoleProvider, extraRoles);
+              doTest(populator, mappings, prefix, excludePrefixes, upper, extraRoles, groupRoleProvider);
+            }
           }
         }
       }
@@ -206,12 +208,14 @@ public class OpencastLdapAuthoritiesPopulatorTest {
 
     // Test several argument combinations
     for (String prefix : PREFIX_TESTS) {
-      for (boolean upper : UPPERCASE_TESTS) {
-        for (JpaGroupRoleProvider groupRoleProvider : groupRoleProviderTests) {
-          for (String[] extraRoles : EXTRA_ROLES_TESTS) {
-            populator = new OpencastLdapAuthoritiesPopulator(attributes, prefix, upper, org, securityService,
-                    groupRoleProvider, extraRoles);
-            doTest(populator, mappings, groupRoleProvider);
+      for (String[] excludePrefixes : EXCLUDE_PREFIXES_TESTS) {
+        for (boolean upper : UPPERCASE_TESTS) {
+          for (JpaGroupRoleProvider groupRoleProvider : groupRoleProviderTests) {
+            for (String[] extraRoles : EXTRA_ROLES_TESTS) {
+              populator = new OpencastLdapAuthoritiesPopulator(attributes, prefix, excludePrefixes, upper, org,
+                      securityService, groupRoleProvider, extraRoles);
+              doTest(populator, mappings, prefix, excludePrefixes, upper, extraRoles, groupRoleProvider);
+            }
           }
         }
       }
@@ -228,12 +232,14 @@ public class OpencastLdapAuthoritiesPopulatorTest {
 
     // Test several argument combinations
     for (String prefix : PREFIX_TESTS) {
-      for (boolean upper : UPPERCASE_TESTS) {
-        for (JpaGroupRoleProvider groupRoleProvider : groupRoleProviderTests) {
-          for (String[] extraRoles : EXTRA_ROLES_TESTS) {
-            populator = new OpencastLdapAuthoritiesPopulator(attributes, prefix, upper, org, securityService,
-                    groupRoleProvider, extraRoles);
-            doTest(populator, mappings, groupRoleProvider);
+      for (String[] excludePrefixes : EXCLUDE_PREFIXES_TESTS) {
+        for (boolean upper : UPPERCASE_TESTS) {
+          for (JpaGroupRoleProvider groupRoleProvider : groupRoleProviderTests) {
+            for (String[] extraRoles : EXTRA_ROLES_TESTS) {
+              populator = new OpencastLdapAuthoritiesPopulator(attributes, prefix, excludePrefixes, upper, org,
+                      securityService, groupRoleProvider, extraRoles);
+              doTest(populator, mappings, prefix, excludePrefixes, upper, extraRoles, groupRoleProvider);
+            }
           }
         }
       }
@@ -245,17 +251,19 @@ public class OpencastLdapAuthoritiesPopulatorTest {
     OpencastLdapAuthoritiesPopulator populator;
 
     // Prepare the mappings
-    mappings.put("myAttribute", new String[] { " value1 ", " value2 ", " value3 ", " value4 " });
+    mappings.put("myAttribute", new String[] { " value1 ", " value2 ", " value3 ", " value4 ", GROUP_ROLE });
     String attributes = StringUtils.join(mappings.keySet(), ", ");
 
     // Test several argument combinations
     for (String prefix : PREFIX_TESTS) {
-      for (boolean upper : UPPERCASE_TESTS) {
-        for (JpaGroupRoleProvider groupRoleProvider : groupRoleProviderTests) {
-          for (String[] extraRoles : EXTRA_ROLES_TESTS) {
-            populator = new OpencastLdapAuthoritiesPopulator(attributes, prefix, upper, org, securityService,
-                    groupRoleProvider, extraRoles);
-            doTest(populator, mappings, groupRoleProvider);
+      for (String[] excludePrefixes : EXCLUDE_PREFIXES_TESTS) {
+        for (boolean upper : UPPERCASE_TESTS) {
+          for (JpaGroupRoleProvider groupRoleProvider : groupRoleProviderTests) {
+            for (String[] extraRoles : EXTRA_ROLES_TESTS) {
+              populator = new OpencastLdapAuthoritiesPopulator(attributes, prefix, excludePrefixes, upper, org,
+                      securityService, groupRoleProvider, extraRoles);
+              doTest(populator, mappings, prefix, excludePrefixes, upper, extraRoles, groupRoleProvider);
+            }
           }
         }
       }
@@ -267,17 +275,19 @@ public class OpencastLdapAuthoritiesPopulatorTest {
     OpencastLdapAuthoritiesPopulator populator;
 
     // Prepare the mappings
-    mappings.put("myAttribute", new String[] { " value1, value2, value3 , value4 " });
+    mappings.put("myAttribute", new String[] { format(" value1, value2, value3 , value4 , %s ", GROUP_ROLE) });
     String attributes = StringUtils.join(mappings.keySet(), ", ");
 
     // Test several argument combinations
     for (String prefix : PREFIX_TESTS) {
-      for (boolean upper : UPPERCASE_TESTS) {
-        for (JpaGroupRoleProvider groupRoleProvider : groupRoleProviderTests) {
-          for (String[] extraRoles : EXTRA_ROLES_TESTS) {
-            populator = new OpencastLdapAuthoritiesPopulator(attributes, prefix, upper, org, securityService,
-                    groupRoleProvider, extraRoles);
-            doTest(populator, mappings, groupRoleProvider);
+      for (String[] excludePrefixes : EXCLUDE_PREFIXES_TESTS) {
+        for (boolean upper : UPPERCASE_TESTS) {
+          for (JpaGroupRoleProvider groupRoleProvider : groupRoleProviderTests) {
+            for (String[] extraRoles : EXTRA_ROLES_TESTS) {
+              populator = new OpencastLdapAuthoritiesPopulator(attributes, prefix, excludePrefixes, upper, org,
+                      securityService, groupRoleProvider, extraRoles);
+              doTest(populator, mappings, prefix, excludePrefixes, upper, extraRoles, groupRoleProvider);
+            }
           }
         }
       }
@@ -291,18 +301,21 @@ public class OpencastLdapAuthoritiesPopulatorTest {
     // Prepare the mappings
     mappings.put("attribute1", new String[] { " ", "\n", "\t", "\r", " \n \t", " \nthis\tis an attribute" });
     mappings.put("attribute2",
-            new String[] { "value_2_1 , value\nwith\n\n multiple\t whitespaces, value____with several_underscores",
-                    "normal_value , normalvalue2" });
+            new String[] {
+                    format("value_2_1 , value\nwith\n\n multiple\t whitespaces, value____with several_underscores",
+                            "normal_value , normalvalue2, %s", GROUP_ROLE) });
     String attributes = StringUtils.join(mappings.keySet(), ", ");
 
     // Test several argument combinations
     for (String prefix : PREFIX_TESTS) {
-      for (boolean upper : UPPERCASE_TESTS) {
-        for (JpaGroupRoleProvider groupRoleProvider : groupRoleProviderTests) {
-          for (String[] extraRoles : EXTRA_ROLES_TESTS) {
-            populator = new OpencastLdapAuthoritiesPopulator(attributes, prefix, upper, org, securityService,
-                    groupRoleProvider, extraRoles);
-            doTest(populator, mappings, groupRoleProvider);
+      for (String[] excludePrefixes : EXCLUDE_PREFIXES_TESTS) {
+        for (boolean upper : UPPERCASE_TESTS) {
+          for (JpaGroupRoleProvider groupRoleProvider : groupRoleProviderTests) {
+            for (String[] extraRoles : EXTRA_ROLES_TESTS) {
+              populator = new OpencastLdapAuthoritiesPopulator(attributes, prefix, excludePrefixes, upper, org,
+                      securityService, groupRoleProvider, extraRoles);
+              doTest(populator, mappings, prefix, excludePrefixes, upper, extraRoles, groupRoleProvider);
+            }
           }
         }
       }
@@ -315,23 +328,25 @@ public class OpencastLdapAuthoritiesPopulatorTest {
 
     // Prepare the mappings
     mappings.put("attribute1", new String[] { " ", "\n", "\t", "\r", " \n \t", " \nthis\tis an attribute" });
-    mappings.put("attribute2",
-            new String[] { "value_2_1 , value\nwith\n\n multiple\t whitespaces, value____with several_underscores",
-                    "normal_value , normalvalue2" });
+    mappings.put("attribute2", new String[] { format("value_1 , exclude_value_1, value_2, exclude_value_2",
+            "normal_value , normalvalue2 , %s", GROUP_ROLE) });
     String attributes = StringUtils.join(mappings.keySet(), ", ");
 
     // Define prefixes
-    String[] prefixes = new String[] { "normal_", "many_underscores____", "cApItAlS_", " WH\n\niTE\tspA cE ",
-            " \n \t\t\n \r" };
+    String[] prefixes = new String[] { "normal_" };
+
+    String[][] excludePrefixesTest = new String[][] { null, new String[0], new String[] { "exclude" } };
 
     // Test several argument combinations
     for (String prefix : prefixes) {
-      for (boolean upper : UPPERCASE_TESTS) {
-        for (JpaGroupRoleProvider groupRoleProvider : groupRoleProviderTests) {
-          for (String[] extraRoles : EXTRA_ROLES_TESTS) {
-            populator = new OpencastLdapAuthoritiesPopulator(attributes, prefix, upper, org, securityService,
-                    groupRoleProvider, extraRoles);
-            doTest(populator, mappings, groupRoleProvider);
+      for (String[] excludePrefixes : excludePrefixesTest) {
+        for (boolean upper : UPPERCASE_TESTS) {
+          for (JpaGroupRoleProvider groupRoleProvider : groupRoleProviderTests) {
+            for (String[] extraRoles : EXTRA_ROLES_TESTS) {
+              populator = new OpencastLdapAuthoritiesPopulator(attributes, prefix, excludePrefixes, upper, org,
+                      securityService, groupRoleProvider, extraRoles);
+              doTest(populator, mappings, prefix, excludePrefixes, upper, extraRoles, groupRoleProvider);
+            }
           }
         }
       }
@@ -353,18 +368,20 @@ public class OpencastLdapAuthoritiesPopulatorTest {
 
     // Test several argument combinations
     for (String prefix : PREFIX_TESTS) {
-      for (boolean upper : UPPERCASE_TESTS) {
-        for (JpaGroupRoleProvider groupRoleProvider : groupRoleProviderTests) {
-          for (String[] extraRoles : EXTRA_ROLES_TESTS) {
-            try {
-              populator = new OpencastLdapAuthoritiesPopulator(attributes, prefix, upper, otherOrg, securityService,
-                      groupRoleProvider, extraRoles);
-              doTest(populator, mappings, groupRoleProvider);
-              fail(format(
-                      "Request came from a different organization (\"%s\") as the expected (\"%s\") but no exception was thrown",
-                      otherOrg, this.org));
-            } catch (SecurityException e) {
-              // OK
+      for (String[] excludePrefixes : EXCLUDE_PREFIXES_TESTS) {
+        for (boolean upper : UPPERCASE_TESTS) {
+          for (JpaGroupRoleProvider groupRoleProvider : groupRoleProviderTests) {
+            for (String[] extraRoles : EXTRA_ROLES_TESTS) {
+              try {
+                populator = new OpencastLdapAuthoritiesPopulator(attributes, prefix, excludePrefixes, upper, otherOrg,
+                        securityService, groupRoleProvider, extraRoles);
+                doTest(populator, mappings, prefix, excludePrefixes, upper, extraRoles, groupRoleProvider);
+                fail(format(
+                        "Request came from a different organization (\"%s\") as the expected (\"%s\") but no exception was thrown",
+                        otherOrg, this.org));
+              } catch (SecurityException e) {
+                // OK
+              }
             }
           }
         }
@@ -381,7 +398,8 @@ public class OpencastLdapAuthoritiesPopulatorTest {
    *          a {@link Map} containing the LDAP attribute name - value pairs, where the name is a {@link String} and the
    *          value an array of {@code String}s, possibly {@code null} or empty.
    */
-  private void doTest(OpencastLdapAuthoritiesPopulator populator, Map<String, String[]> mappings,
+  private void doTest(OpencastLdapAuthoritiesPopulator populator, Map<String, String[]> mappings, String rolePrefix,
+          String[] excludePrefixes, boolean toUppercase, String[] additionalAuthorities,
           JpaGroupRoleProvider groupRoleProvider) {
     DirContextOperations dirContextMock = EasyMock.createNiceMock(DirContextOperations.class);
 
@@ -393,46 +411,80 @@ public class OpencastLdapAuthoritiesPopulatorTest {
 
     // Prepare the expected result
     HashSet<GrantedAuthority> expectedResult = new HashSet<GrantedAuthority>();
-    for (String attrName : populator.getAttributeNames()) {
+    for (String attrName : mappings.keySet()) {
       if (mappings.get(attrName) != null) {
         for (String attrValues : mappings.get(attrName)) {
-          addRoles(expectedResult, populator.getRolePrefix(), populator.getConvertToUpperCase(), groupRoleProvider,
+          addRoles(expectedResult, rolePrefix, excludePrefixes, toUppercase, groupRoleProvider, org,
                   attrValues.split(","));
         }
       }
     }
 
     // Add the additional authorities
-    addRoles(expectedResult, populator.getRolePrefix(), populator.getConvertToUpperCase(), groupRoleProvider,
-            populator.getAdditionalAuthorities());
+    addRoles(expectedResult, rolePrefix, excludePrefixes, toUppercase, groupRoleProvider, org, additionalAuthorities);
 
     // Check the response is correct
     checkResponse(populator.getGrantedAuthorities(dirContextMock, USERNAME), expectedResult);
   }
 
-  private void addRoles(Set<GrantedAuthority> roles, String prefix, boolean toUpper, JpaGroupRoleProvider groupProvider,
-          String... strRoles) {
+  private void addRoles(Set<GrantedAuthority> roles, String thePrefix, String[] excludePrefixes, boolean toUpper,
+          JpaGroupRoleProvider groupProvider, Organization org, String... strRoles) {
+
+    /* The whitespace around the roles and "thePrefix" is always trimmed.
+     * The special characters and internal spaces in roles and "thePrefix" are always converted to underscores
+     * The roles and prefix are always converted to uppercase when the 'toUpper' is true.
+     * The (trimmed, possibly uppercased) prefix is appended if, and only if:
+     *    - The role does not match a group role, and
+     *    - The role does not start with any of the "excludePrefixes" provided
+     */
+
+    if (toUpper)
+      thePrefix = StringUtils.trimToEmpty(thePrefix).toUpperCase();
+    else
+      thePrefix = StringUtils.trimToEmpty(thePrefix);
 
     if (strRoles != null) {
       for (String strRole : strRoles) {
-        String role = strRole.trim();
+        String role;
+        if (toUpper)
+          role = StringUtils.trimToEmpty(strRole).replaceAll("[\\s_]+", "_").toUpperCase();
+        else
+          role = StringUtils.trimToEmpty(strRole).replaceAll("[\\s_]+", "_");
+
         if (!role.isEmpty()) {
-          if (prefix == null) {
-            prefix = "";
-          }
-          if (toUpper) {
-            role = (prefix.trim() + role).replaceAll("[\\s_]+", "_").toUpperCase();
-          } else {
-            role = (prefix.trim() + role).replaceAll("[\\s_]+", "_");
-          }
-          logger.debug("Creating expected attribute '{}'", role);
-          roles.add(new SimpleGrantedAuthority(role));
+          String prefix = thePrefix;
 
           if (groupProvider != null) {
-            for (Role groupRole : groupRoleProvider.getRolesForGroup(role)) {
-              roles.add(new SimpleGrantedAuthority(groupRole.getName()));
+            List<Role> groupRoles = groupRoleProvider.getRolesForGroup(role);
+            if (!groupRoles.isEmpty()) {
+              logger.debug("Found group role {} with the following roles:", role);
+              for (Role groupRole : groupRoles) {
+                logger.debug("\t* {}", groupRole);
+                roles.add(new SimpleGrantedAuthority(groupRole.getName()));
+              }
+              prefix = "";
+            }
+          } else if (!thePrefix.isEmpty()) {
+            if (excludePrefixes != null) {
+              for (String excludePrefix : excludePrefixes) {
+                String excPrefix;
+                if (toUpper)
+                  excPrefix = StringUtils.trimToEmpty(excludePrefix).toUpperCase();
+                else
+                  excPrefix = StringUtils.trimToEmpty(excludePrefix);
+                if (role.startsWith(excPrefix)) {
+                  prefix = "";
+                  break;
+                }
+              }
             }
           }
+
+          role = (prefix + role).replaceAll("[\\s_]+", "_");
+
+          logger.debug("Adding expected authority '{}'", role);
+          roles.add(new SimpleGrantedAuthority(role));
+
         }
       }
     }

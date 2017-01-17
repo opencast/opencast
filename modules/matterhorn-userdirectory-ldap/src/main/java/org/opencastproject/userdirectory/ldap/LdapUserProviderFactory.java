@@ -88,6 +88,12 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
   /** The key to indicate a prefix that will be added to every role read from the LDAP */
   private static final String ROLE_PREFIX_KEY = "org.opencastproject.userdirectory.ldap.roleprefix";
 
+  /**
+   * The key to indicate a comma-separated list of prefixes, the roles with which won't be appended the common prefix
+   * above
+   */
+  private static final String EXCLUDE_PREFIXES_KEY = "org.opencastproject.userdirectory.ldap.exclude.prefixes";
+
   /** The key to indicate whether or not the roles should be converted to uppercase */
   private static final String UPPERCASE_KEY = "org.opencastproject.userdirectory.ldap.uppercase";
 
@@ -181,6 +187,13 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     String password = (String) properties.get(SEARCH_PASSWORD);
     String roleAttributes = (String) properties.get(ROLE_ATTRIBUTES_KEY);
     String rolePrefix = (String) properties.get(ROLE_PREFIX_KEY);
+
+    String[] excludePrefixes = null;
+    String strExcludePrefixes = (String) properties.get(EXCLUDE_PREFIXES_KEY);
+    if (StringUtils.isNotBlank(strExcludePrefixes)) {
+      excludePrefixes = strExcludePrefixes.split(",");
+    }
+
     // Make sure that property convertToUppercase is true by default
     String strUppercase = (String) properties.get(UPPERCASE_KEY);
     boolean convertToUppercase = Boolean.valueOf(strUppercase);
@@ -238,13 +251,13 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
     // Instantiate this LDAP instance and register it as such
     LdapUserProviderInstance provider = new LdapUserProviderInstance(pid, org, searchBase, searchFilter, url, userDn,
-            password, roleAttributes, rolePrefix, convertToUppercase, cacheSize, cacheExpiration,
+            password, roleAttributes, rolePrefix, excludePrefixes, convertToUppercase, cacheSize, cacheExpiration,
             this.groupRoleProvider);
 
     providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
 
     OpencastLdapAuthoritiesPopulator authoritiesPopulator = new OpencastLdapAuthoritiesPopulator(roleAttributes,
-            rolePrefix, convertToUppercase, org, securityService, groupRoleProvider, extraRoles);
+            rolePrefix, excludePrefixes, convertToUppercase, org, securityService, groupRoleProvider, extraRoles);
 
     // Also, register this instance as LdapAuthoritiesPopulator so that it can be used within the security.xml file
     authoritiesPopulatorRegistrations.put(pid,

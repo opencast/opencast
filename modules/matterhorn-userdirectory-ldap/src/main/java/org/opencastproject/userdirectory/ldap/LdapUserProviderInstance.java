@@ -52,6 +52,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -91,6 +92,12 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   /** A token to store in the miss cache */
   protected Object nullToken = new Object();
 
+  /** The general role prefix, to be added to all the LDAP roles that do not start by one of the exclude prefixes */
+  private String rolePrefix;
+
+  /** An array of prefixes. When a role starts with any of these, the role prefix defined above will not be appended */
+  private Set<String> excludePrefixes = new HashSet<String>();
+
   /**
    * Constructs an ldap user provider with the needed settings.
    *
@@ -119,8 +126,8 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
    */
   // CHECKSTYLE:OFF
   LdapUserProviderInstance(String pid, Organization organization, String searchBase, String searchFilter, String url,
-          String userDn, String password, String roleAttributesGlob, String rolePrefix, boolean convertToUppercase,
-          int cacheSize, int cacheExpiration, JpaGroupRoleProvider groupRoleProvider) {
+          String userDn, String password, String roleAttributesGlob, String rolePrefix, String[] aExcludePrefixes,
+          boolean convertToUppercase, int cacheSize, int cacheExpiration, JpaGroupRoleProvider groupRoleProvider) {
     // CHECKSTYLE:ON
     this.organization = organization;
     logger.debug("Creating LdapUserProvider instance with pid=" + pid + ", and organization=" + organization
@@ -149,15 +156,53 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
     if (StringUtils.isNotBlank(roleAttributesGlob)) {
       LdapUserDetailsMapper mapper = new LdapUserDetailsMapper();
 
-      if (StringUtils.isBlank(rolePrefix)) {
-        rolePrefix = "";
-      }
-      mapper.setRolePrefix(rolePrefix);
-      logger.debug("Role prefix set to: \"{}\"", rolePrefix);
-
       mapper.setConvertToUpperCase(convertToUppercase);
 
       mapper.setRoleAttributes(roleAttributesGlob.split(","));
+
+      if (convertToUppercase)
+        this.rolePrefix = StringUtils.trimToEmpty(rolePrefix).toUpperCase();
+      else
+        this.rolePrefix = StringUtils.trimToEmpty(rolePrefix);
+
+      logger.debug("Role prefix set to: \"{}\"", this.rolePrefix);
+
+      // The default prefix value is "ROLE_", so we must explicitly set it to "" by default
+      mapper.setRolePrefix("");
+
+      // Apply the general role profile if no "exclude prefixes" were defined
+      // Otherwise, we'll apply those prefixes manually
+      if (!this.rolePrefix.isEmpty()) {
+        if (aExcludePrefixes == null) {
+          mapper.setRolePrefix(this.rolePrefix);
+        } else {
+          // "Clean" the list of exclude prefixes
+          for (String excludePrefix : aExcludePrefixes) {
+            String cleanPrefix = excludePrefix.trim();
+            if (!cleanPrefix.isEmpty()) {
+              if (convertToUppercase)
+                excludePrefixes.add(cleanPrefix.toUpperCase());
+              else
+                excludePrefixes.add(cleanPrefix);
+            }
+          }
+
+          if (logger.isDebugEnabled()) {
+            if (excludePrefixes.size() > 0) {
+              logger.debug("Exclude prefixes set to:");
+              for (String prefix : aExcludePrefixes) {
+                logger.debug("\t* {}", prefix);
+              }
+            } else {
+              logger.debug("No exclude prefixes defined");
+            }
+          }
+
+          if (excludePrefixes.size() > 0)
+            mapper.setRolePrefix(this.rolePrefix);
+        }
+      }
+
       this.delegate.setUserDetailsMapper(mapper);
     }
 
@@ -267,13 +312,44 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
       Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
       Set<JaxbRole> roles = new HashSet<JaxbRole>();
       if (authorities != null) {
+        /*
+         * Please note the prefix logic for roles:
+         *
+         * - Group roles are left intact
+         * - Roles that start with any of the "exclude prefixes" are left intact
+         * - In any other case, the "role prefix" is appended to the roles read from LDAP
+         *
+         * This only applies to the prefix addition. The conversion to uppercase is independent from these
+         * considerations
+         */
         for (GrantedAuthority authority : authorities) {
-          roles.add(new JaxbRole(authority.getAuthority(), jaxbOrganization));
+          String strAuthority = authority.getAuthority();
 
-          // Check if this role is a group role and assign the groups appropriately
-          for (Role role : groupRoleProvider.getRolesForGroup(authority.getAuthority())) {
-            roles.add(JaxbRole.fromRole(role));
+          // Check if this role is a group role and assign the extra roles appropriately
+
+          List<Role> groupRoles = groupRoleProvider.getRolesForGroup(strAuthority);
+
+          if (!groupRoles.isEmpty()) {
+            for (Role role : groupRoles) {
+              roles.add(JaxbRole.fromRole(role));
+            }
+          } else {
+            if (excludePrefixes.size() > 0) {
+              boolean hasExcludePrefix = false;
+              for (String excludePrefix : excludePrefixes) {
+                if (strAuthority.startsWith(excludePrefix)) {
+                  hasExcludePrefix = true;
+                  break;
+                }
+              }
+              if (!hasExcludePrefix) {
+                strAuthority = rolePrefix + strAuthority;
+              }
+            }
           }
+
+          // Finally, add the role itself
+          roles.add(new JaxbRole(strAuthority, jaxbOrganization));
         }
       }
       User user = new JaxbUser(userDetails.getUsername(), PROVIDER_NAME, jaxbOrganization, roles);

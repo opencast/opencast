@@ -36,20 +36,28 @@ org.opencastproject.userdirectory.ldap.cache.expiration=5
 
 ## The comma-separated list of attributes that will be translated into roles.
 ## Note that the attributes will be converted to uppercase and that they may be prefixed with a string, as defined in the
-## configuration below, which is not blank by default. Please refer to the documentation of the "roleprefix" property
-## below.
+## configuration below. Please refer to the documentation of the "roleprefix" property below.
 ## Example: berkeleyEduAffiliations,departmentNumber
 org.opencastproject.userdirectory.ldap.roleattributes=
 
 ## The organization for this provider
 org.opencastproject.userdirectory.ldap.org=mh_default_org
 
-## A prefix to be added to all the roles read by this provider. It defaults to an empty string "", i.e. no prefix added.
+## A prefix to be added to the roles read by this provider. It defaults to an empty string "", i.e. no prefix added.
 ## Please note that this property had previous a default value of "ROLE_", which is still recommended, but not mandatory.
-org.opencastproject.userdirectory.ldap.roleprefix=ROLE_
+##
+## The prefix is *NOT* added to a role if any of the following conditions is met:
+##
+##   * The role is found to be a "group role", i.e. it represent a role already defined in Opencast.
+##   * The role starts with any of the prefixes defined in the parameter 'exclude.prefixes'
+org.opencastproject.userdirectory.ldap.roleprefix=
+
+## A comma-separated list of prefixes. When the roles read from LDAP start with any of these, then the prefix defined
+## above is not appended to the role
+org.opencastproject.userdirectory.ldap.exclude.prefixes=
 
 ## Whether or not the role names should be converted to uppercase. It defaults to "true"
 org.opencastproject.userdirectory.ldap.uppercase=true
 
-## A comma-separated list of extra roles to apply to all the user authenticated with this LDAP instance
+## A comma-separated list of extra roles to apply to all the users authenticated with this LDAP instance
 org.opencastproject.userdirectory.ldap.extra.roles=
