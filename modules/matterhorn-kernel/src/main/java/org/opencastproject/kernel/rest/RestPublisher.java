@@ -360,9 +360,6 @@ public class RestPublisher implements RestConstants {
 
     /**
      * {@inheritDoc}
-     *
-     * @see org.apache.cxf.jaxrs.provider.JSONProvider#createWriter(java.lang.Object, java.lang.Class,
-     *      java.lang.reflect.Type, java.lang.String, java.io.OutputStream, boolean)
      */
     @Override
     protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass, Type genericType, String enc,

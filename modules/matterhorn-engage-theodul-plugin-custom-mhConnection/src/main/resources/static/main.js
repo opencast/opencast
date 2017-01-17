@@ -195,7 +195,11 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
     }
 
     Engage.on(plugin.events.mediaPackageModelInternalError.getName(), function() {
-        Engage.trigger(events.mediaPackageModelError.getName(), translate("error_mediaPackageInformationNotLoaded", "There are two possible reasons for this error:<ul><li>The media is not available any more</li><li>The media is protected and you need to log in</li></ul>"));
+        var msg = translate("error_mediaPackageInformationNotLoaded", "There are two possible reasons for this error")
+        var rsn1 = translate("error_mediaPackageInformationNotLoaded_reason1", "The media is not available any more")
+        var rsn2 = translate("error_mediaPackageInformationNotLoaded_reason2", "The media is protected and you need to log in")
+        msg += '<ul><li>' + rsn1 + '</li><li>' + rsn2 + '</li></ul>';
+        Engage.trigger(events.mediaPackageModelError.getName(), msg);
     });
 
     Engage.on(plugin.events.getMediaInfo.getName(), function(callback) {

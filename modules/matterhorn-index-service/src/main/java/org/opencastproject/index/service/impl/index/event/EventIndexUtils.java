@@ -170,6 +170,7 @@ public final class EventIndexUtils {
 
     metadata.addField(EventIndexSchema.HAS_COMMENTS, event.hasComments(), true);
     metadata.addField(EventIndexSchema.HAS_OPEN_COMMENTS, event.hasOpenComments(), true);
+    metadata.addField(EventIndexSchema.NEEDS_CUTTING, event.needsCutting(), true);
 
     if (event.getPublications() != null) {
       List<Publication> publications = event.getPublications();
@@ -626,18 +627,21 @@ public final class EventIndexUtils {
    * @throws NotFoundException
    *           if event has not been found
    */
-  public static void updateComments(String eventId, boolean hasComments, boolean hasOpenComments, String organization,
-          User user, AbstractSearchIndex searchIndex) throws SearchIndexException, NotFoundException {
+  public static void updateComments(String eventId, boolean hasComments, boolean hasOpenComments, boolean needsCutting,
+          String organization, User user, AbstractSearchIndex searchIndex) throws SearchIndexException, NotFoundException {
     if (!hasComments && hasOpenComments)
       throw new IllegalStateException(
               "Invalid comment update request: You can't have open comments without having any comments!");
-
+    if (!hasOpenComments && needsCutting)
+      throw new IllegalStateException(
+              "Invalid comment update request: You can't have an needs cutting comment without having any open comments!");
     Event event = getEvent(eventId, organization, user, searchIndex);
     if (event == null)
       throw new NotFoundException("No event with id " + eventId + " found.");
 
     event.setHasComments(hasComments);
     event.setHasOpenComments(hasOpenComments);
+    event.setNeedsCutting(needsCutting);
     try {
       searchIndex.addOrUpdate(event);
     } catch (SearchIndexException e) {

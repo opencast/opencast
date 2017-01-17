@@ -2,7 +2,6 @@
   "value_locale":"gl",
   "error_AudioCodecNotSupported":"Erro: O códec de audio non é compatible con este navegador",
   "error_AudioElementNotSupported":"Erro: O elemento de audio non é compatible co seu navegador.",
-  "switchPlayer":"Cambiar reprodutor",
   "video":"Vídeo",
   "video_short":"Vid.",
   "openInPlayer":"Abrir no reprodutor",

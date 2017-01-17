@@ -53,7 +53,7 @@ public class CommentMessageReceiverImpl extends BaseMessageReceiverImpl<CommentI
 
         try {
           EventIndexUtils.updateComments(commentItem.getEventId(), commentItem.hasComments(),
-                  commentItem.hasOpenComments(), organization, user, getSearchIndex());
+                  commentItem.hasOpenComments(), commentItem.needsCutting(), organization, user, getSearchIndex());
           logger.debug("Event {} comment status updated from adminui search index", commentItem.getEventId());
         } catch (SearchIndexException e) {
           logger.error("Error updating comment status of event {} from the search index: {}", commentItem.getEventId(),

@@ -38,7 +38,7 @@ import javax.servlet.Filter;
 /**
  * Registers a security filter, which delegates to the spring filter chain appropriate for the current request's
  * organization. Organizational security configurations may be added to the security watch directory, and should be
- * named <organization_id>.xml.
+ * named &lt;organization_id&gt;.xml.
  */
 public class SpringSecurityConfigurationArtifactInstaller implements ArtifactInstaller {
   protected static final Logger logger = LoggerFactory.getLogger(SpringSecurityConfigurationArtifactInstaller.class);

@@ -49,19 +49,19 @@
     "CONTINUE_ACTION":"您确定要继续吗?",
     "METADATA":{
       "NOTICE":{
-        "UNKNOWN":"The following element will be deleted",
-        "EVENT":"The following event will be deleted",
-        "SERIES":"The following series will be deleted",
-        "ACL":"The following ACL will be deleted",
-        "GROUP":"The following group will be deleted",
-        "USER":"The following user will be deleted",
-        "USER_BLACKLIST":"The following user blacklist will be deleted",
-        "THEME":"The following theme will be deleted",
-        "EMAIL":"The following email template will be deleted",
-        "LOCATION":"The following location will be deleted",
-        "LOCATION_BLACKLIST":"The following location blacklist will be deleted"
+        "UNKNOWN":"下面的元素将被删除",
+        "EVENT":"以下事件将被删除",
+        "SERIES":"将删除以下一系列",
+        "ACL":"将删除以下 ACL",
+        "GROUP":"将删除以下组",
+        "USER":"以下的用户将被删除",
+        "USER_BLACKLIST":"将删除以下用户黑名单",
+        "THEME":"下列主题将被删除",
+        "EMAIL":"将删除以下电子邮件模板",
+        "LOCATION":"将删除以下位置",
+        "LOCATION_BLACKLIST":"将删除以下位置黑名单"
       },
-      "NAME":"Name"
+      "NAME":"名称"
     },
     "ACTIONS":{
       "CONFIRMATION":"需要确认"
@@ -118,6 +118,8 @@
     "USER_BLACKLIST_NOT_SAVED":"黑名单无法保存",
     "USER_BLACKLIST_DELETED":"黑名单已删除",
     "USER_BLACKLIST_NOT_DELETED":"黑名单无法删除",
+    "LOCATION_DELETED":"位置已被删除",
+    "LOCATION_NOT_DELETED":"无法删除位置",
     "LOCATION_BLACKLIST_CREATED":"黑名单已创建",
     "LOCATION_BLACKLIST_NOT_CREATED":"黑名单无法创建",
     "LOCATION_BLACKLIST_SAVED":"黑名单已保存",
@@ -136,7 +138,7 @@
     "CONFLICT_DETECTED":"排程有冲突：该新事件与已存在的某个事件有重叠，请更改位置、日期或时间。",
     "CONFLICT_ALREADY_ENDED":"排程错误 ︰ 该事件已结束。",
     "CONFLICT_END_BEFORE_START":"排程错误 ︰ 结束时间必须要迟于开始时间。",
-    "INVALID_ACL_RULES":"规则必须含有一个拥有读取和\/或写入权限的有效角色。",
+    "INVALID_ACL_RULES":"规则必须含有一个拥有读取和/或写入权限的有效角色。",
     "MISSING_ACL_RULES":"至少有一个角色必须具有读取和写入权限。",
     "SAVED_ACL_RULES":"访问权限已保存",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"这个系列的现有事件需要重新处理",
@@ -210,7 +212,7 @@
     "SCHEDULE_TASK":{
       "CAPTION":"启动任务",
       "GENERAL":{
-        "CAPTION":"General",
+        "CAPTION":"一般",
         "SUMMARY":"({{ count }} 个选定的事件)",
         "CANNOTSTART":"标示的事件无法在此刻进行处理, 您可以取消选择或稍后再试。"
       },
@@ -706,6 +708,7 @@
           }
         },
         "METADATA":{
+          "CAPTION":"事件详细信息",
           "TITLE":"标题",
           "ID":"UID",
           "SERIES":"系列",
@@ -966,7 +969,8 @@
     },
     "ACTIONS":{
       "EXPORT":"汇出",
-      "ADD_BLACKLIST":"加入黑名单"
+      "ADD_BLACKLIST":"加入黑名单",
+      "REMOVE":"删除"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1046,6 +1050,7 @@
         "EMAIL":"电子邮件",
         "ROLES":"角色",
         "TYPE":"类型",
+        "PROVIDER":"供货商",
         "BLACKLIST_FROM":"从黑名单",
         "BLACKLIST_TO":"直到某日才从黑名单中解除",
         "ACTION":"操作"
@@ -1415,7 +1420,7 @@
     },
     "JOBS":{
       "TABLE":{
-        "ID":"Job Identifier",
+        "ID":"作业的标识符",
         "ACTION":"操作",
         "CAPTION":"作业",
         "CREATED":"创建",
@@ -1490,6 +1495,16 @@
       "UNDO":"撤消",
       "REDO":"重做",
       "CLEAR_SEGMENTS":"清段"
+    },
+    "PLAYER":{
+      "PLAY":"播放",
+      "PAUSE":"暂停...",
+      "NEXT_FRAME":"下一帧",
+      "PREVIOUS_FRAME":"前一帧",
+      "NEXT_SEGMENT":"下一步分割/跳转到结束",
+      "PREVIOUS_SEGMENT":"前一段 / 跳转到开始",
+      "MUTE":"静音：",
+      "VOLUME":"音量"
     }
   },
   "LOGIN":{
@@ -1498,7 +1513,7 @@
     "USERNAME":"用户名...",
     "PASSWORD":"密码...",
     "LOGIN":"登入",
-    "ERROR":"不正确的用户名 和\/或 密码"
+    "ERROR":"不正确的用户名 和/或 密码"
   },
   "TABLE_FILTERS":{
     "CLEAR":"清除所有过滤器",
@@ -1737,7 +1752,7 @@
     "RUNNING":"运行中",
     "FINISHED":"已完成",
     "FAILED":"失败",
-    "FINISHED_WITH_COMMENTS":"完成与公开作出的评注",
+    "FINISHED_WITH_COMMENTS":"待办",
     "SCHEDULED":"已排程"
   }
 }

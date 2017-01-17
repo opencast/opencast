@@ -181,6 +181,10 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
     /** Run the extraction. */
     WorkflowOperationResult main(final MediaPackage mp) throws WorkflowOperationException {
+      if (cfg.sourceTracks.size() == 0) {
+        logger.info("No source tracks found in media package {}, skipping operation", mp.getIdentifier());
+        return handler.createResult(mp, Action.SKIP);
+      }
       // start image extraction jobs
       final List<Extraction> extractions = $(cfg.sourceTracks).bind(new Fn<Track, Stream<Extraction>>() {
         @Override public Stream<Extraction> ap(final Track t) {
