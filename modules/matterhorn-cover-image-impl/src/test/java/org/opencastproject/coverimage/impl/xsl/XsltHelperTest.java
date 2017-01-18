@@ -30,10 +30,18 @@ import org.junit.Test;
 public class XsltHelperTest {
 
   private static final String SHORT_TEXT = "A short title";
-  private static final String TEXT1 = "Multiscale Climatic, Topographic, and Biotic Controls of Tree Invasion in a Sub-Alpine Parkland Landscape, Jefferson Park, Oregon Cascades, USA";
-  private static final String TEXT2 = "The Ancient Ancestors of these Indians here: Colonial European Perceptions of the Greatness of Classical Mesoamerican Cultures and the Apparent Degeneration of Conquest Era and Colonial Indigenous Cultures in Mesoamerica, 1521-1821";
-  private static final String TEXT3 = "Dies ist ein \"Klassiker\" zur Gesprächsführung: Eine der ersten kommerziell erstellten Therapieaufnahmen, bei der die echte Patientin \"Gloria\" mit Rogers, Perls (Gestalttherapie) und Ellis (Rational-emotive Therapie) spricht. Ich stelle Ihnen hier nur den Ausschnitt mit Rogers (Copyright!) zur Verfügung.";
-  private static final String TEXT4 = "Angehrn Tobias, Biedermann Anja, Böni Nicole, Ehrensperger Markus, Merk Cornelia, Rohner Aline, Wattinger Stéphanie, Häni Yannick, Hilfiker Florian, Kratochwill Andreas, Schlösser Nathalie, Schwarzer Andreas";
+  private static final String TEXT1 = "Multiscale Climatic, Topographic, and Biotic Controls of Tree Invasion in a "
+          + "Sub-Alpine Parkland Landscape, Jefferson Park, Oregon Cascades, USA";
+  private static final String TEXT2 = "The Ancient Ancestors of these Indians here: Colonial European Perceptions of "
+          + "the Greatness of Classical Mesoamerican Cultures and the Apparent Degeneration of Conquest Era and "
+          + "Colonial Indigenous Cultures in Mesoamerica, 1521-1821";
+  private static final String TEXT3 = "Dies ist ein \"Klassiker\" zur Gesprächsführung: Eine der ersten "
+          + "kommerziell erstellten Therapieaufnahmen, bei der die echte Patientin \"Gloria\" mit Rogers, Perls "
+          + "(Gestalttherapie) und Ellis (Rational-emotive Therapie) spricht. Ich stelle Ihnen hier nur den "
+          + "Ausschnitt mit Rogers (Copyright!) zur Verfügung.";
+  private static final String TEXT4 = "Angehrn Tobias, Biedermann Anja, Böni Nicole, Ehrensperger Markus, Merk "
+          + "Cornelia, Rohner Aline, Wattinger Stéphanie, Häni Yannick, Hilfiker Florian, Kratochwill Andreas, "
+          + "Schlösser Nathalie, Schwarzer Andreas";
 
   @Test
   public void testSplit() {
