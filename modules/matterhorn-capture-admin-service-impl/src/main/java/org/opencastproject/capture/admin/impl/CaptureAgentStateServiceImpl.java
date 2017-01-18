@@ -24,6 +24,7 @@ package org.opencastproject.capture.admin.impl;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.capture.admin.api.AgentState.KNOWN_STATES;
 import static org.opencastproject.capture.admin.api.AgentState.UNKNOWN;
+import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentState;
@@ -41,6 +42,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple3;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -123,6 +125,9 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   /** A cache of CA properties, which lightens the load on the SQL server */
   private LoadingCache<String, Object> agentCache = null;
 
+  /** Configuration key for capture agent timeout in minutes before being marked offline */
+  public static final String CAPTURE_AGENT_TIMEOUT_KEY = "org.opencastproject.capture.admin.timeout";
+
   /** A token to store in the miss cache */
   protected Object nullToken = new Object();
 
@@ -170,7 +175,23 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   }
 
   public void activate(ComponentContext cc) {
-    setupAgentCache(2, TimeUnit.HOURS);
+
+    // Set up the agent cache
+    int timeoutInMinutes = 120;
+
+    Option<String> timeout = getOptContextProperty(cc, CAPTURE_AGENT_TIMEOUT_KEY);
+
+    if (timeout.isSome()) {
+      try {
+        timeoutInMinutes = Integer.parseInt(timeout.get());
+      } catch (NumberFormatException e) {
+        logger.warn("Invalid configuration for capture agent status timeout (minutes) ({}={})",
+                CAPTURE_AGENT_TIMEOUT_KEY, timeout.get());
+      }
+    }
+
+    setupAgentCache(timeoutInMinutes, TimeUnit.MINUTES);
+    logger.info("Capture agent status timeout is {} minutes", timeoutInMinutes);
   }
 
   public void deactivate() {
@@ -813,7 +834,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   }
 
   protected void setupAgentCache(int count, TimeUnit unit) {
- // Setup the agent cache
+    // Setup the agent cache
     RemovalListener<String, Object> removalListener = new RemovalListener<String, Object>() {
       private Set<String> ignoredStates = new LinkedHashSet<String>(Arrays.asList(AgentState.UNKNOWN, AgentState.OFFLINE));
       @Override
@@ -878,16 +899,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     if (isBlank(schedulerRolesConfig))
       throw new ConfigurationException("schedulerRoles", "must be specified");
     String[] schedulerRoles = schedulerRolesConfig.trim().split(",");
-
-    String cacheLifetime = (String) properties.get("cacheLifetime");
-    if (StringUtils.isNotBlank(cacheLifetime)) {
-      try {
-        int cacheLife = Integer.parseInt(cacheLifetime);
-        setupAgentCache(cacheLife, TimeUnit.HOURS);
-      } catch (NumberFormatException e) {
-        throw new ConfigurationException("cacheLifetime", "is invalid");
-      }
-    }
 
     // If we don't already have a mapping for this PID, create one
     if (!pidMap.containsKey(pid)) {
