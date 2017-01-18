@@ -24,6 +24,7 @@ package org.opencastproject.capture.admin.impl;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.capture.admin.api.AgentState.KNOWN_STATES;
 import static org.opencastproject.capture.admin.api.AgentState.UNKNOWN;
+import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentState;
@@ -41,6 +42,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple3;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -177,10 +179,11 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     // Set up the agent cache
     int timeoutInMinutes = 120;
 
-    if (ensureContextProp(cc, CAPTURE_AGENT_TIMEOUT_KEY)) {
-      String timeout = cc.getBundleContext().getProperty(CAPTURE_AGENT_TIMEOUT_KEY);
+    Option<String> timeout = getOptContextProperty(cc, CAPTURE_AGENT_TIMEOUT_KEY);
+
+    if (timeout.isSome()) {
       try {
-        timeoutInMinutes = Integer.parseInt(timeout);
+        timeoutInMinutes = Integer.parseInt(timeout.get());
       } catch (NumberFormatException e) {
         logger.warn("Invalid configuration for capture agent status timeout (minutes) ({}={})",
                 CAPTURE_AGENT_TIMEOUT_KEY, timeout);
@@ -193,18 +196,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   public void deactivate() {
     agentCache.invalidateAll();
-  }
-
-  /**
-   * Check if a property exists in a given bundle context.
-   *
-   * @param cc
-   *          the OSGi component context
-   * @param prop
-   *          property to check for.
-   */
-  private boolean ensureContextProp(ComponentContext cc, String prop) {
-    return cc != null && cc.getBundleContext().getProperty(prop) != null;
   }
 
   /**
