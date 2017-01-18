@@ -186,7 +186,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
         timeoutInMinutes = Integer.parseInt(timeout.get());
       } catch (NumberFormatException e) {
         logger.warn("Invalid configuration for capture agent status timeout (minutes) ({}={})",
-                CAPTURE_AGENT_TIMEOUT_KEY, timeout);
+                CAPTURE_AGENT_TIMEOUT_KEY, timeout.get());
       }
     }
 
