@@ -79,3 +79,48 @@ The metadata XML, which is passed to the cover image service, looks like the fol
 ### Date and Time
 
 The date is localized based on your servers Java Runtime language settings.
+
+## Libraries that can be used in XSL stylesheets
+
+Opencast provides the XsltHelper class for easy access to some commonly used helper methods.
+
+To make use of the XsltHelper class, you need to reference it from your XSL stylesheet:
+
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <xsl:stylesheet version="1.0"
+      xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dcterms="http://purl.org/dc/terms/"
+      xmlns:opencast="xalan://org.opencastproject.coverimage.impl.xsl" exclude-result-prefixes="opencast"
+      extension-element-prefixes="opencast">
+
+Later on, you can use methods of the XsltHelper class as shown in the following example:
+
+    <tspan class="title" y="30%" x="50%">
+      <xsl:value-of select="opencast:XsltHelper.split(metadata/title, 30, 1, false())" />
+    </tspan>
+
+Note: In XSLT, use `true()` and `false()` for boolean literals (`true` and `false` won't work since those are not 
+keywords in XSLT)
+
+The following methods are provided by the XsltHelper class:
+
+### String split(String text, int maxChars, int line, boolean isLastLine)
+
+This method can be used to break string over multiple lines and to abbreviate strings that are too using ellipsis.
+
+|Parameter  |Description                                                  |
+|-----------|-------------------------------------------------------------|
+|text       |Input string                                                 |
+|maxChars   |Maximum number of characters per line                        |
+|line       |Number of line                                               |
+|isLastLine |Whether `line` is the last line used to represent the `text` |
+
+**Example**
+
+To use at most two lines (max. 30 characters per line) to represent a string `metadata/title` and abbreviate the string if two lines aren't enough:
+
+    <tspan class="title" y="30%" x="50%">
+      <xsl:value-of select="opencast:XsltHelper.split(metadata/title, 30, 1, false())" />
+    </tspan>
+    <tspan class="title" dy="10%" x="50%">
+      <xsl:value-of select="opencast:XsltHelper.split(metadata/title, 30, 2, true())" />
+    </tspan>
