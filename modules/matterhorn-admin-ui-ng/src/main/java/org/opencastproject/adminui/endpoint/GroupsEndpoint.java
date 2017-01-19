@@ -28,6 +28,7 @@ import static com.entwinemedia.fn.data.json.Jsons.v;
 import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
@@ -246,6 +247,7 @@ public class GroupsEndpoint {
       @RestParameter(name = "id", description = "The group identifier", isRequired = true, type = STRING)},
     reponses = {
       @RestResponse(responseCode = SC_OK, description = "Group deleted"),
+      @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to delete the group with admin role."),
       @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found."),
       @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "An internal server error occured.")})
   public Response removeGroup(@PathParam("id") String groupId) throws NotFoundException {
@@ -266,6 +268,7 @@ public class GroupsEndpoint {
     reponses = {
       @RestResponse(responseCode = SC_CREATED, description = "Group created"),
       @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long"),
+      @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to create a group with admin role."),
       @RestResponse(responseCode = SC_CONFLICT, description = "An group with this name already exists.") })
   public Response createGroup(@FormParam("name") String name, @FormParam("description") String description,
           @FormParam("roles") String roles, @FormParam("users") String users) {
@@ -287,6 +290,7 @@ public class GroupsEndpoint {
       @RestParameter(name = "users", description = "Comma seperated list of members", isRequired = false, type = TEXT)},
     reponses = {
       @RestResponse(responseCode = SC_OK, description = "Group updated"),
+      @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to update the group with admin role."),
       @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found"),
       @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long")})
   public Response updateGroup(@PathParam("id") String groupId, @FormParam("name") String name,
