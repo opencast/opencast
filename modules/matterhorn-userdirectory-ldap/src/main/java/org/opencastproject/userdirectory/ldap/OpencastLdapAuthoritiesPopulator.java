@@ -22,6 +22,9 @@ package org.opencastproject.userdirectory.ldap;
 
 import static java.lang.String.format;
 
+import org.opencastproject.security.api.JaxbOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
@@ -137,6 +140,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
 
   @Override
   public Collection<? extends GrantedAuthority> getGrantedAuthorities(DirContextOperations userData, String username) {
+
     Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
     for (String attributeName : attributeNames) {
       try {
@@ -163,6 +167,19 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
       for (GrantedAuthority authority : authorities) {
         logger.error("\t{}", authority);
       }
+    }
+
+    // Update the user in the security service if it matches the user whose authorities are being returned
+    if ((securityService.getOrganization().equals(this.organization))
+            && ((securityService.getUser() == null) || (securityService.getUser().getUsername().equals(username)))) {
+      Set<JaxbRole> roles = new HashSet<JaxbRole>();
+      // Convert GrantedAuthority's into JaxbRole's
+      for (GrantedAuthority authority : authorities)
+        roles.add(new JaxbRole(authority.getAuthority(), JaxbOrganization.fromOrganization(this.organization)));
+      JaxbUser user = new JaxbUser(username, LdapUserProviderInstance.PROVIDER_NAME,
+              JaxbOrganization.fromOrganization(this.organization), roles.toArray(new JaxbRole[0]));
+
+      securityService.setUser(user);
     }
 
     return authorities;
