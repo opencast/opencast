@@ -20,6 +20,9 @@
     <reference name="archivePermissionsUpdatedEventHandler"
             interface="org.opencastproject.event.handler.ArchivePermissionsUpdatedEventHandler"
             cardinality="1..1" policy="dynamic" bind="setArchivePermissionsUpdatedEventHandler"/>
+    <reference name="oaiPmhUpdatedEventHandler"
+            interface="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"
+            cardinality="1..1" policy="dynamic" bind="setOaiPmhUpdatedEventHandler"/>
   </scr:component>
 
   <scr:component
