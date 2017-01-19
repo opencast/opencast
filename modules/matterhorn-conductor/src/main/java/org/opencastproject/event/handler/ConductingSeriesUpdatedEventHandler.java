@@ -108,7 +108,10 @@ public class ConductingSeriesUpdatedEventHandler {
             seriesUpdatedEventHandler.handleEvent(seriesItem);
             archivePermissionsUpdatedEventHandler.handleEvent(seriesItem);
             workflowPermissionsUpdatedEventHandler.handleEvent(seriesItem);
-            oaiPmhUpdatedEventHandler.handleEvent(seriesItem);
+            // the OAI-PMH handler is a dynamic dependency
+            if (oaiPmhUpdatedEventHandler != null) {
+              oaiPmhUpdatedEventHandler.handleEvent(seriesItem);
+            }
           }
         } catch (InterruptedException e) {
           logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(e));
