@@ -935,6 +935,8 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 if (scope.timer) $timeout.cancel( scope.timer );
             });
 
+
+            scope.setWrapperClasses();
         }
     };
 }]);
