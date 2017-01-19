@@ -212,8 +212,8 @@ public class OaiPmhUpdatedEventHandler {
         }
 
         // Update the series dublin core
-        if (SeriesItem.Type.UpdateMetadata.equals(seriesItem.getType())) {
-          DublinCoreCatalog seriesDublinCore = seriesItem.getMetadata();
+        if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())) {
+          DublinCoreCatalog seriesDublinCore = seriesItem.getSeries();
           mp.setSeriesTitle(seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE));
 
           // Update the series dublin core
