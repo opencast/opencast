@@ -39,16 +39,10 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple3;
-import org.opencastproject.workflow.api.WorkflowDatabaseException;
-import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowService;
 
 import com.entwinemedia.fn.data.Opt;
 import com.google.common.cache.CacheBuilder;
@@ -104,9 +98,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
 
-  /** The workflow service */
-  protected WorkflowService workflowService;
-
   /** The scheduler service */
   protected SchedulerService schedulerService;
 
@@ -139,16 +130,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   /** OSGi DI */
   void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
-  }
-
-  /**
-   * Sets the workflow service
-   *
-   * @param workflowService
-   *          the workflowService to set
-   */
-  public void setWorkflowService(WorkflowService workflowService) {
-    this.workflowService = workflowService;
   }
 
   /**
@@ -678,9 +659,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
         logger.debug("Setting Recording {} to state {}.", id, state);
         req.setState(state);
         sendRecordingUpdate(req);
-        if (!RecordingState.WORKFLOW_IGNORE_STATES.contains(state)) {
-          updateWorkflow(id, state);
-        }
         return true;
       }
     } else {
@@ -688,7 +666,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       Recording r = new RecordingImpl(id, state);
       recordings.put(id, r);
       sendRecordingUpdate(r);
-      updateWorkflow(id, state);
       return true;
     }
   }
@@ -717,71 +694,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       logger.warn("Unable to get scheduling for recording {}: {}", recordingId, ExceptionUtils.getStackTrace(e));
     }
     return eventId;
-  }
-
-  /**
-   * Resumes a workflow instance associated with this capture, if one exists.
-   *
-   * @param recordingId
-   *          the recording id, which is assumed to correspond to the scheduled event id
-   * @param state
-   *          the new state for this recording
-   */
-  protected void updateWorkflow(String recordingId, String state) {
-    if (!RecordingState.CAPTURING.equals(state) && !RecordingState.UPLOADING.equals(state) && !state.endsWith("_error")) {
-      logger.debug("Recording state updated to {}.  Not updating an associated workflow.", state);
-      return;
-    }
-
-    WorkflowInstance workflowToUpdate = null;
-    try {
-      workflowToUpdate = workflowService.getWorkflowById(Long.parseLong(recordingId));
-    } catch (NumberFormatException e) {
-      logger.info("Recording id '{}' is not a long, assuming an unscheduled capture", recordingId);
-      return;
-    } catch (WorkflowDatabaseException e) {
-      logger.warn("Unable to update workflow for recording {}: {}", recordingId, e);
-      return;
-    } catch (NotFoundException e) {
-      logger.warn("Unable to find a workflow with id='{}'", recordingId);
-      return;
-    } catch (UnauthorizedException e) {
-      logger.warn("Can not update workflow: {}", e.getMessage());
-    }
-
-    // Does the workflow exist?
-    if (workflowToUpdate == null) {
-      logger.warn("The workflow '{}' cannot be updated because it does not exist", recordingId);
-      return;
-    }
-
-    WorkflowState wfState = workflowToUpdate.getState();
-    switch (workflowToUpdate.getState()) {
-      case FAILED:
-      case FAILING:
-      case STOPPED:
-      case SUCCEEDED:
-        logger.debug("The workflow '{}' should not be updated because it is {}", recordingId, wfState.toString()
-                .toLowerCase());
-        return;
-      default:
-        break;
-
-    }
-
-    try {
-      if (state.endsWith("_error")) {
-        workflowToUpdate.getCurrentOperation().setState(WorkflowOperationInstance.OperationState.FAILED);
-        workflowToUpdate.setState(WorkflowState.FAILED);
-        workflowService.update(workflowToUpdate);
-        logger.info("Recording status changed to '{}', failing workflow '{}'", state, workflowToUpdate.getId());
-      } else {
-        workflowService.resume(workflowToUpdate.getId());
-        logger.info("Recording status changed to '{}', resuming workflow '{}'", state, workflowToUpdate.getId());
-      }
-    } catch (Exception e) {
-      logger.warn("Unable to update workflow {}: {}", workflowToUpdate.getId(), e);
-    }
   }
 
   /**
