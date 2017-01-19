@@ -70,16 +70,16 @@ The variables `width`, `height` and `posterimage` will be set to the values of t
 
 As a starting point for your own template you best take a look at file `etc/branding/coverimage.xsl`.
 
-### Using libraries within the stylesheet
+### Using XLST Extensions
 
 Xalan is a powerful XSLT 1.0 processor that comes with a rich feature set. For example, it is possible to
 execute JavaScript or Java code directly within the stylesheet.
 
-For commonly used tasks it is simpler, however, to make use of available lirbaries.
+For commonly used tasks it is simpler, however, to make use of available XSLT Extensions.
 
-#### Opencast Libraries
+#### Opencast Extenseions
 
-The package org.opencastproject.coverimage.impl.xsl provides classes supposed to be used within the XSL stylesheets.
+The package org.opencastproject.coverimage.impl.xsl provides classes supposed to be used within XSL stylesheets.
 
 To make use of those classes, you need to reference the package from your XSL stylesheet:
 
@@ -113,7 +113,7 @@ This method can be used to break strings over multiple lines and to abbreviate s
 |line       |Number of line                                               |
 |isLastLine |Whether `line` is the last line used to represent the `text` |
 
-**Example**
+*Example*
 
 To use at most two lines (max. 30 characters per line) to represent a string `metadata/title` and abbreviate the string
 if two lines aren't enough:
@@ -125,7 +125,7 @@ if two lines aren't enough:
       <xsl:value-of select="opencast:XsltHelper.split(metadata/title, 30, 2, true())" />
     </tspan>
 
-#### EXSLT libraries
+#### EXSLT Extensions
 
 Xalan supports most of the XSLT extensions of the EXSLT community (see [[1]](http://exslt.org/)). In doubt consult
 [[2]](http://xml.apache.org/xalan-j/extensionslib.html) for more information about Xalan's implementation of the
@@ -149,7 +149,7 @@ Please find an example of how to use EXSLT extensions below:
 
     </xsl:stylesheet>
 
-In this example, the function `format-date` of the EXSLT date-and-time functions library is used to format a date.
+In this example, the function `format-date` of the EXSLT dates-and-times functions library is used to format a date.
 
 ## Operation Example
 
