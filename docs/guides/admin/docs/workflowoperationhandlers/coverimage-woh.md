@@ -66,8 +66,7 @@ The metadata XML, which is passed to the cover image service, looks like the fol
     <?xml version="1.0"?>
     <metadata>
       <title>Puppy Love</title>
-      <date>24. April 2014</date>
-      <time>11:21:00</time>
+      <date>2014-04-24T11:21:00</date>
       <license>All rights reserved</license>
       <description>Here is a description of the video</description>
       <series>Superbowl Commercials</series>
@@ -76,9 +75,7 @@ The metadata XML, which is passed to the cover image service, looks like the fol
       <subjects>Commercial</subjects>
     </metadata>
 
-### Date and Time
-
-The date is localized based on your servers Java Runtime language settings.
+Note that the date is localized based on your servers Java Runtime language settings.
 
 ## Libraries that can be used in XSL stylesheets
 
