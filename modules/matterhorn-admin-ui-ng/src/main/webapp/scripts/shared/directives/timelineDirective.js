@@ -32,6 +32,8 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             scope.from = 0;
             scope.to = 0;
 
+            scope.wrapperClass = ''; // list of border classes for the segment wrapper.
+
             scope.player.adapter.addListener(PlayerAdapter.EVENTS.DURATION_CHANGE, function () {
 
                 // reset then remove the items that are longer than the video duration
@@ -53,6 +55,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 scope.zoomValue = scope.getZoomValue();
                 scope.zoomOffset = scope.getZoomOffset();
                 scope.zoomFieldOffset = scope.getZoomFieldOffset();
+                scope.setWrapperClasses();
             });
 
             scope.player.adapter.addListener(PlayerAdapter.EVENTS.TIMEUPDATE, function () {
@@ -80,7 +83,6 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 if (segment.deleted && scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
                     scope.player.adapter.setCurrentTime(segment.end / 1000);
                 }
-
             });
             
             /**
@@ -184,6 +186,22 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             };
 
             /**
+             * Returns the offset for the currently visible portion.
+             *
+             * Based on the following linear equation.
+             *
+             *          duration
+             * y(pos) = -------- * pos - pos
+             *           zoom
+             *
+             * @return {Number} Relative offset
+             */
+            scope.getZoomOffset = function () {
+                return scope.position * scope.video.duration / scope.zoomValue -
+                    scope.position;
+            };
+
+            /**
              * On change of zoom range slider updates the appropriate zoom select option
              * 
              * @param {Event} event object
@@ -194,6 +212,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 scope.zoomValue = scope.getZoomValue();
                 scope.zoomOffset = scope.getZoomOffset();
                 scope.zoomFieldOffset = scope.getZoomFieldOffset();
+                scope.setWrapperClasses();
 
                 if (scope.zoomValue >= 0) {
                     scope.zoomSelected = "";
@@ -222,6 +241,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     scope.zoomValue = scope.getZoomValue();
                     scope.zoomOffset = scope.getZoomOffset();
                     scope.zoomFieldOffset = scope.getZoomFieldOffset();
+                    scope.setWrapperClasses();
 
                     var dropdown = element.find('.zoom-control #zoomSelect');
                     
@@ -232,27 +252,34 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             }
 
             /**
-             * Returns the offset for the currently visible portion.
-             *
-             * Based on the following linear equation.
-             *
-             *          duration
-             * y(pos) = -------- * pos - pos
-             *           zoom
-             *
-             * @return {Number} Relative offset
+             * Sets the classes for the segment wrapper for displaying the correct border colours.
              */
-            scope.getZoomOffset = function () {
-                return scope.position * scope.video.duration / scope.zoomValue -
-                    scope.position;
-            };
+            scope.setWrapperClasses = function () {
+                if (angular.isUndefined(scope.video.duration)) {
+                    return;
+                }
+            
+                var classes = [];
+                
+                angular.forEach(scope.video.segments, function (segment) {
 
+                    if ((segment.start <= scope.zoomFieldOffset) && (segment.end >= scope.zoomFieldOffset)) {                        
+                        classes[0] = 'left-' + (segment.deleted ? ( segment.selected ? 'deleted-selected' : 'deleted') : ( segment.selected ? 'selected' : 'normal'));
+                    }
+
+                    if ((segment.start <=  (scope.zoomFieldOffset+scope.zoomValue)) && (segment.end >=  (scope.zoomFieldOffset+scope.zoomValue))) {
+                        classes[1] = 'right-' + (segment.deleted ? ( segment.selected ? 'deleted-selected' : 'deleted') : ( segment.selected ? 'selected' : 'normal'));
+                    }
+                });
+
+                scope.wrapperClass = classes.join(' ');
+            }
             /**
              * Returns a style for the given segment.
              *
              * Applies track background and zoom parameters.
              *
-             * @param {Object} track Current segment object
+             * @param {Object} track Current track object
              * @return {Object} ng-style compatible hash
              */
             scope.getSegmentStyle = function (track) {
@@ -424,6 +451,8 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     scope.video.segments[index + 1].start = segment.start;
                     scope.video.segments.splice(index, 1);
                 }
+
+                scope.setWrapperClasses();
             };
 
             /**
@@ -439,6 +468,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 }
 
                 segment.deleted = !segment.deleted;
+                scope.setWrapperClasses();
             };
 
             /**
@@ -470,6 +500,8 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
               scope.video.segments.sort(function (a, b) {
                   return a.start - b.start;
               });
+
+              scope.setWrapperClasses();
             };
 
             /**
@@ -482,7 +514,6 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 $document.mx = document.all ? window.event.clientX : e.pageX;
                 $document.my = document.all ? window.event.clientY : e.pageY;
             });
-
 
             /**
              * Mouseup event handler to finish up the move action for:
@@ -604,6 +635,8 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     scope.video.segments.sort(function (a, b) {
                         return a.start - b.start;
                     });
+
+                    scope.setWrapperClasses();
                 }
 
                 // Clean-up of mousemove handlers
@@ -626,25 +659,26 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                     if (el.attr('id') === 'cursor-track') {
 
-                      var position = (event.clientX - el.offset().left) / el.width() * scope.zoomValue + scope.zoomFieldOffset;
+                        var position = (event.clientX - el.offset().left) / el.width() * scope.zoomValue + scope.zoomFieldOffset;
 
-                      // Limit position to the length of the video
-                      if (position > scope.video.duration) {
-                          position = scope.video.duration;
-                      }
+                        // Limit position to the length of the video
+                        if (position > scope.video.duration) {
+                            position = scope.video.duration;
+                        }
 
-                      if (position < 0) {
-                          position = 0;
-                      }
+                        if (position < 0) {
+                            position = 0;
+                        }
 
-                      scope.player.adapter.setCurrentTime(position / 1000);
+                        scope.player.adapter.setCurrentTime(position / 1000);
+                        scope.setWrapperClasses();
 
-                      // show small cut button below timeline handle
-                      element.find('#cursor .arrow_box').show();
+                        // show small cut button below timeline handle
+                        element.find('#cursor .arrow_box').show();
 
-                      if (scope.timer) $timeout.cancel( scope.timer );
-                      scope.timer = $timeout(
-                            function() {
+                        if (scope.timer) $timeout.cancel( scope.timer );
+                        scope.timer = $timeout(
+                        function() {
                                 // hide cut window
                                 element.find('#cursor .arrow_box').hide();
                             },
@@ -679,6 +713,8 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 scope.$apply(function () {
                     scope.positionStyle = (scope.position * 100 / scope.video.duration) + '%';
                 });
+
+                scope.setWrapperClasses();
             };
             
             /**
@@ -783,6 +819,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 scope.to = scope.zoomFieldOffset + scope.zoomValue;
                 shuttle.find(':first-child').html( scope.formatMilliseconds(scope.from) );
                 shuttle.find(':last-child').html( scope.formatMilliseconds(scope.to) );
+                scope.setWrapperClasses();
             };
 
             /**
@@ -887,6 +924,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     segment.selected = false;
                 });
                 segment.selected = true;
+                scope.setWrapperClasses();
             };
 
             scope.$on('$destroy', function () {
@@ -896,8 +934,6 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 // cancel timer for the small cut button below timeline handle
                 if (scope.timer) $timeout.cancel( scope.timer );
             });
-
-            scope.$on
 
         }
     };

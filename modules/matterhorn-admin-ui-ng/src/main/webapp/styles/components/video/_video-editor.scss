@@ -30,6 +30,12 @@ $track-options-width: 10%;
 // Output
 $track-label-width: (100% - $right-margin) - $track-options-width;
 
+// Colour
+$segment-normal: #71b1f3;
+$segment-selected: darken($segment-normal, 18%);
+$segment-deleted: #f35952;
+$segment-deleted-selected: darken($segment-deleted, 18%);
+
 .video-timeline {
     background: #fff;
     border: $thin-border-stroke $main-border-color;
@@ -64,9 +70,42 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
             overflow: hidden;
 
             &>div:last-child {
-                border-left: 1px solid $primary-color-blue;//$dark-bg-border-color;
-                border-right: 1px solid $primary-color-blue;//$dark-bg-border-color;
+                border: $thin-border-stroke $primary-color-blue;
+                border-top-width: 0;
+                border-bottom-width: 0;
                 overflow: hidden;
+
+                &.left-normal {
+                    border-left-color: $segment-normal;
+                }
+
+                &.right-normal {
+                    border-right-color: $segment-normal;
+                }
+
+                &.left-selected {
+                    border-left-color: $segment-selected;
+                }
+
+                &.right-selected {
+                    border-right-color: $segment-selected;
+                }
+
+                &.left-deleted {
+                    border-left-color: $segment-deleted;
+                }              
+
+                &.right-deleted {
+                    border-right-color: $segment-deleted;
+                }    
+
+                &.left-deleted-selected {
+                    border-left-color: $segment-deleted-selected;
+                }              
+
+                &.right-deleted-selected {
+                    border-right-color: $segment-deleted-selected;
+                }                 
             }
 
             .track-toolbar {
@@ -158,8 +197,8 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                         color: #666666;
                         padding-right: 5px;
                         text-align: right;
-                        background: rgba(193, 215, 238, 0.5);
-                        border: $thin-border-stroke #71b1f3;
+                        background: rgba($segment-normal, 0.5);
+                        border: $thin-border-stroke $segment-normal;
                         border-right-width: 0 !important;
                         transition-property: background-color, background, border;
                         transition-duration: 250ms;
@@ -170,19 +209,30 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                         }
                         
                         &.selected {
-                            background: rgba(106, 183, 236, 0.5);
-                            border: $thin-border-stroke darken(#71b1f3, 2%);
+                            background: rgba($segment-selected, 0.5);
+                            border: $thin-border-stroke darken($segment-selected, 10%);
 
                             a {
                                 &:before {
                                   color: darken($l-blue, 2%);
                                 }
                             }
+
+                            &.deleted {                                
+                                background-color: rgba($segment-deleted-selected, 0.5);
+                                border: $thin-border-stroke $segment-deleted-selected;
+
+                                a {
+                                    &:before {
+                                    color: rgba(0,0,0,0.4)
+                                    }
+                                }
+                            }
                         }
 
                         &.deleted {
-                            background-color: rgba(243, 89, 82, 0.5);
-                            border: $thin-border-stroke #f35952;
+                            background-color: rgba($segment-deleted, 0.5);
+                            border: $thin-border-stroke $segment-deleted;
 
                             a {
                                 &:before {
@@ -233,7 +283,6 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                                 float: right;
                                 color: $l-blue;
                                 background-color: inherit;
-                                color: #378dd4;
                                 padding: 0.3em;
 
                                 &:before {
@@ -282,7 +331,7 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
                             &.selected {
                                 a {
                                     &:before {
-                                      color: darken($l-blue, 2%);
+                                      color: darken($l-blue, 10%);
                                     }
                                 }
                             }
@@ -314,7 +363,7 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
             height: calc(100% - 23px);
             background-color: #fb6257;
             position: absolute;
-            top: 19px;
+            top: 20px;
             z-index: $z-80;
 
             $handle-size: 14px;
