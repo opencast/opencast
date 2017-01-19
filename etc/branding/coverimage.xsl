@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsl:stylesheet version="1.0"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dcterms="http://purl.org/dc/terms/"
-    xmlns:opencast="xalan://org.opencastproject.coverimage.impl.xsl" exclude-result-prefixes="opencast"
-    extension-element-prefixes="opencast">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:date="http://exslt.org/dates-and-times"
+    xmlns:opencast="xalan://org.opencastproject.coverimage.impl.xsl" exclude-result-prefixes="date opencast"
+    extension-element-prefixes="date opencast">
 
   <xsl:param name="width" />
   <xsl:param name="height" />
@@ -98,7 +98,7 @@
           <xsl:value-of select="opencast:XsltHelper.split(metadata/description, 50, 3, true)" />
         </tspan>
         <tspan class="presentationdate" dy="12%" x="50%">
-          <xsl:value-of select="metadata/date" />, <xsl:value-of select="metadata/time" />
+          <xsl:value-of select="date:format-date(metadata/date, 'MMMMMMMMMM dd, YYYY, HH:mm:ss')" />
         </tspan>
         <tspan class="license" dy="10%" x="50%">
           <xsl:value-of select="metadata/license" />
