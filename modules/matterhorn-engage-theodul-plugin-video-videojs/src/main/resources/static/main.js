@@ -624,11 +624,17 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     }
 
     Engage.on(plugin.events.numberOfVideodisplaysSet.getName(), function (number) {
+      var videoDisplays = $('.' + videoDisplayClass);
+      if (Engage.model.get('meInfo').get('hide_video_context_menu')) {
+        videoDisplays.on('contextmenu', function (e) {
+          e.preventDefault();
+        });
+      }
       if (number > 1) {
         selector = '.videoFocused video';
         videoFocused = false;
         singleVideo = false;
-        $('.' + videoDisplayClass).on('click', function () {
+        videoDisplays.on('click', function () {
           if (flag == 0) {
             Engage.trigger(plugin.events.focusVideo.getName(), Utils.getFlavorForVideoDisplay(this));
           }
