@@ -1476,6 +1476,9 @@
      }
    },
    "VIDEO_TOOL": {
+     "TIMELINE": "Timeline",
+     "ZOOMLEVEL": "Zoom Level",
+     "ZOOM": "Zoom",
      "BUTTONS": {
        "COMMENTS": "View",
        "METADATA": "Edit",
@@ -1495,7 +1498,8 @@
        "REPLAY_SEGMENT": "Replay segment",
        "UNDO": "Undo",
        "REDO": "Redo",
-       "CLEAR_SEGMENTS": "Clear segments"
+       "CLEAR_SEGMENTS": "Clear segments",
+       "CLEAR_SELECTED_SEGMENT": "Clear selected segment"
      },
      "PLAYER":{
        "PLAY":              "Play",
