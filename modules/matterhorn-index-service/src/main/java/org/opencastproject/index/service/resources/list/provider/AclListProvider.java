@@ -43,7 +43,7 @@ public class AclListProvider implements ResourceListProvider {
   public static final String NAME = PROVIDER_PREFIX + ".NAME";
   public static final String ID = PROVIDER_PREFIX + ".ID";
 
-  private static final String[] NAMES = { "ACL", NAME, ID };
+  private static final String[] NAMES = { PROVIDER_PREFIX, NAME, ID };
   private static final Logger logger = LoggerFactory.getLogger(AclListProvider.class);
 
   private AclServiceFactory aclServiceFactory;
@@ -70,6 +70,8 @@ public class AclListProvider implements ResourceListProvider {
     for (ManagedAcl a : acls) {
       if (ID.equals(listName)) {
         aclsList.put(a.getId().toString(), a.getId().toString());
+      } else if (NAME.equals(listName)) {
+        aclsList.put(a.getName(), a.getName());
       } else {
         aclsList.put(a.getId().toString(), a.getName());
       }

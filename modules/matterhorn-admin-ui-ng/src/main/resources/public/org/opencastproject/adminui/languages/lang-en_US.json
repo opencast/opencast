@@ -1533,6 +1533,11 @@
      }
    },
    "FILTERS": {
+     "ACLS": {
+       "NAME": {
+         "LABEL": "Name"
+       }
+     },
      "AGENTS": {
        "NAME": {
          "LABEL": "Name"

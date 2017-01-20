@@ -28,6 +28,7 @@ import org.opencastproject.adminui.exception.JsonCreationException;
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
+import org.opencastproject.index.service.resources.list.query.AclsListQuery;
 import org.opencastproject.index.service.resources.list.query.AgentsListQuery;
 import org.opencastproject.index.service.resources.list.query.EventListQuery;
 import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
@@ -203,6 +204,8 @@ public class ListProvidersEndpoint {
       query = new UsersListQuery();
     } else if ("groups".equals(page)) {
       query = new GroupsListQuery();
+    } else if ("acls".equals(page)) {
+      query = new AclsListQuery();
     } else if ("servers".equals(page)) {
       query = new ServersListQuery();
     } else if ("services".equals(page)) {
