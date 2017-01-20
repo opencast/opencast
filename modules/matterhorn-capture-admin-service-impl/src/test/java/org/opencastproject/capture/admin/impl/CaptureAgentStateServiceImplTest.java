@@ -39,16 +39,15 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.persistence.PersistenceUtil;
-import org.opencastproject.workflow.api.WorkflowQuery;
-import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workflow.api.WorkflowSetImpl;
 
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.component.ComponentContext;
 
 import java.util.Dictionary;
 import java.util.HashSet;
@@ -62,6 +61,8 @@ import java.util.concurrent.TimeUnit;
 public class CaptureAgentStateServiceImplTest {
   private CaptureAgentStateServiceImpl service = null;
   private Properties capabilities;
+  private static BundleContext bundleContext;
+  private static ComponentContext cc;
 
   @Before
   public void setUp() throws Exception {
@@ -74,16 +75,24 @@ public class CaptureAgentStateServiceImplTest {
     capabilities.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "CAMERA,SCREEN,AUDIO");
   }
 
+  private void setupCC() {
+
+    String configKey = CaptureAgentStateServiceImpl.CAPTURE_AGENT_TIMEOUT_KEY;
+    String configValue = "15";
+
+    bundleContext = EasyMock.createNiceMock(BundleContext.class);
+    EasyMock.expect(bundleContext.getProperty(configKey)).andReturn(configValue).anyTimes();
+    EasyMock.replay(bundleContext);
+    cc = EasyMock.createNiceMock(ComponentContext.class);
+    EasyMock.expect(cc.getBundleContext()).andReturn(bundleContext);
+    EasyMock.replay(cc);
+
+  }
+
   private void setupService() throws Exception {
 
     service = new CaptureAgentStateServiceImpl();
     service.setEntityManagerFactory(PersistenceUtil.newTestEntityManagerFactory(CaptureAgentStateServiceImpl.PERSISTENCE_UNIT));
-
-    WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
-    EasyMock.expect(workflowService.getWorkflowInstances((WorkflowQuery) EasyMock.anyObject()))
-    .andReturn(new WorkflowSetImpl()).anyTimes();
-    EasyMock.replay(workflowService);
-    service.setWorkflowService(workflowService);
 
     DefaultOrganization organization = new DefaultOrganization();
 
@@ -96,7 +105,9 @@ public class CaptureAgentStateServiceImplTest {
     EasyMock.replay(securityService);
     service.setSecurityService(securityService);
 
-    service.activate(null);
+    setupCC();
+
+    service.activate(cc);
     service.setupAgentCache(1, TimeUnit.HOURS);
   }
 
@@ -332,7 +343,8 @@ public class CaptureAgentStateServiceImplTest {
     service.deactivate();
 
     // Restart the service with the same configuration as before
-    service.activate(null);
+    setupCC();
+    service.activate(cc);
 
     Assert.assertEquals(3, service.getKnownAgents().size());
 

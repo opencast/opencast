@@ -67,7 +67,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@RestService(name = "ResourceListsProviders", title = "Admin UI - Resources List", notes = "These Endpoints have been implemented to be use with the new admin UI. Therefore they first only cover the requirement for this new user interface.", abstractText = "This service provides key-value list from different resources to use in the admin UI.")
+@RestService(name = "ResourceListsProviders", title = "Admin UI - Resources List",
+  abstractText = "This service provides key-value list from different resources to use in the admin UI.",
+  notes = { "This service offers access to list providers for the admin UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public class ListProvidersEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(ListProvidersEndpoint.class);

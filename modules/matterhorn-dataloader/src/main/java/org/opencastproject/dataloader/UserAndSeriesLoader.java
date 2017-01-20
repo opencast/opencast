@@ -305,9 +305,13 @@ public class UserAndSeriesLoader {
     String ldapUserId = "231693";
 
     if (jpaUserProvider.loadUser(ldapUserId, organizationId) == null) {
-      jpaUserProvider.addUser(new JpaUser(ldapUserId, "ldap", getOrganization(organizationId), jpaUserProvider
-              .getName(), true, ldapUserRoles));
-      logger.debug("Added ldap user '{}' into organization '{}'", ldapUserId, organizationId);
+      try {
+        jpaUserProvider.addUser(new JpaUser(ldapUserId, "ldap", getOrganization(organizationId), jpaUserProvider
+                .getName(), true, ldapUserRoles));
+        logger.debug("Added ldap user '{}' into organization '{}'", ldapUserId, organizationId);
+      } catch (UnauthorizedException ex) {
+        logger.error("Unable to add an administrative user because you have not enough permissions.");
+      }
     }
   }
 

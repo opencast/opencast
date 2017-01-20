@@ -32,7 +32,7 @@ angular.module('adminNg.controllers')
               Modal.$scope.close();
               Notifications.add('success', 'GROUP_DELETED');
           }, function () {
-              Notifications.add('error', 'GROUP_NOT_DELETED', 'group-form');
+              Notifications.add('error', 'GROUP_NOT_DELETED');
           });
         };
     }

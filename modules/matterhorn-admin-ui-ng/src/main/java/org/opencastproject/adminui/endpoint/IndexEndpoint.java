@@ -49,7 +49,13 @@ import javax.ws.rs.core.Response;
  * The index endpoint allows the management of the elastic search index.
  */
 @Path("/")
-@RestService(name = "adminuiIndexService", title = "Admin UI Index Service", notes = "", abstractText = "Provides resources and operations related to the Admin UI's elastic search index")
+@RestService(name = "adminuiIndexService", title = "Admin UI Index Service",
+  abstractText = "Provides resources and operations related to the Admin UI's elastic search index",
+  notes = { "This service offers the event CRUD Operations for the admin UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public class IndexEndpoint {
 
   /** The logging facility */

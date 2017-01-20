@@ -75,7 +75,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/")
-@RestService(name = "captureAgents", title = "Capture agents façade service", notes = "This service offers the default capture agents CRUD Operations for the admin UI.", abstractText = "Provides operations for the capture agents")
+@RestService(name = "captureAgents", title = "Capture agents façade service",
+  abstractText = "Provides operations for the capture agents",
+  notes = { "This service offers the default capture agents CRUD Operations for the admin UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public class CaptureAgentsEndpoint {
 
   private static final String TRANSLATION_KEY_PREFIX = "CAPTURE_AGENT.DEVICE.";
