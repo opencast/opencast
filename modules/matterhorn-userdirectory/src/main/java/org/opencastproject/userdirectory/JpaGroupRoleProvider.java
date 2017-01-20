@@ -23,6 +23,7 @@ package org.opencastproject.userdirectory;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -46,11 +47,13 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.userdirectory.utils.UserDirectoryUtils;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -261,7 +264,14 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
    * @param group
    *          the group to add
    */
-  public void addGroup(final JpaGroup group) {
+  public void addGroup(final JpaGroup group) throws UnauthorizedException {
+    if (group != null && !UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, group.getRoles()))
+      throw new UnauthorizedException("The user is not allowed to add or update a group with the admin role");
+
+    Group existingGroup = loadGroup(group.getGroupId(), group.getOrganization().getId());
+    if (existingGroup != null && !UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, existingGroup.getRoles()))
+      throw new UnauthorizedException("The user is not allowed to update a group with the admin role");
+
     Set<JpaRole> roles = UserDirectoryPersistenceUtil.saveRoles(group.getRoles(), emf);
     JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganization(group.getOrganization(), emf);
 
@@ -298,7 +308,11 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
     }
   }
 
-  private void removeGroup(String groupId, String orgId) throws NotFoundException, Exception {
+  private void removeGroup(String groupId, String orgId) throws NotFoundException, UnauthorizedException, Exception {
+    Group group = loadGroup(groupId, orgId);
+    if (group != null && !UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, group.getRoles()))
+      throw new UnauthorizedException("The user is not allowed to delete a group with the admin role");
+
     UserDirectoryPersistenceUtil.removeGroup(groupId, orgId, emf);
     messageSender.sendObjectMessage(GroupItem.GROUP_QUEUE, MessageSender.DestinationType.Queue,
             GroupItem.delete(groupId));
@@ -367,13 +381,18 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   @Path("{id}")
   @RestQuery(name = "removegrouop", description = "Remove a group", returnDescription = "Return no content", pathParameters = { @RestParameter(name = "id", description = "The group identifier", isRequired = true, type = Type.STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "Group deleted"),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to remove a group with the admin role."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found."),
           @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "An internal server error occured.") })
-  public Response removeGroup(@PathParam("id") String groupId) throws NotFoundException {
+  public Response removeGroup(@PathParam("id") String groupId) {
     String orgId = securityService.getOrganization().getId();
     try {
       removeGroup(groupId, orgId);
       return Response.noContent().build();
+    } catch (NotFoundException e) {
+      return Response.status(SC_NOT_FOUND).build();
+    } catch (UnauthorizedException e) {
+      return Response.status(SC_FORBIDDEN).build();
     } catch (Exception e) {
       throw new WebApplicationException(e);
     }
@@ -388,6 +407,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
           @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = false, type = Type.TEXT) }, reponses = {
                   @RestResponse(responseCode = SC_CREATED, description = "Group created"),
                   @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long"),
+                  @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to create a group with the admin role."),
                   @RestResponse(responseCode = SC_CONFLICT, description = "An group with this name already exists.") })
   public Response createGroup(@FormParam("name") String name, @FormParam("description") String description,
           @FormParam("roles") String roles, @FormParam("users") String users) {
@@ -418,6 +438,8 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
     } catch (IllegalArgumentException e) {
       logger.warn(e.getMessage());
       return Response.status(Status.BAD_REQUEST).build();
+    } catch (UnauthorizedException e) {
+      return Response.status(SC_FORBIDDEN).build();
     }
     return Response.status(Status.CREATED).build();
   }
@@ -430,6 +452,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
           @RestParameter(name = "roles", description = "A comma seperated string of additional group roles", isRequired = false, type = Type.TEXT),
           @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = true, type = Type.TEXT) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "Group updated"),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to update a group with the admin role."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long") })
   public Response updateGroup(@PathParam("id") String groupId, @FormParam("name") String name,
@@ -471,6 +494,8 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
     } catch (IllegalArgumentException e) {
       logger.warn(e.getMessage());
       return Response.status(Status.BAD_REQUEST).build();
+    } catch (UnauthorizedException ex) {
+      return Response.status(SC_FORBIDDEN).build();
     }
 
     return Response.ok().build();

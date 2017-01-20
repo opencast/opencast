@@ -45,6 +45,7 @@ import org.opencastproject.mediapackage.MediaPackageReferenceImpl;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
+import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
@@ -81,6 +82,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
+
 
 /**
  * The workflow definition for handling "engage publication" operations
@@ -479,45 +481,46 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       for (MediaPackageElement distributedElement : distributedElements) {
 
         String sourceElementId = distributedElement.getIdentifier();
-        MediaPackageElement sourceElement = mp.getElementById(sourceElementId);
+        if (sourceElementId != null) {
+          MediaPackageElement sourceElement = mp.getElementById(sourceElementId);
 
-        // Make sure the mediapackage is prompted to create a new identifier for this element
-        distributedElement.setIdentifier(null);
-
-        // Adjust the flavor and tags for downloadable elements
-        if (downloadElementIds.contains(sourceElementId)) {
-          if (downloadSubflavor != null) {
-            MediaPackageElementFlavor flavor = sourceElement.getFlavor();
-            if (flavor != null) {
-              MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
-                      downloadSubflavor.getSubtype());
-              distributedElement.setFlavor(newFlavor);
+          // Make sure the mediapackage is prompted to create a new identifier for this element
+          distributedElement.setIdentifier(null);
+          if (sourceElement != null) {
+            // Adjust the flavor and tags for downloadable elements
+            if (downloadElementIds.contains(sourceElementId)) {
+              if (downloadSubflavor != null) {
+                MediaPackageElementFlavor flavor = sourceElement.getFlavor();
+                if (flavor != null) {
+                  MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
+                          downloadSubflavor.getSubtype());
+                  distributedElement.setFlavor(newFlavor);
+                }
+              }
+            }
+            // Adjust the flavor and tags for streaming elements
+            else if (streamingElementIds.contains(sourceElementId)) {
+              if (streamingSubflavor != null && streamingElementIds.contains(sourceElementId)) {
+                MediaPackageElementFlavor flavor = sourceElement.getFlavor();
+                if (flavor != null) {
+                  MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
+                          streamingSubflavor.getSubtype());
+                  distributedElement.setFlavor(newFlavor);
+                }
+              }
+            }
+            // Copy references from the source elements to the distributed elements
+            MediaPackageReference ref = sourceElement.getReference();
+            if (ref != null && mp.getElementByReference(ref) != null) {
+              MediaPackageReference newReference = (MediaPackageReference) ref.clone();
+              distributedElement.setReference(newReference);
             }
           }
-          for (String tag : downloadTargetTags) {
-            distributedElement.addTag(tag);
-          }
         }
-        // Adjust the flavor and tags for streaming elements
-        else if (streamingElementIds.contains(sourceElementId)) {
-          if (streamingSubflavor != null && streamingElementIds.contains(sourceElementId)) {
-            MediaPackageElementFlavor flavor = sourceElement.getFlavor();
-            if (flavor != null) {
-              MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
-                      streamingSubflavor.getSubtype());
-              distributedElement.setFlavor(newFlavor);
-            }
-          }
-          for (String tag : streamingTargetTags) {
-            distributedElement.addTag(tag);
-          }
-        }
-        // Copy references from the source elements to the distributed elements
-        MediaPackageReference ref = sourceElement.getReference();
-        if (ref != null && mp.getElementByReference(ref) != null) {
-          MediaPackageReference newReference = (MediaPackageReference) ref.clone();
-          distributedElement.setReference(newReference);
-        }
+
+        if (isStreamingFormat(distributedElement))
+            applyTags(distributedElement, streamingTargetTags);
+        else applyTags(distributedElement, downloadTargetTags);
 
         // Add the new element to the mediapackage
         mp.add(distributedElement);
@@ -565,6 +568,35 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       mp.remove(element);
     }
     return mp;
+  }
+
+  /**
+   * Checks if the MediaPackage track transport protocol is a streaming format protocol
+   * @param element The MediapackageElement to analyze
+   * @return true if it is a TrackImpl and has a streaming protocol as transport
+   */
+  private boolean isStreamingFormat(MediaPackageElement element) {
+    if (element instanceof TrackImpl) {
+      if (TrackImpl.StreamingProtocol.RTMP.equals(((TrackImpl) element).getTransport())
+          || TrackImpl.StreamingProtocol.RTMPE.equals(((TrackImpl) element).getTransport())
+          || TrackImpl.StreamingProtocol.HLS.equals(((TrackImpl) element).getTransport())
+          || TrackImpl.StreamingProtocol.DASH.equals(((TrackImpl) element).getTransport())
+          || TrackImpl.StreamingProtocol.HDS.equals(((TrackImpl) element).getTransport())
+          || TrackImpl.StreamingProtocol.SMOOTH.equals(((TrackImpl) element).getTransport()))
+        return true;
+    }
+    return false;
+  }
+
+  /**
+   * Adds Tags to a MediaPackageElement
+   * @param element the element that needs the tags
+   * @param tags the list of tags to apply
+   */
+  private void applyTags(MediaPackageElement element, String[] tags) {
+    for (String tag : tags) {
+      element.addTag(tag);
+    }
   }
 
   /** Media package must meet these criteria in order to be published. */

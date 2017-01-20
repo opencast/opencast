@@ -125,7 +125,13 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 
 @Path("/")
-@RestService(name = "toolsService", title = "Tools API Service", notes = "", abstractText = "Provides a location for the tools API.")
+@RestService(name = "toolsService", title = "Tools API Service",
+  abstractText = "Provides a location for the tools API.",
+  notes = { "This service provides a location for the tools API for the admin UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public class ToolsEndpoint implements ManagedService {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ToolsEndpoint.class);

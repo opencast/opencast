@@ -5,4 +5,6 @@
   <service>
     <provide interface="org.opencastproject.security.api.SecurityService" />
   </service>
+  <reference name="userDirectory" interface="org.opencastproject.security.api.UserDirectoryService"
+      cardinality="0..1" policy="dynamic" bind="setUserDirectory" undbind="removeUserDirectory" />
 </scr:component>

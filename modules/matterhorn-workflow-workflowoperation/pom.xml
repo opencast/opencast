@@ -88,7 +88,6 @@
             <Service-Component>
               OSGI-INF/operations/analyze-tracks.xml,
               OSGI-INF/operations/cleanup.xml,
-              OSGI-INF/operations/cli.xml,
               OSGI-INF/operations/copy.xml,
               OSGI-INF/operations/defaults.xml,
               OSGI-INF/operations/error-resolution.xml,

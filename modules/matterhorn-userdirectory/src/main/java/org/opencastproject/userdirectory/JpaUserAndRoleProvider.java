@@ -24,11 +24,13 @@ package org.opencastproject.userdirectory;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
+import org.opencastproject.userdirectory.utils.UserDirectoryUtils;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PasswordEncoder;
 import org.opencastproject.util.data.Monadics;
@@ -255,8 +257,14 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    *
    * @param user
    *          the user to add
+   *
+   * @throws org.opencastproject.security.api.UnauthorizedException
+   *          if the user is not allowed to create other user with the given roles
    */
-  public void addUser(JpaUser user) {
+  public void addUser(JpaUser user) throws UnauthorizedException {
+    if (!UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, user.getRoles()))
+      throw new UnauthorizedException("The user is not allowed to set the admin role on other users");
+
     // Create a JPA user with an encoded password.
     String encodedPassword = PasswordEncoder.encode(user.getPassword(), user.getUsername());
     Set<JpaRole> roles = UserDirectoryPersistenceUtil.saveRoles(user.getRoles(), emf);
@@ -290,10 +298,19 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    * @param user
    *          the user to save
    * @throws NotFoundException
+   * @throws org.opencastproject.security.api.UnauthorizedException
+   *          if the current user is not allowed to update user with the given roles
    */
-  public User updateUser(JpaUser user) throws NotFoundException {
-    if (UserDirectoryPersistenceUtil.findUser(user.getUsername(), user.getOrganization().getId(), emf) == null)
+  public User updateUser(JpaUser user) throws NotFoundException, UnauthorizedException {
+    if (!UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, user.getRoles()))
+      throw new UnauthorizedException("The user is not allowed to set the admin role on other users");
+
+    JpaUser updateUser = UserDirectoryPersistenceUtil.findUser(user.getUsername(), user.getOrganization().getId(), emf);
+    if (updateUser == null)
       throw new NotFoundException("User " + user.getUsername() + " not found.");
+
+    if (!UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, updateUser.getRoles()))
+      throw new UnauthorizedException("The user is not allowed to update an admin user");
 
     String encodedPassword = null;
     //only update Password if a value is set
@@ -325,9 +342,16 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    * @param orgId
    *          the organization id
    * @throws NotFoundException
+   *          if the requested user is not exist
+   * @throws org.opencastproject.security.api.UnauthorizedException
+   *          if you havn't permissions to delete an admin user (only admins may do that)
    * @throws Exception
    */
-  public void deleteUser(String username, String orgId) throws NotFoundException, Exception {
+  public void deleteUser(String username, String orgId) throws NotFoundException, UnauthorizedException, Exception {
+    User user = loadUser(username, orgId);
+    if (user != null && !UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, user.getRoles()))
+      throw new UnauthorizedException("The user is not allowed to delete an admin user");
+
     UserDirectoryPersistenceUtil.deleteUser(username, orgId, emf);
     cache.invalidate(username + DELIMITER + orgId);
   }
@@ -368,5 +392,4 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     String orgId = securityService.getOrganization().getId();
     cache.invalidate(userName + DELIMITER + orgId);
   }
-
 }
