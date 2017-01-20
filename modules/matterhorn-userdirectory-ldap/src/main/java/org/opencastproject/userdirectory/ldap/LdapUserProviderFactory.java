@@ -251,8 +251,8 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
     // Instantiate this LDAP instance and register it as such
     LdapUserProviderInstance provider = new LdapUserProviderInstance(pid, org, searchBase, searchFilter, url, userDn,
-            password, roleAttributes, rolePrefix, excludePrefixes, convertToUppercase, cacheSize, cacheExpiration,
-            this.groupRoleProvider);
+            password, roleAttributes, rolePrefix, extraRoles, excludePrefixes, convertToUppercase, cacheSize,
+            cacheExpiration, this.groupRoleProvider);
 
     providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
 

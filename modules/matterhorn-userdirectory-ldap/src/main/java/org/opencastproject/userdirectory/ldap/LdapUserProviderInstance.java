@@ -40,6 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
@@ -95,8 +96,11 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   /** The general role prefix, to be added to all the LDAP roles that do not start by one of the exclude prefixes */
   private String rolePrefix;
 
-  /** An array of prefixes. When a role starts with any of these, the role prefix defined above will not be appended */
-  private Set<String> excludePrefixes = new HashSet<String>();
+  /** A Set of roles to be added to all the users authenticated using this LDAP instance */
+  private Set<GrantedAuthority> setExtraRoles = new HashSet<GrantedAuthority>();
+
+  /** A Set of prefixes. When a role starts with any of these, the role prefix defined above will not be appended */
+  private Set<String> setExcludePrefixes = new HashSet<String>();
 
   /**
    * Constructs an ldap user provider with the needed settings.
@@ -124,10 +128,42 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
    * @param cacheExpiration
    *          the number of minutes to cache users
    */
+  /**
+   * Constructs an ldap user provider with the needed settings.
+   *
+   * @param pid
+   *          the pid of this service
+   * @param organization
+   *          the organization
+   * @param searchBase
+   *          the ldap search base
+   * @param searchFilter
+   *          the ldap search filter
+   * @param url
+   *          the url of the ldap server
+   * @param userDn
+   *          the user to authenticate as
+   * @param password
+   *          the user credentials
+   * @param roleAttributesGlob
+   *          the comma separate list of ldap attributes to treat as roles
+   * @param rolePrefix
+   *          a prefix to be appended to all the roles read from the LDAP server
+   * @param extraRoles
+   *          an array of extra roles to add to all the users
+   * @param excludePrefixes
+   * @param convertToUppercase
+   * @param cacheSize
+   *          the number of users to cache
+   * @param cacheExpiration
+   *          the number of minutes to cache users
+   * @param groupRoleProvider
+   */
   // CHECKSTYLE:OFF
   LdapUserProviderInstance(String pid, Organization organization, String searchBase, String searchFilter, String url,
-          String userDn, String password, String roleAttributesGlob, String rolePrefix, String[] aExcludePrefixes,
-          boolean convertToUppercase, int cacheSize, int cacheExpiration, JpaGroupRoleProvider groupRoleProvider) {
+          String userDn, String password, String roleAttributesGlob, String rolePrefix, String[] extraRoles,
+          String[] excludePrefixes, boolean convertToUppercase, int cacheSize, int cacheExpiration,
+          JpaGroupRoleProvider groupRoleProvider) {
     // CHECKSTYLE:ON
     this.organization = organization;
     logger.debug("Creating LdapUserProvider instance with pid=" + pid + ", and organization=" + organization
@@ -168,42 +204,48 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
       logger.debug("Role prefix set to: \"{}\"", this.rolePrefix);
 
       // The default prefix value is "ROLE_", so we must explicitly set it to "" by default
+      // Because of the parameters extraRoles and excludePrefixes, we must add the prefix manually
       mapper.setRolePrefix("");
+      this.delegate.setUserDetailsMapper(mapper);
 
-      // Apply the general role profile if no "exclude prefixes" were defined
-      // Otherwise, we'll apply those prefixes manually
+      // Process the excludePrefixes if needed
       if (!this.rolePrefix.isEmpty()) {
-        if (aExcludePrefixes == null) {
-          mapper.setRolePrefix(this.rolePrefix);
-        } else {
+        if (excludePrefixes != null) {
           // "Clean" the list of exclude prefixes
-          for (String excludePrefix : aExcludePrefixes) {
+          for (String excludePrefix : excludePrefixes) {
             String cleanPrefix = excludePrefix.trim();
             if (!cleanPrefix.isEmpty()) {
               if (convertToUppercase)
-                excludePrefixes.add(cleanPrefix.toUpperCase());
+                setExcludePrefixes.add(cleanPrefix.toUpperCase());
               else
-                excludePrefixes.add(cleanPrefix);
+                setExcludePrefixes.add(cleanPrefix);
             }
           }
 
           if (logger.isDebugEnabled()) {
-            if (excludePrefixes.size() > 0) {
+            if (setExcludePrefixes.size() > 0) {
               logger.debug("Exclude prefixes set to:");
-              for (String prefix : aExcludePrefixes) {
+              for (String prefix : excludePrefixes) {
                 logger.debug("\t* {}", prefix);
               }
             } else {
               logger.debug("No exclude prefixes defined");
             }
           }
-
-          if (excludePrefixes.size() > 0)
-            mapper.setRolePrefix(this.rolePrefix);
         }
       }
+    }
 
-      this.delegate.setUserDetailsMapper(mapper);
+    // Process extra roles
+    for (String extraRole : extraRoles) {
+      String finalRole = StringUtils.trimToEmpty(extraRole);
+      if (!finalRole.isEmpty()) {
+        if (convertToUppercase) {
+          setExtraRoles.add(new SimpleGrantedAuthority(finalRole.toUpperCase()));
+        } else {
+          setExtraRoles.add(new SimpleGrantedAuthority(finalRole));
+        }
+      }
     }
 
     // Set the provider to resolve all the roles belonging to a group
@@ -309,7 +351,12 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
       }
 
       JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
-      Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+
+      // Get the roles and add the extra roles
+      Collection<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+      authorities.addAll(userDetails.getAuthorities());
+      authorities.addAll(setExtraRoles);
+
       Set<JaxbRole> roles = new HashSet<JaxbRole>();
       if (authorities != null) {
         /*
@@ -334,17 +381,15 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
               roles.add(JaxbRole.fromRole(role));
             }
           } else {
-            if (excludePrefixes.size() > 0) {
-              boolean hasExcludePrefix = false;
-              for (String excludePrefix : excludePrefixes) {
-                if (strAuthority.startsWith(excludePrefix)) {
-                  hasExcludePrefix = true;
-                  break;
-                }
+            boolean hasExcludePrefix = false;
+            for (String excludePrefix : setExcludePrefixes) {
+              if (strAuthority.startsWith(excludePrefix)) {
+                hasExcludePrefix = true;
+                break;
               }
-              if (!hasExcludePrefix) {
-                strAuthority = rolePrefix + strAuthority;
-              }
+            }
+            if (!hasExcludePrefix) {
+              strAuthority = rolePrefix + strAuthority;
             }
           }
 
