@@ -345,7 +345,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
       "-an", "-vn", "-sn", "-y",
       waveformFilePath.replaceAll(" ", "\\ ")
     };
-    logger.debug("Start waveform ffmpeg process: {}", String.join(" ", command));
+    logger.debug("Start waveform ffmpeg process: {}", StringUtils.join(command, " "));
     logger.info("Create waveform image file for track '{}' at {}", track.getIdentifier(), waveformFilePath);
 
     // run ffmpeg
@@ -431,7 +431,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     filterBuilder.append(":scale=");
     filterBuilder.append(waveformScale);
     filterBuilder.append(":colors=");
-    filterBuilder.append(String.join("|", waveformColor));
+    filterBuilder.append(StringUtils.join(Arrays.asList(waveformColor), "|"));
     return filterBuilder.toString();
   }
 
