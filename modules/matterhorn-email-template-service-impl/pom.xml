@@ -1,8 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>matterhorn-notification-workflowoperation</artifactId>
+  <artifactId>matterhorn-email-template-service-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>matterhorn-notification-workflowoperation</name>
+  <name>matterhorn-email-template-service-impl</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -15,29 +16,40 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.freemarker</groupId>
+      <artifactId>freemarker</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-email-template-service-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-workspace-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-kernel</artifactId>
+      <artifactId>matterhorn-dublincore</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workflow-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-search-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-email-template-service-api</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.fileinstall</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -51,16 +63,12 @@
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -71,15 +79,13 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
+            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
             <Export-Package>
-              org.opencastproject.workflow.handler.notification;version=${project.version}
+              org.opencastproject.eamil.template.impl;version=${project.version},
             </Export-Package>
             <Service-Component>
-              OSGI-INF/operations/distribute-mediapackagepost.xml,
-              OSGI-INF/operations/email.xml,
-              OSGI-INF/operations/http-notify.xml
+              OSGI-INF/email-template-service.xml,
+              OSGI-INF/email-template-scanner.xml
             </Service-Component>
           </instructions>
         </configuration>
