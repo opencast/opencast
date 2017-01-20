@@ -21,6 +21,7 @@
 
 package org.opencastproject.inspection.ffmpeg;
 
+import static org.opencastproject.inspection.api.MediaInspectionOptions.OPTION_ACCURATE_FRAME_COUNT;
 import static org.opencastproject.util.data.Collections.map;
 
 import org.opencastproject.inspection.api.MediaInspectionException;
@@ -74,9 +75,6 @@ import java.util.Map.Entry;
  * OSGi/MH job management boilerplate.
  */
 public class MediaInspector {
-
-  /* Name of option that controls accurateFrameCount */
-  private static final String OPTION_ACCURATE_FRAME_COUNT = "accurate-frame-count";
 
   private static final Logger logger = LoggerFactory.getLogger(MediaInspector.class);
 

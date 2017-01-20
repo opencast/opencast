@@ -24,6 +24,7 @@ package org.opencastproject.workflow.handler.inspection;
 import static java.lang.String.format;
 
 import org.opencastproject.inspection.api.MediaInspectionException;
+import org.opencastproject.inspection.api.MediaInspectionOptions;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
@@ -158,7 +159,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
     final Map<String, String> options = new HashMap<String, String>();
     if ("true".equalsIgnoreCase(operation.getConfiguration(OPT_ACCURATE_FRAME_COUNT))) {
       logger.info("Using accurate frame count for inspection media package {}", mediaPackage);
-      options.put(OPT_ACCURATE_FRAME_COUNT, Boolean.toString(true));
+      options.put(MediaInspectionOptions.OPTION_ACCURATE_FRAME_COUNT, Boolean.toString(true));
     }
 
     // Test if there are tracks in the mediapackage
