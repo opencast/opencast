@@ -25,6 +25,7 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -33,7 +34,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
-@Entity(name = "OaiPmhEntity")
+@Entity(name = "OaiPmhEntity") @IdClass(OaiPmhEntityId.class)
 @Table(name = "mh_oaipmh", uniqueConstraints = @UniqueConstraint(columnNames = { "modification_date" }))
 @NamedQueries({ @NamedQuery(name = "OaiPmh.findById", query = "SELECT o FROM OaiPmhEntity o WHERE o.mediaPackageId=:mediaPackageId AND o.repositoryId=:repository AND o.organization=:organization") })
 public class OaiPmhEntity {
