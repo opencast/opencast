@@ -37,3 +37,15 @@ The property to configure the OAI-PMH default repository can be found in
 
     default-repository=default
 
+Step 4: Allow access to OAI-PMH mount point
+-------------------------------------------
+
+Make sure that the OAI-PMH mount point is accessible. For example, if the OAI-PMH mount point has
+been set to **/oaipmh**, the following two lines
+
+    <sec:intercept-url pattern="/oaipmh/**" method="GET" access="ROLE_ANONYMOUS"/>
+    <sec:intercept-url pattern="/oaipmh/**" method="POST" access="ROLE_ANONYMOUS"/>
+
+should be present in `etc/security/mh_default_org.xml`.
+
+Note that the OAI-PMH specification demands boths GET and POST requests.
