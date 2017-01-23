@@ -46,6 +46,7 @@ pages:
       - Access Control Lists: 'configuration/acl.md'
    - Workflow: 'configuration/workflow.md'
    - External API: 'configuration/external-api.md'
+   - OAI-PMH: 'configuration/oaipmh.md'
 - Modules:
    - Overview: 'modules/index.md'
    - Atom/RSS Feed: 'modules/atomrss.md'
