@@ -236,7 +236,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     final Opt<String> presentationFlavor = getOptConfig(operation, SOURCE_PRESENTATION_FLAVOR);
     final String smilFlavor = getConfig(operation, SOURCE_SMIL_FLAVOR);
     final String concatEncodingProfile = getConfig(operation, CONCAT_ENCODING_PROFILE);
-    final String concatOutputFramerate = getOptConfig(operation, CONCAT_OUTPUT_FRAMERATE);
+    final Opt<String> concatOutputFramerate = getOptConfig(operation, CONCAT_OUTPUT_FRAMERATE);
     final String trimEncodingProfile = getConfig(operation, TRIM_ENCODING_PROFILE);
     final MediaPackageElementFlavor targetPresenterFlavor = parseTargetFlavor(
             getConfig(operation, TARGET_PRESENTER_FLAVOR), "presenter");
@@ -260,10 +260,10 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     }
 
     float outputFramerate = -1.0f;
-    if (StringUtils.isNotEmpty(concatOutputFramerate)) {
-      if (NumberUtils.isNumber(concatOutputFramerate)) {
+    if (concatOutputFramerate.isSome()) {
+      if (NumberUtils.isNumber(concatOutputFramerate.get())) {
         logger.info("Using concat output framerate");
-        outputFramerate = NumberUtils.toFloat(concatOutputFramerate);
+        outputFramerate = NumberUtils.toFloat(concatOutputFramerate.get());
       } else {
         throw new WorkflowOperationException("Unable to parse concat output frame rate!");
       }
