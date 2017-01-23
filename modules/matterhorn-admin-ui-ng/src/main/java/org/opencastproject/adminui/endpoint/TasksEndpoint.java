@@ -206,6 +206,11 @@ public class TasksEndpoint {
     List<WorkflowInstance> instances = archive.applyWorkflow(workflow(wfd, optionsMap),
             httpMediaPackageElementProvider.getUriRewriter(), IteratorUtils.toList(eventIds.iterator()));
 
+    if (eventIds.size() != instances.size()) {
+      logger.debug("Can't start one or more tasks.");
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+
     JSONObject json = new JSONObject();
     JSONArray workflows = new JSONArray();
 
