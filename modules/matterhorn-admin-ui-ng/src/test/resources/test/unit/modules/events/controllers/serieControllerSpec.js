@@ -67,11 +67,11 @@ describe('Serie controller', function () {
             $scope.$broadcast('change', 4581);
         });
 
-        it('isolates dublincore/series catalog', function () {
+/*        it('isolates dublincore/series catalog', function () {
             $scope.$watch('seriesCatalog', function (newCatalog) {
                 expect(newCatalog).toEqual(catalogs[0]);
             });
-        });
+        });*/
 
         it('prepares the extended-metadata catalogs', function () {
             $scope.metadata.$promise.then(function () {
