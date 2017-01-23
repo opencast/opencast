@@ -68,6 +68,14 @@ angular.module('adminNg.directives')
                 scope.submit();
             };
 
+            scope.storeValues = function () {
+              scope.parseValues();
+              if (scope.mixed || scope.collection[scope.value]) {
+                  var newValue = angular.isDefined(scope.collection[scope.value]) ? scope.collection[scope.value] : scope.value;
+                  scope.addValue(scope.params.value, newValue);
+              }
+            };
+
             scope.keyUp = function (event) {
                 var value = event.target.value;
                 if (angular.isDefined(scope.value)) {
@@ -75,11 +83,7 @@ angular.module('adminNg.directives')
                 }
                 if (event.keyCode === 13) {
                     // ENTER
-                    scope.parseValues();
-                    if (scope.mixed || scope.collection[scope.value]) {
-                        var newValue = angular.isDefined(scope.collection[scope.value]) ? scope.collection[scope.value] : scope.value;
-                        scope.addValue(scope.params.value, newValue);
-                    }
+                    scope.storeValues();
                 } else if (event.keyCode === 27) {
                     // ESC
                     scope.editMode = false;

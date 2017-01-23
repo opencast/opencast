@@ -57,6 +57,24 @@ angular.module('adminNg.directives')
             scope.$on('$destroy', function () {
                 $timeout.cancel(scope.submitTimer);
             });
+
+            scope.enterEditMode = function () {
+                // Store the original value for later comparision or undo
+                if (!angular.isDefined(scope.original)) {
+                    scope.original = scope.params.value;
+                }
+                scope.editMode = true;
+                scope.focusTimer = $timeout(function () {
+                  if ($('[chosen]')) {
+                    angular.element($('[chosen]')[0]).trigger('chosen:activate');
+                  }
+                });
+            };
+
+            scope.leaveEditMode = function () {
+                // does not work currently, as angular chose does not support ng-blur yet. But it does not break anything
+                scope.editMode = false;
+            };
        }
     };
 }]);

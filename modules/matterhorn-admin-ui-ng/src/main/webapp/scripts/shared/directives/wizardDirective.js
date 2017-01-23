@@ -108,6 +108,7 @@ angular.module('adminNg.directives')
                 //Its hard to unit test like this also
                 $scope.$parent.openTab(targetState.name);
             }
+            focus();
         };
 
         isReachable = function (stateName) {
@@ -137,6 +138,15 @@ angular.module('adminNg.directives')
             } else {
                 return 'WIZARD.CREATE';
             }
+        };
+
+        focus = function () {
+          //make sure the tab index starts again with 1
+          angular.forEach(angular.element.find("[focushere]"), function (element) {
+            angular.element(element).trigger('chosen:activate').focus();
+          })
+          var tabindexOne = angular.element($("[tabindex=1]"));
+          tabindexOne.focus();
         };
 
         result = {
@@ -179,7 +189,7 @@ angular.module('adminNg.directives')
         link: function (scope) {
             scope.isCurrentTab = function (tab) {
                 return scope.wizard.getCurrentStateName() === tab;
-            };     
+            };
             /**
              * Check if the given value is empty or undefined
              */
@@ -189,6 +199,19 @@ angular.module('adminNg.directives')
             };
             scope.wizard = createWizard(scope);
             scope.deleted = true;
+
+            scope.keyUp = function (event) {
+              if (event.keyCode === 13 || event.keyCode === 32) {
+                scope.wizard.toTab(event);
+              }
+            };
+
+            scope.keyUpSubmit = function (event) {
+              if (event.keyCode === 13 || event.keyCode === 32) {
+                scope.submit();
+              }
+            };
+
         }
     };
 }]);
