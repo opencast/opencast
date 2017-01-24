@@ -51,6 +51,7 @@ angular.module('adminNg.directives')
             };
 
             scope.leaveEditMode = function () {
+                scope.storeValues();
                 scope.editMode = false;
                 scope.value = '';
             };
