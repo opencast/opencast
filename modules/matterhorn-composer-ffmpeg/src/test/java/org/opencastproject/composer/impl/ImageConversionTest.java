@@ -25,7 +25,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.impl.ffmpeg.FFmpegEncoderEngine;
-import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.StreamHelper;
 
@@ -33,7 +32,9 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +61,9 @@ public class ImageConversionTest {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ImageConversionTest.class);
+
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
 
   @BeforeClass
   public static void testOcropus() {
@@ -93,7 +97,7 @@ public class ImageConversionTest {
   @Before
   public void setUp() throws Exception {
     engine = new FFmpegEncoderEngine();
-    workingDirectory = FileSupport.getTempDirectory("imageconversiontest");
+    workingDirectory = testFolder.newFolder("imageconversiontest");
     FileUtils.forceMkdir(workingDirectory);
 
     URL url = EncodingProfileTest.class.getResource("/encodingprofiles.properties");

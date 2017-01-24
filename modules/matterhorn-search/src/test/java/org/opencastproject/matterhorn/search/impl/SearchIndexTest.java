@@ -27,19 +27,19 @@ import static org.junit.Assert.fail;
 import static org.opencastproject.matterhorn.search.impl.SearchIndexImplStub.CONTENT_TYPE;
 
 import org.opencastproject.matterhorn.search.SearchMetadata;
-import org.opencastproject.util.PathSupport;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Test case for {@link AbstractElasticsearchIndex}.
@@ -61,6 +61,9 @@ public class SearchIndexTest {
   /** Flag to indicate read only index */
   protected static boolean isReadOnly = false;
 
+  @ClassRule
+  public static TemporaryFolder testFolder = new TemporaryFolder();
+
   /**
    * Sets up the solr search index. Since solr sometimes has a hard time shutting down cleanly, it's done only once for
    * all the tests.
@@ -70,11 +73,10 @@ public class SearchIndexTest {
   @BeforeClass
   public static void setupClass() throws Exception {
     // Index
-    String rootPath = PathSupport.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
-    System.setProperty("matterhorn.home", rootPath);
-    idxRoot = new File(rootPath);
+    idxRoot = testFolder.newFolder();
+    System.setProperty("matterhorn.home", idxRoot.getPath());
     ElasticsearchUtils.createIndexConfigurationAt(idxRoot, indexName);
-    idx = new SearchIndexImplStub(indexName, indexVersion, rootPath);
+    idx = new SearchIndexImplStub(indexName, indexVersion, idxRoot.getPath());
   }
 
   /**
