@@ -600,11 +600,19 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
    }
 
    @Override
-   public Iterator<Role> findRoles(String query, int offset, int limit) {
+   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
 
      // We search for SITEID, SITEID_Learner, SITEID_Instructor
 
      logger.debug("findRoles(query=" + query + " offset=" + offset + " limit=" + limit + ")");
+
+     // Empty roles list
+     List<Role> roles = new LinkedList<Role>();
+
+     // Don't return roles for users or groups
+     if (target == Role.Target.USER) {
+        return roles.iterator();
+     }
 
      boolean exact = true;
      boolean ltirole = false;
@@ -613,9 +621,6 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
        exact = false;
        query = query.substring(0, query.length() - 1);
      }
-
-     // Empty roles list
-     List<Role> roles = new LinkedList<Role>();
 
      if (query.isEmpty()) {
         return roles.iterator();
