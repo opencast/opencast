@@ -34,11 +34,15 @@ The ThemeWorkflowOperation will set the following workflow properties:
 
 |Property Name             |Description                                                          |
 |--------------------------|---------------------------------------------------------------------|
+|theme_active              |true if the theme has active settings, false or undefined otherwise  |
 |theme_bumper_active       |true if the theme has an active bumper video, false otherwise        |
 |theme_trailer_active      |true if the theme has an active trailer video, false otherwise       |
 |theme_title_slide_active  |true if the theme has an active title slide, false otherwise         |
 |theme_title_slide_uploaded|true if the theme come with an uploaded title slide, false otherwise |
 |theme_watermark_active    |true if the theme has an active watermark, false otherwise           |
+
+Note: The property *theme_active* can be used to test whether a theme has any active settings, i.e.
+at least one of the properties *theme_\*_active* is true.
 
 ## Parameter Table
 

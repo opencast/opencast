@@ -642,7 +642,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         tx.begin();
         em.remove(jobToDelete);
         tx.commit();
-        logger.debug("Job '{}' deleted", jobToDelete.toJob().getId());
+        logger.debug("Job '{}' deleted", job.getId());
       }
       logger.debug("Deleted all child jobs of job '{}'", jobId);
     } catch (Exception e) {

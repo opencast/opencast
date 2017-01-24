@@ -32,8 +32,10 @@
       fail-on-error="false"
       description="Send e-mail notification">
       <configurations>
+        <!-- Note that you can use variable substitution in to, subject, body e.g. ${(catalogs['episode']['FIELD']!'root@localhost'}  -->
         <configuration key="to">root@localhost</configuration>
         <configuration key="subject">Recording failed to process</configuration>
+        <configuration key="body-template-file">errorDetails</configuration>
       </configurations>
     </operation>
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<track id="d852c20a-8c97-4d12-a1b6-ef2ca49ca6d4" type="audio/source" xmlns="http://mediapackage.opencastproject.org">
+  <mimetype>audio/mpeg3</mimetype>
+  <url>test.mp3</url>
+  <checksum type="md5">c32f4cafa0c4ec10548dbd353432f514</checksum>
+  <duration>10</duration>
+  <audio id="audio-1">
+    <device/>
+    <encoder type="Lavf57.41.100"/>
+    <channels>1</channels>
+    <samplingrate>11025</samplingrate>
+    <bitrate>8000</bitrate>
+  </audio>
+</track>

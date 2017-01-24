@@ -65,43 +65,17 @@
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Audio waveform                                                    -->
     <!--                                                                   -->
-    <!-- Extract the audio track and create the waveform.                  -->
+    <!-- Create the waveform.                                              -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
-    <!-- Extract the audio track -->
-
-    <operation 
-      id="compose"
-      fail-on-error="false"
-      description="Extracting audio">
-      <configurations>
-        <configuration key="source-flavor">*/preview</configuration>
-        <configuration key="target-flavor">*/audio</configuration>
-        <configuration key="encoding-profile">audio.wav</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Create the audio waveform -->
-
-    <operation 
+    <operation
       id="waveform"
       fail-on-error="false"
       description="Generating waveform">
       <configurations>
-        <configuration key="source-flavor">*/audio</configuration>
+        <configuration key="source-flavor">*/preview</configuration>
         <configuration key="target-flavor">*/waveform</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Tag the waveform for internal publishing -->
-    <!-- Fixme: remove once "waveform" operation supports target-tags -->
-
-    <operation
-      id="tag"
-      description="Preparing waveform for publishing">
-      <configurations>
-        <configuration key="source-flavors">*/waveform</configuration>
-        <configuration key="target-tags">+preview</configuration>
+        <configuration key="target-tags">preview</configuration>
       </configurations>
     </operation>
 
@@ -118,7 +92,7 @@
       fail-on-error="false"
       description="Detecting silence">
       <configurations>
-        <configuration key="source-flavors">*/audio</configuration>
+        <configuration key="source-flavors">*/preview</configuration>
         <configuration key="smil-flavor-subtype">silence</configuration>
         <configuration key="reference-tracks-flavor">*/work</configuration>
       </configurations>

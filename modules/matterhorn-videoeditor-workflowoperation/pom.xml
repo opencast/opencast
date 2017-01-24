@@ -79,12 +79,11 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
-              org.opencastproject.workflow.handler;version=${project.version}
+              org.opencastproject.workflow.handler.videoeditor;version=${project.version}
             </Export-Package>
             <Service-Component>
               OSGI-INF/operations/editor.xml,
-              OSGI-INF/operations/silence.xml,
-              OSGI-INF/operations/waveform.xml
+              OSGI-INF/operations/silence.xml
             </Service-Component>
           </instructions>
         </configuration>

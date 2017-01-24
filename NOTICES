@@ -866,6 +866,14 @@ matterhorn-dublincore
   org.slf4j                              slf4j-api                                        MIT License
 
 
+matterhorn-email-template=service-impl
+  GroupId                                ArtifactId                                       License
+  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+  org.slf4j                              slf4j-log4j12                                    MIT License
+  org.freemarker                         freemarker                                       BSD-style license
+
+
 matterhorn-engage-theodul-api
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -

@@ -39,7 +39,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${build.number}</Build-Number>
+            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               org.apache.http,
               org.apache.http.client.entity,

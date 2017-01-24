@@ -21,6 +21,7 @@
 
 package org.opencastproject.workflow.handler.notification;
 
+import org.opencastproject.email.template.api.EmailTemplateService;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.kernel.mail.SmtpService;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -47,22 +48,28 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   /** The smtp service */
   private SmtpService smtpService = null;
 
+  /** The email template service */
+  private EmailTemplateService emailTemplateService = null;
+
   // Configuration properties used in the workflow definition
-  private static final String TO_PROPERTY = "to";
-  private static final String SUBJECT_PROPERTY = "subject";
+  static final String TO_PROPERTY = "to";
+  static final String SUBJECT_PROPERTY = "subject";
+  static final String BODY_PROPERTY = "body";
+  static final String BODY_TEMPLATE_FILE_PROPERTY = "body-template-file";
 
   /*
    * (non-Javadoc)
    *
-   * @see
-   * org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext
-   * )
+   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate
+   * (org.osgi.service.component.ComponentContext )
    */
   @Override
   protected void activate(ComponentContext cc) {
     super.activate(cc);
     addConfigurationOption(TO_PROPERTY, "The mail address to send to");
     addConfigurationOption(SUBJECT_PROPERTY, "The subject line");
+    addConfigurationOption(BODY_PROPERTY, "The email body text (or email template)");
+    addConfigurationOption(BODY_TEMPLATE_FILE_PROPERTY, "The file name of the Freemarker template for the email body");
   }
 
   /**
@@ -78,15 +85,26 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     // MediaPackage from previous workflow operations
     MediaPackage srcPackage = workflowInstance.getMediaPackage();
 
-    // Lookup the name of the to, from, and subject
-    String to = operation.getConfiguration(TO_PROPERTY);
-    String subject = operation.getConfiguration(SUBJECT_PROPERTY);
-    // Set the body of the message to be the ID of the media package
-    String body = srcPackage.getTitle() + "(" + srcPackage.getIdentifier().toString() + ")";
+    // To, subject, body can be Freemarker templates
+    String to = applyTemplateIfNecessary(workflowInstance, operation, TO_PROPERTY);
+    String subject = applyTemplateIfNecessary(workflowInstance, operation, SUBJECT_PROPERTY);
+    String bodyText = null;
+    String body = operation.getConfiguration(BODY_PROPERTY);
+    // If specified, templateFile is a file that contains the Freemarker template
+    String bodyTemplateFile = operation.getConfiguration(BODY_TEMPLATE_FILE_PROPERTY);
+    // Body informed? If not, use the default.
+    if (body == null && bodyTemplateFile == null) {
+      // Set the body of the message to be the ID of the media package
+      bodyText = srcPackage.getTitle() + "(" + srcPackage.getIdentifier().toString() + ")";
+    } else if (body != null) {
+      bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_PROPERTY);
+    } else {
+      bodyText = applyTemplateIfNecessary(workflowInstance, operation, BODY_TEMPLATE_FILE_PROPERTY);
+    }
 
     try {
-      logger.debug("Sending e-mail notification to {}", to);
-      smtpService.send(to, subject, body);
+      logger.debug("Sending e-mail notification to {} with subject {} and body {}", to, subject, bodyText);
+      smtpService.send(to, subject, bodyText);
       logger.info("E-mail notification sent to {}", to);
     } catch (MessagingException e) {
       throw new WorkflowOperationException(e);
@@ -94,6 +112,34 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
     // Return the source mediapackage and tell processing to continue
     return createResult(srcPackage, Action.CONTINUE);
+  }
+
+  private String applyTemplateIfNecessary(WorkflowInstance workflowInstance, WorkflowOperationInstance operation,
+          String configName) {
+    String configValue = operation.getConfiguration(configName);
+
+    // Templates are cached, use as template name: the template name or, if
+    // in-line, the
+    // workflow name + the operation number + body/to/subject
+    String templateName = null;
+    String templateContent = null;
+
+    if (BODY_TEMPLATE_FILE_PROPERTY.equals(configName)) {
+      templateName = configValue; // Use body template file name
+    } else if (configValue != null && configValue.indexOf("${") > -1) {
+      // If value contains a "${", it may be a template so apply it
+      // Give a name to the inline template
+      templateName = workflowInstance.getTemplate() + "_" + operation.getPosition() + "_" + configName;
+      // Only alphanumeric and _
+      templateName = templateName.replaceAll("[^A-Za-z0-9 ]", "_");
+      templateContent = configValue;
+    } else {
+      // If value doesn't contain a "${", assume it is NOT a Freemarker
+      // template and thus return the value as it is
+      return configValue;
+    }
+    // Apply the template
+    return emailTemplateService.applyTemplate(templateName, templateContent, workflowInstance);
   }
 
   /**
@@ -104,6 +150,16 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
    */
   void setSmtpService(SmtpService smtpService) {
     this.smtpService = smtpService;
+  }
+
+  /**
+   * Callback for OSGi to set the {@link SmtpService}.
+   *
+   * @param service
+   *          the email template service
+   */
+  void setEmailTemplateService(EmailTemplateService service) {
+    this.emailTemplateService = service;
   }
 
 }
