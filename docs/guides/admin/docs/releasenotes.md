@@ -21,7 +21,7 @@ New Features and Improvements
 - **Event Statistics** - The statistic counters that display statistics of events and allow the user to quickly apply
     filters have been significantly improved by both using the screen estate more effectively and better fitting into
     the overall UI design. Besides this, support for role-based visibility and optimizations to improve performance in
-    large-scale scenarios make this useful feature even more useful. 
+    large-scale scenarios make this useful feature even more useful.
 
 - **Capture Agent API** - The capture agent API now better supports ad-hoc recordings by allowing capture agents to
     start (create), stop and prolong immediate events. Besides this, the missing parts of the JSON interface have been
@@ -54,6 +54,13 @@ New Features and Improvements
     libraries, improving the documentation, design and performance, we continuously ensure Opencast's maintainability
 
 For a completed list of changes, have a look at the [changelog](changelog.md).
+
+
+Additional Notes About 2.3.1
+----------------------------
+
+Opencast 2.3.1 fixes a critical issue with publication on distributed systems as well as two security issues and several
+minor issues.
 
 
 Opencast 2.3 Release Schedule
