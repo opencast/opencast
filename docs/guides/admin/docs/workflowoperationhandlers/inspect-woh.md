@@ -18,12 +18,12 @@ The InspectWorkflowOperation will also set the duration and creation date of the
 ### Accept No Media
 
 If the configuration key `accept-no-media`is set to `false`, the operation will fail if the media package does not
-contain any media tracks. If this behaviour is not appropriate, set `accept-no-media` to `false`.
+contain any media tracks. If this behaviour is not appropriate, set `accept-no-media` to `true`.
 
 ### Accurate Frame Count
 
 The media inspection service will provide the number of frames in case of video streams. Normally, this information is
-extracted from the media file header. In case of incorrect media file headers, this information might be not exact.
+extracted from the media file header. In case of incorrect media file headers, this information might not be accurate.
 Using the configuration key `accurate-frame-count`, the media inspection service can be forced to perform a full
 decoding of the video stream. While this does result in an exact count of frames, this is expensive in terms of 
 computation power.
