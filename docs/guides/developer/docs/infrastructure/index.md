@@ -33,7 +33,7 @@ Maven Repository (Nexus)
 
 Institution                | Hostname                      | Admin (Software) | Admin (Hardware)    | Notes
 ---------------------------|-------------------------------|------------------|---------------------|---------------
-ETH Zurich                 | opencasr-nexus.ethz.ch        | Greg Logan       | Markus Borzechowski |
+ETH Zurich                 | opencast-nexus.ethz.ch        | Greg Logan       | Markus Borzechowski |
 Harvard DCE                | nexus.dcex.harvard.edu        | Greg Logan       | DCE Devel group     | Amazon Cloud
 University of Osnabrück    | nexus.virtuos.uos.de          | Greg Logan       | Lars Kiesow         |
 University of Osnabrück    | nexus.opencast.org            | Greg Logan       | Lars Kiesow         | GeoIP Redirect
@@ -52,6 +52,7 @@ Institution                | Hostname                      | Admin (Software) | 
 ---------------------------|-------------------------------|------------------|-------------------------
 University of Osnabrück    | repo.virtuos.uos.de           | Lars Kiesow      | Lars Kiesow
 University of Osnabrück    | pullrequests.opencast.org     | Lars Kiesow      | Lars Kiesow
+University of Osnabrück    | build.opencast.org            | Greg Logan       | Lars Kiesow
 University of Osnabrück    | docs.opencast.org             | Greg Logan       | Lars Kiesow
 University of Osnabrück    | opencast.org                  | Rüdiger Rolf     | Rüdiger Rolf
 
