@@ -60,6 +60,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -334,6 +335,18 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     for (Date created : metadata.getCreated())
       /* Method formatDate of org.apache.xalan.lib.ExsltDatetime requires the format CCYY-MM-DDThh:mm:ss */
       appendXml(xml, "date", new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss").format(created));
+    for (Date[] period : metadata.getTemporalPeriod()) {
+      if (period[0] != null) {
+        appendXml(xml, "temporalPeriodStart", DateFormat.getDateInstance(DateFormat.LONG).format(period[0]));
+      }
+      if (period[1] != null) {
+        appendXml(xml, "temporalPeriodEnd", DateFormat.getDateInstance(DateFormat.LONG).format(period[1]));
+      }
+    }
+    for (Date instant : metadata.getTemporalInstant())
+      appendXml(xml, "temporalInstant", DateFormat.getDateInstance(DateFormat.LONG).format(instant));
+    for (Long duration : metadata.getTemporalDuration())
+      appendXml(xml, "temporalDuration", new SimpleDateFormat("HH:mm:ss").format(new Date(duration)));
     for (String license : getFirstMetadataValue(metadata.getLicenses()))
       appendXml(xml, "license", license);
     for (String isPartOf : metadata.getIsPartOf())
