@@ -515,7 +515,7 @@ public class MediaInspector {
         if (e.getKey().equals(OPTION_ACCURATE_FRAME_COUNT)) {
           // This option is supported
         } else {
-          throw new MediaInspectionException("Unsupported option");
+          throw new MediaInspectionException("Unsupported option " + e.getKey());
         }
       }
     } else {
