@@ -86,7 +86,7 @@
           <xsl:value-of select="opencast:XsltHelper.split(metadata/title, 30, 2, true)" />
         </tspan>
         <tspan class="creators" dy="12%" x="50%">
-          <xsl:value-of select="opencast:XsltHelper.split(metadata/creators, 40, 2, true)" />
+          <xsl:value-of select="opencast:XsltHelper.split(metadata/creators, 40, 1, true)" />
         </tspan>
         <tspan class="description" dy="12%" x="50%">
           <xsl:value-of select="opencast:XsltHelper.split(metadata/description, 50, 1, false)" />
