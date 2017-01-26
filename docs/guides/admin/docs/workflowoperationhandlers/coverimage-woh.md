@@ -77,7 +77,7 @@ execute JavaScript or Java code directly within the stylesheet.
 
 For commonly used tasks it is simpler, however, to make use of available XSLT Extensions.
 
-#### Opencast Extenseions
+#### Opencast Extensions
 
 The package org.opencastproject.coverimage.impl.xsl provides classes supposed to be used within XSL stylesheets.
 
