@@ -1,7 +1,7 @@
 Opencast Infrastructure
 =======================
 
-List of Opencast project infrastructure and administrators.
+List of Opencast project infrastructure and administrators.  For detailed notes go [here](notes.md)
 
 
 Test Servers
