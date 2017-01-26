@@ -159,7 +159,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
     final Map<String, String> options = new HashMap<String, String>();
     if ("true".equalsIgnoreCase(operation.getConfiguration(OPT_ACCURATE_FRAME_COUNT))) {
       logger.info("Using accurate frame count for inspection media package {}", mediaPackage);
-      options.put(MediaInspectionOptions.OPTION_ACCURATE_FRAME_COUNT, Boolean.toString(true));
+      options.put(MediaInspectionOptions.OPTION_ACCURATE_FRAME_COUNT, Boolean.TRUE.toString());
     }
 
     // Test if there are tracks in the mediapackage

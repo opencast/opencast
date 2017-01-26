@@ -88,10 +88,6 @@
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
     </dependency>
@@ -106,7 +102,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Export-Package> org.opencastproject.inspection.ffmpeg.*;version=${project.version} </Export-Package>
+            <Export-Package>org.opencastproject.inspection.ffmpeg.*;version=${project.version}</Export-Package>
             <Service-Component>
               OSGI-INF/inspection-service.xml
             </Service-Component>

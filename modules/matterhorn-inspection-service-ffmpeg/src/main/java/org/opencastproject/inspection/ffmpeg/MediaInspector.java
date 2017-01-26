@@ -51,6 +51,7 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.tika.metadata.HttpHeaders;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
@@ -505,7 +506,7 @@ public class MediaInspector {
 
   /* Return true if OPTION_ACCURATE_FRAME_COUNT is set to true, false otherwise */
   private boolean getAccurateFrameCount(final Map<String, String> options) {
-    return Boolean.parseBoolean(options.get(OPTION_ACCURATE_FRAME_COUNT));
+    return BooleanUtils.toBoolean(options.get(OPTION_ACCURATE_FRAME_COUNT));
   }
 
   /* Throws an exception if an unsupported option is set */

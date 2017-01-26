@@ -23,6 +23,7 @@ package org.opencastproject.inspection.ffmpeg;
 
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
+import org.opencastproject.inspection.api.util.Options;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -35,9 +36,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.workspace.api.Workspace;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import org.apache.tika.parser.Parser;
 import org.osgi.service.cm.ConfigurationException;
@@ -89,7 +87,6 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   private UserDirectoryService userDirectoryService = null;
   private OrganizationDirectoryService organizationDirectoryService = null;
   private Parser tikaParser;
-  private final Gson gson = new Gson();
 
   private volatile MediaInspector inspector;
 
@@ -135,11 +132,6 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
             serviceRegistry);
   }
 
-  /* Convert JSON string to Map<String, String> */
-  private Map<String, String> parseOptions(String rawOptions) {
-    return gson.fromJson(rawOptions, new TypeToken<Map<String, String>>() { }.getType());
-  }
-
   /**
    * {@inheritDoc}
    *
@@ -157,13 +149,13 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
       switch (op) {
         case Inspect:
           URI uri = URI.create(arguments.get(0));
-          options = parseOptions(arguments.get(1));
+          options = Options.fromJson(arguments.get(1));
           inspectedElement = inspector.inspectTrack(uri, options);
           break;
         case Enrich:
           MediaPackageElement element = MediaPackageElementParser.getFromXml(arguments.get(0));
           boolean overwrite = Boolean.parseBoolean(arguments.get(1));
-          options = parseOptions(arguments.get(2));
+          options = Options.fromJson(arguments.get(2));
           inspectedElement = inspector.enrich(element, overwrite, options);
           break;
         default:
@@ -199,7 +191,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
     assert (options != null);
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Inspect.toString(), Arrays.asList(uri.toString(),
-              gson.toJson(options)), inspectJobLoad);
+              Options.toJson(options)), inspectJobLoad);
     } catch (ServiceRegistryException e) {
       throw new MediaInspectionException(e);
     }
@@ -230,7 +222,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Enrich.toString(),
               Arrays.asList(MediaPackageElementParser.getAsXml(element), Boolean.toString(override),
-              gson.toJson(options)), enrichJobLoad);
+              Options.toJson(options)), enrichJobLoad);
     } catch (ServiceRegistryException e) {
       throw new MediaInspectionException(e);
     }
