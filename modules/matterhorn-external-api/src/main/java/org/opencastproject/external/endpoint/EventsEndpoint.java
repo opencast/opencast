@@ -267,7 +267,6 @@ public class EventsEndpoint implements ManagedService {
   @SuppressWarnings("rawtypes")
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
-
     Opt<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY).toOpt()
             .map(com.entwinemedia.fn.fns.Strings.toLongF);
     if (expiration.isSome()) {
