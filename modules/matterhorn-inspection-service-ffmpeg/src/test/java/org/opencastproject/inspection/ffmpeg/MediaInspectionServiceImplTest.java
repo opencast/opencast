@@ -31,6 +31,7 @@ import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
+import org.opencastproject.inspection.api.util.Options;
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.TrackSupport;
@@ -54,13 +55,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MediaInspectionServiceImplTest {
   private static final Logger logger = LoggerFactory.getLogger(MediaInspectionServiceImplTest.class);
-
-  private static final Map<String, String> NO_OPTIONS = new HashMap<String, String>();
 
   /** True to run the tests */
   private static Option<String> ffprobePath;
@@ -121,7 +118,7 @@ public class MediaInspectionServiceImplTest {
   public void testInspection() throws Exception {
     final URI trackUri = getResource("/test.mp4");
     for (MediaInspector mi : init(trackUri)) {
-      Track track = mi.inspectTrack(trackUri, NO_OPTIONS);
+      Track track = mi.inspectTrack(trackUri, Options.NO_OPTION);
       // test the returned values
       Checksum cs = Checksum.create(ChecksumType.fromString("md5"), "cc72b7a4f1a68b84fba6f0fb895da395");
       assertEquals(cs, track.getChecksum());
@@ -136,7 +133,7 @@ public class MediaInspectionServiceImplTest {
   public void testInspectionEmptyContainer() throws Exception {
     final URI trackUri = getResource("/nostreams.mp4");
     for (MediaInspector mi : init(trackUri)) {
-      final Track track = mi.inspectTrack(trackUri, NO_OPTIONS);
+      final Track track = mi.inspectTrack(trackUri, Options.NO_OPTION);
       assertEquals(0, track.getStreams().length);
       assertEquals("mp4", track.getMimeType().getSubtype());
       assertEquals(null, track.getDuration());
@@ -147,14 +144,14 @@ public class MediaInspectionServiceImplTest {
   public void testEnrichment() throws Exception {
     final URI trackUri = getResource("/test.mp4");
     for (MediaInspector mi : init(trackUri)) {
-      Track track = mi.inspectTrack(trackUri, NO_OPTIONS);
+      Track track = mi.inspectTrack(trackUri, Options.NO_OPTION);
       // make changes to metadata
       Checksum cs = track.getChecksum();
       track.setChecksum(null);
       MimeType mt = mimeType("video", "flash");
       track.setMimeType(mt);
       // test the enrich scenario
-      Track newTrack = (Track) mi.enrich(track, false, NO_OPTIONS);
+      Track newTrack = (Track) mi.enrich(track, false, Options.NO_OPTION);
 
       VideoStream[] videoStreams = TrackSupport.byType(newTrack.getStreams(), VideoStream.class);
       assertTrue(videoStreams[0].getFrameCount().longValue() > 0);
@@ -165,21 +162,21 @@ public class MediaInspectionServiceImplTest {
       assertNotNull(newTrack.getDuration());
       assertTrue(newTrack.getDuration() > 0);
       // test the override scenario
-      newTrack = (Track) mi.enrich(track, true, NO_OPTIONS);
+      newTrack = (Track) mi.enrich(track, true, Options.NO_OPTION);
       assertEquals(newTrack.getChecksum(), cs);
       assertNotSame(newTrack.getMimeType(), mt);
       assertTrue(newTrack.getDuration() > 0);
     }
 
     for (MediaInspector mi : init(trackUri)) {
-      Track track = mi.inspectTrack(trackUri, NO_OPTIONS);
+      Track track = mi.inspectTrack(trackUri, Options.NO_OPTION);
       // make changes to metadata
       Checksum cs = track.getChecksum();
       track.setChecksum(null);
       MimeType mt = mimeType("video", "flash");
       track.setMimeType(mt);
       // test the enrich scenario
-      Track newTrack = (Track) mi.enrich(track, false, NO_OPTIONS);
+      Track newTrack = (Track) mi.enrich(track, false, Options.NO_OPTION);
 
       VideoStream[] videoStreams = TrackSupport.byType(newTrack.getStreams(), VideoStream.class);
       assertTrue(videoStreams[0].getFrameCount().longValue() > 0);
@@ -190,7 +187,7 @@ public class MediaInspectionServiceImplTest {
       assertNotNull(newTrack.getDuration());
       assertTrue(newTrack.getDuration() > 0);
       // test the override scenario
-      newTrack = (Track) mi.enrich(track, true, NO_OPTIONS);
+      newTrack = (Track) mi.enrich(track, true, Options.NO_OPTION);
       assertEquals(newTrack.getChecksum(), cs);
       assertNotSame(newTrack.getMimeType(), mt);
       assertTrue(newTrack.getDuration() > 0);
@@ -201,19 +198,19 @@ public class MediaInspectionServiceImplTest {
   public void testEnrichmentEmptyContainer() throws Exception {
     final URI trackUri = getResource("/nostreams.mp4");
     for (MediaInspector mi : init(trackUri)) {
-      Track track = mi.inspectTrack(trackUri, NO_OPTIONS);
+      Track track = mi.inspectTrack(trackUri, Options.NO_OPTION);
       // make changes to metadata
       Checksum cs = track.getChecksum();
       track.setChecksum(null);
       MimeType mt = mimeType("video", "flash");
       track.setMimeType(mt);
       // test the enrich scenario
-      Track newTrack = (Track) mi.enrich(track, false, NO_OPTIONS);
+      Track newTrack = (Track) mi.enrich(track, false, Options.NO_OPTION);
       assertEquals(newTrack.getChecksum(), cs);
       assertEquals(newTrack.getMimeType(), mt);
       assertNull(newTrack.getDuration());
       // test the override scenario
-      newTrack = (Track) mi.enrich(track, true, NO_OPTIONS);
+      newTrack = (Track) mi.enrich(track, true, Options.NO_OPTION);
       assertEquals(newTrack.getChecksum(), cs);
       assertNotSame(newTrack.getMimeType(), mt);
       assertNull(newTrack.getDuration());

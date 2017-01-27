@@ -47,7 +47,6 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,8 +72,6 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   private float enrichJobLoad = DEFAULT_ENRICH_JOB_LOAD;
 
   private static final Logger logger = LoggerFactory.getLogger(MediaInspectionServiceImpl.class);
-
-  private static final Map<String, String> NO_OPTIONS = new HashMap<String, String>();
 
   /** List of available operations on jobs */
   private enum Operation {
@@ -178,7 +175,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
    */
   @Override
   public Job inspect(URI uri) throws MediaInspectionException {
-    return inspect(uri, NO_OPTIONS);
+    return inspect(uri, Options.NO_OPTION);
   }
 
   /**
@@ -206,7 +203,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   @Override
   public Job enrich(final MediaPackageElement element, final boolean override)
           throws MediaInspectionException, MediaPackageException {
-    return enrich(element, override, NO_OPTIONS);
+    return enrich(element, override, Options.NO_OPTION);
   }
 
   /**
