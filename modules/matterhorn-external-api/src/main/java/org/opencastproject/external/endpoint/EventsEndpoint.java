@@ -155,6 +155,12 @@ public class EventsEndpoint implements ManagedService {
   /** The default time before a piece of signed content expires. 2 Hours. */
   protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
 
+  /** Subtype of previews required by the video editor */
+  private static final String PREVIEW_SUBTYPE = "preview.subtype";
+
+  /** Subtype of previews required by the video editor */
+  private static final String DEFAULT_PREVIEW_SUBTYPE = "preview";
+
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(EventsEndpoint.class);
 
@@ -168,6 +174,8 @@ public class EventsEndpoint implements ManagedService {
   protected String serviceUrl = null;
 
   private static long expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
+
+  private String previewSubtype = DEFAULT_PREVIEW_SUBTYPE;
 
   /** The resolutions */
   private enum CommentResolution {
@@ -259,6 +267,7 @@ public class EventsEndpoint implements ManagedService {
   @SuppressWarnings("rawtypes")
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
+
     Opt<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY).toOpt()
             .map(com.entwinemedia.fn.fns.Strings.toLongF);
     if (expiration.isSome()) {
@@ -269,6 +278,14 @@ public class EventsEndpoint implements ManagedService {
       expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
       logger.info("The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
               URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
+    }
+
+    if ((properties != null) && (properties.get(PREVIEW_SUBTYPE) != null)) {
+      previewSubtype = StringUtils.trimToNull((String) properties.get(PREVIEW_SUBTYPE));
+      logger.info("Preview subtype is '{}'", previewSubtype);
+    } else {
+      previewSubtype = DEFAULT_PREVIEW_SUBTYPE;
+      logger.warn("No preview subtype configured, using '{}'", previewSubtype);
     }
   }
 
@@ -288,6 +305,7 @@ public class EventsEndpoint implements ManagedService {
           @QueryParam("withmetadata") Boolean withMetadata, @QueryParam("withpublications") Boolean withPublications)
           throws Exception {
     for (final Event event : indexService.getEvent(id, externalIndex)) {
+      event.updatePreview(previewSubtype);
       return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0,
               eventToJSON(event, withAcl, withMetadata, withPublications, sign));
     }
@@ -594,6 +612,7 @@ public class EventsEndpoint implements ManagedService {
     List<IndexObject> events = new ArrayList<>();
     for (SearchResultItem<Event> item : items) {
       Event source = item.getSource();
+      source.updatePreview(previewSubtype);
       events.add(source);
     }
     try {
