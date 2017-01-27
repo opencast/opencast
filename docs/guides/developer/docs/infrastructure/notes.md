@@ -16,6 +16,17 @@ Harvard DCE
 - Using [packaged Nexus](https://copr.fedorainfracloud.org/coprs/lkiesow/nexus-oss/)
 
 
+ETH
+---
+
+#### opencast-nexus.ethz.ch 
+
+- Unattended upgrade
+- RHEL 7.x
+- Using [packaged Nexus](https://copr.fedorainfracloud.org/coprs/lkiesow/nexus-oss/)
+
+
+
 SWITCH
 ------
 
@@ -23,11 +34,6 @@ SWITCH
 
 - Unattended upgrade
 - CentOS Linux release 7.x
-
-#### opencast-nexus.ethz.ch 
-
-- RHEL 7.x
-- Using [packaged Nexus](https://copr.fedorainfracloud.org/coprs/lkiesow/nexus-oss/)
 
 #### Test Cluster (*.oc-test.switch.ch)
 
@@ -56,15 +62,20 @@ University of Osnabrück
 
 #### octestallinone.virtuos.uos.de
 
-- Using packaged Opencast
+- Using tarballs build from build.opencast.org
 
 #### pullrequests.opencast.org
 
 - Merge ticket list needs to set manually
 
-#### repo.opencast.org and pullrequests.opencast.org
+#### repo.opencast.org and pkg.opencast.org
+
+- Same server
+
+#### pullrequests.opencast.org
 
 - Scientific Linux 6.x
+- Due for retirement, services will be moved to repo.opencast.org VM and DNS updated
 
 
 University of Saskatchewean

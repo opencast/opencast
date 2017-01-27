@@ -15,7 +15,7 @@ University of Saskatchewan | testengage.usask.ca           | Greg Logan       | 
 University of Saskatchewan | testworker1.usask.ca          | Greg Logan       | Greg Logan       |
 University of Saskatchewan | testworker2.usask.ca          | Greg Logan       | Greg Logan       |
 University of Osnabrück    | octestallinone.virtuos.uos.de | Greg Logan       | Lars Kiesow      |
-SWITCH                     | admin.oc-test.switch.ch       | Greg Logan       | Lars Kiesow      |
+SWITCH                     | admin.oc-test.switch.ch       | Greg Logan       | Lars Kiesow      | SWITCH cluster may be unavailable after 2017-07
 SWITCH                     | player.oc-test.switch.ch      | Greg Logan       | Lars Kiesow      |
 SWITCH                     | ingest.oc-test.switch.ch      | Greg Logan       | Lars Kiesow      |
 SWITCH                     | worker1.oc-test.switch.ch     | Greg Logan       | Lars Kiesow      |
