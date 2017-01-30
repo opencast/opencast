@@ -30,10 +30,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Import-Package>
-              org.opencastproject.metadata.dublincore;version=${project.version},
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>org.opencastproject.series.api;version=${project.version}</Export-Package>
           </instructions>
         </configuration>

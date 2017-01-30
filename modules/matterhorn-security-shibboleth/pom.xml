@@ -45,7 +45,7 @@
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -66,10 +66,11 @@
               org.springframework.security.core.userdetails,
               org.springframework.security.provisioning,
               org.springframework.security.web.authentication.preauth,
-              org.springframework.util
+              org.springframework.util,
+              *
             </Import-Package>
             <Export-Package>
-              org.opencastproject.security.shibboleth;version="${project.version}"
+              org.opencastproject.security.shibboleth;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>

@@ -294,6 +294,16 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
    * video tracks.
    */
   private class CompositeSettings {
+
+    /** Use a fixed output resolution */
+    public static final String OUTPUT_RESOLUTION_FIXED = "fixed";
+
+    /** Use resolution of lower part as output resolution */
+    public static final String OUTPUT_RESOLUTION_LOWER =  "lower";
+
+    /** Use resolution of upper part as output resolution */
+    public static final String OUTPUT_RESOLUTION_UPPER = "upper";
+
     private String sourceTagsUpper;
     private String sourceFlavorUpper;
     private String sourceTagsLower;
@@ -323,6 +333,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
     private Track lowerTrack;
     private Track singleTrack;
 
+    private String outputResolutionSource;
     private Dimension outputDimension;
 
     private EncodingProfile profile;
@@ -397,16 +408,20 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       if (outputResolution == null)
         throw new WorkflowOperationException("Output resolution must be set!");
 
-      try {
-        String[] outputResolutionArray = StringUtils.split(outputResolution, "x");
-        if (outputResolutionArray.length != 2)
-          throw new WorkflowOperationException("Invalid format of output resolution!");
-        outputDimension = Dimension.dimension(Integer.parseInt(outputResolutionArray[0]),
-                Integer.parseInt(outputResolutionArray[1]));
-      } catch (WorkflowOperationException e) {
-        throw e;
-      } catch (Exception e) {
-        throw new WorkflowOperationException("Unable to parse output resolution!", e);
+      if (outputResolution.equals(OUTPUT_RESOLUTION_LOWER) || outputResolution.equals(OUTPUT_RESOLUTION_UPPER)) {
+        outputResolutionSource = outputResolution;
+      } else {
+        outputResolutionSource = OUTPUT_RESOLUTION_FIXED;
+        try {
+          String[] outputResolutionArray = StringUtils.split(outputResolution, "x");
+          if (outputResolutionArray.length != 2) {
+            throw new WorkflowOperationException("Invalid format of output resolution!");
+          }
+          outputDimension = Dimension.dimension(Integer.parseInt(outputResolutionArray[0]),
+                  Integer.parseInt(outputResolutionArray[1]));
+        } catch (Exception e) {
+          throw new WorkflowOperationException("Unable to parse output resolution!", e);
+        }
       }
 
       // Make sure either one of tags or flavor for the upper source are provided
@@ -583,6 +598,10 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       this.singleTrack = singleTrack;
     }
 
+    public String getOutputResolutionSource() {
+      return outputResolutionSource;
+    }
+
     public Dimension getOutputDimension() {
       return outputDimension;
     }
@@ -616,9 +635,20 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       List<Tuple<Dimension, HorizontalCoverageLayoutSpec>> shapes = new ArrayList<Tuple<Dimension, HorizontalCoverageLayoutSpec>>();
       shapes.add(0, Tuple.tuple(videoDimension, compositeSettings.getSingleSourceLayout()));
 
+      // Determine dimension of output
+      Dimension outputDimension = null;
+      String outputResolutionSource = compositeSettings.getOutputResolutionSource();
+      if (outputResolutionSource.equals(CompositeSettings.OUTPUT_RESOLUTION_FIXED)) {
+        outputDimension = compositeSettings.getOutputDimension();
+      } else if (outputResolutionSource.equals(CompositeSettings.OUTPUT_RESOLUTION_LOWER)) {
+        outputDimension = videoDimension;
+      } else if (outputResolutionSource.equals(CompositeSettings.OUTPUT_RESOLUTION_UPPER)) {
+        outputDimension = videoDimension;
+      }
+
       // Calculate the single layout
       MultiShapeLayout multiShapeLayout = LayoutManager
-              .multiShapeLayout(compositeSettings.getOutputDimension(), shapes);
+              .multiShapeLayout(outputDimension, shapes);
 
       // Create the laid out element for the videos
       LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<Track>(compositeSettings.getSingleTrack(),
@@ -626,9 +656,9 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
 
       // Create the optionally laid out element for the watermark
       Option<LaidOutElement<Attachment>> watermarkOption = createWatermarkLaidOutElement(compositeSettings,
-              watermarkAttachment);
+              outputDimension, watermarkAttachment);
 
-      Job compositeJob = composerService.composite(compositeSettings.getOutputDimension(), Option
+      Job compositeJob = composerService.composite(outputDimension, Option
               .<LaidOutElement<Track>> none(), lowerLaidOutElement, watermarkOption, compositeSettings.getProfile()
               .getIdentifier(), compositeSettings.getOutputBackground());
 
@@ -673,7 +703,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
   }
 
   private Option<LaidOutElement<Attachment>> createWatermarkLaidOutElement(CompositeSettings compositeSettings,
-          Option<Attachment> watermarkAttachment) throws WorkflowOperationException {
+          Dimension outputDimension, Option<Attachment> watermarkAttachment) throws WorkflowOperationException {
     Option<LaidOutElement<Attachment>> watermarkOption = Option.<LaidOutElement<Attachment>> none();
     if (watermarkAttachment.isSome() && compositeSettings.getWatermarkLayout().isSome()) {
       BufferedImage image;
@@ -687,7 +717,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       Dimension imageDimension = Dimension.dimension(image.getWidth(), image.getHeight());
       List<Tuple<Dimension, AbsolutePositionLayoutSpec>> watermarkShapes = new ArrayList<Tuple<Dimension, AbsolutePositionLayoutSpec>>();
       watermarkShapes.add(0, Tuple.tuple(imageDimension, compositeSettings.getWatermarkLayout().get()));
-      MultiShapeLayout watermarkLayout = LayoutManager.absoluteMultiShapeLayout(compositeSettings.getOutputDimension(),
+      MultiShapeLayout watermarkLayout = LayoutManager.absoluteMultiShapeLayout(outputDimension,
               watermarkShapes);
       watermarkOption = Option.some(new LaidOutElement<Attachment>(watermarkAttachment.get(), watermarkLayout
               .getShapes().get(0)));
@@ -730,6 +760,17 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       Dimension lowerDimensions = Dimension.dimension(lowerVideoStreams[0].getFrameWidth(),
               lowerVideoStreams[0].getFrameHeight());
 
+      // Determine dimension of output
+      Dimension outputDimension = null;
+      String outputResolutionSource = compositeSettings.getOutputResolutionSource();
+      if (outputResolutionSource.equals(CompositeSettings.OUTPUT_RESOLUTION_FIXED)) {
+        outputDimension = compositeSettings.getOutputDimension();
+      } else if (outputResolutionSource.equals(CompositeSettings.OUTPUT_RESOLUTION_LOWER)) {
+        outputDimension = lowerDimensions;
+      } else if (outputResolutionSource.equals(CompositeSettings.OUTPUT_RESOLUTION_UPPER)) {
+        outputDimension = upperDimensions;
+      }
+
       // Create the video layout definitions
       List<Tuple<Dimension, HorizontalCoverageLayoutSpec>> shapes = new ArrayList<Tuple<Dimension, HorizontalCoverageLayoutSpec>>();
       shapes.add(0, Tuple.tuple(lowerDimensions, layouts.get(0)));
@@ -737,7 +778,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
 
       // Calculate the layout
       MultiShapeLayout multiShapeLayout = LayoutManager
-              .multiShapeLayout(compositeSettings.getOutputDimension(), shapes);
+              .multiShapeLayout(outputDimension, shapes);
 
       // Create the laid out element for the videos
       LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<Track>(lowerTrack, multiShapeLayout.getShapes()
@@ -747,9 +788,9 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
 
       // Create the optionally laid out element for the watermark
       Option<LaidOutElement<Attachment>> watermarkOption = createWatermarkLaidOutElement(compositeSettings,
-              watermarkAttachment);
+              outputDimension, watermarkAttachment);
 
-      Job compositeJob = composerService.composite(compositeSettings.getOutputDimension(), Option
+      Job compositeJob = composerService.composite(outputDimension, Option
               .option(upperLaidOutElement), lowerLaidOutElement, watermarkOption, compositeSettings.getProfile()
               .getIdentifier(), compositeSettings.getOutputBackground());
 

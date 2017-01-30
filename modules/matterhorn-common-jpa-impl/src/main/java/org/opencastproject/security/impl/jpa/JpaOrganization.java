@@ -34,6 +34,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -71,6 +72,7 @@ public class JpaOrganization implements Organization {
   @Column(name = "anonymous_role")
   private String anonymousRole;
 
+  @Lob
   @ElementCollection
   @MapKeyColumn(name = "name")
   @Column(name = "value", length = 65535)

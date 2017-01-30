@@ -28,8 +28,8 @@ import org.opencastproject.engage.theodul.api.EngagePluginManager;
 import org.opencastproject.engage.theodul.api.EngagePluginRegistration;
 import org.opencastproject.engage.theodul.api.EngagePluginRestService;
 import org.opencastproject.kernel.rest.RestPublisher;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.rest.StaticResource;
+import org.opencastproject.util.OsgiUtil;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -50,8 +50,6 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
-
-import javax.servlet.Servlet;
 
 /**
  * A service that tracks the de-/registration of Theodul Player Plugins and
@@ -169,10 +167,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
     StaticResource staticResource = new StaticResource(
             new BundleDelegatingClassLoader(plugin.getServiceReference().getBundle()),
             EngagePlugin.STATIC_RESOURCES_PATH, plugin.getStaticResourcesPath(), null);
-    Dictionary<String, String> props = new Hashtable<String, String>();
-    props.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
-    props.put("alias", PLUGIN_URL_PREFIX + plugin.getStaticResourcesPath());
-    return getKernelBundleContext().registerService(Servlet.class.getName(), staticResource, props);
+    return OsgiUtil.registerServlet(getKernelBundleContext(), staticResource, PLUGIN_URL_PREFIX + plugin.getStaticResourcesPath());
   }
 
   /** Publishes the REST endpoint implemented by the plugin bundle.

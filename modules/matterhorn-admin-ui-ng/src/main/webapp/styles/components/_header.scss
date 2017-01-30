@@ -33,49 +33,17 @@
     @include linear-gradient(top, #388ed6, #2075b1);
 
     .header-branding {
-        width: 200px;
         float: left;
-        padding: 14px 20px 14px;
-    }
 
-    .logo {
-        float: left;
-        $width: $logo-width;
-        $height: $logo-height;
-        display: inline-block;
-        margin-left: $side-margin;
-        width: $width;
-        height: $height;
-        @include retina-image("#{$img-path}#{$logo-file}", $width $height);
-    }
+        a.logo {
+            display: block;
+            padding: 14px 20px 13px;
 
-    .text-logo {
-        display: inline-block;
-        padding-bottom: 2px;
-        float: left;
-        font-size: 18px;
-        font-weight: 600;
-        line-height: 17px;
-        color: darken($l-blue, 25%);
-        text-shadow: 0 1px 0 rgba($white, 0.2);
-        @include font-smoothing(on);
-    }
-
-    .logo-tag {
-        float: left;
-        margin-left: 8px;
-        margin-top: 1px;
-        background: darken($l-blue, 15%);
-        box-shadow: inset 0 1px 2px rgba($black, 0.2), 0 1px 0 rgba($white, 0.1);
-        border-radius: 3px;
-        display: inline-block;
-        padding: 3px 5px;
-        color: lighten($l-blue, 2%);
-        text-shadow: 0 1px 1px rgba($black, 0.2);
-        font-size: 10px;
-        font-weight: 400;
-        text-transform: uppercase;
-        cursor: default;
+            img {
+                width: $logo-width;
+                height: $logo-height;
+            }
+        }
     }
 }
 
@@ -129,7 +97,7 @@
         width: 150px;
         top: 31px;
         right: -11px;
-    }    
+    }
 
     .nav-dd .dropdown-ul {
         width: 150px;
@@ -150,11 +118,11 @@
     $icon-pesudo-position: before;
 
     .cogs-icon {
-        @include fa-icon($fa-cogs, $icon-pesudo-position, $icon-display-value, 0 10px 0 0, 0, $icon-color, $icon-font-size);
+        @include fa-icon($fa-var-cogs, $icon-pesudo-position, $icon-display-value, 0 10px 0 0, 0, $icon-color, $icon-font-size);
     }
 
     .logout-icon {
-        @include fa-icon($fa-power-off, $icon-pesudo-position, $icon-display-value, 0 14px 0 0, 0, $icon-color, $icon-font-size);
+        @include fa-icon($fa-var-power-off, $icon-pesudo-position, $icon-display-value, 0 14px 0 0, 0, $icon-color, $icon-font-size);
     }
 
     .fa {
@@ -199,7 +167,7 @@
 // ----------------------------------------
 
 .dropdown-icon {
-    @include fa-icon($fa-chevron-down, after, inline-block, 0 0 0 5px);
+    @include fa-icon($fa-var-chevron-down, after, inline-block, 0 0 0 5px);
 }
 
 
@@ -223,15 +191,15 @@
             @include btn(green-dark-bg);
 
             &.plus-icon {
-                @include fa-icon($fa-plus, before, inline-block, 0 10px 0 0);
+                @include fa-icon($fa-var-plus, before, inline-block, 0 10px 0 0);
             }
 
             &.user-icon {
-                @include fa-icon($fa-user, before, inline-block, 0 10px 0 0);
+                @include fa-icon($fa-var-user, before, inline-block, 0 10px 0 0);
             }
 
             &.group-icon {
-                @include fa-icon($fa-users, before, inline-block, 0 10px 0 0);
+                @include fa-icon($fa-var-users, before, inline-block, 0 10px 0 0);
             }
         }
 
@@ -290,15 +258,8 @@
         top: 36px;
         left: $side-margin;
 
-        &:after {
-           content: "";
-           position: absolute;
-           @include build-icon(13px, 29px, menu-icon, 21px, 15px);
-        }
-
-        &:hover:after {
-            @include build-icon(13px, 29px, menu-icon-on, 21px, 15px);
-        }
+        @include fa-icon($fa-var-bars, 'before', inline-block, 10px 0 0 30px, 0, #3F5E78, 22px);
+        @include fa-icon($fa-var-bars, 'hover:before', inline-block, 10px 0 0 30px, 0, #5B7B96, 22px);
     }
 
     // Subpage Navigation

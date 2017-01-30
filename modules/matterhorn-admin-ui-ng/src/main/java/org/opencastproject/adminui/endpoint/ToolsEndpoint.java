@@ -25,6 +25,7 @@ import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.json.Jsons.a;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.jsonArrayFromList;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static java.lang.String.format;
@@ -124,7 +125,13 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 
 @Path("/")
-@RestService(name = "toolsService", title = "Tools API Service", notes = "", abstractText = "Provides a location for the tools API.")
+@RestService(name = "toolsService", title = "Tools API Service",
+  abstractText = "Provides a location for the tools API.",
+  notes = { "This service provides a location for the tools API for the admin UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public class ToolsEndpoint implements ManagedService {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ToolsEndpoint.class);
@@ -281,7 +288,8 @@ public class ToolsEndpoint implements ManagedService {
       return R.notFound();
 
     // Select tracks
-    final MediaPackage mp = index.getEventMediapackage(getEvent(mediaPackageId).get()).orError(new NotFoundException())
+    final Event event = getEvent(mediaPackageId).get();
+    final MediaPackage mp = index.getEventMediapackage(event).orError(new NotFoundException())
             .get();
     List<MediaPackageElement> previewPublications = getPreviewElementsFromPublication(getInternalPublication(mp));
 
@@ -351,7 +359,11 @@ public class ToolsEndpoint implements ManagedService {
       jWorkflows.add(j(f("id", v(workflow.getId())), f("name", vN(workflow.getTitle()))));
     }
 
-    return RestUtils.okJson(j(f("previews", a(jPreviews)), f(TRACKS_KEY, a(jTracks)),
+    return RestUtils.okJson(j(f("title", vN(mp.getTitle())),
+            f("date", vN(event.getRecordingStartDate())),
+            f("series", j(f("id", vN(event.getSeriesId())), f("title", vN(event.getSeriesName())))),
+            f("presenters", jsonArrayFromList(event.getPresenters())),
+            f("previews", a(jPreviews)), f(TRACKS_KEY, a(jTracks)),
             f("duration", v(mp.getDuration())), f(SEGMENTS_KEY, a(jSegments)), f("workflows", a(jWorkflows))));
   }
 

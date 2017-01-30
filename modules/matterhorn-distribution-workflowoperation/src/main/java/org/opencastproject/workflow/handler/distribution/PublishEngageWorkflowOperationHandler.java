@@ -45,6 +45,7 @@ import org.opencastproject.mediapackage.MediaPackageReferenceImpl;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
+import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
@@ -62,7 +63,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.client.utils.URIUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -82,6 +82,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
+
 
 /**
  * The workflow definition for handling "engage publication" operations
@@ -106,17 +107,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String STREAMING_TARGET_SUBFLAVOR = "streaming-target-subflavor";
   private static final String CHECK_AVAILABILITY = "check-availability";
   private static final String STRATEGY = "strategy";
-
-  //itbwpdk start
-  /** Distribution delay between elements for engage */
-  private static final String DISTRIBUTION_DELAY_PROPERTY = "org.opencastproject.distribution.delay";
-
-  /** Distribution delay default value */
-  private static final int DISTRIBUTION_DELAY_DEFAULT = 1000;
-
-  /** Distribution delay between elements for engage */
-  private int distributionDelay = 0;
-  //itbwpdk end
 
   /** The streaming distribution service */
   private DistributionService streamingDistributionService = null;
@@ -197,8 +187,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     BundleContext bundleContext = cc.getBundleContext();
 
     // Get configuration
-    distributionDelay = NumberUtils.toInt(bundleContext.getProperty(DISTRIBUTION_DELAY_PROPERTY),
-        DISTRIBUTION_DELAY_DEFAULT);
     serverUrl = UrlSupport.url(bundleContext.getProperty(SERVER_URL_PROPERTY));
     distributeStreaming = StringUtils.isNotBlank(bundleContext.getProperty(STREAMING_URL_PROPERTY));
   }
@@ -321,29 +309,30 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       }
 
       removePublicationElement(mediaPackage);
-        switch (republishStrategy) {
-          case ("merge"):
-              // nothing to do here. other publication strategies can be added to this list later on
-            break;
-          default:
-            retractFromEngage(mediaPackage);
-        }
+      switch (republishStrategy) {
+        case ("merge"):
+          // nothing to do here. other publication strategies can be added to this list later on
+          break;
+        default:
+          retractFromEngage(mediaPackage);
+      }
 
       List<Job> jobs = new ArrayList<Job>();
-//distribute Elements
+      //distribute Elements
       try {
-        for (String elementId : downloadElementIds) {
-          logger.info("Element distribution delay, sleeping for " +  Integer.toString(distributionDelay));
-          Thread.sleep(distributionDelay);
-          Job job = downloadDistributionService.distribute(CHANNEL_ID, mediaPackage, elementId, checkAvailability);
-          if (job != null)
+        if (downloadElementIds.size() > 0) {
+          Job job = downloadDistributionService.distribute(CHANNEL_ID, mediaPackage, downloadElementIds, checkAvailability);
+          if (job != null) {
             jobs.add(job);
+          }
         }
+
         if (distributeStreaming) {
           for (String elementId : streamingElementIds) {
             Job job = streamingDistributionService.distribute(CHANNEL_ID, mediaPackage, elementId);
-            if (job != null)
+            if (job != null) {
               jobs.add(job);
+            }
           }
         }
       } catch (DistributionException e) {
@@ -429,7 +418,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           throw (WorkflowOperationException) t;
         else
           throw new WorkflowOperationException(t);
-      }
+        }
     } catch (Exception e) {
       if (e instanceof WorkflowOperationException) {
         throw (WorkflowOperationException) e;
@@ -472,8 +461,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
     for (Job entry : jobs) {
       Job job = serviceRegistry.getJob(entry.getId());
-      String sourceElementId = job.getArguments().get(2);
-      MediaPackageElement sourceElement = mp.getElementById(sourceElementId);
 
       // If there is no payload, then the item has not been distributed.
       if (job.getPayload() == null)
@@ -491,62 +478,55 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       if (distributedElements == null || distributedElements.size() < 1)
         continue;
 
-      // Make sure the mediapackage is prompted to create a new identifier for this element
-      for (int i = 0; i < distributedElements.size(); i++) {
-        if (distributedElements.get(i) instanceof MediaPackageElement)
-          ((MediaPackageElement) distributedElements.get(i)).setIdentifier(null);
-        else distributedElements.remove(i); // make sure no other Elements are in the list for future operations
-      }
+      for (MediaPackageElement distributedElement : distributedElements) {
 
-      // Adjust the flavor and tags for downloadable elements
-      if (downloadElementIds.contains(sourceElementId)) {
-        if (downloadSubflavor != null) {
-          MediaPackageElementFlavor flavor = sourceElement.getFlavor();
-          if (flavor != null) {
-            MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
-                    downloadSubflavor.getSubtype());
-            for (int i = 0; i < distributedElements.size(); i++)
-              ((MediaPackageElement)distributedElements.get(i)).setFlavor(newFlavor);
+        String sourceElementId = distributedElement.getIdentifier();
+        if (sourceElementId != null) {
+          MediaPackageElement sourceElement = mp.getElementById(sourceElementId);
+
+          // Make sure the mediapackage is prompted to create a new identifier for this element
+          distributedElement.setIdentifier(null);
+          if (sourceElement != null) {
+            // Adjust the flavor and tags for downloadable elements
+            if (downloadElementIds.contains(sourceElementId)) {
+              if (downloadSubflavor != null) {
+                MediaPackageElementFlavor flavor = sourceElement.getFlavor();
+                if (flavor != null) {
+                  MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
+                          downloadSubflavor.getSubtype());
+                  distributedElement.setFlavor(newFlavor);
+                }
+              }
+            }
+            // Adjust the flavor and tags for streaming elements
+            else if (streamingElementIds.contains(sourceElementId)) {
+              if (streamingSubflavor != null && streamingElementIds.contains(sourceElementId)) {
+                MediaPackageElementFlavor flavor = sourceElement.getFlavor();
+                if (flavor != null) {
+                  MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
+                          streamingSubflavor.getSubtype());
+                  distributedElement.setFlavor(newFlavor);
+                }
+              }
+            }
+            // Copy references from the source elements to the distributed elements
+            MediaPackageReference ref = sourceElement.getReference();
+            if (ref != null && mp.getElementByReference(ref) != null) {
+              MediaPackageReference newReference = (MediaPackageReference) ref.clone();
+              distributedElement.setReference(newReference);
+            }
           }
         }
-        for (String tag : downloadTargetTags) {
-          for (int i = 0; i < distributedElements.size(); i++)
-            ((MediaPackageElement)distributedElements.get(i)).addTag(tag);
-        }
-      }
 
-      // Adjust the flavor and tags for streaming elements
-      else if (streamingElementIds.contains(sourceElementId)) {
-        if (streamingSubflavor != null && streamingElementIds.contains(sourceElementId)) {
-          MediaPackageElementFlavor flavor = sourceElement.getFlavor();
-          if (flavor != null) {
-            MediaPackageElementFlavor newFlavor = new MediaPackageElementFlavor(flavor.getType(),
-                    streamingSubflavor.getSubtype());
-            for (int i = 0; i < distributedElements.size(); i++)
-              ((MediaPackageElement)distributedElements.get(i)).setFlavor(newFlavor);
-          }
-        }
-        for (String tag : streamingTargetTags) {
-          for (int i = 0; i < distributedElements.size(); i++)
-            ((MediaPackageElement)distributedElements.get(i)).addTag(tag);
-        }
-      }
+        if (isStreamingFormat(distributedElement))
+            applyTags(distributedElement, streamingTargetTags);
+        else applyTags(distributedElement, downloadTargetTags);
 
-      // Copy references from the source elements to the distributed elements
-      MediaPackageReference ref = sourceElement.getReference();
-      if (ref != null && mp.getElementByReference(ref) != null) {
-        MediaPackageReference newReference = (MediaPackageReference) ref.clone();
-        for (int i = 0; i < distributedElements.size(); i++)
-            ((MediaPackageElement)distributedElements.get(i)).setReference(newReference);
+        // Add the new element to the mediapackage
+        mp.add(distributedElement);
+        elementsToPublish.add(distributedElement.getIdentifier());
+        distributedElementIds.put(sourceElementId, distributedElement.getIdentifier());
       }
-
-      // Add the new element to the mediapackage
-      for (int i = 0; i < distributedElements.size(); i++) {
-        mp.add((MediaPackageElement)distributedElements.get(i));
-        elementsToPublish.add(((MediaPackageElement)distributedElements.get(i)).getIdentifier());
-        distributedElementIds.put(sourceElementId, ((MediaPackageElement)distributedElements.get(i)).getIdentifier());
-      }
-
     }
 
     // Mark everything that is set for removal
@@ -588,6 +568,35 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       mp.remove(element);
     }
     return mp;
+  }
+
+  /**
+   * Checks if the MediaPackage track transport protocol is a streaming format protocol
+   * @param element The MediapackageElement to analyze
+   * @return true if it is a TrackImpl and has a streaming protocol as transport
+   */
+  private boolean isStreamingFormat(MediaPackageElement element) {
+    if (element instanceof TrackImpl) {
+      if (TrackImpl.StreamingProtocol.RTMP.equals(((TrackImpl) element).getTransport())
+          || TrackImpl.StreamingProtocol.RTMPE.equals(((TrackImpl) element).getTransport())
+          || TrackImpl.StreamingProtocol.HLS.equals(((TrackImpl) element).getTransport())
+          || TrackImpl.StreamingProtocol.DASH.equals(((TrackImpl) element).getTransport())
+          || TrackImpl.StreamingProtocol.HDS.equals(((TrackImpl) element).getTransport())
+          || TrackImpl.StreamingProtocol.SMOOTH.equals(((TrackImpl) element).getTransport()))
+        return true;
+    }
+    return false;
+  }
+
+  /**
+   * Adds Tags to a MediaPackageElement
+   * @param element the element that needs the tags
+   * @param tags the list of tags to apply
+   */
+  private void applyTags(MediaPackageElement element, String[] tags) {
+    for (String tag : tags) {
+      element.addTag(tag);
+    }
   }
 
   /** Media package must meet these criteria in order to be published. */
@@ -666,7 +675,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         mergedMediaPackage.add((MediaPackageElement) element.clone());
       } else {
         logger.info(String.format("Overwriting existing %s '%s' with '%s' in the updated mediapackage",
-          type, element.getIdentifier(), updatedMp.getElementsByFlavor(element.getFlavor())[0].getIdentifier()));
+                type, element.getIdentifier(), updatedMp.getElementsByFlavor(element.getFlavor())[0].getIdentifier()));
 
       }
     }
@@ -676,38 +685,46 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   private void removePublicationElement(MediaPackage mediaPackage) {
     for (Publication publicationElement : mediaPackage.getPublications()) {
-        if (CHANNEL_ID.equals(publicationElement.getChannel())) {
-            mediaPackage.remove(publicationElement);
-        }
+      if (CHANNEL_ID.equals(publicationElement.getChannel())) {
+        mediaPackage.remove(publicationElement);
+      }
     }
   }
 
-/**
+  /**
  * Removes every Publication for Searchindex from Mediapackage
  * Removes Mediapackage from Searchindex
- * @param mediaPackage Mediapackage
- * @param mediaPackageForSearch Mediapackage prepared for searchIndex
- * @throws WorkflowOperationException
- */
+   * @param mediaPackage Mediapackage
+   * @param mediaPackageForSearch Mediapackage prepared for searchIndex
+   * @throws WorkflowOperationException
+   */
   private void retractFromEngage(MediaPackage mediaPackage) throws WorkflowOperationException {
     List<Job> jobs = new ArrayList<Job>();
+    Set<String> elementIds = new HashSet<String>();
     try {
       MediaPackage distributedMediaPackage = getDistributedMediapackage(mediaPackage.toString());
       if (distributedMediaPackage != null) {
+
         for (MediaPackageElement element : distributedMediaPackage.getElements()) {
-         logger.info("Element distribution delay, sleeping for " + Integer.toString(distributionDelay));
-         Thread.sleep(distributionDelay);
-         Job retractDownloadJob = downloadDistributionService.retract(CHANNEL_ID, distributedMediaPackage, element.getIdentifier());
-         if (retractDownloadJob != null) {
-           jobs.add(retractDownloadJob);
-         }
-         if (distributeStreaming) {
-           Job retractStreamingJob = streamingDistributionService.retract(CHANNEL_ID, distributedMediaPackage, element.getIdentifier());
-           if (retractStreamingJob != null) {
-             jobs.add(retractStreamingJob);
-           }
-         }
+          elementIds.add(element.getIdentifier());
         }
+        //bulk retraction
+        if (elementIds.size() > 0) {
+          Job  retractDownloadDistributionJob = downloadDistributionService.retract(CHANNEL_ID, distributedMediaPackage, elementIds);
+          if (retractDownloadDistributionJob != null) {
+            jobs.add(retractDownloadDistributionJob);
+          }
+        }
+
+        if (distributeStreaming) {
+          for (MediaPackageElement element : distributedMediaPackage.getElements()) {
+            Job retractStreamingJob = streamingDistributionService.retract(CHANNEL_ID, distributedMediaPackage, element.getIdentifier());
+            if (retractStreamingJob != null) {
+              jobs.add(retractStreamingJob);
+            }
+          }
+        }
+
         Job deleteSearchJob = null;
         logger.info("Retracting already published Elements for Mediapackage: {}", mediaPackage.getIdentifier().toString());
         deleteSearchJob = searchService.delete(mediaPackage.getIdentifier().toString());
@@ -723,7 +740,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       throw new WorkflowOperationException(e);
     } catch (SearchException e) {
       throw new WorkflowOperationException("Error retracting media package", e);
-    } catch (UnauthorizedException | NotFoundException | InterruptedException ex) {
+    } catch (UnauthorizedException | NotFoundException ex) {
       logger.error("Retraction failed of Mediapackage: { }", mediaPackage.getIdentifier().toString(), ex);
     }
   }

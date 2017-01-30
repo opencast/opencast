@@ -1,6 +1,6 @@
 angular.module('adminNg.controllers')
-.controller('AclsCtrl', ['$scope', 'Table', 'AclsResource', 'AclResource', 'Notifications',
-    function ($scope, Table, AclsResource, AclResource, Notifications) {
+.controller('AclsCtrl', ['$scope', 'Table', 'AclsResource', 'AclResource', 'ResourcesFilterResource', 'Notifications',
+    function ($scope, Table, AclsResource, AclResource, ResourcesFilterResource, Notifications) {
 
         $scope.table = Table;
         $scope.table.configure({
@@ -27,8 +27,11 @@ angular.module('adminNg.controllers')
             apiService: AclsResource
         });
 
+        $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
+
         $scope.table.delete = function (row) {
             AclResource.delete({id: row.id}, function () {
+                Table.fetch();
                 Notifications.add('success', 'ACL_DELETED');
             }, function () {
                 Notifications.add('error', 'ACL_NOT_DELETED');

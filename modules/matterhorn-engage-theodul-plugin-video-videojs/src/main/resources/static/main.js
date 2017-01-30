@@ -181,7 +181,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var isUsingFlash = false;
   var mastervideotype = '';
   var aspectRatio = null;
-  var singleVideoPaddingTop = '';
+  var singleVideoPaddingTop = '56.25%';
   var initCount = 7;
   var infoMeChange = 'change:infoMe';
   var mediapackageError = false;
@@ -375,8 +375,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       return foundQualities;
     }
     var tagsList = getTags(videoSources, '-quality');
-    var qualitiesList = _.map(Array.from(tagsList), function(quality) {
-      return quality.substring(0, quality.indexOf('-quality'));
+    var qualitiesList = [];
+    tagsList.forEach(function(quality) {
+      qualitiesList.push(quality.substring(0, quality.indexOf('-quality')));
     });
     var tracks;
     for (var source in videoSources) {
@@ -626,11 +627,17 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     }
 
     Engage.on(plugin.events.numberOfVideodisplaysSet.getName(), function (number) {
+      var videoDisplays = $('.' + videoDisplayClass);
+      if (Engage.model.get('meInfo').get('hide_video_context_menu')) {
+        videoDisplays.on('contextmenu', function (e) {
+          e.preventDefault();
+        });
+      }
       if (number > 1) {
         selector = '.videoFocused video';
         videoFocused = false;
         singleVideo = false;
-        $('.' + videoDisplayClass).on('click', function () {
+        videoDisplays.on('click', function () {
           if (flag == 0) {
             Engage.trigger(plugin.events.focusVideo.getName(), Utils.getFlavorForVideoDisplay(this));
           }
@@ -1317,18 +1324,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
   function calculateVideoAreaAspectRatio() {
     var $engageVideoId = $('#' + id_engage_video);
-
-    // Determin reasonable default for videoAreaAspectRatio as video width and height cannot be determined sometimes.
-    var numberDisplays = 1;
-    if ($('.' + videoDisplayClass) !== undefined && isDefaultLayout()) {
-      numberDisplays = $('.' + videoDisplayClass).length;
-    }
-    videoAreaAspectRatio = 1.7 * numberDisplays;
-
-    // Calculate real aspect ratio if possible
+    var oldAspectRatio = videoAreaAspectRatio;
 
     var videoHeight = $engageVideoId.height();
     var videoWidth = $engageVideoId.width();
+    if (videoWidth !== undefined && videoHeight !== undefined &&
+        videoWidth === 0 && videoHeight === 0) {
+        return;
+    }
     if (isEmbedMode) {
       if (videoWidth !== undefined && videoHeight !== undefined &&
           videoWidth > 0 && videoHeight > 0) {
@@ -1344,7 +1347,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         videoWidth > 0 && videoHeight > 0) {
       videoAreaAspectRatio = videoWidth / videoHeight;
     }
-    checkVideoDisplaySize();
+
+    if (videoAreaAspectRatio !== oldAspectRatio) {
+      checkVideoDisplaySize();
+    }
   }
 
   function checkVideoDisplaySize() {

@@ -63,8 +63,8 @@ modules/matterhorn-admin-ui-ng/src/main/webapp/lib/chosen.js
 modules/matterhorn-admin-ui-ng/src/main/webapp/lib/chosen.jquery.*
   Chosen, a Select Box Enhancer for jQuery and Prototype
   by Patrick Filler for Harvest, http://getharvest.com
-  Version 1.1.0
-  Copyright (c) 2011 Harvest http://getharvest.com
+  Version 1.6.2
+  Copyright (c) 2011-2016 Harvest http://getharvest.com
   MIT License
 
 modules/matterhorn-admin-ui-ng/src/main/webapp/lib/datepicker/*
@@ -857,6 +857,14 @@ matterhorn-dublincore
   GroupId                                ArtifactId                                       License
   com.google.code.findbugs               jsr305                                           The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
+
+
+matterhorn-email-template=service-impl
+  GroupId                                ArtifactId                                       License
+  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+  org.slf4j                              slf4j-log4j12                                    MIT License
+  org.freemarker                         freemarker                                       BSD-style license
 
 
 matterhorn-engage-theodul-api

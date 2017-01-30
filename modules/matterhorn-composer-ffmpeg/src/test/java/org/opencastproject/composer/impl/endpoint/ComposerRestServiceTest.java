@@ -26,14 +26,18 @@ import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.api.EncodingProfileImpl;
 import org.opencastproject.composer.api.EncodingProfileList;
+import org.opencastproject.composer.layout.Dimension;
+import org.opencastproject.composer.layout.Serializer;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Collections;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -86,6 +90,10 @@ public class ComposerRestServiceTest {
     EasyMock.expect(composer.mux(videoTrack, audioTrack, profileId)).andReturn(job).anyTimes();
     EasyMock.expect(composer.listProfiles()).andReturn(list.toArray(new EncodingProfile[list.size()]));
     EasyMock.expect(composer.getProfile(profileId)).andReturn(profile);
+    EasyMock.expect(composer.concat(EasyMock.eq(profileId), EasyMock.eq(new Dimension(640, 480)),
+            (Track) EasyMock.notNull(), (Track) EasyMock.notNull())).andReturn(job);
+    EasyMock.expect(composer.concat(EasyMock.eq(profileId), EasyMock.eq(new Dimension(640, 480)),
+            EasyMock.gt(0.0f), (Track) EasyMock.notNull(), (Track) EasyMock.notNull())).andReturn(job);
     EasyMock.replay(composer);
 
     // Set up the rest endpoint
@@ -142,6 +150,16 @@ public class ComposerRestServiceTest {
 
     EncodingProfileList list = restService.listProfiles();
     Assert.assertEquals(profileList, list);
+  }
+
+  @Test
+  public void testConcat() throws Exception {
+    Dimension dimension = new Dimension(640, 480);
+    Track videoTrack = (Track) MediaPackageElementParser.getFromXml(generateVideoTrack());
+    String sourceTracks = MediaPackageElementParser.getArrayAsXml(Collections.list(videoTrack, videoTrack));
+    Response response = restService.concat(sourceTracks, profileId, Serializer.json(dimension).toJson(), "25");
+    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    Assert.assertNotNull("Concat rest endpoint should send a job in response", response.getEntity());
   }
 
   protected String generateVideoTrack() {

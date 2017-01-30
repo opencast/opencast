@@ -134,6 +134,19 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
   }
 
   /**
+   * Creates a JpaOrganization from an organization
+   *
+   * @param org
+   *          the organization
+   */
+  private JpaOrganization fromOrganization(Organization org) {
+    if (org instanceof JpaOrganization)
+      return (JpaOrganization) org;
+    return new JpaOrganization(org.getId(), org.getName(), org.getServers(), org.getAdminRole(), org.getAnonymousRole(),
+            org.getProperties());
+  }
+
+  /**
    * Creates initial groups for system administrators per organization.
    *
    * @param organization
@@ -144,33 +157,39 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
    *           if the specified role list is unavailable
    */
   private void createSystemAdministratorUserAndGroup(final Organization organization) {
+
+    if ((adminUserName == null) || (adminPassword == null)) {
+      logger.info("The administrator user and group loader is disabled.");
+      return;
+    }
+
     SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(componentCtx, organization), new Effect0() {
       @Override
       protected void run() {
         try {
-          JpaOrganization org = (JpaOrganization) organizationDirectoryService.getOrganization(organization.getId());
-          String adminUserId = null;
-          if (StringUtils.isNotBlank(adminUserName))
-            adminUserId = adminUserName;
-          else
-            adminUserId = org.getId();
+          JpaOrganization org = fromOrganization(organizationDirectoryService.getOrganization(organization.getId()));
 
           // Make sure the administrator exists for this organization. Note that the user will gain its roles through
           // membership in the administrator group
-          JpaUser adminUser = (JpaUser) userAndRoleProvider.loadUser(adminUserId);
-          if (adminUser == null) {
-            Set<JpaRole> adminRolesSet = new HashSet<JpaRole>();
-            // Add roles according to the system configuration
-            if (adminRoles != null) {
-              for (String r : StringUtils.split(adminRoles, ',')) {
-                String roleId = StringUtils.trimToNull(r);
-                if (roleId != null)
-                  adminRolesSet.add(new JpaRole(roleId, org));
+          JpaUser adminUser = (JpaUser) userAndRoleProvider.loadUser(adminUserName);
+          boolean userExists = adminUser != null;
+          // Add roles according to the system configuration
+          Set<JpaRole> adminRolesSet = new HashSet<JpaRole>();
+          if (adminRoles != null) {
+            for (String r : StringUtils.split(adminRoles, ',')) {
+              String roleId = StringUtils.trimToNull(r);
+              if (roleId != null) {
+                adminRolesSet.add(new JpaRole(roleId, org));
               }
             }
-            String adminUserName = organization.getName().concat(" Administrator");
-            adminUser = new JpaUser(adminUserId, adminPassword, org, adminUserName, adminEmail, PROVIDER_NAME,
-                    false, adminRolesSet);
+          }
+          String adminUserFullName = organization.getName().concat(" Administrator");
+          adminUser = new JpaUser(adminUserName, adminPassword, org, adminUserFullName, adminEmail, PROVIDER_NAME,
+                                  false, adminRolesSet);
+          if (userExists) {
+            userAndRoleProvider.updateUser(adminUser);
+            logger.info("Administrator user for '{}' updated", org.getId());
+          } else {
             userAndRoleProvider.addUser(adminUser);
             logger.info("Administrator user for '{}' created", org.getId());
           }
@@ -216,7 +235,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
 
           // Make sure the organization administrator is part of this group
           Set<String> groupMembers = new HashSet<String>();
-          groupMembers.add(adminUserId);
+          groupMembers.add(adminUserName);
 
           // Create the group
           String adminGroupName = org.getName().concat(" System Administrators");

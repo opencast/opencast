@@ -25,10 +25,19 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
 
+import java.util.Set;
+
 /**
  * Distributes elements from MediaPackages to distribution channels.
  */
 public interface DownloadDistributionService extends DistributionService {
+
   Job distribute(String channelId, MediaPackage mediapackage, String elementId, boolean checkAvailability)
           throws DistributionException, MediaPackageException;
+
+  Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds, boolean checkAvailability)
+          throws DistributionException, MediaPackageException;
+
+  Job retract(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
+          throws DistributionException;
 }

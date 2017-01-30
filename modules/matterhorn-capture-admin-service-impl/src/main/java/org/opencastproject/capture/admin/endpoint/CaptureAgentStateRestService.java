@@ -21,8 +21,14 @@
 
 package org.opencastproject.capture.admin.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_METHOD_NOT_ALLOWED;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+import static org.opencastproject.capture.admin.api.AgentState.KNOWN_STATES;
+
 import org.opencastproject.capture.admin.api.Agent;
-import org.opencastproject.capture.admin.api.AgentState;
 import org.opencastproject.capture.admin.api.AgentStateUpdate;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.capture.admin.api.Recording;
@@ -34,6 +40,9 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +59,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -66,13 +74,16 @@ import javax.ws.rs.core.Response;
  * The REST endpoint for the capture agent service on the capture device
  */
 @Path("/")
-@RestService(name = "captureadminservice", title = "Capture Admin Service", abstractText = "This service is a registry of capture agents and their recordings.", notes = {
-        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-        "If the service is down or not working it will return a status 503, this means the the underlying service is "
-                + "not working and is either restarting or has failed",
-        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+@RestService(name = "captureadminservice",
+  title = "Capture Admin Service",
+  abstractText = "This service is a registry of capture agents and their recordings.",
+  notes = {
+    "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
+    "If the service is down or not working it will return a status 503, this means the the underlying service is "
+      + "not working and is either restarting or has failed",
+    "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
+      + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+      + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class CaptureAgentStateRestService {
 
   private static final Logger logger = LoggerFactory.getLogger(CaptureAgentStateRestService.class);
@@ -101,13 +112,19 @@ public class CaptureAgentStateRestService {
   @GET
   @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
   @Path("agents/{name}.{format:xml|json}")
-  @RestQuery(name = "getAgent", description = "Return the state of a given capture agent", pathParameters = {
-          @RestParameter(name = "name", description = "The name of a given capture agent", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "format", description = "The output format (json or xml) of the response body.", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = {}, reponses = {
-          @RestResponse(description = "{agentState}", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The agent {agentName} does not exist", responseCode = HttpServletResponse.SC_NOT_FOUND),
-          @RestResponse(description = "If the {format} is not xml or json", responseCode = HttpServletResponse.SC_METHOD_NOT_ALLOWED),
-          @RestResponse(description = "If no capture agent state service is available", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
+  @RestQuery(
+    name = "getAgent",
+    description = "Return the state of a given capture agent",
+    pathParameters = {
+      @RestParameter(name = "name", description = "Name of the capture agent", isRequired = true, type = Type.STRING),
+      @RestParameter(name = "format", description = "The output format (json or xml) of the response body.",
+        isRequired = true, type = RestParameter.Type.STRING)
+    }, restParameters = {}, reponses = {
+      @RestResponse(description = "{agentState}", responseCode = SC_OK),
+      @RestResponse(description = "The agent {agentName} does not exist", responseCode = SC_NOT_FOUND),
+      @RestResponse(description = "If the {format} is not xml or json", responseCode = SC_METHOD_NOT_ALLOWED),
+      @RestResponse(description = "iCapture agent state service unavailable", responseCode = SC_SERVICE_UNAVAILABLE)
+    }, returnDescription = "")
   public Response getAgentState(@PathParam("name") String agentName, @PathParam("format") String format)
           throws NotFoundException {
     if (service == null)
@@ -127,25 +144,34 @@ public class CaptureAgentStateRestService {
   @Path("agents/{name}")
   // Todo: Capture agent may send an optional FormParam containing it's configured address.
   // If this exists don't use request.getRemoteHost() for the URL
-  @RestQuery(name = "setAgentState", description = "Set the status of a given capture agent", pathParameters = { @RestParameter(name = "name", description = "The name of a given capture agent", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = {
-          @RestParameter(description = "The address of a given capture agent", isRequired = true, name = "address", type = Type.STRING),
-          @RestParameter(description = "The state of the capture agent", isRequired = true, name = "state", type = Type.STRING) }, reponses = {
-          @RestResponse(description = "{agentName} set to {state}", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "{state} is empty or not known", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "The agent {agentName} does not exist", responseCode = HttpServletResponse.SC_NOT_FOUND),
-          @RestResponse(description = "If no capture agent state service is available", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
+  @RestQuery(
+    name = "setAgentState",
+    description = "Set the status of a given capture agent",
+    pathParameters = {
+      @RestParameter(name = "name", isRequired = true, type = Type.STRING, description = "Name of the capture agent")
+    }, restParameters = {
+      @RestParameter(name = "address", isRequired = false, type = Type.STRING, description = "Address of the agent"),
+      @RestParameter(name = "state", isRequired = true, type = Type.STRING, description = "The state of the capture "
+        + "agent. Known states are: idle, shutting_down, capturing, uploading, unknown, offline")
+    }, reponses = {
+      @RestResponse(description = "{agentName} set to {state}", responseCode = SC_OK),
+      @RestResponse(description = "{state} is empty or not known", responseCode = SC_BAD_REQUEST),
+      @RestResponse(description = "Capture agent state service not available", responseCode = SC_SERVICE_UNAVAILABLE)
+    }, returnDescription = "")
   public Response setAgentState(@Context HttpServletRequest request, @FormParam("address") String address,
           @PathParam("name") String agentName, @FormParam("state") String state) throws NotFoundException {
-    if (service == null)
+    if (service == null) {
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
+    }
 
-    if (StringUtils.isBlank(state) || !AgentState.KNOWN_STATES.contains(state)) {
+    if (!KNOWN_STATES.contains(state)) {
       logger.debug("'{}' is not a valid state", state);
       return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).build();
     }
 
-    if (StringUtils.isEmpty(address))
+    if (StringUtils.isEmpty(address)) {
       address = request.getRemoteHost();
+    }
 
     logger.debug("Agents URL: {}", address);
 
@@ -164,9 +190,15 @@ public class CaptureAgentStateRestService {
   @DELETE
   @Path("agents/{name}")
   @Produces(MediaType.TEXT_HTML)
-  @RestQuery(name = "removeAgent", description = "Remove record of a given capture agent", pathParameters = { @RestParameter(name = "name", description = "The name of a given capture agent", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = {}, reponses = {
-          @RestResponse(description = "{agentName} removed", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The agent {agentname} does not exist", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "")
+  @RestQuery(
+    name = "removeAgent",
+    description = "Remove record of a given capture agent",
+    pathParameters = {
+      @RestParameter(name = "name", description = "Name of the capture agent", isRequired = true, type = Type.STRING)
+    }, restParameters = {}, reponses = {
+      @RestResponse(description = "{agentName} removed", responseCode = SC_OK),
+      @RestResponse(description = "The agent {agentname} does not exist", responseCode = SC_NOT_FOUND)
+    }, returnDescription = "")
   public Response removeAgent(@PathParam("name") String agentName) throws NotFoundException {
     if (service == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
@@ -180,7 +212,14 @@ public class CaptureAgentStateRestService {
   @GET
   @Produces({ MediaType.TEXT_XML, MediaType.APPLICATION_JSON })
   @Path("agents.{type:xml|json}")
-  @RestQuery(name = "getKnownAgents", description = "Return all of the known capture agents on the system", pathParameters = { @RestParameter(description = "The Document type", isRequired = true, name = "type", type = Type.STRING) }, restParameters = {}, reponses = { @RestResponse(description = "An XML representation of the agent capabilities", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(
+    name = "getKnownAgents",
+    description = "Return all of the known capture agents on the system",
+    pathParameters = {
+      @RestParameter(description = "The Document type", isRequired = true, name = "type", type = Type.STRING)
+    }, restParameters = {}, reponses = {
+      @RestResponse(description = "An XML representation of the agent capabilities", responseCode = SC_OK)
+    }, returnDescription = "")
   public Response getKnownAgents(@PathParam("type") String type) {
     if (service == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
@@ -204,11 +243,16 @@ public class CaptureAgentStateRestService {
   @GET
   @Produces({ MediaType.TEXT_XML, MediaType.APPLICATION_JSON })
   @Path("agents/{name}/capabilities.{type:xml|json}")
-  @RestQuery(name = "getAgentCapabilities", description = "Return the capabilities of a given capture agent", pathParameters = {
-          @RestParameter(description = "The name of a given capture agent", isRequired = true, name = "name", type = Type.STRING),
-          @RestParameter(description = "The Document type", isRequired = true, name = "type", type = Type.STRING) }, restParameters = {}, reponses = {
-          @RestResponse(description = "An XML representation of the agent capabilities", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The agent {name} does not exist in the system", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "")
+  @RestQuery(
+    name = "getAgentCapabilities",
+    description = "Return the capabilities of a given capture agent",
+    pathParameters = {
+      @RestParameter(description = "Name of the capture agent", isRequired = true, name = "name", type = Type.STRING),
+      @RestParameter(description = "The Document type", isRequired = true, name = "type", type = Type.STRING)
+    }, restParameters = {}, reponses = {
+      @RestResponse(description = "An XML representation of the agent capabilities", responseCode = SC_OK),
+      @RestResponse(description = "The agent {name} does not exist in the system", responseCode = SC_NOT_FOUND)
+    }, returnDescription = "")
   public Response getCapabilities(@PathParam("name") String agentName, @PathParam("type") String type)
           throws NotFoundException {
     if (service == null)
@@ -225,11 +269,16 @@ public class CaptureAgentStateRestService {
   @GET
   @Produces({ MediaType.TEXT_XML, MediaType.APPLICATION_JSON })
   @Path("agents/{name}/configuration.{type:xml|json}")
-  @RestQuery(name = "getAgentConfiguration", description = "Return the configuration of a given capture agent", pathParameters = {
-          @RestParameter(description = "The name of a given capture agent", isRequired = true, name = "name", type = Type.STRING),
-          @RestParameter(description = "The Document type", isRequired = true, name = "type", type = Type.STRING) }, restParameters = {}, reponses = {
-          @RestResponse(description = "An XML or JSON representation of the agent configuration", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The agent {name} does not exist in the system", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "")
+  @RestQuery(
+    name = "getAgentConfiguration",
+    description = "Return the configuration of a given capture agent",
+    pathParameters = {
+      @RestParameter(description = "Name of the capture agent", isRequired = true, name = "name", type = Type.STRING),
+      @RestParameter(description = "The Document type", isRequired = true, name = "type", type = Type.STRING)
+    }, restParameters = {}, reponses = {
+      @RestResponse(description = "An XML or JSON representation of the agent configuration", responseCode = SC_OK),
+      @RestResponse(description = "The agent {name} does not exist in the system", responseCode = SC_NOT_FOUND)
+    }, returnDescription = "")
   public Response getConfiguration(@PathParam("name") String agentName, @PathParam("type") String type)
           throws NotFoundException {
     if (service == null)
@@ -246,11 +295,22 @@ public class CaptureAgentStateRestService {
   }
 
   @POST
-  @Produces(MediaType.TEXT_XML)
+  @Produces({ MediaType.TEXT_XML, MediaType.APPLICATION_JSON })
   @Path("agents/{name}/configuration")
-  @RestQuery(name = "setAgentStateConfiguration", description = "Set the configuration of a given capture agent, registering it if it does not exist", pathParameters = { @RestParameter(description = "The name of a given capture agent", isRequired = true, name = "name", type = Type.STRING) }, restParameters = { @RestParameter(description = "An XML representation of the capabilities, as specified in http://java.sun.com/dtd/properties.dtd (friendly names as keys, device locations as their corresponding values)", type = Type.TEXT, isRequired = true, name = "configuration") }, reponses = {
-          @RestResponse(description = "{name} set to {state}", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The configuration format is incorrect OR the agent name is blank or null", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+  @RestQuery(
+    name = "setAgentStateConfiguration",
+    description = "Set the configuration of a given capture agent, registering it if it does not exist",
+    pathParameters = {
+      @RestParameter(description = "Name of the capture agent", isRequired = true, name = "name", type = Type.STRING)
+    }, restParameters = {
+      @RestParameter(description = "An XML or JSON representation of the capabilities. XML as specified in "
+        + "http://java.sun.com/dtd/properties.dtd (friendly names as keys, device locations as corresponding values)",
+        type = Type.TEXT, isRequired = true, name = "configuration")
+    }, reponses = {
+      @RestResponse(description = "An XML or JSON representation of the agent configuration", responseCode = SC_OK),
+      @RestResponse(description = "The configuration format is incorrect OR the agent name is blank or null",
+        responseCode = SC_BAD_REQUEST)
+    }, returnDescription = "")
   public Response setConfiguration(@PathParam("name") String agentName, @FormParam("configuration") String configuration) {
     if (service == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
@@ -260,34 +320,59 @@ public class CaptureAgentStateRestService {
       return Response.serverError().status(Response.Status.BAD_REQUEST).build();
     }
 
-    Properties caps = new Properties();
-    ByteArrayInputStream bais = null;
-    try {
-      bais = new ByteArrayInputStream(configuration.getBytes());
-      caps.loadFromXML(bais);
-      if (!service.setAgentConfiguration(agentName, caps))
-        logger.debug("'{}''s configuration has not been updated because nothing has been changed", agentName);
+    Properties caps;
 
-      // Prepares the value to return
-      PropertiesResponse r = new PropertiesResponse(caps);
-      logger.debug("{}'s configuration updated", agentName);
-      return Response.ok(r).build();
-    } catch (IOException e) {
-      logger.debug("Unexpected I/O Exception when unmarshalling the capabilities: {}", e.getMessage());
-      return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).build();
-    } finally {
-      IOUtils.closeQuietly(bais);
+    if (StringUtils.startsWith(configuration, "{")) {
+      // JSON
+      Gson gson = new Gson();
+      try {
+        caps = gson.fromJson(configuration, Properties.class);
+        if (!service.setAgentConfiguration(agentName, caps)) {
+          logger.debug("'{}''s configuration has not been updated because nothing has been changed", agentName);
+        }
+        return Response.ok(gson.toJson(caps)).type(MediaType.APPLICATION_JSON).build();
+      } catch (JsonSyntaxException e) {
+        logger.debug("Exception when deserializing capabilities: {}", e.getMessage());
+        return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).build();
+      }
+
+    } else {
+      // XML
+      caps = new Properties();
+      ByteArrayInputStream bais = null;
+      try {
+        bais = new ByteArrayInputStream(configuration.getBytes());
+        caps.loadFromXML(bais);
+        if (!service.setAgentConfiguration(agentName, caps)) {
+          logger.debug("'{}''s configuration has not been updated because nothing has been changed", agentName);
+        }
+
+        // Prepares the value to return
+        PropertiesResponse r = new PropertiesResponse(caps);
+        logger.debug("{}'s configuration updated", agentName);
+        return Response.ok(r).type(MediaType.TEXT_XML).build();
+      } catch (IOException e) {
+        logger.debug("Unexpected I/O Exception when unmarshalling the capabilities: {}", e.getMessage());
+        return Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).build();
+      } finally {
+        IOUtils.closeQuietly(bais);
+      }
     }
   }
 
   @GET
   @Produces({ MediaType.TEXT_XML, MediaType.APPLICATION_JSON })
   @Path("recordings/{id}.{type:xml|json|}")
-  @RestQuery(name = "getRecordingState", description = "Return the state of a given recording", pathParameters = {
-          @RestParameter(description = "The ID of a given recording", isRequired = true, name = "id", type = Type.STRING),
-          @RestParameter(description = "The Documenttype", isRequired = true, name = "type", type = Type.STRING) }, restParameters = {}, reponses = {
-          @RestResponse(description = "Returns the state of the recording with the correct id", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The recording with the specified ID does not exist", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "")
+  @RestQuery(
+    name = "getRecordingState",
+    description = "Return the state of a given recording",
+    pathParameters = {
+      @RestParameter(description = "The ID of a given recording", isRequired = true, name = "id", type = Type.STRING),
+      @RestParameter(description = "The Documenttype", isRequired = true, name = "type", type = Type.STRING)
+    }, restParameters = {}, reponses = {
+      @RestResponse(description = "Returns the state of the recording with the correct id", responseCode = SC_OK),
+      @RestResponse(description = "The recording with the specified ID does not exist", responseCode = SC_NOT_FOUND)
+    }, returnDescription = "")
   public Response getRecordingState(@PathParam("id") String id, @PathParam("type") String type)
           throws NotFoundException {
     if (service == null)
@@ -305,10 +390,20 @@ public class CaptureAgentStateRestService {
 
   @POST
   @Path("recordings/{id}")
-  @RestQuery(name = "setRecordingState", description = "Set the status of a given recording, registering it if it is new", pathParameters = { @RestParameter(description = "The ID of a given recording", isRequired = true, name = "id", type = Type.STRING) }, restParameters = { @RestParameter(description = "The state of the recording. Must be one of the following: unknown, capturing, capture_finished, capture_error, manifest, manifest_error, manifest_finished, compressing, compressing_error, uploading, upload_finished, upload_error.", isRequired = true, name = "state", type = Type.STRING) }, reponses = {
-          @RestResponse(description = "{id} set to {state}", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "{id} or state {state} is empty or the {state} is not known", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "If no capture agent state service is available", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
+  @RestQuery(
+    name = "setRecordingState",
+    description = "Set the status of a given recording, registering it if it is new",
+    pathParameters = {
+      @RestParameter(description = "The ID of a given recording", isRequired = true, name = "id", type = Type.STRING)
+    }, restParameters = {
+      @RestParameter(description = "The state of the recording. Known states: unknown, capturing, capture_finished, "
+        + "capture_error, manifest, manifest_error, manifest_finished, compressing, compressing_error, uploading, "
+        + "upload_finished, upload_error.", isRequired = true, name = "state", type = Type.STRING)
+    }, reponses = {
+      @RestResponse(description = "{id} set to {state}", responseCode = SC_OK),
+      @RestResponse(description = "{id} or {state} is empty or {state} is not known", responseCode = SC_BAD_REQUEST),
+      @RestResponse(description = "Capture agent state service not available", responseCode = SC_SERVICE_UNAVAILABLE)
+    }, returnDescription = "")
   public Response setRecordingState(@PathParam("id") String id, @FormParam("state") String state) {
     if (service == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
@@ -325,11 +420,17 @@ public class CaptureAgentStateRestService {
 
   @DELETE
   @Path("recordings/{id}")
-  @RestQuery(name = "removeRecording", description = "Remove record of a given recording", pathParameters = { @RestParameter(description = "The ID of a given recording", isRequired = true, name = "id", type = Type.STRING) }, restParameters = {}, reponses = {
-          @RestResponse(description = "{id} removed", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "{id} is empty", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "Recording with {id} could not be found", responseCode = HttpServletResponse.SC_NOT_FOUND),
-          @RestResponse(description = "If no capture agent state service is available", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
+  @RestQuery(
+    name = "removeRecording",
+    description = "Remove record of a given recording",
+    pathParameters = {
+      @RestParameter(description = "The ID of a given recording", isRequired = true, name = "id", type = Type.STRING)
+    }, restParameters = {}, reponses = {
+      @RestResponse(description = "{id} removed", responseCode = SC_OK),
+      @RestResponse(description = "{id} is empty", responseCode = SC_BAD_REQUEST),
+      @RestResponse(description = "Recording with {id} could not be found", responseCode = SC_NOT_FOUND),
+      @RestResponse(description = "Capture agent state service not available", responseCode = SC_SERVICE_UNAVAILABLE)
+    }, returnDescription = "")
   public Response removeRecording(@PathParam("id") String id) throws NotFoundException {
     if (service == null)
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
@@ -344,7 +445,10 @@ public class CaptureAgentStateRestService {
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("recordings")
-  @RestQuery(name = "getAllRecordings", description = "Return all registered recordings and their state", pathParameters = {}, restParameters = {}, reponses = { @RestResponse(description = "Returns all known recordings.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(name = "getAllRecordings", description = "Return all registered recordings and their state",
+    pathParameters = {}, restParameters = {}, reponses = {
+      @RestResponse(description = "Returns all known recordings.", responseCode = SC_OK) },
+    returnDescription = "")
   public List<RecordingStateUpdate> getAllRecordings() {
     LinkedList<RecordingStateUpdate> update = new LinkedList<RecordingStateUpdate>();
     if (service != null) {

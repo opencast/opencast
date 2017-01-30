@@ -34,6 +34,8 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.TrackSupport;
+import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
@@ -59,6 +61,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 public class ConcatWorkflowOperationHandlerTest {
   private ConcatWorkflowOperationHandler operationHandler;
@@ -187,6 +190,63 @@ public class ConcatWorkflowOperationHandlerTest {
   }
 
   @Test
+  public void testFrameRateFixedValue() throws Exception {
+    createTestFrameRateWithValue("25", 25.0f);
+  }
+
+  @Test
+  public void testFrameRateFixedDecimalValue() throws Exception {
+    createTestFrameRateWithValue("25.000", 25.0f);
+  }
+
+  @Test
+  public void testFrameRatePartValue() throws Exception {
+    Track part1 = (Track) mp.getElementsByFlavor(MediaPackageElementFlavor.parseFlavor("presenter/source"))[0];
+    VideoStream[] videoStreams = TrackSupport.byType(part1.getStreams(), VideoStream.class);
+    createTestFrameRateWithValue("part-1", videoStreams[0].getFrameRate());
+  }
+
+  @Test(expected = WorkflowOperationException.class)
+  public void testFrameRateInvalidDigitPartValue() throws Exception {
+    createTestFrameRateWithValue("part-10", Float.MAX_VALUE);
+  }
+
+  @Test(expected = WorkflowOperationException.class)
+  public void testFrameRateInvalidPartValue() throws Exception {
+    createTestFrameRateWithValue("part-foo", Float.MAX_VALUE);
+  }
+
+  @Test(expected = WorkflowOperationException.class)
+  public void testFrameRateInvalidValue() throws Exception {
+    createTestFrameRateWithValue("foo", Float.MAX_VALUE);
+  }
+
+  protected void createTestFrameRateWithValue(String frameRateValue, float expectedFrameRateValue) throws Exception {
+    setMockupsWithFrameRate(expectedFrameRateValue);
+
+    // operation configuration
+    String targetTags = "engage,rss";
+    Map<String, String> configurations = new HashMap<String, String>();
+    configurations.put("source-flavor-part-0", "presentation/source");
+    configurations.put("source-flavor-part-1", "presenter/source");
+    configurations.put("source-flavor-part-1-mandatory", "true");
+    configurations.put("target-tags", targetTags);
+    configurations.put("target-flavor", "presenter/concat");
+    configurations.put("encoding-profile", "concat");
+    configurations.put("output-resolution", "part-1");
+    configurations.put("output-framerate", frameRateValue);
+
+    // run the operation handler
+    WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
+
+    // check track metadata
+    MediaPackage mpNew = result.getMediaPackage();
+    Track trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID);
+    Assert.assertEquals("presenter/concat", trackEncoded.getFlavor().toString());
+    Assert.assertArrayEquals(targetTags.split("\\W"), trackEncoded.getTags());
+  }
+
+  @Test
   public void testConcat2EncodedTracksWithTags() throws Exception {
     setMockups();
 
@@ -277,6 +337,10 @@ public class ConcatWorkflowOperationHandlerTest {
   }
 
   private void setMockups() throws EncoderException, MediaPackageException {
+    setMockupsWithFrameRate(-1.0f);
+  }
+
+  private void setMockupsWithFrameRate(float expectedFramerate) throws EncoderException, MediaPackageException {
     // set up mock profile
     profile = EasyMock.createNiceMock(EncodingProfile.class);
     EasyMock.expect(profile.getIdentifier()).andReturn(PROFILE_ID);
@@ -288,9 +352,15 @@ public class ConcatWorkflowOperationHandlerTest {
     // set up mock composer service
     composerService = EasyMock.createNiceMock(ComposerService.class);
     EasyMock.expect(composerService.getProfile(PROFILE_ID)).andReturn(profile);
-    EasyMock.expect(
-            composerService.concat((String) EasyMock.anyObject(), (Dimension) EasyMock.anyObject(),
-                    (Track) EasyMock.anyObject(), (Track) EasyMock.anyObject())).andReturn(job);
+    if (expectedFramerate > 0) {
+      EasyMock.expect(composerService.concat(
+              (String) EasyMock.anyObject(), (Dimension) EasyMock.anyObject(),
+              EasyMock.eq(expectedFramerate), (Track) EasyMock.anyObject(), (Track) EasyMock.anyObject())).andReturn(job);
+    } else {
+      EasyMock.expect(composerService.concat(
+              (String) EasyMock.anyObject(), (Dimension) EasyMock.anyObject(),
+              (Track) EasyMock.anyObject(), (Track) EasyMock.anyObject())).andReturn(job);
+    }
     EasyMock.replay(composerService);
     operationHandler.setComposerService(composerService);
   }

@@ -43,8 +43,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Test suite for the Execute Service
@@ -81,7 +81,7 @@ public class ExecuteServiceImplTest {
     EasyMock.expect(cc.getBundleContext()).andReturn(bundleContext).anyTimes();
     configKey2 = "edu.harvard.dce.param2";
     String configValue2 = baseDir.getAbsolutePath() + "/test.txt";
-    Properties props = new Properties();
+    Hashtable<String, Object> props = new Hashtable<>();
     props.put(configKey2, configValue2);
     EasyMock.expect(cc.getProperties()).andReturn(props);
     EasyMock.replay(cc);
@@ -103,7 +103,7 @@ public class ExecuteServiceImplTest {
 
   @Test
   public void testNoElements() throws ExecuteException, NotFoundException {
-    List<String> params = new ArrayList<String>();
+    List<String> params = new ArrayList<>();
     params.add("echo");
     params.add(TEXT);
 
@@ -117,7 +117,7 @@ public class ExecuteServiceImplTest {
 
   @Test
   public void testWithInputElement() throws ExecuteException, NotFoundException {
-    List<String> params = new ArrayList<String>();
+    List<String> params = new ArrayList<>();
     params.add("echo");
     params.add(pattern);
     MediaPackageElement element = MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
@@ -130,7 +130,7 @@ public class ExecuteServiceImplTest {
 
   @Test
   public void testWithGlobalConfigParam() throws ExecuteException, NotFoundException {
-    List<String> params = new ArrayList<String>();
+    List<String> params = new ArrayList<>();
     params.add("cat");
     params.add("#{" + configKey1 + "}");
     MediaPackage mp = null;
@@ -143,7 +143,7 @@ public class ExecuteServiceImplTest {
 
   @Test
   public void testWithServiceConfigParam() throws ExecuteException, NotFoundException {
-    List<String> params = new ArrayList<String>();
+    List<String> params = new ArrayList<>();
     params.add("cat");
     params.add("#{" + configKey2 + "}");
     MediaPackage mp = null;

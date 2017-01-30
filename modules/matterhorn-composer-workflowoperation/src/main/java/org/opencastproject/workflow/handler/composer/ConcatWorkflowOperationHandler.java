@@ -76,7 +76,9 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
   private static final String ENCODING_PROFILE = "encoding-profile";
   private static final String OUTPUT_RESOLUTION = "output-resolution";
-  private static final String OUTPUT_RESOLUTION_PART_PREFIX = "part-";
+  private static final String OUTPUT_FRAMERATE = "output-framerate";
+  private static final String OUTPUT_PART_PREFIX = "part-";
+
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ConcatWorkflowOperationHandler.class);
@@ -97,6 +99,9 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
             .put(OUTPUT_RESOLUTION,
                     "The resulting resolution of the concat video e.g. 1900x1080 or the part name to take as the output resolution");
     CONFIG_OPTIONS.put(ENCODING_PROFILE, "The encoding profile to use");
+    CONFIG_OPTIONS.put(OUTPUT_FRAMERATE,
+            "The frame rate of the resulting video in frames per second, e.g. 25, 23.976 "
+            + "or part name to take the value from, e.g. part-1.");
   }
 
   /** The composer service */
@@ -160,6 +165,7 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
     Map<Integer, Tuple<TrackSelector, Boolean>> trackSelectors = getTrackSelectors(operation);
     String outputResolution = StringUtils.trimToNull(operation.getConfiguration(OUTPUT_RESOLUTION));
+    String outputFrameRate = StringUtils.trimToNull(operation.getConfiguration(OUTPUT_FRAMERATE));
     String encodingProfile = StringUtils.trimToNull(operation.getConfiguration(ENCODING_PROFILE));
 
     // Skip the worklow if no source-flavors or tags has been configured
@@ -191,9 +197,9 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
       throw new WorkflowOperationException("Output resolution must be set!");
 
     Dimension outputDimension = null;
-    if (outputResolution.startsWith(OUTPUT_RESOLUTION_PART_PREFIX)) {
+    if (outputResolution.startsWith(OUTPUT_PART_PREFIX)) {
       if (!trackSelectors.keySet().contains(
-              Integer.parseInt(outputResolution.substring(OUTPUT_RESOLUTION_PART_PREFIX.length()))))
+              Integer.parseInt(outputResolution.substring(OUTPUT_PART_PREFIX.length()))))
         throw new WorkflowOperationException("Output resolution part not set!");
     } else {
       try {
@@ -207,6 +213,21 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
         throw e;
       } catch (Exception e) {
         throw new WorkflowOperationException("Unable to parse output resolution!", e);
+      }
+    }
+
+    float fps = -1.0f;
+    if (StringUtils.isNotEmpty(outputFrameRate)) {
+      if (StringUtils.startsWith(outputFrameRate, OUTPUT_PART_PREFIX)) {
+        if (!NumberUtils.isNumber(outputFrameRate.substring(OUTPUT_PART_PREFIX.length()))
+                || !trackSelectors.keySet().contains(Integer.parseInt(
+                        outputFrameRate.substring(OUTPUT_PART_PREFIX.length())))) {
+          throw new WorkflowOperationException("Output frame rate part not set or invalid!");
+        }
+      } else if (NumberUtils.isNumber(outputFrameRate)) {
+        fps = NumberUtils.toFloat(outputFrameRate);
+      } else {
+        throw new WorkflowOperationException("Unable to parse output frame rate!");
       }
     }
 
@@ -248,14 +269,19 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
           logger.info("No video stream available in the track with flavor {}! {}", currentFlavor, t);
           return createResult(mediaPackage, Action.SKIP);
         }
-        if (outputResolution.startsWith(OUTPUT_RESOLUTION_PART_PREFIX)
-                && trackSelector.getKey() == Integer.parseInt(outputResolution.substring(OUTPUT_RESOLUTION_PART_PREFIX
-                        .length()))) {
+        if (StringUtils.startsWith(outputResolution, OUTPUT_PART_PREFIX)
+                && NumberUtils.isNumber(outputResolution.substring(OUTPUT_PART_PREFIX.length()))
+                && trackSelector.getKey() == Integer.parseInt(outputResolution.substring(OUTPUT_PART_PREFIX.length()))) {
           outputDimension = new Dimension(videoStreams[0].getFrameWidth(), videoStreams[0].getFrameHeight());
           if (!trackSelector.getValue().getB()) {
             logger.warn("Output resolution track {} must be mandatory, skipping concatenation!", outputResolution);
             return createResult(mediaPackage, Action.SKIP);
           }
+        }
+        if (fps <= 0 && StringUtils.startsWith(outputFrameRate, OUTPUT_PART_PREFIX)
+                && NumberUtils.isNumber(outputFrameRate.substring(OUTPUT_PART_PREFIX.length()))
+                && trackSelector.getKey() == Integer.parseInt(outputFrameRate.substring(OUTPUT_PART_PREFIX.length()))) {
+          fps = videoStreams[0].getFrameRate();
         }
       }
     }
@@ -271,8 +297,14 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
       return createResult(mediaPackage, Action.SKIP);
     }
 
-    Job concatJob = composerService.concat(profile.getIdentifier(), outputDimension,
-            tracks.toArray(new Track[tracks.size()]));
+    Job concatJob;
+    if (fps > 0) {
+      concatJob = composerService.concat(profile.getIdentifier(), outputDimension,
+              fps, tracks.toArray(new Track[tracks.size()]));
+    } else {
+      concatJob = composerService.concat(profile.getIdentifier(), outputDimension,
+              tracks.toArray(new Track[tracks.size()]));
+    }
 
     // Wait for the jobs to return
     if (!waitForStatus(concatJob).isSuccess())

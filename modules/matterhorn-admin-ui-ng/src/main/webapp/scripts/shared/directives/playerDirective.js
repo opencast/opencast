@@ -23,6 +23,9 @@ angular.module('adminNg.directives')
                 scope.playing = false;
                 scope.positionStart = false;
                 scope.positionEnd = false;
+                scope.muted = false;
+                scope.volume = 100;
+                scope.playButtonTooltip = 'VIDEO_TOOL.PLAYER.PLAY';
                 scope.time = {
                     hours: 0,
                     minutes: 0,
@@ -33,12 +36,14 @@ angular.module('adminNg.directives')
                 scope.player.adapter.addListener(PlayerAdapter.EVENTS.PAUSE, function () {
                     scope.$apply(function () {
                         scope.playing = false;
+                        scope.playButtonTooltip = 'VIDEO_TOOL.PLAYER.PLAY';
                     });
                 });
 
                 scope.player.adapter.addListener(PlayerAdapter.EVENTS.PLAY, function () {
                     scope.$apply(function () {
                         scope.playing = true;
+                        scope.playButtonTooltip = 'VIDEO_TOOL.PLAYER.PAUSE';
                     });
                 });
 
@@ -47,6 +52,11 @@ angular.module('adminNg.directives')
                     scope.time = scope.player.adapter.getCurrentTimeObject();
 
                     scope.$apply();
+                });
+
+                scope.player.adapter.addListener(PlayerAdapter.EVENTS.VOLUMECHANGE, function () {
+                    scope.muted = scope.player.adapter.muted();
+                    scope.volume = scope.player.adapter.volume();
                 });
             }
 
@@ -64,7 +74,7 @@ angular.module('adminNg.directives')
                     }
                 }
             }
-            
+
             function getTimeInSeconds(time) {
                 var millis = time.milliseconds;
                 millis += time.seconds * 1000;
@@ -107,11 +117,19 @@ angular.module('adminNg.directives')
                     scope.player.adapter.play();
                 }
             };
-            
+
             scope.changeTime = function (time) {
             	scope.player.adapter.setCurrentTime(getTimeInSeconds(time));
             };
-            
+
+            scope.toggleMute = function () {
+              scope.player.adapter.muted(! scope.player.adapter.muted());
+            }
+
+            scope.setVolume = function () {
+              scope.player.adapter.volume(scope.volume);
+            }
+
             scope.subControls = angular.isDefined(scope.subControls) ? scope.subControls : 'true';
 
             // Check for the player (10 times) before to load the adapter

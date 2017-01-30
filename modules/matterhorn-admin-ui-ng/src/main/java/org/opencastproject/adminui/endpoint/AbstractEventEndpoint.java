@@ -193,7 +193,13 @@ import javax.ws.rs.core.Response.Status;
  * the endpoint may abstract over the concrete archive.
  */
 @Path("/")
-@RestService(name = "eventservice", title = "Event Service", notes = "", abstractText = "Provides resources and operations related to the events")
+@RestService(name = "eventservice", title = "Event Service",
+  abstractText = "Provides resources and operations related to the events",
+  notes = { "This service offers the event CRUD Operations for the admin UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public abstract class AbstractEventEndpoint {
 
   /** The logging facility */
@@ -667,7 +673,7 @@ public abstract class AbstractEventEndpoint {
       throw e;
     } catch (Exception e) {
       logger.error("Unable to delete comment {} on event {}: {}",
-              new String[] { Long.toString(commentId), eventId, ExceptionUtils.getStackTrace(e) });
+              commentId, eventId, ExceptionUtils.getStackTrace(e));
       throw new WebApplicationException(e);
     }
   }
@@ -710,7 +716,7 @@ public abstract class AbstractEventEndpoint {
       throw e;
     } catch (Exception e) {
       logger.warn("Could not remove event comment reply {} from comment {}: {}",
-              new String[] { Long.toString(replyId), Long.toString(commentId), ExceptionUtils.getStackTrace(e) });
+              replyId, commentId, ExceptionUtils.getStackTrace(e));
       throw new WebApplicationException(e);
     }
   }
@@ -761,7 +767,7 @@ public abstract class AbstractEventEndpoint {
       throw e;
     } catch (Exception e) {
       logger.warn("Could not update event comment reply {} from comment {}: {}",
-              new String[] { Long.toString(replyId), Long.toString(commentId), ExceptionUtils.getStackTrace(e) });
+              replyId, commentId, ExceptionUtils.getStackTrace(e));
       throw new WebApplicationException(e);
     }
   }
@@ -1390,7 +1396,7 @@ public abstract class AbstractEventEndpoint {
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     } catch (AclServiceException e) {
       logger.error("Unable to update transtion {} of event {}: {}",
-              new String[] { Long.toString(transitionId), eventId, ExceptionUtils.getStackTrace(e) });
+              transitionId, eventId, ExceptionUtils.getStackTrace(e));
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     } catch (ParseException e) {
       // That should never happen
@@ -1480,7 +1486,7 @@ public abstract class AbstractEventEndpoint {
       return Response.noContent().build();
     } catch (AclServiceException e) {
       logger.error("Error while trying to delete transition '{}' from event '{}': {}",
-              new String[] { Long.toString(transitionId), eventId, ExceptionUtils.getStackTrace(e) });
+              transitionId, eventId, ExceptionUtils.getStackTrace(e));
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     }
   }
@@ -1644,7 +1650,7 @@ public abstract class AbstractEventEndpoint {
       return Response.noContent().build();
     } catch (Exception e) {
       logger.error("Unable to find conflicting events for {}, {}, {}: {}",
-              new String[] { device, startDate, endDate, ExceptionUtils.getStackTrace(e) });
+              device, startDate, endDate, ExceptionUtils.getStackTrace(e));
       return RestUtil.R.serverError();
     }
   }
@@ -1868,6 +1874,7 @@ public abstract class AbstractEventEndpoint {
     fields.add(f("source", v(getIndexService().getEventSource(event).toString())));
     fields.add(f("has_comments", v(event.hasComments())));
     fields.add(f("has_open_comments", v(event.hasOpenComments())));
+    fields.add(f("needs_cutting", v(event.needsCutting())));
     fields.add(f("has_preview", v(event.hasPreview())));
     fields.add(f("agent_id", vN(event.getAgentId())));
     fields.add(f("technical_start", vN(event.getTechnicalStartTime())));

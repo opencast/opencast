@@ -174,7 +174,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
         FileUtils.forceDelete(parentDirectory.getParentFile());
       return true;
     } catch (NotFoundException e) {
-      log.info("Unable to delete non existing object %s/%s", mediaPackageID, mediaPackageElementID);
+      log.info("Unable to delete non existing media package element {}@{}", mediaPackageElementID, mediaPackageID);
       return false;
     }
   }

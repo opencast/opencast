@@ -49,10 +49,10 @@
         }
 
         .fa-plus-circle {
-            color: $green;
+            color: $primary-color-green;
 
             &:hover {
-                color: lighten($green, 5%);
+                color: $primary-color-green-light-1;
             }
         }
 

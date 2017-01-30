@@ -181,7 +181,7 @@
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+            <artifactId>javax.servlet-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -293,7 +293,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>c3p0</groupId>
+            <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>
             <scope>test</scope>
         </dependency>
@@ -321,8 +321,18 @@
                                     <goal>install-node-and-npm</goal>
                                 </goals>
                                 <configuration>
-                                    <nodeVersion>v4.4.0</nodeVersion>
-                                    <npmVersion>2.14.20</npmVersion>
+                                    <nodeVersion>v6.9.2</nodeVersion>
+                                    <npmVersion>3.10.9</npmVersion>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>npm clean</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                  <arguments>cache clean</arguments>
                                 </configuration>
                             </execution>
 

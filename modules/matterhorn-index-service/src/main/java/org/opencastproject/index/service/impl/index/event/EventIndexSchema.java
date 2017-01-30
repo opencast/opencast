@@ -77,6 +77,9 @@ public interface EventIndexSchema extends IndexSchema {
   /** The has open comments field name */
   String HAS_OPEN_COMMENTS = "has_open_comments";
 
+  /** The event has open comment that it needs cutting */
+  String NEEDS_CUTTING = "needs_cutting";
+
   /** The publications */
   String PUBLICATION = "publication";
 

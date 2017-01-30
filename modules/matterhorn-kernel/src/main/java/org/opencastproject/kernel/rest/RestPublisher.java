@@ -22,17 +22,30 @@
 package org.opencastproject.kernel.rest;
 
 import org.opencastproject.rest.RestConstants;
+import org.opencastproject.rest.SharedHttpContext;
 import org.opencastproject.rest.StaticResource;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.NotFoundException;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.cxf.Bus;
+import org.apache.cxf.binding.BindingFactoryManager;
+import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.jaxrs.JAXRSBindingFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.ext.RequestHandler;
+import org.apache.cxf.jaxrs.ext.ResourceComparator;
+import org.apache.cxf.jaxrs.impl.UriInfoImpl;
+import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.provider.JSONProvider;
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.apache.http.HttpStatus;
@@ -51,6 +64,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
@@ -58,18 +72,21 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -83,8 +100,8 @@ public class RestPublisher implements RestConstants {
   protected static final Logger logger = LoggerFactory.getLogger(RestPublisher.class);
 
   /** The rest publisher looks for any non-servlet with the 'opencast.service.path' property */
-  public static final String JAX_RS_SERVICE_FILTER = "(&(!(objectClass=javax.servlet.Servlet))("
-          + SERVICE_PATH_PROPERTY + "=*))";
+  public static final String JAX_RS_SERVICE_FILTER = "(&(!(objectClass=javax.servlet.Servlet))(" + SERVICE_PATH_PROPERTY
+          + "=*))";
 
   /** A map that sets default xml namespaces in {@link XMLStreamWriter}s */
   protected static final ConcurrentHashMap<String, String> NAMESPACE_MAP;
@@ -92,11 +109,10 @@ public class RestPublisher implements RestConstants {
   /** The 404 Error page */
   protected String fourOhFour = null;
 
-  @SuppressWarnings("unchecked")
-  protected List providers = null;
+  protected List<Object> providers = null;
 
   static {
-    NAMESPACE_MAP = new ConcurrentHashMap<String, String>();
+    NAMESPACE_MAP = new ConcurrentHashMap<>();
     NAMESPACE_MAP.put("http://www.w3.org/2001/XMLSchema-instance", "");
   }
 
@@ -104,18 +120,43 @@ public class RestPublisher implements RestConstants {
   protected ComponentContext componentContext;
 
   /** A service tracker that monitors JAX-RS annotated services, (un)publishing servlets as they (dis)appear */
-  protected ServiceTracker jaxRsTracker = null;
+  protected ServiceTracker<Object, Object> jaxRsTracker = null;
 
   /**
    * A bundle tracker that registers StaticResource servlets for bundles with the right headers.
    */
-  protected BundleTracker bundleTracker = null;
+  protected BundleTracker<Object> bundleTracker = null;
 
   /** The base URL for this server */
   protected String baseServerUri;
 
   /** Holds references to servlets that this class publishes, so they can be unpublished later */
-  protected Map<String, ServiceRegistration> servletRegistrationMap;
+  protected Map<String, ServiceRegistration<?>> servletRegistrationMap;
+
+  /** The JAX-RS Server */
+  private Server server;
+
+  /** The map of JAX-RS resource providers */
+  private Map<ServiceReference<?>, ResourceProvider> resourceProviders = new HashMap<>();
+
+  /** A token to store in the miss cache */
+  private Object nullToken = new Object();
+
+  private final CacheLoader<Class<?>, Object> servicePathLoader = new CacheLoader<Class<?>, Object>() {
+    @Override
+    public Object load(Class<?> clazz) {
+      ServiceReference<?> ref = componentContext.getBundleContext().getServiceReference(clazz.getName());
+      if (ref == null) {
+        logger.warn("No service reference found for class {}", clazz.getName());
+        return nullToken;
+      }
+      String servicePath = (String) ref.getProperty(SERVICE_PATH_PROPERTY);
+      return StringUtils.isBlank(servicePath) ? nullToken : servicePath;
+    }
+  };
+
+  private final LoadingCache<Class<?>, Object> servicePathCache = CacheBuilder.newBuilder()
+          .expireAfterWrite(5, TimeUnit.MINUTES).build(servicePathLoader);
 
   /** Activates this rest publisher */
   @SuppressWarnings("unchecked")
@@ -124,8 +165,8 @@ public class RestPublisher implements RestConstants {
     this.baseServerUri = componentContext.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
     this.componentContext = componentContext;
     this.fourOhFour = "The resource you requested does not exist."; // TODO: Replace this with something a little nicer
-    this.servletRegistrationMap = new ConcurrentHashMap<String, ServiceRegistration>();
-    this.providers = new ArrayList();
+    this.servletRegistrationMap = new ConcurrentHashMap<>();
+    this.providers = new ArrayList<>();
 
     JSONProvider jsonProvider = new MatterhornJSONProvider();
     jsonProvider.setIgnoreNamespaces(true);
@@ -133,16 +174,17 @@ public class RestPublisher implements RestConstants {
 
     providers.add(jsonProvider);
     providers.add(new ExceptionMapper<NotFoundException>() {
+      @Override
       public Response toResponse(NotFoundException e) {
         return Response.status(404).entity(fourOhFour).type(MediaType.TEXT_PLAIN).build();
       }
     });
     providers.add(new ExceptionMapper<UnauthorizedException>() {
+      @Override
       public Response toResponse(UnauthorizedException e) {
         return Response.status(HttpStatus.SC_UNAUTHORIZED).entity("unauthorized").type(MediaType.TEXT_PLAIN).build();
       };
     });
-    providers.add(new RestDocRedirector());
 
     try {
       jaxRsTracker = new JaxRsServiceTracker();
@@ -163,6 +205,44 @@ public class RestPublisher implements RestConstants {
     bundleTracker.close();
   }
 
+  protected class OsgiCxfEndpointComparator implements ResourceComparator {
+
+    @Override
+    public int compare(OperationResourceInfo oper1, OperationResourceInfo oper2, Message message) {
+      return compareByServiceClass(oper1.getClassResourceInfo().getServiceClass(),
+              oper2.getClassResourceInfo().getServiceClass(), message);
+    }
+
+    @Override
+    public int compare(ClassResourceInfo cri1, ClassResourceInfo cri2, Message message) {
+      return compareByServiceClass(cri1.getServiceClass(), cri2.getServiceClass(), message);
+    }
+
+    private int compareByServiceClass(Class<?> clazz1, Class<?> clazz2, Message message) {
+      if (clazz1.equals(clazz2))
+        return 0;
+
+      UriInfoImpl uriInfo = new UriInfoImpl(message);
+      String path = uriInfo.getBaseUri().getPath();
+      path = StringUtils.removeEnd(path, "/");
+      if (StringUtils.isBlank(path))
+        return 0;
+
+      Object servicePath1 = servicePathCache.getUnchecked(clazz1);
+      Object servicePath2 = servicePathCache.getUnchecked(clazz2);
+
+      if (servicePath1 != nullToken && path.equals(servicePath1)) {
+        return -1;
+      } else if (servicePath2 != nullToken && path.equals(servicePath2)) {
+        return 1;
+      } else if (servicePath1 != nullToken && servicePath2 != nullToken) {
+        return servicePath1.toString().compareTo(servicePath2.toString());
+      } else {
+        return 0;
+      }
+    }
+  }
+
   /**
    * Creates a REST endpoint for the JAX-RS annotated service.
    *
@@ -171,18 +251,26 @@ public class RestPublisher implements RestConstants {
    * @param service
    *          The service itself
    */
-  @SuppressWarnings("unchecked")
-  protected void createEndpoint(ServiceReference ref, Object service) {
-    RestServlet cxf = new RestServlet();
-    ServiceRegistration reg = null;
+  protected void createEndpoint(ServiceReference<?> ref, Object service) {
     String serviceType = (String) ref.getProperty(SERVICE_TYPE_PROPERTY);
     String servicePath = (String) ref.getProperty(SERVICE_PATH_PROPERTY);
-    boolean servicePublishFlag = ref.getProperty(SERVICE_PUBLISH_PROPERTY) == null || Boolean.parseBoolean((String)ref.getProperty(SERVICE_PUBLISH_PROPERTY));
+    boolean servicePublishFlag = ref.getProperty(SERVICE_PUBLISH_PROPERTY) == null
+            || Boolean.parseBoolean((String) ref.getProperty(SERVICE_PUBLISH_PROPERTY));
     boolean jobProducer = Boolean.parseBoolean((String) ref.getProperty(SERVICE_JOBPRODUCER_PROPERTY));
+
+    ServiceRegistration<?> reg = servletRegistrationMap.get(servicePath);
+    if (reg != null) {
+      logger.debug("Rest endpoint {} is still registred, skip registering again", servicePath);
+      return;
+    }
+
+    RestServlet cxf = new RestServlet();
     try {
-      Dictionary<String, Object> props = new Hashtable<String, Object>();
-      props.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
-      props.put("alias", servicePath);
+      Dictionary<String, Object> props = new Hashtable<>();
+      props.put(SharedHttpContext.ALIAS, servicePath);
+      props.put(SharedHttpContext.SERVLET_NAME, service.toString());
+      props.put(SharedHttpContext.CONTEXT_ID, RestConstants.HTTP_CONTEXT_ID);
+      props.put(SharedHttpContext.SHARED, "true");
       props.put(SERVICE_TYPE_PROPERTY, serviceType);
       props.put(SERVICE_PATH_PROPERTY, servicePath);
       props.put(SERVICE_PUBLISH_PROPERTY, servicePublishFlag);
@@ -215,34 +303,33 @@ public class RestPublisher implements RestConstants {
       return;
     }
 
-    // Was initialization successful
-    if (!cxf.isInitialized()) {
-      logger.error("Whiteboard implemenation failed to pick up REST endpoint declaration {}", serviceType);
-      return;
-    }
+    resourceProviders.put(ref, new SingletonResourceProvider(service));
 
     // Set up cxf
     Bus bus = cxf.getBus();
-    JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
-    factory.setBus(bus);
-    factory.setProviders(providers);
+    JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+    sf.setBus(bus);
+    sf.setProviders(providers);
 
     // Set the service class
-    factory.setServiceClass(service.getClass());
-    factory.setResourceProvider(service.getClass(), new SingletonResourceProvider(service));
+    sf.setResourceProviders(new ArrayList<>(resourceProviders.values()));
+    sf.setResourceComparator(new OsgiCxfEndpointComparator());
 
-    // Set the address to '/', which will force the use of the http service
-    factory.setAddress("/");
+    sf.setAddress("/");
 
-    // Use the cxf classloader itself to create the cxf server
-    ClassLoader bundleClassLoader = Thread.currentThread().getContextClassLoader();
-    ClassLoader delegateClassLoader = JAXRSServerFactoryBean.class.getClassLoader();
-    try {
-      Thread.currentThread().setContextClassLoader(delegateClassLoader);
-      factory.create();
-    } finally {
-      Thread.currentThread().setContextClassLoader(bundleClassLoader);
+    BindingFactoryManager manager = sf.getBus().getExtension(BindingFactoryManager.class);
+    JAXRSBindingFactory factory = new JAXRSBindingFactory();
+    factory.setBus(sf.getBus());
+    manager.registerBindingFactory(JAXRSBindingFactory.JAXRS_BINDING_ID, factory);
+
+    if (server != null) {
+      logger.debug("Destroying JAX-RS server");
+      server.stop();
+      server.destroy();
     }
+
+    server = sf.create();
+
     logger.info("Registered REST endpoint at " + servicePath);
     if (service instanceof RestEndpoint) {
       ((RestEndpoint) service).endpointPublished();
@@ -254,9 +341,12 @@ public class RestPublisher implements RestConstants {
    *
    * @param alias
    *          The URL space to reclaim
+   * @param reference
+   *          The service reference
    */
-  protected void destroyEndpoint(String alias) {
-    ServiceRegistration reg = servletRegistrationMap.remove(alias);
+  protected void destroyEndpoint(String alias, ServiceReference<?> reference) {
+    ServiceRegistration<?> reg = servletRegistrationMap.remove(alias);
+    resourceProviders.remove(reference);
     if (reg != null) {
       reg.unregister();
     }
@@ -265,15 +355,13 @@ public class RestPublisher implements RestConstants {
   /**
    * Extends the CXF JSONProvider for the grand purpose of removing '@' symbols from json and padded jsonp.
    */
-  protected static class MatterhornJSONProvider extends JSONProvider {
+  protected static class MatterhornJSONProvider<T> extends JSONProvider<T> {
     private static final Charset UTF8 = Charset.forName("utf-8");
 
     /**
      * {@inheritDoc}
-     *
-     * @see org.apache.cxf.jaxrs.provider.JSONProvider#createWriter(java.lang.Object, java.lang.Class,
-     *      java.lang.reflect.Type, java.lang.String, java.io.OutputStream, boolean)
      */
+    @Override
     protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass, Type genericType, String enc,
             OutputStream os, boolean isCollection) throws Exception {
       Configuration c = new Configuration(NAMESPACE_MAP);
@@ -305,22 +393,22 @@ public class RestPublisher implements RestConstants {
    * A custom ServiceTracker that published JAX-RS annotated services with the
    * {@link RestPublisher#SERVICE_PATH_PROPERTY} property set to some non-null value.
    */
-  public class JaxRsServiceTracker extends ServiceTracker {
+  public class JaxRsServiceTracker extends ServiceTracker<Object, Object> {
 
     JaxRsServiceTracker() throws InvalidSyntaxException {
-      super(componentContext.getBundleContext(), componentContext.getBundleContext()
-              .createFilter(JAX_RS_SERVICE_FILTER), null);
+      super(componentContext.getBundleContext(),
+              componentContext.getBundleContext().createFilter(JAX_RS_SERVICE_FILTER), null);
     }
 
     @Override
-    public void removedService(ServiceReference reference, Object service) {
+    public void removedService(ServiceReference<Object> reference, Object service) {
       String servicePath = (String) reference.getProperty(SERVICE_PATH_PROPERTY);
-      destroyEndpoint(servicePath);
+      destroyEndpoint(servicePath, reference);
       super.removedService(reference, service);
     }
 
     @Override
-    public Object addingService(ServiceReference reference) {
+    public Object addingService(ServiceReference<Object> reference) {
       Object service = componentContext.getBundleContext().getService(reference);
       if (service == null) {
         logger.info("JAX-RS service {} has not been instantiated yet, or has already been unregistered. Skipping "
@@ -328,8 +416,9 @@ public class RestPublisher implements RestConstants {
       } else {
         Path pathAnnotation = service.getClass().getAnnotation(Path.class);
         if (pathAnnotation == null) {
-          logger.warn("{} was registered with '{}={}', but the service is not annotated with the JAX-RS "
-                  + "@Path annotation",
+          logger.warn(
+                  "{} was registered with '{}={}', but the service is not annotated with the JAX-RS "
+                          + "@Path annotation",
                   new Object[] { service, SERVICE_PATH_PROPERTY, reference.getProperty(SERVICE_PATH_PROPERTY) });
         } else {
           createEndpoint(reference, service);
@@ -361,7 +450,7 @@ public class RestPublisher implements RestConstants {
   /**
    * Tracks bundles containing static resources to be exposed via HTTP URLs.
    */
-  class StaticResourceBundleTracker extends BundleTracker {
+  class StaticResourceBundleTracker extends BundleTracker<Object> {
 
     /**
      * Creates a new StaticResourceBundleTracker.
@@ -380,14 +469,15 @@ public class RestPublisher implements RestConstants {
      */
     @Override
     public Object addingBundle(Bundle bundle, BundleEvent event) {
-      String classpath = (String) bundle.getHeaders().get(RestConstants.HTTP_CLASSPATH);
-      String alias = (String) bundle.getHeaders().get(RestConstants.HTTP_ALIAS);
-      String welcomeFile = (String) bundle.getHeaders().get(RestConstants.HTTP_WELCOME);
+      String classpath = bundle.getHeaders().get(RestConstants.HTTP_CLASSPATH);
+      String alias = bundle.getHeaders().get(RestConstants.HTTP_ALIAS);
+      String welcomeFile = bundle.getHeaders().get(RestConstants.HTTP_WELCOME);
 
       if (classpath != null && alias != null) {
-        Dictionary<String, String> props = new Hashtable<String, String>();
-        props.put("alias", alias);
-        props.put("httpContext.id", RestConstants.HTTP_CONTEXT_ID);
+        Dictionary<String, String> props = new Hashtable<>();
+        props.put(SharedHttpContext.ALIAS, alias);
+        props.put(SharedHttpContext.CONTEXT_ID, RestConstants.HTTP_CONTEXT_ID);
+        props.put(SharedHttpContext.SHARED, "true");
 
         StaticResource servlet = new StaticResource(new StaticResourceClassLoader(bundle), classpath, alias,
                 welcomeFile);
@@ -421,33 +511,31 @@ public class RestPublisher implements RestConstants {
       return initialized;
     }
 
+    /**
+     * Default constructor needed by Jetty
+     */
+    public RestServlet() {
+    }
+
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
       super.init(servletConfig);
       initialized = true;
     }
+
+    @Override
+    protected void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+      if (request.getRequestURI().endsWith("/docs")) {
+        try {
+          response.sendRedirect("/docs.html?path=" + request.getServletPath());
+        } catch (IOException e) {
+          logger.error("Unable to redirect to rest docs: {}", ExceptionUtils.getStackTrace(e));
+        }
+      } else {
+        super.handleRequest(request, response);
+      }
+    }
+
   }
 
-  public class RestDocRedirector implements RequestHandler {
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.apache.cxf.jaxrs.ext.RequestHandler#handleRequest(org.apache.cxf.message.Message,
-     *      org.apache.cxf.jaxrs.model.ClassResourceInfo)
-     */
-    @Override
-    public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
-      String uri = (String) m.get(Message.REQUEST_URI);
-      if (uri.endsWith("/docs")) {
-        String[] pathSegments = uri.split("/");
-        String path = "";
-        for (int i = 1; i < pathSegments.length - 1; i++) {
-          path += "/" + pathSegments[i].replace("/", "");
-        }
-        return Response.status(Status.MOVED_PERMANENTLY).type(MediaType.TEXT_PLAIN)
-                .header("Location", "/docs.html?path=" + path).build();
-      }
-      return null;
-    }
-  }
 }

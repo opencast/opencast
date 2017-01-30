@@ -257,6 +257,21 @@ public class StaticResourceClassloaderTest {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
+        public int compareTo(Bundle o) {
+          return 0;
+        }
+
+        @Override
+        public <A> A adapt(Class<A> type) {
+          return null;
+        }
+
+        @Override
+        public File getDataFile(String filename) {
+          return null;
+        }
+
 //</editor-fold>
     }
 }

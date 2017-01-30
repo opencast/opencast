@@ -8,15 +8,6 @@ angular.module('adminNg.services')
         this.stats = [];
         this.loading = true;
 
-        // Variable related to the pagination
-        this.pagination = {
-            totalItems  :       100, // the number of items in total
-            pages       :        [], // list of pages
-            limit       :        10, // the number of items per page
-            offset      :         0, // currently selected page
-            directAccessibleNo :  3  // number of pages on each side of the current index
-        };
-
         this.configure = function (options) {
             me.resource = options.resource;
             me.apiService = options.apiService;
@@ -43,6 +34,13 @@ angular.module('adminNg.services')
                 if (filters.length) {
                     query.filter = filters.join(',');
                 }
+
+                /* Workaround:
+                 * We don't want actual data here, but limit 0 does not work (retrieves all data)
+                 * See MH-11892 Implement event counters efficiently
+                 */
+                query.limit = 1;
+
                 me.apiService.query(query).$promise.then(function (data) {
                     me.loading = false;
                     stat.counter = data.total;

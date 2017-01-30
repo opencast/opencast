@@ -22,8 +22,8 @@
 
 // Controller for creating a new event. This is a wizard, so it implements a state machine design pattern.
 angular.module('adminNg.controllers')
-.controller('NewEventCtrl', ['$scope', 'NewEventStates', 'NewEventResource', 'EVENT_TAB_CHANGE', 'Notifications', 'Modal',
- function ($scope, NewEventStates, NewEventResource, EVENT_TAB_CHANGE, Notifications, Modal) {
+.controller('NewEventCtrl', ['$scope', '$timeout', 'Table', 'NewEventStates', 'NewEventResource', 'EVENT_TAB_CHANGE', 'Notifications', 'Modal',
+ function ($scope, $timeout, Table, NewEventStates, NewEventResource, EVENT_TAB_CHANGE, Notifications, Modal) {
     $scope.states = NewEventStates.get();
     // This is a hack, due to the fact that we need to read html from the server :(
     // Shall be banished ASAP
@@ -123,6 +123,10 @@ angular.module('adminNg.controllers')
         });
 
         NewEventResource.save({}, userdata, function () {
+            $timeout(function () {
+                Table.fetch();
+            }, 500);
+
             Notifications.add('success', 'EVENTS_CREATED');
             Notifications.remove(messageId);
             resetStates();
@@ -134,7 +138,6 @@ angular.module('adminNg.controllers')
             window.onbeforeunload = null;
         });
 
-        // close will also make the Table.fetch()
         Modal.$scope.close();
         // add message that never disappears
         messageId = Notifications.add('success', 'EVENTS_UPLOAD_STARTED', 'global', -1);

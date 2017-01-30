@@ -16,7 +16,34 @@ A proposal is accepted when no veto (`-1`) is voted within a time spawn of 72 ho
 Passed Proposals
 ----------------
 
+### Officially declare the Admin UI Facade as internal API for exclusive use by the module matterhorn-adminui-ng
+Proposed by Sven Stauber <sven.stauber@switch.ch>, passed on December 16, 2016
 
+```no-highlight
+Dear all,
+I hereby propose to officially declare the Admin UI Facade as internal API for exclusive use by the module
+matterhorn-adminui-ng.
+
+Reason:
+The Admin UI Facade is essentially the backend of the Admin UI.
+While it would be technically possible to use this API for other purposes, this would introduce dependencies to
+components other than the Admin UI.
+Allowing such dependencies to come into existence would cause changes to the Admin UI Facade to potentially break
+other (possibly unknown external) components.
+Hence, we would need to announce, coordinate and discuss changes to this API to not break dependencies to components
+we potentially don't even know.
+This would unnecessarily slow down the future development of the Admin UI.
+In addition, Opencast 2.3 introduces the External API which has been explicitly designed to meet the requirements of
+an API used to integrate other components.
+
+Changes needed:
+The documentation needs to reflect that the Admin UI Facade is an internal API that will be changed without prior
+announcement whenever needed without respecting dependencies other than the Admin UI itself and therefore people shall
+not use this API for integration purposes.
+
+Best,
+Sven
+```
 ### Opencast Next: Code Cleanup
 Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Thu, 7 July 2016 15:21:19 UTC
 

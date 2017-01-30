@@ -43,6 +43,10 @@
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
     <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
@@ -117,9 +121,18 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
+            <Import-Package>
+              javax.servlet,
+              javax.servlet.http,
+              *
+            </Import-Package>
             <Export-Package>
               org.opencastproject.userdirectory;version=${project.version},
+              org.opencastproject.userdirectory.endpoint;version=${project.version},
             </Export-Package>
+            <Private-Package>
+              org.opencastproject.userdirectory.utils;version=${project.version},
+            </Private-Package>
             <Service-Component>
               OSGI-INF/admin-user-and-group-loader.xml,
               OSGI-INF/userdirectory-service.xml,

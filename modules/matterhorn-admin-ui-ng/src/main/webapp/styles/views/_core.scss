@@ -177,11 +177,11 @@ body {
                 }
 
                 &.prev {
-                    @include fa-icon($fa-chevron-left, before, inline-block, 0 5px 0 0, 0, inherit, 10px);
+                    @include fa-icon($fa-var-chevron-left, before, inline-block, 0 5px 0 0, 0, inherit, 10px);
                 }
 
                 &.next {
-                    @include fa-icon($fa-chevron-right, after, inline-block, 0 0 0 5px, 0, inherit, 10px);
+                    @include fa-icon($fa-var-chevron-right, after, inline-block, 0 0 0 5px, 0, inherit, 10px);
                 }
             }
 

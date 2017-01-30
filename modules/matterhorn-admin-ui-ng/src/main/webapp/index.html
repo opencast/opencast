@@ -2,6 +2,7 @@
 <html ng-app="adminNg">
     <head>
         <meta charset="utf-8">
+        <title>Opencast</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
@@ -12,10 +13,7 @@
         <!-- build:css(.tmp) styles/main.css -->
         <link rel="stylesheet" href="styles/main.css">
         <!-- endbuild -->
-        <meta charset="UTF-8">
-        <title>Opencast</title>
         <link type="text/css" href="lib/datepicker/themes/smoothness/jquery-ui-1.10.3.min.css" rel="stylesheet">
-        <link type="text/css" href="lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
         <link rel="shortcut icon" href="img/favicon.ico">
         <script>
             window.jQuery || document.write('<script src="lib/jquery-1.10.2.js"><\/script>')
@@ -31,8 +29,8 @@
     <body ng-cloak ng-controller="ApplicationCtrl" ng-click="bodyClicked()">
         <header ng-controller="NavCtrl" class="primary-header">
             <div class="header-branding">
-                <a href="/" target="_self">
-                    <img src="img/opencast-white.svg" height="20px" alt="Opencast Logo" />
+                <a href="/" target="_self" class="logo">
+                    <img src="img/opencast-white.svg" alt="Opencast Logo" />
                 </a>
             </div>
             <nav class="header-nav nav-dd-container" id="nav-dd-container">

@@ -43,7 +43,7 @@
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.xml.bind</groupId>
@@ -95,6 +95,10 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>javax.persistence</artifactId>
     </dependency>
@@ -124,7 +128,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>c3p0</groupId>
+      <groupId>com.mchange</groupId>
       <artifactId>c3p0</artifactId>
       <scope>test</scope>
     </dependency>
@@ -148,10 +152,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Import-Package>
-              javax.persistence,
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package> org.opencastproject.capture.admin.*;version=${project.version} </Export-Package>
             <Service-Component>
               OSGI-INF/capture-admin-service.xml,

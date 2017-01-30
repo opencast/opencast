@@ -61,11 +61,11 @@
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-bundle-jaxrs</artifactId>
+      <artifactId>cxf-rt-frontend-jaxrs</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
@@ -83,7 +83,7 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    
+
     <!-- Testing -->
 
     <!-- REST test environment -->
@@ -133,7 +133,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>c3p0</groupId>
+      <groupId>com.mchange</groupId>
       <artifactId>c3p0</artifactId>
       <scope>test</scope>
     </dependency>
@@ -179,11 +179,9 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Import-Package>
-              *;resolution:=optional
-            </Import-Package>
             <Export-Package>
-              org.opencastproject.event.comment
+              org.opencastproject.event.comment;version=${project.version},
+              org.opencastproject.event.comment.persistence;version=${project.version}
             </Export-Package>
             <Service-Component>
               OSGI-INF/event-comment-database-service.xml,

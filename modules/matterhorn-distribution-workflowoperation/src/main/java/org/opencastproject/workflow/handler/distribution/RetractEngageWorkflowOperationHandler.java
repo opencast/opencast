@@ -46,7 +46,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -129,7 +131,7 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
     if (StringUtils.isNotBlank(bundleContext.getProperty(STREAMING_URL_PROPERTY)))
       distributeStreaming = true;
-  }
+    }
 
   /**
    * {@inheritDoc}
@@ -153,25 +155,35 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         throw new WorkflowOperationException("More than one mediapackage with id " + mediaPackage.getIdentifier()
                 + " found");
       } else {
+        Set<String> retractElementIds = new HashSet<String>();
         MediaPackage searchMediaPackage = result.getItems()[0].getMediaPackage();
         logger.info("Retracting media package {} from download/streaming distribution channel", searchMediaPackage);
         for (MediaPackageElement element : searchMediaPackage.getElements()) {
-          Job retractDownloadJob = downloadDistributionService.retract(CHANNEL_ID, searchMediaPackage,
-                  element.getIdentifier());
-          jobs.add(retractDownloadJob);
-
-          if (distributeStreaming) {
-            Job retractStreamingJob = streamingDistributionService.retract(CHANNEL_ID, searchMediaPackage,
-                    element.getIdentifier());
-            if (retractStreamingJob != null)
-              jobs.add(retractStreamingJob);
+          retractElementIds.add(element.getIdentifier());
+        }
+        if (retractElementIds.size() > 0) {
+          Job retractDownloadDistributionJob = downloadDistributionService.retract(CHANNEL_ID, searchMediaPackage, retractElementIds);
+          if (retractDownloadDistributionJob != null) {
+            jobs.add(retractDownloadDistributionJob);
+          }
+        }
+        if (distributeStreaming) {
+          for (MediaPackageElement element : searchMediaPackage.getElements()) {
+            if (distributeStreaming) {
+              Job retractStreamingJob = streamingDistributionService.retract(CHANNEL_ID, searchMediaPackage,
+                      element.getIdentifier());
+              if (retractStreamingJob != null) {
+                jobs.add(retractStreamingJob);
+              }
+            }
           }
         }
       }
 
       // Wait for retraction to finish
-      if (!waitForStatus(jobs.toArray(new Job[jobs.size()])).isSuccess())
+      if (!waitForStatus(jobs.toArray(new Job[jobs.size()])).isSuccess()) {
         throw new WorkflowOperationException("One of the download/streaming retract job did not complete successfully");
+      }
 
       logger.debug("Retraction operation complete");
 

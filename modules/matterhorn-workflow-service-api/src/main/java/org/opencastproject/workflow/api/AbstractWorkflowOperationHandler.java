@@ -341,9 +341,10 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    */
   protected JobBarrier.Result waitForStatus(long timeout, Job... jobs) throws IllegalStateException,
           IllegalArgumentException {
-    if (serviceRegistry == null)
+    if (serviceRegistry == null) {
       throw new IllegalStateException("Can't wait for job status without providing a service registry first");
-    JobBarrier barrier = new JobBarrier(null, serviceRegistry, jobs);
+    }
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, jobBarrierPollingInterval, jobs);
     return barrier.waitForJobs(timeout);
   }
 

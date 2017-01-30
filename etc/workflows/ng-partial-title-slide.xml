@@ -63,7 +63,7 @@
       <operation id="image-to-video"
                  description="Create video with title slide"
                  fail-on-error="true"
-                 exception-handler-workflow="switchcast-exception-handler-1.0">
+                 exception-handler-workflow="ng-partial-error">
         <configurations>
           <configuration key="source-flavor">branding/titleslide+metadata</configuration>
           <configuration key="target-flavor">branding/titleslide+video</configuration>

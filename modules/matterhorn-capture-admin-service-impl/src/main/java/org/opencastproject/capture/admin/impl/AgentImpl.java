@@ -40,6 +40,7 @@ import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
@@ -51,7 +52,7 @@ import javax.persistence.Transient;
 /**
  * An in-memory construct to represent the state of a capture agent, and when it was last heard from.
  */
-@Entity
+@Entity @IdClass(AgentImplId.class)
 @Table(name = "mh_capture_agent_state")
 @NamedQueries({
   @NamedQuery(name = "Agent.get", query = "select a from AgentImpl a where a.name = :id and a.organization = :org"),

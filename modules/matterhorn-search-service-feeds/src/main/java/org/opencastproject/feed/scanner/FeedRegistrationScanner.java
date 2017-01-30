@@ -57,7 +57,7 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
   private static final Logger logger = LoggerFactory.getLogger(FeedRegistrationScanner.class);
 
   /** A map to keep track of each feed registration file and feed generator it produces */
-  protected Map<File, ServiceRegistration> generators = new HashMap<File, ServiceRegistration>();
+  protected Map<File, ServiceRegistration<?>> generators = new HashMap<>();
 
   /** The search service to use in each feed generator */
   protected SearchService searchService;
@@ -131,12 +131,13 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
     generator.setSearchService(searchService);
     generator.setSeriesService(seriesService);
     generator.initialize(props);
-    ServiceRegistration reg = bundleContext.registerService(FeedGenerator.class.getName(), generator, null);
+    ServiceRegistration<?> reg = bundleContext.registerService(FeedGenerator.class.getName(), generator, null);
     generators.put(artifact, reg);
     sumInstalledFiles++;
 
     // Determine the number of available profiles
     String[] filesInDirectory = artifact.getParentFile().list(new FilenameFilter() {
+      @Override
       public boolean accept(File arg0, String name) {
         return name.endsWith(".properties");
       }
@@ -144,7 +145,7 @@ public class FeedRegistrationScanner implements ArtifactInstaller {
 
     // Once all profiles have been loaded, announce readiness
     if (filesInDirectory.length == sumInstalledFiles) {
-      Dictionary<String, String> properties = new Hashtable<String, String>();
+      Dictionary<String, String> properties = new Hashtable<>();
       properties.put(ARTIFACT, "feed");
       logger.debug("Indicating readiness of feed");
       bundleContext.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);

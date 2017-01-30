@@ -709,6 +709,7 @@
            }
          },
          "METADATA": {
+           "CAPTION": "Event details",
            "TITLE":          "Title",
            "ID":            "UID",
            "SERIES":         "Series",
@@ -1050,6 +1051,7 @@
          "EMAIL":    "Email",
          "ROLES":    "Roles",
          "TYPE":     "Type",
+         "PROVIDER":  "Provider",
          "BLACKLIST_FROM": "Blacklisted from",
          "BLACKLIST_TO":   "Blacklisted until",
          "ACTION":   "Actions"
@@ -1474,6 +1476,9 @@
      }
    },
    "VIDEO_TOOL": {
+     "TIMELINE": "Timeline",
+     "ZOOMLEVEL": "Zoom Level",
+     "ZOOM": "Zoom",
      "BUTTONS": {
        "COMMENTS": "View",
        "METADATA": "Edit",
@@ -1493,7 +1498,18 @@
        "REPLAY_SEGMENT": "Replay segment",
        "UNDO": "Undo",
        "REDO": "Redo",
-       "CLEAR_SEGMENTS": "Clear segments"
+       "CLEAR_SEGMENTS": "Clear segments",
+       "CLEAR_SELECTED_SEGMENT": "Clear selected segment"
+     },
+     "PLAYER":{
+       "PLAY":              "Play",
+       "PAUSE":             "Pause",
+       "NEXT_FRAME":        "Next frame",
+       "PREVIOUS_FRAME":    "Previous frame",
+       "NEXT_SEGMENT":      "Next segment / Jump to end",
+       "PREVIOUS_SEGMENT":  "Previous segment / Jump to start",
+       "MUTE":              "Mute",
+       "VOLUME":            "Volume"
      }
    },
    "LOGIN": {
@@ -1521,6 +1537,11 @@
      }
    },
    "FILTERS": {
+     "ACLS": {
+       "NAME": {
+         "LABEL": "Name"
+       }
+     },
      "AGENTS": {
        "NAME": {
          "LABEL": "Name"

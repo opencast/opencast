@@ -28,7 +28,7 @@
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
@@ -77,6 +77,9 @@
             <Export-Package>
               org.opencastproject.fsresources;version=${project.version}
             </Export-Package>
+            <Service-Component>
+              OSGI-INF/static.xml
+            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

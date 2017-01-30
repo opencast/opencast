@@ -5,8 +5,9 @@
     <implementation class="org.opencastproject.kernel.rest.CurrentJobFilter" />
     <property name="service.description" value="Current Job Filter" />
     <property name="httpContext.id" value="opencast.httpcontext" />
+    <property name="httpContext.shared" value="true" />
     <!-- The CleanSessionsFilter must have the highest service.ranking value. See CleanSessionsFilter.java for details. -->
-    <property name="service.ranking" value="6" />
+    <property name="service.ranking" value="4" />
     <property name="urlPatterns" value="*" />
     <service>
       <provide interface="javax.servlet.Filter" />

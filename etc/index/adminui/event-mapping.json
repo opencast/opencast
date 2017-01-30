@@ -93,6 +93,8 @@
 
             "has_open_comments": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
 
+            "needs_cutting": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+
             "scheduling_status": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
             "recording_status": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
