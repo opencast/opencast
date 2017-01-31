@@ -6,12 +6,12 @@ This page contains notes about the current configuration of the Opencast servers
 Harvard DCE
 -----------
 
-### Common Configuration Choices
+#### Common Configuration Choices
 
 - Unattended upgrade
 - CentOS Linux release 7.x
 
-#### nexus.dcex.harvard.edu
+##### nexus.dcex.harvard.edu
 
 - Using [packaged Nexus](https://copr.fedorainfracloud.org/coprs/lkiesow/nexus-oss/)
 
@@ -30,12 +30,12 @@ ETH
 SWITCH
 ------
 
-### Common Configuration Choices
+#### Common Configuration Choices
 
 - Unattended upgrade
 - CentOS Linux release 7.x
 
-#### Test Cluster (*.oc-test.switch.ch)
+##### Test Cluster (*.oc-test.switch.ch)
 
 - Rebuilt weekly via cron + shell, manual branch selection
 
@@ -43,50 +43,47 @@ SWITCH
 University of Osnabrück 
 -----------------------
 
-### Common Configuration Choices
+#### Common Configuration Choices
 
 - Unattended upgrade
 - Scientific Linux 7.x
 
-#### build.opencast.org
+##### build.opencast.org
 
 - Builds are triggered by cron, manual branch selection currently
 
-#### docs.opencast.org
+##### docs.opencast.org
 
 - Rebuild every 5 minutes via bitbucket webhook, nightly rebuild
 
-#### nexus.virtuos.uos.de
+##### nexus.virtuos.uos.de
 
 - Using [packaged Nexus](https://copr.fedorainfracloud.org/coprs/lkiesow/nexus-oss/)
 
-#### octestallinone.virtuos.uos.de
+##### octestallinone.virtuos.uos.de
 
 - Using tarballs build from build.opencast.org
 
-#### pullrequests.opencast.org
-
-- Merge ticket list needs to set manually
-
-#### repo.opencast.org and pkg.opencast.org
-
-- Same server
-
-#### pullrequests.opencast.org
+##### pullrequests.opencast.org
 
 - Scientific Linux 6.x
 - Due for retirement, services will be moved to repo.opencast.org VM and DNS updated
+- Merge ticket list needs to set manually
+
+##### repo.opencast.org and pkg.opencast.org
+
+- Same server
 
 
 University of Saskatchewean
 ---------------------------
 
-### Common Configuration Choices
+#### Common Configuration Choices
 
 - Debian 8.x
 - Unattended upgrades
 
-### Testing Cluster (test*.usask.ca)
+##### Testing Cluster (test*.usask.ca)
 
 - Using Debian packages for Opencast
 - Nightly reset and upgrade
