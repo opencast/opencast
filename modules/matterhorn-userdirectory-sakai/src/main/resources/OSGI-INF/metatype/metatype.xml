@@ -10,6 +10,7 @@
     <AD name="Cache size" id="org.opencastproject.userdirectory.sakai.cache.size" required="false" type="Integer" default="1000" />
     <AD name="Cache expiration (minutes)" id="org.opencastproject.userdirectory.sakai.cache.expiration" required="false" type="Integer" default="60" />
     <AD name="Sakai Site ID pattern (regular expression)" id="org.opencastproject.userdirectory.sakai.site.pattern" required="false" type="String" default="" />
+    <AD name="Sakai User ID (EID) pattern (regular expression)" id="org.opencastproject.userdirectory.sakai.user.pattern" required="false" type="String" default="" />
     <AD name="Sakai roles mapped to Instructor (comma-separated list)" id="org.opencastproject.userdirectory.sakai.instructor.roles" required="false" type="String" default="Instructor,Site owner,maintain" />
     
   </OCD>

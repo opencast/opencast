@@ -67,8 +67,11 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
   /** The key to look up the password to use for performing searches */
   private static final String SEARCH_PASSWORD = "org.opencastproject.userdirectory.sakai.password";
 
-  /** The key to look up the regular expression used to valid sites */
+  /** The key to look up the regular expression used to validate sites */
   private static final String SITE_PATTERN_KEY = "org.opencastproject.userdirectory.sakai.site.pattern";
+
+  /** The key to look up the regular expression used to validate users */
+  private static final String USER_PATTERN_KEY = "org.opencastproject.userdirectory.sakai.user.pattern";
 
   /** The key to look up the number of user records to cache */
   private static final String CACHE_SIZE = "org.opencastproject.userdirectory.sakai.cache.size";
@@ -137,6 +140,7 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
     String password = (String) properties.get(SEARCH_PASSWORD);
 
     String sitePattern = (String) properties.get(SITE_PATTERN_KEY);
+    String userPattern = (String) properties.get(USER_PATTERN_KEY);
 
     int cacheSize = 1000;
     try {
@@ -196,7 +200,7 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
 
     logger.debug("creating new SakaiUserProviderInstance for pid=" + pid);
     SakaiUserProviderInstance provider = new SakaiUserProviderInstance(pid,
-            org, url, userDn, password, sitePattern, instructorRoles, cacheSize, cacheExpiration);
+            org, url, userDn, password, sitePattern, userPattern, instructorRoles, cacheSize, cacheExpiration);
 
     providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
     providerRegistrations.put(pid, bundleContext.registerService(RoleProvider.class.getName(), provider, null));

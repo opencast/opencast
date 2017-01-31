@@ -114,6 +114,9 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
   /** Regular expression for matching valid sites */
   private String sitePattern;
 
+  /** Regular expression for matching valid users */
+  private String userPattern;
+
   /** A map of roles which are regarded as Instructor roles */
   private Set<String> instructorRoles;
 
@@ -136,13 +139,14 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
    *          the number of minutes to cache users
    */
   public SakaiUserProviderInstance(String pid, Organization organization, String url, String userName, String password,
-          String sitePattern, Set<String> instructorRoles, int cacheSize, int cacheExpiration) {
+          String sitePattern, String userPattern, Set<String> instructorRoles, int cacheSize, int cacheExpiration) {
 
     this.organization = organization;
     this.sakaiUrl = url;
     this.sakaiUsername = userName;
     this.sakaiPassword = password;
     this.sitePattern = sitePattern;
+    this.userPattern = userPattern;
     this.instructorRoles = instructorRoles;
 
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
@@ -321,6 +325,16 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
   private boolean verifySakaiUser(String userId) {
 
       logger.debug("verifySakaiUser(" + userId + ")");
+
+      try {
+        if ((userPattern != null) && !userId.matches(userPattern)) {
+          logger.debug("verify user {} failed regexp {}", userId, userPattern);
+          return false;
+        }
+      } catch (PatternSyntaxException e) {
+        logger.warn("Invalid regular expression for user pattern {} - disabling checks", userPattern);
+        userPattern = null;
+      }
 
       int code;
 

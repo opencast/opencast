@@ -50,7 +50,7 @@ public class SakaiUserProviderTest {
     instructorRoles.add("maintain");
 
     sakaiProvider = new SakaiUserProviderInstance("sample_pid", new DefaultOrganization(), "https://qa11-mysql.nightly.sakaiproject.org",
-      "admin", "admin", "^[a-zA-Z0-9-]+$", instructorRoles, 100, 10);
+      "admin", "admin", "^[a-zA-Z0-9-]+$", "^[0-9a-zA-Z]{6,}$", instructorRoles, 100, 10);
   }
 
   private boolean hasRole(Set<Role> roles, String roleName) {
@@ -81,6 +81,9 @@ public class SakaiUserProviderTest {
 
     // User exists
     assertEquals(1, IteratorUtils.toList(sakaiProvider.findUsers("datest", 0, 1)).size());
+
+    // User exists but fails regexp pattern (minimum 6 characters)
+    assertEquals(0, IteratorUtils.toList(sakaiProvider.findUsers("admin", 0, 1)).size());
 
     // User doesn't exist
     assertEquals(0, IteratorUtils.toList(sakaiProvider.findUsers("nobody", 0, 1)).size());
