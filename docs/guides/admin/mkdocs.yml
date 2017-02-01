@@ -42,6 +42,7 @@ pages:
       - General Security: 'configuration/security.md'
       - Central Authentication Service (CAS): 'configuration/security.cas.md'
       - LDAP Authentication and Authorization (without CAS): 'configuration/security.ldap.md'
+      - Authentication and Authorization Infrastructure (AAI): 'configuration/security.aai.md'
       - Stream Security: 'configuration/stream-security.md'
       - Access Control Lists: 'configuration/acl.md'
    - Workflow: 'configuration/workflow.md'
