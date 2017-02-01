@@ -81,7 +81,7 @@ respective name of the Shibboleth attribute you use in your Shibboleth Federatio
 
     <!-- General Shibboleth header extration filter -->
     <bean id="shibbolethHeaderFilter" class="org.opencastproject.security.shibboleth.ShibbolethRequestHeaderAuthenticationFilter">
-      <property name="principalRequestHeader" value="uniqueID"/>
+      <property name="principalRequestHeader" value="<Shibboleth attribute name>"/>
       <property name="authenticationManager" ref="authenticationManager" />
       <property name="userDetailsService" ref="userDetailsService" />
       <property name="userDirectoryService" ref="userDirectoryService" />
