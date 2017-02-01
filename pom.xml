@@ -148,6 +148,7 @@
     <module>modules/matterhorn-search-service-impl</module>
     <module>modules/matterhorn-search-service-remote</module>
     <module>modules/matterhorn-search-workflowoperation</module>
+    <module>modules/matterhorn-security-aai</module>
     <module>modules/matterhorn-security-cas</module>
     <module>modules/matterhorn-security-ldap</module>
     <module>modules/matterhorn-security-openid</module>
