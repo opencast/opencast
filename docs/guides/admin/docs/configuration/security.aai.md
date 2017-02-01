@@ -1,5 +1,5 @@
 Authentication and Authorization Infrastructure (AAI) Configuration
-=============================================================
+===================================================================
 
 This page describes how to configure Opencast to take advantage of the Authentication and Authorization
 Infrastructure (AAI).
