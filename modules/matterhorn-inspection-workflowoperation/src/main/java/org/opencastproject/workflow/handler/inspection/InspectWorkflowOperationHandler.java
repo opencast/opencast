@@ -41,6 +41,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
+import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -158,34 +159,41 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
       logger.info("Inspecting track '{}' of {}", track.getIdentifier(), mediaPackage);
 
       Job inspectJob = null;
-      try {
-        inspectJob = inspectionService.enrich(track, rewrite);
-        if (!waitForStatus(inspectJob).isSuccess()) {
-          throw new WorkflowOperationException("Track " + track + " could not be inspected");
-        }
-      } catch (MediaInspectionException e) {
-        throw new WorkflowOperationException("Error inspecting media package", e);
-      } catch (MediaPackageException e) {
-        throw new WorkflowOperationException("Error parsing media package", e);
-      }
-
-      // add this receipt's queue and execution times to the total
-      long timeInQueue = inspectJob.getQueueTime() == null ? 0 : inspectJob.getQueueTime();
-      totalTimeInQueue += timeInQueue;
-
       Track inspectedTrack;
-      try {
-        inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectJob.getPayload());
-      } catch (MediaPackageException e) {
-        throw new WorkflowOperationException("Unable to parse track from job " + inspectJob.getId(), e);
+      if (track != null && track.getURI() != null && (track.getURI().toString().endsWith(".vtt")
+              || track.getURI().toString().endsWith(".srt"))) {
+        inspectedTrack = (Track)track.clone();
+        inspectedTrack.setMimeType(MimeType.mimeType("text", "vtt"));
+        logger.info("Track '{}' of {} contains captions", track.getIdentifier(), mediaPackage);
+      } else {
+        try {
+          inspectJob = inspectionService.enrich(track, rewrite);
+          if (!waitForStatus(inspectJob).isSuccess()) {
+            throw new WorkflowOperationException("Track " + track + " could not be inspected");
+          }
+        } catch (MediaInspectionException e) {
+          throw new WorkflowOperationException("Error inspecting media package", e);
+        } catch (MediaPackageException e) {
+          throw new WorkflowOperationException("Error parsing media package", e);
+        }
+
+        // add this receipt's queue and execution times to the total
+        long timeInQueue = inspectJob.getQueueTime() == null ? 0 : inspectJob.getQueueTime();
+        totalTimeInQueue += timeInQueue;
+
+
+        try {
+          inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectJob.getPayload());
+        } catch (MediaPackageException e) {
+          throw new WorkflowOperationException("Unable to parse track from job " + inspectJob.getId(), e);
+        }
+
+        if (inspectedTrack == null)
+          throw new WorkflowOperationException("Track " + track + " could not be inspected");
+
+        if (inspectedTrack.getStreams().length == 0)
+          throw new WorkflowOperationException(format("Track %s does not contain any streams", track));
       }
-
-      if (inspectedTrack == null)
-        throw new WorkflowOperationException("Track " + track + " could not be inspected");
-
-      if (inspectedTrack.getStreams().length == 0)
-        throw new WorkflowOperationException(format("Track %s does not contain any streams", track));
-
       // Replace the original track with the inspected one
       try {
         mediaPackage.remove(track);

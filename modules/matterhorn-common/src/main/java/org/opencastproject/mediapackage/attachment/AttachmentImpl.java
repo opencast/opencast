@@ -69,6 +69,7 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
   protected AttachmentImpl(String identifier, MediaPackageElementFlavor flavor, URI uri, long size, Checksum checksum,
           MimeType mimeType) {
     super(identifier, Type.Attachment, flavor, uri, size, checksum, mimeType);
+    this.setMimeType(MimeType.determineMimeType(uri.toString()));
   }
 
   /**
@@ -87,6 +88,7 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
    */
   protected AttachmentImpl(MediaPackageElementFlavor flavor, URI uri, long size, Checksum checksum, MimeType mimeType) {
     super(Type.Attachment, flavor, uri, size, checksum, mimeType);
+    this.setMimeType(MimeType.determineMimeType(uri.toString()));
   }
 
   /**

@@ -10,6 +10,11 @@
     <Extensions>txt</Extensions>
   </MimeType>
   <MimeType>
+    <Type>text/vtt</Type>
+    <Description>Web VTT captions</Description>
+    <Extensions>vtt</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>application/pdf</Type>
     <Description>Portable Document Format</Description>
     <Extensions>pdf</Extensions>

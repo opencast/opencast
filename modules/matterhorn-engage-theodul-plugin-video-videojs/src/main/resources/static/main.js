@@ -168,7 +168,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var timer_qualitychange = 1000;
   var zoom_step_size = 0.05;
   var decimal_places = 3;
-  var defaultCaptionURL = "http://localhost:8080/staticfiles/3feb303a-a5c2-4895-abbf-301c7ba9c786";
 
   /* don't change these variables */
   var currentTime = 0;
@@ -2362,15 +2361,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     for(var a in tracks) {
       if(tracks[a].mimetype == "text/vtt") {
         console.log("Found caption in tracks");
-        captionsURL = attachments[a].url;
+        captionsURL = tracks[a].url;
       }
-    }
-
-    // TODO Load from Catalog
-
-    if(captionsURL == null && defaultCaptionURL != undefined) {
-      console.warn("Loading default captions file");
-      captionsURL = defaultCaptionURL;
     }
 
     if(captionsURL == null) {
