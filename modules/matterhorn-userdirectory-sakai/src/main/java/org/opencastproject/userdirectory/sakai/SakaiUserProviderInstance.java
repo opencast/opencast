@@ -296,9 +296,6 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
         roles.add(new JaxbRole(r, jaxbOrganization, "Sakai external role", Role.Type.EXTERNAL));
       }
 
-      // Add ROLE_USER
-      roles.add(new JaxbRole("ROLE_USER", jaxbOrganization, "Opencast User", Role.Type.INTERNAL));
-
       // Add a group role for testing
       roles.add(new JaxbRole(Group.ROLE_PREFIX + "SAKAI", jaxbOrganization, "Sakai Group", Role.Type.EXTERNAL_GROUP));
 
