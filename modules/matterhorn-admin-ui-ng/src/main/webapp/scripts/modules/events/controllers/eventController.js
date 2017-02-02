@@ -318,6 +318,7 @@ angular.module('adminNg.controllers')
                 //Magic values here.  Filter is from ListProvidersEndpoint, role_name is from RolesListProvider
                 //The filter format is care of ListProvidersEndpoint, which gets it from EndpointUtil
                 queryParams["filter"] = "role_name:"+ value +",role_target:ACL";
+                queryParams["offset"] = 0;
             } else {
                 queryParams["filter"] = "role_target:ACL";
             }
