@@ -10,7 +10,7 @@
                                     <tr>
                                         <td>{{ 'USERS.ACLS.NEW.METADATA.NAME.CAPTION' | translate }}<i class="required">*</i></td>
                                         <td>
-                                            <input 
+                                            <input
                                             class="hidden-input"
                                             ng-model="wizard.step.metadata.name"
                                             placeholder="{{ 'USERS.ACLS.NEW.METADATA.NAME.PLACEHOLDER' | translate }}">
@@ -98,17 +98,18 @@
                                         <tr ng-repeat="policy in wizard.step.ud.policies">
                                             <td>
                                                 <select chosen pre-select-from="wizard.step.roles"
-                                                    data-width="'200px'"
+                                                    data-width="'360px'"
                                                     data-disable-search-threshold="8"
                                                     data-search_contains="true"
                                                     ng-model="policy.role"
-                                                    ng-options="id as name for (id, name) in wizard.step.roles"
+                                                    ng-get-more="wizard.step.getMoreRoles"
+                                                    ng-options="id as id for (id, type) in wizard.step.roles"
                                                     data-placeholder="{{ 'USERS.ACLS.NEW.ACCESS.ROLES.LABEL' | translate }}"
                                                     no-results-text="'{{ 'USERS.ACLS.NEW.ACCESS.ROLES.EMPTY' | translate }}'"
                                                 />
                                             </td>
-                                            <td class="fit"><input type="checkbox"  ng-model="policy.read"/></td>
-                                            <td class="fit"><input type="checkbox"  ng-model="policy.write"/></td>
+                                            <td class="fit text-center"><input type="checkbox"  ng-model="policy.read"/></td>
+                                            <td class="fit text-center"><input type="checkbox"  ng-model="policy.write"/></td>
                                             <td class="fit editable" ng-if="wizard.step.hasActions"><div admin-ng-editable-multi-select mixed="false" params="policy.actions" collection="wizard.step.actions"> </div></td>
                                             <td class="fit"><a ng-click="wizard.step.deletePolicy(policy)" class="remove"></a>
                                             </td>

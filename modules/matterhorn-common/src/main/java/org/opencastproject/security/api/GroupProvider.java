@@ -19,58 +19,22 @@
  *
  */
 
+package org.opencastproject.security.api;
 
-html,
-body {
-    width: 100%;
-    height: 100%;
-    font-family: $font-stack;
-}
+import java.util.List;
 
-body {
-    background: $body-background;
-    font-size: 14px;
-    font-family: $font-stack;
-    position: relative;
-    color: $global-text-color;
+/**
+ * Mix-in interface for directories that can return a list of members of a group
+ */
+public interface GroupProvider {
 
-    &.login-body {
-        @include radial-gradient($off-white, #d8dfe4);
-    }
-}
+  /**
+   * Returns the roles for this group or an empty array if no roles are applicable.
+   *
+   * @param groupName
+   *          the group id
+   * @return the set of roles
+   */
+  List<Role> getRolesForGroup(String groupName);
 
-// Resets
-
-a {
-    color: $color-link;
-    text-decoration: none;
-
-    &:hover {
-        color: $color-link-hover;
-    }
-}
-
-
-strong {
-    font-weight: 600;
-}
-
-textarea,
-input,
-button {
-    &:focus {
-        outline: none;
-    }
-}
-
-.text-left {
-    text-align: left;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.text-right {
-    text-align: right;
 }

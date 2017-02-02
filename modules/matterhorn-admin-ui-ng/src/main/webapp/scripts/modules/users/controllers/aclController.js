@@ -22,8 +22,12 @@
 
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
-.controller('AclCtrl', ['$scope', 'AclResource', 'ResourcesListResource', 'Notifications',
-        function ($scope, AclResource, ResourcesListResource, Notifications) {
+.controller('AclCtrl', ['$scope', 'AclResource', 'UserRolesResource', 'ResourcesListResource', 'Notifications',
+        function ($scope, AclResource, UserRolesResource, ResourcesListResource, Notifications) {
+    var roleSlice = 100;
+    var roleOffset = 0;
+    var loading = false;
+    var rolePromise = null;
 
     var createPolicy = function (role) {
             return {
@@ -60,22 +64,6 @@ angular.module('adminNg.controllers')
             if (!loading) {
                 $scope.save();
             }
-        },
-        updateRoles = function() {
-            //MH-11716: We have to wait for both the access (series ACL), and the roles (list of system roles)
-            //to resolve before we can add the roles that are present in the series but not in the system
-            return ResourcesListResource.get({ resource: 'ROLES' }, function (results) {
-                var roles = results;
-                return $scope.acl.$promise.then(function () {
-                    angular.forEach(angular.fromJson($scope.acl.acl.ace), function(value, key) {
-                        var rolename = value["role"];
-                        if (angular.isUndefined(roles[rolename])) {
-                            roles[rolename] = rolename;
-                       }
-                    }, this);
-                    return roles;
-                });
-            }, this);
         };
 
     $scope.policies = [];
@@ -111,7 +99,36 @@ angular.module('adminNg.controllers')
         $scope.save();
     };
 
+    $scope.getMoreRoles = function (value) {
+
+        if (loading)
+            return rolePromise;
+
+        loading = true;
+        var queryParams = {limit: roleSlice, offset: roleOffset};
+
+        if ( angular.isDefined(value) && (value != "")) {
+            //Magic values here.  Filter is from ListProvidersEndpoint, role_name is from RolesListProvider
+            //The filter format is care of ListProvidersEndpoint, which gets it from EndpointUtil
+            queryParams["filter"] = "role_name:"+ value +",role_target:ACL";
+        } else {
+            queryParams["filter"] = "role_target:ACL";
+        }
+        rolePromise = UserRolesResource.query(queryParams);
+        rolePromise.$promise.then(function (data) {
+            angular.forEach(data, function (role) {
+                $scope.roles[role.name] = role.value;
+            });
+            roleOffset = Object.keys($scope.roles).length;
+        }).finally(function () {
+            loading = false;
+        });
+        return rolePromise;
+    };
+
     fetchChildResources = function (id) {
+        //NB: roles is updated in both the functions for $scope.acl (MH-11716) and $scope.roles (MH-11715, MH-11717)
+        $scope.roles = {};
         $scope.acl = AclResource.get({id: id}, function (data) {
             $scope.metadata.name = data.name;
 
@@ -119,6 +136,13 @@ angular.module('adminNg.controllers')
                 var json = angular.fromJson(data.acl);
                 changePolicies(json.ace, true);
             }
+
+            angular.forEach(angular.fromJson(data.acl.ace), function(value, key) {
+                var rolename = value["role"];
+                if (angular.isUndefined($scope.roles[rolename])) {
+                    $scope.roles[rolename] = rolename;
+                }
+            }, this);
         });
 
         $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
@@ -132,7 +156,7 @@ angular.module('adminNg.controllers')
                 }
             });
         });
-        $scope.roles = updateRoles();
+        $scope.getMoreRoles();
     };
 
 

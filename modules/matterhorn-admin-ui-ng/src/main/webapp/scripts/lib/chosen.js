@@ -83,6 +83,45 @@
           attr.$observe('disabled', function() {
             return element.trigger('chosen:updated');
           });
+          function getMoreElements(event) {
+            var raw = scope.scroller[0],
+                val = this.value;
+            scope.scrollPosition = raw.scrollTop;
+
+            //The multiplication here tries to keep the user from hitting the bottom of the scroller
+            if (raw.scrollTop + (raw.clientHeight * 2) >= raw.scrollHeight) {
+
+              if (!angular.isUndefined(attr.ngGetMore)) {
+
+                var _arr = attr.ngGetMore.split('.'),
+                  _func = scope;
+
+                for (var i = 0, len = _arr.length; i < len; i ++) {
+                  _func = _func[_arr[i]];
+                  if (typeof(_func) === 'function') break;
+                }
+
+                scope.$apply( function() {
+
+                    if (typeof(_func) === 'function') _func(val);
+                });
+              }
+            }
+          };
+          $timeout(function() {
+            var scroller = angular.element(element).parent().children(".chosen-container").children('.chosen-drop').children('.chosen-results');
+            scope.scroller = scroller;
+            /* This makes opencast-scroll-glue work, the if check prevents the unit tests from failing */
+            if (angular.isDefined(scroller.injector())) {
+              scroller.injector().invoke(function($compile) {
+                var scope = angular.element(scroller).scope();
+                $compile(scroller)(scope);
+              });
+            }
+            scroller.bind('scroll', getMoreElements);
+            var search = angular.element(angular.element(element).parent().children(".chosen-container").children('.chosen-drop').children('.chosen-search')[0].childNodes["0"]);
+            search.bind('keyup.chosen paste.chosen', getMoreElements);
+          });
           if (attr.ngOptions && ngModel) {
             match = attr.ngOptions.match(NG_OPTIONS_REGEXP);
             valuesExpr = match[7];

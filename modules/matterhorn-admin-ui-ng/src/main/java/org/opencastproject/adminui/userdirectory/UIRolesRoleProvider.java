@@ -25,6 +25,7 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
+import org.opencastproject.security.api.Role.Type;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserProvider;
@@ -111,9 +112,14 @@ public class UIRolesRoleProvider implements RoleProvider {
    * @see org.opencastproject.security.api.RoleProvider#findRoles(String, int, int)
    */
   @Override
-  public Iterator<Role> findRoles(String query, int offset, int limit) {
+  public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
+
+    // These roles are not meaningful for use in ACLs
+    if (target == Role.Target.ACL) {
+      return Collections.emptyIterator();
+    }
 
     Organization organization = securityService.getOrganization();
     return Stream.$(roles).filter(filterByName._2(query)).drop(offset)
@@ -130,7 +136,7 @@ public class UIRolesRoleProvider implements RoleProvider {
   private static final Fn2<String, Organization, Role> toRole = new Fn2<String, Organization, Role>() {
     @Override
     public Role ap(String role, Organization organization) {
-      return new JaxbRole(role, JaxbOrganization.fromOrganization(organization));
+      return new JaxbRole(role, JaxbOrganization.fromOrganization(organization), "AdminNG UI Role", Type.INTERNAL);
     }
   };
 

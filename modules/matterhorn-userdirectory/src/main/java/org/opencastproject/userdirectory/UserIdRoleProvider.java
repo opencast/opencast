@@ -27,10 +27,14 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.api.UserProvider;
-import org.opencastproject.util.SmartIterator;
 
 import com.google.common.base.CharMatcher;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,12 +49,19 @@ import java.util.regex.Pattern;
 public class UserIdRoleProvider implements RoleProvider {
 
   private static final String ROLE_USER_PREFIX = "ROLE_USER_";
+  private static final String ROLE_USER = "ROLE_USER";
 
   private static final CharMatcher SAFE_USERNAME = CharMatcher.inRange('a', 'z').or(CharMatcher.inRange('A', 'Z'))
           .or(CharMatcher.inRange('0', '9')).negate().precomputed();
 
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(UserIdRoleProvider.class);
+
   /** The security service */
   protected SecurityService securityService = null;
+
+  /** The user directory service */
+  protected UserDirectoryService userDirectoryService = null;
 
   /**
    * @param securityService
@@ -58,6 +69,16 @@ public class UserIdRoleProvider implements RoleProvider {
    */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /**
+   * Sets the user directory service
+   *
+   * @param userDirectoryService
+   *          the userDirectoryService to set
+   */
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    this.userDirectoryService = userDirectoryService;
   }
 
   public static final String getUserIdRole(String userName) {
@@ -81,7 +102,8 @@ public class UserIdRoleProvider implements RoleProvider {
   public List<Role> getRolesForUser(String userName) {
     Organization organization = securityService.getOrganization();
     List<Role> roles = new ArrayList<Role>();
-    roles.add(new JaxbRole(getUserIdRole(userName), JaxbOrganization.fromOrganization(organization), "The user id role"));
+    roles.add(new JaxbRole(getUserIdRole(userName), JaxbOrganization.fromOrganization(organization), "The user id role", Role.Type.SYSTEM));
+    roles.add(new JaxbRole(ROLE_USER, JaxbOrganization.fromOrganization(organization), "The authenticated user role", Role.Type.SYSTEM));
     return Collections.unmodifiableList(roles);
   }
 
@@ -97,16 +119,43 @@ public class UserIdRoleProvider implements RoleProvider {
    * @see org.opencastproject.security.api.RoleProvider#findRoles(String, int, int)
    */
   @Override
-  public Iterator<Role> findRoles(String query, int offset, int limit) {
+  public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
-    HashSet<Role> foundRoles = new HashSet<Role>();
-    for (Iterator<Role> it = getRoles(); it.hasNext();) {
-      Role role = it.next();
-      if (like(role.getName(), query) || like(role.getDescription(), query))
-        foundRoles.add(role);
+
+    // These roles are not meaningful for users/groups
+    if (target == Role.Target.USER) {
+      return Collections.emptyIterator();
     }
-    return new SmartIterator<Role>(limit, offset).applyLimitAndOffset(foundRoles).iterator();
+
+    logger.debug("findRoles(query={} offset={} limit={})", query, offset, limit);
+
+    // Only authoritative for user roles
+    if (!"%".equals(query) && !query.startsWith(ROLE_USER_PREFIX)) {
+      return Collections.emptyIterator();
+    }
+
+    // Return user roles for matching users
+    String userQuery = "%";
+    if (query.startsWith(ROLE_USER_PREFIX)) {
+      userQuery = query.substring(ROLE_USER_PREFIX.length());
+    }
+
+    HashSet<Role> foundRoles = new HashSet<Role>();
+
+    Organization organization = securityService.getOrganization();
+    foundRoles.add(new JaxbRole(ROLE_USER, JaxbOrganization.fromOrganization(organization), "The authenticated user role", Role.Type.SYSTEM));
+
+    Iterator<User> users = userDirectoryService.findUsers(userQuery, offset, limit);
+    while (users.hasNext()) {
+      User u = users.next();
+      // We exclude the digest user, but then add the global ROLE_USER above
+      if (!"system".equals(u.getProvider())) {
+        foundRoles.add(new JaxbRole(getUserIdRole(u.getUsername()), JaxbOrganization.fromOrganization(u.getOrganization()), "User id role", Role.Type.SYSTEM));
+      }
+    }
+
+    return foundRoles.iterator();
   }
 
   private static boolean like(String string, final String query) {

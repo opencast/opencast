@@ -35,6 +35,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 /**
@@ -62,6 +63,9 @@ public final class JpaRole implements Role {
 
   @Column(name = "description", nullable = true)
   private String description;
+
+  @Transient
+  private Type type = Type.INTERNAL;
 
   /**
    * No-arg constructor needed by JPA
@@ -99,6 +103,23 @@ public final class JpaRole implements Role {
   }
 
   /**
+   * Constructs a role with the specified name, organization and description.
+   *
+   * @param name
+   *          the name
+   * @param organization
+   *          the organization
+   * @param description
+   *          the description
+   * @param type
+   *          the role {@link Type}
+   */
+  public JpaRole(String name, JpaOrganization organization, String description, Type type) {
+    this(name, organization, description);
+    this.type = type;
+  }
+
+  /**
    * Gets the identifier.
    *
    * @return the identifier
@@ -133,6 +154,11 @@ public final class JpaRole implements Role {
   }
 
   @Override
+  public Type getType() {
+    return type;
+  }
+
+  @Override
   public int hashCode() {
     return EqualsUtil.hash(name, organization);
   }
@@ -149,4 +175,5 @@ public final class JpaRole implements Role {
   public String toString() {
     return new StringBuilder(name).append(":").append(organization).toString();
   }
+
 }

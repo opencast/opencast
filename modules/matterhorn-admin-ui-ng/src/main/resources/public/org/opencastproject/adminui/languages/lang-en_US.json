@@ -1061,7 +1061,9 @@
          "EDITCAPTION": "Edit user",
          "TABS": {
            "USER":  "User",
-           "ROLES": "Roles"
+           "INTERNALROLES": "Internal Roles",
+           "EXTERNALROLES": "External Roles",
+           "EFFECTIVEROLES": "Effective Roles"
          },
          "FORM": {
             "USERNAME":        "Username",

@@ -82,11 +82,11 @@
                     <p translate="EVENTS.SERIES.DETAILS.PARTICIPATION.WARNING_TEMPLATE"></p>
                 </div>
 
-                <div class="obj">   
+                <div class="obj">
                     <header  translate="EVENTS.SERIES.DETAILS.PARTICIPATION.CAPTION">Participation Status</header>
 
                     <div class="obj-container padded">
-                        
+
                         <div class="form-container">
                             <div class="row">
                                 <input type="radio" name="execute-toggle" id="executeNow-toggle" ng-model="participation.opt_out" ng-change="updateOptout(false)" value="false" >
@@ -97,7 +97,7 @@
                                 <label translate="EVENTS.SERIES.DETAILS.PARTICIPATION.OPTEDOUT.OPTEDOUT" for="executeLater-toggle">Opted out</label>
                             </div>
                         </div>
-                    </div>   
+                    </div>
                 </div>
 
                 <div class="obj tbl-container">
@@ -244,18 +244,19 @@
                                                 <td>
                                                     <select chosen pre-select-from="roles"
                                                         ng-disabled="(tab == 'permissions') && (!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked)"
-                                                        data-width="'200px'"
+                                                        data-width="'360px'"
                                                         data-disable-search-threshold="8"
                                                         data-search_contains="true"
                                                         ng-model="policy.role"
                                                         ng-change="accessSave(policy)"
-                                                        ng-options="id as name for (id, name) in roles"
+                                                        ng-options="id as id for (id, type) in roles"
+                                                        ng-get-more="getMoreRoles"
                                                         data-placeholder="{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.LABEL' | translate }}"
                                                         no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
                                                     />
                                                 </td>
-                                                <td class="fit"><input type="checkbox" ng-disabled="aclLocked" ng-model="policy.read" ng-change="accessSave(policy)" ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/></td>
-                                                <td class="fit"><input type="checkbox" ng-disabled="aclLocked" ng-model="policy.write" ng-change="accessSave(policy)" ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/></td>
+                                                <td class="fit text-center"><input type="checkbox" ng-disabled="aclLocked" ng-model="policy.read" ng-change="accessSave(policy)" ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/></td>
+                                                <td class="fit text-center"><input type="checkbox" ng-disabled="aclLocked" ng-model="policy.write" ng-change="accessSave(policy)" ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/></td>
                                                 <td class="fit editable" ng-if="hasActions">
                                                     <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked" save="accessSave" admin-ng-editable-multi-select mixed="false" params="policy.actions" collection="actions"></div>
                                                     <div ng-if="(!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')) || aclLocked" ng-repeat="customAction in policy.actions.value">{{ customAction }}</div>
@@ -271,7 +272,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>  
+                        </div>
                     </li>
                 </ul>
             </div>

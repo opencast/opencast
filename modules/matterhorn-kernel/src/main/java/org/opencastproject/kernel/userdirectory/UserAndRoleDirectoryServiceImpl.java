@@ -24,6 +24,7 @@ package org.opencastproject.kernel.userdirectory;
 import static org.opencastproject.security.api.UserProvider.ALL_ORGANIZATIONS;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.security.api.GroupProvider;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -251,11 +252,37 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
         roles.add(JaxbRole.fromRole(role));
       }
 
-      for (RoleProvider roleProvider : roleProviders) {
-        for (Role role : roleProvider.getRolesForUser(user.getUsername())) {
-          roles.add(JaxbRole.fromRole(role));
+      // Consult roleProviders if this is not an internal system user
+      if (!InMemoryUserAndRoleProvider.PROVIDER_NAME.equals(user.getProvider())) {
+        for (RoleProvider roleProvider : roleProviders) {
+          for (Role role : roleProvider.getRolesForUser(user.getUsername())) {
+            roles.add(JaxbRole.fromRole(role));
+          }
         }
       }
+
+      // Resolve any transitive roles granted via group membership
+      Set<JaxbRole> derivedRoles = new HashSet<JaxbRole>();
+      for (Role role : roles) {
+        if (Role.Type.EXTERNAL_GROUP.equals(role.getType())) {
+          // Load roles granted to this group
+          logger.debug("Resolving transitive roles for user {} from external group {}", user.getUsername(), role.getName());
+          for (RoleProvider roleProvider : roleProviders) {
+            if (roleProvider instanceof GroupProvider) {
+              List<Role> groupRoles = ((GroupProvider) roleProvider).getRolesForGroup(role.getName());
+              if (groupRoles != null) {
+                for (Role groupRole : groupRoles) {
+                  derivedRoles.add(JaxbRole.fromRole(groupRole));
+                }
+                logger.debug("Adding {} derived role(s) for user {} from internal group {}", derivedRoles.size(), user.getUsername(), role.getName());
+              } else {
+                logger.warn("Cannot resolve externallly provided group reference for user {} to internal group {}", user.getUsername(), role.getName());
+              }
+            }
+          }
+        }
+      }
+      roles.addAll(derivedRoles);
 
       // Create and return the final user
       JaxbUser mergedUser = new JaxbUser(user.getUsername(), user.getPassword(), user.getName(), user.getEmail(),
@@ -286,10 +313,12 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     }
 
     // Add additional roles from role providers
-    for (RoleProvider roleProvider : roleProviders) {
-      List<Role> rolesForUser = roleProvider.getRolesForUser(userName);
-      for (Role role : rolesForUser)
-        authorities.add(new SimpleGrantedAuthority(role.getName()));
+    if (!InMemoryUserAndRoleProvider.PROVIDER_NAME.equals(user.getProvider())) {
+      for (RoleProvider roleProvider : roleProviders) {
+        List<Role> rolesForUser = roleProvider.getRolesForUser(userName);
+        for (Role role : rolesForUser)
+          authorities.add(new SimpleGrantedAuthority(role.getName()));
+      }
     }
 
     authorities.add(new SimpleGrantedAuthority(securityService.getOrganization().getAnonymousRole()));
@@ -326,7 +355,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     boolean manageable = user1.isManageable() || user2.isManageable() ? true : false;
 
     JaxbOrganization organization = JaxbOrganization.fromOrganization(user1.getOrganization());
-    String provider = StringUtils.join(Collections.list(user1.getProvider(), user2.getProvider()), ",");
+    String provider = StringUtils.join(Collections.nonNullList(user1.getProvider(), user2.getProvider()), ",");
 
     JaxbUser jaxbUser = new JaxbUser(user1.getUsername(), password, name, email, provider, organization, mergedRoles);
     jaxbUser.setManageable(manageable);
@@ -365,7 +394,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
   @Override
   @SuppressWarnings("unchecked")
-  public Iterator<Role> findRoles(String query, int offset, int limit) {
+  public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
     Organization org = securityService.getOrganization();
@@ -378,7 +407,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
       String providerOrgId = roleProvider.getOrganization();
       if (!ALL_ORGANIZATIONS.equals(providerOrgId) && !org.getId().equals(providerOrgId))
         continue;
-      roles = roles.append(IteratorUtils.toList(roleProvider.findRoles(query, 0, 0))).sort(roleComparator);
+      roles = roles.append(IteratorUtils.toList(roleProvider.findRoles(query, target, 0, 0))).sort(roleComparator);
     }
     return roles.drop(offset).apply(limit > 0 ? StreamOp.<Role> id().take(limit) : StreamOp.<Role> id()).iterator();
   }

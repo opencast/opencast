@@ -36,7 +36,7 @@ angular.module('adminNg.controllers')
 
         var reloadRoles = function () {
           $scope.role = {
-              available: ResourcesListResource.query({ resource: 'ROLES'}),
+              available: UserRolesResource.query({limit: 0, offset: 0, filter: 'role_target:USER'}),
               selected:  [],
               i18n: 'USERS.GROUPS.DETAILS.ROLES',
               searchable: true
@@ -73,7 +73,7 @@ angular.module('adminNg.controllers')
             });
 
             angular.forEach($scope.role.selected, function (item) {
-              $scope.group.roles.push(item.value);
+              $scope.group.roles.push(item.name);
             });
 
           if ($scope.action === 'edit') {

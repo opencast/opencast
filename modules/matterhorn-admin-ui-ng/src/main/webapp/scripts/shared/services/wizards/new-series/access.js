@@ -1,7 +1,12 @@
 angular.module('adminNg.services')
-.factory('NewSeriesAccess', ['ResourcesListResource', 'SeriesAccessResource', 'AuthService', 'Notifications', '$timeout',
-    function (ResourcesListResource, SeriesAccessResource, AuthService, Notifications, $timeout) {
+.factory('NewSeriesAccess', ['ResourcesListResource', 'SeriesAccessResource', 'AuthService', 'UserRolesResource', 'Notifications', '$timeout',
+    function (ResourcesListResource, SeriesAccessResource, AuthService, UserRolesResource, Notifications, $timeout) {
     var Access = function () {
+
+        var roleSlice = 100;
+        var roleOffset = 0;
+        var loading = false;
+        var rolePromise = null;
 
         var me = this,
             NOTIFICATION_CONTEXT = 'series-acl',
@@ -22,7 +27,7 @@ angular.module('adminNg.services')
                     if (!angular.isUndefined(me.notificationRules)) {
                         Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);
                     }
-                    me.notificationRules = Notifications.add('warning', 'INVALID_ACL_RULES', NOTIFICATION_CONTEXT);  
+                    me.notificationRules = Notifications.add('warning', 'INVALID_ACL_RULES', NOTIFICATION_CONTEXT);
                 } else if (!angular.isUndefined(me.notificationRules)) {
                     Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);
                     me.notificationRules = undefined;
@@ -32,7 +37,7 @@ angular.module('adminNg.services')
                     if (!angular.isUndefined(me.notificationRights)) {
                         Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
                     }
-                    me.notificationRights = Notifications.add('warning', 'MISSING_ACL_RULES', NOTIFICATION_CONTEXT);  
+                    me.notificationRights = Notifications.add('warning', 'MISSING_ACL_RULES', NOTIFICATION_CONTEXT);
                 } else if (!angular.isUndefined(me.notificationRights)) {
                     Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);
                     me.notificationRights = undefined;
@@ -40,7 +45,7 @@ angular.module('adminNg.services')
 
                 $timeout(function () {
                     checkNotification();
-                 }, 200);
+                }, 200);
             },
             addUserRolePolicy = function (policies) {
                 if (angular.isDefined(AuthService.getUserRole())) {
@@ -98,7 +103,7 @@ angular.module('adminNg.services')
 
             angular.forEach(me.ud.policies, function (policy, idx) {
                 if (policy.role === policyToDelete.role &&
-                    policy.write === policyToDelete.write && 
+                    policy.write === policyToDelete.write &&
                     policy.read === policyToDelete.read) {
                     index = idx;
                 }
@@ -135,12 +140,12 @@ angular.module('adminNg.services')
             if (!hasRights && !angular.isDefined(aclNotification)) {
                 aclNotification = Notifications.add('warning', 'SERIES_ACL_MISSING_READWRITE_ROLE', 'series-acl', -1);
             }
-            
+
             return rulesValid && hasRights;
         };
 
         checkNotification();
-        
+
         me.acls  = ResourcesListResource.get({ resource: 'ACL' });
         me.actions = {};
         me.hasActions = false;
@@ -152,7 +157,37 @@ angular.module('adminNg.services')
                 }
             });
         });
-        me.roles = ResourcesListResource.get({ resource: 'ROLES' }); 
+
+        me.roles = {};
+
+        me.getMoreRoles = function (value) {
+
+            if (me.loading)
+                return rolePromise;
+
+            me.loading = true;
+            var queryParams = {limit: roleSlice, offset: roleOffset};
+
+            if ( angular.isDefined(value) && (value != "")) {
+                //Magic values here.  Filter is from ListProvidersEndpoint, role_name is from RolesListProvider
+                //The filter format is care of ListProvidersEndpoint, which gets it from EndpointUtil
+                queryParams["filter"] = "role_name:"+ value +",role_target:ACL";
+            } else {
+                queryParams["filter"] = "role_target:ACL";
+            }
+            rolePromise = UserRolesResource.query(queryParams);
+            rolePromise.$promise.then(function (data) {
+                angular.forEach(data, function (role) {
+                    me.roles[role.name] = role.value;
+                });
+                roleOffset = Object.keys(me.roles).length;
+            }).finally(function () {
+                me.loading = false;
+            });
+            return rolePromise;
+        };
+
+        me.getMoreRoles();
 
         this.reset = function () {
             me.ud = {
@@ -165,7 +200,9 @@ angular.module('adminNg.services')
 
         this.reload = function () {
             me.acls  = ResourcesListResource.get({ resource: 'ACL' });
-            me.roles = ResourcesListResource.get({ resource: 'ROLES' }); 
+            me.roles = {};
+            me.roleOffset = 0;
+            me.getMoreRoles();
         };
 
         this.reset();

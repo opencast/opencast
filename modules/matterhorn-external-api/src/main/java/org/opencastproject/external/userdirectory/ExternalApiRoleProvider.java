@@ -19,9 +19,7 @@
  *
  */
 
-package org.opencastproject.kernel.userdirectory;
-
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+package org.opencastproject.external.userdirectory;
 
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
@@ -32,26 +30,37 @@ import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserProvider;
 
+import com.entwinemedia.fn.Fn2;
+import com.entwinemedia.fn.Stream;
+import com.entwinemedia.fn.StreamOp;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 /**
- * The organization role provider returning the admin and anonymous role from the current organization.
+ * The External API role provider.
  */
-public class OrganizationRoleProvider implements RoleProvider {
+public class ExternalApiRoleProvider implements RoleProvider {
 
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(OrganizationRoleProvider.class);
+  private static final Logger logger = LoggerFactory.getLogger(ExternalApiRoleProvider.class);
 
   /** The security service */
   protected SecurityService securityService = null;
+
+  private Set<String> roles;
 
   /**
    * @param securityService
@@ -61,19 +70,27 @@ public class OrganizationRoleProvider implements RoleProvider {
     this.securityService = securityService;
   }
 
+  protected void activate(ComponentContext cc) {
+    String rolesFile = ExternalGroupLoader.ROLES_PATH_PREFIX + "/" + ExternalGroupLoader.EXTERNAL_APPLICATIONS_ROLES_FILE;
+    InputStream in = null;
+    try {
+      in = getClass().getResourceAsStream(rolesFile);
+      roles = new TreeSet<String>(IOUtils.readLines(in, "UTF-8"));
+    } catch (IOException e) {
+      logger.error("Unable to read available roles: {}", ExceptionUtils.getStackTrace(e));
+    } finally {
+      IOUtils.closeQuietly(in);
+    }
+    logger.info("Activated External API role provider");
+  }
+
   /**
    * @see org.opencastproject.security.api.RoleProvider#getRoles()
    */
   @Override
   public Iterator<Role> getRoles() {
     Organization organization = securityService.getOrganization();
-    List<Role> roles = new ArrayList<Role>();
-    // The GLOBAL_ADMIN_ROLE is provided by the InMemoryUserAndRoleProvider
-    if (!GLOBAL_ADMIN_ROLE.equals(organization.getAdminRole())) {
-      roles.add(new JaxbRole(organization.getAdminRole(), JaxbOrganization.fromOrganization(organization), "", Type.INTERNAL));
-    }
-    roles.add(new JaxbRole(organization.getAnonymousRole(), JaxbOrganization.fromOrganization(organization), "", Type.SYSTEM));
-    return roles.iterator();
+    return Stream.$(roles).map(toRole._2(organization)).iterator();
   }
 
   /**
@@ -99,36 +116,35 @@ public class OrganizationRoleProvider implements RoleProvider {
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
+
+    // These roles are not meaningful for use in ACLs
+    if (target == Role.Target.ACL) {
+      return Collections.emptyIterator();
+    }
+
     Organization organization = securityService.getOrganization();
-    HashSet<Role> foundRoles = new HashSet<Role>();
-    for (Iterator<Role> it = getRoles(); it.hasNext();) {
-      Role role = it.next();
-      // Anonymous roles are not relevant for adding to users or groups
-      if ((target == Role.Target.USER) && role.getName().equals(organization.getAnonymousRole()))
-        continue;
-      if (like(role.getName(), query) || like(role.getDescription(), query))
-        foundRoles.add(role);
-    }
-    return offsetLimitCollection(offset, limit, foundRoles).iterator();
+    return Stream.$(roles).filter(filterByName._2(query)).drop(offset)
+            .apply(limit > 0 ? StreamOp.<String> id().take(limit) : StreamOp.<String> id()).map(toRole._2(organization))
+            .iterator();
   }
 
-  private <T> HashSet<T> offsetLimitCollection(int offset, int limit, HashSet<T> entries) {
-    HashSet<T> result = new HashSet<T>();
-    int i = 0;
-    for (T entry : entries) {
-      if (limit != 0 && result.size() >= limit)
-        break;
-      if (i >= offset)
-        result.add(entry);
-      i++;
-    }
-    return result;
-  }
-
-  private boolean like(String string, final String query) {
+  private static boolean like(String string, final String query) {
     String regex = query.replace("_", ".").replace("%", ".*?");
     Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     return p.matcher(string).matches();
   }
 
+  private static final Fn2<String, Organization, Role> toRole = new Fn2<String, Organization, Role>() {
+    @Override
+    public Role ap(String role, Organization organization) {
+      return new JaxbRole(role, JaxbOrganization.fromOrganization(organization), "AdminNG UI Role", Type.INTERNAL);
+    }
+  };
+
+  private static final Fn2<String, String, Boolean> filterByName = new Fn2<String, String, Boolean>() {
+    @Override
+    public Boolean ap(String role, String query) {
+      return like(role, query);
+    }
+  };
 }

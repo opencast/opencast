@@ -38,6 +38,7 @@ import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Group;
+import org.opencastproject.security.api.GroupProvider;
 import org.opencastproject.security.api.JaxbGroup;
 import org.opencastproject.security.api.JaxbGroupList;
 import org.opencastproject.security.api.JaxbOrganization;
@@ -106,7 +107,7 @@ import javax.ws.rs.core.Response.Status;
                 "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                         + "other words, there is a bug! You should file an error report with your server logs from the time when the "
                         + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
-public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleProvider {
+public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleProvider, GroupProvider {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(JpaGroupRoleProvider.class);
@@ -208,6 +209,28 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   /**
    * {@inheritDoc}
    *
+   * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
+   */
+  @Override
+  public List<Role> getRolesForGroup(String groupName) {
+    List<Role> roles = new ArrayList<Role>();
+    String orgId = securityService.getOrganization().getId();
+    Group group = UserDirectoryPersistenceUtil.findGroupByRole(groupName, orgId, emf);
+    if (group != null) {
+      for (Role role : group.getRoles()) {
+        JaxbRole grouprole = new JaxbRole(role.getName(), JaxbOrganization.fromOrganization(role.getOrganization()), role.getDescription(), Role.Type.DERIVED);
+        roles.add(grouprole);
+      }
+    } else {
+      logger.warn("Group {} not found", groupName);
+    }
+    return roles;
+  }
+
+
+  /**
+   * {@inheritDoc}
+   *
    * @see org.opencastproject.security.api.RoleProvider#getOrganization()
    */
   @Override
@@ -221,16 +244,18 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
    * @see org.opencastproject.security.api.RoleProvider#findRoles(String, int, int)
    */
   @Override
-  public Iterator<Role> findRoles(String query, int offset, int limit) {
+  public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
     String orgId = securityService.getOrganization().getId();
 
-    List<Role> groupRoles = getGroupsRoles(UserDirectoryPersistenceUtil.findGroups(orgId, 0, 0, emf));
+    //  Here we want to return only the ROLE_GROUP_ names, not the roles associated with a group
+    List<JpaGroup> groups = UserDirectoryPersistenceUtil.findGroups(orgId, 0, 0, emf);
+
     List<Role> roles = new ArrayList<Role>();
-    for (Role role : groupRoles) {
-      if (like(role.getName(), query) || like(role.getDescription(), query))
-        roles.add(role);
+    for (JpaGroup group : groups) {
+      if (like(group.getRole(), query))
+        roles.add(new JaxbRole(group.getRole(), JaxbOrganization.fromOrganization(group.getOrganization()), "", Role.Type.GROUP));
     }
 
     Set<Role> result = new HashSet<Role>();
@@ -243,6 +268,65 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
       i++;
     }
     return result.iterator();
+  }
+
+  /**
+   * Updates a user's group membership
+   *
+   * @param userName
+   *          the username
+   * @param orgId
+   *          the user's organization
+   * @param roleList
+   *          the list of group role names
+   * @return
+   */
+  public void updateGroupMembershipFromRoles(String userName, String orgId, List<String> roleList) {
+
+    logger.debug("updateGroupMembershipFromRoles({}, size={})", userName, roleList.size());
+
+    // The list of groups for this user represented by the roleList is considered authoritative,
+    // so remove the user from any groups which aren't represented in the roleList, and add the
+    // user to all groups which are in the roleList.
+
+    Set<String> membershipRoles = new HashSet<String>();
+
+    // List of the user's groups
+    List<JpaGroup> membership = UserDirectoryPersistenceUtil.findGroupsByUser(userName, orgId, emf);
+    for (JpaGroup group : membership) {
+      try {
+        if (roleList.contains(group.getRole())) {
+          // record this membership
+          membershipRoles.add(group.getRole());
+        } else {
+          // remove user from this group
+          logger.debug("Removing user {} from group {}", userName, group.getRole());
+          group.getMembers().remove(userName);
+          addGroup(group);
+        }
+      } catch (UnauthorizedException e) {
+         logger.warn("Unable to add or remove user {} from group {} - unauthorized", userName, group.getRole());
+      }
+    }
+
+    // Now add the user to any groups that they are not already a member of
+    for (String rolename : roleList) {
+      if (!membershipRoles.contains(rolename)) {
+        JpaGroup group = UserDirectoryPersistenceUtil.findGroupByRole(rolename, orgId, emf);
+        try {
+          if (group != null) {
+            logger.debug("Adding user {} to group {}", userName, rolename);
+            group.getMembers().add(userName);
+            addGroup(group);
+          } else {
+            logger.warn("Cannot add user {} to group {} - no group found with that role", userName, rolename);
+          }
+        } catch (UnauthorizedException e) {
+          logger.warn("Unable to add user {} to group {} - unauthorized", userName, group.getRole());
+        }
+      }
+    }
+
   }
 
   /**
@@ -328,8 +412,12 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   private List<Role> getGroupsRoles(List<JpaGroup> groups) {
     List<Role> roles = new ArrayList<Role>();
     for (Group group : groups) {
-      roles.add(new JaxbRole(group.getRole(), JaxbOrganization.fromOrganization(group.getOrganization()), ""));
-      roles.addAll(group.getRoles());
+      roles.add(new JaxbRole(group.getRole(), JaxbOrganization.fromOrganization(group.getOrganization()), "", Role.Type.GROUP));
+      for (Role role : group.getRoles()) {
+        JaxbRole grouprole = new JaxbRole(role.getName(), JaxbOrganization.fromOrganization(role.getOrganization()), role.getDescription(), Role.Type.DERIVED);
+        roles.add(grouprole);
+      }
+
     }
     return roles;
   }

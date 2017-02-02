@@ -25,13 +25,18 @@ angular.module('adminNg.controllers')
 .controller('EventCtrl', [
     '$scope', 'Notifications', 'EventTransactionResource', 'EventMetadataResource', 'EventAssetsResource',
     'EventCatalogsResource', 'CommentResource', 'EventWorkflowsResource',
-    'ResourcesListResource', 'EventAccessResource', 'EventGeneralResource',
+    'ResourcesListResource', 'UserRolesResource', 'EventAccessResource', 'EventGeneralResource',
     'OptoutsResource', 'EventParticipationResource', 'NewEventProcessingResource',
     'OptoutSingleResource', 'CaptureAgentsResource', 'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout',
     function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource, EventCatalogsResource, CommentResource,
-        EventWorkflowsResource, ResourcesListResource, EventAccessResource, EventGeneralResource,
+        EventWorkflowsResource, ResourcesListResource, UserRolesResource, EventAccessResource, EventGeneralResource,
         OptoutsResource, EventParticipationResource, NewEventProcessingResource,
         OptoutSingleResource, CaptureAgentsResource, ConflictCheckResource, Language, JsHelper, $sce, $timeout) {
+
+        var roleSlice = 100;
+        var roleOffset = 0;
+        var loading = false;
+        var rolePromise = null;
 
         var saveFns = {},
             me = this,
@@ -299,6 +304,34 @@ angular.module('adminNg.controllers')
                 $scope.comments = CommentResource.query({ resource: 'event', resourceId: id, type: 'comments' });
             },
             tzOffset = (new Date()).getTimezoneOffset() / -60;
+
+
+        $scope.getMoreRoles = function (value) {
+
+            if (loading)
+                return rolePromise;
+
+            loading = true;
+            var queryParams = {limit: roleSlice, offset: roleOffset};
+
+            if ( angular.isDefined(value) && (value != "")) {
+                //Magic values here.  Filter is from ListProvidersEndpoint, role_name is from RolesListProvider
+                //The filter format is care of ListProvidersEndpoint, which gets it from EndpointUtil
+                queryParams["filter"] = "role_name:"+ value +",role_target:ACL";
+            } else {
+                queryParams["filter"] = "role_target:ACL";
+            }
+            rolePromise = UserRolesResource.query(queryParams);
+            rolePromise.$promise.then(function (data) {
+                angular.forEach(data, function (role) {
+                    $scope.roles[role.name] = role.value;
+                });
+                roleOffset = Object.keys($scope.roles).length;
+            }).finally(function () {
+                loading = false;
+            });
+            return rolePromise;
+        };
 
         /**
          * <===============================

@@ -118,6 +118,12 @@ modules/matterhorn-admin-ui-ng/src/main/webapp/lib/video-js/*
   Copyright 2014 Brightcove, Inc.
   Licensed under the Apache License, Version 2.0
 
+modules/matterhornad-min-ui-ng/src/main/webapp/scripts/shared/directives/opencastScrollGlue.js
+  AngularJS Scroll Glue v2.0.6
+  https://github.com/Luegg/angularjs-scroll-glue
+  (c) 2013 Lukas Wegmann
+  Licensed under the MIT license
+
 modules/matterhorn-admin-ui-ng/src/test/resources/test/lib/angular/angular-scenario.js
   Copyright 2005, 2013 jQuery Foundation, Inc. and other contributors
   Released under the MIT license
