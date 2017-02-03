@@ -130,21 +130,24 @@ public class UserIdRoleProvider implements RoleProvider {
 
     logger.debug("findRoles(query={} offset={} limit={})", query, offset, limit);
 
-    // Only authoritative for user roles
-    if (!"%".equals(query) && !query.startsWith(ROLE_USER_PREFIX)) {
-      return Collections.emptyIterator();
+    HashSet<Role> foundRoles = new HashSet<Role>();
+    Organization organization = securityService.getOrganization();
+
+    // Return authenticated user role if it matches the query pattern
+    if (like(ROLE_USER, query)) {
+      foundRoles.add(new JaxbRole(ROLE_USER, JaxbOrganization.fromOrganization(organization), "The authenticated user role", Role.Type.SYSTEM));
     }
 
-    // Return user roles for matching users
+    // Include user id roles only if wildcard search or query matches user id role prefix
+    // (iterating through users may be slow)
+    if (!"%".equals(query) && !query.startsWith(ROLE_USER_PREFIX)) {
+      return foundRoles.iterator();
+    }
+
     String userQuery = "%";
     if (query.startsWith(ROLE_USER_PREFIX)) {
       userQuery = query.substring(ROLE_USER_PREFIX.length());
     }
-
-    HashSet<Role> foundRoles = new HashSet<Role>();
-
-    Organization organization = securityService.getOrganization();
-    foundRoles.add(new JaxbRole(ROLE_USER, JaxbOrganization.fromOrganization(organization), "The authenticated user role", Role.Type.SYSTEM));
 
     Iterator<User> users = userDirectoryService.findUsers(userQuery, offset, limit);
     while (users.hasNext()) {
