@@ -1,7 +1,7 @@
 # InspectWorkflowOperation
 
 ## Description
- 
+
 The InspectWorkflowOperation is used to inspect all tracks of a media package. It tries to verify if they are valid
 media tracks.
 The InspectWorkflowOperation will also set the duration and creation date of the dublincore/episode catalog
@@ -25,8 +25,13 @@ contain any media tracks. If this behaviour is not appropriate, set `accept-no-m
 The media inspection service will provide the number of frames in case of video streams. Normally, this information is
 extracted from the media file header. In case of incorrect media file headers, this information might not be accurate.
 Using the configuration key `accurate-frame-count`, the media inspection service can be forced to perform a full
-decoding of the video stream. While this does result in an exact count of frames, this is expensive in terms of 
+decoding of the video stream. While this does result in an exact count of frames, this is expensive in terms of
 computation power.
+
+### Overwrite
+
+The inspection service will try to fill empty metadata fields. It will not overwrite any existing values except when
+you specify the option `overwrite` as `true`.
 
 ## Operation Example
 
@@ -34,5 +39,10 @@ computation power.
         id="inspect"
         fail-on-error="true"
         exception-handler-workflow="error"
-        description="Inspecting the media package">
+        description="Inspecting mediapackage track elements">
+        <configurations>
+            <configuration key="overwrite">false</configuration>
+            <configuration key="accept-no-media">false</configuration>
+            <configuration key="accurate-frame-count">false</configuration>
+        </configurations>
     </operation>
