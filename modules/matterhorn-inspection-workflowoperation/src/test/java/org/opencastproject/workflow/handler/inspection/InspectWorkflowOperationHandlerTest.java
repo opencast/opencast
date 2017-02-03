@@ -58,6 +58,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class InspectWorkflowOperationHandlerTest {
   private InspectWorkflowOperationHandler operationHandler;
@@ -144,7 +145,8 @@ public class InspectWorkflowOperationHandlerTest {
     operationHandler.setServiceRegistry(serviceRegistry);
 
     inspectionService = EasyMock.createNiceMock(MediaInspectionService.class);
-    EasyMock.expect(inspectionService.enrich((Track) EasyMock.anyObject(), EasyMock.anyBoolean())).andReturn(job);
+    EasyMock.expect(inspectionService.enrich((Track) EasyMock.anyObject(), EasyMock.anyBoolean(),
+            (Map<String, String>) EasyMock.anyObject())).andReturn(job);
     EasyMock.replay(inspectionService);
     operationHandler.setInspectionService(inspectionService);
 
