@@ -321,7 +321,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
    */
   private boolean verifySakaiUser(String userId) {
 
-      logger.debug("verifySakaiUser(" + userId + ")");
+      logger.debug("verifySakaiUser({})", userId);
 
       try {
         if ((userPattern != null) && !userId.matches(userPattern)) {
@@ -543,17 +543,23 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
 
-    if (query.contains("%"))
-      return Collections.<User> emptyList().iterator();
+    if (query.endsWith("%")) {
+      query = query.substring(0, query.length() - 1);
+    }
+
+    if (query.isEmpty()) {
+      return Collections.emptyIterator();
+    }
+
+    // Verify if a user exists (non-wildcard searches only)
+    if (!verifySakaiUser(query)) {
+      return Collections.emptyIterator();
+    }
 
     List<User> users = new LinkedList<User>();
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
-
-    // Verify if a user exists (non-wildcard searches only)
-    if (verifySakaiUser(query)) {
-      JaxbUser queryUser = new JaxbUser(query, PROVIDER_NAME, jaxbOrganization, new HashSet<JaxbRole>());
-      users.add(queryUser);
-    }
+    JaxbUser queryUser = new JaxbUser(query, PROVIDER_NAME, jaxbOrganization, new HashSet<JaxbRole>());
+    users.add(queryUser);
 
     return users.iterator();
   }
@@ -561,7 +567,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
   @Override
   public Iterator<User> getUsers() {
     // We never enumerate all users
-    return Collections.<User> emptyList().iterator();
+    return Collections.emptyIterator();
   }
 
   @Override
@@ -581,9 +587,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
    public Iterator<Role> getRoles() {
 
      // We won't ever enumerate all Sakai sites, so return an empty list here
-
-     List<Role> roles = new LinkedList<Role>();
-     return roles.iterator();
+     return Collections.emptyIterator();
    }
 
    @Override
@@ -617,12 +621,9 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
 
      logger.debug("findRoles(query=" + query + " offset=" + offset + " limit=" + limit + ")");
 
-     // Empty roles list
-     List<Role> roles = new LinkedList<Role>();
-
      // Don't return roles for users or groups
      if (target == Role.Target.USER) {
-        return roles.iterator();
+        return Collections.emptyIterator();
      }
 
      boolean exact = true;
@@ -634,12 +635,12 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
      }
 
      if (query.isEmpty()) {
-        return roles.iterator();
+        return Collections.emptyIterator();
      }
 
      // Verify that role name ends with LTI_LEARNER_ROLE or LTI_INSTRUCTOR_ROLE
      if (exact && !query.endsWith("_" + LTI_LEARNER_ROLE) && !query.endsWith("_" + LTI_INSTRUCTOR_ROLE)) {
-        return roles.iterator();
+        return Collections.emptyIterator();
      }
 
      String sakaiSite = null;
@@ -656,20 +657,22 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
        sakaiSite = query;
      }
 
-     boolean siteExists = verifySakaiSite(sakaiSite);
+     if (!verifySakaiSite(sakaiSite)) {
+        return Collections.emptyIterator();
+     }
 
-     if (siteExists) {
-       JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
+     // Roles list
+     List<Role> roles = new LinkedList<Role>();
 
-       if (ltirole) {
-         // Query is for a Site ID and an LTI role (Instructor/Learner)
-         roles.add(new JaxbRole(query, jaxbOrganization, "Sakai Site Role", Role.Type.EXTERNAL));
-       } else {
-         // Site ID - return both roles
-         roles.add(new JaxbRole(sakaiSite + "_" + LTI_INSTRUCTOR_ROLE, jaxbOrganization, "Sakai Site Instructor Role", Role.Type.EXTERNAL));
-         roles.add(new JaxbRole(sakaiSite + "_" + LTI_LEARNER_ROLE, jaxbOrganization, "Sakai Site Learner Role", Role.Type.EXTERNAL));
-       }
+     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
 
+     if (ltirole) {
+       // Query is for a Site ID and an LTI role (Instructor/Learner)
+       roles.add(new JaxbRole(query, jaxbOrganization, "Sakai Site Role", Role.Type.EXTERNAL));
+     } else {
+       // Site ID - return both roles
+       roles.add(new JaxbRole(sakaiSite + "_" + LTI_INSTRUCTOR_ROLE, jaxbOrganization, "Sakai Site Instructor Role", Role.Type.EXTERNAL));
+       roles.add(new JaxbRole(sakaiSite + "_" + LTI_LEARNER_ROLE, jaxbOrganization, "Sakai Site Learner Role", Role.Type.EXTERNAL));
      }
 
      return roles.iterator();
