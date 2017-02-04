@@ -989,6 +989,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     final Job job = jpaJob.toJob();
     final Date now = new Date();
     final Status status = job.getStatus();
+    final Status fromDbStatus = fromDb.getStatus();
 
     fromDb.setPayload(job.getPayload());
     fromDb.setStatus(job.getStatus());
@@ -1009,7 +1010,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               job.getJobType(), job.getProcessingHost());
       fromDb.setProcessorServiceRegistration(processingService);
     }
-    if (Status.RUNNING.equals(status) && !Status.WAITING.equals(fromDb.getStatus())) {
+    if (Status.RUNNING.equals(status) && !Status.WAITING.equals(fromDbStatus)) {
       jpaJob.setDateStarted(now);
       jpaJob.setQueueTime(now.getTime() - job.getDateCreated().getTime());
       fromDb.setDateStarted(now);
