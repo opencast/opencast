@@ -33,7 +33,7 @@ public interface DistributionService {
   /**
    * A prefix used by distribution service implementations to indicate the types of distribution channels they manage.
    */
-  String JOB_TYPE_PREFIX = "org.opencastproject.distribution";
+  String JOB_TYPE_PREFIX = "org.opencastproject.distribution.";
 
   String CONFIG_KEY_STORE_TYPE = "distribution.channel";
 

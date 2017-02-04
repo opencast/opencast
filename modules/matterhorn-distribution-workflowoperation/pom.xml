@@ -94,6 +94,7 @@
             <Service-Component>
               OSGI-INF/operations/publish-engage.xml,
               OSGI-INF/operations/publish-configurable.xml,
+              OSGI-INF/operations/publish-aws.xml,
               OSGI-INF/operations/publish-youtube.xml,
               OSGI-INF/operations/publish-oaipmh.xml,
               OSGI-INF/operations/republish-oaipmh.xml,
