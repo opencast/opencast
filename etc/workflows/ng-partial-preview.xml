@@ -126,6 +126,7 @@
         <configuration key="source-tags">preview</configuration>
         <configuration key="channel-id">internal</configuration>
         <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
+        <configuration key="check-availability">true</configuration>
       </configurations>
     </operation>
 
