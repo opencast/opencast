@@ -1,17 +1,18 @@
 Infrastructure Notes
-=======================================================
+====================
 
 This page contains notes about the current configuration of the Opencast servers around the world
+
 
 Harvard DCE
 -----------
 
-#### Common Configuration Choices
+### Common Configuration Choices
 
 - Unattended upgrade
 - CentOS Linux release 7.x
 
-##### nexus.dcex.harvard.edu
+### nexus.dcex.harvard.edu
 
 - Using [packaged Nexus](https://copr.fedorainfracloud.org/coprs/lkiesow/nexus-oss/)
 
@@ -19,23 +20,22 @@ Harvard DCE
 ETH
 ---
 
-#### opencast-nexus.ethz.ch 
+### opencast-nexus.ethz.ch 
 
 - Unattended upgrade
 - RHEL 7.x
 - Using [packaged Nexus](https://copr.fedorainfracloud.org/coprs/lkiesow/nexus-oss/)
 
 
-
 SWITCH
 ------
 
-#### Common Configuration Choices
+### Common Configuration Choices
 
 - Unattended upgrade
 - CentOS Linux release 7.x
 
-##### Test Cluster (*.oc-test.switch.ch)
+### Test Cluster (\*.oc-test.switch.ch)
 
 - Rebuilt weekly via cron + shell, manual branch selection
 
@@ -43,34 +43,35 @@ SWITCH
 University of Osnabrück 
 -----------------------
 
-#### Common Configuration Choices
+### Common Configuration Choices
 
 - Unattended upgrade
 - Scientific Linux 7.x
 
-##### build.opencast.org
+### build.opencast.org
 
-- Builds are triggered by cron, manual branch selection currently
+- Builds are triggered by cron, manual branch selection
 
-##### docs.opencast.org
+### docs.opencast.org
 
 - Rebuild every 5 minutes via bitbucket webhook, nightly rebuild
 
-##### nexus.virtuos.uos.de
+### nexus.opencast.org, nexus.virtuos.uos.de
 
+- GeoIP based redirect for all Nexus servers
 - Using [packaged Nexus](https://copr.fedorainfracloud.org/coprs/lkiesow/nexus-oss/)
 
-##### octestallinone.virtuos.uos.de
+### octestallinone.virtuos.uos.de
 
 - Using tarballs build from build.opencast.org
 
-##### pullrequests.opencast.org
+### pullrequests.opencast.org
 
 - Scientific Linux 6.x
 - Due for retirement, services will be moved to repo.opencast.org VM and DNS updated
-- Merge ticket list needs to set manually
+- Merge ticket list needs to be set manually
 
-##### repo.opencast.org and pkg.opencast.org
+### repo.opencast.org and pkg.opencast.org
 
 - Same server
 
@@ -78,12 +79,12 @@ University of Osnabrück
 University of Saskatchewean
 ---------------------------
 
-#### Common Configuration Choices
+### Common Configuration Choices
 
 - Debian 8.x
 - Unattended upgrades
 
-##### Testing Cluster (test*.usask.ca)
+### Testing Cluster (test\*.usask.ca)
 
 - Using Debian packages for Opencast
 - Nightly reset and upgrade

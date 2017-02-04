@@ -54,7 +54,7 @@ University of Osnabrück    | repo.virtuos.uos.de           | Lars Kiesow      |
 University of Osnabrück    | pullrequests.opencast.org     | Lars Kiesow      | Lars Kiesow
 University of Osnabrück    | build.opencast.org            | Greg Logan       | Lars Kiesow
 University of Osnabrück    | docs.opencast.org             | Greg Logan       | Lars Kiesow
-University of Osnabrück    | opencast.org                  | Rüdiger Rolf     | Rüdiger Rolf
+University of Osnabrück    | opencast.org                  | Rüdiger Rolf     | UOS RZ
 
 Account Management
 ------------------
@@ -80,18 +80,22 @@ Account Management
     - Adam McKenzie
     - Andy Wasklewicz
     - Basil Brunner
+    - Greg Logan
     - Lars Kiesow
     - Michael Stypa
+    - Rubén Pérez
+    - Sven Stauber
     - Tobias Schiebeck
     - Tobias Wunden
+    - Waldemar Smirnow
 
 Video Conferencing
 ------------------
 
 - BigBlueButton
-    - [Conference rooms](http://matterhorn.bigbluebutton.org/matterhorn)
+    - [Conference rooms](http://opencast.blindsidenetworks.net/opencast/)
         - Password: welcome
-    - [Recordings](http://matterhorn.bigbluebutton.org/matterhorn/recordings.jsp)
+    - [Recordings](http://opencast.blindsidenetworks.net/opencast/recordings-5720cd14621.jsp)
     - Flash based
 - AppearIn
     - [Conference room](http://appear.in/opencast)
