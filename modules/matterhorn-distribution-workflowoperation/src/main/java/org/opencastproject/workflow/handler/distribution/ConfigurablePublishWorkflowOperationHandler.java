@@ -200,6 +200,9 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
           //fail is a dummy function for further distribution strategies
           fail(mp);
           break;
+        case ("merge"):
+          // nothing to do here. other publication strategies can be added to this list later on
+          break;
         default:
           retract(mp, channelId);
       }

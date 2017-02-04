@@ -25,8 +25,6 @@ import static java.lang.String.format;
 import static org.opencastproject.util.HttpUtil.param;
 import static org.opencastproject.util.HttpUtil.post;
 import static org.opencastproject.util.JobUtil.jobFromHttpResponse;
-import static org.opencastproject.util.data.Arrays.array;
-import static org.opencastproject.util.data.Arrays.mkString;
 import static org.opencastproject.util.data.functions.Options.join;
 
 import org.opencastproject.distribution.api.DistributionException;
@@ -36,6 +34,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.util.OsgiUtil;
 
 import com.google.gson.Gson;
 
@@ -54,7 +53,6 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
   private static final Logger logger = LoggerFactory.getLogger(DownloadDistributionServiceRemoteImpl.class);
 
   /** The property to look up and append to REMOTE_SERVICE_TYPE_PREFIX */
-  private static final String PARAM_REMOTE_SERVICE_CHANNEL = "distribution.channel";
   private static final String PARAM_CHANNEL_ID = "channelId";
   private static final String PARAM_MEDIAPACKAGE = "mediapackage";
   private static final String PARAM_ELEMENT_ID = "elementId";
@@ -66,13 +64,18 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
   private String distributionChannel;
 
   public DownloadDistributionServiceRemoteImpl() {
-    super(mkString(array(JOB_TYPE_PREFIX, "download"), "."));
+    // the service type is not available at construction time. we need to wait for activation to set this value
+    super("waiting for activation");
+  }
+
+  public String getDistributionType() {
+    return this.distributionChannel;
   }
 
   /** activates the component */
   protected void activate(ComponentContext cc) {
-    this.distributionChannel = (String) cc.getProperties().get(PARAM_REMOTE_SERVICE_CHANNEL);
-    super.serviceType = mkString(array(JOB_TYPE_PREFIX, this.distributionChannel), ".");
+    this.distributionChannel = OsgiUtil.getComponentContextProperty(cc, CONFIG_KEY_STORE_TYPE);
+    super.serviceType = JOB_TYPE_PREFIX + this.distributionChannel;
   }
 
   @Override

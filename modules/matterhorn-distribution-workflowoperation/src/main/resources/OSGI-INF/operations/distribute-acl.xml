@@ -7,10 +7,10 @@
   <service>
     <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
   </service>
-  <reference cardinality="1..1" interface="org.opencastproject.distribution.api.DistributionService"
-  name="DistributionService" policy="static" target="(distribution.channel=acl)" bind="setDistributionService"/>
+  <reference cardinality="1..n" interface="org.opencastproject.distribution.api.DistributionService"
+  name="DistributionService" policy="dynamic" target="(distribution.channel=acl)" bind="setDistributionService"/>
   <reference name="ServiceRegistry" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
     policy="static" bind="setServiceRegistry" />
-  <reference name="AuthorizationSErvice" cardinality="1..1" interface="org.opencastproject.security.api.AuthorizationService"
+  <reference name="AuthorizationService" cardinality="1..1" interface="org.opencastproject.security.api.AuthorizationService"
     policy="static" bind="setAuthorizationService" />
 </scr:component>

@@ -35,6 +35,8 @@ public interface DistributionService {
    */
   String JOB_TYPE_PREFIX = "org.opencastproject.distribution";
 
+  String CONFIG_KEY_STORE_TYPE = "distribution.channel";
+
   /**
    * Distribute a media package element.
    *
@@ -62,5 +64,13 @@ public interface DistributionService {
    *           if there was a problem retracting the mediapackage
    */
   Job retract(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException;
+
+  /**
+   * Returns the distribution type for this service.
+   * This type should be unique within an Opencast instance, and is used to select where file distribution happens.
+   *
+   * @return The distribution type.  A string like "download", or "streaming"
+   */
+  String getDistributionType();
 
 }
