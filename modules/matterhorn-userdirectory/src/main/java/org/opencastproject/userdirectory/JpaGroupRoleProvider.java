@@ -49,6 +49,7 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
@@ -130,12 +131,25 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   /** The organization directory service */
   protected OrganizationDirectoryService organizationDirectoryService;
 
+  /** The user directory service */
+  protected UserDirectoryService userDirectoryService = null;
+
   /** The component context */
   private ComponentContext cc;
 
   /** OSGi DI */
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
+  }
+
+  /**
+   * Sets the user directory service
+   *
+   * @param userDirectoryService
+   *          the userDirectoryService to set
+   */
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    this.userDirectoryService = userDirectoryService;
   }
 
   /**
@@ -569,12 +583,32 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
     }
 
     if (users != null) {
+
       HashSet<String> members = new HashSet<String>();
+      HashSet<String> invalidateUsers = new HashSet<String>();
+
+      Set<String> groupMembers = group.getMembers();
 
       for (String member : StringUtils.split(users, ",")) {
-        members.add(StringUtils.trim(member));
+        String newMember = StringUtils.trim(member);
+        members.add(newMember);
+        if (!groupMembers.contains(newMember)) {
+          invalidateUsers.add(newMember);
+        }
       }
+
+      for (String member : groupMembers) {
+        if (!members.contains(member)) {
+          invalidateUsers.add(member);
+        }
+      }
+
       group.setMembers(members);
+
+      // Invalidate cache entries for users who have been added or removed
+      for (String member : invalidateUsers) {
+        userDirectoryService.invalidate(member);
+      }
     }
 
     try {
