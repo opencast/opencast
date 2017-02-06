@@ -292,6 +292,7 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventResponse(@PathParam("eventId") String id) throws Exception {
     for (final Event event : getIndexService().getEvent(id, getIndex())) {
+      event.updatePreview(getAdminUIConfiguration().getPreviewSubtype());
       return okJson(eventToJSON(event));
     }
     return notFound("Cannot find an event with id '%s'.", id);
