@@ -218,6 +218,15 @@ public final class EncodingSchemeUtils {
       } catch (IllegalArgumentException ignore) {
       }
     }
+
+    // Try unixtime in milliseconds (backwards-compatibility with older mediapackages)
+    try {
+      long timestamp = Long.parseLong(value.getValue());
+      Date decoded = new java.util.Date(timestamp);
+      return decoded;
+    } catch (NumberFormatException nfe) {
+    }
+
     return null;
   }
 
