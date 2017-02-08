@@ -1,6 +1,6 @@
 angular.module('adminNg.directives')
-.directive('videoPlayer', ['PlayerAdapter', 'PlayerAdapterRepository', 'VideoService', '$timeout',
-    function (PlayerAdapter, PlayerAdapterRepository, VideoService, $timeout) {
+.directive('videoPlayer', ['PlayerAdapter', 'PlayerAdapterRepository', 'VideoService', '$timeout', 'HotkeysService',
+    function (PlayerAdapter, PlayerAdapterRepository, VideoService, $timeout, HotkeysService) {
 
     return {
         restrict: 'A',
@@ -118,8 +118,24 @@ angular.module('adminNg.directives')
                 }
             };
 
+            scope.pause = function () {
+                scope.player.adapter.pause();
+            }
+
             scope.changeTime = function (time) {
             	scope.player.adapter.setCurrentTime(getTimeInSeconds(time));
+            };
+
+            scope.stepBackward = function () {
+              var newTime = scope.player.adapter.getCurrentTime() - 10;
+              console.log("setting player to " + newTime);
+            	scope.player.adapter.setCurrentTime(newTime);
+            };
+
+            scope.stepForward = function () {
+              var newTime = scope.player.adapter.getCurrentTime() + 10;
+              console.log("setting player to " + newTime);
+            	scope.player.adapter.setCurrentTime(newTime);
             };
 
             scope.toggleMute = function () {
@@ -130,10 +146,90 @@ angular.module('adminNg.directives')
               scope.player.adapter.volume(scope.volume);
             }
 
+            scope.volumeUp = function () {
+              if (scope.volume + 10 <= 100) {
+                scope.volume = scope.volume + 10;
+              } else {
+                scope.volume = 100;
+              }
+              scope.setVolume();
+            }
+
+            scope.volumeDown = function () {
+              if (scope.volume - 10 >= 0) {
+                scope.volume = scope.volume - 10;
+              } else {
+                scope.volume = 0;
+              }
+              scope.setVolume();
+            }
+
             scope.subControls = angular.isDefined(scope.subControls) ? scope.subControls : 'true';
 
             // Check for the player (10 times) before to load the adapter
             checkPlayerElement(10, loadPlayerAdapter);
+
+            HotkeysService.activateHotkey(scope, "player.play_pause",
+              "play / pause video", function(event) {
+                  event.preventDefault();
+                  scope.play();
+            });
+
+            HotkeysService.activateHotkey(scope, "player.previous_frame",
+              "Previous Frame", function(event) {
+                  event.preventDefault();
+                  scope.pause();
+                  scope.previousFrame();
+            });
+
+            HotkeysService.activateHotkey(scope, "player.next_frame",
+              "Next Frame", function(event) {
+                  event.preventDefault();
+                  scope.pause();
+                  scope.nextFrame();
+            });
+
+            HotkeysService.activateHotkey(scope, "player.step_backward",
+              "Jump 10s back", function(event) {
+                  event.preventDefault();
+                  scope.stepBackward();
+            });
+
+            HotkeysService.activateHotkey(scope, "player.step_forward",
+              "Jump 10s forward", function(event) {
+                  event.preventDefault();
+                  scope.stepForward();
+            });
+
+            HotkeysService.activateHotkey(scope, "player.previous_segment",
+              "Previous segment", function(event) {
+                  event.preventDefault();
+                  scope.previousSegment();
+            });
+
+            HotkeysService.activateHotkey(scope, "player.next_segment",
+              "Next Segment", function(event) {
+                  event.preventDefault();
+                  scope.nextSegment();
+            });
+
+            HotkeysService.activateHotkey(scope, "player.volume_up",
+              "Volume up", function(event) {
+                  event.preventDefault();
+                  scope.volumeUp();
+            });
+
+            HotkeysService.activateHotkey(scope, "player.volume_down",
+              "Volume down", function(event) {
+                  event.preventDefault();
+                  scope.volumeDown();
+            });
+
+            HotkeysService.activateHotkey(scope, "player.mute",
+              "Mute / unmute", function(event) {
+                  event.preventDefault();
+                  scope.toggleMute();
+            });
         }
     };
 }]);
