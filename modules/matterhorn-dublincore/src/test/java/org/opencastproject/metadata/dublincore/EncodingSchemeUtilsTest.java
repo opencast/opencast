@@ -112,6 +112,7 @@ public class EncodingSchemeUtilsTest {
     assertEquals(createDate(1999, 3, 21, 14, 30, 15, "UTC"), decodeDate(DublinCoreValue.mk("1999-03-21T14:30:15Z")));
     assertEquals(createDate(2001, 9, 11, 0, 0, 0), decodeDate(DublinCoreValue.mk("2001-09-11")));
     assertEquals(createDate(2011, 2, 24, 7, 0, 0, "UTC"), decodeDate(DublinCoreValue.mk("1298530800000")));
+    assertEquals(createDate(2011, 2, 24, 7, 0, 0, "UTC"), decodeDate("1298530800000"));
     logger.info(decodeDate(DublinCoreValue.mk("2009-03-31")).toString());
     logger.info(decodeDate(DublinCoreValue.mk("2009-09-11")).toString());
     logger.info(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(decodeDate(DublinCoreValue.mk(
