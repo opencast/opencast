@@ -181,7 +181,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.inspection.api.MediaInspectionService#inspect(java.net.URI, Map<String,String>)
+   * @see org.opencastproject.inspection.api.MediaInspectionService#inspect(java.net.URI, java.util.Map)
    */
   @Override
   public Job inspect(URI uri, final Map<String,String> options) throws MediaInspectionException {
@@ -210,7 +210,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
    * {@inheritDoc}
    *
    * @see org.opencastproject.inspection.api.MediaInspectionService#enrich(org.opencastproject.mediapackage.MediaPackageElement,
-   *      boolean, Map<String,String>)
+   *      boolean, java.util.Map)
    */
   @Override
   public Job enrich(final MediaPackageElement element, final boolean override, final Map<String,String> options)
