@@ -311,8 +311,8 @@ public class PartialImportWorkflowOperationHandlerTest {
 
     PartialImportWorkflowOperationHandler handler = new PartialImportWorkflowOperationHandler();
     handler.setComposerService(composerService);
-    handler.startConcatJob(encodingProfile, tracks, false);
-    handler.startConcatJob(encodingProfile, tracks, true);
+    handler.startConcatJob(encodingProfile, tracks, -1.0F, false);
+    handler.startConcatJob(encodingProfile, tracks, -1.0F, true);
   }
 
   /**
