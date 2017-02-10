@@ -282,23 +282,13 @@
     <!-- Enable and configure the failure URL for form-based logins -->
     <sec:form-login authentication-failure-url="/admin-ng/login.html?error" authentication-success-handler-ref="authSuccessHandler" />
 
-    <!-- Digest auth is used by capture agents and is used to enable transparent clustering of services -->
-    <sec:custom-filter position="BASIC_AUTH_FILTER" ref="digestFilter" />
+    <!-- Authentication filter chain -->
+    <sec:custom-filter position="BASIC_AUTH_FILTER" ref="authenticationFilters" />
 
     <sec:custom-filter ref="asyncTimeoutRedirectFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
 
     <!-- Opencast is shipping its own implementation of the anonymous filter -->
     <sec:custom-filter ref="anonymousFilter" position="ANONYMOUS_FILTER" />
-
-    <!-- Basic authentication
-    <sec:custom-filter after="BASIC_AUTH_FILTER" ref="basicAuthenticationFilter" />
-    -->
-
-    <!--
-      2-legged oauth is used by trusted 3rd party applications, including LTI producers.
-      If you do not plan to use OAuth, comment this out.
-    <sec:custom-filter after="BASIC_AUTH_FILTER" ref="oauthProtectedResourceFilter" />
-    -->
 
     <!-- Enables "remember me" functionality -->
     <sec:remember-me key="opencast" user-service-ref="userDetailsService" />
@@ -313,6 +303,27 @@
     <sec:logout success-handler-ref="logoutSuccessHandler" />
 
   </sec:http>
+
+  <!-- ############################# -->
+  <!-- # Authentication Filters    # -->
+  <!-- ############################# -->
+
+  <bean id="authenticationFilters" class="org.springframework.web.filter.CompositeFilter">
+    <property name="filters">
+      <list>
+        <!-- Digest auth is used by capture agents and is used to enable transparent clustering of services -->
+        <!-- ATTENTION! Do not deactivate the digest filter, otherwise the distributed setup would not work -->
+        <ref bean="digestFilter" />
+
+        <!-- Basic authentication  -->
+        <!-- <ref bean="basicAuthenticationFilter" /> -->
+
+        <!-- 2-legged oauth is used by trusted 3rd party applications, including LTI producers. -->
+        <!-- If you do not plan to use OAuth, comment this out. -->
+        <!-- <ref bean="oauthProtectedResourceFilter" /> -->
+      </list>
+    </property>
+  </bean>
 
   <!-- ########################################### -->
   <!-- # Custom ajax timeout Filter Definition   # -->
