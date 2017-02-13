@@ -24,6 +24,7 @@ package org.opencastproject.workflow.handler.inspection;
 import static java.lang.String.format;
 
 import org.opencastproject.inspection.api.MediaInspectionException;
+import org.opencastproject.inspection.api.MediaInspectionOptions;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
@@ -59,6 +60,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -79,10 +82,17 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /** Option to adjust whether mediapackages without media should be accepted */
   private static final String OPT_ACCEPT_NO_MEDIA = "accept-no-media";
 
+  /** Option to adjust whether the exact frame count should be determined
+      Note that this is an expensive operation. Its use should be avoided if not depending on the exact framecount
+      Default: false */
+  private static final String OPT_ACCURATE_FRAME_COUNT = "accurate-frame-count";
+
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
     CONFIG_OPTIONS.put(OPT_OVERWRITE, "Whether to rewrite existing metadata");
     CONFIG_OPTIONS.put(OPT_ACCEPT_NO_MEDIA, "Whether mediapackages with no media tracks should be accepted");
+    CONFIG_OPTIONS.put(OPT_ACCURATE_FRAME_COUNT,
+            "Whether the media inspection service should determine the exact frame count");
   }
 
   /** The inspection service */
@@ -146,6 +156,12 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
     boolean rewrite = "true".equalsIgnoreCase(operation.getConfiguration(OPT_OVERWRITE));
     boolean acceptNoMedia = "true".equalsIgnoreCase(operation.getConfiguration(OPT_ACCEPT_NO_MEDIA));
 
+    final Map<String, String> options = new HashMap<String, String>();
+    if ("true".equalsIgnoreCase(operation.getConfiguration(OPT_ACCURATE_FRAME_COUNT))) {
+      logger.info("Using accurate frame count for inspection media package {}", mediaPackage);
+      options.put(MediaInspectionOptions.OPTION_ACCURATE_FRAME_COUNT, Boolean.TRUE.toString());
+    }
+
     // Test if there are tracks in the mediapackage
     if (mediaPackage.getTracks().length == 0) {
       logger.warn("Recording {} contains no media", mediaPackage);
@@ -159,7 +175,7 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
       Job inspectJob = null;
       try {
-        inspectJob = inspectionService.enrich(track, rewrite);
+        inspectJob = inspectionService.enrich(track, rewrite, options);
         if (!waitForStatus(inspectJob).isSuccess()) {
           throw new WorkflowOperationException("Track " + track + " could not be inspected");
         }

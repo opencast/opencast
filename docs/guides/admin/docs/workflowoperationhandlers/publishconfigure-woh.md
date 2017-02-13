@@ -18,6 +18,7 @@ These are the keys that are configured through the workflow definition (The file
 |source-tags             |The tags of the mediapackage elements to publish.                                                       |engage-download                                |
 |url-pattern             |The pattern to insert the variables into to create the uri for the published element.                   |http://api.opencast.org/api/events/${event_id} |
 |with-published-elements |Use the current contents of the mediapackage instead of publishing elements to a channel                |true                                           |
+|check-availability      |Check if the media if reachable (default: false)                                                        |true                                           |
 |strategy                |Strategy if there is allready published material default is retract                                     |fail                                           |
 |mode                    |Control how elements are distributed: single, mixed or bulk (default: bulk)                             |mixed                                          |
 
@@ -73,6 +74,6 @@ These are the variables that are available when you define the url-pattern confi
             <configuration key="mimetype">application/json</configuration>
             <configuration key="source-tags">engage-download,engage-streaming</configuration>
             <configuration key="url-pattern">http://api.opencast.org/api/events/${event_id}</configuration>
-            <configuration key="with-published-elements">true</configuration>
+            <configuration key="check-availability">true</configuration>
         </configurations>
     </operation>

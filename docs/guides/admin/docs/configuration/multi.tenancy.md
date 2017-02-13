@@ -56,14 +56,6 @@ installation:
     prop.logo_mediamodule=/engage/ui/img/logo/opencast-icon.svg
     prop.logo_player=/engage/ui/img/logo/opencast.svg
 
-    # Define which parts of the admin ui should be visible
-    prop.adminui.i18n_tab_episode.enable=false
-    prop.adminui.i18n_tab_users.enable=false
-
-    # Define which parts of the engage ui should be visible
-    prop.engageui.link_download.enable=false
-    prop.engageui.link_download.enable=false
-
 Note that if you are running Apache httpd with mod_proxy in front of the Opencast installation, the port number will be
 -1.
 
