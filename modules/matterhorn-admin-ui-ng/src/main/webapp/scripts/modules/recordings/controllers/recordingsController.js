@@ -29,6 +29,7 @@ angular.module('adminNg.controllers')
         $scope.table.configure({
             columns: [{
                 name:  'status',
+                template: 'modules/recordings/partials/recordingStatusCell.html',
                 label: 'RECORDINGS.RECORDINGS.TABLE.STATUS'
             }, {
                 name:  'name',
