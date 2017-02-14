@@ -547,6 +547,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       final int total = persistence.countSeries();
       logger.info("Re-populating '{}' index with series. There are {} series to add to the index.", indexName, total);
+      final int responseInterval = (total / 100);
       Iterator<Tuple<DublinCoreCatalog, String>> databaseSeries = persistence.getAllSeries();
       final int[] current = new int[1];
       current[0] = 1;
@@ -573,9 +574,11 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                       messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                               SeriesItem.updateProperty(id, property.getKey(), property.getValue()));
                     }
-                    messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                    if (((current[0] % responseInterval) == 0) || (current[0] == total)) {
+                      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                             IndexRecreateObject
                                     .update(indexName, IndexRecreateObject.Service.Series, total, current[0]));
+                    }
                     current[0] += 1;
                     return null;
                   }
