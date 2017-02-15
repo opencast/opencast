@@ -33,7 +33,9 @@ import org.opencastproject.util.FileSupport;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,11 +66,14 @@ public class MediaPackageMergeTest {
   /** The target media package directory for merge tests */
   private MediaPackage targetPackage = null;
 
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
+
   @Before
   public void setUp() throws Exception {
 
     // Get hold of the tmp directory
-    tmpDir = FileSupport.getTempDirectory();
+    tmpDir = testFolder.newFolder();
 
     // Create a media package builder
     mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();

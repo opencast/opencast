@@ -24,7 +24,9 @@ package org.opencastproject.engage.theodul.manager.impl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -58,15 +60,18 @@ public class StaticResourceClassloaderTest {
     private File overrideDir;
     private File overrideResource;
 
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+
     @Before
     public void setUp() throws Exception {
         // create override directory and resource
         try {
-            String tempPath = System.getProperty("java.io.tmpdir");
-            overrideResource = new File(tempPath + File.separator + overrideDirName + File.separator + resourceFilename);
-            overrideDir = overrideResource.getParentFile();
+            File tempFolder = testFolder.newFolder("folder");
+            overrideDir = new File(tempFolder, overrideDirName);
+            overrideResource = new File(overrideDir, resourceFilename);
             overrideDir.mkdir();
-            logger.info("Creating " + overrideResource.getAbsolutePath());
+            logger.info("Creating {}", overrideResource);
             if (overrideResource.createNewFile()) {
                 // write something to ensure file existence
                 PrintWriter writer = new PrintWriter(overrideResource);

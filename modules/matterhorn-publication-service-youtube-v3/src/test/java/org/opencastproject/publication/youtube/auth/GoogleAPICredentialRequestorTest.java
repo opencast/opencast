@@ -32,12 +32,17 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.util.store.DataStore;
 
 import org.json.simple.parser.ParseException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
 
 public class GoogleAPICredentialRequestorTest {
+
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
 
   @Test(expected = IllegalArgumentException.class)
   public void testInvalidArgs() throws IOException, ParseException {
@@ -46,7 +51,8 @@ public class GoogleAPICredentialRequestorTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testFileDoesNotExist() throws IOException, ParseException {
-    GoogleAPICredentialRequestor.main(new String[] {"/this/path/does/exist", "credentialDataStore", "dataStoreDirectory"});
+    GoogleAPICredentialRequestor.main(new String[] {"/this/path/does/exist", "credentialDataStore",
+      "dataStoreDirectory"});
   }
 
   @Test
@@ -54,14 +60,18 @@ public class GoogleAPICredentialRequestorTest {
     final String clientId = "clientId";
     final String credentialDataStore = "credentialDataStore";
     final String dataStoreDirectory = "dataStoreDirectory";
-    final File clientSecrets = UnitTestUtils.getMockClientSecretsFile(clientId);
+    final File clientSecrets = UnitTestUtils.getMockClientSecretsFile(clientId,
+        testFolder.newFile("client-secrets-youtube-v3.json"));
     try {
       final OAuth2CredentialFactory credentialFactory = createMock(OAuth2CredentialFactory.class);
-      expect(credentialFactory.getDataStore(credentialDataStore, dataStoreDirectory)).andReturn(createMock(DataStore.class)).once();
-      expect(credentialFactory.getGoogleCredential(anyObject(DataStore.class), anyObject(ClientCredentials.class))).andReturn(new GoogleCredential()).once();
+      expect(credentialFactory.getDataStore(credentialDataStore, dataStoreDirectory))
+        .andReturn(createMock(DataStore.class)).once();
+      expect(credentialFactory.getGoogleCredential(anyObject(DataStore.class), anyObject(ClientCredentials.class)))
+        .andReturn(new GoogleCredential()).once();
       replay(credentialFactory);
       GoogleAPICredentialRequestor.setCredentialFactory(credentialFactory);
-      GoogleAPICredentialRequestor.main(new String[] {clientSecrets.getAbsolutePath(), credentialDataStore, dataStoreDirectory});
+      GoogleAPICredentialRequestor
+        .main(new String[] {clientSecrets.getAbsolutePath(), credentialDataStore, dataStoreDirectory});
     } finally {
       if (clientSecrets != null) {
         clientSecrets.delete();
