@@ -455,12 +455,17 @@ public final class EventIndexUtils {
     }
     event.setCreated(DateTimeSupport.toUTC(created.getTime()));
     String strPeriod = dc.getFirst(DublinCore.PROPERTY_TEMPORAL);
-    if (StringUtils.isNotBlank(strPeriod)) {
-      DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(dc.getFirst(DublinCore.PROPERTY_TEMPORAL));
-      event.setRecordingStartDate(DateTimeSupport.toUTC(period.getStart().getTime()));
-      event.setRecordingEndDate(DateTimeSupport.toUTC(period.getEnd().getTime()));
-      event.setDuration(period.getEnd().getTime() - period.getStart().getTime());
-    } else {
+    try {
+      if (StringUtils.isNotBlank(strPeriod)) {
+        DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(strPeriod);
+        event.setRecordingStartDate(DateTimeSupport.toUTC(period.getStart().getTime()));
+        event.setRecordingEndDate(DateTimeSupport.toUTC(period.getEnd().getTime()));
+        event.setDuration(period.getEnd().getTime() - period.getStart().getTime());
+      } else {
+        event.setRecordingStartDate(DateTimeSupport.toUTC(created.getTime()));
+      }
+    } catch (Exception e) {
+      logger.warn("Invalid start and end date/time for event {}: {}", event.getIdentifier(), strPeriod);
       event.setRecordingStartDate(DateTimeSupport.toUTC(created.getTime()));
     }
 
