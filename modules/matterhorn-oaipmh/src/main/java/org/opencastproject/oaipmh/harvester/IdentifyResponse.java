@@ -32,7 +32,7 @@ import org.w3c.dom.Document;
  * The "Identify" response.
  * See <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Identify">4.2 Identify</a> for further
  * information.
- * <p/>
+ * <p>
  * todo implement missing element accessors
  */
 public class IdentifyResponse extends OaiPmhResponse {

@@ -37,7 +37,7 @@ import java.util.NoSuchElementException;
  * The "ListRecords" response.
  * See <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#ListRecords">4.5 ListRecords</a> for further
  * information.
- * <p/>
+ * <p>
  * todo implement missing element accessors
  */
 public class ListRecordsResponse extends OaiPmhResponse {

@@ -75,9 +75,6 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo,
 
   /**
    * The alias under which the servlet is currently registered.
-   *
-   * @see HttpService#registerServlet(String, javax.servlet.Servlet, java.util.Dictionary,
-   *      org.osgi.service.http.HttpContext)
    */
   private String mountPoint;
 

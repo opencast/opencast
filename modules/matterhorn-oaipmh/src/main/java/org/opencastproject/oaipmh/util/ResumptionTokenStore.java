@@ -33,7 +33,7 @@ import java.util.Map;
 
 /**
  * Strategy to store resumption tokens. Uses a {@link org.apache.commons.collections.map.LRUMap}.
- * <p/>
+ * <p>
  * Use in {@link org.opencastproject.oaipmh.server.OaiPmhRepository#saveQuery(org.opencastproject.oaipmh.server.ResumableQuery)}
  * and {@link org.opencastproject.oaipmh.server.OaiPmhRepository#getSavedQuery(String)}.
  */
