@@ -152,7 +152,7 @@ public class CaptureAgentStateRestService {
     }, restParameters = {
       @RestParameter(name = "address", isRequired = false, type = Type.STRING, description = "Address of the agent"),
       @RestParameter(name = "state", isRequired = true, type = Type.STRING, description = "The state of the capture "
-        + "agent. Known states are: idle, shutting_down, capturing, uploading, unknown, offline")
+        + "agent. Known states are: idle, shutting_down, capturing, uploading, unknown, offline, error")
     }, reponses = {
       @RestResponse(description = "{agentName} set to {state}", responseCode = SC_OK),
       @RestResponse(description = "{state} is empty or not known", responseCode = SC_BAD_REQUEST),
