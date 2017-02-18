@@ -136,7 +136,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -156,22 +155,8 @@ import javax.management.ObjectInstance;
  */
 public class WorkflowServiceImpl extends AbstractIndexProducer implements WorkflowService, JobProducer, ManagedService {
 
-  /** The code to use for the incident service to report a failed capture. */
-  private static final int FAILED_CAPTURE_CODE = 1;
-  /** The code to use for the incident service to report a failed ingest. */
-  private static final int FAILED_INGEST_CODE = 2;
-
   /** The number of milliseconds in a second. */
   public static final long MILLISECONDS_IN_SECONDS = 1000L;
-
-  /** The unique service template that identifies the capture operation. */
-  public static final String CAPTURE_OPERATION_TEMPLATE = "capture";
-  /** The unique service template that identifies the ingest operation. */
-
-  public static final String INGEST_OPERATION_TEMPLATE = "ingest";
-
-  /** The unique service template that identifies the schedule operation. */
-  public static final String SCHEDULE_OPERATION_TEMPLATE = "schedule";
 
   /** Retry strategy property name */
   private static final String RETRY_STRATEGY = "retryStrategy";
@@ -2381,147 +2366,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   /**
-   * Find and fail jobs due to their status still being in effect after their start or end capture date and time.
-   *
-   * @param operation
-   *          The type of operation to look for. e.g. schedule, ingest, capturing
-   * @param workflowState
-   *          The workflow state the given operation needs to be in.
-   * @param buffer
-   *          The amount of time in seconds to wait after the beginning or ending of a capture before marking that
-   *          workflow as failed.
-   * @param useCaptureStartTime
-   *          Whether to use the start time or the end time of the capture to calculate if it is overdue.
-   * @throws WorkflowDatabaseException
-   *           if there is a problem reading the workflows from persistence
-   * @throws IllegalArgumentException
-   *           invalid buffer value, it must be equal or greater than 0
-   */
-  public void failJobs(String operation, WorkflowState workflowState, long buffer, boolean useCaptureStartTime)
-          throws WorkflowDatabaseException, IllegalArgumentException {
-    if (buffer < 0) {
-      throw new IllegalArgumentException("Buffer '" + buffer
-              + "' is not a valid value, it must be equal or greater than 0.");
-    }
-
-    Date now = new Date();
-    Date cutoffTime;
-
-    logger.info(
-            "Starting to look for workflows that in operation '%s' that have failed to start if now is %s after their start time.",
-            operation, Log.getHumanReadableTimeString(buffer));
-    // Note: getWorkflowInstances will only return a given number of results (default 20)
-    WorkflowQuery query = new WorkflowQuery().withState(workflowState).withDateBefore(now);
-    WorkflowSet result = getWorkflowInstances(query);
-    Integer offset = 0;
-
-    List<WorkflowInstance> workflowInstances = new ArrayList<WorkflowInstance>();
-    while (result.size() > 0) {
-      for (WorkflowInstance workflowInstance : result.getItems()) {
-        Date startTime = workflowInstance.getMediaPackage().getDate();
-        if (useCaptureStartTime) {
-          cutoffTime = new Date(startTime.getTime() + (buffer * MILLISECONDS_IN_SECONDS));
-        } else {
-          cutoffTime = new Date(startTime.getTime() + workflowInstance.getMediaPackage().getDuration()
-                  + (buffer * MILLISECONDS_IN_SECONDS));
-        }
-        logger.debug("%d's cutoff time is %s.", workflowInstance.getId(), cutoffTime);
-
-        if (!cutoffTime.before(now)) {
-          logger.debug("Ignoring %d as it is still within the grace period. %d", workflowInstance.getId(),
-                  (now.getTime() - cutoffTime.getTime()));
-          continue;
-        }
-        workflowInstances.add(workflowInstance);
-      }
-      offset++;
-      query = query.withStartPage(offset);
-      result = getWorkflowInstances(query);
-    }
-
-    int failedInstances = 0;
-    int cleaningFailed = 0;
-    for (WorkflowInstance workflowInstance : workflowInstances) {
-      WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
-      if (currentOperation == null) {
-        currentOperation = findIfFailedState(workflowInstance, operation);
-        if (currentOperation == null) {
-          logger.debug("Ignoring %d as it seems to have no current operation and it has the wrong failed operation.",
-                  workflowInstance.getId());
-          continue;
-        }
-      }
-
-      if (!operation.equals(currentOperation.getTemplate())) {
-        logger.debug("Ignoring %d as it is the wrong operation. It is '%s' instead of '%s'.", workflowInstance.getId(),
-                currentOperation.getTemplate(), operation);
-        continue;
-      }
-
-      try {
-        currentOperation.setState(WorkflowOperationInstance.OperationState.FAILED);
-        workflowInstance.setState(WorkflowState.FAILED);
-        update(workflowInstance);
-        removeTempFiles(workflowInstance);
-        recordFailedOperationIncident(currentOperation, operation, buffer);
-        failedInstances++;
-        logger.info("Setting %d to failed as it should have started.", workflowInstance.getId());
-      } catch (WorkflowException e) {
-        logger.warn("Unable to update workflow %d: %s", workflowInstance.getId(), ExceptionUtils.getStackTrace(e));
-        cleaningFailed++;
-      } catch (UnauthorizedException e) {
-        logger.warn("Unable to update workflow %d: %s", workflowInstance.getId(), ExceptionUtils.getStackTrace(e));
-        cleaningFailed++;
-      } catch (IllegalStateException e) {
-        logger.warn("Unable to fail job %s: %s", currentOperation.getId(), ExceptionUtils.getStackTrace(e));
-        cleaningFailed++;
-      } catch (NotFoundException e) {
-        logger.warn("Unable to fail job %d: %s", currentOperation.getId(), ExceptionUtils.getStackTrace(e));
-        cleaningFailed++;
-      } catch (ServiceRegistryException e) {
-        logger.warn("Unable to fail job %d: %s", currentOperation.getId(), ExceptionUtils.getStackTrace(e));
-        cleaningFailed++;
-      }
-    }
-
-    if (failedInstances > 0) {
-      logger.info("Cleaned up %d failed workflow instances", failedInstances);
-    }
-    if (cleaningFailed > 0) {
-      logger.warn("Cleaning failed for %d failed capture workflow instances", cleaningFailed);
-      throw new WorkflowDatabaseException("Unable to clean all failed capture workflow instances, see logs!");
-    }
-    logger.info(
-            "Finished looking for workflows in operation '%s' that have failed to start after %s their start time.",
-            operation, Log.getHumanReadableTimeString(buffer));
-  }
-
-  /**
-   * Records a failed incident for a capture or ingest operation.
-   *
-   * @param currentOperation
-   *          The current operation insteance
-   * @param operation
-   *          The operation type the job was in when this occurred
-   * @param buffer
-   *          The amount of buffer time the job was given before it was expected to move onto the next operation.
-   */
-  private void recordFailedOperationIncident(WorkflowOperationInstance currentOperation, String operation, long buffer)
-          throws NotFoundException, ServiceRegistryException {
-    Job job = serviceRegistry.getJob(currentOperation.getId());
-    int failedCode;
-    if (operation.equalsIgnoreCase(SCHEDULE_OPERATION_TEMPLATE)) {
-      failedCode = FAILED_CAPTURE_CODE;
-    } else {
-      failedCode = FAILED_INGEST_CODE;
-    }
-    TreeMap<String, String> properties = new TreeMap<String, String>();
-    properties.put("state", operation);
-    properties.put("buffer", Log.getHumanReadableTimeString(buffer));
-    getServiceRegistry().incident().recordFailure(job, failedCode, properties);
-  }
-
-  /**
    * Finds a given operation position in a WorkflowInstance if the operation is failed.
    *
    * @param workflowInstance
@@ -2542,29 +2386,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       last = current;
     }
     return result;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService#moveMissingCapturesFromUpcomingToFailedStatus(long)
-   */
-  @Override
-  public synchronized void moveMissingCapturesFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException,
-          IllegalArgumentException {
-    failJobs(SCHEDULE_OPERATION_TEMPLATE, WorkflowState.PAUSED, buffer, true);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService#moveMissingIngestsFromUpcomingToFailedStatus(long)
-   */
-  @Override
-  public synchronized void moveMissingIngestsFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException,
-          IllegalArgumentException {
-    failJobs(CAPTURE_OPERATION_TEMPLATE, WorkflowState.PAUSED, buffer, false);
-    failJobs(INGEST_OPERATION_TEMPLATE, WorkflowState.PAUSED, buffer, false);
   }
 
   @Override
