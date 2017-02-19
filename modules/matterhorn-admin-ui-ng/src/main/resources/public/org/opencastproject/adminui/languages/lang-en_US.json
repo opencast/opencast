@@ -1765,6 +1765,7 @@
        "FINISHED":  "Finished",
        "FAILED" :   "Failed",
        "FINISHED_WITH_COMMENTS": "Todo",
-       "SCHEDULED" : "Scheduled"
+       "SCHEDULED" : "Scheduled",
+       "RECORDING" : "Recording"
    }
 }

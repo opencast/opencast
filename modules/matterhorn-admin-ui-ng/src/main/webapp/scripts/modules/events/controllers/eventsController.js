@@ -29,13 +29,17 @@ angular.module('adminNg.controllers')
         $scope.stats.configure({
             stats: [
             {filters: [{name: 'status',
+                        filter: 'FILTERS.EVENTS.STATUS.LABEL',
+                        value: 'EVENTS.EVENTS.STATUS.SCHEDULED'}],
+             description: 'DASHBOARD.SCHEDULED'},
+            {filters: [{name: 'status',
+                        filter: 'FILTERS.EVENTS.STATUS.LABEL',
+                        value: 'EVENTS.EVENTS.STATUS.RECORDING'}],
+             description: 'DASHBOARD.RECORDING'},
+            {filters: [{name: 'status',
                         filter:'FILTERS.EVENTS.STATUS.LABEL',
                         value: 'EVENTS.EVENTS.STATUS.PROCESSING'}],
              description: 'DASHBOARD.RUNNING'},
-            {filters: [{name: 'status',
-                        filter:'FILTERS.EVENTS.STATUS.LABEL',
-                        value: 'EVENTS.EVENTS.STATUS.PROCESSED'}],
-             description: 'DASHBOARD.FINISHED'},
             {filters: [{name: 'status',
                         filter:'FILTERS.EVENTS.STATUS.LABEL',
                         value: 'EVENTS.EVENTS.STATUS.PROCESSING_FAILURE'}],
@@ -48,9 +52,9 @@ angular.module('adminNg.controllers')
                         value: 'EVENTS.EVENTS.STATUS.PROCESSED'}],
              description: 'DASHBOARD.FINISHED_WITH_COMMENTS'},
             {filters: [{name: 'status',
-                        filter: 'FILTERS.EVENTS.STATUS.LABEL',
-                        value: 'EVENTS.EVENTS.STATUS.SCHEDULED'}],
-             description: 'DASHBOARD.SCHEDULED'}
+                        filter:'FILTERS.EVENTS.STATUS.LABEL',
+                        value: 'EVENTS.EVENTS.STATUS.PROCESSED'}],
+             description: 'DASHBOARD.FINISHED'}
             ],
             resource:   'events',
             apiService: EventsResource
