@@ -547,7 +547,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       final int total = persistence.countSeries();
       logger.info("Re-populating '{}' index with series. There are {} series to add to the index.", indexName, total);
-      final int responseInterval = (total / 100);
+      final int responseInterval = (total < 100) ? 1 : (total / 100);
       Iterator<Tuple<DublinCoreCatalog, String>> databaseSeries = persistence.getAllSeries();
       final int[] current = new int[1];
       current[0] = 1;

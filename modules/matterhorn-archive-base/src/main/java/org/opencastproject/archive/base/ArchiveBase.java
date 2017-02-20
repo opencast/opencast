@@ -716,7 +716,7 @@ public abstract class ArchiveBase<RS extends ResultSet> extends AbstractIndexPro
       logger.error("Unable to load the archive entries: {}", e);
       throw new ServiceException(e.getMessage());
     }
-    final int responseInterval = (total / 100);
+    final int responseInterval = (total < 100) ? 1 : (total / 100);
     int errors = 0;
     while (episodes.hasNext()) {
       final Episode episode = episodes.next();
