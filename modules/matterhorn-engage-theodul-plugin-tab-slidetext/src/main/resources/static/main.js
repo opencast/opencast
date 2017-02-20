@@ -155,17 +155,17 @@ define(["require", "jquery", "underscore", "backbone", "engage/core"], function(
                 var segmentInformation = this.model.get("segments");
                 if (segmentInformation !== undefined) {
                     for (var i = 0; i < segmentInformation.length; i++) {
-                      if (segmentInformation[i].time) {
+                      if (segmentInformation[i] && segmentInformation[i].time) {
                         var segmentText = "No slide text available.";
 
                         if (segmentInformation[i].text)
                             segmentText = segmentInformation[i].text;
 
                         var segmentPreview = undefined;
-                          if (segmentInformation[i] !== undefined && segmentInformation[i].previews !== undefined &&
-                                segmentInformation[i].previews.preview !== undefined && segmentInformation[i].previews.preview.$ !== undefined) {
-                            segmentPreview = segmentInformation[i].previews.preview.$;
-                          }
+                        if (segmentInformation[i].previews && segmentInformation[i].previews.preview
+                            && segmentInformation[i].previews.preview.$) {
+                          segmentPreview = segmentInformation[i].previews.preview.$;
+                        }
                         segments.push(new Segment((segmentInformation[i].time / 1000), segmentPreview, segmentText));
                       } else {
                         Engage.log("Tab:Slidetext: Detected Segment with start time " + segmentInformation[i].time / 1000 +
