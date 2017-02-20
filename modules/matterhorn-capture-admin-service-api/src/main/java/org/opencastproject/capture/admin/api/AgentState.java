@@ -48,10 +48,10 @@ public interface AgentState {
   /** Constant <code>OFFLINE="offline"</code> */
   String OFFLINE = "offline";
 
-  /** Constant <code>ERROR="error</code> */
+  /** Constant <code>ERROR="error"</code> */
   String ERROR = "error";
 
   /** The collection of all known states. TODO: Remove this when the states are replaced with enums */
-  List<String> KNOWN_STATES = Arrays.asList(new String[] { IDLE, SHUTTING_DOWN, CAPTURING, UPLOADING, ERROR, UNKNOWN, OFFLINE });
+  List<String> KNOWN_STATES = Arrays.asList(IDLE, SHUTTING_DOWN, CAPTURING, UPLOADING, ERROR, UNKNOWN, OFFLINE);
 
 }

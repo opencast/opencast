@@ -51,7 +51,6 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageReferenceImpl;
 import org.opencastproject.mediapackage.NamespaceBindingException;
 import org.opencastproject.metadata.api.MediaPackageMetadata;
-import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.XmlNamespaceContext;
@@ -69,7 +68,9 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,6 +122,9 @@ public class DublinCoreTest {
   private File dcTempFile2 = null;
 
   private DublinCoreCatalogService service = null;
+
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
 
   /**
    * @throws java.lang.Exception
@@ -241,7 +245,7 @@ public class DublinCoreTest {
 
       // Create a new catalog and fill it with a few fields
       DublinCoreCatalog dcNew = DublinCores.mkOpencastEpisode().getCatalog();
-      dcTempFile1 = new File(FileSupport.getTempDirectory(), Long.toString(System.currentTimeMillis()));
+      dcTempFile1 = testFolder.newFile();
 
       // Add the required fields
       dcNew.add(PROPERTY_IDENTIFIER, dcSample.getFirst(PROPERTY_IDENTIFIER));

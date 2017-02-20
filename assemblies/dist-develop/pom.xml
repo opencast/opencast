@@ -12,11 +12,12 @@
 
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
+    <packaging.definition>${project.basedir}/target/classes/package.xml</packaging.definition>
   </properties>
 
-  <artifactId>opencast-dist-allinone</artifactId>
+  <artifactId>opencast-dist-develop</artifactId>
   <packaging>karaf-assembly</packaging>
-  <name>Assemblies // Distribution All-In-One</name>
+  <name>Assemblies // Distribution Develop</name>
 
   <dependencies>
     <dependency>
@@ -81,6 +82,13 @@
         <filtering>false</filtering>
         <includes>
           <include>**/*</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>..</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>package.xml</include>
         </includes>
       </resource>
     </resources>

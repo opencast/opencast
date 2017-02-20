@@ -13,6 +13,7 @@
   <properties>
     <checkstyle.skip>true</checkstyle.skip>
     <opencast.basedir>${project.basedir}/..</opencast.basedir>
+    <packaging.definition>${opencast.basedir}/assemblies/package.xml</packaging.definition>
   </properties>
 
   <groupId>org.opencastproject.assemblies</groupId>
@@ -20,16 +21,34 @@
   <packaging>pom</packaging>
   <name>Assemblies</name>
 
-  <modules>
-    <module>karaf-features</module>
-    <module>dist-admin</module>
-    <module>dist-adminpresentation</module>
-    <module>dist-adminworker</module>
-    <module>dist-allinone</module>
-    <module>dist-ingest</module>
-    <module>dist-presentation</module>
-    <module>dist-worker</module>
-  </modules>
+  <profiles>
+    <profile>
+      <id>dist</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+
+      <modules>
+        <module>karaf-features</module>
+        <module>dist-admin</module>
+        <module>dist-adminpresentation</module>
+        <module>dist-adminworker</module>
+        <module>dist-allinone</module>
+        <module>dist-ingest</module>
+        <module>dist-presentation</module>
+        <module>dist-worker</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>dev</id>
+
+      <modules>
+        <module>karaf-features</module>
+        <module>dist-develop</module>
+      </modules>
+    </profile>
+  </profiles>
 
   <build>
     <plugins>
@@ -178,19 +197,29 @@
           <artifactId>maven-assembly-plugin</artifactId>
           <executions>
             <execution>
-              <id>bin</id>
               <phase>package</phase>
               <goals>
                 <goal>single</goal>
               </goals>
               <configuration>
                 <descriptors>
-                  <descriptor>${opencast.basedir}/assemblies/package.xml</descriptor>
+                  <descriptor>${packaging.definition}</descriptor>
                 </descriptors>
                 <outputDirectory>${opencast.basedir}/build/</outputDirectory>
                 <appendAssemblyId>false</appendAssemblyId>
                 <tarLongFileMode>gnu</tarLongFileMode>
+                <attach>false</attach>
               </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-install</id>
+              <phase>none</phase>
             </execution>
           </executions>
         </plugin>
