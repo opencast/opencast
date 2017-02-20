@@ -122,23 +122,18 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 }
             };
 
-            scope.initHumanReadableTimes = function () {
+            scope.setHumanReadableTimes = function () {
 
               var n = 0;
               angular.forEach(scope.video.segments, function(segment, key) {
                 segment.startTime = scope.formatMilliseconds(segment.start);
                 segment.endTime = scope.formatMilliseconds(segment.end);
-                scope.$watch('segment.start', function(new_time, old_time) {
-                  console.log("Found new Start time:" + segment.start);
-          //        segment.startTime = scope.formatMilliseconds(segment.start);
-                });
-                scope.$watch('segment.end', function(new_time, old_time) {
-                  console.log("Found new End time:" + segment.end);
-          //        segment.endTime = scope.formatMilliseconds(segment.start);
-                });
               });
-
             };
+
+            scope.$root.$on("segmentTimesUpdated", function () {
+              scope.setHumanReadableTimes();
+            });
 
             scope.updateStartTime = function (segment) {
               var newTime = scope.parseTime(segment.startTime);
@@ -147,6 +142,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 segment.start = newTime;
                 if (previousSegment) {
                   previousSegment.end = newTime;
+                  scope.$root.$broadcast("segmentTimesUpdated");
                 }
               }
             };
@@ -158,6 +154,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 segment.end = newTime;
                 if (nextSegment) {
                   nextSegment.start = newTime;
+                  scope.$root.$broadcast("segmentTimesUpdated");
                 }
               }
             };
@@ -194,7 +191,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
               return nextSegment;
             }
 
-            scope.initHumanReadableTimes();
+            scope.setHumanReadableTimes();
         }
     };
 }]);
