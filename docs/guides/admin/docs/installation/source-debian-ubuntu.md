@@ -6,9 +6,9 @@ These instructions outline how to install an all in one Opencast system on Ubunt
 Preparation
 -----------
 
-Create a dedicated Opencast user:
+Create a dedicated Opencast system user:
 
-    useradd -d /opt/opencast opencast
+    useradd -r -d /opt/opencast opencast
 
 Get Opencast source:
 
