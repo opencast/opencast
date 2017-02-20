@@ -70,7 +70,7 @@ modules/matterhorn-admin-ui-ng/src/main/webapp/lib/chosen.jquery.*
 modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-chosen.js
 modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-chosen.min.js
   Angular Binding for Harvest Chosen
-  Version 1.5.1
+  Version 1.6.0
   Copyright (c) 2013 Localytics http://www.localytics.com
   MIT License
 
