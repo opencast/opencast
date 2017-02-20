@@ -127,7 +127,7 @@ Make sure the path to Opencast is set correctly:
 
 Install the unit file:
 
-    cp docs/scripts/service/opencast.service /usr/lib/systemd/system/
+    cp docs/scripts/service/opencast.service /etc/systemd/system/
     systemctl daemon-reload
 
 Start Opencast and make it run automatically:
