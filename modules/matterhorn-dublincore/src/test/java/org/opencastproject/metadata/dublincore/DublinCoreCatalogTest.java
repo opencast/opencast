@@ -34,7 +34,9 @@ import com.entwinemedia.fn.FnX;
 import com.entwinemedia.fn.Unit;
 import com.entwinemedia.fn.data.Opt;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,6 +45,9 @@ import java.io.InputStream;
 
 public class DublinCoreCatalogTest {
   private static final EName PROPERTY_FOO_ID = new EName("http://foo.org/metadata", "id");
+
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
 
   @Test
   public void testLoadFromFile() throws Exception {
@@ -79,7 +84,7 @@ public class DublinCoreCatalogTest {
   @Test
   public void testLoadAndSave() throws Exception {
     final DublinCoreCatalog dc = load(IoSupport.classPathResourceAsFile("/dublincore-extended.xml").get());
-    final File out = File.createTempFile("dublincore", "xml");
+    final File out = testFolder.newFile("dublincore.xml");
     IoSupport.withResource(new FileOutputStream(out), new FnX<FileOutputStream, Unit>() {
       @Override public Unit apx(FileOutputStream out) throws Exception {
         dc.toXml(out, false);

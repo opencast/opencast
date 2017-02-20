@@ -468,6 +468,11 @@ modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-wizard/.*
   Copyright (c) 2013-2014 Martin Gontovnikas http://www.gon.to/
   Licensed under MIT
 
+modules/matterhorn-admin-ui-ng/bower_components/angular-hotkeys/.*
+  angular-wizard 0.6.1 (https://github.com/chieffancypants/angular-hotkeys)
+  Copyright (c) 2014 Wes Cruver
+  Licensed under MIT
+
 modules/matterhorn-engage-ui/src/main/resources/ui/js/alertify/alertify.js
   AlertifyJS - v0.13.12
   Copyright Fabien Doiron <fabien.doiron@gmail.com>

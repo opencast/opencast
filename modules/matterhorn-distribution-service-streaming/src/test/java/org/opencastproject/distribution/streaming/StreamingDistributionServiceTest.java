@@ -50,7 +50,9 @@ import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -67,6 +69,9 @@ public class StreamingDistributionServiceTest {
   private File distributionRoot = null;
   private ServiceRegistry serviceRegistry = null;
   private DefaultOrganization defaultOrganization;
+
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
 
   @Before
   public void setUp() throws Exception {
@@ -135,7 +140,7 @@ public class StreamingDistributionServiceTest {
   @Test
   public void testUriFileConversionFlvWorkspace() throws Exception {
     final StreamingDistributionService.Locations loc = new StreamingDistributionService.Locations(
-            URI.create("rtmp://localhost/matterhorn-engage"), new File(System.getProperty("java.io.tmpdir")), false);
+            URI.create("rtmp://localhost/matterhorn-engage"), testFolder.newFolder(), false);
     final String channelId = "engage-player";
     final String mpId = "9f411edb-edf5-4308-8df5-f9b111d9d346";
     final String mpeId = "bed1cdba-2d42-49b1-b78f-6c6745fb064a";
@@ -156,7 +161,7 @@ public class StreamingDistributionServiceTest {
   @Test
   public void testUriFileConversionFlvDistribution() throws Exception {
     final StreamingDistributionService.Locations loc = new StreamingDistributionService.Locations(
-            URI.create("rtmp://localhost/matterhorn-engage"), new File(System.getProperty("java.io.tmpdir")), false);
+            URI.create("rtmp://localhost/matterhorn-engage"), testFolder.newFolder(), false);
     final String channelId = "engage-player";
     final String mpId = "9f411edb-edf5-4308-8df5-f9b111d9d346";
     final String mpeId = "bed1cdba-2d42-49b1-b78f-6c6745fb064a";
@@ -177,7 +182,7 @@ public class StreamingDistributionServiceTest {
   @Test
   public void testUriFileConversionMp4Workspace() throws Exception {
     final StreamingDistributionService.Locations loc = new StreamingDistributionService.Locations(
-            URI.create("rtmp://localhost/matterhorn-engage"), new File(System.getProperty("java.io.tmpdir")), false);
+            URI.create("rtmp://localhost/matterhorn-engage"), testFolder.newFolder(), false);
     final String channelId = "engage-player";
     final String mpId = "9f411edb-edf5-4308-8df5-f9b111d9d346";
     final String mpeId = "bed1cdba-2d42-49b1-b78f-6c6745fb064a";
@@ -198,7 +203,7 @@ public class StreamingDistributionServiceTest {
   @Test
   public void testUriFileConversionMp4Distribution() throws Exception {
     final StreamingDistributionService.Locations loc = new StreamingDistributionService.Locations(
-            URI.create("rtmp://localhost/matterhorn-engage"), new File(System.getProperty("java.io.tmpdir")), false);
+            URI.create("rtmp://localhost/matterhorn-engage"), testFolder.newFolder(), false);
     final String channelId = "engage-player";
     final String mpId = "9f411edb-edf5-4308-8df5-f9b111d9d346";
     final String mpeId = "bed1cdba-2d42-49b1-b78f-6c6745fb064a";
@@ -218,10 +223,11 @@ public class StreamingDistributionServiceTest {
 
   @Test
   public void testUriFileRetrieval() throws Exception {
+    File testDir = testFolder.newFolder();
     final StreamingDistributionService.Locations loc1 = new StreamingDistributionService.Locations(
-            URI.create("rtmp://localhost/matterhorn-engage"), new File(System.getProperty("java.io.tmpdir")), false);
+            URI.create("rtmp://localhost/matterhorn-engage"), testDir, false);
     final StreamingDistributionService.Locations loc2 = new StreamingDistributionService.Locations(
-            URI.create("rtmp://localhost/matterhorn-engage/"), new File(System.getProperty("java.io.tmpdir")), false);
+            URI.create("rtmp://localhost/matterhorn-engage/"), testDir, false);
     final String channelId = "engage-player";
     final String mpId = "9f411edb-edf5-4308-8df5-f9b111d9d346";
     final String mpeId = "bed1cdba-2d42-49b1-b78f-6c6745fb064a";

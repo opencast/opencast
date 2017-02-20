@@ -1,19 +1,6 @@
 Video Editor: Setup
 ===================
 
-
-User Interface Configuration
-----------------------------
-
-Currently there are two config file parameters for UI options.
-
-The config file can be found at `etc/org.opencastproject.organization-mh_default_org.cfg`.
-
-1. `prop.adminui.prePostRoll`
-    - Change the duration of the pre and post roll (in seconds)
-2. `prop.adminui.minSegmentLength`
-    - Change the minimum required segment length (in seconds)
-
 Silence Detection Configuration
 -------------------------------
 

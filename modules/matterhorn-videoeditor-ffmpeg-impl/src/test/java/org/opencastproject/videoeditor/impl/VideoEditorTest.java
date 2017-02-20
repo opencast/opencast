@@ -66,7 +66,9 @@ import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -92,7 +94,8 @@ public class VideoEditorTest {
   private static final String FFMPEG_BINARY = "ffmpeg";
   /** SMIL file to run the editing */
   protected static Smil smil = null;
-  protected static String storageDir = "/tmp";
+  @Rule
+  public TemporaryFolder folder = new TemporaryFolder();
 
   /** Videos file to test. 2 videos of different framerate, must have same resolution */
   protected static final String mediaResource = "/testresources/testvideo_320x180.mp4";// 320x180, 30fps h264
@@ -281,7 +284,9 @@ public class VideoEditorTest {
 
     /* mock the osgi init for the video editor itself */
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-    EasyMock.expect(bc.getProperty("org.opencastproject.storage.dir")).andReturn(storageDir).anyTimes();
+    File storageDir = folder.newFolder();
+    logger.info("storageDir: {}", storageDir);
+    EasyMock.expect(bc.getProperty("org.opencastproject.storage.dir")).andReturn(storageDir.getPath()).anyTimes();
     EasyMock.expect(bc.getProperty("org.opencastproject.composer.ffmpegpath")).andReturn(FFMPEG_BINARY).anyTimes();
     EasyMock.expect(bc.getProperty(FFmpegAnalyzer.FFPROBE_BINARY_CONFIG)).andReturn("ffprobe").anyTimes();
     ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);

@@ -41,6 +41,7 @@ describe('adminNg.directives.playerDirective', function () {
         $httpBackend = _$httpBackend_;
         $timeout = _$timeout_;
         repository = _PlayerAdapterRepository_;
+        $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
     }));
 
     beforeEach(function () {

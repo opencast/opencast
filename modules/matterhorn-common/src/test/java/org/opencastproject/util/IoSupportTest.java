@@ -43,7 +43,9 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -67,6 +69,9 @@ public class IoSupportTest {
           + "adarga antigua, rocin flaco y galgo corredor.\n\n"
           + "                                 Miguel de Cervantes Saavedra\n"
           + "                      \"El ingenioso hidalgo don Quijote de la Mancha\"\n";
+
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
 
   /**
    * @throws URISyntaxException
@@ -194,9 +199,8 @@ public class IoSupportTest {
 
   @Test
   public void testDeleteLockedFile() throws Exception {
-    final File dst = File.createTempFile("test", "tmp");
+    final File dst = testFolder.newFile("test.tmp");
     final File src = new File(this.getClass().getResource("/dublincore.xml").toURI());
-    dst.deleteOnExit();
     locked(dst, new Effect.X<File>() {
       @Override
       protected void xrun(File file) throws IOException {

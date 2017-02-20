@@ -218,7 +218,6 @@
 
         For more details see http://wiki.apache.org/solr/SolrJmx
   -->
-  <jmx />
 
   <!-- the default high-performance update handler -->
   <updateHandler class="org.apache.solr.update.DirectUpdateHandler2">
