@@ -51,7 +51,7 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
         margin-top: 10px;
         padding-top: 10px;
     }
-    
+
     label {
         color: $medium-prim-color;
         font-size: 10px;
@@ -93,19 +93,19 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
 
                 &.left-deleted {
                     border-left-color: $segment-deleted;
-                }              
+                }
 
                 &.right-deleted {
                     border-right-color: $segment-deleted;
-                }    
+                }
 
                 &.left-deleted-selected {
                     border-left-color: $segment-deleted-selected;
-                }              
+                }
 
                 &.right-deleted-selected {
                     border-right-color: $segment-deleted-selected;
-                }                 
+                }
             }
 
             .track-toolbar {
@@ -113,10 +113,10 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
                 @include clearfix();
 
                 label {
-                    padding-top: 6px; 
-                    padding-left: 6px;                    
+                    padding-top: 6px;
+                    padding-left: 6px;
                 }
-                
+
                 .track-label,
                 .track-options {
                     float: left;
@@ -145,13 +145,13 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
                         vertical-align: middle;
                     }
                 }
-            }            
-            
+            }
+
             $segment-height: 24px;
             $segment-background: $segment-height;
             $segment-main-height: 60px;
             $segment-main-background: ($segment-main-height - 10);
-            
+
             .segments {
                 // background image set inline
                 overflow: hidden;
@@ -159,7 +159,7 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
                 background-size: 100% $segment-background;
                 background-position: bottom left;
                 height: $segment-height;
-                
+
                 // needed for zoom offset
                 position: relative;
 
@@ -204,10 +204,10 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
                         transition-duration: 250ms;
                         transition-timing-function: ease;
 
-                        a { 
+                        a {
                             display:none;
                         }
-                        
+
                         &.selected {
                             background: rgba($segment-selected, 0.5);
                             border: $thin-border-stroke darken($segment-selected, 10%);
@@ -218,7 +218,7 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
                                 }
                             }
 
-                            &.deleted {                                
+                            &.deleted {
                                 background-color: rgba($segment-deleted-selected, 0.5);
                                 border: $thin-border-stroke $segment-deleted-selected;
 
@@ -245,10 +245,10 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
                     &:first-child .segment {
                         border-left: none;
 
-                        &.selected { 
+                        &.selected {
                             border-left: none;
 
-                            &.deleted {   
+                            &.deleted {
                                 border-left: none;
                             }
                         }
@@ -259,26 +259,26 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
                     }
                 }
             }
-            
+
             &:first-child {
                 margin: 0;
 
                 .track-toolbar {
                     position: inherit;
                     margin: 0 0 5px 0;
-                    
+
                     label {
                         padding: 0px;
                     }
                 }
-                
+
                 .segments {
                     background-size: 100% $segment-main-background;
                     height: $segment-main-height;
 
                     .segment-container {
                         height: $segment-main-height;
-                        
+
                         .segment-seperator {
                             height: $segment-main-height;
                         }
@@ -288,8 +288,8 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
                         }
 
                         .segment {
-                            height: $segment-main-height;  
-                            
+                            height: $segment-main-height;
+
                             a {
                                 display: inline-block;
                                 float: right;
@@ -326,20 +326,20 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
                             }
 
                             &.small {
-                                a { 
+                                a {
                                     display: none;
                                 }
                                 a:last-child {
                                     display: inline-block;
                                 }
-                            }   
+                            }
 
                             &.tiny {
-                                a { 
+                                a {
                                     display: none;
                                 }
-                            }   
-                            
+                            }
+
                             &.selected {
                                 a {
                                     &:before {
@@ -354,7 +354,7 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
                                       color: rgba(0,0,0,0.4)
                                     }
                                 }
-                            }                            
+                            }
                         }
                     }
                 }
@@ -447,7 +447,7 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
                 }
             }
         }
-        
+
         #cursor_fake {
             opacity: 0.6;
             display: none;
@@ -574,5 +574,104 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
             line-height: 20px;
 
         }
+    }
+}
+
+// Segment list styles
+// ----------------------------------------
+
+.editor-segments {
+    background: #fff;
+    border: $thin-border-stroke $main-border-color;
+    margin-top: 5px;
+    width: 50%;
+
+    $segment-list-element-height: 35px;
+
+    .segment-list {
+
+      .segment-list-entry {
+          margin: 8px auto;
+          width: 98%;
+          height: $segment-list-element-height;
+          color: $dark-prim-color;
+          padding-right: 5px;
+          padding-left: 5px;
+          text-align: right;
+          //background: $off-white;
+          background: rgba($segment-normal, 0.5);
+          border: $thin-border-stroke $segment-normal;
+          transition-property: background-color, background, border;
+          transition-duration: 250ms;
+          transition-timing-function: ease;
+
+          a {
+              display: inline-block;
+              color: lighten($black, 10%);
+              padding: 9px;
+
+              &:before {
+                  width: 1em;
+                  text-align: center;
+              }
+
+              &:hover, &:active {
+                  &:before {
+                      color: $black !important; // force this for mouseover
+                  }
+              }
+
+              &.unused {
+                @include fa-icon($fa-var-square-o , before, inline-block, 0 0 0 0, 0, lighten($black, 10%), 1em);
+              }
+
+              &.used {
+                @include fa-icon($fa-var-check-square-o, before, inline-block, 0 0 0 0, 0, lighten($black, 10%), 1em);
+              }
+
+              &.remove {
+                  @include fa-icon($fa-var-times, before, inline-block, 0 0 0 0, 0, lighten($black, 10%), 1em);
+              }
+          }
+
+
+          &.selected {
+              background: rgba($segment-selected, 0.5);
+              border: $thin-border-stroke darken($segment-selected, 10%);
+
+              &.deleted {
+                  background-color: rgba($segment-deleted-selected, 0.5);
+                  border: $thin-border-stroke $segment-deleted-selected;
+              }
+          }
+
+          &.deleted {
+              background-color: rgba($segment-deleted, 0.5);
+              border: $thin-border-stroke $segment-deleted;
+          }
+
+          .segment-start-end {
+            float: left;
+            padding: 6px;
+          }
+
+          .segment-start {
+          }
+
+          .segment-end {
+          }
+
+          .segment-remove {
+            float: left;
+          }
+
+
+          input[type="text"] {
+            height: auto;
+            width: 90px;
+            padding: 0 5px;
+          }
+      }
+
     }
 }
