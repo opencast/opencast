@@ -22,7 +22,7 @@ The Opencast OAI-PMH server supports three metadata prefixes:
 |-------------------|--------------------------------------------------------------------|
 |oai_dc             |Dublin core element set 1.1 as required by the OAI-PMH specification|
 |matterhorn         |Opencast media package representation                               |
-|matterhorn-inlined |Opencast media packate representation with embedded catalogs        |
+|matterhorn-inlined |Opencast media package representation with embedded catalogs        |
 
 Note that the metadata prefix **oai_dc** is a standard metadata representation supported by all OAI-PMH servers and
 harverster, while the other prefixes are specific to Opencast.
@@ -34,8 +34,8 @@ Glossary
 
 |Term            |Description                                                                                         |
 |----------------|----------------------------------------------------------------------------------------------------|
-|Repository      |An entity that holds a set of items to be disseminated via the OAI-PMH protocol. Different repositories may hold different set of items. |
+|Repository      |An entity that holds a set of items to be disseminated via the OAI-PMH protocol. Different repositories may hold different sets of items. |
 |Channel         |The client's perspective on a repository. Each channel is backed by a single repository (1:1 relationship) so these terms may be used synonymously depending on the perspective. |
-|Item            |The base entity of a repository. In Matterhorn an item is equal to a mediapackage. |
+|Item            |The base entity of a repository. In Opencast an item is equal to a mediapackage. |
 |Metadata format |OAI-PMH repositories disseminate their content in various formats. The oai_dc format is mandatory to each OAI-PMH repository. Formats are expressed in XML. |
 |Metadata prefix |The prefix identifies a metadata format. The terms are often used synonymously. |
