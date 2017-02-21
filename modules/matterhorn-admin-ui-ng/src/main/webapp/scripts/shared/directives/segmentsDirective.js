@@ -53,7 +53,6 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     millis = parseInt(time.substring(9));
 
                 return millis + (seconds * 1000) + (minutes * 60000) + (hours * 36000000);
-
               }
             };
 
@@ -91,6 +90,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     scope.video.segments[index + 1].start = segment.start;
                     scope.video.segments.splice(index, 1);
                 }
+              scope.$root.$broadcast("segmentTimesUpdated");
             };
 
             /**
@@ -126,7 +126,6 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
              * Sets / Updates the human readable start and end times of the segments.
              */
             scope.setHumanReadableTimes = function () {
-              var n = 0;
               angular.forEach(scope.video.segments, function(segment, key) {
                 segment.startTime = scope.formatMilliseconds(segment.start);
                 segment.endTime = scope.formatMilliseconds(segment.end);
@@ -222,7 +221,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
               var index = scope.video.segments.indexOf(currentSegment);
               if (index > 0)
                 return scope.video.segments[index - 1];
-            }
+            };
 
             /**
              * Gets the next segment to the provided segment
@@ -233,7 +232,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
               var index = scope.video.segments.indexOf(currentSegment);
               if (index < (scope.video.segments.length - 1))
                 return scope.video.segments[index + 1];
-            }
+            };
 
             scope.setHumanReadableTimes();
         }
