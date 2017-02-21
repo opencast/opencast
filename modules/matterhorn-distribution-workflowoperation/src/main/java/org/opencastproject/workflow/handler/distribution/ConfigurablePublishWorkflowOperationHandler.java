@@ -46,6 +46,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -92,6 +93,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
   static final String SOURCE_TAGS = "source-tags";
   static final String SOURCE_FLAVORS = "source-flavors";
   static final String WITH_PUBLISHED_ELEMENTS = "with-published-elements";
+  static final String CHECK_AVAILABILITY = "check-availability";
   static final String STRATEGY = "strategy";
   static final String MODE = "mode";
 
@@ -183,8 +185,11 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
       }
     }
 
-    final boolean withPublishedElements = Boolean.parseBoolean(StringUtils.trimToEmpty(op
-            .getConfiguration(WITH_PUBLISHED_ELEMENTS)));
+    final boolean withPublishedElements = BooleanUtils.toBoolean(StringUtils.trimToEmpty(
+            op.getConfiguration(WITH_PUBLISHED_ELEMENTS)));
+
+    boolean checkAvailability = BooleanUtils.toBoolean(StringUtils.trimToEmpty(
+            op.getConfiguration(CHECK_AVAILABILITY)));
 
     if (getPublications(mp, channelId).size() > 0) {
       final String rePublishStrategy = StringUtils.trimToEmpty(op.getConfiguration(STRATEGY));
@@ -225,7 +230,8 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
 
     if (sourceFlavors.length > 0 || sourceTags.length > 0) {
       if (!withPublishedElements) {
-        Set<MediaPackageElement> elements = distribute(selector.select(mp, false), mp, channelId, mode);
+        Set<MediaPackageElement> elements = distribute(selector.select(mp, false), mp, channelId, mode,
+            checkAvailability);
         if (elements.size() > 0) {
           for (MediaPackageElement element : elements) {
               // Make sure the mediapackage is prompted to create a new identifier for this element
@@ -258,8 +264,8 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     return createResult(mp, Action.CONTINUE);
   }
 
-  private Set<MediaPackageElement> distribute(Collection<MediaPackageElement> elements,
-          MediaPackage mediapackage, String channelId, String mode) throws WorkflowOperationException {
+  private Set<MediaPackageElement> distribute(Collection<MediaPackageElement> elements,  MediaPackage mediapackage,
+          String channelId, String mode, boolean checkAvailability) throws WorkflowOperationException {
 
     Set<MediaPackageElement> result = new HashSet<MediaPackageElement>();
 
@@ -279,7 +285,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
       logger.info("Start bulk publishing of {} elements of media package '{}' to publication channel '{}'",
           new Object[] { bulkElementIds.size(), mediapackage, channelId });
       try {
-        Job job = distributionService.distribute(channelId, mediapackage, bulkElementIds, true);
+        Job job = distributionService.distribute(channelId, mediapackage, bulkElementIds, checkAvailability);
         jobs.add(job);
       } catch (DistributionException | MediaPackageException e) {
         logger.error("Creating the distribution job for {} elements of media package '{}' failed: {}",
@@ -292,7 +298,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
           new Object[] { singleElementIds.size(), mediapackage, channelId });
       for (String elementId : singleElementIds) {
         try {
-            Job job = distributionService.distribute(channelId, mediapackage, elementId, true);
+            Job job = distributionService.distribute(channelId, mediapackage, elementId, checkAvailability);
             jobs.add(job);
           } catch (DistributionException | MediaPackageException e) {
             logger.error("Creating the distribution job for element '{}' of media package '{}' failed: {}",

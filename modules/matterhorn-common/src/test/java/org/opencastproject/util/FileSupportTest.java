@@ -32,7 +32,9 @@ import static org.opencastproject.util.PathSupport.path;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,11 +49,13 @@ public class FileSupportTest {
   private File fileSupportTestsDirectory;
   private File fileSupportTestsDestinationDirectory;
 
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
+
   @Before
   public void setUp() throws IOException {
-    fileSupportTestsDirectory = new File(System.getProperty("java.io.tmpdir"), "fileSupportTestsDirectory");
-    fileSupportTestsDestinationDirectory = new File(System.getProperty("java.io.tmpdir"),
-            "fileSupportTestsDestinationDirectory");
+    fileSupportTestsDirectory = testFolder.newFolder();
+    fileSupportTestsDestinationDirectory = testFolder.newFolder();
     fileToLink = new File(fileSupportTestsDirectory.getAbsolutePath(), "file-to-link");
     linkLocation = new File(fileSupportTestsDirectory.getAbsolutePath(), "link-location");
     // Create test directory
@@ -123,7 +127,7 @@ public class FileSupportTest {
 
   @Test
   public void testDeleteHierarchyIfEmpty() throws Exception {
-    final File a = File.createTempFile("test", ".tmp");
+    final File a = testFolder.newFile("test.tmp");
     a.deleteOnExit();
     final File tmpDir = a.getParentFile();
     assertFalse(deleteHierarchyIfEmpty(tmpDir, a));

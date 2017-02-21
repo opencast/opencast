@@ -29,8 +29,6 @@ import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.archive.opencast.OpencastArchive;
 import org.opencastproject.archive.opencast.OpencastQueryBuilder;
 import org.opencastproject.archive.opencast.OpencastResultSet;
-import org.opencastproject.authorization.xacml.manager.api.AclService;
-import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.event.comment.EventComment;
@@ -182,7 +180,6 @@ public class IndexServiceImpl implements IndexService {
   private EventCatalogUIAdapter eventCatalogUIAdapter;
   private SeriesCatalogUIAdapter seriesCatalogUIAdapter;
 
-  private AclServiceFactory aclServiceFactory;
   private AuthorizationService authorizationService;
   private CaptureAgentStateService captureAgentStateService;
   private HttpMediaPackageElementProvider httpMediaPackageElementProvider;
@@ -198,11 +195,6 @@ public class IndexServiceImpl implements IndexService {
 
   /** The single thread executor service */
   private ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-  /** OSGi DI. */
-  public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
-    this.aclServiceFactory = aclServiceFactory;
-  }
 
   /** OSGi DI. */
   public void setAuthorizationService(AuthorizationService authorizationService) {
@@ -292,10 +284,6 @@ public class IndexServiceImpl implements IndexService {
   /** OSGi DI. */
   public void setGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
     this.jpaGroupRoleProvider = jpaGroupRoleProvider;
-  }
-
-  public AclService getAclService() {
-    return aclServiceFactory.serviceFor(securityService.getOrganization());
   }
 
   private static final Fn2<EventCatalogUIAdapter, String, Boolean> eventOrganizationFilter = new Fn2<EventCatalogUIAdapter, String, Boolean>() {

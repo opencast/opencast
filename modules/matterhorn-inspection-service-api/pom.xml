@@ -19,6 +19,10 @@
       <artifactId>matterhorn-common</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -30,7 +34,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Export-Package> org.opencastproject.inspection.api;versio=${project.version} </Export-Package>
+            <Export-Package>org.opencastproject.inspection.api.*;version=${project.version}</Export-Package>
           </instructions>
         </configuration>
       </plugin>
