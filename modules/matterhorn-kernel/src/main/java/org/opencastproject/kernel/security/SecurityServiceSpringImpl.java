@@ -93,19 +93,16 @@ public class SecurityServiceSpringImpl implements SecurityService {
     }
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(org);
-    if (auth == null) {
-      return SecurityUtil.createAnonymousUser(jaxbOrganization);
-    } else {
+    if (auth != null) {
       Object principal = auth.getPrincipal();
-      if (principal == null) {
-        return SecurityUtil.createAnonymousUser(jaxbOrganization);
-      }
-      if (principal instanceof UserDetails) {
+      if ((principal != null) && (principal instanceof UserDetails)) {
         UserDetails userDetails = (UserDetails) principal;
         if (userDirectory != null) {
           User user = userDirectory.loadUser(userDetails.getUsername());
-          delegatedUserHolder.set(user);
-          return JaxbUser.fromUser(user);
+          if (user != null) {
+            delegatedUserHolder.set(user);
+            return JaxbUser.fromUser(user);
+          }
         } else {
           Set<JaxbRole> roles = new HashSet<JaxbRole>();
           Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
@@ -116,10 +113,11 @@ public class SecurityServiceSpringImpl implements SecurityService {
           }
           return new JaxbUser(userDetails.getUsername(), null, jaxbOrganization, roles);
         }
-      } else {
-        return SecurityUtil.createAnonymousUser(jaxbOrganization);
       }
     }
+
+    // Return the anonymous user by default
+    return SecurityUtil.createAnonymousUser(jaxbOrganization);
   }
 
   /**
@@ -144,7 +142,7 @@ public class SecurityServiceSpringImpl implements SecurityService {
 
   /**
    * OSGi callback for setting the user directory.
-   * 
+   *
    * @param userDirectory
    *          the user directory
    */
