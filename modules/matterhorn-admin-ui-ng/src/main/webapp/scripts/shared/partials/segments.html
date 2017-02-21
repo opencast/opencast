@@ -15,10 +15,12 @@
                 ng-click="toggleSegment($event, segment)" />
             </div>
             <div class="segment-start segment-start-end"> Start:
-              <input type="text" ng-model="segment.startTime" ng-change="updateStartTime(segment)"/>
+              <input type="text" ng-model="segment.startTime" ng-change="updateStartTime(segment)"
+                     ng-disabled="segment.start === 0"/>
             </div>
             <div class="segment-end segment-start-end"> End:
-              <input type="text" ng-model="segment.endTime" ng-change="updateEndTime(segment)"/>
+              <input type="text" ng-model="segment.endTime" ng-change="updateEndTime(segment)"
+                     ng-disabled="segment.end === video.duration"/>
             </div>
             <a title="{{'VIDEO_TOOL.SEGMENTS.REMOVE_SEGMENT' | translate}}" class="remove"
                ng-if="video.segments.length > 1"

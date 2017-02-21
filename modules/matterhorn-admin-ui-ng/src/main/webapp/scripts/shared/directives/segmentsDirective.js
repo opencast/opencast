@@ -122,8 +122,10 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 }
             };
 
+            /**
+             * Sets / Updates the human readable start and end times of the segments.
+             */
             scope.setHumanReadableTimes = function () {
-
               var n = 0;
               angular.forEach(scope.video.segments, function(segment, key) {
                 segment.startTime = scope.formatMilliseconds(segment.start);
@@ -131,64 +133,106 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
               });
             };
 
+            /*
+             * Make sure that times are updates if needed.
+             */
             scope.$root.$on("segmentTimesUpdated", function () {
               scope.setHumanReadableTimes();
             });
 
+            /**
+             * Checks if a time is within the valid boundaries
+             * @param {type} time time to check
+             * @returns {Boolean} true if time is > 0 and <video duration
+             */
+            scope.timeValid = function (time) {
+              if (time >= 0 && time <= scope.video.duration) {
+                return true;
+              } else {
+                return false;
+              }
+            };
+
+            /**
+             * Set a new Start time of a segment, other segments are changed or deleted accordingly
+             * @param {type} segment that should change
+             */
+
             scope.updateStartTime = function (segment) {
               var newTime = scope.parseTime(segment.startTime);
               if (newTime && newTime !== segment.start) {
-                var previousSegment = scope.getPreviousSegment(segment);
-                segment.start = newTime;
-                if (previousSegment) {
-                  previousSegment.end = newTime;
-                  scope.$root.$broadcast("segmentTimesUpdated");
+                if (newTime > segment.end || ! scope.timeValid(newTime)) {
+                  segment.startTime = scope.formatMilliseconds(segment.start);
+                } else {
+                  var previousSegment = scope.getPreviousSegment(segment);
+                  segment.start = newTime;
+                  while (previousSegment &&previousSegment.start > newTime) {
+                    scope.removeSegment(previousSegment);
+                    previousSegment = scope.getPreviousSegment(segment);
+                  }
+                  if (previousSegment) {
+                    previousSegment.end = newTime;
+                    scope.$root.$broadcast("segmentTimesUpdated");
+                  }
                 }
               }
             };
 
+            /**
+             * Sets a new end time of a segment, other segments are changed or deleted accordingly
+             * @param {type} segment that should change
+             */
             scope.updateEndTime = function (segment) {
               var newTime = scope.parseTime(segment.endTime);
               if (newTime && newTime !== segment.end) {
-                var nextSegment = scope.getNextSegment(segment);
-                segment.end = newTime;
-                if (nextSegment) {
-                  nextSegment.start = newTime;
-                  scope.$root.$broadcast("segmentTimesUpdated");
+                if (newTime < segment.start || ! scope.timeValid(newTime)) {
+                  segment.endTime = scope.formatMilliseconds(segment.end);
+                } else {
+                  var nextSegment = scope.getNextSegment(segment);
+                  segment.end = newTime;
+                  while (nextSegment && nextSegment.end < newTime) {
+                    scope.removeSegment(nextSegment);
+                    nextSegment = scope.getNextSegment(segment);
+                  }
+                  if (nextSegment) {
+                    nextSegment.start = newTime;
+                    scope.$root.$broadcast("segmentTimesUpdated");
+                  }
                 }
               }
             };
 
+            /**
+             * Deletes a segment from the segment list. Times of other segments are not changed!
+             * @param {type} segment that should be deleted
+             */
+            scope.removeSegment = function (segment) {
+              if (segment) {
+                var index = scope.video.segments.indexOf(segment);
+                scope.video.segments.splice(index, 1);
+              }
+            };
+
+            /**
+             * Gets the segment previous to the provided segment.
+             * @param {type} currentSegment the reference segment
+             * @returns {unresolved} the previous segment or "undefinded" if current segment is the first
+             */
             scope.getPreviousSegment = function (currentSegment) {
-              var previousSegment;
-
-              angular.forEach(scope.video.segments, function(segment, key) {
-                if (currentSegment.start > segment.start) {
-                  if (! previousSegment) {
-                    previousSegment = segment;
-                  } else if (previousSegment.start < segment.start) {
-                    previousSegment = segment;
-                  }
-                }
-              });
-
-              return previousSegment;
+              var index = scope.video.segments.indexOf(currentSegment);
+              if (index > 0)
+                return scope.video.segments[index - 1];
             }
 
+            /**
+             * Gets the next segment to the provided segment
+             * @param {type} currentSegment the reference segment
+             * @returns {unresolved} the next segment or "undefined" if the current segment is the last.
+             */
             scope.getNextSegment = function (currentSegment) {
-              var nextSegment;
-
-              angular.forEach(scope.video.segments, function(segment, key) {
-                if (currentSegment.start < segment.start) {
-                  if (! nextSegment) {
-                    nextSegment = segment;
-                  } else if (nextSegment.start > segment.start) {
-                    nextSegment = segment;
-                  }
-                }
-              });
-
-              return nextSegment;
+              var index = scope.video.segments.indexOf(currentSegment);
+              if (index < (scope.video.segments.length - 1))
+                return scope.video.segments[index + 1];
             }
 
             scope.setHumanReadableTimes();
