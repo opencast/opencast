@@ -4,7 +4,7 @@
   immediate="true" activate="activate" deactivate="deactivate">
   <implementation class="org.opencastproject.index.service.message.RecordingMessageReceiverImpl" />
   <property name="service.description" value="Recording Message Receiver" />
-  <property name="destinationId" value="RECORDING.Adminui"/>
+  <property name="destinationId" value="RECORDING.Externalapi"/>
   <service>
     <provide interface="org.opencastproject.index.service.message.RecordingMessageReceiverImpl" />
   </service>
