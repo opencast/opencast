@@ -54,28 +54,21 @@ public class AsyncTimeoutRedirectFilter extends GenericFilterBean {
   private static final int TIMEOUT_ERROR_CODE = 419;
 
   @Override
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-          ServletException {
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+          throws IOException, ServletException {
     try {
       chain.doFilter(request, response);
       logger.debug("Chain processed normally");
-    } catch (IOException ex) {
-      throw ex;
     } catch (Exception ex) {
       Throwable[] causeChain = throwableAnalyzer.determineCauseChain(ex);
-      RuntimeException exception = (AuthenticationException) throwableAnalyzer.getFirstThrowableOfType(
-              AuthenticationException.class, causeChain);
+      RuntimeException exception = (AuthenticationException) throwableAnalyzer
+              .getFirstThrowableOfType(AuthenticationException.class, causeChain);
 
       if (exception == null) {
         exception = (AccessDeniedException) throwableAnalyzer.getFirstThrowableOfType(AccessDeniedException.class,
                 causeChain);
-      }
 
-      if (exception != null) {
-        if (exception instanceof AuthenticationException) {
-          throw exception;
-        } else if (exception instanceof AccessDeniedException) {
-
+        if (exception != null) {
           if (authenticationTrustResolver.isAnonymous(SecurityContextHolder.getContext().getAuthentication())) {
             logger.debug("User session expired or not logged in yet");
 
@@ -86,16 +79,15 @@ public class AsyncTimeoutRedirectFilter extends GenericFilterBean {
               logger.debug("Asynchronous call detected, send {} error code", TIMEOUT_ERROR_CODE);
               HttpServletResponse resp = (HttpServletResponse) response;
               resp.sendError(TIMEOUT_ERROR_CODE);
-            } else {
-              logger.debug("Redirect to login page");
-              throw exception;
+              return;
             }
-          } else {
-            throw exception;
           }
+          logger.debug("Redirect to login page");
+          throw exception;
         }
       }
 
+      throw ex;
     }
   }
 
