@@ -373,16 +373,12 @@ public class UsersEndpoint {
         JSONObject role = (JSONObject) roleObj;
         String rolename = (String) role.get("id");
         Role.Type roletype = Role.Type.valueOf((String) role.get("type"));
-        if (Role.Type.INTERNAL.equals(roletype) || Role.Type.GROUP.equals(roletype)) {
-          rolesSet.add(new JpaRole(rolename, organization, null, roletype));
-        }
+        rolesSet.add(new JpaRole(rolename, organization, null, roletype));
       }
     } else {
       // Or the use the one from the user if no one is given
       for (Role role : user.getRoles()) {
-        if (Role.Type.INTERNAL.equals(role.getType()) || Role.Type.GROUP.equals(role.getType())) {
-          rolesSet.add(new JpaRole(role.getName(), organization, role.getDescription(), role.getType()));
-        }
+        rolesSet.add(new JpaRole(role.getName(), organization, role.getDescription(), role.getType()));
       }
     }
 
