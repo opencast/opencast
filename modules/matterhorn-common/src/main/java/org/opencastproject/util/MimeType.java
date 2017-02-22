@@ -174,6 +174,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
       case "mp4": return mimeType("video", "mp4", "mp4");
       case "mkv": return mimeType("video", "x-matroska" , "mkv");
       case "webm": return mimeType("video", "webm", "webm");
+      case "zip": return mimeType("application", "zip", "zip");
 
 
       default: return null;

@@ -118,7 +118,6 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
    */
   protected AbstractMediaPackageElement(Type elementType, MediaPackageElementFlavor flavor, URI uri) {
     this(null, elementType, flavor, uri, null, null, null);
-    //this.setMimeType(MimeType.determineMimeType(uri.toString()));
   }
 
   /**
