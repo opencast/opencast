@@ -310,9 +310,7 @@ public class UsersEndpoint {
       for (Object role : rolesArray.get()) {
         JSONObject roleAsJson = (JSONObject) role;
         Role.Type roletype = Role.Type.valueOf((String) roleAsJson.get("type"));
-        if (Role.Type.INTERNAL.equals(roletype) || Role.Type.GROUP.equals(roletype)) {
-          rolesSet.add(new JpaRole(roleAsJson.get("id").toString(), organization, null, roletype));
-        }
+        rolesSet.add(new JpaRole(roleAsJson.get("id").toString(), organization, null, roletype));
       }
     } else {
       rolesSet.add(new JpaRole(organization.getAnonymousRole(), organization));
