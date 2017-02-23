@@ -32,7 +32,7 @@ angular.module('adminNg.directives')
             collection: '=',
             save:       '='
         },
-        link: function (scope) {
+        link: function (scope, element) {
             scope.submit = function () {
                 // Wait until the change of the value propagated to the parent's
                 // metadata object.
@@ -66,7 +66,7 @@ angular.module('adminNg.directives')
                 scope.editMode = true;
                 scope.focusTimer = $timeout(function () {
                   if ($('[chosen]')) {
-                    angular.element($('[chosen]')[0]).trigger('chosen:activate');
+                    element.find('select').trigger('chosen:activate');
                   }
                 });
             };
