@@ -70,7 +70,7 @@
     <Extensions>flc,fli,cel</Extensions>
   </MimeType>
   <MimeType>
-    <Type>image/x-png</Type>
+    <Type>image/png</Type>
     <Description>PNG image</Description>
     <Extensions>png</Extensions>
   </MimeType>

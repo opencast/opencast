@@ -2343,7 +2343,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
    * @returns {undefined}
    */
   function loadAndAppendCaptions(videoDataView) {
-    console.log("Video: Loading Captions.");
+    Engage.log("Video: Loading Captions.");
     var tracks        = Engage.model.get('mediaPackage').get('tracks');
     var attachments   = Engage.model.get('mediaPackage').get('attachments')
     var videoDisplays = videoDataView.model.get('ids');
@@ -2352,7 +2352,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     // Load from attachment
     for(var a in attachments) {
       if(attachments[a].mimetype == "text/vtt") {
-        console.log("Found caption in attachments.");
+        Engage.log("Found caption in attachments.");
         captionsURL = attachments[a].url;
       }
     }
@@ -2360,7 +2360,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     // Load from track
     for(var a in tracks) {
       if(tracks[a].mimetype == "text/vtt") {
-        console.log("Found caption in tracks");
+        Engage.log("Found caption in tracks");
         captionsURL = tracks[a].url;
       }
     }
@@ -2376,7 +2376,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         label: 'Caption',
         src: captionsURL,
         mode: "hidden"
-      });
+      }, true);
     });
 
     activeCaption = videojs(videoDisplays[0]).remoteTextTracks()[0];

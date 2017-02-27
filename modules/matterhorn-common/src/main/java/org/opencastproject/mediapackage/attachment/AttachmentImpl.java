@@ -26,6 +26,8 @@ import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeType;
+import org.opencastproject.util.MimeTypes;
+import org.opencastproject.util.UnknownFileTypeException;
 
 import java.net.URI;
 
@@ -70,7 +72,9 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
           MimeType mimeType) {
     super(identifier, Type.Attachment, flavor, uri, size, checksum, mimeType);
     if (uri != null)
-      this.setMimeType(MimeType.determineMimeType(uri.toString()));
+      try {
+        this.setMimeType(MimeTypes.fromURI(uri));
+      } catch (UnknownFileTypeException e) { }
   }
 
   /**
@@ -90,7 +94,9 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
   protected AttachmentImpl(MediaPackageElementFlavor flavor, URI uri, long size, Checksum checksum, MimeType mimeType) {
     super(Type.Attachment, flavor, uri, size, checksum, mimeType);
     if (uri != null)
-      this.setMimeType(MimeType.determineMimeType(uri.toString()));
+      try {
+        this.setMimeType(MimeTypes.fromURI(uri));
+      } catch (UnknownFileTypeException e) { }
   }
 
   /**
