@@ -107,8 +107,8 @@ angular.module('adminNg.directives')
                 //FIXME: This should rather be a service I guess, so it won't be tied to modals.
                 //Its hard to unit test like this also
                 $scope.$parent.openTab(targetState.name);
+		focus();
             }
-            focus();
         };
 
         isReachable = function (stateName) {
