@@ -63,7 +63,12 @@ public class OaiPmhEntity {
   private boolean deleted = false;
 
   /** The last modification date */
-  @Column(name = "modification_date")
+  @Column(
+      name = "modification_date",
+      insertable = false,
+      updatable = false,
+      // this is H2 syntax - Opencast uses a dedicated database dependent schema in production
+      columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP()")
   @Temporal(TemporalType.TIMESTAMP)
   private Date modificationDate;
 
@@ -166,17 +171,7 @@ public class OaiPmhEntity {
   public Date getModificationDate() {
     return modificationDate;
   }
-
-  /**
-   * Sets the modification date
-   * 
-   * @param modificationDate
-   *          the modification date
-   */
-  public void setModificationDate(Date modificationDate) {
-    this.modificationDate = modificationDate;
-  }
-
+  
   /**
    * Returns serialized media package.
    * 

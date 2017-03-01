@@ -4,7 +4,7 @@ CREATE TABLE mh_oaipmh (
   repo_id VARCHAR(255) NOT NULL,
   series_id VARCHAR(128),
   deleted tinyint(1) DEFAULT '0',
-  modification_date DATETIME NOT NULL,
+  modification_date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   mediapackage_xml TEXT(65535) NOT NULL,
   series_dublincore_xml TEXT(65535),
   episode_dublincore_xml TEXT(65535),
