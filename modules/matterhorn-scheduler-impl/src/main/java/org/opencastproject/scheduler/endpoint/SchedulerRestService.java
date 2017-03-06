@@ -358,7 +358,7 @@ public class SchedulerRestService {
       } else {
         Long id = service.addEvent(eventCatalog, wfProperties);
         service.updateCaptureAgentMetadata(caProperties, tuple(id, eventCatalog));
-        return Response.status(Status.CREATED)
+        return Response.status(Status.CREATED).entity(id)
                 .header("Location", PathSupport.concat(new String[] { this.serverUrl, this.serviceUrl, id + ".xml" }))
                 .build();
       }
