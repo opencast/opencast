@@ -68,7 +68,7 @@ public class OaiPmhEntity {
       insertable = false,
       updatable = false,
       // this is H2 syntax - Opencast uses a dedicated database dependent schema in production
-      columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP()")
+      columnDefinition = "TIMESTAMP AS CURRENT_TIMESTAMP()")
   @Temporal(TemporalType.TIMESTAMP)
   private Date modificationDate;
 
