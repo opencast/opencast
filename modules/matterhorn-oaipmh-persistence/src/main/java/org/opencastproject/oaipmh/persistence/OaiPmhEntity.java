@@ -171,7 +171,7 @@ public class OaiPmhEntity {
   public Date getModificationDate() {
     return modificationDate;
   }
-  
+
   /**
    * Returns serialized media package.
    * 
