@@ -36,7 +36,12 @@
 
         &:hover {
             cursor: pointer;
-            @include linear-gradient($primary-color-green-light-1, $primary-color-green-dark-2);
+            @include linear-gradient($primary-color-green-light-1, darken($primary-color-green-dark-2, 5%));
+        }
+
+        &:focus {
+            cursor: pointer;
+            @include linear-gradient($primary-color-green-light-1, darken($primary-color-green-dark-2, 5%));
         }
 
         &:active {
@@ -55,7 +60,12 @@
 
         &:hover {
             cursor: pointer;
-            @include linear-gradient(lighten(#3a5e7e, 5%), darken(#2c9966, 2%));
+            @include linear-gradient(lighten(#3a5e7e, 5%), darken(#2c9966, 10%));
+        }
+
+        &:focus {
+            cursor: pointer;
+            @include linear-gradient(lighten(#3a5e7e, 5%), darken(#2c9966, 10%));
         }
 
         &:active {
@@ -73,7 +83,12 @@
 
         &:hover {
             cursor: pointer;
-            @include linear-gradient($primary-color-green-light-1, $primary-color-green-dark-2);
+            @include linear-gradient($primary-color-green-light-1, darken($primary-color-green-dark-2, 10%));
+        }
+
+        &:focus {
+            cursor: pointer;
+            @include linear-gradient($primary-color-green-light-1, darken($primary-color-green-dark-2, 10%));
         }
 
         &:active {
@@ -92,7 +107,12 @@
 
         &:hover {
             cursor: pointer;
-            @include linear-gradient(darken(#3a5e7e, 1%), darken(#2c9966, 2%));
+            @include linear-gradient(darken(#3a5e7e, 1%), darken(#2c9966, 10%));
+        }
+
+        &:focus {
+            cursor: pointer;
+            @include linear-gradient(darken(#3a5e7e, 1%), darken(#2c9966, 10%));
         }
 
         &:active {
@@ -111,7 +131,12 @@
 
         &:hover {
             cursor: pointer;
-            @include linear-gradient(lighten(#388ed6, 5%), darken(#2b77b9, 5%));
+            @include linear-gradient(lighten(#388ed6, 10%), darken(#2b77b9, 10%));
+        }
+
+        &:focus {
+            cursor: pointer;
+            @include linear-gradient(lighten(#388ed6, 10%), darken(#2b77b9, 10%));
         }
 
         &:active {
@@ -130,7 +155,12 @@
 
         &:hover {
             cursor: pointer;
-            @include linear-gradient(lighten(#55cef2, 5%), darken(#4da1f7, 5%));
+            @include linear-gradient(lighten(#55cef2, 5%), darken(#4da1f7, 10%));
+        }
+
+        &:focus {
+            cursor: pointer;
+            @include linear-gradient(lighten(#55cef2, 5%), darken(#4da1f7, 10%));
         }
 
         &:active {
@@ -147,6 +177,12 @@
         border: $thin-border-stroke darken($alt-red, 20%);
 
         &:hover {
+            cursor: pointer;
+            border: $thin-border-stroke darken($alt-red, 30%);
+            @include linear-gradient(lighten($alt-red, 10%), darken($alt-red, 10%));
+        }
+
+        &:focus {
             cursor: pointer;
             border: $thin-border-stroke darken($alt-red, 30%);
             @include linear-gradient(lighten($alt-red, 10%), darken($alt-red, 10%));
@@ -170,7 +206,14 @@
         &:hover {
             cursor: pointer;
             border: $thin-border-stroke darken($main-border-color, 2%);
-            @include linear-gradient(darken(#fff, 4%), darken(#f7f7f7, 8%));
+            @include linear-gradient(darken(#fff, 4%), darken(#f7f7f7, 10%));
+            color: $medium-prim-color;
+        }
+
+        &:focus {
+            cursor: pointer;
+            border: $thin-border-stroke darken($main-border-color, 2%);
+            @include linear-gradient(darken(#fff, 4%), darken(#f7f7f7, 10%));
             color: $medium-prim-color;
         }
 
