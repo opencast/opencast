@@ -99,6 +99,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     zoomReset: new Engage.Event('Video:resetZoom', 'resets position and zoom level', 'trigger'),
     zoomChange: new Engage.Event('Video:zoomChange', 'zoom level has changed', 'handler'),
     toggleCaptions: new Engage.Event('Video:toggleCaptions', 'toggle captions', 'trigger'),
+    captionsFound: new Engage.Event('Video:captionsFound', 'captions found', 'handler'),
     // events for mobile view
     switchVideo: new Engage.Event('Video:switch', 'switch the video', 'trigger'),
     showControls: new Engage.Event('Controls:show', 'show the controls', 'both'),
@@ -1036,6 +1037,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         Engage.trigger(plugin.events.focusVideo.getName(), currentFocusFlavor);
         videosInitialReadyness = false;
       }
+      if (Engage.model.get("captions")) {
+        $("#" + id_captions_button).removeClass("disabled");
+      }
     }
   }
 
@@ -1428,6 +1432,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
               }
             }
           }
+        });
+        Engage.on(plugin.events.captionsFound.getName(), function () {
+            $("#" + id_captions_button).removeClass("disabled");
         });
       }
 

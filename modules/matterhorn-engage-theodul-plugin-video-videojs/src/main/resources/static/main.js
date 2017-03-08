@@ -101,6 +101,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     zoomChange: new Engage.Event('Video:zoomChange', 'zoom level has changed', 'trigger'),
     switchVideo: new Engage.Event('Video:switch', 'switch the video', 'handler'),
     toggleCaptions: new Engage.Event('Video:toggleCaptions', 'toggle captions', 'handler'),
+    captionsFound: new Engage.Event('Video:captionsFound', 'captions found', 'handler')
   };
 
   var isDesktopMode = false;
@@ -2354,6 +2355,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       if(attachments[a].mimetype == "text/vtt") {
         Engage.log("Found caption in attachments.");
         captionsURL = attachments[a].url;
+        Engage.model.set("captions", true);
+        Engage.trigger(plugin.events.captionsFound.getName());
       }
     }
 
@@ -2362,6 +2365,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       if(tracks[a].mimetype == "text/vtt") {
         Engage.log("Found caption in tracks");
         captionsURL = tracks[a].url;
+        Engage.model.set("captions", true);
+        Engage.trigger(plugin.events.captionsFound.getName());
       }
     }
 
