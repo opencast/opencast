@@ -31,6 +31,7 @@ The following table contains the workflow operations that are available in an ou
 |compose             |Encode media files using FFmpeg                                |[Documentation](compose-woh.md)|
 |composite           |Compose two videos on one canvas.                              |[Documentation](composite-woh.md)|
 |concat              |Concatenate multiple video tracks into one video track         |[Documentation](concat-woh.md)|
+|configure-by-dcterm |Set workflow parameter if dublincore term matches value        |[Documentation](configure-by-dcterm-woh.md)|
 |copy                |Copy media package elements to target directory                |[Documentation](copy-woh.md)|
 |cover-image         |Generate a cover-image containing metadata                     |[Documentation](coverimage-woh.md)|
 |defaults            |Applies default workflow configuration values                  |[Documentation](defaults-woh.md)|
