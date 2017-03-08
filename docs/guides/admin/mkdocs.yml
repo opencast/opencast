@@ -100,6 +100,7 @@ pages:
    - Series: 'workflowoperationhandlers/series-woh.md'
    - Silence: 'workflowoperationhandlers/silence-woh.md'
    - Tag: 'workflowoperationhandlers/tag-woh.md'
+   - Tag-By-DCTerm: 'workflowoperationhandlers/tag-by-dcterm-woh.md'
    - Theme: 'workflowoperationhandlers/theme-woh.md'
    - Waveform: 'workflowoperationhandlers/waveform-woh.md'
    - Zip: 'workflowoperationhandlers/zip-woh.md'
