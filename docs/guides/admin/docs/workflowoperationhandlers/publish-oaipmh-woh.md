@@ -35,7 +35,7 @@ element will use the following default values:
 
 Note that `org.opencastproject.oaipmh.server.hosturl` is defined in
 `etc/org.opencastproject.organization-mh_default_org.cfg` and `org.opencastproject.oaipmh.mountpoint` is defined in
-`org.opencastproject.oaipmh.mountpoint=/oaipmh`.
+`custom.properties` and defaults to `/oaipmh`.
 
 Example:
 
