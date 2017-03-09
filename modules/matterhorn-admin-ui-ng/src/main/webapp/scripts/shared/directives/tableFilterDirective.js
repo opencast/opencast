@@ -22,6 +22,7 @@ angular.module('adminNg.directives')
                 return optionLabel;
             };
 
+
             scope.restoreFilters = function () {
                 angular.forEach(scope.filters.filters, function (filter, name) {
                     filter.value = Storage.get('filter', scope.namespace)[name];
@@ -31,10 +32,26 @@ angular.module('adminNg.directives')
 
             scope.filters.$promise.then(function () {
                 scope.restoreFilters();
+                scope.filters.map = {};
+                scope.filterInfo = {
+                                       map: scope.filters.map,
+                                       filters: scope.filters.filters
+                                   };
+                for (var key in scope.filters.filters) {
+                    scope.filters.map[key] = {
+                        options: {},
+                        type: scope.filters.filters[key].type,
+                        label: scope.filters.filters[key].label
+                    };
+                    var options = scope.filters.filters[key].options;
+                    options.forEach(function(option) {
+                         scope.filters.map[key].options[option.value] = option.label;
+                    });
+                }
             });
 
             scope.removeFilters = function () {
-                angular.forEach(scope.filters.filters, function (filter) {
+                angular.forEach(scope.filters.map, function (filter) {
                     delete filter.value;
                 });
 
@@ -54,10 +71,11 @@ angular.module('adminNg.directives')
                 Storage.put('filter', scope.namespace, filterName, filterValue);
             }, 250);
 
-            scope.selectFilterSelectValue = function (filterName, filter) {
+            scope.selectFilterSelectValue = function (filterName, filter)  {
                 scope.showFilterSelector = false;
                 scope.selectedFilter = null;
                 Storage.put('filter', scope.namespace, filterName, filter.value);
+                scope.filters.map[filterName].value = filter.value;
             };
 
             scope.toggleFilterSettings = function () {
@@ -66,6 +84,9 @@ angular.module('adminNg.directives')
 
             scope.selectFilterPeriodValue = function (filterName, filter) {
                 // Merge from-to values of period filter)
+                if (!filter.period.to || !filter.period.from) {
+                    return;
+                }
                 if (filter.period.to && filter.period.from) {
                     filter.value = new Date(filter.period.from).toISOString() + '/' + new Date(filter.period.to).toISOString();
                 }
@@ -74,6 +95,7 @@ angular.module('adminNg.directives')
                     scope.showFilterSelector = false;
                     scope.selectedFilter = null;
                     Storage.put('filter', scope.namespace, filterName, filter.value);
+                    scope.filters.map[filterName].value = filter.value;
                 }
             };
 
