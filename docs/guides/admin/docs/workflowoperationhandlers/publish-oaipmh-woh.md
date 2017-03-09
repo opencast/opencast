@@ -20,8 +20,7 @@ The PublishOaiPmhWorkflowOperation will bring your media to your OAI-PMH reposit
 |external-channel   |The optional channel name for the OAI-PMH publication element                                 |
 |external-mime-type |The optional mime type for the OAI-PMH publication element                                    |
 
-Note: The configuration keys `external-template`, `external-channel` and `external-mime-type` need to be set either
-all or none
+Note: The all or none of the configuration keys `external-template`, `external-channel` and `external-mime-type` must to be set.
 
 ## Customizing the OAI-PMH Publication Element
 
