@@ -98,24 +98,25 @@ public class OaiPmhRepositoryPersistenceTest {
 
   @Test
   public void testInsertRepoSecond() throws Exception {
-    final Date ref = currentDate();
+    final Date now = currentDate();
     final MediaPackage mp1 = MediaPackageSupport.loadFromClassPath("/mp1.xml");
     final MediaPackage mp2 = MediaPackageSupport.loadFromClassPath("/mp2.xml");
     final MediaPackage mp3 = MediaPackageSupport.loadFromClassPath("/mp3.xml");
     final OaiPmhRepository repo = repo(oaiPmhDatabase(mp1, mp2, mp3), Granularity.SECOND);
     assertThat(
-            "List all records",
+            "List all records yields 3 records",
             s(repo.selectVerb(params("ListRecords", null, FORMAT_PREFIX, null, null, null))),
             allOf(hasXPath("count(//oai20:ListRecords/oai20:record/oai20:header)", NS_CTX, returningANumber(),
                     equalTo(3.0)),
                     hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='10.0000/11']", NS_CTX),
                     hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='10.0000/12']", NS_CTX),
                     hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='10.0000/13']", NS_CTX)));
-    assertThat("List records from time in the past",
-            s(repo.selectVerb(params("ListRecords", null, FORMAT_PREFIX, enc(ref), null, null))),
+    assertThat("List records from time in the past yields 3 records",
+            s(repo.selectVerb(params("ListRecords", null, FORMAT_PREFIX, enc(now), null, null))),
             hasXPath("count(//oai20:ListRecords/oai20:record/oai20:header)", NS_CTX, returningANumber(), equalTo(3.0)));
-    assertThat("List records from time in the future",
-            s(repo.selectVerb(params("ListRecords", null, FORMAT_PREFIX, enc(currentDate()), null, null))),
+    final Date future = new Date(System.currentTimeMillis() + 1000);
+    assertThat("List records from time in the future yields no records",
+            s(repo.selectVerb(params("ListRecords", null, FORMAT_PREFIX, enc(future), null, null))),
             hasXPath("count(//oai20:ListRecords/oai20:record/oai20:header)", NS_CTX, returningANumber(), equalTo(0.0)));
   }
 
@@ -154,25 +155,29 @@ public class OaiPmhRepositoryPersistenceTest {
 
   @Test
   public void testSelectDateRange() throws Exception {
-    final Date ref1 = currentDate();
+    final Date ref1 = new Date();
     final MediaPackage mp1 = MediaPackageSupport.loadFromClassPath("/mp1.xml");
     final MediaPackage mp2 = MediaPackageSupport.loadFromClassPath("/mp2.xml");
     final MediaPackage mp3 = MediaPackageSupport.loadFromClassPath("/mp3.xml");
     final OaiPmhRepository repo = repo(oaiPmhDatabase(mp1), Granularity.SECOND);
-    final Date ref2 = currentDate();
+    // wait 1 second since the repo has a time granularity of seconds
+    Thread.sleep(1000);
+    final Date ref2 = new Date();
     repo.getPersistence().store(mp2, REPOSITORY_ID);
-    final Date ref3 = currentDate();
+    // wait 1 second since the repo has a time granularity of seconds
+    Thread.sleep(1000);
+    final Date ref3 = new Date();
     repo.getPersistence().store(mp3, REPOSITORY_ID);
-    assertThat("List records from time in the past",
+    assertThat("List records from time 1 yields all 3 records",
             s(repo.selectVerb(params("ListRecords", null, FORMAT_PREFIX, enc(ref1), null, null))),
             hasXPath("count(//oai20:ListRecords/oai20:record/oai20:header)", NS_CTX, returningANumber(), equalTo(3.0)));
-    assertThat("List records from mid time",
+    assertThat("List records from time 3 yields only the record record inserted last",
             s(repo.selectVerb(params("ListRecords", null, FORMAT_PREFIX, enc(ref3), null, null))),
             hasXPath("count(//oai20:ListRecords/oai20:record/oai20:header)", NS_CTX, returningANumber(), equalTo(1.0)));
-    assertThat("List records until mid time",
+    assertThat("List records until time 3 yields the first two records",
             s(repo.selectVerb(params("ListRecords", null, FORMAT_PREFIX, null, enc(ref3), null))),
             hasXPath("count(//oai20:ListRecords/oai20:record/oai20:header)", NS_CTX, returningANumber(), equalTo(2.0)));
-    assertThat("List records from until",
+    assertThat("List records from time 2 until time 3 yields the record inserted second",
             s(repo.selectVerb(params("ListRecords", null, FORMAT_PREFIX, enc(ref2), enc(ref3), null))),
             hasXPath("count(//oai20:ListRecords/oai20:record/oai20:header)", NS_CTX, returningANumber(), equalTo(1.0)));
   }
@@ -313,8 +318,7 @@ public class OaiPmhRepositoryPersistenceTest {
   private static long tickOffset = 2000;
 
   private static Date currentDate() {
-    tick = tick + tickOffset;
-    return new Date(tick);
+    return new Date();
   }
 
   private static OaiPmhRepository repo(final AbstractOaiPmhDatabase persistence, final Granularity granularity) {
