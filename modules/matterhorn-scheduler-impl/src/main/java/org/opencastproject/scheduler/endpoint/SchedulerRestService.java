@@ -51,7 +51,6 @@ import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.functions.Misc;
@@ -359,7 +358,7 @@ public class SchedulerRestService {
         Long id = service.addEvent(eventCatalog, wfProperties);
         service.updateCaptureAgentMetadata(caProperties, tuple(id, eventCatalog));
         return Response.status(Status.CREATED).entity(id)
-                .header("Location", PathSupport.concat(new String[] { this.serverUrl, this.serviceUrl, id + ".xml" }))
+                .header("Location", this.serverUrl + this.serviceUrl + "/" + id + ".xml")
                 .build();
       }
     } catch (UnauthorizedException e) {
@@ -504,7 +503,7 @@ public class SchedulerRestService {
       Long id = service.addEvent(eventCatalog, wfProperties);
       service.updateCaptureAgentMetadata(caProperties, tuple(id, eventCatalog));
       return Response.status(Status.CREATED)
-              .header("Location", PathSupport.concat(new String[] { this.serverUrl, this.serviceUrl, id + ".xml" }))
+              .header("Location", this.serverUrl + this.serviceUrl + "/" + id + ".xml")
               .build();
     } catch (Exception e) {
       prolongingService.stop(agentId);
