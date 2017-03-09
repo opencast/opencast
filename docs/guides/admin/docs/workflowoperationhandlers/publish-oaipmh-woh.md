@@ -3,7 +3,7 @@
 
 ## Description
 
-The PublishOaiPmhWorkflowOperation will bring your media to your OAI-PMH repositories.
+The `PublishOaiPmhWorkflowOperation` exposes your media's metadata in a OAI-PMH repository for harvesting by OAI-PMH aware applications.
 
 
 ## Parameter Table
@@ -54,7 +54,7 @@ template:
 
 Example:
 
-    https://www.externalURL.com/watch.html?series={series}&id={event}"
+    https://www.externalURL.com/watch.html?series={series}&id={event}
 
 The configuration key `external-mime-type` is used to set the mime type of the content return when accessing the
 URL of the publication element.
