@@ -1,6 +1,6 @@
 angular.module('adminNg.services')
-.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', '$translate', 'underscore', '$timeout',
-    function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate, _, $timeout) {
+.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', '$translate', 'underscore', '$timeout', 'localStorageService', 'AuthService',
+    function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate, _, $timeout, localStorageService, AuthService) {
 
     // -- constants ------------------------------------------------------------------------------------------------- --
 
@@ -45,29 +45,59 @@ angular.module('adminNg.services')
         };
         this.loadCaptureAgents();
 
-        this.reset = function () {
-          self.weekdays = _.clone(WEEKDAYS);
-          self.ud = {
-            upload: {},
+        this.reset = function (opts) {
+            self.weekdays = _.clone(WEEKDAYS);
+            self.ud = {
+                upload: {},
 
-            SCHEDULE_SINGLE: {
-              device: {
-                inputMethods: {}
-              }
-            },
+                SCHEDULE_SINGLE: {
+                    device: {
+                        inputMethods: {}
+                    }
+                },
 
-            SCHEDULE_MULTIPLE: {
-              device: {
-                inputMethods: {}
-              },
-              weekdays: {},
-              presentableWeekdays: ''
-            },
+                SCHEDULE_MULTIPLE: {
+                    device: {
+                        inputMethods: {}
+                    },
+                    weekdays: {},
+                    presentableWeekdays: ''
+                },
 
-            type: "UPLOAD"
-          };
+                type: "UPLOAD"
+            };
+
+            if (opts) {
+                var singleKeys = ['duration', 'start', 'device'];                        //Only apply these default fields to SCHEDULE_SINGLE
+
+                for (var key in opts) {
+                    if (key === 'type') {
+                      continue;
+                    }
+
+                    self.ud.SCHEDULE_MULTIPLE[key] = opts[key];
+
+                    if (singleKeys.indexOf(key) > -1) {
+                      self.ud.SCHEDULE_SINGLE[key] = opts[key];
+                    }
+                }
+
+                if (opts.presentableWeekdays) {
+                    self.ud.SCHEDULE_MULTIPLE.weekdays[opts.presentableWeekdays.toUpperCase()] = true;
+                }
+
+                if (opts.type) {
+                    self.ud.type = opts.type;
+                }
+
+                self.checkConflicts();
+            }
         };
         this.reset();
+
+        this.changeType = function() {
+            localStorageService.set('sourceSticky', getType());
+        }
 
         this.sortedWeekdays = _.map(self.weekdays, function(day, index) {
             return { key: index, translation: day };
@@ -78,6 +108,11 @@ angular.module('adminNg.services')
 
         this.roomChanged = function () {
             self.ud[self.ud.type].device.inputMethods = {};
+
+            self.ud[self.ud.type]
+                .device.inputs.forEach(function(input) {
+                    self.ud[self.ud.type].device.inputMethods[input.id] = true;
+                });
         };
 
         this.toggleWeekday = function (weekday) {
@@ -332,6 +367,58 @@ angular.module('adminNg.services')
 
         this.getUserEntries = function () {
             return self.ud;
+        };
+
+        this.setDefaultsIfNeeded = function() {
+                var defaults = {};
+                AuthService.getUser().$promise.then(function (user) {
+                    var orgProperties = user.org.properties;
+
+                    //Variables needed to determine an event's start time
+                    var startTime = orgProperties['admin.event.new.start_time'] || '08:00';
+                    var endTime = orgProperties['admin.event.new.end_time'] || '20:00';
+                    var durationMins = parseInt(orgProperties['admin.event.new.duration'] || 55);
+                    var intervalMins = parseInt(orgProperties['admin.event.new.interval'] || 60);
+
+                    var chosenSlot = moment( moment().format('YYYY-MM-DD') + ' ' + startTime );
+                    var endSlot =  moment( moment().format('YYYY-MM-DD') + ' ' + endTime );
+                    var dateNow = moment();
+                    var timeDiff = dateNow.unix() - chosenSlot.unix();
+
+                    //Find the next available timeslot for an event's start time
+                    if (timeDiff > 0) {
+                        var multiple = Math.ceil( timeDiff/(intervalMins * 60) );
+                        chosenSlot.add(multiple * intervalMins, 'minute');
+                        if (chosenSlot.unix() >= endSlot.unix()) {
+                            chosenSlot = moment( moment().format('YYYY-MM-DD') + ' ' + startTime )
+                                             .add(1, 'day');
+                        }
+                    }
+
+                    defaults.start = {
+                                         date: chosenSlot.format('YYYY-MM-DD'),
+                                         hour: parseInt(chosenSlot.format('H')),
+                                         minute: parseInt(chosenSlot.format('mm'))
+                                     }
+
+                    defaults.duration = {
+                                            hour: parseInt(durationMins / 60),
+                                            minute: durationMins % 60
+                                        };
+
+                    defaults.presentableWeekdays = chosenSlot.format('dd');
+
+                    if (self.captureAgents.length === 0) {
+                        //No capture agents, so user can only upload files
+                        defaults.type = UPLOAD;
+                    }
+                    else if (localStorageService.get('sourceSticky')) {
+                        //auto-select previously chosen source
+                        defaults.type = localStorageService.get('sourceSticky');
+                    }
+
+                    self.reset(defaults);
+                });
         };
     };
     return new Source();

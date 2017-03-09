@@ -62,6 +62,7 @@ angular.module('adminNg.controllers')
 
         if (args.current.stateController.isSourceState) {
             args.current.stateController.loadCaptureAgents();
+            args.current.stateController.setDefaultsIfNeeded();
         }
     });
 

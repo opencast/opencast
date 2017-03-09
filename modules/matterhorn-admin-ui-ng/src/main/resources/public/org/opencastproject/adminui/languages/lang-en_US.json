@@ -383,7 +383,8 @@
                "REPEATS": "Repeats",
                "REPEAT_ON": "Repeat on",
                "WEEKDAYS": "Weekdays"
-           }
+           },
+           "NO_SOURCE_AVAILABLE": "No capture agents available for scheduling"
          },
          "PROCESSING": {
            "CAPTION": "Processing",

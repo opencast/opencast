@@ -83,8 +83,10 @@
                             <label>
                                 <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle"
                                        class="source-toggle" value="SCHEDULE_SINGLE" data-upload-type="SCHEDULE_SINGLE"
-                                       ng-change="wizard.step.changeType()">
-                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_SINGLE.CAPTION">
+                                       ng-change="wizard.step.changeType()" ng-disabled="wizard.step.captureAgents.length === 0">
+                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_SINGLE.CAPTION"
+                                      ng-class="wizard.step.captureAgents.length === 0 ? 'ui-state-disabled' : ''"
+                                      ng-attr-title="{{ (wizard.step.captureAgents.length === 0 ? 'EVENTS.EVENTS.NEW.SOURCE.NO_SOURCE_AVAILABLE' : '') | translate }}">
                                     <!-- Schedule Single Event -->
                                 </span>
                             </label>
@@ -93,8 +95,10 @@
                             <label>
                                 <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle"
                                        class="source-toggle" value="SCHEDULE_MULTIPLE" data-upload-type="SCHEDULE_MULTIPLE"
-                                       ng-change="wizard.step.changeType()">
-                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.CAPTION">
+                                       ng-change="wizard.step.changeType()" ng-disabled="wizard.step.captureAgents.length === 0">
+                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.CAPTION"
+                                      ng-class="wizard.step.captureAgents.length === 0 ? 'ui-state-disabled' : ''"
+                                      ng-attr-title="{{ (wizard.step.captureAgents.length === 0 ? 'EVENTS.EVENTS.NEW.SOURCE.NO_SOURCE_AVAILABLE' : '') | translate }}">
                                     <!-- Schedule Multiple Events -->
                                 </span>
                             </label>
@@ -235,7 +239,9 @@
                                 ng-model="wizard.step.ud.SCHEDULE_SINGLE.device"
                                 ng-options="value.name for (id, value) in wizard.step.captureAgents"
                                 data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }}"
-                            />
+                            >
+                                <option value=""></option>
+                            </select>
                             </td>
                         </tr>
                         <tr>
@@ -353,7 +359,9 @@
                                 ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device"
                                 ng-options="value.name for (id, value) in wizard.step.captureAgents"
                                 data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }}"
-                            />
+                            >
+                                <option value=""></option>
+                            </select>
                             </td>
                         </tr>
                         <tr>
@@ -393,7 +401,9 @@
                         ng-options="w.title for (obj, w) in wizard.step.workflows"
                         data-placeholder="{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW' | translate }}"
                         no-results-text="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW_EMPTY' | translate }}'"
-                    />
+                    >
+                        <option value=""></option>
+                    </select>
 
                     <div id="new-event-workflow-configuration"
                          class="checkbox-container"
@@ -446,7 +456,9 @@
                                                     ng-options="id as name for (id, name) in wizard.step.acls"
                                                     data-placeholder="{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
                                                     no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
-                                                />
+                                                >
+                                                    <option value=""></option>
+                                                </select>
                                             </div>
                                         </td>
                                     </tr>
@@ -493,7 +505,9 @@
                                                     ng-options="id as name for (id, name) in wizard.step.roles"
                                                     data-placeholder="{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL' | translate }}"
                                                     no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.EMPTY' | translate }}'"
-                                                />
+                                                >
+                                                    <option value=""></option>
+                                                </select>
                                             </td>
                                             <td class="fit"><input type="checkbox"  ng-model="policy.read"/></td>
                                             <td class="fit"><input type="checkbox"  ng-model="policy.write"/></td>
