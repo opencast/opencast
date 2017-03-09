@@ -55,7 +55,6 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -90,15 +89,9 @@ public class OaiPmhRepositoryPersistenceTest {
     return encodeDate(a, Precision.Second).getValue();
   }
 
-  @Before
-  public void setUp() {
-    // init artificial clock
-    tick = System.currentTimeMillis();
-  }
-
   @Test
   public void testInsertRepoSecond() throws Exception {
-    final Date now = currentDate();
+    final Date now = new Date();
     final MediaPackage mp1 = MediaPackageSupport.loadFromClassPath("/mp1.xml");
     final MediaPackage mp2 = MediaPackageSupport.loadFromClassPath("/mp2.xml");
     final MediaPackage mp3 = MediaPackageSupport.loadFromClassPath("/mp3.xml");
@@ -122,12 +115,12 @@ public class OaiPmhRepositoryPersistenceTest {
 
   @Test
   public void testInsertRepoDay() throws Exception {
-    final Date ref = currentDate();
+    final Date ref = new Date();
     final MediaPackage mp1 = MediaPackageSupport.loadFromClassPath("/mp1.xml");
     final MediaPackage mp2 = MediaPackageSupport.loadFromClassPath("/mp2.xml");
     final MediaPackage mp3 = MediaPackageSupport.loadFromClassPath("/mp3.xml");
     final OaiPmhRepository repo = repo(oaiPmhDatabase(mp1, mp2, mp3), Granularity.DAY);
-    final Date ref2 = currentDate();
+    final Date ref2 = new Date();
     final long diff = (ref2.getTime() - ref.getTime()) / 1000;
     assertThat("List records from time in the past",
             s(repo.selectVerb(params("ListRecords", null, FORMAT_PREFIX, enc(ref), null, null))),
@@ -300,9 +293,7 @@ public class OaiPmhRepositoryPersistenceTest {
 
         @Override
         public Date currentDate() {
-          // both repo and db use an artificial clock that ensures that each new timestamp is more than a second
-          // ahead of the last.
-          return OaiPmhRepositoryPersistenceTest.currentDate();
+          return new Date();
         }
       };
       for (MediaPackage mp : mps)
@@ -311,14 +302,6 @@ public class OaiPmhRepositoryPersistenceTest {
     } catch (Exception e) {
       return chuck(e);
     }
-  }
-
-  private static long tick = System.currentTimeMillis();
-
-  private static long tickOffset = 2000;
-
-  private static Date currentDate() {
-    return new Date();
   }
 
   private static OaiPmhRepository repo(final AbstractOaiPmhDatabase persistence, final Granularity granularity) {
@@ -370,9 +353,7 @@ public class OaiPmhRepositoryPersistenceTest {
 
       @Override
       public Date currentDate() {
-        // both repo and db use an artificial clock that ensures that each new timestamp is more than a second
-        // ahead of the last.
-        return OaiPmhRepositoryPersistenceTest.currentDate();
+        return new Date();
       }
     };
   }
