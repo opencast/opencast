@@ -9,12 +9,12 @@ not been published before, this operation will skip.
 
 ## Parameter Table
 
-|Configuration Keys |Description                                                                                    |
-|-------------------|-----------------------------------------------------------------------------------------------|
-|source-flavors     |Republish any media package elements with one of these (comma-separated) flavors               |
-|source-tags        |Republish only media package elements that are tagged with one of these (comma-separated) tags |
-|repository         |The name of the OAI-PMH repository where the media should be updated                           |
-|merge              |Merge with existing published data                                                             |
+| Configuration Keys | Description                                                                                                     |
+|:-------------------|:----------------------------------------------------------------------------------------------------------------|
+| source-flavors     | Republish any media package elements with one of these (comma-separated) flavors                                |
+| source-tags        | Republish only media package elements that are tagged with one of these (comma-separated) tags                  |
+| repository         | The name of the OAI-PMH repository where the media should be updated                                            |
+| merge              | Merge with existing published data. Updated media package elements replace existing ones based on their flavor. |
 
 
 ## Operation Example
