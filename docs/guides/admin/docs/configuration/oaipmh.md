@@ -48,4 +48,6 @@ been set to **/oaipmh**, the following two lines
 
 should be present in `etc/security/mh_default_org.xml`.
 
-Note that the OAI-PMH specification demands boths GET and POST requests.
+Note that the OAI-PMH specification demands both GET and POST requests and that
+it does not feature any access restrictions. If you need to restrict access
+to OAI-PMH consider using Spring security or an iptables approach.
