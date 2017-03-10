@@ -75,7 +75,7 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
     // Check to see if the default value was set as a preset at the series or organization level
     return Opt.nul(presetProvider).bind(new Fn<PresetProvider, Opt<String>>() {
       @Override
-      public Opt<String> ap(PresetProvider presetProvider) {
+      public Opt<String> apply(PresetProvider presetProvider) {
         try {
           return Opt.nul(presetProvider.getProperty(seriesID, key));
         } catch (NotFoundException e) {

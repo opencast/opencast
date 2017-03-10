@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.util.data;
 
 import static org.opencastproject.util.data.Tuple.tuple;
@@ -411,6 +410,14 @@ public abstract class Option<A> implements Iterable<A> {
       return none();
   }
 
+  /** Convert an <code>Opt</code> into an <code>Option</code>. */
+  public static <A> Option<A> fromOpt(Opt<A> a) {
+    for (A x : a) {
+      return some(x);
+    }
+    return none();
+  }
+
   /** {@link #option(Object)} as a function. */
   public static <A> Function<A, Option<A>> option() {
     return new Function<A, Option<A>>() {
@@ -427,6 +434,7 @@ public abstract class Option<A> implements Iterable<A> {
    * @deprecated use {@link #orError(Throwable)} or {@link #orElse(Function0)} instead since it saves the need for
    *             creating new objects just for the sake of type soundness. Java unfortunately lacks a bottom type.
    */
+  @Deprecated
   public static <A> Function0<A> error(final String message) {
     return new Function0<A>() {
       @Override

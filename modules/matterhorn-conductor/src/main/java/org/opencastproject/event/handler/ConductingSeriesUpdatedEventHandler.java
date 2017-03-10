@@ -45,13 +45,13 @@ import java.util.concurrent.FutureTask;
  */
 public class ConductingSeriesUpdatedEventHandler {
 
-  private static final Logger logger = LoggerFactory.getLogger(SeriesUpdatedEventHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(ConductingSeriesUpdatedEventHandler.class);
   private static final String QUEUE_ID = "SERIES.Conductor";
 
   private SecurityService securityService;
   private MessageReceiver messageReceiver;
 
-  private ArchivePermissionsUpdatedEventHandler archivePermissionsUpdatedEventHandler;
+  private AssetManagerPermissionsUpdatedEventHandler assetManagerPermissionsUpdatedEventHandler;
   private SeriesUpdatedEventHandler seriesUpdatedEventHandler;
   private WorkflowPermissionsUpdatedEventHandler workflowPermissionsUpdatedEventHandler;
 
@@ -105,7 +105,7 @@ public class ConductingSeriesUpdatedEventHandler {
                   || SeriesItem.Type.UpdateAcl.equals(seriesItem.getType())
                   || SeriesItem.Type.Delete.equals(seriesItem.getType())) {
             seriesUpdatedEventHandler.handleEvent(seriesItem);
-            archivePermissionsUpdatedEventHandler.handleEvent(seriesItem);
+            assetManagerPermissionsUpdatedEventHandler.handleEvent(seriesItem);
             workflowPermissionsUpdatedEventHandler.handleEvent(seriesItem);
           }
         } catch (InterruptedException e) {
@@ -127,8 +127,8 @@ public class ConductingSeriesUpdatedEventHandler {
   }
 
   /** OSGi DI callback. */
-  public void setArchivePermissionsUpdatedEventHandler(ArchivePermissionsUpdatedEventHandler h) {
-    this.archivePermissionsUpdatedEventHandler = h;
+  public void setAssetManagerPermissionsUpdatedEventHandler(AssetManagerPermissionsUpdatedEventHandler h) {
+    this.assetManagerPermissionsUpdatedEventHandler = h;
   }
 
   /** OSGi DI callback. */

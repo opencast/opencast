@@ -156,4 +156,10 @@ public final class RequireUtil {
       return value;
     throw new IllegalArgumentException(value + " must not be smaller than " + min);
   }
+
+  public static long min(long value, long min) {
+    if (min <= value)
+      return value;
+    throw new IllegalArgumentException(value + " must not be smaller than " + min);
+  }
 }

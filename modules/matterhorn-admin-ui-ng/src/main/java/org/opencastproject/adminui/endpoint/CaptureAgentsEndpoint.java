@@ -21,14 +21,14 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
+import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.util.TextFilter;
@@ -39,7 +39,6 @@ import org.opencastproject.index.service.resources.list.query.AgentsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.matterhorn.search.SearchQuery.Order;
 import org.opencastproject.matterhorn.search.SortCriterion;
-import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SmartIterator;
 import org.opencastproject.util.data.Option;
@@ -48,8 +47,9 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import com.entwinemedia.fn.data.json.JField;
+import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -138,7 +138,7 @@ public class CaptureAgentsEndpoint {
     }
 
     // Filter agents by filter criteria
-    List<Agent> filteredAgents = new ArrayList<Agent>();
+    List<Agent> filteredAgents = new ArrayList<>();
     for (Entry<String, Agent> entry : service.getKnownAgents().entrySet()) {
       Agent agent = entry.getValue();
 
@@ -187,7 +187,7 @@ public class CaptureAgentsEndpoint {
     filteredAgents = new SmartIterator<Agent>(limit, offset).applyLimitAndOffset(filteredAgents);
 
     // Run through and build a map of updates (rather than states)
-    List<JValue> agentsJSON = new ArrayList<JValue>();
+    List<JValue> agentsJSON = new ArrayList<>();
     for (Agent agent : filteredAgents) {
       agentsJSON.add(generateJsonAgent(agent, /* Option.option(room), blacklist, */ inputs));
     }
@@ -211,18 +211,27 @@ public class CaptureAgentsEndpoint {
     return Response.status(SC_OK).build();
   }
 
+  /**
+   * Generate a JSON Object for the given capture agent with its related blacklist periods
+   *
+   * @param agent
+   *          The target capture agent
+   * @param withInputs
+   *          Whether the agent has inputs
+   * @return A {@link JValue} representing the capture agent
+   */
   private JValue generateJsonAgent(Agent agent, boolean withInputs) {
-    List<JField> fields = new ArrayList<JField>();
-    fields.add(f("Status", vN(agent.getState())));
+    List<Field> fields = new ArrayList<>();
+    fields.add(f("Status", v(agent.getState(), Jsons.BLANK)));
     fields.add(f("Name", v(agent.getName())));
-    fields.add(f("Update", vN(DateTimeSupport.toUTC(agent.getLastHeardFrom()))));
+    fields.add(f("Update", v(toUTC(agent.getLastHeardFrom()), Jsons.BLANK)));
 
     if (withInputs) {
       String devices = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_NAMES);
-      fields.add(f("inputs", (StringUtils.isEmpty(devices)) ? a() : generateJsonDevice(devices.split(","))));
+      fields.add(f("inputs", (StringUtils.isEmpty(devices)) ? arr() : generateJsonDevice(devices.split(","))));
     }
 
-    return j(fields);
+    return obj(fields);
   }
 
   /**
@@ -233,11 +242,11 @@ public class CaptureAgentsEndpoint {
    * @return A {@link JValue} representing the devices
    */
   private JValue generateJsonDevice(String[] devices) {
-    List<JValue> jsonDevices = new ArrayList<JValue>();
+    List<JValue> jsonDevices = new ArrayList<>();
     for (String device : devices) {
-      jsonDevices.add(j(f("id", v(device)), f("value", v(TRANSLATION_KEY_PREFIX + device.toUpperCase()))));
+      jsonDevices.add(obj(f("id", v(device)), f("value", v(TRANSLATION_KEY_PREFIX + device.toUpperCase()))));
     }
-    return a(jsonDevices);
+    return arr(jsonDevices);
   }
 
 }

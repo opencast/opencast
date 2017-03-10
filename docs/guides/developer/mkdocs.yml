@@ -32,6 +32,7 @@ pages:
 - Localization: 'localization.md'
 - Packaging: 'packaging.md'
 - Proposal Log: 'proposal-log.md'
+- Asset Manager: 'asset-manager.md'
 - Modules:
    - Overview: 'modules/index.md'
    - Admin UI:

@@ -22,12 +22,13 @@
 package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.Opt.nul;
+import static com.entwinemedia.fn.data.json.Jsons.BLANK;
+import static com.entwinemedia.fn.data.json.Jsons.NULL;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
-import static com.entwinemedia.fn.data.json.Jsons.jsonArrayFromList;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static java.lang.String.format;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
@@ -40,8 +41,9 @@ import static org.opencastproject.index.service.util.RestUtils.conflictJson;
 import static org.opencastproject.index.service.util.RestUtils.notFound;
 import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
+import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.RestUtil.R.badRequest;
-import static org.opencastproject.util.RestUtil.R.conflict;
+import static org.opencastproject.util.RestUtil.R.forbidden;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.R.serverError;
@@ -53,8 +55,6 @@ import org.opencastproject.adminui.exception.JobEndpointException;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
 import org.opencastproject.adminui.util.QueryPreprocessor;
-import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
-import org.opencastproject.archive.opencast.OpencastArchive;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
@@ -131,7 +131,6 @@ import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowUtil;
@@ -139,9 +138,11 @@ import org.opencastproject.workflow.api.WorkflowUtil;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.JField;
-import com.entwinemedia.fn.data.json.JObjectWrite;
+import com.entwinemedia.fn.data.json.Field;
+import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.Jsons;
+import com.entwinemedia.fn.data.json.Jsons.Functions;
 
 import net.fortuna.ical4j.model.property.RRule;
 
@@ -216,11 +217,6 @@ public abstract class AbstractEventEndpoint {
 
   public abstract JobEndpoint getJobService();
 
-  public abstract OpencastArchive getArchive();
-
-  /** A media package element provider used by the archive. */
-  public abstract HttpMediaPackageElementProvider getHttpMediaPackageElementProvider();
-
   public abstract AclService getAclService();
 
   public abstract EventCommentService getEventCommentService();
@@ -273,14 +269,14 @@ public abstract class AbstractEventEndpoint {
   @RestQuery(name = "getcataloguiadapters", description = "Returns the available catalog UI adapters as JSON", returnDescription = "The catalog UI adapters as JSON", reponses = {
           @RestResponse(description = "Returns the available catalog UI adapters as JSON", responseCode = HttpServletResponse.SC_OK) })
   public Response getCatalogAdapters() {
-    List<JValue> adapters = new ArrayList<JValue>();
+    List<JValue> adapters = new ArrayList<>();
     for (EventCatalogUIAdapter adapter : getIndexService().getEventCatalogUIAdapters()) {
-      List<JField> fields = new ArrayList<JField>();
+      List<Field> fields = new ArrayList<>();
       fields.add(f("flavor", v(adapter.getFlavor().toString())));
       fields.add(f("title", v(adapter.getUITitle())));
-      adapters.add(j(fields));
+      adapters.add(obj(fields));
     }
-    return okJson(a(adapters));
+    return okJson(arr(adapters));
   }
 
   @GET
@@ -372,7 +368,7 @@ public abstract class AbstractEventEndpoint {
     // for (WorkflowDefinition wflDef : workflowsDefinitions) {
     // if (wflDef.containsTag(WORKFLOWDEF_TAG)) {
     //
-    // actions.add(j(f("id", v(wflDef.getId())), f("title", v(Opt.nul(wflDef.getTitle()).or(""))),
+    // actions.add(obj(f("id", v(wflDef.getId())), f("title", v(Opt.nul(wflDef.getTitle()).or(""))),
     // f("description", v(Opt.nul(wflDef.getDescription()).or(""))),
     // f("configuration_panel", v(Opt.nul(wflDef.getConfigurationPanel()).or("")))));
     // }
@@ -381,13 +377,14 @@ public abstract class AbstractEventEndpoint {
     Event event = optEvent.get();
     List<JValue> pubJSON = eventPublicationsToJson(event);
 
-    return okJson(j(f("publications", a(pubJSON)), f("optout", vN(event.getOptedOut())),
-            f("blacklisted", vN(event.getBlacklisted())), f("review-status", vN(event.getReviewStatus()))));
+    return okJson(obj(f("publications", arr(pubJSON)), f("optout", v(event.getOptedOut(), Jsons.BLANK)),
+            f("blacklisted", v(event.getBlacklisted(), Jsons.BLANK)),
+            f("review-status", v(event.getReviewStatus(), Jsons.BLANK))));
   }
 
   private List<JValue> eventPublicationsToJson(Event event) {
-    List<JValue> pubJSON = new ArrayList<JValue>();
-    for (JObjectWrite json : Stream.$(event.getPublications()).filter(EventUtils.internalChannelFilter)
+    List<JValue> pubJSON = new ArrayList<>();
+    for (JObject json : Stream.$(event.getPublications()).filter(EventUtils.internalChannelFilter)
             .map(publicationToJson)) {
       pubJSON.add(json);
     }
@@ -417,7 +414,7 @@ public abstract class AbstractEventEndpoint {
 
     try {
       List<EventComment> comments = getEventCommentService().getComments(eventId);
-      List<Val> commentArr = new ArrayList<Val>();
+      List<Val> commentArr = new ArrayList<>();
       for (EventComment c : comments) {
         commentArr.add(c.toJson());
       }
@@ -567,9 +564,7 @@ public abstract class AbstractEventEndpoint {
         logger.warn("An ACL cannot be edited while an event is part of a current workflow because it might"
                 + " lead to inconsistent ACLs i.e. changed after distribution so that the old ACL is still "
                 + "being used by the distribution channel.");
-        JSONObject json = new JSONObject();
-        json.put("Error", "Unable to edit an ACL for a current workflow.");
-        return conflict(json.toJSONString());
+        return forbidden("Unable to edit an ACL for a current workflow.");
       } else {
         // The event doesn't exist as a mediapackage yet so use the scheduler service to update the ACL
         getSchedulerService().updateAccessControlList(getSchedulerService().getEventId(eventId), accessControlList);
@@ -841,8 +836,8 @@ public abstract class AbstractEventEndpoint {
 
     Boolean optedOut = event.getOptedOut();
 
-    return okJson(j(f("opt_out", v(optedOut != null ? optedOut : false)),
-            f("review_status", vN(event.getReviewStatus())), f("read_only", v(readOnly))));
+    return okJson(obj(f("opt_out", v(optedOut != null ? optedOut : false)),
+            f("review_status", v(event.getReviewStatus(), BLANK)), f("read_only", v(readOnly))));
   }
 
   @GET
@@ -887,6 +882,10 @@ public abstract class AbstractEventEndpoint {
                           @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "No content is returned.")
   public Response updateEventMetadata(@PathParam("eventId") String id, @FormParam("metadata") String metadataJSON)
           throws Exception {
+    Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
+    if (optEvent.isNone())
+      return notFound("Cannot find an event with id '%s'.", id);
+
     MetadataList metadataList = getIndexService().updateAllEventMetadata(id, metadataJSON, getIndex());
     return okJson(metadataList.toJSON());
   }
@@ -912,7 +911,7 @@ public abstract class AbstractEventEndpoint {
       media = mp.get().getTracks().length;
       publications = mp.get().getPublications().length;
     }
-    return okJson(j(f("attachments", v(attachments)), f("catalogs", v(catalogs)), f("media", v(media)),
+    return okJson(obj(f("attachments", v(attachments)), f("catalogs", v(catalogs)), f("media", v(media)),
             f("publications", v(publications))));
   }
 
@@ -931,7 +930,7 @@ public abstract class AbstractEventEndpoint {
     if (mp.isSome()) {
       attachments = getEventMediaPackageElements(mp.get().getAttachments());
     }
-    return okJson(a(attachments));
+    return okJson(arr(attachments));
   }
 
   @GET
@@ -967,7 +966,7 @@ public abstract class AbstractEventEndpoint {
     if (mp.isSome()) {
       catalogs = getEventMediaPackageElements(mp.get().getCatalogs());
     }
-    return okJson(a(catalogs));
+    return okJson(arr(catalogs));
   }
 
   @GET
@@ -1003,7 +1002,7 @@ public abstract class AbstractEventEndpoint {
     if (mp.isSome()) {
       media = getEventMediaPackageElements(mp.get().getTracks());
     }
-    return okJson(a(media));
+    return okJson(arr(media));
   }
 
   @GET
@@ -1039,7 +1038,7 @@ public abstract class AbstractEventEndpoint {
     if (mp.isSome()) {
       publications = getEventPublications(mp.get().getPublications());
     }
-    return okJson(a(publications));
+    return okJson(arr(publications));
   }
 
   @GET
@@ -1297,7 +1296,7 @@ public abstract class AbstractEventEndpoint {
     episodeAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(activeAcl));
     episodeAccessJson.put("transitions", transitionsJson);
     if (StringUtils.isNotBlank(optEvent.get().getWorkflowState())
-            && WorkflowUtil.isActive(WorkflowState.valueOf(optEvent.get().getWorkflowState())))
+            && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(optEvent.get().getWorkflowState())))
       episodeAccessJson.put("locked", true);
 
     JSONObject jsonReturnObj = new JSONObject();
@@ -1523,15 +1522,15 @@ public abstract class AbstractEventEndpoint {
     List<String> tags = RestUtil.splitCommaSeparatedParam(Option.option(tagsString)).value();
 
     // This is the JSON Object which will be returned by this request
-    List<JValue> actions = new ArrayList<JValue>();
+    List<JValue> actions = new ArrayList<>();
     try {
       List<WorkflowDefinition> workflowsDefinitions = getWorkflowService().listAvailableWorkflowDefinitions();
       for (WorkflowDefinition wflDef : workflowsDefinitions) {
         if (wflDef.containsTag(tags)) {
 
-          actions.add(j(f("id", v(wflDef.getId())), f("title", v(Opt.nul(wflDef.getTitle()).or(""))),
-                  f("description", v(Opt.nul(wflDef.getDescription()).or(""))),
-                  f("configuration_panel", v(Opt.nul(wflDef.getConfigurationPanel()).or("")))));
+          actions.add(obj(f("id", v(wflDef.getId())), f("title", v(nul(wflDef.getTitle()).getOr(""))),
+                  f("description", v(nul(wflDef.getDescription()).getOr(""))),
+                  f("configuration_panel", v(nul(wflDef.getConfigurationPanel()).getOr("")))));
         }
       }
     } catch (WorkflowDatabaseException e) {
@@ -1539,7 +1538,7 @@ public abstract class AbstractEventEndpoint {
       return RestUtil.R.serverError();
     }
 
-    return okJson(a(actions));
+    return okJson(arr(actions));
   }
 
   @POST
@@ -1637,16 +1636,16 @@ public abstract class AbstractEventEndpoint {
         events = getSchedulerService().findConflictingEvents(device, start, end);
       }
       if (!events.getCatalogList().isEmpty()) {
-        List<JValue> eventsJSON = new ArrayList<JValue>();
+        List<JValue> eventsJSON = new ArrayList<>();
         for (DublinCoreCatalog event : events.getCatalogList()) {
           final DCMIPeriod period = EncodingSchemeUtils
                   .decodeMandatoryPeriod(event.getFirst(DublinCore.PROPERTY_TEMPORAL));
-          eventsJSON.add(j(f("start", v(DateTimeSupport.toUTC(period.getStart().getTime()))),
+          eventsJSON.add(obj(f("start", v(DateTimeSupport.toUTC(period.getStart().getTime()))),
                   f("end", v(DateTimeSupport.toUTC(period.getEnd().getTime()))),
                   f("title", v(event.getFirst(DublinCoreCatalog.PROPERTY_TITLE)))));
         }
         if (!eventsJSON.isEmpty())
-          return conflictJson(a(eventsJSON));
+          return conflictJson(arr(eventsJSON));
       }
       return Response.noContent().build();
     } catch (Exception e) {
@@ -1690,7 +1689,7 @@ public abstract class AbstractEventEndpoint {
     Option<Integer> optLimit = Option.option(limit);
     Option<Integer> optOffset = Option.option(offset);
     Option<String> optSort = Option.option(trimToNull(sort));
-    ArrayList<JValue> eventsList = new ArrayList<JValue>();
+    ArrayList<JValue> eventsList = new ArrayList<>();
     EventSearchQuery query = new EventSearchQuery(getSecurityService().getOrganization().getId(),
             getSecurityService().getUser());
 
@@ -1819,7 +1818,7 @@ public abstract class AbstractEventEndpoint {
     // If the results list if empty, we return already a response.
     if (results.getPageSize() == 0) {
       logger.debug("No events match the given filters.");
-      return okJsonList(eventsList, Opt.nul(offset).or(0), Opt.nul(limit).or(0), 0);
+      return okJsonList(eventsList, nul(offset).getOr(0), nul(limit).getOr(0), 0);
     }
 
     for (SearchResultItem<Event> item : results.getItems()) {
@@ -1828,7 +1827,7 @@ public abstract class AbstractEventEndpoint {
       eventsList.add(eventToJSON(source));
     }
 
-    return okJsonList(eventsList, Opt.nul(offset).or(0), Opt.nul(limit).or(0), results.getHitCount());
+    return okJsonList(eventsList, nul(offset).getOr(0), nul(limit).getOr(0), results.getHitCount());
   }
 
   // --
@@ -1849,124 +1848,124 @@ public abstract class AbstractEventEndpoint {
   }
 
   private JValue eventToJSON(Event event) {
-    List<JField> fields = new ArrayList<JField>();
+    List<Field> fields = new ArrayList<>();
 
     fields.add(f("id", v(event.getIdentifier())));
-    fields.add(f("title", vN(event.getTitle())));
-    fields.add(f("source", vN(event.getSource())));
-    fields.add(f("presenters", jsonArrayFromList(event.getPresenters())));
+    fields.add(f("title", v(event.getTitle(), BLANK)));
+    fields.add(f("source", v(event.getSource(), BLANK)));
+    fields.add(f("presenters", arr($(event.getPresenters()).map(Functions.stringToJValue))));
     if (StringUtils.isNotBlank(event.getSeriesId())) {
       String seriesTitle = event.getSeriesName();
       String seriesID = event.getSeriesId();
 
-      fields.add(f("series", j(f("id", vN(seriesID)), f("title", vN(seriesTitle)))));
+      fields.add(f("series", obj(f("id", v(seriesID, BLANK)), f("title", v(seriesTitle, BLANK)))));
     }
-    fields.add(f("location", vN(event.getLocation())));
-    fields.add(f("start_date", vN(event.getRecordingStartDate())));
-    fields.add(f("end_date", vN(event.getRecordingEndDate())));
+    fields.add(f("location", v(event.getLocation(), BLANK)));
+    fields.add(f("start_date", v(event.getRecordingStartDate(), BLANK)));
+    fields.add(f("end_date", v(event.getRecordingEndDate(), BLANK)));
 
     String schedulingStatus = event.getSchedulingStatus() == null ? null
             : "EVENTS.EVENTS.SCHEDULING_STATUS." + event.getSchedulingStatus();
-    fields.add(f("managedAcl", vN(event.getManagedAcl())));
-    fields.add(f("scheduling_status", vN(schedulingStatus)));
-    fields.add(f("workflow_state", vN(event.getWorkflowState())));
-    fields.add(f("review_status", vN(event.getReviewStatus())));
+    fields.add(f("managedAcl", v(event.getManagedAcl(), BLANK)));
+    fields.add(f("scheduling_status", v(schedulingStatus, BLANK)));
+    fields.add(f("workflow_state", v(event.getWorkflowState(), BLANK)));
+    fields.add(f("review_status", v(event.getReviewStatus(), BLANK)));
     fields.add(f("event_status", v(event.getEventStatus())));
     fields.add(f("source", v(getIndexService().getEventSource(event).toString())));
     fields.add(f("has_comments", v(event.hasComments())));
     fields.add(f("has_open_comments", v(event.hasOpenComments())));
     fields.add(f("needs_cutting", v(event.needsCutting())));
     fields.add(f("has_preview", v(event.hasPreview())));
-    fields.add(f("agent_id", vN(event.getAgentId())));
-    fields.add(f("technical_start", vN(event.getTechnicalStartTime())));
-    fields.add(f("technical_end", vN(event.getTechnicalEndTime())));
-    fields.add(f("technical_presenters", jsonArrayFromList(event.getTechnicalPresenters())));
-    fields.add(f("publications", a(eventPublicationsToJson(event))));
-    return j(fields);
+    fields.add(f("agent_id", v(event.getAgentId(), BLANK)));
+    fields.add(f("technical_start", v(event.getTechnicalStartTime(), BLANK)));
+    fields.add(f("technical_end", v(event.getTechnicalEndTime(), BLANK)));
+    fields.add(f("technical_presenters", arr($(event.getTechnicalPresenters()).map(Functions.stringToJValue))));
+    fields.add(f("publications", arr(eventPublicationsToJson(event))));
+    return obj(fields);
   }
 
   private JValue attachmentToJSON(Attachment attachment) {
-    List<JField> fields = new ArrayList<JField>();
+    List<Field> fields = new ArrayList<>();
     fields.addAll(getEventMediaPackageElementFields(attachment));
     fields.addAll(getCommonElementFields(attachment));
-    return j(fields);
+    return obj(fields);
   }
 
   private JValue catalogToJSON(Catalog catalog) {
-    List<JField> fields = new ArrayList<JField>();
+    List<Field> fields = new ArrayList<>();
     fields.addAll(getEventMediaPackageElementFields(catalog));
     fields.addAll(getCommonElementFields(catalog));
-    return j(fields);
+    return obj(fields);
   }
 
   private JValue trackToJSON(Track track) {
-    List<JField> fields = new ArrayList<JField>();
+    List<Field> fields = new ArrayList<>();
     fields.addAll(getEventMediaPackageElementFields(track));
     fields.addAll(getCommonElementFields(track));
-    fields.add(f("duration", vN(track.getDuration())));
+    fields.add(f("duration", v(track.getDuration(), BLANK)));
     fields.add(f("has_audio", v(track.hasAudio())));
     fields.add(f("has_video", v(track.hasVideo())));
-    fields.add(f("streams", j(streamsToJSON(track.getStreams()))));
-    return j(fields);
+    fields.add(f("streams", obj(streamsToJSON(track.getStreams()))));
+    return obj(fields);
   }
 
-  private List<JField> streamsToJSON(org.opencastproject.mediapackage.Stream[] streams) {
-    List<JField> fields = new ArrayList<JField>();
-    List<JValue> audioList = new ArrayList<JValue>();
-    List<JValue> videoList = new ArrayList<JValue>();
+  private List<Field> streamsToJSON(org.opencastproject.mediapackage.Stream[] streams) {
+    List<Field> fields = new ArrayList<>();
+    List<JValue> audioList = new ArrayList<>();
+    List<JValue> videoList = new ArrayList<>();
     for (org.opencastproject.mediapackage.Stream stream : streams) {
       // TODO There is a bug with the stream ids, see MH-10325
       if (stream instanceof AudioStreamImpl) {
-        List<JField> audio = new ArrayList<JField>();
+        List<Field> audio = new ArrayList<>();
         AudioStream audioStream = (AudioStream) stream;
-        audio.add(f("id", vN(audioStream.getIdentifier())));
-        audio.add(f("type", vN(audioStream.getFormat())));
-        audio.add(f("channels", vN(audioStream.getChannels())));
-        audio.add(f("bitrate", vN(audioStream.getBitRate())));
-        audio.add(f("bitdepth", vN(audioStream.getBitDepth())));
-        audio.add(f("samplingrate", vN(audioStream.getSamplingRate())));
-        audio.add(f("framecount", vN(audioStream.getFrameCount())));
-        audio.add(f("peakleveldb", vN(audioStream.getPkLevDb())));
-        audio.add(f("rmsleveldb", vN(audioStream.getRmsLevDb())));
-        audio.add(f("rmspeakdb", vN(audioStream.getRmsPkDb())));
-        audioList.add(j(audio));
+        audio.add(f("id", v(audioStream.getIdentifier(), BLANK)));
+        audio.add(f("type", v(audioStream.getFormat(), BLANK)));
+        audio.add(f("channels", v(audioStream.getChannels(), BLANK)));
+        audio.add(f("bitrate", v(audioStream.getBitRate(), BLANK)));
+        audio.add(f("bitdepth", v(audioStream.getBitDepth(), BLANK)));
+        audio.add(f("samplingrate", v(audioStream.getSamplingRate(), BLANK)));
+        audio.add(f("framecount", v(audioStream.getFrameCount(), BLANK)));
+        audio.add(f("peakleveldb", v(audioStream.getPkLevDb(), BLANK)));
+        audio.add(f("rmsleveldb", v(audioStream.getRmsLevDb(), BLANK)));
+        audio.add(f("rmspeakdb", v(audioStream.getRmsPkDb(), BLANK)));
+        audioList.add(obj(audio));
       } else if (stream instanceof VideoStreamImpl) {
-        List<JField> video = new ArrayList<JField>();
+        List<Field> video = new ArrayList<>();
         VideoStream videoStream = (VideoStream) stream;
-        video.add(f("id", vN(videoStream.getIdentifier())));
-        video.add(f("type", vN(videoStream.getFormat())));
+        video.add(f("id", v(videoStream.getIdentifier(), BLANK)));
+        video.add(f("type", v(videoStream.getFormat(), BLANK)));
         video.add(f("bitrate", v(videoStream.getBitRate())));
-        video.add(f("framerate", vN(videoStream.getFrameRate())));
-        video.add(f("resolution", vN(videoStream.getFrameWidth() + "x" + videoStream.getFrameHeight())));
-        video.add(f("framecount", vN(videoStream.getFrameCount())));
-        video.add(f("scantype", vN(videoStream.getScanType())));
-        video.add(f("scanorder", vN(videoStream.getScanOrder())));
-        videoList.add(j(video));
+        video.add(f("framerate", v(videoStream.getFrameRate(), BLANK)));
+        video.add(f("resolution", v(videoStream.getFrameWidth() + "x" + videoStream.getFrameHeight(), BLANK)));
+        video.add(f("framecount", v(videoStream.getFrameCount(), BLANK)));
+        video.add(f("scantype", v(videoStream.getScanType(), BLANK)));
+        video.add(f("scanorder", v(videoStream.getScanOrder(), BLANK)));
+        videoList.add(obj(video));
       } else {
         throw new IllegalArgumentException("Stream must be either audio or video");
       }
     }
-    fields.add(f("audio", a(audioList)));
-    fields.add(f("video", a(videoList)));
+    fields.add(f("audio", arr(audioList)));
+    fields.add(f("video", arr(videoList)));
     return fields;
   }
 
   private JValue publicationToJSON(Publication publication) {
-    List<JField> fields = new ArrayList<JField>();
-    fields.add(f("id", vN(publication.getIdentifier())));
-    fields.add(f("channel", vN(publication.getChannel())));
-    fields.add(f("mimetype", vN(publication.getMimeType())));
-    fields.add(f("tags", a($(publication.getTags()).map(toStringJValue))));
-    fields.add(f("url", vN(signUrl(publication.getURI()))));
+    List<Field> fields = new ArrayList<>();
+    fields.add(f("id", v(publication.getIdentifier(), BLANK)));
+    fields.add(f("channel", v(publication.getChannel(), BLANK)));
+    fields.add(f("mimetype", v(publication.getMimeType(), BLANK)));
+    fields.add(f("tags", arr($(publication.getTags()).map(toStringJValue))));
+    fields.add(f("url", v(signUrl(publication.getURI()), BLANK)));
     fields.addAll(getCommonElementFields(publication));
-    return j(fields);
+    return obj(fields);
   }
 
-  private List<JField> getCommonElementFields(MediaPackageElement element) {
-    List<JField> fields = new ArrayList<JField>();
-    fields.add(f("size", vN(element.getSize())));
-    fields.add(f("checksum", vN(element.getChecksum() != null ? element.getChecksum().getValue() : null)));
-    fields.add(f("reference", vN(element.getReference() != null ? element.getReference().getIdentifier() : null)));
+  private List<Field> getCommonElementFields(MediaPackageElement element) {
+    List<Field> fields = new ArrayList<>();
+    fields.add(f("size", v(element.getSize(), BLANK)));
+    fields.add(f("checksum", v(element.getChecksum() != null ? element.getChecksum().getValue() : null, BLANK)));
+    fields.add(f("reference", v(element.getReference() != null ? element.getReference().getIdentifier() : null, BLANK)));
     return fields;
   }
 
@@ -1978,11 +1977,12 @@ public abstract class AbstractEventEndpoint {
    * @return {@link List} of {@link JValue}s that represent the {@link Publication}
    */
   private List<JValue> getEventPublications(Publication[] publications) {
-    List<JValue> publicationJSON = new ArrayList<JValue>();
+    List<JValue> publicationJSON = new ArrayList<>();
     for (Publication publication : publications) {
-      publicationJSON.add(j(f("id", vN(publication.getIdentifier())), f("channel", vN(publication.getChannel())),
-              f("mimetype", vN(publication.getMimeType())), f("tags", a($(publication.getTags()).map(toStringJValue))),
-              f("url", vN(signUrl(publication.getURI())))));
+      publicationJSON.add(obj(f("id", v(publication.getIdentifier(), BLANK)),
+              f("channel", v(publication.getChannel(), BLANK)), f("mimetype", v(publication.getMimeType(), BLANK)),
+              f("tags", arr($(publication.getTags()).map(toStringJValue))),
+              f("url", v(signUrl(publication.getURI()), BLANK))));
     }
     return publicationJSON;
   }
@@ -2010,50 +2010,51 @@ public abstract class AbstractEventEndpoint {
    * @return {@link List} of {@link JValue}s that represent the {@link MediaPackageElement}
    */
   private List<JValue> getEventMediaPackageElements(MediaPackageElement[] elements) {
-    List<JValue> elementJSON = new ArrayList<JValue>();
+    List<JValue> elementJSON = new ArrayList<>();
     for (MediaPackageElement element : elements) {
-      elementJSON.add(j(getEventMediaPackageElementFields(element)));
+      elementJSON.add(obj(getEventMediaPackageElementFields(element)));
     }
     return elementJSON;
   }
 
-  private List<JField> getEventMediaPackageElementFields(MediaPackageElement element) {
-    List<JField> fields = new ArrayList<JField>();
-    fields.add(f("id", vN(element.getIdentifier())));
-    fields.add(f("type", vN(element.getFlavor().toString())));
-    fields.add(f("mimetype", vN(element.getMimeType())));
+  private List<Field> getEventMediaPackageElementFields(MediaPackageElement element) {
+    List<Field> fields = new ArrayList<>();
+    fields.add(f("id", v(element.getIdentifier(), BLANK)));
+    fields.add(f("type", v(element.getFlavor().toString(), BLANK)));
+    fields.add(f("mimetype", v(element.getMimeType(), BLANK)));
     List<JValue> tags = Stream.$(element.getTags()).map(toStringJValue).toList();
-    fields.add(f("tags", a(tags)));
-    fields.add(f("url", vN(signUrl(element.getURI()))));
+    fields.add(f("tags", arr(tags)));
+    fields.add(f("url", v(signUrl(element.getURI()), BLANK)));
     return fields;
   }
 
   private static final Fn<String, JValue> toStringJValue = new Fn<String, JValue>() {
     @Override
-    public JValue ap(String stringValue) {
-      return vN(stringValue);
+    public JValue apply(String stringValue) {
+      return v(stringValue, BLANK);
     }
   };
 
-  private final Fn<Publication, JObjectWrite> publicationToJson = new Fn<Publication, JObjectWrite>() {
+  private final Fn<Publication, JObject> publicationToJson = new Fn<Publication, JObject>() {
     @Override
-    public JObjectWrite ap(Publication publication) {
+    public JObject apply(Publication publication) {
       final Opt<String> channel = Opt.nul(EventUtils.PUBLICATION_CHANNELS.get(publication.getChannel()));
       String url = publication.getURI() == null ? "" : signUrl(publication.getURI()).toString();
-      return j(f("id", v(publication.getChannel())), f("name", v(channel.or("EVENTS.EVENTS.DETAILS.GENERAL.CUSTOM"))),
-              f("url", v(url)));
+      return obj(f("id", v(publication.getChannel())),
+              f("name", v(channel.getOr("EVENTS.EVENTS.DETAILS.GENERAL.CUSTOM"))), f("url", v(url, NULL)));
     }
   };
 
-  protected static final Fn<Opt<Recording>, JObjectWrite> recordingToJson = new Fn<Opt<Recording>, JObjectWrite>() {
+  protected static final Fn<Opt<Recording>, JObject> recordingToJson = new Fn<Opt<Recording>, JObject>() {
     @Override
-    public JObjectWrite ap(Opt<Recording> recording) {
+    public JObject apply(Opt<Recording> recording) {
       if (recording.isNone()) {
-        return j();
+        return obj();
       }
-      return j(f("id", vN(recording.get().getID())), f("lastCheckInTime", vN(recording.get().getLastCheckinTime())),
-              f("lastCheckInTimeUTC", vN(DateTimeSupport.toUTC(recording.get().getLastCheckinTime()))),
-              f("state", vN(recording.get().getState())));
+      return obj(f("id", v(recording.get().getID(), BLANK)),
+              f("lastCheckInTime", v(recording.get().getLastCheckinTime(), BLANK)),
+              f("lastCheckInTimeUTC", v(toUTC(recording.get().getLastCheckinTime()), BLANK)),
+              f("state", v(recording.get().getState(), BLANK)));
     }
   };
 

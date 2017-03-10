@@ -88,14 +88,14 @@ public final class ManagedAclEntity implements ManagedAcl {
   @Column(name = "organization_id", nullable = false)
   private String organizationId;
 
-
   /** JPA constructor */
   public ManagedAclEntity() {
   }
 
   ManagedAclEntity update(String name, AccessControlList acl, String orgId) {
-    this.name = name;
+    // Update the ACL first, since it's fetching the entity and overriding the previous set values
     this.acl = toJsonSilent(acl);
+    this.name = name;
     this.organizationId = orgId;
     return this;
   }

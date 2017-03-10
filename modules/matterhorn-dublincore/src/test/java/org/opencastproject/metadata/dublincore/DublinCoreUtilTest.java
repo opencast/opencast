@@ -23,8 +23,7 @@ package org.opencastproject.metadata.dublincore;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
-
-import org.opencastproject.util.IoSupport;
+import static org.opencastproject.metadata.dublincore.TestUtil.read;
 
 import org.hamcrest.CustomTypeSafeMatcher;
 import org.hamcrest.Matcher;
@@ -89,9 +88,12 @@ public class DublinCoreUtilTest {
     assertArrayEquals(digest1, digest2);
   }
 
+  //
+  //
+  //
+
   private String checksum(String dcFile) throws Exception {
-    final DublinCoreCatalog dc = DublinCoreXmlFormat.read(IoSupport.classPathResourceAsFile(dcFile).get());
-    return DublinCoreUtil.calculateChecksum(dc).getValue();
+    return DublinCoreUtil.calculateChecksum(read(dcFile)).getValue();
   }
 
   private <A> Matcher<List<A>> isDistinct() {

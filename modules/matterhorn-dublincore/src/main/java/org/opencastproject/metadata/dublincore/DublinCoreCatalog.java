@@ -470,6 +470,11 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
     return super.getValues(element);
   }
 
+  // make public
+  @Override public List<CatalogEntry> getEntriesSorted() {
+    return super.getEntriesSorted();
+  }
+
   /**
    * Saves the dublin core metadata container to a dom.
    *

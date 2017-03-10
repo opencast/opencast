@@ -67,7 +67,7 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
       case UpdateCatalog:
         logger.debug("Received Update Series");
 
-        DublinCoreCatalog dc = seriesItem.getSeries();
+        DublinCoreCatalog dc = seriesItem.getMetadata();
         String seriesId = dc.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER);
 
         // Load or create the corresponding series

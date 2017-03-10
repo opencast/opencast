@@ -23,8 +23,7 @@ package org.opencastproject.authorization.xacml.manager.endpoint;
 
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 
-import org.opencastproject.archive.api.Archive;
-import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
@@ -50,9 +49,8 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
   private SecurityService securityService;
   private AuthorizationService authorizationService;
   private String endpointBaseUrl;
-  private Archive<?> archive;
+  private AssetManager assetManager;
   private SeriesService seriesService;
-  private HttpMediaPackageElementProvider httpMediaPackageElementProvider;
 
   /** OSGi callback. */
   public void activate(ComponentContext cc) {
@@ -77,18 +75,13 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
   }
 
   /** OSGi DI callback. */
-  public void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
-    this.httpMediaPackageElementProvider = httpMediaPackageElementProvider;
-  }
-
-  /** OSGi DI callback. */
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
   /** OSGi DI callback. */
-  public void setArchive(Archive<?> archive) {
-    this.archive = archive;
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
   }
 
   /** OSGi DI callback. */
@@ -117,17 +110,12 @@ public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndp
   }
 
   @Override
-  protected Archive<?> getArchive() {
-    return archive;
-  }
-
-  @Override
   protected SeriesService getSeriesService() {
     return seriesService;
   }
 
   @Override
-  protected HttpMediaPackageElementProvider getHttpMediaPackageElementProvider() {
-    return httpMediaPackageElementProvider;
+  public AssetManager getAssetManager() {
+    return assetManager;
   }
 }

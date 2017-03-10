@@ -187,7 +187,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
       }
       // start image extraction jobs
       final List<Extraction> extractions = $(cfg.sourceTracks).bind(new Fn<Track, Stream<Extraction>>() {
-        @Override public Stream<Extraction> ap(final Track t) {
+        @Override public Stream<Extraction> apply(final Track t) {
           final List<MediaPosition> p = limit(t, cfg.positions);
           if (p.size() != cfg.positions.size()) {
             logger.warn("Could not apply all configured positions to track " + t);
@@ -196,7 +196,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
           }
           // create one extraction per encoding profile
           return $(cfg.profiles).map(new Fn<EncodingProfile, Extraction>() {
-            @Override public Extraction ap(EncodingProfile profile) {
+            @Override public Extraction apply(EncodingProfile profile) {
               return new Extraction(extractImages(t, profile, p), t, profile, p);
             }
           });
@@ -264,10 +264,10 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
       final String format;
       switch (pos.type) {
         case Seconds:
-          format = cfg.targetBaseNameFormatSecond.or(trackBaseName + "_%.3fs%s");
+          format = cfg.targetBaseNameFormatSecond.getOr(trackBaseName + "_%.3fs%s");
           break;
         case Percentage:
-          format = cfg.targetBaseNameFormatPercent.or(trackBaseName + "_%.1fp%s");
+          format = cfg.targetBaseNameFormatPercent.getOr(trackBaseName + "_%.1fp%s");
           break;
         default:
           throw unexhaustiveMatchError();
@@ -291,7 +291,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     /** Start a composer job to extract images from a track at the given positions. */
     private Job extractImages(final Track track, final EncodingProfile profile, final List<MediaPosition> positions) {
       final List<Double> p = $(positions).map(new Fn<MediaPosition, Double>() {
-        @Override public Double ap(MediaPosition mediaPosition) {
+        @Override public Double apply(MediaPosition mediaPosition) {
           return toSeconds(track, mediaPosition, cfg.endMargin);
         }
       }).toList();
@@ -320,7 +320,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   /** Concat the jobs of a list of extraction objects. */
   private static List<Job> concatJobs(List<Extraction> extractions) {
     return $(extractions).map(new Fn<Extraction, Job>() {
-      @Override public Job ap(Extraction extraction) {
+      @Override public Job apply(Extraction extraction) {
         return extraction.job;
       }
     }).toList();
@@ -346,7 +346,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   static List<MediaPosition> limit(Track track, List<MediaPosition> positions) {
     final long duration = track.getDuration();
     return $(positions).filter(new Fn<MediaPosition, Boolean>() {
-      @Override public Boolean ap(MediaPosition p) {
+      @Override public Boolean apply(MediaPosition p) {
         return !(
                 (eq(p.type, PositionType.Seconds) && (p.position >= duration || p.position < 0.0))
                         ||
@@ -385,7 +385,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   public static <E extends MediaPackageElement, S extends AbstractMediaPackageElementSelector<E>>
   StreamFold<MediaPackageElementFlavor, S> flavorFold(S selector) {
     return StreamFold.foldl(selector, new Fn2<S, MediaPackageElementFlavor, S>() {
-      @Override public S ap(S sum, MediaPackageElementFlavor flavor) {
+      @Override public S apply(S sum, MediaPackageElementFlavor flavor) {
         sum.addFlavor(flavor);
         return sum;
       }
@@ -396,7 +396,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   public static <E extends MediaPackageElement, S extends AbstractMediaPackageElementSelector<E>>
   StreamFold<String, S> tagFold(S selector) {
     return StreamFold.foldl(selector, new Fn2<S, String, S>() {
-      @Override public S ap(S sum, String tag) {
+      @Override public S apply(S sum, String tag) {
         sum.addTag(tag);
         return sum;
       }
@@ -409,7 +409,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
    */
   public static Fn<String, EncodingProfile> fetchProfile(final ComposerService composerService) {
     return new Fn<String, EncodingProfile>() {
-      @Override public EncodingProfile ap(String profileName) {
+      @Override public EncodingProfile apply(String profileName) {
         final EncodingProfile profile = composerService.getProfile(profileName);
         return profile != null
                 ? profile
@@ -497,7 +497,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
       sourceTracks = $(trackSelector.select(mp, true))
               .filter(Filters.hasVideo.toFn())
               .each(new Fx<Track>() {
-                @Override public void ap(Track track) {
+                @Override public void apply(Track track) {
                   if (track.getDuration() == null) {
                     chuck(new WorkflowOperationException(format("Track %s cannot tell its duration", track)));
                   }
@@ -505,7 +505,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
               }).toList();
     }
     final List<MediaPosition> positions = parsePositions(getConfig(woi, OPT_POSITIONS));
-    final long endMargin = getOptConfig(woi, OPT_END_MARGIN).bind(Strings.toLong).or(END_MARGIN_DEFAULT);
+    final long endMargin = getOptConfig(woi, OPT_END_MARGIN).bind(Strings.toLong).getOr(END_MARGIN_DEFAULT);
     //
     return new Cfg(sourceTracks,
                    positions,
@@ -524,7 +524,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   static Fx<String> validateTargetBaseNameFormat(final String formatName) {
     return new Fx<String>() {
-      @Override public void ap(String format) {
+      @Override public void apply(String format) {
         boolean valid;
         try {
           final String name = formatFileName(format, 15.11, ".png");
@@ -552,13 +552,13 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
     static final Parser<Double> number = token(Parsers.dbl);
     static final Parser<MediaPosition> seconds = number.bind(new Fn<Double, Parser<MediaPosition>>() {
-      @Override public Parser<MediaPosition> ap(Double p) {
+      @Override public Parser<MediaPosition> apply(Double p) {
         return yield(new MediaPosition(PositionType.Seconds, p));
       }
     });
     static final Parser<MediaPosition> percentage =
             number.bind(Parsers.<Double, String>ignore(symbol("%"))).bind(new Fn<Double, Parser<MediaPosition>>() {
-              @Override public Parser<MediaPosition> ap(Double p) {
+              @Override public Parser<MediaPosition> apply(Double p) {
                 return yield(new MediaPosition(PositionType.Percentage, p));
               }
             });
@@ -570,11 +570,11 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     static final Parser<List<MediaPosition>> positions =
             position.bind(new Fn<MediaPosition, Parser<List<MediaPosition>>>() {
               // first position
-              @Override public Parser<List<MediaPosition>> ap(final MediaPosition first) {
+              @Override public Parser<List<MediaPosition>> apply(final MediaPosition first) {
                 // following
                 return many(opt(comma).bind(Parsers.ignorePrevious(position)))
                         .bind(new Fn<List<MediaPosition>, Parser<List<MediaPosition>>>() {
-                          @Override public Parser<List<MediaPosition>> ap(List<MediaPosition> rest) {
+                          @Override public Parser<List<MediaPosition>> apply(List<MediaPosition> rest) {
                             return yield($(first).append(rest).toList());
                           }
                         });

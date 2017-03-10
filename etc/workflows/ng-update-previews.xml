@@ -41,7 +41,7 @@
       <!-- Archive with previews generated -->
 
       <operation
-        id="archive"
+        id="snapshot"
         description="Archive preview information">
         <configurations>
           <configuration key="source-tags">archive</configuration>

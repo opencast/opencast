@@ -21,7 +21,7 @@
 
 package org.opencastproject.index.service.catalog.adapter;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
@@ -62,17 +62,17 @@ public abstract class AbstractMetadataCollection implements MetadataCollection {
   protected static final String KEY_METADATA_VALUE = "value";
 
   /** The list containing all the metadata */
-  private List<MetadataField<?>> fieldsInOrder = new ArrayList<MetadataField<?>>();
-  private Map<String, MetadataField<?>> inputFields = new HashMap<String, MetadataField<?>>();
-  private Map<String, MetadataField<?>> outputFields = new HashMap<String, MetadataField<?>>();
+  private List<MetadataField<?>> fieldsInOrder = new ArrayList<>();
+  private Map<String, MetadataField<?>> inputFields = new HashMap<>();
+  private Map<String, MetadataField<?>> outputFields = new HashMap<>();
 
   @Override
   public JValue toJSON() {
-    List<JValue> metadata = new ArrayList<JValue>();
+    List<JValue> metadata = new ArrayList<>();
     for (MetadataField<?> metadataField : getFields()) {
       metadata.add(metadataField.toJSON());
     }
-    return a(metadata);
+    return arr(metadata);
   }
 
   @Override
@@ -139,8 +139,8 @@ public abstract class AbstractMetadataCollection implements MetadataCollection {
     removeFieldIfExists(metadata);
 
     // Find all of the ordered or unordered elements.
-    ArrayList<MetadataField<?>> orderedFields = new ArrayList<MetadataField<?>>();
-    ArrayList<MetadataField<?>> unorderedFields = new ArrayList<MetadataField<?>>();
+    ArrayList<MetadataField<?>> orderedFields = new ArrayList<>();
+    ArrayList<MetadataField<?>> unorderedFields = new ArrayList<>();
     for (MetadataField<?> field : fieldsInOrder) {
       if (field.getOrder().isSome()) {
         orderedFields.add(field);
@@ -165,7 +165,7 @@ public abstract class AbstractMetadataCollection implements MetadataCollection {
     });
 
     // Add all the non-ordered elements to the collection
-    fieldsInOrder = new ArrayList<MetadataField<?>>(unorderedFields);
+    fieldsInOrder = new ArrayList<>(unorderedFields);
 
     // Add all of the fields that have an index to their location starting at the lowest value.
     for (MetadataField<?> orderedField : orderedFields) {

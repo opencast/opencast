@@ -128,23 +128,13 @@
         </dependency>
         <dependency>
             <groupId>org.opencastproject</groupId>
-            <artifactId>matterhorn-archive-api</artifactId>
+            <artifactId>matterhorn-asset-manager-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.opencastproject</groupId>
-            <artifactId>matterhorn-archive-schema</artifactId>
+            <artifactId>matterhorn-asset-manager-util</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.opencastproject</groupId>
-                    <artifactId>matterhorn-solr</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.solr</groupId>
-                    <artifactId>solr-core</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.opencastproject</groupId>
@@ -223,12 +213,12 @@
             <artifactId>matterhorn-series-service-impl</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.opencastproject</groupId>
-                    <artifactId>matterhorn-solr</artifactId>
-                </exclusion>
-            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.opencastproject</groupId>
+            <artifactId>matterhorn-asset-manager-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>xalan</groupId>
@@ -300,6 +290,12 @@
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- contains javax.inject.Provider -->
+        <dependency>
+            <groupId>com.mysema.querydsl</groupId>
+            <artifactId>querydsl-apt</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -412,7 +408,7 @@
                             OSGI-INF/language-service.xml,
                             OSGI-INF/languages_endpoint.xml,
                             OSGI-INF/message-receiver-acl.xml,
-                            OSGI-INF/message-receiver-archive.xml,
+                            OSGI-INF/message-receiver-assetmanager.xml,
                             OSGI-INF/message-receiver-comment.xml,
                             OSGI-INF/message-receiver-group.xml,
                             OSGI-INF/message-receiver-recording.xml,

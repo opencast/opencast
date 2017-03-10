@@ -110,7 +110,7 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
       ProcessInfo info = ProcessRunner.mk(binary, command.toArray(new String[command.size()]));
       int exitCode = ProcessRunner.run(info, new Pred<String>() {
         @Override
-        public Boolean ap(String s) {
+        public Boolean apply(String s) {
           logger.debug(s);
           sb.append(s);
           sb.append(System.getProperty("line.separator"));
@@ -356,7 +356,7 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
 
   private static final Pred<String> fnLogError = new Pred<String>() {
     @Override
-    public Boolean ap(String s) {
+    public Boolean apply(String s) {
       logger.debug(s);
       return true;
     }

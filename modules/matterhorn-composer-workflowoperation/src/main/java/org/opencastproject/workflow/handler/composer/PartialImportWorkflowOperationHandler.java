@@ -243,8 +243,8 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     final MediaPackageElementFlavor targetPresentationFlavor = parseTargetFlavor(
             getConfig(operation, TARGET_PRESENTATION_FLAVOR), "presentation");
     final Opt<EncodingProfile> forceProfile = getForceEncodingProfile(operation);
-    final boolean forceEncoding = BooleanUtils.toBoolean(getOptConfig(operation, FORCE_ENCODING).or("false"));
-    final boolean forceDivisible = BooleanUtils.toBoolean(getOptConfig(operation, ENFORCE_DIVISIBLE_BY_TWO).or("false"));
+    final boolean forceEncoding = BooleanUtils.toBoolean(getOptConfig(operation, FORCE_ENCODING).getOr("false"));
+    final boolean forceDivisible = BooleanUtils.toBoolean(getOptConfig(operation, ENFORCE_DIVISIBLE_BY_TWO).getOr("false"));
     final List<String> requiredExtensions = getRequiredExtensions(operation);
 
     //
@@ -624,7 +624,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
           throws WorkflowOperationException {
     return getOptConfig(woi, FORCE_ENCODING_PROFILE).map(new Fn<String, EncodingProfile>() {
       @Override
-      public EncodingProfile ap(String profileName) {
+      public EncodingProfile apply(String profileName) {
         for (EncodingProfile profile : Opt.nul(composerService.getProfile(profileName))) {
           return profile;
         }

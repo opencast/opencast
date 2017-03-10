@@ -21,17 +21,16 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static java.lang.String.CASE_INSENSITIVE_ORDER;
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.apache.http.HttpStatus.SC_CONFLICT;
 import static org.apache.http.HttpStatus.SC_CREATED;
+import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -70,6 +69,7 @@ import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.json.JString;
 import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
@@ -192,7 +192,7 @@ public class UsersEndpoint {
     }
 
     // Filter users by filter criteria
-    List<User> filteredUsers = new ArrayList<User>();
+    List<User> filteredUsers = new ArrayList<>();
     for (Iterator<User> i = userDirectoryService.getUsers(); i.hasNext();) {
       User user = i.next();
 
@@ -259,7 +259,7 @@ public class UsersEndpoint {
     // Apply Limit and offset
     filteredUsers = new SmartIterator<User>(limit, offset).applyLimitAndOffset(filteredUsers);
 
-    List<JValue> usersJSON = new ArrayList<JValue>();
+    List<JValue> usersJSON = new ArrayList<>();
     for (User user : filteredUsers) {
       usersJSON.add(generateJsonUser(user));
     }
@@ -299,7 +299,7 @@ public class UsersEndpoint {
       rolesArray = Option.option((JSONArray) JSONValue.parse(roles));
     }
 
-    Set<JpaRole> rolesSet = new HashSet<JpaRole>();
+    Set<JpaRole> rolesSet = new HashSet<>();
 
     // Add the roles given
     if (rolesArray.isSome()) {
@@ -360,7 +360,7 @@ public class UsersEndpoint {
     }
 
     JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
-    Set<JpaRole> rolesSet = new HashSet<JpaRole>();
+    Set<JpaRole> rolesSet = new HashSet<>();
 
     Option<JSONArray> rolesArray = Option.none();
     if (StringUtils.isNotBlank(roles)) {
@@ -416,21 +416,21 @@ public class UsersEndpoint {
     // Prepare the roles
     List<JString> rolesJSON = Stream.$(user.getRoles()).map(getRoleName).sort(sortByName).map(toJString).toList();
 
-    return j(f("username", vN(user.getUsername())), f("manageable", v(user.isManageable())),
-            f("name", vN(user.getName())), f("email", vN(user.getEmail())), f("roles", a(rolesJSON)),
-            f("provider", vN(user.getProvider())));
+    return obj(f("username", v(user.getUsername(), Jsons.BLANK)), f("manageable", v(user.isManageable())),
+            f("name", v(user.getName(), Jsons.BLANK)), f("email", v(user.getEmail(), Jsons.BLANK)),
+            f("roles", arr(rolesJSON)), f("provider", v(user.getProvider(), Jsons.BLANK)));
   }
 
   private static final Fn<Role, String> getRoleName = new Fn<Role, String>() {
     @Override
-    public String ap(Role role) {
+    public String apply(Role role) {
       return role.getName();
     }
   };
 
   private static final Fn<String, JString> toJString = new Fn<String, JString>() {
     @Override
-    public JString ap(String string) {
+    public JString apply(String string) {
       return v(string);
     }
   };

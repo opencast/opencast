@@ -56,7 +56,7 @@ public class MultiResourceLock {
 
     final A ap;
     synchronized (counter) {
-      ap = function.ap(resource);
+      ap = function.apply(resource);
     }
 
     synchronized (lockMap) {

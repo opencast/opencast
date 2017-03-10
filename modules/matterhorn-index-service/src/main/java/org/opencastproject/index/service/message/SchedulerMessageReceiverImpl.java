@@ -21,6 +21,8 @@
 
 package org.opencastproject.index.service.message;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.index.service.impl.index.event.EventIndexUtils.getOrCreateEvent;
 
 import org.opencastproject.index.service.impl.index.event.Event;
@@ -34,7 +36,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +64,8 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
         // Load or create the corresponding recording event
         try {
           event = getOrCreateEvent(schedulerItem.getMediaPackageId(), organization, user, getSearchIndex());
-          event.setCreator(getSecurityService().getUser().getName());
+          if (isBlank(event.getCreator()))
+            event.setCreator(getSecurityService().getUser().getName());
           if (event.getBlacklisted() == null)
             event.setBlacklisted(false);
           if (event.getOptedOut() == null)
@@ -72,8 +74,7 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
           if (dc != null)
             EventIndexUtils.updateEvent(event, dc);
         } catch (SearchIndexException e) {
-          logger.error("Error retrieving the recording event from the search index: {}",
-                  ExceptionUtils.getStackTrace(e));
+          logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
           return;
         }
 
@@ -81,7 +82,7 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
         try {
           EventIndexUtils.updateSeriesName(event, organization, user, getSearchIndex());
         } catch (SearchIndexException e) {
-          logger.error("Error updating the series name of the event to index: {}", ExceptionUtils.getStackTrace(e));
+          logger.error("Error updating the series name of the event to index: {}", getStackTrace(e));
         }
 
         // Persist the scheduling event
@@ -96,8 +97,7 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
                   getSearchIndex());
           event.setAccessPolicy(AccessControlParser.toJsonSilent(schedulerItem.getAcl()));
         } catch (SearchIndexException e) {
-          logger.error("Error retrieving the recording event from the search index: {}",
-                  ExceptionUtils.getStackTrace(e));
+          logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
           return;
         }
 
@@ -116,8 +116,7 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
                   getSearchIndex());
           event.setOptedOut(schedulerItem.getOptOut());
         } catch (SearchIndexException e) {
-          logger.error("Error retrieving the recording event from the search index: {}",
-                  ExceptionUtils.getStackTrace(e));
+          logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
           return;
         }
 
@@ -151,8 +150,7 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
           if (schedulerItem.getReviewDate() != null)
             event.setReviewDate(DateTimeSupport.toUTC(schedulerItem.getReviewDate().getTime()));
         } catch (SearchIndexException e) {
-          logger.error("Error retrieving the recording event from the search index: {}",
-                  ExceptionUtils.getStackTrace(e));
+          logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
           return;
         }
 
@@ -169,7 +167,7 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
         } catch (NotFoundException e) {
           logger.warn("Scheduled recording {} not found for deletion", schedulerItem.getMediaPackageId());
         } catch (SearchIndexException e) {
-          logger.error("Error deleting the recording event from the search index: {}", ExceptionUtils.getStackTrace(e));
+          logger.error("Error deleting the recording event from the search index: {}", getStackTrace(e));
           return;
         }
         return;
@@ -183,7 +181,7 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
       getSearchIndex().addOrUpdate(event);
       logger.debug("Scheduled recording {} updated in the adminui search index", event.getIdentifier());
     } catch (SearchIndexException e) {
-      logger.error("Error retrieving the recording event from the search index: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
     }
   }
 }

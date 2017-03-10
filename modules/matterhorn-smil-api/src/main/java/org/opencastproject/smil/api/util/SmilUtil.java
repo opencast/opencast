@@ -67,7 +67,7 @@ public final class SmilUtil {
   /** Parse a SMIL document from an input stream. */
   public static final Fn<InputStream, SMILDocument> parseSmilFn = new FnX<InputStream, SMILDocument>() {
     @Override
-    public SMILDocument apx(InputStream in) throws SAXException, IOException {
+    public SMILDocument applyX(InputStream in) throws SAXException, IOException {
       return new SmilXmlParser().parse(in);
     }
   };

@@ -25,7 +25,8 @@ The following table contains the workflow operations that are available in an ou
 |--------------------|---------------------------------------------------------------|------------------------------------|
 |analyze-tracks      |Analyze tracks in media package                                |[Documentation](analyze-tracks-woh.md)|
 |analyze-audio       |Analyze first audio stream                                     |[Documentation](analyzeaudio-woh.md)|
-|archive             |Archive the current state of the mediapackage                  |[Documentation](archive-woh.md)|
+|asset-snapshot      |Archive the current state of the mediapackage                  |[Documentation](asset-snapshot-woh.md)|
+|asset-delete        |Deletes the current mediapackage from the Archive              |[Documentation](asset-delete-woh.md)|
 |cleanup             |Cleanup the working file repository                            |[Documentation](cleanup-woh.md)|
 |comment             |Add, resolve or delete a comment                               |[Documentation](comment-woh.md)|
 |compose             |Encode media files using FFmpeg                                |[Documentation](compose-woh.md)|

@@ -690,7 +690,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     }
     return lock.synchronize(workflowInstanceId, new FnX<Long, Response>() {
       @Override
-      public Response apx(Long workflowInstanceId) throws Exception {
+      public Response applyX(Long workflowInstanceId) throws Exception {
         try {
           WorkflowInstance workflow = service.getWorkflowById(workflowInstanceId);
           if (!WorkflowState.PAUSED.equals(workflow.getState())) {

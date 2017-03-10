@@ -22,7 +22,6 @@
 package org.opencastproject.index.service.catalog.adapter;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_FLAVOR_KEY;
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_ORGANIZATION_KEY;
@@ -32,7 +31,6 @@ import org.opencastproject.index.service.catalog.adapter.events.ConfigurableEven
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
-import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -43,15 +41,14 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.PropertiesUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
@@ -78,8 +75,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
-
 public class DublinCoreCatalogUIAdapterTest {
   private static final Logger logger = LoggerFactory.getLogger(DublinCoreCatalogUIAdapterTest.class);
   private static final String TEMPORAL_DUBLIN_CORE_KEY = "temporal";
@@ -101,7 +96,7 @@ public class DublinCoreCatalogUIAdapterTest {
   private static final String TITLE_STRING = "Event Metadata";
 
   private Dictionary<String, String> dictionary;
-  private Properties eventProperties;
+  private Dictionary<String, String> eventProperties;
   private ListProvidersService listProvidersService;
   private MediaPackage mediapackage;
   private MediaPackageElementFlavor mediaPackageElementFlavor;
@@ -152,10 +147,12 @@ public class DublinCoreCatalogUIAdapterTest {
                     EasyMock.anyObject(Organization.class), EasyMock.anyBoolean())).andReturn(collection).anyTimes();
     EasyMock.replay(listProvidersService);
 
-    eventProperties = new Properties();
-    InputStream in = getClass().getResourceAsStream("/catalog-adapter/dublincore.properties");
-    eventProperties.load(in);
+    Properties props = new Properties();
+    InputStream in = getClass().getResourceAsStream("/catalog-adapter/event.properties");
+    props.load(in);
     in.close();
+
+    eventProperties = PropertiesUtil.toDictionary(props);
 
     mediaPackageElementFlavor = new MediaPackageElementFlavor(FLAVOR_STRING.split("/")[0], FLAVOR_STRING.split("/")[1]);
 
@@ -249,20 +246,6 @@ public class DublinCoreCatalogUIAdapterTest {
     assertEquals(true, metadataFields.get(0).isRequired());
     assertEquals(listProvider, metadataFields.get(0).getListprovider().get());
     assertEquals(collectionID, metadataFields.get(0).getCollectionID().get());
-  }
-
-  @Test
-  public void testGetFields() throws Exception {
-    String eventJson = IOUtils.toString(getClass().getResource("/catalog-adapter/dublincore.json"));
-
-    ConfigurableEventDCCatalogUIAdapter configurationDublinCoreCatalogUIAdapter = new ConfigurableEventDCCatalogUIAdapter();
-    configurationDublinCoreCatalogUIAdapter.setListProvidersService(listProvidersService);
-    configurationDublinCoreCatalogUIAdapter.setWorkspace(workspace);
-    configurationDublinCoreCatalogUIAdapter.updated(eventProperties);
-
-    MetadataCollection abstractMetadata = configurationDublinCoreCatalogUIAdapter.getFields(mediapackage);
-    assertThat(eventJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(abstractMetadata.toJSON()))
-            .allowingAnyArrayOrdering());
   }
 
   @Test

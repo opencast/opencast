@@ -261,7 +261,7 @@
               OSGI-INF/external-security-endpoint.xml,
               OSGI-INF/external-series-endpoint.xml,
               OSGI-INF/message-receiver-acl.xml,
-              OSGI-INF/message-receiver-archive.xml,
+              OSGI-INF/message-receiver-assetmanager.xml,
               OSGI-INF/message-receiver-comment.xml,
               OSGI-INF/message-receiver-group.xml,
               OSGI-INF/message-receiver-recording.xml,

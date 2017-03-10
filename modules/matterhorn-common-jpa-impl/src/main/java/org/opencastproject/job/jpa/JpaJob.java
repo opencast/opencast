@@ -290,7 +290,7 @@ public class JpaJob {
   public static Fn<JpaJob, Job> fnToJob() {
     return new Fn<JpaJob, Job>() {
       @Override
-      public Job ap(JpaJob jobJpa) {
+      public Job apply(JpaJob jobJpa) {
         return jobJpa.toJob();
       }
     };

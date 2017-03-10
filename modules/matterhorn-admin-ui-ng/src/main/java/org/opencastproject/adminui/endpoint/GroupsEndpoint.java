@@ -21,11 +21,10 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
@@ -63,8 +62,9 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.JField;
+import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
@@ -213,7 +213,6 @@ public class GroupsEndpoint {
     if (optOffset.isSome())
       query.withOffset(optOffset.get());
 
-
     SearchResult<Group> results;
     try {
       results = searchIndex.getByQuery(query);
@@ -222,16 +221,16 @@ public class GroupsEndpoint {
       return RestUtil.R.serverError();
     }
 
-    List<JValue> groupsJSON = new ArrayList<JValue>();
+    List<JValue> groupsJSON = new ArrayList<>();
     for (SearchResultItem<Group> item : results.getItems()) {
       Group group = item.getSource();
-      List<JField> fields = new ArrayList<JField>();
+      List<Field> fields = new ArrayList<>();
       fields.add(f("id", v(group.getIdentifier())));
-      fields.add(f("name", vN(group.getName())));
-      fields.add(f("description", vN(group.getDescription())));
+      fields.add(f("name", v(group.getName(), Jsons.BLANK)));
+      fields.add(f("description", v(group.getDescription(), Jsons.BLANK)));
       fields.add(f("role", v(group.getRole())));
       fields.add(f("users", membersToJSON(group.getMembers())));
-      groupsJSON.add(j(fields));
+      groupsJSON.add(obj(fields));
     }
 
     return okJsonList(groupsJSON, offset, limit, results.getHitCount());
@@ -317,8 +316,8 @@ public class GroupsEndpoint {
       throw new NotFoundException("Group " + groupId + " does not exist.");
 
     Group group = groupOpt.get();
-    return RestUtils.okJson(j(f("id", v(group.getIdentifier())), f("name", vN(group.getName())),
-            f("description", vN(group.getDescription())), f("role", vN(group.getRole())),
+    return RestUtils.okJson(obj(f("id", v(group.getIdentifier())), f("name", v(group.getName(), Jsons.BLANK)),
+            f("description", v(group.getDescription(), Jsons.BLANK)), f("role", v(group.getRole(), Jsons.BLANK)),
             f("roles", rolesToJSON(group.getRoles())), f("users", membersToJSON(group.getMembers()))));
   }
 
@@ -330,12 +329,12 @@ public class GroupsEndpoint {
    * @return a JSON array ({@link JValue}) with the given roles
    */
   private JValue rolesToJSON(Set<String> roles) {
-    List<JValue> rolesJSON = new ArrayList<JValue>();
+    List<JValue> rolesJSON = new ArrayList<>();
 
     for (String role : roles) {
       rolesJSON.add(v(role));
     }
-    return a(rolesJSON);
+    return arr(rolesJSON);
   }
 
   /**
@@ -346,7 +345,7 @@ public class GroupsEndpoint {
    * @return a JSON array ({@link JValue}) with the given members
    */
   private JValue membersToJSON(Set<String> members) {
-    List<JValue> membersJSON = new ArrayList<JValue>();
+    List<JValue> membersJSON = new ArrayList<>();
 
     for (String username : members) {
       User user = userDirectoryService.loadUser(username);
@@ -356,9 +355,9 @@ public class GroupsEndpoint {
         name = user.getName();
       }
 
-      membersJSON.add(j(f("username", v(username)), f("name", v(name))));
+      membersJSON.add(obj(f("username", v(username)), f("name", v(name))));
     }
 
-    return a(membersJSON);
+    return arr(membersJSON);
   }
 }

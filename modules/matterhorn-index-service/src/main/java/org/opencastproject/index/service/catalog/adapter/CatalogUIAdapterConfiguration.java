@@ -45,8 +45,7 @@ public final class CatalogUIAdapterConfiguration {
   public static final String XML_BINDING_PREFIX_SUFFIX = ".prefix";
 
   /** The raw configuration properties */
-  @SuppressWarnings("rawtypes")
-  private final Dictionary configProperties;
+  private final Dictionary<String, ?> configProperties;
 
   /** The xml namespace binding context */
   private XmlNamespaceContext xmlNSContext;
@@ -60,13 +59,12 @@ public final class CatalogUIAdapterConfiguration {
    * @throws ConfigurationException
    *           If the configuration has any errors
    */
-  public static CatalogUIAdapterConfiguration loadFromDictionary(@SuppressWarnings("rawtypes") Dictionary properties)
+  public static CatalogUIAdapterConfiguration loadFromDictionary(Dictionary<String, ?> properties)
           throws ConfigurationException {
     return new CatalogUIAdapterConfiguration(properties);
   }
 
-  private CatalogUIAdapterConfiguration(@SuppressWarnings("rawtypes") Dictionary properties)
-          throws ConfigurationException {
+  private CatalogUIAdapterConfiguration(Dictionary<String, ?> properties) throws ConfigurationException {
     this.configProperties = properties;
     loadXmlNSContext();
     validate();
@@ -96,11 +94,10 @@ public final class CatalogUIAdapterConfiguration {
    * Load the XML namespace bindings from the configuration and build the XML namespace context.
    */
   private void loadXmlNSContext() {
-    @SuppressWarnings("rawtypes")
-    final Enumeration keys = configProperties.keys();
+    final Enumeration<String> keys = configProperties.keys();
     final Map<String, String> prefixToUri = new HashMap<String, String>();
     while (keys.hasMoreElements()) {
-      final String key = (String) keys.nextElement();
+      final String key = keys.nextElement();
       if (key.startsWith(XML_BINDING_KEY_PREFIX)) {
         // First, we need to get the name of the binding
         final String nsBindingName = getXmlBindingNameFromConfigKey(key);

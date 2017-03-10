@@ -21,9 +21,9 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
@@ -63,8 +63,8 @@ import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.StreamOp;
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.JField;
-import com.entwinemedia.fn.data.json.JObjectWrite;
+import com.entwinemedia.fn.data.json.Field;
+import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -165,7 +165,7 @@ public class AclEndpoint {
     }
 
     // Filter acls by filter criteria
-    List<ManagedAcl> filteredAcls = new ArrayList<ManagedAcl>();
+    List<ManagedAcl> filteredAcls = new ArrayList<>();
     for (ManagedAcl acl : aclService().getAcls()) {
       // Filter list
       if ((filterName.isSome() && !filterName.get().equals(acl.getName()))
@@ -233,7 +233,7 @@ public class AclEndpoint {
           @RestResponse(responseCode = SC_CONFLICT, description = "An ACL with the same name already exists"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse the ACL") })
   public Response createAcl(@FormParam("name") String name, @FormParam("acl") String accessControlList) {
-    final AccessControlList acl = parseAcl.ap(accessControlList);
+    final AccessControlList acl = parseAcl.apply(accessControlList);
     final Opt<ManagedAcl> managedAcl = aclService().createAcl(acl, name).toOpt();
     if (managedAcl.isNone()) {
       logger.info("An ACL with the same name '{}' already exists", name);
@@ -254,7 +254,7 @@ public class AclEndpoint {
   public Response updateAcl(@PathParam("id") long aclId, @FormParam("name") String name,
           @FormParam("acl") String accessControlList) throws NotFoundException {
     final Organization org = securityService.getOrganization();
-    final AccessControlList acl = parseAcl.ap(accessControlList);
+    final AccessControlList acl = parseAcl.apply(accessControlList);
     final ManagedAclImpl managedAcl = new ManagedAclImpl(aclId, name, org.getId(), acl);
     if (!aclService().updateAcl(managedAcl)) {
       logger.info("No ACL with id '{}' could be found under organization '{}'", aclId, org.getId());
@@ -279,7 +279,7 @@ public class AclEndpoint {
 
   private static final Fn<String, AccessControlList> parseAcl = new Fn<String, AccessControlList>() {
     @Override
-    public AccessControlList ap(String acl) {
+    public AccessControlList apply(String acl) {
       try {
         return AccessControlParser.parseAcl(acl);
       } catch (Exception e) {
@@ -289,34 +289,34 @@ public class AclEndpoint {
     }
   };
 
-  public static JObjectWrite full(AccessControlEntry ace) {
-    return j(f(JsonConv.KEY_ROLE, v(ace.getRole())), f(JsonConv.KEY_ACTION, v(ace.getAction())),
+  public JObject full(AccessControlEntry ace) {
+    return obj(f(JsonConv.KEY_ROLE, v(ace.getRole())), f(JsonConv.KEY_ACTION, v(ace.getAction())),
             f(JsonConv.KEY_ALLOW, v(ace.isAllow())));
   }
 
-  public static final Fn<AccessControlEntry, JValue> fullAccessControlEntry = new Fn<AccessControlEntry, JValue>() {
+  private final Fn<AccessControlEntry, JValue> fullAccessControlEntry = new Fn<AccessControlEntry, JValue>() {
     @Override
-    public JValue ap(AccessControlEntry ace) {
+    public JValue apply(AccessControlEntry ace) {
       return full(ace);
     }
   };
 
-  public static JObjectWrite full(AccessControlList acl) {
-    return j(f(JsonConv.KEY_ACE, a(Stream.$(acl.getEntries()).map(fullAccessControlEntry))));
+  public JObject full(AccessControlList acl) {
+    return obj(f(JsonConv.KEY_ACE, arr(Stream.$(acl.getEntries()).map(fullAccessControlEntry))));
   }
 
-  public static JObjectWrite full(ManagedAcl acl) {
-    List<JField> fields = new ArrayList<JField>();
+  public JObject full(ManagedAcl acl) {
+    List<Field> fields = new ArrayList<>();
     fields.add(f(JsonConv.KEY_ID, v(acl.getId())));
     fields.add(f(JsonConv.KEY_NAME, v(acl.getName())));
     fields.add(f(JsonConv.KEY_ORGANIZATION_ID, v(acl.getOrganizationId())));
     fields.add(f(JsonConv.KEY_ACL, full(acl.getAcl())));
-    return j(fields);
+    return obj(fields);
   }
 
-  public static final Fn<ManagedAcl, JValue> fullManagedAcl = new Fn<ManagedAcl, JValue>() {
+  private final Fn<ManagedAcl, JValue> fullManagedAcl = new Fn<ManagedAcl, JValue>() {
     @Override
-    public JValue ap(ManagedAcl acl) {
+    public JValue apply(ManagedAcl acl) {
       return full(acl);
     }
   };

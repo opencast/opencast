@@ -88,7 +88,7 @@ public final class XmlNamespaceContext implements NamespaceContext {
                     new HashMap<String, String>(),
                     new Fn2<HashMap<String, String>, XmlNamespaceBinding, HashMap<String, String>>() {
                       @Override
-                      public HashMap<String, String> ap(
+                      public HashMap<String, String> apply(
                               HashMap<String, String> prefixToUri, XmlNamespaceBinding binding) {
                         prefixToUri.put(binding.getPrefix(), binding.getNamespaceURI());
                         return prefixToUri;
@@ -98,7 +98,7 @@ public final class XmlNamespaceContext implements NamespaceContext {
 
   @Override @Nonnull
   public String getNamespaceURI(String prefix) {
-    return Opt.nul(prefixToUri.get(prefix)).or(XMLConstants.NULL_NS_URI);
+    return Opt.nul(prefixToUri.get(prefix)).getOr(XMLConstants.NULL_NS_URI);
   }
 
   @Override @Nullable
@@ -135,19 +135,19 @@ public final class XmlNamespaceContext implements NamespaceContext {
   }
 
   private static final Fn<Entry<String, String>, String> key = new Fn<Entry<String, String>, String>() {
-    @Override public String ap(Entry<String, String> e) {
+    @Override public String apply(Entry<String, String> e) {
       return e.getKey();
     }
   };
 
   private static final Fn<Entry<String, String>, String> value = new Fn<Entry<String, String>, String>() {
-    @Override public String ap(Entry<String, String> e) {
+    @Override public String apply(Entry<String, String> e) {
       return e.getValue();
     }
   };
 
   private static final Fn<Entry<String, String>, XmlNamespaceBinding> toBinding = new Fn<Entry<String, String>, XmlNamespaceBinding>() {
-    @Override public XmlNamespaceBinding ap(Entry<String, String> e) {
+    @Override public XmlNamespaceBinding apply(Entry<String, String> e) {
       return new XmlNamespaceBinding(e.getKey(), e.getValue());
     }
   };
