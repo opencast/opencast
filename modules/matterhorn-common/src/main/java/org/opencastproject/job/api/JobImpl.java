@@ -383,4 +383,9 @@ public class JobImpl implements Job {
             .append(runTime).append(payload).append(parentJobId).append(rootJobId).append(dispatchable).append(uri)
             .append(load).append(blockedJobIds).append(blockingJobId).toHashCode();
   }
+
+  @Override
+  public String toString() {
+    return String.format("Job {id:%d, operation:%s, status:%s}", id, operation, status.toString());
+  }
 }
