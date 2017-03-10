@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-archive-api</artifactId>
+      <artifactId>matterhorn-asset-manager-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -78,12 +78,6 @@
       <scope>test</scope>
     </dependency>
     <!-- Tests -->
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-archive-schema</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

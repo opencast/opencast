@@ -21,14 +21,13 @@
 package org.opencastproject.migration;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
+import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 import static org.opencastproject.util.PathSupport.path;
-import static org.opencastproject.util.data.Option.none;
 
-import org.opencastproject.archive.api.Archive;
-import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
-import org.opencastproject.archive.api.Query;
-import org.opencastproject.archive.api.ResultSet;
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.query.AQueryBuilder;
+import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.search.api.SearchQuery;
@@ -46,7 +45,6 @@ import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Function0;
-import org.opencastproject.util.data.Option;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -65,7 +63,6 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -94,11 +91,8 @@ public class DistributionMigrationService {
   /** The search database service */
   private SearchServiceDatabase searchServiceDatabase;
 
-  /** The archive */
-  private Archive<?> archive;
-
-  /** HttpMediaPackagheElementProvider */
-  private HttpMediaPackageElementProvider httpMediaPackageElementProvider;
+  /** The asset manager */
+  private AssetManager assetManager;
 
   /** The component context */
   private ComponentContext cc;
@@ -129,13 +123,8 @@ public class DistributionMigrationService {
   }
 
   /** OSGi DI callback. */
-  public void setArchive(Archive<?> archive) {
-    this.archive = archive;
-  }
-
-  /** OSGi DI callback. */
-  public void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
-    this.httpMediaPackageElementProvider = httpMediaPackageElementProvider;
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
   }
 
   public void activate(final ComponentContext cc) {
@@ -278,71 +267,14 @@ public class DistributionMigrationService {
     return SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(cc, org), new Function0<Boolean>() {
       @Override
       public Boolean apply() {
-        final ResultSet result = archive.findForAdministrativeRead(getQuery(mpId, org),
-                httpMediaPackageElementProvider.getUriRewriter());
-        if (result.size() > 0) {
+        AQueryBuilder q = assetManager.createQuery();
+        final AResult r = q.select(q.snapshot())
+                .where(q.mediaPackageId(mpId).and(q.version().isLatest()).and(q.organizationId().eq(org.getId())))
+                .run();
+        if (enrich(r).getSize() > 0) {
           return true;
         }
         return false;
-      }
-
-      private Query getQuery(final String mpId, final Organization org) {
-        return new Query() {
-          @Override
-          public boolean isOnlyLastVersion() {
-            return false;
-          }
-
-          @Override
-          public boolean isIncludeDeleted() {
-            return false;
-          }
-
-          @Override
-          public Option<String> getSeriesId() {
-            return none();
-          }
-
-          @Override
-          public Option<String> getOrganizationId() {
-            return Option.some(org.getId());
-          }
-
-          @Override
-          public Option<Integer> getOffset() {
-            return none();
-          }
-
-          @Override
-          public Option<String> getMediaPackageId() {
-            return Option.some(mpId);
-          }
-
-          @Override
-          public Option<Integer> getLimit() {
-            return none();
-          }
-
-          @Override
-          public Option<Date> getDeletedBefore() {
-            return none();
-          }
-
-          @Override
-          public Option<Date> getDeletedAfter() {
-            return none();
-          }
-
-          @Override
-          public Option<Date> getArchivedBefore() {
-            return none();
-          }
-
-          @Override
-          public Option<Date> getArchivedAfter() {
-            return none();
-          }
-        };
       }
     });
   }
