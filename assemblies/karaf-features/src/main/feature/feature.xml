@@ -417,6 +417,7 @@
     <bundle>mvn:org.opencastproject/matterhorn-videoeditor-remote/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-videoeditor-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-videosegmenter-api/${project.version}</bundle>
+    <bundle>mvn:org.opencastproject/matterhorn-videosegmenter-remote/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-videosegmenter-workflowoperation/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-workflow-service-impl/${project.version}</bundle>
     <bundle>mvn:org.opencastproject/matterhorn-workflow-workflowoperation/${project.version}</bundle>
