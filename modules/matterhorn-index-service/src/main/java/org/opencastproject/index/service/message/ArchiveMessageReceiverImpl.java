@@ -23,6 +23,7 @@ package org.opencastproject.index.service.message;
 
 import static org.opencastproject.index.service.impl.index.event.EventIndexUtils.getOrCreateEvent;
 import static org.opencastproject.index.service.impl.index.event.EventIndexUtils.updateEvent;
+import static org.opencastproject.util.data.Option.none;
 
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
@@ -71,8 +72,14 @@ public class ArchiveMessageReceiverImpl extends BaseMessageReceiverImpl<ArchiveI
       case Update:
         logger.debug("Received Update Archive Entry");
 
+        Option<DublinCoreCatalog> loadedDC = none();
         MediaPackage mp = archiveItem.getMediapackage();
-        Option<DublinCoreCatalog> loadedDC = DublinCoreUtil.loadEpisodeDublinCore(workspace, mp);
+        try {
+          loadedDC = DublinCoreUtil.loadEpisodeDublinCore(workspace, mp);
+        } catch (Exception nfe) {
+          // Probably a NotFoundException wrapped by chuck()
+          logger.warn("Unable to retrieve dublincore metadata for mediapackage {} during archive index", mp.getIdentifier());
+        }
 
         // Load or create the corresponding recording event
         Event event = null;
