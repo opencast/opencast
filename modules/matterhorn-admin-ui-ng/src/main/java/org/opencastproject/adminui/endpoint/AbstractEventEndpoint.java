@@ -1934,7 +1934,7 @@ public abstract class AbstractEventEndpoint {
         VideoStream videoStream = (VideoStream) stream;
         video.add(f("id", v(videoStream.getIdentifier(), BLANK)));
         video.add(f("type", v(videoStream.getFormat(), BLANK)));
-        video.add(f("bitrate", v(videoStream.getBitRate())));
+        video.add(f("bitrate", v(videoStream.getBitRate(), BLANK)));
         video.add(f("framerate", v(videoStream.getFrameRate(), BLANK)));
         video.add(f("resolution", v(videoStream.getFrameWidth() + "x" + videoStream.getFrameHeight(), BLANK)));
         video.add(f("framecount", v(videoStream.getFrameCount(), BLANK)));

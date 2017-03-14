@@ -156,7 +156,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    */
   private void recreateService(IndexRecreateObject.Service service)
           throws IndexServiceException, InterruptedException, CancellationException, ExecutionException {
-    logger.info("Starting to recreate index for service {}", service);
+    logger.info("Starting to recreate index for service '{}'", service);
     messageSender.sendObjectMessage(IndexProducer.RECEIVER_QUEUE + "." + service, MessageSender.DestinationType.Queue,
             IndexRecreateObject.start(getIndexName(), service));
     boolean done = false;
@@ -170,13 +170,15 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
         IndexRecreateObject indexRecreateObject = (IndexRecreateObject) message.getObject();
         switch (indexRecreateObject.getStatus()) {
           case Update:
-            logger.info("Updating service: '{}' with {}/{} finished.", new Object[] { indexRecreateObject.getService(),
-                    indexRecreateObject.getCurrent(), indexRecreateObject.getTotal() });
+            logger.info("Updating service: '{}' with {}/{} finished, {}% complete.", new Object[] { indexRecreateObject.getService(),
+                    indexRecreateObject.getCurrent(), indexRecreateObject.getTotal(), (int) (indexRecreateObject.getCurrent() * 100 / indexRecreateObject.getTotal()) });
+            if (indexRecreateObject.getCurrent() == indexRecreateObject.getTotal()) {
+              logger.info("Waiting for service '{}' indexing to complete", indexRecreateObject.getService());
+            }
             break;
           case End:
             done = true;
-            logger.info("Finished re-creating data for service '{}'", new Object[] { indexRecreateObject.getService(),
-                    +indexRecreateObject.getCurrent(), indexRecreateObject.getTotal() });
+            logger.info("Finished re-creating data for service '{}'", indexRecreateObject.getService());
             break;
           case Error:
             logger.error("Error updating service '{}' with {}/{} finished.",

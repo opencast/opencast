@@ -188,4 +188,12 @@ public class JobImplTest {
 
     assertEquals(job, equalJob);
   }
+
+  @Test
+  public void testToString() throws Exception {
+    Job newJob = new JobImpl(3L, "test", "test_org", 0L, "simple", "do", arguments, DISPATCHING, "localhost",
+            "remotehost", created, started, completed, 100L, 200L, "result", 3L, 1L, true, uri, 1.5F, blockedJobs, 4L);
+    String jobString = "Job {id:3, operation:do, status:DISPATCHING}";
+    assertEquals(newJob.toString(), jobString);
+  }
 }

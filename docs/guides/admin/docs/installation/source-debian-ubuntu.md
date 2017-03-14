@@ -6,9 +6,9 @@ These instructions outline how to install an all in one Opencast system on Ubunt
 Preparation
 -----------
 
-Create a dedicated Opencast user:
+Create a dedicated Opencast system user:
 
-    useradd -d /opt/opencast opencast
+    useradd -r -d /opt/opencast opencast
 
 Get Opencast source:
 
@@ -127,7 +127,7 @@ Make sure the path to Opencast is set correctly:
 
 Install the unit file:
 
-    cp docs/scripts/service/opencast.service /usr/lib/systemd/system/
+    cp docs/scripts/service/opencast.service /etc/systemd/system/
     systemctl daemon-reload
 
 Start Opencast and make it run automatically:

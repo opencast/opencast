@@ -69,7 +69,7 @@ describe('Serie controller', function () {
 
         it('isolates dublincore/series catalog', function () {
             $scope.$watch('seriesCatalog', function (newCatalog) {
-                expect(newCatalog).toEqual(catalogs[0]);
+                expect(newCatalog.flavor).toEqual(catalogs[0].flavor);
             });
         });
 
