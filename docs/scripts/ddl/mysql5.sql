@@ -283,12 +283,6 @@ CREATE TABLE mh_oaipmh (
 
 CREATE INDEX IX_mh_oaipmh_modification_date ON mh_oaipmh (modification_date);
 
-CREATE TABLE mh_oaipmh_harvesting (
-  url VARCHAR(255) NOT NULL,
-  last_harvested datetime,
-  PRIMARY KEY (url)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE mh_user_session (
   session_id VARCHAR(50) NOT NULL,
   user_ip VARCHAR(255),
