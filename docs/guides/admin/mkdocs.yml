@@ -22,8 +22,7 @@ pages:
    - Overview: 'installation/index.md'
    - Multiple Servers: 'installation/multiple-servers.md'
    - Installation from Source:
-      - Debian/Ubuntu: 'installation/source-debian-ubuntu.md'
-      - RHEL/CentOS: 'installation/source-rhel-sl-centos.md'
+      - Linux: 'installation/source-linux.md'
       - MacOS X: 'installation/source-macosx.md'
    - Installation from Package (RPM):
       - Fedora: 'installation/rpm-fedora.md'

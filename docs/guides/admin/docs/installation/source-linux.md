@@ -1,12 +1,14 @@
-Install from Source (RedHat Enterprise Linux, CentOS, Scientific Linux, Fedora)
-===============================================================================
+Install from Source (Linux)
+===========================
+
+These instructions outline how to install an all in one Opencast system on Linux.
 
 Preparation
 -----------
 
-Create a dedicated Opencast user:
+Create a dedicated Opencast system user:
 
-    useradd -d /opt/opencast opencast
+    useradd -r -d /opt/opencast opencast
 
 Get Opencast source:
 
@@ -39,7 +41,7 @@ Please make sure to install the following dependencies. Note that not all depend
 
 Required:
 
-    java-devel >= 1:1.7.0
+    java-devel / openjdk >= 1.7.0
     ffmpeg >= 3.0.1
     maven >= 3.1
     unzip
@@ -125,7 +127,7 @@ Make sure the path to Opencast is set correctly:
 
 Install the unit file:
 
-    cp docs/scripts/service/opencast.service /usr/lib/systemd/system/
+    cp docs/scripts/service/opencast.service /etc/systemd/system/
     systemctl daemon-reload
 
 Start Opencast and make it run automatically:
