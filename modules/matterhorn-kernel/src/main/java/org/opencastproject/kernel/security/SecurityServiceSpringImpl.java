@@ -25,6 +25,7 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -88,31 +89,41 @@ public class SecurityServiceSpringImpl implements SecurityService {
       throw new IllegalStateException("No organization is set in security context");
 
     User delegatedUser = delegatedUserHolder.get();
+
     if (delegatedUser != null) {
       return delegatedUser;
     }
+
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(org);
     if (auth != null) {
       Object principal = auth.getPrincipal();
       if ((principal != null) && (principal instanceof UserDetails)) {
         UserDetails userDetails = (UserDetails) principal;
+        Set<JaxbRole> roles = new HashSet<JaxbRole>();
+
+        // If user exist, add the existing roles to the list
         if (userDirectory != null) {
           User user = userDirectory.loadUser(userDetails.getUsername());
           if (user != null) {
-            delegatedUserHolder.set(user);
-            return JaxbUser.fromUser(user);
-          }
-        } else {
-          Set<JaxbRole> roles = new HashSet<JaxbRole>();
-          Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
-          if (authorities != null && authorities.size() > 0) {
-            for (GrantedAuthority ga : authorities) {
-              roles.add(new JaxbRole(ga.getAuthority(), jaxbOrganization));
+            for (Role role : user.getRoles()) {
+              roles.add(JaxbRole.fromRole(role));
             }
           }
-          return new JaxbUser(userDetails.getUsername(), null, jaxbOrganization, roles);
         }
+
+        // Add the roles (authorities) in the security context
+        Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+        if (authorities != null) {
+          for (GrantedAuthority ga : authorities) {
+            roles.add(new JaxbRole(ga.getAuthority(), jaxbOrganization));
+          }
+        }
+
+        User user = new JaxbUser(userDetails.getUsername(), null, jaxbOrganization, roles);
+        delegatedUserHolder.set(user);
+
+        return user;
       }
     }
 
