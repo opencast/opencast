@@ -1,0 +1,660 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+package org.opencastproject.timelinepreviews.ffmpeg;
+
+import org.opencastproject.job.api.AbstractJobProducer;
+import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.Attachment;
+import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementBuilder;
+import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.timelinepreviews.api.TimelinePreviewsException;
+import org.opencastproject.timelinepreviews.api.TimelinePreviewsService;
+import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.LoadUtil;
+import org.opencastproject.util.MimeTypes;
+import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.UnknownFileTypeException;
+import org.opencastproject.workspace.api.Workspace;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.List;
+
+/**
+ * Media analysis plugin that takes a video stream and extracts video segments
+ * by trying to detect slide and/or scene changes.
+ *
+ * This plugin runs
+ *
+ * <pre>
+ * ffmpeg -nostats -i in.mp4 -filter:v 'select=gt(scene\,0.04),showinfo' -f null - 2&gt;&amp;1 | grep Parsed_showinfo_1
+ * </pre>
+ */
+public class TimelinePreviewsServiceImpl extends AbstractJobProducer implements
+TimelinePreviewsService, ManagedService {
+
+  /** Resulting collection in the working file repository */
+  public static final String COLLECTION_ID = "timelinepreviews";
+
+  /** List of available operations on jobs */
+  private enum Operation {
+    TimelinePreview
+  };
+
+  /** Path to the executable */
+  protected String binary = FFMPEG_BINARY_DEFAULT;
+
+  /** The key to look for in the service configuration file to override the DEFAULT_FFMPEG_BINARY */
+  public static final String FFMPEG_BINARY_CONFIG = "org.opencastproject.composer.ffmpeg.path";
+
+  /** The default path to the FFmpeg binary */
+  public static final String FFMPEG_BINARY_DEFAULT = "ffmpeg";
+
+  /** Name of the constant used to retrieve the horizontal resolution */
+  public static final String OPT_RESOLUTION_X = "resolutionX";
+
+  /** Default value for the horizontal resolution */
+  public static final int DEFAULT_RESOLUTION_X = 160;
+
+  /** Name of the constant used to retrieve the vertical resolution */
+  public static final String OPT_RESOLUTION_Y = "resolutionY";
+
+  /** Default value for the vertical resolution */
+  public static final int DEFAULT_RESOLUTION_Y = -1;
+
+  /** Name of the constant used to retrieve the output file format */
+  public static final String OPT_OUTPUT_FORMAT = "outputFormat";
+
+  /** Default value for the format of the output image file */
+  public static final String DEFAULT_OUTPUT_FORMAT = ".png";
+
+  /** Name of the constant used to retrieve the mimetype */
+  public static final String OPT_MIMETYPE = "mimetype";
+
+  /** Default value for the mimetype of the generated image */
+  public static final String DEFAULT_MIMETYPE = "image/png";
+
+  /** Name of the constant used to retrieve the additional FFmpeg parameters */
+  public static final String OPT_FFMPEG_PARAMETERS = "ffmpegParameters";
+
+  /** Default value for the additional FFmpeg parameters */
+  public static final String DEFAULT_FFMPEG_PARAMETERS = "";
+
+
+  /** The default job load of a timeline previews job */
+  public static final float DEFAULT_TIMELINEPREVIEWS_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the DEFAULT_TIMELINEPREVIEWS_JOB_LOAD */
+  public static final String TIMELINEPREVIEWS_JOB_LOAD_KEY = "job.load.timelinepreviews";
+
+  /** The load introduced on the system by creating a caption job */
+  private float timelinepreviewsJobLoad = DEFAULT_TIMELINEPREVIEWS_JOB_LOAD;
+
+  /** The logging facility */
+  protected static final Logger logger = LoggerFactory
+    .getLogger(TimelinePreviewsServiceImpl.class);
+
+  /** The horizontal resolution of a single preview image */
+  protected int resolutionX = DEFAULT_RESOLUTION_X;
+
+  /** The vertical resolution of a single preview image */
+  protected int resolutionY = DEFAULT_RESOLUTION_Y;
+
+  /** The file format of the generated preview images file */
+  protected String outputFormat = DEFAULT_OUTPUT_FORMAT;
+
+  /** The mimetype that will be set for the generated Attachment containing the timeline previews image */
+  protected String mimetype = DEFAULT_MIMETYPE;
+
+  /** The additional parameters that will be inserted in the ffmpeg command between input and the filter to generate
+   *  the timeline previews image */
+  protected String ffmpegParameters = DEFAULT_FFMPEG_PARAMETERS;
+
+
+  /** Reference to the receipt service */
+  protected ServiceRegistry serviceRegistry = null;
+
+  /** The workspace to use when retrieving remote media files */
+  protected Workspace workspace = null;
+
+  /** The security service */
+  protected SecurityService securityService = null;
+
+  /** The user directory service */
+  protected UserDirectoryService userDirectoryService = null;
+
+  /** The organization directory service */
+  protected OrganizationDirectoryService organizationDirectoryService = null;
+
+  /**
+   * Creates a new instance of the timeline previews service.
+   */
+  public TimelinePreviewsServiceImpl() {
+    super(JOB_TYPE);
+    this.binary = FFMPEG_BINARY_DEFAULT;
+  }
+
+  @Override
+  public void activate(ComponentContext cc) {
+    super.activate(cc);
+    logger.info("Activate ffmpeg timeline previews service");
+    final String path = cc.getBundleContext().getProperty(FFMPEG_BINARY_CONFIG);
+    this.binary = path == null ? FFMPEG_BINARY_DEFAULT : path;
+    logger.debug("Configuration {}: {}", FFMPEG_BINARY_CONFIG, FFMPEG_BINARY_DEFAULT);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
+   */
+  @Override
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    if (properties == null) {
+      return;
+    }
+    logger.debug("Configuring the timeline previews service");
+
+    // Horizontal resolution
+    if (properties.get(OPT_RESOLUTION_X) != null) {
+      String res = (String) properties.get(OPT_RESOLUTION_X);
+      try {
+        resolutionX = Integer.parseInt(res);
+        logger.info("Horizontal resolution set to {} pixels", resolutionX);
+      } catch (Exception e) {
+        logger.warn("Found illegal value '{}' for timeline previews horizontal resolution", res);
+      }
+    }
+    // Vertical resolution
+    if (properties.get(OPT_RESOLUTION_Y) != null) {
+      String res = (String) properties.get(OPT_RESOLUTION_Y);
+      try {
+        resolutionY = Integer.parseInt(res);
+        logger.info("Vertical resolution set to {} pixels", resolutionY);
+      } catch (Exception e) {
+        logger.warn("Found illegal value '{}' for timeline previews vertical resolution", res);
+      }
+    }
+    // Output file format
+    if (properties.get(OPT_OUTPUT_FORMAT) != null) {
+      String format = (String) properties.get(OPT_OUTPUT_FORMAT);
+      try {
+        outputFormat = format;
+        logger.info("Output file format set to \"{}\"", outputFormat);
+      } catch (Exception e) {
+        logger.warn("Found illegal value '{}' for timeline previews output file format", format);
+      }
+    }
+    // Output mimetype
+    if (properties.get(OPT_MIMETYPE) != null) {
+      String type = (String) properties.get(OPT_MIMETYPE);
+      try {
+        mimetype = type;
+        logger.info("Mime type set to \"{}\"", mimetype);
+      } catch (Exception e) {
+        logger.warn("Found illegal value '{}' for timeline previews mimetype", type);
+      }
+    }
+    // Additional FFmpeg parameters
+    if (properties.get(OPT_FFMPEG_PARAMETERS) != null) {
+      String params = (String) properties.get(OPT_FFMPEG_PARAMETERS);
+      try {
+        ffmpegParameters = params;
+        logger.info("Additional FFmpeg parameters set to \"{}\"", ffmpegParameters);
+      } catch (Exception e) {
+        logger.warn("Found illegal value '{}' for timeline previews additional FFmpeg parameters", params);
+      }
+    }
+
+    timelinepreviewsJobLoad = LoadUtil.getConfiguredLoadValue(properties, TIMELINEPREVIEWS_JOB_LOAD_KEY,
+            DEFAULT_TIMELINEPREVIEWS_JOB_LOAD, serviceRegistry);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.timelinepreviews.api.TimelinePreviewsService#createTimelinePreviewImages(org.opencastproject.mediapackage.Track)
+   */
+  @Override
+  public Job createTimelinePreviewImages(Track track, int imageCount) throws TimelinePreviewsException,
+         MediaPackageException {
+    try {
+      logger.info("track: {}", track);
+      logger.info("job_type: {}", JOB_TYPE);
+      logger.info("operation: {}", Operation.TimelinePreview.toString());
+      logger.info("jobLoad: {}", timelinepreviewsJobLoad);
+
+      List<String> parameters = Arrays.asList(MediaPackageElementParser.getAsXml(track), Integer.toString(imageCount));
+
+      return serviceRegistry.createJob(JOB_TYPE,
+          Operation.TimelinePreview.toString(),
+          parameters,
+          timelinepreviewsJobLoad);
+    } catch (ServiceRegistryException e) {
+      logger.info("e: {}", e);
+      e.printStackTrace();
+      throw new TimelinePreviewsException("Unable to create timelinepreviews job", e);
+    }
+  }
+
+  /**
+   * Starts segmentation on the video track identified by ***TODO: change javadoc
+   * <code>mediapackageId</code> and <code>elementId</code> and returns a
+   * receipt containing the final result in the form of anMpeg7Catalog.
+   *
+   * @param job
+   * @param track the element to analyze
+   * @param imageCount number of preview images that will be generated
+   * @return a receipt containing the resulting mpeg-7 catalog
+   * @throws TimelinePreviewsException
+   * @throws org.opencastproject.mediapackage.MediaPackageException
+   */
+  protected Attachment generatePreviewImages(Job job, Track track, int imageCount)
+    throws TimelinePreviewsException, MediaPackageException {
+
+    // Make sure the element can be analyzed using this analysis implementation
+    if (!track.hasVideo()) {
+      logger.warn("Element {} is not a video track", track);
+      throw new TimelinePreviewsException("Element is not a video track");
+    }
+
+    try {
+      File mediaFile = null;
+      URL mediaUrl = null;
+      try {
+        mediaFile = workspace.get(track.getURI());
+        mediaUrl = mediaFile.toURI().toURL();
+      } catch (NotFoundException e) {
+        throw new TimelinePreviewsException(
+            "Error finding the video file in the workspace", e);
+      } catch (IOException e) {
+        throw new TimelinePreviewsException(
+            "Error reading the video file in the workspace", e);
+      }
+
+      if (track.getDuration() == null)
+        throw new MediaPackageException("Track " + track + " does not have a duration");
+      logger.info("Track {} loaded, duration is {} s", mediaUrl, track.getDuration() / 1000);
+
+
+      int testCount = 0;
+
+        //parameters so far:
+        double seconds = 10;
+        int width = resolutionX;//160;
+        int height = resolutionY;//-1;
+//          int imageSize = 10;
+
+        // calculate number of images
+//          int duration = (int)Math.ceil(track.getDuration() / 1000.0);
+        double duration = track.getDuration() / 1000.0;
+        int tileNum = (int)Math.ceil(duration / (float)seconds);
+        // +1 to be sure to have enough space?
+        //seconds = Math.round(duration / 100.0f); // TODO: breaks everything -> file not found. maybe check if value is ok before ffmpeg call?
+//          seconds = Math.round(duration / (float)(imageSize * imageSize)); // TODO: breaks everything -> file not found. maybe check if value is ok before ffmpeg call?
+        seconds = duration / (double)(imageCount);
+        seconds = seconds <= 0 ? 1 : seconds;
+        int seconds10 = Math.round((float)duration / (float)(imageCount));
+
+        logger.info("test " + testCount++ + " trackDuration: " + duration);
+
+        // optional: calculate best number of tiles for row in tiled image, so that approx. quadratic
+        int tileX = tileNum;
+        int tileY = 1;
+
+        int imageSize = (int) Math.ceil(Math.sqrt(imageCount));
+//        int imageSizeX = 1;
+//        int imageSizeY = 1;
+
+
+//          int[] dimensions = calculateOptimalImageDimension(duration, seconds);
+
+        logger.info("test BEFORE " + testCount++);
+//          Attachment composedImage = createPreviews(track, seconds, width, height, dimensions[0], dimensions[1]);
+        logger.info("duration: {}, seconds10: {}", duration, seconds10);
+        logger.info("1:");
+        Attachment composedImage = createPreviewsFFmpeg(track, seconds, width, height, imageSize, imageSize, 0, duration);
+        logger.info("2:");
+//          Attachment composedImage1 = createPreviewsFFmpeg(track, seconds, width, height, 10, 10, 0, seconds10);
+//          logger.info("3:");
+//          Attachment composedImage2 = createPreviewsFFmpeg(track, seconds, width, height, 10, 10, seconds10, seconds10);
+//          logger.info("test AFTER " + testCount++);
+
+//           Attachment composedImage = (Attachment) element;
+        if (composedImage == null)
+          throw new IllegalStateException("Unable to compose image");
+
+        // Set the mimetype
+        try {
+          composedImage.setMimeType(MimeTypes.parseMimeType(mimetype));
+        } catch (IllegalArgumentException e) {
+          logger.warn("Invalid mimetype provided for timeline previews image");
+          try  {
+            composedImage.setMimeType(MimeTypes.fromURI(composedImage.getURI()));
+          } catch (UnknownFileTypeException ex) {
+            logger.warn("No valid mimetype could be found for timeline previews image");
+          }
+        }
+
+//        composedImage.addTag("imageSize=" + imageCount);
+
+        composedImage.addProperty("imageCount=" + imageCount, String.valueOf(imageCount));
+        composedImage.addProperty("tileResolutionX=" + resolutionX, String.valueOf(imageCount));
+        composedImage.addProperty("tileResolutionY=" + resolutionY, String.valueOf(imageCount));
+
+
+        return composedImage;
+
+    } catch (Exception e) {
+      logger.warn("Error creating timeline preview images for " + track, e);
+      if (e instanceof TimelinePreviewsException) {
+        throw (TimelinePreviewsException) e;
+      } else {
+        throw new TimelinePreviewsException(e);
+      }
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.AbstractJobProducer#process(org.opencastproject.job.api.Job)
+   */
+  @Override
+  protected String process(Job job) throws Exception {
+    Operation op = null;
+    String operation = job.getOperation();
+    List<String> arguments = job.getArguments();
+    try {
+      op = Operation.valueOf(operation);
+      switch (op) {
+        case TimelinePreview:
+          Track track = (Track) MediaPackageElementParser
+            .getFromXml(arguments.get(0));
+          int imageCount = Integer.parseInt(arguments.get(1));
+          Attachment timelinePreviewsMpe = generatePreviewImages(job, track, imageCount);
+          return MediaPackageElementParser.getAsXml(timelinePreviewsMpe);
+        default:
+          throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
+      }
+    } catch (IllegalArgumentException e) {
+      throw new ServiceRegistryException("This service can't handle operations of type '" + op + "'", e);
+    } catch (IndexOutOfBoundsException e) {
+      throw new ServiceRegistryException("This argument list for operation '" + op + "' does not meet expectations", e);
+    } catch (Exception e) {
+      throw new ServiceRegistryException("Error handling operation '" + op + "'", e);
+    }
+  }
+
+  protected Attachment createPreviewsFFmpeg(Track track, double seconds, int width, int height, int tileX, int tileY, int start, double duration)
+          throws TimelinePreviewsException, IOException {
+
+    // copy source file into workspace
+    File mediaFile = null;
+    try {
+      mediaFile = workspace.get(track.getURI());
+    } catch (NotFoundException e) {
+      throw new TimelinePreviewsException(
+          "Error finding the media file in the workspace", e);
+    } catch (IOException e) {
+      throw new TimelinePreviewsException(
+          "Error reading the media file in the workspace", e);
+    }
+
+    String imageFilePath = "";
+    int trialCount = 0;
+    int exitCode = 1;
+    boolean ffmpegSuccess = false;
+    while (trialCount < 3 && !ffmpegSuccess) {
+
+  //    String imageFilePath = FilenameUtils.removeExtension(mediaFile.getAbsolutePath()).concat("_timelinepreviews.png");
+      imageFilePath = FilenameUtils.removeExtension(mediaFile.getAbsolutePath()).concat("_timelinepreviews" + outputFormat);
+
+      String[] command = new String[] {
+        binary,
+        "-loglevel", "error",
+        "-t", String.valueOf(duration - seconds / 2.0),
+        "-y", "-i",
+        mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
+        "-vf", "fps=1/" + seconds + ",scale=" + width + ":" + height + ",tile=" + tileX + "x" + tileY,
+        imageFilePath.replaceAll(" ", "\\ ")
+      };
+
+      logger.info("imageFilePath: " + imageFilePath);
+
+      logger.debug("Start timeline previews ffmpeg process: {}", StringUtils.join(command, " "));
+      logger.info("Create timeline preview images file for track '{}' at {}", track.getIdentifier(), imageFilePath);
+
+      ProcessBuilder pbuilder = new ProcessBuilder(command);
+
+      pbuilder.redirectErrorStream(true);
+      Process ffmpegProcess = null;
+      exitCode = 1;
+      String errorMessage = "";
+      BufferedReader errStream = null;
+      try {
+        ffmpegProcess = pbuilder.start();
+
+        errStream = new BufferedReader(new InputStreamReader(ffmpegProcess.getInputStream()));
+        String line = errStream.readLine();
+        while (line != null) {
+          logger.error("FFmpeg error: " + line);
+          errorMessage = line;
+          line = errStream.readLine();
+        }
+
+        exitCode = ffmpegProcess.waitFor();
+      } catch (IOException ex) {
+        throw new TimelinePreviewsException("Starting ffmpeg process failed", ex);
+      } catch (InterruptedException ex) {
+        throw new TimelinePreviewsException("Waiting until timeline previews process exited was interrupted unexpectly", ex);
+      } finally {
+        IoSupport.closeQuietly(ffmpegProcess);
+        IoSupport.closeQuietly(errStream);
+        if (exitCode != 0) {
+          try {
+            FileUtils.forceDelete(new File(imageFilePath));
+          } catch (IOException e) {
+            // it is ok, no output file was generated by ffmpeg
+          }
+        }
+      }
+
+      // if there was a problem in the ffmpeg call try to resolve it
+      if (exitCode == 0) {
+        ffmpegSuccess = true;
+      } else {
+        if (errorMessage.contains("frame filename number 2 from pattern")) {
+          tileX++;
+        }
+        if (errorMessage.contains("Unable to find a suitable output format")) {
+          if (!outputFormat.contains(".")) {
+            outputFormat = "." + outputFormat;
+          }
+        }
+      }
+      trialCount++;
+    }
+
+    if (exitCode != 0)
+      throw new TimelinePreviewsException("The timeline previews process exited abnormally with exit code " + exitCode);
+
+
+    // put timeline previews image into workspace
+    FileInputStream timelinepreviewsFileInputStream = null;
+    URI previewsFileUri = null;
+    try {
+      timelinepreviewsFileInputStream = new FileInputStream(imageFilePath);
+      previewsFileUri = workspace.putInCollection(COLLECTION_ID,
+              FilenameUtils.getName(imageFilePath), timelinepreviewsFileInputStream);
+      logger.info("Copied the created timeline preview images file to the workspace {}", previewsFileUri.toString());
+    } catch (FileNotFoundException ex) {
+      throw new TimelinePreviewsException(
+              String.format("Timeline previews image file '%s' not found", imageFilePath), ex);
+    } catch (IOException ex) {
+      throw new TimelinePreviewsException(
+              String.format("Can't write timeline preview images file '%s' to workspace", imageFilePath), ex);
+    } catch (IllegalArgumentException ex) {
+      throw new TimelinePreviewsException(ex);
+    } finally {
+      IoSupport.closeQuietly(timelinepreviewsFileInputStream);
+      logger.info("Deleted local timeline preview images file at {}", imageFilePath);
+      FileUtils.deleteQuietly(new File(imageFilePath));
+    }
+
+    // create media package element
+    MediaPackageElementBuilder mpElementBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
+    // it is up to the workflow operation handler to set the attachment flavor
+    Attachment timelinepreviewsMpe = (Attachment) mpElementBuilder.elementFromURI(
+            previewsFileUri, MediaPackageElement.Type.Attachment, track.getFlavor());
+    timelinepreviewsMpe.setIdentifier(IdBuilderFactory.newInstance().newIdBuilder().createNew().compact());
+
+    // add reference to track and image size
+//    timelinepreviewsMpe.referTo(track);
+//    timelinepreviewsMpe.getReference().setProperty("imageSize", tileX + "x" + tileY);
+      timelinepreviewsMpe.addProperty("imageSizeX=" + tileX, String.valueOf(0));
+      timelinepreviewsMpe.addProperty("imageSizeY=" + tileY, String.valueOf(0));
+
+    return timelinepreviewsMpe;
+
+  }
+
+  /**
+   * Sets the workspace
+   *
+   * @param workspace
+   *            an instance of the workspace
+   */
+  protected void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
+  }
+
+  /**
+   * Sets the receipt service
+   *
+   * @param serviceRegistry
+   *            the service registry
+   */
+  protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
+   */
+  @Override
+  protected ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
+  }
+
+  /**
+   * Callback for setting the security service.
+   *
+   * @param securityService
+   *            the securityService to set
+   */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
+  /**
+   * Callback for setting the user directory service.
+   *
+   * @param userDirectoryService
+   *            the userDirectoryService to set
+   */
+  public void setUserDirectoryService(
+      UserDirectoryService userDirectoryService) {
+    this.userDirectoryService = userDirectoryService;
+  }
+
+  /**
+   * Sets a reference to the organization directory service.
+   *
+   * @param organizationDirectory
+   *            the organization directory
+   */
+  public void setOrganizationDirectoryService(
+      OrganizationDirectoryService organizationDirectory) {
+    this.organizationDirectoryService = organizationDirectory;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
+   */
+  @Override
+  protected SecurityService getSecurityService() {
+    return securityService;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
+   */
+  @Override
+  protected UserDirectoryService getUserDirectoryService() {
+    return userDirectoryService;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
+   */
+  @Override
+  protected OrganizationDirectoryService getOrganizationDirectoryService() {
+    return organizationDirectoryService;
+  }
+
+}
