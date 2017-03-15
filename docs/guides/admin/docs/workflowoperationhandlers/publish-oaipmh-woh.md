@@ -3,7 +3,7 @@
 
 ## Description
 
-The PublishOaiPmhWorkflowOperation will bring your media to your OAI-PMH repositories.
+The `PublishOaiPmhWorkflowOperation` exposes your media's metadata in a OAI-PMH repository for harvesting by OAI-PMH aware applications.
 
 
 ## Parameter Table
@@ -20,8 +20,7 @@ The PublishOaiPmhWorkflowOperation will bring your media to your OAI-PMH reposit
 |external-channel   |The optional channel name for the OAI-PMH publication element                                 |
 |external-mime-type |The optional mime type for the OAI-PMH publication element                                    |
 
-Note: The configuration keys `external-template`, `external-channel` and `external-mime-type` need to be set either
-all or none
+Note: The all or none of the configuration keys `external-template`, `external-channel` and `external-mime-type` must to be set.
 
 ## Customizing the OAI-PMH Publication Element
 
@@ -36,7 +35,7 @@ element will use the following default values:
 
 Note that `org.opencastproject.oaipmh.server.hosturl` is defined in
 `etc/org.opencastproject.organization-mh_default_org.cfg` and `org.opencastproject.oaipmh.mountpoint` is defined in
-`org.opencastproject.oaipmh.mountpoint=/oaipmh`.
+`custom.properties` and defaults to `/oaipmh`.
 
 Example:
 
@@ -55,7 +54,7 @@ template:
 
 Example:
 
-    https://www.externalURL.com/watch.html?series={series}&id={event}"
+    https://www.externalURL.com/watch.html?series={series}&id={event}
 
 The configuration key `external-mime-type` is used to set the mime type of the content return when accessing the
 URL of the publication element.
