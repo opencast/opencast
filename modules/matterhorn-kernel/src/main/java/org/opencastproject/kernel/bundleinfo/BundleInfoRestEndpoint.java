@@ -56,8 +56,13 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 /** Bundle information via REST. */
-@RestService(name = "bundleInfo", title = "Bundle Info", notes = { "The bundle info endpoint yields information about the OSGi bundles running on the whole Matterhorn cluster" }, abstractText = "This service indexes and queries available (distributed) episodes.")
+@RestService(
+  name = "systemInfo",
+  title = "System Bundle Info",
+  notes = { "This is used to display the version information on the login page." },
+  abstractText = "The system bundle info endpoint yields information about the running OSGi bundles of Opencast.")
 public abstract class BundleInfoRestEndpoint {
+
   private static final String DEFAULT_BUNDLE_PREFIX = "matterhorn";
 
   protected abstract BundleInfoDb getDb();
@@ -67,7 +72,12 @@ public abstract class BundleInfoRestEndpoint {
   // See https://opencast.jira.com/browse/MH-9768
   @Path("bundles/list")
   @Produces(APPLICATION_JSON)
-  @RestQuery(name = "list", description = "Return a list of all running bundles on the whole Matterhorn cluster.", reponses = { @RestResponse(description = "A list of bundles.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, expressed as xml or json.")
+  @RestQuery(
+    name = "list",
+    description = "Return a list of all running bundles on the whole cluster.",
+    reponses = {
+      @RestResponse(description = "A list of bundles.", responseCode = HttpServletResponse.SC_OK) },
+    returnDescription = "The search results, expressed as xml or json.")
   public Response getVersions() {
     final Monadics.ListMonadic<Jsons.Val> bundleInfos = mlist(getDb().getBundles()).map(
             Functions.<BundleInfo, Jsons.Val> co(bundleInfo));
@@ -77,9 +87,20 @@ public abstract class BundleInfoRestEndpoint {
   /** Return true if all bundles have the same bundle version and build number. */
   @GET
   @Path("bundles/check")
-  @RestQuery(name = "check", description = "Check if all Matterhorn bundles throughout the cluster have the same OSGi bundle version and the same build number.", restParameters = { @RestParameter(name = "prefix", description = "The bundle name prefixes to check. Defaults to 'matterhorn' to check all matterhorn core bundles.", isRequired = false, defaultValue = "matterhorn", type = RestParameter.Type.STRING) }, reponses = {
-          @RestResponse(description = "true/false", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "cannot find any bundles with the given prefix", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "The search results, expressed as xml or json.")
+  @RestQuery(
+    name = "check",
+    description = "Check if all bundles throughout the cluster have the same OSGi bundle version and build number.",
+    restParameters = {
+      @RestParameter(
+        name = "prefix",
+        description = "The bundle name prefixes to check. Defaults to 'matterhorn'.",
+        isRequired = false,
+        defaultValue = "matterhorn",
+        type = RestParameter.Type.STRING) },
+    reponses = {
+      @RestResponse(description = "true/false", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "cannot find any bundles with the given prefix", responseCode = HttpServletResponse.SC_NOT_FOUND) },
+    returnDescription = "The search results, expressed as xml or json.")
   public Response checkBundles(@DefaultValue(DEFAULT_BUNDLE_PREFIX) @QueryParam("prefix") List<String> prefixes) {
     return withBundles(prefixes, new Function<List<BundleInfo>, Response>() {
       @Override
@@ -99,9 +120,20 @@ public abstract class BundleInfoRestEndpoint {
   @GET
   @Path("bundles/version")
   @Produces(APPLICATION_JSON)
-  @RestQuery(name = "bundleVersion", description = "Return the common OSGi build version and build number of all bundles matching the given prefix.", restParameters = { @RestParameter(name = "prefix", description = "The bundle name prefixes to check. Defaults to 'matterhorn' to check all matterhorn core bundles.", isRequired = false, defaultValue = "matterhorn", type = RestParameter.Type.STRING) }, reponses = {
-          @RestResponse(description = "Version structure", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "cannot find any bundles with the given prefix", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "The search results, expressed as xml or json.")
+  @RestQuery(
+    name = "bundleVersion",
+    description = "Return the common OSGi build version and build number of all bundles matching the given prefix.",
+    restParameters = {
+      @RestParameter(
+        name = "prefix",
+        description = "The bundle name prefixes to check. Defaults to 'matterhorn'.",
+        isRequired = false,
+        defaultValue = "matterhorn",
+        type = RestParameter.Type.STRING) },
+    reponses = {
+      @RestResponse(description = "Version structure", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "No bundles with the given prefix", responseCode = HttpServletResponse.SC_NOT_FOUND) },
+    returnDescription = "The search results as json.")
   public Response getBundleVersion(@DefaultValue(DEFAULT_BUNDLE_PREFIX) @QueryParam("prefix") List<String> prefixes) {
     return withBundles(prefixes, new Function<List<BundleInfo>, Response>() {
       @Override
@@ -120,9 +152,8 @@ public abstract class BundleInfoRestEndpoint {
             return ok(obj(p("consistent", true)).append(fullVersionJson.apply(example.getVersion())));
           default:
             // multiple versions found
-            return ok(obj(
-                    p("consistent", false),
-                    p("versions",
+            return ok(obj(p("consistent", false),
+                          p("versions",
                             arr(mlist(versions.iterator())
                                     .map(Functions.<BundleVersion, Jsons.Val> co(fullVersionJson))))));
         }

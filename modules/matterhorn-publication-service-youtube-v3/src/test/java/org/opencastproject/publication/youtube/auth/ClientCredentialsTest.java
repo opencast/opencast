@@ -28,12 +28,17 @@ import static org.junit.Assert.fail;
 import org.opencastproject.publication.youtube.UnitTestUtils;
 
 import org.json.simple.parser.ParseException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
 
 public class ClientCredentialsTest {
+
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
 
   @Test
   public void testToStringNullTolerance() {
@@ -43,7 +48,8 @@ public class ClientCredentialsTest {
   @Test
   public void testParsingJSON() throws IOException, ParseException {
     final String clientId = "652137994117.apps.googleusercontent.com";
-    final File clientSecretsFile = UnitTestUtils.getMockClientSecretsFile(clientId);
+    final File clientSecretsFile = UnitTestUtils.getMockClientSecretsFile(clientId,
+        testFolder.newFile("client-secrets-youtube-v3.json"));
     try {
       final ClientCredentials cc = new ClientCredentials();
       cc.setClientSecrets(clientSecretsFile);

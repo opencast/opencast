@@ -1,156 +1,161 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang=en>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv=content-type content="text/html; charset=utf-8" />
+  <meta name=viewport content="width=device-width, initial-scale=1">
+
   <title>${meta.title} REST Documentation</title>
   <style type="text/css">
   /* styles for the page */
-  HTML {
-    font: 13px/1.231 arial,helvetica,clean,sans-serif;
-  }
+
   body {
+    font-family: "Open Sans", Helvetica, sans-serif;
+    font-size: 14px;
+    padding: 0px;
+    margin: 0px;
+  }
+
+  header {
+    padding: 20px;
+  }
+
+  h1 {
+    background-color: #2075b1;
+    margin: 0px;
+    padding: 15px;
+    font-size: larger;
+    color: white;
+  }
+
+  h2 {
+    font-size: larger;
+    margin-top: 35px;
+  }
+
+  summary {
+    background-color: #24425c;
+    padding: 20px;
+    padding-top:30px;
+    color: #ccc;
+  }
+
+  .toc a {
+    color: #333;
+    padding: 10px 0;
+    text-decoration: underline;
+  }
+
+  .center {
+    max-width: 1000px;
     margin: 0 auto;
-    max-width: 1200px;
   }
-  FIELDSET {
-    margin-bottom: 2em;
-    margin-top: 0.5em;
-    padding-bottom: 1em;
-    width: 90%;
+
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: small
   }
-  PRE {
-    white-space: pre-wrap;       /* css-3 */
-    white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
-    white-space: -pre-wrap;      /* Opera 4-6 */
-    white-space: -o-pre-wrap;    /* Opera 7 */
-    word-wrap: break-word;       /* Internet Explorer 5.5+ */
-  }
-  TABLE.method {
+
+  table.method {
     width: 100%;
+    margin-bottom:15px;
   }
-  TABLE.testing {
+
+  table.testing {
     width: 96%;
-    border: 2px solid #CCC;
+    border: 1px solid #CCC;
+    padding: 5px;
   }
-  UL {
-    margin: 0.2em;
-    padding-left: 1em;
-  }
-  DIV.table_spacer {
-    height: 2em;
-  }
-  .method_set_header {
-    padding-left: 0.5em;
-    padding-right: 0.5em;
-    font-size: 1.4em;
-    font-weight: bold;
-  }
-  .method_header TH {
-    background: #F6921E none repeat scroll 0 0;
-    font-size: 1.2em;
-    font-weight: bold;
-    padding: 0.6em 0.3em;
+
+  th, td {
+    padding: 7px;
+    vertical-align: middle;
+    border-bottom: 1px solid #ccc;
     text-align: left;
-    vertical-align: middle;;
   }
-  TH.method_header_left {
+
+  th:first-of-type {
+    width: 20%;
     text-align: right;
-    padding: 0.6em 1em;
   }
-  TR.method TH {
-    font-family: sans-serif;
-    font-weight: normal;
-    padding: 0.5em 1.0em;
-    text-align: right;
-    vertical-align: middle;
-  }
-  TR.method TH.method_important {
+
+  thead th {
+    background-color: #ddd;
     font-weight: bold;
   }
-  TR.method TD {
-    border-bottom: 1px solid #CCC;
-    padding-bottom: 6px;
-    padding-left: 4px;
-    padding-top: 6px;
-    vertical-align: middle;
+
+  table ul {
+    margin: 0;
+    padding: 0 20px;
   }
-  TR.testform TD {
-  }
-  TR.testform A {
-  }
-  DIV.hidden {
+
+  .hidden {
     display: none;
   }
-  DIV.spaced {
+
+  div.spaced {
     margin: 4px 0px;
   }
-  A.hidden {
-    display: none;
-  }
-  TD.form_label {
+
+  td.form_label {
     width: 10%;
-    font-size: 1.1em !important;
-  }
-  .form_field_description {
-    font-size: 0.9em !important;
-  }
-  TD.form_submit {
-    border: none !important;
-  }
-  test_form_response TEXTAREA {
-    font-size: small;
-    font-family: monospace;
-    width: 100%;
   }
   </style>
 </head>
 <body>
-<div style="margin-top: .5em">
-  <a href=/><img src="/img/logo/opencast.svg" alt="Opencast" border=0 height=60 /></a>
-</div>
+<header class=center>
+  <a href=/>
+  <img src=/img/logo/opencast.svg alt=Opencast style="width: 180px;" />
+  </a>
+</header>
 
-<h2>${meta.title} REST Documentation</h2>
-<span class="meta_url">${meta.url}</span>
-<#if meta.abstract??>
-<div class="meta_abstract">${meta.abstract}</div>
-</#if>
+<h1><div class=center>${meta.title} REST Documentation</div></h1>
+
+<summary>
+  <div class=center>
+    <div>${meta.url}</div>
+    <div>${(meta.abstract)!}</div>
+  </div>
+</summary>
+
+<main class=center>
 
 <!-- GENERAL NOTES -->
-<#if (notes?size <= 0)>
-<#else>
-<fieldset>
-<legend class="method_set_header">General Notes</legend>
+<#list notes>
+<h2>General Notes</h2>
 <ul>
-  <#list notes as note>
+  <#items as note>
   <li>${note}</li>
+  </#items>
+</ul>
+</#list>
+
+<!-- TABLE OF CONTENTS -->
+
+<h2>Table of Contents</h2>
+<ul class="toc">
+  <#list endpointHolders as endpointHolder>
+  <#list endpointHolder.endpoints as endpoint>
+  <li><a href="#${endpoint.name}-${endpoint?counter}">${endpoint.method} ${endpoint.path}</a></li>
+  </#list>
   </#list>
 </ul>
-</fieldset>
-</#if>
 
 <!-- ENDPOINTS -->
 
 <#list endpointHolders as endpointHolder>
-<fieldset id="endpoint_holder_${endpointHolder.name}">
-<legend class="method_set_header">${endpointHolder.title} methods</legend>
-<#if (endpointHolder.endpoints?size <= 0)>
-<em>NONE</em>
-<#else>
-<#list endpointHolder.endpoints as endpoint>
-<table id="${endpoint.name}" class="method" cellpadding="0px" cellspacing="0px"
+<#list endpointHolder.endpoints>
+<h2>${endpointHolder.title} methods</h2>
+<#items as endpoint>
+<table id="${endpoint.name}-${endpoint?counter}" class="method" cellpadding="0px" cellspacing="0px"
   summary="${endpointHolder.title} function for the ${endpoint.method} ${endpoint.path} REST endpoint, Name of the attribute followed by the value">
   <thead>
-    <tr class="method_header">
-      <th width="20%" scope="col" class="method_header_left">NAME</th>
-      <th scope="col">VALUE and NOTES</th>
+    <tr>
+      <th>Method / Path:</th>
+      <th title="${meta.url}${endpoint.path}">${endpoint.method} ${endpoint.path}</th>
     </tr>
   </thead>
   <tbody>
-    <tr class="method">
-      <th class="method_important" scope="row">Method / Path:</th>
-      <td><tt title="${meta.url}${endpoint.path}">${endpoint.method} ${endpoint.path}</tt></td>
-    </tr>
     <tr class="method">
       <th scope="row">Description:</th>
       <td>${endpoint.description!"<em>NONE</em>"}</td>
@@ -158,13 +163,12 @@
     <tr class="method">
       <th class="method_important" scope="row">Path params:</th>
       <td>
-        <#if (endpoint.pathParams?size > 0)>
         <#list endpoint.pathParams as param>
-        <tt>${param.name}<#if param.defaultValue??>&#40;Default value=${param.escapedDefaultValue}&#41;</#if></tt>: ${param.description!"<em>NONE</em>"}<#if param_has_next> <br/></#if>
-        </#list>
+        <tt>${param.name}<#if param.defaultValue??>&#40;Default value=${param.escapedDefaultValue}&#41;</#if></tt>:
+        ${param.description!"<em>NONE</em>"}<#sep><br/></#sep>
         <#else>
         <em>NONE</em>
-        </#if>
+        </#list>
       </td>
     </tr>
     <#if (endpoint.requiredParams?size > 0)>
@@ -192,20 +196,21 @@
     <tr class="method">
       <th class="method_important" scope="row">Body (upload) param:</th>
       <td>
-        <#if endpoint.bodyParam.defaultValue??><tt>&#40;Default value=${endpoint.bodyParam.escapedDefaultValue}&#41;</tt>: </#if>${endpoint.bodyParam.description!"<em>NONE</em>"}
+        <#if endpoint.bodyParam.defaultValue??>
+        <tt>&#40;Default value=${endpoint.bodyParam.escapedDefaultValue}&#41;</tt>:
+        </#if>${endpoint.bodyParam.description!"<em>NONE</em>"}
       </td>
     </tr>
     </#if>
     <tr class="method">
       <th scope="row">Optional (<#if (endpoint.method == "GET")>query<#else>form</#if>) params:</th>
       <td>
-        <#if (endpoint.optionalParams?size > 0)>
         <#list endpoint.optionalParams as param>
-        <tt>${param.name}<#if param.defaultValue??>&#40;Default value=${param.escapedDefaultValue}&#41;</#if></tt>: ${param.description!"<em>NONE</em>"}<#if param_has_next> <br/></#if>
-        </#list>
+        <tt>${param.name}<#if param.defaultValue??>&#40;Default value=${param.escapedDefaultValue}&#41;</#if></tt>:
+        ${param.description!"<em>NONE</em>"}<#sep> <br/></#sep>
         <#else>
         <em>NONE</em>
-        </#if>
+        </#list>
       </td>
     </tr>
     <#if (endpoint.formats?size > 0)>
@@ -213,7 +218,8 @@
       <th scope="row">Response formats:</th>
       <td>
         <#list endpoint.formats as format>
-        <#if format.url??><a href="${format.url}">${format.name}</a><#else>${format.name}</#if> <#if format.description??>(${format.description})</#if><#if format_has_next> <br/></#if>
+        <#if format.url??><a href="${format.url}">${format.name}</a><#else>${format.name}</#if>
+        <#if format.description??>(${format.description})</#if><#sep><br/></#sep>
         </#list>
       </td>
     </tr>
@@ -221,13 +227,11 @@
     <tr class="method">
       <th scope="row">Status codes:</th>
       <td>
-        <#if (endpoint.statuses?size <= 0)>
-        <em>NONE</em>
-        <#else>
         <#list endpoint.statuses as status>
         <tt>${status.code}: ${status.name}</tt>, ${status.description!"<em>NONE</em>"}<#if status_has_next> <br/></#if>
+        <#else>
+        <em>NONE</em>
         </#list>
-        </#if>
       </td>
     </tr>
     <#if (endpoint.returnTypeSchema??)>
@@ -268,10 +272,12 @@
         <#else>
         <a href="#" class="show_form_link">Testing form (click to reveal)</a>
         <div class="hidden_form hidden">
-          <form id="form_${endpoint.name}" class="form_test_form" action="${meta.url}${endpoint.path}"
+          <form id="form_${endpoint.name}-${endpoint?counter}"
+                class="form_test_form"
+                action="${meta.url}${endpoint.path}"
                 method="${endpoint.method?lower_case}"<#if endpoint.form.fileUpload> enctype="multipart/form-data"</#if>>
             <input class="form_action_holder" type="hidden" value="${meta.url}${endpoint.path}" />
-            <input class="form_endpoint_name" type="hidden" value="${endpoint.name}" />
+            <input class="form_endpoint_name" type="hidden" value="${endpoint.name}-${endpoint?counter}" />
             <input class="form_method" type="hidden" value="${endpoint.method}" />
             <#if (endpoint.form.ajaxSubmit)>
             <input class="form_ajax_submit" type="hidden" value="1" />
@@ -284,35 +290,49 @@
               <tr class="form_field <#if item.required>form_required<#else>form_optional</#if>">
                 <#if item.type == "text">
                 <td class="form_textarea" colspan="3">
-                  <label for="${endpoint.name}_${item.name}">${item.name}</label>:<br/>
-                  <textarea id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field_text form_param_submit<#if item.required> form_param_required</#if>"
-                    rows="<#if item.attributes.rows??>${item.attributes.rows}<#else><#if item.name == "BODY">8<#else>3</#if></#if>" cols="${(item.attributes.cols)!'80'}">${item.defaultValue!}</textarea>
+                  <label for="${endpoint.name}-${endpoint?counter}_${item.name}">${item.name}</label>:<br/>
+                  <textarea id="${endpoint.name}-${endpoint?counter}_${item.name}"
+                            name="${item.name}"
+                            class="form_field_text form_param_submit<#if item.required> form_param_required</#if>"
+                            rows="<#if item.attributes.rows??>${item.attributes.rows}<#else><#if item.name == "BODY">8<#else>3</#if></#if>"
+                            cols="${(item.attributes.cols)!'80'}">${item.defaultValue!}</textarea>
                   <div class="form_field_description">${item.description!}</div>
                 </td>
                 <#elseif item.type == "boolean">
                 <td class="form_label">
-                  <#if item.required>* </#if><label for="${endpoint.name}_${item.name}">${item.name}</label>:
+                  <#if item.required>* </#if><label for="${endpoint.name}-${endpoint?counter}_${item.name}">${item.name}</label>:
                 </td>
                 <td>
-                  <input id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>"
-                    type="checkbox" value="true" <#if item.defaultValue??>checked="${item.defaultValue}" defaultChecked="${item.defaultValue}"</#if> />
+                  <input id="${endpoint.name}-${endpoint?counter}_${item.name}"
+                         name="${item.name}"
+                         class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>"
+                         type="checkbox"
+                         value="true" <#if item.defaultValue??>checked="${item.defaultValue}" defaultChecked="${item.defaultValue}"</#if> />
                 </td>
                 <td class="form_field_description">${item.description!}</td>
                 <#elseif item.type == "file">
                 <td class="form_label">
-                  <#if item.required>* </#if><label for="${endpoint.name}_${item.name}">${item.name}</label>:
+                  <#if item.required>* </#if><label for="${endpoint.name}-${endpoint?counter}_${item.name}">${item.name}</label>:
                 </td>
                 <td>
-                  <input id="${endpoint.name}_${item.name}" name="${item.name}" class="form_field_file" class="form_field form_param_upload<#if item.required> form_param_required</#if>" type="file" />
+                  <input id="${endpoint.name}-${endpoint?counter}_${item.name}"
+                         name="${item.name}"
+                         class="form_field_file"
+                         class="form_field form_param_upload<#if item.required> form_param_required</#if>"
+                         type="file" />
                 </td>
                 <td class="form_field_description">${item.description!}</td>
                 <#else>
                 <td class="form_label">
-                  <#if item.required>* </#if><label for="${endpoint.name}_${item.name}">${item.name}</label>:
+                  <#if item.required>* </#if><label for="${endpoint.name}-${endpoint?counter}_${item.name}">${item.name}</label>:
                 </td>
                 <td>
-                  <input id="${endpoint.name}_${item.name}" class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>" name="${item.name}"
-                    type="text" value="${item.defaultValue!}" size="${(item.attributes.size)!'30'}" />
+                  <input id="${endpoint.name}-${endpoint?counter}_${item.name}"
+                         class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>"
+                         name="${item.name}"
+                         type="text"
+                         value="${item.defaultValue!}"
+                         size="${(item.attributes.size)!'30'}" />
                 </td>
                 <td class="form_field_description">${item.description!}</td>
                 </#if>
@@ -344,20 +364,16 @@
   </tbody>
 </table>
 
-<#if endpoint_has_next>
-<div class="table_spacer"></div>
-</#if>
+</#items>
+</#list>
+</#list>
 
-</#list>
-</#if>
-</fieldset>
-</#list>
+</main>
 
 <!-- JAVASCRIPT below here -->
 <script type="text/javascript" src="js/jquery/jquery.js"></script>
 <script type="text/javascript">
-/*global alert, jQuery  */
-(function($) {
+$(document).ready(function() {
 
     $("a.show_form_link").click(
         function() {
@@ -400,11 +416,11 @@
             if (params.hasOwnProperty(key)) {
                 var value = params[key];
                 if (value !== undefined && value !== null && value !== '') {
-					// The Regex here handles syntax like /episode.{format:xml|json}.
-					// In this case, the {format:xml|json} part is extracted, then
-					// the xml|json part is used as the second regex to verify user's input.
-					// If the input is valid, the path /episode.{format:xml|json} would be
-					// replaced by /episode.xml for example.
+          // The Regex here handles syntax like /episode.{format:xml|json}.
+          // In this case, the {format:xml|json} part is extracted, then
+          // the xml|json part is used as the second regex to verify user's input.
+          // If the input is valid, the path /episode.{format:xml|json} would be
+          // replaced by /episode.xml for example.
                     var regex = new RegExp( "{" + key + "(:[^}]*|)}", "");
                     if (regex.test(newPath))
                     {
@@ -471,7 +487,9 @@
         if ($form.find("input.form_action_holder").length >= 1) {
             // now find and put the event handler on all path params
             $form.find(".form_param_path").change( function() {
-                checkPath($form);
+              checkPath($form);
+            }).keyup(function() {
+              checkPath($form);
             });
             // run the checkPath method
             checkPath($form);
@@ -479,6 +497,8 @@
             if ($reqParams.length > 0) {
                 // add required options checks
                 $reqParams.change( function(){
+                    checkRequired($form);
+                }).keyup( function(){
                     checkRequired($form);
                 });
             }
@@ -544,7 +564,7 @@
             }
         }
     });
-}(jQuery));
+});
 </script>
 
 </body>

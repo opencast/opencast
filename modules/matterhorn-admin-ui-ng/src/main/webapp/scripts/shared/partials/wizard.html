@@ -12,18 +12,18 @@
 <ng-include src="'shared/partials/wizards/' + name + '.html'"></ng-include>
 
 <footer>
-    <a ng-if="!wizard.isLast()" ng-click="wizard.toTab($event)"
-        data-modal-tab="next" class="submit"
+    <a ng-if="!wizard.isLast()" ng-click="wizard.toTab($event)" ng-keyup="keyUp($event)"
+        data-modal-tab="next" class="submit" tabindex="100"
         ng-class="{active: wizard.getCurrentState().stateController.isValid(), inactive: !wizard.getCurrentState().stateController.isValid()}">
         {{ 'WIZARD.NEXT_STEP' | translate }}
     </a>
-    <a ng-if="wizard.isLast()" ng-click="wizard.submit()"
-        data-modal-tab="next" class="submit"
+    <a ng-if="wizard.isLast()" ng-click="wizard.submit()" ng-keyup="keyUpSubmit($event)"
+        data-modal-tab="next" class="submit" tabindex="100"
         ng-class="active">
         {{ wizard.getFinalButtonTranslation() | translate}}
     </a>
-    <a ng-if="wizard.hasPrevious()" ng-click="wizard.toTab($event)"
-        data-modal-tab="previous" class="cancel">
+    <a ng-if="wizard.hasPrevious()" ng-click="wizard.toTab($event)" ng-keyup="keyUp($event)"
+        data-modal-tab="previous" class="cancel" tabindex="101">
         {{ 'WIZARD.BACK' | translate}}
     </a>
 </footer>

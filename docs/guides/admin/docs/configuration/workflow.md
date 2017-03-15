@@ -285,13 +285,31 @@ operation should be executed. This so-called execution condition is a boolean ex
 
 As the formal description above explains, such boolean expressions may contain the booelan constants (`true` and
 `false`) and numbers, as well as references to the variables of the workflow instance that contain these data types.
-Workflow instance variables can be accessed by using `${variableName}`. 
+Workflow instance variables can be accessed by using `${variableName}`.
 
 Example:
 
     <operation id="..." if="${variableName1} AND NOT (${variableName2} OR ${variableName3})">
-      ...
+      …
     </operation>
+
+Note that XML requires certain characters like the `<` and `>` operators to be written as XML entities. Even if they are
+used quoted in attributes. The following table shows all those characters:
+
+```no-highlight
+"  →  &quot;
+'  →  &apos;
+<  →  &lt;
+>  →  &gt;
+&  →  &amp;
+```
+
+Example:
+
+    <operation id="..." if="${yresolution} &gt; 720">
+      …
+    </operation>
+
 
 ## Test the Workflow
 

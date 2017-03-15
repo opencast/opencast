@@ -45,7 +45,9 @@ import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,6 +64,9 @@ public class WorkspaceImplTest {
   private static final String workspaceRoot = "." + File.separator + "target" + File.separator
           + "junit-workspace-rootdir";
   private static final String repoRoot = "." + File.separator + "target" + File.separator + "junit-repo-rootdir";
+
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
 
   @Before
   public void setUp() throws Exception {
@@ -240,7 +245,7 @@ public class WorkspaceImplTest {
 
   @Test
   public void testGetNoFilename() throws Exception {
-    final File expectedFile = new File(FileUtils.getTempDirectory(), "test.txt");
+    final File expectedFile = testFolder.newFile("test.txt");
     FileUtils.write(expectedFile, "asdf");
     expectedFile.deleteOnExit();
 

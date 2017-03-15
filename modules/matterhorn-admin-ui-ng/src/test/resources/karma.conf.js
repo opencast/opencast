@@ -21,7 +21,7 @@ module.exports = function (config) {
             '../../main/webapp/scripts/lib/angular/angular-local-storage.js',
             '../../main/webapp/scripts/lib/angular-file-upload/angular-file-upload.js',
             '../../main/webapp/scripts/lib/chosen.jquery.min.js',
-            '../../main/webapp/scripts/lib/chosen.js',
+            '../../main/webapp/scripts/lib/angular-chosen.js',
             '../../main/webapp/scripts/lib/angular/angular-*.js',
             '../../main/webapp/scripts/lib/angular-sortable.js',
             '../../main/webapp/scripts/lib/underscore-1.5.2.js',

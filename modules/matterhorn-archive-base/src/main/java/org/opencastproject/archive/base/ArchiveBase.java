@@ -716,6 +716,7 @@ public abstract class ArchiveBase<RS extends ResultSet> extends AbstractIndexPro
       logger.error("Unable to load the archive entries: {}", e);
       throw new ServiceException(e.getMessage());
     }
+    final int responseInterval = (total < 100) ? 1 : (total / 100);
     int errors = 0;
     while (episodes.hasNext()) {
       final Episode episode = episodes.next();
@@ -748,9 +749,11 @@ public abstract class ArchiveBase<RS extends ResultSet> extends AbstractIndexPro
                             MessageSender.DestinationType.Queue,
                             ArchiveItem.update(pmp.getMediaPackage(), episode.getAcl(), episode.getVersion(),
                                     episode.getModificationDate()));
-                    messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                    if (((current[0] % responseInterval) == 0) || (current[0] == total)) {
+                      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                             IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Archive, total,
                                     current[0]));
+                    }
                     current[0] += 1;
                   }
                 });
