@@ -184,32 +184,23 @@
 
 .timelinePreview {
     position: absolute;
-    /*background-color: #1C94C4;*/
     visibility: hidden;
     margin-left: 20px;
     display: none;
 }
 
 .timelinePreviewHover {
-    /*bottom: 82px;*/
     visibility: visible;
     position: relative;
     margin-left: 20px;
     display: block;
-    /*top: 0;*/
-    /*left: 0;*/
-    /*right: 0;*/
+    border: 2px solid white;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px black;
 }
 
 .timeline_preview_container {
     height: 0px;
-}
-
-.timelinePreviewHover img {
-    /*bottom: 82px;*/
-    visibility: visible;
-    position: absolute;
-    display: block;
 }
 
 .dropdown-submenu {

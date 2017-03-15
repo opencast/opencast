@@ -252,7 +252,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   var usingFlash = false;
   var isAudioOnly = false;
   var segments = {};
-  var mediaPackageModel;
   var timelinePreview;
   var mediapackageError = false;
   var aspectRatioTriggered = false;
@@ -419,10 +418,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
 
   var ControlsView = Backbone.View.extend({
     el: $('#' + id_engage_controls), // every view has an element associated with it
-    initialize: function (videoDataModel, mediaPackageModel, template, plugin_path) {
+    initialize: function (videoDataModel, template, plugin_path) {
       this.setElement($(plugin.container));
       this.model = videoDataModel;
-      this.mediaPackageModel = mediaPackageModel;
       this.template = template;
       this.pluginPath = plugin_path;
 
@@ -444,39 +442,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
 
         segments = Utils.repairSegmentLength(segments, duration, min_segment_duration);
         
+        // find timeline preview images in media package
         var attachments = Engage.model.get('mediaPackage').get('attachments');
-        console.log(attachments);
         timelinePreview = $(attachments).filter(function(index) {
-          return $(attachments[index]).attr('type') == 'presentation/timeline-preview';
-          //return $(this).attr('type') == 'presentation/timeline-preview';
-        })
-        console.log(timelinePreview);
-        console.log($(attachments).filter(function(index) {
-          return $(attachments[index]).attr('type') == 'presentation/timeline-preview';
-          //return $(this).attr('type') == 'presentation/timeline-preview';
-        }).get(0));
-        console.log($(attachments).filter(function(index) {
-          return $(attachments[index]).attr('type') == 'presentation/timeline-preview';
-          //return $(this).attr('type') == 'presentation/timeline-preview';
-        }).get(0).url);
-//        console.log($($(attachments).filter(function(index) {
-//          return $(attachments[index]).attr('type') == 'presentation/timeline-preview';
-//          //return $(this).attr('type') == 'presentation/timeline-preview';
-//        }).get(0)).find('url'));
-        console.log($(attachments).filter(function(index) {
-          return $(attachments[index]).attr('type') == 'presentation/segment+preview';
-          //return $(this).attr('type') == 'presentation/timeline-preview';
-        }));
-        console.log(timelinePreview.find('url'));
-        console.log($(attachments).filter(function(index) {
-          return $(attachments[index]).attr('type') == 'presentation/timeline-preview';
-          //return $(this).attr('type') == 'presentation/timeline-preview';
-        }).children());
-        console.log(timelinePreview.children());
-        console.log(attachments[6]);
-        console.log($(attachments[6]).attr('type'));
-        console.log($(attachments[6]).attr('type') == 'presentation/timeline-preview');
-        console.log($(attachments[6]).attr('type') === 'presentation/timeline-preview');
+          return $(attachments[index]).attr('type') === 'presentation/timeline-preview';
+        });
 
         if (Engage.model.get('meInfo')) {
           if (Engage.model.get('meInfo').get('logo_player')) {
@@ -589,10 +559,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   // provide this additional view if the controls are below the video to have content above the video
   var ControlsViewTop_ifBottom = Backbone.View.extend({
     el: $('#' + id_engage_controls_topIfBottom), // every view has an element associated with it
-    initialize: function (videoDataModel, mediaPackageModel, template, plugin_path) {
+    initialize: function (videoDataModel, template, plugin_path) {
       this.setElement($(plugin.containerSecondIfBottom));
       this.model = videoDataModel;
-      this.mediaPackageModel = mediaPackageModel;
       this.template = template;
       this.pluginPath = plugin_path;
 
@@ -954,7 +923,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         var dur = (duration && (duration > 0)) ? duration : 1;
         currPos = (currPos < 0) ? 0 : ((currPos > 1) ? 1 : currPos);
         Engage.trigger(plugin.events.sliderMousemove.getName(), currPos * dur);
-        Engage.trigger(plugin.events.sliderMousemovePreview.getName(), [currPos, e.clientX, e.offsetX]);
+        Engage.trigger(plugin.events.sliderMousemovePreview.getName(), e.clientX);
       });
       // volume event
       $('#' + id_volumeSlider).on(event_slide, function (event, ui) {
@@ -986,10 +955,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
             Engage.trigger(plugin.events.segmentMouseout.getName(), i);
           }).mousemove(function (e) {
             e.preventDefault();
-            var currPos = e.clientX / ($('#' + id_slider).width() + $('#' + id_slider).offset().left);
-            var dur = (duration && (duration > 0)) ? duration : 1;
-            currPos = (currPos < 0) ? 0 : ((currPos > 1) ? 1 : currPos);
-            Engage.trigger(plugin.events.sliderMousemovePreview.getName(), [currPos, e.clientX, e.pageX]);
+            Engage.trigger(plugin.events.sliderMousemovePreview.getName(), e.clientX);
           });
         });
       }
@@ -1434,7 +1400,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
       Engage.on(plugin.events.segmentMouseover.getName(), function (no) {
         if (!mediapackageError) {
           $('#' + id_segmentNo + no).addClass('segmentHover');
-          $('#timeline_preview_canvas').addClass('timelinePreviewHover');
         }
       });
       Engage.on(plugin.events.segmentMouseout.getName(), function (no) {
@@ -1443,91 +1408,69 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
           $('#timeline_preview_canvas').removeClass('timelinePreviewHover');
         }
       });
-      Engage.on(plugin.events.sliderMousein.getName(), function () {
-        if (!mediapackageError) {
-          $('#timeline_preview_canvas').addClass('timelinePreviewHover');
-          $('#timeline_preview_canvas_img').attr('src', timelinePreview.get(0).url);
-        }
-      });
       Engage.on(plugin.events.sliderMouseout.getName(), function () {
         if (!mediapackageError) {
           $('#timeline_preview_canvas').removeClass('timelinePreviewHover');
         }
       });
       Engage.on(plugin.events.sliderMousemovePreview.getName(), function (pos) {
-        if (!mediapackageError) {
+        if (!mediapackageError && timelinePreview.length > 0) {
           $('#timeline_preview_canvas').addClass('timelinePreviewHover');
           $('#timeline_preview_canvas_img').attr('src', timelinePreview.get(0).url);
+
+          // get number of saved preview images in the timeline preview image
           var imageSize = timelinePreview.get(0).size;
           
+          // size of each of the images
           var width = 160;
           var height = 90;
+          
           var wrapperOffset = Math.ceil($('#slider').offset().left);
-          var num = (imageSize * imageSize) * ((pos[1] - wrapperOffset) / $('#slider').width());
-          if(num >= (imageSize * imageSize)) num = (imageSize * imageSize) - 1;
+          
+          // calculates position on timeline, so that it ranges from 0 at the start to 1 at the end of the video
+          var posPercent = ((pos - wrapperOffset) / $('#slider').width());
+          
+          // index of the image that previews that part of the video
+          var num = (imageSize * imageSize) * posPercent;
+          if (num >= (imageSize * imageSize)) {
+              num = (imageSize * imageSize) - 1;
+          }
+          
+          // position of this image in the timeline previews image
           var offsetX = width * Math.floor(num % imageSize);
           var offsetY = height * Math.floor(num / imageSize);
-          console.log("[" + Math.floor(num % imageSize) + "][" + Math.floor(num / imageSize) + "]");
+          
           var pageWidth = $(window).width();
-          console.log(pos[0]);
-          console.log(num);
-          // rect(top, right, bottom, left)
-//          $('#segment_preview_img').css({'clip':'rect(' + offsetY + 'px ' + (offsetX + width) + 'px ' + (offsetY + height) + 'px ' + offsetX + 'px)'});
-//          $('#segment_preview_img').css({'-webkit-clip-path':'inset(' + offsetY + 'px ' + (offsetX + width) + 'px ' + (offsetY + height) + 'px ' + offsetX + 'px)'});
-//          $('#segment_preview_img').css({'clip-path':'inset(100px 50px)'});
-//          $('#segment_preview_img').css({'clip':'rect(0px 320px 90px 160px)'});
-//          $('#segment_preview_img').css({'bottom': offsetY + 'px'});
-//          $('#segment_preview_img').css({'rigth': (pageWidth) + 'px'});
-
-          var c = document.getElementById("timeline_preview_canvas");
-          c.width = width;
-          c.height = height;
-          var ctx = c.getContext("2d");
+          
+          // draw only the current preview image into the canvas
+          var canvas = document.getElementById("timeline_preview_canvas");
+          canvas.width = width;
+          canvas.height = height;
+          var ctx = canvas.getContext("2d");
           var img = document.getElementById("timeline_preview_canvas_img");
           ctx.drawImage(img, offsetX, offsetY, width, height, 0, 0, width, height);
             
-          var wrapperHeight = $('#navigation_wrapper').height();
-          var wrapperWidth = $('#navigation_wrapper').width();
-//          console.log(wrapperHeight);
-//          console.log(wrapperWidth);
-//          console.log("wrapperOffset: " + wrapperOffset);
+          var wrapperHeight = $('#navigation_wrapper').height();          
+          var offsetLeft = (pos - wrapperOffset) - (width / 2);
 
-          offsetX = 0;
-          offsetY = 0;
-          var offsetTop = -10 + (-height) + (-wrapperHeight) + (-offsetY);
-////          var offsetLeft = (pos[1] - offsetX) - (width / 2);
-//          var offsetLeft = (pos[2] - offsetX) - (width / 2);
-          var offsetLeft = ((pos[1] - wrapperOffset) - offsetX) - (width / 2);
-          console.log("offsetLeft: " + offsetLeft);
-          console.log("pos[1]: ", pos[1]);
-//          console.log("pos[2]: ", pos[2]);
-//          console.log("diff: ", pos[2] - pos[1]);
-//          console.log("");
-
-          // clamp left
-          if(pos[1] < width/2 ) {
-              console.log("clamp offset!");
-              offsetLeft = -offsetX - wrapperOffset;
+          // clamp left: in case the preview image would exceed the page on the left, move it back to window border
+          if (pos < width / 2 ) {
+              offsetLeft = -wrapperOffset;
           }
 
-          //clamp right
-          if(pos[1] > pageWidth - width/2) {
-              console.log("clamp offset!");
-              offsetLeft = -offsetX + (pageWidth - width) - wrapperOffset;
-              console.log(offsetX);
+          // clamp right: in case the preview image would exceed the page on the right, move it back to window border
+          if (pos > pageWidth - (width + 6) / 2) {
+              offsetLeft = (pageWidth - (width + 3)) - wrapperOffset;
           }
 
-          var offsetBottom = Engage.controls_top? 0 : c.height + wrapperHeight + 10;
+          var offsetBottom = Engage.controls_top? 0 : canvas.height + wrapperHeight + 10;
 
-//          $('#segment_preview_img').css({'top': Math.round(offsetTop) + 'px'});
-//          $('#segment_preview_img').css({'left': Math.round(offsetLeft) + 'px'});
+          // move the image to the mouse position at a fixed height above the timeline
           $('#timeline_preview_canvas').css({'bottom': Math.round(offsetBottom) + 'px'});
           $('#timeline_preview_canvas').css({'left': Math.round(offsetLeft) + 'px'});
-          $('#timeline_preview_canvas_img').css({'top': 0 + 'px'});
-          $('#timeline_preview_canvas_img').css({'left': 0 + 'px'});
         }
       });
-
+      
       // no pip in mobile mode
       if (!isMobileMode) {
         Engage.on(plugin.events.togglePiP.getName(), function (pip) {
@@ -1630,9 +1573,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
       });
 
       if (!Engage.controls_top && plugin.template_topIfBottom && (plugin.template_topIfBottom != 'none')) {
-        controlsViewTopIfBottom = new ControlsViewTop_ifBottom(Engage.model.get('videoDataModel'), Engage.model.get('mediaPackage'), plugin.template_topIfBottom, plugin.pluginPath_topIfBottom);
+        controlsViewTopIfBottom = new ControlsViewTop_ifBottom(Engage.model.get('videoDataModel'), plugin.template_topIfBottom, plugin.pluginPath_topIfBottom);
       }
-      controlsView = new ControlsView(Engage.model.get('videoDataModel'), Engage.model.get('mediaPackage'), plugin.template, plugin.pluginPath);
+      controlsView = new ControlsView(Engage.model.get('videoDataModel'), plugin.template, plugin.pluginPath);
 
       loadStoredInitialValues();
     }

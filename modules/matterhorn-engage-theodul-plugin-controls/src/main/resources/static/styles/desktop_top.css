@@ -184,7 +184,6 @@
 
 .timelinePreview {
     position: absolute;
-    background-color: #1C94C4;
     visibility: hidden;
     margin-left: 20px;
     display: none;
@@ -195,6 +194,9 @@
     position: relative;
     margin-left: 20px;
     display: block;
+    border: 2px solid white;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px black;
 }
 
 .timeline_preview_container {
