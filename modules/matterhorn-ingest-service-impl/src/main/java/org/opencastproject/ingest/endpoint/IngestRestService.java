@@ -289,7 +289,10 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
       if (MediaPackageSupport.sanityCheck(mp).isSome())
         return Response.serverError().status(Status.BAD_REQUEST).build();
-      String[] tagsArray = tags.split(",");
+      String[] tagsArray = null;
+      if (tags != null) {
+        tagsArray = tags.split(",");
+      }
       mp = ingestService.addTrack(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), tagsArray, mp);
       return Response.ok(mp).build();
     } catch (Exception e) {
