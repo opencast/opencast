@@ -30,8 +30,13 @@
         <% } %>
     </div>
     <div class="clear"></div>
-    <div id="segment_preview" class="segmentTooltip">
+    <!--div id="timeline_preview" class="timelinePreview">
         <img id="segment_preview_img" class="media-object pull-left" src="http://dummyimage.com/50x50/00b9d1/fff" alt="segment preview image">
+    </div-->
+    <div class="timeline_preview_container">
+        <canvas id="timeline_preview_canvas" class ="timelinePreview">
+            <img id="timeline_preview_canvas_img" src="http://dummyimage.com/50x50/00b9d1/fff">
+        </canvas>
     </div>
     <div id="navigation_control">
         <div id="backward_button" class="controlbutton" role="button" aria-label="<%= str_prevChapter %>">
