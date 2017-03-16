@@ -371,8 +371,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
           Thread.sleep(SLEEP_INTERVAL);
         }
         if (!success) {
-          logger.warn("Could not check availability of distributed file {}: {}", uri, response.getStatusLine()
-                  .getStatusCode());
+          logger.warn("Could not check availability of distributed file {}", uri);
           // throw new DistributionException("Unable to load distributed file " + uri.toString());
         }
       }
