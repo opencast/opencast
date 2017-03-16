@@ -31,6 +31,8 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,6 +46,9 @@ import java.util.Set;
  * A Spring Security implementation of {@link SecurityService}.
  */
 public class SecurityServiceSpringImpl implements SecurityService {
+
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(SecurityServiceSpringImpl.class);
 
   /** Holds delegates users for new threads that have been spawned from authenticated threads */
   private static final ThreadLocal<User> delegatedUserHolder = new ThreadLocal<User>();
@@ -110,6 +115,10 @@ public class SecurityServiceSpringImpl implements SecurityService {
               roles.add(JaxbRole.fromRole(role));
             }
           }
+        } else {
+          logger.debug(
+                  "Authenticated user '{}' could not be found in any of the current UserProviders. Continuing anyway...",
+                  userDetails.getUsername());
         }
 
         // Add the roles (authorities) in the security context
