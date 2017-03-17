@@ -145,7 +145,6 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
   private void updateEntity(OaiPmhEntity entity, MediaPackage mediaPackage,
                             String repository) throws OaiPmhDatabaseException {
     entity.setOrganization(getSecurityService().getOrganization().getId());
-    entity.setModificationDate(currentDate());
     entity.setDeleted(false);
     entity.setRepositoryId(repository);
 
@@ -228,7 +227,6 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
         if (oaiPmhEntity == null)
           throw new NotFoundException("No media package with id=" + mediaPackageId + " exists");
 
-        oaiPmhEntity.setModificationDate(currentDate());
         oaiPmhEntity.setDeleted(true);
         em.merge(oaiPmhEntity);
         tx.commit();
