@@ -63,45 +63,49 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RoleProvider, ManagedService {
 
-  /** Is AAI enabled? This is used to avoid log messages in case the module is included in the 
-      distribution but not in use */
-  private static final String CFG_AAI_ENABLED = "enabled";
+  /** Name of the configuration property that specifies whether AAI authencation is enabled. This is used to avoid log
+      messages in case the module is included in the distribution but not in use */
+  private static final String CFG_AAI_ENABLED_KEY = "enabled";
 
-  /** Default value of CFG_AAI_ENABLED **/
+  /** Default value of the configuration property CFG_AAI_ENABLED_KEY **/
   private static final boolean CFG_AAI_ENABLED_DEFAULT = false;
 
   /** Shibboleth header configuration */
 
-  /** Configuration property specifying the name of the HTTP request header where the users name can be extracted */
-  private static final String CFG_HEADER_GIVEN_NAME = "header.given_name";
+  /** Name of the configuration property specifying the name of the HTTP request header where the users name can be
+      extracted */
+  private static final String CFG_HEADER_GIVEN_NAME_KEY = "header.given_name";
 
-  /** Configuration property specifying the name of the HTTP request header where the users surname can be extracted */
-  private static final String CFG_HEADER_SURNAME = "header.surname";
+  /** Name of the configuration property specifying the name of the HTTP request header where the users surname can be
+      extracted */
+  private static final String CFG_HEADER_SURNAME_KEY = "header.surname";
 
-  /** Configuration property specifying the name of the HTTP request header where the users e-mail can be extracted */
-  private static final String CFG_HEADER_MAIL = "header.mail";
+  /** Name of the configuration property specifying the name of the HTTP request header where the users e-mail can be
+      extracted */
+  private static final String CFG_HEADER_MAIL_KEY = "header.mail";
 
-  /** Optional configuration property specifying a list of home organizations */
-  private static final String CFG_HEADER_ORGANIZATION = "header.organization";
+  /** Name of the optional configuration property specifying a list of home organizations */
+  private static final String CFG_HEADER_ORGANIZATION_KEY = "header.organization";
 
   /**
    * Shibboleth roles configuration
    * At login time, the Shibboleth login handler assigns some basic roles to authenticated users.
    */
 
-  /** Role assigned to all Shibboleth authenticated users, i.e. members of an Sibboleth federation */
-  private static final String CFG_ROLE_FEDERATION_MEMBER = "role.federation";
+  /** Name of the configuration property that specifies the name of the role assigned to all Shibboleth authenticated
+      users, i.e. members of an Sibboleth federation */
+  private static final String CFG_ROLE_FEDERATION_MEMBER_KEY = "role.federation";
 
-  /** Default value of CFG_ROLE_FEDERATION_MEMBER */
+  /** Default value of the configuration property CFG_ROLE_FEDERATION_MEMBER_KEY */
   private static final String CFG_ROLE_FEDERATION_MEMBER_DEFAULT = "ROLE_AAI_USER";
 
   /**
-   * Prefix of role uniquely identifying a Shibboleth authenticated users
-   * The user role will be of the form CFG_USER_ROLE_PREFIX + SHIBBOLETH_ID
+   * Name of the configuration property that specifies the prefix of the user role uniquely identifying a Shibboleth
+   * authenticated users. The user role will be of the form USER_ROLE_PREFIX + SHIBBOLETH_UNIQUE_ID
    */
-  private static final String CFG_USER_ROLE_PREFIX = "role.prefix";
+  private static final String CFG_USER_ROLE_PREFIX_KEY = "role.prefix";
 
-  /** Role assigned to all Shibboleth authenticated users */
+  /** Default value of configuration property CFG_USER_ROLE_PREFIX_KEY */
   private static final String CFG_USER_ROLE_PREFIX_DEFAULT = "ROLE_AAI_USER_";
 
   /** The logging facility */
@@ -152,7 +156,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
       return;
     }
 
-    String cfgEnabled = StringUtils.trimToNull((String) properties.get(CFG_AAI_ENABLED));
+    String cfgEnabled = StringUtils.trimToNull((String) properties.get(CFG_AAI_ENABLED_KEY));
     if (cfgEnabled != null) {
       enabled = BooleanUtils.toBoolean(cfgEnabled);
       logger.info("AAI login handler is enabled.");
@@ -163,56 +167,56 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
 
     /* Shibboleth header configuration */
 
-    String cfgOrganization = StringUtils.trimToNull((String) properties.get(CFG_HEADER_ORGANIZATION));
+    String cfgOrganization = StringUtils.trimToNull((String) properties.get(CFG_HEADER_ORGANIZATIONKEY));
     if (cfgOrganization != null) {
       headerOrganization = cfgOrganization;
-      logger.info("Header '{}' set to '{}'", CFG_HEADER_ORGANIZATION, headerOrganization);
+      logger.info("Header '{}' set to '{}'", CFG_HEADER_ORGANIZATION_KEY, headerOrganization);
     } else {
-      logger.warn("Header '{}' is not configured ", CFG_HEADER_ORGANIZATION);
+      logger.warn("Header '{}' is not configured ", CFG_HEADER_ORGANIZATION_KEY);
     }
 
-    String cfgGivenName = StringUtils.trimToNull((String) properties.get(CFG_HEADER_GIVEN_NAME));
+    String cfgGivenName = StringUtils.trimToNull((String) properties.get(CFG_HEADER_GIVEN_NAME_KEY));
     if (cfgGivenName != null) {
       headerGivenName = cfgGivenName;
-      logger.info("Header '{}' set to '{}'", CFG_HEADER_GIVEN_NAME, headerGivenName);
+      logger.info("Header '{}' set to '{}'", CFG_HEADER_GIVEN_NAME_KEY, headerGivenName);
     } else {
-      logger.error("Header '{}' is not configured ", CFG_HEADER_GIVEN_NAME);
+      logger.error("Header '{}' is not configured ", CFG_HEADER_GIVEN_NAME_KEY);
     }
 
-    String cfgSurname = StringUtils.trimToNull((String) properties.get(CFG_HEADER_SURNAME));
+    String cfgSurname = StringUtils.trimToNull((String) properties.get(CFG_HEADER_SURNAME_KEY));
     if (cfgSurname != null) {
       headerSurname = cfgSurname;
-      logger.info("Header '{}' set to '{}'", CFG_HEADER_SURNAME, headerSurname);
+      logger.info("Header '{}' set to '{}'", CFG_HEADER_SURNAME_KEY, headerSurname);
     } else {
-      logger.error("Header '{}' is not configured ", CFG_HEADER_SURNAME);
+      logger.error("Header '{}' is not configured ", CFG_HEADER_SURNAME_KEY);
     }
 
-    String cfgMail = StringUtils.trimToNull((String) properties.get(CFG_HEADER_MAIL));
+    String cfgMail = StringUtils.trimToNull((String) properties.get(CFG_HEADER_MAIL_KEY));
     if (cfgMail != null) {
       headerMail = cfgMail;
-      logger.info("Header '{}' set to '{}'", CFG_HEADER_MAIL, headerMail);
+      logger.info("Header '{}' set to '{}'", CFG_HEADER_MAIL_KEY, headerMail);
     } else {
-      logger.error("Header '{}' is not configured ", CFG_HEADER_MAIL);
+      logger.error("Header '{}' is not configured ", CFG_HEADER_MAIL_KEY);
     }
 
     /* Shibboleth user roles configuration */
 
-    String cfgRoleFederationMember = StringUtils.trimToNull((String) properties.get(CFG_ROLE_FEDERATION_MEMBER));
+    String cfgRoleFederationMember = StringUtils.trimToNull((String) properties.get(CFG_ROLE_FEDERATION_MEMBER_KEY));
     if (cfgRoleFederationMember != null) {
       roleFederationMember = cfgRoleFederationMember;
-      logger.info("Header '{}' set to '{}'", CFG_ROLE_FEDERATION_MEMBER, roleFederationMember);
+      logger.info("Header '{}' set to '{}'", CFG_ROLE_FEDERATION_MEMBER_KEY, roleFederationMember);
     } else {
       roleFederationMember = CFG_ROLE_FEDERATION_MEMBER_DEFAULT;
-      logger.error("Header '{}' is not configured, using '{}'", CFG_ROLE_FEDERATION_MEMBER, roleFederationMember);
+      logger.error("Header '{}' is not configured, using '{}'", CFG_ROLE_FEDERATION_MEMBER_KEY, roleFederationMember);
     }
 
-    String cfgUserRolePrefix = StringUtils.trimToNull((String) properties.get(CFG_USER_ROLE_PREFIX));
+    String cfgUserRolePrefix = StringUtils.trimToNull((String) properties.get(CFG_USER_ROLE_PREFIX_KEY));
     if (cfgUserRolePrefix != null) {
       userRolePrefix = cfgUserRolePrefix;
-      logger.info("Header '{}' set to '{}'", CFG_USER_ROLE_PREFIX, userRolePrefix);
+      logger.info("Header '{}' set to '{}'", CFG_USER_ROLE_PREFIX_KEY, userRolePrefix);
     } else {
       userRolePrefix = CFG_USER_ROLE_PREFIX_DEFAULT;
-      logger.error("Header '{}' is not configured, using '{}'", CFG_USER_ROLE_PREFIX, userRolePrefix);
+      logger.error("Header '{}' is not configured, using '{}'", CFG_USER_ROLE_PREFIX_KEY, userRolePrefix);
     }
   }
 
