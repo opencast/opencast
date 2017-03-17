@@ -108,6 +108,6 @@ Finally be sure to enable the user reference provider to enable support for exte
 
     <!-- Uncomment to enable external users e.g. used together shibboleth -->
     <osgi:reference id="userReferenceProvider" cardinality="1..1"
-                  interface="org.opencastproject.userdirectory.JpaUserReferenceProvider"  />
+                  interface="org.opencastproject.userdirectory.UserReferenceProvider" />
 
 
