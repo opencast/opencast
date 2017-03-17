@@ -93,7 +93,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
   private static final String CFG_ROLE_FEDERATION_MEMBER = "role.federation";
 
   /** Default value of CFG_ROLE_FEDERATION_MEMBER */
-  private static final String CFG_ROLE_FEDERATION_MEMBER_DEFAULT = "ROLE_AAI_FEDERATION_MEMBER";
+  private static final String CFG_ROLE_FEDERATION_MEMBER_DEFAULT = "ROLE_AAI_USER";
 
   /**
    * Prefix of role uniquely identifying a Shibboleth authenticated users

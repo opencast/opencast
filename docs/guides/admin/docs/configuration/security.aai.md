@@ -51,7 +51,7 @@ form *role.user.prefix + <unique ID provided by Shibboleth\>*.
 To indicate the fact that a user has authenticated himself using Shibboleth, the login handler assigns the
 role as specified by the property **role.federation.member**.
 
-    role.federation.member = "ROLE_AAI_FEDERATION_MEMBER"
+    role.federation.member = "ROLE_AAI_USER"
 
 
 Step 2: Spring Security Configuration
