@@ -32,18 +32,16 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.Fraction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -53,14 +51,15 @@ import java.util.TreeMap;
 public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** Configuration key for the "flavor" of the tracks to use as a source input */
-  private static final String OPT_SOURCE_FLAVOR = "source-flavor";
+  static final String OPT_SOURCE_FLAVOR = "source-flavor";
 
   /** Configuration key for video resolutions to check */
-  private static final String OPT_VIDEO_RES_X = "xresolution";
-  private static final String OPT_VIDEO_RES_Y = "yresolution";
+  static final String OPT_VIDEO_RES_X = "xresolution";
+  static final String OPT_VIDEO_RES_Y = "yresolution";
 
   /** Configuration key for video aspect ratio to check */
-  private static final String OPT_VIDEO_ASPECT = "aspect-ratio";
+  static final String OPT_VIDEO_ASPECT = "aspect-ratio";
+  static final String OPT_VIDEO_ASPECT_SNAP = "snap-to-aspect";
 
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
@@ -71,6 +70,7 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
     CONFIG_OPTIONS.put(OPT_VIDEO_RES_X, "Horizontal video resolutions to check for");
     CONFIG_OPTIONS.put(OPT_VIDEO_RES_Y, "Vertical video resolutions to check for");
     CONFIG_OPTIONS.put(OPT_VIDEO_ASPECT, "Video aspect ratio to check for");
+    CONFIG_OPTIONS.put(OPT_VIDEO_ASPECT_SNAP, "Snap to closest aspect ratio");
   }
 
   /** The logging facility */
@@ -89,6 +89,7 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
     List<Integer> xresolutions = getResolutions(getConfig(workflowInstance, OPT_VIDEO_RES_X, ""));
     List<Integer> yresolutions = getResolutions(getConfig(workflowInstance, OPT_VIDEO_RES_Y, ""));
     List<Fraction> aspectRatios = getAspectRatio(getConfig(workflowInstance, OPT_VIDEO_ASPECT, ""));
+    boolean snapToAspect = BooleanUtils.toBoolean(getConfig(workflowInstance, OPT_VIDEO_ASPECT_SNAP, "false"));
 
     final Track[] tracks = mediaPackage.getTracks(sourceFlavor);
     if (tracks.length <= 0) {
@@ -104,12 +105,18 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
 
       // Check resolution
       if (track.hasVideo()) {
-        for (VideoStream video : ((TrackImpl) track).getVideo()) {
+        for (VideoStream video: ((TrackImpl) track).getVideo()) {
           // Set resolution variables
           properties.put(varName + "_resolution_x", video.getFrameWidth().toString());
           properties.put(varName + "_resolution_y", video.getFrameHeight().toString());
           Fraction trackAspect = Fraction.getReducedFraction(video.getFrameWidth(), video.getFrameHeight());
           properties.put(varName + "_aspect", trackAspect.toString());
+
+          // Check if we should fall back to nearest defined aspect ratio
+          if (snapToAspect) {
+            trackAspect = getNearestAspectRatio(trackAspect, aspectRatios);
+            properties.put(varName + "_aspect_snap", trackAspect.toString());
+          }
 
           // Set boolean variables
 
@@ -131,9 +138,27 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
         }
       }
     }
-    logger.info("Finished analyze-tracks workflow operation adding the properties: {}",
-                propertiesAsString(properties));
+    logger.info("Finished analyze-tracks workflow operation adding the properties: {}", properties);
     return createResult(mediaPackage, properties, Action.CONTINUE, 0);
+  }
+
+  /**
+   * Get nearest aspect ratio from list
+   *
+   * @param videoAspect
+   *        Aspect ratio of video to check
+   * @param aspects
+   *        List of aspect ratios to snap to.
+   * @return Nearest aspect ratio
+   */
+  Fraction getNearestAspectRatio(final Fraction videoAspect, final List<Fraction> aspects) {
+    Fraction nearestAspect = aspects.get(0);
+    for (Fraction aspect: aspects) {
+      if (videoAspect.subtract(nearestAspect).abs().compareTo(videoAspect.subtract(aspect).abs()) > 0) {
+        nearestAspect = aspect;
+      }
+    }
+    return nearestAspect;
   }
 
   /**
@@ -143,7 +168,7 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
    *        Configuration string
    * @return List of resolutions to check
    */
-  private List<Integer> getResolutions(String resolutionsConfig) {
+  List<Integer> getResolutions(String resolutionsConfig) {
     List<Integer> resolutions = new ArrayList<>();
     for (String res: resolutionsConfig.split(" *, *")) {
       if (StringUtils.isNotBlank(res)) {
@@ -160,7 +185,7 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
    *        Configuration string
    * @return List of aspect rations to check
    */
-  private List<Fraction> getAspectRatio(String aspectConfig) {
+  List<Fraction> getAspectRatio(String aspectConfig) {
     List<Fraction> aspectRatios = new ArrayList<>();
     for (String aspect: aspectConfig.split(" *, *")) {
       if (StringUtils.isNotBlank(aspect)) {
@@ -173,20 +198,5 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
   /** Create a name for a workflow variable from a flavor */
   private static String toVariableName(final MediaPackageElementFlavor flavor) {
     return flavor.getType() + "_" + flavor.getSubtype();
-  }
-
-  /** Log a warning and fail by throwing a {@link org.opencastproject.workflow.api.WorkflowOperationException}. */
-  private static <A> A fail(String msg) throws WorkflowOperationException {
-    logger.warn(msg);
-    throw new WorkflowOperationException(msg);
-  }
-
-  /** Serialize a properties map into string. */
-  private String propertiesAsString(Map<String, String> map) {
-    Properties prop = new Properties();
-    prop.putAll(map);
-    StringWriter writer = new StringWriter();
-    prop.list(new PrintWriter(writer));
-    return writer.getBuffer().toString();
   }
 }
