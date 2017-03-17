@@ -272,7 +272,6 @@ CREATE TABLE mh_oaipmh (
   repo_id VARCHAR(255) NOT NULL,
   series_id VARCHAR(128),
   deleted tinyint(1) DEFAULT '0',
-  -- set to current date and time on insert and update
   modification_date DATETIME DEFAULT NULL,
   mediapackage_xml TEXT(65535) NOT NULL,
   series_dublincore_xml TEXT(65535),
