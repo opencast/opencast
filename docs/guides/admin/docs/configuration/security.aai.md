@@ -110,4 +110,28 @@ Finally be sure to enable the user reference provider to enable support for exte
     <osgi:reference id="userReferenceProvider" cardinality="1..1"
                   interface="org.opencastproject.userdirectory.UserReferenceProvider" />
 
+Since the Opencast login page is not used when Shibboleth authentication is in place, there is no point in redirecting
+unauthenticated requests to the Opencast login form. You can redirect them directly to the administrative user
+interface which is supposed to be protected by Shibboleth.
+
+    <!-- Redirects unauthenticated requests to the login form -->
+      <bean id="userEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+      <property name="loginFormUrl" value="/admin-ng/index.html" />
+    </bean>
+
+Step 3: Protecting HTML pages by Shibboleth
+-------------------------------------------
+
+It is important to understand that Shibboleth is only used to protect content that is accessed by human users.
+Access to APIs is protected by other means of authentication as, for example, digest authentication.
+
+To protect HTML pages, you will need to adapt the configuration of your web server:
+
+    <LocationMatch \.(htm|html)$>
+        AuthType shibboleth
+        ShibRequireSession On
+        ShibUseHeaders On
+        require valid-user
+    </LocationMatch>
+
 
