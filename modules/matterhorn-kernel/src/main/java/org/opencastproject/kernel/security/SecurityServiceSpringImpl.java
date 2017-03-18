@@ -114,11 +114,13 @@ public class SecurityServiceSpringImpl implements SecurityService {
             for (Role role : user.getRoles()) {
               roles.add(JaxbRole.fromRole(role));
             }
+          } else {
+            logger.debug(
+                    "Authenticated user '{}' could not be found in any of the current UserProviders. Continuing anyway...",
+                    userDetails.getUsername());
           }
         } else {
-          logger.debug(
-                  "Authenticated user '{}' could not be found in any of the current UserProviders. Continuing anyway...",
-                  userDetails.getUsername());
+          logger.debug("No UserDirectory was found when trying to search for user '{}'", userDetails.getUsername());
         }
 
         // Add the roles (authorities) in the security context
