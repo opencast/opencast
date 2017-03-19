@@ -51,6 +51,7 @@ The following table contains the workflow operations that are available in an ou
 |post-mediapackage   |Send mediapackage to remote service                            |[Documentation](postmediapackage-woh.md)|
 |prepare-av          |Preparing audio and video work versions                        |[Documentation](prepareav-woh.md)|
 |publish-aws         |Distribute and publish media to Amazon S3                      |[Documentation](publishawss3-woh.md)|
+|probe-resolution    |Set workflow instance variables based on video resolution      |[Documentation](probe-resolution-woh.md)|
 |publish-configure   |Distribute and publish media to the configured publication     |[Documentation](publishconfigure-woh.md)|
 |publish-engage      |Distribute and publish media to the engage player              |[Documentation](publishengage-woh.md)|
 |publish-oaipmh      |Distribute and publish media to a OAI-PMH repository           |[Documentation](publish-oaipmh-woh.md)|
