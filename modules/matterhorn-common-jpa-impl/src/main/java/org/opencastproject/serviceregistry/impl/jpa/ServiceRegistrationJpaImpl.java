@@ -60,12 +60,12 @@ import javax.persistence.UniqueConstraint;
                 + "avg(job.queueTime) as meanQueue, "
                 + "avg(job.runTime) as meanRun FROM Job job "
                 + "where job.dateCreated >= :minDateCreated and job.dateCreated <= :maxDateCreated "
-                + "group by job.processorServiceRegistration, job.status"),
+                + "group by job.processorServiceRegistration.id, job.status"),
         @NamedQuery(name = "ServiceRegistration.hostloads", query = "SELECT job.processorServiceRegistration as serviceRegistration, job.status, sum(job.jobLoad) "
                 + "FROM Job job "
                 + "WHERE job.processorServiceRegistration.online=true and job.processorServiceRegistration.active=true and job.processorServiceRegistration.hostRegistration.maintenanceMode=false "
                 + "and job.status in :statuses "
-                + "GROUP BY job.processorServiceRegistration, job.status"),
+                + "GROUP BY job.processorServiceRegistration.id, job.status"),
         @NamedQuery(name = "ServiceRegistration.getRegistration", query = "SELECT r from ServiceRegistration r "
                 + "where r.hostRegistration.baseUrl = :host and r.serviceType = :serviceType"),
         @NamedQuery(name = "ServiceRegistration.getAll", query = "SELECT rh FROM ServiceRegistration rh WHERE rh.hostRegistration.active = true"),
