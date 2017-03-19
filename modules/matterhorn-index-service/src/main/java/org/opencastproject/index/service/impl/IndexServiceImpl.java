@@ -744,7 +744,6 @@ public class IndexServiceImpl implements IndexService {
    * @return a list of scheduling periods
    */
   protected List<Period> calculatePeriods(Date start, Date end, long duration, RRule rRule, TimeZone tz) {
-    final TimeZone timeZone = TimeZone.getDefault();
     final TimeZone utc = TimeZone.getTimeZone("UTC");
     TimeZone.setDefault(tz);
     DateTime seed = new DateTime(start);
@@ -782,7 +781,7 @@ public class IndexServiceImpl implements IndexService {
       periods.add(new Period(new DateTime(cDate.getTime()), new DateTime(cDate.getTimeInMillis() + duration)));
     }
 
-    TimeZone.setDefault(timeZone);
+    TimeZone.setDefault(null);
     return periods;
   }
 
