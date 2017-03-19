@@ -25,7 +25,6 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -107,13 +106,13 @@ public class SecurityServiceSpringImpl implements SecurityService {
         UserDetails userDetails = (UserDetails) principal;
         Set<JaxbRole> roles = new HashSet<JaxbRole>();
 
+        User authUser = new JaxbUser(userDetails.getUsername(), null, jaxbOrganization, roles);
+
         // If user exist, add the existing roles to the list
         if (userDirectory != null) {
           User user = userDirectory.loadUser(userDetails.getUsername());
           if (user != null) {
-            for (Role role : user.getRoles()) {
-              roles.add(JaxbRole.fromRole(role));
-            }
+            authUser = user;
           } else {
             logger.debug(
                     "Authenticated user '{}' could not be found in any of the current UserProviders. Continuing anyway...",
@@ -131,7 +130,7 @@ public class SecurityServiceSpringImpl implements SecurityService {
           }
         }
 
-        User user = new JaxbUser(userDetails.getUsername(), null, jaxbOrganization, roles);
+        User user = JaxbUser.fromUser(authUser, roles);
         delegatedUserHolder.set(user);
 
         return user;

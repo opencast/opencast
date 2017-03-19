@@ -26,6 +26,8 @@ import org.opencastproject.util.EqualsUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -269,12 +271,29 @@ public final class JaxbUser implements User {
   public static JaxbUser fromUser(User user) {
     if (user instanceof JaxbUser)
       return (JaxbUser) user;
+    return fromUser(user, Collections.<JaxbRole>emptySet());
+  }
+
+  /**
+   * Creates a JAXB user from a regular user object with an additional set of roles.
+   *
+   * @param user
+   *          the user
+   * @return the JAXB user
+   */
+  public static JaxbUser fromUser(User user, Collection<JaxbRole> extraRoles) {
     Set<JaxbRole> roles = new HashSet<JaxbRole>();
     for (Role role : user.getRoles()) {
-      if (role instanceof JaxbRole)
+      if (role instanceof JaxbRole) {
         roles.add((JaxbRole) role);
-      roles.add(JaxbRole.fromRole(role));
+      } else {
+        roles.add(JaxbRole.fromRole(role));
+      }
     }
+    for (JaxbRole role : extraRoles) {
+      roles.add(role);
+    }
+
     JaxbUser jaxbUser = new JaxbUser(user.getUsername(), user.getPassword(), user.getName(), user.getEmail(),
             user.getProvider(), user.canLogin(), JaxbOrganization.fromOrganization(user.getOrganization()), roles);
     jaxbUser.setManageable(user.isManageable());
