@@ -65,7 +65,7 @@ import javax.persistence.UniqueConstraint;
                 + "FROM Job job "
                 + "WHERE job.processorServiceRegistration.online=true and job.processorServiceRegistration.active=true and job.processorServiceRegistration.hostRegistration.maintenanceMode=false "
                 + "and job.status in :statuses "
-                + "GROUP BY job.processorServiceRegistration.id, job.status"),
+                + "GROUP BY job.processorServiceRegistration, job.status"),
         @NamedQuery(name = "ServiceRegistration.getRegistration", query = "SELECT r from ServiceRegistration r "
                 + "where r.hostRegistration.baseUrl = :host and r.serviceType = :serviceType"),
         @NamedQuery(name = "ServiceRegistration.getAll", query = "SELECT rh FROM ServiceRegistration rh WHERE rh.hostRegistration.active = true"),
