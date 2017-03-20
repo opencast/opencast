@@ -271,7 +271,7 @@ public final class JaxbUser implements User {
   public static JaxbUser fromUser(User user) {
     if (user instanceof JaxbUser)
       return (JaxbUser) user;
-    return fromUser(user, Collections.<JaxbRole>emptySet());
+    return fromUser(user, Collections.<JaxbRole> emptySet());
   }
 
   /**
@@ -281,13 +281,13 @@ public final class JaxbUser implements User {
    *          the user
    * @return the JAXB user
    */
-  public static JaxbUser fromUser(User user, Collection<JaxbRole> extraRoles) {
+  public static JaxbUser fromUser(User user, Collection<? extends Role> extraRoles) {
     Set<JaxbRole> roles = new HashSet<JaxbRole>();
     for (Role role : user.getRoles()) {
       roles.add(JaxbRole.fromRole(role));
     }
-    for (JaxbRole role : extraRoles) {
-      roles.add(role);
+    for (Role role : extraRoles) {
+      roles.add(JaxbRole.fromRole(role));
     }
 
     JaxbUser jaxbUser = new JaxbUser(user.getUsername(), user.getPassword(), user.getName(), user.getEmail(),
