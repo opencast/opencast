@@ -345,6 +345,7 @@ text/richtext rtx
 text/scriptlet sct wsc
 text/texmacs tm
 text/tab-separated-values tsv
+text/vtt vtt srt
 text/vnd.sun.j2me.app-descriptor jad
 text/vnd.wap.wml wml
 text/vnd.wap.wmlscript wmls

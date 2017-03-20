@@ -98,6 +98,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     setZoomLevel: new Engage.Event('Video:setZoomLevel', 'sets the zoom level', 'trigger'),
     zoomReset: new Engage.Event('Video:resetZoom', 'resets position and zoom level', 'trigger'),
     zoomChange: new Engage.Event('Video:zoomChange', 'zoom level has changed', 'handler'),
+    toggleCaptions: new Engage.Event('Video:toggleCaptions', 'toggle captions', 'trigger'),
+    captionsFound: new Engage.Event('Video:captionsFound', 'captions found', 'handler'),
     // events for mobile view
     switchVideo: new Engage.Event('Video:switch', 'switch the video', 'trigger'),
     showControls: new Engage.Event('Controls:show', 'show the controls', 'both'),
@@ -179,6 +181,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   var id_zoomLevel1 = 'zoomLevel1';
   var id_zoomLevel2 = 'zoomLevel2';
   var id_zoomLevel3 = 'zoomLevel3';
+  var id_captions_button = 'captions_button';
   var id_engage_controls = 'engage_controls';
   var id_engage_controls_topIfBottom = 'engage_controls_second';
   var id_slider = 'slider';
@@ -278,6 +281,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   var controlsVisible = true;
   var controlsTimer = null;
   var carousel = null;
+  var captionsOn = false;
 
   function initTranslate(language, funcSuccess, funcError) {
     var path = Engage.getPluginPath('EngagePluginControls').replace(/(\.\.\/)/g, '');
@@ -508,7 +512,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         // compile template and load it
         var template = _.template(this.template);
         this.$el.html(template(tempVars));
-        
+
         initControlsEvents();
 
         if (isDesktopMode) {
@@ -882,6 +886,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         }
       });
 
+      $('#' + id_captions_button).click(function (e) {
+        e.preventDefault();
+
+        $(this).toggleClass('active');
+        captionsOn  = !captionsOn;
+        Engage.trigger(plugin.events.toggleCaptions.getName(), captionsOn);
+      })
       // slider events
       $('#' + id_slider).on(event_slidestart, function (event, ui) {
         isSliding = true;
@@ -1025,6 +1036,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
       if (videosInitialReadyness) {
         Engage.trigger(plugin.events.focusVideo.getName(), currentFocusFlavor);
         videosInitialReadyness = false;
+      }
+      if (Engage.model.get("captions")) {
+        $("#" + id_captions_button).removeClass("disabled");
       }
     }
   }
@@ -1419,6 +1433,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
             }
           }
         });
+        Engage.on(plugin.events.captionsFound.getName(), function () {
+            $("#" + id_captions_button).removeClass("disabled");
+        });
       }
 
       if (isMobileMode) {
@@ -1442,7 +1459,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
             controlsVisible = false;
           }
         });
-        
+
         // add first class to video wrapper
         $('#' + id_engage_controls).addClass('first');
       }
@@ -1484,7 +1501,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
       initPlugin();
     }
   });
-  
+
   // listen on a change/set of the InfoMe model
   Engage.model.on(infoMeChange, function () {
     initCount -= 1;

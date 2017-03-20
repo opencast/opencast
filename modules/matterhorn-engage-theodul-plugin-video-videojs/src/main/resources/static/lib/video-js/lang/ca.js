@@ -11,7 +11,7 @@ videojs.addLanguage("ca",{
  "Fullscreen": "Pantalla completa",
  "Non-Fullscreen": "Pantalla no completa",
  "Mute": "Silencia",
- "Unmuted": "Amb so",
+ "Unmute": "Amb so",
  "Playback Rate": "Velocitat de reproducció",
  "Subtitles": "Subtítols",
  "subtitles off": "Subtítols desactivats",
