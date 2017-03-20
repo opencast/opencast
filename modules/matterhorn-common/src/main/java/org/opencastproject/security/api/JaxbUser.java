@@ -284,11 +284,7 @@ public final class JaxbUser implements User {
   public static JaxbUser fromUser(User user, Collection<JaxbRole> extraRoles) {
     Set<JaxbRole> roles = new HashSet<JaxbRole>();
     for (Role role : user.getRoles()) {
-      if (role instanceof JaxbRole) {
-        roles.add((JaxbRole) role);
-      } else {
-        roles.add(JaxbRole.fromRole(role));
-      }
+      roles.add(JaxbRole.fromRole(role));
     }
     for (JaxbRole role : extraRoles) {
       roles.add(role);
