@@ -38,6 +38,7 @@ Harvard DCE                | nexus.dcex.harvard.edu        | Greg Logan       | 
 University of Osnabrück    | nexus.virtuos.uos.de          | Greg Logan       | Lars Kiesow         |
 University of Osnabrück    | nexus.opencast.org            | Greg Logan       | Lars Kiesow         | GeoIP Redirect
 University of Saskatchewan | oc-cache.usask.ca             | Greg Logan       | Greg Logan          |
+
 Nexus administration:
 
 - Greg Logan (usask)
@@ -50,7 +51,7 @@ Other Hosted Services
 
 Institution                | Hostname                      | Admin (Software) | Admin (Hardware)
 ---------------------------|-------------------------------|------------------|-------------------------
-University of Osnabrück    | repo.virtuos.uos.de           | Lars Kiesow      | Lars Kiesow
+University of Osnabrück    | pkg.opencast.org              | Lars Kiesow      | Lars Kiesow
 University of Osnabrück    | pullrequests.opencast.org     | Lars Kiesow      | Lars Kiesow
 University of Osnabrück    | build.opencast.org            | Greg Logan       | Lars Kiesow
 University of Osnabrück    | docs.opencast.org             | Greg Logan       | Lars Kiesow
