@@ -130,8 +130,13 @@
     <module>modules/matterhorn-mpeg7</module>
     <module>modules/matterhorn-notification-workflowoperation</module>
     <module>modules/matterhorn-oaipmh</module>
+    <module>modules/matterhorn-oaipmh-api</module>
+    <module>modules/matterhorn-oaipmh-persistence</module>
+    <module>modules/matterhorn-oaipmh-remote</module>
     <module>modules/matterhorn-presets</module>
     <module>modules/matterhorn-publication-service-api</module>
+    <module>modules/matterhorn-publication-service-oaipmh</module>
+    <module>modules/matterhorn-publication-service-oaipmh-remote</module>
     <module>modules/matterhorn-publication-service-youtube-remote</module>
     <module>modules/matterhorn-publication-service-youtube-v3</module>
     <module>modules/matterhorn-runtime-info</module>

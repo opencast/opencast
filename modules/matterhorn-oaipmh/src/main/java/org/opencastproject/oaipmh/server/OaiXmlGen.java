@@ -18,19 +18,23 @@
  * the License.
  *
  */
-
-
 package org.opencastproject.oaipmh.server;
 
+import static org.opencastproject.fun.juc.Immutables.list;
+import static org.opencastproject.oaipmh.OaiPmhConstants.OAI_2_0_SCHEMA_LOCATION;
+import static org.opencastproject.oaipmh.OaiPmhConstants.OAI_2_0_XML_NS;
 import static org.opencastproject.oaipmh.OaiPmhUtil.toUtcSecond;
 import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
 
+import org.opencastproject.mediapackage.EName;
+import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.oaipmh.OaiPmhConstants;
+import org.opencastproject.oaipmh.persistence.SearchResult;
+import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.oaipmh.util.XmlGen;
-import org.opencastproject.search.api.SearchResult;
-import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
@@ -55,6 +59,7 @@ public abstract class OaiXmlGen extends XmlGen {
    * Create a new OaiXmlGen for a certain repository.
    */
   public OaiXmlGen(OaiPmhRepository repository) {
+    super(some(OaiPmhConstants.OAI_2_0_XML_NS));
     this.repository = repository;
   }
 
@@ -62,11 +67,13 @@ public abstract class OaiXmlGen extends XmlGen {
    * Create the OAI-PMH tag.
    */
   Element oai(Node... nodes) {
-    List<Node> combined = new ArrayList<Node>(Arrays.asList(nodes));
-    combined.addAll(_(schemaLocation(OaiPmhConstants.OAI_2_0_SCHEMA_LOCATION),
-            $eTxt("responseDate", toUtcSecond(new Date()))));
-    return $e("OAI-PMH", OaiPmhConstants.OAI_2_0_XML_NS, _(ns("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI)),
-            combined);
+    final List<Node> combined = list(
+            list(schemaLocation(OAI_2_0_SCHEMA_LOCATION),
+                 $eTxt("responseDate", OAI_2_0_XML_NS, toUtcSecond(new Date()))),
+            nodes);
+    return $e("OAI-PMH",
+              list(ns("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI)),
+              combined);
   }
 
   /**
@@ -74,44 +81,71 @@ public abstract class OaiXmlGen extends XmlGen {
    */
   Element dc(Node... nodes) {
     List<Node> combined = new ArrayList<Node>(Arrays.asList(nodes));
-    combined.addAll(_(schemaLocation(OaiPmhConstants.OAI_DC_SCHEMA_LOCATION)));
+    combined.addAll(list(schemaLocation(OaiPmhConstants.OAI_DC_SCHEMA_LOCATION)));
     return $e("oai_dc:dc", OaiPmhConstants.OAI_DC_XML_NS,
-            _(ns("dc", "http://purl.org/dc/elements/1.1/"), ns("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI)),
-            combined);
+              list(ns("dc", "http://purl.org/dc/elements/1.1/"),
+                   ns("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI)),
+              combined);
   }
 
   /**
-   * Create the dublin core tag from a search result item.
+   * Create the dublin core tag from a search result item. Note: Sets are currently not supported.
    */
-  Element dc(SearchResultItem item) {
-    return dc($e("dc:title", $txtBlank(item.getDcTitle())), $e("dc:creator", $txtBlank(item.getDcCreator())),
-            $e("dc:subject", $txtBlank(item.getDcSubject())), $e("dc:description", $txtBlank(item.getDcDescription())),
-            $e("dc:publisher", $txtBlank(item.getDcPublisher())),
-            $e("dc:contributor", $txtBlank(item.getDcContributor())),
-            $e("dc:date", $txtBlank(repository.toSupportedGranularity(item.getDcCreated()))),
-            $e("dc:type", $txtBlank(item.getDcType())), $e("dc:identifier", $txtBlank(item.getId())),
-            $e("dc:language", $txtBlank(item.getDcLanguage())), $e("dc:rights", $txtBlank(item.getDcLicense())));
+  @SuppressWarnings("unchecked") Element dc(final SearchResultItem item, Option<String> set) {
+    if (item.getEpisodeDublinCore().isNone())
+      return dc($e("dc:identifier", $txtBlank(item.getId())));
+    else
+      return getDublincoreElement(item.getEpisodeDublinCore().get());
+  }
+
+  // <dcterms:description xml:lang="en">
+  // Introduction lecture from the Institute for Atmospheric and Climate Science.
+  // </dcterms:description>
+  private Element getDublincoreElement(DublinCoreCatalog dc) {
+    List<Node> nodes = new ArrayList<Node>();
+    nodes.addAll(getDublinCoreNodes(dc, DublinCore.PROPERTY_TITLE));
+    nodes.addAll(getDublinCoreNodes(dc, DublinCore.PROPERTY_CREATOR));
+    nodes.addAll(getDublinCoreNodes(dc, DublinCore.PROPERTY_SUBJECT));
+    nodes.addAll(getDublinCoreNodes(dc, DublinCore.PROPERTY_DESCRIPTION));
+    nodes.addAll(getDublinCoreNodes(dc, DublinCore.PROPERTY_PUBLISHER));
+    nodes.addAll(getDublinCoreNodes(dc, DublinCore.PROPERTY_CONTRIBUTOR));
+    nodes.addAll(getDublinCoreNodes(dc, DublinCore.PROPERTY_TYPE));
+    nodes.addAll(getDublinCoreNodes(dc, DublinCore.PROPERTY_FORMAT));
+    nodes.addAll(getDublinCoreNodes(dc, DublinCore.PROPERTY_IDENTIFIER));
+    nodes.addAll(getDublinCoreNodes(dc, DublinCore.PROPERTY_SOURCE));
+    nodes.addAll(getDublinCoreNodes(dc, DublinCore.PROPERTY_LANGUAGE));
+    nodes.addAll(getDublinCoreNodes(dc, DublinCore.PROPERTY_RELATION));
+    nodes.addAll(getDublinCoreNodes(dc, DublinCore.PROPERTY_COVERAGE));
+    nodes.addAll(getDublinCoreNodes(dc, DublinCore.PROPERTY_LICENSE));
+    return dc(nodes.toArray(new Node[nodes.size()]));
+  }
+
+  private List<Node> getDublinCoreNodes(DublinCoreCatalog dc, EName eName) {
+    List<Node> nodes = new ArrayList<Node>();
+
+    List<DublinCoreValue> values = dc.get(eName);
+    for (DublinCoreValue dcValue : values) {
+      Element element = $e("dc:" + eName.getLocalName(), $langNode(dcValue.getLanguage()), $txt(dcValue.getValue()));
+      nodes.add(element);
+    }
+    return nodes;
   }
 
   /**
    * Create the resumption token and store the query.
    */
-  Node resumptionToken(final Option<String> resumptionToken, final String metadataPrefix, final SearchResult result) {
-    final int offset;
-    if (result.getOffset() <= Integer.MAX_VALUE) {
-      offset = (int) result.getOffset();
-    } else {
-      throw new RuntimeException("offset too big");
-    }
+  Node resumptionToken(final Option<String> resumptionToken, final String metadataPrefix, final SearchResult result,
+                       Date until, Option<String> set) {
     // compute the token value...
     final Option<Option<String>> token;
-    if (offset + result.size() < result.getTotalSize()) {
+    if (result.size() == result.getLimit()) {
+      SearchResultItem lastResult = result.getItems().get((int) (result.size() - 1));
       // more to come...
-      token = some(some(repository.saveQuery(new ResumableQuery(result.getQuery(), metadataPrefix, offset, repository
-              .getResultLimit()))));
+      token = some(some(repository.saveQuery(new ResumableQuery(metadataPrefix, lastResult.getModificationDate(),
+                                                                until, set))));
     } else if (resumptionToken.isSome()) {
       // last page reached
-      token = some(Option.<String> none());
+      token = some(Option.<String>none());
     } else {
       token = none();
     }
@@ -119,8 +153,10 @@ public abstract class OaiXmlGen extends XmlGen {
     return token.map(new Function<Option<String>, Node>() {
       @Override
       public Node apply(Option<String> token) {
-        return $e("resumptionToken", $a("completeListSize", Long.toString(result.getTotalSize())),
-                $a("cursor", Integer.toString(offset)), token.map(mkText).getOrElse(nodeZero));
+        return $e("resumptionToken",
+                  // $a("completeListSize", Long.toString(result.getTotalSize())),
+                  // $a("cursor", Integer.toString(offset)),
+                  token.map(mkText).getOrElse(nodeZero));
       }
     }).getOrElse(nodeZero);
   }
@@ -128,8 +164,12 @@ public abstract class OaiXmlGen extends XmlGen {
   /**
    * Create a record element.
    */
-  Element record(SearchResultItem item, Node metadata) {
-    return $e("record", header(item), $e("metadata", metadata));
+  Element record(final SearchResultItem item, final Node metadata) {
+    if (item.isDeleted()) {
+      return $e("record", header(item));
+    } else {
+      return $e("record", header(item), $e("metadata", metadata));
+    }
   }
 
   /**
@@ -137,7 +177,7 @@ public abstract class OaiXmlGen extends XmlGen {
    */
   Element metadataFormat(MetadataFormat f) {
     return $e("metadataFormat", $eTxt("metadataPrefix", f.getPrefix()), $eTxt("schema", f.getSchema().toString()),
-            $eTxt("metadataNamespace", f.getNamespace().toString()));
+              $eTxt("metadataNamespace", f.getNamespace().toString()));
   }
 
   /**
@@ -150,26 +190,27 @@ public abstract class OaiXmlGen extends XmlGen {
   /**
    * Create the header element for a result item.
    */
-  Element header(SearchResultItem item) {
-    return $e(
-            "header",
-            $eTxt("identifier", item.getId()),
-            $eTxt("datestamp",
-                    option(item.getModified()).map(repository.toSupportedGranularity).getOrElse(
-                            Functions.defaultValue("", "created"))
-            // todo output setSpec and deleted status
-            // How to determine the media type?
-            // There is a field oc_mediatype in the index but this one distinguishes
-            // only audioVisual and series.
-            ));
+  Element header(final SearchResultItem item) {
+    // todo output setSpec
+    // How to determine the media type?
+    // There is a field oc_mediatype in the index but this one distinguishes
+    // only audioVisual and series.
+    if (item.isDeleted()) {
+      return $e("header", $a("status", "deleted"), $eTxt("identifier", item.getId()),
+                $eTxt("datestamp", repository.toSupportedGranularity.apply(item.getModificationDate())));
+    } else {
+      return $e("header", $eTxt("identifier", item.getId()),
+                $eTxt("datestamp", repository.toSupportedGranularity(item.getModificationDate())));
+    }
   }
 
   /**
    * Merge two node arrays into a list.
    */
   protected List<Node> merge(Node[] a, Node... b) {
-    List<Node> merge = new ArrayList<Node>(_(a));
-    merge.addAll(_(b));
+    List<Node> merge = new ArrayList<Node>(a.length + b.length);
+    java.util.Collections.addAll(merge, a);
+    java.util.Collections.addAll(merge, b);
     return merge;
   }
 }

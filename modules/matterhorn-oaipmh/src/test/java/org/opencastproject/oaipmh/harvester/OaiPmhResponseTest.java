@@ -24,26 +24,11 @@ package org.opencastproject.oaipmh.harvester;
 
 import static org.junit.Assert.assertEquals;
 
-import org.opencastproject.oaipmh.Granularity;
-
-import org.junit.Test;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
 public class OaiPmhResponseTest {
-
-  @Test
-  public void testExtractGranularity() throws Exception {
-    IdentifyResponse response = new IdentifyResponse(loadDoc("identify-response.xml"));
-    assertEquals(Granularity.DAY, response.getGranularity());
-  }
-
-  @Test
-  public void testExtractMetadataPrefix() throws Exception {
-    ListRecordsResponse response = new ListRecordsResponse(loadDoc("list-records-response.xml"));
-    assertEquals("matterhorn", response.getMetadataPrefix());
-  }
 
   public void testMetadataFromRecord() throws Exception {
     ListRecordsResponse response = new ListRecordsResponse(loadDoc("list-records-response.xml"));

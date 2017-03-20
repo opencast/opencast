@@ -18,8 +18,6 @@
  * the License.
  *
  */
-
-
 package org.opencastproject.oaipmh.matterhorn;
 
 import org.opencastproject.mediapackage.MediaPackage;
@@ -28,33 +26,34 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.oaipmh.harvester.ListRecordsResponse;
 import org.opencastproject.oaipmh.harvester.RecordHandler;
-import org.opencastproject.search.api.SearchService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
 /**
- * Handle records from the "matterhorn" metadata prefix
- * that contain whole media packages and feed them to the search service.
+ * Handle records from the "matterhorn" metadata prefix that contain whole media packages and feed them to the search
+ * service.
+ *
+ * TODO IMPORTANT: THIS SERVICE IS OUTDATED AND DOESN'T WORK ANYMORE. PLEASE RE-IMPLEMENT WITH ASSET-MANAGER.
  */
 public class MatterhornRecordHandler implements RecordHandler {
   private static final Logger logger = LoggerFactory.getLogger(MatterhornRecordHandler.class);
 
   private final MediaPackageBuilder mediaPackageBuilder;
 
-  private SearchService searchService;
+  // private SearchService searchService;
 
   public MatterhornRecordHandler() {
     mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
   }
 
-  /**
-   * Set the search service. To be called by the OSGi container.
-   */
-  public void setSearchService(SearchService searchService) {
-    this.searchService = searchService;
-  }
+  // /**
+  // * Set the search service. To be called by the OSGi container.
+  // */
+  // public void setSearchService(SearchService searchService) {
+  // this.searchService = searchService;
+  // }
 
   @Override
   public String getMetadataPrefix() {
@@ -72,7 +71,8 @@ public class MatterhornRecordHandler implements RecordHandler {
     }
     logger.info("Harvested mediapackage " + mediaPackage.getIdentifier().toString());
     try {
-      searchService.add(mediaPackage);
+      logger.error("This record handler is outdated and doesn't work: It need to be re-implemented");
+      // searchService.add(mediaPackage);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

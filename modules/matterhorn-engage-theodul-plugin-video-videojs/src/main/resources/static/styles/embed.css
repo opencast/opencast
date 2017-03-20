@@ -125,10 +125,6 @@
     width: auto !important;
 }
 
-.vjs-fullscreen-control {
-    visibility: hidden;
-}
-
 #indicator {
     position: absolute;
     background-color: black;
@@ -215,7 +211,7 @@
 }
 
 .vjs-fullscreen-control {
-    visibility: hidden;
+    visibility: visible;
 }
 
 #indicator {
