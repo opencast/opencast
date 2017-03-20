@@ -88,8 +88,8 @@ public class AnalyzeTracksWorkflowOperationHandlerTest {
   @Test
   public void testGetAspectRatio() {
     List<Fraction> a = operationHandler.getAspectRatio("4/3,16/9");
-    assertEquals(a.get(0), Fraction.getFraction(4, 3));
-    assertEquals(a.get(1), Fraction.getFraction(16, 9));
+    assertEquals(Fraction.getFraction(4, 3), a.get(0));
+    assertEquals(Fraction.getFraction(16, 9), a.get(1));
     assertTrue(operationHandler.getAspectRatio("").isEmpty());
   }
 

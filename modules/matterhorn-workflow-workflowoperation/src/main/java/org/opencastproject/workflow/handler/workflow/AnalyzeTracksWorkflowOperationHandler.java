@@ -42,8 +42,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Workflow operation handler for analyzing tracks and set control variables.
@@ -61,18 +59,6 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
   static final String OPT_VIDEO_ASPECT = "aspect-ratio";
   static final String OPT_VIDEO_ASPECT_SNAP = "snap-to-aspect";
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<>();
-    CONFIG_OPTIONS.put(OPT_SOURCE_FLAVOR, "The \"flavor\" of the tracks to use as a source input");
-    CONFIG_OPTIONS.put(OPT_VIDEO_RES_X, "Horizontal video resolutions to check for");
-    CONFIG_OPTIONS.put(OPT_VIDEO_RES_Y, "Vertical video resolutions to check for");
-    CONFIG_OPTIONS.put(OPT_VIDEO_ASPECT, "Video aspect ratio to check for");
-    CONFIG_OPTIONS.put(OPT_VIDEO_ASPECT_SNAP, "Snap to closest aspect ratio");
-  }
-
   /** The logging facility */
   private static final Logger logger = LoggerFactory
           .getLogger(AnalyzeTracksWorkflowOperationHandler.class);
@@ -83,19 +69,18 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
 
     logger.info("Running analyze-tracks workflow operation on workflow {}", workflowInstance.getId());
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
-    final String sourceFlavorName = getConfig(workflowInstance, OPT_SOURCE_FLAVOR);
-    final MediaPackageElementFlavor sourceFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavorName);
+    final String sourceFlavor = getConfig(workflowInstance, OPT_SOURCE_FLAVOR);
+
+    final Track[] tracks = mediaPackage.getTracks(MediaPackageElementFlavor.parseFlavor(sourceFlavor));
+    if (tracks.length <= 0) {
+      logger.info("No tracks with specified flavors ({}) to analyse.", sourceFlavor);
+      return createResult(mediaPackage, Action.CONTINUE);
+    }
 
     List<Integer> xresolutions = getResolutions(getConfig(workflowInstance, OPT_VIDEO_RES_X, ""));
     List<Integer> yresolutions = getResolutions(getConfig(workflowInstance, OPT_VIDEO_RES_Y, ""));
     List<Fraction> aspectRatios = getAspectRatio(getConfig(workflowInstance, OPT_VIDEO_ASPECT, ""));
     boolean snapToAspect = BooleanUtils.toBoolean(getConfig(workflowInstance, OPT_VIDEO_ASPECT_SNAP, "false"));
-
-    final Track[] tracks = mediaPackage.getTracks(sourceFlavor);
-    if (tracks.length <= 0) {
-      logger.info("No tracks with specified flavors ({}) to analyse.", sourceFlavorName);
-      return createResult(mediaPackage, Action.CONTINUE);
-    }
 
     Map<String, String> properties = new HashMap<String, String>();
     for (Track track : tracks) {
