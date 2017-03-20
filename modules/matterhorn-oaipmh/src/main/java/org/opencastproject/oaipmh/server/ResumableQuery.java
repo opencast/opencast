@@ -22,35 +22,41 @@
 
 package org.opencastproject.oaipmh.server;
 
+import org.opencastproject.util.data.Option;
+
+import java.util.Date;
+
 /**
  * Stores information about a query with a paged response so that the next page can be retrieved.
  */
-class ResumableQuery {
-  private final String query;
+public class ResumableQuery {
+
   private final String metadataPrefix;
-  private final int offset;
-  private final int limit;
+  private final Date until;
+  private final Date lastResult;
+  private final Option<String> set;
 
-  ResumableQuery(String query, String metadataPrefix, int offset, int limit) {
-    this.query = query;
+  ResumableQuery(String metadataPrefix, Date lastResult, Date until, Option<String> set) {
+    this.until = until;
     this.metadataPrefix = metadataPrefix;
-    this.offset = offset;
-    this.limit = limit;
-  }
-
-  String getQuery() {
-    return query;
-  }
-
-  int getOffset() {
-    return offset;
-  }
-
-  int getLimit() {
-    return limit;
+    this.lastResult = lastResult;
+    this.set = set;
   }
 
   String getMetadataPrefix() {
     return metadataPrefix;
   }
+
+  Date getUntil() {
+    return until;
+  }
+
+  Date getLastResult() {
+    return lastResult;
+  }
+
+  Option<String> getSet() {
+    return set;
+  }
+
 }

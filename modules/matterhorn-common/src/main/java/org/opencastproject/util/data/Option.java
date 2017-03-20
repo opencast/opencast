@@ -391,7 +391,7 @@ public abstract class Option<A> implements Iterable<A> {
   /**
    * Create a none with the type of <code>example</code>. This saves some nasty typing, e.g.
    * <code>Option.&lt;String&gt;none()</code> vs. <code>none("")</code>.
-   *
+   * <p>
    * Please note that this constructor is only due to Java's insufficient type inference.
    */
   public static <A> Option<A> none(A example) {
@@ -409,6 +409,14 @@ public abstract class Option<A> implements Iterable<A> {
       return some(a);
     else
       return none();
+  }
+
+  /** Convert an <code>Opt</code> into an <code>Option</code>. */
+  public static <A> Option<A> fromOpt(Opt<A> a) {
+    for (A x : a) {
+      return some(x);
+    }
+    return none();
   }
 
   /** {@link #option(Object)} as a function. */

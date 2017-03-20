@@ -54,6 +54,7 @@ public class ConductingSeriesUpdatedEventHandler {
   private ArchivePermissionsUpdatedEventHandler archivePermissionsUpdatedEventHandler;
   private SeriesUpdatedEventHandler seriesUpdatedEventHandler;
   private WorkflowPermissionsUpdatedEventHandler workflowPermissionsUpdatedEventHandler;
+  private OaiPmhUpdatedEventHandler oaiPmhUpdatedEventHandler;
 
   // Use a single thread executor to ensure that only one update is handled at a time.
   // This is because Matterhorn lacks a distributed synchronization model on media packages and/or series.
@@ -107,6 +108,10 @@ public class ConductingSeriesUpdatedEventHandler {
             seriesUpdatedEventHandler.handleEvent(seriesItem);
             archivePermissionsUpdatedEventHandler.handleEvent(seriesItem);
             workflowPermissionsUpdatedEventHandler.handleEvent(seriesItem);
+            // the OAI-PMH handler is a dynamic dependency
+            if (oaiPmhUpdatedEventHandler != null) {
+              oaiPmhUpdatedEventHandler.handleEvent(seriesItem);
+            }
           }
         } catch (InterruptedException e) {
           logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(e));
@@ -139,6 +144,11 @@ public class ConductingSeriesUpdatedEventHandler {
   /** OSGi DI callback. */
   public void setWorkflowPermissionsUpdatedEventHandler(WorkflowPermissionsUpdatedEventHandler h) {
     this.workflowPermissionsUpdatedEventHandler = h;
+  }
+
+  /** OSGi DI callback. */
+  public void setOaiPmhUpdatedEventHandler(OaiPmhUpdatedEventHandler h) {
+    this.oaiPmhUpdatedEventHandler = h;
   }
 
   /** OSGi DI callback. */

@@ -39,6 +39,12 @@
               </li>
               <li>
                 <span>
+                  <input id="retractFromOaiPmh" type="checkbox" checked="checked" class="configField" value="true" />
+                  <span>&nbsp;Default OAI-PMH Repository</span>
+                </span>
+              </li>
+              <li>
+                <span>
                   <input id="retractFromYouTube" type="checkbox" class="configField" value="true" />
                   <span>&nbsp;YouTube</span>
                 </span>
@@ -59,6 +65,7 @@
         <configuration key="retractFromEngage">true</configuration>
         <configuration key="retractFromApi">true</configuration>
         <configuration key="retractPreview">true</configuration>
+        <configuration key="retractFromOaiPmh">true</configuration>
         <configuration key="retractFromYouTube">false</configuration>
       </configurations>
     </operation>
@@ -94,6 +101,18 @@
       description="Retract from internal publication channel">
       <configurations>
         <configuration key="channel-id">internal</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Remove from default OAI-PMH repository -->
+
+    <operation
+      id="retract-oaipmh"
+      if="${retractFromOaiPmh}"
+      exception-handler-workflow="ng-partial-error"
+      description="Retract recording from the default OAI-PMH repository">
+      <configurations>
+        <configuration key="repository">default</configuration>
       </configurations>
     </operation>
 

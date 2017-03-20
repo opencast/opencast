@@ -16,6 +16,16 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-oaipmh-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-oaipmh-persistence</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-common</artifactId>
       <version>${project.version}</version>
       <exclusions>
@@ -27,7 +37,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-search-service-impl</artifactId>
+      <artifactId>matterhorn-dublincore</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -67,6 +77,18 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+      <scope>test</scope>
+      <version>1.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xmlmatchers</groupId>
+      <artifactId>xml-matchers</artifactId>
+      <version>1.0-RC1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -123,10 +145,9 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/oai-pmh-server.xml,
-              OSGI-INF/oai-dc-metadata-provider.xml,
-              OSGI-INF/matterhorn-metadata-provider.xml,
               OSGI-INF/matterhorn-harvester.xml,
-              OSGI-INF/matterhorn-record-handler.xml
+              OSGI-INF/matterhorn-record-handler.xml,
+              OSGI-INF/default-repository.xml
             </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml

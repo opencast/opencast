@@ -22,25 +22,29 @@
 
 package org.opencastproject.oaipmh.matterhorn;
 
+import static org.opencastproject.util.UrlSupport.uri;
+import static org.opencastproject.util.UrlSupport.url;
+
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.oaipmh.server.MetadataFormat;
 import org.opencastproject.oaipmh.server.MetadataProvider;
 import org.opencastproject.oaipmh.server.OaiPmhRepository;
 import org.opencastproject.oaipmh.util.XmlGen;
-import org.opencastproject.search.api.SearchResultItem;
+import org.opencastproject.util.data.Option;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
  * The Matterhorn metadata provider provides whole media packages.
  */
 public class MatterhornMetadataProvider implements MetadataProvider {
+  private static final URL SCHEMA_URL = url("http://www.opencastproject.org/oai/matterhorn.xsd");
+  private static final URI NAMESPACE_URI = uri("http://www.opencastproject.org/oai/matterhorn");
 
   private static final MetadataFormat METADATA_FORMAT = new MetadataFormat() {
     @Override
@@ -50,21 +54,12 @@ public class MatterhornMetadataProvider implements MetadataProvider {
 
     @Override
     public URL getSchema() {
-      // todo define a location for the schema
-      try {
-        return new URL("http://www.opencastproject.org/oai/matterhorn.xsd");
-      } catch (MalformedURLException e) {
-        throw new RuntimeException(e);
-      }
+      return SCHEMA_URL;
     }
 
     @Override
     public URI getNamespace() {
-      try {
-        return new URI("http://www.opencastproject.org/oai/matterhorn");
-      } catch (URISyntaxException e) {
-        throw new RuntimeException(e);
-      }
+      return NAMESPACE_URI;
     }
   };
 
@@ -74,9 +69,9 @@ public class MatterhornMetadataProvider implements MetadataProvider {
   }
 
   @Override
-  public Element createMetadata(OaiPmhRepository repository, final SearchResultItem item) {
+  public Element createMetadata(OaiPmhRepository repository, final SearchResultItem item, Option<String> set) {
     final Document mp = MediaPackageParser.getAsXmlDocument(item.getMediaPackage());
-    XmlGen xml = new XmlGen() {
+    XmlGen xml = new XmlGen(Option.<String>none()) {
       @Override
       public Element create() {
         return (Element) mp.getFirstChild();
