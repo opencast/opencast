@@ -104,16 +104,13 @@ public class SecurityServiceSpringImpl implements SecurityService {
       Object principal = auth.getPrincipal();
       if ((principal != null) && (principal instanceof UserDetails)) {
         UserDetails userDetails = (UserDetails) principal;
-        Set<JaxbRole> roles = new HashSet<JaxbRole>();
 
-        User authUser = new JaxbUser(userDetails.getUsername(), null, jaxbOrganization, roles);
+        User user = null;
 
-        // If user exist, add the existing roles to the list
+        // If user exists, fetch it from the userDirectory
         if (userDirectory != null) {
-          User user = userDirectory.loadUser(userDetails.getUsername());
-          if (user != null) {
-            authUser = user;
-          } else {
+          user = userDirectory.loadUser(userDetails.getUsername());
+          if (user == null) {
             logger.debug(
                     "Authenticated user '{}' could not be found in any of the current UserProviders. Continuing anyway...",
                     userDetails.getUsername());
@@ -123,6 +120,7 @@ public class SecurityServiceSpringImpl implements SecurityService {
         }
 
         // Add the roles (authorities) in the security context
+        Set<JaxbRole> roles = new HashSet<JaxbRole>();
         Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
         if (authorities != null) {
           for (GrantedAuthority ga : authorities) {
@@ -130,7 +128,15 @@ public class SecurityServiceSpringImpl implements SecurityService {
           }
         }
 
-        User user = JaxbUser.fromUser(authUser, roles);
+        if (user == null) {
+          // No user was found. Create one to hold the auth information from the security context
+          user = new JaxbUser(userDetails.getUsername(), null, jaxbOrganization, roles);
+        } else {
+          // Combine the existing user with the roles in the security context
+          user = JaxbUser.fromUser(user, roles);
+        }
+
+        // Save the user to retrieve it quicker the next time(s) this method is called (by this thread)
         delegatedUserHolder.set(user);
 
         return user;
