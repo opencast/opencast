@@ -211,10 +211,6 @@ angular.module('adminNg.controllers')
               }, this);
             },
             fetchChildResources = function (id) {
-/*                if (! id) {
-                  console.log("trying alternative event ID in fetchChildResources: " + EventHelperService.eventId);
-                  id = EventHelperService.eventId;
-                }*/
                 $scope.general = EventGeneralResource.get({ id: id }, function () {
                     angular.forEach($scope.general.publications, function (publication) {
                         publication.label = publication.name;
