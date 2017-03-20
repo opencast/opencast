@@ -22,7 +22,8 @@ Database Migration
 
 Opencast 2.4 includes the following database changes:
 
-1. Fix for a mis-named role name for the External API (MH-12015)
+1. Support for OAI-PMH (MH-12013)
+2. Fix for a mis-named role name for the External API (MH-12015)
 
 It should be needless to say that this migration should not take a lot of time and should be safe. Nevertheless, as with
 all database migrations, we recommend to make a database backup before attempting the upgrade.
