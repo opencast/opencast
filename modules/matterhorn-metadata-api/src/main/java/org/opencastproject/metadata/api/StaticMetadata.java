@@ -58,6 +58,12 @@ public interface StaticMetadata {
 
   Option<Interval> getAvailable();
 
+  Option<Date[]> getTemporalPeriod();
+
+  Option<Date> getTemporalInstant();
+
+  Option<Long> getTemporalDuration();
+
   NonEmptyList<MetadataValue<String>> getTitles();
 
   List<MetadataValue<String>> getSubjects();
