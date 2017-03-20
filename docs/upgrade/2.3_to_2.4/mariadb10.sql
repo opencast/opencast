@@ -1,3 +1,4 @@
+-- MH-12013
 CREATE TABLE mh_oaipmh (
   id VARCHAR(128) NOT NULL,
   organization VARCHAR(128) NOT NULL,
@@ -28,3 +29,7 @@ CREATE TABLE mh_oaipmh_harvesting (
   last_harvested datetime,
   PRIMARY KEY (url)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- MH-12015
+update mh_role set name='ROLE_API_GROUPS_CREATE' where name='ROLE_API_GOURPS_CREATE';
+
