@@ -21,6 +21,7 @@
         <div class="modal-content" data-modal-tab-content="group">
             <div class="modal-body">
                 <div class="form-container">
+                    <div data-admin-ng-notifications="" context="group-form"></div>
                     <div class="row">
                         <label class="required" translate="USERS.GROUPS.DETAILS.FORM.NAME"><!-- Group Name --></label>
                         <input ng-init="blurred.name = false" ng-model="group.name" type="text" ng-required="true" placeholder="{{ 'USERS.GROUPS.DETAILS.FORM.NAME' | translate }}..." name="name" ng-class="blurred.name == true && !groupForm.name.$valid ? 'error' : ''" ng-blur="blurred.name=true">
@@ -36,6 +37,7 @@
         <div class="modal-content" data-modal-tab-content="roles">
             <div class="modal-body">
                 <div class="form-container">
+                    <div data-admin-ng-notifications="" context="group-form"></div>
                     <admin-ng-select-box resource="role"></admin-ng-select-box>
                 </div>
             </div>
@@ -44,6 +46,7 @@
         <div class="modal-content" data-modal-tab-content="users">
             <div class="modal-body">
                 <div class="form-container">
+                    <div data-admin-ng-notifications="" context="group-form"></div>
                     <admin-ng-select-box resource="user" group-by="provider"></admin-ng-select-box>
                 </div>
             </div>

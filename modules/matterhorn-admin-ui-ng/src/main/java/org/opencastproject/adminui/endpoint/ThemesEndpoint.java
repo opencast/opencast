@@ -106,7 +106,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/")
-@RestService(name = "themes", title = "Themes facade service", notes = "This service offers the default themes CRUD Operations for the admin UI.", abstractText = "Provides operations for the themes")
+@RestService(name = "themes", title = "Themes facade service",
+  abstractText = "Provides operations for the themes",
+  notes = { "This service offers the default themes CRUD Operations for the admin UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public class ThemesEndpoint {
 
   /** The logging facility */

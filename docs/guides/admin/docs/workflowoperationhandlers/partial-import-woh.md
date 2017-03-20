@@ -5,11 +5,11 @@ The PartialImportWorkflowOperation processes a set of audio and video files acco
 Its primary use is to post-process audio and video files ingested by capture agents using /ingest/addPartialTrack of the ingest endpoint.
 
 ## Prerequisite
-When using the PartialImportWorkflowOperation you must active the accurate frame count setting in the `org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl.cfg` configuration file:
-
-	accurate_frame_count=true
-
-This will be fixed by the ticket: https://opencast.jira.com/browse/MH-11264
+When using the PartialImportWorkflowOperation, it is recommended to perform a media inspection beforehand using the
+InspectWorkflowOperation with the option `accurate-frame-count` set to `true`. This ensures that
+the PartialImportWorkflowOperation works correctly in case of media files with incorrect framecount in their header.
+Note that the use of `accurate-frame-count` will force the InspectWorkflowOperation to decode the complete video
+stream which makes the operation more expensive in terms of load. 
 
 ## Parameter Table
 
@@ -21,6 +21,7 @@ This will be fixed by the ticket: https://opencast.jira.com/browse/MH-11264
 |**target-presenter-flavor**\*| MediaPackageElementFlavor |The flavor to be used for the target presentation track.</br>Both the type and subtype must not be *\**||
 |**target-presentation-flavor**\*| MediaPackageElementFlavor |The flavor to be used for the target presentation track.</br>Both the type nor subtype must not be *\**||
 |**concat-encoding-profile**\*|String|Encoding profile used for concatenating audio or video files||
+|concat-output-framerate|Float|The optional output framerate for concatenated video files||
 |**trim-encoding-profile**\*|String|Encoding profile using for trimming tracks|
 |force-encoding|Boolean|If set to *true*, all generated target files will be encoded using the encoding profile *force-encoding-profile*|false|
 |**force-encoding-profile**\*|String|Encoding profile to be used when *force-encoding* is set to *true* or a given target track has a file extension not included in *required-extensions*||

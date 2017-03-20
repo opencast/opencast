@@ -1527,27 +1527,31 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           DublinCoreCatalog[] catalogs = persistence.getAllEvents();
           for (DublinCoreCatalog event : catalogs) {
             final long id = getEventIdentifier(event);
-            Properties properties = persistence.getEventMetadata(id);
-            String eventId = persistence.getMediaPackageId(id);
-            ReviewStatus reviewStatus = persistence.getReviewStatus(eventId);
-            Date reviewDate = persistence.getReviewDate(eventId);
-            AccessControlList accessControlList = persistence.getAccessControlList(id);
-            messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                    SchedulerItem.updateCatalog(eventId, event));
-            messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                    SchedulerItem.updateProperties(eventId, new HashMap<String, String>((Map) properties)));
-            if (accessControlList != null)
+            try {
+              Properties properties = persistence.getEventMetadata(id);
+              String eventId = persistence.getMediaPackageId(id);
+              ReviewStatus reviewStatus = persistence.getReviewStatus(eventId);
+              Date reviewDate = persistence.getReviewDate(eventId);
+              AccessControlList accessControlList = persistence.getAccessControlList(id);
               messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                    SchedulerItem.updateCatalog(eventId, event));
+              messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                    SchedulerItem.updateProperties(eventId, new HashMap<String, String>((Map) properties)));
+              if (accessControlList != null)
+                messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                       SchedulerItem.updateAcl(eventId, accessControlList));
-            messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+              messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                     SchedulerItem.updateOptOut(eventId, persistence.isOptOut(id)));
-            messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+              messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                     SchedulerItem.updateBlacklist(eventId, persistence.isBlacklisted(id)));
-            messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+              messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                     SchedulerItem.updateReviewStatus(eventId, reviewStatus, reviewDate));
-            messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+              messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                     IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Scheduler, total, current));
-            current++;
+              current++;
+            } catch (Exception e) {
+              logger.warn("Unable to add scheduled event with id {} to the index, skipping", current, id);
+            }
           }
         } catch (Exception e) {
           logger.warn("Unable to index scheduled instances: {}", e);

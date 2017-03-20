@@ -79,13 +79,18 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/")
-@RestService(name = "TasksService", title = "UI Tasks", abstractText = "Provides resources and operations related to the tasks", notes = {
-        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-        "If the service is down or not working it will return a status 503, this means the the underlying service is "
-                + "not working and is either restarting or has failed",
-        "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+@RestService(name = "TasksService", title = "UI Tasks",
+  abstractText = "Provides resources and operations related to the tasks",
+  notes = { "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
+            "If the service is down or not working it will return a status 503, this means the the underlying service is "
+              + "not working and is either restarting or has failed",
+            "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
+              + "other words, there is a bug! You should file an error report with your server logs from the time when the "
+              + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public class TasksEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(TasksEndpoint.class);
@@ -200,6 +205,11 @@ public class TasksEndpoint {
 
     List<WorkflowInstance> instances = archive.applyWorkflow(workflow(wfd, optionsMap),
             httpMediaPackageElementProvider.getUriRewriter(), IteratorUtils.toList(eventIds.iterator()));
+
+    if (eventIds.size() != instances.size()) {
+      logger.debug("Can't start one or more tasks.");
+      return Response.status(Status.BAD_REQUEST).build();
+    }
 
     JSONObject json = new JSONObject();
     JSONArray workflows = new JSONArray();

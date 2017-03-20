@@ -79,10 +79,6 @@
             "$": "space"
           },
           {
-            "key": "adminui.i18n_tab_users.enable",
-            "$": "false"
-          },
-          {
             "key": "engageui.annotations.enable",
             "$": "false"
           },
@@ -97,14 +93,6 @@
           {
             "key": "trim.previous_frame",
             "$": "left"
-          },
-          {
-            "key": "adminui.series_prepopulate.enable",
-            "$": "false"
-          },
-          {
-            "key": "adminui.i18n_tab_episode.enable",
-            "$": "true"
           },
           {
             "key": "engageui.link_mobile_redirect.enable",
@@ -233,10 +221,6 @@
                   "$": "space"
                 },
                 {
-                  "key": "adminui.i18n_tab_users.enable",
-                  "$": "false"
-                },
-                {
                   "key": "engageui.annotations.enable",
                   "$": "false"
                 },
@@ -251,14 +235,6 @@
                 {
                   "key": "trim.previous_frame",
                   "$": "left"
-                },
-                {
-                  "key": "adminui.series_prepopulate.enable",
-                  "$": "false"
-                },
-                {
-                  "key": "adminui.i18n_tab_episode.enable",
-                  "$": "true"
                 },
                 {
                   "key": "engageui.link_mobile_redirect.enable",
@@ -380,10 +356,6 @@
                   "$": "space"
                 },
                 {
-                  "key": "adminui.i18n_tab_users.enable",
-                  "$": "false"
-                },
-                {
                   "key": "engageui.annotations.enable",
                   "$": "false"
                 },
@@ -398,14 +370,6 @@
                 {
                   "key": "trim.previous_frame",
                   "$": "left"
-                },
-                {
-                  "key": "adminui.series_prepopulate.enable",
-                  "$": "false"
-                },
-                {
-                  "key": "adminui.i18n_tab_episode.enable",
-                  "$": "true"
                 },
                 {
                   "key": "engageui.link_mobile_redirect.enable",

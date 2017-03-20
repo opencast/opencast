@@ -45,7 +45,9 @@ import com.google.api.services.youtube.model.Video;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,6 +65,9 @@ public class YouTubeV3PublicationServiceImplTest {
   private ServiceRegistry registry;
   private UserDirectoryService userDirectoryService;
   private Workspace workspace;
+
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
 
   @Before
   public void before() throws Exception {
@@ -91,14 +96,18 @@ public class YouTubeV3PublicationServiceImplTest {
   public void testPublishNewPlaylist() throws Exception {
     final File baseDir = new File(this.getClass().getResource("/mediapackage").toURI());
     final String xml = FileUtils.readFileToString(new File(baseDir, "manifest.xml"));
-    final MediaPackage mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(xml);
+    final MediaPackage mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
+      .loadFromXml(xml);
     //
     expect(youTubeService.getMyPlaylistByTitle(mediaPackage.getTitle())).andReturn(null).once();
-    expect(youTubeService.createPlaylist(mediaPackage.getSeriesTitle(), null, mediaPackage.getSeries())).andReturn(new Playlist()).once();
+    expect(youTubeService.createPlaylist(mediaPackage.getSeriesTitle(), null, mediaPackage.getSeries()))
+      .andReturn(new Playlist()).once();
     expect(youTubeService.addVideoToMyChannel(anyObject(VideoUpload.class))).andReturn(new Video()).once();
-    expect(youTubeService.addPlaylistItem(anyObject(String.class), anyObject(String.class))).andReturn(new PlaylistItem()).once();
+    expect(youTubeService.addPlaylistItem(anyObject(String.class), anyObject(String.class)))
+      .andReturn(new PlaylistItem()).once();
 
-    expect(registry.createJob(anyObject(String.class), anyObject(String.class), anyObject(List.class), anyObject(Float.class))).andReturn(new JobImpl()).once();
+    expect(registry.createJob(anyObject(String.class), anyObject(String.class), anyObject(List.class),
+          anyObject(Float.class))).andReturn(new JobImpl()).once();
     replay(youTubeService, orgDirectory, security, registry, userDirectoryService, workspace);
     service.updated(getServiceProperties());
     service.publish(mediaPackage, mediaPackage.getTracks()[0]);
@@ -108,7 +117,8 @@ public class YouTubeV3PublicationServiceImplTest {
     final Properties p = new Properties();
     YouTubeUtils.put(p, YouTubeKey.credentialDatastore, "credentialDatastore");
     YouTubeUtils.put(p, YouTubeKey.scopes, "foo");
-    final String absolutePath = UnitTestUtils.getMockClientSecretsFile("clientId").getAbsolutePath();
+    final String absolutePath = UnitTestUtils.getMockClientSecretsFile("clientId",
+        testFolder.newFile("client-secrets-youtube-v3.json")).getAbsolutePath();
     YouTubeUtils.put(p, YouTubeKey.clientSecretsV3, absolutePath);
     YouTubeUtils.put(p, YouTubeKey.dataStore, "dataStore");
     YouTubeUtils.put(p, YouTubeKey.keywords, "foo");

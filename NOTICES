@@ -34,7 +34,7 @@ List of Included Third-Party Dependencies
 modules/matterhorn-admin-ui-ng/src/main/webapp/css/vendor/chosen.less
   Chosen, a Select Box Enhancer for jQuery and Prototype
   by Patrick Filler for Harvest, http://getharvest.com
-  Copyright (c) 2011 Harvest http://getharvest.com
+  Copyright (c) 2011 - 2016 Harvest http://getharvest.com
   MIT License, https://github.com/harvesthq/chosen/blob/master/LICENSE.md
 
 modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular/*
@@ -63,8 +63,15 @@ modules/matterhorn-admin-ui-ng/src/main/webapp/lib/chosen.js
 modules/matterhorn-admin-ui-ng/src/main/webapp/lib/chosen.jquery.*
   Chosen, a Select Box Enhancer for jQuery and Prototype
   by Patrick Filler for Harvest, http://getharvest.com
-  Version 1.1.0
-  Copyright (c) 2011 Harvest http://getharvest.com
+  Version 1.6.2
+  Copyright (c) 2011 - 2016 Harvest http://getharvest.com
+  MIT License
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-chosen.js
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-chosen.min.js
+  Angular Binding for Harvest Chosen
+  Version 1.6.0
+  Copyright (c) 2013 Localytics http://www.localytics.com
   MIT License
 
 modules/matterhorn-admin-ui-ng/src/main/webapp/lib/datepicker/*
@@ -459,6 +466,11 @@ modules/matterhorn-engage-ui/src/main/resources/ui/css/bootstrap.*
 modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-wizard/.*
   angular-wizard 0.6.1 (https://github.com/mgonto/angular-wizard)
   Copyright (c) 2013-2014 Martin Gontovnikas http://www.gon.to/
+  Licensed under MIT
+
+modules/matterhorn-admin-ui-ng/bower_components/angular-hotkeys/.*
+  angular-wizard 0.6.1 (https://github.com/chieffancypants/angular-hotkeys)
+  Copyright (c) 2014 Wes Cruver
   Licensed under MIT
 
 modules/matterhorn-engage-ui/src/main/resources/ui/js/alertify/alertify.js
@@ -857,6 +869,14 @@ matterhorn-dublincore
   GroupId                                ArtifactId                                       License
   com.google.code.findbugs               jsr305                                           The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
+
+
+matterhorn-email-template=service-impl
+  GroupId                                ArtifactId                                       License
+  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+  org.slf4j                              slf4j-log4j12                                    MIT License
+  org.freemarker                         freemarker                                       BSD-style license
 
 
 matterhorn-engage-theodul-api

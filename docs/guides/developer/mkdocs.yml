@@ -57,8 +57,10 @@ pages:
       - Plugin Development: 'modules/player/plugin.development.md'
       - Testing: 'modules/player/testing.md'
    - Stream Security: 'modules/stream-security.md'
+   - OAI-PMH: 'modules/oaipmh.md'
 - Infrastructure:
    - Overview: 'infrastructure/index.md'
+   - Notes: 'infrastructure/notes.md'
    - Nexus Maven Repository: 'infrastructure/nexus.md'
 - API:
    - Introduction: 'api/index.md'

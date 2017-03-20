@@ -397,8 +397,12 @@ public class SolrIndexManager {
     }
     // TODO: merge the segments from each mpeg7 if there is more than one mpeg7 catalog
     if (mpeg7Catalogs.length > 0) {
-      Mpeg7Catalog mpeg7Catalog = loadMpeg7Catalog(mpeg7Catalogs[0]);
-      addMpeg7Metadata(doc, mediaPackage, mpeg7Catalog);
+      try {
+        Mpeg7Catalog mpeg7Catalog = loadMpeg7Catalog(mpeg7Catalogs[0]);
+        addMpeg7Metadata(doc, mediaPackage, mpeg7Catalog);
+      } catch (IOException e) {
+        logger.error("Error loading mpeg7 catalog. Skipping catalog: {}", e.getMessage());
+      }
     } else {
       logger.debug("No segmentation catalog found");
     }

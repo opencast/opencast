@@ -29,6 +29,8 @@ import org.opencastproject.util.FileSupport;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -95,6 +97,9 @@ public abstract class AbstractMediaPackageTest {
   /** The unzipped media package */
   protected MediaPackage unzippedMediaPackage = null;
 
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
+
   /**
    * Creates everything that is needed to test a media package.
    *
@@ -115,7 +120,7 @@ public abstract class AbstractMediaPackageTest {
     identifier = handleBuilder.createNew();
 
     // Get hold of the tmp directory
-    tmpDir = FileSupport.getTempDirectory();
+    tmpDir = testFolder.newFolder();
 
     // Create the media package directory
     packageDir = new File(tmpDir, Long.toString(System.currentTimeMillis()));

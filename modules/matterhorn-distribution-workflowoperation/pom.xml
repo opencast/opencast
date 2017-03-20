@@ -45,6 +45,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-oaipmh-persistence</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
     </dependency>
@@ -90,9 +95,12 @@
               OSGI-INF/operations/publish-engage.xml,
               OSGI-INF/operations/publish-configurable.xml,
               OSGI-INF/operations/publish-youtube.xml,
+              OSGI-INF/operations/publish-oaipmh.xml,
+              OSGI-INF/operations/republish-oaipmh.xml,
               OSGI-INF/operations/retract-configurable.xml,
               OSGI-INF/operations/retract-engage.xml,
               OSGI-INF/operations/retract-youtube.xml,
+              OSGI-INF/operations/retract-oaipmh.xml,
               OSGI-INF/operations/distribute-acl.xml
             </Service-Component>
           </instructions>

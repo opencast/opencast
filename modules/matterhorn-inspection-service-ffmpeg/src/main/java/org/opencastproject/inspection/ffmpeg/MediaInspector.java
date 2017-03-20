@@ -21,6 +21,7 @@
 
 package org.opencastproject.inspection.ffmpeg;
 
+import static org.opencastproject.inspection.api.MediaInspectionOptions.OPTION_ACCURATE_FRAME_COUNT;
 import static org.opencastproject.util.data.Collections.map;
 
 import org.opencastproject.inspection.api.MediaInspectionException;
@@ -50,6 +51,7 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.tika.metadata.HttpHeaders;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
@@ -66,12 +68,15 @@ import java.net.URI;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Contains the business logic for media inspection. Its primary purpose is to decouple the inspection logic from all
  * OSGi/MH job management boilerplate.
  */
 public class MediaInspector {
+
   private static final Logger logger = LoggerFactory.getLogger(MediaInspector.class);
 
   private final Workspace workspace;
@@ -79,18 +84,10 @@ public class MediaInspector {
   private final Parser tikaParser;
   private final String ffprobePath;
 
-  /** Whether the calculation of the frames is accurate or not */
-  private boolean accurateFrameCount = false;
-
-  public void setAccurateFrameCount(boolean accurateFrameCount) {
-    this.accurateFrameCount = accurateFrameCount;
-  }
-
-  public MediaInspector(Workspace workspace, Parser tikaParser, String ffprobePath, boolean accurateFrameCount) {
+  public MediaInspector(Workspace workspace, Parser tikaParser, String ffprobePath) {
     this.workspace = workspace;
     this.tikaParser = tikaParser;
     this.ffprobePath = ffprobePath;
-    this.accurateFrameCount = accurateFrameCount;
   }
 
   /**
@@ -102,8 +99,9 @@ public class MediaInspector {
    * @throws org.opencastproject.inspection.api.MediaInspectionException
    *           if inspection fails
    */
-  public Track inspectTrack(URI trackURI) throws MediaInspectionException {
+  public Track inspectTrack(URI trackURI, Map<String, String> options) throws MediaInspectionException {
     logger.debug("inspect(" + trackURI + ") called, using workspace " + workspace);
+    throwExceptionIfInvalid(options);
 
     try {
       // Get the file from the URL (runtime exception if invalid)
@@ -122,7 +120,7 @@ public class MediaInspector {
         throw new MediaInspectionException("Can not inspect files without a filename extension");
       }
 
-      MediaContainerMetadata metadata = getFileMetadata(file);
+      MediaContainerMetadata metadata = getFileMetadata(file, getAccurateFrameCount(options));
       if (metadata == null) {
         throw new MediaInspectionException("Media analyzer returned no metadata from " + file);
       } else {
@@ -209,12 +207,14 @@ public class MediaInspector {
    * @throws MediaInspectionException
    *           if enriching fails
    */
-  public MediaPackageElement enrich(MediaPackageElement element, boolean override) throws MediaInspectionException {
+  public MediaPackageElement enrich(MediaPackageElement element, boolean override, final Map<String, String> options)
+          throws MediaInspectionException {
+    throwExceptionIfInvalid(options);
     if (element instanceof Track) {
       final Track originalTrack = (Track) element;
-      return enrichTrack(originalTrack, override);
+      return enrichTrack(originalTrack, override, options);
     } else {
-      return enrichElement(element, override);
+      return enrichElement(element, override, options);
     }
   }
 
@@ -228,7 +228,7 @@ public class MediaInspector {
    * @return the media package element
    * @throws MediaInspectionException
    */
-  private MediaPackageElement enrichTrack(final Track originalTrack, final boolean override)
+  private MediaPackageElement enrichTrack(final Track originalTrack, final boolean override, final Map<String, String> options)
           throws MediaInspectionException {
     try {
       URI originalTrackUrl = originalTrack.getURI();
@@ -252,7 +252,7 @@ public class MediaInspector {
         throw new MediaInspectionException("Can not inspect files without a filename extension");
       }
 
-      MediaContainerMetadata metadata = getFileMetadata(file);
+      MediaContainerMetadata metadata = getFileMetadata(file, getAccurateFrameCount(options));
       if (metadata == null) {
         throw new MediaInspectionException("Unable to acquire media metadata for " + originalTrackUrl);
       } else {
@@ -351,8 +351,8 @@ public class MediaInspector {
    * @throws MediaInspectionException
    *           if enriching fails
    */
-  private MediaPackageElement enrichElement(final MediaPackageElement element, final boolean override)
-          throws MediaInspectionException {
+  private MediaPackageElement enrichElement(final MediaPackageElement element, final boolean override,
+          final Map<String, String> options) throws MediaInspectionException {
     try {
       File file;
       try {
@@ -403,7 +403,7 @@ public class MediaInspector {
    * @throws MediaInspectionException
    *           if metadata extraction fails
    */
-  private MediaContainerMetadata getFileMetadata(File file) throws MediaInspectionException {
+  private MediaContainerMetadata getFileMetadata(File file, boolean accurateFrameCount) throws MediaInspectionException {
     if (file == null)
       throw new IllegalArgumentException("file to analyze cannot be null");
     try {
@@ -501,6 +501,26 @@ public class MediaInspector {
     } catch (Exception e) {
       logger.warn("Unable to extract mimetype from input stream, ", e);
       return null;
+    }
+  }
+
+  /* Return true if OPTION_ACCURATE_FRAME_COUNT is set to true, false otherwise */
+  private boolean getAccurateFrameCount(final Map<String, String> options) {
+    return BooleanUtils.toBoolean(options.get(OPTION_ACCURATE_FRAME_COUNT));
+  }
+
+  /* Throws an exception if an unsupported option is set */
+  private void throwExceptionIfInvalid(final Map<String, String> options) throws MediaInspectionException {
+    if (options != null) {
+      for (Entry e : options.entrySet()) {
+        if (e.getKey().equals(OPTION_ACCURATE_FRAME_COUNT)) {
+          // This option is supported
+        } else {
+          throw new MediaInspectionException("Unsupported option " + e.getKey());
+        }
+      }
+    } else {
+      throw new MediaInspectionException("Options must not be null");
     }
   }
 }

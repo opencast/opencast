@@ -169,7 +169,7 @@
      "VIDEO_CUT_PROCESSING": "The video is being processed…",
      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Please try again later.",
      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Please try again later.",
-     "ACTIVE_TRANSACTION": "The current event can currently not be edited as it is involved of an active transaction."
+     "ACTIVE_TRANSACTION": "This event can not be edited while there is an active workflow or transaction."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
@@ -1476,6 +1476,9 @@
      }
    },
    "VIDEO_TOOL": {
+     "TIMELINE": "Timeline",
+     "ZOOMLEVEL": "Zoom Level",
+     "ZOOM": "Zoom",
      "BUTTONS": {
        "COMMENTS": "View",
        "METADATA": "Edit",
@@ -1493,9 +1496,12 @@
        "SPLIT": "Split",
        "CUT":   "Cut",
        "REPLAY_SEGMENT": "Replay segment",
+       "REPLAY_END_OF_SEGMENT": "End of segment",
+       "REPLAY_SEGMENT_WITH_PREROLL": "Check transition",
        "UNDO": "Undo",
        "REDO": "Redo",
-       "CLEAR_SEGMENTS": "Clear segments"
+       "CLEAR_SEGMENTS": "Clear segments",
+       "CLEAR_SELECTED_SEGMENT": "Clear selected segment"
      },
      "PLAYER":{
        "PLAY":              "Play",
@@ -1533,6 +1539,11 @@
      }
    },
    "FILTERS": {
+     "ACLS": {
+       "NAME": {
+         "LABEL": "Name"
+       }
+     },
      "AGENTS": {
        "NAME": {
          "LABEL": "Name"

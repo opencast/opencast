@@ -22,6 +22,7 @@
 package org.opencastproject.inspection.ffmpeg.endpoints;
 
 import org.opencastproject.inspection.api.MediaInspectionService;
+import org.opencastproject.inspection.api.util.Options;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
@@ -113,14 +114,19 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("inspect")
-  @RestQuery(name = "inspect", description = "Analyze a given media file, returning a receipt to check on the status and outcome of the job", restParameters = { @RestParameter(description = "Location of the media file.", isRequired = false, name = "uri", type = RestParameter.Type.STRING) }, reponses = {
-          @RestResponse(description = "XML encoded receipt is returned.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Service unavailabe or not currently present", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE),
-          @RestResponse(description = "Problem retrieving media file or invalid media file or URL.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
-  public Response inspectTrack(@QueryParam("uri") URI uri) {
+  @RestQuery(name = "inspect", description = "Analyze a given media file",
+    restParameters = {
+        @RestParameter(description = "Location of the media file.", isRequired = false, name = "uri", type = RestParameter.Type.STRING),
+        @RestParameter(description = "Options passed to media inspection service", isRequired = false, name = "options", type = RestParameter.Type.STRING) },
+    reponses = {
+        @RestResponse(description = "XML encoded receipt is returned.", responseCode = HttpServletResponse.SC_OK),
+        @RestResponse(description = "Service unavailabe or not currently present", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE),
+        @RestResponse(description = "Problem retrieving media file or invalid media file or URL.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
+    returnDescription = "Returns a receipt to check on the status and outcome of the job")
+  public Response inspectTrack(@QueryParam("uri") URI uri, @QueryParam("options") String options) {
     checkNotNull(service);
     try {
-      Job job = service.inspect(uri);
+      Job job = service.inspect(uri, Options.fromJson(options));
       return Response.ok(new JaxbJob(job)).build();
     } catch (Exception e) {
       logger.info(e.getMessage());
@@ -131,17 +137,22 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
   @POST
   @Produces(MediaType.TEXT_XML)
   @Path("enrich")
-  @RestQuery(name = "enrich", description = "Analyze and add missing metadata of a given media file, returning a receipt to check on the status and outcome of the job.", restParameters = {
-          @RestParameter(description = "MediaPackage Element, that should be enriched with metadata ", isRequired = true, name = "mediaPackageElement", type = RestParameter.Type.TEXT),
-          @RestParameter(description = "Should the existing metadata values remain", isRequired = true, name = "override", type = RestParameter.Type.BOOLEAN) }, reponses = {
-          @RestResponse(description = "XML encoded receipt is returned.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Service unavailabe or not currently present", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE),
-          @RestResponse(description = "Problem retrieving media file or invalid media file or URL.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+  @RestQuery(name = "enrich", description = "Analyze and add missing metadata of a given media file",
+    restParameters = {
+        @RestParameter(description = "MediaPackage Element, that should be enriched with metadata ", isRequired = true, name = "mediaPackageElement", type = RestParameter.Type.TEXT),
+        @RestParameter(description = "Should the existing metadata values remain", isRequired = true, name = "override", type = RestParameter.Type.BOOLEAN),
+        @RestParameter(description = "Options passed to media inspection service", isRequired = false, name = "options", type = RestParameter.Type.STRING) },
+    reponses = {
+        @RestResponse(description = "XML encoded receipt is returned.", responseCode = HttpServletResponse.SC_OK),
+        @RestResponse(description = "Service unavailabe or not currently present", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE),
+        @RestResponse(description = "Problem retrieving media file or invalid media file or URL.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
+    returnDescription = "Return a receipt to check on the status and outcome of the job")
   public Response enrichTrack(@FormParam("mediaPackageElement") String mediaPackageElement,
-          @FormParam("override") boolean override) {
+          @FormParam("override") boolean override, @FormParam("options") String options) {
     checkNotNull(service);
     try {
-      Job job = service.enrich(MediaPackageElementParser.getFromXml(mediaPackageElement), override);
+      Job job = service.enrich(MediaPackageElementParser.getFromXml(mediaPackageElement), override,
+              Options.fromJson(options));
       return Response.ok(new JaxbJob(job)).build();
     } catch (Exception e) {
       logger.info(e.getMessage(), e);
