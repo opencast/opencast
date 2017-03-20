@@ -29,7 +29,6 @@ import static org.opencastproject.archive.base.storage.Source.source;
 import org.opencastproject.archive.api.Version;
 import org.opencastproject.archive.base.StoragePath;
 import org.opencastproject.archive.base.storage.DeletionSelector;
-import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
@@ -42,7 +41,9 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
@@ -74,6 +75,9 @@ public class FileSystemElementStoreTest {
 
   private File sampleElemDir;
 
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
+
   @Before
   public void setUp() throws Exception {
 
@@ -87,10 +91,11 @@ public class FileSystemElementStoreTest {
     EasyMock.replay(response);
 
     Workspace workspace = createNiceMock(Workspace.class);
-    expect(workspace.get(getClass().getClassLoader().getResource(FILE_NAME).toURI())).andStubReturn(new File(getClass().getClassLoader().getResource(FILE_NAME).toURI()));
+    expect(workspace.get(getClass().getClassLoader().getResource(FILE_NAME).toURI()))
+      .andStubReturn(new File(getClass().getClassLoader().getResource(FILE_NAME).toURI()));
     replay(workspace);
 
-    tmpRoot = FileSupport.getTempDirectory(TEST_ROOT_DIR_NAME);
+    tmpRoot = testFolder.newFolder(TEST_ROOT_DIR_NAME);
 
     BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
     EasyMock.expect(bundleContext.getProperty(FileSystemElementStore.CONFIG_ARCHIVE_ROOT_DIR)).andReturn(

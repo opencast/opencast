@@ -153,6 +153,8 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
             "http://api.opencast.org/api/events/${event_id}");
     EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.SOURCE_TAGS)).andStubReturn(
             "engage-download,engage-streaming");
+    EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.CHECK_AVAILABILITY)).andStubReturn(
+            "true");
     EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.STRATEGY)).andStubReturn(
             "retract");
     EasyMock.expect(op.getConfiguration(ConfigurablePublishWorkflowOperationHandler.MODE)).andStubReturn(

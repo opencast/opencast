@@ -46,7 +46,15 @@
     }
 
     &.replay {
-        @include fa-icon($fa-var-refresh, $pseudo-position, $display-value, $margin, $padding, $color, $font-size);
+        @include fa-icon($fa-var-arrows-h, $pseudo-position, $display-value, $margin, $padding, $color, $font-size);
+    }
+
+    &.replay-with-preroll {
+        @include fa-icon($fa-var-long-arrow-right $fa-var-long-arrow-left, $pseudo-position, $display-value, $margin, $padding, $color, $font-size);
+    }
+
+    &.replay-end-of-segment {
+        @include fa-icon($fa-var-long-arrow-left, $pseudo-position, $display-value, $margin, $padding, $color, $font-size);
     }
 
     &.switch-feed {

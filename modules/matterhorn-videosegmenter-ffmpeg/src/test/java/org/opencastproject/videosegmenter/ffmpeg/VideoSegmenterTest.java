@@ -65,7 +65,9 @@ import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -116,6 +118,9 @@ public class VideoSegmenterTest {
   protected File tempFile = null;
   protected File tempFile1 = null;
 
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
+
   /**
    * Copies test files to the local file system, since jmf is not able to access movies from the resource section of a
    * bundle.
@@ -149,7 +154,7 @@ public class VideoSegmenterTest {
     mpeg7Service = new Mpeg7CatalogService();
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(new File(track.getURI()));
-    tempFile = File.createTempFile(getClass().getName(), "xml");
+    tempFile = testFolder.newFile(getClass().getName() + ".xml");
     EasyMock.expect(
             workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andAnswer(new IAnswer<URI>() {
@@ -165,7 +170,7 @@ public class VideoSegmenterTest {
     mpeg7Service1 = new Mpeg7CatalogService();
     Workspace workspace1 = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace1.get((URI) EasyMock.anyObject())).andReturn(new File(track1.getURI()));
-    tempFile1 = File.createTempFile(getClass().getName(), "xml");
+    tempFile1 = testFolder.newFile(getClass().getName() + "-1.xml");
     EasyMock.expect(
             workspace1.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (InputStream) EasyMock.anyObject())).andAnswer(new IAnswer<URI>() {

@@ -22,8 +22,8 @@
 
 // Controller for all event screens.
 angular.module('adminNg.controllers')
-.controller('VideoEditCtrl', ['$scope', 'PlayerAdapter', 'VideoService',
-    function ($scope, PlayerAdapter, VideoService) {
+.controller('VideoEditCtrl', ['$scope', 'PlayerAdapter', 'VideoService', 'HotkeysService',
+    function ($scope, PlayerAdapter, VideoService, HotkeysService) {
 
         $scope.split = function () {
             var segment = VideoService.getCurrentSegment($scope.player, $scope.video),
@@ -89,5 +89,62 @@ angular.module('adminNg.controllers')
                 $scope.player.adapter.play();
             }
         };
+
+        $scope.replayEndOfSegment = function () {
+            var segment = VideoService.getCurrentSegment($scope.player, $scope.video);
+            segment.replay = true;
+            $scope.player.adapter.setCurrentTime((segment.end/1000) - 2);
+            if ($scope.player.adapter.getStatus() !== PlayerAdapter.STATUS.PLAYING) {
+                $scope.player.adapter.play();
+            }
+        };
+
+        $scope.replayPreRoll = function () {
+            var segment = VideoService.getPreviousActiveSegment($scope.player, $scope.video);
+            var currentSegment = VideoService.getCurrentSegment($scope.player, $scope.video);
+            currentSegment.replay = true;
+            segment.replay = true;
+            $scope.player.adapter.setCurrentTime((segment.end/1000) - 2);
+            if ($scope.player.adapter.getStatus() !== PlayerAdapter.STATUS.PLAYING) {
+                $scope.player.adapter.play();
+            }
+        };
+
+        HotkeysService.activateHotkey($scope, "editor.split_at_current_time",
+          "split the video at current time", function(event) {
+              event.preventDefault();
+              $scope.split();
+        });
+
+        HotkeysService.activateHotkey($scope, "editor.cut_selected_segment",
+          "remove current segment", function(event) {
+              event.preventDefault();
+              $scope.cut();
+        });
+
+        HotkeysService.activateHotkey($scope, "editor.play_current_segment",
+          "play current segment", function(event) {
+              event.preventDefault();
+              $scope.replay();
+        });
+
+        HotkeysService.activateHotkey($scope, "editor.clear_list",
+          "clear segment list", function(event) {
+              event.preventDefault();
+              $scope.clearSegments();
+        });
+
+        HotkeysService.activateHotkey($scope, "editor.play_current_segment_with_pre-roll",
+          "Play current segment with pre-roll", function(event) {
+              event.preventDefault();
+              $scope.replayPreRoll();
+        });
+
+        HotkeysService.activateHotkey($scope, "editor.play_ending_of_current_segment",
+          "Play end of segment", function(event) {
+              event.preventDefault();
+              $scope.replayEndOfSegment();
+        });
+
     }
 ]);

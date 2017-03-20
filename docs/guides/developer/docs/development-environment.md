@@ -1,10 +1,19 @@
 Development Environment
-======================
+=======================
+
+Developer Builds
+----------------
+
+Besides the default `dist` Maven profile, the assemblies project defines a second `dev` profile which will cause only
+one allinone distribution to be created. It is already unpacked and ready to be started. Activate the profile using:
+
+    mvn clean install -Pdev
+
 
 Building single modules
 -----------------------
 
-When working on a single Opencast module, it can be extremely helpful to watch the newly built version and include 
+When working on a single Opencast module, it can be extremely helpful to watch the newly built version and include
 it automatically in the Opencast OSGi infrastructure. This can be done through the
 [bundle:watch](https://karaf.apache.org/manual/latest/commands/bundle-watch.html) command in Karaf. The workflow would
 be as follows:
