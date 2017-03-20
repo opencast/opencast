@@ -85,7 +85,7 @@
 }
 
 .vjs-fullscreen-control {
-    visibility: hidden;
+    visibility: visible;
 }
 
 #fullscreen_video_wrapper {
