@@ -91,7 +91,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
   private static final String CFG_HEADER_MAIL_KEY = "header.mail";
 
   /** Name of the optional configuration property specifying a list of home organizations */
-  private static final String CFG_HEADER_ORGANIZATION_KEY = "header.organization";
+  private static final String CFG_HEADER_HOME_ORGANIZATION_KEY = "header.homeOrganization";
 
   /**
    * Shibboleth roles configuration
@@ -107,12 +107,27 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
 
   /**
    * Name of the configuration property that specifies the prefix of the user role uniquely identifying a Shibboleth
-   * authenticated users. The user role will be of the form USER_ROLE_PREFIX + SHIBBOLETH_UNIQUE_ID
+   * authenticated users. The user role will be of the form ROLE_USER_PREFIX + SHIBBOLETH_UNIQUE_ID
    */
-  private static final String CFG_USER_ROLE_PREFIX_KEY = "role.prefix";
+  private static final String CFG_ROLE_USER_PREFIX_KEY = "role.prefix";
 
-  /** Default value of configuration property CFG_USER_ROLE_PREFIX_KEY */
-  private static final String CFG_USER_ROLE_PREFIX_DEFAULT = "ROLE_AAI_USER_";
+  /** Default value of configuration property CFG_ROLE_USER_PREFIX_KEY */
+  private static final String CFG_ROLE_USER_PREFIX_DEFAULT = "ROLE_AAI_USER_";
+
+  /** The organization membership role indicates that a user belong to a specific AAI home organization.
+      It has the from: valueOf(role.organization.prefix) + homeOrganization + valueOf(role.organization.suffix) */
+
+  /** Name of the configuration property that specifies the prefix of the organization membership role */
+  private static final String CFG_ROLE_ORGANIZATION_PREFIX_KEY = "role.organization.prefix";
+
+  /** Default value of configuration property CFG_ROLE_ORGANIZATION_PREFIX_KEY */
+  private static final String CFG_ROLE_ORGANIZATION_PREFIX_DEFAULT = "ROLE_AAI_ORG_";
+
+  /** Name of the configuration property that specifies the prefix of the organization membership role */
+  private static final String CFG_ROLE_ORGANIZATION_SUFFIX_KEY = "role.organization.suffix";
+
+  /** Default value of configuration property CFG_ROLE_ORGANIZATION_SUFFIX_KEY */
+  private static final String CFG_ROLE_ORGANIZATION_SUFFIX_DEFAULT = "_MEMBER";
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ConfigurableLoginHandler.class);
@@ -141,14 +156,20 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
   /** Header to extract the e-mail address */
   private String headerMail = null;
 
-  /** Header to extract the organization */
-  private String headerOrganization = null;
+  /** Header to extract the home organization */
+  private String headerHomeOrganization = null;
 
   /** Role assigned to all Shibboleth authenticated users */
   private String roleFederationMember = CFG_ROLE_FEDERATION_MEMBER_DEFAULT;
 
   /** Prefix of unique Shibboleth user role */
-  private String userRolePrefix = CFG_USER_ROLE_PREFIX_DEFAULT;
+  private String userRolePrefix = CFG_ROLE_USER_PREFIX_DEFAULT;
+
+  /** Prefix of the home organization membership role */
+  private String roleOrganizationPrefix = CFG_ROLE_ORGANIZATION_PREFIX_DEFAULT;
+
+  /** Suffix of the home organization membership role */
+  private String roleOrganizationSuffix = CFG_ROLE_ORGANIZATION_SUFFIX_DEFAULT;
 
   public ConfigurableLoginHandler() {
     BundleContext bundleContext = FrameworkUtil.getBundle(this.getClass()).getBundleContext();
@@ -181,12 +202,12 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
 
     /* Shibboleth header configuration */
 
-    String cfgOrganization = StringUtils.trimToNull((String) properties.get(CFG_HEADER_ORGANIZATION_KEY));
-    if (cfgOrganization != null) {
-      headerOrganization = cfgOrganization;
-      logger.info("Header '{}' set to '{}'", CFG_HEADER_ORGANIZATION_KEY, headerOrganization);
+    String cfgHomeOrganization = StringUtils.trimToNull((String) properties.get(CFG_HEADER_HOME_ORGANIZATION_KEY));
+    if (cfgHomeOrganization != null) {
+      headerHomeOrganization = cfgHomeOrganization;
+      logger.info("Header '{}' set to '{}'", CFG_HEADER_HOME_ORGANIZATION_KEY, headerHomeOrganization);
     } else {
-      logger.warn("Header '{}' is not configured ", CFG_HEADER_ORGANIZATION_KEY);
+      logger.warn("Optional header '{}' is not configured ", CFG_HEADER_HOME_ORGANIZATION_KEY);
     }
 
     String cfgGivenName = StringUtils.trimToNull((String) properties.get(CFG_HEADER_GIVEN_NAME_KEY));
@@ -213,24 +234,51 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
       logger.error("Header '{}' is not configured ", CFG_HEADER_MAIL_KEY);
     }
 
-    /* Shibboleth user roles configuration */
+    /* Shibboleth roles configuration */
 
     String cfgRoleFederationMember = StringUtils.trimToNull((String) properties.get(CFG_ROLE_FEDERATION_MEMBER_KEY));
     if (cfgRoleFederationMember != null) {
       roleFederationMember = cfgRoleFederationMember;
-      logger.info("Header '{}' set to '{}'", CFG_ROLE_FEDERATION_MEMBER_KEY, roleFederationMember);
+      logger.info("AAI federation membership role '{}' set to '{}'", CFG_ROLE_FEDERATION_MEMBER_KEY,
+              roleFederationMember);
     } else {
       roleFederationMember = CFG_ROLE_FEDERATION_MEMBER_DEFAULT;
-      logger.error("Header '{}' is not configured, using '{}'", CFG_ROLE_FEDERATION_MEMBER_KEY, roleFederationMember);
+      logger.info("AAI federation membership role '{}' is not configured, using default '{}'",
+              CFG_ROLE_FEDERATION_MEMBER_KEY, roleFederationMember);
     }
 
-    String cfgUserRolePrefix = StringUtils.trimToNull((String) properties.get(CFG_USER_ROLE_PREFIX_KEY));
+    String cfgUserRolePrefix = StringUtils.trimToNull((String) properties.get(CFG_ROLE_USER_PREFIX_KEY));
     if (cfgUserRolePrefix != null) {
       userRolePrefix = cfgUserRolePrefix;
-      logger.info("Header '{}' set to '{}'", CFG_USER_ROLE_PREFIX_KEY, userRolePrefix);
+      logger.info("AAI user role prefix '{}' set to '{}'", CFG_ROLE_USER_PREFIX_KEY, userRolePrefix);
     } else {
-      userRolePrefix = CFG_USER_ROLE_PREFIX_DEFAULT;
-      logger.error("Header '{}' is not configured, using '{}'", CFG_USER_ROLE_PREFIX_KEY, userRolePrefix);
+      userRolePrefix = CFG_ROLE_USER_PREFIX_DEFAULT;
+      logger.info("AAI user role prefix '{}' is not configured, using default '{}'", CFG_ROLE_USER_PREFIX_KEY,
+              userRolePrefix);
+    }
+
+    String cfgRoleOrganizationPrefix = StringUtils.trimToNull((String) properties.get(
+            CFG_ROLE_ORGANIZATION_PREFIX_KEY));
+    if (cfgRoleOrganizationPrefix != null) {
+      roleOrganizationPrefix = cfgRoleOrganizationPrefix;
+      logger.info("AAI organization membership role prefix '{}' set to '{}'", CFG_ROLE_ORGANIZATION_PREFIX_KEY,
+              cfgRoleOrganizationPrefix);
+    } else {
+      roleOrganizationPrefix = CFG_ROLE_ORGANIZATION_PREFIX_DEFAULT;
+      logger.error("AAI organization membership role prefix '{}' is not configured, using default '{}'",
+              CFG_ROLE_ORGANIZATION_PREFIX_KEY, roleOrganizationPrefix);
+    }
+
+    String cfgRoleOrganizationSuffix = StringUtils.trimToNull((String) properties.get(
+            CFG_ROLE_ORGANIZATION_SUFFIX_KEY));
+    if (cfgRoleOrganizationSuffix != null) {
+      roleOrganizationSuffix = cfgRoleOrganizationSuffix;
+      logger.info("AAI organization membership role suffix '{}' set to '{}'", CFG_ROLE_ORGANIZATION_SUFFIX_KEY,
+              cfgRoleOrganizationSuffix);
+    } else {
+      roleOrganizationSuffix = CFG_ROLE_ORGANIZATION_SUFFIX_DEFAULT;
+      logger.error("AAI organization membership role suffix '{}' is not configured, using default '{}'",
+              CFG_ROLE_ORGANIZATION_SUFFIX_KEY, roleOrganizationSuffix);
     }
   }
 
@@ -361,6 +409,10 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
     roles.add(new JpaRole(roleFederationMember, organization));
     roles.add(new JpaRole(userRolePrefix + id, organization));
     roles.add(new JpaRole(organization.getAnonymousRole(), organization));
+    if (headerHomeOrganization != null) {
+      String homeOrganization = request.getHeader(headerHomeOrganization);
+      roles.add(new JpaRole(roleOrganizationPrefix + homeOrganization + roleOrganizationSuffix, organization));
+    }
     if (StringUtils.equals(id, bootstrapUserId)) {
       roles.add(new JpaRole(GLOBAL_ADMIN_ROLE, organization));
     }

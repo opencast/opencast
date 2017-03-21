@@ -56,6 +56,13 @@ form *role.user.prefix + <unique ID provided by Shibboleth\>*.
 
     role.user.prefix = "ROLE_AAI_USER_"
 
+To indicate the AAI home organization a user belongs to, the organization membership role is assigned to the user.
+The role is of the form *role.organization.prefix + <homeOrganization provided by Shibboleth> +
+role.organization.suffix*
+
+    role.organization.prefix = "ROLE_AAI_ORG_"
+    role.organization.suffix = "_MEMBER"
+
 To indicate the fact that a user has authenticated himself using Shibboleth, the login handler assigns the
 role as specified by the property **role.federation.member**.
 
