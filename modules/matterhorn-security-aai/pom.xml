@@ -70,9 +70,6 @@
               *
             </Import-Package>
             <Fragment-Host>matterhorn-kernel</Fragment-Host>
-            <Service-Component>
-                OSGI-INF/configurable_login_handler.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
