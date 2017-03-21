@@ -52,19 +52,19 @@ Set the following header names to the correct values:
 Optionally, you can configure the name of some basic roles the AAI login handler will assign to authenticated users.
 
 The prefix of the user role will determine what unique role a given Shibboleth user has. The role is of the
-form *role.user.prefix + <unique ID provided by Shibboleth\>*.
+form *role.user.prefix + Unique ID provided by Shibboleth*.
 
     role.user.prefix = "ROLE_AAI_USER_"
 
 To indicate the AAI home organization a user belongs to, the organization membership role is assigned to the user.
-The role is of the form *role.organization.prefix + <homeOrganization provided by Shibboleth> +
+The role is of the form *role.organization.prefix + Home Organization provided by Shibboleth +
 role.organization.suffix*
 
     role.organization.prefix = "ROLE_AAI_ORG_"
     role.organization.suffix = "_MEMBER"
 
 To indicate the fact that a user has authenticated himself using Shibboleth, the login handler assigns the
-role as specified by the property **role.federation**.
+role as specified by the property *role.federation*.
 
     role.federation = "ROLE_AAI_USER"
 
@@ -94,7 +94,8 @@ respective name of the Shibboleth attribute you use in your Shibboleth Federatio
     <!-- ###################### -->
 
     <!-- General Shibboleth header extration filter -->
-    <bean id="shibbolethHeaderFilter" class="org.opencastproject.security.shibboleth.ShibbolethRequestHeaderAuthenticationFilter">
+    <bean id="shibbolethHeaderFilter"
+          class="org.opencastproject.security.shibboleth.ShibbolethRequestHeaderAuthenticationFilter">
       <property name="principalRequestHeader" value="<Shibboleth attribute name>"/>
       <property name="authenticationManager" ref="authenticationManager" />
       <property name="userDetailsService" ref="userDetailsService" />
@@ -109,9 +110,11 @@ respective name of the Shibboleth attribute you use in your Shibboleth Federatio
       <property name="userReferenceProvider" ref="userReferenceProvider" />
     </bean>
 
-    <bean id="preauthAuthProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+    <bean id="preauthAuthProvider"
+          class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
   	  <property name="preAuthenticatedUserDetailsService">
-        <bean id="userDetailsServiceWrapper" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+        <bean id="userDetailsServiceWrapper"
+              class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
           <property name="userDetailsService" ref="userDetailsService"/>
         </bean>
       </property>
@@ -119,16 +122,15 @@ respective name of the Shibboleth attribute you use in your Shibboleth Federatio
 
 Finally be sure to enable the user reference provider to enable support for externally provided users:
 
-    <!-- Uncomment to enable external users e.g. used together shibboleth -->
     <osgi:reference id="userReferenceProvider" cardinality="1..1"
-                  interface="org.opencastproject.userdirectory.UserReferenceProvider" />
+                  interface="org.opencastproject.userdirectory.api.UserReferenceProvider" />
 
 Since the Opencast login page is not used when Shibboleth authentication is in place, there is no point in redirecting
 unauthenticated requests to the Opencast login form. You can redirect them directly to the administrative user
 interface which is supposed to be protected by Shibboleth.
 
     <!-- Redirects unauthenticated requests to the login form -->
-      <bean id="userEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+    <bean id="userEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
       <property name="loginFormUrl" value="/admin-ng/index.html" />
     </bean>
 
