@@ -20,6 +20,8 @@
  */
 package org.opencastproject.security.aai;
 
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.Organization;
@@ -69,6 +71,10 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
 
   /** Default value of the configuration property CFG_AAI_ENABLED_KEY **/
   private static final boolean CFG_AAI_ENABLED_DEFAULT = false;
+
+  /** Name of the configuration property specifying the ID of the bootstrap user. The bootstrap user
+    * will be assigned the global admin role */
+  private static final String CFG_BOOTSTRAP_USER_ID_KEY = "bootstrap.user.id";
 
   /** Shibboleth header configuration */
 
@@ -123,6 +129,9 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
   /** Whether the configurable Shibboleth login handler */
   private boolean enabled = CFG_AAI_ENABLED_DEFAULT;
 
+  /** The ID of the bootstrap user if configured */
+  private String bootstrapUserId = null;
+
   /** Header to extract the given name (first name) from */
   private String headerGivenName = null;
 
@@ -165,9 +174,14 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
       return;
     }
 
+    String bootstrapUserId = StringUtils.trimToNull((String) properties.get(CFG_BOOTSTRAP_USER_ID_KEY));
+    if (bootstrapUserId != null) {
+      logger.warn("AAI User ID {} is configured as AAI boostrap user. You want to disable this after bootstrapping.");
+    }
+
     /* Shibboleth header configuration */
 
-    String cfgOrganization = StringUtils.trimToNull((String) properties.get(CFG_HEADER_ORGANIZATIONKEY));
+    String cfgOrganization = StringUtils.trimToNull((String) properties.get(CFG_HEADER_ORGANIZATION_KEY));
     if (cfgOrganization != null) {
       headerOrganization = cfgOrganization;
       logger.info("Header '{}' set to '{}'", CFG_HEADER_ORGANIZATION_KEY, headerOrganization);
@@ -347,6 +361,9 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
     roles.add(new JpaRole(roleFederationMember, organization));
     roles.add(new JpaRole(userRolePrefix + id, organization));
     roles.add(new JpaRole(organization.getAnonymousRole(), organization));
+    if (StringUtils.equals(id, bootstrapUserId)) {
+      roles.add(new JpaRole(GLOBAL_ADMIN_ROLE, organization));
+    }
     return roles;
   }
 

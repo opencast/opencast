@@ -31,6 +31,14 @@ First off all, enable the AAI login handler:
 
     enabled=true
 
+For bootstrapping purposes, you might want to configure the AAI bootstrap user:
+
+    bootstrap.user.id=<AAI ID>
+
+That user will be assigned ROLE_ADMIN at login time. This enables you to access the administrative UI and
+configure user authorization without the need to fiddle with the database directly.
+Once user authorization has been setup, disable the AAI bootstrap user.
+
 Since the HTTP request header names required by the AAI login handler are specific to Shibboleth Federations,
 you will need to first adjust the following properties.
 
@@ -52,7 +60,6 @@ To indicate the fact that a user has authenticated himself using Shibboleth, the
 role as specified by the property **role.federation.member**.
 
     role.federation.member = "ROLE_AAI_USER"
-
 
 Step 2: Spring Security Configuration
 -------------------------------------
@@ -133,5 +140,4 @@ To protect HTML pages, you will need to adapt the configuration of your web serv
         ShibUseHeaders On
         require valid-user
     </LocationMatch>
-
 
