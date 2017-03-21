@@ -34,7 +34,7 @@ import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUserReference;
 import org.opencastproject.security.shibboleth.ShibbolethLoginHandler;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
-import org.opencastproject.userdirectory.JpaUserReferenceProvider;
+import org.opencastproject.userdirectory.api.UserReferenceProvider;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -58,8 +58,8 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * This configurable implementation of the ShibbolethLoginHandler uses the JpaUserReferenceProvider to create and
- * update users that are external to Opencast.
+ * This configurable implementation of the ShibbolethLoginHandler uses the UserReferenceProvider interface to create
+ * and update Opencast reference users provided and authenticated by an external identity provider.
  * Note that this configurable implementation aims at requiring the minimum number of Shibboleth attributes
  * to make Opencast work with most Shibboleth-based Authentication and Authorization Infrastractures (AAI).
  */
@@ -133,7 +133,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
   private static final Logger logger = LoggerFactory.getLogger(ConfigurableLoginHandler.class);
 
   /** The user reference provider */
-  private JpaUserReferenceProvider userReferenceProvider = null;
+  private UserReferenceProvider userReferenceProvider = null;
 
   /** The group role provider */
   private JpaGroupRoleProvider groupRoleProvider = null;
@@ -353,7 +353,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
    * @param userReferenceProvider
    *          the user reference provider
    */
-  public void setUserReferenceProvider(JpaUserReferenceProvider userReferenceProvider) {
+  public void setUserReferenceProvider(UserReferenceProvider userReferenceProvider) {
     this.userReferenceProvider = userReferenceProvider;
   }
 
