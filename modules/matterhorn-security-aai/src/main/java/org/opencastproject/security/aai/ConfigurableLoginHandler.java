@@ -182,6 +182,9 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
     String cfgEnabled = StringUtils.trimToNull((String) properties.get(CFG_AAI_ENABLED_KEY));
     if (cfgEnabled != null) {
       enabled = BooleanUtils.toBoolean(cfgEnabled);
+    }
+
+    if (enabled) {
       logger.info("AAI login handler is enabled.");
     } else {
       logger.info("AAI login handler is disabled.");
