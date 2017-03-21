@@ -106,8 +106,8 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-mpeg7/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-runtime-info/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-security-shibboleth/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-security-aai/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-security-shibboleth/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-series-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-serviceregistry/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-static/${project.version}</bundle>
