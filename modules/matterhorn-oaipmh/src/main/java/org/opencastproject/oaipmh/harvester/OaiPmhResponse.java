@@ -18,12 +18,11 @@
  * the License.
  *
  */
-
-
 package org.opencastproject.oaipmh.harvester;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.functions.Booleans.eq;
 
 import org.opencastproject.util.data.Option;
 
@@ -64,6 +63,10 @@ public abstract class OaiPmhResponse {
     return xpathExists("/oai20:OAI-PMH/oai20:error");
   }
 
+  protected boolean isError(String code) {
+    return getErrorCode().map(eq(code)).getOrElse(false);
+  }
+
   /**
    * Get the error code if this is an error response.
    */
@@ -71,11 +74,9 @@ public abstract class OaiPmhResponse {
     return option(trimToNull(xpathString("/oai20:OAI-PMH/oai20:error/@code")));
   }
 
-  /**
-   * Check if this is a "noRecordsMatch" error response.
-   */
-  public boolean isErrorNoRecordsMatch() {
-    return xpathExists("/oai20:OAI-PMH/oai20:error[@code='noRecordsMatch']");
+  /** Return the request tag. */
+  public String getRequest() {
+    return xpathString("/oai20:OAI-PMH/oai20:request");
   }
 
   /**
@@ -93,12 +94,16 @@ public abstract class OaiPmhResponse {
    * Evaluate the xpath expression against the contained document. The expression must return a node.
    */
   protected Node xpathNode(String expr) {
-    return xpathNode(xpath, doc, expr);
+    try {
+      return (Node) xpath.evaluate(expr, doc, XPathConstants.NODE);
+    } catch (XPathExpressionException e) {
+      throw new RuntimeException("malformed xpath expression " + expr, e);
+    }
   }
 
   public static Node xpathNode(XPath xpath, Node context, String expr) {
     if (expr.startsWith("/"))
-      throw new IllegalArgumentException("an xpath expression that evaluates relative to a given context node "
+      throw new IllegalArgumentException("An xpath expression that evaluates relative to a given context node "
               + "must not be absolute, i.e. start with a '/'. In this case the expression is evaluated against the"
               + "whole document which might not be wanted.");
     try {

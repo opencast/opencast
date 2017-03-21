@@ -417,6 +417,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         workflowService.getWorkflowDefinitionById(workflowDefinitionId);
       } catch (WorkflowDatabaseException e) {
         throw new IngestException(e);
+      } catch (NotFoundException nfe) {
+        logger.warn("Workflow definition {} not found, using default workflow {} instead", workflowDefinitionId, defaultWorkflowDefinionId);
+        workflowDefinitionId = defaultWorkflowDefinionId;
       }
     }
 
@@ -1471,6 +1474,18 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.info("Using default workflow definition '{}' to process ingested mediapackage {}",
               defaultWorkflowDefinionId, mediapackage);
       workflowDefinitionID = defaultWorkflowDefinionId;
+    }
+
+    // Check if the workflow definition is valid
+    if (StringUtils.isNotBlank(workflowDefinitionID) && StringUtils.isNotBlank(defaultWorkflowDefinionId)) {
+      try {
+        workflowService.getWorkflowDefinitionById(workflowDefinitionID);
+      } catch (WorkflowDatabaseException e) {
+        throw new IngestException(e);
+      } catch (NotFoundException nfe) {
+        logger.warn("Workflow definition {} not found, using default workflow {} instead", workflowDefinitionID, defaultWorkflowDefinionId);
+        workflowDefinitionID = defaultWorkflowDefinionId;
+      }
     }
 
     // Have we been able to find a workflow definition id?

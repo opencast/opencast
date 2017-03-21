@@ -25,11 +25,14 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,6 +46,9 @@ import java.util.Set;
  * A Spring Security implementation of {@link SecurityService}.
  */
 public class SecurityServiceSpringImpl implements SecurityService {
+
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(SecurityServiceSpringImpl.class);
 
   /** Holds delegates users for new threads that have been spawned from authenticated threads */
   private static final ThreadLocal<User> delegatedUserHolder = new ThreadLocal<User>();
@@ -88,38 +94,52 @@ public class SecurityServiceSpringImpl implements SecurityService {
       throw new IllegalStateException("No organization is set in security context");
 
     User delegatedUser = delegatedUserHolder.get();
+
     if (delegatedUser != null) {
       return delegatedUser;
     }
+
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(org);
-    if (auth == null) {
-      return SecurityUtil.createAnonymousUser(jaxbOrganization);
-    } else {
+    if (auth != null) {
       Object principal = auth.getPrincipal();
-      if (principal == null) {
-        return SecurityUtil.createAnonymousUser(jaxbOrganization);
-      }
-      if (principal instanceof UserDetails) {
+      if ((principal != null) && (principal instanceof UserDetails)) {
         UserDetails userDetails = (UserDetails) principal;
+        Set<JaxbRole> roles = new HashSet<JaxbRole>();
+
+        // If user exist, add the existing roles to the list
         if (userDirectory != null) {
           User user = userDirectory.loadUser(userDetails.getUsername());
-          delegatedUserHolder.set(user);
-          return JaxbUser.fromUser(user);
-        } else {
-          Set<JaxbRole> roles = new HashSet<JaxbRole>();
-          Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
-          if (authorities != null && authorities.size() > 0) {
-            for (GrantedAuthority ga : authorities) {
-              roles.add(new JaxbRole(ga.getAuthority(), jaxbOrganization));
+          if (user != null) {
+            for (Role role : user.getRoles()) {
+              roles.add(JaxbRole.fromRole(role));
             }
+          } else {
+            logger.debug(
+                    "Authenticated user '{}' could not be found in any of the current UserProviders. Continuing anyway...",
+                    userDetails.getUsername());
           }
-          return new JaxbUser(userDetails.getUsername(), null, jaxbOrganization, roles);
+        } else {
+          logger.debug("No UserDirectory was found when trying to search for user '{}'", userDetails.getUsername());
         }
-      } else {
-        return SecurityUtil.createAnonymousUser(jaxbOrganization);
+
+        // Add the roles (authorities) in the security context
+        Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
+        if (authorities != null) {
+          for (GrantedAuthority ga : authorities) {
+            roles.add(new JaxbRole(ga.getAuthority(), jaxbOrganization));
+          }
+        }
+
+        User user = new JaxbUser(userDetails.getUsername(), null, jaxbOrganization, roles);
+        delegatedUserHolder.set(user);
+
+        return user;
       }
     }
+
+    // Return the anonymous user by default
+    return SecurityUtil.createAnonymousUser(jaxbOrganization);
   }
 
   /**
@@ -144,7 +164,7 @@ public class SecurityServiceSpringImpl implements SecurityService {
 
   /**
    * OSGi callback for setting the user directory.
-   * 
+   *
    * @param userDirectory
    *          the user directory
    */

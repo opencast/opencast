@@ -114,7 +114,7 @@
 	  <% if((typeof hasqualities !== "undefined") && hasqualities
 	     && (typeof str_qualityButton !== "undefined")
 	     && (typeof str_quality !== "undefined")
-	     && (typeof qualities !== "undefined") 
+	     && (typeof qualities !== "undefined")
        && (typeof translatedqualities !== "undefined")) { %>
             <div class="btn-group">
                 <button id="dropdownMenuQuality" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_qualityButton %>">
@@ -189,6 +189,9 @@
                 </ul>
             </div>
             <% } %>
+            <button id="captions_button" type="button" class="btn btn-default disabled" role="button">
+              <span class="glyphicon glyphicon-subtitles"></span>
+            </button>
             <button id="fullscreen_button" type="button" class="btn btn-default disabled" role="button" aria-label="<%= str_fullscreen %>">
             <span class="glyphicon glyphicon-fullscreen"></span>
             </button>

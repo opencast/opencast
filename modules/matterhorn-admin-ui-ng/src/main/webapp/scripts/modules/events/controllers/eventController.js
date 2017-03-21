@@ -211,10 +211,6 @@ angular.module('adminNg.controllers')
               }, this);
             },
             fetchChildResources = function (id) {
-/*                if (! id) {
-                  console.log("trying alternative event ID in fetchChildResources: " + EventHelperService.eventId);
-                  id = EventHelperService.eventId;
-                }*/
                 $scope.general = EventGeneralResource.get({ id: id }, function () {
                     angular.forEach($scope.general.publications, function (publication) {
                         publication.label = publication.name;
@@ -242,6 +238,7 @@ angular.module('adminNg.controllers')
                             $scope.episodeCatalog = catalog;
                             episodeCatalogIndex = index;
                             var keepGoing = true;
+                            var tabindex = 2;
                             angular.forEach(catalog.fields, function (entry) {
                                 if (entry.id === 'title' && angular.isString(entry.value)) {
                                     $scope.titleParams = { resourceId: entry.value.substring(0,70) };
@@ -250,6 +247,7 @@ angular.module('adminNg.controllers')
                                     metadata.locked = entry.locked;
                                     keepGoing = false;
                                 }
+                                entry.tabindex = tabindex ++;
                             });
                         }
                     });

@@ -1480,8 +1480,6 @@
      "ZOOMLEVEL": "Zoom Level",
      "ZOOM": "Zoom",
      "BUTTONS": {
-       "COMMENTS":    "View",
-       "METADATA":    "Edit",
        "CLOSE":       "Close",
        "SAVE":        "Save",
        "PROCESS":     "Save & Continue",

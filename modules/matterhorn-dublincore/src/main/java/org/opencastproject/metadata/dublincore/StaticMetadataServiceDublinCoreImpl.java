@@ -37,6 +37,7 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_REPLAC
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_RIGHTS_HOLDER;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_SPATIAL;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_SUBJECT;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPORAL;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TYPE;
 import static org.opencastproject.util.data.Collections.head;
@@ -139,6 +140,7 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
         return date != null ? date : Misc.<Date>chuck(new RuntimeException(a + " does not conform to W3C-DTF encoding scheme."));
       }
     });
+    final Option temporalOpt = option(episode.getFirstVal(PROPERTY_TEMPORAL)).map(dc2temporalValueOption());
     final Option<String> language = option(episode.getFirst(PROPERTY_LANGUAGE));
     final Option<Long> extent = head(episode.get(PROPERTY_EXTENT)).map(new Function<DublinCoreValue, Long>() {
       @Override
@@ -191,6 +193,37 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
       @Override
       public Option<Date> getCreated() {
         return created;
+      }
+
+      @Override
+      public Option<Date[]> getTemporalPeriod() {
+        if (temporalOpt.isSome()) {
+          if (temporalOpt.get() instanceof DCMIPeriod) {
+            DCMIPeriod p = (DCMIPeriod) temporalOpt.get();
+            return option(new Date[] { p.getStart(), p.getEnd() });
+          }
+        }
+        return Option.none();
+      }
+
+      @Override
+      public Option<Date> getTemporalInstant() {
+        if (temporalOpt.isSome()) {
+          if (temporalOpt.get() instanceof Date) {
+            return temporalOpt;
+          }
+        }
+        return Option.none();
+      }
+
+      @Override
+      public Option<Long> getTemporalDuration() {
+        if (temporalOpt.isSome()) {
+          if (temporalOpt.get() instanceof Long) {
+            return temporalOpt;
+          }
+        }
+        return Option.none();
       }
 
       @Override
@@ -284,6 +317,38 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
   @Override
   public int getPriority() {
     return priority;
+  }
+
+  /**
+   * Return a function that creates a Option with the value of temporal from a DublinCoreValue.
+   */
+  private static Function<DublinCoreValue, Object> dc2temporalValueOption() {
+    return new Function<DublinCoreValue, Object>() {
+      @Override
+      public Object apply(DublinCoreValue dcv) {
+        Temporal temporal = EncodingSchemeUtils.decodeTemporal(dcv);
+        if (temporal != null) {
+          return temporal.fold(new Temporal.Match<Object>() {
+            @Override
+            public Object period(DCMIPeriod period) {
+              return period;
+            }
+
+            @Override
+            public Object instant(Date instant) {
+              return instant;
+            }
+
+            @Override
+            public Object duration(long duration) {
+              return duration;
+            }
+          });
+        }
+        return Misc.<Object>chuck(new RuntimeException(dcv
+                + " does not conform to ISO8601 encoding scheme for temporal."));
+      }
+    };
   }
 
   /**

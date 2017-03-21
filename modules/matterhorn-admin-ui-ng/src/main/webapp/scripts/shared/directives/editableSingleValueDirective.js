@@ -30,7 +30,7 @@ angular.module('adminNg.directives')
             save:       '='
         },
         link: function (scope, element) {
-                // Parse the given time string (HH:mm) to separate the minutes / hours 
+                // Parse the given time string (HH:mm) to separate the minutes / hours
             var parseTime = function (dateStr) {
                     var date = JsHelper.parseUTCTimeString(dateStr);
                     if (angular.isDate(date)) {
@@ -45,7 +45,7 @@ angular.module('adminNg.directives')
                 // Format the value to be presented as string
                 present = function (params) {
                     switch (params.type) {
-                        case 'time': 
+                        case 'time':
                             if (angular.isUndefined(params.hours)) {
                                 parseTime(params.value);
                             }
@@ -56,7 +56,7 @@ angular.module('adminNg.directives')
                 };
 
             scope.editMode = false;
-            
+
             if (scope.params.type === 'time') {
                 scope.hours = JsHelper.initArray(24);
                 scope.minutes = JsHelper.initArray(60);
@@ -72,7 +72,11 @@ angular.module('adminNg.directives')
                 }
                 scope.editMode = true;
                 scope.focusTimer = $timeout(function () {
+                  if ((scope.params.type === 'text_long') && (element.find('textarea'))) {
+                    element.find('textarea').focus();
+                  } else if (element.find('input')) {
                     element.find('input').focus();
+                  }
                 });
             };
 
