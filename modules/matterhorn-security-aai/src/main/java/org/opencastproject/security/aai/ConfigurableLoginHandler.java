@@ -49,6 +49,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -164,13 +165,31 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
   /** Suffix of the home organization membership role */
   private String roleOrganizationSuffix = CFG_ROLE_ORGANIZATION_SUFFIX_DEFAULT;
 
+  /*
+   * It is the bundle matterhorn-kernel what will need to instantiate the ConfigurableLoginHandler
+   * since it is wired using Spring Security.
+   * Since Shibboleth support is supposed to be an optional extension of the bundle matterhorn-kernel,
+   * we implement this as fragment bundle.
+   * The use of the Service Component Runtime (SCR) would require us to declare this bundle as service
+   * component in matterhorn-kernel which we don't want since it is optional.
+   * To make us visible to the config admin and take advantage of the ManagedService mechanism, we
+   * register us as ManagedService in the constructor.
+   * An alternative solution would be to include the manifest of all fragments in matterhorn-kernel, i.e.
+   * by specifying OSGI-INF/*.xml as service component in matterhorn-kernel.
+   */
   public ConfigurableLoginHandler() {
     BundleContext bundleContext = FrameworkUtil.getBundle(this.getClass()).getBundleContext();
-    bundleContext.registerService(RoleProvider.class.getName(), this, null);
+    registerAsManagedService(bundleContext);
   }
 
   protected ConfigurableLoginHandler(BundleContext bundleContext) {
-    bundleContext.registerService(RoleProvider.class.getName(), this, null);
+    registerAsManagedService(bundleContext);
+  }
+
+  private void registerAsManagedService(BundleContext bundleContext) {
+    Dictionary<String, String> properties = new Hashtable<String, String>();
+    properties.put("service.pid", this.getClass().getName());
+    bundleContext.registerService(ManagedService.class.getName(), this, properties);
   }
 
   @Override
@@ -193,18 +212,11 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
 
     String bootstrapUserId = StringUtils.trimToNull((String) properties.get(CFG_BOOTSTRAP_USER_ID_KEY));
     if (bootstrapUserId != null) {
-      logger.warn("AAI User ID {} is configured as AAI boostrap user. You want to disable this after bootstrapping.");
+      logger.warn("AAI User ID {} is configured as AAI boostrap user. You want to disable this after bootstrapping.",
+              bootstrapUserId);
     }
 
     /* Shibboleth header configuration */
-
-    String cfgHomeOrganization = StringUtils.trimToNull((String) properties.get(CFG_HEADER_HOME_ORGANIZATION_KEY));
-    if (cfgHomeOrganization != null) {
-      headerHomeOrganization = cfgHomeOrganization;
-      logger.info("Header '{}' set to '{}'", CFG_HEADER_HOME_ORGANIZATION_KEY, headerHomeOrganization);
-    } else {
-      logger.warn("Optional header '{}' is not configured ", CFG_HEADER_HOME_ORGANIZATION_KEY);
-    }
 
     String cfgGivenName = StringUtils.trimToNull((String) properties.get(CFG_HEADER_GIVEN_NAME_KEY));
     if (cfgGivenName != null) {
@@ -228,6 +240,14 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
       logger.info("Header '{}' set to '{}'", CFG_HEADER_MAIL_KEY, headerMail);
     } else {
       logger.error("Header '{}' is not configured ", CFG_HEADER_MAIL_KEY);
+    }
+
+    String cfgHomeOrganization = StringUtils.trimToNull((String) properties.get(CFG_HEADER_HOME_ORGANIZATION_KEY));
+    if (cfgHomeOrganization != null) {
+      headerHomeOrganization = cfgHomeOrganization;
+      logger.info("Header '{}' set to '{}'", CFG_HEADER_HOME_ORGANIZATION_KEY, headerHomeOrganization);
+    } else {
+      logger.warn("Optional header '{}' is not configured ", CFG_HEADER_HOME_ORGANIZATION_KEY);
     }
 
     /* Shibboleth roles configuration */
@@ -261,7 +281,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
               cfgRoleOrganizationPrefix);
     } else {
       roleOrganizationPrefix = CFG_ROLE_ORGANIZATION_PREFIX_DEFAULT;
-      logger.error("AAI organization membership role prefix '{}' is not configured, using default '{}'",
+      logger.info("AAI organization membership role prefix '{}' is not configured, using default '{}'",
               CFG_ROLE_ORGANIZATION_PREFIX_KEY, roleOrganizationPrefix);
     }
 
@@ -273,7 +293,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
               cfgRoleOrganizationSuffix);
     } else {
       roleOrganizationSuffix = CFG_ROLE_ORGANIZATION_SUFFIX_DEFAULT;
-      logger.error("AAI organization membership role suffix '{}' is not configured, using default '{}'",
+      logger.info("AAI organization membership role suffix '{}' is not configured, using default '{}'",
               CFG_ROLE_ORGANIZATION_SUFFIX_KEY, roleOrganizationSuffix);
     }
   }
