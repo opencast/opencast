@@ -90,25 +90,15 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
   private static final String CFG_HEADER_MAIL_KEY = "header.mail";
 
   /** Name of the optional configuration property specifying a list of home organizations */
-  private static final String CFG_HEADER_HOME_ORGANIZATION_KEY = "header.homeOrganization";
+  private static final String CFG_HEADER_HOME_ORGANIZATION_KEY = "header.home_organization";
 
-  /**
-   * Shibboleth roles configuration
-   * At login time, the Shibboleth login handler assigns some basic roles to authenticated users.
-   */
-
-  /** Name of the configuration property that specifies the name of the role assigned to all Shibboleth authenticated
-      users, i.e. members of an Sibboleth federation */
-  private static final String CFG_ROLE_FEDERATION_MEMBER_KEY = "role.federation";
-
-  /** Default value of the configuration property CFG_ROLE_FEDERATION_MEMBER_KEY */
-  private static final String CFG_ROLE_FEDERATION_MEMBER_DEFAULT = "ROLE_AAI_USER";
+  /** Shibboleth roles configuration */
 
   /**
    * Name of the configuration property that specifies the prefix of the user role uniquely identifying a Shibboleth
    * authenticated users. The user role will be of the form ROLE_USER_PREFIX + SHIBBOLETH_UNIQUE_ID
    */
-  private static final String CFG_ROLE_USER_PREFIX_KEY = "role.prefix";
+  private static final String CFG_ROLE_USER_PREFIX_KEY = "role.user.prefix";
 
   /** Default value of configuration property CFG_ROLE_USER_PREFIX_KEY */
   private static final String CFG_ROLE_USER_PREFIX_DEFAULT = "ROLE_AAI_USER_";
@@ -127,6 +117,13 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
 
   /** Default value of configuration property CFG_ROLE_ORGANIZATION_SUFFIX_KEY */
   private static final String CFG_ROLE_ORGANIZATION_SUFFIX_DEFAULT = "_MEMBER";
+
+  /** Name of the configuration property that specifies the name of the role assigned to all Shibboleth authenticated
+      users, i.e. members of an Sibboleth federation */
+  private static final String CFG_ROLE_FEDERATION_KEY = "role.federation";
+
+  /** Default value of the configuration property CFG_ROLE_FEDERATION_KEY */
+  private static final String CFG_ROLE_FEDERATION_DEFAULT = "ROLE_AAI_USER";
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ConfigurableLoginHandler.class);
@@ -156,10 +153,10 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
   private String headerHomeOrganization = null;
 
   /** Role assigned to all Shibboleth authenticated users */
-  private String roleFederationMember = CFG_ROLE_FEDERATION_MEMBER_DEFAULT;
+  private String roleFederationMember = CFG_ROLE_FEDERATION_DEFAULT;
 
   /** Prefix of unique Shibboleth user role */
-  private String userRolePrefix = CFG_ROLE_USER_PREFIX_DEFAULT;
+  private String roleUserPrefix = CFG_ROLE_USER_PREFIX_DEFAULT;
 
   /** Prefix of the home organization membership role */
   private String roleOrganizationPrefix = CFG_ROLE_ORGANIZATION_PREFIX_DEFAULT;
@@ -232,25 +229,25 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
 
     /* Shibboleth roles configuration */
 
-    String cfgRoleFederationMember = StringUtils.trimToNull((String) properties.get(CFG_ROLE_FEDERATION_MEMBER_KEY));
+    String cfgRoleFederationMember = StringUtils.trimToNull((String) properties.get(CFG_ROLE_FEDERATION_KEY));
     if (cfgRoleFederationMember != null) {
       roleFederationMember = cfgRoleFederationMember;
-      logger.info("AAI federation membership role '{}' set to '{}'", CFG_ROLE_FEDERATION_MEMBER_KEY,
+      logger.info("AAI federation membership role '{}' set to '{}'", CFG_ROLE_FEDERATION_KEY,
               roleFederationMember);
     } else {
-      roleFederationMember = CFG_ROLE_FEDERATION_MEMBER_DEFAULT;
+      roleFederationMember = CFG_ROLE_FEDERATION_DEFAULT;
       logger.info("AAI federation membership role '{}' is not configured, using default '{}'",
-              CFG_ROLE_FEDERATION_MEMBER_KEY, roleFederationMember);
+              CFG_ROLE_FEDERATION_KEY, roleFederationMember);
     }
 
-    String cfgUserRolePrefix = StringUtils.trimToNull((String) properties.get(CFG_ROLE_USER_PREFIX_KEY));
-    if (cfgUserRolePrefix != null) {
-      userRolePrefix = cfgUserRolePrefix;
-      logger.info("AAI user role prefix '{}' set to '{}'", CFG_ROLE_USER_PREFIX_KEY, userRolePrefix);
+    String cfgRoleUserPrefix = StringUtils.trimToNull((String) properties.get(CFG_ROLE_USER_PREFIX_KEY));
+    if (cfgRoleUserPrefix != null) {
+      roleUserPrefix = cfgRoleUserPrefix;
+      logger.info("AAI user role prefix '{}' set to '{}'", CFG_ROLE_USER_PREFIX_KEY, roleUserPrefix);
     } else {
-      userRolePrefix = CFG_ROLE_USER_PREFIX_DEFAULT;
+      roleUserPrefix = CFG_ROLE_USER_PREFIX_DEFAULT;
       logger.info("AAI user role prefix '{}' is not configured, using default '{}'", CFG_ROLE_USER_PREFIX_KEY,
-              userRolePrefix);
+              roleUserPrefix);
     }
 
     String cfgRoleOrganizationPrefix = StringUtils.trimToNull((String) properties.get(
@@ -393,7 +390,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
     JpaOrganization organization = fromOrganization(securityService.getOrganization());
     Set<JpaRole> roles = new HashSet<JpaRole>();
     roles.add(new JpaRole(roleFederationMember, organization));
-    roles.add(new JpaRole(userRolePrefix + id, organization));
+    roles.add(new JpaRole(roleUserPrefix + id, organization));
     roles.add(new JpaRole(organization.getAnonymousRole(), organization));
     if (headerHomeOrganization != null) {
       String homeOrganization = request.getHeader(headerHomeOrganization);

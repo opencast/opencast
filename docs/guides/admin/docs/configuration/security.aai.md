@@ -47,7 +47,7 @@ Set the following header names to the correct values:
     header.given_name = "<Name of Shibboleth attribute>"
     header.surname = "<Name of Shibboleth attribute>"
     header.email = "<Name of Shibboleth attribute>"
-    header.organization = "<Name of Shibboleth attribute>"
+    header.home_organization = "<Name of Shibboleth attribute>"
 
 Optionally, you can configure the name of some basic roles the AAI login handler will assign to authenticated users.
 
@@ -64,9 +64,9 @@ role.organization.suffix*
     role.organization.suffix = "_MEMBER"
 
 To indicate the fact that a user has authenticated himself using Shibboleth, the login handler assigns the
-role as specified by the property **role.federation.member**.
+role as specified by the property **role.federation**.
 
-    role.federation.member = "ROLE_AAI_USER"
+    role.federation = "ROLE_AAI_USER"
 
 Step 2: Spring Security Configuration
 -------------------------------------
