@@ -462,13 +462,13 @@
     <property name="authenticationManager" ref="authenticationManager" />
     <property name="userDetailsService" ref="userDetailsService" />
     <property name="userDirectoryService" ref="userDirectoryService" />
-    <property name="shibbolethLoginHandler" ref="configurableLoginHandler" />
+    <property name="shibbolethLoginHandler" ref="aaiLoginHandler" />
     <property name="exceptionIfHeaderMissing" value="false" />
   </bean>
   -->
 
   <!-- AAI header extractor and user generator
-  <bean id="configurableLoginHandler" class="org.opencastproject.security.aai.ConfigurableLoginHandler">
+  <bean id="aaiLoginHandler" class="org.opencastproject.security.aai.ConfigurableLoginHandler">
     <property name="securityService" ref="securityService" />
     <property name="userReferenceProvider" ref="userReferenceProvider" />
   </bean>
@@ -498,7 +498,7 @@
 
   <!-- Uncomment to enable external users e.g. used together shibboleth -->
   <!-- <osgi:reference id="userReferenceProvider" cardinality="1..1"
-                  interface="org.opencastproject.userdirectory.UserReferenceProvider"  /> -->
+                  interface="org.opencastproject.userdirectory.api.UserReferenceProvider"  /> -->
 
   <osgi:reference id="userDirectoryService" cardinality="1..1"
                   interface="org.opencastproject.security.api.UserDirectoryService" />
