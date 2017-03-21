@@ -107,7 +107,6 @@ respective name of the Shibboleth attribute you use in your Shibboleth Federatio
     <bean id="configurableLoginHandler" class="org.opencastproject.security.aai.ConfigurableLoginHandler">
       <property name="securityService" ref="securityService" />
       <property name="userReferenceProvider" ref="userReferenceProvider" />
-      <property name="groupRoleProvider" ref="groupRoleProvider" />
     </bean>
 
     <bean id="preauthAuthProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">

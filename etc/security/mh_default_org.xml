@@ -471,7 +471,6 @@
   <bean id="configurableLoginHandler" class="org.opencastproject.security.aai.ConfigurableLoginHandler">
     <property name="securityService" ref="securityService" />
     <property name="userReferenceProvider" ref="userReferenceProvider" />
-    <property name="groupRoleProvider" ref="groupRoleProvider" />
   </bean>
   -->
 

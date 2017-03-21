@@ -33,7 +33,6 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUserReference;
 import org.opencastproject.security.shibboleth.ShibbolethLoginHandler;
-import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.userdirectory.api.UserReferenceProvider;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -134,9 +133,6 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
 
   /** The user reference provider */
   private UserReferenceProvider userReferenceProvider = null;
-
-  /** The group role provider */
-  private JpaGroupRoleProvider groupRoleProvider = null;
 
   /** The security service */
   private SecurityService securityService = null;
@@ -355,16 +351,6 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
    */
   public void setUserReferenceProvider(UserReferenceProvider userReferenceProvider) {
     this.userReferenceProvider = userReferenceProvider;
-  }
-
-  /**
-   * Sets the group role provider.
-   *
-   * @param groupRoleProvider
-   *          the group role provider.
-   */
-  public void setGroupRoleProvider(JpaGroupRoleProvider groupRoleProvider) {
-    this.groupRoleProvider = groupRoleProvider;
   }
 
   /**
