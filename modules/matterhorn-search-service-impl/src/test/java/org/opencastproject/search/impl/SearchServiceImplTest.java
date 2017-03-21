@@ -571,6 +571,53 @@ public class SearchServiceImplTest {
   }
 
   /**
+   * Test removal from the search index even when it is missing from database #MH-11616
+   */
+  @Test
+  public void testDeleteIndexNotInDbMediaPackage() throws Exception {
+    MediaPackage mediaPackage = getMediaPackage("/manifest-simple.xml");
+
+    // Make sure our mocked ACL has the read and write permission
+    acl.getEntries().add(new AccessControlEntry(ROLE_STUDENT, READ.toString(), true));
+    acl.getEntries().add(new AccessControlEntry(ROLE_STUDENT, WRITE.toString(), true));
+
+    // Add the media package to the search index
+    Job job = service.add(mediaPackage);
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, 1000, job);
+    barrier.waitForJobs();
+
+    // Delete the mediapackage from persistence (leave it in index)
+    Date dateDeletedFromDb = new Date();
+    searchDatabase.deleteMediaPackage(mediaPackage.getIdentifier().toString(), dateDeletedFromDb);
+
+    // Verify it is not marked as deleted
+    SearchQuery qDel = new SearchQuery();
+    qDel.withDeletedSince(dateDeletedFromDb);
+    assertEquals(0, service.getByQuery(qDel).size());
+
+    // Verify that it is still active in index
+    SearchQuery q = new SearchQuery();
+    q.includeEpisodes(true);
+    q.includeSeries(false);
+    q.withId(mediaPackage.getIdentifier().toString());
+    assertEquals(1, service.getByQuery(q).size());
+
+    // Try delete it
+    job = service.delete(mediaPackage.getIdentifier().toString());
+    barrier = new JobBarrier(null, serviceRegistry, 1000, job);
+    barrier.waitForJobs();
+    assertEquals("Job to delete mediapackage did not finish", Job.Status.FINISHED, job.getStatus());
+
+    // Verify that it is now not active in the index
+    assertEquals(0, service.getByQuery(q).size());
+
+    // Verify that it is now marked as deleted in the index
+    q = new SearchQuery();
+    q.withDeletedSince(dateDeletedFromDb);
+    assertEquals(1, service.getByQuery(q).size());
+  }
+
+  /**
    * Adds a media package with a dublin core catalog for episode and series. Verifies series catalog can be retrieved
    * via search service.
    *

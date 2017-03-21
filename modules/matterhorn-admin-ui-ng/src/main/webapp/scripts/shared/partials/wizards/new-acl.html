@@ -12,6 +12,8 @@
                                         <td>
                                             <input
                                             class="hidden-input"
+                                            tabindex="1"
+                                            focushere
                                             ng-model="wizard.step.metadata.name"
                                             placeholder="{{ 'USERS.ACLS.NEW.METADATA.NAME.PLACEHOLDER' | translate }}">
                                         </td>
@@ -54,6 +56,8 @@
                                                     data-width="'200px'"
                                                     data-disable-search-threshold="8"
                                                     data-search_contains="true"
+                                                    tabindex="1"
+                                                    focushere
                                                     ng-change="wizard.step.changeBaseAcl()"
                                                     ng-model="wizard.step.ud.id"
                                                     ng-options="id as name for (id, name) in wizard.step.acls"

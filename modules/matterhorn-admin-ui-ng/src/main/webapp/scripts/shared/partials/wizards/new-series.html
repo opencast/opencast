@@ -79,6 +79,8 @@
                                                     data-width="'200px'"
                                                     data-disable-search-threshold="8"
                                                     data-search_contains="true"
+                                                    tabindex="1"
+                                                    focushere
                                                     ng-change="wizard.step.changeBaseAcl()"
                                                     ng-model="wizard.step.ud.id"
                                                     ng-options="id as name for (id, name) in wizard.step.acls"
@@ -167,6 +169,8 @@
                     <select chosen pre-select-from="wizard.step.themes"
                             allow-single-deselect="true"
                             data-width="'200px'"
+                            tabindex="1"
+                            focushere
                             data-disable-search-threshold="8"
                             ng-model="wizard.step.ud.theme"
                             ng-options="id as name for (id, name) in wizard.step.themes"

@@ -47,19 +47,4 @@
     $button-padding: 8px 18px;
     $font-size: 14px;
 
-    .view-comments-btn {
-        @include btn(white);
-        @include fa-icon($fa-var-comments, after, inline, 0 0 0 8px, 0, inherit, 16px);
-        font-size: $font-size;
-        padding: $button-padding;
-        display: inline-block;
-    }
-
-    .edit-video-btn {
-        @include btn(white);
-        @include fa-icon($fa-var-file-video-o, after, inline, 0 0 0 8px, 0, inherit, 16px);
-        font-size: $font-size;
-        padding: $button-padding;
-        display: inline-block;
-    }
 }

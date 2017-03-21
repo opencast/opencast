@@ -17,6 +17,7 @@ angular.module('adminNg.services')
             me.ud[mainMetadataName] = mainData;
             if (mainData && mainData.fields) {
                 for (i = 0; i < mainData.fields.length; i++) {
+                    mainData.fields[i].tabindex = i + 1; // just hooking the tab index up here, as this is already running through all elements
                     if (mainData.fields[i].required) {
                         me.requiredMetadata[mainData.fields[i].id] = false;
                         if (mainData.fields[i].type === 'boolean') {

@@ -27,11 +27,11 @@ angular.module('adminNg.controllers')
     'EventCatalogsResource', 'CommentResource', 'EventWorkflowsResource',
     'ResourcesListResource', 'UserRolesResource', 'EventAccessResource', 'EventGeneralResource',
     'OptoutsResource', 'EventParticipationResource', 'NewEventProcessingResource',
-    'OptoutSingleResource', 'CaptureAgentsResource', 'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout',
+    'OptoutSingleResource', 'CaptureAgentsResource', 'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService',
     function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource, EventCatalogsResource, CommentResource,
         EventWorkflowsResource, ResourcesListResource, UserRolesResource, EventAccessResource, EventGeneralResource,
         OptoutsResource, EventParticipationResource, NewEventProcessingResource,
-        OptoutSingleResource, CaptureAgentsResource, ConflictCheckResource, Language, JsHelper, $sce, $timeout) {
+        OptoutSingleResource, CaptureAgentsResource, ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService) {
 
         var roleSlice = 100;
         var roleOffset = 0;
@@ -243,6 +243,7 @@ angular.module('adminNg.controllers')
                             $scope.episodeCatalog = catalog;
                             episodeCatalogIndex = index;
                             var keepGoing = true;
+                            var tabindex = 2;
                             angular.forEach(catalog.fields, function (entry) {
                                 if (entry.id === 'title' && angular.isString(entry.value)) {
                                     $scope.titleParams = { resourceId: entry.value.substring(0,70) };
@@ -251,6 +252,7 @@ angular.module('adminNg.controllers')
                                     metadata.locked = entry.locked;
                                     keepGoing = false;
                                 }
+                                entry.tabindex = tabindex ++;
                             });
                         }
                     });
@@ -512,6 +514,9 @@ angular.module('adminNg.controllers')
         };
 
         $scope.replyToId = null; // the id of the comment to which the user wants to reply
+        if (! $scope.resourceId) {
+            $scope.resourceId = EventHelperService.eventId;
+        }
         $scope.title = $scope.resourceId; // if nothing else use the resourceId
 
         fetchChildResources($scope.resourceId);
@@ -758,7 +763,6 @@ angular.module('adminNg.controllers')
             }
             $scope.modal_close();
         };
-
         checkForActiveTransactions();
     }
 ]);
