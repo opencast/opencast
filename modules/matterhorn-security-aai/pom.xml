@@ -73,6 +73,7 @@
               org.osgi.framework,
               org.apache.commons.lang3,
               org.opencastproject.userdirectory;version=${project.version},
+              org.opencastproject.userdirectory.api;version=${project.version},
               org.opencastproject.kernel.security.persistence;version=${project.version},
               org.opencastproject.security.api;version=${project.version},
               org.opencastproject.security.impl.jpa;version=${project.version},
