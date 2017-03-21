@@ -134,6 +134,15 @@ interface which is supposed to be protected by Shibboleth.
       <property name="loginFormUrl" value="/admin-ng/index.html" />
     </bean>
 
+Last but not least, you need to add the *preauthAuthProvider* authentication provider to the *authentication-manager*:
+
+    <sec:authentication-manager alias="authenticationManager">
+      <sec:authentication-provider ref="preauthAuthProvider">
+      <sec:authentication-provider user-service-ref="userDetailsService">
+        <sec:password-encoder hash="md5"><sec:salt-source user-property="username" /></sec:password-encoder>
+      </sec:authentication-provider>
+    </sec:authentication-manager>
+
 Step 3: Protecting HTML pages by Shibboleth
 -------------------------------------------
 
