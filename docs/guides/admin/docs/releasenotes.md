@@ -72,6 +72,13 @@ Opencast 2.3.1 fixes a critical issue with publication on distributed systems as
 minor issues.
 
 
+Additional Notes About 2.3.2
+----------------------------
+
+Opencast 2.3.2 is a bug fix release that fixes some minor issues of Opencast 2.3.1. For more details, please have a look
+at the [changelog](changelog.md).
+
+
 Opencast 2.3 Release Schedule
 -----------------------------
 
