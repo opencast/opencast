@@ -210,10 +210,13 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
       return;
     }
 
-    String bootstrapUserId = StringUtils.trimToNull((String) properties.get(CFG_BOOTSTRAP_USER_ID_KEY));
-    if (bootstrapUserId != null) {
-      logger.warn("AAI User ID {} is configured as AAI boostrap user. You want to disable this after bootstrapping.",
+    String cfgBootstrapUserId = StringUtils.trimToNull((String) properties.get(CFG_BOOTSTRAP_USER_ID_KEY));
+    if (cfgBootstrapUserId != null) {
+      bootstrapUserId = cfgBootstrapUserId;
+      logger.warn("AAI User ID '{}' is configured as AAI boostrap user. You want to disable this after bootstrapping.",
               bootstrapUserId);
+    } else {
+      bootstrapUserId = null;
     }
 
     /* Shibboleth header configuration */
