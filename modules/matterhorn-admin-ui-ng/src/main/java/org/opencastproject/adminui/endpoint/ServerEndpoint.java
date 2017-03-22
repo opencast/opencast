@@ -189,11 +189,10 @@ public class ServerEndpoint {
     query.setOffset(offset);
 
     List<JSONObject> servers = new ArrayList<JSONObject>();
+    // Get service statistics for all hosts and services
+    List<ServiceStatistics> servicesStatistics = serviceRegistry.getServiceStatistics();
     for (HostRegistration server : serviceRegistry.getHostRegistrations()) {
-      // Get all the services statistics pro host
-      // TODO improve the service registry to get service statistics by host
-      List<ServiceStatistics> servicesStatistics = serviceRegistry.getServiceStatistics();
-      // may become very big
+      // Calculate statistics per server
       long jobsCompleted = 0;
       int jobsRunning = 0;
       int jobsQueued = 0;
