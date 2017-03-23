@@ -46,7 +46,7 @@ angular.module('adminNg.controllers')
         $scope.event    = EventHelperService;
         $scope.resource = $route.current.params.resource;
         $scope.tab      = $route.current.params.tab;
-        $scope.area     = "comments"
+        $scope.area     = "segments"
         $scope.id       = $route.current.params.itemId;
 
         $scope.event.eventId = $scope.id;

@@ -69,12 +69,12 @@
             <div class="event-container" ng-controller="EventCtrl">
                 <div>
                     <nav class="view-controller">
+                        <a ng-class="{active: area === 'segments'}" ng-if="tab === 'editor'"
+                            ng-click="openArea('segments')" translate>VIDEO_TOOL.AREAS.SEGMENTS</a>
                         <a ng-class="{active: area === 'metadata'}"
                             ng-click="openArea('metadata')" translate>VIDEO_TOOL.AREAS.METADATA</a>
                         <a ng-class="{active: area === 'comments'}"
                             ng-click="openArea('comments')" translate>VIDEO_TOOL.AREAS.COMMENTS</a>
-                        <a ng-class="{active: area === 'segments'}" ng-if="tab === 'editor'"
-                            ng-click="openArea('segments')" translate>VIDEO_TOOL.AREAS.SEGMENTS</a>
                     </nav>
                 </div>
 
