@@ -3,14 +3,14 @@
         <div class="multi-select-col">
             <div class="row">
                 <label translate="{{ resource.i18n }}.LEFT"><i class="required"><!-- * --></i></label>
+
+                <a ng-click="searchField=''" class="clear" ng-show="resource.searchable"></a>
                 <input type="text" id="search" class="search"
                     placeholder="{{ 'TABLE_FILTERS.PLACEHOLDER' | translate  }}"
                     ng-show="resource.searchable"
                     ng-disabled="disabled"
                     ng-class="{ disabled: disabled }"
                     ng-model="searchField">
-
-                <a ng-click="searchField=''" class="clear" ng-show="resource.searchable"></a>
 
                 <select multiple class="available"
                     ng-model="markedForAddition"

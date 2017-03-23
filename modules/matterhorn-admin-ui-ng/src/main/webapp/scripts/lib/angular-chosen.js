@@ -134,7 +134,8 @@
           });
           function getMoreElements(event) {
             var raw = scope.scroller[0],
-                val = this.value;
+                val = this.value,
+                el = element;
             scope.scrollPosition = raw.scrollTop;
 
             //The multiplication here tries to keep the user from hitting the bottom of the scroller
@@ -152,7 +153,9 @@
 
                 scope.$apply( function() {
 
-                    if (typeof(_func) === 'function') _func(val);
+                    if (typeof(_func) === 'function') {
+                      _func(val, el)
+                    }
                 });
               }
             }

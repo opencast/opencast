@@ -133,7 +133,9 @@
                                                     ng-options="id as id for (id, type) in wizard.step.roles"
                                                     data-placeholder=" "
                                                     no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.EMPTY' | translate }}'"
-                                                /><!-- {{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL' | translate }} -->
+                                                    data-placeholder="{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL' | translate }}">
+                                                    <option value=""></option>
+                                                 </select>
                                             </td>
                                             <td class="fit text-center"><input type="checkbox"  ng-model="policy.read"/></td>
                                             <td class="fit text-center"><input type="checkbox"  ng-model="policy.write"/></td>

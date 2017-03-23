@@ -15,7 +15,7 @@
         </a>
         <a ng-click="openTab('externalRoles')" data-modal-tab="externalroles" ng-class="{ active: tab == 'externalRoles' }"
             ng-style="{ display: action === 'edit' ? 'inline-block' : 'none'}"
-            translate="USERS.USERS.DETAILS.TABS.EXTERNALROLES">
+            translate="USERS.USERS.DETAILS.TABS.EXTERNALROLES" ng-if="showExternalRoles">
             <!-- Unmanagable Roles -->
         </a>
         <a ng-click="openTab('effectiveRoles')" data-modal-tab="effectiveRoles" ng-class="{ active: tab == 'effectiveRoles' }"
@@ -97,13 +97,13 @@
                 <div class="form-container multi-select-container">
                     <label translate="USERS.USERS.DETAILS.TABS.EXTERNALROLES"></label>
 
+                    <a ng-click="clearSearchFieldExternal()" class="clear" ng-show="role.searchable"></a>
                     <input type="text" id="search_external" class="search"
                         placeholder="{{ 'TABLE_FILTERS.PLACEHOLDER' | translate  }}"
                         ng-show="role.searchable"
                         ng-disabled="disabled"
                         ng-class="{ disabled: disabled }"
                         ng-model="searchFieldExternal">
-                    <a ng-click="clearSearchFieldExternal()" class="clear" ng-show="role.searchable"></a>
 
                     <select multiple
                         ng-options="item.name for item in role.external | filter: {name: searchFieldExternal} | orderBy: [groupSort, 'name']"
@@ -118,13 +118,13 @@
                 <div class="form-container multi-select-container">
                     <label translate="USERS.USERS.DETAILS.TABS.EFFECTIVEROLES"></label>
 
+                    <a ng-click="clearSearchFieldEffective()" class="clear" ng-show="role.searchable"></a>
                     <input type="text" id="search_effective" class="search"
                         placeholder="{{ 'TABLE_FILTERS.PLACEHOLDER' | translate  }}"
                         ng-show="role.searchable"
                         ng-disabled="disabled"
                         ng-class="{ disabled: disabled }"
                         ng-model="searchFieldEffective">
-                    <a ng-click="clearSearchFieldEffective()" class="clear" ng-show="role.searchable"></a>
 
                     <select multiple
                         ng-options="item.name for item in role.derived.concat(role.external.concat(role.selected)) | filter: customEffectiveFilter() | orderBy: [groupSort, 'name']"

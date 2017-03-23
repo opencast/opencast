@@ -1,11 +1,22 @@
 angular.module('adminNg.controllers')
-.controller('UserCtrl', ['$scope', 'Table', 'UserRolesResource', 'UserResource', 'UsersResource', 'JsHelper', 'Notifications', 'Modal', 'underscore',
-    function ($scope, Table, UserRolesResource, UserResource, UsersResource, JsHelper, Notifications, Modal, _) {
+.controller('UserCtrl', ['$scope', 'Table', 'UserRolesResource', 'UserResource', 'UsersResource', 'JsHelper', 'Notifications', 'Modal', 'AuthService', 'underscore',
+    function ($scope, Table, UserRolesResource, UserResource, UsersResource, JsHelper, Notifications, Modal, AuthService, _) {
         $scope.manageable = true;
         var roleSlice = 100;
         var roleOffset = roleSlice; //Note that the initial offset is the same size as the initial slice so that the *next* slice starts at the right place
         var loading = false;
+        var showExternalRoles = false; // Should the External Roles tab be visible
 
+        var EXTERNAL_ROLE_DISPLAY = 'adminui.user.external_role_display';
+
+        AuthService.getUser().$promise.then(function(user) {
+            $scope.currentUser = user;
+
+            if (angular.isDefined(user.org.properties[EXTERNAL_ROLE_DISPLAY])) {
+                $scope.showExternalRoles = user.org.properties[EXTERNAL_ROLE_DISPLAY] === "true";
+            }
+        });
+        
         $scope.role = {
             available: UserRolesResource.query({limit: 0, offset: 0, filter: 'role_target:USER'}), // Load all the internal roles
             external: [],

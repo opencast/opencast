@@ -166,7 +166,9 @@ angular.module('adminNg.services')
                 return rolePromise;
 
             me.loading = true;
-            var queryParams = {limit: roleSlice, offset: roleOffset};
+
+            // the offset should actually be setto roleOffset, but when used doesn't display the correct roles
+            var queryParams = {limit: roleSlice, offset: 0};
 
             if ( angular.isDefined(value) && (value != "")) {
                 //Magic values here.  Filter is from ListProvidersEndpoint, role_name is from RolesListProvider
