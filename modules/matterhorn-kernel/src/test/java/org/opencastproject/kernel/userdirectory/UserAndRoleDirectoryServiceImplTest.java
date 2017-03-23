@@ -148,6 +148,7 @@ public class UserAndRoleDirectoryServiceImplTest {
     EasyMock.replay(provider1, provider2, roleProvider1, roleProvider2, otherOrgRoleProvider, securityService);
 
     directory = new UserAndRoleDirectoryServiceImpl();
+    directory.activate(null);
     directory.setSecurityService(securityService);
     directory.addUserProvider(provider1);
     directory.addUserProvider(provider2);
