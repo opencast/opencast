@@ -71,17 +71,11 @@
     <!-- Uncomment to enable x509 client certificates for identifying clients -->
     <!-- sec:x509 subject-principal-regex="CN=(.*?)," user-service-ref="userDetailsService" / -->
 
-    <!-- Digest auth is used by capture agents and is used to enable transparent clustering of services -->
-    <sec:custom-filter position="BASIC_AUTH_FILTER" ref="digestFilter" />
+    <!-- Authentication filter chain -->
+    <sec:custom-filter position="BASIC_AUTH_FILTER" ref="authenticationFilters" />
 
     <!-- CAS auth is used for authentication via browsers -->
     <sec:custom-filter position="FORM_LOGIN_FILTER" ref="casFilter" />
-
-    <!--
-      2-legged oauth is used by trusted 3rd party applications, including LTI producers.
-      If you do not plan to use OAuth, comment this out.
-    -->
-    <sec:custom-filter after="BASIC_AUTH_FILTER" ref="oauthProtectedResourceFilter" />
 
     <!-- Enables "remember me" functionality -->
     <sec:remember-me key="opencast" user-service-ref="userDetailsService" />
@@ -98,6 +92,27 @@
     <sec:custom-filter ref="singleLogoutFilter" before="FORM_LOGIN_FILTER"/>
 
   </sec:http>
+
+  <!-- ############################# -->
+  <!-- # Authentication Filters    # -->
+  <!-- ############################# -->
+
+  <bean id="authenticationFilters" class="org.springframework.web.filter.CompositeFilter">
+    <property name="filters">
+      <list>
+        <!-- Digest auth is used by capture agents and is used to enable transparent clustering of services -->
+        <!-- ATTENTION! Do not deactivate the digest filter, otherwise the distributed setup would not work -->
+        <ref bean="digestFilter" />
+
+        <!-- Basic authentication  -->
+        <!-- <ref bean="basicAuthenticationFilter" /> -->
+
+        <!-- 2-legged oauth is used by trusted 3rd party applications, including LTI producers. -->
+        <!-- If you do not plan to use OAuth, comment this out. -->
+        <ref bean="oauthProtectedResourceFilter" />
+      </list>
+    </property>
+  </bean>
 
   <!-- ######################################## -->
   <!-- # Custom Anonymous Filter Definition   # -->
