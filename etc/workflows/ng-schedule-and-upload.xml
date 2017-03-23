@@ -87,8 +87,6 @@
             $('#publicationConfigurationPanel').toggle(show);
             $('#straightToPublishing').val(show);
         });
-        <!-- Remove this line if you wish to publish to AWS S3
-        $('#publishToAws').prop('disabled', false);
         $('input[name="publishToSearch"]').change(function(){
             if ($(this).is(':checked')) {
               $('#publishToAws').prop('disabled', false);
@@ -101,7 +99,9 @@
               $('#publishToEngage').prop('checked', false);
             }
         });
-        Remove this line if you wish to publish to AWS S3 -->
+        <!-- Remove the line below if you wish to publish to AWS S3 -->
+        $('#publishToAws').prop('disabled', false);
+        <!-- Remove the line above if you wish to publish to AWS S3 -->
       </script>
     ]]>
   </configuration_panel>
@@ -121,6 +121,7 @@
         <configuration key="publishToApi">true</configuration>
         <configuration key="publishToOaiPmh">true</configuration>
         <configuration key="publishToYouTube">false</configuration>
+        <configuration key="publishToAws">false</configuration>
       </configurations>
     </operation>
 

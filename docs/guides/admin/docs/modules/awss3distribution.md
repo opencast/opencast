@@ -17,7 +17,7 @@ The development and testing it is generally safe to allow the Opencast AWS S3 Di
 Amazon CloudFront
 -----------------
 
-Amazon CloudFront provides an *optional* way to better handle distributing your media to end users.  While fully configuring CloudFront is outside the scope of this documentation, we wish to note that this does affect one of the keys described below.  Please ensure you use the correct distribution base frmat depending on which service you are using!
+Amazon CloudFront provides an *optional* way to better handle distributing your media to end users.  While fully configuring CloudFront is outside the scope of this documentation, we wish to note that this does affect one of the keys described below.  Please ensure you use the correct distribution base format depending on which service you are using!
 
 Opencast Service Configuration
 ------------------------------

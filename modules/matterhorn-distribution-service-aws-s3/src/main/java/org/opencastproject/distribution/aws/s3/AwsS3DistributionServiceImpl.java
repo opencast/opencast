@@ -96,6 +96,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
   };
 
   // Service configuration
+  public static final String AWS_S3_DISTRIBUTION_ENABLE = "org.opencastproject.distribution.aws.s3.distribution.enable";
   public static final String AWS_S3_DISTRIBUTION_BASE_CONFIG = "org.opencastproject.distribution.aws.s3.distribution.base";
   public static final String AWS_S3_ACCESS_KEY_ID_CONFIG = "org.opencastproject.distribution.aws.s3.access.id";
   public static final String AWS_S3_SECRET_ACCESS_KEY_CONFIG = "org.opencastproject.distribution.aws.s3.secret.key";
@@ -144,6 +145,12 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
 
     // Get the configuration
     if (cc != null) {
+
+      if (!Boolean.valueOf(getAWSConfigKey(cc, AWS_S3_DISTRIBUTION_ENABLE))) {
+        logger.info("AWS S3 distribution disabled");
+        return;
+      }
+
       // AWS S3 bucket name
       bucketName = getAWSConfigKey(cc, AWS_S3_BUCKET_CONFIG);
       logger.info("AWS S3 bucket name is {}", bucketName);
@@ -389,7 +396,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
 
   @Override
   public Job retract(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException {
-    Set<String> elementIds = new HashSet();
+    Set<String> elementIds = new HashSet<String>();
     elementIds.add(elementId);
     return retract(channelId, mediapackage, elementIds);
   }
