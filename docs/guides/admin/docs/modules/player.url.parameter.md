@@ -1,5 +1,5 @@
-Theodul Pass Player - URL Parameters
-====================================
+Opencast Player - URL Parameters
+================================
 
 URL Parameters
 --------------

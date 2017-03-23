@@ -23,21 +23,25 @@
 define(['jquery', 'backbone'], function($, Backbone) {
     "use strict";
 
-    var prop_shortcut = "player.shortcut.";
-    var prop_shortcut_sequence = "player.shortcut-sequence";
-    var prop_allowedtags = "player.allowedtags";
-    var prop_allowedformats = "player.allowedformats";
-    var prop_mastervideotype = "player.mastervideotype";
-    var prop_positioncontrols = "player.positioncontrols";
-    var prop_layout = "player.layout";
-    var prop_focusedflavor = "player.focusedflavor";
-    var prop_logo_player = "logo_player";
-    var prop_logo_mediamodule = "logo_mediamodule";
-    var prop_link_mediamodule = "link_mediamodule";
-    var prop_show_embed_link = "show_embed_links";
-    var prop_hide_video_context_menu = "player.hide_video_context_menu";
-    var ready = false;
-    var positioncontrols = "";
+    var prop_shortcut = "player.shortcut.",
+        prop_shortcut_sequence = "player.shortcut-sequence",
+        prop_allowedtags = "player.allowedtags",
+        prop_allowedformats = "player.allowedformats",
+        prop_mastervideotype = "player.mastervideotype",
+        prop_positioncontrols = "player.positioncontrols",
+        prop_layout = "player.layout",
+        prop_focusedflavor = "player.focusedflavor",
+        prop_logo_player = "logo_player",
+        prop_logo_mediamodule = "logo_mediamodule",
+        prop_link_mediamodule = "link_mediamodule",
+        prop_show_embed_link = "show_embed_links",
+        prop_piwik_server = "player.piwik.server",
+        prop_piwik_site_id = "player.piwik.site_id",
+        prop_piwik_heartbeat = "player.piwik.heartbeat",
+        prop_piwik_track_events = "player.piwik.track_events",
+        prop_hide_video_context_menu = "player.hide_video_context_menu",
+        ready = false,
+        positioncontrols = "";
 
     /*
      * Model with information about the current user and the current MH configuration
@@ -47,18 +51,22 @@ define(['jquery', 'backbone'], function($, Backbone) {
         initialize: function() {
             this.fetch({
                 success: function(me) {
-                    var shortcuts = new Array();
-                    var shortcut_sequence = "";
-                    var allowedTags;
-                    var allowedFormats;
-                    var mastervideotype = "";
-                    var logo_mediamodule = "";
-                    var logo_player = "";
-                    var link_mediamodule = false;
-                    var show_embed_link = false;
-                    var hide_video_context_menu = false;
-                    var layout = "off";
-                    var focusedflavor = "presentation";
+                    var shortcuts = new Array(),
+                        shortcut_sequence = "",
+                        allowedTags,
+                        allowedFormats,
+                        mastervideotype = "",
+                        logo_mediamodule = "",
+                        logo_player = "",
+                        link_mediamodule = false,
+                        show_embed_link = false,
+                        hide_video_context_menu = false,
+                        layout = "off",
+                        focusedflavor = "presentation",
+                        piwik_server,
+                        piwik_site_id,
+                        piwik_heartbeat,
+                        piwik_track_events;
                     if (me && me.attributes && me.attributes.org && me.attributes.org.properties) {
                         // extract shortcuts
                         $.each(me.attributes.org.properties, function(key, value) {
@@ -97,7 +105,7 @@ define(['jquery', 'backbone'], function($, Backbone) {
                             // controls position
                             else if ((key == prop_focusedflavor) && value) {
                                 focusedflavor = value;
-                            }                            
+                            }
                             // player logo
                             else if ((key == prop_logo_mediamodule) && value) {
                                 logo_mediamodule = value;
@@ -105,7 +113,7 @@ define(['jquery', 'backbone'], function($, Backbone) {
                             // small logo
                             else if ((key == prop_logo_player) && value) {
                                 logo_player = value;
-                            }             
+                            }
                             // link to Media Modul
                             else if ((key == prop_link_mediamodule) && value) {
                                 if (value.trim() == "true") link_mediamodule = true;
@@ -117,6 +125,19 @@ define(['jquery', 'backbone'], function($, Backbone) {
                             // hide video context menu
                             else if ((key == prop_hide_video_context_menu) && value) {
                               if (value.trim() == "true") hide_video_context_menu = true;
+                            }
+                            // Piwik-Settings
+                            else if ((key == prop_piwik_server) && value) {
+                              piwik_server = value;
+                            }
+                            else if ((key == prop_piwik_site_id) && value) {
+                              piwik_site_id = value;
+                            }
+                            else if ((key == prop_piwik_heartbeat) && value) {
+                              piwik_heartbeat = value;
+                            }
+                            else if ((key == prop_piwik_track_events) && value) {
+                              piwik_track_events = value;
                             }
                         });
                     }
@@ -132,6 +153,10 @@ define(['jquery', 'backbone'], function($, Backbone) {
                     me.set("shortcut-sequence", shortcut_sequence);
                     me.set("layout", layout);
                     me.set("focusedflavor", focusedflavor);
+                    me.set("piwik.server", piwik_server);
+                    me.set("piwik.site_id", piwik_site_id);
+                    me.set("piwik.heartbeat", piwik_heartbeat);
+                    me.set("piwik.track_events", piwik_track_events);
                     ready = true;
                 }
             });
