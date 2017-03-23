@@ -271,7 +271,7 @@
 	  interface="org.opencastproject.security.api.SecurityService" />
 
   <osgi:reference id="userReferenceProvider" cardinality="1..1"
-	  interface="org.opencastproject.userdirectory.JpaUserReferenceProvider"  />
+	  interface="org.opencastproject.userdirectory.api.UserReferenceProvider"  />
 
 
   <!-- ############################# -->

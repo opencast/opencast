@@ -21,9 +21,6 @@
 
 package org.opencastproject.kernel.security;
 
-
-
-
 import org.opencastproject.security.api.SecurityService;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -53,10 +50,8 @@ import javax.servlet.http.HttpServletRequest;
  * Callback interface for handing authentication details that are used when an authenticated request for a protected
  * resource is received.
  */
-public class LtiLaunchAuthenticationHandler implements
-        org.springframework.security.oauth.provider.OAuthAuthenticationHandler {
-
-
+public class LtiLaunchAuthenticationHandler
+        implements org.springframework.security.oauth.provider.OAuthAuthenticationHandler {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(LtiLaunchAuthenticationHandler.class);
@@ -73,7 +68,7 @@ public class LtiLaunchAuthenticationHandler implements
   /** The LTI field containing the context_id */
   public static final String CONTEXT_ID = "context_id";
 
-  /** The prefix for LTI user ids   */
+  /** The prefix for LTI user ids */
   public static final String LTI_USER_ID_PREFIX = "lti";
 
   /** The delimiter to use in generated OAUTH id's **/
@@ -109,10 +104,12 @@ public class LtiLaunchAuthenticationHandler implements
 
   /**
    * Full constructor for a LTI authentication handler that includes a list of highly trusted keys
+   *
    * @param userDetailsService
    * @param highlyTrustedkeys
    */
-  public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService, SecurityService securityService, List<String> highlyTrustedkeys) {
+  public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService, SecurityService securityService,
+          List<String> highlyTrustedkeys) {
     this.userDetailsService = userDetailsService;
     this.securityService = securityService;
     this.highlyTrustedKeys = highlyTrustedkeys;
@@ -138,25 +135,25 @@ public class LtiLaunchAuthenticationHandler implements
 
     // Get the comser guid if provided
     String consumerGUID = request.getParameter(LTI_CONSUMER_GUID);
-    //This is an optional field it could be blank
+    // This is an optional field it could be blank
     if (StringUtils.isBlank(consumerGUID)) {
       consumerGUID = "UknownConsumer";
     }
 
-    //We need to construct a complex ID to avoid confusion
+    // We need to construct a complex ID to avoid confusion
     userIdFromConsumer = LTI_USER_ID_PREFIX + LTI_ID_DELIMITER + consumerGUID + LTI_ID_DELIMITER + userIdFromConsumer;
 
-    //if this is a trusted consumer we trust their details
+    // if this is a trusted consumer we trust their details
     String oaAuthKey = request.getParameter("oauth_consumer_key");
     if (highlyTrustedKeys.contains(oaAuthKey)) {
       logger.debug("{} is a trusted key", oaAuthKey);
-      //If supplied we use the human readable name
+      // If supplied we use the human readable name
       String suppliedEid = request.getParameter("lis_person_sourcedid");
-      //This is an optional field it could be null
+      // This is an optional field it could be null
       if (StringUtils.isNotBlank(suppliedEid)) {
         userIdFromConsumer = suppliedEid;
       } else {
-        //if no eid is set we use the supplied ID
+        // if no eid is set we use the supplied ID
         userIdFromConsumer = request.getParameter(LTI_USER_ID_PARAM);
       }
     }
@@ -169,30 +166,36 @@ public class LtiLaunchAuthenticationHandler implements
     Collection<GrantedAuthority> userAuthorities = null;
     try {
       userDetails = userDetailsService.loadUserByUsername(userIdFromConsumer);
-      userAuthorities = (Collection<GrantedAuthority>) userDetails.getAuthorities();
-      //This list is potentially an modifiable collection
-      userAuthorities = new HashSet<GrantedAuthority>(userAuthorities);
-      //we still need to enrich this user with the LTI Roles
+
+      // userDetails returns a Collection<? extends GrantedAuthority>, which cannot be directly casted to a
+      // Collection<GrantedAuthority>.
+      // On the other hand, one cannot add non-null elements or modify the existing ones in a Collection<? extends
+      // GrantedAuthority>. Therefore, we *must* instantiate a new Collection<GrantedAuthority> (an ArrayList in this
+      // case) and populate it with whatever elements are returned by getAuthorities()
+      userAuthorities = new HashSet<GrantedAuthority>(userDetails.getAuthorities());
+
+      // we still need to enrich this user with the LTI Roles
       String roles = request.getParameter(ROLES);
       String context = request.getParameter(CONTEXT_ID);
       enrichRoleGrants(roles, context, userAuthorities);
     } catch (UsernameNotFoundException e) {
-      // This user is known to the tool consumer, but not to Matterhorn. Create a user "on the fly"
+      // This user is known to the tool consumer, but not to Opencast. Create a user "on the fly"
       userAuthorities = new HashSet<GrantedAuthority>();
       // We should add the authorities passed in from the tool consumer?
-      userAuthorities.add(new GrantedAuthorityImpl("ROLE_ANONYMOUS"));
       String roles = request.getParameter(ROLES);
       String context = request.getParameter(CONTEXT_ID);
       enrichRoleGrants(roles, context, userAuthorities);
-      //all users need the OATH ROLE, the user Role and the Anon Role
-      userAuthorities.add(new GrantedAuthorityImpl(ROLE_OAUTH_USER));
-      userAuthorities.add(new GrantedAuthorityImpl("ROLE_USER"));
-      userAuthorities.add(new GrantedAuthorityImpl("ROLE_ANONYMOUS"));
 
       logger.info("Returning user with {} authorities", userAuthorities.size());
 
       userDetails = new User(userIdFromConsumer, "oauth", true, true, true, true, userAuthorities);
     }
+
+    // All users need the OAUTH, USER and ANONYMOUS roles
+    userAuthorities.add(new SimpleGrantedAuthority(ROLE_OAUTH_USER));
+    userAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+    userAuthorities.add(new SimpleGrantedAuthority("ROLE_ANONYMOUS"));
+
     Authentication ltiAuth = new PreAuthenticatedAuthenticationToken(userDetails, authentication.getCredentials(),
             userAuthorities);
     SecurityContextHolder.getContext().setAuthentication(ltiAuth);
@@ -201,35 +204,40 @@ public class LtiLaunchAuthenticationHandler implements
 
   /**
    * Enrich A collection of role grants with specified LTI memberships
+   *
    * @param roles
    * @param context
    * @param userGrants
    */
   private void enrichRoleGrants(String roles, String context, Collection<GrantedAuthority> userAuthorities) {
-  //Roles could be a list
-      if (roles != null) {
-        List<String> roleList = Arrays.asList(roles.split(","));
-        for (int i = 0; i < roleList.size(); i++) {
+    // Roles could be a list
+    if (roles != null) {
+      List<String> roleList = Arrays.asList(roles.split(","));
 
-          /* Use a generic context and learner if none is given: */
-          context = StringUtils.isBlank(context) ? DEFAULT_CONTEXT : context;
-          String learner = StringUtils.isBlank(roleList.get(i))
-            ? DEFAULT_LEARNER : roleList.get(i);
+      /* Use a generic context and learner if none is given: */
+      context = StringUtils.isBlank(context) ? DEFAULT_CONTEXT : context;
 
-          /* Build the role */
-          String role = context + "_" + learner;
+      for (String learner : roleList) {
 
-          /* Make sure to not accept ROLE_… */
-          if (role.trim().toUpperCase().startsWith("ROLE_")) {
-            logger.warn("Discarding attempt to acquire role “{}”", role);
-            continue;
-          }
-
-          /* Add this role */
-          logger.debug("adding role: {}", role);
-          userAuthorities.add(new GrantedAuthorityImpl(role));
+        /* Build the role */
+        String role;
+        if (StringUtils.isBlank(learner)) {
+          role = context + "_" + DEFAULT_LEARNER;
+        } else {
+          role = context + "_" + learner;
         }
+
+        /* Make sure to not accept ROLE_… */
+        if (role.trim().toUpperCase().startsWith("ROLE_")) {
+          logger.warn("Discarding attempt to acquire role “{}”", role);
+          continue;
+        }
+
+        /* Add this role */
+        logger.debug("Adding role: {}", role);
+        userAuthorities.add(new SimpleGrantedAuthority(role));
       }
+    }
   }
 
 }

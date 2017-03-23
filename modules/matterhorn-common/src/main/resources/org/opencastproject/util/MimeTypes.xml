@@ -10,6 +10,11 @@
     <Extensions>txt</Extensions>
   </MimeType>
   <MimeType>
+    <Type>text/vtt</Type>
+    <Description>Web VTT captions</Description>
+    <Extensions>vtt</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>application/pdf</Type>
     <Description>Portable Document Format</Description>
     <Extensions>pdf</Extensions>
@@ -65,7 +70,7 @@
     <Extensions>flc,fli,cel</Extensions>
   </MimeType>
   <MimeType>
-    <Type>image/x-png</Type>
+    <Type>image/png</Type>
     <Description>PNG image</Description>
     <Extensions>png</Extensions>
   </MimeType>

@@ -1480,17 +1480,20 @@
      "ZOOMLEVEL": "Zoom Level",
      "ZOOM": "Zoom",
      "BUTTONS": {
-       "COMMENTS": "View",
-       "METADATA": "Edit",
-       "CLOSE":    "Close",
-       "SAVE":     "Save",
-       "PROCESS":  "Save & process"
+       "CLOSE":       "Close",
+       "SAVE":        "Save",
+       "PROCESS":     "Save & Continue",
+       "ADD_COMMENT": "Add Comment"
      },
      "TABS": {
        "PLAY":        "Playback",
        "EDIT":        "Editor",
        "CAPTIONS":    "Captions",
        "ANNOTATIONS": "Annotations"
+     },
+     "AREAS": {
+       "METADATA":    "Metadata",
+       "COMMENTS":    "Comments"
      },
      "ACTIONS": {
        "SPLIT": "Split",

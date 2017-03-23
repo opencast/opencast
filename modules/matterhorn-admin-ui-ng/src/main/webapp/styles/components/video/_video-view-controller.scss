@@ -23,28 +23,32 @@
 .view-controller {
     text-align: center;
     padding: 12px 20px;
-    background: #fff;
-    border: $thin-border-stroke $main-border-color;
+    background: $primary-color-blue;
+    border: $thin-border-stroke $primary-color-blue;
 
     a {
         font-size: 12px;
         font-weight: $weight-semibold;
-        color: $grey;
+        color: $header-link-color;
 
         &:not(:first-child) {
             margin-left: 36px;
         }
 
         &:hover {
-            color: darken($grey, 10%);
+            color: lighten($header-link-color, 10%);
         }
 
         &.active {
-            color: $l-blue;
+            color: $primary-color-white;
 
             &:hover {
-                color: darken($l-blue, 5%);
+                color: darken($primary-color-white, 5%);
             }
         }
     }
+}
+
+.event-container {
+  margin-top: 12px;
 }

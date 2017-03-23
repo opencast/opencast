@@ -99,7 +99,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     zoomIn: new Engage.Event('Video:zoomIn', 'zooms in video', 'handler'),
     zoomOut: new Engage.Event('Video:zoomOut', 'zooms out video', 'handler'),
     zoomChange: new Engage.Event('Video:zoomChange', 'zoom level has changed', 'trigger'),
-    switchVideo: new Engage.Event('Video:switch', 'switch the video', 'handler')
+    switchVideo: new Engage.Event('Video:switch', 'switch the video', 'handler'),
+    toggleCaptions: new Engage.Event('Video:toggleCaptions', 'toggle captions', 'handler'),
+    captionsFound: new Engage.Event('Video:captionsFound', 'captions found', 'handler')
   };
 
   var isDesktopMode = false;
@@ -248,6 +250,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var focusedClass = 'videoFocused';
   var isPiP = true;
   var pipPos = 'left';
+  var activeCaption = undefined;
 
   var foundQualities = undefined;
   var zoomTimeout = 500;
@@ -1196,7 +1199,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
   function renderVideoDisplay(videoDataView) {
     Engage.log('Video: Rendering video displays');
-
     var videoDisplays = videoDataView.model.get('ids');
     var videoSources = videoDataView.model.get('videoSources');
 
@@ -1235,6 +1237,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         }
       }
     }
+    console.log(videodisplayMaster);
+
+    loadAndAppendCaptions(videoDataView);
   }
 
   function prepareRenderingVideoDisplay(videoDataView) {
@@ -1347,7 +1352,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       checkVideoDisplaySize();
     }
   }
-
 
   function checkVideoDisplaySize() {
     var $engageVideoId = $('#' + id_engage_video);
@@ -2333,6 +2337,74 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     }
 
     return 0;
+  }
+
+  /**
+   * Try to load captions for video
+   * @returns {undefined}
+   */
+  function loadAndAppendCaptions(videoDataView) {
+    Engage.log("Video: Loading Captions.");
+    var tracks        = Engage.model.get('mediaPackage').get('tracks');
+    var attachments   = Engage.model.get('mediaPackage').get('attachments')
+    var videoDisplays = videoDataView.model.get('ids');
+    var captionsURL   = null;
+
+    // Load from attachment
+    for(var a in attachments) {
+      if(attachments[a].mimetype == "text/vtt") {
+        Engage.log("Found caption in attachments.");
+        captionsURL = attachments[a].url;
+        Engage.model.set("captions", true);
+        Engage.trigger(plugin.events.captionsFound.getName());
+      }
+    }
+
+    // Load from track
+    for(var a in tracks) {
+      if(tracks[a].mimetype == "text/vtt") {
+        Engage.log("Found caption in tracks");
+        captionsURL = tracks[a].url;
+        Engage.model.set("captions", true);
+        Engage.trigger(plugin.events.captionsFound.getName());
+      }
+    }
+
+    if(captionsURL == null) {
+      return;
+    }
+
+    $.each(videoDisplays, function(i, j){
+      var caption = videojs(j).addRemoteTextTrack({
+        kind: 'caption',
+        language: 'en',
+        label: 'Caption',
+        src: captionsURL,
+        mode: "hidden"
+      }, true);
+    });
+
+    activeCaption = videojs(videoDisplays[0]).remoteTextTracks()[0];
+
+    Engage.on(plugin.events.toggleCaptions.getName(), function(data) {
+      if(data) {
+        activeCaption.mode = "showing";
+      } else {
+        activeCaption.mode = "hidden";
+      }
+    });
+
+    Engage.on(plugin.events.focusVideo.getName(), function (data) {
+      var captionMode = activeCaption.mode;
+      activeCaption.mode = "hidden";
+      activeCaption = videojs("videojs_videodisplay_" + data).textTracks()[0];
+      activeCaption.mode = captionMode;
+      if(data == "none") {
+        console.warn("none " + data);
+      } else {
+        console.warn("else " + data);
+      }
+    });
   }
 
   function initPlugin() {

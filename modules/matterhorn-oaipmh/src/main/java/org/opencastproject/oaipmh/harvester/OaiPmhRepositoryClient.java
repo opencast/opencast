@@ -18,8 +18,6 @@
  * the License.
  *
  */
-
-
 package org.opencastproject.oaipmh.harvester;
 
 import static org.opencastproject.oaipmh.OaiPmhUtil.toUtc;
@@ -40,14 +38,12 @@ import org.w3c.dom.Document;
 import java.io.InputStream;
 import java.util.Date;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * The repository client provides low level methods to talk to an OAI-PMH repository.
  */
 public final class OaiPmhRepositoryClient {
-
   private final HttpClient httpclient;
 
   private final DocumentBuilderFactory builderFactory;
@@ -102,9 +98,23 @@ public final class OaiPmhRepositoryClient {
   }
 
   /**
+   * Run a "GetRecord" request.
+   */
+  public GetRecordResponse getRecord(String metadataPrefix, String identifier, Option<Date> from, Option<Date> until, Option<String> set) {
+    String queryParams = join(
+        "verb=" + OaiPmhConstants.VERB_GET_RECORD,
+        "metadataPrefix=" + metadataPrefix,
+        "identifier=" + identifier,
+        from.map(mkQueryParamDate("from")).getOrElse(""),
+        until.map(mkQueryParamDate("until")).getOrElse(""),
+        set.map(mkQueryParam("set")).getOrElse(""));
+    return new GetRecordResponse(doRequest(baseUrl + "?" + queryParams));
+  }
+
+  /**
    * Resume a "ListRecords" request.
    */
-  public ListRecordsResponse resumeListRecords(String metadataPrefix, String resumptionToken) {
+  public ListRecordsResponse resumeListRecords(String resumptionToken) {
     String queryParams = "verb=" + OaiPmhConstants.VERB_LIST_RECORDS + "&resumptionToken=" + resumptionToken;
     return new ListRecordsResponse(doRequest(baseUrl + "?" + queryParams));
   }
@@ -143,15 +153,18 @@ public final class OaiPmhRepositoryClient {
    * Execute the request and return the document.
    */
   public Document doRequest(String url) {
-    HttpGet httpget = new HttpGet(url);
+    final HttpGet httpget = new HttpGet(url);
     try {
-      HttpResponse response = httpclient.execute(httpget);
+      final HttpResponse response = httpclient.execute(httpget);
       if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-        HttpEntity entity = response.getEntity();
+        final HttpEntity entity = response.getEntity();
         if (entity != null) {
-          InputStream content = entity.getContent();
-          DocumentBuilder docBuilder = builderFactory.newDocumentBuilder();
-          return docBuilder.parse(content);
+          final InputStream content = entity.getContent();
+          final Document doc = builderFactory.newDocumentBuilder().parse(content);
+          if (doc.getChildNodes().getLength() == 0) {
+            throw new RequestException("Empty response");
+          }
+          return doc;
         } else {
           throw new RequestException("Empty response");
         }

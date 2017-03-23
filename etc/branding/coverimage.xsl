@@ -40,7 +40,7 @@
           }
           .description {
             font-size: 0.5em;
-          }          
+          }
           .license {
             font-size: 0.8em;
           }
@@ -98,7 +98,7 @@
           <xsl:value-of select="opencast:XsltHelper.split(metadata/description, 50, 3, true)" />
         </tspan>
         <tspan class="presentationdate" dy="12%" x="50%">
-          <xsl:value-of select="date:format-date(metadata/date, 'MMMMMMMMMM dd, YYYY, HH:mm:ss')" />
+          <xsl:value-of select="date:format-date(metadata/start, 'MMMMMMMMMM dd, YYYY, HH:mm')" />
         </tspan>
         <tspan class="license" dy="10%" x="50%">
           <xsl:value-of select="metadata/license" />

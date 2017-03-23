@@ -25,8 +25,9 @@ import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.XMLCatalogImpl.CatalogEntry;
 import org.opencastproject.util.XmlNamespaceContext;
 
-import org.apache.commons.io.IOUtils;
-import org.eclipse.persistence.internal.oxm.record.DOMInputSource;
+import com.entwinemedia.fn.Fn;
+import com.entwinemedia.fn.data.Opt;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -38,20 +39,28 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
 
 /**
- * Parse a DublinCore catalog from XML.
+ * XML serialization of Dublin Core catalogs.
  */
 @ParametersAreNonnullByDefault
 public final class DublinCoreXmlFormat extends DefaultHandler {
@@ -125,13 +134,35 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
   @Nonnull
   public static DublinCoreCatalog read(String xml)
           throws IOException, SAXException, ParserConfigurationException {
-    return new DublinCoreXmlFormat().readImpl(new InputSource(IOUtils.toInputStream(xml, "UTF-8")));
+    return new DublinCoreXmlFormat().readImpl(
+        new InputSource(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))));
   }
+
+  public static Opt<DublinCoreCatalog> readOpt(String xml) {
+    try {
+      return Opt.some(read(xml));
+    } catch (Exception e) {
+      return Opt.none();
+    }
+  }
+
+  /** {@link #read(String)} as a function, returning none on error. */
+  public static final Fn<String, Opt<DublinCoreCatalog>> readOptFromString = new Fn<String, Opt<DublinCoreCatalog>>() {
+    @Override public Opt<DublinCoreCatalog> ap(String xml) {
+      return readOpt(xml);
+    }
+  };
 
   @Nonnull
   public static DublinCoreCatalog read(Node xml)
-          throws IOException, SAXException, ParserConfigurationException {
-    return new DublinCoreXmlFormat().readImpl(new DOMInputSource(xml));
+      throws TransformerException {
+    return new DublinCoreXmlFormat().readImpl(xml);
+  }
+
+  @Nonnull
+  public static DublinCoreCatalog read(InputSource xml)
+      throws IOException, SAXException, ParserConfigurationException {
+    return new DublinCoreXmlFormat().readImpl(xml);
   }
 
   public static Document writeDocument(DublinCoreCatalog dc)
@@ -155,7 +186,23 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
     }
   }
 
+  public static String writeString(DublinCoreCatalog dc) {
+    try {
+      return dc.toXmlString();
+    } catch (IOException e) {
+      throw new IllegalStateException(String.format("Error serializing the episode dublincore catalog %s.", dc), e);
+    }
+  }
+
   // SAX
+
+  private DublinCoreCatalog readImpl(Node node) throws TransformerException {
+    final Result outputTarget = new SAXResult(this);
+    final Transformer t = TransformerFactory.newInstance().newTransformer();
+    t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+    t.transform(new DOMSource(node), outputTarget);
+    return dc;
+  }
 
   private DublinCoreCatalog readImpl(InputSource in)
           throws ParserConfigurationException, SAXException, IOException {

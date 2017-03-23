@@ -104,7 +104,7 @@ public class OaiPmhHarvester implements ManagedService {
    * @see #activate(ComponentContext)
    */
   @Override
-  public synchronized void updated(Dictionary properties) throws ConfigurationException {
+  public synchronized void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     logger.info("Updated");
     try {
       checkDictionary(properties, componentContext);
@@ -206,7 +206,7 @@ public class OaiPmhHarvester implements ManagedService {
 
     /**
      * @param urls the urls, i.e. the repositories, to harvest
-     * @param securityConfigurator a function to configure the security service in order to access the search service
+     * @param securityConfigurator a function to configure the security service in order to access the episode service
      */
     Worker(String[] urls,
            RecordHandler handler,

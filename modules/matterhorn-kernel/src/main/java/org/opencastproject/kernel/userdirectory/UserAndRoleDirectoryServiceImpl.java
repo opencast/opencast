@@ -47,6 +47,7 @@ import com.google.common.cache.LoadingCache;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -75,6 +76,12 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   /** A non-obvious password to allow a Spring User to be instantiated for CAS authenticated users having no password */
   private static final String DEFAULT_PASSWORD = "4b3e4b30-718c-11e2-bcfd-0800200c9a66";
 
+  /** The configuration property for the user cache size */
+  public static final String USER_CACHE_SIZE_KEY = "org.opencastproject.userdirectory.cache.size";
+
+  /** The configuration property for the user cache expiry time */
+  public static final String USER_CACHE_EXPIRY_KEY = "org.opencastproject.userdirectory.cache.expiry";
+
   /** The list of user providers */
   protected List<UserProvider> userProviders = new CopyOnWriteArrayList<UserProvider>();
 
@@ -95,8 +102,46 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     }
   };
 
-  private final LoadingCache<Tuple<String, String>, Object> cache = CacheBuilder.newBuilder()
-          .expireAfterWrite(1, TimeUnit.MINUTES).maximumSize(200).build(userLoader);
+  /** The user cache */
+  private LoadingCache<Tuple<String, String>, Object> cache;
+
+  /** Size of the user cache */
+  private int cacheSize = 200;
+
+  /** Expiry time for elements in the user cache */
+  private int cacheExpiryTimeInMinutes = 1;
+
+  /**
+   * Callback to activate the component.
+   *
+   * @param cc
+   *          the declarative services component context
+   */
+  protected void activate(ComponentContext cc) {
+
+    if (cc != null) {
+      String stringValue = cc.getBundleContext().getProperty(USER_CACHE_SIZE_KEY);
+      try {
+        cacheSize = Integer.parseInt(StringUtils.trimToNull(stringValue));
+      } catch (Exception e) {
+        logger.warn("Ignoring invalid value {} for user cache size", stringValue);
+      }
+
+      stringValue = cc.getBundleContext().getProperty(USER_CACHE_EXPIRY_KEY);
+      try {
+        cacheExpiryTimeInMinutes = Integer.parseInt(StringUtils.trimToNull(stringValue));
+      } catch (Exception e) {
+        logger.warn("Ignoring invalid value {} for user cache expiry time", stringValue);
+      }
+    }
+
+    // Create the user cache
+    cache = CacheBuilder.newBuilder().expireAfterWrite(cacheExpiryTimeInMinutes, TimeUnit.MINUTES).maximumSize(cacheSize).build(userLoader);
+
+    logger.info("Activated UserAndRoleDirectoryService with user cache of size {}, expiry time {} minutes",
+      cacheSize, cacheExpiryTimeInMinutes);
+
+  }
 
   /**
    * Adds a user provider.
