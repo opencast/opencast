@@ -30,9 +30,8 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
-import org.opencastproject.metadata.dublincore.DublinCores;
-import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -40,16 +39,11 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -202,7 +196,7 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
 
       // Find DCTerm
       for (Catalog catalog : catalogs) {
-        DublinCoreCatalog dc = extractDublinCoreCatalog(mediaPackage, catalog.getIdentifier());
+        DublinCoreCatalog dc = DublinCoreUtil.loadDublinCore(workspace, catalog);
         // Match Value
         List<DublinCoreValue> values = dc.get(dcterm);
         if (values.isEmpty()) {
@@ -255,27 +249,7 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
         }
       } // if foundValue
     } // if catalogs
+    
     return createResult(mediaPackage, Action.CONTINUE);
-  }
-
-  protected DublinCoreCatalog extractDublinCoreCatalog(MediaPackage mediaPackage, String catalogId) {
-    Catalog catalog = mediaPackage.getCatalog(catalogId);
-
-    if (catalog != null) {
-      InputStream istream = null;
-      try {
-        File file = workspace.get(catalog.getURI());
-        istream = new FileInputStream(file);
-        DublinCoreCatalog dc = DublinCores.read(istream);
-        return dc;
-      } catch (NotFoundException | IOException e) {
-        logger.warn("Error loading Dublin Core metadata from media packge '{}': {}", mediaPackage, e);
-        return null;
-      } finally {
-        IOUtils.closeQuietly(istream);
-      }
-    }
-
-    return null;
   }
 }
