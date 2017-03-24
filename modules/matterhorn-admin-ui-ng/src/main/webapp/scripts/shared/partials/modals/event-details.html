@@ -272,7 +272,7 @@
                                 <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.INPUTS' | translate }}</td>
                                 <td>
                                     <label ng-repeat="inputMethod in source.device.inputs">
-                                        <input type="checkbox" 
+                                        <input type="checkbox"
                                             ng-change="saveScheduling()"
                                             ng-model="source.device.inputMethods[inputMethod.id]"
                                             ng-disabled="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')"> {{ inputMethod.value | translate }}
@@ -286,7 +286,7 @@
                 </div>
 
                 <!-- Participation status -->
-                <div class="obj">   
+                <div class="obj">
                     <header translate="EVENTS.EVENTS.DETAILS.SCHEDULING.CAPTION">
                         <!-- Participation Status -->
                     </header>
@@ -311,7 +311,7 @@
                                 </label>
                             </div>
                         </div>
-                    </div>  
+                    </div>
                 </div>
 
             </div>
@@ -390,7 +390,7 @@
                                                 </td>
                                             </tr>
                                         </tbody>
-                                    </table>                            
+                                    </table>
                                 </div>
 
                                 <div class="obj list-obj quick-actions">
@@ -612,7 +612,7 @@
                                     <p>
                                       <span>@{{ comment.author.name }}</span> {{ reply.text }}
                                     </p>
-                                    <a ng-show="!transactions.read_only" ng-click="deleteCommentReply(comment.id, reply.id)" class="delete" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE">
+                                    <a ng-click="deleteCommentReply(comment.id, reply.id)" class="delete" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE">
                                       <i class="fa fa-times-circle"></i> {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.DELETE' | translate }}
                                     </a>
                                 </div>
@@ -622,7 +622,6 @@
                           <textarea ng-model="myComment.text" placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.PLACEHOLDER' | translate }}"></textarea>
                           <div>
                               <select chosen pre-select-from="components.eventCommentReasons"
-                                  ng-disabled="!transactions.read_only"
                                   data-width="'200px'"
                                   data-disable-search-threshold="8"
                                   ng-model="myComment.reason"
