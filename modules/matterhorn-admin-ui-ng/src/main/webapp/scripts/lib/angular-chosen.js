@@ -165,10 +165,10 @@
             scope.scroller = scroller;
             /* This makes opencast-scroll-glue work, the if check prevents the unit tests from failing */
             if (angular.isDefined(scroller.injector())) {
-              scroller.injector().invoke(function($compile) {
+              scroller.injector().invoke(['$compile', function($compile) {
                 var scope = angular.element(scroller).scope();
                 $compile(scroller)(scope);
-              });
+              }]);
             }
             scroller.bind('scroll', getMoreElements);
             var search = angular.element(angular.element(element).parent().children(".chosen-container").children('.chosen-drop').children('.chosen-search')[0].childNodes["0"]);
