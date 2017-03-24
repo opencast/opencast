@@ -81,7 +81,7 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
    *          the distribution service
    */
   protected void setDistributionService(DistributionService distributionService) {
-    distributionService = distributionService;
+    this.distributionService = distributionService;
   }
 
   /**
