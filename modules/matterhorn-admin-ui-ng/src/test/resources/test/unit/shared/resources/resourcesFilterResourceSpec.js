@@ -24,7 +24,7 @@ describe('Resource Filter API Resource', function () {
                 .respond(JSON.stringify(filtersResponse));
             result = ResourcesFilterResource.get({ resource: 'events' });
             $httpBackend.flush();
-            expect(result.filters.location.options.option1).toEqual('OPTION1');
+            expect(result.filters.location.options[0].label).toEqual('OPTION1');
         });
     });
 });

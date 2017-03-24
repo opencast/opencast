@@ -95,6 +95,9 @@ angular.module('adminNg.directives')
                     scope.showFilterSelector = false;
                     scope.selectedFilter = null;
                     Storage.put('filter', scope.namespace, filterName, filter.value);
+                    if (!scope.filters.map[filterName]) {
+                      scope.filters.map[filterName] = {};
+                    }
                     scope.filters.map[filterName].value = filter.value;
                 }
             };
