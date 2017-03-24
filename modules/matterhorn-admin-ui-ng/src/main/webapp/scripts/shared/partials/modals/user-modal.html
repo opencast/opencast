@@ -10,17 +10,20 @@
             <!-- User -->
         </a>
         <a ng-click="openTab('internalRoles')" data-modal-tab="internalroles" ng-class="{ active: tab == 'internalRoles' }"
-            translate="USERS.USERS.DETAILS.TABS.ROLES" class="wider">
+            translate="{{ (showExternalRoles ? 'USERS.USERS.DETAILS.TABS.INTERNALROLES' : 'USERS.USERS.DETAILS.TABS.ROLES') | translate }}" class="wider"
+            title="{{ 'USERS.USERS.DETAILS.DESCRIPTION.ROLES' | translate }}">
             <!-- Managable Roles -->
         </a>
         <a ng-click="openTab('externalRoles')" data-modal-tab="externalroles" ng-class="{ active: tab == 'externalRoles' }"
             ng-style="{ display: action === 'edit' ? 'inline-block' : 'none'}"
-            translate="USERS.USERS.DETAILS.TABS.EXTERNALROLES" ng-if="showExternalRoles">
+            translate="USERS.USERS.DETAILS.TABS.EXTERNALROLES" ng-if="showExternalRoles"
+            title="{{ 'USERS.USERS.DETAILS.DESCRIPTION.EXTERNALROLES' | translate }}">
             <!-- Unmanagable Roles -->
         </a>
         <a ng-click="openTab('effectiveRoles')" data-modal-tab="effectiveRoles" ng-class="{ active: tab == 'effectiveRoles' }"
             ng-style="{ display: action === 'edit' ? 'inline-block' : 'none'}"
-            translate="USERS.USERS.DETAILS.TABS.EFFECTIVEROLES">
+            translate="USERS.USERS.DETAILS.TABS.EFFECTIVEROLES"
+            title="{{ 'USERS.USERS.DETAILS.DESCRIPTION.EFFECTIVEROLES' | translate }}">
             <!-- Effective Roles = Internal + External -->
         </a>
     </nav>
@@ -96,6 +99,7 @@
             <div class="modal-body">
                 <div class="form-container multi-select-container">
                     <label translate="USERS.USERS.DETAILS.TABS.EXTERNALROLES"></label>
+                    <p>{{ 'USERS.USERS.DETAILS.DESCRIPTION.EXTERNALROLES' | translate }}</p>
 
                     <a ng-click="clearSearchFieldExternal()" class="clear" ng-show="role.searchable"></a>
                     <input type="text" id="search_external" class="search"
@@ -117,6 +121,7 @@
             <div class="modal-body">
                 <div class="form-container multi-select-container">
                     <label translate="USERS.USERS.DETAILS.TABS.EFFECTIVEROLES"></label>
+                    <p>{{ 'USERS.USERS.DETAILS.DESCRIPTION.EFFECTIVEROLES' | translate }}</p>
 
                     <a ng-click="clearSearchFieldEffective()" class="clear" ng-show="role.searchable"></a>
                     <input type="text" id="search_effective" class="search"
