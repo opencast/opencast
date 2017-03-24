@@ -3,7 +3,7 @@ Install from Repository (Fedora)
 
 The Opencast RPM repository for Fedora has been discontinued since Fedora with RPMfusion now provides nearly all
 necessary dependencies for Opencast. Use the following steps to install them, then continue with the [installation from
-source](source-rhel-sl-centos.md).
+source](source-linux.md).
 
 *This guide is to be merged into the guide for the installation from source.*
 
@@ -46,4 +46,4 @@ Install Opencast
 ----------------
 
 For the installation of Opencast, please have a look at the [installation from source documentation
-](source-rhel-sl-centos.md).
+](source-linux.md).

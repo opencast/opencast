@@ -29,6 +29,7 @@ import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUserReference;
+import org.opencastproject.userdirectory.api.UserReferenceProvider;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -55,7 +56,7 @@ import javax.persistence.Query;
 /**
  * Manages and locates users references using JPA.
  */
-public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
+public class JpaUserReferenceProvider implements UserReferenceProvider, UserProvider, RoleProvider {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(JpaUserReferenceProvider.class);
@@ -277,6 +278,9 @@ public class JpaUserReferenceProvider implements UserProvider, RoleProvider {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void updateUserReference(JpaUserReference user) {
     EntityManager em = null;
     EntityTransaction tx = null;
