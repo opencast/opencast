@@ -235,6 +235,10 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             };
 
             scope.setHumanReadableTimes();
+
+            $timeout(function () {
+              scope.$root.$broadcast("segmentTimesUpdated");
+            }, 300);
         }
     };
 }]);
