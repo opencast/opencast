@@ -59,8 +59,6 @@
 
       <!-- Show or hide the hold and publication configuration panel -->
       <script type="text/javascript">
-        <!-- Remove this line if you wish to publish to AWS S3
-        $('#publishToAws').prop('disabled', false);
         $('input[name="publishToSearch"]').change(function(){
             if ($(this).is(':checked')) {
               $('#publishToAws').prop('disabled', false);
@@ -73,7 +71,9 @@
               $('#publishToEngage').prop('checked', false);
             }
         });
-        Remove this line if you wish to publish to AWS S3 -->
+        <!-- Remove the line below if you wish to publish to AWS S3 -->
+        $('#publishToAws').prop('disabled', false);
+        <!-- Remove the line above if you wish to publish to AWS S3 -->
       </script>
     ]]>
   </configuration_panel>
