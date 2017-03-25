@@ -1062,7 +1062,6 @@
          "TABS": {
            "USER":  "User",
            "ROLES": "Roles",
-           "INTERNALROLES": "Internal Roles",
            "EXTERNALROLES": "External Roles",
            "EFFECTIVEROLES": "Effective Roles"
          },
