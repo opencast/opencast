@@ -34,7 +34,7 @@ angular.module('adminNg.controllers')
         resetStates = function () {
             angular.forEach($scope.states, function(state)  {
                 if (angular.isDefined(state.stateController.reset)) {
-                    state.stateController.reset();
+                    state.stateController.reset({resetDefaults: true});
                 }
             });
         };
@@ -61,8 +61,10 @@ angular.module('adminNg.controllers')
         }
 
         if (args.current.stateController.isSourceState) {
-            args.current.stateController.loadCaptureAgents();
-            args.current.stateController.setDefaultsIfNeeded();
+            if (!args.current.stateController.defaultsSet) {
+              args.current.stateController.loadCaptureAgents();
+              args.current.stateController.setDefaultsIfNeeded();
+            }
         }
     });
 

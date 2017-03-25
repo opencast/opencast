@@ -27,6 +27,8 @@ angular.module('adminNg.services')
 
         self.isSourceState = true;
 
+        this.defaultsSet = false;
+
         this.checkingConflicts = false;
         this.hasConflicts = false;
         this.conflicts = [];
@@ -68,6 +70,11 @@ angular.module('adminNg.services')
             };
 
             if (opts) {
+                if (opts.resetDefaults) {
+                  self.defaultsSet = !opts.resetDefaults;
+                  return;
+                }
+
                 var singleKeys = ['duration', 'start', 'device'];                        //Only apply these default fields to SCHEDULE_SINGLE
 
                 for (var key in opts) {
@@ -370,6 +377,10 @@ angular.module('adminNg.services')
         };
 
         this.setDefaultsIfNeeded = function() {
+                if (self.defaultsSet) {
+                  return;
+                }
+
                 var defaults = {};
                 AuthService.getUser().$promise.then(function (user) {
                     var orgProperties = user.org.properties;
@@ -418,6 +429,7 @@ angular.module('adminNg.services')
                     }
 
                     self.reset(defaults);
+                    self.defaultsSet = true;
                 });
         };
     };
