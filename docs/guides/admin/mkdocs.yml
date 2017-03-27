@@ -94,6 +94,7 @@ pages:
    - Partial Import: 'workflowoperationhandlers/partial-import-woh.md'
    - Post Media Package: 'workflowoperationhandlers/postmediapackage-woh.md'
    - Prepare A/V: 'workflowoperationhandlers/prepareav-woh.md'
+   - Probe Resolution: 'workflowoperationhandlers/probe-resolution-woh.md'
    - Publish Configure: 'workflowoperationhandlers/publishconfigure-woh.md'
    - Publish Engage: 'workflowoperationhandlers/publishengage-woh.md'
    - Publish OAI-PMH: 'workflowoperationhandlers/publish-oaipmh-woh.md'

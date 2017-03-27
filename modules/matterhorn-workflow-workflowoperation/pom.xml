@@ -102,6 +102,7 @@
               OSGI-INF/operations/failing.xml,
               OSGI-INF/operations/import-wf-properties.xml,
               OSGI-INF/operations/include.xml,
+              OSGI-INF/operations/probe-resolution.xml,
               OSGI-INF/operations/series.xml,
               OSGI-INF/operations/tag.xml,
               OSGI-INF/operations/tag-by-dcterm.xml,
