@@ -156,6 +156,10 @@ public abstract class AbstractJobProducer implements JobProducer {
    */
   @Override
   public boolean isReadyToAccept(Job job) throws ServiceRegistryException, UndispatchableJobException {
+    if (!jobType.equals(job.getJobType())) {
+      logger.debug("Invalid job type submitted: {}", job.getJobType());
+      return false;
+    }
     NodeLoad maxload;
     try {
       maxload = getServiceRegistry().getMaxLoadOnNode(getServiceRegistry().getRegistryHostname());

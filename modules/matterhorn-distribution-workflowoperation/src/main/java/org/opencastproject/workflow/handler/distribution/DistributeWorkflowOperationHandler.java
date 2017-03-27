@@ -141,6 +141,7 @@ public class DistributeWorkflowOperationHandler extends AbstractWorkflowOperatio
             "source-flavors"));
     String sourcePriorityFlavors = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
             "source-priority-flavors"));
+    String storeType = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration("store-type"));
 
     AbstractMediaPackageElementSelector<MediaPackageElement> elementSelector;
 

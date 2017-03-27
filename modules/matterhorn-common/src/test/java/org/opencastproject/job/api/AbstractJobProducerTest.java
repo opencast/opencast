@@ -116,6 +116,7 @@ public class AbstractJobProducerTest extends EasyMockSupport {
     replayAll();
 
     Job job = new JobImpl(3);
+    job.setJobType("test");
     job.setStatus(Status.DISPATCHING);
     job.setProcessingHost("same");
 

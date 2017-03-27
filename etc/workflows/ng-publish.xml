@@ -18,28 +18,63 @@
       <div id="workflow-configuration">
         <fieldset>
           <legend>Publish to:</legend>
-            <ul>
-              <li>
-                <span>
-                  <input id="publishToEngage" name="publishToEngage" type="checkbox" checked="checked" class="configField" value="true" />
-                  <span>&nbsp;Opencast Media Module</span>
-                </span>
-              </li>
-              <li>
-                <span>
+                      <ul>
+            <li>
+              <input id="holdOrPublishToggle_hold" type="radio" name="holdOrPublishToggle" value="hold" />
+              <label for="holdOrPublishToggle_hold">Hold</label>
+            </li>
+            <li>
+              <input id="holdOrPublishToggle_publish" type="radio" name="holdOrPublishToggle" value="publish" checked="checked" />
+              <label for="holdOrPublishToggle_publish">Publish right away to</label>
+              <ul id="publicationConfigurationPanel" class="workflow-configuration-subpanel">
+                <li>
+                  <input id="publishToSearch" name="publishToSearch" type="checkbox" checked="checked" class="configField" value="true" />
+                  <label for="publishToSearch">Opencast Index</label>
+                  <fieldset>
+                    <ul id="searchConfigurationPanel" class="workflow-configuration-subpanel">
+                      <li>
+                        <input id="publishToEngage" name="searchPublishType" type="radio" checked="checked" class="configField" value="true" />
+                        <label for="publishToEngage">Opencast Media Module</label>
+                      </li>
+                      <li>
+                        <input id="publishToAws" name="searchPublishType" type="radio" class="configField" disabled="disabled" value="true"/>
+                        <label for="publishToAws">AWS</label>
+                      </li>
+                    </ul>
+                  </fieldset>
+                </li>
+                <li>
                   <input id="publishToApi" name="publishToApi" type="checkbox" checked="checked" class="configField" value="true" />
-                  <span>&nbsp;External Applications</span>
-                </span>
-              </li>
-              <li>
-                <span>
-                  <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" />
-                  <span>&nbsp;YouTube</span>
-                </span>
-              </li>
+                  <label for="publishToApi">External Applications</label>
+                </li>
+                <li>
+                  <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
+                  <label for="publishToYouTube">YouTube</label>
+                </li>
+              </ul>
+            </li>
           </ul>
         </fieldset>
       </div>
+
+      <!-- Show or hide the hold and publication configuration panel -->
+      <script type="text/javascript">
+        $('input[name="publishToSearch"]').change(function(){
+            if ($(this).is(':checked')) {
+              $('#publishToAws').prop('disabled', false);
+              $('#publishToEngage').prop('disabled', false);
+              $('#publishToEngage').prop('checked', true);
+            } else if (!$(this).is(':checked')) {
+              $('#publishToAws').prop('disabled', true);
+              $('#publishToEngage').prop('disabled', true);
+              $('#publishToAws').prop('checked', false);
+              $('#publishToEngage').prop('checked', false);
+            }
+        });
+        <!-- Remove the line below if you wish to publish to AWS S3 -->
+        $('#publishToAws').prop('disabled', false);
+        <!-- Remove the line above if you wish to publish to AWS S3 -->
+      </script>
     ]]>
   </configuration_panel>
 

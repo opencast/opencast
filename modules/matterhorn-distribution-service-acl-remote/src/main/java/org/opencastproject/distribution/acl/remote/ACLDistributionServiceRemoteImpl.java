@@ -28,6 +28,7 @@ import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.util.OsgiUtil;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -48,12 +49,6 @@ public class ACLDistributionServiceRemoteImpl extends RemoteBase implements Dist
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(ACLDistributionServiceRemoteImpl.class);
 
-  /** The service type prefix */
-  public static final String REMOTE_SERVICE_TYPE_PREFIX = "org.opencastproject.distribution.";
-
-  /** The property to look up and append to REMOTE_SERVICE_TYPE_PREFIX */
-  public static final String REMOTE_SERVICE_CHANNEL = "distribution.channel";
-
   /** The distribution channel identifier */
   protected String distributionChannel;
 
@@ -64,8 +59,12 @@ public class ACLDistributionServiceRemoteImpl extends RemoteBase implements Dist
 
   /** activates the component */
   protected void activate(ComponentContext cc) {
-    this.distributionChannel = (String) cc.getProperties().get(REMOTE_SERVICE_CHANNEL);
-    super.serviceType = REMOTE_SERVICE_TYPE_PREFIX + this.distributionChannel;
+    this.distributionChannel = OsgiUtil.getComponentContextProperty(cc, CONFIG_KEY_STORE_TYPE);
+    super.serviceType = JOB_TYPE_PREFIX + this.distributionChannel;
+  }
+
+  public String getDistributionType() {
+    return this.distributionChannel;
   }
 
   @Override

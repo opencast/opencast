@@ -28,9 +28,9 @@ import static org.opencastproject.util.UrlSupport.concat;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 
+import org.opencastproject.distribution.api.AbstractDistributionService;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
-import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -38,17 +38,13 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.track.TrackImpl;
-import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -80,7 +76,7 @@ import java.util.List;
 /**
  * Distributes media to the local media delivery directory.
  */
-public class StreamingDistributionService extends AbstractJobProducer implements DistributionService, ManagedService {
+public class StreamingDistributionService extends AbstractDistributionService implements DistributionService, ManagedService {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(StreamingDistributionService.class);
@@ -110,21 +106,6 @@ public class StreamingDistributionService extends AbstractJobProducer implements
 
   /** The load on the system introduced by creating a retract job */
   private float retractJobLoad = DEFAULT_RETRACT_JOB_LOAD;
-
-  /** The workspace reference */
-  protected Workspace workspace = null;
-
-  /** The service registry */
-  protected ServiceRegistry serviceRegistry = null;
-
-  /** The security service */
-  protected SecurityService securityService = null;
-
-  /** The user directory service */
-  protected UserDirectoryService userDirectoryService = null;
-
-  /** The organization directory service */
-  protected OrganizationDirectoryService organizationDirectoryService = null;
 
   private Option<Locations> locations = none();
 
@@ -165,6 +146,11 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       }
       logger.info("No streaming url configured (org.opencastproject.streaming.url)");
     }
+    this.distributionChannel = OsgiUtil.getComponentContextProperty(cc, CONFIG_KEY_STORE_TYPE);
+  }
+
+  public String getDistributionType() {
+    return this.distributionChannel;
   }
 
   /**
@@ -382,96 +368,6 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     } catch (Exception e) {
       throw new ServiceRegistryException("Error handling operation '" + op + "'", e);
     }
-  }
-
-  /**
-   * Callback for the OSGi environment to set the workspace reference.
-   *
-   * @param workspace
-   *          the workspace
-   */
-  protected void setWorkspace(Workspace workspace) {
-    this.workspace = workspace;
-  }
-
-  /**
-   * Callback for the OSGi environment to set the service registry reference.
-   *
-   * @param serviceRegistry
-   *          the service registry
-   */
-  protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
-    this.serviceRegistry = serviceRegistry;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
-   */
-  @Override
-  protected ServiceRegistry getServiceRegistry() {
-    return serviceRegistry;
-  }
-
-  /**
-   * Callback for setting the security service.
-   *
-   * @param securityService
-   *          the securityService to set
-   */
-  public void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
-  }
-
-  /**
-   * Callback for setting the user directory service.
-   *
-   * @param userDirectoryService
-   *          the userDirectoryService to set
-   */
-  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
-    this.userDirectoryService = userDirectoryService;
-  }
-
-  /**
-   * Sets a reference to the organization directory service.
-   *
-   * @param organizationDirectory
-   *          the organization directory
-   */
-  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
-    this.organizationDirectoryService = organizationDirectory;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
-   */
-  @Override
-  protected SecurityService getSecurityService() {
-    return securityService;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
-   */
-  @Override
-  protected UserDirectoryService getUserDirectoryService() {
-    return userDirectoryService;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
-   */
-  @Override
-  protected OrganizationDirectoryService getOrganizationDirectoryService() {
-    return organizationDirectoryService;
   }
 
   /**

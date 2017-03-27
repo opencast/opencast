@@ -45,8 +45,20 @@
               <label for="holdOrPublishToggle_publish">Publish right away to</label>
               <ul id="publicationConfigurationPanel" class="workflow-configuration-subpanel">
                 <li>
-                  <input id="publishToEngage" name="publishToEngage" type="checkbox" checked="checked" class="configField" value="true" />
-                  <label for="publishToEngage">Opencast Media Module</label>
+                  <input id="publishToSearch" name="publishToSearch" type="checkbox" checked="checked" class="configField" value="true" />
+                  <label for="publishToSearch">Opencast Index</label>
+                  <fieldset>
+                    <ul id="searchConfigurationPanel" class="workflow-configuration-subpanel">
+                      <li>
+                        <input id="publishToEngage" name="searchPublishType" type="radio" checked="checked" class="configField" value="true" />
+                        <label for="publishToEngage">Opencast Media Module</label>
+                      </li>
+                      <li>
+                        <input id="publishToAws" name="searchPublishType" type="radio" class="configField" disabled="disabled" value="true"/>
+                        <label for="publishToAws">AWS</label>
+                      </li>
+                    </ul>
+                  </fieldset>
                 </li>
                 <li>
                   <input id="publishToApi" name="publishToApi" type="checkbox" checked="checked" class="configField" value="true" />
@@ -75,6 +87,21 @@
             $('#publicationConfigurationPanel').toggle(show);
             $('#straightToPublishing').val(show);
         });
+        $('input[name="publishToSearch"]').change(function(){
+            if ($(this).is(':checked')) {
+              $('#publishToAws').prop('disabled', false);
+              $('#publishToEngage').prop('disabled', false);
+              $('#publishToEngage').prop('checked', true);
+            } else if (!$(this).is(':checked')) {
+              $('#publishToAws').prop('disabled', true);
+              $('#publishToEngage').prop('disabled', true);
+              $('#publishToAws').prop('checked', false);
+              $('#publishToEngage').prop('checked', false);
+            }
+        });
+        <!-- Remove the line below if you wish to publish to AWS S3 -->
+        $('#publishToAws').prop('disabled', false);
+        <!-- Remove the line above if you wish to publish to AWS S3 -->
       </script>
     ]]>
   </configuration_panel>
@@ -94,6 +121,7 @@
         <configuration key="publishToApi">true</configuration>
         <configuration key="publishToOaiPmh">true</configuration>
         <configuration key="publishToYouTube">false</configuration>
+        <configuration key="publishToAws">false</configuration>
       </configurations>
     </operation>
 
