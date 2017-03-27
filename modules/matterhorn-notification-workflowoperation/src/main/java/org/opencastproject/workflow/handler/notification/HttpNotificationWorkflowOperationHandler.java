@@ -28,7 +28,6 @@ import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.apache.http.HttpStatus.SC_OK;
 
 import org.opencastproject.job.api.JobContext;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -39,14 +38,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.CoreConnectionPNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,7 +99,7 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
   private static final SortedMap<String, String> CONFIG_OPTIONS;
 
   static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
+    CONFIG_OPTIONS = new TreeMap<>();
     CONFIG_OPTIONS.put(OPT_URL_PATH, "Notification request target");
     CONFIG_OPTIONS.put(OPT_NOTIFICATION_SUBJECT, "Notification title");
     CONFIG_OPTIONS.put(OPT_NOTIFICATION_MESSAGE, "Notification");
@@ -134,62 +134,54 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
           throws WorkflowOperationException {
     logger.debug("Running HTTP notification workflow operation on workflow {}", workflowInstance.getId());
 
-    String urlPath = null;
     int maxRetry = DEFAULT_MAX_RETRY;
     int timeout = DEFAULT_TIMEOUT;
 
-    Option<String> notificationSubjectOpt = getCfg(workflowInstance, OPT_NOTIFICATION_SUBJECT);
-    Option<String> notificationMessageOpt = getCfg(workflowInstance, OPT_NOTIFICATION_MESSAGE);
-    Option<String> methodOpt = getCfg(workflowInstance, OPT_METHOD);
-    Option<String> urlPathOpt = getCfg(workflowInstance, OPT_URL_PATH);
-    Option<String> maxRetryOpt = getCfg(workflowInstance, OPT_MAX_RETRY);
-    Option<String> timeoutOpt = getCfg(workflowInstance, OPT_TIMEOUT);
+    // Required configuration
+    String urlPath = getConfig(workflowInstance, OPT_URL_PATH);
 
-    // Make sure that at least the url has been set.
-    try {
-      urlPath = urlPathOpt.get();
-    } catch (IllegalStateException e) {
-      throw new WorkflowOperationException(format(
-              "The %s configuration key is a required parameter for the HTTP notification workflow operation.",
-              OPT_URL_PATH));
-    }
+    // Optional configuration
+    String notificationSubject = getConfig(workflowInstance, OPT_NOTIFICATION_SUBJECT, null);
+    String notificationMessage = getConfig(workflowInstance, OPT_NOTIFICATION_MESSAGE, null);
+    String method = getConfig(workflowInstance, OPT_METHOD, "post");
+    String maxRetryOpt = getConfig(workflowInstance, OPT_MAX_RETRY, null);
+    String timeoutOpt = getConfig(workflowInstance, OPT_TIMEOUT, null);
+
 
     // If set, convert the timeout to milliseconds
-    if (timeoutOpt.isSome())
-      timeout = Integer.parseInt(StringUtils.trimToNull(timeoutOpt.get())) * 1000;
+    if (timeoutOpt != null) {
+      timeout = Integer.parseInt(timeoutOpt) * 1000;
+    }
 
     // Is there a need to retry on failure?
-    if (maxRetryOpt.isSome())
-      maxRetry = Integer.parseInt(StringUtils.trimToNull(maxRetryOpt.get()));
+    if (maxRetryOpt != null) {
+      maxRetry = Integer.parseInt(maxRetryOpt);
+    }
 
     // Figure out which request method to use
     HttpEntityEnclosingRequestBase request = null;
-    if (methodOpt.isSome()) {
-      if ("post".equalsIgnoreCase(methodOpt.get())) {
-        logger.debug("Request will be sent using the 'post' method");
-        request = new HttpPost(urlPath);
-      } else if ("put".equalsIgnoreCase(methodOpt.get())) {
-        logger.debug("Request will be sent using the 'put' method");
-        request = new HttpPut(urlPath);
-      } else
-        throw new WorkflowOperationException("The configuration key '" + OPT_METHOD
-                + "' only supports 'post' and 'put'");
-    } else {
-      logger.debug("Request will be sent using the default method 'post'");
+    if (StringUtils.equalsIgnoreCase("post", method)) {
       request = new HttpPost(urlPath);
+    } else if (StringUtils.equalsIgnoreCase("put", method)) {
+      request = new HttpPut(urlPath);
+    } else {
+      throw new WorkflowOperationException("The configuration key '" + OPT_METHOD + "' only supports 'post' and 'put'");
     }
+    logger.debug("Request will be sent using the '{}' method", method);
 
     // Add event parameters as form parameters
     try {
-      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      List<BasicNameValuePair> params = new ArrayList<>();
 
       // Add the subject (if specified)
-      if (notificationSubjectOpt.isSome())
-        params.add(new BasicNameValuePair(HTTP_PARAM_SUBJECT, notificationSubjectOpt.get()));
+      if (notificationSubject != null) {
+        params.add(new BasicNameValuePair(HTTP_PARAM_SUBJECT, notificationSubject));
+      }
 
       // Add the message (if specified)
-      if (notificationMessageOpt.isSome())
-        params.add(new BasicNameValuePair(HTTP_PARAM_MESSAGE, notificationMessageOpt.get()));
+      if (notificationMessage != null) {
+        params.add(new BasicNameValuePair(HTTP_PARAM_MESSAGE, notificationMessage));
+      }
 
       // Add the workflow instance id
       params.add(new BasicNameValuePair(HTTP_PARAM_WORKFLOW, Long.toString(workflowInstance.getId())));
@@ -224,17 +216,20 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
 
     logger.debug(format("Executing notification request on target %s, %d attemps left", request.getURI(), maxAttempts));
 
-    DefaultHttpClient httpClient = new DefaultHttpClient();
-    httpClient.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
+    RequestConfig config = RequestConfig.custom()
+            .setConnectTimeout(timeout)
+            .setConnectionRequestTimeout(timeout)
+            .setSocketTimeout(timeout).build();
+    CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 
     HttpResponse response;
     try {
       response = httpClient.execute(request);
     } catch (ClientProtocolException e) {
-      logger.error(format("Protocol error during execution of query on target %s: %s", request.getURI(), e.getMessage()));
+      logger.error("Protocol error during execution of query on target {}: {}", request.getURI(), e.getMessage());
       return false;
     } catch (IOException e) {
-      logger.error(format("I/O error during execution of query on target %s: %s", request.getURI(), e.getMessage()));
+      logger.error("I/O error during execution of query on target {}: {}", request.getURI(), e.getMessage());
       return false;
     }
 
@@ -253,7 +248,7 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
         return false;
       }
     } else {
-      logger.warn(format("Request failed on target %s, status code: %d, no more attempt.", request.getURI(), statusCode));
+      logger.warn("Request failed on target {}, status code: {}, no more attempt.", request.getURI(), statusCode);
       return false;
     }
   }
