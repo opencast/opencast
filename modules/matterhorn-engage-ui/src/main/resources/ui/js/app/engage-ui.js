@@ -23,7 +23,7 @@ function($, bootbox, _, alertify) {
         var page = 1;
         var sort = "";
         var totalEntries = -1;
-        var bufferEntries = 6; // number of entries to load for one page.
+        var bufferEntries = 18; // number of entries to load for one page.
         var restData = "";
         var active = "episodes";
         var stack = new Array();
@@ -255,7 +255,7 @@ function($, bootbox, _, alertify) {
             // get page from url parameter
             var pageNotGet = GetURLParameter("p") == undefined;
             var lastPage = false;
-            page = pageNotGet ? "1" : parseInt(GetURLParameter("p"));
+            page = pageNotGet ? 1 : parseInt(GetURLParameter("p"));
 
             // load episodes from specific series
             var epFromGet = GetURLParameter("epFrom");
@@ -321,6 +321,7 @@ function($, bootbox, _, alertify) {
                     location.href.replace(/(p=[\d]*)/, "p=1")));
             }
 
+            endlessScrolling();
             $($main_container).html(msg_html_loading);
         }
 
