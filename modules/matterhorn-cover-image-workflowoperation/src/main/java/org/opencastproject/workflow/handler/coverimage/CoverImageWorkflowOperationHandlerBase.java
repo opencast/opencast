@@ -334,6 +334,18 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     for (Date created : metadata.getCreated())
       /* Method formatDate of org.apache.xalan.lib.ExsltDatetime requires the format CCYY-MM-DDThh:mm:ss */
       appendXml(xml, "date", new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss").format(created));
+    for (Date[] period : metadata.getTemporalPeriod()) {
+      if (period[0] != null) {
+        appendXml(xml, "start", new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss").format(period[0]));
+      }
+      if (period[1] != null) {
+        appendXml(xml, "end", new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss").format(period[1]));
+      }
+    }
+    for (Date instant : metadata.getTemporalInstant())
+      appendXml(xml, "start", new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss").format(instant));
+    for (Long duration : metadata.getTemporalDuration())
+      appendXml(xml, "duration", new SimpleDateFormat("HH:mm:ss").format(new Date(duration)));
     for (String license : getFirstMetadataValue(metadata.getLicenses()))
       appendXml(xml, "license", license);
     for (String isPartOf : metadata.getIsPartOf())

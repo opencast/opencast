@@ -27,7 +27,7 @@
 
   <scr:component name="org.opencastproject.kernel.bundleinfo.OsgiBundleInfoRestEndpoint" immediate="true">
     <implementation class="org.opencastproject.kernel.bundleinfo.OsgiBundleInfoRestEndpoint" />
-    <property name="service.description" value="BundleInfo REST Endpoint" />
+    <property name="service.description" value="System BundleInfo REST Endpoint" />
     <property name="opencast.service.type" value="org.opencastproject.kernel.bundleinfo" />
     <property name="opencast.service.path" value="/sysinfo" />
     <service>

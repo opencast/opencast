@@ -22,6 +22,7 @@ package org.opencastproject.external.userdirectory;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.impl.jpa.JpaGroup;
@@ -130,6 +131,7 @@ public class ExternalGroupLoader {
               for (String role : loadRoles(EXTERNAL_APPLICATIONS_ROLES_FILE)) {
                 roles.add(new JpaRole(role, org));
               }
+              roles.add(new JpaRole(SecurityConstants.GLOBAL_SUDO_ROLE, org));
               externalApplicationGroup = new JpaGroup(externalApplicationsGroupId, org, externalApplicationsGroupname,
                       externalApplicationsGroupDescription, roles, new HashSet<String>());
               groupRoleProvider.addGroup(externalApplicationGroup);

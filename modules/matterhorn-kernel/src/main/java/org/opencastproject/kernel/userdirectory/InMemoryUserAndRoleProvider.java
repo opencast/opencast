@@ -21,6 +21,8 @@
 
 package org.opencastproject.kernel.userdirectory;
 
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_SUDO_ROLE;
+
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -209,7 +211,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
   }
 
   @Override
-  public Iterator<Role> findRoles(String query, int offset, int limit) {
+  public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
 
@@ -217,16 +219,22 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
     Stream<Role> roles = Stream.empty();
     for (Iterator<Role> it = getRoles(); it.hasNext();) {
       Role role = it.next();
-      if (like(role.getName(), query) || like(role.getDescription(), query))
+      if ((like(role.getName(), query) || like(role.getDescription(), query))
+          && !(target == Role.Target.ACL && GLOBAL_SUDO_ROLE.equals(role.getName())))
         roles = roles.append(Stream.single(role)).sort(roleComparator);
     }
+
     return roles.drop(offset).apply(limit > 0 ? StreamOp.<Role> id().take(limit) : StreamOp.<Role> id()).iterator();
   }
 
   private boolean like(String string, final String query) {
     String regex = query.replace("_", ".").replace("%", ".*?");
     Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-    return p.matcher(string).matches();
+    if (null != string) {
+      return p.matcher(string).matches();
+    } else {
+      return false;
+    }
   }
 
   @Override

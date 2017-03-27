@@ -35,7 +35,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@RestService(name = "messagebrokerservice", title = "Message Broker Service", notes = "", abstractText = "Handles publishers and subscribers connecting to message brokers")
+@RestService(
+  name = "messagebrokerservice",
+  title = "Message Broker Service",
+  abstractText = "Handles publishers and subscribers connecting to message brokers",
+  notes = {})
 public class MessageBrokerServiceEndpoint {
 
   private MessageReceiver messageReceiver;

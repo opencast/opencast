@@ -72,13 +72,18 @@
                     <ul>
                         <li>
                             <label>
-                                <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle" class="source-toggle" value="UPLOAD" data-upload-type="UPLOAD" ng-change="wizard.step.changeType()">
+                                <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle"
+                                       class="source-toggle" value="UPLOAD" data-upload-type="UPLOAD"
+                                       ng-change="wizard.step.changeType()"
+                                       ng-checked="true" focushere tabindex="1">
                                 <span translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.CAPTION"><!-- Upload --></span>
                             </label>
                         </li>
                         <li>
                             <label>
-                                <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle" class="source-toggle" value="SCHEDULE_SINGLE" data-upload-type="SCHEDULE_SINGLE" ng-change="wizard.step.changeType()">
+                                <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle"
+                                       class="source-toggle" value="SCHEDULE_SINGLE" data-upload-type="SCHEDULE_SINGLE"
+                                       ng-change="wizard.step.changeType()">
                                 <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_SINGLE.CAPTION">
                                     <!-- Schedule Single Event -->
                                 </span>
@@ -86,7 +91,9 @@
                         </li>
                         <li>
                             <label>
-                                <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle" class="source-toggle" value="SCHEDULE_MULTIPLE" data-upload-type="SCHEDULE_MULTIPLE" ng-change="wizard.step.changeType()">
+                                <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle"
+                                       class="source-toggle" value="SCHEDULE_MULTIPLE" data-upload-type="SCHEDULE_MULTIPLE"
+                                       ng-change="wizard.step.changeType()">
                                 <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.CAPTION">
                                     <!-- Schedule Multiple Events -->
                                 </span>
@@ -104,7 +111,7 @@
                     <ul>
                         <li>
                         <div class="file-upload">
-                            <input class="blue-btn file-select-btn" admin-ng-file-upload type="file" file="wizard.step.ud.upload.segmentable"/>
+                            <input class="blue-btn file-select-btn" admin-ng-file-upload type="file" file="wizard.step.ud.upload.segmentable" tabindex="4"/>
                         </div>
                         <span translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SEGMENTABLE.SHORT">
                             <!-- File with segmentable video -->
@@ -117,7 +124,7 @@
                         </li>
                         <li>
                         <div class="file-upload">
-                            <input class="blue-btn file-select-btn" admin-ng-file-upload type="file" type="file" file="wizard.step.ud.upload.nonSegmentable"/>
+                            <input class="blue-btn file-select-btn" admin-ng-file-upload type="file" type="file" file="wizard.step.ud.upload.nonSegmentable" tabindex="5"/>
                         </div>
                         <span translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.NON_SEGMENTABLE.SHORT">
                             <!--File with non-segmentable video-->
@@ -129,7 +136,7 @@
                         </li>
                         <li>
                             <div class="file-upload">
-                                <input class="blue-btn file-select-btn" admin-ng-file-upload type="file" type="file" file="wizard.step.ud.upload.audioOnly"/>
+                                <input class="blue-btn file-select-btn" admin-ng-file-upload type="file" type="file" file="wizard.step.ud.upload.audioOnly" tabindex="6"/>
                             </div>
                             <span translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.AUDIO_ONLY.SHORT">
                                 <!-- Audio only -->
@@ -155,6 +162,7 @@
                             <td>
                                 <input datepicker
                                     type="text"
+                                    tabindex="4"
                                     ng-disabled="wizard.step.checkingConflicts"
                                     placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.date"
@@ -166,6 +174,7 @@
                             <td>
                                 <select chosen
                                     data-width="'100px'"
+                                    tabindex="5"
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.hour" ng-change="wizard.step.checkConflicts()"
@@ -176,6 +185,7 @@
                                 </select>
                                 <select chosen
                                     data-width="'100px'"
+                                    tabindex="6"
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.minute" ng-change="wizard.step.checkConflicts()"
@@ -191,6 +201,7 @@
                             <td>
                                 <select chosen
                                     data-width="'100px'"
+                                    tabindex="7"
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.duration.hour" ng-change="wizard.step.checkConflicts()"
@@ -201,6 +212,7 @@
                                 </select>
                                 <select chosen
                                     data-width="'100px'"
+                                    tabindex="8"
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.duration.minute" ng-change="wizard.step.checkConflicts()"
@@ -216,6 +228,7 @@
                             <td>
                             <select chosen
                                 data-width="'200px'"
+                                tabindex="9"
                                 ng-disabled="wizard.step.checkingConflicts"
                                 ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
                                 data-disable-search-threshold="8"
@@ -229,7 +242,7 @@
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS' | translate }} <i class="required">*</i></td>
                             <td>
                                 <label ng-repeat="inputMethod in wizard.step.ud.SCHEDULE_SINGLE.device.inputs">
-                                    <input type="checkbox" ng-model="wizard.step.ud.SCHEDULE_SINGLE.device.inputMethods[inputMethod.id]"> {{ inputMethod.id | translate }}
+                                    <input type="checkbox" ng-model="wizard.step.ud.SCHEDULE_SINGLE.device.inputMethods[inputMethod.id]" tabindex="10"> {{ inputMethod.id | translate }}
                                     <br>
                                 </label>
                             </td>
@@ -249,13 +262,13 @@
                         <tr>
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE' | translate }} <i class="required">*</i></td>
                             <td>
-                                <input type="text"  placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}"  datepicker ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.date" ng-change="wizard.step.checkConflicts()">
+                                <input type="text" tabindex="4" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}"  datepicker ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.date" ng-change="wizard.step.checkConflicts()">
                             </td>
                         </tr>
                         <tr>
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_DATE' | translate }} <i class="required">*</i></td>
                             <td>
-                                <input type="text" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.END_DATE' | translate }}"  datepicker ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.end" ng-change="wizard.step.checkConflicts()">
+                                <input type="text" tabindex="5" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.END_DATE' | translate }}"  datepicker ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.end" ng-change="wizard.step.checkConflicts()">
                             </td>
                         </tr>
                         <tr>
@@ -275,6 +288,7 @@
                             <td>
                                 <select chosen
                                     data-width="'100px'"
+                                    tabindex="15"
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.hour"
@@ -286,6 +300,7 @@
                                 </select>
                                 <select chosen
                                     data-width="'100px'"
+                                    tabindex="16"
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.minute"
@@ -303,6 +318,7 @@
                                 <select chosen
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-width="'100px'"
+                                    tabindex="17"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.duration.hour"
                                     ng-change="wizard.step.checkConflicts()"
@@ -314,6 +330,7 @@
                                 <select chosen
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-width="'100px'"
+                                    tabindex="18"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.duration.minute"
                                     ng-change="wizard.step.checkConflicts()"
@@ -330,6 +347,7 @@
                             <select chosen
                                 ng-disabled="wizard.step.checkingConflicts"
                                 data-width="'100%'"
+                                tabindex="19"
                                 ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
                                 data-disable-search-threshold="8"
                                 ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device"
@@ -342,7 +360,7 @@
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS' | translate }} <i class="required">*</i></td>
                             <td>
                                 <label ng-repeat-start="inputMethod in wizard.step.ud.SCHEDULE_MULTIPLE.device.inputs">
-                                    <input type="checkbox" ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device.inputMethods[inputMethod.id]">{{ inputMethod.id | translate }}</input>
+                                    <input type="checkbox" ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device.inputMethods[inputMethod.id]" tabindex="20">{{ inputMethod.id | translate }}</input>
                                      <br>
                                 </label>
                                 <br ng-repeat-end>
@@ -366,6 +384,8 @@
                     <select chosen pre-select-from="wizard.step.workflows"
                         ng-disabled="wizard.step.changingWorkflow"
                         data-width="'100%'"
+                        tabindex="1"
+                        focushere
                         ng-change="wizard.step.changeWorkflow()"
                         data-disable-search-threshold="8"
                         data-search_contains="true"
@@ -417,6 +437,8 @@
                                             <div class="obj-container padded">
                                                 <select chosen
                                                     data-width="'200px'"
+                                                    tabindex="1"
+                                                    focushere
                                                     data-disable-search-threshold="8"
                                                     data-search_contains="true"
                                                     ng-change="wizard.step.changeBaseAcl()"
@@ -464,17 +486,19 @@
                                         <tr ng-repeat="policy in wizard.step.ud.policies">
                                             <td>
                                                 <select chosen
-                                                    data-width="'200px'"
+                                                    data-width="'360px'"
                                                     data-disable-search-threshold="8"
                                                     data-search_contains="true"
                                                     ng-model="policy.role"
-                                                    ng-options="id as name for (id, name) in wizard.step.roles"
+                                                    ng-get-more="wizard.step.getMoreRoles"
+                                                    ng-options="id as id for (id, type) in wizard.step.roles"
                                                     data-placeholder="{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL' | translate }}"
-                                                    no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.EMPTY' | translate }}'"
-                                                />
+                                                    no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.EMPTY' | translate }}'">
+                                                    <option value=""></option>
+                                                 </select>
                                             </td>
-                                            <td class="fit"><input type="checkbox"  ng-model="policy.read"/></td>
-                                            <td class="fit"><input type="checkbox"  ng-model="policy.write"/></td>
+                                            <td class="fit text-center"><input type="checkbox"  ng-model="policy.read"/></td>
+                                            <td class="fit text-center"><input type="checkbox"  ng-model="policy.write"/></td>
                                             <td class="fit editable" ng-if="wizard.step.hasActions">
                                               <div admin-ng-editable-multi-select mixed="false"
                                                    params="policy.actions"

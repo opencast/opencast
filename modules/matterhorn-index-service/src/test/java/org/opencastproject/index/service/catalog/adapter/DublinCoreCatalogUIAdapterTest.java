@@ -51,15 +51,15 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,10 +121,8 @@ public class DublinCoreCatalogUIAdapterTest {
 
   private DublinCoreMetadataCollection metadata;
 
-  @After
-  public void tearDown() {
-    FileUtils.deleteQuietly(outputCatalog);
-  }
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
 
   @Before
   public void setUp() throws URISyntaxException, NotFoundException, IOException, ListProviderException {
@@ -163,7 +161,7 @@ public class DublinCoreCatalogUIAdapterTest {
 
     eventDublincoreURI = getClass().getResource("/catalog-adapter/dublincore.xml").toURI();
 
-    outputCatalog = File.createTempFile("out", "xml");
+    outputCatalog = testFolder.newFile("out.xml");
 
     Capture<String> mediapackageIDCapture = new Capture<String>();
     Capture<String> catalogIDCapture = new Capture<String>();

@@ -34,7 +34,7 @@ List of Included Third-Party Dependencies
 modules/matterhorn-admin-ui-ng/src/main/webapp/css/vendor/chosen.less
   Chosen, a Select Box Enhancer for jQuery and Prototype
   by Patrick Filler for Harvest, http://getharvest.com
-  Copyright (c) 2011 Harvest http://getharvest.com
+  Copyright (c) 2011 - 2016 Harvest http://getharvest.com
   MIT License, https://github.com/harvesthq/chosen/blob/master/LICENSE.md
 
 modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular/*
@@ -64,7 +64,14 @@ modules/matterhorn-admin-ui-ng/src/main/webapp/lib/chosen.jquery.*
   Chosen, a Select Box Enhancer for jQuery and Prototype
   by Patrick Filler for Harvest, http://getharvest.com
   Version 1.6.2
-  Copyright (c) 2011-2016 Harvest http://getharvest.com
+  Copyright (c) 2011 - 2016 Harvest http://getharvest.com
+  MIT License
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-chosen.js
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-chosen.min.js
+  Angular Binding for Harvest Chosen
+  Version 1.6.0
+  Copyright (c) 2013 Localytics http://www.localytics.com
   MIT License
 
 modules/matterhorn-admin-ui-ng/src/main/webapp/lib/datepicker/*
@@ -117,6 +124,12 @@ modules/matterhorn-admin-ui-ng/src/main/webapp/lib/video-js/*
   Video.js v4.11.2
   Copyright 2014 Brightcove, Inc.
   Licensed under the Apache License, Version 2.0
+
+modules/matterhorn-admin-ui-ng/src/main/webapp/scripts/shared/directives/opencastScrollGlue.js
+  Adapted from AngularJS Scroll Glue v2.0.6
+  https://github.com/Luegg/angularjs-scroll-glue
+  (c) 2013 Lukas Wegmann
+  Licensed under the MIT license
 
 modules/matterhorn-admin-ui-ng/src/test/resources/test/lib/angular/angular-scenario.js
   Copyright 2005, 2013 jQuery Foundation, Inc. and other contributors

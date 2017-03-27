@@ -27,6 +27,29 @@ package org.opencastproject.security.api;
 public interface Role {
 
   /**
+   * The type of role:
+   *  SYSTEM - A role granted automatically by Opencast, not persisted
+   *  INTERNAL - A role indicating an ability that the user has within Opencast, persisted
+   *  GROUP - A role indicating membership of an Opencast group, persisted
+   *  EXTERNAL - A role granted to a user from an external system, not persisted
+   *  EXTERNAL_GROUP - A role indicating membership of an Opencast group from an external system, not persisted
+   *  DERIVED - A role which is derived from the user's group membership (a role which the group has), not persisted
+   */
+  enum Type {
+    INTERNAL, SYSTEM, GROUP, EXTERNAL, EXTERNAL_GROUP, DERIVED;
+  }
+
+  /**
+   * The target (intended purpose) of a set of roles
+   *  USER - Roles which are assigned to users and/or groups to provide access to capabilities
+   *  ACL  - Roles which are used to manage access to resources (Event, Series) in an ACL
+   *  ALL  - All roles
+   */
+  enum Target {
+    USER, ACL, ALL;
+  }
+
+  /**
    * Gets the role name
    *
    * @return the role name
@@ -47,4 +70,10 @@ public interface Role {
    */
   Organization getOrganization();
 
+  /**
+   * Returns the role's {@link Type}
+   * 
+   * @return the type
+   */
+  Type getType();
 }

@@ -433,6 +433,11 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
       Date now = new Date();
       try {
         persistence.deleteMediaPackage(mediaPackageId, now);
+        logger.info("Removed mediapackage {} from search persistence", mediaPackageId);
+      } catch (NotFoundException e) {
+        // even if mp not found in persistence, it might still exist in search index.
+        logger.info("Could not find mediapackage with id {} in persistence, but will try remove it from index, anyway.",
+                mediaPackageId);
       } catch (SearchServiceDatabaseException e) {
         logger.error("Could not delete media package with id {} from persistence storage", mediaPackageId);
         throw new SearchException(e);
@@ -440,6 +445,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
       return indexManager.delete(mediaPackageId, now);
     } catch (SolrServerException e) {
+      logger.info("Could not delete media package with id {} from search index", mediaPackageId);
       throw new SearchException(e);
     }
   }

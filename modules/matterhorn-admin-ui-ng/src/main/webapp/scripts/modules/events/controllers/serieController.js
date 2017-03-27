@@ -22,10 +22,15 @@
 
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
-.controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource', 'SeriesThemeResource', 'ResourcesListResource', 'Notifications',
-        'OptoutSingleResource', 'SeriesParticipationResource',
-        function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, ResourcesListResource, Notifications,
+.controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource', 'SeriesThemeResource', 'ResourcesListResource', 'UserRolesResource',
+        'Notifications', 'OptoutSingleResource', 'SeriesParticipationResource',
+        function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, ResourcesListResource, UserRolesResource, Notifications,
             OptoutSingleResource, SeriesParticipationResource) {
+
+    var roleSlice = 100;
+    var roleOffset = 0;
+    var loading = false;
+    var rolePromise = null;
 
     var saveFns = {}, aclNotification,
         me = this,
@@ -65,21 +70,6 @@ angular.module('adminNg.controllers')
             if (!loading) {
                 $scope.accessSave();
             }
-        },
-        updateRoles = function() {
-            //MH-11716: We have to wait for both the access (series ACL), and the roles (list of system roles)
-            //to resolve before we can add the roles that are present in the series but not in the system
-            return ResourcesListResource.get({ resource: 'ROLES' }, function (results) {
-                var roles = results;
-                return $scope.access.$promise.then(function () {
-                    angular.forEach($scope.access.series_access.privileges, function(value, key) {
-                        if (angular.isUndefined(roles[key])) {
-                            roles[key] = key;
-                        }
-                    }, this);
-		            return roles;
-		        });
-            }, this);
         };
 
     $scope.aclLocked = false,
@@ -128,6 +118,33 @@ angular.module('adminNg.controllers')
         });
     };
 
+    $scope.getMoreRoles = function (value) {
+
+        if (loading)
+            return rolePromise;
+
+        loading = true;
+        var queryParams = {limit: roleSlice, offset: roleOffset};
+
+        if ( angular.isDefined(value) && (value != "")) {
+            //Magic values here.  Filter is from ListProvidersEndpoint, role_name is from RolesListProvider
+            //The filter format is care of ListProvidersEndpoint, which gets it from EndpointUtil
+            queryParams["filter"] = "role_name:"+ value +",role_target:ACL";
+            queryParams["offset"] = 0;
+        } else {
+            queryParams["filter"] = "role_target:ACL";
+        }
+        rolePromise = UserRolesResource.query(queryParams);
+        rolePromise.$promise.then(function (data) {
+            angular.forEach(data, function (role) {
+                $scope.roles[role.name] = role.value;
+            });
+            roleOffset = Object.keys($scope.roles).length;
+        }).finally(function () {
+            loading = false;
+        });
+        return rolePromise;
+    };
 
     fetchChildResources = function (id) {
         $scope.metadata = SeriesMetadataResource.get({ id: id }, function (metadata) {
@@ -136,6 +153,7 @@ angular.module('adminNg.controllers')
                 if (catalog.flavor === mainCatalog) {
                     $scope.seriesCatalog = catalog;
                     seriesCatalogIndex = index;
+                    var tabindex = 2;
                     angular.forEach(catalog.fields, function (entry) {
                         if (entry.id === 'title' && angular.isString(entry.value)) {
                             $scope.titleParams = { resourceId: entry.value.substring(0,70) };
@@ -144,6 +162,7 @@ angular.module('adminNg.controllers')
                             metadata.locked = entry.locked;
                             keepGoing = false;
                         }
+                        entry.tabindex = tabindex++;
                     });
                 }
             });
@@ -152,6 +171,8 @@ angular.module('adminNg.controllers')
                 metadata.entries.splice(seriesCatalogIndex, 1);
             }
         });
+
+        $scope.roles = {};
 
         $scope.access = SeriesAccessResource.get({id: id}, function (data) {
             if (angular.isDefined(data.series_access)) {
@@ -165,9 +186,12 @@ angular.module('adminNg.controllers')
                 } else if (aclNotification) {
                     Notifications.remove(aclNotification, 'series-acl');
                 }
-
+                angular.forEach(data.series_access.privileges, function(value, key) {
+                    if (angular.isUndefined($scope.roles[key])) {
+                        $scope.roles[key] = key;
+                    }
+                });
             }
-
         });
 
         $scope.participation = SeriesParticipationResource.get({ id: id });
@@ -183,7 +207,6 @@ angular.module('adminNg.controllers')
             });
         });
 
-        $scope.roles = updateRoles();
         $scope.theme = {};
 
         ResourcesListResource.get({ resource: 'THEMES.NAME' }, function (data) {
@@ -202,6 +225,7 @@ angular.module('adminNg.controllers')
                 });
             });
         });
+        $scope.getMoreRoles();
     };
 
       // Generate proxy function for the save metadata function based on the given flavor
@@ -336,7 +360,7 @@ angular.module('adminNg.controllers')
       switch (value) {
         case 'permissions':
             $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
-            $scope.roles = updateRoles();
+            $scope.getMoreRoles();
           break;
       }
     });

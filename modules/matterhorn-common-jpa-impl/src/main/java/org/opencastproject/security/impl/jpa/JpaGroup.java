@@ -56,7 +56,8 @@ import javax.persistence.UniqueConstraint;
 @NamedQueries({
         @NamedQuery(name = "Group.findAll", query = "Select g FROM JpaGroup g WHERE g.organization.id = :organization"),
         @NamedQuery(name = "Group.findByUser", query = "Select g FROM JpaGroup g WHERE g.organization.id = :organization AND :username MEMBER OF g.members"),
-        @NamedQuery(name = "Group.findById", query = "Select g FROM JpaGroup g WHERE g.groupId = :groupId AND g.organization.id = :organization") })
+        @NamedQuery(name = "Group.findById", query = "Select g FROM JpaGroup g WHERE g.groupId = :groupId AND g.organization.id = :organization"),
+        @NamedQuery(name = "Group.findByRole", query = "Select g FROM JpaGroup g WHERE g.role = :role AND g.organization.id = :organization") })
 public final class JpaGroup implements Group {
   @Id
   @GeneratedValue

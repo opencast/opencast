@@ -21,6 +21,9 @@
 
 package org.opencastproject.kernel.http;
 
+import org.opencastproject.util.MimeTypes;
+import org.opencastproject.util.UnknownFileTypeException;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -35,6 +38,7 @@ import java.net.URL;
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 
 /**
  * Matterhorn's shared {@link HttpContext}. All Servlet and {@link org.opencastproject.rest.StaticResource}
@@ -66,7 +70,11 @@ public class SharedHttpContext implements HttpContext {
    */
   @Override
   public String getMimeType(String name) {
-    return null;
+    try {
+    return MimeTypes.fromString(name).toString();
+    } catch (UnknownFileTypeException e) {
+      return null;
+    }
   }
 
   /**

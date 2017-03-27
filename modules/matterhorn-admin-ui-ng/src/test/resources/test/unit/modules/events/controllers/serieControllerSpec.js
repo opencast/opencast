@@ -1,5 +1,5 @@
 describe('Serie controller', function () {
-    var $scope, $httpBackend, $controller, SeriesMetadataResource, SeriesAccessResource, SeriesThemeResource, Notifications;
+    var $scope, $httpBackend, $controller, $timeout, SeriesMetadataResource, SeriesAccessResource, SeriesThemeResource, Notifications;
 
     beforeEach(module('adminNg'));
 
@@ -12,11 +12,12 @@ describe('Serie controller', function () {
         $provide.value('Language', service);
     }));
 
-    beforeEach(inject(function ($rootScope, _$controller_, _$httpBackend_, _SeriesMetadataResource_, _SeriesAccessResource_, _SeriesThemeResource_, _Notifications_) {
+    beforeEach(inject(function ($rootScope, _$controller_, _$timeout_, _$httpBackend_, _SeriesMetadataResource_, _SeriesAccessResource_, _SeriesThemeResource_, _Notifications_) {
         $scope = $rootScope.$new();
         $scope.resourceId = '4581';
         $controller = _$controller_;
         $httpBackend = _$httpBackend_;
+        $timeout = _$timeout_;
         SeriesMetadataResource = _SeriesMetadataResource_;
         SeriesAccessResource = _SeriesAccessResource_;
         SeriesThemeResource = _SeriesThemeResource_;
@@ -37,8 +38,8 @@ describe('Serie controller', function () {
         $httpBackend.whenGET('/admin-ng/resources/THEMES.NAME.json').respond({1001: 'Heinz das Pferd', 1002: 'Full Fledged', 401: 'Doc Test'});
         $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond('{}');
-        $httpBackend.whenGET('/admin-ng/resources/ROLES.json').respond({"ROLE_ANONYMOUS": "ROLE_ANONYMOUS"});
-
+        $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=100&offset=0').respond('{"ROLE_ANONYMOUS": "ROLE_ANONYMOUS"}');
+        $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=100&offset=3').respond('{}');
 
         $controller('SerieCtrl', {$scope: $scope});
     });
@@ -69,7 +70,7 @@ describe('Serie controller', function () {
 
         it('isolates dublincore/series catalog', function () {
             $scope.$watch('seriesCatalog', function (newCatalog) {
-                expect(newCatalog).toEqual(catalogs[0]);
+                expect(newCatalog.flavor).toEqual(catalogs[0].flavor);
             });
         });
 
@@ -95,9 +96,11 @@ describe('Serie controller', function () {
         });
 
         it('adds external roles appropriately', function() {
-            $scope.roles.$promise.then(function () {
+            //This is lame, but we have to wait for the series ACL to load, and the external role call to load
+            $timeout(function() {
                 expect($scope.roles.ROLE_EXTERNAL).toEqual("ROLE_EXTERNAL");
                 expect($scope.roles.ROLE_ADMIN_UI).toEqual("ROLE_ADMIN_UI");
+                expect($scope.roles.ROLE_ANONYMOUS).toEqual("ROLE_ANONYMOUS");
             });
         });
 

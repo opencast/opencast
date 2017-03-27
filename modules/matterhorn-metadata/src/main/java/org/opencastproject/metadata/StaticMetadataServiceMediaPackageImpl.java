@@ -128,6 +128,21 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
       }
 
       @Override
+      public Option<Date[]> getTemporalPeriod() {
+        return none();
+      }
+
+      @Override
+      public Option<Date> getTemporalInstant() {
+        return none();
+      }
+
+      @Override
+      public Option<Long> getTemporalDuration() {
+        return none();
+      }
+
+      @Override
       public NonEmptyList<MetadataValue<String>> getTitles() {
         if (mp.getTitle() != null)
           return new NonEmptyList<MetadataValue<String>>(new MetadataValue(mp.getTitle(), "title"));

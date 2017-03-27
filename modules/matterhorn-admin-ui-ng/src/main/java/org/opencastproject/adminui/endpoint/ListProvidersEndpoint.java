@@ -54,7 +54,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -118,8 +117,7 @@ public class ListProvidersEndpoint {
       addRequestFiltersToQuery(filter, query);
       Map<String, String> autocompleteList;
       try {
-        autocompleteList = new TreeMap<String, String>(listProvidersService.getList(source, query,
-                securityService.getOrganization(), false));
+        autocompleteList = listProvidersService.getList(source, query, securityService.getOrganization(), false);
       } catch (ListProviderException e) {
         logger.error("Not able to get list from provider {}: {}", source, e);
         return SERVER_ERROR;
