@@ -329,6 +329,7 @@
               OSGI-INF/organization-persistence.xml,
               OSGI-INF/organization-filter.xml,
               OSGI-INF/organization-role-provider.xml,
+              OSGI-INF/custom-role-provider.xml,
               OSGI-INF/current-job-filter.xml,
               OSGI-INF/pingback.xml,
               OSGI-INF/rest.xml,
