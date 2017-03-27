@@ -613,7 +613,7 @@
                                     <p>
                                       <span>@{{ comment.author.name }}</span> {{ reply.text }}
                                     </p>
-                                    <a ng-show="!transactions.read_only" ng-click="deleteCommentReply(comment.id, reply.id)" class="delete" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE">
+                                    <a ng-click="deleteCommentReply(comment.id, reply.id)" class="delete" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE">
                                       <i class="fa fa-times-circle"></i> {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.DELETE' | translate }}
                                     </a>
                                 </div>
@@ -623,7 +623,6 @@
                           <textarea ng-model="myComment.text" placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.PLACEHOLDER' | translate }}"></textarea>
                           <div>
                               <select chosen pre-select-from="components.eventCommentReasons"
-                                  ng-disabled="!transactions.read_only"
                                   data-width="'200px'"
                                   data-disable-search-threshold="8"
                                   ng-model="myComment.reason"
