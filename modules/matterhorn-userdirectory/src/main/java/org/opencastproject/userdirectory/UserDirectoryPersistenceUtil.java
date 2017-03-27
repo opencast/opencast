@@ -480,8 +480,8 @@ public final class UserDirectoryPersistenceUtil {
   /**
    * Returns the persisted group by the group role name and organization id
    *
-   * @param groupId
-   *          the group role name
+   * @param role
+   *          the role name
    * @param orgId
    *          the organization id
    * @param emf

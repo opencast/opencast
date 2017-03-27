@@ -255,7 +255,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.security.api.RoleProvider#findRoles(String, int, int)
+   * @see org.opencastproject.security.api.RoleProvider#findRoles(String, Role.Target, int, int)
    */
   @Override
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
@@ -293,7 +293,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
    *          the user's organization
    * @param roleList
    *          the list of group role names
-   * @return
    */
   public void updateGroupMembershipFromRoles(String userName, String orgId, List<String> roleList) {
 

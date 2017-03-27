@@ -93,7 +93,7 @@ public class OrganizationRoleProvider implements RoleProvider {
   }
 
   /**
-   * @see org.opencastproject.security.api.RoleProvider#findRoles(String, int, int)
+   * @see org.opencastproject.security.api.RoleProvider#findRoles(String, Role.Target, int, int)
    */
   @Override
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
