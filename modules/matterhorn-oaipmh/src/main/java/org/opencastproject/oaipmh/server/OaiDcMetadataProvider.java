@@ -18,11 +18,11 @@
  * the License.
  *
  */
-
-
 package org.opencastproject.oaipmh.server;
 
-import org.opencastproject.search.api.SearchResultItem;
+import org.opencastproject.oaipmh.OaiPmhConstants;
+import org.opencastproject.oaipmh.persistence.SearchResultItem;
+import org.opencastproject.util.data.Option;
 
 import org.w3c.dom.Element;
 
@@ -32,18 +32,16 @@ import org.w3c.dom.Element;
 public class OaiDcMetadataProvider implements MetadataProvider {
   @Override
   public MetadataFormat getMetadataFormat() {
-    return OaiPmhRepository.OAI_DC_METADATA_FORMAT;
+    return OaiPmhConstants.OAI_DC_METADATA_FORMAT;
   }
 
   @Override
-  public Element createMetadata(OaiPmhRepository repository, final SearchResultItem item) {
+  public Element createMetadata(OaiPmhRepository repository, final SearchResultItem item, final Option<String> set) {
     return new OaiXmlGen(repository) {
       @Override
       public Element create() {
-        return dc(item);
+        return dc(item, set);
       }
-      // CHECKSTYLE:OFF
     }.create();
-    // CHECKSTYLE:ON
   }
 }

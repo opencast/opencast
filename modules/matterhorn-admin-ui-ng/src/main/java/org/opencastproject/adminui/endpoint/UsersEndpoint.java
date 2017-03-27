@@ -27,6 +27,7 @@ import static com.entwinemedia.fn.data.json.Jsons.j;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static java.lang.String.CASE_INSENSITIVE_ORDER;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.apache.http.HttpStatus.SC_CONFLICT;
@@ -40,6 +41,7 @@ import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.util.TextFilter;
+import org.opencastproject.authorization.xacml.manager.endpoint.JsonConv;
 import org.opencastproject.index.service.resources.list.query.UsersListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.matterhorn.search.SearchQuery.Order;
@@ -47,6 +49,7 @@ import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
@@ -66,11 +69,13 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.json.JString;
+import com.entwinemedia.fn.data.json.JField;
+import com.entwinemedia.fn.data.json.JObjectWrite;
 import com.entwinemedia.fn.data.json.JValue;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -99,7 +104,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@RestService(name = "users", title = "User service", notes = "This service offers the default users CRUD Operations for the admin UI.", abstractText = "Provides operations for users")
+@RestService(name = "users", title = "User service",
+  abstractText = "Provides operations for users",
+  notes = { "This service offers the default users CRUD Operations for the admin UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public class UsersEndpoint {
 
   /** The logging facility */
@@ -268,7 +279,8 @@ public class UsersEndpoint {
           @RestParameter(description = "The email.", isRequired = false, name = "email", type = STRING),
           @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array") }, reponses = {
           @RestResponse(responseCode = SC_CREATED, description = "User has been created."),
-          @RestResponse(responseCode = SC_CONFLICT, description = "An user with this username already exist.") })
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to create a user with a admin role."),
+          @RestResponse(responseCode = SC_CONFLICT, description = "An user with this username already exist.")})
   public Response createUser(@FormParam("username") String username, @FormParam("password") String password,
           @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles)
           throws NotFoundException {
@@ -296,7 +308,9 @@ public class UsersEndpoint {
     if (rolesArray.isSome()) {
       // Add the roles given
       for (Object role : rolesArray.get()) {
-        rolesSet.add(new JpaRole((String) role, organization));
+        JSONObject roleAsJson = (JSONObject) role;
+        Role.Type roletype = Role.Type.valueOf((String) roleAsJson.get("type"));
+        rolesSet.add(new JpaRole(roleAsJson.get("id").toString(), organization, null, roletype));
       }
     } else {
       rolesSet.add(new JpaRole(organization.getAnonymousRole(), organization));
@@ -304,9 +318,12 @@ public class UsersEndpoint {
 
     JpaUser user = new JpaUser(username, password, organization, name, email, jpaUserAndRoleProvider.getName(), true,
             rolesSet);
-    jpaUserAndRoleProvider.addUser(user);
-
-    return Response.created(uri(endpointBaseUrl, user.getUsername() + ".json")).build();
+    try {
+      jpaUserAndRoleProvider.addUser(user);
+      return Response.created(uri(endpointBaseUrl, user.getUsername() + ".json")).build();
+    } catch (UnauthorizedException e) {
+      return Response.status(Response.Status.FORBIDDEN).build();
+    }
   }
 
   @GET
@@ -321,10 +338,6 @@ public class UsersEndpoint {
       throw new NotFoundException("User " + username + " does not exist.");
     }
 
-    // Reload user from internal user provider
-    if (JpaUserAndRoleProvider.PROVIDER_NAME.equals(user.getProvider()))
-      user = jpaUserAndRoleProvider.loadUser(username);
-
     return RestUtils.okJson(generateJsonUser(user));
   }
 
@@ -336,7 +349,8 @@ public class UsersEndpoint {
           @RestParameter(description = "The email.", isRequired = false, name = "email", type = STRING),
           @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array") }, pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), reponses = {
           @RestResponse(responseCode = SC_OK, description = "User has been updated."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to update a user with admin role."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.")})
   public Response updateUser(@PathParam("username") String username, @FormParam("password") String password,
           @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles)
           throws NotFoundException {
@@ -355,34 +369,46 @@ public class UsersEndpoint {
     }
     if (rolesArray.isSome()) {
       // Add the roles given
-      for (Object role : rolesArray.get()) {
-        rolesSet.add(new JpaRole((String) role, organization));
+      for (Object roleObj : rolesArray.get()) {
+        JSONObject role = (JSONObject) roleObj;
+        String rolename = (String) role.get("id");
+        Role.Type roletype = Role.Type.valueOf((String) role.get("type"));
+        rolesSet.add(new JpaRole(rolename, organization, null, roletype));
       }
     } else {
       // Or the use the one from the user if no one is given
       for (Role role : user.getRoles()) {
-        rolesSet.add(new JpaRole(role.getName(), organization));
+        rolesSet.add(new JpaRole(role.getName(), organization, role.getDescription(), role.getType()));
       }
     }
 
-    jpaUserAndRoleProvider.updateUser(new JpaUser(username, password, organization, name, email, jpaUserAndRoleProvider
-            .getName(), true, rolesSet));
-    return Response.status(SC_OK).build();
+    try {
+      jpaUserAndRoleProvider.updateUser(new JpaUser(username, password, organization, name, email, jpaUserAndRoleProvider
+              .getName(), true, rolesSet));
+      userDirectoryService.invalidate(username);
+      return Response.status(SC_OK).build();
+    } catch (UnauthorizedException ex) {
+      return Response.status(Response.Status.FORBIDDEN).build();
+    }
   }
 
   @DELETE
   @Path("{username}.json")
   @RestQuery(name = "deleteUser", description = "Deleter a new  user", returnDescription = "Status ok", pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), reponses = {
           @RestResponse(responseCode = SC_OK, description = "User has been deleted."),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to delete a user with admin role."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })
   public Response deleteUser(@PathParam("username") String username) throws NotFoundException {
     Organization organization = securityService.getOrganization();
 
     try {
       jpaUserAndRoleProvider.deleteUser(username, organization.getId());
+      userDirectoryService.invalidate(username);
     } catch (NotFoundException e) {
       logger.error("User {} not found.", username);
       return Response.status(SC_NOT_FOUND).build();
+    } catch (UnauthorizedException e) {
+      return Response.status(SC_FORBIDDEN).build();
     } catch (Exception e) {
       logger.error("Error during deletion of user {}: {}", username, e);
       return Response.status(SC_INTERNAL_SERVER_ERROR).build();
@@ -394,11 +420,25 @@ public class UsersEndpoint {
 
   private JValue generateJsonUser(User user) {
     // Prepare the roles
-    List<JString> rolesJSON = Stream.$(user.getRoles()).map(getRoleName).sort(sortByName).map(toJString).toList();
+    List<JValue> rolesJSON = Stream.$(user.getRoles()).sort(sortRolesByName).map(serializeRole).toList();
 
     return j(f("username", vN(user.getUsername())), f("manageable", v(user.isManageable())),
             f("name", vN(user.getName())), f("email", vN(user.getEmail())), f("roles", a(rolesJSON)),
             f("provider", vN(user.getProvider())));
+  }
+
+  private static final Fn<Role, JValue> serializeRole = new Fn<Role, JValue>() {
+    @Override
+    public JValue ap(Role role) {
+      return roleToJson(role);
+    }
+  };
+
+  private static JObjectWrite roleToJson(Role role) {
+    List<JField> fields = new ArrayList<JField>();
+    fields.add(f(JsonConv.KEY_NAME, v(role.getName())));
+    fields.add(f("type", v(role.getType().toString())));
+    return j(fields);
   }
 
   private static final Fn<Role, String> getRoleName = new Fn<Role, String>() {
@@ -408,17 +448,17 @@ public class UsersEndpoint {
     }
   };
 
-  private static final Fn<String, JString> toJString = new Fn<String, JString>() {
-    @Override
-    public JString ap(String string) {
-      return v(string);
-    }
-  };
-
   private static final Comparator<String> sortByName = new Comparator<String>() {
     @Override
     public int compare(String name1, String name2) {
       return name1.compareTo(name2);
+    }
+  };
+
+  private static final Comparator<Role> sortRolesByName = new Comparator<Role>() {
+    @Override
+    public int compare(Role name1, Role name2) {
+      return name1.getName().compareTo(name2.getName());
     }
   };
 

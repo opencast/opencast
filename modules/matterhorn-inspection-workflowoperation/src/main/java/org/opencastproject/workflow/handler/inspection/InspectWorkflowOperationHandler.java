@@ -24,6 +24,7 @@ package org.opencastproject.workflow.handler.inspection;
 import static java.lang.String.format;
 
 import org.opencastproject.inspection.api.MediaInspectionException;
+import org.opencastproject.inspection.api.MediaInspectionOptions;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
@@ -41,6 +42,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
+import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -59,6 +61,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -79,10 +83,17 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /** Option to adjust whether mediapackages without media should be accepted */
   private static final String OPT_ACCEPT_NO_MEDIA = "accept-no-media";
 
+  /** Option to adjust whether the exact frame count should be determined
+      Note that this is an expensive operation. Its use should be avoided if not depending on the exact framecount
+      Default: false */
+  private static final String OPT_ACCURATE_FRAME_COUNT = "accurate-frame-count";
+
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
     CONFIG_OPTIONS.put(OPT_OVERWRITE, "Whether to rewrite existing metadata");
     CONFIG_OPTIONS.put(OPT_ACCEPT_NO_MEDIA, "Whether mediapackages with no media tracks should be accepted");
+    CONFIG_OPTIONS.put(OPT_ACCURATE_FRAME_COUNT,
+            "Whether the media inspection service should determine the exact frame count");
   }
 
   /** The inspection service */
@@ -146,6 +157,12 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
     boolean rewrite = "true".equalsIgnoreCase(operation.getConfiguration(OPT_OVERWRITE));
     boolean acceptNoMedia = "true".equalsIgnoreCase(operation.getConfiguration(OPT_ACCEPT_NO_MEDIA));
 
+    final Map<String, String> options = new HashMap<String, String>();
+    if ("true".equalsIgnoreCase(operation.getConfiguration(OPT_ACCURATE_FRAME_COUNT))) {
+      logger.info("Using accurate frame count for inspection media package {}", mediaPackage);
+      options.put(MediaInspectionOptions.OPTION_ACCURATE_FRAME_COUNT, Boolean.TRUE.toString());
+    }
+
     // Test if there are tracks in the mediapackage
     if (mediaPackage.getTracks().length == 0) {
       logger.warn("Recording {} contains no media", mediaPackage);
@@ -158,34 +175,41 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
       logger.info("Inspecting track '{}' of {}", track.getIdentifier(), mediaPackage);
 
       Job inspectJob = null;
-      try {
-        inspectJob = inspectionService.enrich(track, rewrite);
-        if (!waitForStatus(inspectJob).isSuccess()) {
-          throw new WorkflowOperationException("Track " + track + " could not be inspected");
-        }
-      } catch (MediaInspectionException e) {
-        throw new WorkflowOperationException("Error inspecting media package", e);
-      } catch (MediaPackageException e) {
-        throw new WorkflowOperationException("Error parsing media package", e);
-      }
-
-      // add this receipt's queue and execution times to the total
-      long timeInQueue = inspectJob.getQueueTime() == null ? 0 : inspectJob.getQueueTime();
-      totalTimeInQueue += timeInQueue;
-
       Track inspectedTrack;
-      try {
-        inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectJob.getPayload());
-      } catch (MediaPackageException e) {
-        throw new WorkflowOperationException("Unable to parse track from job " + inspectJob.getId(), e);
+      if (track != null && track.getURI() != null && (track.getURI().toString().endsWith(".vtt")
+              || track.getURI().toString().endsWith(".srt"))) {
+        inspectedTrack = (Track)track.clone();
+        inspectedTrack.setMimeType(MimeType.mimeType("text", "vtt"));
+        logger.info("Track '{}' of {} contains captions", track.getIdentifier(), mediaPackage);
+      } else {
+        try {
+          inspectJob = inspectionService.enrich(track, rewrite, options);
+          if (!waitForStatus(inspectJob).isSuccess()) {
+            throw new WorkflowOperationException("Track " + track + " could not be inspected");
+          }
+        } catch (MediaInspectionException e) {
+          throw new WorkflowOperationException("Error inspecting media package", e);
+        } catch (MediaPackageException e) {
+          throw new WorkflowOperationException("Error parsing media package", e);
+        }
+
+        // add this receipt's queue and execution times to the total
+        long timeInQueue = inspectJob.getQueueTime() == null ? 0 : inspectJob.getQueueTime();
+        totalTimeInQueue += timeInQueue;
+
+
+        try {
+          inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectJob.getPayload());
+        } catch (MediaPackageException e) {
+          throw new WorkflowOperationException("Unable to parse track from job " + inspectJob.getId(), e);
+        }
+
+        if (inspectedTrack == null)
+          throw new WorkflowOperationException("Track " + track + " could not be inspected");
+
+        if (inspectedTrack.getStreams().length == 0)
+          throw new WorkflowOperationException(format("Track %s does not contain any streams", track));
       }
-
-      if (inspectedTrack == null)
-        throw new WorkflowOperationException("Track " + track + " could not be inspected");
-
-      if (inspectedTrack.getStreams().length == 0)
-        throw new WorkflowOperationException(format("Track %s does not contain any streams", track));
-
       // Replace the original track with the inspected one
       try {
         mediaPackage.remove(track);

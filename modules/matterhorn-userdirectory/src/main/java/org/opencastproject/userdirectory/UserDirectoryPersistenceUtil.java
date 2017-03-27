@@ -63,7 +63,7 @@ public final class UserDirectoryPersistenceUtil {
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
-      // Save or udpate roles
+      // Save or update roles
       for (Role role : roles) {
         JpaRole jpaRole = (JpaRole) role;
         saveOrganization((JpaOrganization) jpaRole.getOrganization(), emf);
@@ -244,6 +244,8 @@ public final class UserDirectoryPersistenceUtil {
    *
    * @param userName
    *          the user name
+   * @param orgId
+   *          the user's organization
    * @param emf
    *          the entity manager factory
    * @return the group list
@@ -474,6 +476,34 @@ public final class UserDirectoryPersistenceUtil {
         em.close();
     }
   }
+
+  /**
+   * Returns the persisted group by the group role name and organization id
+   *
+   * @param role
+   *          the role name
+   * @param orgId
+   *          the organization id
+   * @param emf
+   *          the entity manager factory
+   * @return the group or <code>null</code> if not found
+   */
+  public static JpaGroup findGroupByRole(String role, String orgId, EntityManagerFactory emf) {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("Group.findByRole");
+      q.setParameter("role", role);
+      q.setParameter("organization", orgId);
+      return (JpaGroup) q.getSingleResult();
+    } catch (NoResultException e) {
+      return null;
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
 
   public static void removeGroup(String groupId, String orgId, EntityManagerFactory emf) throws NotFoundException,
   Exception {

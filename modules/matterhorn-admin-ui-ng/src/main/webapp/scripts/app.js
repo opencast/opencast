@@ -30,6 +30,7 @@ angular.module('adminNg', [
     'ui.sortable',
     'LocalStorageModule',
     'ngRoute',
+    'cfp.hotkeys',
     'ngResource',
     'ngAnimate',
     'ngMessages',
@@ -42,7 +43,8 @@ angular.module('adminNg', [
     'adminNg.services.table',
     'adminNg.services.modal',
     'adminNg.directives',
-    'mgo-angular-wizard'
+    'mgo-angular-wizard',
+    'opencast.directives'
 ]).config(['$routeProvider', function ($routeProvider) {
     var firstCharToUpper = function (string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -103,6 +105,9 @@ angular.module('adminNg', [
         };
     }]);
 }])
+.config(function(hotkeysProvider) {
+    hotkeysProvider.includeCheatSheet = false;
+})
 .run(['$rootScope', function ($rootScope) {
     // Define wrappers around non-mockable native functions.
     $rootScope.location = {};

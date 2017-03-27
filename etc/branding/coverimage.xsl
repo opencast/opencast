@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:date="http://exslt.org/dates-and-times"
+    xmlns:opencast="xalan://org.opencastproject.coverimage.impl.xsl" exclude-result-prefixes="date opencast"
+    extension-element-prefixes="date opencast">
 
   <xsl:param name="width" />
   <xsl:param name="height" />
@@ -8,6 +11,7 @@
   <xsl:template match="/">
 
     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+
       <xsl:attribute name="width">
         <xsl:value-of select="$width" />
       </xsl:attribute>
@@ -21,24 +25,24 @@
             font-size: 50pt;
             font-family: Arial;
           }
-          .maintitle {
+          .metadata tspan {
+             text-anchor: middle;
+          }
+          .title {
             font-weight: bolder;
             font-size: 1.6em;
           }
-          .titles tspan {
-             text-anchor: middle;
+          .creators {
+            font-style: italic;
           }
-          .presentor, .presentationdate {
+          .creators, .presentationdate {
             font-size: 1.2em;
           }
           .description {
             font-size: 0.5em;
-          }          
+          }
           .license {
             font-size: 0.8em;
-          }
-          .presentor {
-            font-style: italic;
           }
         ]]>
       </style>
@@ -74,18 +78,27 @@
       </xsl:if>
 
       <!-- Layer 3: Metadata -->
-      <text class="titles" x="50%">
-        <tspan class="maintitle" y="30%">
-          <xsl:value-of select="metadata/title" />
+      <text class="metadata">
+        <tspan class="title" y="30%" x="50%">
+          <xsl:value-of select="opencast:XsltHelper.split(metadata/title, 30, 1, false)" />
         </tspan>
-        <tspan class="presentor" dy="12%" x="50%">
-          <xsl:value-of select="metadata/creators" />
+        <tspan class="title" dy="10%" x="50%">
+          <xsl:value-of select="opencast:XsltHelper.split(metadata/title, 30, 2, true)" />
+        </tspan>
+        <tspan class="creators" dy="12%" x="50%">
+          <xsl:value-of select="opencast:XsltHelper.split(metadata/creators, 40, 1, true)" />
         </tspan>
         <tspan class="description" dy="12%" x="50%">
-          <xsl:value-of select="metadata/description" />
-        </tspan>        
+          <xsl:value-of select="opencast:XsltHelper.split(metadata/description, 50, 1, false)" />
+        </tspan>
+        <tspan class="description" dy="5%" x="50%">
+          <xsl:value-of select="opencast:XsltHelper.split(metadata/description, 50, 2, false)" />
+        </tspan>
+        <tspan class="description" dy="5%" x="50%">
+          <xsl:value-of select="opencast:XsltHelper.split(metadata/description, 50, 3, true)" />
+        </tspan>
         <tspan class="presentationdate" dy="12%" x="50%">
-          <xsl:value-of select="metadata/date" />, <xsl:value-of select="metadata/time" />
+          <xsl:value-of select="date:format-date(metadata/start, 'MMMMMMMMMM dd, YYYY, HH:mm')" />
         </tspan>
         <tspan class="license" dy="10%" x="50%">
           <xsl:value-of select="metadata/license" />

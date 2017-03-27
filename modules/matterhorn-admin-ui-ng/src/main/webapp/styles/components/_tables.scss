@@ -275,6 +275,37 @@
             border-right: none;
         }
 
+        span[data-status]:before {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            line-height: 20px;
+            border-radius: 50%;
+            margin: 5px 5px 0;
+            content: '';
+            vertical-align: top;
+        }
+
+        span[data-status=offline]:before {
+            background: black;
+        }
+
+        span[data-status=idle]:before {
+            background: $green;
+        }
+        
+        span[data-status="shutting_down"]:before,span[data-status=unknown]:before {
+            background: $yellow;
+        }
+
+        span[data-status="capturing"]:before,span[data-status="uploading"]:before {
+            background: $l-blue;
+        }
+
+        span[data-status="error"]:before {
+            background: $red;
+        }
+
         // Circles used on server page
         .circle {
             width: 12px;

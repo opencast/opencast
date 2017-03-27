@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<track id="7f9cbfd5-e2c2-4e07-8376-4b44652e20ee" type="presenter/delivery" ref="track:28be3165-7335-4323-ba12-e8dac8203058" xmlns="http://mediapackage.opencastproject.org">
+  <mimetype>video/mp4</mimetype>
+  <url>http://localhost:8080/files/mediapackage/6f988a67-45f9-4fd8-acdc-7b1a9cbf47f1/df6bb84f-ba8f-47d3-b0b2-e358ad50b64c/sintel_720p_stereo_30sec.mp4</url>
+  <checksum type="md5">98e96c6ad1a839d2e7c9b7d4b0684775</checksum>
+  <duration>30040</duration>
+  <audio id="audio-1">
+    <device/>
+    <encoder type="AAC (Advanced Audio Coding)"/>
+    <channels>2</channels>
+    <samplingrate>44100</samplingrate>
+    <bitrate>96012.0</bitrate>
+  </audio>
+  <video id="video-1">
+    <device/>
+    <encoder type="H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"/>
+    <bitrate>554060.0</bitrate>
+    <framerate>25.0</framerate>
+    <resolution>848x360</resolution>
+  </video>
+</track>

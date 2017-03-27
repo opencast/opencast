@@ -26,7 +26,9 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +57,6 @@ import java.util.zip.ZipFile;
 
 public class ZipUtilTest {
 
-  private static final String baseDirName = "zip_test_tmp";
   private static final String srcDirName = "src";
   private static final String nestedSrcDirName = "nested";
   private static final String srcFileName = "av.mov";
@@ -65,17 +66,20 @@ public class ZipUtilTest {
   private static final String dummieName = "notExists";
   private static final String over4GBFileName = "bigFish";
 
-  private static final File baseDir = new File(System.getProperty("java.io.tmpdir"), baseDirName);
-  private static final File srcDir = new File(baseDir, srcDirName);
-  private static final File nestedSrcDir = new File(srcDir, nestedSrcDirName);
-  private static final File srcFile = new File(srcDir, srcFileName);
-  private static final File nestedSrcFile = new File(nestedSrcDir, nestedSrcFileName);
-  private static final File destDir = new File(baseDir, destDirName);
-  private static final File sampleZip = new File(baseDir, sampleZipName);
-  private static final File dummieFile = new File(baseDir, dummieName);
-  private static final File bigFile = new File(srcDir, over4GBFileName);
+  private File baseDir;
+  private File srcDir;
+  private File nestedSrcDir;
+  private File srcFile;
+  private File nestedSrcFile;
+  private File destDir;
+  private File sampleZip;
+  private File dummieFile;
+  private File bigFile;
 
   public static final long bigFileSize = (long) 4.5 * 1024 * 1024 * 1024;
+
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
 
   /**
    * Added as part of the fix for MH-1809 WARNING: Changes in the files to zip would change the resulting zip size. If
@@ -87,19 +91,22 @@ public class ZipUtilTest {
 
   private static final Logger logger = LoggerFactory.getLogger(ZipUtilTest.class);
 
-  // Please adjust this value -cedriessen
-  // Commented out by ruben.perez --not necessary
-  // private static final long WINDOWS_ZIP_SIZE = 870533;
-
   @Before
   public void setUp() throws Exception {
+    baseDir = testFolder.newFolder();
+    srcDir = new File(baseDir, srcDirName);
+    nestedSrcDir = new File(srcDir, nestedSrcDirName);
+    srcFile = new File(srcDir, srcFileName);
+    nestedSrcFile = new File(nestedSrcDir, nestedSrcFileName);
+    destDir = new File(baseDir, destDirName);
+    sampleZip = new File(baseDir, sampleZipName);
+    dummieFile = new File(baseDir, dummieName);
+    bigFile = new File(srcDir, over4GBFileName);
+
     // Set up the source and destination directories
     Assert.assertTrue(baseDir.isDirectory() || baseDir.mkdirs());
-
     Assert.assertTrue(srcDir.isDirectory() || srcDir.mkdir());
-
     Assert.assertTrue(srcDir.isDirectory() || nestedSrcDir.mkdir());
-
     Assert.assertTrue(destDir.isDirectory() || destDir.mkdir());
 
     // Copy the source files from the classpath to the source dir

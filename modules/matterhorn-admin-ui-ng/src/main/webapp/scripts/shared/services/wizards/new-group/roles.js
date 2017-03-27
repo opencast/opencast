@@ -1,11 +1,11 @@
 angular.module('adminNg.services')
-.factory('NewGroupRoles', ['UsersResource', 'ResourcesListResource', function (UsersResource, ResourcesListResource) {
+.factory('NewGroupRoles', ['UsersResource', 'UserRolesResource', 'ResourcesListResource', function (UsersResource, UserRolesResource, ResourcesListResource) {
     var Roles = function () {
         var me = this;
 
         this.reset = function () {
             me.roles = {
-                available: ResourcesListResource.query({ resource: 'ROLES'}),
+                available: UserRolesResource.query({limit: 0, offset: 0, filter: 'role_target:USER'}),
                 selected:  [],
                 i18n: 'USERS.GROUPS.DETAILS.ROLES',
                 searchable: true

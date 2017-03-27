@@ -18,8 +18,6 @@
  * the License.
  *
  */
-
-
 package org.opencastproject.oaipmh.server;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
@@ -29,19 +27,22 @@ import static org.opencastproject.util.data.Option.option;
 import org.opencastproject.oaipmh.OaiPmhConstants;
 import org.opencastproject.util.data.Option;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * Helper to encapsulate HTTP parameter handling.
  */
 public abstract class Params {
-
   /**
    * Implement this method to supply the needed parameters.
    *
    * @return the parameter or null or a blank string to indicate a missing parameter
    */
   abstract String getParameter(String key);
+
+  /**
+   * Return the complete repository URL. This is everything before the query parameters.
+   * Examples: http://localhost:8080/oaipmh or http://localhost:8080/oaipmh/cq5
+   */
+  abstract String getRepositoryUrl();
 
   boolean isVerbGetRecord() {
     return getVerb().map(eq(OaiPmhConstants.VERB_GET_RECORD)).getOrElse(false);
@@ -88,7 +89,7 @@ public abstract class Params {
   }
 
   Option<String> getSet() {
-    return option(StringUtils.trimToNull(getParameter("set")));
+    return option(trimToNull(getParameter("set")));
   }
 
   Option<String> getResumptionToken() {

@@ -22,7 +22,9 @@ package org.opencastproject.external.userdirectory;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
@@ -129,6 +131,7 @@ public class ExternalGroupLoader {
               for (String role : loadRoles(EXTERNAL_APPLICATIONS_ROLES_FILE)) {
                 roles.add(new JpaRole(role, org));
               }
+              roles.add(new JpaRole(SecurityConstants.GLOBAL_SUDO_ROLE, org));
               externalApplicationGroup = new JpaGroup(externalApplicationsGroupId, org, externalApplicationsGroupname,
                       externalApplicationsGroupDescription, roles, new HashSet<String>());
               groupRoleProvider.addGroup(externalApplicationGroup);
@@ -138,6 +141,8 @@ public class ExternalGroupLoader {
           } catch (IllegalStateException e) {
             logger.error("Unable to load external API groups because {}", ExceptionUtils.getStackTrace(e));
           } catch (IOException e) {
+            logger.error("Unable to load external API groups because {}", ExceptionUtils.getStackTrace(e));
+          } catch (UnauthorizedException e) {
             logger.error("Unable to load external API groups because {}", ExceptionUtils.getStackTrace(e));
           }
         }

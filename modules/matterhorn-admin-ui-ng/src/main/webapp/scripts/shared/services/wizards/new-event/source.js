@@ -62,7 +62,9 @@ angular.module('adminNg.services')
               },
               weekdays: {},
               presentableWeekdays: ''
-            }
+            },
+
+            type: "UPLOAD"
           };
         };
         this.reset();

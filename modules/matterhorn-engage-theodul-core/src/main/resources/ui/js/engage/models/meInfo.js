@@ -35,6 +35,7 @@ define(['jquery', 'backbone'], function($, Backbone) {
     var prop_logo_mediamodule = "logo_mediamodule";
     var prop_link_mediamodule = "link_mediamodule";
     var prop_show_embed_link = "show_embed_links";
+    var prop_hide_video_context_menu = "player.hide_video_context_menu";
     var ready = false;
     var positioncontrols = "";
 
@@ -55,6 +56,7 @@ define(['jquery', 'backbone'], function($, Backbone) {
                     var logo_player = "";
                     var link_mediamodule = false;
                     var show_embed_link = false;
+                    var hide_video_context_menu = false;
                     var layout = "off";
                     var focusedflavor = "presentation";
                     if (me && me.attributes && me.attributes.org && me.attributes.org.properties) {
@@ -111,7 +113,11 @@ define(['jquery', 'backbone'], function($, Backbone) {
                             // show embed links
                             else if ((key == prop_show_embed_link) && value) {
                                 if (value.trim() == "true") show_embed_link = true;
-                            }                              
+                            }
+                            // hide video context menu
+                            else if ((key == prop_hide_video_context_menu) && value) {
+                              if (value.trim() == "true") hide_video_context_menu = true;
+                            }
                         });
                     }
                     me.set("allowedtags", allowedTags);
@@ -122,7 +128,8 @@ define(['jquery', 'backbone'], function($, Backbone) {
                     me.set("logo_player", logo_player);
                     me.set("link_mediamodule", link_mediamodule);
                     me.set("show_embed_links", show_embed_link);
-                    me.set("shortcut-sequence", shortcut_sequence)
+                    me.set("hide_video_context_menu", hide_video_context_menu);
+                    me.set("shortcut-sequence", shortcut_sequence);
                     me.set("layout", layout);
                     me.set("focusedflavor", focusedflavor);
                     ready = true;

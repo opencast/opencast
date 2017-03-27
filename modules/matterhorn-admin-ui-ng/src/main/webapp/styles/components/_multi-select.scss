@@ -25,6 +25,12 @@
 
     select[multiple] {
         margin-top: 10px;
+        font-size: 12px;
+        padding: 5px;
+
+        option {
+            padding: 3px 0px;
+        }
     }
 
     select {
@@ -57,13 +63,33 @@
             @include btn(red);
         }
     }
-}
 
-.multi-select-col {
-    width: 45%;
-    display: block;
-    float: left;
-    vertical-align: top;
+    .multi-select-col {
+        width: 45%;
+        display: block;
+        float: left;
+        vertical-align: top;
+
+        input.search {
+            border-radius: $main-border-radius 0 0 $main-border-radius;
+            border-right-width: 0;
+            float: left;
+            width: 100% !important;
+        }
+
+        a.clear {
+            margin-top: 10px;
+            float: right;
+            @include btn(white);
+            @include fa-icon($fa-var-times, before, block, 0, 0.45em 0.45em 0.55em 0.45em, inherit, 14px);
+
+            border-radius: 0 $main-border-radius $main-border-radius 0;
+
+            &+input.search {
+                width: calc(100% - 46px) !important;
+            }
+        }
+    }
 }
 
 .multi-select-search {

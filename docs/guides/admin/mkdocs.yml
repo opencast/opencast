@@ -22,8 +22,7 @@ pages:
    - Overview: 'installation/index.md'
    - Multiple Servers: 'installation/multiple-servers.md'
    - Installation from Source:
-      - Debian/Ubuntu: 'installation/source-debian-ubuntu.md'
-      - RHEL/CentOS: 'installation/source-rhel-sl-centos.md'
+      - Linux: 'installation/source-linux.md'
       - MacOS X: 'installation/source-macosx.md'
    - Installation from Package (RPM):
       - Fedora: 'installation/rpm-fedora.md'
@@ -42,10 +41,12 @@ pages:
       - General Security: 'configuration/security.md'
       - Central Authentication Service (CAS): 'configuration/security.cas.md'
       - LDAP Authentication and Authorization (without CAS): 'configuration/security.ldap.md'
+      - Authentication and Authorization Infrastructure (AAI): 'configuration/security.aai.md'
       - Stream Security: 'configuration/stream-security.md'
       - Access Control Lists: 'configuration/acl.md'
    - Workflow: 'configuration/workflow.md'
    - External API: 'configuration/external-api.md'
+   - OAI-PMH: 'configuration/oaipmh.md'
 - Modules:
    - Overview: 'modules/index.md'
    - Atom/RSS Feed: 'modules/atomrss.md'
@@ -61,6 +62,7 @@ pages:
       - Setup: 'modules/videoeditor.setup.md'
       - Architecture: 'modules/videoeditor.architecture.md'
    - Video Segmentation: 'modules/videosegmentation.md'
+   - Waveform Service: 'modules/waveform.md'
    - YouTube Publication: 'modules/youtubepublication.md'
 - Workflow Operation Handler:
    - Overview: 'workflowoperationhandlers/index.md'
@@ -93,7 +95,10 @@ pages:
    - Prepare A/V: 'workflowoperationhandlers/prepareav-woh.md'
    - Publish Configure: 'workflowoperationhandlers/publishconfigure-woh.md'
    - Publish Engage: 'workflowoperationhandlers/publishengage-woh.md'
+   - Publish OAI-PMH: 'workflowoperationhandlers/publish-oaipmh-woh.md'
+   - Republish OAI-PMH: 'workflowoperationhandlers/republish-oaipmh-woh.md'
    - Retract Configure: 'workflowoperationhandlers/retractconfigure-woh.md'
+   - Retract OAI-PMH: 'workflowoperationhandlers/retract-oaipmh-woh.md'
    - Segment Previews: 'workflowoperationhandlers/segmentpreviews-woh.md'
    - Segment Video: 'workflowoperationhandlers/segmentvideo-woh.md'
    - Series: 'workflowoperationhandlers/series-woh.md'

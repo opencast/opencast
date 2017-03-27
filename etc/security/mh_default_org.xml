@@ -282,22 +282,16 @@
     <!-- Enable and configure the failure URL for form-based logins -->
     <sec:form-login authentication-failure-url="/admin-ng/login.html?error" authentication-success-handler-ref="authSuccessHandler" />
 
-    <!-- Digest auth is used by capture agents and is used to enable transparent clustering of services -->
-    <sec:custom-filter position="BASIC_AUTH_FILTER" ref="digestFilter" />
+    <!-- Authentication filter chain -->
+    <sec:custom-filter position="BASIC_AUTH_FILTER" ref="authenticationFilters" />
 
     <sec:custom-filter ref="asyncTimeoutRedirectFilter" after="EXCEPTION_TRANSLATION_FILTER"/>
 
     <!-- Opencast is shipping its own implementation of the anonymous filter -->
     <sec:custom-filter ref="anonymousFilter" position="ANONYMOUS_FILTER" />
 
-    <!-- Basic authentication
-    <sec:custom-filter after="BASIC_AUTH_FILTER" ref="basicAuthenticationFilter" />
-    -->
-
-    <!--
-      2-legged oauth is used by trusted 3rd party applications, including LTI producers.
-      If you do not plan to use OAuth, comment this out.
-    <sec:custom-filter after="BASIC_AUTH_FILTER" ref="oauthProtectedResourceFilter" />
+    <!-- Shibboleth header authentication filter
+    <sec:custom-filter ref="shibbolethHeaderFilter" position="PRE_AUTH_FILTER"/>
     -->
 
     <!-- Enables "remember me" functionality -->
@@ -312,7 +306,33 @@
     <!-- Enables log out -->
     <sec:logout success-handler-ref="logoutSuccessHandler" />
 
+    <!-- Shibooleth log out
+         Please specifiy the URL to return to after logging out
+    <sec:logout logout-success-url="/Shibboleth.sso/Logout?return=http://www.opencast.org" />
+    -->
+
   </sec:http>
+
+  <!-- ############################# -->
+  <!-- # Authentication Filters    # -->
+  <!-- ############################# -->
+
+  <bean id="authenticationFilters" class="org.springframework.web.filter.CompositeFilter">
+    <property name="filters">
+      <list>
+        <!-- Digest auth is used by capture agents and is used to enable transparent clustering of services -->
+        <!-- ATTENTION! Do not deactivate the digest filter, otherwise the distributed setup would not work -->
+        <ref bean="digestFilter" />
+
+        <!-- Basic authentication  -->
+        <!-- <ref bean="basicAuthenticationFilter" /> -->
+
+        <!-- 2-legged oauth is used by trusted 3rd party applications, including LTI producers. -->
+        <!-- If you do not plan to use OAuth, comment this out. -->
+        <!-- <ref bean="oauthProtectedResourceFilter" /> -->
+      </list>
+    </property>
+  </bean>
 
   <!-- ########################################### -->
   <!-- # Custom ajax timeout Filter Definition   # -->
@@ -442,6 +462,40 @@
   </bean>
   -->
 
+  <!-- ###################### -->
+  <!-- # Shibboleth Support # -->
+  <!-- ###################### -->
+
+  <!-- General Shibboleth header extration filter
+  <bean id="shibbolethHeaderFilter"
+        class="org.opencastproject.security.shibboleth.ShibbolethRequestHeaderAuthenticationFilter">
+    <property name="principalRequestHeader" value="<this need to be configured>"/>
+    <property name="authenticationManager" ref="authenticationManager" />
+    <property name="userDetailsService" ref="userDetailsService" />
+    <property name="userDirectoryService" ref="userDirectoryService" />
+    <property name="shibbolethLoginHandler" ref="aaiLoginHandler" />
+    <property name="exceptionIfHeaderMissing" value="false" />
+  </bean>
+  -->
+
+  <!-- AAI header extractor and user generator
+  <bean id="aaiLoginHandler" class="org.opencastproject.security.aai.ConfigurableLoginHandler">
+    <property name="securityService" ref="securityService" />
+    <property name="userReferenceProvider" ref="userReferenceProvider" />
+  </bean>
+  -->
+
+  <!--
+  <bean id="preauthAuthProvider"
+        class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+    <property name="preAuthenticatedUserDetailsService">
+      <bean id="userDetailsServiceWrapper" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+        <property name="userDetailsService" ref="userDetailsService"/>
+      </bean>
+    </property>
+  </bean>
+  -->
+
   <!-- #################### -->
   <!-- # OSGI Integration # -->
   <!-- #################### -->
@@ -455,7 +509,7 @@
 
   <!-- Uncomment to enable external users e.g. used together shibboleth -->
   <!-- <osgi:reference id="userReferenceProvider" cardinality="1..1"
-                  interface="org.opencastproject.userdirectory.JpaUserReferenceProvider"  /> -->
+                  interface="org.opencastproject.userdirectory.api.UserReferenceProvider"  /> -->
 
   <osgi:reference id="userDirectoryService" cardinality="1..1"
                   interface="org.opencastproject.security.api.UserDirectoryService" />
@@ -467,6 +521,8 @@
 
   <!-- The JPA user directory stores md5 hashed, salted passwords, so we must use a username-salted md5 password encoder. -->
   <sec:authentication-manager alias="authenticationManager">
+    <!-- Uncomment this if using Shibboleth authentication -->
+    <!--sec:authentication-provider ref="preauthAuthProvider" /-->
     <sec:authentication-provider user-service-ref="userDetailsService">
       <sec:password-encoder hash="md5"><sec:salt-source user-property="username" /></sec:password-encoder>
     </sec:authentication-provider>

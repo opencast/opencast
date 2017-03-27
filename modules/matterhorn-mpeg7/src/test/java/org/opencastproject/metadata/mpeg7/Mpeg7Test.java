@@ -27,13 +27,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.opencastproject.util.FileSupport;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.awt.Rectangle;
 import java.io.File;
@@ -55,6 +56,9 @@ public class Mpeg7Test {
 
   /** Temp file for mpeg7 catalog contents */
   private File mpeg7TempFile = null;
+
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
 
   /**
    * @throws java.lang.Exception
@@ -92,7 +96,7 @@ public class Mpeg7Test {
     Mpeg7Catalog mpeg7Sample = new Mpeg7CatalogImpl(catalogFile.toURI().toURL().openStream());
 
     // Create a new catalog and fill it with a few fields
-    mpeg7TempFile = new File(FileSupport.getTempDirectory(), Long.toString(System.currentTimeMillis()));
+    mpeg7TempFile = testFolder.newFile();
 
     // TODO: Add sample tracks to new catalog
     // TODO: Add sample video segments to new catalog

@@ -13,8 +13,8 @@
       "name": "•mock• Xavier Butty",
       "provider": "",
       "roles": [
-        "•mock• ROLE_USER",
-        "•mock• ROLE_ANONYMOUS"
+        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
       ],
       "username": "xavier_butty"
     },
@@ -25,11 +25,11 @@
       "name": "•mock• MH System Account",
       "provider": "system",
       "roles": [
-        "•mock• ROLE_ADMIN",
-        "•mock• ROLE_USER",
-        "•mock• ROLE_OAUTH_USER",
-        "•mock• MATTERHORN_ADMINISTRATOR",
-        "•mock• ROLE_ANONYMOUS"
+        {"name": "•mock• ROLE_ADMIN", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_OAUTH_USER", "type": "INTERNAL"},
+        {"name": "•mock• MATTERHORN_ADMINISTRATOR", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
       ],
       "username": "matterhorn_system_account"
     },
@@ -43,11 +43,11 @@
       "name": "•mock• SystemAdmin",
       "provider": "local",
       "roles": [
-        "•mock• ROLE_ADMIN",
-        "•mock• ROLE_USER",
-        "•mock• ROLE_OAUTH_USER",
-        "•mock• MATTERHORN_ADMINISTRATOR",
-        "•mock• ROLE_ANONYMOUS"
+        {"name": "•mock• ROLE_ADMIN", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_OAUTH_USER", "type": "INTERNAL"},
+        {"name": "•mock• MATTERHORN_ADMINISTRATOR", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
       ],
       "username": "admin"
     },
@@ -62,8 +62,8 @@
       "provider": "participation",
       "personId": 1,
       "roles": [
-        "•mock• ROLE_USER",
-        "•mock• ROLE_ANONYMOUS"
+        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
       ],
       "username": "pm.user.1"
     },
@@ -78,8 +78,8 @@
       "provider": "participation",
       "personId": 2,
       "roles": [
-        "•mock• ROLE_USER",
-        "•mock• ROLE_ANONYMOUS"
+        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
       ],
       "username": "pm.user.2"
     },
@@ -94,8 +94,8 @@
       "provider": "participation",
       "personId": 3,
       "roles": [
-        "•mock• ROLE_USER",
-        "•mock• ROLE_ANONYMOUS"
+        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
       ],
       "username": "pm.user.3"
     }

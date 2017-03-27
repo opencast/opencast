@@ -29,17 +29,16 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.User;
-import org.opencastproject.util.PathSupport;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.util.UUID;
 
 @Ignore
 public class AdminUIEventSearchQueryTest {
@@ -77,28 +76,17 @@ public class AdminUIEventSearchQueryTest {
   /** Flag to indicate read only index */
   protected static boolean isReadOnly = false;
 
+  @ClassRule
+  public static TemporaryFolder testFolder = new TemporaryFolder();
+
   @BeforeClass
   public static void setupClass() throws Exception {
     TestUtils.startTesting();
     // Index
-    String rootPath = PathSupport.concat(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
-    System.setProperty("matterhorn.home", rootPath);
-    idxRoot = new File(rootPath);
+    idxRoot = testFolder.newFolder();
     AdminUIElasticsearchUtils.createIndexConfigurationAt(idxRoot, indexName);
     idx = new AdminUISearchIndex();
     idx.activate(null);
-    // idx = new AdminUISearchIndex();
-  }
-
-  /**
-   * Does the cleanup after the test suite.
-   */
-  @AfterClass
-  public static void tearDownClass() {
-    /*
-     * try { if (idx != null) idx.close(); FileUtils.deleteQuietly(idxRoot); } catch (IOException e) {
-     * fail("Error closing search index: " + e.getMessage()); }
-     */
   }
 
   /**

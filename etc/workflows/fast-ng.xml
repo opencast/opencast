@@ -37,8 +37,14 @@
             <legend>Immediately distribute the recording to:</legend>
             <ul>
               <li>
-                <input id="publish" name="publish" type="checkbox" class="configField" value="true" checked=checked />
-                <label for=publish>Opencast Media Module</label>
+                <input id="publishToMediaModule" name="publishToMediaModule" type="checkbox" class="configField" value="true" checked=checked />
+                <label for=publishToMediaModule>Opencast Media Module</label>
+              </li>
+            </ul>
+            <ul>
+              <li>
+                <input id="publishToOaiPmh" name="publishToOaiPmh" type="checkbox" class="configField" value="true" checked=checked />
+                <label for=publishToOaiPmh>Default OAI-PMH Repository</label>
               </li>
             </ul>
           </fieldset>
@@ -53,7 +59,8 @@
       description="Applying default configuration values">
       <configurations>
         <configuration key="comment">false</configuration>
-        <configuration key="publish">true</configuration>
+        <configuration key="publishToMediaModule">true</configuration>
+        <configuration key="publishToOaiPmh">true</configuration>
       </configurations>
     </operation>
 
@@ -138,7 +145,7 @@
 
     <operation
       id="image"
-      if="${publish}"
+      if="${publishToMediaModule} OR ${publishToOaiPmh}"
       fail-on-error="true"
       exception-handler-workflow="error"
       description="Creating Engage search result thumbnails">
@@ -156,7 +163,7 @@
 
     <operation
       id="image"
-      if="${publish}"
+      if="${publishToMediaModule} OR ${publishToOaiPmh}"
       fail-on-error="true"
       exception-handler-workflow="error"
       description="Creating Engage player preview image">
@@ -175,7 +182,7 @@
     <!-- Uncomment this if you need the feed preview image
     <operation
       id="image"
-      if="${publish}"
+      if="${publishToMediaModule} OR ${publishToOaiPmh}"
       fail-on-error="true"
       exception-handler-workflow="error"
       description="Creating feed preview images">
@@ -193,7 +200,7 @@
 
     <operation
       id="segment-video"
-      if="${publish}"
+      if="${publishToMediaModule} OR ${publishToOaiPmh}"
       fail-on-error="false"
       exception-handler-workflow="error"
       description="Detecting slide transitions in presentation track">
@@ -207,7 +214,7 @@
 
     <operation
       id="segmentpreviews"
-      if="${publish}"
+      if="${publishToMediaModule} OR ${publishToOaiPmh}"
       fail-on-error="false"
       exception-handler-workflow="error"
       description="Creating presentation segments preview image">
@@ -225,7 +232,7 @@
 
     <operation
       id="extract-text"
-      if="${publish}"
+      if="${publishToMediaModule} OR ${publishToOaiPmh}"
       fail-on-error="false"
       exception-handler-workflow="error"
       description="Extracting text from presentation segments">
@@ -242,9 +249,10 @@
       exception-handler-workflow="ng-partial-error"
       description="Publish to preview publication channel">
       <configurations>
-        <configuration key="source-tags">engage-download</configuration>
+        <configuration key="source-flavors">*/preview</configuration>
         <configuration key="channel-id">internal</configuration>
         <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
+        <configuration key="check-availability">true</configuration>
       </configurations>
     </operation>
 
@@ -252,16 +260,32 @@
 
     <operation
       id="publish-engage"
-      if="${publish}"
+      if="${publishToMediaModule}"
       max-attempts="2"
       fail-on-error="true"
       exception-handler-workflow="error"
       description="Publishing to Engage">
       <configurations>
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
-        <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
+        <configuration key="download-source-tags">engage-download,atom,rss</configuration>
         <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="check-availability">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Publish to OAI-PMH -->
+
+    <operation
+      id="publish-oaipmh"
+      if="${publishToOaiPmh}"
+      exception-handler-workflow="error"
+      description="Publish to OAI-PMH Default Repository">
+      <configurations>
+        <configuration key="download-flavors">dublincore/*,security/*</configuration>
+        <configuration key="download-tags">engage-download,atom,rss</configuration>
+        <configuration key="streaming-tags">engage-streaming</configuration>
+        <configuration key="check-availability">true</configuration>
+        <configuration key="repository">default</configuration>
       </configurations>
     </operation>
 

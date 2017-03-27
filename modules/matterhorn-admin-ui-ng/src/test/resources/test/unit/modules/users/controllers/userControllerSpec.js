@@ -31,7 +31,7 @@ describe('User controller', function () {
         $httpBackend.whenGET('/roles/roles.json').respond(JSON.stringify(getJSONFixture('roles/roles.json')));
         $httpBackend.whenGET('/admin-ng/users/matterhorn_system_account.json')
             .respond(JSON.stringify(getJSONFixture('admin-ng/users/matterhorn_system_account.json')));
-        $httpBackend.whenGET('/admin-ng/resources/ROLES.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:USER&limit=0&offset=0').respond('{}');
         $controller('UserCtrl', {$scope: $scope});
         $httpBackend.flush();
     });

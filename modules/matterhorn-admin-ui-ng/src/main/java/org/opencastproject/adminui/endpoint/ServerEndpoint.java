@@ -68,7 +68,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@RestService(name = "ServerProxyService", title = "UI Servers", notes = "These Endpoints deliver informations about the server required for the UI.", abstractText = "This service provides the server data for the UI.")
+@RestService(name = "ServerProxyService", title = "UI Servers",
+  abstractText = "This service provides the server data for the UI.",
+  notes = { "These Endpoints deliver informations about the server required for the UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public class ServerEndpoint {
 
   private enum Sort {
@@ -183,11 +189,10 @@ public class ServerEndpoint {
     query.setOffset(offset);
 
     List<JSONObject> servers = new ArrayList<JSONObject>();
+    // Get service statistics for all hosts and services
+    List<ServiceStatistics> servicesStatistics = serviceRegistry.getServiceStatistics();
     for (HostRegistration server : serviceRegistry.getHostRegistrations()) {
-      // Get all the services statistics pro host
-      // TODO improve the service registry to get service statistics by host
-      List<ServiceStatistics> servicesStatistics = serviceRegistry.getServiceStatistics();
-      // may become very big
+      // Calculate statistics per server
       long jobsCompleted = 0;
       int jobsRunning = 0;
       int jobsQueued = 0;

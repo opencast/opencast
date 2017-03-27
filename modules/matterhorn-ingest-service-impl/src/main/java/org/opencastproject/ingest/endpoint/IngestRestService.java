@@ -289,7 +289,10 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
       if (MediaPackageSupport.sanityCheck(mp).isSome())
         return Response.serverError().status(Status.BAD_REQUEST).build();
-      String[] tagsArray = tags.split(",");
+      String[] tagsArray = null;
+      if (tags != null) {
+        tagsArray = tags.split(",");
+      }
       mp = ingestService.addTrack(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), tagsArray, mp);
       return Response.ok(mp).build();
     } catch (Exception e) {
@@ -531,22 +534,22 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         + "mandatory to set a title for the recording. This can be done with the 'title' form field or by supplying a DC "
         + "catalog with a title included.  The identifier of the newly created media package will be taken from the "
         + "<em>identifier</em> field or the episode DublinCore catalog (deprecated<sup>*</sup>). If no identifier is "
-        + "set, a newa randumm UUIDv4 will be generated. This endpoint is not meant to be used by capture agents for "
-        + "scheduled recordings. It's primary use is for manual ingests with command line tools like curl.</p> "
-        + "<p>Multiple tracks can be ingested by using multiple form fields. It's important, however, to always set the "
+        + "set, a new random UUIDv4 will be generated. This endpoint is not meant to be used by capture agents for "
+        + "scheduled recordings. Its primary use is for manual ingests with command line tools like curl.</p> "
+        + "<p>Multiple tracks can be ingested by using multiple form fields. It is important to always set the "
         + "flavor of the next media file <em>before</em> sending the media file itself.</p>"
-        + "<b>(*)</b> The special treatment of the identifier field is deprecated any may be removed in future versions "
+        + "<b>(*)</b> The special treatment of the identifier field is deprecated and may be removed in future versions "
         + "without further notice in favor of a random UUID generation to ensure uniqueness of identifiers. "
         + "<h3>Example curl command:</h3>"
         + "<p>Ingest one video file:</p>"
         + "<p><pre>\n"
-        + "curl -f -i --digest -u matterhorn_system_account:CHANGE_ME -H 'X-Requested-Auth: Digest' \\\n"
+        + "curl -f -i --digest -u opencast_system_account:CHANGE_ME -H 'X-Requested-Auth: Digest' \\\n"
         + "    http://localhost:8080/ingest/addMediaPackage -F creator='John Doe' -F title='Test Recording' \\\n"
         + "    -F 'flavor=presentation/source' -F 'BODY=@test-recording.mp4' \n"
         + "</pre></p>"
         + "<p>Ingest two video files:</p>"
         + "<p><pre>\n"
-        + "curl -f -i --digest -u matterhorn_system_account:CHANGE_ME -H 'X-Requested-Auth: Digest' \\\n"
+        + "curl -f -i --digest -u opencast_system_account:CHANGE_ME -H 'X-Requested-Auth: Digest' \\\n"
         + "    http://localhost:8080/ingest/addMediaPackage -F creator='John Doe' -F title='Test Recording' \\\n"
         + "    -F 'flavor=presentation/source' -F 'BODY=@test-recording-vga.mp4' \\\n"
         + "    -F 'flavor=presenter/source' -F 'BODY=@test-recording-camera.mp4' \n"
@@ -615,14 +618,14 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         + "<h3>Example curl command:</h3>"
         + "<p>Ingest one video file:</p>"
         + "<p><pre>\n"
-        + "curl -f -i --digest -u matterhorn_system_account:CHANGE_ME -H 'X-Requested-Auth: Digest' \\\n"
-        + "    http://localhost:8080/ingest/addMediaPackage/full -F creator='John Doe' -F title='Test Recording' \\\n"
+        + "curl -f -i --digest -u opencast_system_account:CHANGE_ME -H 'X-Requested-Auth: Digest' \\\n"
+        + "    http://localhost:8080/ingest/addMediaPackage/fast -F creator='John Doe' -F title='Test Recording' \\\n"
         + "    -F 'flavor=presentation/source' -F 'BODY=@test-recording.mp4' \n"
         + "</pre></p>"
         + "<p>Ingest two video files:</p>"
         + "<p><pre>\n"
-        + "curl -f -i --digest -u matterhorn_system_account:CHANGE_ME -H 'X-Requested-Auth: Digest' \\\n"
-        + "    http://localhost:8080/ingest/addMediaPackage/full -F creator='John Doe' -F title='Test Recording' \\\n"
+        + "curl -f -i --digest -u opencast_system_account:CHANGE_ME -H 'X-Requested-Auth: Digest' \\\n"
+        + "    http://localhost:8080/ingest/addMediaPackage/fast -F creator='John Doe' -F title='Test Recording' \\\n"
         + "    -F 'flavor=presentation/source' -F 'BODY=@test-recording-vga.mp4' \\\n"
         + "    -F 'flavor=presenter/source' -F 'BODY=@test-recording-camera.mp4' \n"
         + "</pre></p>",

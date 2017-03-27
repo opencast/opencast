@@ -1,6 +1,54 @@
 Opencast 2.3.x
 ==============
 
+Opencast 2.3.2
+--------------
+*Released on March 22, 2017*
+
+- [[MH-11224]](https://opencast.jira.com/browse/MH-11224) - Attempting to view source metadata through the new admin UI generates a stack trace
+- [[MH-11340]](https://opencast.jira.com/browse/MH-11340) - Uncaught NullPointer Exception in Karaf console from com.entwinemedia.fn.data.json.SimpleSerializer.toJson
+- [[MH-11616]](https://opencast.jira.com/browse/MH-11616) - Search Service will not remove mp from index if it is not found in database
+- [[MH-11743]](https://opencast.jira.com/browse/MH-11743) - event.hasPreview() broken
+- [[MH-11760]](https://opencast.jira.com/browse/MH-11760) - Event edit warning cannot be removed
+- [[MH-11790]](https://opencast.jira.com/browse/MH-11790) - Slide Previews and slide text are not shown in Theodul Engage player
+- [[MH-11817]](https://opencast.jira.com/browse/MH-11817) - Unhide volume controls in video-editor
+- [[MH-11819]](https://opencast.jira.com/browse/MH-11819) - Admin UI Video Editor - Improved Zoom Controls
+- [[MH-12009]](https://opencast.jira.com/browse/MH-12009) - Admin UI Video Editor: Segmentation lost after publishing
+- [[MH-12058]](https://opencast.jira.com/browse/MH-12058) - Ingests fail if specified workflow does not exist
+- [[MH-12059]](https://opencast.jira.com/browse/MH-12059) - Catch invalid dates when indexing
+- [[MH-12061]](https://opencast.jira.com/browse/MH-12061) - Reduce the number of activemq messages and log entries during index rebuild
+- [[MH-12062]](https://opencast.jira.com/browse/MH-12062) - Improve robustness of scheduler re-indexing
+- [[MH-12063]](https://opencast.jira.com/browse/MH-12063) - Catch incomplete archive entries when indexing
+- [[MH-12072]](https://opencast.jira.com/browse/MH-12072) - Wrong destinationId for External API message receiver
+- [[MH-12084]](https://opencast.jira.com/browse/MH-12084) - The class "AsyncTimeoutRedirectFilter" swallows almost all the exceptions
+- [[MH-12087]](https://opencast.jira.com/browse/MH-12087) - Null bitrate can cause UI display of source media to fail
+- [[MH-12092]](https://opencast.jira.com/browse/MH-12092) - Return event ID when event is created through Scheduler API
+- [[MH-12097]](https://opencast.jira.com/browse/MH-12097) - SegmentVideoWorkflowOperation: Modules not included in Admin Presentation build.
+
+Opencast 2.3.1
+--------------
+*Released on Janurary 25, 2017*
+
+- [[MH-11267]](https://opencast.jira.com/browse/MH-11267) - Wrong notification text when deleting series
+- [[MH-11458]](https://opencast.jira.com/browse/MH-11458) - Update translations from crowdin
+- [[MH-11687]](https://opencast.jira.com/browse/MH-11687) - UI date formats are wrong for most of the English-speaking world
+- [[MH-11776]](https://opencast.jira.com/browse/MH-11776) - CaptureAgentStateServiceImplTest incorrectly passes a non-long recording id, misses finding the NullPointer in Impl
+- [[MH-11960]](https://opencast.jira.com/browse/MH-11960) - matterhorn-adminui-ng fails on first build
+- [[MH-11961]](https://opencast.jira.com/browse/MH-11961) - Cannot access slidetext.xml should not break re-indexing
+- [[MH-11963]](https://opencast.jira.com/browse/MH-11963) - Fix ingest REST docs
+- [[MH-11966]](https://opencast.jira.com/browse/MH-11966) - Confusing AdminUI Groups Endpoint Documentation
+- [[MH-11967]](https://opencast.jira.com/browse/MH-11967) - Publish internal fails on Distrubuted System Admin/Engage
+- [[MH-11983]](https://opencast.jira.com/browse/MH-11983) - Only administrators should be allowed to assign the admin roles to other users
+- [[MH-11987]](https://opencast.jira.com/browse/MH-11987) - Declare Admin UI Facade as module internal interface
+- [[MH-11988]](https://opencast.jira.com/browse/MH-11988) - Advise to change karaf shutdown command in the docs
+- [[MH-11989]](https://opencast.jira.com/browse/MH-11989) - Allow unknown as well as offline CAs to be removed via UI
+- [[MH-11992]](https://opencast.jira.com/browse/MH-11992) - Compatibility issue when using contrib Wowza adaptive streaming module
+- [[MH-11998]](https://opencast.jira.com/browse/MH-11998) - /info/me.json sometimes doesn't provide full information about the user
+- [[MH-12004]](https://opencast.jira.com/browse/MH-12004) - Removing an recording does not remove all correspronding jobs
+- [[MH-12005]](https://opencast.jira.com/browse/MH-12005) - UI shows inconsistent version due to missing version in cover-image-remote
+- [[MH-12006]](https://opencast.jira.com/browse/MH-12006) - Security Issue Allowing Arbitrary Code Execution
+
+
 Opencast 2.3.0
 --------------
 *Released on December 13, 2016*

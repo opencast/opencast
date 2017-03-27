@@ -17,7 +17,7 @@ angular.module('adminNg.controllers')
           });
 
           angular.forEach($scope.states[1].stateController.roles.selected, function (value) {
-            $scope.group.roles.push(value.value);
+            $scope.group.roles.push(value.name);
           });
 
           GroupsResource.create($scope.group, function () {
@@ -41,7 +41,7 @@ angular.module('adminNg.controllers')
         $scope.$parent.$watch('tab', function (value) {
           angular.forEach($scope.states, function (state) {
             if (value === state.name && !angular.isUndefined(state.stateController.reload)) {
-              state.stateController.reload();            
+              state.stateController.reload();
             }
           });
         });

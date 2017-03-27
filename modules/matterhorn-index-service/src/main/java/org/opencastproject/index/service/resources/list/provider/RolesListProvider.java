@@ -31,13 +31,15 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class RolesListProvider implements ResourceListProvider {
 
   public static final String ROLES = "ROLES";
+  public static final String ROLE_QUERY_KEY = "role_name";
+  public static final String ROLE_TARGET_KEY = "role_target";
 
   private static final String[] NAMES = { ROLES };
   private static final Logger logger = LoggerFactory.getLogger(RolesListProvider.class);
@@ -60,7 +62,9 @@ public class RolesListProvider implements ResourceListProvider {
 
   @Override
   public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
-    Map<String, String> usersList = new HashMap<String, String>();
+
+    // Preserve the ordering of roles from the providers
+    Map<String, String> rolesList = new LinkedHashMap<String, String>();
 
     int offset = 0;
     int limit = 0;
@@ -73,12 +77,30 @@ public class RolesListProvider implements ResourceListProvider {
         offset = query.getOffset().get();
     }
 
-    Iterator<Role> roles = roleDirectoryService.findRoles("%", offset, limit);
+    String queryString = "%";
+
+    if (query.hasFilter(ROLE_QUERY_KEY)) {
+      queryString = query.getFilter(ROLE_QUERY_KEY).getValue().get() + "%";
+    }
+
+    Role.Target target = Role.Target.ALL;
+
+    if (query.hasFilter(ROLE_TARGET_KEY)) {
+      String targetString = (String) query.getFilter(ROLE_TARGET_KEY).getValue().get();
+      try {
+        target = Role.Target.valueOf(targetString);
+      } catch (Exception e) {
+        logger.warn("Invalid target filter value {}", targetString);
+      }
+    }
+
+    Iterator<Role> roles = roleDirectoryService.findRoles(queryString, target, offset, limit);
 
     while (roles.hasNext()) {
       Role r = roles.next();
-      usersList.put(r.getName(), r.getName());
+      rolesList.put(r.getName(), r.getType().toString());
     }
-    return usersList;
+
+    return rolesList;
   }
 }

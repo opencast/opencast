@@ -193,7 +193,13 @@ import javax.ws.rs.core.Response.Status;
  * the endpoint may abstract over the concrete archive.
  */
 @Path("/")
-@RestService(name = "eventservice", title = "Event Service", notes = "", abstractText = "Provides resources and operations related to the events")
+@RestService(name = "eventservice", title = "Event Service",
+  abstractText = "Provides resources and operations related to the events",
+  notes = { "This service offers the event CRUD Operations for the admin UI.",
+            "<strong>Important:</strong> "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+              + "DO NOT use this for integration of third-party applications.<em>"})
 public abstract class AbstractEventEndpoint {
 
   /** The logging facility */
@@ -286,6 +292,7 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventResponse(@PathParam("eventId") String id) throws Exception {
     for (final Event event : getIndexService().getEvent(id, getIndex())) {
+      event.updatePreview(getAdminUIConfiguration().getPreviewSubtype());
       return okJson(eventToJSON(event));
     }
     return notFound("Cannot find an event with id '%s'.", id);
@@ -1928,7 +1935,7 @@ public abstract class AbstractEventEndpoint {
         VideoStream videoStream = (VideoStream) stream;
         video.add(f("id", vN(videoStream.getIdentifier())));
         video.add(f("type", vN(videoStream.getFormat())));
-        video.add(f("bitrate", v(videoStream.getBitRate())));
+        video.add(f("bitrate", vN(videoStream.getBitRate())));
         video.add(f("framerate", vN(videoStream.getFrameRate())));
         video.add(f("resolution", vN(videoStream.getFrameWidth() + "x" + videoStream.getFrameHeight())));
         video.add(f("framecount", vN(videoStream.getFrameCount())));

@@ -27,7 +27,6 @@ import static org.opencastproject.util.MimeTypeUtil.suffix;
 import static org.opencastproject.util.RestUtil.R.noContent;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.serverError;
-import static org.opencastproject.util.RestUtil.getResponseFormat;
 import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
@@ -56,9 +55,7 @@ import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.util.doc.rest.RestParameter;
-import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
@@ -77,7 +74,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -85,7 +81,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -197,48 +192,6 @@ public abstract class ArchiveRestEndpointBase<RS extends ResultSet> implements H
         final WorkflowDefinition wfd = getWorkflowService().getWorkflowDefinitionById(wfId);
         getArchive().applyWorkflow(workflow(wfd, wfp), uriRewriter, mpIds);
         return Response.noContent().build();
-      }
-    });
-  }
-
-  @GET
-  @Path("episode.{format:xml|json}")
-  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-  @RestQuery(name = "episodes",
-             description = "Search for episodes matching the query parameters.",
-             pathParameters = {
-                     @RestParameter(name = "format",
-                                    description = "The output format (json or xml) of the response body.",
-                                    isRequired = true, type = RestParameter.Type.STRING)
-             },
-             restParameters = {
-                     @RestParameter(name = "id", type = RestParameter.Type.STRING, description = "The ID of the single episode to be returned, if it exists.", isRequired = false),
-                     @RestParameter(name = "series", isRequired = false, description = "Filter results by media package's series identifier.", type = STRING),
-                     @RestParameter(name = "limit", type = RestParameter.Type.STRING, defaultValue = "0", description = "The maximum number of items to return per page.", isRequired = false),
-                     @RestParameter(name = "offset", type = RestParameter.Type.STRING, defaultValue = "0", description = "The page number.", isRequired = false),
-                     @RestParameter(name = "onlyLatest", type = Type.BOOLEAN, defaultValue = "false", description = "Filter results by only latest version of the archive", isRequired = false)},
-             reponses = {
-                     @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK)
-             },
-             returnDescription = "The search results, expressed as xml or json.")
-  public Response find(@QueryParam("id") final String id,
-                       @QueryParam("series") final String series,
-                       @QueryParam("limit") final Integer limit,
-                       @QueryParam("offset") final Integer offset,
-                       @QueryParam("onlyLatest") @DefaultValue("true") final boolean onlyLatest,
-                       @PathParam("format") final String format) {
-    return handleException(new Function0<Response>() {
-      @Override public Response apply() {
-        final Query q = QueryBuilder.query()
-                .currentOrganization(getSecurityService())
-                .mediaPackageId(option(id).bind(Strings.trimToNone))
-                .seriesId(option(series).bind(Strings.trimToNone))
-                .limit(option(limit))
-                .offset(option(offset))
-                .onlyLastVersion(onlyLatest);
-        // Return the results using the requested format
-        final RS rs = getArchive().find(q, uriRewriter);
-        return Response.ok(convert(rs)).type(getResponseFormat(format)).build();
       }
     });
   }
