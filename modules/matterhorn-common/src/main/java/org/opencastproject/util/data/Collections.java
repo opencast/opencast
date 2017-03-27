@@ -397,6 +397,18 @@ public final class Collections {
     return t;
   }
 
+  /** Create a list from an array. */
+  @SafeVarargs
+  public static <A> List<A> nonNullList(A... as) {
+    final List<A> t = new ArrayList<>();
+    for (A a : as) {
+      if (null != a) {
+        t.add(a);
+      }
+    }
+    return t;
+  }
+
   /** The empty list. */
   @SuppressWarnings("unchecked")
   public static <A> List<A> nil() {

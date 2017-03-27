@@ -17,6 +17,8 @@ describe('New Event Controller', function () {
         Table = _Table_;
         Notifications = _Notifications_;
 
+        $httpBackend.expectGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=100&offset=0').respond('{"ROLE_ANONYMOUS": "ROLE_ANONYMOUS"}');
+
         $parentScope = $rootScope.$new();
         $scope = $parentScope.$new();
         $controller('NewEventCtrl', {$scope: $scope});

@@ -49,6 +49,9 @@ public final class JaxbRole implements Role {
   @XmlElement(name = "organization")
   protected JaxbOrganization organization;
 
+  @XmlElement(name = "type")
+  protected Type type = Type.INTERNAL;
+
   /**
    * No-arg constructor needed by JAXB
    */
@@ -84,11 +87,29 @@ public final class JaxbRole implements Role {
     this.description = description;
   }
 
+
+  /**
+   * Constructs a role with the specified name, organization, description, and persistence settings.
+   *
+   * @param name
+   *          the name
+   * @param organization
+   *          the organization
+   * @param description
+   *          the description
+   * @param type
+   *          the role {@link type}
+   */
+  public JaxbRole(String name, JaxbOrganization organization, String description, Type type) throws IllegalArgumentException {
+    this(name, organization, description);
+    this.type = type;
+  }
+
   public static JaxbRole fromRole(Role role) {
     if (role instanceof JaxbRole)
       return (JaxbRole) role;
     JaxbOrganization org = JaxbOrganization.fromOrganization(role.getOrganization());
-    return new JaxbRole(role.getName(), org, role.getDescription());
+    return new JaxbRole(role.getName(), org, role.getDescription(), role.getType());
   }
 
   /**
@@ -123,6 +144,15 @@ public final class JaxbRole implements Role {
   /**
    * {@inheritDoc}
    *
+   * @see org.opencastproject.security.api.Role#getType()
+   */
+  public Type getType() {
+    return type;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -152,5 +182,4 @@ public final class JaxbRole implements Role {
   public String toString() {
     return new StringBuilder(name).append(":").append(organization).toString();
   }
-
 }

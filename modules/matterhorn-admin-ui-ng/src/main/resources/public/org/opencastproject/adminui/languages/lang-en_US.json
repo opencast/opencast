@@ -1061,7 +1061,14 @@
          "EDITCAPTION": "Edit user",
          "TABS": {
            "USER":  "User",
-           "ROLES": "Roles"
+           "ROLES": "Roles",
+           "EXTERNALROLES": "External Roles",
+           "EFFECTIVEROLES": "Effective Roles"
+         },
+         "DESCRIPTION": {
+            "ROLES": "Roles and groups that can be or are already assigned to the user.",
+            "EXTERNALROLES": "The list of external roles assigned to the user granted by the external role provider(s).",
+            "EFFECTIVEROLES": "The list of effective roles directly assigned to the user and the roles indirectly loaded through group membership." 
          },
          "FORM": {
             "USERNAME":        "Username",

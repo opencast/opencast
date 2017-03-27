@@ -472,10 +472,10 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
   }
 
   /**
-   * @see org.opencastproject.security.api.RoleProvider#findRoles(String, int, int)
+   * @see org.opencastproject.security.api.RoleProvider#findRoles(String, Role.Target, int, int)
    */
   @Override
-  public Iterator<Role> findRoles(String query, int offset, int limit) {
+  public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
     HashSet<Role> foundRoles = new HashSet<Role>();

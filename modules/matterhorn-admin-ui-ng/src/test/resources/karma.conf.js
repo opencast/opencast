@@ -20,7 +20,7 @@ module.exports = function (config) {
             '../../main/webapp/scripts/lib/angular/angular-translate-loader-static-files.js',
             '../../main/webapp/scripts/lib/angular/angular-local-storage.js',
             '../../main/webapp/scripts/lib/angular-file-upload/angular-file-upload.js',
-            '../../main/webapp/scripts/lib/chosen.jquery.min.js',
+            '../../main/webapp/scripts/lib/chosen.jquery.js',
             '../../main/webapp/scripts/lib/angular-chosen.js',
             '../../main/webapp/scripts/lib/angular/angular-*.js',
             '../../main/webapp/scripts/lib/angular-sortable.js',

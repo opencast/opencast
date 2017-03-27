@@ -50,6 +50,14 @@ module.exports = function (grunt, appPath) {
       connect().use(
         '/info',
         serveStatic('./src/test/resources/app/GET/info')
+      ),
+      connect().use(
+        '/i18n',
+        serveStatic('./src/test/resources/app/GET/i18n')
+      ),
+      connect().use(
+        '/sysinfo',
+        serveStatic('./src/test/resources/app/GET/sysinfo')
       )
     ];
 

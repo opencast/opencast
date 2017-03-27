@@ -87,6 +87,7 @@
     "adminRole": "ROLE_ADMIN",
     "properties": {
       "adminui.chunksize": "2024",
+      "adminui.user.external_role_display": "false",
       "engageui.annotations.enable": "false",
       "engageui.link_download.enable": "false",
       "engageui.link_mobile_redirect.description": "For more information have a look at the official site.",

@@ -172,10 +172,10 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.security.api.RoleProvider#findRoles(String, int, int)
+   * @see org.opencastproject.security.api.RoleProvider#findRoles(String, Role.Target, int, int)
    */
   @Override
-  public Iterator<Role> findRoles(String query, int offset, int limit) {
+  public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     // The roles are returned from the JpaUserAndRoleProvider
     return Collections.<Role> emptyList().iterator();
   }

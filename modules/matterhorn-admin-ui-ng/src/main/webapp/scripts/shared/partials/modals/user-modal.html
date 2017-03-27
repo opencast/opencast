@@ -9,8 +9,22 @@
         <a ng-click="openTab('user')" data-modal-tab="user" ng-class="{ active: tab == 'user' }" translate="USERS.USERS.DETAILS.TABS.USER">
             <!-- User -->
         </a>
-        <a ng-click="openTab('roles')" data-modal-tab="roles" ng-class="{ active: tab == 'roles' }" translate="USERS.USERS.DETAILS.TABS.ROLES">
-            <!-- Roles -->
+        <a ng-click="openTab('internalRoles')" data-modal-tab="internalroles" ng-class="{ active: tab == 'internalRoles' }"
+            translate="USERS.USERS.DETAILS.TABS.ROLES" class="wider"
+            title="{{ 'USERS.USERS.DETAILS.DESCRIPTION.ROLES' | translate }}">
+            <!-- Managable Roles -->
+        </a>
+        <a ng-click="openTab('externalRoles')" data-modal-tab="externalroles" ng-class="{ active: tab == 'externalRoles' }"
+            ng-style="{ display: action === 'edit' ? 'inline-block' : 'none'}"
+            translate="USERS.USERS.DETAILS.TABS.EXTERNALROLES" ng-if="showExternalRoles"
+            title="{{ 'USERS.USERS.DETAILS.DESCRIPTION.EXTERNALROLES' | translate }}">
+            <!-- Unmanagable Roles -->
+        </a>
+        <a ng-click="openTab('effectiveRoles')" data-modal-tab="effectiveRoles" ng-class="{ active: tab == 'effectiveRoles' }"
+            ng-style="{ display: action === 'edit' ? 'inline-block' : 'none'}"
+            translate="USERS.USERS.DETAILS.TABS.EFFECTIVEROLES"
+            title="{{ 'USERS.USERS.DETAILS.DESCRIPTION.EFFECTIVEROLES' | translate }}">
+            <!-- Effective Roles = Internal + External -->
         </a>
     </nav>
 
@@ -73,11 +87,55 @@
                 </div>
             </div>
         </div>
-        <div class="modal-content" data-modal-tab-content="roles">
+        <div class="modal-content" data-modal-tab-content="internalRoles">
             <div class="modal-body">
                 <div class="form-container">
                     <div data-admin-ng-notifications="" context="user-form"></div>
-                    <admin-ng-select-box resource="role" data-disabled="!manageable"></admin-ng-select-box>
+                    <admin-ng-select-box resource="role" data-disabled="!manageable" data-loader="getMoreRoles" data-height="21em"></admin-ng-select-box>
+                </div>
+            </div>
+        </div>
+        <div class="modal-content" data-modal-tab-content="externalRoles">
+            <div class="modal-body">
+                <div class="form-container multi-select-container">
+                    <label translate="USERS.USERS.DETAILS.TABS.EXTERNALROLES"></label>
+                    <p>{{ 'USERS.USERS.DETAILS.DESCRIPTION.EXTERNALROLES' | translate }}</p>
+
+                    <a ng-click="clearSearchFieldExternal()" class="clear" ng-show="role.searchable"></a>
+                    <input type="text" id="search_external" class="search"
+                        placeholder="{{ 'TABLE_FILTERS.PLACEHOLDER' | translate  }}"
+                        ng-show="role.searchable"
+                        ng-disabled="disabled"
+                        ng-class="{ disabled: disabled }"
+                        ng-model="searchFieldExternal">
+
+                    <select multiple
+                        ng-options="item.name for item in role.external | filter: {name: searchFieldExternal} | orderBy: [groupSort, 'name']"
+                        ng-model="selectedExternals"
+                        ng-style="getHeight()">
+                    </select>
+                </div>
+            </div>
+        </div>
+         <div class="modal-content" data-modal-tab-content="effectiveRoles">
+            <div class="modal-body">
+                <div class="form-container multi-select-container">
+                    <label translate="USERS.USERS.DETAILS.TABS.EFFECTIVEROLES"></label>
+                    <p>{{ 'USERS.USERS.DETAILS.DESCRIPTION.EFFECTIVEROLES' | translate }}</p>
+
+                    <a ng-click="clearSearchFieldEffective()" class="clear" ng-show="role.searchable"></a>
+                    <input type="text" id="search_effective" class="search"
+                        placeholder="{{ 'TABLE_FILTERS.PLACEHOLDER' | translate  }}"
+                        ng-show="role.searchable"
+                        ng-disabled="disabled"
+                        ng-class="{ disabled: disabled }"
+                        ng-model="searchFieldEffective">
+
+                    <select multiple
+                        ng-options="item.name for item in role.derived.concat(role.external.concat(role.selected)) | filter: customEffectiveFilter() | orderBy: [groupSort, 'name']"
+                        ng-model="selectedEffective"
+                        ng-style="getHeight()">
+                    </select>
                 </div>
             </div>
         </div>

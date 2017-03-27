@@ -66,6 +66,6 @@ public interface RoleProvider {
    * @throws IllegalArgumentException
    *           if the query is <code>null</code>
    */
-  Iterator<Role> findRoles(String query, int offset, int limit);
+  Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit);
 
 }

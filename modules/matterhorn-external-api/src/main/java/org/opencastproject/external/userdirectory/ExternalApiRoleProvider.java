@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.adminui.userdirectory;
+package org.opencastproject.external.userdirectory;
 
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
@@ -40,6 +40,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -50,12 +51,12 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 /**
- * The admin UI roles role provider.
+ * The External API role provider.
  */
-public class UIRolesRoleProvider implements RoleProvider {
+public class ExternalApiRoleProvider implements RoleProvider {
 
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(UIRolesRoleProvider.class);
+  private static final Logger logger = LoggerFactory.getLogger(ExternalApiRoleProvider.class);
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -71,16 +72,17 @@ public class UIRolesRoleProvider implements RoleProvider {
   }
 
   protected void activate(ComponentContext cc) {
+    String rolesFile = ExternalGroupLoader.ROLES_PATH_PREFIX + File.separator + ExternalGroupLoader.EXTERNAL_APPLICATIONS_ROLES_FILE;
     InputStream in = null;
     try {
-      in = getClass().getResourceAsStream("/roles.txt");
+      in = getClass().getResourceAsStream(rolesFile);
       roles = new TreeSet<String>(IOUtils.readLines(in, "UTF-8"));
     } catch (IOException e) {
       logger.error("Unable to read available roles: {}", ExceptionUtils.getStackTrace(e));
     } finally {
       IOUtils.closeQuietly(in);
     }
-    logger.info("Activated Admin UI roles role provider");
+    logger.info("Activated External API role provider");
   }
 
   /**
@@ -136,7 +138,7 @@ public class UIRolesRoleProvider implements RoleProvider {
   private static final Fn2<String, Organization, Role> toRole = new Fn2<String, Organization, Role>() {
     @Override
     public Role ap(String role, Organization organization) {
-      return new JaxbRole(role, JaxbOrganization.fromOrganization(organization), "AdminNG UI Role", Type.INTERNAL);
+      return new JaxbRole(role, JaxbOrganization.fromOrganization(organization), "External API Role", Type.INTERNAL);
     }
   };
 

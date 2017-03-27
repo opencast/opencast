@@ -272,7 +272,7 @@
                                 <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.INPUTS' | translate }}</td>
                                 <td>
                                     <label ng-repeat="inputMethod in source.device.inputs">
-                                        <input type="checkbox" 
+                                        <input type="checkbox"
                                             ng-change="saveScheduling()"
                                             ng-model="source.device.inputMethods[inputMethod.id]"
                                             ng-disabled="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')"> {{ inputMethod.value | translate }}
@@ -286,7 +286,7 @@
                 </div>
 
                 <!-- Participation status -->
-                <div class="obj">   
+                <div class="obj">
                     <header translate="EVENTS.EVENTS.DETAILS.SCHEDULING.CAPTION">
                         <!-- Participation Status -->
                     </header>
@@ -311,7 +311,7 @@
                                 </label>
                             </div>
                         </div>
-                    </div>  
+                    </div>
                 </div>
 
             </div>
@@ -390,7 +390,7 @@
                                                 </td>
                                             </tr>
                                         </tbody>
-                                    </table>                            
+                                    </table>
                                 </div>
 
                                 <div class="obj list-obj quick-actions">
@@ -516,13 +516,14 @@
                                             <tr ng-repeat="policy in policies track by $index">
                                                 <td ng-show="!transactions.read_only">
                                                     <select chosen pre-select-from="roles"
-                                                        data-width="'200px'"
+                                                        ng-disabled="((tab == 'access') && !$root.userIs('ROLE_UI_EVENT_DETAILS_ACL_EDIT'))"
+                                                        data-width="'360px'"
                                                         data-disable-search-threshold="8"
                                                         data-search_contains="true"
-                                                        ng-disabled="((tab == 'access') && !$root.userIs('ROLE_UI_EVENT_DETAILS_ACL_EDIT'))"
                                                         ng-model="policy.role"
                                                         ng-change="accessSave(policy)"
-                                                        ng-options="id as name for (id, name) in roles"
+                                                        ng-options="id as id for (id, type) in roles"
+                                                        ng-get-more="getMoreRoles"
                                                         data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL' | translate }}"
                                                         no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
                                                     />
@@ -530,8 +531,8 @@
                                                 <td ng-show="transactions.read_only">
                                                     <p>{{policy.role}}</p>
                                                 </td>
-                                                <td class="fit"><input type="checkbox" ng-model="policy.read" ng-change="accessSave(policy)" ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"/></td>
-                                                <td class="fit"><input type="checkbox" ng-model="policy.write" ng-change="accessSave(policy)" ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"/></td>
+                                                <td class="fit text-center"><input type="checkbox" ng-model="policy.read" ng-change="accessSave(policy)" ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"/></td>
+                                                <td class="fit text-center"><input type="checkbox" ng-model="policy.write" ng-change="accessSave(policy)" ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"/></td>
                                                 <td class="fit editable" ng-if="hasActions">
                                                     <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked" save="accessSave" admin-ng-editable-multi-select mixed="false" params="policy.actions" collection="actions"></div>
                                                     <div ng-if="((!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')) || aclLocked)" ng-repeat="customAction in policy.actions.value">{{ customAction }}</div>

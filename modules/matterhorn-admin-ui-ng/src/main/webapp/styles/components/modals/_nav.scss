@@ -43,6 +43,11 @@
         color: $modal-nav-link-color;
         font-size: 13px;
 
+        &.wider {
+            padding-left: 2px;
+            padding-right: 2px;
+        }
+
         &:first-child {
             margin-left: 3px;
         }
