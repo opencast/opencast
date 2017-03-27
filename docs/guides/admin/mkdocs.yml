@@ -50,6 +50,7 @@ pages:
 - Modules:
    - Overview: 'modules/index.md'
    - Atom/RSS Feed: 'modules/atomrss.md'
+   - AWS S3 Distribution: 'modules/awss3distribution.md'
    - LTI Module: 'modules/ltimodule.md'
    - Media Module: 'modules/mediamodule.configuration.md'
    - Player:
@@ -96,6 +97,7 @@ pages:
    - Post Media Package: 'workflowoperationhandlers/postmediapackage-woh.md'
    - Prepare A/V: 'workflowoperationhandlers/prepareav-woh.md'
    - Probe Resolution: 'workflowoperationhandlers/probe-resolution-woh.md'
+   - Publish AWS: 'workflowoperationhandlers/publishaws-woh.md'
    - Publish Configure: 'workflowoperationhandlers/publishconfigure-woh.md'
    - Publish Engage: 'workflowoperationhandlers/publishengage-woh.md'
    - Publish OAI-PMH: 'workflowoperationhandlers/publish-oaipmh-woh.md'
