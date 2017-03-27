@@ -192,6 +192,7 @@
     <module>modules/matterhorn-urlsigning-verifier-service-impl</module>
     <module>modules/matterhorn-userdirectory</module>
     <module>modules/matterhorn-userdirectory-ldap</module>
+    <module>modules/matterhorn-userdirectory-sakai</module>
     <module>modules/matterhorn-usertracking-api</module>
     <module>modules/matterhorn-usertracking-impl</module>
     <module>modules/matterhorn-videoeditor-api</module>
