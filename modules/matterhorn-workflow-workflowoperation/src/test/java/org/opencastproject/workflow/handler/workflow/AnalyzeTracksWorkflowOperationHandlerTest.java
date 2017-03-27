@@ -23,6 +23,7 @@ package org.opencastproject.workflow.handler.workflow;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -94,16 +95,6 @@ public class AnalyzeTracksWorkflowOperationHandlerTest {
   }
 
   @Test
-  public void testGetResolutions() {
-    assertTrue(operationHandler.getResolutions("").isEmpty());
-
-    List<Integer> res = operationHandler.getResolutions("123,234,345");
-    assertEquals(new Integer(123), res.get(0));
-    assertEquals(new Integer(234), res.get(1));
-    assertEquals(new Integer(345), res.get(2));
-  }
-
-  @Test
   public void testStart() throws MediaPackageException, WorkflowOperationException {
     MediaPackage mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     VideoStreamImpl videoStream = new VideoStreamImpl("234");
@@ -119,13 +110,14 @@ public class AnalyzeTracksWorkflowOperationHandlerTest {
     WorkflowOperationInstance operationInstance = EasyMock.createMock(WorkflowOperationInstance.class);
     String[][] config = {
             {AnalyzeTracksWorkflowOperationHandler.OPT_SOURCE_FLAVOR, "*/source"},
-            {AnalyzeTracksWorkflowOperationHandler.OPT_VIDEO_RES_X, "1280"},
-            {AnalyzeTracksWorkflowOperationHandler.OPT_VIDEO_RES_Y, "480,720,1080"},
-            {AnalyzeTracksWorkflowOperationHandler.OPT_VIDEO_ASPECT, "4/3,16/9"},
-            {AnalyzeTracksWorkflowOperationHandler.OPT_VIDEO_ASPECT_SNAP, "true"}};
+            {AnalyzeTracksWorkflowOperationHandler.OPT_VIDEO_ASPECT, "4/3,16/9"}};
     for (String[] cfg: config) {
       EasyMock.expect(operationInstance.getConfiguration(cfg[0])).andReturn(cfg[1]).anyTimes();
     }
+    EasyMock.expect(operationInstance.getConfiguration(AnalyzeTracksWorkflowOperationHandler.OPT_FAIL_NO_TRACK))
+            .andReturn("true");
+    EasyMock.expect(operationInstance.getConfiguration(AnalyzeTracksWorkflowOperationHandler.OPT_FAIL_NO_TRACK))
+            .andReturn("false").anyTimes();
     EasyMock.replay(operationInstance);
 
     WorkflowInstance workflowInstance = EasyMock.createMock(WorkflowInstance.class);
@@ -134,27 +126,30 @@ public class AnalyzeTracksWorkflowOperationHandlerTest {
     EasyMock.expect(workflowInstance.getCurrentOperation()).andReturn(operationInstance).anyTimes();
     EasyMock.replay(workflowInstance);
 
-    // With no matching track
-    assertEquals(null, operationHandler.start(workflowInstance, jobContext).getProperties());
+    // With no matching track (should fail)
+    try {
+      operationHandler.start(workflowInstance, jobContext);
+      fail();
+    } catch (WorkflowOperationException e) {
+      logger.info("Fail on no tracks works");
+    }
+    WorkflowOperationResult workflowOperationResult = operationHandler.start(workflowInstance, jobContext);
+    Map<String, String> properties = workflowOperationResult.getProperties();
+    assertTrue(properties.isEmpty());
 
     // With matching track
     mediaPackage.add(track);
-    WorkflowOperationResult workflowOperationResult = operationHandler.start(workflowInstance, jobContext);
-    Map<String, String> properties = workflowOperationResult.getProperties();
+    workflowOperationResult = operationHandler.start(workflowInstance, jobContext);
+    properties = workflowOperationResult.getProperties();
 
     String[][] props = {
-            {"presenter_source_resolution_y_720", "true"},
-            {"presenter_source_resolution_x_1280", "true"},
+            {"presenter_source_media", "true"},
             {"presenter_source_audio", "false"},
-            {"presenter_source_resolution_y_480", "true"},
             {"presenter_source_aspect", "16/9"},
             {"presenter_source_resolution_y", "720"},
             {"presenter_source_resolution_x", "1280"},
             {"presenter_source_aspect_snap", "16/9"},
-            {"presenter_source_aspect_4_3", "false"},
-            {"presenter_source_aspect_16_9", "true"},
-            {"presenter_source_video", "true"},
-            {"presenter_source_resolution_y_1080", "false"}};
+            {"presenter_source_video", "true"}};
     for (String[] prop: props) {
       assertEquals(prop[1], properties.get(prop[0]));
     }

@@ -51,13 +51,11 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
   /** Configuration key for the "flavor" of the tracks to use as a source input */
   static final String OPT_SOURCE_FLAVOR = "source-flavor";
 
-  /** Configuration key for video resolutions to check */
-  static final String OPT_VIDEO_RES_X = "xresolution";
-  static final String OPT_VIDEO_RES_Y = "yresolution";
-
   /** Configuration key for video aspect ratio to check */
   static final String OPT_VIDEO_ASPECT = "aspect-ratio";
-  static final String OPT_VIDEO_ASPECT_SNAP = "snap-to-aspect";
+
+  /** Configuration key to define behavior if no track matches */
+  static final String OPT_FAIL_NO_TRACK = "fail-no-track";
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory
@@ -70,21 +68,23 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
     logger.info("Running analyze-tracks workflow operation on workflow {}", workflowInstance.getId());
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     final String sourceFlavor = getConfig(workflowInstance, OPT_SOURCE_FLAVOR);
+    Map<String, String> properties = new HashMap<>();
 
-    final Track[] tracks = mediaPackage.getTracks(MediaPackageElementFlavor.parseFlavor(sourceFlavor));
+    final MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(sourceFlavor);
+    final Track[] tracks = mediaPackage.getTracks(flavor);
     if (tracks.length <= 0) {
+      if (BooleanUtils.toBoolean(getConfig(workflowInstance, OPT_FAIL_NO_TRACK, "false"))) {
+        throw new WorkflowOperationException("No matching tracks for flavor " + sourceFlavor);
+      }
       logger.info("No tracks with specified flavors ({}) to analyse.", sourceFlavor);
-      return createResult(mediaPackage, Action.CONTINUE);
+      return createResult(mediaPackage, properties, Action.CONTINUE, 0);
     }
 
-    List<Integer> xresolutions = getResolutions(getConfig(workflowInstance, OPT_VIDEO_RES_X, ""));
-    List<Integer> yresolutions = getResolutions(getConfig(workflowInstance, OPT_VIDEO_RES_Y, ""));
     List<Fraction> aspectRatios = getAspectRatio(getConfig(workflowInstance, OPT_VIDEO_ASPECT, ""));
-    boolean snapToAspect = BooleanUtils.toBoolean(getConfig(workflowInstance, OPT_VIDEO_ASPECT_SNAP, "false"));
 
-    Map<String, String> properties = new HashMap<String, String>();
     for (Track track : tracks) {
       final String varName = toVariableName(track.getFlavor());
+      properties.put(varName + "_media", "true");
       properties.put(varName + "_video", Boolean.toString(track.hasVideo()));
       properties.put(varName + "_audio", Boolean.toString(track.hasAudio()));
 
@@ -98,27 +98,9 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
           properties.put(varName + "_aspect", trackAspect.toString());
 
           // Check if we should fall back to nearest defined aspect ratio
-          if (snapToAspect) {
+          if (!aspectRatios.isEmpty()) {
             trackAspect = getNearestAspectRatio(trackAspect, aspectRatios);
             properties.put(varName + "_aspect_snap", trackAspect.toString());
-          }
-
-          // Set boolean variables
-
-          // Probe for resolutions
-          for (int res: xresolutions) {
-            final String var = varName + "_resolution_x_" + res;
-            properties.put(var, Boolean.toString(video.getFrameWidth() >= res));
-          }
-          for (int res: yresolutions) {
-            final String var = varName + "_resolution_y_" + res;
-            properties.put(var, Boolean.toString(video.getFrameHeight() >= res));
-          }
-
-          // Probe for aspect ratio
-          for (Fraction aspect: aspectRatios) {
-            final String var = varName + "_aspect_" + aspect.toString().replace('/', '_');
-            properties.put(var, Boolean.toString(aspect.equals(trackAspect)));
           }
         }
       }
@@ -144,23 +126,6 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
       }
     }
     return nearestAspect;
-  }
-
-  /**
-   * Get resolution to probe for from configuration string.
-   *
-   * @param resolutionsConfig
-   *        Configuration string
-   * @return List of resolutions to check
-   */
-  List<Integer> getResolutions(String resolutionsConfig) {
-    List<Integer> resolutions = new ArrayList<>();
-    for (String res: resolutionsConfig.split(" *, *")) {
-      if (StringUtils.isNotBlank(res)) {
-        resolutions.add(Integer.parseInt(res));
-      }
-    }
-    return resolutions;
   }
 
   /**
