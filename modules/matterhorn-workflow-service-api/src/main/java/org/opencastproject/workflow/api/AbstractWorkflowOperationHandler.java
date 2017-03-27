@@ -368,6 +368,23 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   }
 
   /**
+   * Get a configuration key. Values are returned trimmed.
+   *
+   * @param w
+   *        WorkflowInstance with current operation
+   * @param key
+   *        Configuration key to check for
+   * @param defaultValue
+   *        Value to return if key does not exists
+   */
+  protected String getConfig(WorkflowInstance w, String key, String defaultValue) {
+    for (final String cfg : getOptConfig(w.getCurrentOperation(), key)) {
+      return cfg;
+    }
+    return defaultValue;
+  }
+
+  /**
    * Get a mandatory configuration key. Values are returned trimmed.
    *
    * @throws WorkflowOperationException

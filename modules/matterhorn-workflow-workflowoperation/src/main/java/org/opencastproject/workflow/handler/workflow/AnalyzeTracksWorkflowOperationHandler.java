@@ -20,28 +20,28 @@
  */
 package org.opencastproject.workflow.handler.workflow;
 
-import static java.lang.String.format;
-
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.VideoStream;
+import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.Fraction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Workflow operation handler for analyzing tracks and set control variables.
@@ -49,15 +49,13 @@ import java.util.TreeMap;
 public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** Configuration key for the "flavor" of the tracks to use as a source input */
-  public static final String OPT_SOURCE_FLAVOR = "source-flavor";
+  static final String OPT_SOURCE_FLAVOR = "source-flavor";
 
-  /** The configuration options for this handler */
-  public static final SortedMap<String, String> CONFIG_OPTIONS;
+  /** Configuration key for video aspect ratio to check */
+  static final String OPT_VIDEO_ASPECT = "aspect-ratio";
 
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(OPT_SOURCE_FLAVOR, "The \"flavor\" of the tracks to use as a source input");
-  }
+  /** Configuration key to define behavior if no track matches */
+  static final String OPT_FAIL_NO_TRACK = "fail-no-track";
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory
@@ -69,42 +67,86 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
 
     logger.info("Running analyze-tracks workflow operation on workflow {}", workflowInstance.getId());
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
-    final String sourceFlavorName = getConfig(workflowInstance, OPT_SOURCE_FLAVOR);
-    final MediaPackageElementFlavor sourceFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavorName);
+    final String sourceFlavor = getConfig(workflowInstance, OPT_SOURCE_FLAVOR);
+    Map<String, String> properties = new HashMap<>();
 
-    final Track[] tracks = mediaPackage.getTracks(sourceFlavor);
-    if (tracks.length > 0) {
-      Map<String, String> properties = new HashMap<String, String>();
-      for (Track track : tracks) {
-        final String varName = toVariableName(track.getFlavor());
-        properties.put(varName + "_video", Boolean.toString(track.hasVideo()));
-        properties.put(varName + "_audio", Boolean.toString(track.hasAudio()));
+    final MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(sourceFlavor);
+    final Track[] tracks = mediaPackage.getTracks(flavor);
+    if (tracks.length <= 0) {
+      if (BooleanUtils.toBoolean(getConfig(workflowInstance, OPT_FAIL_NO_TRACK, "false"))) {
+        throw new WorkflowOperationException("No matching tracks for flavor " + sourceFlavor);
       }
-      logger.info("Finished analyze-tracks workflow operation adding the properties: {}",
-                  propertiesAsString(properties));
+      logger.info("No tracks with specified flavors ({}) to analyse.", sourceFlavor);
       return createResult(mediaPackage, properties, Action.CONTINUE, 0);
-    } else {
-      return fail(format("Invalid media package: Does not contain any tracks matching flavor %s", sourceFlavor));
     }
+
+    List<Fraction> aspectRatios = getAspectRatio(getConfig(workflowInstance, OPT_VIDEO_ASPECT, ""));
+
+    for (Track track : tracks) {
+      final String varName = toVariableName(track.getFlavor());
+      properties.put(varName + "_media", "true");
+      properties.put(varName + "_video", Boolean.toString(track.hasVideo()));
+      properties.put(varName + "_audio", Boolean.toString(track.hasAudio()));
+
+      // Check resolution
+      if (track.hasVideo()) {
+        for (VideoStream video: ((TrackImpl) track).getVideo()) {
+          // Set resolution variables
+          properties.put(varName + "_resolution_x", video.getFrameWidth().toString());
+          properties.put(varName + "_resolution_y", video.getFrameHeight().toString());
+          Fraction trackAspect = Fraction.getReducedFraction(video.getFrameWidth(), video.getFrameHeight());
+          properties.put(varName + "_aspect", trackAspect.toString());
+
+          // Check if we should fall back to nearest defined aspect ratio
+          if (!aspectRatios.isEmpty()) {
+            trackAspect = getNearestAspectRatio(trackAspect, aspectRatios);
+            properties.put(varName + "_aspect_snap", trackAspect.toString());
+          }
+        }
+      }
+    }
+    logger.info("Finished analyze-tracks workflow operation adding the properties: {}", properties);
+    return createResult(mediaPackage, properties, Action.CONTINUE, 0);
+  }
+
+  /**
+   * Get nearest aspect ratio from list
+   *
+   * @param videoAspect
+   *        Aspect ratio of video to check
+   * @param aspects
+   *        List of aspect ratios to snap to.
+   * @return Nearest aspect ratio
+   */
+  Fraction getNearestAspectRatio(final Fraction videoAspect, final List<Fraction> aspects) {
+    Fraction nearestAspect = aspects.get(0);
+    for (Fraction aspect: aspects) {
+      if (videoAspect.subtract(nearestAspect).abs().compareTo(videoAspect.subtract(aspect).abs()) > 0) {
+        nearestAspect = aspect;
+      }
+    }
+    return nearestAspect;
+  }
+
+  /**
+   * Get aspect ratios to check from configuration string.
+   *
+   * @param aspectConfig
+   *        Configuration string
+   * @return List of aspect rations to check
+   */
+  List<Fraction> getAspectRatio(String aspectConfig) {
+    List<Fraction> aspectRatios = new ArrayList<>();
+    for (String aspect: aspectConfig.split(" *, *")) {
+      if (StringUtils.isNotBlank(aspect)) {
+        aspectRatios.add(Fraction.getFraction(aspect).reduce());
+      }
+    }
+    return aspectRatios;
   }
 
   /** Create a name for a workflow variable from a flavor */
   private static String toVariableName(final MediaPackageElementFlavor flavor) {
     return flavor.getType() + "_" + flavor.getSubtype();
-  }
-
-  /** Log a warning and fail by throwing a {@link org.opencastproject.workflow.api.WorkflowOperationException}. */
-  private static <A> A fail(String msg) throws WorkflowOperationException {
-    logger.warn(msg);
-    throw new WorkflowOperationException(msg);
-  }
-
-  /** Serialize a properties map into string. */
-  private String propertiesAsString(Map<String, String> map) {
-    Properties prop = new Properties();
-    prop.putAll(map);
-    StringWriter writer = new StringWriter();
-    prop.list(new PrintWriter(writer));
-    return writer.getBuffer().toString();
   }
 }
