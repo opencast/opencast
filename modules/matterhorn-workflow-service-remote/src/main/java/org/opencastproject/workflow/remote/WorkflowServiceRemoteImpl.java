@@ -691,64 +691,6 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   }
 
   @Override
-  public void moveMissingCapturesFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException {
-    if (buffer < 0) {
-      throw new IllegalArgumentException("Buffer '" + buffer
-              + "' is not a valid value, it must be equal or greater than 0.");
-    }
-
-    HttpPost post = new HttpPost("/failMissedCaptures");
-
-    List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-    params.add(new BasicNameValuePair("buffer", String.valueOf(buffer)));
-    try {
-      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-    } catch (UnsupportedEncodingException e) {
-      throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
-    }
-
-    HttpResponse response = getResponse(post, SC_OK);
-    try {
-      if (response != null) {
-        logger.info("Successful request to workflow cleanup endpoint");
-        return;
-      }
-    } finally {
-      closeConnection(response);
-    }
-    throw new WorkflowDatabaseException("Unable to successfully request the workflow cleanup endpoint");
-  }
-
-  @Override
-  public void moveMissingIngestsFromUpcomingToFailedStatus(long buffer) throws WorkflowDatabaseException {
-    if (buffer < 0) {
-      throw new IllegalArgumentException("Buffer '" + buffer
-              + "' is not a valid value, it must be equal or greater than 0.");
-    }
-
-    HttpPost post = new HttpPost("/failMissedIngests");
-
-    List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-    params.add(new BasicNameValuePair("buffer", String.valueOf(buffer)));
-    try {
-      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-    } catch (UnsupportedEncodingException e) {
-      throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
-    }
-
-    HttpResponse response = getResponse(post, SC_OK);
-    try {
-      if (response != null) {
-        logger.info("Successful request to workflow cleanup endpoint");
-        return;
-      }
-    } finally {
-      closeConnection(response);
-    }
-    throw new WorkflowDatabaseException("Unable to successfully request the workflow cleanup endpoint");
-  }
-
-  @Override
   public void cleanupWorkflowInstances(int lifetime, WorkflowState state) throws WorkflowDatabaseException,
           UnauthorizedException {
     HttpPost post = new HttpPost("/cleanup");
