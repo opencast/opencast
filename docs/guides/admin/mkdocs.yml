@@ -22,8 +22,7 @@ pages:
    - Overview: 'installation/index.md'
    - Multiple Servers: 'installation/multiple-servers.md'
    - Installation from Source:
-      - Debian/Ubuntu: 'installation/source-debian-ubuntu.md'
-      - RHEL/CentOS: 'installation/source-rhel-sl-centos.md'
+      - Linux: 'installation/source-linux.md'
       - MacOS X: 'installation/source-macosx.md'
    - Installation from Package (RPM):
       - Fedora: 'installation/rpm-fedora.md'
@@ -43,6 +42,7 @@ pages:
       - General Security: 'configuration/security.md'
       - Central Authentication Service (CAS): 'configuration/security.cas.md'
       - LDAP Authentication and Authorization (without CAS): 'configuration/security.ldap.md'
+      - Authentication and Authorization Infrastructure (AAI): 'configuration/security.aai.md'
       - Stream Security: 'configuration/stream-security.md'
       - Access Control Lists: 'configuration/acl.md'
    - Workflow: 'configuration/workflow.md'

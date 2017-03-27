@@ -12,16 +12,20 @@ How to Upgrade
 2. Stop your current Opencast instance
 3. Back-up Opencast files and database (optional)
 4. [Upgrade the database](#database-migration)
-7. Update the third party tools
-5. Replace Opencast 2.3 with 2.4
-6. Review the configuration changes and adjust your configuration accordingly
+5. Update the third party tools
+6. Replace Opencast 2.3 with 2.4
+7. Review the configuration changes and adjust your configuration accordingly
 8. [Re-build the search indexes](#re-build-search-indexes)
 
 
 Database Migration
 ------------------
 
-Opencast 2.4 comes with a large modified database scheme compared to Opencast 2.3.
+Opencast 2.4 includes the following database changes:
+
+1. Support for OAI-PMH (MH-12013)
+2. Fix for a mis-named role name for the External API (MH-12015)
+3. AssetManager migration (MH-12082)
 
 It should be needless to say that this migration should not take a lot of time and should be safe. Nevertheless, as with
 all database migrations, we recommend to make a database backup before attempting the upgrade.

@@ -87,6 +87,7 @@
       description="Update recording in default OAI-PMH repository">
       <configurations>
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
+        <configuration key="repository">default</configuration>
         <configuration key="merge">true</configuration>
       </configurations>
     </operation>

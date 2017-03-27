@@ -21,6 +21,7 @@
 
 package org.opencastproject.userdirectory;
 
+import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
@@ -83,6 +84,9 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   /** The security service */
   protected SecurityService securityService = null;
 
+  /** Group provider */
+  protected JpaGroupRoleProvider groupRoleProvider;
+
   /** A cache of users, which lightens the load on the SQL server */
   private LoadingCache<String, Object> cache = null;
 
@@ -100,6 +104,14 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /**
+   * @param groupRoleProvider
+   *          the groupRoleProvider to set
+   */
+  void setGroupRoleProvider(JpaGroupRoleProvider groupRoleProvider) {
+    this.groupRoleProvider = groupRoleProvider;
   }
 
   /** The factory used to generate the entity manager */
@@ -158,15 +170,16 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.security.api.RoleProvider#findRoles(String, int, int)
+   * @see org.opencastproject.security.api.RoleProvider#findRoles(String, Role.Target, int, int)
    */
   @Override
-  public Iterator<Role> findRoles(String query, int offset, int limit) {
+  public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
     String orgId = securityService.getOrganization().getId();
-    List<JpaRole> rolesIterator = UserDirectoryPersistenceUtil.findRolesByQuery(orgId, query, limit, offset, emf);
-    return new ArrayList<Role>(rolesIterator).iterator();
+
+    // This provider persists roles but is not authoritative for any roles, so return an empty set
+    return new ArrayList<Role>().iterator();
   }
 
   /**
@@ -199,9 +212,13 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   @Override
   public Iterator<Role> getRoles() {
+    return getRolesAsList().iterator();
+  }
+
+  public List<Role> getRolesAsList() {
     String orgId = securityService.getOrganization().getId();
     List<JpaRole> rolesIterator = UserDirectoryPersistenceUtil.findRoles(orgId, 0, 0, emf);
-    return new ArrayList<Role>(rolesIterator).iterator();
+    return new ArrayList<Role>(rolesIterator);
   }
 
   /**
@@ -267,10 +284,13 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
     // Create a JPA user with an encoded password.
     String encodedPassword = PasswordEncoder.encode(user.getPassword(), user.getUsername());
-    Set<JpaRole> roles = UserDirectoryPersistenceUtil.saveRoles(user.getRoles(), emf);
+
+    // Only save internal roles
+    Set<JpaRole> roles = UserDirectoryPersistenceUtil.saveRoles(filterRoles(user.getRoles()), emf);
     JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganization(
             (JpaOrganization) user.getOrganization(), emf);
-    user = new JpaUser(user.getUsername(), encodedPassword, organization, user.getName(), user.getEmail(),
+
+    JpaUser newUser = new JpaUser(user.getUsername(), encodedPassword, organization, user.getName(), user.getEmail(),
             user.getProvider(), user.isManageable(), roles);
 
     // Then save the user
@@ -280,9 +300,9 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
-      em.persist(user);
+      em.persist(newUser);
       tx.commit();
-      cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), user);
+      cache.put(user.getUsername() + DELIMITER + user.getOrganization().getId(), newUser);
     } finally {
       if (tx.isActive()) {
         tx.rollback();
@@ -290,6 +310,9 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
       if (em != null)
         em.close();
     }
+
+    updateGroupMembership(user);
+
   }
 
   /**
@@ -309,6 +332,8 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     if (updateUser == null)
       throw new NotFoundException("User " + user.getUsername() + " not found.");
 
+    logger.debug("updateUser({})", user.getUsername());
+
     if (!UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, updateUser.getRoles()))
       throw new UnauthorizedException("The user is not allowed to update an admin user");
 
@@ -322,16 +347,60 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     encodedPassword = PasswordEncoder.encode(user.getPassword(), user.getUsername());
     }
 
-    Set<JpaRole> roles = UserDirectoryPersistenceUtil.saveRoles(user.getRoles(), emf);
+    // Only save internal roles
+    Set<JpaRole> roles = UserDirectoryPersistenceUtil.saveRoles(filterRoles(user.getRoles()), emf);
     JpaOrganization organization = UserDirectoryPersistenceUtil.saveOrganization(
             (JpaOrganization) user.getOrganization(), emf);
 
-    user = UserDirectoryPersistenceUtil.saveUser(
+    JpaUser updatedUser = UserDirectoryPersistenceUtil.saveUser(
             new JpaUser(user.getUsername(), encodedPassword, organization, user.getName(), user.getEmail(), user
                     .getProvider(), true, roles), emf);
-    cache.put(user.getUsername() + DELIMITER + organization.getId(), user);
+    cache.put(user.getUsername() + DELIMITER + organization.getId(), updatedUser);
 
-    return user;
+    updateGroupMembership(user);
+
+    return updatedUser;
+  }
+
+  /**
+   * Select only internal roles
+   *
+   * @param userRoles
+   *          the user's full set of roles
+   */
+  private Set<JpaRole> filterRoles(Set<Role> userRoles) {
+    Set<JpaRole> roles = new HashSet<JpaRole>();
+    for (Role role : userRoles) {
+      if (Role.Type.INTERNAL.equals(role.getType()) && !role.getName().startsWith(Group.ROLE_PREFIX)) {
+        JpaRole jpaRole = (JpaRole) role;
+        roles.add(jpaRole);
+      }
+    }
+    return roles;
+  }
+
+  /**
+   * Updates a user's groups based on assigned roles
+   *
+   * @param user
+   *          the user for whom groups should be updated
+   * @throws NotFoundException
+   */
+  private void updateGroupMembership(JpaUser user) {
+
+    logger.debug("updateGroupMembership({}, roles={})", user.getUsername(), user.getRoles().size());
+
+    List<String> internalGroupRoles = new ArrayList<String>();
+
+    for (Role role : user.getRoles()) {
+      if (Role.Type.GROUP.equals(role.getType())
+          || (Role.Type.INTERNAL.equals(role.getType()) && role.getName().startsWith(Group.ROLE_PREFIX))) {
+        internalGroupRoles.add(role.getName());
+      }
+    }
+
+    groupRoleProvider.updateGroupMembershipFromRoles(user.getUsername(), user.getOrganization().getId(), internalGroupRoles);
+
   }
 
   /**
@@ -352,7 +421,12 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     if (user != null && !UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, user.getRoles()))
       throw new UnauthorizedException("The user is not allowed to delete an admin user");
 
+    // Remove the user's group membership
+    groupRoleProvider.updateGroupMembershipFromRoles(username, orgId, new ArrayList<String>());
+
+    // Remove the user
     UserDirectoryPersistenceUtil.deleteUser(username, orgId, emf);
+
     cache.invalidate(username + DELIMITER + orgId);
   }
 

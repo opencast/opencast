@@ -128,6 +128,7 @@
             </Import-Package>
             <Export-Package>
               org.opencastproject.userdirectory;version=${project.version},
+              org.opencastproject.userdirectory.api;version=${project.version},
               org.opencastproject.userdirectory.endpoint;version=${project.version},
             </Export-Package>
             <Private-Package>

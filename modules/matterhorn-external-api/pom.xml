@@ -256,6 +256,7 @@
               OSGI-INF/external-base-endpoint.xml,
               OSGI-INF/external-events-endpoint.xml,
               OSGI-INF/external-group-loader.xml,
+              OSGI-INF/external-role-provider.xml,
               OSGI-INF/external-groups-endpoint.xml,
               OSGI-INF/external-index.xml,
               OSGI-INF/external-security-endpoint.xml,

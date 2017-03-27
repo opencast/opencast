@@ -63,6 +63,10 @@
             "$": "2024"
           },
           {
+            "key": "adminui.user.external_role_display",
+            "$": "false"
+          },
+          {
             "key": "org.opencastproject.engage.ui.url",
             "$": "http:\/\/mhallinone-sbox.ethz.ch"
           },
@@ -205,6 +209,10 @@
                   "$": "2024"
                 },
                 {
+                  "key": "adminui.user.external_role_display",
+                  "$": "false"
+                },
+                {
                   "key": "org.opencastproject.engage.ui.url",
                   "$": "http:\/\/mhallinone-sbox.ethz.ch"
                 },
@@ -338,6 +346,10 @@
                 {
                   "key": "adminui.chunksize",
                   "$": "2024"
+                },
+                {
+                  "key": "adminui.user.external_role_display",
+                  "$": "false"
                 },
                 {
                   "key": "org.opencastproject.engage.ui.url",

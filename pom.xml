@@ -154,6 +154,7 @@
     <module>modules/matterhorn-search-service-impl</module>
     <module>modules/matterhorn-search-service-remote</module>
     <module>modules/matterhorn-search-workflowoperation</module>
+    <module>modules/matterhorn-security-aai</module>
     <module>modules/matterhorn-security-cas</module>
     <module>modules/matterhorn-security-ldap</module>
     <module>modules/matterhorn-security-openid</module>
@@ -338,9 +339,14 @@
       in the child. -->
     <pluginManagement>
       <plugins>
-        <!-- Fix eclipse (indigo) maven integration -->
-        <!-- See http://wiki.eclipse.org/M2E_plugin_execution_not_covered for
-          more information -->
+        <!-- Fix Eclipse Maven integration -->
+        <!-- Since its 1.0 version, the Eclipse Maven integration requires
+          this info to map several workspace actions to specific phases of Maven's
+          lifecycle. Should this section not be included, or should certain plugins
+          not be covered by the list of "pluginExecutions" below, Eclipse users will
+          see errors of the type "plugin execution not covered". -->
+        <!-- See https://www.eclipse.org/m2e/documentation/m2e-execution-not-covered.html
+          for more information -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>

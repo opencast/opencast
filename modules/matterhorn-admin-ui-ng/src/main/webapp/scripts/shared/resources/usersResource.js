@@ -15,7 +15,13 @@ angular.module('adminNg.resources')
                     row.name = r.name;
                     row.username = r.username;
                     row.manageable = r.manageable;
-                    row.roles = r.roles.join(', ');
+                    row.rolesDict = {};
+                    var roleNames = [];
+                    angular.forEach(r.roles, function(role) {
+                        roleNames.push(role.name);
+                        row.rolesDict[role.name] = role;
+                    });
+                    row.roles = roleNames.join(", ");
                     row.provider = r.provider;
                     row.email = r.email;
                     if (!angular.isUndefined(r.blacklist)) {
@@ -26,7 +32,7 @@ angular.module('adminNg.resources')
                     return row;
                 };
 
-                for (; i < data.results.length; i++) {
+                for (i = 0; i < data.results.length; i++) {
                     result.push(parse(data.results[i]));
                 }
 

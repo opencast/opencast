@@ -22,8 +22,8 @@
 
 // Controller for all event screens.
 angular.module('adminNg.controllers')
-.controller('ToolsCtrl', ['$scope', '$route', '$location', '$window', 'ToolsResource', 'Notifications',
-    function ($scope, $route, $location, $window, ToolsResource, Notifications) {
+.controller('ToolsCtrl', ['$scope', '$route', '$location', '$window', 'ToolsResource', 'Notifications', 'EventHelperService',
+    function ($scope, $route, $location, $window, ToolsResource, Notifications, EventHelperService) {
 
         $scope.navigateTo = function (path) {
             // FIMXE When changing tabs, video playback breaks. Using playback
@@ -43,13 +43,21 @@ angular.module('adminNg.controllers')
             $location.path(path).replace();
         };
 
+        $scope.event    = EventHelperService;
         $scope.resource = $route.current.params.resource;
         $scope.tab      = $route.current.params.tab;
+        $scope.area     = "comments"
         $scope.id       = $route.current.params.itemId;
+
+        $scope.event.eventId = $scope.id;
 
         $scope.openTab = function (tab) {
             $scope.navigateTo('events/' + $scope.resource + '/' +
                 $scope.id + '/tools/' + tab);
+        };
+
+        $scope.openArea = function (area) {
+            $scope.area = area;
         };
 
         // TODO Move the following to a VideoCtrl

@@ -7,12 +7,12 @@ Installation from Source
 These guides will help you to build Opencast, including all necessary third party tools. This method will most likely
 work on all Unix-like systems.
 
- - [RedHat Enterprise Linux](source-rhel-sl-centos.md)
- - [CentOS](source-rhel-sl-centos.md)
- - [Scientific Linux](source-rhel-sl-centos.md)
- - [Fedora](source-rhel-sl-centos.md)
- - [Debian](source-debian-ubuntu.md)
- - [Ubuntu](source-debian-ubuntu.md)
+ - [RedHat Enterprise Linux](source-linux.md)
+ - [CentOS](source-linux.md)
+ - [Scientific Linux](source-linux.md)
+ - [Fedora](source-linux.md)
+ - [Debian](source-linux.md)
+ - [Ubuntu](source-linux.md)
  - [Mac OS X](source-macosx.md)
 
 Building on most other Unix-like operating systems should be very much alike.

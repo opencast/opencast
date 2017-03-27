@@ -40,6 +40,7 @@ import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.util.TextFilter;
+import org.opencastproject.authorization.xacml.manager.endpoint.JsonConv;
 import org.opencastproject.index.service.resources.list.query.UsersListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.matterhorn.search.SearchQuery.Order;
@@ -67,12 +68,14 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.json.JString;
+import com.entwinemedia.fn.data.json.JField;
+import com.entwinemedia.fn.data.json.JObjectWrite;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -305,7 +308,9 @@ public class UsersEndpoint {
     if (rolesArray.isSome()) {
       // Add the roles given
       for (Object role : rolesArray.get()) {
-        rolesSet.add(new JpaRole((String) role, organization));
+        JSONObject roleAsJson = (JSONObject) role;
+        Role.Type roletype = Role.Type.valueOf((String) roleAsJson.get("type"));
+        rolesSet.add(new JpaRole(roleAsJson.get("id").toString(), organization, null, roletype));
       }
     } else {
       rolesSet.add(new JpaRole(organization.getAnonymousRole(), organization));
@@ -332,10 +337,6 @@ public class UsersEndpoint {
     if (user == null) {
       throw new NotFoundException("User " + username + " does not exist.");
     }
-
-    // Reload user from internal user provider
-    if (JpaUserAndRoleProvider.PROVIDER_NAME.equals(user.getProvider()))
-      user = jpaUserAndRoleProvider.loadUser(username);
 
     return RestUtils.okJson(generateJsonUser(user));
   }
@@ -368,19 +369,23 @@ public class UsersEndpoint {
     }
     if (rolesArray.isSome()) {
       // Add the roles given
-      for (Object role : rolesArray.get()) {
-        rolesSet.add(new JpaRole((String) role, organization));
+      for (Object roleObj : rolesArray.get()) {
+        JSONObject role = (JSONObject) roleObj;
+        String rolename = (String) role.get("id");
+        Role.Type roletype = Role.Type.valueOf((String) role.get("type"));
+        rolesSet.add(new JpaRole(rolename, organization, null, roletype));
       }
     } else {
       // Or the use the one from the user if no one is given
       for (Role role : user.getRoles()) {
-        rolesSet.add(new JpaRole(role.getName(), organization));
+        rolesSet.add(new JpaRole(role.getName(), organization, role.getDescription(), role.getType()));
       }
     }
 
     try {
       jpaUserAndRoleProvider.updateUser(new JpaUser(username, password, organization, name, email, jpaUserAndRoleProvider
               .getName(), true, rolesSet));
+      userDirectoryService.invalidate(username);
       return Response.status(SC_OK).build();
     } catch (UnauthorizedException ex) {
       return Response.status(Response.Status.FORBIDDEN).build();
@@ -398,6 +403,7 @@ public class UsersEndpoint {
 
     try {
       jpaUserAndRoleProvider.deleteUser(username, organization.getId());
+      userDirectoryService.invalidate(username);
     } catch (NotFoundException e) {
       logger.error("User {} not found.", username);
       return Response.status(SC_NOT_FOUND).build();
@@ -414,11 +420,25 @@ public class UsersEndpoint {
 
   private JValue generateJsonUser(User user) {
     // Prepare the roles
-    List<JString> rolesJSON = Stream.$(user.getRoles()).map(getRoleName).sort(sortByName).map(toJString).toList();
+    List<JValue> rolesJSON = Stream.$(user.getRoles()).sort(sortRolesByName).map(serializeRole).toList();
 
     return obj(f("username", v(user.getUsername(), Jsons.BLANK)), f("manageable", v(user.isManageable())),
             f("name", v(user.getName(), Jsons.BLANK)), f("email", v(user.getEmail(), Jsons.BLANK)),
             f("roles", arr(rolesJSON)), f("provider", v(user.getProvider(), Jsons.BLANK)));
+  }
+
+  private static final Fn<Role, JValue> serializeRole = new Fn<Role, JValue>() {
+    @Override
+    public JValue apply(Role role) {
+      return roleToJson(role);
+    }
+  };
+
+  private static JObjectWrite roleToJson(Role role) {
+    List<JField> fields = new ArrayList<JField>();
+    fields.add(f(JsonConv.KEY_NAME, v(role.getName())));
+    fields.add(f("type", v(role.getType().toString())));
+    return j(fields);
   }
 
   private static final Fn<Role, String> getRoleName = new Fn<Role, String>() {
@@ -428,17 +448,17 @@ public class UsersEndpoint {
     }
   };
 
-  private static final Fn<String, JString> toJString = new Fn<String, JString>() {
-    @Override
-    public JString apply(String string) {
-      return v(string);
-    }
-  };
-
   private static final Comparator<String> sortByName = new Comparator<String>() {
     @Override
     public int compare(String name1, String name2) {
       return name1.compareTo(name2);
+    }
+  };
+
+  private static final Comparator<Role> sortRolesByName = new Comparator<Role>() {
+    @Override
+    public int compare(Role name1, Role name2) {
+      return name1.getName().compareTo(name2.getName());
     }
   };
 

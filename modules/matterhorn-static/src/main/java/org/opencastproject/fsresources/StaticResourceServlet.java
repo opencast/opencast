@@ -21,6 +21,9 @@
 
 package org.opencastproject.fsresources;
 
+import org.opencastproject.util.ConfigurationException;
+
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +37,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 import java.util.zip.CRC32;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -83,16 +85,20 @@ public class StaticResourceServlet extends HttpServlet {
   public void activate(ComponentContext cc) {
     if (cc != null) {
       String ccDistributionDirectory = cc.getBundleContext().getProperty("org.opencastproject.download.directory");
-      logger.info("serving static files from '{}'", ccDistributionDirectory);
-      if (ccDistributionDirectory != null) {
+      if (StringUtils.isNotEmpty(ccDistributionDirectory)) {
         this.distributionDirectory = ccDistributionDirectory;
+      } else {
+        String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
+        if (StringUtils.isNotEmpty(storageDir)) {
+          this.distributionDirectory = new File(storageDir, "downloads").getPath();
+        }
       }
     }
 
     if (distributionDirectory == null) {
-      distributionDirectory = System.getProperty("java.io.tmpdir") + File.separator + "opencast" + File.separator
-              + "static";
+      throw new ConfigurationException("Distribution directory not set");
     }
+    logger.info("Serving static files from '{}'", distributionDirectory);
 
     InputStream is = this.getClass().getResourceAsStream("/META-INF/mime.types");
     BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -101,8 +107,8 @@ public class StaticResourceServlet extends HttpServlet {
       while ((line = reader.readLine()) != null) {
         MIME_TYPES_MAP.addMimeTypes(line);
       }
-    } catch (IOException ex) {
-      java.util.logging.Logger.getLogger(StaticResourceServlet.class.getName()).log(Level.SEVERE, null, ex);
+    } catch (IOException e) {
+      logger.error("Failed to read mime type map from JAR", e);
     }
   }
 

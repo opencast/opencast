@@ -104,7 +104,11 @@ public final class EndpointUtil {
   };
 
   /**
-   * Returns a generated JSON object with key-value from given list
+   * Returns a generated JSON object with key-value from given list.
+   *
+   * Note that JSONObject (and JSON in general) does not preserve key ordering,
+   * so while the Map passed to this function may have ordered keys, the resulting
+   * JSONObject is not ordered.
    *
    * @param list
    *          The source list for the JSON object

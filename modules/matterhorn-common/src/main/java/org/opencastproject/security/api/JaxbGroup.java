@@ -137,9 +137,11 @@ public final class JaxbGroup implements Group {
     JaxbOrganization organization = JaxbOrganization.fromOrganization(group.getOrganization());
     Set<JaxbRole> roles = new HashSet<JaxbRole>();
     for (Role role : group.getRoles()) {
-      if (role instanceof JaxbRole)
+      if (role instanceof JaxbRole) {
         roles.add((JaxbRole) role);
-      roles.add(JaxbRole.fromRole(role));
+      } else {
+        roles.add(JaxbRole.fromRole(role));
+      }
     }
     return new JaxbGroup(group.getGroupId(), organization, group.getName(), group.getDescription(), roles,
             group.getMembers());

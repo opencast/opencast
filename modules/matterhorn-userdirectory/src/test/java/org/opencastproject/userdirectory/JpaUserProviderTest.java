@@ -66,9 +66,12 @@ public class JpaUserProviderTest {
     SecurityService securityService = mockSecurityServiceWithUser(
             createUserWithRoles(org1, "admin", SecurityConstants.GLOBAL_SYSTEM_ROLES));
 
+    JpaGroupRoleProvider groupRoleProvider = EasyMock.createNiceMock(JpaGroupRoleProvider.class);
+
     provider = new JpaUserAndRoleProvider();
     provider.setSecurityService(securityService);
     provider.setEntityManagerFactory(newTestEntityManagerFactory(JpaUserAndRoleProvider.PERSISTENCE_UNIT));
+    provider.setGroupRoleProvider(groupRoleProvider);
     provider.activate(null);
   }
 
@@ -385,11 +388,13 @@ public class JpaUserProviderTest {
     JpaUser userOne = createUserWithRoles(org1, "user1", "ROLE_COOL_ONE", "ROLE_COOL_TWO");
     provider.addUser(userOne);
 
-    assertEquals(2, IteratorUtils.toList(provider.findRoles("%coOL%", 0, 0)).size());
-    assertEquals(1, IteratorUtils.toList(provider.findRoles("%cOoL%", 0, 1)).size());
+    // We expect findRoles() for this provider to return an empty set,
+    // as it is not authoritative for roles that it persists.
+    assertEquals(0, IteratorUtils.toList(provider.findRoles("%coOL%", Role.Target.ALL, 0, 0)).size());
+    assertEquals(0, IteratorUtils.toList(provider.findRoles("%cOoL%", Role.Target.ALL, 0, 1)).size());
 
-    assertEquals(3, IteratorUtils.toList(provider.findRoles("%oLe%", 0, 0)).size());
-    assertEquals(2, IteratorUtils.toList(provider.findRoles("%olE%", 1, 2)).size());
+    assertEquals(0, IteratorUtils.toList(provider.findRoles("%oLe%", Role.Target.ALL, 0, 0)).size());
+    assertEquals(0, IteratorUtils.toList(provider.findRoles("%olE%", Role.Target.ALL, 1, 2)).size());
   }
 
   private static SecurityService mockSecurityServiceWithUser(User currentUser) {

@@ -288,6 +288,7 @@ public class JpaGroupRoleProviderTest {
 
   @Test
   public void testFindRoles() throws UnauthorizedException {
+    // findRoles() should return a role per group, not the included roles for each group
     Set<JpaRole> authorities = new HashSet<JpaRole>();
     authorities.add(new JpaRole("ROLE_ASTRO_101_SPRING_2011_STUDENT", org1));
     authorities.add(new JpaRole("ROLE_ASTRO_109_SPRING_2012_STUDENT", org1));
@@ -296,6 +297,9 @@ public class JpaGroupRoleProviderTest {
 
     JpaGroup group = new JpaGroup("test", org1, "Test", "Test group", authorities, members);
     provider.addGroup(group);
+
+    Role role = provider.findRoles("%test%", Role.Target.ALL, 0, 0).next();
+    Assert.assertEquals("ROLE_GROUP_TEST", role.getName());
 
     authorities.clear();
     authorities.add(new JpaRole("ROLE_ASTRO_122_SPRING_2011_STUDENT", org1));
@@ -311,13 +315,10 @@ public class JpaGroupRoleProviderTest {
     JpaGroup group3 = new JpaGroup("test2", org2, "Test2", "Test 2 group", authorities, members);
     provider.addGroup(group3);
 
-    Assert.assertEquals(4, IteratorUtils.toList(provider.findRoles("%PrIn%", 0, 0)).size());
-    Assert.assertEquals(1, IteratorUtils.toList(provider.findRoles("%PrIn%", 0, 1)).size());
-    Role role = provider.findRoles("%24%SPrIn%", 0, 0).next();
-    Assert.assertEquals("ROLE_ASTRO_124_SPRING_2012_STUDENT", role.getName());
+    Assert.assertEquals(0, IteratorUtils.toList(provider.findRoles("%PrIn%", Role.Target.ALL, 0, 0)).size());
+    Assert.assertEquals(0, IteratorUtils.toList(provider.findRoles("%PrIn%", Role.Target.ALL, 0, 1)).size());
 
-    Assert.assertEquals(6, IteratorUtils.toList(provider.findRoles("%oLe%", 0, 0)).size());
-    Assert.assertEquals(2, IteratorUtils.toList(provider.findRoles("%olE%", 1, 2)).size());
+    Assert.assertEquals(2, IteratorUtils.toList(provider.findRoles("%test%", Role.Target.ALL, 0, 2)).size());
   }
 
 }

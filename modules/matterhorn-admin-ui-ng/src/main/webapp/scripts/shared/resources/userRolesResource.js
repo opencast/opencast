@@ -12,8 +12,9 @@ angular.module('adminNg.resources')
             if (angular.isDefined(data)) {
               angular.forEach(data, function(value, key) {
                 result.push({
-                  name: value,
-                  value: key
+                  name: key,
+                  value: key,
+                  type: value
                 });
               });
             }
