@@ -470,7 +470,7 @@ public class JobEndpoint {
       fields.add(f(key, vN(instance.getConfiguration(key))));
     }
 
-    return j(f("start", vN(DateTimeSupport.toUTC(mp.getDate().getTime()))), f("state", vN(instance.getState())),
+    return j(f("start", v(created != null ? DateTimeSupport.toUTC(created.getTime()) : "")), f("state", vN(instance.getState())),
             f("description", vN(instance.getDescription())), f("duration", vN(duration)),
             f("id", vN(instance.getId())), f("workflow", vN(instance.getTitle())),
             f("workflowId", vN(instance.getTemplate())), f("title", vN(mp.getTitle())),
