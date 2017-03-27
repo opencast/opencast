@@ -47,7 +47,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                 var i = scope.ZoomSelectOptions.length;
                 while (i--) {
-                    if (scope.ZoomSelectOptions[i].time > (scope.video.duration - 1000)) { 
+                    if (scope.ZoomSelectOptions[i].time > (scope.video.duration - 1000)) {
                         scope.ZoomSelectOptions.splice(i, 1);
                     }
                 }
@@ -85,7 +85,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     scope.player.adapter.setCurrentTime(segment.end / 1000);
                 }
             });
-            
+
             /**
             * Formats time stamps to HH:MM:SS.sss
             *
@@ -114,7 +114,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                    pad(date.getUTCSeconds(), 2) +
                    (showMilliseconds ? '.' + pad(date.getUTCMilliseconds(), 3) : '');
             };
-           
+
             /**
              * Display the current zoom level ms value into human readable value
              * in the existing drop down > overriding the display HTML
@@ -204,11 +204,11 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
             /**
              * On change of zoom range slider updates the appropriate zoom select option
-             * 
+             *
              * @param {Event} event object
              */
             scope.changeZoomLevel = function (event) {
-                
+
                 // Cache the zoom value and position
                 scope.zoomValue = scope.getZoomValue();
                 scope.zoomOffset = scope.getZoomOffset();
@@ -225,7 +225,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
             /**
              * On change of the zoom selected drop-down
-             * 
+             *
              * @param {Event} event object
              */
             scope.changeZoomSelected = function (event) {
@@ -245,7 +245,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     scope.setWrapperClasses();
 
                     var dropdown = element.find('.zoom-control #zoomSelect');
-                    
+
                     if (dropdown) {
                         dropdown.attr('data-placeholder', dropdown.data('data-translated'));
                     }
@@ -259,12 +259,12 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 if (angular.isUndefined(scope.video.duration)) {
                     return;
                 }
-            
+
                 var classes = [];
-                
+
                 angular.forEach(scope.video.segments, function (segment) {
 
-                    if ((segment.start <= scope.zoomFieldOffset) && (segment.end >= scope.zoomFieldOffset)) {                        
+                    if ((segment.start <= scope.zoomFieldOffset) && (segment.end >= scope.zoomFieldOffset)) {
                         classes[0] = 'left-' + (segment.deleted ? ( segment.selected ? 'deleted-selected' : 'deleted') : ( segment.selected ? 'selected' : 'normal'));
                     }
 
@@ -307,7 +307,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                     var img = '.video-timeline .timeline-control .field-of-vision:before{'
                                + 'background-image: url("'+ track.waveform +'");';
-                    
+
                     if ($('#timeline-header').length) {
                         $('#timeline-header').html(img);
                     } else {
@@ -317,7 +317,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                 return style;
             };
-            
+
             /**
              * Returns an object that describes the css classes for a given segment.
              *
@@ -326,7 +326,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
              */
             scope.getSegmentClass = function (segment) {
                 var result = { deleted: segment.deleted, selected: segment.selected, small: false, tiny: false };
-                
+
                 if (angular.isUndefined(scope.video.duration)) {
                     return result;
                 }
@@ -340,21 +340,21 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                         segment_width = element.width();
 
                     if ( segment_width <= (total + 10)) {
-                        
+
                         if ( (single + 10) <= segment_width) {
 
                             // a single element can be shown
                             result.small = true;
                         }   else {
-                            // smaller than a single element > show none 
+                            // smaller than a single element > show none
                             result.tiny = true;
                         }
-                    } 
+                    }
                 }
                 catch(e) {
 
-                    // When splitting segments the angular digest updates the segments items, 
-                    // triggering the ng-class directive but the html does not exist yet and 
+                    // When splitting segments the angular digest updates the segments items,
+                    // triggering the ng-class directive but the html does not exist yet and
                     // the internal_widths array is empty - for these cases we return tiny.
                     // the digest will be called again and the class correctly assigned.
 
@@ -406,7 +406,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     width = 100;
                     left = 0;
                 }
-                
+
                 var style = {
                     width:  width + '%',
                     left: left + '%'
@@ -424,7 +424,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                 var field = angular.element('.field'),
                     width = field.width();
-            
+
                 return { 'active': (field.data('active') === true), 'small': (width <= 190) };
             };
 
@@ -441,7 +441,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 if (event) {
                     event.preventDefault();
                     event.stopPropagation();
-                }                
+                }
 
                 var index = scope.video.segments.indexOf(segment);
 
@@ -454,6 +454,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 }
 
                 scope.setWrapperClasses();
+                scope.$root.$broadcast("segmentTimesUpdated");
             };
 
             /**
@@ -503,12 +504,13 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
               });
 
               scope.setWrapperClasses();
+              scope.$root.$broadcast("segmentTimesUpdated");
             };
 
             /**
              * Catch all method to track the mouse movement on the page,
              * to calculate the movement of elements properly.
-             * 
+             *
              * @param {Event} e event of the mousemove
              */
             $document.mousemove(function(e) {
@@ -543,7 +545,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                         cursor.hide();
 
                         scope.player.adapter.setCurrentTime(handle.data('position') / 1000);
-                    } else {    
+                    } else {
 
                         element.find('#cursor .handle').data('active', false);
                         scope.player.adapter.setCurrentTime(scope.position / 1000);
@@ -638,6 +640,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     });
 
                     scope.setWrapperClasses();
+                    scope.$root.$broadcast("segmentTimesUpdated");
                 }
 
                 // Clean-up of mousemove handlers
@@ -652,10 +655,10 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
              * @param {Event} event Event that triggered this method.
              */
             scope.clickPlayTrack = function (event) {
-                
+
                 if (event) {
                     event.preventDefault();
-                    
+
                     var el = $(event.target);
 
                     if (el.attr('id') === 'cursor-track') {
@@ -717,7 +720,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                 scope.setWrapperClasses();
             };
-            
+
             /**
              * Sets the fake timeline handle cursor position depending on the mouse coordinates.
              *
@@ -760,21 +763,21 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     target = $(event.target);
 
                 // true if we clicked on the split button > so do split
-                scope.doSplitSegment = target.hasClass('split'); 
-                    
+                scope.doSplitSegment = target.hasClass('split');
+
                 // We are currently playing - use fake handle
                 if (scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
-                    
+
                     var cursorFake = element.find('#cursor_fake'),
-                        handle = element.find('#cursor_fake .handle'); 
-                    
+                        handle = element.find('#cursor_fake .handle');
+
                     cursorFake.css('left', cursor.css('left'));
                     cursorFake.show();
-                    
+
                     handle.data('dx', $document.mx - handle.offset().left);
                     handle.data('dy', $document.my - handle.offset().top);
                     handle.addClass('active');
-                    
+
                     // Register global mouse move callback - Fake Playhead movement
                     $document.mousemove(scope.moveFakePlayHead);
                 } else {
@@ -789,7 +792,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     $document.mousemove(scope.movePlayHead);
                 }
             };
-            
+
             /**
              * Sets the zoomFieldOffset corresponding to the position of the zoom field
              * in the field-of-vision as the mouse drag event unfolds.

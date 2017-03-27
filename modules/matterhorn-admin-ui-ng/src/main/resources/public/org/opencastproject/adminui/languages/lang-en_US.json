@@ -1500,7 +1500,8 @@
      },
      "AREAS": {
        "METADATA":    "Metadata",
-       "COMMENTS":    "Comments"
+       "COMMENTS":    "Comments",
+       "SEGMENTS":    "Segments"
      },
      "ACTIONS": {
        "SPLIT": "Split",
@@ -1512,6 +1513,10 @@
        "REDO": "Redo",
        "CLEAR_SEGMENTS": "Clear segments",
        "CLEAR_SELECTED_SEGMENT": "Clear selected segment"
+     },
+     "SEGMENTS": {
+       "REMOVE_SEGMENT":  "Remove Segment",
+       "USE_SEGMENT":     "Use this Segment"
      },
      "PLAYER":{
        "PLAY":              "Play",
