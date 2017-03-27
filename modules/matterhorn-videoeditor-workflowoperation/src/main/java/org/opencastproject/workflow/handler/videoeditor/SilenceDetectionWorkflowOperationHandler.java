@@ -182,6 +182,11 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
     MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
 
     for (Track sourceTrack : sourceTracks) {
+      // Skip over track with no audio stream
+      if (!sourceTrack.hasAudio()) {
+        logger.info("Skipping silence detection of track {} since it has no audio", sourceTrack);
+        continue;
+      }
       logger.info("Executing silence detection on track {}", sourceTrack.getIdentifier());
       try {
         Job detectionJob = detetionService.detect(sourceTrack,
