@@ -21,6 +21,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-dublincore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-index-service</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -88,6 +93,7 @@
             <Service-Component>
               OSGI-INF/operations/analyze-tracks.xml,
               OSGI-INF/operations/cleanup.xml,
+              OSGI-INF/operations/configure-by-dcterm.xml,
               OSGI-INF/operations/copy.xml,
               OSGI-INF/operations/defaults.xml,
               OSGI-INF/operations/error-resolution.xml,
@@ -98,6 +104,7 @@
               OSGI-INF/operations/include.xml,
               OSGI-INF/operations/series.xml,
               OSGI-INF/operations/tag.xml,
+              OSGI-INF/operations/tag-by-dcterm.xml,
               OSGI-INF/operations/zip.xml
             </Service-Component>
           </instructions>
