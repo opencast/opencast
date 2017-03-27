@@ -249,7 +249,7 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
         }
       } // if foundValue
     } // if catalogs
-    
+
     return createResult(mediaPackage, Action.CONTINUE);
   }
 }

@@ -81,7 +81,7 @@ public class TagByDublinCoreTermWOHTest {
     operation.setConfiguration(TagByDublinCoreTermWOH.SOURCE_FLAVORS_PROPERTY, "dublincore/*");
     operation.setConfiguration(TagByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
     operation.setConfiguration(TagByDublinCoreTermWOH.DCTERM_PROPERTY, "publisher");
-    operation.setConfiguration(TagByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "ETH Zurich, Switzerland");
+    operation.setConfiguration(TagByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "University of Opencast");
     operation.setConfiguration(TagByDublinCoreTermWOH.TARGET_TAGS_PROPERTY, "tag1,tag2");
     operation.setConfiguration(TagByDublinCoreTermWOH.COPY_PROPERTY, "false");
 

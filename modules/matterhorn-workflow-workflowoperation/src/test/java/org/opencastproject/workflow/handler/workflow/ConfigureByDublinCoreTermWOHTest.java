@@ -81,7 +81,7 @@ public class ConfigureByDublinCoreTermWOHTest {
   public void testMatchPresentDCTerm() throws Exception {
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "publisher");
-    operation.setConfiguration(ConfigureByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "ETH Zurich, Switzerland");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "University of Opencast");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.COPY_PROPERTY, "false");
     operation.setConfiguration("newConfigProperty", "true");
 
@@ -96,7 +96,7 @@ public class ConfigureByDublinCoreTermWOHTest {
   public void testMatchPresentDCTermOverwriteProperty() throws Exception {
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.DCTERM_PROPERTY, "publisher");
-    operation.setConfiguration(ConfigureByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "ETH Zurich, Switzerland");
+    operation.setConfiguration(ConfigureByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "University of Opencast");
     operation.setConfiguration(ConfigureByDublinCoreTermWOH.COPY_PROPERTY, "false");
     operation.setConfiguration("oldConfigProperty", "bar");
 
