@@ -1,19 +1,19 @@
-Upgrading Opencast 2.3 To 2.4
+Upgrading Opencast 2.4 To 2.5
 =============================
 
-This guide describes how to upgrade Opencast 2.3.x to 2.4.x. In case you need information about how to upgrade older
+This guide describes how to upgrade Opencast 2.4.x to 2.5.x. In case you need information about how to upgrade older
 versions of Opencast, please refer to the [old release notes](https://docs.opencast.org).
 
 
 How to Upgrade
 --------------
 
-1. Download Opencast 2.4
+1. Download Opencast 2.5
 2. Stop your current Opencast instance
 3. Back-up Opencast files and database (optional)
 4. [Upgrade the database](#database-migration)
 5. Update the third party tools
-6. Replace Opencast 2.3 with 2.4
+6. Replace Opencast 2.4 with 2.5
 7. Review the configuration changes and adjust your configuration accordingly
 8. [Re-build the search indexes](#re-build-search-indexes)
 
@@ -21,20 +21,18 @@ How to Upgrade
 Database Migration
 ------------------
 
-Opencast 2.4 includes the following database changes:
+Opencast 2.5 includes the following database changes:
 
-1. Support for OAI-PMH (MH-12013)
-2. Fix for a mis-named role name for the External API (MH-12015)
-3. AssetManager migration (MH-12082)
+1. AssetManager migration (MH-12082)
 
 It should be needless to say that this migration should not take a lot of time and should be safe. Nevertheless, as with
 all database migrations, we recommend to make a database backup before attempting the upgrade.
 
-You can find the database upgrade script at `…/docs/upgrade/2.3_to_2.4/mysql5.sql`.
+You can find the database upgrade script at `…/docs/upgrade/2.4_to_2.5/mysql5.sql`.
 
 ### Standalone migration from Archive to AssetManager
 
-The AssetManager replaces the Archive in Opencast 2.4
+The AssetManager replaces the Archive in Opencast 2.5
 
 If you're setting up Opencast from scratch you can safely skip this document but if you plan to upgrade your system
 and continue to use your data you should read on.
