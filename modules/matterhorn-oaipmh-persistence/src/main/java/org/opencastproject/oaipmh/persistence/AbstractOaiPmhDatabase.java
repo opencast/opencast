@@ -442,7 +442,7 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
 
   public static String forSwitch(Opt<?>... opts) {
     return $(opts).map(new Fn<Opt<?>, String>() {
-      @Override public String ap(Opt<?> o) {
+      @Override public String apply(Opt<?> o) {
         return o.isSome() ? "some" : "none";
       }
     }).mkString(":");

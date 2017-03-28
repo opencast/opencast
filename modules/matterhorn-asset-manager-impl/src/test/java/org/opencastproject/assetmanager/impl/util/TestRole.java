@@ -78,4 +78,9 @@ public final class TestRole implements Role {
         + '}';
   }
 
+  @Override
+  public Type getType() {
+    return Type.INTERNAL;
+  }
+
 }

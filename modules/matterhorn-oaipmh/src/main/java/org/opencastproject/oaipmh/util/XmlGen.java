@@ -335,7 +335,7 @@ public abstract class XmlGen {
   private List<Node> filter(List<Option<Node>> nodes) {
     return $(nodes).bind(new Fn<Option<Node>, Collection<Node>>() {
       @Override
-      public Collection<Node> ap(Option<Node> nodeOption) {
+      public Collection<Node> apply(Option<Node> nodeOption) {
         return nodeOption.fold(new Option.Match<Node, Collection<Node>>() {
           @Override
           public Collection<Node> some(Node node) {

@@ -68,8 +68,8 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.json.JField;
-import com.entwinemedia.fn.data.json.JObjectWrite;
+import com.entwinemedia.fn.data.json.Field;
+import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 
@@ -434,11 +434,11 @@ public class UsersEndpoint {
     }
   };
 
-  private static JObjectWrite roleToJson(Role role) {
-    List<JField> fields = new ArrayList<JField>();
+  private static JObject roleToJson(Role role) {
+    List<Field> fields = new ArrayList<>();
     fields.add(f(JsonConv.KEY_NAME, v(role.getName())));
     fields.add(f("type", v(role.getType().toString())));
-    return j(fields);
+    return obj(fields);
   }
 
   private static final Fn<Role, String> getRoleName = new Fn<Role, String>() {
