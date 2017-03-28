@@ -33,8 +33,8 @@ pre-built Opencast installations.
 Installation with Docker
 ----------------------------
 
-You can also use Docker to install or quickly test Opencast. There are multiple versions available for either installing
-Opencast on one server or separating parts out to different servers.
+You can also use Docker to quickly install or test Opencast. There are multiple Docker images available for installing
+Opencast on either a single or multiple server.
 
  - [Testing Locally with Docker](docker-local.md)
 
