@@ -47,4 +47,7 @@ public interface MatterhornConstants {
   /** The property key for the Admin UI documentation URL in the organization properties */
   String ADMIN_DOC_URL_ORG_PROPERTY = "org.opencastproject.admin.documentation.url";
 
+  /** The property key for the Working File Repository URL defined in the organization properties */
+  String WFR_URL_ORG_PROPERTY = "org.opencastproject.file.repo.url";
+
 }

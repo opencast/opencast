@@ -22,20 +22,25 @@
 
 package org.opencastproject.workingfilerepository.impl;
 
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.tika.parser.AutoDetectParser;
+import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
@@ -47,11 +52,23 @@ public class WorkingFileRepositoryRestEndpointTest {
 
   @Before
   public void setUp() throws Exception {
+    Organization organization = EasyMock.createMock(Organization.class);
+    EasyMock.expect(organization.getId()).andReturn("org1").anyTimes();
+    Map<String, String> orgProps = new HashMap<String, String>();
+    orgProps.put(MatterhornConstants.WFR_URL_ORG_PROPERTY, UrlSupport.DEFAULT_BASE_URL);
+    EasyMock.expect(organization.getProperties()).andReturn(orgProps).anyTimes();
+    EasyMock.replay(organization);
+
+    SecurityService securityService = EasyMock.createMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
+    EasyMock.replay(securityService);
+
     endpoint = new WorkingFileRepositoryRestEndpoint();
+    endpoint.setSecurityService(securityService);
     endpoint.rootDirectory = "target/endpointroot";
     FileUtils.forceMkdir(new File(endpoint.rootDirectory));
     endpoint.serverUrl = UrlSupport.DEFAULT_BASE_URL;
-    endpoint.serviceUrl = new URI("http://localhost/files");
+    endpoint.servicePath = WorkingFileRepositoryImpl.URI_PREFIX;
     endpoint.setTikaParser(new AutoDetectParser());
   }
 

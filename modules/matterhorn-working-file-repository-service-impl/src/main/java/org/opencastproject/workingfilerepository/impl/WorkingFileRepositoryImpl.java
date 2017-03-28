@@ -22,6 +22,7 @@
 package org.opencastproject.workingfilerepository.impl;
 
 import org.opencastproject.rest.RestConstants;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.Checksum;
@@ -55,6 +56,7 @@ import java.net.URISyntaxException;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 
 import javax.management.ObjectInstance;
 
@@ -95,8 +97,11 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   /** The Base URL for this server */
   protected String serverUrl = null;
 
-  /** The URL for the services provided by the working file repository */
-  protected URI serviceUrl = null;
+  /** The URL path for the services provided by the working file repository */
+  protected String servicePath = null;
+
+  /** The security service to get current organization from */
+  protected SecurityService securityService;
 
   /**
    * Activate the component
@@ -111,21 +116,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       throw new IllegalStateException("Server URL must be set");
 
     // working file repository 'facade' configuration
-    String servicePath = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
-    String canonicalFileRepositoryUrl = cc.getBundleContext().getProperty("org.opencastproject.file.repo.url");
-    if (StringUtils.isNotBlank(canonicalFileRepositoryUrl)) {
-      try {
-        this.serviceUrl = new URI(UrlSupport.concat(canonicalFileRepositoryUrl, servicePath));
-      } catch (URISyntaxException e) {
-        throw new IllegalStateException("Service URL must be a valid URI, but is " + canonicalFileRepositoryUrl, e);
-      }
-    } else {
-      try {
-        serviceUrl = new URI(UrlSupport.concat(serverUrl, servicePath));
-      } catch (URISyntaxException e) {
-        throw new IllegalStateException("Service URL can not be set to " + serverUrl + servicePath, e);
-      }
-    }
+    servicePath = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
 
     // root directory
     rootDirectory = StringUtils.trimToNull(cc.getBundleContext().getProperty("org.opencastproject.file.repo.path"));
@@ -199,7 +190,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   @Override
   public URI getCollectionURI(String collectionID, String fileName) {
     try {
-      return new URI(serviceUrl + COLLECTION_PATH_PREFIX + collectionID + "/" + PathSupport.toSafeName(fileName));
+      return new URI(getBaseUri() + COLLECTION_PATH_PREFIX + collectionID + "/" + PathSupport.toSafeName(fileName));
     } catch (URISyntaxException e) {
       throw new IllegalStateException("Unable to create valid uri from " + collectionID + " and " + fileName);
     }
@@ -750,7 +741,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     URI[] uris = new URI[files.length];
     for (int i = 0; i < files.length; i++) {
       try {
-        uris[i] = new URI(serviceUrl + COLLECTION_PATH_PREFIX + collectionId + "/"
+        uris[i] = new URI(getBaseUri() + COLLECTION_PATH_PREFIX + collectionId + "/"
                                   + PathSupport.toSafeName(getSourceFile(files[i]).getName()));
       } catch (URISyntaxException e) {
         throw new IllegalStateException("Invalid URI for " + files[i]);
@@ -884,7 +875,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    */
   @Override
   public String getUrlPrefix() {
-    return serviceUrl.toString();
+    return getBaseUri().toString();
   }
 
   /**
@@ -894,7 +885,18 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    */
   @Override
   public URI getBaseUri() {
-    return serviceUrl;
+    if (securityService.getOrganization() != null) {
+      Map<String, String> orgProps = securityService.getOrganization().getProperties();
+      if (orgProps != null && orgProps.containsKey(MatterhornConstants.WFR_URL_ORG_PROPERTY)) {
+        try {
+          return new URI(UrlSupport.concat(orgProps.get(MatterhornConstants.WFR_URL_ORG_PROPERTY), servicePath));
+        } catch (URISyntaxException ex) {
+          logger.warn("Organization working file repository URL not set, fallback to server URL");
+        }
+      }
+    }
+
+    return URI.create(UrlSupport.concat(serverUrl, servicePath));
   }
 
   /**
@@ -904,6 +906,10 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    */
   public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
     this.remoteServiceManager = remoteServiceManager;
+  }
+
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
 }
