@@ -21,6 +21,7 @@
 
 package org.opencastproject.distribution.download;
 
+import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -57,9 +58,13 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.ComponentContext;
 
 import java.io.File;
 import java.net.URI;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -124,8 +129,6 @@ public class DownloadDistributionServiceImplTest {
             organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
     service.setServiceRegistry(serviceRegistry);
     service.setTrustedHttpClient(httpClient);
-    service.distributionDirectory = distributionRoot;
-    service.serviceUrl = UrlSupport.DEFAULT_BASE_URL;
 
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     service.setWorkspace(workspace);
@@ -140,6 +143,17 @@ public class DownloadDistributionServiceImplTest {
       }
     }).anyTimes();
     EasyMock.replay(workspace);
+
+    BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+    EasyMock.expect(bc.getProperty("org.opencastproject.download.directory")).andReturn(distributionRoot.toString()).anyTimes();
+    EasyMock.expect(bc.getProperty("org.opencastproject.download.url")).andReturn(UrlSupport.DEFAULT_BASE_URL).anyTimes();
+    ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
+    Dictionary<String, Object> p = new Hashtable<String, Object>();
+    p.put(DistributionService.CONFIG_KEY_STORE_TYPE, "download");
+    EasyMock.expect(cc.getProperties()).andReturn(p).anyTimes();
+    EasyMock.expect(cc.getBundleContext()).andReturn(bc).anyTimes();
+    EasyMock.replay(bc, cc);
+    service.activate(cc);
   }
 
   @After

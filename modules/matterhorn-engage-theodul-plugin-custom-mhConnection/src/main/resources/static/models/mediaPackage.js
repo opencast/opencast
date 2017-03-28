@@ -24,7 +24,8 @@ define(["backbone", "engage/core"], function(Backbone, Engage) {
     "use strict";
 
     var events = {
-        mediaPackageModelInternalError: new Engage.Event("MhConnection:mediaPackageModelInternalError", "A mediapackage model error occured", "trigger")
+        mediaPackageModelInternalError: new Engage.Event("MhConnection:mediaPackageModelInternalError", "A mediapackage model error occured", "trigger"),
+        mediaPackageLoaded: new Engage.Event("MhConnection:mediaPackageLoaded", "A mediapackage has been loaded", "trigger")
     };
 
     var SEARCH_ENDPOINT = "/search/episode.json";
@@ -73,6 +74,9 @@ define(["backbone", "engage/core"], function(Backbone, Engage) {
                                 if (mediaPackage.mediapackage.seriestitle) {
                                     model.attributes.series = mediaPackage.mediapackage.seriestitle;
                                 }
+                                if (mediaPackage.mediapackage.series) {
+                                    model.attributes.seriesid = mediaPackage.mediapackage.series;
+                                }
                             }
                             if (mediaPackage.dcTitle) {
                                 model.attributes.title = mediaPackage.dcTitle;
@@ -95,8 +99,11 @@ define(["backbone", "engage/core"], function(Backbone, Engage) {
                             if (mediaPackage.segments && mediaPackage.segments.segment) {
                                 model.attributes.segments = mediaPackage.segments.segment;
                             }
+                            model.attributes.eventid = mediaPackageID;
+                            model.attributes.ready = true;
                         }
                         model.trigger("change");
+                        Engage.trigger(events.mediaPackageLoaded.getName());
                         Engage.log("MhConnection: Mediapackage Data change event thrown");
                     } else {
                         Engage.log("MhConnection: Mediapackage data not loaded successfully");
@@ -112,7 +119,8 @@ define(["backbone", "engage/core"], function(Backbone, Engage) {
             "description": "",
             "subject": "",
             "tracks": {},
-            "attachments": {}
+            "attachments": {},
+            "ready" : false
         }
     });
 

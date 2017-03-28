@@ -390,6 +390,21 @@
     </operation>
 
     <operation
+      id="publish-aws"
+      if="${publishToAws}"
+      max-attempts="2"
+      exception-handler-workflow="ng-partial-error"
+      description="Publishing to Amazon Web Services">
+      <configurations>
+        <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
+        <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
+        <configuration key="streaming-source-tags">engage-streaming</configuration>
+        <configuration key="strategy">merge</configuration>
+        <configuration key="check-availability">true</configuration>
+      </configurations>
+    </operation>
+
+    <operation
       id="publish-configure"
       if="${publishToApi}"
       exception-handler-workflow="ng-partial-error"

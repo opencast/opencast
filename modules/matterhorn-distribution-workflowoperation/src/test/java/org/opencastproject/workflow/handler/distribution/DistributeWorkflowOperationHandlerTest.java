@@ -222,6 +222,10 @@ public class DistributeWorkflowOperationHandlerTest {
   class TestDistributionService implements DistributionService, JobProducer {
     public static final String JOB_TYPE = "distribute";
 
+    public String getDistributionType() {
+      return "test";
+    }
+
     @Override
     public Job distribute(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException,
             MediaPackageException {

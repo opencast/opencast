@@ -8,7 +8,7 @@
                 <input type="range" class="zoom-level" ng-model="zoomLevel" ng-change="changeZoomLevel($event)">
 
                 <select chosen class="workflow" id="zoomSelect"
-                        data-width="'85px'" 
+                        data-width="'85px'"
                         data-placeholder="{{ 'VIDEO_TOOL.ZOOM' | translate }}"
                         data-translated="{{ 'VIDEO_TOOL.ZOOM' | translate }}"
                         data-disable-search-threshold="10"
@@ -60,11 +60,11 @@
                                   ng-class="getSegmentClass(segment)"
                                   data-start="{{segment.start}}">
 
-                                <a title="remove segment" class="remove"
+                                <a title="{{'VIDEO_TOOL.SEGMENTS.REMOVE_SEGMENT' | translate}}" class="remove"
                                    ng-if="video.segments.length > 1"
                                    ng-click="mergeSegment($event, segment)">
                                 </a>
-                                <a title="Use this segment"
+                                <a title="{{'VIDEO_TOOL.SEGMENTS.USE_SEGMENT' | translate}}"
                                    ng-class="{ unused: segment.deleted, used: !segment.deleted }"
                                    ng-click="toggleSegment($event, segment)">
                                 </a>

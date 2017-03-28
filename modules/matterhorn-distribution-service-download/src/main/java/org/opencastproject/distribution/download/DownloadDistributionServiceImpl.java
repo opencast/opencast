@@ -26,29 +26,24 @@ import static org.opencastproject.util.HttpUtil.waitForResource;
 import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.RequireUtil.notNull;
 
+import org.opencastproject.distribution.api.AbstractDistributionService;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
-import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
-import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.TrustedHttpClient;
-import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.functions.Misc;
-import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -87,7 +82,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Distributes media to the local media delivery directory.
  */
-public class DownloadDistributionServiceImpl extends AbstractJobProducer
+public class DownloadDistributionServiceImpl extends AbstractDistributionService
         implements DistributionService, DownloadDistributionService, ManagedService {
 
   /** Logging facility */
@@ -100,9 +95,6 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
 
   /** Receipt type */
   public static final String JOB_TYPE = "org.opencastproject.distribution.download";
-
-  /** Default distribution directory */
-  public static final String DEFAULT_DISTRIBUTION_DIR = "opencast" + File.separator + "static";
 
   /** Timeout in millis for checking distributed file request */
   private static final long TIMEOUT = 60000L;
@@ -127,30 +119,6 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
 
   /** Interval time in millis for checking distributed file request */
   private static final long INTERVAL = 300L;
-
-  /** Path to the distribution directory */
-  protected File distributionDirectory = null;
-
-  /** this media download service's base URL */
-  protected String serviceUrl = null;
-
-  /** The remote service registry */
-  protected ServiceRegistry serviceRegistry = null;
-
-  /** The workspace reference */
-  protected Workspace workspace = null;
-
-  /** The security service */
-  protected SecurityService securityService = null;
-
-  /** The user directory service */
-  protected UserDirectoryService userDirectoryService = null;
-
-  /** The organization directory service */
-  protected OrganizationDirectoryService organizationDirectoryService = null;
-
-  /** The trusted HTTP client */
-  private TrustedHttpClient trustedHttpClient;
 
   private Gson gson = new Gson();
 
@@ -180,6 +148,11 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
       throw new IllegalStateException("Distribution directory must be set (org.opencastproject.download.directory)");
     this.distributionDirectory = new File(ccDistributionDirectory);
     logger.info("Download distribution directory is {}", distributionDirectory);
+    this.distributionChannel = OsgiUtil.getComponentContextProperty(cc, CONFIG_KEY_STORE_TYPE);
+  }
+
+  public String getDistributionType() {
+    return this.distributionChannel;
   }
 
   @Override
@@ -611,106 +584,6 @@ public class DownloadDistributionServiceImpl extends AbstractJobProducer
     String orgId = securityService.getOrganization().getId();
     String destinationURI = UrlSupport.concat(serviceUrl, orgId, channelId, mediaPackageId, elementId, fileName);
     return new URI(destinationURI);
-  }
-
-  /**
-   * Callback for the OSGi environment to set the workspace reference.
-   *
-   * @param workspace
-   *          the workspace
-   */
-  protected void setWorkspace(Workspace workspace) {
-    this.workspace = workspace;
-  }
-
-  /**
-   * Callback for the OSGi environment to set the service registry reference.
-   *
-   * @param serviceRegistry
-   *          the service registry
-   */
-  protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
-    this.serviceRegistry = serviceRegistry;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
-   */
-  @Override
-  protected ServiceRegistry getServiceRegistry() {
-    return serviceRegistry;
-  }
-
-  /**
-   * Callback for setting the security service.
-   *
-   * @param securityService
-   *          the securityService to set
-   */
-  public void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
-  }
-
-  /**
-   * Callback for setting the trusted HTTP client.
-   *
-   * @param trustedHttpClient
-   *          the trusted HTTP client to set
-   */
-  public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
-    this.trustedHttpClient = trustedHttpClient;
-  }
-
-  /**
-   * Callback for setting the user directory service.
-   *
-   * @param userDirectoryService
-   *          the userDirectoryService to set
-   */
-  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
-    this.userDirectoryService = userDirectoryService;
-  }
-
-  /**
-   * Sets a reference to the organization directory service.
-   *
-   * @param organizationDirectory
-   *          the organization directory
-   */
-  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
-    this.organizationDirectoryService = organizationDirectory;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
-   */
-  @Override
-  protected SecurityService getSecurityService() {
-    return securityService;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
-   */
-  @Override
-  protected UserDirectoryService getUserDirectoryService() {
-    return userDirectoryService;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
-   */
-  @Override
-  protected OrganizationDirectoryService getOrganizationDirectoryService() {
-    return organizationDirectoryService;
   }
 
   @Override

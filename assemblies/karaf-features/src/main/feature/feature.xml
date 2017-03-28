@@ -81,6 +81,12 @@
     <bundle>mvn:org.opencastproject/android-mms/1.1</bundle>
     <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
 
+    <!-- AWS Bits -->
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.0</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.6.6</bundle>
+    <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/2.6.6</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.aws-java-sdk/${aws.version}</bundle>
+
     <!-- Spring Framework / Security -->
     <bundle>mvn:org.springframework.ldap/org.springframework.ldap/1.3.1.RELEASE</bundle>
     <bundle>mvn:org.springframework.osgi/spring-osgi-core/1.2.1</bundle>
@@ -169,6 +175,8 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-dictionary-regexp/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-acl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-aws-s3/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-aws-s3-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-download/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-streaming/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-workflowoperation/${project.version}</bundle>
@@ -180,6 +188,7 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-custom-mhConnection/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-custom-notifications/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-custom-usertracking/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-custom-piwik/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-description/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-tab-description/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-tab-shortcuts/${project.version}</bundle>
@@ -273,6 +282,8 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-dataloader/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-acl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-aws-s3-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-aws-s3-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-download-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-streaming-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-workflowoperation/${project.version}</bundle>
@@ -362,6 +373,8 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-dataloader/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-acl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-aws-s3-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-aws-s3/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-download/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-streaming/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-workflowoperation/${project.version}</bundle>
@@ -373,6 +386,7 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-custom-mhConnection/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-custom-notifications/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-custom-usertracking/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-custom-piwik/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-description/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-tab-description/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-tab-shortcuts/${project.version}</bundle>
@@ -525,6 +539,8 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-dictionary-regexp/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-acl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-aws-s3-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-aws-s3-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-download-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-streaming-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-workflowoperation/${project.version}</bundle>
@@ -598,6 +614,8 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-annotation-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-acl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-aws-s3-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-aws-s3/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-download/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-distribution-service-streaming/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-api/${project.version}</bundle>
@@ -606,6 +624,7 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-custom-mhConnection/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-custom-notifications/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-custom-usertracking/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-custom-piwik/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-description/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-tab-description/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-tab-shortcuts/${project.version}</bundle>

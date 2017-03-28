@@ -383,7 +383,8 @@
                "REPEATS": "Repeats",
                "REPEAT_ON": "Repeat on",
                "WEEKDAYS": "Weekdays"
-           }
+           },
+           "NO_SOURCE_AVAILABLE": "No capture agents available for scheduling"
          },
          "PROCESSING": {
            "CAPTION": "Processing",
@@ -1500,7 +1501,8 @@
      },
      "AREAS": {
        "METADATA":    "Metadata",
-       "COMMENTS":    "Comments"
+       "COMMENTS":    "Comments",
+       "SEGMENTS":    "Segments"
      },
      "ACTIONS": {
        "SPLIT": "Split",
@@ -1512,6 +1514,10 @@
        "REDO": "Redo",
        "CLEAR_SEGMENTS": "Clear segments",
        "CLEAR_SELECTED_SEGMENT": "Clear selected segment"
+     },
+     "SEGMENTS": {
+       "REMOVE_SEGMENT":  "Remove Segment",
+       "USE_SEGMENT":     "Use this Segment"
      },
      "PLAYER":{
        "PLAY":              "Play",
@@ -1775,6 +1781,7 @@
        "FINISHED":  "Finished",
        "FAILED" :   "Failed",
        "FINISHED_WITH_COMMENTS": "Todo",
-       "SCHEDULED" : "Scheduled"
+       "SCHEDULED" : "Scheduled",
+       "RECORDING" : "Recording"
    }
 }

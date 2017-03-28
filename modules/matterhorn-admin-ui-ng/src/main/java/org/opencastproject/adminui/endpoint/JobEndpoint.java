@@ -456,7 +456,7 @@ public class JobEndpoint {
       fields.add(f(key, v(instance.getConfiguration(key), Jsons.BLANK)));
     }
 
-    return obj(f("start", v(toUTC(mp.getDate().getTime()), Jsons.BLANK)), f("state", v(instance.getState(), Jsons.BLANK)),
+    return obj(f("start", v(created != null ? toUTC(created.getTime()) : "", Jsons.BLANK)), f("state", v(instance.getState(), Jsons.BLANK)),
                f("description", v(instance.getDescription(), Jsons.BLANK)), f("duration", v(duration, Jsons.BLANK)),
                f("id", v(instance.getId(), Jsons.BLANK)), f("workflow", v(instance.getTitle(), Jsons.BLANK)),
                f("workflowId", v(instance.getTemplate(), Jsons.BLANK)), f("title", v(mp.getTitle(), Jsons.BLANK)),

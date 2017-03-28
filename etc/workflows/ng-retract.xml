@@ -27,6 +27,12 @@
               </li>
               <li>
                 <span>
+                  <input id="retractFromAws" type="checkbox" checked="checked" class="configField" value="true" />
+                  <span>&nbsp;AWS</span>
+                </span>
+              </li>
+              <li>
+                <span>
                   <input id="retractFromApi" type="checkbox" checked="checked" class="configField" value="true" />
                   <span>&nbsp;External Applications</span>
                 </span>
@@ -63,6 +69,7 @@
       description="Applying default configuration values">
       <configurations>
         <configuration key="retractFromEngage">true</configuration>
+        <configuration key="retractFromAws">true</configuration>
         <configuration key="retractFromApi">true</configuration>
         <configuration key="retractPreview">true</configuration>
         <configuration key="retractFromOaiPmh">true</configuration>
@@ -78,6 +85,16 @@
       exception-handler-workflow="ng-partial-error"
       if="${retractFromEngage}"
       description="Retract recording from Engage">
+    </operation>
+
+    <!-- Retract from AWS -->
+
+    <operation
+      id="retract-aws"
+      fail-on-error="true"
+      exception-handler-workflow="ng-partial-error"
+      if="${retractFromAws}"
+      description="Retract recording from AWS">
     </operation>
 
     <!-- Retract from external applications -->

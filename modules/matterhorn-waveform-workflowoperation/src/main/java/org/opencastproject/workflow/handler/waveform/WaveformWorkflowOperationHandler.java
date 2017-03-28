@@ -148,15 +148,20 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
     }
     Collection<Track> sourceTracks = trackSelector.select(mediaPackage, false);
     if (sourceTracks.isEmpty()) {
-      logger.info("No tracks found in mediapackage {} with specified {} {}", new String[] {
+      logger.info("No tracks found in mediapackage {} with specified {} {}",
               mediaPackage.getIdentifier().compact(),
               SOURCE_FLAVOR_PROPERTY,
-              sourceFlavorProperty});
+              sourceFlavorProperty);
       createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
     }
 
     List<Job> waveformJobs = new ArrayList<Job>(sourceTracks.size());
     for (Track sourceTrack : sourceTracks) {
+      // Skip over track with no audio stream
+      if (!sourceTrack.hasAudio()) {
+        logger.info("Skipping waveform extraction of track {} since it has no audio", sourceTrack);
+        continue;
+      }
       try {
         // generate waveform
         logger.info("Create waveform job for track '{}' in mediapackage '{}'",

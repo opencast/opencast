@@ -155,6 +155,12 @@ modules/matterhorn-common/src/test/resources/InfusionAll.js
   Copyright (c) 2009 John Resig
   Dual licensed under the MIT and GPL licenses.
 
+modules/matterhorn-distribution-service-aws-s3
+  Amazon AWS SDK for Java
+  Version 1.11.49_1
+  https://github.com/aws/aws-sdk-java
+  Licensed under Apache 2 (https://github.com/aws/aws-sdk-java/blob/master/LICENSE.txt)
+
 modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/backbone.js
   Backbone v1.2.3 (http://backbonejs.org)
   Copyright 2010-2016 Jeremy Ashkenas, DocumentCloud

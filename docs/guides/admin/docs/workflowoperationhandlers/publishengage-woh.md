@@ -21,7 +21,7 @@ The PublishEngageWorkflowOperation will bring your media to the engage distribut
 |streaming-source-flavors   |Specifies which media should be published to the streaming server             |
 |streaming-source-tags      |Specifies which media should be published to the streaming server             |
 |streaming-tagret-tags      |Modify tags of published media                                                |
-|streaming-target-szbflavors|Subflavor to use for distributed material                                     |
+|streaming-target-subflavors|Subflavor to use for distributed material                                     |
 
 
 ## Operation Example
