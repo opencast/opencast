@@ -39,16 +39,21 @@ import org.opencastproject.message.broker.api.MessageSender.DestinationType;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.TakeSnapshot;
 import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
+import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.util.data.Effect0;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.P1Lazy;
 
+import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,6 +142,16 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator
           }
         }
         logger.info("Populating index | end");
+        Organization organization = new DefaultOrganization();
+        SecurityUtil.runAs(getSecurityService(), organization,
+                SecurityUtil.createSystemUser(getSystemUserName(), organization), new Effect0() {
+                  @Override
+                  protected void run() {
+                    String destinationId = AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(indexName);
+                    messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                            IndexRecreateObject.end(indexName, IndexRecreateObject.Service.AssetManager));
+                  }
+                });
       }
     };
     this.indexProducerMsgReceiver.activate();
