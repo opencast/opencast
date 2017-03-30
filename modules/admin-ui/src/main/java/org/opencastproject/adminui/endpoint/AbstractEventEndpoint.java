@@ -426,7 +426,9 @@ public abstract class AbstractEventEndpoint {
 
     return okJson(obj(f("publications", arr(pubJSON)), f("optout", v(event.getOptedOut(), Jsons.BLANK)),
             f("blacklisted", v(event.getBlacklisted(), Jsons.BLANK)),
-            f("review-status", v(event.getReviewStatus(), Jsons.BLANK))));
+            f("review-status", v(event.getReviewStatus(), Jsons.BLANK)),
+            f("start-date", v(event.getRecordingStartDate(), Jsons.BLANK)),
+            f("end-date", v(event.getRecordingEndDate(), Jsons.BLANK))));
   }
 
   private List<JValue> eventPublicationsToJson(Event event) {

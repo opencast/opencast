@@ -42,6 +42,15 @@ angular.module('adminNg.resources')
                 row.date = Language.formatDate('short', r.start_date);
                 row.technical_date = Language.formatDate('short', r.technical_start);
                 row.publications = r.publications;
+                if (typeof(r.publications) != 'undefined' && r.publications != null) {
+                	var now = new Date();
+                	console.log("now: " + now + ", start: " + new Date(r.start_date) + ", end: " + new Date(r.end_date));
+                	for (var i = 0; i < row.publications.length; i++)
+                		if (row.publications[i].id == "engage-live" && 
+                				(now < new Date(r.start_date) || now > new Date(r.end_date)))
+                			row.publications[i].enabled = false;
+                		else row.publications[i].enabled = true;
+                }
                 row.start_date = Language.formatTime('short', r.start_date);
                 row.technical_start = Language.formatTime('short', r.technical_start);
                 row.end_date = Language.formatTime('short', r.end_date);

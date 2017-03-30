@@ -60,7 +60,9 @@
                                       <span translate="{{ publication.label }}">{{ publication.label }}</span>
                                       <p class="description" translate="{{ publication.description }}" ng-if="publication.description">{{ publication.description }}</p>
                                     </div>
-                                    <a href="{{ publication.url }}" class="play"></a>
+                                    <a data-ng-show="publication.enabled" href="{{ publication.url }}" class="play"></a>
+                                    <span data-ng-hide="publication.enabled" translate="EVENTS.EVENTS.DETAILS.GENERAL.LIVE_EVENT_NOT_IN_PROGRESS" style="display: inline-block;float: right;" >
+                                    </span>
                                 </div>
                             </li>
                         </ul>

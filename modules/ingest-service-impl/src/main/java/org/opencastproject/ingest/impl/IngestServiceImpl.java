@@ -1345,7 +1345,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   private void mergeMediaPackageElements(MediaPackage mp, MediaPackage scheduledMp) {
     for (MediaPackageElement element : scheduledMp.getElements()) {
-      if (mp.getElementsByFlavor(element.getFlavor()).length > 0) {
+      // Asset manager media package may have a publication element (for live) if retract live has not run yet
+      if (!MediaPackageElement.Type.Publication.equals(element.getElementType())
+              && mp.getElementsByFlavor(element.getFlavor()).length > 0) {
         logger.info("Ignore scheduled element '{}', there is already an ingested element with flavor '{}'", element,
                 element.getFlavor());
         continue;

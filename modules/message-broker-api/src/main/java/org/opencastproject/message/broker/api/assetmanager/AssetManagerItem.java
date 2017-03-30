@@ -99,14 +99,16 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
     private final String acl;
     private final long version;
     private final String episodeDublincore;
+    private final String owner;
 
     private TakeSnapshot(String mediaPackageId, String mediapackage, String episodeDublincore, String acl, long version,
-            Date date) {
+            Date date, String owner) {
       super(mediaPackageId, date);
       this.mediapackage = mediapackage;
       this.episodeDublincore = episodeDublincore;
       this.acl = acl;
       this.version = version;
+      this.owner = owner;
     }
 
     @Override
@@ -148,6 +150,10 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
       return version;
     }
 
+    public String getOwner() {
+      return owner;
+    }
+
     //
 
     public static final Fn<TakeSnapshot, MediaPackage> getMediaPackage = new Fn<TakeSnapshot, MediaPackage>() {
@@ -178,6 +184,12 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
       }
     };
 
+    public static final Fn<TakeSnapshot, String> getOwner = new Fn<TakeSnapshot, String>() {
+      @Override
+      public String apply(TakeSnapshot a) {
+        return a.getOwner();
+      }
+    };
   }
 
   /*
@@ -291,7 +303,8 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
    *          The modification date.
    * @return Builds a {@link AssetManagerItem} for taking a media package snapshot.
    */
-  public static TakeSnapshot add(Workspace workspace, MediaPackage mp, AccessControlList acl, long version, Date date) {
+  public static TakeSnapshot add(Workspace workspace, MediaPackage mp, AccessControlList acl, long version, Date date,
+          String owner) {
     String dc = null;
     Opt<DublinCoreCatalog> episodeDublincore = DublinCoreUtil.loadEpisodeDublinCore(workspace, mp);
     if (episodeDublincore.isSome()) {
@@ -303,7 +316,7 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
       }
     }
     return new TakeSnapshot(mp.getIdentifier().compact(), MediaPackageParser.getAsXml(mp), dc,
-            AccessControlParser.toJsonSilent(acl), version, date);
+            AccessControlParser.toJsonSilent(acl), version, date, owner);
   }
 
   /**

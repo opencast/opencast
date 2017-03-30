@@ -232,7 +232,7 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator
   private TakeSnapshot mkTakeSnapshotMessage(Snapshot snapshot) {
     final AccessControlList acl = authSvc.getActiveAcl(snapshot.getMediaPackage()).getA();
     return AssetManagerItem.add(workspace, snapshot.getMediaPackage(), acl, getVersionLong(snapshot),
-            snapshot.getArchivalDate());
+            snapshot.getArchivalDate(), snapshot.getOwner());
   }
 
   private long getVersionLong(Snapshot snapshot) {

@@ -23,6 +23,7 @@ package org.opencastproject.assetmanager.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
@@ -60,7 +61,7 @@ public class AssetManagerItemTest {
     mp.add(DublinCores.mkOpencastEpisode().getCatalog());
     final AccessControlList acl = new AccessControlList(new AccessControlEntry("admin", "read", true));
     final Date now = new Date();
-    final AssetManagerItem item = AssetManagerItem.add(workspace, mp, acl, 10L, now);
+    final AssetManagerItem item = AssetManagerItem.add(workspace, mp, acl, 10L, now, AssetManager.DEFAULT_OWNER);
     final AssetManagerItem deserialized = IoSupport.serializeDeserialize(item);
     assertEquals(item.getDate(), deserialized.getDate());
     assertEquals(item.getType(), deserialized.getType());

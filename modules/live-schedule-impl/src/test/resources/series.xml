@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/"
+  xmlns:dcterms="http://purl.org/dc/terms/">
+  <dcterms:contributor>Henry H. Leitner</dcterms:contributor>
+  <dcterms:created>2017-08-15T04:00:00Z</dcterms:created>
+  <dcterms:creator>Harvard Extension School</dcterms:creator>
+  <dcterms:description>http://www.ext.harvard.edu</dcterms:description>
+  <dcterms:identifier>20170119999</dcterms:identifier>
+  <dcterms:language>eng</dcterms:language>
+  <dcterms:publisher>Harvard University, DCE</dcterms:publisher>
+  <dcterms:subject>Test E-19999</dcterms:subject>
+  <dcterms:title>Test Fall 2017</dcterms:title>
+</dublincore>
