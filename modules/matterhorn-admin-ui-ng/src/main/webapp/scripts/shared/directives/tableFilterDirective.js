@@ -24,17 +24,17 @@ angular.module('adminNg.directives')
             };
 
             scope.initializeMap = function() {
-                 for (var key in scope.filters.filters) {
-                     scope.filters.map[key] = {
-                         options: {},
-                         type: scope.filters.filters[key].type,
-                         label: scope.filters.filters[key].label
-                     };
-                     var options = scope.filters.filters[key].options;
-                     angular.forEach(options, function(option) {
-                          scope.filters.map[key].options[option.value] = option.label;
-                     });
-                 }
+                for (var key in scope.filters.filters) {
+                    scope.filters.map[key] = {
+                        options: {},
+                        type: scope.filters.filters[key].type,
+                        label: scope.filters.filters[key].label
+                    };
+                    var options = scope.filters.filters[key].options;
+                    angular.forEach(options, function(option) {
+                         scope.filters.map[key].options[option.value] = option.label;
+                    });
+                }
             }
 
             scope.restoreFilters = function () {
