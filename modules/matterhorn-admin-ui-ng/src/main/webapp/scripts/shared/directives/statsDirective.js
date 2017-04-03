@@ -34,13 +34,26 @@ angular.module('adminNg.directives')
         },
         link: function (scope) {
             scope.stats.fetch();
+            scope.statsFilterFields = [].concat.apply([],
+                                          scope.stats.stats
+                                              .map(function(stat) {
+                                                  return stat.filters;
+                                              })
+                                      )
+                                      .reduce(function(fieldArr, current) {
+                                          if (fieldArr.indexOf(current.name) === -1) {
+                                              fieldArr.push(current.name);
+                                          }
+                                          return fieldArr;
+                                      }, []);
 
             scope.showStatsFilter = function (index) {
-                var filters = [];
-                angular.forEach(scope.stats.stats[index].filters, function (filter) {
-                    filters.push({namespace: scope.stats.resource, key: filter.name, value: filter.value});
+                angular.forEach(scope.statsFilterFields, function(field) {
+                    Storage.remove('filter', scope.stats.resource, field);
                 });
-                Storage.replace(filters, 'filter');
+                angular.forEach(scope.stats.stats[index].filters, function (filter) {
+                    Storage.put('filter', scope.stats.resource, filter.name, filter.value);
+                });
             };
         }
     };

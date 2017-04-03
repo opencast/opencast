@@ -9,6 +9,7 @@ angular.module('adminNg.directives')
         },
         link: function (scope) {
             scope.formatDateRange = Language.formatDateRange;
+            scope.filterMap = {};
 
             scope.getOptionLabel = function (filter) {
                 var optionLabel;
@@ -22,21 +23,7 @@ angular.module('adminNg.directives')
                 return optionLabel;
             };
 
-
-            scope.restoreFilters = function () {
-                angular.forEach(scope.filters.filters, function (filter, name) {
-                    filter.value = Storage.get('filter', scope.namespace)[name];
-                });
-                scope.textFilter = Storage.get('filter', scope.namespace).textFilter;
-            };
-
-            scope.filters.$promise.then(function () {
-                scope.restoreFilters();
-                scope.filters.map = {};
-                scope.filterInfo = {
-                                       map: scope.filters.map,
-                                       filters: scope.filters.filters
-                                   };
+            scope.initializeMap = function() {
                 for (var key in scope.filters.filters) {
                     scope.filters.map[key] = {
                         options: {},
@@ -44,9 +31,29 @@ angular.module('adminNg.directives')
                         label: scope.filters.filters[key].label
                     };
                     var options = scope.filters.filters[key].options;
-                    options.forEach(function(option) {
+                    angular.forEach(options, function(option) {
                          scope.filters.map[key].options[option.value] = option.label;
                     });
+                }
+            }
+
+            scope.restoreFilters = function () {
+                angular.forEach(scope.filters.filters, function (filter, name) {
+                    filter.value = Storage.get('filter', scope.namespace)[name];
+
+                    if (scope.filters.map[name]) {
+                        scope.filters.map[name].value = filter.value;
+                    }
+                });
+                scope.textFilter = Storage.get('filter', scope.namespace).textFilter;
+            };
+
+            scope.filters.$promise.then(function () {
+                scope.filters.map = scope.filterMap;
+                scope.restoreFilters();
+
+                if (Object.keys(scope.filters.map).length === 0) {
+                    scope.initializeMap();
                 }
             });
 
