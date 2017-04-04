@@ -68,9 +68,9 @@ import javax.ws.rs.core.Response;
 
 /**
  * A base REST endpoint for the {@link AssetManager}.
- * <p/>
+ * <p>
  * The endpoint provides assets over http (see {@link org.opencastproject.assetmanager.impl.HttpAssetProvider}).
- * <p/>
+ * <p>
  * No @Path annotation here since this class cannot be created by JAX-RS. Put it on the concrete implementations.
  */
 @RestService(name = "assetManager", title = "AssetManager",

@@ -30,7 +30,7 @@ import com.entwinemedia.fn.Stream;
 
 /**
  * Product of a media package and a media package element filter.
- * <p/>
+ * <p>
  * Get the filtered set of elements by calling {@link #getElements()}.
  * Get the full set of elements by calling {@link #getMediaPackage()}<code>.getElements()</code>.
  */

@@ -77,7 +77,7 @@ import java.util.Date;
 
 /**
  * Core implementation of the asset manager interface.
- * </p>
+ * <p>
  * This implementation features only basic functionality and does not
  * cover security or messaging aspects.
  */

@@ -37,7 +37,7 @@ public interface ARecord {
   /**
    * Get all properties associated with an episode. If the stream contains any properties also depends on
    * the query specification. If it has not been specified to fetch properties the stream is definitely empty.
-   * <p/>
+   * <p>
    * Please note that properties are not versioned but stored per episode.
    */
   Stream<Property> getProperties();

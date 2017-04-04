@@ -48,10 +48,10 @@ import java.net.URI;
 
 /**
  * Implementation of an {@link HttpAssetProvider} for the {@link OsgiAssetManagerRestEndpoint}.
- * <p/>
+ * <p>
  * The implementation of the interface needs to be decoupled from the endpoint to avoid
  * a circular dependency between the AssetManager and the endpoint. See HIWEST-492 for details.
- * <p/>
+ * <p>
  * Because of its tight coupling to the OSGi runtime, the implementation goes without an abstract base class.
  */
 public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {

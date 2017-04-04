@@ -58,7 +58,7 @@ import junitparams.Parameters;
 /**
  * Test the migration of {@link org.opencastproject.archive.api.Archive} tables
  * to {@link org.opencastproject.assetmanager.api.AssetManager} tables on a MySQL database.
- * <p/>
+ * <p>
  * The test is set to "ignore" since it requires some system properties to be set.
  * <ul>
  * <li>-Dtest-database-url, JDBC URL</li>

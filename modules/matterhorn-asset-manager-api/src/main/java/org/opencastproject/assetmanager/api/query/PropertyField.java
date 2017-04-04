@@ -25,7 +25,7 @@ import org.opencastproject.assetmanager.api.PropertyName;
 
 /**
  * Description of a property of type <code>A</code>.
- * <p/>
+ * <p>
  * Implementations are supposed to be immutable.
  */
 public interface PropertyField<A> extends Field<A> {

@@ -275,7 +275,7 @@ public final class AccessControlUtil {
   /**
    * Define equality on AccessControlLists. Two AccessControlLists are considered equal if they contain the exact same
    * entries no matter in which order.
-   * <p/>
+   * <p>
    * This has not been implemented in terms of #equals and #hashCode because the list of entries is not immutable and
    * therefore not suitable to be put in a set.
    */

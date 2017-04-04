@@ -36,7 +36,7 @@ public interface Asset {
   /**
    * Return a stream to the asset data. A client is responsible of closing the stream after consumption.
    * Use the <i>try with resource</i> construct which is available from Java 7 onwards if possible.
-   * <p/>
+   * <p>
    * If the asset is currently not {@linkplain #getAvailability() available} an empty input stream is
    * returned.
    */

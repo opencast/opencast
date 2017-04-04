@@ -28,7 +28,7 @@ import java.util.Date;
 
 /**
  * To phrase queries to the {@link org.opencastproject.assetmanager.api.AssetManager}.
- * <p/>
+ * <p>
  * Implementations are supposed to be immutable so that one builder can be safely
  * used in a concurrent environment.
  */
@@ -36,11 +36,11 @@ public interface AQueryBuilder {
   /**
    * Determine what should be included in the result records, i.e. what will actually be fetched from the database.
    * If no target is given, only the media package ID ({@link ARecord#getMediaPackageId()}) is fetched.
-   * <p/>
+   * <p>
    * Use targets to reduce the amount of database IO, e.g. if you're not interested in the attached properties do
    * not select them. Or, on the other hand if you want to work with properties only, do not select the snapshot
    * ({@link AQueryBuilder#snapshot()}).
-   * <p/>
+   * <p>
    * Please note that a result record always represents a snapshot accompanied by the properties of the whole episode.
    * That means that always snapshots are being selected. In case a property target is given, it only means that those
    * properties are added to the result set.
@@ -52,7 +52,7 @@ public interface AQueryBuilder {
 
   /**
    * Create a new deletion query.
-   * <p/>
+   * <p>
    * The query will only affect snapshots owned by the given owner. If the target is a property
    * the owner parameter will be ignored since properties belong to the whole episode and not
    * to individual snapshots.

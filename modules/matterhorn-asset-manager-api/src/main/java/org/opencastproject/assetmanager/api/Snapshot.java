@@ -45,7 +45,7 @@ public interface Snapshot {
 
   /**
    * Get the media package.
-   * <p/>
+   * <p>
    * Implementations are required to provide media package element URIs that point to some valid HTTP endpoint.
    */
   MediaPackage getMediaPackage();

@@ -39,7 +39,7 @@ import java.util.Date;
 
 /**
  * Test the {@link org.opencastproject.assetmanager.api.Value} type.
- * <p/>
+ * <p>
  * Not in the same package as {@link org.opencastproject.assetmanager.api.Value}
  * on purpose to showcase method visibility.
  */

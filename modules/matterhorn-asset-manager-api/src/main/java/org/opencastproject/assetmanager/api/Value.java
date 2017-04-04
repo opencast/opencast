@@ -36,12 +36,12 @@ import javax.annotation.concurrent.Immutable;
 
 /**
  * A property value.
- * <p/>
+ * <p>
  * The wrapped type is not exposed as a generic type parameter since {@link Value}s appear in contexts like lists where this type information cannot be preserved.
  * To access the wrapped type one can choose between two options.
  * If the type is known, use {@link #get(ValueType)}.
  * If the type is not known, safely decompose the value with {@link #decompose(Fn, Fn, Fn, Fn, Fn)}.
- * <p/>
+ * </p>
  * The value type is a sum type made up from
  * <ul>
  * <li>{@link StringValue}
@@ -49,7 +49,7 @@ import javax.annotation.concurrent.Immutable;
  * <li>{@link LongValue}
  * <li>{@link BooleanValue}
  * </ul>
- * <p/>
+ * <p>
  * Use one of the various <code>mk(..)</code> constructors to create a new {@link Value}.
  *
  * @see Property
@@ -166,8 +166,8 @@ public abstract class Value {
   /**
    * ValueType gives evidence that type <code>A</code> is suitable for the creation
    * of a {@link Value}.
-   * <p/>
-   * This is a more advanced version of the usual <code>Class&lt;A></code> idiom.
+   * <p>
+   * This is a more advanced version of the usual <code>Class&lt;A&gt;</code> idiom.
    * A <code>ValueType</code> is also a constructor for {@link TypedValue}s of
    * the same type <code>A</code>.
    *

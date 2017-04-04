@@ -29,7 +29,7 @@ import java.util.concurrent.FutureTask;
 public interface MessageReceiver extends MessageBrokerConnector {
 
   /**
-   * {@link java.util.concurrent.Future} for the next {@link Serializable} from an {@link java.jms.ObjectMessage}.
+   * {@link java.util.concurrent.Future} for the next {@link Serializable} from an {@link javax.jms.ObjectMessage}.
    *
    * @param destinationId
    *          The unique id for the queue or topic to listen to.

@@ -64,7 +64,7 @@ import java.util.Map;
 
 /**
  * Bind an asset manager to ActiveMQ messaging.
- * <p/>
+ * <p>
  * Please make sure to {@link #close()} the AssetManager.
  */
 public class AssetManagerWithMessaging extends AssetManagerDecorator
@@ -202,7 +202,7 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator
 
   /**
    * Create a {@link TakeSnapshot} message.
-   * <p/>
+   * <p>
    * Do not call outside of a security context.
    */
   private TakeSnapshot mkTakeSnapshotMessage(Snapshot snapshot) {

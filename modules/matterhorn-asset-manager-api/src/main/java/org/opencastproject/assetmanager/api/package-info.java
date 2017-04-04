@@ -21,7 +21,7 @@
 
 /**
  * This package and all of its sub-packages contain the API definition of the asset manager.
- * <p/>
+ * <p>
  * Implementations of this API must neither accept nor yield null values. The use of null
  * to indicate optionality is strictly prohibited. Use the {@link com.entwinemedia.fn.data.Opt}
  * type instead.

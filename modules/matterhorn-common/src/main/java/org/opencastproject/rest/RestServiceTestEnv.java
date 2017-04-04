@@ -53,9 +53,9 @@ import java.util.regex.Pattern;
 
 /**
  * Helper environment for creating REST service unit tests.
- * <p/>
+ * <p>
  * The REST endpoint to test needs a no-arg constructor in order to be created by the framework.
- * <p/>
+ * <p>
  * Write REST unit tests using <a href="http://code.google.com/p/rest-assured/">rest assured</a>.
  * <h3>Example Usage</h3>
  * 
@@ -168,8 +168,8 @@ public final class RestServiceTestEnv {
 
   /**
    * Return the base URL of the HTTP server. <code>http://host:port</code> public URL getBaseUrl() { return baseUrl; }
-   * 
-   * /** Call in {@link @BeforeClass} annotated method.
+   *
+   * Call in @BeforeClass annotated method.
    */
   public void setUpServer() {
     try {
@@ -187,7 +187,7 @@ public final class RestServiceTestEnv {
     }
   }
 
-  /** Call in {@link @AfterClass} annotated method. */
+  /** Call in @AfterClass annotated method. */
   public void tearDownServer() {
     if (hs != null) {
       logger.info("Stop http server");

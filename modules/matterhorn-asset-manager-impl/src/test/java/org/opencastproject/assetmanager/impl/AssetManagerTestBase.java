@@ -76,10 +76,10 @@ import javax.persistence.EntityManager;
 
 /**
  * Base class for {@link AssetManager} tests.
- * <p/>
+ * <p>
  * See {@link org.opencastproject.util.persistencefn.PersistenceUtil#mkTestEntityManagerFactoryFromSystemProperties(String)}
  * for command line configuration options.
- * <p/>
+ * <p>
  * Implementations of this class need to call {@link #setUp(AssetManager)} to setup the necessary variables prior to
  * running a test. You may implement a {@link org.junit.Before} annotated method like this:
  * <pre>
@@ -158,7 +158,7 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
 
   /**
    * Create a number of media packages with one catalog each and add it to the AssetManager. Return the media package IDs as an array.
-   * <p/>
+   * <p>
    * Please note that each media package creates two assets in the store--the catalog and the manifest--but only one asset
    * in the database which is the catalog. The manifest is represented in the snapshot table, not the asset table.
    *

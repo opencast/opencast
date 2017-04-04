@@ -39,7 +39,7 @@ import com.entwinemedia.fn.Fn;
  * This implementation of the AssetManager only takes its own implementation of query, result, record etc.
  * This could by modeled in a static, type safe manner with path dependent types but
  * this concept is not known to Java so these checks have to be performed at runtime.
- * <p/>
+ * <p>
  * All those checks are grouped in this class.
  */
 public final class RuntimeTypes {

@@ -28,7 +28,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * The version of an archived media package or element.
- * <p/>
+ * <p>
  * This class encapsulates the actual data type used for identifying versions to minimize
  * API changes.
  */

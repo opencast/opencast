@@ -27,7 +27,7 @@ import com.entwinemedia.fn.data.Opt;
 
 /**
  * The AssetManager stores versioned {@linkplain Snapshot snapshots} of media packages.
- * <p/>
+ * <p>
  * It also supports the association of {@linkplain Property properties} to a history of snapshots which is called an episode.
  *
  * <h1>Terms</h1>
@@ -51,7 +51,7 @@ public interface AssetManager {
 
   /**
    * Take a versioned snapshot of a media package.
-   * <p/>
+   * <p>
    * Snapshot are tagged with string identifying the owner. Only the owner
    * of a snapshot is allowed to delete it.
    * Ownership only affects the deletion of a snapshot.

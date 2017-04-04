@@ -117,10 +117,10 @@ public final class DublinCoreUtil {
   /**
    * Define equality on DublinCoreCatalogs. Two DublinCores are considered equal if they have the same properties and if
    * each property has the same values in the same order.
-   * <p/>
+   * <p>
    * Note: As long as http://opencast.jira.com/browse/MH-8759 is not fixed, the encoding scheme of values is not
    * considered.
-   * <p/>
+   * <p>
    * Implementation Note: DublinCores should not be compared by their string serialization since the ordering of
    * properties is not defined and cannot be guaranteed between serializations.
    */

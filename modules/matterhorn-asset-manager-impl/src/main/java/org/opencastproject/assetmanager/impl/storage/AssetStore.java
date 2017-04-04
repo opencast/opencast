@@ -28,7 +28,7 @@ import java.io.InputStream;
 
 /**
  * Versioned storage for binary resources.
- * <p/>
+ * <p>
  * The ElementStore is designed to be as simple as possible, so that it must not have any additional logic or persistent
  * storage of metadata.
  */

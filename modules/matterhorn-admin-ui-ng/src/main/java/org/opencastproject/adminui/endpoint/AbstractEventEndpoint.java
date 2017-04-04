@@ -190,7 +190,7 @@ import javax.ws.rs.core.Response.Status;
  * The event endpoint acts as a facade for WorkflowService and Archive providing a unified query interface and result
  * set.
  * <p>
- * This first implementation uses the {@link org.opencastproject.archive.opencast.OpencastArchive}. In a later iteration
+ * This first implementation uses the {@link org.opencastproject.assetmanager.api.AssetManager}. In a later iteration
  * the endpoint may abstract over the concrete archive.
  */
 @Path("/")

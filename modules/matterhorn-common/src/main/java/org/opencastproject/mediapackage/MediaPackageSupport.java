@@ -227,7 +227,7 @@ public final class MediaPackageSupport {
 
   /**
    * Create a copy of the given media package.
-   * <p/>
+   * <p>
    * ATTENTION: Copying changes the type of the media package elements, e.g. an element of
    * type <code>DublinCoreCatalog</code> will become a <code>CatalogImpl</code>.
    */

@@ -49,7 +49,7 @@ import javax.persistence.EntityManagerFactory;
 
 /**
  * Ties the asset manager to the OSGi environment.
- * <p/>
+ * <p>
  * Composes the core asset manager with the {@link AssetManagerWithMessaging} and {@link AssetManagerWithSecurity}
  * implementations.
  */

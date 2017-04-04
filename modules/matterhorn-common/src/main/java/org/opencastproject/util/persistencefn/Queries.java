@@ -164,7 +164,7 @@ public final class Queries {
 
   /**
    * Set a list of named parameters on a query.
-   * <p/>
+   * <p>
    * Values of type {@link java.util.Date} and {@link org.joda.time.base.AbstractInstant}
    * are recognized and set as a timestamp ({@link javax.persistence.TemporalType#TIMESTAMP}.
    */
@@ -185,7 +185,7 @@ public final class Queries {
 
   /**
    * Set a list of positional parameters on a query.
-   * <p/>
+   * <p>
    * Values of type {@link java.util.Date} and {@link org.joda.time.base.AbstractInstant}
    * are recognized and set as a timestamp ({@link javax.persistence.TemporalType#TIMESTAMP}.
    */

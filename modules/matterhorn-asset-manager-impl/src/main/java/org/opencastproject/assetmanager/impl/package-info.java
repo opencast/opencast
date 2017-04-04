@@ -22,10 +22,10 @@
 /**
  * This package and all of its sub-packages contain the default implementation of the asset manager API
  * as defined in {@link org.opencastproject.assetmanager.api}.
- * <p/>
+ * <p>
  * Also contained are a default storage backend, a REST endpoint, a persistence layer and other
  * components that are not described in the API.
- * <p/>
+ * <p>
  * Please note that none of the classes and methods accepts or yields null values.
  * Optionality is always indicated by the use of type {@link com.entwinemedia.fn.data.Opt}.
  */
