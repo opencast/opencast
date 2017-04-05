@@ -197,6 +197,22 @@
       </configurations>
     </operation>
 
+	<!-- Generate timeline preview images -->
+
+    <operation
+      id="timelinepreviews"
+      if="${publishToMediaModule} OR ${publishToOaiPmh}"
+      fail-on-error="false"
+      exception-handler-workflow="error"
+      description="Creating timeline preview images">
+      <configurations>
+        <configuration key="source-flavor">*/preview</configuration>
+        <configuration key="target-flavor">*/timeline+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="image-count">100</configuration>
+      </configurations>
+    </operation>
+
     <!-- Extract text form slide preview images -->
 
     <operation
