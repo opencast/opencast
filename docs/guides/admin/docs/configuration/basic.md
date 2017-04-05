@@ -93,3 +93,6 @@ the storage directory. This directory is used to store all media, metadata, … 
 can set the directory by changing `org.opencastproject.storage.dir` like:
 
     org.opencastproject.storage.dir=/media/mhdatamount
+
+Don't forget to ensure that the user running Opencast has read/write permissions to the storage directory.
+
