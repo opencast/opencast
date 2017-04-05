@@ -120,12 +120,6 @@ TimelinePreviewsService, ManagedService {
   /** Default value for the mimetype of the generated image */
   public static final String DEFAULT_MIMETYPE = "image/png";
 
-  /** Name of the constant used to retrieve the additional FFmpeg parameters */
-  public static final String OPT_FFMPEG_PARAMETERS = "ffmpegParameters";
-
-  /** Default value for the additional FFmpeg parameters */
-  public static final String DEFAULT_FFMPEG_PARAMETERS = "";
-
 
   /** The default job load of a timeline previews job */
   public static final float DEFAULT_TIMELINEPREVIEWS_JOB_LOAD = 1.0f;
@@ -151,10 +145,6 @@ TimelinePreviewsService, ManagedService {
 
   /** The mimetype that will be set for the generated Attachment containing the timeline previews image */
   protected String mimetype = DEFAULT_MIMETYPE;
-
-  /** The additional parameters that will be inserted in the ffmpeg command between input and the filter to generate
-   *  the timeline previews image */
-  protected String ffmpegParameters = DEFAULT_FFMPEG_PARAMETERS;
 
 
   /** Reference to the receipt service */
@@ -239,16 +229,6 @@ TimelinePreviewsService, ManagedService {
         logger.info("Mime type set to \"{}\"", mimetype);
       } catch (Exception e) {
         logger.warn("Found illegal value '{}' for timeline previews mimetype", type);
-      }
-    }
-    // Additional FFmpeg parameters
-    if (properties.get(OPT_FFMPEG_PARAMETERS) != null) {
-      String params = (String) properties.get(OPT_FFMPEG_PARAMETERS);
-      try {
-        ffmpegParameters = params;
-        logger.info("Additional FFmpeg parameters set to \"{}\"", ffmpegParameters);
-      } catch (Exception e) {
-        logger.warn("Found illegal value '{}' for timeline previews additional FFmpeg parameters", params);
       }
     }
 

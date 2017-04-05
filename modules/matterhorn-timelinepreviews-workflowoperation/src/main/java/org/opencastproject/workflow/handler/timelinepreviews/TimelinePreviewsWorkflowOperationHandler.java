@@ -77,7 +77,7 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
   private static final String TARGET_TAGS_PROPERTY = "target-tags";
 
   /** Image size configuration property name. */
-  private static final String IMAGE_SIZE_PROPERTY = "image-size";
+  private static final String IMAGE_SIZE_PROPERTY = "image-count";
 
   /** Default value for image size. */
   private static final int DEFAULT_IMAGE_SIZE = 10;
