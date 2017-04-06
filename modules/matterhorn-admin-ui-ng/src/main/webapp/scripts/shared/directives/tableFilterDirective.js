@@ -50,11 +50,11 @@ angular.module('adminNg.directives')
 
             scope.filters.$promise.then(function () {
                 scope.filters.map = scope.filterMap;
-                scope.restoreFilters();
-
                 if (Object.keys(scope.filters.map).length === 0) {
                     scope.initializeMap();
                 }
+
+                scope.restoreFilters();
             });
 
             scope.removeFilters = function () {
