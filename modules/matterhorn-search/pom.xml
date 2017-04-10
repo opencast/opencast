@@ -46,7 +46,7 @@
     <dependency>
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
-      <version>1.4.5</version>
+      <version>1.7.6</version>
     </dependency>
 
     <!-- elasticsearch dependencies -->
