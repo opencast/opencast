@@ -30,4 +30,5 @@ video/quicktime             qt mov
 video/x-msvideo             avi
 video/mp4                   mp4
 video/x-matroska            mkv
+video/x-matroska-3d         mk3d
 audio/x-matroska            mka

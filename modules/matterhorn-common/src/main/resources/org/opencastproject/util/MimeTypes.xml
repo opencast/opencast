@@ -1,4 +1,3 @@
-<?xml version="1.0"?>
 <MimeTypes>
   <MimeType>
     <Type>application/futuresplash</Type>
@@ -181,6 +180,11 @@
     <Extensions>m4p</Extensions>
   </MimeType>
   <MimeType>
+    <Type>audio/x-matroska</Type>
+    <Description>Matroska audio</Description>
+    <Extensions>mka</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>audio/x-midi</Type>
     <Description>MIDI</Description>
     <Extensions>mid,midi,smf,kar</Extensions>
@@ -301,6 +305,16 @@
     <Extensions>txt</Extensions>
   </MimeType>
   <MimeType>
+    <Type>text/plain</Type>
+    <Description>SubRip</Description>
+    <Extensions>srt</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>text/vtt</Type>
+    <Description>WebVTT</Description>
+    <Extensions>vtt</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>text/xml</Type>
     <Description>XML Document</Description>
     <Extensions>xml</Extensions>
@@ -334,6 +348,11 @@
     <Type>video/mj2</Type>
     <Description>Motion JPEG</Description>
     <Extensions>mj2</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>video/mp2t</Type>
+    <Description>MPEG-2 transport stream</Description>
+    <Extensions>ts</Extensions>
   </MimeType>
   <MimeType>
     <Type>video/mp4</Type>
@@ -384,6 +403,16 @@
     <Type>video/x-m4v</Type>
     <Description>Video (protected)</Description>
     <Extensions>m4v</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>video/x-matroska</Type>
+    <Description>Matroska video</Description>
+    <Extensions>mkv</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>video/x-matroska-3d</Type>
+    <Description>Matroska 3D video</Description>
+    <Extensions>mk3d</Extensions>
   </MimeType>
   <MimeType>
     <Type>video/x-ms-asf</Type>
