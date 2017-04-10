@@ -143,10 +143,10 @@ function($, bootbox, _, alertify) {
             // load template
             $.ajax({
                 url: window.location.origin + "/engage/ui/template/desktop.html",
-                dataType: "html",
+                dataType: "html"
             }).fail(function() {
-                console.error("Something went wrong while loading template.")
-                $("body").append("Error loading template.")
+                console.error("Something went wrong while loading template.");
+                $("body").append("Error loading template.");
             }).done(function(tData) {
                 // set template data
                 template = _.template(tData);
