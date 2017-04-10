@@ -232,7 +232,6 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
             for (SmilMediaObject elementChild : container.getElements()) {
               if (!elementChild.isContainer()) {
                 SmilMediaElement media = (SmilMediaElement) elementChild;
-                 //logger.debug("Start processing smilMedia {}", media.toString());
                 if (trackParamGroupId.equals(media.getParamGroup())) {
                   long begin = media.getClipBeginMS();
                   long end = media.getClipEndMS();
@@ -301,7 +300,6 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
         IOUtils.closeQuietly(in);
         FileUtils.deleteQuietly(tempDirectory);
       }
-      //logger.debug("Copied the edited file from " + outputPath.toString() + " to workspace at " + String.format("%s-%s%s", sourceTrackFlavor.getType(), newTrackId, outputFileExtension) + " returns  " + newTrackURI.toString());
 
       // inspect new Track
       try {
@@ -310,7 +308,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
           throw new ProcessFailedException("Media inspection of " + newTrackURI + " failed", e);
       }
       Track editedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
-      logger.info("edited FILE " + inspectionJob.getPayload());
+      logger.info("Finished editing track {}", editedTrack);
       editedTrack.setIdentifier(newTrackId);
       editedTrack.setFlavor(new MediaPackageElementFlavor(sourceTrackFlavor.getType(), SINK_FLAVOR_SUBTYPE));
 
