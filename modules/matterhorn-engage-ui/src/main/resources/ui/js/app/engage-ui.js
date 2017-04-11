@@ -86,6 +86,8 @@ function($, bootbox, _, alertify) {
 
         function getDefaultLanguage(language) {
             var lang = language.substring(0, language.indexOf("-"));
+	    if (!lang || lang.length <= 0) lang = language;
+
             switch (lang) {
                 case "en":
                     return "en-US";
