@@ -42,8 +42,8 @@ According to the set release schedule, at one point a release branch should be c
 for a given release.
 
 Once a release process has started, a branch should be created with the proposed version number of that release. This
-branch is created off of `develop` and should be named `r/X.Y.x` (e.g. `r/2.1.x` for the Opencast 2.1 release branch).
-In the following command, we assume that the release branch for 2.1 is to be created. For other versions, please adjust
+branch is created off of `develop` and should be named `r/N.x` (e.g. `r/3.x` for the Opencast 3.0 release branch).
+In the following command, we assume that the release branch for 3.0 is to be created. For other versions, please adjust
 the version number accordingly.
 
 Create the Branch:
@@ -59,8 +59,8 @@ Create the Branch:
 
 3. Create and push release branch:
 
-        git checkout -b r/2.1.x
-        git push <remote> r/2.1.x
+        git checkout -b r/3.x
+        git push <remote> r/3.x
 
 4. Make sure you did not modify any files. If you did, stash those changes.
 
@@ -69,9 +69,9 @@ Create the Branch:
 
         git checkout develop
         for i in `find . -name pom.xml`; do \
-          sed -i 's/<version>2.1-SNAPSHOT</<version>2.2-SNAPSHOT</' $i; done
+          sed -i 's/<version>3.0-SNAPSHOT</<version>4.0-SNAPSHOT</' $i; done
 
-6. Have a look at the changes. Make sure no library version we use has the version `2.1-SNAPSHOT` and was accidentally
+6. Have a look at the changes. Make sure no library version we use has the version `3.0-SNAPSHOT` and was accidentally
    changed. Also make sure that nothing else was modified:
 
         git diff
@@ -83,7 +83,7 @@ Create the Branch:
         git commit -as
         git push <remote> develop
 
-9. Finally change the `fixVersion` and `summary` on the merge ticket for 2.1 and create a new one for develop.
+9. Finally change the `fixVersion` and `summary` on the merge ticket for 3.0 and create a new one for develop.
 
 
 At this point, the developer community should then be notified. Consider using the following as a template email:
@@ -132,7 +132,7 @@ To not have to merge bug fixes into several branches and create several pull req
 the release branch back into `develop` on a regular basis. It is encouraged to do that frequently, to not let the
 branches diverge too much and to avoid possible merge conflicts.
 
-To merge the release branch into `develop`. As example, we do that for 2.1. Please adjust the version accordingly:
+To merge the release branch into `develop`. As example, we do that for 3.0. Please adjust the version accordingly:
 
 1. Grab the merge ticket for `develop`. You are not doing any changes to the release branch, so you will not need that
    merge ticket. If someone else holds the merge ticket for a feature pull request, talk to that person that you will
@@ -140,8 +140,8 @@ To merge the release branch into `develop`. As example, we do that for 2.1. Plea
 
 2. Update release branch:
 
-        git checkout r/2.1.x
-        git pull <remote> r/2.1.x
+        git checkout r/3.x
+        git pull <remote> r/3.x
 
 3. Update `develop`:
 
@@ -151,7 +151,7 @@ To merge the release branch into `develop`. As example, we do that for 2.1. Plea
 4. Merge the release branch. Not that if large merge conflicts arise, you may ask for help from the people creating the
    problematic patches:
 
-        git merge r/2.1.x
+        git merge r/3.x
 
 5. Push updated branch into the community repository:
 
@@ -165,36 +165,36 @@ For testing purposes, the release manager should regularly create beta versions.
 a beta version should exist. Additionally, he should create a release candidate for testing before proposing that a
 release be cut.
 
-Create a version/tag. Again, version 2.1 is used as example. Please adjust the version accordingly:
+Create a version/tag. Again, version 3.0 is used as example. Please adjust the version accordingly:
 
 1. Switch to release branch you want to create the beta from:
 
-        git checkout r/2.1.x
+        git checkout r/3.x
 
 2. Switch to a new branch to create the release (name does not really matter):
 
-        git checkout -b r/2.1.0-beta1
+        git checkout -b r/3.0-beta1
 
 3. Make version changes for release. You can use `sed` to make things easier. Please make sure, the changes are correct:
 
         for i in `find . -name pom.xml`; do \
-          sed -i 's/<version>2.1-SNAPSHOT</<version>2.1.0-beta1</' $i; done
+          sed -i 's/<version>3.0-SNAPSHOT</<version>3.0-beta1</' $i; done
 
 4. Commit changes and create release tag:
 
-        git commit -asS -m 'Opencast 2.1.0-beta1'
-        git tag -s 2.1.0-beta1
+        git commit -asS -m 'Opencast 3.0-beta1'
+        git tag -s 3.0-beta1
 
 5. Switch back to release branch and push tags:
 
-        git checkout r/2.1.x
-        git push <remote> 2.1.0-beta1:2.1.0-beta1
+        git checkout r/3.x
+        git push <remote> 3.0-beta1:3.0-beta1
 
 6. You can remove the new branch afterwards:
 
-        git branch -D r/2.1.0-beta1
+        git branch -D r/3.0-beta1
 
-For a release candidate, instead of `A.B.C-betaX` the tag should be named `A.B.C-rcX`.
+For a release candidate, instead of `A.B-betaX` the tag should be named `A.B-rcX`.
 
 At this point the developer community should then be notified. Consider using the following email template:
 
@@ -225,12 +225,12 @@ and *#propose* this to become the final release.
 ### Releasing
 
 Once the proposal for a release candidate to become the final release has passed, the release manager should create the
-final release. In the following example, again, version 2.1 is used. Please adjust the version accordingly. We also
-assume the final release should be based on `2.1.0-rc2`.
+final release. In the following example, again, version 3.0 is used. Please adjust the version accordingly. We also
+assume the final release should be based on `3.0-rc2`.
 
 1. Check which commit the release candidate was based on:
 
-        git merge-base 2.1.0-rc2 r/2.1.x
+        git merge-base 3.0-rc2 r/3.x
           060dfc3e2328518ae402846577fc6e7ce3b650d7
 
 2. Switch to commit you want to create the release from:
@@ -239,7 +239,7 @@ assume the final release should be based on `2.1.0-rc2`.
 
 3. Switch to a new branch to create the release (name does not really matter):
 
-        git checkout -b r/2.1.0
+        git checkout -b r/3.0
 
 4. Add release notes and commit them:
 
@@ -248,29 +248,29 @@ assume the final release should be based on `2.1.0-rc2`.
 
 5. Merge release notes into release branch:
 
-        git checkout r/2.1.x
-        git merge r/2.1.0
-        git checkout r/2.1.0
+        git checkout r/3.x
+        git merge r/3.0
+        git checkout r/3.0
 
 6. Make version changes for release. You can use `sed` to make things easier. Please make sure, the changes are correct:
 
         for i in `find . -name pom.xml`; do \
-          sed -i 's/<version>2.1-SNAPSHOT</<version>2.1.0</' $i; done
+          sed -i 's/<version>3.0-SNAPSHOT</<version>3.0</' $i; done
 
 7. Commit changes and create release tag:
 
-        git commit -asS -m 'Opencast 2.1.0'
-        git tag -s 2.1.0
+        git commit -asS -m 'Opencast 3.0'
+        git tag -s 3.0
 
 8. Switch back to release branch, push release notes and tags:
 
-        git checkout r/2.1.x
-        git push <remote> 2.1.0:2.1.0
-        git push <remote> r/2.1.x
+        git checkout r/3.x
+        git push <remote> 3.0:3.0
+        git push <remote> r/3.x
 
 9. You can remove the new branch afterwards:
 
-        git branch -D r/2.1.0
+        git branch -D r/3.0
 
 
 Finally, send a release notice to list. You may use the following template:
@@ -363,6 +363,25 @@ This email template may be used to initiate the vote:
     [1] http://docs.opencast.org/develop/developer/development/
 
 #### Announcing Election Results
+
+Votes, once complete, are announced on the developer list by the current QA, or the last release manager.
+
+As an example:
+
+    To: dev@opencast.org
+    Subject: Release Managers of Opencast <NEXT_RELEASE_VERSION>
+
+    Hi everyone,
+
+    It is my pleasure to announce that the following person/people have been
+    elected to position of Release Manager for the upcoming Opencast <NEXT_RELEASE_VERSION>
+    release:
+
+      <Name, Institution>
+      <Name, Institution>
+
+    We wish to thank them for volunteering, and hope the release goes smoothly!
+
 
 Once the vote has been held, the current release manager announces the elected release manager on list, and the newly
 elected release manager is expected to start work on the release shortly after.
