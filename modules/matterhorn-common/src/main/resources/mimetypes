@@ -23,6 +23,7 @@ audio/midi                      midi mid
 audio/x-aifc                    aifc
 audio/x-aiff                    aif aiff
 audio/x-flac                    flac
+audio/x-matroska                mka
 audio/x-mpeg                    mpeg mpg
 audio/x-wav                     wav
 auido/mpeg                      mp3
@@ -31,6 +32,7 @@ video/quicktime                 qt mov
 video/x-msvideo                 avi
 video/mp4                       mp4
 video/x-matroska                mkv
+video/x-matroska-3d             mk3d
 video/webm                      webm
 audio/x-aac                     m4a aac
 application/x-font-truetype     ttf
