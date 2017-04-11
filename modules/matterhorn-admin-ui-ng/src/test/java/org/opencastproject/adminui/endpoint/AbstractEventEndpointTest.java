@@ -56,6 +56,7 @@ import org.easymock.EasyMock;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -477,10 +478,24 @@ public class AbstractEventEndpointTest {
     given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
             .get(rt.host("{eventId}/access.json"));
 
-    String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
-            .get(rt.host("{eventId}/access.json")).asString();
+    JSONObject result = (JSONObject) new JSONParser().parse(given().pathParam("eventId", "asdasd").expect()
+            .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/access.json")).asString());
 
-    assertThat(eventAccessJson, SameJSONAs.sameJSONAs(result));
+    // Fix ordering for embedded acl json string
+    String expectedAclString = getAclString(eventAccessJson);
+    String aclString = getAclString(result.toJSONString());
+    assertThat(expectedAclString, SameJSONAs.sameJSONAs(aclString));
+
+    JSONObject episodeAccess = (JSONObject) result.get("episode_access");
+    episodeAccess.replace("acl", expectedAclString);
+
+    assertThat(eventAccessJson, SameJSONAs.sameJSONAs(result.toJSONString()));
+  }
+
+  private String getAclString(String accessJsonString) throws ParseException {
+    JSONObject accessJson = (JSONObject) new JSONParser().parse(accessJsonString);
+    JSONObject episodeAccess = (JSONObject) accessJson.get("episode_access");
+    return (String) episodeAccess.get("acl");
   }
 
   @Test
