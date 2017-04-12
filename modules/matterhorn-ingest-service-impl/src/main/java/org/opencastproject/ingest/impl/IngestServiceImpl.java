@@ -1821,10 +1821,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           throws IngestException {
     if (MediaPackageElements.PRESENTER_SOURCE.getType().equals(track.getFlavor().getType())) {
       return SmilUtil.addTrack(smilDocument, SmilUtil.TrackType.PRESENTER, track.hasVideo(), startTime,
-              track.getDuration(), track.getURI(),track.getIdentifier());
+              track.getDuration(), track.getURI(), track.getIdentifier());
     } else if (MediaPackageElements.PRESENTATION_SOURCE.getType().equals(track.getFlavor().getType())) {
       return SmilUtil.addTrack(smilDocument, SmilUtil.TrackType.PRESENTATION, track.hasVideo(), startTime,
-              track.getDuration(), track.getURI(),track.getIdentifier());
+              track.getDuration(), track.getURI(), track.getIdentifier());
     } else {
       logger.warn("Invalid partial flavor type {} of track {}", track.getFlavor(), track);
       throw new IngestException("Invalid partial flavor type " + track.getFlavor().getType() + " of track "

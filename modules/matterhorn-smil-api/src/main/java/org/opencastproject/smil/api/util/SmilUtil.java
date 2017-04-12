@@ -161,10 +161,12 @@ public final class SmilUtil {
    *          the duration
    * @param uri
    *          the track URI
+   * @param trackId
+   *          the Id of the track
    * @return the augmented SMIL document
    */
   public static Document addTrack(Document smilDocument, TrackType trackType, boolean hasVideo, long startTime,
-          long duration, URI uri,String trackId) {
+          long duration, URI uri, String trackId) {
     Element parallel = (Element) smilDocument.getElementsByTagName("par").item(0);
     if (parallel.getChildNodes().getLength() == 0) {
       Node presenterSeq = smilDocument.createElement("seq");
@@ -197,7 +199,7 @@ public final class SmilUtil {
     element.setAttribute("dur", Long.toString(duration) + "ms");
     element.setAttribute("src", URIUtil.getPath(uri.toString()));
     if (trackId != null) {
-    element.setAttribute("xml:id", trackId);
+      element.setAttribute("xml:id", trackId);
     }
     sequence.appendChild(element);
     return smilDocument;
