@@ -488,8 +488,6 @@ $(document).ready(function() {
             // now find and put the event handler on all path params
             $form.find(".form_param_path").change( function() {
               checkPath($form);
-            }).keyup(function() {
-              checkPath($form);
             });
             // run the checkPath method
             checkPath($form);

@@ -27,7 +27,9 @@ pages:
    - Lazy Consensus: 'decision-making/lazy-consensus.md'
    - Consensus Building: 'decision-making/consensus-building.md'
    - Voting: 'decision-making/voting.md'
-- Development Environment: 'development-environment.md'
+- Development Environment:
+   - Overview: 'development-environment.md'
+   - With Docker: 'development-environment-docker.md'
 - Licenses and Legal Matters: 'license.md'
 - Localization: 'localization.md'
 - Packaging: 'packaging.md'

@@ -60,10 +60,10 @@ public final class OsgiUtil {
    *           key does not exist or its value is blank
    */
   public static String getContextProperty(ComponentContext cc, String key) {
-    String p = StringUtils.trimToEmpty(cc.getBundleContext().getProperty(key));
+    String p = cc.getBundleContext().getProperty(key);
     if (StringUtils.isBlank(p))
       throw new RuntimeException("Please provide context property " + key);
-    return p;
+    return StringUtils.trimToEmpty(p);
   }
 
   /**
@@ -83,10 +83,10 @@ public final class OsgiUtil {
    *           key does not exist or its value is blank
    */
   public static String getComponentContextProperty(ComponentContext cc, String key) {
-    String p = StringUtils.trimToEmpty((String) cc.getProperties().get(key));
+    String p = (String) cc.getProperties().get(key);
     if (StringUtils.isBlank(p))
       throw new RuntimeException("Please provide context property " + key);
-    return p;
+    return StringUtils.trimToEmpty(p);
   }
 
   /**
@@ -99,10 +99,10 @@ public final class OsgiUtil {
     Object p = d.get(key);
     if (p == null)
       throw new ConfigurationException(key, "does not exist");
-    String ps = StringUtils.trimToEmpty(p.toString());
+    String ps = p.toString();
     if (StringUtils.isBlank(ps))
       throw new ConfigurationException(key, "is blank");
-    return ps;
+    return StringUtils.trimToEmpty(ps);
   }
 
   /** Get a value from a dictionary. Return none if the key does either not exist or the value is blank. */
