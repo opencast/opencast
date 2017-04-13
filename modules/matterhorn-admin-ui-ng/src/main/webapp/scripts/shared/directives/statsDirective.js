@@ -49,7 +49,7 @@ angular.module('adminNg.directives')
                 scope.statsFilterNumber = index;
 
                 angular.forEach(scope.stats.stats[index].filters, function (filter) {
-                    filters.push({namespace: scope.stats.resource, key: filter.name, value: filter.value});
+                  filters.push({namespace: scope.stats.resource, key: filter.name, value: filter.value});
                 });
                 Storage.replace(filters, 'filter');
             };
