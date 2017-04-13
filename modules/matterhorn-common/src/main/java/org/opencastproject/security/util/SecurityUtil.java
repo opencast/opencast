@@ -123,7 +123,7 @@ public final class SecurityUtil {
       return systemUserName;
     } else {
       throw new ConfigurationException(
-              "An Opencast installation always needs a system user name. Please do configure one" + " under the key "
+              "An Opencast installation always needs a system user name. Please configure one under the key "
                       + PROPERTY_KEY_SYS_USER);
     }
   }

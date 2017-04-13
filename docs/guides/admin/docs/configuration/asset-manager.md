@@ -3,7 +3,7 @@ Config Options
 
 File System Based Asset Store
 -----------------------------
-Configure the file system based asset store in config.properties.
+Configure the file system based asset store in custom.properties.
 
 - `org.opencastproject.episode.rootdir`  
    The path where the file system based asset store of the default implementation stores the assets. This key is optional.
