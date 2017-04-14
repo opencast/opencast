@@ -59,7 +59,8 @@ public class CommentMessageReceiverImpl extends BaseMessageReceiverImpl<CommentI
           logger.error("Error updating comment status of event {} from the search index: {}", commentItem.getEventId(),
                   ExceptionUtils.getStackTrace(e));
         } catch (NotFoundException e) {
-          logger.warn("Event {} not found for comment status updating", commentItem.getEventId());
+          // This is expected if the event's comments have been removed as part of the event's removal
+          logger.debug("Event {} not found for comment status updating", commentItem.getEventId());
         }
         return;
       default:
