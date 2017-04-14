@@ -453,4 +453,10 @@ public class JpaJob {
   public String getOrganization() {
     return organization;
   }
+
+  @Override
+  public String toString() {
+    return String.format("Job {id:%d, operation:%s, status:%s}", id, operation, getStatus().toString());
+  }
+
 }
