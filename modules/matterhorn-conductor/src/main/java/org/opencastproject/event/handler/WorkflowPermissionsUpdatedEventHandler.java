@@ -172,7 +172,7 @@ public class WorkflowPermissionsUpdatedEventHandler {
 
           // Update the series dublin core
           if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())) {
-            DublinCoreCatalog seriesDublinCore = seriesItem.getSeries();
+            DublinCoreCatalog seriesDublinCore = seriesItem.getMetadata();
             mp.setSeriesTitle(seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE));
 
             // Update the series dublin core

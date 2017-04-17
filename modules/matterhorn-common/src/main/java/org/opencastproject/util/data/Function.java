@@ -97,7 +97,7 @@ public abstract class Function<A, B> {
   public Fn<A, B> toFn() {
     return new Fn<A, B>() {
       @Override
-      public B ap(A a) {
+      public B apply(A a) {
         return Function.this.apply(a);
       }
     };

@@ -264,7 +264,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
   private Fn<User, Boolean> filterByCurrentOrg() {
     return new Fn<User, Boolean>() {
       @Override
-      public Boolean ap(User user) {
+      public Boolean apply(User user) {
         return user.getOrganization().equals(securityService.getOrganization());
       }
     };

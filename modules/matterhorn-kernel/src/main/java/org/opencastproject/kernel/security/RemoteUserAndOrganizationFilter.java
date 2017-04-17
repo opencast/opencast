@@ -291,7 +291,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
   private static final Fn2<String, Organization, JaxbRole> toJaxbRole = new Fn2<String, Organization, JaxbRole>() {
     @Override
-    public JaxbRole ap(String role, Organization organization) {
+    public JaxbRole apply(String role, Organization organization) {
       return new JaxbRole(role, JaxbOrganization.fromOrganization(organization));
     }
   };

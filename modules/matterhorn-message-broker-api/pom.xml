@@ -28,7 +28,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-archive-api</artifactId>
+      <artifactId>matterhorn-asset-manager-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -71,7 +71,7 @@
               org.opencastproject.message.broker.api;version=${project.version},
               org.opencastproject.message.broker.api.acl;version=${project.version},
               org.opencastproject.message.broker.api.agent;version=${project.version},
-              org.opencastproject.message.broker.api.archive;version=${project.version},
+              org.opencastproject.message.broker.api.assetmanager;version=${project.version},
               org.opencastproject.message.broker.api.comments;version=${project.version},
               org.opencastproject.message.broker.api.group;version=${project.version},
               org.opencastproject.message.broker.api.index;version=${project.version},

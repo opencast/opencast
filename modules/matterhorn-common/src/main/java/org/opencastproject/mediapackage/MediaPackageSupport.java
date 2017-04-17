@@ -21,6 +21,7 @@
 
 package org.opencastproject.mediapackage;
 
+import static com.entwinemedia.fn.Prelude.chuck;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.opencastproject.util.IoSupport.withResource;
 import static org.opencastproject.util.data.Collections.list;
@@ -35,11 +36,18 @@ import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
+import com.entwinemedia.fn.data.Opt;
+import com.entwinemedia.fn.fns.Strings;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.List;
 
 /** Utility class used for media package handling. */
@@ -129,6 +137,55 @@ public final class MediaPackageSupport {
   }
 
   /**
+   * Extract the file name from a media package elements URI.
+   *
+   * @return the file name or none if it could not be determined
+   */
+  public static Opt<String> getFileName(MediaPackageElement mpe) {
+    final URI uri = mpe.getURI();
+    if (uri != null) {
+      return Opt.nul(FilenameUtils.getName(uri.toString())).bind(Strings.blankToNone);
+    } else {
+      return Opt.none();
+    }
+  }
+
+  public static InputStream getJsonInputStream(MediaPackage mp) {
+    return getInputStream(MediaPackageParser.getAsJSON(mp));
+  }
+
+  public static InputStream getXmlInputStream(MediaPackage mp) {
+    return getInputStream(MediaPackageParser.getAsXml(mp));
+  }
+
+  public static InputStream getJsonInputStream(XMLCatalog catalog) {
+    try {
+      return getInputStream(catalog.toJson());
+    } catch (IOException e) {
+      return chuck(e);
+    }
+  }
+
+  public static InputStream getXmlInputStream(XMLCatalog catalog) {
+    try {
+      return getInputStream(catalog.toXmlString());
+    } catch (IOException e) {
+      return chuck(e);
+    }
+  }
+
+  /**
+   * Get a UTF-8 encoded input stream.
+   */
+  private static InputStream getInputStream(String s) {
+    try {
+      return IOUtils.toInputStream(s, "UTF-8");
+    } catch (IOException e) {
+      return chuck(e);
+    }
+  }
+
+  /**
    * Creates a unique filename inside the root folder, based on the parameter <code>filename</code>.
    *
    * @param root
@@ -168,9 +225,19 @@ public final class MediaPackageSupport {
     return clone;
   }
 
-  /** Create a copy of the given media package. */
+  /**
+   * Create a copy of the given media package.
+   * <p>
+   * ATTENTION: Copying changes the type of the media package elements, e.g. an element of
+   * type <code>DublinCoreCatalog</code> will become a <code>CatalogImpl</code>.
+   */
   public static MediaPackage copy(MediaPackage mp) {
     return (MediaPackage) mp.clone();
+  }
+
+  /** Create a copy of the given media package element. */
+  public static MediaPackageElement copy(MediaPackageElement mpe) {
+    return (MediaPackageElement) mpe.clone();
   }
 
   /** Update a mediapackage element of a mediapackage. Mutates <code>mp</code>. */
@@ -250,7 +317,6 @@ public final class MediaPackageSupport {
 
     public static <A extends MediaPackageElement> Function<MediaPackageElement, List<A>> byType(final Class<A> type) {
       return new Function<MediaPackageElement, List<A>>() {
-        @SuppressWarnings("unchecked")
         @Override
         public List<A> apply(MediaPackageElement mpe) {
           return type.isAssignableFrom(mpe.getClass()) ? list((A) mpe) : (List<A>) NIL;
@@ -261,7 +327,6 @@ public final class MediaPackageSupport {
     public static Function<MediaPackageElement, List<MediaPackageElement>> byFlavor(
             final MediaPackageElementFlavor flavor) {
       return new Function<MediaPackageElement, List<MediaPackageElement>>() {
-        @SuppressWarnings("unchecked")
         @Override
         public List<MediaPackageElement> apply(MediaPackageElement mpe) {
           // match is commutative
@@ -272,7 +337,6 @@ public final class MediaPackageSupport {
 
     public static Function<MediaPackageElement, List<MediaPackageElement>> byTags(final List<String> tags) {
       return new Function<MediaPackageElement, List<MediaPackageElement>>() {
-        @SuppressWarnings("unchecked")
         @Override
         public List<MediaPackageElement> apply(MediaPackageElement mpe) {
           return mpe.containsTag(tags) ? list(mpe) : Immutables.<MediaPackageElement> nil();
@@ -417,6 +481,18 @@ public final class MediaPackageSupport {
         }
       };
     }
+
+    public static final Function<MediaPackageElement, Boolean> isXACML = MediaPackageSupport.Filters
+            .matchesFlavorAny(list(MediaPackageElements.XACML_POLICY, MediaPackageElements.XACML_POLICY_EPISODE,
+                    MediaPackageElements.XACML_POLICY_SERIES));
+
+    public static final Function<MediaPackageElement, Boolean> isEpisodeAcl = new Function<MediaPackageElement, Boolean>() {
+      @Override
+      public Boolean apply(MediaPackageElement mpe) {
+        // match is commutative
+        return MediaPackageElements.XACML_POLICY_EPISODE.matches(mpe.getFlavor());
+      }
+    };
 
     public static final Function<MediaPackageElement, Boolean> isEpisodeDublinCore = new Function<MediaPackageElement, Boolean>() {
       @Override

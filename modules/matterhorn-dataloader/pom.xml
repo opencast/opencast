@@ -31,7 +31,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-archive-api</artifactId>
+      <artifactId>matterhorn-asset-manager-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -20,12 +20,12 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.Stream.$;
+import static com.entwinemedia.fn.data.json.Jsons.BLANK;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
-import static com.entwinemedia.fn.data.json.Jsons.jsonArrayFromList;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_0_0;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
@@ -89,7 +89,6 @@ import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Arrays;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
@@ -101,9 +100,11 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.JField;
-import com.entwinemedia.fn.data.json.JObjectWrite;
+import com.entwinemedia.fn.data.json.Field;
+import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.Jsons;
+import com.entwinemedia.fn.data.json.Jsons.Functions;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -264,9 +265,13 @@ public class EventsEndpoint implements ManagedService {
   }
 
   /** OSGi callback if properties file is present */
-  @SuppressWarnings("rawtypes")
   @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    if (properties == null) {
+      logger.info("No configuration available, using defaults");
+      return;
+    }
+
     Opt<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY).toOpt()
             .map(com.entwinemedia.fn.fns.Strings.toLongF);
     if (expiration.isSome()) {
@@ -328,7 +333,7 @@ public class EventsEndpoint implements ManagedService {
 
         List<JValue> tracksJson = new ArrayList<>();
         for (Track track : tracks) {
-          List<JField> fields = new ArrayList<>();
+          List<Field> fields = new ArrayList<>();
           if (track.getChecksum() != null)
             fields.add(f("checksum", v(track.getChecksum().toString())));
           if (track.getDescription() != null)
@@ -345,24 +350,24 @@ public class EventsEndpoint implements ManagedService {
             fields.add(f("identifier", v(track.getMimeType().toString())));
           fields.add(f("size", v(track.getSize())));
           if (track.getStreams() != null) {
-            List<JField> streams = new ArrayList<>();
+            List<Field> streams = new ArrayList<>();
             for (Stream stream : track.getStreams()) {
               streams.add(f(stream.getIdentifier(), getJsonStream(stream)));
             }
-            fields.add(f("streams", j(streams)));
+            fields.add(f("streams", obj(streams)));
           }
           if (track.getTags() != null) {
             List<JValue> tags = new ArrayList<>();
             for (String tag : track.getTags()) {
               tags.add(v(tag));
             }
-            fields.add(f("tags", a(tags)));
+            fields.add(f("tags", arr(tags)));
           }
           if (track.getURI() != null)
             fields.add(f("uri", v(track.getURI().toString())));
-          tracksJson.add(j(fields));
+          tracksJson.add(obj(fields));
         }
-        return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, a(tracksJson));
+        return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(tracksJson));
       }
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
@@ -476,7 +481,7 @@ public class EventsEndpoint implements ManagedService {
     EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.createFromHttpServletRequest(request,
             ingestService, getEventCatalogUIAdapters(), source);
     String eventId = indexService.createEvent(eventHttpServletRequest);
-    return ApiResponses.Json.created(VERSION_1_0_0, URI.create(getEventUrl(eventId)), j(f("identifier", v(eventId))));
+    return ApiResponses.Json.created(VERSION_1_0_0, URI.create(getEventUrl(eventId)), obj(f("identifier", v(eventId))));
   }
 
   @GET
@@ -640,11 +645,10 @@ public class EventsEndpoint implements ManagedService {
     for (IndexObject item : events) {
       eventsList.add(eventToJSON((Event) item, withAcl, withMetadata, withPublications, withSignedUrls));
     }
-    return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, a(eventsList));
+    return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(eventsList));
   }
 
-  private void extendEventsStatusOverview(List<JField> fields, Series series)
-          throws SearchIndexException {
+  private void extendEventsStatusOverview(List<Field> fields, Series series) throws SearchIndexException {
     EventSearchQuery query = new EventSearchQuery(getSecurityService().getOrganization().getId(),
             getSecurityService().getUser()).withoutActions().withSeriesId(series.getIdentifier());
     SearchResult<Event> result = externalIndex.getByQuery(query);
@@ -669,7 +673,7 @@ public class EventsEndpoint implements ManagedService {
       }
     }
 
-    fields.add(f("events", j(f("BLACKLISTED", v(blacklisted)), f("OPTED_OUT", v(optOut)), f("READY", v(ready)))));
+    fields.add(f("events", obj(f("BLACKLISTED", v(blacklisted)), f("OPTED_OUT", v(optOut)), f("READY", v(ready)))));
   }
 
   /**
@@ -695,40 +699,40 @@ public class EventsEndpoint implements ManagedService {
    */
   protected JValue eventToJSON(Event event, Boolean withAcl, Boolean withMetadata, Boolean withPublications,
           Boolean withSignedUrls) throws IndexServiceException, SearchIndexException, NotFoundException {
-    List<JField> fields = new ArrayList<>();
+    List<Field> fields = new ArrayList<>();
     if (event.getArchiveVersion() != null)
       fields.add(f("archive_version", v(event.getArchiveVersion())));
-    fields.add(f("created", vN(event.getCreated())));
-    fields.add(f("creator", vN(event.getCreator())));
-    fields.add(f("contributor", jsonArrayFromList(event.getContributors())));
-    fields.add(f("description", vN(event.getDescription())));
+    fields.add(f("created", v(event.getCreated(), Jsons.BLANK)));
+    fields.add(f("creator", v(event.getCreator(), Jsons.BLANK)));
+    fields.add(f("contributor", arr($(event.getContributors()).map(Functions.stringToJValue))));
+    fields.add(f("description", v(event.getDescription(), Jsons.BLANK)));
     fields.add(f("has_previews", v(event.hasPreview())));
-    fields.add(f("identifier", vN(event.getIdentifier())));
-    fields.add(f("location", vN(event.getLocation())));
-    fields.add(f("presenter", jsonArrayFromList(event.getPresenters())));
-    List<String> publicationIds = new ArrayList<>();
+    fields.add(f("identifier", v(event.getIdentifier(), BLANK)));
+    fields.add(f("location", v(event.getLocation(), BLANK)));
+    fields.add(f("presenter", arr($(event.getPresenters()).map(Functions.stringToJValue))));
+    List<JValue> publicationIds = new ArrayList<>();
     if (event.getPublications() != null) {
       for (Publication publication : event.getPublications()) {
-        publicationIds.add(publication.getChannel());
+        publicationIds.add(v(publication.getChannel()));
       }
     }
-    fields.add(f("publication_status", jsonArrayFromList(publicationIds)));
-    fields.add(f("processing_state", vN(event.getWorkflowState())));
-    fields.add(f("start", vN(event.getTechnicalStartTime())));
+    fields.add(f("publication_status", arr(publicationIds)));
+    fields.add(f("processing_state", v(event.getWorkflowState(), BLANK)));
+    fields.add(f("start", v(event.getTechnicalStartTime(), BLANK)));
     if (event.getTechnicalEndTime() != null) {
-      long duration = new DateTime(event.getTechnicalEndTime()).getMillis()
-                    - new DateTime(event.getTechnicalStartTime()).getMillis();
+      long duration = new DateTime(event.getTechnicalStartTime()).getMillis()
+              - new DateTime(event.getTechnicalEndTime()).getMillis();
       fields.add(f("duration", v(duration)));
     }
     if (StringUtils.trimToNull(event.getSubject()) != null) {
-      fields.add(f("subjects", a(splitSubjectIntoArray(event.getSubject()))));
+      fields.add(f("subjects", arr(splitSubjectIntoArray(event.getSubject()))));
     } else {
-      fields.add(f("subjects", a()));
+      fields.add(f("subjects", arr()));
     }
-    fields.add(f("title", vN(event.getTitle())));
+    fields.add(f("title", v(event.getTitle(), BLANK)));
     if (withAcl != null && withAcl) {
       AccessControlList acl = getAclFromEvent(event);
-      fields.add(f("acl", a(AclUtils.serializeAclToJson(acl))));
+      fields.add(f("acl", arr(AclUtils.serializeAclToJson(acl))));
     }
     if (withMetadata != null && withMetadata) {
       try {
@@ -744,15 +748,15 @@ public class EventsEndpoint implements ManagedService {
     }
     if (withPublications != null && withPublications) {
       List<JValue> publications = getPublications(event.getIdentifier(), withSignedUrls);
-      fields.add(f("publications", a(publications)));
+      fields.add(f("publications", arr(publications)));
     }
-    return j(fields);
+    return obj(fields);
   }
 
   private List<JValue> splitSubjectIntoArray(final String subject) {
     return com.entwinemedia.fn.Stream.$(subject.split(",")).map(new Fn<String, JValue>() {
       @Override
-      public JValue ap(String a) {
+      public JValue apply(String a) {
         return v(a.trim());
       }
     }).toList();
@@ -769,7 +773,7 @@ public class EventsEndpoint implements ManagedService {
           throws Exception {
     for (final Event event : indexService.getEvent(id, externalIndex)) {
       AccessControlList acl = getAclFromEvent(event);
-      return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, a(AclUtils.serializeAclToJson(acl)));
+      return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(AclUtils.serializeAclToJson(acl)));
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
   }
@@ -1150,7 +1154,7 @@ public class EventsEndpoint implements ManagedService {
   public Response getEventPublications(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("sign") boolean sign) throws Exception {
     try {
-      return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, a(getPublications(id, sign)));
+      return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(getPublications(id, sign)));
     } catch (NotFoundException e) {
       return ApiResponses.notFound(e.getMessage());
     } catch (SearchIndexException e) {
@@ -1160,15 +1164,15 @@ public class EventsEndpoint implements ManagedService {
     }
   }
 
-  private final Fn2<Publication, Boolean, JObjectWrite> publicationToJson = new Fn2<Publication, Boolean, JObjectWrite>() {
+  private final Fn2<Publication, Boolean, JObject> publicationToJson = new Fn2<Publication, Boolean, JObject>() {
     @Override
-    public JObjectWrite ap(Publication publication, Boolean sign) {
+    public JObject apply(Publication publication, Boolean sign) {
       String url = publication.getURI() == null ? "" : publication.getURI().toString();
-      return j(f("id", v(publication.getIdentifier())), f("channel", v(publication.getChannel())),
-              f("mediatype", vN(publication.getMimeType())), f("url", v(url)),
-              f("media", a(getPublicationTracksJson(publication, sign))),
-              f("attachments", a(getPublicationAttachmentsJson(publication, sign))),
-              f("metadata", a(getPublicationCatalogsJson(publication, sign))));
+      return obj(f("id", v(publication.getIdentifier())), f("channel", v(publication.getChannel())),
+              f("mediatype", v(publication.getMimeType(), BLANK)), f("url", v(url)),
+              f("media", arr(getPublicationTracksJson(publication, sign))),
+              f("attachments", arr(getPublicationAttachmentsJson(publication, sign))),
+              f("metadata", arr(getPublicationCatalogsJson(publication, sign))));
     }
 
     private String getMediaPackageElementUri(MediaPackageElement element, Boolean sign) {
@@ -1203,7 +1207,7 @@ public class EventsEndpoint implements ManagedService {
       for (Track track : publication.getTracks()) {
 
         VideoStream[] videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
-        List<JField> trackInfo = new ArrayList<>();
+        List<Field> trackInfo = new ArrayList<>();
 
         if (videoStreams.length > 0) {
           // Only supporting one stream, like in many other places...
@@ -1223,12 +1227,12 @@ public class EventsEndpoint implements ManagedService {
           }
         }
 
-        tracks.add(j(f("id", vN(track.getIdentifier())), f("mediatype", vN(track.getMimeType())),
-                f("url", vN(getMediaPackageElementUri(track, sign))), f("flavor", vN(track.getFlavor())),
-                f("size", v(track.getSize())), f("checksum", vN(track.getChecksum())),
-                f("tags", jsonArrayFromList(Arrays.<String> toList().apply(track.getTags()))),
-                f("has_audio", v(track.hasAudio())), f("has_video", v(track.hasVideo())),
-                f("duration", v(track.getDuration())), f("description", vN(track.getDescription()))).merge(trackInfo));
+        tracks.add(obj(f("id", v(track.getIdentifier(), BLANK)), f("mediatype", v(track.getMimeType(), BLANK)),
+                f("url", v(getMediaPackageElementUri(track, sign), BLANK)), f("flavor", v(track.getFlavor(), BLANK)),
+                f("size", v(track.getSize())), f("checksum", v(track.getChecksum(), BLANK)),
+                f("tags", arr(track.getTags())), f("has_audio", v(track.hasAudio())),
+                f("has_video", v(track.hasVideo())), f("duration", v(track.getDuration())),
+                f("description", v(track.getDescription(), BLANK))).merge(trackInfo));
       }
       return tracks;
     }
@@ -1236,11 +1240,12 @@ public class EventsEndpoint implements ManagedService {
     private List<JValue> getPublicationAttachmentsJson(Publication publication, Boolean sign) {
       List<JValue> attachments = new ArrayList<>();
       for (Attachment attachment : publication.getAttachments()) {
-        attachments.add(j(f("id", vN(attachment.getIdentifier())), f("mediatype", vN(attachment.getMimeType())),
-                f("url", vN(getMediaPackageElementUri(attachment, sign))), f("flavor", vN(attachment.getFlavor())),
-                f("ref", vN(attachment.getReference())), f("size", v(attachment.getSize())),
-                f("checksum", vN(attachment.getChecksum())),
-                f("tags", jsonArrayFromList(Arrays.<String> toList().apply(attachment.getTags())))));
+        attachments.add(
+                obj(f("id", v(attachment.getIdentifier(), BLANK)), f("mediatype", v(attachment.getMimeType(), BLANK)),
+                        f("url", v(getMediaPackageElementUri(attachment, sign), BLANK)),
+                        f("flavor", v(attachment.getFlavor(), BLANK)), f("ref", v(attachment.getReference(), BLANK)),
+                        f("size", v(attachment.getSize())), f("checksum", v(attachment.getChecksum(), BLANK)),
+                        f("tags", arr(attachment.getTags()))));
       }
       return attachments;
     }
@@ -1248,10 +1253,10 @@ public class EventsEndpoint implements ManagedService {
     private List<JValue> getPublicationCatalogsJson(Publication publication, Boolean sign) {
       List<JValue> catalogs = new ArrayList<>();
       for (Catalog catalog : publication.getCatalogs()) {
-        catalogs.add(j(f("id", vN(catalog.getIdentifier())), f("mediatype", vN(catalog.getMimeType())),
-                f("url", vN(getMediaPackageElementUri(catalog, sign))), f("flavor", vN(catalog.getFlavor())),
-                f("size", v(catalog.getSize())), f("checksum", vN(catalog.getChecksum())),
-                f("tags", jsonArrayFromList(Arrays.<String> toList().apply(catalog.getTags())))));
+        catalogs.add(obj(f("id", v(catalog.getIdentifier(), BLANK)), f("mediatype", v(catalog.getMimeType(), BLANK)),
+                f("url", v(getMediaPackageElementUri(catalog, sign), BLANK)),
+                f("flavor", v(catalog.getFlavor(), BLANK)), f("size", v(catalog.getSize())),
+                f("checksum", v(catalog.getChecksum(), BLANK)), f("tags", arr(catalog.getTags()))));
       }
       return catalogs;
     }
@@ -1261,8 +1266,8 @@ public class EventsEndpoint implements ManagedService {
           throws NotFoundException, SearchIndexException {
     for (final Event event : indexService.getEvent(id, externalIndex)) {
       List<JValue> pubJSON = new ArrayList<>();
-      pubJSON = new ArrayList<JValue>(com.entwinemedia.fn.Stream.$(event.getPublications())
-              .filter(EventUtils.internalChannelFilter).map(publicationToJson._2(withSignedUrls)).toList());
+      pubJSON = new ArrayList<JValue>($(event.getPublications()).filter(EventUtils.internalChannelFilter)
+              .map(publicationToJson._2(withSignedUrls)).toList());
 
       return pubJSON;
     }
@@ -1290,14 +1295,13 @@ public class EventsEndpoint implements ManagedService {
     }
   }
 
-  private JObjectWrite getPublication(String eventId, String publicationId, Boolean withSignedUrls)
+  private JObject getPublication(String eventId, String publicationId, Boolean withSignedUrls)
           throws SearchIndexException, NotFoundException {
     for (final Event event : indexService.getEvent(eventId, externalIndex)) {
-      List<Publication> publications = com.entwinemedia.fn.Stream.$(event.getPublications())
-              .filter(EventUtils.internalChannelFilter).toList();
+      List<Publication> publications = $(event.getPublications()).filter(EventUtils.internalChannelFilter).toList();
       for (Publication publication : publications) {
         if (publicationId.equals(publication.getIdentifier())) {
-          return com.entwinemedia.fn.Stream.$(publication).map(publicationToJson._2(withSignedUrls)).head2();
+          return $(publication).map(publicationToJson._2(withSignedUrls)).head2();
         }
       }
       throw new NotFoundException(
@@ -1381,7 +1385,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   private JValue getJsonStream(Stream stream) {
-    List<JField> fields = new ArrayList<>();
+    List<Field> fields = new ArrayList<>();
     if (stream instanceof AudioStream) {
       AudioStream audioStream = (AudioStream) stream;
       if (audioStream.getBitDepth() != null)
@@ -1445,7 +1449,7 @@ public class EventsEndpoint implements ManagedService {
       if (videoStream.getScanType() != null)
         fields.add(f("scantype", v(videoStream.getScanType().toString())));
     }
-    return j(fields);
+    return obj(fields);
   }
 
   private String getEventUrl(String eventId) {

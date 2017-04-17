@@ -161,7 +161,7 @@ public class JaxbJob {
   public static Fn<JaxbJob, Job> fnToJob() {
     return new Fn<JaxbJob, Job>() {
       @Override
-      public Job ap(JaxbJob jaxbJob) {
+      public Job apply(JaxbJob jaxbJob) {
         return jaxbJob.toJob();
       }
     };
@@ -170,7 +170,7 @@ public class JaxbJob {
   public static Fn<Job, JaxbJob> fnFromJob() {
     return new Fn<Job, JaxbJob>() {
       @Override
-      public JaxbJob ap(Job job) {
+      public JaxbJob apply(Job job) {
         return  new JaxbJob(job);
       }
     };

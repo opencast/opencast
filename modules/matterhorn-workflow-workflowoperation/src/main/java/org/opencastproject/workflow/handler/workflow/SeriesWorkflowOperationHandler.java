@@ -191,7 +191,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
     Opt<String> optSeries = getOptConfig(workflowInstance.getCurrentOperation(), SERIES_PROPERTY);
     Opt<String> optAttachFlavors = getOptConfig(workflowInstance.getCurrentOperation(), ATTACH_PROPERTY);
     Boolean applyAcl = getOptConfig(workflowInstance.getCurrentOperation(), APPLY_ACL_PROPERTY).map(toBoolean)
-            .or(false);
+            .getOr(false);
 
     if (optSeries.isSome() && !optSeries.get().equals(mediaPackage.getSeries())) {
       logger.info("Changing series id from '{}' to '{}'", StringUtils.trimToEmpty(mediaPackage.getSeries()),
@@ -329,7 +329,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
   private static final Fn2<SeriesCatalogUIAdapter, String, Boolean> seriesOrganizationFilter = new Fn2<SeriesCatalogUIAdapter, String, Boolean>() {
     @Override
-    public Boolean ap(SeriesCatalogUIAdapter catalogUIAdapter, String organization) {
+    public Boolean apply(SeriesCatalogUIAdapter catalogUIAdapter, String organization) {
       return catalogUIAdapter.getOrganization().equals(organization);
     }
   };
@@ -337,7 +337,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
   /** Convert a string into a boolean. */
   private static final Fn<String, Boolean> toBoolean = new Fn<String, Boolean>() {
     @Override
-    public Boolean ap(String s) {
+    public Boolean apply(String s) {
       return BooleanUtils.toBoolean(s);
     }
   };

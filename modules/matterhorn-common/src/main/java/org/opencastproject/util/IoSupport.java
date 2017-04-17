@@ -401,7 +401,7 @@ public final class IoSupport {
    */
   public static <A, B extends Closeable> A withResource(B b, Fn<? super B, ? extends A> f) {
     try {
-      return f.ap(b);
+      return f.apply(b);
     } finally {
       IoSupport.closeQuietly(b);
     }
@@ -678,7 +678,7 @@ public final class IoSupport {
       withResource(
               new ObjectOutputStream(out),
               new FnX<ObjectOutputStream, Unit>() {
-                @Override public Unit apx(ObjectOutputStream out) throws Exception {
+                @Override public Unit applyX(ObjectOutputStream out) throws Exception {
                   out.writeObject(a);
                   return Unit.unit;
                 }
@@ -686,7 +686,7 @@ public final class IoSupport {
       return withResource(
               new ObjectInputStream(new ByteArrayInputStream(out.toByteArray())),
               new FnX<ObjectInputStream, A>() {
-                @Override public A apx(ObjectInputStream in) throws Exception {
+                @Override public A applyX(ObjectInputStream in) throws Exception {
                   return (A) in.readObject();
                 }
               });

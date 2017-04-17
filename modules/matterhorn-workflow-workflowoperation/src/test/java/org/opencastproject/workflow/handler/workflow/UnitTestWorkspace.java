@@ -53,7 +53,7 @@ public class UnitTestWorkspace implements Workspace {
 
   public void clean() {
     logger.info("Cleaning workspace " + baseDir.getAbsolutePath());
-    FileSupport.delete(baseDir, true);
+    FileSupport.deleteQuietly(baseDir, true);
   }
 
   @Override

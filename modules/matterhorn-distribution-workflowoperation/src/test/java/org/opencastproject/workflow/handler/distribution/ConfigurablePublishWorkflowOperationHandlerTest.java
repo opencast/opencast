@@ -208,7 +208,7 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
         HashMap<Job, Status> map = Stream.mk(jobs).foldl(new HashMap<Job, Status>(),
                 new Fn2<HashMap<Job, Status>, Job, HashMap<Job, Status>>() {
                   @Override
-                  public HashMap<Job, Status> ap(HashMap<Job, Status> a, Job b) {
+                  public HashMap<Job, Status> apply(HashMap<Job, Status> a, Job b) {
                     a.put(b, Status.FINISHED);
                     return a;
                   }

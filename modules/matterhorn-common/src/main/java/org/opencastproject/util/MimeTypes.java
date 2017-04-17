@@ -173,7 +173,7 @@ public final class MimeTypes {
 
   public static final Fn<String, Opt<MimeType>> toMimeType = new Fn<String, Opt<MimeType>>() {
     @Override
-    public Opt<MimeType> ap(String name) {
+    public Opt<MimeType> apply(String name) {
       try {
         return Opt.some(fromString(name));
       } catch (Exception e) {

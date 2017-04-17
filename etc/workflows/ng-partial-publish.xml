@@ -43,7 +43,7 @@
     <!-- Archive smil/cutting right now information to ensure we don't loose it in case later operations fail -->
 
     <operation
-      id="archive"
+      id="snapshot"
       description="Archive cutting information">
       <configurations>
         <configuration key="source-tags">archive</configuration>

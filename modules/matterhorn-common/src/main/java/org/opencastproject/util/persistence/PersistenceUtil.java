@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.util.persistence;
 
 import static org.opencastproject.util.data.Monadics.mlist;
@@ -163,7 +162,7 @@ public final class PersistenceUtil {
    * <p>
    * Transaction propagation is supported on a per thread basis.
    *
-   * @deprecated
+   * @deprecated use {@link PersistenceEnvs#persistenceEnvironment(EntityManagerFactory)}
    */
   @Deprecated
   public static PersistenceEnv newPersistenceEnvironment(final EntityManagerFactory emf) {
@@ -200,7 +199,7 @@ public final class PersistenceUtil {
    * Create a named query with a list of parameters. Values of type {@link Date} are recognized and set as a timestamp (
    * {@link TemporalType#TIMESTAMP}.
    *
-   * @deprecated
+   * @deprecated use {@link Queries#named} query(EntityManager, String, Class, Object[])
    */
   @Deprecated
   public static Query createNamedQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
@@ -219,7 +218,7 @@ public final class PersistenceUtil {
   /**
    * Run an update (UPDATE or DELETE) query and ensure that at least one row got affected.
    *
-   * @deprecated
+   * @deprecated use {@link Queries#named} #update(EntityManager, String, Object[])
    */
   @Deprecated
   public static boolean runUpdate(EntityManager em, String queryName, Tuple<String, ?>... params) {
@@ -229,7 +228,7 @@ public final class PersistenceUtil {
   /**
    * Run a query (SELECT) that should return a single result.
    *
-   * @deprecated
+   * @deprecated use {@link Queries#named} #findSingle(EntityManager, String, Object[])
    */
   @Deprecated
   public static <A> Option<A> runSingleResultQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
@@ -245,7 +244,7 @@ public final class PersistenceUtil {
   /**
    * Run a query that should return the first result of it.
    *
-   * @deprecated
+   * @deprecated use {@link Queries#named} findFirst(EntityManager, String, Object[])
    */
   @Deprecated
   public static <A> Option<A> runFirstResultQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
@@ -261,16 +260,14 @@ public final class PersistenceUtil {
   /**
    * Execute a <code>COUNT(x)</code> query.
    *
-   * @deprecated
+   * @deprecated use {@link Queries#named} count(EntityManager, String, Object[])
    */
   @Deprecated
   public static long runCountQuery(EntityManager em, String queryName, Tuple<String, ?>... params) {
     return ((Number) createNamedQuery(em, queryName, params).getSingleResult()).longValue();
   }
 
-  /**
-   * @deprecated
-   */
+  /** @deprecated use {@link Queries#find(Class, Object)} */
   @Deprecated
   public static <A> Function<EntityManager, Option<A>> findById(final Class<A> clazz, final Object primaryKey) {
     return new Function<EntityManager, Option<A>>() {
@@ -299,7 +296,7 @@ public final class PersistenceUtil {
   /**
    * Find multiple objects.
    *
-   * @deprecated
+   * @deprecated use {@link Queries#named} findAll(EntityManager, String, Object[])
    */
   @Deprecated
   public static <A> List<A> findAll(EntityManager em, final String queryName, final Tuple<String, ?>... params) {
@@ -309,7 +306,7 @@ public final class PersistenceUtil {
   /**
    * Find multiple objects with optional pagination.
    *
-   * @deprecated
+   * @deprecated use {@link Queries#named} findAll(EntityManager, String, Option, Option, Object[])
    */
   @Deprecated
   public static <A> List<A> findAll(EntityManager em, final String queryName, Option<Integer> offset,
@@ -329,7 +326,7 @@ public final class PersistenceUtil {
    *          the query parameters
    * @param toA
    *          map to the desired result object
-   * @deprecated
+   * @deprecated use {@link Queries#named} findAll(EntityManager, String, Object[]) instead
    */
   @Deprecated
   public static <A, B> List<A> findAll(EntityManager em, final Function<B, A> toA, final String queryName,
@@ -344,7 +341,7 @@ public final class PersistenceUtil {
    *          the query parameters
    * @param toA
    *          map to the desired result object
-   * @deprecated
+   * @deprecated use {@link Queries#named} findAll(EntityManager, String, Option, Option, Object[]) instead
    */
   @Deprecated
   public static <A, B> List<A> findAll(EntityManager em, final Function<B, A> toA, Option<Integer> offset,
@@ -359,6 +356,8 @@ public final class PersistenceUtil {
 
   /**
    * Create function to persist object <code>a</code> using {@link EntityManager#persist(Object)}.
+   *
+   * @deprecated use {@link Queries#persist(Object)}
    */
   @Deprecated
   public static <A> Function<EntityManager, A> persist(final A a) {
@@ -373,6 +372,8 @@ public final class PersistenceUtil {
 
   /**
    * Create function to merge an object <code>a</code> with the persisten context of the given entity manage.
+   *
+   * @deprecated use {@link Queries#merge(Object)}
    */
   @Deprecated
   public static <A> Function<EntityManager, A> merge(final A a) {
@@ -399,9 +400,9 @@ public final class PersistenceUtil {
     pooledDataSource.setPassword(pwd);
 
     // Set up the persistence properties
-    final Map<String, Object> props = Immutables
-            .<String, Object> map(persistenceProps, tuple("javax.persistence.nonJtaDataSource", pooledDataSource),
-                    tuple("eclipselink.target-database", vendor));
+    final Map<String, Object> props = Immutables.<String, Object> map(persistenceProps,
+            tuple("javax.persistence.nonJtaDataSource", pooledDataSource),
+            tuple("eclipselink.target-database", vendor));
 
     final EntityManagerFactory emf = pp.createEntityManagerFactory(emName, props);
     if (emf == null) {
@@ -418,15 +419,10 @@ public final class PersistenceUtil {
    *          name of the persistence unit (see META-INF/persistence.xml)
    */
   public static EntityManagerFactory newTestEntityManagerFactory(String emName) {
-    return newEntityManagerFactory(
-            emName,
-            "Auto",
-            "org.h2.Driver",
-            "jdbc:h2:./target/db" + System.currentTimeMillis(),
-            "sa",
-            "sa",
-            Immutables.map(tuple("eclipselink.ddl-generation", "create-tables"),
-                    tuple("eclipselink.ddl-generation.output-mode", "database")), testPersistenceProvider());
+    return newEntityManagerFactory(emName, "Auto", "org.h2.Driver", "jdbc:h2:./target/db" + System.currentTimeMillis(),
+            "sa", "sa", Immutables.map(tuple("eclipselink.ddl-generation", "create-tables"),
+                    tuple("eclipselink.ddl-generation.output-mode", "database")),
+            testPersistenceProvider());
   }
 
   /** Create a new persistence provider for unit tests. */
@@ -440,7 +436,7 @@ public final class PersistenceUtil {
    *
    * @param emName
    *          name of the persistence unit (see META-INF/persistence.xml)
-   * @deprecated
+   * @deprecated use {@link PersistenceEnvs#testPersistenceEnv(String)}
    */
   @Deprecated
   public static PersistenceEnv newTestPersistenceEnv(String emName) {

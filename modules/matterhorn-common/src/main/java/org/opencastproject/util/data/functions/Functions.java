@@ -52,7 +52,7 @@ public final class Functions {
   public static <A, B> Fn<A, B> fn(final Function<A, B> f) {
     return new Fn<A, B>() {
       @Override
-      public B ap(A a) {
+      public B apply(A a) {
         return f.apply(a);
       }
     };

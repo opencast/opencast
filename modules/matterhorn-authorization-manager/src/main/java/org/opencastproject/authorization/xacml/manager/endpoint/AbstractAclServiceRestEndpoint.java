@@ -27,6 +27,7 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.authorization.xacml.manager.endpoint.JsonConv.digestManagedAcl;
 import static org.opencastproject.authorization.xacml.manager.endpoint.JsonConv.fullAccessControlList;
 import static org.opencastproject.authorization.xacml.manager.endpoint.JsonConv.nest;
@@ -54,11 +55,10 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.archive.api.Archive;
-import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
-import org.opencastproject.archive.api.Query;
-import org.opencastproject.archive.api.ResultItem;
-import org.opencastproject.archive.base.QueryBuilder;
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.Snapshot;
+import org.opencastproject.assetmanager.api.query.AQueryBuilder;
+import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
@@ -134,11 +134,9 @@ public abstract class AbstractAclServiceRestEndpoint {
 
   protected abstract AuthorizationService getAuthorizationService();
 
-  protected abstract Archive<?> getArchive();
+  protected abstract AssetManager getAssetManager();
 
   protected abstract SeriesService getSeriesService();
-
-  protected abstract HttpMediaPackageElementProvider getHttpMediaPackageElementProvider();
 
   @PUT
   @Path("/series/{transitionId}")
@@ -533,11 +531,11 @@ public abstract class AbstractAclServiceRestEndpoint {
 
   private Either<AccessControlList, Tuple<ManagedAcl, AclScope>> getActiveAclForEpisode(AclService aclService,
           String episodeId) {
-    final Query q = QueryBuilder.query().mediaPackageId(episodeId).onlyLastVersion(true);
-    for (ResultItem sr : mlist(getArchive().find(q, getHttpMediaPackageElementProvider().getUriRewriter()).getItems())
-            .headOpt()) {
+    final AQueryBuilder q = getAssetManager().createQuery();
+    final ASelectQuery sq = q.select(q.snapshot()).where(q.mediaPackageId(episodeId).and(q.version().isLatest()));
+    for (Snapshot snapshot : enrich(sq.run()).getSnapshots().head()) {
       // get active ACL of found media package
-      final Tuple<AccessControlList, AclScope> activeAcl = getAuthorizationService().getActiveAcl(sr.getMediaPackage());
+      final Tuple<AccessControlList, AclScope> activeAcl = getAuthorizationService().getActiveAcl(snapshot.getMediaPackage());
       // find corresponding managed ACL
       for (ManagedAcl macl : matchAcls(aclService, activeAcl.getA())) {
         return right(tuple(macl, activeAcl.getB()));
@@ -641,7 +639,7 @@ public abstract class AbstractAclServiceRestEndpoint {
           @RestResponse(responseCode = SC_OK, description = "The list of ACL's has successfully been returned"),
           @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during returning the list of ACL's") })
   public String getAcls() {
-    return Jsons.arr(mlist(aclService().getAcls()).map(Functions.<ManagedAcl, Jsons.Val> co(JsonConv.fullManagedAcl)))
+    return Jsons.arr(mlist(aclService().getAcls()).map(Functions.co(JsonConv.fullManagedAcl)))
             .toJson();
   }
 

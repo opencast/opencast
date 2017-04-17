@@ -671,7 +671,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
 
   private final Fn<WorkflowOperationDefinition, WorkflowOperationInstance> mkInstanceFn = new Fn<WorkflowOperationDefinition, WorkflowOperationInstance>() {
     @Override
-    public WorkflowOperationInstance ap(WorkflowOperationDefinition wod) {
+    public WorkflowOperationInstance apply(WorkflowOperationDefinition wod) {
       return new WorkflowOperationInstanceImpl(wod, -1);
     }
   };

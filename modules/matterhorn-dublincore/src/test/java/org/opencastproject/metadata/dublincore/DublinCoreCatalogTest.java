@@ -21,12 +21,17 @@
 
 package org.opencastproject.metadata.dublincore;
 
+import static com.entwinemedia.fn.Stream.$;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.opencastproject.util.data.Collections.list;
+import static org.opencastproject.util.data.Collections.map;
+import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.mediapackage.EName;
+import org.opencastproject.mediapackage.XMLCatalogImpl.CatalogEntry;
 import org.opencastproject.util.IoSupport;
 
 import com.entwinemedia.fn.Fn;
@@ -39,9 +44,11 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.XMLConstants;
 
 public class DublinCoreCatalogTest {
   private static final EName PROPERTY_FOO_ID = new EName("http://foo.org/metadata", "id");
@@ -51,7 +58,7 @@ public class DublinCoreCatalogTest {
 
   @Test
   public void testLoadFromFile() throws Exception {
-    final DublinCoreCatalog dc = load(IoSupport.classPathResourceAsFile("/dublincore-extended.xml").get());
+    final DublinCoreCatalog dc = read("/dublincore-extended.xml");
     assertEquals(asList("2007-12-05"), dc.get(DublinCore.PROPERTY_MODIFIED, DublinCore.LANGUAGE_UNDEFINED));
     assertEquals(Opt.<EName>none(), dc.get(DublinCore.PROPERTY_TYPE).get(0).getEncodingScheme());
     assertEquals(2, dc.get(DublinCore.PROPERTY_TITLE).size());
@@ -73,7 +80,7 @@ public class DublinCoreCatalogTest {
 
   @Test
   public void testLoadNonOpencastDublinCore() throws Exception {
-    final DublinCoreCatalog dc = load(IoSupport.classPathResourceAsFile("/dublincore-non-oc.xml").get());
+    final DublinCoreCatalog dc = read("/dublincore-non-oc.xml");
     assertEquals(9, dc.getValuesFlat().size());
     assertEquals(2, dc.get(DublinCore.PROPERTY_TITLE).size());
     assertEquals(
@@ -83,15 +90,15 @@ public class DublinCoreCatalogTest {
 
   @Test
   public void testLoadAndSave() throws Exception {
-    final DublinCoreCatalog dc = load(IoSupport.classPathResourceAsFile("/dublincore-extended.xml").get());
+    final DublinCoreCatalog dc = read("/dublincore-extended.xml");
     final File out = testFolder.newFile("dublincore.xml");
     IoSupport.withResource(new FileOutputStream(out), new FnX<FileOutputStream, Unit>() {
-      @Override public Unit apx(FileOutputStream out) throws Exception {
+      @Override public Unit applyX(FileOutputStream out) throws Exception {
         dc.toXml(out, false);
         return Unit.unit;
       }
     });
-    final DublinCoreCatalog reloaded = load(out);
+    final DublinCoreCatalog reloaded = DublinCoreXmlFormat.read(out);
     assertEquals(
             "The reloaded catalog should have the same amount of properties than the original one.",
             dc.getValues().size(), reloaded.getValues().size());
@@ -99,20 +106,46 @@ public class DublinCoreCatalogTest {
 
   @Test
   public void testLoadDublinCoreNoDefaultNs() throws Exception {
-    final DublinCoreCatalog dc = load(IoSupport.classPathResourceAsFile("/dublincore-no-default-ns.xml").get());
+    final DublinCoreCatalog dc = read("/dublincore-no-default-ns.xml");
     assertEquals(
             "The catalog should contain 4 properties because empty property are not considered.",
             4, dc.getValuesFlat().size());
     assertEquals("Cutting Test 1", dc.getFirst(DublinCore.PROPERTY_TITLE));
   }
 
-  private DublinCoreCatalog load(File catalog) throws Exception {
-    return IoSupport.withResource(
-            new FileInputStream(catalog),
-            new Fn<InputStream, DublinCoreCatalog>() {
-              @Override public DublinCoreCatalog ap(InputStream in) {
-                return DublinCores.read(in);
-              }
-            });
+  @Test
+  public void testSortingOfCatalogEntries() throws Exception {
+    final DublinCoreCatalog dc1 = read("/sorting/dublincore1-1.xml");
+    final DublinCoreCatalog dc2 = read("/sorting/dublincore1-2.xml");
+    assertEquals(dc1.getEntriesSorted(), dc2.getEntriesSorted());
+    // make sure attributes are sorted in the correct order
+    List<Map<EName, String>> attributes = $(dc1.getEntriesSorted())
+        .map(new Fn<CatalogEntry, Map<EName, String>>() {
+          @Override public Map<EName, String> apply(CatalogEntry entry) {
+            return entry.getAttributes();
+          }
+        })
+        .toList();
+    assertEquals("Attribute order", attributes, list(
+        map(),
+        map(tuple(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de")),
+        map(tuple(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de"),
+            tuple(EName.mk(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type"), "string")),
+        map(tuple(EName.mk(XMLConstants.XML_NS_URI, "lang"), "en"),
+            tuple(EName.mk(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type"), "string")),
+        map(),
+        map(),
+        map(),
+        map(tuple(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de"))));
+    assertEquals(dc1.toXmlString(), dc2.toXmlString());
+    //
+    assertEquals(
+        read("/sorting/dublincore2-1.xml").toXmlString().trim(),
+        IoSupport.loadTxtFromClassPath("/sorting/dublincore2-2.xml", this.getClass()).get().trim());
+  }
+
+  /** Read from the classpath. */
+  private DublinCoreCatalog read(String dcFile) throws Exception {
+    return DublinCoreXmlFormat.read(IoSupport.classPathResourceAsFile(dcFile).get());
   }
 }

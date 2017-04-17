@@ -32,7 +32,6 @@ public interface MessageSender extends MessageBrokerConnector {
     Queue, Topic
   };
 
-
   /**
    * Send a message asynchronously with a {@link Serializable} object.
    *

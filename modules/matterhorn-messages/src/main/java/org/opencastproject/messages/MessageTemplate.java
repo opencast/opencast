@@ -20,10 +20,10 @@
  */
 package org.opencastproject.messages;
 
+import static com.entwinemedia.fn.data.json.Jsons.BLANK;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.opencastproject.util.RequireUtil.notEmpty;
 import static org.opencastproject.util.RequireUtil.notNull;
 
@@ -33,8 +33,8 @@ import org.opencastproject.util.EqualsUtil;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.Jsons.Obj;
 
-import com.entwinemedia.fn.data.json.JField;
-import com.entwinemedia.fn.data.json.JObjectWrite;
+import com.entwinemedia.fn.data.json.Field;
+import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
 
 import java.util.ArrayList;
@@ -317,10 +317,10 @@ public class MessageTemplate {
   }
 
   public JValue toJValue() {
-    JObjectWrite creatorObj = j(f("name", vN(creator.getName())), f("username", v(creator.getUsername())),
-            f("email", vN(creator.getEmail())));
+    JObject creatorObj = obj(f("name", v(creator.getName(), BLANK)), f("username", v(creator.getUsername())),
+            f("email", v(creator.getEmail(), BLANK)));
 
-    List<JField> fields = new ArrayList<JField>();
+    List<Field> fields = new ArrayList<>();
     fields.add(f("id", v(id)));
     fields.add(f("name", v(name)));
     fields.add(f("subject", v(getSubject())));
@@ -329,6 +329,6 @@ public class MessageTemplate {
     fields.add(f("hidden", v(hidden)));
     fields.add(f("type", v(type.getType().toString())));
     fields.add(f("creationDate", v(DateTimeSupport.toUTC(creationDate.getTime()))));
-    return j(fields);
+    return obj(fields);
   }
 }

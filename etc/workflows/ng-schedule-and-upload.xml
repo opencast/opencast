@@ -147,7 +147,7 @@
     <!-- Archive the source material -->
 
     <operation
-      id="archive"
+      id="snapshot"
       description="Archive raw recording after ingest">
       <configurations>
         <configuration key="source-tags">archive</configuration>
@@ -177,7 +177,7 @@
     <!-- Archive with previews generated -->
 
     <operation
-      id="archive"
+      id="snapshot"
       description="Archive preview information">
       <configurations>
         <configuration key="source-tags">archive</configuration>
@@ -245,7 +245,7 @@
     <!-- Archive the recording -->
 
     <operation
-      id="archive"
+      id="snapshot"
       if="${straightToPublishing}"
       description="Archive publishing information">
       <configurations>

@@ -39,6 +39,7 @@
     <pax.web.version>4.3.0</pax.web.version>
     <cxf.version>3.1.7</cxf.version>
     <jackson.version>2.7.0</jackson.version>
+    <functional.version>1.4.2</functional.version>
     <jdk.version>1.8</jdk.version>
   </properties>
 
@@ -46,11 +47,11 @@
     <module>modules/matterhorn-admin-ui-ng</module>
     <module>modules/matterhorn-annotation-api</module>
     <module>modules/matterhorn-annotation-impl</module>
-    <module>modules/matterhorn-archive-api</module>
-    <module>modules/matterhorn-archive-base</module>
-    <module>modules/matterhorn-archive-schema</module>
-    <module>modules/matterhorn-archive-storage-fs</module>
-    <module>modules/matterhorn-archive-workflowoperation</module>
+    <module>modules/matterhorn-asset-manager-api</module>
+    <module>modules/matterhorn-asset-manager-impl</module>
+    <module>modules/matterhorn-asset-manager-workflowoperation</module>
+    <module>modules/matterhorn-asset-manager-storage-fs</module>
+    <module>modules/matterhorn-asset-manager-util</module>
     <module>modules/matterhorn-authorization-manager</module>
     <module>modules/matterhorn-authorization-xacml</module>
     <module>modules/matterhorn-caption-api</module>
@@ -1091,6 +1092,20 @@
         <version>1.7.0</version>
       </dependency>
 
+      <!-- Querydsl -->
+      <dependency>
+        <groupId>com.mysema.querydsl</groupId>
+        <artifactId>querydsl-apt</artifactId>
+        <version>3.6.5</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.mysema.querydsl</groupId>
+        <artifactId>querydsl-jpa</artifactId>
+        <version>3.6.5</version>
+      </dependency>
+
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
@@ -1138,7 +1153,7 @@
       <dependency>
         <groupId>com.entwinemedia.common</groupId>
         <artifactId>functional</artifactId>
-        <version>1.1.1</version>
+        <version>${functional.version}</version>
       </dependency>
 
       <dependency>

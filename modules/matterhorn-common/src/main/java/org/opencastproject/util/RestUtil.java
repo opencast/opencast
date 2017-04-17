@@ -19,9 +19,10 @@
  *
  */
 
-
 package org.opencastproject.util;
 
+import static org.opencastproject.util.Jsons.obj;
+import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Tuple.tuple;
@@ -30,12 +31,15 @@ import static org.opencastproject.util.data.functions.Strings.trimToNil;
 
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.rest.ErrorCodeException;
 import org.opencastproject.rest.RestConstants;
+import org.opencastproject.util.Jsons.Obj;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 
 import java.io.File;
@@ -49,6 +53,7 @@ import javax.ws.rs.core.Response;
 
 /** Utility functions for REST endpoints. */
 public final class RestUtil {
+
   private RestUtil() {
   }
 
@@ -183,6 +188,11 @@ public final class RestUtil {
     return mlist();
   }
 
+  public static String generateErrorResponse(ErrorCodeException e) {
+    Obj json = obj(p("error", obj(p("code", e.getErrorCode()), p("message", StringUtils.trimToEmpty(e.getMessage())))));
+    return json.toJson();
+  }
+
   /** Response builder functions. */
   public static final class R {
     private R() {
@@ -299,6 +309,7 @@ public final class RestUtil {
     public static Response conflict(String msg) {
       return Response.status(Response.Status.CONFLICT).entity(msg).build();
     }
+
     /**
      * create a partial file response
      *

@@ -74,7 +74,7 @@ public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapte
   /** The catalog UI adapter configuration */
   private CatalogUIAdapterConfiguration config;
 
-  private Map<String, MetadataField<?>> dublinCoreProperties = new TreeMap<String, MetadataField<?>>();
+  private Map<String, MetadataField<?>> dublinCoreProperties = new TreeMap<>();
   private MediaPackageElementFlavor flavor;
   private String organization;
   private String title;
@@ -82,7 +82,7 @@ public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapte
   private ListProvidersService listProvidersService;
   private Workspace workspace;
 
-  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     config = CatalogUIAdapterConfiguration.loadFromDictionary(properties);
     organization = getCfg(properties, CONF_ORGANIZATION_KEY);
     String flavorString = getCfg(properties, CONF_FLAVOR_KEY);
@@ -99,7 +99,7 @@ public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapte
   @Override
   public DublinCoreMetadataCollection getRawFields() {
     DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
-    Set<String> emptyFields = new TreeSet<String>(dublinCoreProperties.keySet());
+    Set<String> emptyFields = new TreeSet<>(dublinCoreProperties.keySet());
     populateEmptyFields(dublinCoreMetadata, emptyFields);
     return dublinCoreMetadata;
   }
@@ -118,7 +118,7 @@ public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapte
   @Override
   public MetadataCollection getFields(MediaPackage mediapackage) {
     DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
-    Set<String> emptyFields = new TreeSet<String>(dublinCoreProperties.keySet());
+    Set<String> emptyFields = new TreeSet<>(dublinCoreProperties.keySet());
     if (mediapackage != null) {
       for (Catalog catalog : mediapackage.getCatalogs(getFlavor())) {
         getFieldValuesFromCatalog(dublinCoreMetadata, emptyFields, catalog);
@@ -179,6 +179,7 @@ public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapte
     } else {
       catalog = catalogs[0];
       dc = DublinCoreUtil.loadDublinCore(getWorkspace(), catalog);
+      dc.addBindings(config.getXmlNamespaceContext());
       filename = FilenameUtils.getName(catalog.getURI().toString());
     }
 

@@ -10,13 +10,8 @@
           cardinality="1..1" policy="static" bind="setAclDb"/>
   <reference name="authorization-service" interface="org.opencastproject.security.api.AuthorizationService"
           cardinality="1..1" policy="static" bind="setAuthorizationService"/>
-  <reference name="archive" interface="org.opencastproject.archive.api.Archive"
-          cardinality="1..1" policy="dynamic" bind="setArchive"/>
-  <reference name="archive-http-media-package-element-provider"
-          interface="org.opencastproject.archive.api.HttpMediaPackageElementProvider"
-          cardinality="1..1" policy="dynamic" bind="setHttpMediaPackageElementProvider"/>
-  <reference name="search-service" interface="org.opencastproject.search.api.SearchService"
-          cardinality="1..1" policy="static" bind="setSearchService"/>
+  <reference name="asset-manager" interface="org.opencastproject.assetmanager.api.AssetManager"
+          cardinality="1..1" policy="dynamic" bind="setAssetManager"/>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
           cardinality="1..1" policy="static" bind="setSecurityService"/>
   <reference name="series-service" interface="org.opencastproject.series.api.SeriesService"
@@ -25,10 +20,8 @@
     	  cardinality="1..1" policy="static" bind="setTransitionDb" />
   <reference name="workflow-service" interface="org.opencastproject.workflow.api.WorkflowService"
     	  cardinality="1..1" policy="static" bind="setWorkflowService" />
-  <reference name="service-registry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-          cardinality="1..1" policy="static" bind="setServiceRegistry"/>
-  <reference name="distribution-service" interface="org.opencastproject.distribution.api.DistributionService"
-          cardinality="1..1" policy="static" target="(distribution.channel=download)" bind="setDistributionService"/>
+  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+    	  cardinality="1..1" policy="static" bind="setWorkspace" />
   <reference name="message-receiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
           cardinality="1..1" policy="static" bind="setMessageReceiver"/>
   <reference name="message-sender" interface="org.opencastproject.message.broker.api.MessageSender"

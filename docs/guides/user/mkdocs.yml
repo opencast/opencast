@@ -25,6 +25,7 @@ pages:
 - Themes: 'themes.md'
 - Processing: 'processing.md'
 - Video Editor: 'videoeditor.md'
+- Asset Manager: 'asset-manager.md'
 - Search & Filter: 'searchandfilter.md'
 - Configure the UI: 'configure.md'
 - Glossary: 'glossary.md'

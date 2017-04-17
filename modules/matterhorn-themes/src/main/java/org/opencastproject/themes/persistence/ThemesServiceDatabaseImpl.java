@@ -177,7 +177,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       TypedQuery<ThemeDto> q = em.createNamedQuery("Themes.findByOrg", ThemeDto.class).setParameter("org", orgId);
       List<ThemeDto> themeDtos = q.getResultList();
 
-      List<Theme> themes = new ArrayList<Theme>();
+      List<Theme> themes = new ArrayList<>();
       for (ThemeDto themeDto : themeDtos) {
         themes.add(themeDto.toTheme(userDirectoryService));
       }
@@ -388,6 +388,21 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   @Override
   public String getClassName() {
     return ThemesServiceDatabaseImpl.class.getName();
+  }
+
+  @Override
+  public MessageSender getMessageSender() {
+    return messageSender;
+  }
+
+  @Override
+  public SecurityService getSecurityService() {
+    return securityService;
+  }
+
+  @Override
+  public String getSystemUserName() {
+    return SecurityUtil.getSystemUserName(cc);
   }
 
 }

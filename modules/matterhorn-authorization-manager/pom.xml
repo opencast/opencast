@@ -36,12 +36,12 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-archive-api</artifactId>
+      <artifactId>matterhorn-asset-manager-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-search-service-api</artifactId>
+      <artifactId>matterhorn-asset-manager-util</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

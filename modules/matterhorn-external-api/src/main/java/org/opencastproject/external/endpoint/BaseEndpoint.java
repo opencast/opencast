@@ -20,11 +20,10 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.userdirectory.UserIdRoleProvider.getUserIdRole;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
@@ -46,9 +45,10 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import com.entwinemedia.fn.data.json.JField;
+import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JString;
 import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.Jsons;
 import com.entwinemedia.fn.data.json.SimpleSerializer;
 
 import org.apache.commons.lang3.StringUtils;
@@ -130,7 +130,7 @@ public class BaseEndpoint {
       url = v(endpointBaseUrl);
     }
 
-    JValue json = j(f("url", url), f("version", v(ApiVersion.CURRENT_VERSION.toString())));
+    JValue json = obj(f("url", url), f("version", v(ApiVersion.CURRENT_VERSION.toString())));
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
   }
 
@@ -142,8 +142,9 @@ public class BaseEndpoint {
   public Response getUserInfo() {
     final User user = securityService.getUser();
 
-    JValue json = j(f("email", vN(user.getEmail())), f("name", v(user.getName())), f("provider", v(user.getProvider())),
-            f("userrole", v(getUserIdRole(user.getUsername()))), f("username", v(user.getUsername())));
+    JValue json = obj(f("email", v(user.getEmail(), Jsons.BLANK)), f("name", v(user.getName())),
+            f("provider", v(user.getProvider())), f("userrole", v(getUserIdRole(user.getUsername()))),
+            f("username", v(user.getUsername())));
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
   }
 
@@ -160,7 +161,7 @@ public class BaseEndpoint {
       roles.add(v(role.getName()));
     }
 
-    return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(a(roles)));
+    return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(arr(roles)));
   }
 
   @GET
@@ -171,7 +172,7 @@ public class BaseEndpoint {
   public Response getOrganizationInfo() {
     final Organization org = securityService.getOrganization();
 
-    JValue json = j(f("adminRole", v(org.getAdminRole())), f("anonymousRole", v(org.getAnonymousRole())),
+    JValue json = obj(f("adminRole", v(org.getAdminRole())), f("anonymousRole", v(org.getAnonymousRole())),
             f("id", v(org.getId())), f("name", v(org.getName())));
 
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
@@ -185,12 +186,12 @@ public class BaseEndpoint {
   public Response getOrganizationProperties() {
     final Organization org = securityService.getOrganization();
 
-    List<JField> props = new ArrayList<>();
+    List<Field> props = new ArrayList<>();
     for (Entry<String, String> prop : org.getProperties().entrySet()) {
-      props.add(f(prop.getKey(), vN(prop.getValue())));
+      props.add(f(prop.getKey(), v(prop.getValue(), Jsons.BLANK)));
     }
 
-    return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(j(props)));
+    return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(obj(props)));
   }
 
   @GET
@@ -201,7 +202,7 @@ public class BaseEndpoint {
   public Response getVersion() throws Exception {
     List<JValue> versions = new ArrayList<>();
     versions.add(v(ApiVersion.VERSION_1_0_0.toString()));
-    JValue json = j(f("versions", a(versions)), f("default", v(ApiVersion.CURRENT_VERSION.toString())));
+    JValue json = obj(f("versions", arr(versions)), f("default", v(ApiVersion.CURRENT_VERSION.toString())));
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
   }
 
@@ -211,7 +212,7 @@ public class BaseEndpoint {
   @RestQuery(name = "getversiondefault", description = "Returns the default version.", returnDescription = "", reponses = {
           @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getVersionDefault() throws Exception {
-    JValue json = j(f("default", v(ApiVersion.CURRENT_VERSION.toString())));
+    JValue json = obj(f("default", v(ApiVersion.CURRENT_VERSION.toString())));
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
   }
 

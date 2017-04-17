@@ -18,8 +18,6 @@
  * the License.
  *
  */
-
-
 package org.opencastproject.workflow.handler.workflow;
 
 import org.opencastproject.job.api.JobContext;

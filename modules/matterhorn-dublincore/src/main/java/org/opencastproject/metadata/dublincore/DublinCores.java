@@ -21,6 +21,9 @@
 
 package org.opencastproject.metadata.dublincore;
 
+import static java.util.UUID.randomUUID;
+import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
+import static org.opencastproject.mediapackage.XMLCatalogImpl.XSI_NS_PREFIX;
 import static org.opencastproject.metadata.dublincore.DublinCore.ELEMENTS_1_1_NS_PREFIX;
 import static org.opencastproject.metadata.dublincore.DublinCore.ELEMENTS_1_1_NS_URI;
 import static org.opencastproject.metadata.dublincore.DublinCore.TERMS_NS_PREFIX;
@@ -40,7 +43,6 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.UUID;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -144,7 +146,7 @@ public final class DublinCores {
   @Nonnull
   public static Episode mkOpencastEpisode(Opt<String> id) {
     final Episode dc = mkOpencastEpisode();
-    dc.setDcIdentifier(id.or(UUID.randomUUID().toString()));
+    dc.setDcIdentifier(id.getOr(randomUUID().toString()));
     return dc;
   }
 
@@ -163,6 +165,15 @@ public final class DublinCores {
     final Episode dc = mkOpencastEpisode(id);
     dc.setIsPartOf(seriesId);
     return dc;
+  }
+
+  /**
+   * Create an Opencast episode DublinCore accessor for a {@link DublinCoreCatalog}.
+   * Read and write operations access and modify the wrapped catalog.
+   */
+  @Nonnull
+  public static Episode mkOpencastEpisode(DublinCoreCatalog dc) {
+    return new Episode(dc);
   }
 
   /**
@@ -193,6 +204,15 @@ public final class DublinCores {
     final Series dc = mkOpencastSeries();
     dc.setDcIdentifier(id);
     return dc;
+  }
+
+  /**
+   * Create an Opencast series DublinCore accessor for a {@link DublinCoreCatalog}.
+   * Read and write operations access and modify the wrapped catalog.
+   */
+  @Nonnull
+  public static Series mkOpencastSeries(DublinCoreCatalog dc) {
+    return new Series(dc);
   }
 
   /**
@@ -250,15 +270,15 @@ public final class DublinCores {
   }
 
   private static DublinCoreCatalog mkOpencast(MediaPackageElementFlavor flavor) {
-    final DublinCoreCatalog dc = new DublinCoreCatalog();
+    final DublinCoreCatalog dc = mkStandard();
     dc.setFlavor(flavor);
     dc.addBindings(XmlNamespaceContext.mk(
-        XmlNamespaceBinding.mk(ELEMENTS_1_1_NS_PREFIX, ELEMENTS_1_1_NS_URI),
-        XmlNamespaceBinding.mk(TERMS_NS_PREFIX, TERMS_NS_URI),
-        // Opencast property namespace
-        XmlNamespaceBinding.mk(OC_PROPERTY_NS_PREFIX, OC_PROPERTY_NS_URI),
-        // Opencast root tag
-        XmlNamespaceBinding.mk(XMLConstants.DEFAULT_NS_PREFIX, OC_DC_CATALOG_NS_URI)));
+            // Opencast property namespace
+            XmlNamespaceBinding.mk(OC_PROPERTY_NS_PREFIX, OC_PROPERTY_NS_URI),
+            // Opencast root tag
+            XmlNamespaceBinding.mk(XMLConstants.DEFAULT_NS_PREFIX, OC_DC_CATALOG_NS_URI)));
+            //XMLSchema-instance namespace xsi
+            XmlNamespaceBinding.mk(XSI_NS_PREFIX, W3C_XML_SCHEMA_INSTANCE_NS_URI);
     dc.setRootTag(OC_DC_CATALOG_ROOT_ELEMENT);
     return dc;
   }

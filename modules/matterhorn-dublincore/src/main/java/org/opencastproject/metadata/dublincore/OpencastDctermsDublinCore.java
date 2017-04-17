@@ -588,7 +588,7 @@ public abstract class OpencastDctermsDublinCore {
   }
 
   private final Fn<String, DublinCoreValue> mkValue = new Fn<String, DublinCoreValue>() {
-    @Override public DublinCoreValue ap(String v) {
+    @Override public DublinCoreValue apply(String v) {
       return DublinCoreValue.mk(v);
     }
   };

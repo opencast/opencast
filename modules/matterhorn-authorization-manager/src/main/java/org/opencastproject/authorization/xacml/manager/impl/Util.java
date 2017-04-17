@@ -26,10 +26,8 @@ import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 import static org.opencastproject.workflow.api.ConfiguredWorkflowRef.workflow;
 
-import org.opencastproject.archive.api.ResultItem;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
@@ -75,13 +73,6 @@ public final class Util {
     @Override
     public AccessControlList apply(ManagedAcl managedAcl) {
       return managedAcl.getAcl();
-    }
-  };
-
-  public static final Function<ResultItem, MediaPackage> getArchiveMp = new Function<ResultItem, MediaPackage>() {
-    @Override
-    public MediaPackage apply(ResultItem item) {
-      return item.getMediaPackage();
     }
   };
 
