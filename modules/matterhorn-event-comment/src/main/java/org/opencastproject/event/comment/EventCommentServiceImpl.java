@@ -74,6 +74,17 @@ public class EventCommentServiceImpl implements EventCommentService {
   }
 
   @Override
+  public void deleteComments(String eventId) throws NotFoundException, EventCommentException {
+    try {
+      eventCommentDatabaseService.deleteComments(eventId);
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new EventCommentException(e);
+    }
+  }
+
+  @Override
   public EventComment updateComment(EventComment comment) throws EventCommentException {
     try {
       return eventCommentDatabaseService.updateComment(comment);

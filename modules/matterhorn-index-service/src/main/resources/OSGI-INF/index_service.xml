@@ -34,6 +34,11 @@
              policy="dynamic"
              bind="addCatalogUIAdapter"
              unbind="removeCatalogUIAdapter" />
+  <reference name="EventCommentService"
+             interface="org.opencastproject.event.comment.EventCommentService"
+             cardinality="1..1"
+             policy="static"
+             bind="setEventCommentService"/>
   <reference name="httpMediaPackageElementProvider"
              interface="org.opencastproject.archive.api.HttpMediaPackageElementProvider"
              cardinality="1..1"
