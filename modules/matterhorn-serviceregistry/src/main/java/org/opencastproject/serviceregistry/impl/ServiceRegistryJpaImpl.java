@@ -801,6 +801,16 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
   }
 
+  /**
+   * OSGI callback when the configuration is updated. This method is only here to prevent the
+   * configuration admin service from calling the service deactivate and activate methods
+   * for a config update. It does not have to do anything as the updates are handled by updated().
+   */
+  public void modified(Map<String, Object> config)
+     throws ConfigurationException {
+    logger.debug("Modified serviceregistry");
+  }
+
   private JpaJob getJpaJob(long id) throws NotFoundException, ServiceRegistryException {
     EntityManager em = null;
     try {
