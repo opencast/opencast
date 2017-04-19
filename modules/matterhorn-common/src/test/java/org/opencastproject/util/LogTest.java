@@ -48,6 +48,8 @@ public class LogTest {
     log.info("hello a {} {}", 100, "times");
     log.info("Decent number formatting looks like this: %.4f", 1970.114284121232);
     log.info("Oh, an exception! {}", new RuntimeException("Panic!"));
+    log.info(null);
+    log.info(null, "Args get lost");
   }
 
   @Test
