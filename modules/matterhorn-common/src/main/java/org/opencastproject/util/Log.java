@@ -219,7 +219,7 @@ public final class Log {
 
   private static String convertCurlyBraces(String format) {
     if (format == null)
-      return "(null format)";
+      return "(null message)";
 
     return format.replaceAll("\\{\\}", "%s");
   }
