@@ -1004,12 +1004,18 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       @Override
       public WorkflowInstance apx(Long workflowInstanceId) throws Exception {
         WorkflowInstanceImpl instance = getWorkflowById(workflowInstanceId);
-        instance.setState(STOPPED);
 
-        // Update the workflow instance
-        update(instance);
+        if (instance.getState() != STOPPED) {
+          // Update the workflow instance
+          instance.setState(STOPPED);
+          update(instance);
+        }
 
-        removeTempFiles(instance);
+        try {
+          removeTempFiles(instance);
+        } catch (Exception e) {
+          logger.warn("Cannot remove temp files for workflow instance {}: {}", workflowInstanceId, e.getMessage());
+        }
 
         return instance;
       }
@@ -1358,7 +1364,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
               job.setStatus(Status.RUNNING);
               break;
             case STOPPED:
-              job.setStatus(Status.DELETED);
+              job.setStatus(Status.CANCELED);
               break;
             case SUCCEEDED:
               job.setStatus(Status.FINISHED);
