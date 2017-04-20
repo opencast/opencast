@@ -14,15 +14,15 @@ Docker is available for multiple Linux distributions. Please have a look at the 
 documentation](https://docs.docker.com/engine/installation/) for the latest installation instructions. Note that it
 might be necessary to install [`docker-compose`](https://docs.docker.com/compose/install/) separately.
 
-## Start with `docker-compose`
+## Start with docker-compose
 
 Opencast is packaged into multiple distributions. There is a separate Docker image for each distribution. Simple
 installations can use the all-in-one distribution.
 
-Opencast requires a database connection and, since version 2, Apache ActiveMQ. We currently support H2 or MySQL/MariaDB
-databases. The Docker Hub repository has official Docker images for MySQL and MariaDB. H2 is already integrated into
-Opencast so that no database container is needed. There are multiple 3rd-party Docker images for ActiveMQ; this guide
-uses `webcenter/activemq`.
+Opencast requires a database and a message broker (Apache ActiveMQ). We currently support H2 or MySQL/MariaDB databases.
+The Docker Hub repository has official Docker images for MySQL and MariaDB. H2 is already integrated into Opencast so
+that no database container is needed. There are multiple 3rd-party Docker images for ActiveMQ; this guide uses
+`webcenter/activemq`.
 
 `docker-compose` can be used to configure, start and connect all services automatically. The [opencast-docker
 repository](https://github.com/opencast/opencast-docker/tree/master/docker-compose) contains multiple configuration
