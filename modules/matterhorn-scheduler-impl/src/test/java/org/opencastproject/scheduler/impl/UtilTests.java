@@ -116,6 +116,7 @@ public class UtilTests {
       logger.info(p.toString());
     }
     assertEquals(5, periods.size());
+    TimeZone.setDefault(cet);
     for (Period d : periods) {
       DateTime dEnd = d.getEnd();
 

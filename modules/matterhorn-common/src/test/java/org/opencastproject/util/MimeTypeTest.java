@@ -37,7 +37,7 @@ public class MimeTypeTest {
   @Test
   public void testMimeTypesFromSuffix() throws Exception {
     assertTrue(MimeTypes.fromSuffix("xml").eq(mimeType("text", "xml")));
-    assertTrue(MimeTypes.fromSuffix("avi").eq(mimeType("video", "msvideo")));
+    assertTrue(MimeTypes.fromSuffix("mkv").eq(mimeType("video", "x-matroska")));
   }
 
   @Test

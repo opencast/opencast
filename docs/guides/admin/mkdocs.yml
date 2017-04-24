@@ -27,6 +27,8 @@ pages:
    - Installation from Package (RPM):
       - Fedora: 'installation/rpm-fedora.md'
       - RHEL/CentOS: 'installation/rpm-rhel-sl-centos.md'
+   - Installation with Docker:
+      - Testing Locally: 'installation/docker-local.md'
 - Configuration:
    - Overview: 'configuration/index.md'
    - Basic: 'configuration/basic.md'

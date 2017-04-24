@@ -1,7 +1,7 @@
 Install from Repository (RedHat Enterprise Linux, CentOS, Scientific Linux)
 ===========================================================================
 
-There is an RPM software repository available for RedHat-based Linux distributions provided by the University of
+There is an RPM software repository available for Red Hat-based Linux distributions provided by the University of
 Osnabrück. This repository provides preconfigured Opencast installations, including all 3rd-Party-Tools. Using this
 method, you do not have to compile the software by yourself.
 
@@ -20,7 +20,7 @@ Currently Supported
 -------------------
 
  - CentOS 7.x (x86\_64)
- - RedHat Enterprise Linux 7.x (x86\_64)
+ - Red Hat Enterprise Linux 7.x (x86\_64)
  - Scientific Linux 7.x (x86\_64)
 
 > *Other architectures like i386, i686, arm, … are not supported!*
@@ -53,9 +53,12 @@ First you have to install the necessary repositories so that your package manage
     repository. Until then, you can use `.../opencast-testing.repo` instead to get the latest version. Note that the
     testing repository is an additional repository and still requires the stable repository to be active.
 
-2. Add EPEL repository:
+2. Add the Extra Packages for Enterprise Linux (EPEL) repository:
 
         yum install epel-release
+
+    If this package is not available, please enable this repository manually. For that, follow the [instructions in the
+    EPEL documentation](https://fedoraproject.org/wiki/EPEL#How_can_I_use_these_extra_packages.3F).
 
 
 Install Apache ActiveMQ

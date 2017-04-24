@@ -35,6 +35,7 @@
                interface="org.opencastproject.distribution.api.DownloadDistributionService"
                cardinality="1..1"
                policy="static"
+               target="(distribution.channel=download)"
                bind="setDownloadDistributionService" />
     <reference name="streamingDistributionService"
                interface="org.opencastproject.distribution.api.DistributionService"
