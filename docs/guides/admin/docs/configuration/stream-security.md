@@ -34,7 +34,7 @@ Configuration of Signing Providers
 
 The GenericUrlSigningProvider that comes with Opencast has its own configuration file:
 
-    etc/org.opencastproject.security.urlsigning.provider.impl.GenericUrlSigningProvider.properties
+    etc/org.opencastproject.security.urlsigning.provider.impl.GenericUrlSigningProvider.cfg
 
 All signing providers follow the same configuration structure and support multiple configuration blocks, providing the
 settings for separate distributions (i.e. download or streaming servers, services or paths).
@@ -83,11 +83,11 @@ The signed URLs can also be configured to restrict access to the user’s IP add
 
 Overview of configuration files for services that are able to automatically sign URLs on behalf of users:
 
-|URLs That Are Signed     |Configuration File Name                                                           |
-|-------------------------|----------------------------------------------------------------------------------|
-|Video player content     | org.opencastproject.security.urlsigning.SigningMediaPackageSerializer.properties |
-|Admin UI links           | org.opencastproject.adminui.endpoint.OsgiEventEndpoint.properties                |
-|Preview and editor files | org.opencastproject.adminui.endpoint.ToolsEndpoint.properties                    |
+|URLs That Are Signed     |Configuration File Name                                                    |
+|-------------------------|---------------------------------------------------------------------------|
+|Video player content     | org.opencastproject.security.urlsigning.SigningMediaPackageSerializer.cfg |
+|Admin UI links           | org.opencastproject.adminui.endpoint.OsgiEventEndpoint.cfg                |
+|Preview and editor files | org.opencastproject.adminui.endpoint.ToolsEndpoint.cfg                    |
 
 The URLs will be signed by the first signing provider that will accept the URL’s path based upon the signing provider’s
 configuration. This makes it flexible to support many different scenarios. For example, we could configure the signing
@@ -146,7 +146,7 @@ Two things need to be configured for the Opencast verification filter:
 
 The configuration is located at:
 
-    etc/org.opencastproject.security.urlsigning.verifier.impl.UrlSigningVerifierImpl.properties
+    etc/org.opencastproject.security.urlsigning.verifier.impl.UrlSigningVerifierImpl.cfg
 
 First of all, the key pairs used to sign must be configured in order to allow the filter to verify the signatures. More
 than one key pair can be defined by increasing the counter (1, 2, 3, ...) in steps of 1. If you miss any numbers it will
@@ -164,7 +164,7 @@ The entries in this file need to have the same values for the signing providers 
 
 The second step is to configure the filter defining the endpoints to be protected. The configuration file is located at:
 
-    etc/org.opencastproject.security.urlsigning.filter.UrlSigningFilter.properties
+    etc/org.opencastproject.security.urlsigning.filter.UrlSigningFilter.cfg
 
 The configuration defaults to a set of regular expressions which match all of the endpoints that serve files, and avoid
 protecting endpoints that only serve data. Therefore, the remaining step is enabling the filter by setting the property
