@@ -16,6 +16,52 @@ therefore will be lost!*
 Note that Crowdin managers take care of uploading the English sources (and possibly translations) to Crowdin and download the
 others translations from Crowdin.
 
+I would like Opencast to support my language. Is this possible?
+===============================================================
+
+Yes, absolutely! If you are willing to take the effort to provide the translation, we are happy to include your
+favorite language in Opencast!
+
+How can I provide a language translation?
+=========================================
+
+We use the [Crowdin Localization Management Platform](https://crowdin.com/project/opencast-matterhorn) - an easy to
+use web service for localization management. To provide a language translation, please perform the following steps:
+
+1. Create a free account on [Crowdin](https://crowdin.com)
+2. Visit the [Opencast project](https://crowdin.com/project/opencast-matterhorn) on Crowdin and issue a join request
+3. Translate Opencast on Crowdin
+
+Once the translation reaches at least 90% (prefarable 100%), please read the section about include and exclusion
+of translations just below.
+
+In case you have questions, we are happy to answer them on the Opencast Users mailing list.
+
+Inclusion and Exclusion of Translations
+=======================================
+
+Opencast supports a number of languages right out-of-the-box. Please find the criteria for inclusion and exlusion of
+language translations in Opencast releases below:
+
+1.  A not yet supported translation is included into the next major release if it is translated at least 90% at the
+    time when the release branch is cut. The release managers will take the review if no other reviewer can be found.
+
+2.  A not yet supported translation may be included in the current release branch anytime if it is translated to 100%
+    and a reviewer is found. It will then be part of the next minor release and major release if feasible
+
+3.  An endangered translation is a supported translation that is translated less than 80% at the time when the release
+    branch of the next major release is cut. The release managers will publish a list of endangered languages if any
+
+4.  An endangered translation will be removed with the next major release if it is not saved. The release managers take
+    care of the removal in case no other person will
+
+5.  An endangered translation may be saved by reaching at least 90% translated until at least two weeks before the
+    release date of the next major release and a reviewer is found
+
+Note that [Crowdin](https://crowdin.com/project/opencast-matterhorn) is displaying the percentage translated for 
+each language. It is the percentages shown on that page that act as reference.
+Considering the dates when releases branch are cut, the respective releases schedules act as reference.
+
 Crowdin Managers
 ================
 

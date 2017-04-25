@@ -104,6 +104,57 @@ At this point, the developer community should then be notified. Consider using t
     during the public QA phase.  Please report any bugs or issues you encounter.
 
 
+### Check Status of Language Translations
+
+On the date when the release branch is cut, the release manager is responsible to check whether there are language
+translations that need to be included or excluded for the upcoming release.
+Have a look at [Inclusion and Exclusion of Languages](localization.md) for the criteria.
+
+1. Check whether translations not yet included in Opencast meet the inclusion criteria (candidates for includsion)
+2. Check whether translations included in Opencast meet the exclusion criteria (endangered translations)
+3. Publish an announcement on the Opencast Users list that specifies:
+    a. Translations that will be included in the upcoming release
+    b. Endangered translations
+
+Consider using the following as a template E-mail:
+
+    To: matterhorn@opencast.org
+    Subject: Opencast <VERSION>: Status of Translations
+
+    Hi everyone,
+    
+    Please let me inform you about the current state of language support in the upcoming Opencast <VERSION> release.
+
+    <if candidate for inclusion found>
+    We are happy to announce that the translations of the following languages meet the inclusion criteria and will
+    therefore be included in Opencast <VERSION>>:
+
+    - language 1
+    - language 2
+    - ...
+    <end>
+
+    <if there are endangered translations>
+    IMPORTANT:
+    The following translations, unfortunately, do not meet our quality expectations anymore and are hereby declared
+    endangered translations. Those translations will be removed unless the community takes action to save them:
+
+    - language 1
+    - language 2
+    - ...
+
+    To save an endangered translation, it needs to be translated at least 90% until <Release date - 2 weeks>.
+    <else>
+    We are happy to announce that all translations meet the quality criteria and will be included in the upcoming
+    release.
+    <end>
+
+    Note that the criteria for inclusion and exclusion of languages in Opencast can be found at: tbd
+
+    Sincerly,
+    Your Opencast <VERSION> Release Manager
+
+
 ### Adjust Pull Request Filter
 
 The [Opencast pull request filter](http://pullrequests.opencast.org) links the versions currently in development. The
