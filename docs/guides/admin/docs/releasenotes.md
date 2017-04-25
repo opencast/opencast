@@ -1,7 +1,7 @@
-Opencast NEXT: Release Notes
+Opencast 3.0: Release Notes
 ============================
 
-Opencast NEXT has been streamlined to better address Adopters' needs when it comes to their processes. This means
+Opencast 3.0 has been streamlined to better address Adopters' needs when it comes to their processes. This means
 the user experience and the efficiency of users performing their tasks have been significantly enhanced.
 Other major improvements are new features for the Opencast Player and even more flexibiity when it comes to the
 integration of Opencast into external authentication and authorization systems.
@@ -17,16 +17,16 @@ New Features and Improvements
   - **Streamlined Keyboard Accessibility** - The introduction of keyboard shortcuts and vastly improved support for
     tab navigation across the administrative UI allow users to more efficiently interact with Opencast.
 
-  - **Streamlining Continued** - The user experience has been approved and streamlined at many other locations. For
+  - **Improved User Experience** - The user experience has been approved and streamlined at many other locations. For
     example, the user is presented configurable defaults for the input masks used to schedule recordings. The capture
-    agent status is now additional indicated by using traffic-light style colors. The event counter filters have been
-    reordered to match the life cycly of recordings. Series dropdowns are now sorted alphabetically. The access policy
-    page now supports search and filtering.
+    agent status is now additional indicated colors. The event counter filters have been reordered to match the life
+    cycly of recordings. Series dropdowns are now sorted alphabetically. The access policy page now supports search and
+    filtering.
   
-  - **Opencast Player**
-    - **Piwik Integration** - The Opencast video player now comes with out-of-the-box Piwik support so that user
-    statistics for the player can be easiliy gathered and visualized by Piwik
-    - **Caption Support** - The Opencast video player now supports captions
+  - **Piwik Integration** - The Opencast video player now comes with out-of-the-box Piwik support so that user
+    statistics for the player can be easily gathered and visualized
+
+  - **Caption Support** - The Opencast video player now supports captions
 
   - **Users and roles** - The management of users and roles has been significantly improved to better support
     intergration of third-party user providers (e.g. LDAP, Sakai). The administrative user interface has been 
@@ -47,7 +47,7 @@ New Features and Improvements
 
   - **AWS S3 Support** - Opencast now supports distribution to Amazon S3
 
-  - **Extended Themes** - The themes facility that allows Producer to let Opencast brand their produced video content
+  - **Extended Themes** - The themes facility that allows producers to let Opencast brand their produced video content
     using intro and outro videos has been extended to support title slides (metadata within video content) and
     watermarks.
   
@@ -62,17 +62,20 @@ New Features and Improvements
     - **WOH send-mail** is a powerful E-mail notification facility that allows workflows to send E-mail containing
       detailed data about media packages and processing incidents
   - **Improved Workflow Operation Handlers**
-    - **WOH analyze-trackes** now allows workflow operations to be conditionally executed based on video resolution
+    - **WOH analyze-tracks** now allows workflow operations to be conditionally executed based on video resolution
       and aspect ratio critera
     - **WOH composite** can now be configured to take the input resolution as output resolution which makes it
       fully capable of generating Picture-in-Picture (PiP) outputs
-    - **WOH waveform** takes advantage of the new waveform generation service and support more configuration options
     - **And Even More** A lot of minor improvements have been added to other worfklow operation handlers.
 
   - **New Waveform Service** - Waveform generation has been completely rewritten and implemented as an independet
      service. It is now faster and more flexible.
 
-  - **REST Documentation** - The REST endpoint documentation interface comes with a new look and feel.
+  - **REST Documentation** - The REST endpoint documentation interface comes with a new look & feel and search
+    capabilities
+
+  - **Capture Agent API** - The capture agent API supports a new error state that can be set by capture agents
+    to indicate errors. Note that the API is, of course, backwards compatible.
 
   - **Migration Aid** - The Ingest REST endpoint has been extended to offer functionality required when migrating
     data from older Opencast versions. A workflow specifically designed for data migration has been added.
@@ -81,9 +84,7 @@ New Features and Improvements
     been updated to version 4.0.8
 
 
-
 - Database connection pooling (SPS: Too detailed for my taste)
-- Capture agent error state (SPS: Too detailed for my taste)
 
 
 Configuration Changes
