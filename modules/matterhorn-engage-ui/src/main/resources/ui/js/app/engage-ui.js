@@ -85,7 +85,10 @@ function($, bootbox, _, alertify) {
         }
 
         function getDefaultLanguage(language) {
-            switch (language) {
+            var lang = language.substring(0, language.indexOf("-"));
+	    if (!lang || lang.length <= 0) lang = language;
+
+            switch (lang) {
                 case "en":
                     return "en-US";
                 case "de":
@@ -125,10 +128,10 @@ function($, bootbox, _, alertify) {
             }
         }
 
-        function loadAndTranslate(callbackFunction) {
+        function loadAndTranslate(callbackFunction, lang) {
             log("loadAndTranslate");
 
-            var lang = detectLanguage();
+            if (!lang) lang = detectLanguage();
             var selectedLanguage = lang;
             if (getDefaultLanguage(lang) !== null) {
                 selectedLanguage = getDefaultLanguage(lang);
@@ -138,15 +141,14 @@ function($, bootbox, _, alertify) {
             log("Detected Language: " + selectedLanguage);
 
             var template;
-            var templateData;
 
             // load template
-            var templateRequest = $.ajax({
+            $.ajax({
                 url: window.location.origin + "/engage/ui/template/desktop.html",
-                dataType: "html",
+                dataType: "html"
             }).fail(function() {
-                console.error("Something went wrong while loading template.")
-                $("body").append("Error loading template.")
+                console.error("Something went wrong while loading template.");
+                $("body").append("Error loading template.");
             }).done(function(tData) {
                 // set template data
                 template = _.template(tData);
@@ -156,16 +158,9 @@ function($, bootbox, _, alertify) {
                     url: jsonstr,
                     dataType: "json"
                 }).fail(function() {
-                    console.warn("Failed to load language data. Try to load alternative.");
+                    console.warn("Failed to load language data for " + selectedLanguage + ". Try to load alternative.");
                     // load default en-US
-                    $.ajax({
-                        url: window.location.origin + "/engage/ui/language/en-US.json",
-                        dataType: "json"
-                    }).fail(function() {
-                        console.error("Could not load default language data.");
-                    }).done(function(data) {
-                        setTemplateAndVariables(data, template);
-                    });
+                    loadAndTranslate(callbackFunction, "en-US");
 
                 }).done(function(data) {
                     log("Append template and set variables.");

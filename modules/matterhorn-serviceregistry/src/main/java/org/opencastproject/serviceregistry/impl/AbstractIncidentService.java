@@ -137,6 +137,9 @@ public abstract class AbstractIncidentService implements IncidentService {
         }
       }
       return new IncidentTreeImpl(incidents, childIncidents);
+    } catch (NotFoundException ignore) {
+      // Workflow deleted
+      return new IncidentTreeImpl(incidents, childIncidents);
     } catch (Exception e) {
       logger.error("Error loading child jobs of {}: {}", jobId);
       throw new IncidentServiceException(e);

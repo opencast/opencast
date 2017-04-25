@@ -38,6 +38,7 @@ import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentException;
 import org.opencastproject.event.comment.EventCommentParser;
+import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
@@ -186,6 +187,7 @@ public class IndexServiceImpl implements IndexService {
   private AclServiceFactory aclServiceFactory;
   private AuthorizationService authorizationService;
   private CaptureAgentStateService captureAgentStateService;
+  private EventCommentService eventCommentService;
   private IngestService ingestService;
   private AssetManager assetManager;
   private SchedulerService schedulerService;
@@ -212,6 +214,11 @@ public class IndexServiceImpl implements IndexService {
   /** OSGi DI. */
   public void setCaptureAgentStateService(CaptureAgentStateService captureAgentStateService) {
     this.captureAgentStateService = captureAgentStateService;
+  }
+
+  /** OSGi callback for the event comment service. */
+  public void setEventCommentService(EventCommentService eventCommentService) {
+    this.eventCommentService = eventCommentService;
   }
 
   /** OSGi callback to add the event dublincore {@link EventCatalogUIAdapter} instance. */
@@ -737,7 +744,6 @@ public class IndexServiceImpl implements IndexService {
    * @return a list of scheduling periods
    */
   protected List<Period> calculatePeriods(Date start, Date end, long duration, RRule rRule, TimeZone tz) {
-    final TimeZone timeZone = TimeZone.getDefault();
     final TimeZone utc = TimeZone.getTimeZone("UTC");
     TimeZone.setDefault(tz);
     DateTime seed = new DateTime(start);
@@ -775,7 +781,7 @@ public class IndexServiceImpl implements IndexService {
       periods.add(new Period(new DateTime(cDate.getTime()), new DateTime(cDate.getTimeInMillis() + duration)));
     }
 
-    TimeZone.setDefault(timeZone);
+    TimeZone.setDefault(null);
     return periods;
   }
 
@@ -1188,6 +1194,12 @@ public class IndexServiceImpl implements IndexService {
 
     if (unauthorizedScheduler || unauthorizedWorkflow || unauthorizedArchive)
       throw new UnauthorizedException("Not authorized to remove event id " + id);
+
+    try {
+      eventCommentService.deleteComments(id);
+    } catch (EventCommentException e) {
+      logger.error("Unable to remove comments for event '{}': {}", id, getStackTrace(e));
+    }
 
     return removedScheduler && removedWorkflow && removedArchive;
   }

@@ -21,7 +21,10 @@
 package org.opencastproject.serviceregistry.impl.jpa;
 
 import static org.junit.Assert.assertEquals;
+import static org.opencastproject.job.api.Job.Status.DISPATCHING;
 
+import org.opencastproject.job.api.Job;
+import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.job.jpa.JpaJob;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
@@ -121,5 +124,14 @@ public class ServiceRegistrationJpaImplTest {
     assertEquals(0, statistic.size());
 
   }
+
+ @Test
+ public void testToString() throws Exception {
+   Job newJob = new JobImpl(3L, "test", "test_org", 0L, "simple", "do", null, DISPATCHING, "localhost",
+           "remotehost", null, null, null, 100L, 200L, "result", 3L, 1L, true, null, 1.5F, null, 4L);
+   JpaJob jpaJob = JpaJob.from(newJob);
+   String jobString = "Job {id:3, operation:do, status:DISPATCHING}";
+   assertEquals(jpaJob.toString(), jobString);
+ }
 
 }

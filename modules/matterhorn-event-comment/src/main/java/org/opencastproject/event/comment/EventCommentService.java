@@ -71,6 +71,18 @@ public interface EventCommentService {
   void deleteComment(long commentId) throws NotFoundException, EventCommentException;
 
   /**
+   * Delete all comments from an event.
+   * @param eventId
+   *          The id of the event to get the comments for (mediapackage id).
+   *
+   * @throws NotFoundException
+   *           Thrown if cannot find the event
+   * @throws EventCommentException
+   *           Thrown if there is a problem deleting the comments.
+   */
+  void deleteComments(String eventId) throws NotFoundException, EventCommentException;
+
+  /**
    * Update a comment.
    * @param comment
    *          The new comment status to update to.

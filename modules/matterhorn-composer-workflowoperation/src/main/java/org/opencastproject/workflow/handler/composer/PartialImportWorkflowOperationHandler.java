@@ -50,7 +50,6 @@ import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.VCell;
@@ -948,7 +947,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
       } else {
         SMILMediaElement e = (SMILMediaElement) item;
         if (mediaType.equals(e.getNodeName())) {
-          Track track = getFromOriginal(e.getSrc(), originalTracks, type);
+          Track track = getFromOriginal(e.getId(), originalTracks, type);
           double beginInSeconds = e.getBegin().item(0).getResolvedOffset();
           long beginInMs = Math.round(beginInSeconds * 1000d);
           // Fill out gaps with first or last frame from video
@@ -989,10 +988,9 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     return position;
   }
 
-  private Track getFromOriginal(String src, List<Track> originalTracks, VCell<String> type) {
-    String uri = PathSupport.toSafeName(FilenameUtils.getName(src));
+  private Track getFromOriginal(String trackId, List<Track> originalTracks, VCell<String> type) {
     for (Track t : originalTracks) {
-      if (t.getURI().toString().contains(uri)) {
+      if (t.getURI().toString().contains(trackId)) {
         if (EMPTY_VALUE.equals(type.get())) {
           String suffix = (t.hasAudio() && !t.hasVideo()) ? FLAVOR_AUDIO_SUFFIX : "";
           type.set(t.getFlavor().getType() + suffix);
@@ -1001,7 +999,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
         return t;
       }
     }
-    throw new IllegalStateException("No track matching smil src: " + src);
+    throw new IllegalStateException("No track matching smil Track-id: " + trackId);
   }
 
   private Track getSilentAudio(final double time, final List<MediaPackageElement> elementsToClean,

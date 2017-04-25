@@ -50,12 +50,12 @@ building Opencast.
 There is a preconfigured Docker image for a Nexus server set-up for Opencast. To run an Opencast Nexus using Docker,
 follow these steps:
 
-    docker pull lkiesow/opencast-nexus-oss
+    docker pull opencast/opencast-nexus-oss
     docker run \
        --name opencast-nexus-oss \
        -p 8081:8081 \
       -v /place/for/nexus/data/on/host/machine:/var/lib/nexus-oss \
-      lkiesow/opencast-nexus-oss
+      opencast/opencast-nexus-oss
 
 - The `-p` option will map the internal port of the Nexus server in Docker to the port on the host machine.
 - The `-v` option will mount the folder `/place/for/nexus/data` from the Docker host machine to `/var/lib/nexus-oss`
@@ -72,12 +72,12 @@ If you followed the set-up guide above, the main configuration, along with all t
 machine. Hence we just need to get the latest Docker image and replace the Nexus container:
 
     docker rm -f opencast-nexus-oss
-    docker pull lkiesow/opencast-nexus-oss
+    docker pull opencast/opencast-nexus-oss
     docker run \
        --name opencast-nexus-oss \
        -p 8081:8081 \
       -v /place/for/nexus/data/on/host/machine:/var/lib/nexus-oss \
-      lkiesow/opencast-nexus-oss
+      opencast/opencast-nexus-oss
 
 
 ### Set-up Using RPMs

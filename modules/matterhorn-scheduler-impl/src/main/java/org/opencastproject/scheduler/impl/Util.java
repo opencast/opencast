@@ -82,7 +82,6 @@ public final class Util {
    * @return a list of scheduling periods
    */
   public static List<Period> calculatePeriods(Date start, Date end, long duration, RRule rRule, TimeZone tz) {
-    final TimeZone timeZone = TimeZone.getDefault();
     final TimeZone utc = TimeZone.getTimeZone("UTC");
     TimeZone.setDefault(tz);
     DateTime seed = new DateTime(start);
@@ -120,7 +119,7 @@ public final class Util {
       periods.add(new Period(new DateTime(cDate.getTime()), new DateTime(cDate.getTimeInMillis() + duration)));
     }
 
-    TimeZone.setDefault(timeZone);
+    TimeZone.setDefault(null);
     return periods;
   }
 }

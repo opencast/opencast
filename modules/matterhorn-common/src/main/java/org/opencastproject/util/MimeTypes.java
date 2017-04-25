@@ -88,6 +88,7 @@ public final class MimeTypes {
   public static final MimeType JPG;
   public static final MimeType MJPEG;
   public static final MimeType MPEG4;
+  public static final MimeType MATROSKA;
   public static final MimeType MPEG4_AAC;
   public static final MimeType DV;
   public static final MimeType MJPEG2000;
@@ -107,6 +108,7 @@ public final class MimeTypes {
     JPG = MimeTypes.parseMimeType("image/jpg");
     MJPEG = MimeTypes.parseMimeType("video/x-motion-jpeg");
     MPEG4 = MimeTypes.parseMimeType("video/mp4");
+    MATROSKA = MimeTypes.parseMimeType("video/x-matroska");
     MPEG4_AAC = MimeTypes.parseMimeType("video/x-m4v");
     DV = MimeTypes.parseMimeType("video/x-dv");
     MJPEG2000 = MimeTypes.parseMimeType("video/mj2");

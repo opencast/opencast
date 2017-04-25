@@ -753,6 +753,8 @@ public class IndexServiceImplTest {
 
     periods = generatePeriods(cet, start, end, days, durationMillis);
     assertEquals(5, periods.size());
+
+    TimeZone.setDefault(cet);
     for (Period d : periods) {
       DateTime dEnd = d.getEnd();
 

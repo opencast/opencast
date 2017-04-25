@@ -225,6 +225,42 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   }
 
   @Override
+  public void deleteComments(String eventId) throws NotFoundException, EventCommentDatabaseException {
+
+    // Similar to deleteComment but we want to avoid sending a message for each deletion
+
+    EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
+    try {
+      tx.begin();
+      List<EventComment> comments = getComments(eventId);
+
+      for (EventComment comment : comments) {
+        long commentId = comment.getId().get().intValue();
+        EventCommentDto event = getEventComment(commentId, em);
+        if (event == null)
+          throw new NotFoundException("Event comment with ID " + commentId + " does not exist");
+
+        em.remove(event);
+      }
+      tx.commit();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not delete event comments: {}", ExceptionUtils.getStackTrace(e));
+      if (tx.isActive())
+        tx.rollback();
+
+      throw new EventCommentDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+
+    sendMessageUpdate(eventId);
+  }
+
+  @Override
   public EventComment updateComment(EventComment comment) throws EventCommentDatabaseException {
     final EventCommentDto commentDto = EventCommentDto.from(comment);
     final EventComment updatedComment = env.tx(persistOrUpdate(commentDto)).toComment(userDirectoryService);
