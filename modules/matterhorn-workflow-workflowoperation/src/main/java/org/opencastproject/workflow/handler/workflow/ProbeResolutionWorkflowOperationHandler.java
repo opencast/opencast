@@ -56,6 +56,9 @@ public class ProbeResolutionWorkflowOperationHandler extends AbstractWorkflowOpe
   /** Configuration key for video resolutions to check */
   static final String OPT_VAR_PREFIX = "var-";
 
+  /** Configuration key for value to set */
+  static final String OPT_VAL_PREFIX = "val-";
+
   /** The logging facility */
   private static final Logger logger = LoggerFactory
           .getLogger(ProbeResolutionWorkflowOperationHandler.class);
@@ -90,16 +93,18 @@ public class ProbeResolutionWorkflowOperationHandler extends AbstractWorkflowOpe
       }
     }
 
+    // Create mapping:  varName -> value
+    Map<String, String> valueMapping = new HashMap<>();
+    for (String key: workflowInstance.getCurrentOperation().getConfigurationKeys()) {
+      if (key.startsWith(OPT_VAL_PREFIX)) {
+        String varName = key.substring(OPT_VAL_PREFIX.length());
+        valueMapping.put(varName, getConfig(workflowInstance, key));
+      }
+    }
+
     Map<String, String> properties = new HashMap<String, String>();
     for (Track track : tracks) {
       final String flavor = toVariableName(track.getFlavor());
-
-      // Initialize variables
-      for (Set<String> varNames: resolutionMapping.values()) {
-        for (String var: varNames) {
-          properties.put(flavor + var, "false");
-        }
-      }
 
       // Check if resolution fits
       if (track.hasVideo()) {
@@ -107,7 +112,8 @@ public class ProbeResolutionWorkflowOperationHandler extends AbstractWorkflowOpe
           Fraction resolution = Fraction.getFraction(video.getFrameWidth(), video.getFrameHeight());
           if (resolutionMapping.containsKey(resolution)) {
             for (String varName : resolutionMapping.get(resolution)) {
-              properties.put(flavor + varName, "true");
+              String value = valueMapping.containsKey(varName) ? valueMapping.get(varName) : "true";
+              properties.put(flavor + varName, value);
             }
           }
         }
