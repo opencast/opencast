@@ -56,6 +56,18 @@ fix the problem.
 For more details about the review and merge process, have a look at [Reviewing, Merging and Declining Pull
 Requests](reviewing-and-merging.md).
 
+#### Pull Request Expectations
+
+When reviewing a pull request, it is always easier if the reviewer knows what the ticket is about, and has a rough idea
+of what work has been done.  To this end, there are a few expectations for all pull requests:
+
+ - The JIRA ticket and JIRA ticket title should be the pull request title
+ - The pull request description should contain a summary of the work done, along with reasoning for any major change
+ - For feature pull requests, accompanying documentation should be included
+
+While a committer may accept a patch even if it does not meet these expectations, it is encouraged that anyone filing
+a pull request ensures that they meet these expectations.
+
 
 Coding Rules
 ------------
