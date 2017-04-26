@@ -6,7 +6,7 @@ angular.module('adminNg.resources')
                 device: data.device.id,
                 duration: String(moment.duration(parseInt(data.duration.hour, 10), 'h')
                             .add(parseInt(data.duration.minute, 10), 'm')
-                            .asMilliseconds())
+                            .asMilliseconds()),
             };
 
         if (data.weekdays) {
@@ -21,7 +21,7 @@ angular.module('adminNg.resources')
         }
         
         if (data.eventId) {
-        	result.id = data.eventId;
+       	    result.id = data.eventId;
         }
 
         return $.param({metadata: angular.toJson(result)});
