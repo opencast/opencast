@@ -128,7 +128,7 @@ main() {
     fi
 
     # Get process id
-    PID_FILE=$(replace "$(grepProperty '^karaf.shutdown.pid.file')")
+    PID_FILE=$(replace "$(grepProperty '^karaf.pid.file')")
     if [ -n "${PID_FILE}" ]; then
         if [ ! -f "$PID_FILE" ]; then
             die "PID file configured but not found"
