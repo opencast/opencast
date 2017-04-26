@@ -246,7 +246,7 @@
     "RETRACT":"Retract",
     "UPDATE":"Update",
     "DURATION":{
-      "HOURS":"Horas",
+      "HOURS":"Hours",
       "MINUTES":"Minutes"
     }
   },
@@ -656,7 +656,7 @@
           "CAPTION":"Access policy",
           "DESCRIPTION":"",
           "TEMPLATES":{
-            "TITLE":"Templateauswahl"
+            "TITLE":"Templates"
           },
           "ACCESS_POLICY":{
             "TITLE":"Access policy",
