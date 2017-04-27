@@ -30,3 +30,8 @@ all database migrations, we recommend to make a database backup before attemptin
 
 You can find the database upgrade script at `…/docs/upgrade/2.3_to_2.4/mysql5.sql`.
 
+
+Configuration Changes
+------------------
+
+1. The parameter "karaf.shutdown.pid.file" is renamed to "karaf.pid.file" (MH-12188)
