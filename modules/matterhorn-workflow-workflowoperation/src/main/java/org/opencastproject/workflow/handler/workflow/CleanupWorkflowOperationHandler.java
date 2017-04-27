@@ -55,7 +55,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.logging.Level;
 
 /**
  * Removes all files in the working file repository for mediapackage elements that don't match one of the
@@ -125,24 +124,24 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   List <WorkflowOperationInstance> workflowInstances = workflowInstance.getOperations();
   for (WorkflowOperationInstance iterworkflowInstance: workflowInstances) {
-       logger.error("Job id from Workflowinstance" + iterworkflowInstance.getId());
+       logger.debug("Delete JobArguments for Job id from Workflowinstance" + iterworkflowInstance.getId());
 
-    //delete job Arguments
+     //delete job Arguments
     try {
       Job jobWorkflowinstance = (serviceRegistry.getJob(iterworkflowInstance.getId()));
-        List <String> list = new ArrayList <>();
-        jobWorkflowinstance.setArguments(list);
+      List <String> list = new ArrayList <>();
+      jobWorkflowinstance.setArguments(list);
       serviceRegistry.updateJob(jobWorkflowinstance);
 
       List<Job> jobs = serviceRegistry.getChildJobs(iterworkflowInstance.getId());
       for (Job job : jobs) {
         logger.debug("Deleting Arguments:  " + job.getArguments());
         job.setArguments(list);
-      serviceRegistry.updateJob(job);
+        serviceRegistry.updateJob(job);
       }
 
     } catch (ServiceRegistryException | NotFoundException ex) {
-      java.util.logging.Logger.getLogger(CleanupWorkflowOperationHandler.class.getName()).log(Level.SEVERE, null, ex);
+      logger.error("Deleting JobArguments faild Job id:{} ",workflowInstance.getId(), ex);
     }
   }
   MediaPackage mediaPackage = workflowInstance.getMediaPackage();
