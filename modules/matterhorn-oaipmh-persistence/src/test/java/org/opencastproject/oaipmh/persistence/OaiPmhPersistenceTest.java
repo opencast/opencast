@@ -172,6 +172,8 @@ public class OaiPmhPersistenceTest {
 
     oaiPmhDatabase.delete(mp2.getIdentifier().toString(), REPOSITORY_ID_2);
 
+    Thread.sleep(10);
+
     search = oaiPmhDatabase.search(query().modifiedAfter(new Date()).build());
     Assert.assertEquals(0, search.size());
 
