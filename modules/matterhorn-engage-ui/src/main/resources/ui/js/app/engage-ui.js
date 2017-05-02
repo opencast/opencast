@@ -615,14 +615,14 @@ function($, bootbox, _, alertify) {
 
                 var seriesClass = "";
                 if (data.mediapackage) {
-                    seriesClass = "series" + data.mediapackage.series + " ";
+                    seriesClass = "series" + _.escape(data.mediapackage.series) + " ";
                 }
 
                 var tile = mediaContainer + "<a class=\"tile\" id=\"" + serID + "\" role=\"menuitem\" tabindex=\"" + tabIndexNumber++ + "\">" +
                     "<div class=\"" + seriesClass + "seriesindicator \"/> " +
                     "<div class=\"tilecontent\">";
 
-                tile = tile + "<h4 class=\"title\">" + data.dcTitle + "</h4>";
+                tile = tile + "<h4 class=\"title\">" + _.escape(data.dcTitle) + "</h4>";
 
                 // append thumbnail
                 var thumb = "";
@@ -653,12 +653,12 @@ function($, bootbox, _, alertify) {
                     tile = tile + "<div class=\"infos\">";
 
                     if (data.dcCreator) {
-                        creator = data.dcCreator;
+                        creator = _.escape(data.dcCreator);
                     };
                     tile = tile + "<div class=\"creator\">" + creator + "</div>";
 
                     if (data.mediapackage.seriestitle) {
-                        seriestitle = data.mediapackage.seriestitle;
+                        seriestitle = _.escape(data.mediapackage.seriestitle);
                     };
                     tile = tile + "<div class=\"seriestitle\">" + seriestitle + "</div>";
 
@@ -690,11 +690,11 @@ function($, bootbox, _, alertify) {
 
                     $($main_container).append(tile);
 
-                    $("#" + data["id"]).attr("href", playerEndpoint + "?id=" + data["id"]);
+                    $("#" + _.escape(data["id"])).attr("href", playerEndpoint + "?id=" + _.escape(data["id"]));
 
-                    $("#" + data["id"]).on("keypress", function(ev) {
+                    $("#" + _.escape(data["id"])).on("keypress", function(ev) {
                         if (ev.which == 13 || ev.which == 32) {
-                            $(location).attr("href", playerEndpoint + "?id=" + data["id"]);
+                            $(location).attr("href", playerEndpoint + "?id=" + _.escape(data["id"]));
                         }
                     });
 
@@ -717,34 +717,34 @@ function($, bootbox, _, alertify) {
         function createSeriesGrid(data) {
             log("build series grid");
             if (data && data.id) {
-                var seriesClass = "series" + data.id + " ";
+                var seriesClass = "series" + _.escape(data.id) + " ";
                 var color = generateSeriesColor(data.id);
 
                 var creator = "<br>";
                 var contributor = "<br>";
 
-                var tile = mediaContainer + "<a class=\"tile\" id=\"" + data.id + "\" role=\"menuitem\" tabindex=\"" + tabIndexNumber++ + "\"> " +
+                var tile = mediaContainer + "<a class=\"tile\" id=\"" + _.escape(data.id) + "\" role=\"menuitem\" tabindex=\"" + tabIndexNumber++ + "\"> " +
                     "<div class=\"" + seriesClass + "seriesindicator \"/> " +
                     "<div class=\"tilecontent\">";
 
-                tile = tile + "<h4 class=\"title\">" + (data.dcTitle ? data.dcTitle : "Unknown title") + "</h4>";
+                tile = tile + "<h4 class=\"title\">" + (data.dcTitle ? _.escape(data.dcTitle) : "Unknown title") + "</h4>";
 
                 if (data.dcCreator) {
-                    creator = data.dcCreator;
+                    creator = _.escape(data.dcCreator);
                 };
                 tile = tile + "<div class=\"creator\">" + creator + "</div>";
 
                 if (data.dcContributor) {
-                    contributor = data.dcContributor;
+                    contributor = _.escape(data.dcContributor);
                 };
                 tile = tile + "<div class=\"contributor\">" + contributor + "</div>";
 
                 tile = tile + "</div></div></a>";
 
                 $($main_container).append(tile);
-                $("#" + data.id).attr("href", "?e=1&p=1&epFrom=" + data.id);
+                $("#" + _.escape(data.id)).attr("href", "?e=1&p=1&epFrom=" + _.escape(data.id));
 
-                $("#" + data.id).on("keypress", function(ev) {
+                $("#" + _.escape(data.id)).on("keypress", function(ev) {
                     log("keypress")
                     if (ev.which == 13 || ev.which == 32) {
                         restData = "sid=" + data.id;
