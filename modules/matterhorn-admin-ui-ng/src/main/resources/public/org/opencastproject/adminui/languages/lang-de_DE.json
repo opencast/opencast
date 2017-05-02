@@ -970,7 +970,7 @@
     "ACTIONS":{
       "EXPORT":"Exportieren",
       "ADD_BLACKLIST":"Sperrliste hinzufügen",
-      "REMOVE":"Entfernen"
+      "REMOVE":"Remove"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1050,7 +1050,7 @@
         "EMAIL":"E-Mail",
         "ROLES":"Rollen",
         "TYPE":"Typ",
-        "PROVIDER":"Anbieter",
+        "PROVIDER":"Provider",
         "BLACKLIST_FROM":"Gesperrt von",
         "BLACKLIST_TO":"Gesperrt bis",
         "ACTION":"Aktionen"
