@@ -35,6 +35,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * Goes through each request and sets its max inactive time to a default value if they are a normal request or
@@ -94,7 +95,12 @@ public class CleanSessionsFilter implements Filter {
     }
     else if (request.getHeader("Authorization") != null) {
       logger.trace("Invalidating digest request.");
-      request.getSession().invalidate();
+      HttpSession session = request.getSession(false);
+      if (session != null) {
+        session.invalidate();
+      } else {
+        logger.trace("Too late to run invalidate, the request is already committed ({}).", request.getRequestURI());
+      }
     }
   }
 }
