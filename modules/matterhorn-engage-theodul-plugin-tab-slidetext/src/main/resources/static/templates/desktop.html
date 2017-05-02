@@ -4,25 +4,25 @@
 <div id="engage_slidetext_tab_content">
     <% if((typeof segments !== "undefined") && (segments.length > 0)) { var i = 0; %>
     <% _.each(segments, function(segment) { %>
-    <div class="media mediaColor" id="tab_slidetext_segment_<%= i %>">
-        <img class="media-object pull-left" src="<%= segment.image_url %>" alt="<%= str_segment %> <%= i %>" />
+    <div class="media mediaColor" id="tab_slidetext_segment_<%- i %>">
+        <img class="media-object pull-left" src="<%- segment.image_url %>" alt="<%- str_segment %> <%- i %>" />
         <div class="media-body">
             <div class="media-heading">
-                <%= str_segment %> <%= i + 1 %>
+                <%- str_segment %> <%= i + 1 %>
             </div>
             <div class="media-time">
-                <%= segment.humanReadableTime %>
+                <%- segment.humanReadableTime %>
             </div>
             <div class="media-text">
                 <% if((segment.text !== "undefined") && (segment.text != "")) { %>
-                <%= segment.text %>
+                <%- segment.text %>
                 <% } %>
             </div>
         </div>
     </div>
     <% ++i; }); %>
     <% } else { %>
-    <p><%= str_noSlidesAvailable %></p>
+    <p><%- str_noSlidesAvailable %></p>
     <% } %>
 </div>
 <% } %>
