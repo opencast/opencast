@@ -21,7 +21,9 @@
 package org.opencastproject.publication.oaipmh;
 
 import static com.entwinemedia.fn.Stream.$;
+
 import static java.lang.String.format;
+
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.ofChannel;
 import static org.opencastproject.util.JobUtil.waitForJobs;
 import static org.opencastproject.util.data.Collections.set;
@@ -77,6 +79,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -466,27 +469,35 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
       if (job.getPayload() == null)
         continue;
 
-      final MediaPackageElement distributedElement = MediaPackageElementParser.getFromXml(job.getPayload());
+      List <MediaPackageElement> distributedElements = null;
+      try {
+        distributedElements = (List <MediaPackageElement>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
+      } catch (MediaPackageException e) {
+        distributedElements = new LinkedList<>();
+        distributedElements.add(MediaPackageElementParser.getFromXml(job.getPayload()));
+      }
 
       // If the job finished successfully, but returned no new element, the channel simply doesn't support this
       // kind of element. So we just keep on looping.
-      if (distributedElement == null)
+      if (distributedElements == null || distributedElements.isEmpty())
         continue;
 
-      // Make sure the mediapackage is prompted to create a new identifier for this element
-      distributedElement.setIdentifier(null);
+      for (MediaPackageElement distributedElement : distributedElements) {
+        // Make sure the mediapackage is prompted to create a new identifier for this element
+        distributedElement.setIdentifier(null);
 
-      // Copy references from the source elements to the distributed elements
-      MediaPackageReference ref = sourceElement.getReference();
-      if (ref != null && mp.getElementByReference(ref) != null) {
-        MediaPackageReference newReference = (MediaPackageReference) ref.clone();
-        distributedElement.setReference(newReference);
+        // Copy references from the source elements to the distributed elements
+        MediaPackageReference ref = sourceElement.getReference();
+        if (ref != null && mp.getElementByReference(ref) != null) {
+          MediaPackageReference newReference = (MediaPackageReference) ref.clone();
+          distributedElement.setReference(newReference);
+        }
+
+        // Add the new element to the mediapackage
+        mp.add(distributedElement);
+        elementsToPublish.add(distributedElement.getIdentifier());
+        distributedElementIds.put(sourceElementId, distributedElement.getIdentifier());
       }
-
-      // Add the new element to the mediapackage
-      mp.add(distributedElement);
-      elementsToPublish.add(distributedElement.getIdentifier());
-      distributedElementIds.put(sourceElementId, distributedElement.getIdentifier());
 
     }
 
