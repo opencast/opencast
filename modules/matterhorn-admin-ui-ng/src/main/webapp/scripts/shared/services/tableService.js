@@ -239,9 +239,17 @@ angular.module('adminNg.services')
         /**
          * Retrieve data from the defined API with the given filter values.
          */
-        this.fetch = function () {
+        this.fetch = function (reset) {
             if (angular.isUndefined(me.apiService)) {
                 return;
+            }
+
+            if(reset) {
+              me.rows = [];
+              me.pagination.totalItems = 0;
+              me.refreshColumns();
+              me.updatePagination();
+              me.updateAllSelected();
             }
 
             var query = {},
