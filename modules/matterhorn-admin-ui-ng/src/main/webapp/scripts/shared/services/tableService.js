@@ -278,7 +278,12 @@ angular.module('adminNg.services')
             query.limit = me.pagination.limit;
             query.offset = me.pagination.offset * me.pagination.limit;
 
-            me.apiService.query(query).$promise.then(function (data) {
+            (function(resource){
+              me.apiService.query(query).$promise.then(function (data) {
+                if(resource != me.resource) {
+                  return;
+                }
+
                 var selected = [];
                 angular.forEach(me.rows, function (row) {
                     if (row.selected) {
@@ -306,7 +311,8 @@ angular.module('adminNg.services')
 
                 me.updatePagination();
                 me.updateAllSelected();
-            });
+              });
+            })(me.resource);
 
             if (me.refreshScheduler.on) {
                 me.refreshScheduler.newSchedule();
