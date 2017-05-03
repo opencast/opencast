@@ -247,7 +247,6 @@ angular.module('adminNg.services')
             if(reset) {
               me.rows = [];
               me.pagination.totalItems = 0;
-              me.refreshColumns();
               me.updatePagination();
               me.updateAllSelected();
             }
