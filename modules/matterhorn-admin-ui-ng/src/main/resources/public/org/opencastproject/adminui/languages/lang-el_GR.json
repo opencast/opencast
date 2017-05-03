@@ -970,7 +970,7 @@
     "ACTIONS":{
       "EXPORT":"Εξαγωγή",
       "ADD_BLACKLIST":"Προσθέστε στην μαύρη λίστα",
-      "REMOVE":"Κατάργηση"
+      "REMOVE":"Remove"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1050,7 +1050,7 @@
         "EMAIL":"Διεύθυνση ηλεκτρονικού ταχυδρομείου",
         "ROLES":"Ρόλοι",
         "TYPE":"Τύπος",
-        "PROVIDER":"Πάροχος",
+        "PROVIDER":"Provider",
         "BLACKLIST_FROM":"Στη μαύρη λίστα από",
         "BLACKLIST_TO":"Στη μαύρη λίστα μέχρι",
         "ACTION":"Ενέργειες"

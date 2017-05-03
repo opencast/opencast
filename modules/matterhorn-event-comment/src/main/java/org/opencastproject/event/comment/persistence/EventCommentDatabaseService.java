@@ -72,6 +72,18 @@ public interface EventCommentDatabaseService {
   void deleteComment(long commentId) throws NotFoundException, EventCommentDatabaseException;
 
   /**
+   * Delete all comments from an event.
+   * @param eventId
+   *          The id of the event.
+   *
+   * @throws NotFoundException
+   *           Thrown if cannot find the event.
+   * @throws EventCommentDatabaseException
+   *           Thrown if there is a problem deleting the comments.
+   */
+  void deleteComments(String eventId) throws NotFoundException, EventCommentDatabaseException;
+
+  /**
    * Update a comment.
    * @param comment
    *          The new comment status to update to.
