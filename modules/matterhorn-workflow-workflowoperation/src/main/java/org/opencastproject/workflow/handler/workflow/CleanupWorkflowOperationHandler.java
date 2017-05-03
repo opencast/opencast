@@ -113,6 +113,37 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
   }
 
   /**
+   * Deletes JobArguments for every finished Job of the WorkfloInstance
+   * 
+   * @param workflowInstance
+   */
+  public void cleanUpJobArgument(WorkflowInstance workflowInstance) {
+    List<WorkflowOperationInstance> workflowOperationInstance = workflowInstance.getOperations();
+    for (WorkflowOperationInstance iterworkflowInstance : workflowOperationInstance) {
+      logger.debug("Delete JobArguments for Job id from Workflowinstance" + iterworkflowInstance.getId());
+
+      //delete job Arguments
+      try {
+        Job jobWorkflowinstance = (serviceRegistry.getJob(iterworkflowInstance.getId()));
+        List<String> list = new ArrayList<>();
+        jobWorkflowinstance.setArguments(list);
+        serviceRegistry.updateJob(jobWorkflowinstance);
+
+        List<Job> jobs = serviceRegistry.getChildJobs(iterworkflowInstance.getId());
+        for (Job job : jobs) {
+          if (job.getStatus() == Job.Status.FINISHED) {
+            logger.debug("Deleting Arguments:  " + job.getArguments());
+            job.setArguments(list);
+            serviceRegistry.updateJob(job);
+          }
+        }
+      } catch (ServiceRegistryException | NotFoundException ex) {
+        logger.error("Deleting JobArguments faild Job id:{} ", workflowInstance.getId(), ex);
+      }
+    }
+  }
+
+  /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
@@ -122,29 +153,9 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
 
-  List <WorkflowOperationInstance> workflowInstances = workflowInstance.getOperations();
-  for (WorkflowOperationInstance iterworkflowInstance: workflowInstances) {
-       logger.debug("Delete JobArguments for Job id from Workflowinstance" + iterworkflowInstance.getId());
+    cleanUpJobArgument(workflowInstance);
 
-     //delete job Arguments
-    try {
-      Job jobWorkflowinstance = (serviceRegistry.getJob(iterworkflowInstance.getId()));
-      List <String> list = new ArrayList <>();
-      jobWorkflowinstance.setArguments(list);
-      serviceRegistry.updateJob(jobWorkflowinstance);
-
-      List<Job> jobs = serviceRegistry.getChildJobs(iterworkflowInstance.getId());
-      for (Job job : jobs) {
-        logger.debug("Deleting Arguments:  " + job.getArguments());
-        job.setArguments(list);
-        serviceRegistry.updateJob(job);
-      }
-
-    } catch (ServiceRegistryException | NotFoundException ex) {
-      logger.error("Deleting JobArguments faild Job id:{} ",workflowInstance.getId(), ex);
-    }
-  }
-  MediaPackage mediaPackage = workflowInstance.getMediaPackage();
+    MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
 
     String flavors = currentOperation.getConfiguration(PRESERVE_FLAVOR_PROPERTY);
