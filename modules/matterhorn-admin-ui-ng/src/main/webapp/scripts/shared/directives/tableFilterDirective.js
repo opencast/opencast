@@ -83,7 +83,7 @@ angular.module('adminNg.directives')
                 scope.showFilterSelector = false;
                 scope.selectedFilter = null;
                 Storage.put('filter', scope.namespace, filtername.toLowerCase() , filter.value);
-                scope.filters.map[filterName].value = filter.value;
+                scope.filters.map[filtername].value = filter.value;
             };
 
             scope.toggleFilterSettings = function () {
