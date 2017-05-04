@@ -1,5 +1,5 @@
 angular.module('adminNg.directives')
-.directive('adminNgTableFilter', ['Storage', 'FilterProfiles', 'Language', 'underscore', function (Storage, FilterProfiles, Language, _) {
+.directive('adminNgTableFilter', ['Storage', 'FilterProfiles', 'Language', 'underscore', '$translate', function (Storage, FilterProfiles, Language, _, $translate) {
     return {
         templateUrl: 'shared/partials/tableFilters.html',
         replace: true,
@@ -78,10 +78,11 @@ angular.module('adminNg.directives')
                 Storage.put('filter', scope.namespace, filterName, filterValue);
             }, 250);
 
-            scope.selectFilterSelectValue = function (filterName, filter)  {
+            scope.selectFilterSelectValue = function (filter)  {
+                var filtername = $translate.instant(filter.label);
                 scope.showFilterSelector = false;
                 scope.selectedFilter = null;
-                Storage.put('filter', scope.namespace, filterName, filter.value);
+                Storage.put('filter', scope.namespace, filtername.toLowerCase() , filter.value);
                 scope.filters.map[filterName].value = filter.value;
             };
 

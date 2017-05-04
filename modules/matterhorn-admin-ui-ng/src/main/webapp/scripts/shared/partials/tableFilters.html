@@ -9,21 +9,22 @@
             <i title="{{ 'TABLE_FILTERS.ADD' | translate }}"
                 ng-click="showFilterSelector = true" class="fa fa-filter"></i>
 
-            <select ng-model="selectedFilter" ng-change="filter = filters.filters[selectedFilter]"
-                ng-show="showFilterSelector">
-                <option ng-repeat="(name, filter) in filters.filters"
-                    value="{{ name | limitTo : 70 }}">
-                    {{ filter.label | translate | limitTo : 70 }}
-                </option>
+            <select
+                chosen
+                ng-model="selectedFilter"
+                ng-change="filter = selectedFilter"
+                ng-show="showFilterSelector"
+                ng-options="value as value.label | translate | limitTo : 70 for (key,value) in filters.filters"
+                >
             </select>
 
             <div ng-show="selectedFilter"
-                ng-switch on="filters.filters[selectedFilter].type">
+                ng-switch on="selectedFilter.type">
                 <div ng-switch-when="select">
                     <select ng-model="filter.value"
                         ng-change="selectFilterSelectValue(selectedFilter, filter)">
                         <option></option>
-                        <option ng-repeat="option in filters.filters[selectedFilter].options"
+                        <option ng-repeat="option in selectedFilter.options"
                             value="{{ option.value | limitTo : 70 }}">
                             {{ option.label |  translate | limitTo : 70 }}
                         </option>
