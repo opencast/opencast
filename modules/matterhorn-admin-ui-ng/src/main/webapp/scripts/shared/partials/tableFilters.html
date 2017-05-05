@@ -25,8 +25,8 @@
                 <div ng-switch-when="select">
                     <select 
                         chosen
-                        ng-model="filter.value"
-                        ng-change="selectFilterSelectValue(selectedFilter, filter)"
+                        ng-model="filterValue"
+                        ng-change="selectFilterSelectValue(filterValue)"
                         ng-options="option as option.label | translate | limitTo : 70 for option in selectedFilter.options"
                         >
                         <option value=""></option>
@@ -35,9 +35,9 @@
 
                 <div ng-switch-when="period">
                     <input type="text" class="small-search" datepicker ng-model="filter.period.from"
-                        select="selectFilterPeriodValue(selectedFilter, filter)" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}">
+                        select="selectFilterPeriodValue(filter)" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}">
                     <input type="text" class="small-search" datepicker ng-model="filter.period.to"
-                        select="selectFilterPeriodValue(selectedFilter, filter)" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.END_DATE' | translate }}">
+                        select="selectFilterPeriodValue(filter)" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.END_DATE' | translate }}">
                 </div>
             </div>
 

@@ -78,19 +78,28 @@ angular.module('adminNg.directives')
                 Storage.put('filter', scope.namespace, filterName, filterValue);
             }, 250);
 
+            scope.getFilterName = function(){
+                for(var i in scope.filters.filters){
+                    if(scope.filters.filters[i] === scope.selectedFilter){
+                        return i;
+                    }
+                }
+            };
+
             scope.selectFilterSelectValue = function (filter)  {
-                var filtername = $translate.instant(filter.label);
+                var filterName = scope.getFilterName();
                 scope.showFilterSelector = false;
                 scope.selectedFilter = null;
-                Storage.put('filter', scope.namespace, filtername.toLowerCase() , filter.value);
-                scope.filters.map[filtername].value = filter.value;
+                Storage.put('filter', scope.namespace, filterName , filter.value);
+                scope.filters.map[filterName].value = filter.value;
             };
 
             scope.toggleFilterSettings = function () {
                 scope.mode = scope.mode ? 0:1;
             };
 
-            scope.selectFilterPeriodValue = function (filterName, filter) {
+            scope.selectFilterPeriodValue = function ( filter) {
+                var filterName = scope.getFilterName();
                 // Merge from-to values of period filter)
                 if (!filter.period.to || !filter.period.from) {
                     return;
