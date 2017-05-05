@@ -16,6 +16,7 @@
                     ng-change="filter = selectedFilter"  
                     ng-options="value as value.label | translate | limitTo : 70 for (key,value) in filters.filters"
                     >
+                    <option value=""></option>
                 </select>
             </div>
 
@@ -25,12 +26,10 @@
                     <select 
                         chosen
                         ng-model="filter.value"
-                        ng-change="selectFilterSelectValue(selectedFilter, filter)">
-                        <option></option>
-                        <option ng-repeat="option in selectedFilter.options"
-                            value="{{ option.value | limitTo : 70 }}">
-                            {{ option.label |  translate | limitTo : 70 }}
-                        </option>
+                        ng-change="selectFilterSelectValue(selectedFilter, filter)"
+                        ng-options="option as option.label | translate | limitTo : 70 for option in selectedFilter.options"
+                        >
+                        <option value=""></option>
                     </select>
                 </div>
 
