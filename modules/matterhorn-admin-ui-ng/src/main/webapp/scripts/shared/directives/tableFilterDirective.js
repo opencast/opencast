@@ -75,7 +75,7 @@ angular.module('adminNg.directives')
             scope.selectFilterTextValue = _.debounce(function (filterName, filterValue) {
                 scope.showFilterSelector = false;
                 scope.selectedFilter = null;
-                Storage.put('filter', scope.namespace, filterName, filterValue);
+                scope.addFilterToStorage('filter', scope.namespace, filterName, filterValue);
             }, 250);
 
             scope.getFilterName = function(){
@@ -90,15 +90,15 @@ angular.module('adminNg.directives')
                 var filterName = scope.getFilterName();
                 scope.showFilterSelector = false;
                 scope.selectedFilter = null;
-                Storage.put('filter', scope.namespace, filterName , filter.value);
                 scope.filters.map[filterName].value = filter.value;
+                scope.addFilterToStorage('filter', scope.namespace, filterName , filter.value);
             };
 
             scope.toggleFilterSettings = function () {
                 scope.mode = scope.mode ? 0:1;
             };
 
-            scope.selectFilterPeriodValue = function ( filter) {
+            scope.selectFilterPeriodValue = function (filter) {
                 var filterName = scope.getFilterName();
                 // Merge from-to values of period filter)
                 if (!filter.period.to || !filter.period.from) {
@@ -111,13 +111,19 @@ angular.module('adminNg.directives')
                 if (filter.value) {
                     scope.showFilterSelector = false;
                     scope.selectedFilter = null;
-                    Storage.put('filter', scope.namespace, filterName, filter.value);
+
                     if (!scope.filters.map[filterName]) {
                       scope.filters.map[filterName] = {};
                     }
                     scope.filters.map[filterName].value = filter.value;
+                    scope.addFilterToStorage('filter', scope.namespace, filterName, filter.value)
                 }
             };
+
+            scope.addFilterToStorage = function(type, namespace, filterName, filterValue) {
+                Storage.put(type, namespace, filterName, filterValue);
+                angular.element('.main-filter').val('').trigger('chosen:updated');
+            }
 
             // Restore filter profiles
             scope.profiles = FilterProfiles.get(scope.namespace);
