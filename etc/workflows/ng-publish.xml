@@ -31,7 +31,7 @@
                         <label for="publishToEngage">Opencast Media Module</label>
                       </li>
                       <li>
-                        <input id="publishToAws" name="searchPublishType" type="radio" class="configField" disabled="disabled" value="true"/>
+                        <input id="publishToAws" name="searchPublishType" type="radio" class="configField" value="true"/>
                         <label for="publishToAws">AWS</label>
                       </li>
                     </ul>
@@ -75,7 +75,7 @@
             }
         });
         <!-- Remove the line below if you wish to publish to AWS S3 -->
-        $('#publishToAws').prop('disabled', false);
+        $('#publishToAws').prop('disabled', disabled);
         <!-- Remove the line above if you wish to publish to AWS S3 -->
       </script>
     ]]>
