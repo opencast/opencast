@@ -12,6 +12,8 @@
             <div ng-show="showFilterSelector">
                 <select
                     chosen
+                    disable_search_threshold="10"
+                    class="main-filter"
                     ng-model="selectedFilter"
                     ng-change="filter = selectedFilter"  
                     ng-options="value as value.label | translate | limitTo : 70 for (key,value) in filters.filters"
@@ -25,6 +27,7 @@
                 <div ng-switch-when="select">
                     <select 
                         chosen
+                        disable_search_threshold="10"
                         ng-model="filterValue"
                         ng-change="selectFilterSelectValue(filterValue)"
                         ng-options="option as option.label | translate | limitTo : 70 for option in selectedFilter.options"
