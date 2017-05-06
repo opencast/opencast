@@ -122,6 +122,7 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-static-file-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-userdirectory/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-userdirectory-ldap/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-userdirectory-sakai/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-urlsigning-common/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-urlsigning-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-urlsigning-service-impl/${project.version}</bundle>
