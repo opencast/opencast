@@ -645,7 +645,7 @@
            "RESOLVED":    "Resolved",
            "REPLY":       "Reply",
            "REPLY_TO":       "Reply to",
-           "CANCEL_REPLY":   "Dismiss",
+           "CANCEL_REPLY":   "Cancel",
            "DELETE":      "Delete",
            "REASON":      "Reason"
          },
