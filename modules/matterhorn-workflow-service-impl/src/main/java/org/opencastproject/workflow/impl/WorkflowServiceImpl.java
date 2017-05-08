@@ -1002,14 +1002,20 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           UnauthorizedException {
     return lock.synchronize(workflowInstanceId, new FnX<Long, WorkflowInstance>() {
       @Override
-      public WorkflowInstance apx(Long workflowInstanceId) throws Exception {
+      public WorkflowInstance applyX(Long workflowInstanceId) throws Exception {
         WorkflowInstanceImpl instance = getWorkflowById(workflowInstanceId);
-        instance.setState(STOPPED);
 
-        // Update the workflow instance
-        update(instance);
+        if (instance.getState() != STOPPED) {
+          // Update the workflow instance
+          instance.setState(STOPPED);
+          update(instance);
+        }
 
-        removeTempFiles(instance);
+        try {
+          removeTempFiles(instance);
+        } catch (Exception e) {
+          logger.warn("Cannot remove temp files for workflow instance {}: {}", workflowInstanceId, e.getMessage());
+        }
 
         return instance;
       }
@@ -1041,7 +1047,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           UnauthorizedException, WorkflowParsingException, WorkflowStateException {
     lock.synchronize(workflowInstanceId, new FnX<Long, Void>() {
       @Override
-      public Void apx(Long workflowInstanceId) throws Exception {
+      public Void applyX(Long workflowInstanceId) throws Exception {
         WorkflowQuery query = new WorkflowQuery();
         query.withId(Long.toString(workflowInstanceId));
         WorkflowSet workflows = index.getWorkflowInstances(query, Permissions.Action.READ.toString(), false);
@@ -1127,7 +1133,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           UnauthorizedException {
     return lock.synchronize(workflowInstanceId, new FnX<Long, WorkflowInstance>() {
       @Override
-      public WorkflowInstance apx(Long workflowInstanceId) throws Exception {
+      public WorkflowInstance applyX(Long workflowInstanceId) throws Exception {
         WorkflowInstanceImpl instance = getWorkflowById(workflowInstanceId);
         instance.setState(PAUSED);
         update(instance);
@@ -1287,7 +1293,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   public void update(final WorkflowInstance workflowInstance) throws WorkflowException, UnauthorizedException {
     updateLock.synchronize(workflowInstance.getId(), new FnX<Long, Void>() {
       @Override
-      public Void apx(Long a) throws Exception {
+      public Void applyX(Long a) throws Exception {
         WorkflowInstance originalWorkflowInstance = null;
         try {
           originalWorkflowInstance = getWorkflowById(workflowInstance.getId());
@@ -1358,7 +1364,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
               job.setStatus(Status.RUNNING);
               break;
             case STOPPED:
-              job.setStatus(Status.DELETED);
+              job.setStatus(Status.CANCELED);
               break;
             case SUCCEEDED:
               job.setStatus(Status.FINISHED);
@@ -2528,6 +2534,21 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   public String getClassName() {
     return WorkflowServiceImpl.class.getName();
+  }
+
+  @Override
+  public MessageSender getMessageSender() {
+    return messageSender;
+  }
+
+  @Override
+  public SecurityService getSecurityService() {
+    return securityService;
+  }
+
+  @Override
+  public String getSystemUserName() {
+    return SecurityUtil.getSystemUserName(componentContext);
   }
 
 }

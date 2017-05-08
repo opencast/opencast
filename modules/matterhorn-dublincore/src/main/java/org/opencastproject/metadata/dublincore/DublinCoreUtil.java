@@ -21,11 +21,9 @@
 
 package org.opencastproject.metadata.dublincore;
 
+import static com.entwinemedia.fn.Equality.eq;
+import static com.entwinemedia.fn.Prelude.chuck;
 import static com.entwinemedia.fn.Stream.$;
-import static org.opencastproject.util.EqualsUtil.eqListSorted;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -33,13 +31,10 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.XMLCatalogImpl.CatalogEntry;
 import org.opencastproject.util.Checksum;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Prelude;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.ImmutableListWrapper;
 import com.entwinemedia.fn.data.Opt;
@@ -72,8 +67,8 @@ public final class DublinCoreUtil {
    *
    * @return the catalog or none if the media package does not contain an episode DublinCore
    */
-  public static Option<DublinCoreCatalog> loadEpisodeDublinCore(final Workspace ws, MediaPackage mp) {
-    return loadDublinCore(ws, mp, MediaPackageSupport.Filters.isEpisodeDublinCore);
+  public static Opt<DublinCoreCatalog> loadEpisodeDublinCore(final Workspace ws, MediaPackage mp) {
+    return loadDublinCore(ws, mp, MediaPackageSupport.Filters.isEpisodeDublinCore.toFn());
   }
 
   /**
@@ -81,8 +76,8 @@ public final class DublinCoreUtil {
    *
    * @return the catalog or none if the media package does not contain a series DublinCore
    */
-  public static Option<DublinCoreCatalog> loadSeriesDublinCore(final Workspace ws, MediaPackage mp) {
-    return loadDublinCore(ws, mp, MediaPackageSupport.Filters.isSeriesDublinCore);
+  public static Opt<DublinCoreCatalog> loadSeriesDublinCore(final Workspace ws, MediaPackage mp) {
+    return loadDublinCore(ws, mp, MediaPackageSupport.Filters.isSeriesDublinCore.toFn());
   }
 
   /**
@@ -90,9 +85,9 @@ public final class DublinCoreUtil {
    *
    * @return the catalog or none if no media package element matches predicate <code>p</code>.
    */
-  public static Option<DublinCoreCatalog> loadDublinCore(final Workspace ws, MediaPackage mp,
-          Function<MediaPackageElement, Boolean> p) {
-    return mlist(mp.getElements()).filter(p).headOpt().map(new Function<MediaPackageElement, DublinCoreCatalog>() {
+  public static Opt<DublinCoreCatalog> loadDublinCore(final Workspace ws, MediaPackage mp,
+                                                      Fn<MediaPackageElement, Boolean> p) {
+    return $(mp.getElements()).filter(p).head().map(new Fn<MediaPackageElement, DublinCoreCatalog>() {
       @Override
       public DublinCoreCatalog apply(MediaPackageElement mpe) {
         return loadDublinCore(ws, mpe);
@@ -120,21 +115,6 @@ public final class DublinCoreUtil {
   }
 
   /**
-   * Parse an XML string into a DublinCore catalog. Returns none if the xml cannot be parsed into a catalog.
-   */
-  public static Option<DublinCoreCatalog> fromXml(String xml) {
-    InputStream in = null;
-    try {
-      in = IOUtils.toInputStream(xml, "UTF-8");
-      return Option.<DublinCoreCatalog> some(DublinCores.read(in));
-    } catch (Exception e) {
-      return none();
-    } finally {
-      IOUtils.closeQuietly(in);
-    }
-  }
-
-  /**
    * Define equality on DublinCoreCatalogs. Two DublinCores are considered equal if they have the same properties and if
    * each property has the same values in the same order.
    * <p>
@@ -149,7 +129,7 @@ public final class DublinCoreUtil {
     final Map<EName, List<DublinCoreValue>> bv = b.getValues();
     if (av.size() == bv.size()) {
       for (Map.Entry<EName, List<DublinCoreValue>> ave : av.entrySet()) {
-        if (!eqListSorted(ave.getValue(), bv.get(ave.getKey())))
+        if (!eq(ave.getValue(), bv.get(ave.getKey())))
           return false;
       }
       return true;
@@ -157,14 +137,6 @@ public final class DublinCoreUtil {
       return false;
     }
   }
-
-  /** {@link #fromXml(String)} as a function. */
-  public static final Function<String, Option<DublinCoreCatalog>> fromXml = new Function<String, Option<DublinCoreCatalog>>() {
-    @Override
-    public Option<DublinCoreCatalog> apply(String s) {
-      return fromXml(s);
-    }
-  };
 
   /** Return a sorted list of all catalog entries. */
   public static List<CatalogEntry> getPropertiesSorted(DublinCoreCatalog dc) {
@@ -186,7 +158,7 @@ public final class DublinCoreUtil {
         // consider all DublinCore properties
         $(getPropertiesSorted(dc))
             .bind(new Fn<CatalogEntry, Stream<String>>() {
-              @Override public Stream<String> ap(CatalogEntry entry) {
+              @Override public Stream<String> apply(CatalogEntry entry) {
                 // get attributes, sorted and serialized as [name, value, name, value, ...]
                 final Stream<String> attributesSorted = $(entry.getAttributes().entrySet())
                     .sort(new Comparator<Entry<EName, String>>() {
@@ -195,7 +167,7 @@ public final class DublinCoreUtil {
                       }
                     })
                     .bind(new Fn<Entry<EName, String>, Stream<String>>() {
-                      @Override public Stream<String> ap(Entry<EName, String> attribute) {
+                      @Override public Stream<String> apply(Entry<EName, String> attribute) {
                         return $(attribute.getKey().toString(), attribute.getValue());
                       }
                     });
@@ -206,7 +178,7 @@ public final class DublinCoreUtil {
             .append(Opt.nul(dc.getRootTag()).map(toString))
             // digest them
             .foldl(mkMd5MessageDigest(), new Fn2<MessageDigest, String, MessageDigest>() {
-              @Override public MessageDigest ap(MessageDigest digest, String s) {
+              @Override public MessageDigest apply(MessageDigest digest, String s) {
                 digest.update(s.getBytes(StandardCharsets.UTF_8));
                 // add separator byte (see definition above)
                 digest.update(sep);
@@ -221,7 +193,7 @@ public final class DublinCoreUtil {
   }
 
   private static final Fn<Object, String> toString = new Fn<Object, String>() {
-    @Override public String ap(Object o) {
+    @Override public String apply(Object o) {
       return o.toString();
     }
   };
@@ -231,7 +203,7 @@ public final class DublinCoreUtil {
       return MessageDigest.getInstance("MD5");
     } catch (NoSuchAlgorithmException e) {
       logger.error("Unable to create md5 message digest");
-      return Prelude.chuck(e);
+      return chuck(e);
     }
   }
 }

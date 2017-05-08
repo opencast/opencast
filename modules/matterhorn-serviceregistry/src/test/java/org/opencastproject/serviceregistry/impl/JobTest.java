@@ -264,7 +264,7 @@ public class JobTest {
   private static Fn<Job, Boolean> matchesId(final Job j) {
     return new Fn<Job, Boolean>() {
       @Override
-      public Boolean ap(Job job) {
+      public Boolean apply(Job job) {
         return job.getId() == j.getId();
       }
     };

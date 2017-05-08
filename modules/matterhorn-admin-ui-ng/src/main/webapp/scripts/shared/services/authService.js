@@ -21,9 +21,10 @@ angular.module('adminNg.services')
         this.loadUser = function () {
             identity = IdentityResource.get();
             identity.$promise.then(function (user) {
-                var adminRole = user.org.adminRole;
+                // Users holding the global admin role shall always be authorized to do anything
+                var globalAdminRole = "ROLE_ADMIN";
                 me.user = user;
-                isAdmin = angular.isDefined(adminRole) && user.roles.indexOf(adminRole) > -1;
+                isAdmin = angular.isDefined(globalAdminRole) && user.roles.indexOf(globalAdminRole) > -1;
                 if (angular.isDefined(user.userRole)) {
                     userRole = user.userRole;
                 }

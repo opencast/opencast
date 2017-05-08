@@ -57,7 +57,7 @@ public class JsonsTest {
     assertEquals("Karl", p.get("name"));
     assertEquals("Paris", p.get("city"));
     assertNull(p.get("remove_me"));
-    assertEquals(79, p.get("age"));
+    assertEquals(new Integer(79), p.get("age"));
   }
 
   @Test
@@ -73,7 +73,7 @@ public class JsonsTest {
   public void testComposition3() {
     final Jsons.Obj j = obj(p("person", obj(p("name", "Karl"), p("city", "Paris"), p("age", 79))));
     final JsonPath p = JsonPath.from(toJson(j));
-    assertEquals(79, p.get("person.age"));
+    assertEquals(new Integer(79), p.get("person.age"));
     assertEquals("Karl", p.get("person.name"));
     assertEquals("Paris", p.get("person.city"));
   }

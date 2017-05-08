@@ -384,7 +384,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService, M
       throw new SoxException("Unable to put the normalized file into the workspace", e);
     } finally {
       IOUtils.closeQuietly(in);
-      FileSupport.delete(normalizedFile);
+      FileSupport.deleteQuietly(normalizedFile);
     }
 
     Track normalizedTrack = (Track) audioTrack.clone();

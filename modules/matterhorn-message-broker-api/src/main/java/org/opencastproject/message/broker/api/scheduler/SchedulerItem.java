@@ -23,14 +23,16 @@ package org.opencastproject.message.broker.api.scheduler;
 
 import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreUtil;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.Date;
@@ -298,7 +300,11 @@ public class SchedulerItem implements MessageItem, Serializable {
     if (StringUtils.isBlank(event))
       return null;
 
-    return DublinCoreUtil.fromXml(event).getOrElseNull();
+    try (InputStream in = IOUtils.toInputStream(event, "UTF-8")) {
+      return DublinCores.read(in);
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   public Map<String, String> getProperties() {

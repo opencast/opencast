@@ -1,0 +1,30 @@
+{
+  "tags": [
+    "engage"
+  ],
+  "id": "publish-track-1",
+  "has_video": true,
+  "duration": 1004400000,
+  "mimetype": "video\/quicktime",
+  "streams": {
+    "audio": [],
+    "video": [
+      {
+        "id": "fortesting",
+        "scanorder": "",
+        "bitrate": 540520.0,
+        "framecount": "",
+        "resolution": "640x480",
+        "type": "H.264",
+        "scantype": "",
+        "framerate": ""
+      }
+    ]
+  },
+  "checksum": "43b7d843b02c4a429b2f547a4f230d31",
+  "type": "presentation\/source",
+  "has_audio": false,
+  "reference": "",
+  "url": "media.mov",
+  "size": -1
+}

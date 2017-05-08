@@ -72,10 +72,10 @@
           </virtualDestinationInterceptor>
           <virtualDestinationInterceptor>
             <virtualDestinations>
-              <compositeQueue name="ARCHIVE.QUEUE">
+              <compositeQueue name="ASSETMANAGER.QUEUE">
                 <forwardTo>
-                  <queue physicalName="ARCHIVE.Adminui" />
-                  <queue physicalName="ARCHIVE.Externalapi" />
+                  <queue physicalName="ASSETMANAGER.Adminui" />
+                  <queue physicalName="ASSETMANAGER.Externalapi" />
                 </forwardTo>
               </compositeQueue>
             </virtualDestinations>

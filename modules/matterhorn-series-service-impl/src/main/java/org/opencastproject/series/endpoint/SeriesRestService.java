@@ -754,7 +754,7 @@ public class SeriesRestService {
       Opt<Map<String, byte[]>> optSeriesElements = seriesService.getSeriesElements(seriesId);
       if (optSeriesElements.isSome()) {
         Map<String, byte[]> seriesElements = optSeriesElements.get();
-        JValue jsonArray = Jsons.a(Stream.$(seriesElements.keySet()).map(Jsons.stringToJValueFn));
+        JValue jsonArray = Jsons.arr(Stream.$(seriesElements.keySet()).map(Jsons.Functions.stringToJValue));
         return Response.ok(new SimpleSerializer().toJson(jsonArray)).build();
       } else {
         return R.notFound();

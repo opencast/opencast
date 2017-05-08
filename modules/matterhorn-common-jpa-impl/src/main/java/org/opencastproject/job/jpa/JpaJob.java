@@ -290,7 +290,7 @@ public class JpaJob {
   public static Fn<JpaJob, Job> fnToJob() {
     return new Fn<JpaJob, Job>() {
       @Override
-      public Job ap(JpaJob jobJpa) {
+      public Job apply(JpaJob jobJpa) {
         return jobJpa.toJob();
       }
     };
@@ -453,4 +453,10 @@ public class JpaJob {
   public String getOrganization() {
     return organization;
   }
+
+  @Override
+  public String toString() {
+    return String.format("Job {id:%d, operation:%s, status:%s}", id, operation, getStatus().toString());
+  }
+
 }

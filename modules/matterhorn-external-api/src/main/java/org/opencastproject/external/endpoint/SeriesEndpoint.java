@@ -21,12 +21,11 @@
 package org.opencastproject.external.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.BLANK;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
-import static com.entwinemedia.fn.data.json.Jsons.jsonArrayFromList;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
@@ -82,8 +81,10 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.JField;
+import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.Jsons;
+import com.entwinemedia.fn.data.json.Jsons.Functions;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -277,21 +278,21 @@ public class SeriesEndpoint {
 
       SearchResult<Series> result = externalIndex.getByQuery(query);
 
-      return ApiResponses.Json.ok(VERSION_1_0_0, a($(result.getItems()).map(new Fn<SearchResultItem<Series>, JValue>() {
+      return ApiResponses.Json.ok(VERSION_1_0_0, arr($(result.getItems()).map(new Fn<SearchResultItem<Series>, JValue>() {
         @Override
-        public JValue ap(SearchResultItem<Series> a) {
+        public JValue apply(SearchResultItem<Series> a) {
           final Series s = a.getSource();
           JValue subjects;
           if (s.getSubject() == null) {
-            subjects = a();
+            subjects = arr();
           } else {
-            subjects = a(splitSubjectIntoArray(s.getSubject()));
+            subjects = arr(splitSubjectIntoArray(s.getSubject()));
           }
-          return j(f("identifier", v(s.getIdentifier())), f("title", v(s.getTitle())), f("creator", v(s.getCreator())),
+          return obj(f("identifier", v(s.getIdentifier())), f("title", v(s.getTitle())), f("creator", v(s.getCreator())),
                   f("created", v(toUTC(s.getCreatedDateTime().getTime()))), f("subjects", subjects),
-                  f("contributors", jsonArrayFromList(s.getContributors())),
-                  f("organizers", jsonArrayFromList(s.getOrganizers())),
-                  f("publishers", jsonArrayFromList(s.getPublishers())));
+                  f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
+                  f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
+                  f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))));
         }
       }).toList()));
     } catch (Exception e) {
@@ -312,16 +313,18 @@ public class SeriesEndpoint {
     for (final Series s : indexService.getSeries(id, externalIndex)) {
       JValue subjects;
       if (s.getSubject() == null) {
-        subjects = a();
+        subjects = arr();
       } else {
-        subjects = a(splitSubjectIntoArray(s.getSubject()));
+        subjects = arr(splitSubjectIntoArray(s.getSubject()));
       }
-      return ApiResponses.Json.ok(VERSION_1_0_0, j(f("identifier", v(s.getIdentifier())), f("title", v(s.getTitle())),
-              f("description", v(s.getDescription())), f("creator", v(s.getCreator())), f("subjects", subjects),
-              f("organization", v(s.getOrganization())), f("created", v(toUTC(s.getCreatedDateTime().getTime()))),
-              f("contributors", jsonArrayFromList(s.getContributors())),
-              f("organizers", jsonArrayFromList(s.getOrganizers())),
-              f("publishers", jsonArrayFromList(s.getPublishers())), f("opt_out", v(s.isOptedOut()))));
+      return ApiResponses.Json.ok(VERSION_1_0_0, obj(
+          f("identifier", v(s.getIdentifier())), f("title", v(s.getTitle())),
+          f("description", v(s.getDescription())), f("creator", v(s.getCreator())), f("subjects", subjects),
+          f("organization", v(s.getOrganization())), f("created", v(toUTC(s.getCreatedDateTime().getTime()))),
+          f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
+          f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
+          f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))),
+          f("opt_out", v(s.isOptedOut()))));
     }
     return ApiResponses.notFound("Cannot find an series with id '%s'.", id);
   }
@@ -329,7 +332,7 @@ public class SeriesEndpoint {
   private List<JValue> splitSubjectIntoArray(final String subject) {
     return com.entwinemedia.fn.Stream.$(subject.split(",")).map(new Fn<String, JValue>() {
       @Override
-      public JValue ap(String a) {
+      public JValue apply(String a) {
         return v(a.trim());
       }
     }).toList();
@@ -676,11 +679,10 @@ public class SeriesEndpoint {
     if (indexService.getSeries(id, externalIndex).isSome()) {
       final Map<String, String> properties = seriesService.getSeriesProperties(id);
 
-      return ApiResponses.Json.ok(VERSION_1_0_0,
-              j($(properties.entrySet()).map(new Fn<Entry<String, String>, JField>() {
+      return ApiResponses.Json.ok(VERSION_1_0_0, obj($(properties.entrySet()).map(new Fn<Entry<String, String>, Field>() {
                 @Override
-                public JField ap(Entry<String, String> a) {
-                  return f(a.getKey(), vN(a.getValue()));
+                public Field apply(Entry<String, String> a) {
+                  return f(a.getKey(), v(a.getValue(), Jsons.BLANK));
                 }
               }).toList()));
     } else {
@@ -787,7 +789,7 @@ public class SeriesEndpoint {
     try {
       String seriesId = indexService.createSeries(metadataList, options, Opt.some(acl), optThemeId);
       return ApiResponses.Json.created(VERSION_1_0_0, URI.create(getSeriesUrl(seriesId)),
-              j(f("identifier", v(seriesId))));
+                                       obj(f("identifier", v(seriesId, BLANK))));
     } catch (IndexServiceException e) {
       logger.error("Unable to create series with metadata '{}', acl '{}', theme '{}' because: ",
               new Object[] { metadataParam, aclParam, themeIdParam, ExceptionUtils.getStackTrace(e) });
@@ -893,7 +895,7 @@ public class SeriesEndpoint {
 
     List<AccessControlEntry> accessControlEntries = $(acl.toArray()).map(new Fn<Object, AccessControlEntry>() {
       @Override
-      public AccessControlEntry ap(Object a) {
+      public AccessControlEntry apply(Object a) {
         JSONObject ace = (JSONObject) a;
         return new AccessControlEntry((String) ace.get("role"), (String) ace.get("action"), (boolean) ace.get("allow"));
       }

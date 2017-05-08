@@ -248,7 +248,8 @@ public class ServiceRegistryJpaImplTest {
 
   @Test
   public void testHostAddedToPriorityList() throws Exception {
-    serviceRegistryJpaImpl.scheduledExecutor.shutdown();
+    if (serviceRegistryJpaImpl.scheduledExecutor != null)
+      serviceRegistryJpaImpl.scheduledExecutor.shutdown();
     serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
     serviceRegistryJpaImpl.activate(null);
     Hashtable<String, String> properties = new Hashtable<>();
@@ -267,7 +268,8 @@ public class ServiceRegistryJpaImplTest {
 
   @Test
   public void testHostAddedToPriorityListExceptWorkflowType() throws Exception {
-    serviceRegistryJpaImpl.scheduledExecutor.shutdown();
+    if (serviceRegistryJpaImpl.scheduledExecutor != null)
+      serviceRegistryJpaImpl.scheduledExecutor.shutdown();
     serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
     serviceRegistryJpaImpl.activate(null);
     Hashtable<String, String> properties = new Hashtable<>();
@@ -287,7 +289,8 @@ public class ServiceRegistryJpaImplTest {
 
   @Test
   public void testHostsBeingRemovedFromPriorityList() throws Exception {
-    serviceRegistryJpaImpl.scheduledExecutor.shutdown();
+    if (serviceRegistryJpaImpl.scheduledExecutor != null)
+      serviceRegistryJpaImpl.scheduledExecutor.shutdown();
     serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
     serviceRegistryJpaImpl.activate(null);
     Hashtable<String, String> properties = new Hashtable<>();
@@ -307,7 +310,8 @@ public class ServiceRegistryJpaImplTest {
 
   @Test
   public void testIgnoreHostsInPriorityList() throws Exception {
-    serviceRegistryJpaImpl.scheduledExecutor.shutdown();
+    if (serviceRegistryJpaImpl.scheduledExecutor != null)
+      serviceRegistryJpaImpl.scheduledExecutor.shutdown();
     serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
     serviceRegistryJpaImpl.activate(null);
     Hashtable<String, String> properties = new Hashtable<>();
@@ -332,7 +336,8 @@ public class ServiceRegistryJpaImplTest {
 
   @Test
   public void testDispatchingJobsHigherMaxLoad() throws Exception {
-    serviceRegistryJpaImpl.scheduledExecutor.shutdown();
+    if (serviceRegistryJpaImpl.scheduledExecutor != null)
+      serviceRegistryJpaImpl.scheduledExecutor.shutdown();
     serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
     serviceRegistryJpaImpl.activate(null);
     Hashtable<String, String> properties = new Hashtable<>();

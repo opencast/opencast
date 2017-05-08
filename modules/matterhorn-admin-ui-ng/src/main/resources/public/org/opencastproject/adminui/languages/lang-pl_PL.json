@@ -970,7 +970,7 @@
     "ACTIONS":{
       "EXPORT":"Eksportuj",
       "ADD_BLACKLIST":"Dodaj czarną listę",
-      "REMOVE":"Usuń"
+      "REMOVE":"Remove"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1050,7 +1050,7 @@
         "EMAIL":"Email",
         "ROLES":"Role",
         "TYPE":"Typ",
-        "PROVIDER":"Dostawca",
+        "PROVIDER":"Provider",
         "BLACKLIST_FROM":"Na czarnej liście od",
         "BLACKLIST_TO":"Na czarnej liście do",
         "ACTION":"Działania"

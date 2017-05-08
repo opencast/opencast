@@ -22,9 +22,8 @@
 package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.index.service.resources.list.query.ServicesListQuery;
@@ -42,6 +41,7 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONAware;
@@ -287,11 +287,11 @@ public class ServicesEndpoint {
      * @return a json representation of a service as {@code JValue}
      */
     public JValue toJSON() {
-      return j(f(COMPLETED_NAME, v(getCompletedJobs())), f(HOST_NAME, vN(getHost())),
+      return obj(f(COMPLETED_NAME, v(getCompletedJobs())), f(HOST_NAME, v(getHost(), Jsons.BLANK)),
               f(MEAN_QUEUE_TIME_NAME, v(getMeanQueueTime())), f(MEAN_RUN_TIME_NAME, v(getMeanRunTime())),
-              f(NAME_NAME, vN(getName())), f(QUEUED_NAME, v(getQueuedJobs())),
+              f(NAME_NAME, v(getName(), Jsons.BLANK)), f(QUEUED_NAME, v(getQueuedJobs())),
               f(RUNNING_NAME, v(getRunningJobs())),
-              f(STATUS_NAME, vN(getStatus().name())));
+              f(STATUS_NAME, v(getStatus().name(), Jsons.BLANK)));
     }
   }
 
@@ -340,7 +340,7 @@ public class ServicesEndpoint {
       int result = 0;
       switch (sortBy) {
         case Service.COMPLETED_NAME:
-          result = (int)(s1.getCompletedJobs() - s2.getCompletedJobs());
+          result = s1.getCompletedJobs() - s2.getCompletedJobs();
           break;
         case Service.HOST_NAME:
           result = s1.getHost().compareToIgnoreCase(s2.getHost());

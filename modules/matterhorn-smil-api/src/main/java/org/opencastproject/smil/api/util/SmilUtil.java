@@ -67,7 +67,7 @@ public final class SmilUtil {
   /** Parse a SMIL document from an input stream. */
   public static final Fn<InputStream, SMILDocument> parseSmilFn = new FnX<InputStream, SMILDocument>() {
     @Override
-    public SMILDocument apx(InputStream in) throws SAXException, IOException {
+    public SMILDocument applyX(InputStream in) throws SAXException, IOException {
       return new SmilXmlParser().parse(in);
     }
   };
@@ -143,6 +143,30 @@ public final class SmilUtil {
    */
   public static Document addTrack(Document smilDocument, TrackType trackType, boolean hasVideo, long startTime,
           long duration, URI uri) {
+    return addTrack(smilDocument, trackType, hasVideo, startTime,duration, uri, null);
+  }
+
+  /**
+   * Adds a track to the SMIL document.
+   *
+   * @param smilDocument
+   *          the SMIL document
+   * @param trackType
+   *          the track type
+   * @param hasVideo
+   *          whether the track has a video stream
+   * @param startTime
+   *          the start time
+   * @param duration
+   *          the duration
+   * @param uri
+   *          the track URI
+   * @param trackId
+   *          the Id of the track
+   * @return the augmented SMIL document
+   */
+  public static Document addTrack(Document smilDocument, TrackType trackType, boolean hasVideo, long startTime,
+          long duration, URI uri, String trackId) {
     Element parallel = (Element) smilDocument.getElementsByTagName("par").item(0);
     if (parallel.getChildNodes().getLength() == 0) {
       Node presenterSeq = smilDocument.createElement("seq");
@@ -174,8 +198,12 @@ public final class SmilUtil {
     element.setAttribute("begin", Long.toString(startTime) + "ms");
     element.setAttribute("dur", Long.toString(duration) + "ms");
     element.setAttribute("src", URIUtil.getPath(uri.toString()));
+    if (trackId != null) {
+      element.setAttribute("xml:id", trackId);
+    }
     sequence.appendChild(element);
     return smilDocument;
   }
+
 
 }

@@ -23,8 +23,6 @@ package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
-import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
-import org.opencastproject.archive.opencast.OpencastArchive;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
@@ -53,10 +51,8 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   private AuthorizationService authorizationService;
   private CaptureAgentStateService captureAgentStateService;
   private EventCommentService eventCommentService;
-  private HttpMediaPackageElementProvider httpMediaPackageElementProvider;
   private IndexService indexService;
   private JobEndpoint jobService;
-  private OpencastArchive archive;
   private SchedulerService schedulerService;
   private SecurityService securityService;
   private UrlSigningService urlSigningService;
@@ -77,16 +73,6 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   @Override
-  public OpencastArchive getArchive() {
-    return archive;
-  }
-
-  /** OSGi DI. */
-  public void setArchive(OpencastArchive archive) {
-    this.archive = archive;
-  }
-
-  @Override
   public WorkflowService getWorkflowService() {
     return workflowService;
   }
@@ -104,16 +90,6 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   /** OSGi DI. */
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
-  }
-
-  @Override
-  public HttpMediaPackageElementProvider getHttpMediaPackageElementProvider() {
-    return httpMediaPackageElementProvider;
-  }
-
-  /** OSGi DI. */
-  public void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
-    this.httpMediaPackageElementProvider = httpMediaPackageElementProvider;
   }
 
   @Override
@@ -207,7 +183,12 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   }
 
   @Override
-  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    if (properties == null) {
+      logger.info("No configuration available, using defaults");
+      return;
+    }
+
     expireSeconds = UrlSigningServiceOsgiUtil.getUpdatedSigningExpiration(properties, this.getClass().getSimpleName());
     signWithClientIP = UrlSigningServiceOsgiUtil.getUpdatedSignWithClientIP(properties,
             this.getClass().getSimpleName());

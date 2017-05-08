@@ -107,11 +107,11 @@ public class StreamConsumer implements Runnable {
   }
 
   private final Fn<BufferedReader, Unit> consumeBuffered = new Fx<BufferedReader>() {
-    @Override public void ap(BufferedReader reader) {
+    @Override public void apply(BufferedReader reader) {
       String line;
       try {
         while ((line = reader.readLine()) != null) {
-          if (!consumer.ap(line)) {
+          if (!consumer.apply(line)) {
             stopConsuming();
           }
         }

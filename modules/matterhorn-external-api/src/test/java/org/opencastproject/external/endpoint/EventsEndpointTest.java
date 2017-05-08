@@ -20,7 +20,7 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.jayway.restassured.RestAssured.given;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
@@ -199,7 +199,7 @@ public class EventsEndpointTest {
     AccessControlList acl = new AccessControlList();
     Event event = new Event();
     event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
-    Response result = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, a(AclUtils.serializeAclToJson(acl)));
+    Response result = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(AclUtils.serializeAclToJson(acl)));
     assertTrue(result.getMetadata().get("Content-Type") != null);
     assertEquals("application/" + ApiVersion.CURRENT_VERSION + "+json",
             result.getMetadata().get("Content-Type").get(0).toString().toLowerCase());
@@ -211,7 +211,7 @@ public class EventsEndpointTest {
     acl = new AccessControlList(ace);
     event = new Event();
     event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
-    result = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, a(AclUtils.serializeAclToJson(acl)));
+    result = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(AclUtils.serializeAclToJson(acl)));
     assertTrue(result.getMetadata().get("Content-Type") != null);
     assertEquals("application/" + ApiVersion.CURRENT_VERSION + "+json",
             result.getMetadata().get("Content-Type").get(0).toString().toLowerCase());
@@ -224,7 +224,7 @@ public class EventsEndpointTest {
     acl = new AccessControlList(ace1, ace2);
     event = new Event();
     event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
-    result = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, a(AclUtils.serializeAclToJson(acl)));
+    result = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(AclUtils.serializeAclToJson(acl)));
     assertTrue(result.getMetadata().get("Content-Type") != null);
     assertEquals("application/" + ApiVersion.CURRENT_VERSION + "+json",
             result.getMetadata().get("Content-Type").get(0).toString().toLowerCase());

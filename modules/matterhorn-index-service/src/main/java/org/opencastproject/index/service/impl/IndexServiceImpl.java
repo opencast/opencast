@@ -22,18 +22,23 @@
 package org.opencastproject.index.service.impl;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
+import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
 
-import org.opencastproject.archive.api.ArchiveException;
-import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
-import org.opencastproject.archive.opencast.OpencastArchive;
-import org.opencastproject.archive.opencast.OpencastQueryBuilder;
-import org.opencastproject.archive.opencast.OpencastResultSet;
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.AssetManagerException;
+import org.opencastproject.assetmanager.api.query.AQueryBuilder;
+import org.opencastproject.assetmanager.api.query.AResult;
+import org.opencastproject.assetmanager.api.query.Predicate;
+import org.opencastproject.authorization.xacml.manager.api.AclService;
+import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentException;
 import org.opencastproject.event.comment.EventCommentParser;
+import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
@@ -103,7 +108,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.util.data.Effect0;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowException;
@@ -175,16 +179,17 @@ public class IndexServiceImpl implements IndexService {
   /** A parser for handling JSON documents inside the body of a request. **/
   private static final JSONParser parser = new JSONParser();
 
-  private final List<EventCatalogUIAdapter> eventCatalogUIAdapters = new ArrayList<EventCatalogUIAdapter>();
-  private final List<SeriesCatalogUIAdapter> seriesCatalogUIAdapters = new ArrayList<SeriesCatalogUIAdapter>();
+  private final List<EventCatalogUIAdapter> eventCatalogUIAdapters = new ArrayList<>();
+  private final List<SeriesCatalogUIAdapter> seriesCatalogUIAdapters = new ArrayList<>();
   private EventCatalogUIAdapter eventCatalogUIAdapter;
   private SeriesCatalogUIAdapter seriesCatalogUIAdapter;
 
+  private AclServiceFactory aclServiceFactory;
   private AuthorizationService authorizationService;
   private CaptureAgentStateService captureAgentStateService;
-  private HttpMediaPackageElementProvider httpMediaPackageElementProvider;
+  private EventCommentService eventCommentService;
   private IngestService ingestService;
-  private OpencastArchive opencastArchive;
+  private AssetManager assetManager;
   private SchedulerService schedulerService;
   private SecurityService securityService;
   private JpaGroupRoleProvider jpaGroupRoleProvider;
@@ -197,6 +202,11 @@ public class IndexServiceImpl implements IndexService {
   private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
   /** OSGi DI. */
+  public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
+    this.aclServiceFactory = aclServiceFactory;
+  }
+
+  /** OSGi DI. */
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -204,6 +214,11 @@ public class IndexServiceImpl implements IndexService {
   /** OSGi DI. */
   public void setCaptureAgentStateService(CaptureAgentStateService captureAgentStateService) {
     this.captureAgentStateService = captureAgentStateService;
+  }
+
+  /** OSGi callback for the event comment service. */
+  public void setEventCommentService(EventCommentService eventCommentService) {
+    this.eventCommentService = eventCommentService;
   }
 
   /** OSGi callback to add the event dublincore {@link EventCatalogUIAdapter} instance. */
@@ -237,18 +252,13 @@ public class IndexServiceImpl implements IndexService {
   }
 
   /** OSGi DI. */
-  public void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
-    this.httpMediaPackageElementProvider = httpMediaPackageElementProvider;
-  }
-
-  /** OSGi DI. */
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
 
   /** OSGi DI. */
-  public void setOpencastArchive(OpencastArchive opencastArchive) {
-    this.opencastArchive = opencastArchive;
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
   }
 
   /** OSGi DI. */
@@ -286,16 +296,20 @@ public class IndexServiceImpl implements IndexService {
     this.jpaGroupRoleProvider = jpaGroupRoleProvider;
   }
 
+  public AclService getAclService() {
+    return aclServiceFactory.serviceFor(securityService.getOrganization());
+  }
+
   private static final Fn2<EventCatalogUIAdapter, String, Boolean> eventOrganizationFilter = new Fn2<EventCatalogUIAdapter, String, Boolean>() {
     @Override
-    public Boolean ap(EventCatalogUIAdapter catalogUIAdapter, String organization) {
+    public Boolean apply(EventCatalogUIAdapter catalogUIAdapter, String organization) {
       return organization.equals(catalogUIAdapter.getOrganization());
     }
   };
 
   private static final Fn2<SeriesCatalogUIAdapter, String, Boolean> seriesOrganizationFilter = new Fn2<SeriesCatalogUIAdapter, String, Boolean>() {
     @Override
-    public Boolean ap(SeriesCatalogUIAdapter catalogUIAdapter, String organization) {
+    public Boolean apply(SeriesCatalogUIAdapter catalogUIAdapter, String organization) {
       return catalogUIAdapter.getOrganization().equals(organization);
     }
   };
@@ -315,13 +329,12 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public List<EventCatalogUIAdapter> getEventCatalogUIAdapters() {
-    return new ArrayList<EventCatalogUIAdapter>(getEventCatalogUIAdapters(securityService.getOrganization().getId()));
+    return new ArrayList<>(getEventCatalogUIAdapters(securityService.getOrganization().getId()));
   }
 
   @Override
   public List<SeriesCatalogUIAdapter> getSeriesCatalogUIAdapters() {
-    return new LinkedList<SeriesCatalogUIAdapter>(
-            getSeriesCatalogUIAdapters(securityService.getOrganization().getId()));
+    return new LinkedList<>(getSeriesCatalogUIAdapters(securityService.getOrganization().getId()));
   }
 
   @Override
@@ -522,7 +535,7 @@ public class IndexServiceImpl implements IndexService {
     }
 
     // Get presenter usernames for use as technical presenters
-    Set<String> presenterUsernames = new HashSet<String>();
+    Set<String> presenterUsernames = new HashSet<>();
     Opt<Set<String>> technicalPresenters = updatePresenters(eventMetadata);
     if (technicalPresenters.isSome()) {
       presenterUsernames = technicalPresenters.get();
@@ -583,10 +596,9 @@ public class IndexServiceImpl implements IndexService {
       rRule = new RRule((String) sourceMetadata.get("rrule"));
     }
 
-    Map<String, String> configuration = new HashMap<String, String>();
+    Map<String, String> configuration = new HashMap<>();
     if (eventHttpServletRequest.getProcessing().get().get("configuration") != null) {
-      configuration = new HashMap<String, String>(
-              (JSONObject) eventHttpServletRequest.getProcessing().get().get("configuration"));
+      configuration = new HashMap<>((JSONObject) eventHttpServletRequest.getProcessing().get().get("configuration"));
     }
     for (Entry<String, String> entry : configuration.entrySet()) {
       caProperties.put(WORKFLOW_CONFIG_PREFIX.concat(entry.getKey()), entry.getValue());
@@ -616,7 +628,7 @@ public class IndexServiceImpl implements IndexService {
         List<Period> periods = calculatePeriods(start.toDate(), end.toDate(), duration, rRule, tz);
         int i = 1;
         int length = Integer.toString(periods.size()).length();
-        List<String> ids = new ArrayList<String>();
+        List<String> ids = new ArrayList<>();
         String initialTitle = dc.getFirst(DublinCore.PROPERTY_TITLE);
         for (Period period : periods) {
           Date startDate = new Date(period.getStart().getTime());
@@ -657,7 +669,7 @@ public class IndexServiceImpl implements IndexService {
    */
   private DublinCoreCatalog getDublinCoreCatalog(EventHttpServletRequest eventHttpServletRequest) {
     DublinCoreCatalog dc;
-    Option<DublinCoreCatalog> dcOpt = DublinCoreUtil.loadEpisodeDublinCore(workspace,
+    Opt<DublinCoreCatalog> dcOpt = DublinCoreUtil.loadEpisodeDublinCore(workspace,
             eventHttpServletRequest.getMediaPackage().get());
     if (dcOpt.isSome()) {
       dc = dcOpt.get();
@@ -683,7 +695,7 @@ public class IndexServiceImpl implements IndexService {
     MetadataField<?> presentersMetadataField = eventMetadata.getOutputFields()
             .get(DublinCore.PROPERTY_CREATOR.getLocalName());
     if (presentersMetadataField.isUpdated()) {
-      Set<String> presenterUsernames = new HashSet<String>();
+      Set<String> presenterUsernames = new HashSet<>();
       Tuple<List<String>, Set<String>> updatedPresenters = getTechnicalPresenters(eventMetadata);
       presenterUsernames = updatedPresenters.getB();
       eventMetadata.removeField(presentersMetadataField);
@@ -732,7 +744,6 @@ public class IndexServiceImpl implements IndexService {
    * @return a list of scheduling periods
    */
   protected List<Period> calculatePeriods(Date start, Date end, long duration, RRule rRule, TimeZone tz) {
-    final TimeZone timeZone = TimeZone.getDefault();
     final TimeZone utc = TimeZone.getTimeZone("UTC");
     TimeZone.setDefault(tz);
     DateTime seed = new DateTime(start);
@@ -748,7 +759,7 @@ public class IndexServiceImpl implements IndexService {
     period.setTime(calendar.getTime().getTime() + duration);
     duration = duration % (DateTimeConstants.MILLIS_PER_DAY);
 
-    List<Period> periods = new ArrayList<Period>();
+    List<Period> periods = new ArrayList<>();
 
     TimeZone.setDefault(utc);
     for (Object date : rRule.getRecur().getDates(seed, period, Value.DATE_TIME)) {
@@ -770,7 +781,7 @@ public class IndexServiceImpl implements IndexService {
       periods.add(new Period(new DateTime(cDate.getTime()), new DateTime(cDate.getTimeInMillis() + duration)));
     }
 
-    TimeZone.setDefault(timeZone);
+    TimeZone.setDefault(null);
     return periods;
   }
 
@@ -836,7 +847,7 @@ public class IndexServiceImpl implements IndexService {
           }
           break;
         case ARCHIVE:
-          opencastArchive.add(mediaPackage);
+          assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
           break;
         case SCHEDULE:
           // Ignoring as there are no mediapackages attached to scheduled items
@@ -916,7 +927,7 @@ public class IndexServiceImpl implements IndexService {
         }
         mediaPackage = mpOpt.get();
         updateMediaPackageMetadata(mediaPackage, metadataList);
-        opencastArchive.add(mediaPackage);
+        assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
         break;
       case SCHEDULE:
         try {
@@ -951,8 +962,8 @@ public class IndexServiceImpl implements IndexService {
   protected Tuple<List<String>, Set<String>> getTechnicalPresenters(MetadataCollection eventMetadata) {
     MetadataField<?> presentersMetadataField = eventMetadata.getOutputFields()
             .get(DublinCore.PROPERTY_CREATOR.getLocalName());
-    List<String> presenters = new ArrayList<String>();
-    Set<String> technicalPresenters = new HashSet<String>();
+    List<String> presenters = new ArrayList<>();
+    Set<String> technicalPresenters = new HashSet<>();
     for (String presenter : MetadataUtils.getIterableStringMetadata(presentersMetadataField)) {
       User user = userDirectoryService.loadUser(presenter);
       if (user == null) {
@@ -988,7 +999,7 @@ public class IndexServiceImpl implements IndexService {
         }
         mediaPackage = mpOpt.get();
         mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
-        opencastArchive.add(mediaPackage);
+        assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
         return acl;
       case SCHEDULE:
         try {
@@ -1159,18 +1170,18 @@ public class IndexServiceImpl implements IndexService {
     boolean notFoundArchive = false;
     boolean removedArchive = true;
     try {
-      OpencastResultSet archiveRes = opencastArchive.find(
-              OpencastQueryBuilder.query().mediaPackageId(id).onlyLastVersion(true),
-              httpMediaPackageElementProvider.getUriRewriter());
-      if (archiveRes.size() > 0) {
-        opencastArchive.delete(id);
+      final AQueryBuilder q = assetManager.createQuery();
+      final Predicate p = q.organizationId().eq(securityService.getOrganization().getId()).and(q.mediaPackageId(id));
+      final AResult r = q.select(q.nothing()).where(p).run();
+      if (r.getSize() > 0) {
+        q.delete(DEFAULT_OWNER, q.snapshot()).where(p).run();
       } else {
         notFoundArchive = true;
       }
-    } catch (ArchiveException e) {
-      if (e.isCauseNotAuthorized()) {
+    } catch (AssetManagerException e) {
+      if (e.getCause() instanceof UnauthorizedException) {
         unauthorizedArchive = true;
-      } else if (e.isCauseNotFound()) {
+      } else if (e.getCause() instanceof NotFoundException) {
         notFoundArchive = true;
       } else {
         removedArchive = false;
@@ -1183,6 +1194,12 @@ public class IndexServiceImpl implements IndexService {
 
     if (unauthorizedScheduler || unauthorizedWorkflow || unauthorizedArchive)
       throw new UnauthorizedException("Not authorized to remove event id " + id);
+
+    try {
+      eventCommentService.deleteComments(id);
+    } catch (EventCommentException e) {
+      logger.error("Unable to remove comments for event '{}': {}", id, getStackTrace(e));
+    }
 
     return removedScheduler && removedWorkflow && removedArchive;
   }
@@ -1213,12 +1230,12 @@ public class IndexServiceImpl implements IndexService {
         }
         return Opt.none();
       case ARCHIVE:
-        final OpencastResultSet archiveRes = opencastArchive.find(
-                OpencastQueryBuilder.query().mediaPackageId(event.getIdentifier()).onlyLastVersion(true),
-                httpMediaPackageElementProvider.getUriRewriter());
-        if (archiveRes.size() > 0) {
+        final AQueryBuilder q = assetManager.createQuery();
+        final AResult r = q.select(q.snapshot())
+                .where(q.mediaPackageId(event.getIdentifier()).and(q.version().isLatest())).run();
+        if (r.getSize() > 0) {
           logger.debug("Found event in archive with id {}", event.getIdentifier());
-          return Opt.some(archiveRes.getItems().get(0).getMediaPackage());
+          return Opt.some(enrich(r).getSnapshots().head2().getMediaPackage());
         }
         logger.error("No event with id {} found from archive!", event.getIdentifier());
         throw new IndexServiceException("No archived event found with id " + event.getIdentifier());
@@ -1481,7 +1498,7 @@ public class IndexServiceImpl implements IndexService {
                   break;
                 case ARCHIVE:
                   logger.info("Update archive mediapacakge {} with updated comments catalog.", event.getIdentifier());
-                  opencastArchive.add(mediaPackage);
+                  assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
                   break;
                 default:
                   logger.error("Unkown event source {}!", event.getSource().toString());

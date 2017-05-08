@@ -224,7 +224,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   protected RestServiceTracker tracker = null;
 
   /** The thread pool to use for dispatching queued jobs and checking on phantom services. */
-  protected ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
+  protected ScheduledExecutorService scheduledExecutor = null;
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -337,14 +337,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY).map(Strings.toBool)
               .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
     }
-
-    // Schedule the heartbeat with the default interval
-    scheduledExecutor.scheduleWithFixedDelay(new JobProducerHeartbeat(), DEFAULT_HEART_BEAT, DEFAULT_HEART_BEAT,
-            TimeUnit.SECONDS);
-
-    // Schedule the job dispatching with the default interval
-    scheduledExecutor.scheduleWithFixedDelay(new JobDispatcher(), DEFAULT_DISPATCH_INTERVAL, DEFAULT_DISPATCH_INTERVAL,
-            TimeUnit.MILLISECONDS);
   }
 
   @Override
@@ -713,6 +705,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @Override
   @SuppressWarnings("rawtypes")
   public void updated(Dictionary properties) throws ConfigurationException {
+
+    logger.info("Updating service registry");
+
     String maxAttempts = StringUtils.trimToNull((String) properties.get(MAX_ATTEMPTS_CONFIG_KEY));
     if (maxAttempts != null) {
       try {
@@ -787,8 +782,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     // Stop the current scheduled executors so we can configure new ones
     if (scheduledExecutor != null) {
       scheduledExecutor.shutdown();
-      scheduledExecutor = Executors.newScheduledThreadPool(2);
     }
+
+    scheduledExecutor = Executors.newScheduledThreadPool(2);
 
     // Schedule the service heartbeat if the interval is > 0
     if (heartbeatInterval > 0) {
@@ -799,10 +795,20 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     // Schedule the job dispatching.
     if (dispatchInterval > 0) {
-      logger.debug("Starting job dispatching at a custom interval of {}s", DEFAULT_DISPATCH_INTERVAL / 1000);
+      logger.debug("Starting job dispatching at a custom interval of {}s", dispatchInterval / 1000);
       scheduledExecutor.scheduleWithFixedDelay(new JobDispatcher(), dispatchInterval, dispatchInterval,
               TimeUnit.MILLISECONDS);
     }
+  }
+
+  /**
+   * OSGI callback when the configuration is updated. This method is only here to prevent the
+   * configuration admin service from calling the service deactivate and activate methods
+   * for a config update. It does not have to do anything as the updates are handled by updated().
+   */
+  public void modified(Map<String, Object> config)
+     throws ConfigurationException {
+    logger.debug("Modified serviceregistry");
   }
 
   private JpaJob getJpaJob(long id) throws NotFoundException, ServiceRegistryException {
@@ -898,7 +904,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   private Fn<JpaJob, JpaJob> fnSetJobUri() {
     return new Fn<JpaJob, JpaJob>() {
       @Override
-      public JpaJob ap(JpaJob job) {
+      public JpaJob apply(JpaJob job) {
         return setJobUri(job);
       }
     };
@@ -2773,7 +2779,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   private final Fn<HostRegistration, String> toBaseUrl = new Fn<HostRegistration, String>() {
     @Override
-    public String ap(HostRegistration h) {
+    public String apply(HostRegistration h) {
       return h.getBaseUrl();
     }
   };
@@ -2794,6 +2800,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
      */
     @Override
     public void run() {
+
+      logger.debug("Starting job dispatching");
+
       undispatchableJobTypes = new ArrayList<String>();
       EntityManager em = null;
       try {
@@ -2868,6 +2877,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         if (em != null)
           em.close();
       }
+
+      logger.debug("Finished job dispatching");
     }
 
     /**
@@ -3093,13 +3104,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       // We've tried dispatching to every online service that can handle this type of job, with no luck.
       if (triedDispatching) {
-        String host = job.getProcessorServiceRegistration().getHost();
         // Workflow type jobs are not set to priority list, because they handle accepting jobs not based on the job load
         // If the system don't accepts jobs whose load exceeds the host's max load we can't make use of the priority
         // list
         if (acceptJobLoadsExeedingMaxLoad && !dispatchPriorityList.containsKey(job.getId())
-                && !TYPE_WORKFLOW.equals(job.getJobType()))
+                && !TYPE_WORKFLOW.equals(job.getJobType()) && job.getProcessorServiceRegistration() != null) {
+          String host = job.getProcessorServiceRegistration().getHost();
           dispatchPriorityList.put(job.getId(), host);
+        }
 
         try {
           job.setStatus(Status.QUEUED);
@@ -3116,7 +3128,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     private final Fn2<HostRegistration, Long, Boolean> filterOutPriorityHosts = new Fn2<HostRegistration, Long, Boolean>() {
       @Override
-      public Boolean ap(HostRegistration host, Long jobId) {
+      public Boolean apply(HostRegistration host, Long jobId) {
         if (dispatchPriorityList.values().contains(host.getBaseUrl())
                 && !host.getBaseUrl().equals(dispatchPriorityList.get(jobId))) {
           return false;
@@ -3127,14 +3139,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     private final Fn<ServiceRegistration, HostRegistration> toHostRegistration = new Fn<ServiceRegistration, HostRegistration>() {
       @Override
-      public HostRegistration ap(ServiceRegistration s) {
+      public HostRegistration apply(ServiceRegistration s) {
         return ((ServiceRegistrationJpaImpl) s).getHostRegistration();
       }
     };
 
     private final Fn<HostRegistration, Float> toMaxLoad = new Fn<HostRegistration, Float>() {
       @Override
-      public Float ap(HostRegistration h) {
+      public Float apply(HostRegistration h) {
         return h.getMaxLoad();
       }
     };

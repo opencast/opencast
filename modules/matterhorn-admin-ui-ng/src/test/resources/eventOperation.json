@@ -1,13 +1,15 @@
 {
-    "id": 5,
-    "failed_attempts": 0,
-    "description": "Archive",
-    "name": "archive",
-    "state": "INSTANTIATED",
-    "execution_Host": "",
-    "job": 3,
-    "max_attempts": 1,
-    "fail_on_error": true,
-    "retry_strategy": "NONE",
-    "exception_handler_workflow": "error"
+  "time_in_queue": 0,
+  "state": "INSTANTIATED",
+  "max_attempts": 1,
+  "job": 5,
+  "retry_strategy": "NONE",
+  "fail_on_error": true,
+  "exception_handler_workflow": "error",
+  "failed_attempts": 0,
+  "description": "Archive",
+  "execution_host": "",
+  "name": "archive",
+  "started": "",
+  "completed": ""
 }

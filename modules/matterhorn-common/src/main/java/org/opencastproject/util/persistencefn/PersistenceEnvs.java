@@ -30,6 +30,8 @@ import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 
 import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -42,6 +44,8 @@ import javax.persistence.spi.PersistenceProvider;
  * Persistence environment factory.
  */
 public final class PersistenceEnvs {
+  private static final Logger logger = LoggerFactory.getLogger(PersistenceEnvs.class);
+
   private PersistenceEnvs() {
   }
 
@@ -71,10 +75,10 @@ public final class PersistenceEnvs {
             tx.begin();
             emStore.set(Opt.<Transactional>some(new Transactional() {
               @Override public <A> A tx(Fn<EntityManager, A> transactional) {
-                return transactional.ap(em);
+                return transactional.apply(em);
               }
             }));
-            A ret = transactional.ap(em);
+            A ret = transactional.apply(em);
             tx.commit();
             return ret;
           } catch (Exception e) {
@@ -94,7 +98,7 @@ public final class PersistenceEnvs {
     };
     return new PersistenceEnv() {
       Transactional currentTx() {
-        return emStore.get().or(startTx);
+        return emStore.get().getOr(startTx);
       }
 
       @Override public <A> A tx(Fn<EntityManager, A> transactional) {
@@ -152,5 +156,23 @@ public final class PersistenceEnvs {
    */
   public static PersistenceEnv mkTestEnv(String emName, boolean withSqlLogging) {
     return mk(mkTestEntityManagerFactory(emName, withSqlLogging));
+  }
+
+  /**
+   * Create a persistence environment for unit tests configured by the following system properties.
+   * <ul>
+   * <li>-Dtest-database-url, JDBC URL, defaults to H2 in-memory database</li>
+   * <li>-Dtest-database-user, defaults to 'matterhorn'</li>
+   * <li>-Dtest-database-password, defaults to 'matterhorn'</li>
+   * <li>-Dsql-logging=[true|false], defaults to 'false', turns on SQL logging to the console</li>
+   * <li>-Dkeep-database=[true|false], defaults to 'false', keep an existing database or recreate at startup. Not used with H2.</li>
+   * </ul>
+   * Currently only MySQL is recognized.
+   *
+   * @param emName
+   *         name of the persistence unit (see META-INF/persistence.xml)
+   */
+  public static PersistenceEnv mkTestEnvFromSystemProperties(String emName) {
+    return mk(PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(emName));
   }
 }

@@ -1,11 +1,1 @@
-{
-  "opt_out": true,
-  "messages": [
-    {
-      "id": 1234,
-      "subject": "Test email",
-      "creator": "Marcus Lundstrom",
-      "creation_date": "2015-05-04T11:33:53Z"
-    }
-  ]
-}
+{"opt_out":true,"read_only":true,"review_status":"UNSENT"}

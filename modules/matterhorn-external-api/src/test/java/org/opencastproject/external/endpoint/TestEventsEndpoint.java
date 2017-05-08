@@ -42,6 +42,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.PropertiesUtil;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -86,7 +87,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
     // Setup common event catalog
     CommonEventCatalogUIAdapter commonEventCatalogUIAdapter = new CommonEventCatalogUIAdapter();
     Properties episodeCatalogProperties = getCatalogProperties(getClass(), "/episode-catalog.properties");
-    commonEventCatalogUIAdapter.updated(episodeCatalogProperties);
+    commonEventCatalogUIAdapter.updated(PropertiesUtil.toDictionary(episodeCatalogProperties));
     this.setCommonEventCatalogUIAdapter(commonEventCatalogUIAdapter);
     addCatalogUIAdapter(commonEventCatalogUIAdapter);
 

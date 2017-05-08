@@ -45,6 +45,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.PropertiesUtil;
 import org.opencastproject.util.data.Arrays;
 
 import com.entwinemedia.fn.data.Opt;
@@ -76,7 +77,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     expect(org.getId()).andStubReturn("opencast");
     replay(org);
 
-    Set<Role> roles = new HashSet<Role>();
+    Set<Role> roles = new HashSet<>();
     Role roleStudent = createNiceMock(Role.class);
     expect(roleStudent.getName()).andStubReturn("ROLE_STUDENT");
     roles.add(roleStudent);
@@ -129,14 +130,14 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     expect(externalIndex.getByQuery(anyObject(SeriesSearchQuery.class))).andStubReturn(searchResult);
     replay(externalIndex);
 
-    Map<String, String> series1Props = new HashMap<String, String>();
+    Map<String, String> series1Props = new HashMap<>();
     series1Props.put("live", "false");
     series1Props.put("ondemand", "true");
 
     CommonSeriesCatalogUIAdapter commonAdapter = new CommonSeriesCatalogUIAdapter();
     Properties seriesCatalogProperties = getCatalogProperties(getClass(), "/series-catalog.properties");
-    commonAdapter.updated(seriesCatalogProperties);
-    List<SeriesCatalogUIAdapter> adapters = new LinkedList<SeriesCatalogUIAdapter>();
+    commonAdapter.updated(PropertiesUtil.toDictionary(seriesCatalogProperties));
+    List<SeriesCatalogUIAdapter> adapters = new LinkedList<>();
     adapters.add(commonAdapter);
 
     IndexService indexService = createNiceMock(IndexService.class);

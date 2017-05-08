@@ -99,12 +99,12 @@ public final class RepublishOaiPmhWorkflowOperationHandler extends AbstractWorkf
     final Set<MediaPackageElementFlavor> flavors = new HashSet<>();
     // Check which flavors have been configured
     final List<String> configuredFlavors = getOptConfig(wi, OPT_SOURCE_FLAVORS).bind(trimToNone).map(asList.toFn())
-            .or(Collections.<String> nil());
+            .getOr(Collections.<String> nil());
     for (String flavor : configuredFlavors) {
       flavors.add(MediaPackageElementFlavor.parseFlavor(flavor));
     }
     // Get the configured tags
-    final List<String> tags = asList(getOptConfig(wi, OPT_SOURCE_TAGS).or(""));
+    final List<String> tags = asList(getOptConfig(wi, OPT_SOURCE_TAGS).getOr(""));
     // Merge or replace?
     boolean merge = Boolean.parseBoolean(getConfig(wi, OPT_MERGE));
     // repository

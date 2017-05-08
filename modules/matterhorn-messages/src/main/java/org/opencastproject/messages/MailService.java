@@ -149,7 +149,7 @@ public class MailService {
 
   public List<MessageTemplate> findMessageTemplates(TemplateMessageQuery query) {
     EntityManager em = null;
-    List<MessageTemplate> messageTemplates = new ArrayList<MessageTemplate>();
+    List<MessageTemplate> messageTemplates = new ArrayList<>();
 
     try {
       em = emf.createEntityManager();
@@ -157,7 +157,7 @@ public class MailService {
       CriteriaQuery<MessageTemplateDto> q = cb.createQuery(MessageTemplateDto.class);
       Root<MessageTemplateDto> messageTemplateRoot = q.from(MessageTemplateDto.class);
 
-      List<Predicate> predicates = new ArrayList<Predicate>();
+      List<Predicate> predicates = new ArrayList<>();
 
       q.select(messageTemplateRoot);
 
@@ -177,7 +177,7 @@ public class MailService {
         predicates.add(cb.equal(messageTemplateRoot.get("type").as(TemplateType.Type.class), query.getType()));
 
       if (StringUtils.isNotEmpty(query.getFullText())) {
-        List<Predicate> fullTextPredicates = new ArrayList<Predicate>();
+        List<Predicate> fullTextPredicates = new ArrayList<>();
         fullTextPredicates.add(cb.like(messageTemplateRoot.<String> get("name"), "%" + query.getFullText() + "%"));
         fullTextPredicates.add(cb.like(messageTemplateRoot.<String> get("subject"), "%" + query.getFullText() + "%"));
         fullTextPredicates.add(cb.like(messageTemplateRoot.<String> get("body"), "%" + query.getFullText() + "%"));
@@ -227,7 +227,7 @@ public class MailService {
       em = emf.createEntityManager();
       String orgId = securityService.getOrganization().getId();
       TypedQuery<MessageTemplateDto> q = em.createNamedQuery("MessageTemplate.findAll", MessageTemplateDto.class).setParameter("org", orgId);
-      List<MessageTemplate> templates = new ArrayList<MessageTemplate>();
+      List<MessageTemplate> templates = new ArrayList<>();
       List<MessageTemplateDto> result = q.getResultList();
       for (MessageTemplateDto m : result) {
         templates.add(m.toMessageTemplate(userDirectoryService));
@@ -250,7 +250,7 @@ public class MailService {
       TypedQuery<MessageTemplateDto> q = em.createNamedQuery("MessageTemplate.findByName", MessageTemplateDto.class)
               .setParameter("org", orgId);
       q.setParameter("name", messageTemplateName);
-      List<MessageTemplate> templates = new ArrayList<MessageTemplate>();
+      List<MessageTemplate> templates = new ArrayList<>();
       List<MessageTemplateDto> result = q.getResultList();
       for (MessageTemplateDto m : result) {
         templates.add(m.toMessageTemplate(userDirectoryService));
@@ -273,7 +273,7 @@ public class MailService {
       TypedQuery<MessageTemplateDto> q = em.createNamedQuery("MessageTemplate.likeName", MessageTemplateDto.class)
               .setParameter("org", orgId);
       q.setParameter("name", filterText + "%");
-      List<MessageTemplate> templates = new ArrayList<MessageTemplate>();
+      List<MessageTemplate> templates = new ArrayList<>();
       List<MessageTemplateDto> result = q.getResultList();
       for (MessageTemplateDto m : result) {
         templates.add(m.toMessageTemplate(userDirectoryService));
@@ -342,7 +342,7 @@ public class MailService {
       em = emf.createEntityManager();
       String orgId = securityService.getOrganization().getId();
       Query q = em.createNamedQuery("MessageSignature.findAll").setParameter("org", orgId);
-      List<MessageSignature> signatures = new ArrayList<MessageSignature>();
+      List<MessageSignature> signatures = new ArrayList<>();
       List<MessageSignatureDto> result = q.getResultList();
       for (MessageSignatureDto m : result) {
         signatures.add(m.toMessageSignature(userDirectoryService));
@@ -369,7 +369,7 @@ public class MailService {
       String orgId = securityService.getOrganization().getId();
       String username = securityService.getUser().getUsername();
       Query q = em.createNamedQuery("MessageSignature.findByCreator").setParameter("username", username).setParameter("org", orgId);
-      List<MessageSignature> signatures = new ArrayList<MessageSignature>();
+      List<MessageSignature> signatures = new ArrayList<>();
       List<MessageSignatureDto> result = q.getResultList();
       for (MessageSignatureDto m : result) {
         signatures.add(m.toMessageSignature(userDirectoryService));
@@ -384,7 +384,6 @@ public class MailService {
       }
     }
   }
-
 
   /**
    * Get the current logged in user's signature

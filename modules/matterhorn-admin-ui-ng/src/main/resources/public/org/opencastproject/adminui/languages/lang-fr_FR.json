@@ -970,7 +970,7 @@
     "ACTIONS":{
       "EXPORT":"Exporter",
       "ADD_BLACKLIST":"Ajouter liste de blocage",
-      "REMOVE":"Retirer"
+      "REMOVE":"Remove"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1050,7 +1050,7 @@
         "EMAIL":"E-mail",
         "ROLES":"Rôles",
         "TYPE":"Type",
-        "PROVIDER":"Fournisseur",
+        "PROVIDER":"Provider",
         "BLACKLIST_FROM":"Bloqué de",
         "BLACKLIST_TO":"Bloqué jusqu'au",
         "ACTION":"Actions"

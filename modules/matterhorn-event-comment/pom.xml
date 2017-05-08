@@ -10,7 +10,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>2.5-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -183,6 +183,10 @@
               org.opencastproject.event.comment;version=${project.version},
               org.opencastproject.event.comment.persistence;version=${project.version}
             </Export-Package>
+            <Import-Package>
+              org.w3c.dom;version=0,
+              *
+            </Import-Package>
             <Service-Component>
               OSGI-INF/event-comment-database-service.xml,
               OSGI-INF/event-comment-service.xml

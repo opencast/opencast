@@ -21,8 +21,8 @@
 
 package org.opencastproject.metadata.dublincore;
 
+import static com.entwinemedia.fn.Equality.ne;
 import static org.opencastproject.metadata.dublincore.DublinCore.LANGUAGE_UNDEFINED;
-import static org.opencastproject.util.EqualsUtil.ne;
 
 import org.opencastproject.mediapackage.EName;
 

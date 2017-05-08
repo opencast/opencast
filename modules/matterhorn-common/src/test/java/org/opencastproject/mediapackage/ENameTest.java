@@ -28,6 +28,10 @@ import org.opencastproject.util.IoSupport;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class ENameTest {
   @Test
   public void testEquals() throws Exception {
@@ -49,4 +53,25 @@ public class ENameTest {
     final EName a = new EName("http://localhost/a", "a");
     assertEquals(a, IoSupport.serializeDeserialize(a));
   }
+
+  @Test
+  public void testCompareTo() {
+    final EName a1 = new EName("http://localhost/a", "a");
+    final EName b1 = new EName("http://localhost/b", "b");
+    final EName a2 = new EName("", "a");
+    final EName b2 = new EName("", "b");
+
+    List<EName> eNames = new ArrayList<>();
+    eNames.add(b1);
+    eNames.add(a1);
+    eNames.add(b2);
+    eNames.add(a2);
+    Collections.sort(eNames);
+
+    assertEquals(a2, eNames.get(0));
+    assertEquals(b2, eNames.get(1));
+    assertEquals(a1, eNames.get(2));
+    assertEquals(b1, eNames.get(3));
+  }
+
 }

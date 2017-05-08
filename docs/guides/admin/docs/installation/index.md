@@ -30,6 +30,15 @@ pre-built Opencast installations.
  - [Fedora](rpm-fedora.md)
 
 
+Installation with Docker
+----------------------------
+
+You can also use Docker to quickly install or test Opencast. There are multiple Docker images available for installing
+Opencast on either a single or multiple server.
+
+ - [Testing Locally with Docker](docker-local.md)
+
+
 Installation Across Multiple Servers
 ------------------------------------
 

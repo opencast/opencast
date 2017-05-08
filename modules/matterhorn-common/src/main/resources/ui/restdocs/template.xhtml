@@ -39,9 +39,13 @@
     color: #ccc;
   }
 
+  .toc li {
+    padding: 2px 0;
+  }
+
   .toc a {
     color: #333;
-    padding: 10px 0;
+    padding: 1px 0;
     text-decoration: underline;
   }
 
@@ -487,8 +491,6 @@ $(document).ready(function() {
         if ($form.find("input.form_action_holder").length >= 1) {
             // now find and put the event handler on all path params
             $form.find(".form_param_path").change( function() {
-              checkPath($form);
-            }).keyup(function() {
               checkPath($form);
             });
             // run the checkPath method

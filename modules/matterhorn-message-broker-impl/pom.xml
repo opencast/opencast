@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>2.5-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -134,7 +134,7 @@
               !sun.management,
               org.opencastproject.message.broker.api.acl,
               org.opencastproject.message.broker.api.agent,
-              org.opencastproject.message.broker.api.archive,
+              org.opencastproject.message.broker.api.assetmanager,
               org.opencastproject.message.broker.api.comments,
               org.opencastproject.message.broker.api.group,
               org.opencastproject.message.broker.api.index,

@@ -73,7 +73,7 @@ public final class DublinCoreMetadataUtil {
   public static void updateDublincoreCatalog(DublinCoreCatalog dc, MetadataCollection metadata) {
     for (MetadataField<?> field : metadata.getOutputFields().values()) {
       if (field.isUpdated() && field.getValue().isSome()) {
-        final String namespace = field.getNamespace().or(DublinCore.TERMS_NS_URI);
+        final String namespace = field.getNamespace().getOr(DublinCore.TERMS_NS_URI);
         final EName ename = new EName(namespace, field.getInputID());
         if (field.getType() == MetadataField.Type.START_DATE) {
           setTemporalStartDate(dc, field, ename);

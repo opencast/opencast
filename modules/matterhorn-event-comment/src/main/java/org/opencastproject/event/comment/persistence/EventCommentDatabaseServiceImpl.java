@@ -225,6 +225,42 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   }
 
   @Override
+  public void deleteComments(String eventId) throws NotFoundException, EventCommentDatabaseException {
+
+    // Similar to deleteComment but we want to avoid sending a message for each deletion
+
+    EntityManager em = emf.createEntityManager();
+    EntityTransaction tx = em.getTransaction();
+    try {
+      tx.begin();
+      List<EventComment> comments = getComments(eventId);
+
+      for (EventComment comment : comments) {
+        long commentId = comment.getId().get().intValue();
+        EventCommentDto event = getEventComment(commentId, em);
+        if (event == null)
+          throw new NotFoundException("Event comment with ID " + commentId + " does not exist");
+
+        em.remove(event);
+      }
+      tx.commit();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not delete event comments: {}", ExceptionUtils.getStackTrace(e));
+      if (tx.isActive())
+        tx.rollback();
+
+      throw new EventCommentDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+
+    sendMessageUpdate(eventId);
+  }
+
+  @Override
   public EventComment updateComment(EventComment comment) throws EventCommentDatabaseException {
     final EventCommentDto commentDto = EventCommentDto.from(comment);
     final EventComment updatedComment = env.tx(persistOrUpdate(commentDto)).toComment(userDirectoryService);
@@ -275,7 +311,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
                   return (v1 ^ v2) ? ((v1 ^ false) ? 1 : -1) : 0;
                 }
               }).value();
-      return new ArrayList<EventComment>(comments);
+      return new ArrayList<>(comments);
     } catch (Exception e) {
       logger.error("Could not retreive comments for event {}: {}", eventId, ExceptionUtils.getStackTrace(e));
       throw new EventCommentDatabaseException(e);
@@ -324,14 +360,14 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
 
   private static final Fn<EventComment, Boolean> filterOpenComments = new Fn<EventComment, Boolean>() {
     @Override
-    public Boolean ap(EventComment comment) {
+    public Boolean apply(EventComment comment) {
       return !comment.isResolvedStatus();
     }
   };
 
   private static final Fn<EventComment, Boolean> filterNeedsCuttingComment = new Fn<EventComment, Boolean>() {
     @Override
-    public Boolean ap(EventComment comment) {
+    public Boolean apply(EventComment comment) {
       return EventComment.REASON_NEEDS_CUTTING.equals(comment.getReason()) && !comment.isResolvedStatus();
     }
   };
@@ -391,6 +427,21 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   @Override
   public String getClassName() {
     return EventCommentDatabaseServiceImpl.class.getName();
+  }
+
+  @Override
+  public MessageSender getMessageSender() {
+    return messageSender;
+  }
+
+  @Override
+  public SecurityService getSecurityService() {
+    return securityService;
+  }
+
+  @Override
+  public String getSystemUserName() {
+    return SecurityUtil.getSystemUserName(cc);
   }
 
 }

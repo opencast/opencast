@@ -1,5 +1,5 @@
 {
-    "total": 3,
+    "total": 0,
     "limit": 3,
     "count": 3,
     "results": [
@@ -14,7 +14,7 @@
         {
             "id": 2,
             "series": "Serie 1",
-            "title": "Mediapackage 2",
+            "title": "",
             "status": "INSTANTIATED",
             "submitted": "2014-06-05T15:00:00Z",
             "workflow": "Full"

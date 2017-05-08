@@ -9,6 +9,7 @@ These guides will help you if you want to participate in Opencast development.
     - [Release Manager](release-manager.md)
  - [Decision Making](decision-making)
  - [Development Environment](development-environment.md)
+    - [Docker](development-environment-docker.md)
  - [Proposal Log](proposal-log.md)
  - [Licenses and Legal Matters](license.md)
  - [Localization](localization.md)

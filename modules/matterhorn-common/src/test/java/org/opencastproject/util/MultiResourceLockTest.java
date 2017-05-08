@@ -98,7 +98,7 @@ public class MultiResourceLockTest {
   private Fn<Long, Void> task(final String taskName, final long minSleep, final long maxSleep) {
     return new Fn<Long, Void>() {
       @Override
-      public Void ap(Long id) {
+      public Void apply(Long id) {
         final Double value = Math.random();
         data.put(id, value);
         final Map<Long, Double> dataCopy = new HashMap<>(data);

@@ -86,7 +86,7 @@
     <!-- Archive the recording -->
 
     <operation
-      id="archive"
+      id="snapshot"
       description="Archive publishing information">
       <configurations>
         <configuration key="source-tags">archive</configuration>

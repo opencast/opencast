@@ -27,10 +27,13 @@ pages:
    - Installation from Package (RPM):
       - Fedora: 'installation/rpm-fedora.md'
       - RHEL/CentOS: 'installation/rpm-rhel-sl-centos.md'
+   - Installation with Docker:
+      - Testing Locally: 'installation/docker-local.md'
 - Configuration:
    - Overview: 'configuration/index.md'
    - Basic: 'configuration/basic.md'
    - Database: 'configuration/database.md'
+   - Asset Manager: 'configuration/asset-manager.md'
    - Message Broker: 'configuration/message-broker.md'
    - Metadata: 'configuration/metadata.md'
    - Encoding: 'configuration/encoding.md'
@@ -70,7 +73,8 @@ pages:
    - Overview: 'workflowoperationhandlers/index.md'
    - Analyze Tracks: 'workflowoperationhandlers/analyze-tracks-woh.md'
    - Analyze Audio: 'workflowoperationhandlers/analyzeaudio-woh.md'
-   - Archive: 'workflowoperationhandlers/archive-woh.md'
+   - Asset Snapshot WOH: 'workflowoperationhandlers/asset-snapshot-woh.md'
+   - Asset Delete WOH: 'workflowoperationhandlers/asset-delete-woh.md'
    - Cleanup: 'workflowoperationhandlers/cleanup-woh.md'
    - Comment: 'workflowoperationhandlers/comment-woh.md'
    - Compose: 'workflowoperationhandlers/compose-woh.md'

@@ -970,7 +970,7 @@
     "ACTIONS":{
       "EXPORT":"Exporteren",
       "ADD_BLACKLIST":"Zwarte lijst toevoegen",
-      "REMOVE":"Verwijderen"
+      "REMOVE":"Remove"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1050,7 +1050,7 @@
         "EMAIL":"E-mail",
         "ROLES":"Rollen",
         "TYPE":"Type",
-        "PROVIDER":"Leverancier",
+        "PROVIDER":"Provider",
         "BLACKLIST_FROM":"Geblokkeerd van",
         "BLACKLIST_TO":"Geblokkeerd tot",
         "ACTION":"Acties"

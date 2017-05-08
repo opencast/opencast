@@ -22,15 +22,14 @@ package org.opencastproject.migration;
 
 import static org.opencastproject.util.PathSupport.path;
 
-import org.opencastproject.archive.api.Archive;
-import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
-import org.opencastproject.archive.api.Query;
-import org.opencastproject.archive.api.ResultSet;
-import org.opencastproject.archive.api.UriRewriter;
-import org.opencastproject.archive.api.Version;
-import org.opencastproject.archive.opencast.OpencastResultItem;
-import org.opencastproject.archive.opencast.OpencastResultSet;
-import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.query.AQueryBuilder;
+import org.opencastproject.assetmanager.api.query.AResult;
+import org.opencastproject.assetmanager.api.query.ASelectQuery;
+import org.opencastproject.assetmanager.api.query.Field;
+import org.opencastproject.assetmanager.api.query.Predicate;
+import org.opencastproject.assetmanager.api.query.Target;
+import org.opencastproject.assetmanager.api.query.VersionField;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbUser;
@@ -48,7 +47,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
 import java.io.File;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -78,64 +76,33 @@ public class DistributionMigrationServiceTest {
     EasyMock.expect(securityService.getUser()).andReturn(new JaxbUser()).anyTimes();
     EasyMock.replay(securityService);
 
-    ResultSet rs = new OpencastResultSet() {
-      @Override
-      public long size() {
-        return 1;
-      }
+    AResult result = EasyMock.createNiceMock(AResult.class);
+    EasyMock.expect(result.getSize()).andReturn(1L).anyTimes();
 
-      @Override
-      public List<OpencastResultItem> getItems() {
-        List<OpencastResultItem> items = new ArrayList<>();
-        return items;
-      }
+    ASelectQuery select = EasyMock.createNiceMock(ASelectQuery.class);
+    EasyMock.expect(select.where(EasyMock.anyObject(Predicate.class))).andReturn(select).anyTimes();
+    EasyMock.expect(select.run()).andReturn(result).anyTimes();
 
-      @Override
-      public String getQuery() {
-        return "";
-      }
+    VersionField version = EasyMock.createNiceMock(VersionField.class);
 
-      @Override
-      public long getTotalSize() {
-        return 3;
-      }
+    Field<String> field = EasyMock.createNiceMock(Field.class);
 
-      @Override
-      public long getLimit() {
-        return 0;
-      }
+    Predicate predicate = EasyMock.createNiceMock(Predicate.class);
+    EasyMock.expect(predicate.and(EasyMock.anyObject(Predicate.class))).andReturn(predicate).anyTimes();
 
-      @Override
-      public long getOffset() {
-        return 0;
-      }
+    AQueryBuilder query = EasyMock.createNiceMock(AQueryBuilder.class);
+    EasyMock.expect(query.version()).andReturn(version).anyTimes();
+    EasyMock.expect(query.mediaPackageId(EasyMock.anyString())).andReturn(predicate).anyTimes();
+    EasyMock.expect(query.organizationId()).andReturn(field).anyTimes();
+    EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(select).anyTimes();
 
-      @Override
-      public long getSearchTime() {
-        return 0;
-      }
-    };
-
-    Archive<ResultSet> archive = EasyMock.createNiceMock(Archive.class);
-    EasyMock.expect(
-            archive.findForAdministrativeRead(EasyMock.anyObject(Query.class), EasyMock.anyObject(UriRewriter.class)))
-            .andReturn(rs).anyTimes();
-    EasyMock.replay(archive);
-
-    HttpMediaPackageElementProvider httpMediaPackageElementProvider = EasyMock
-            .createNiceMock(HttpMediaPackageElementProvider.class);
-    EasyMock.expect(httpMediaPackageElementProvider.getUriRewriter()).andReturn(new UriRewriter() {
-      @Override
-      public URI apply(Version v, MediaPackageElement mpe) {
-        return null;
-      }
-    }).anyTimes();
-    EasyMock.replay(httpMediaPackageElementProvider);
+    AssetManager assetManager = EasyMock.createNiceMock(AssetManager.class);
+    EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
+    EasyMock.replay(assetManager, query, predicate, field, version, select, result);
 
     distributionMigrationService.setOrganizationDirectoryService(orgDirService);
     distributionMigrationService.setSecurityService(securityService);
-    distributionMigrationService.setArchive(archive);
-    distributionMigrationService.setHttpMediaPackageElementProvider(httpMediaPackageElementProvider);
+    distributionMigrationService.setAssetManager(assetManager);
   }
 
   @Test

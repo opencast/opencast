@@ -837,7 +837,7 @@ public final class WorkspaceImpl implements Workspace {
 
     for (File file : filesToDelete) {
       logger.info("Workspace cleanup: Deleting {}", file);
-      FileSupport.delete(file);
+      FileSupport.deleteQuietly(file);
       FileSupport.deleteHierarchyIfEmpty(rootDirecotry, file.getParentFile());
     }
     logger.debug("Finished cleanup of workspace!");

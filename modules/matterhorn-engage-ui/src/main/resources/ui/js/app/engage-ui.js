@@ -85,7 +85,10 @@ function($, bootbox, _, alertify) {
         }
 
         function getDefaultLanguage(language) {
-            switch (language) {
+            var lang = language.substring(0, language.indexOf("-"));
+	    if (!lang || lang.length <= 0) lang = language;
+
+            switch (lang) {
                 case "en":
                     return "en-US";
                 case "de":
@@ -125,10 +128,10 @@ function($, bootbox, _, alertify) {
             }
         }
 
-        function loadAndTranslate(callbackFunction) {
+        function loadAndTranslate(callbackFunction, lang) {
             log("loadAndTranslate");
 
-            var lang = detectLanguage();
+            if (!lang) lang = detectLanguage();
             var selectedLanguage = lang;
             if (getDefaultLanguage(lang) !== null) {
                 selectedLanguage = getDefaultLanguage(lang);
@@ -138,15 +141,14 @@ function($, bootbox, _, alertify) {
             log("Detected Language: " + selectedLanguage);
 
             var template;
-            var templateData;
 
             // load template
-            var templateRequest = $.ajax({
+            $.ajax({
                 url: window.location.origin + "/engage/ui/template/desktop.html",
-                dataType: "html",
+                dataType: "html"
             }).fail(function() {
-                console.error("Something went wrong while loading template.")
-                $("body").append("Error loading template.")
+                console.error("Something went wrong while loading template.");
+                $("body").append("Error loading template.");
             }).done(function(tData) {
                 // set template data
                 template = _.template(tData);
@@ -156,16 +158,9 @@ function($, bootbox, _, alertify) {
                     url: jsonstr,
                     dataType: "json"
                 }).fail(function() {
-                    console.warn("Failed to load language data. Try to load alternative.");
+                    console.warn("Failed to load language data for " + selectedLanguage + ". Try to load alternative.");
                     // load default en-US
-                    $.ajax({
-                        url: window.location.origin + "/engage/ui/language/en-US.json",
-                        dataType: "json"
-                    }).fail(function() {
-                        console.error("Could not load default language data.");
-                    }).done(function(data) {
-                        setTemplateAndVariables(data, template);
-                    });
+                    loadAndTranslate(callbackFunction, "en-US");
 
                 }).done(function(data) {
                     log("Append template and set variables.");
@@ -620,14 +615,14 @@ function($, bootbox, _, alertify) {
 
                 var seriesClass = "";
                 if (data.mediapackage) {
-                    seriesClass = "series" + data.mediapackage.series + " ";
+                    seriesClass = "series" + _.escape(data.mediapackage.series) + " ";
                 }
 
                 var tile = mediaContainer + "<a class=\"tile\" id=\"" + serID + "\" role=\"menuitem\" tabindex=\"" + tabIndexNumber++ + "\">" +
                     "<div class=\"" + seriesClass + "seriesindicator \"/> " +
                     "<div class=\"tilecontent\">";
 
-                tile = tile + "<h4 class=\"title\">" + data.dcTitle + "</h4>";
+                tile = tile + "<h4 class=\"title\">" + _.escape(data.dcTitle) + "</h4>";
 
                 // append thumbnail
                 var thumb = "";
@@ -658,12 +653,12 @@ function($, bootbox, _, alertify) {
                     tile = tile + "<div class=\"infos\">";
 
                     if (data.dcCreator) {
-                        creator = data.dcCreator;
+                        creator = _.escape(data.dcCreator);
                     };
                     tile = tile + "<div class=\"creator\">" + creator + "</div>";
 
                     if (data.mediapackage.seriestitle) {
-                        seriestitle = data.mediapackage.seriestitle;
+                        seriestitle = _.escape(data.mediapackage.seriestitle);
                     };
                     tile = tile + "<div class=\"seriestitle\">" + seriestitle + "</div>";
 
@@ -695,11 +690,11 @@ function($, bootbox, _, alertify) {
 
                     $($main_container).append(tile);
 
-                    $("#" + data["id"]).attr("href", playerEndpoint + "?id=" + data["id"]);
+                    $("#" + _.escape(data["id"])).attr("href", playerEndpoint + "?id=" + _.escape(data["id"]));
 
-                    $("#" + data["id"]).on("keypress", function(ev) {
+                    $("#" + _.escape(data["id"])).on("keypress", function(ev) {
                         if (ev.which == 13 || ev.which == 32) {
-                            $(location).attr("href", playerEndpoint + "?id=" + data["id"]);
+                            $(location).attr("href", playerEndpoint + "?id=" + _.escape(data["id"]));
                         }
                     });
 
@@ -722,34 +717,34 @@ function($, bootbox, _, alertify) {
         function createSeriesGrid(data) {
             log("build series grid");
             if (data && data.id) {
-                var seriesClass = "series" + data.id + " ";
+                var seriesClass = "series" + _.escape(data.id) + " ";
                 var color = generateSeriesColor(data.id);
 
                 var creator = "<br>";
                 var contributor = "<br>";
 
-                var tile = mediaContainer + "<a class=\"tile\" id=\"" + data.id + "\" role=\"menuitem\" tabindex=\"" + tabIndexNumber++ + "\"> " +
+                var tile = mediaContainer + "<a class=\"tile\" id=\"" + _.escape(data.id) + "\" role=\"menuitem\" tabindex=\"" + tabIndexNumber++ + "\"> " +
                     "<div class=\"" + seriesClass + "seriesindicator \"/> " +
                     "<div class=\"tilecontent\">";
 
-                tile = tile + "<h4 class=\"title\">" + (data.dcTitle ? data.dcTitle : "Unknown title") + "</h4>";
+                tile = tile + "<h4 class=\"title\">" + (data.dcTitle ? _.escape(data.dcTitle) : "Unknown title") + "</h4>";
 
                 if (data.dcCreator) {
-                    creator = data.dcCreator;
+                    creator = _.escape(data.dcCreator);
                 };
                 tile = tile + "<div class=\"creator\">" + creator + "</div>";
 
                 if (data.dcContributor) {
-                    contributor = data.dcContributor;
+                    contributor = _.escape(data.dcContributor);
                 };
                 tile = tile + "<div class=\"contributor\">" + contributor + "</div>";
 
                 tile = tile + "</div></div></a>";
 
                 $($main_container).append(tile);
-                $("#" + data.id).attr("href", "?e=1&p=1&epFrom=" + data.id);
+                $("#" + _.escape(data.id)).attr("href", "?e=1&p=1&epFrom=" + _.escape(data.id));
 
-                $("#" + data.id).on("keypress", function(ev) {
+                $("#" + _.escape(data.id)).on("keypress", function(ev) {
                     log("keypress")
                     if (ev.which == 13 || ev.which == 32) {
                         restData = "sid=" + data.id;

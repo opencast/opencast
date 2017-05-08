@@ -136,7 +136,7 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
     assert ((mp != null) && (channelId != null));
     final List<Publication> publications = Stream.mk(mp.getPublications()).filter(new Fn<Publication, Boolean>() {
       @Override
-      public Boolean ap(Publication a) {
+      public Boolean apply(Publication a) {
         return channelId.equals(a.getChannel());
       }
     }).toList();

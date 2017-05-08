@@ -24,7 +24,7 @@ package org.opencastproject.message.broker.api.series;
 import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreUtil;
+import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 
@@ -219,8 +219,8 @@ public class SeriesItem implements MessageItem, Serializable {
     return seriesId;
   }
 
-  public DublinCoreCatalog getSeries() {
-    return DublinCoreUtil.fromXml(series).getOrElseNull();
+  public DublinCoreCatalog getMetadata() {
+    return DublinCoreXmlFormat.readOpt(series).orNull();
   }
 
   public AccessControlList getAcl() {
