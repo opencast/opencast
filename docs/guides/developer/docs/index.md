@@ -7,6 +7,8 @@ These guides will help you if you want to participate in Opencast development.
  - [Development Process](development-process.md)
     - [Reviewing, Merging and Declining Pull Requests](reviewing-and-merging.md)
     - [Release Manager](release-manager.md)
+    - [QA Coordinator](qa-coordinator.md)
+    - [Security Issues](security.md)
  - [Decision Making](decision-making)
  - [Development Environment](development-environment.md)
     - [Docker](development-environment-docker.md)
