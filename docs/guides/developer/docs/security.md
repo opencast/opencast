@@ -16,7 +16,11 @@ Report it to security@opencast.org!  Please include a complete description of th
 What to do once you have reported your security issue
 -----------------------------------------------------
 
-Wait.  The committers will work to find a mitigation for the immediate case, and a proper solution for the long term.  This may take a while, please be patient.  A notice to security-notices@opencast.org will be released once the issue has been resolved and proper patches applied to the codebase.  This notice may be accompanied by a release, or instructions on how to patch a live system depending on the issue.
+Wait, and/or help fix the issue.  The committers will work to find a mitigation for the immediate case, and a proper solution for the long term.  This may take a while, please be patient.  It may also require you to test it if the issue is derived from a complex system that most committers would not necessarily have access to (e.g: your LDAP or LTI servers).
+
+What happens once the issue has been fixed?
+-------------------------------------------
+A notice to security-notices@opencast.org will be released once the issue has been resolved and proper patches applied to the codebase.  This notice may be accompanied by a release, or instructions on how to patch a live system depending on the issue.
 
 ----------------------------
 
@@ -31,28 +35,16 @@ If no one else has, create a JIRA issue with a 'Committer' security level, and t
 Where do we review security patches?
 ------------------------------------
 
-Minor patches can be reviewed on an adhoc basis but larger patches, especially those requring collaboration in private, or extensive comment and review, can use the matterhorn-security repository under the opencast-community account.  Note that this repository is private to committers, and reporters.  It is not, in general, kept up to date with the upstream codebase, so please remember to update the security repository to the latest upstream code prior to applying a patch for security review.  To do this, ensure that you have the security repostiory added as a remote.  If you run `git remote -v` and don't see something like this:
-
-```no-highlight
-origin          git@bitbucket.org:opencast-community/matterhorn.git (fetch)
-origin          git@bitbucket.org:opencast-community/matterhorn.git (push)
-security        git@bitbucket.org:opencast-community/matterhorn-security.git (fetch)
-security        git@bitbucket.org:opencast-community/matterhorn-security.git (push)
-```
-
-then run
+Minor patches can be reviewed on an adhoc basis but larger patches, especially those requring collaboration in private, or extensive comment and review, can use the matterhorn-security repository under the opencast-community account.  Note that this repository is private to committers, and reporters.  Add the security repository to your remotes with this command:
 
 ```no-highlight
 git remote add security git@bitbucket.org:opencast-community/matterhorn-security.git
 ```
 
-Then, to update a branch in the security repo (e.g: r/3.x) you run the following:
+Then create your branch locally.  When the branch is ready to be pushed to the security repo do something like this:
 
-```
-git fetch --all
-git checkout r/3.x
-git reset --hard origin r/3.x
-git push security r/3.x
+```no-highlight
+git push security <your branch name>
 ```
 
 You can then create your branch like you normally would, pushing it to security rather than your own repository.
