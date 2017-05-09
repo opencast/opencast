@@ -237,10 +237,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   var event_slidestop = 'slidestop';
   var event_slide = 'slide';
   var plugin_path = '';
-  var initCount = 6;
+  var initCount = 5;
   if (isMobileMode) {
     initCount += 3;          // increase initCount, because mobile version loads 3 more libs
   }
+  var inited = false;
   var isPlaying = false;
   var isSliding = false;
   var duration;
@@ -508,7 +509,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         // compile template and load it
         var template = _.template(this.template);
         this.$el.html(template(tempVars));
-        
+
         initControlsEvents();
 
         if (isDesktopMode) {
@@ -1175,8 +1176,23 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
    * Initializes the plugin
    */
   function initPlugin() {
+    // Check that the videoDataModel is available.
+    if (! Engage.model.get('videoDataModel')) {
+      Engage.on(videoDataModelChange, function() {
+        Engage.log("Controls: videoDataModel available.");
+        initPlugin();
+      });
+      window.setTimeout(function() {
+        if (Engage.model.get('videoDataModel') && ! inited) {
+          initPlugin();
+        }
+      }, 500);
+      Engage.log("Controls: videoDataModel not available at start.");
+      return;
+    }
     // only init if plugin template was inserted into the DOM
-    if (plugin.inserted) {
+    if (plugin.inserted && ! inited) {
+      inited = true;
       Engage.on(plugin.events.videoFormatsFound.getName(), function (formatarr) {
         if (Array.isArray(formatarr)) {
           resolutions = formatarr;
@@ -1442,7 +1458,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
             controlsVisible = false;
           }
         });
-        
+
         // add first class to video wrapper
         $('#' + id_engage_controls).addClass('first');
       }
@@ -1477,14 +1493,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   Engage.log('Controls: Init');
   var relative_plugin_path = Engage.getPluginPath('EngagePluginControls');
 
-  // listen on a change/set of the video data model
-  Engage.model.on(videoDataModelChange, function () {
-    initCount -= 1;
-    if (initCount == 0) {
-      initPlugin();
-    }
-  });
-  
   // listen on a change/set of the InfoMe model
   Engage.model.on(infoMeChange, function () {
     initCount -= 1;
