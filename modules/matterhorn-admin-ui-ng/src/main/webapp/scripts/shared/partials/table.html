@@ -41,6 +41,9 @@
         <tr ng-if="table.rows.length === 0 && table.loading === false">
             <td colspan="{{table.columns.length}}" translate="TABLE_NO_RESULT"><!-- No results found --></td>
         </tr>
+        <tr ng-if="table.rows.length === 0 && table.loading === true">
+            <td colspan="{{table.columns.length}}" style="text-align:center"><i class="fa fa-spinner fa-spin fa-2x fa-fw"></i></td>
+        </tr>
     </tbody>
 </table>
 
