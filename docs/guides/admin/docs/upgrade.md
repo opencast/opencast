@@ -41,3 +41,5 @@ Opencast 4.0 has following configuration changes:
 The Configuration key `org.opencastproject.file.repo.url` was moved from `etc/custom.properties` to
 `etc/org.opencastproject.organization-mh_default_org.cfg` as `prop.org.opencastproject.file.repo.url`.
 The fallback value is same as before (set to `${org.opencastproject.server.url}`).
+On a multiple server setup the value should be same on all nodes.
+For more information read the [Configure Opencast](installation/multiple-servers/#step-5-configure-opencast) section.
