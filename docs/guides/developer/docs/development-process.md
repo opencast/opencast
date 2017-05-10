@@ -67,11 +67,15 @@ of what work has been done.  To this end, there are a few expectations for all p
    - The JIRA ticket should contain the same information
  - For feature pull requests, accompanying documentation should be included
  - It is encouraged, but not required that the pull request have a clean commit history
- - In the case of major user interface changes, it is good practice to include screenshots of the affect sections of the interface
- - If you add or modify any external libraries ensure that those additions and modifications are also applied to the NOTICES file
- - Any actions that would be required for a version upgrade (e.g: from 3.x to 4.x) must be documented in docs/guides/admin/docs/upgrade.md
+ - In the case of major user interface changes, it is good practice to include screenshots of the affect sections of
+   the interface
+ - If you add or modify any external libraries ensure that those additions and modifications are also applied to the
+   NOTICES file
+ - Any actions that would be required for a version upgrade (e.g: from 3.x to 4.x) must be documented in
+   docs/guides/admin/docs/upgrade.md
  - The commands `mvn clean install`, `mvn javadoc:javadoc javadoc:aggregate`, and `mvn site` should all succeed
- - The licenses of any external libraries used in the pull request comply with the [licensing rules](license.md) both in terms of the license itself as well as its listing in NOTICES
+ - The licenses of any external libraries used in the pull request comply with the [licensing rules](license.md) both
+   in terms of the license itself as well as its listing in NOTICES
 
 While a committer may accept a patch even if it does not meet these expectations, it is encouraged that anyone filing
 a pull request ensures that they meet these expectations.
