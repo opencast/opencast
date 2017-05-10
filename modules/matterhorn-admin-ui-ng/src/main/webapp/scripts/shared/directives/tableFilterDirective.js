@@ -1,5 +1,5 @@
 angular.module('adminNg.directives')
-.directive('adminNgTableFilter', ['Storage', 'FilterProfiles', 'Language', 'underscore', '$translate', function (Storage, FilterProfiles, Language, _, $translate) {
+.directive('adminNgTableFilter', ['Storage', 'FilterProfiles', 'Language', 'underscore', '$translate', '$timeout', function (Storage, FilterProfiles, Language, _, $translate, $timeout) {
     return {
         templateUrl: 'shared/partials/tableFilters.html',
         replace: true,
@@ -22,6 +22,13 @@ angular.module('adminNg.directives')
 
                 return optionLabel;
             };
+
+            scope.displayFilterSelector = function() {
+                scope.showFilterSelector = true;
+                $timeout(function(){
+                    angular.element('.main-filter').trigger('chosen:open');
+                })
+            }
 
             scope.initializeMap = function() {
                 for (var key in scope.filters.filters) {
@@ -102,6 +109,7 @@ angular.module('adminNg.directives')
                 var filterName = scope.getFilterName();
                 // Merge from-to values of period filter)
                 if (!filter.period.to || !filter.period.from) {
+                    scope.openSecondFilter(filter);
                     return;
                 }
                 if (filter.period.to && filter.period.from) {
@@ -116,7 +124,7 @@ angular.module('adminNg.directives')
                       scope.filters.map[filterName] = {};
                     }
                     scope.filters.map[filterName].value = filter.value;
-                    scope.addFilterToStorage('filter', scope.namespace, filterName, filter.value)
+                    scope.addFilterToStorage('filter', scope.namespace, filterName, filter.value);
                 }
             };
 
@@ -186,6 +194,29 @@ angular.module('adminNg.directives')
                 scope.mode = 0;
                 scope.activeProfile = index;
             };
+
+            scope.onChnageSelectMainFilter = function(selectedFilter) {
+                scope.filter = selectedFilter;
+                scope.openSecondFilter(selectedFilter);
+            }
+
+            scope.openSecondFilter = function (filter) {
+
+                switch (filter.type) {
+                    case 'period':
+                        if(!filter.hasOwnProperty('period')){
+                            angular.element('.small-search.start-date').datepicker('show');
+                        }else if(!filter.period.hasOwnProperty('to')){
+                            angular.element('.small-search.end-date').datepicker('show');
+                        }
+                        break;
+                    default:
+                        $timeout(function(){
+                            angular.element('.second-filter').trigger('chosen:open');
+                        })
+                        break;
+                }
+            }
 
             // Deregister change handler
             scope.$on('$destroy', function () {
