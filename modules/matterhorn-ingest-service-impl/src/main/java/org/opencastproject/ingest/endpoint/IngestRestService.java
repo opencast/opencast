@@ -59,6 +59,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -1244,12 +1245,16 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               } else if ("CATALOG".equalsIgnoreCase(elementType)) {
                 logger.info("Adding Catalog: " + fileName + " - " + flavor);
                 mp = ingestService.addCatalog(item.openStream(), fileName, flavor, mp);
+              } else if ("ATTACHMENT".equalsIgnoreCase(elementType)) {
+                logger.info("Adding Attachment: " + fileName + " - " + flavor);
+                mp = ingestService.addAttachment(item.openStream(), fileName, flavor, mp);
               }
               InputStream is = null;
               try {
                 is = getClass().getResourceAsStream("/templates/complete.html");
                 String html = IOUtils.toString(is, "UTF-8");
-                html = html.replaceAll("\\{mediaPackage\\}", MediaPackageParser.getAsXml(mp));
+                String mpEscaped = StringEscapeUtils.escapeXml10(MediaPackageParser.getAsXml(mp));
+                html = html.replaceAll("\\{mediaPackage\\}", mpEscaped);
                 html = html.replaceAll("\\{jobId\\}", job.getId());
                 return Response.ok(html).build();
               } finally {
@@ -1427,7 +1432,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   /**
    * Sets the trusted http client
-   * 
+   *
    * @param httpClient
    *          the http client
    */
