@@ -32,6 +32,7 @@ import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.util.OsgiUtil;
@@ -128,5 +129,11 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
     throw new DistributionException(format("Unable to retract '%s' elements of "
                                                    + "mediapackage '%s' using a remote destribution service proxy",
                                            elementIds.size(), mediaPackage.getIdentifier().toString()));
+  }
+
+  @Override
+  public Job distribute(String pubChannelId, MediaPackage mediaPackage, Set<String> downloadIds, boolean checkAvailability, boolean preserveReference) throws DistributionException, MediaPackageException {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  //stub function
   }
 }
