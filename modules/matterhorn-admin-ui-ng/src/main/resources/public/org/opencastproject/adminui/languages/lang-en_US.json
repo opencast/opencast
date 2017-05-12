@@ -475,6 +475,7 @@
          },
          "GENERAL": {
            "PUBLICATION_STATUS":         "Publication status",
+           "NO_PUBLICATIONS_AVAILABLE":  "This event has no publications",
            "SCHEDULING_STATUS":          "Status",
            "READY_FOR_RECORDING":        "Ready for recording",
            "OPTED_OUT":                  "Opted-out",
