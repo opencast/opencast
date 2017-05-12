@@ -29,6 +29,7 @@ angular.module('adminNg.directives')
             save: '='
         },
         link: function (scope, element) {
+            scope.params.value = new Date(scope.params.value);
             scope.enterEditMode = function () {
                 // Store the original value for later comparision or undo
                 if (!angular.isDefined(scope.original)) {
@@ -58,7 +59,6 @@ angular.module('adminNg.directives')
                 if (scope.params.value === scope.original) { return; }
 
                 scope.editMode = false;
-
                 scope.save(scope.params.id, function () {
                     scope.original = scope.params.value;
                 });
