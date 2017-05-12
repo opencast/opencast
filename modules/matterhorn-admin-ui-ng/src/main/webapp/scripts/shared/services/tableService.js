@@ -239,9 +239,16 @@ angular.module('adminNg.services')
         /**
          * Retrieve data from the defined API with the given filter values.
          */
-        this.fetch = function () {
+        this.fetch = function (reset) {
             if (angular.isUndefined(me.apiService)) {
                 return;
+            }
+
+            if(reset) {
+              me.rows = [];
+              me.pagination.totalItems = 0;
+              me.updatePagination();
+              me.updateAllSelected();
             }
 
             var query = {},
@@ -278,7 +285,12 @@ angular.module('adminNg.services')
             query.limit = me.pagination.limit;
             query.offset = me.pagination.offset * me.pagination.limit;
 
-            me.apiService.query(query).$promise.then(function (data) {
+            (function(resource){
+              me.apiService.query(query).$promise.then(function (data) {
+                if(resource != me.resource) {
+                  return;
+                }
+
                 var selected = [];
                 angular.forEach(me.rows, function (row) {
                     if (row.selected) {
@@ -306,7 +318,8 @@ angular.module('adminNg.services')
 
                 me.updatePagination();
                 me.updateAllSelected();
-            });
+              });
+            })(me.resource);
 
             if (me.refreshScheduler.on) {
                 me.refreshScheduler.newSchedule();

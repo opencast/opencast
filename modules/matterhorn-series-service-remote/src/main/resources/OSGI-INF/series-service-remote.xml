@@ -10,6 +10,7 @@
   
   <service>
     <provide interface="org.opencastproject.series.api.SeriesService" />
+    <provide interface="org.opencastproject.series.remote.SeriesServiceRemoteImpl" />
   </service>
   <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
     cardinality="1..1" policy="static" bind="setTrustedHttpClient" />

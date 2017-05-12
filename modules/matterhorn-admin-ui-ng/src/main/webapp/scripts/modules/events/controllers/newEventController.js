@@ -86,6 +86,12 @@ angular.module('adminNg.controllers')
                         userdata.metadata.push(state.stateController.ud[o]);
                     }
                 }
+            } else if (state.stateController.isMetadataExtendedState) {
+                for (var o in state.stateController.ud) {
+                    if (state.stateController.ud.hasOwnProperty(o)) {
+                        userdata.metadata.push(state.stateController.ud[o]);
+                    }
+                }
             } else if (state.stateController.isAccessState) {
                 angular.forEach(state.stateController.ud.policies, function (policy) {
                     if (angular.isDefined(policy.role)) {
