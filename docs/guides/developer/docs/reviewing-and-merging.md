@@ -71,7 +71,7 @@ Here are some things a reviewer should usually do:
 
  - Check if code looks sensible (e.g. no nonsensical files, no obvious formatting errors, no large binary files, …)
  - Perform the merge locally to make sure there are no conflicts
- - Build Opencast with the `-Dall` flag (build all modules) and tests enabled (default). If you have some more time
+ - Build Opencast with the `-P dev,dist` flag (build all modules) and tests enabled (default). If you have some more time
    (e.g. lunch break), clear your local Maven repository (usually `~/.m2`) before starting the build process
  - Locally run Opencast to make sure it still works after the merge
  - Make sure the issue has been fixed (as described in the pull request and/or the Jira ticket) or the feature does

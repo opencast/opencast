@@ -55,23 +55,23 @@ The load values for the non-encoding jobs are set in the etc/services files.  Lo
 `job.load.download.distribute` configuration key controls the load placed on the system when a download distribution job
 is running.  The current files with relevant configuration keys are:
 
-|File|Controls|
-|----|--------|
-|org.opencastproject.caption.impl.CaptionServiceImpl.properties|Caption convertion services|
-|org.opencastproject.composer.impl.ComposerServiceImpl.properties|Caption embedding services|
-|org.opencastproject.distribution.acl.AclDistributionService.properties|ACL file distribution|
-|org.opencastproject.distribution.distribution.streaming.StreamingDistributionService.properties|Streaming distribution|
-|org.opencastproject.distribution.download.DownloadDistributionServiceImpl.properties|Download distribution|
-|org.opencastproject.ingest.impl.IngestServiceImpl.properties|Ingest services|
-|org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl.properties|Media inspection using ffmpeg|
-|org.opencastproject.inspection.impl.MediaInspectionServiceImpl.properties|Media inspection using mediainfo|
-|org.opencastproject.publication.youtube.YouTubePublicationServiceImpl.properties|Youtube distribution|
-|org.opencastproject.publication.youtube.YouTubeV3PublicationServiceImpl.properties|Youtube distribution|
-|org.opencastproject.search.impl.SearchServiceImpl.properties|Matterhorn engage index jobs|
-|org.opencastproject.silencedetection.impl.SilenceDetectionServiceImpl.properties|Silence detection|
-|org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl.properties|Text analysis, including slide OCR|
-|org.opencastproject.videoeditor.impl.VideoEditorServiceImpl.properties|Video editor|
-|org.opencastproject.videosegmenter.ffmpeg.VideoSegmenterServiceImpl.properties|Video segmentation|
+| File                                                                                     | Controls                           |
+|------------------------------------------------------------------------------------------|------------------------------------|
+| org.opencastproject.caption.impl.CaptionServiceImpl.cfg                                  | Caption convertion services        |
+| org.opencastproject.composer.impl.ComposerServiceImpl.cfg                                | Caption embedding services         |
+| org.opencastproject.distribution.acl.AclDistributionService.cfg                          | ACL file distribution              |
+| org.opencastproject.distribution.distribution.streaming.StreamingDistributionService.cfg | Streaming distribution             |
+| org.opencastproject.distribution.download.DownloadDistributionServiceImpl.cfg            | Download distribution              |
+| org.opencastproject.ingest.impl.IngestServiceImpl.cfg                                    | Ingest services                    |
+| org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl.cfg                     | Media inspection using ffmpeg      |
+| org.opencastproject.inspection.impl.MediaInspectionServiceImpl.cfg                       | Media inspection using mediainfo   |
+| org.opencastproject.publication.youtube.YouTubePublicationServiceImpl.cfg                | Youtube distribution               |
+| org.opencastproject.publication.youtube.YouTubeV3PublicationServiceImpl.cfg              | Youtube distribution               |
+| org.opencastproject.search.impl.SearchServiceImpl.cfg                                    | Matterhorn engage index jobs       |
+| org.opencastproject.silencedetection.impl.SilenceDetectionServiceImpl.cfg                | Silence detection                  |
+| org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl.cfg                        | Text analysis, including slide OCR |
+| org.opencastproject.videoeditor.impl.VideoEditorServiceImpl.cfg                          | Video editor                       |
+| org.opencastproject.videosegmenter.ffmpeg.VideoSegmenterServiceImpl.cfg                  | Video segmentation                 |
 
 Note: Ingest jobs are a special case in Opencast.  Because of their immediate nature there is no way to limit the 
 number of running jobs.  However, these jobs will block other jobs from running on the ingest/admin nodes if enough 

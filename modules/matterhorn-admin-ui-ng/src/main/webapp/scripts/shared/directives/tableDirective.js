@@ -43,7 +43,7 @@ angular.module('adminNg.directives')
             table: '='
         },
         link: function (scope, element) {
-            scope.table.fetch();
+            scope.table.fetch(true);
 
             // Deregister change handler
             scope.$on('$destroy', function () {

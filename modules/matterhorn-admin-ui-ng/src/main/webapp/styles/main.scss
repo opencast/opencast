@@ -333,6 +333,9 @@ div.table-filter {
     min-width: 150px;
     padding: 7px;
 
+    .chosen-search {
+      width: 100%;
+    }
     &>i {
       font-size: 18px;
       padding: 2px;

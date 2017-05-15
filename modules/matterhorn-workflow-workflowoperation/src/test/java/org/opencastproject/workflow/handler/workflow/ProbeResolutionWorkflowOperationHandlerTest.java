@@ -81,6 +81,8 @@ public class ProbeResolutionWorkflowOperationHandlerTest {
     WorkflowOperationInstance operationInstance = EasyMock.createMock(WorkflowOperationInstance.class);
     String[][] config = {
             { ProbeResolutionWorkflowOperationHandler.OPT_SOURCE_FLAVOR, "*/source"},
+            { ProbeResolutionWorkflowOperationHandler.OPT_VAR_PREFIX + "aspect", "1280x720,1280x700"},
+            { ProbeResolutionWorkflowOperationHandler.OPT_VAL_PREFIX + "aspect", "16/9"},
             { ProbeResolutionWorkflowOperationHandler.OPT_VAR_PREFIX + "is_720", "1280x720,1280x700"},
             { ProbeResolutionWorkflowOperationHandler.OPT_VAR_PREFIX + "is_1080", "1920x1080"}};
     Set<String> keys = new HashSet<>();
@@ -105,8 +107,9 @@ public class ProbeResolutionWorkflowOperationHandlerTest {
     Map<String, String> properties = workflowOperationResult.getProperties();
 
     String[][] props = {
+            {"presenter_source_aspect", "16/9"},
             {"presenter_source_is_720", "true"},
-            {"presenter_source_is_1080", "false"}};
+            {"presenter_source_is_1080", null}};
     for (String[] prop: props) {
       assertEquals(prop[1], properties.get(prop[0]));
     }

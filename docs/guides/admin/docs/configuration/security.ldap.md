@@ -327,6 +327,3 @@ at the bottom of the file. Please see the example below:
       <sec:authentication-provider ref="ldapAuthProvider2" />
       <sec:authentication-provider ref="ldapAuthProvider" />
     </sec:authentication-manager>
-
-In multi-machine installations, remember to include the additional LDAP server(s) in the
-`etc/factories/org.opencastproject.userdirectory.ldap.properties` file.

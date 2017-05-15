@@ -118,8 +118,8 @@
     "USER_BLACKLIST_NOT_SAVED":"Svartlistan kunde inte sparas",
     "USER_BLACKLIST_DELETED":"Svartlistan har tagits bort",
     "USER_BLACKLIST_NOT_DELETED":"Svartlistan kunde inte tas bort",
-    "LOCATION_DELETED":"The location has been deleted",
-    "LOCATION_NOT_DELETED":"The location could not be deleted",
+    "LOCATION_DELETED":"Platsen har raderats",
+    "LOCATION_NOT_DELETED":"Platsen kunde inte raderas",
     "LOCATION_BLACKLIST_CREATED":"Svartlistan har skapats",
     "LOCATION_BLACKLIST_NOT_CREATED":"Svartlistan kunde inte skapas",
     "LOCATION_BLACKLIST_SAVED":"Svartlistan har sparats",
@@ -708,7 +708,7 @@
           }
         },
         "METADATA":{
-          "CAPTION":"Event details",
+          "CAPTION":"Händelseinformation",
           "TITLE":"Titel",
           "ID":"UID",
           "SERIES":"Serie",
@@ -970,7 +970,7 @@
     "ACTIONS":{
       "EXPORT":"Exportera",
       "ADD_BLACKLIST":"Lägg till svartlista",
-      "REMOVE":"Ta bort"
+      "REMOVE":"Remove"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1050,7 +1050,7 @@
         "EMAIL":"E-post",
         "ROLES":"Roller",
         "TYPE":"Typ",
-        "PROVIDER":"Leverantör",
+        "PROVIDER":"Provider",
         "BLACKLIST_FROM":"Svartlistad från",
         "BLACKLIST_TO":"Svartlistad tills",
         "ACTION":"Åtgärder"
@@ -1497,14 +1497,14 @@
       "CLEAR_SEGMENTS":"Rensa segment"
     },
     "PLAYER":{
-      "PLAY":"Play",
+      "PLAY":"Spela",
       "PAUSE":"Pause",
-      "NEXT_FRAME":"Next frame",
-      "PREVIOUS_FRAME":"Previous frame",
-      "NEXT_SEGMENT":"Next segment / Jump to end",
-      "PREVIOUS_SEGMENT":"Previous segment / Jump to start",
-      "MUTE":"Mute",
-      "VOLUME":"Volume"
+      "NEXT_FRAME":"Nästa bild",
+      "PREVIOUS_FRAME":"Föregående bild",
+      "NEXT_SEGMENT":"Nästa segment / Hoppa till slutet",
+      "PREVIOUS_SEGMENT":"Föregående segment / Hoppa till start",
+      "MUTE":"Tyst",
+      "VOLUME":"Volym"
     }
   },
   "LOGIN":{

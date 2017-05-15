@@ -1,6 +1,31 @@
 Opencast 2.3.x
 ==============
 
+Opencast 2.3.3
+--------------
+*Released on May 02, 2017*
+
+- [[MH-10558]](https://opencast.jira.com/browse/MH-10558) - Mime type not identified for matroska / mkv files
+- [[MH-10595]](https://opencast.jira.com/browse/MH-10595) - Incident service returns internal server error if cascade=true requested for deleted workflow
+- [[MH-10747]](https://opencast.jira.com/browse/MH-10747) - Inputs for capture device should be pre-selected
+- [[MH-11736]](https://opencast.jira.com/browse/MH-11736) - Difference in start time displayed in overview and metadata details
+- [[MH-11811]](https://opencast.jira.com/browse/MH-11811) - Opencast build fails when system timezone is set to PDT (Pacific Daylight Time)
+- [[MH-12048]](https://opencast.jira.com/browse/MH-12048) - Series drop-down not sorted alphabetically in filter
+- [[MH-12069]](https://opencast.jira.com/browse/MH-12069) - Deleting an event leaves behind orphaned comments
+- [[MH-12095]](https://opencast.jira.com/browse/MH-12095) - Server default timezone can be incorrect
+- [[MH-12106]](https://opencast.jira.com/browse/MH-12106) - Preserve user attributes from providers during authentication
+- [[MH-12107]](https://opencast.jira.com/browse/MH-12107) - Improve performance of Servers table in Admin UI
+- [[MH-12118]](https://opencast.jira.com/browse/MH-12118) - Paging in media module is broken
+- [[MH-12129]](https://opencast.jira.com/browse/MH-12129) - Media module only works with english localized browsers
+- [[MH-12130]](https://opencast.jira.com/browse/MH-12130) - Filters set by selecting a category in the dashboard are not shown
+- [[MH-12148]](https://opencast.jira.com/browse/MH-12148) - Undocumented Archive WOH Requirements
+- [[MH-12150]](https://opencast.jira.com/browse/MH-12150) - Matroska files are not recognized
+- [[MH-12158]](https://opencast.jira.com/browse/MH-12158) - Workflow job dispatching failures
+- [[MH-12162]](https://opencast.jira.com/browse/MH-12162) - JpaJob object toString override for better log messages
+- [[MH-12163]](https://opencast.jira.com/browse/MH-12163) - Events with stopped workflows sometimes cannot be deleted
+- [[MH-12164]](https://opencast.jira.com/browse/MH-12164) - Updating serviceregistry config while running leaves Opencast in a non-functional state
+- [[MH-12190]](https://opencast.jira.com/browse/MH-12190) - Script injection in Media Module and Player
+
 Opencast 2.3.2
 --------------
 *Released on March 22, 2017*
