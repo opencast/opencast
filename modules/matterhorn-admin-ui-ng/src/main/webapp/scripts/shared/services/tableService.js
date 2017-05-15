@@ -22,13 +22,14 @@ angular.module('adminNg.services')
         };
 
         this.updatePagination = function () {
-            var p = me.pagination, i;
+            var p = me.pagination, i, numberOfPages = p.totalItems / p.limit;
 
             p.pages = [];
-            for (i = 0; i < (p.totalItems / p.limit); i++) {
+            for (i = 0; i < numberOfPages || (i === 0 && numberOfPages === 0); i++) {
                 p.pages.push({
-                    number : i,
-                    active : i === p.offset
+                    number: i,
+                    label: (i + 1).toString(),
+                    active: i === p.offset
                 });
             }
         };
@@ -130,19 +131,6 @@ angular.module('adminNg.services')
             }
         };
 
-        this.updatePagination = function () {
-            var p = me.pagination, i, numberOfPages = p.totalItems / p.limit;
-
-            p.pages = [];
-            for (i = 0; i < numberOfPages || (i === 0 && numberOfPages === 0); i++) {
-                p.pages.push({
-                    number: i,
-                    label: (i + 1).toString(),
-                    active: i === p.offset
-                });
-            }
-        };
-
         this.configure = function (options) {
             var pagination;
             me.allSelected = false;
@@ -173,7 +161,7 @@ angular.module('adminNg.services')
 
             // Load pagination configuration from local storage
             pagination = Storage.get('pagination', me.resource);
-            if (angular.isUndefined(pagination)) {
+            if (angular.isDefined(pagination)) {
                 if (angular.isDefined(pagination.limit)) {
                     me.pagination.limit = pagination.limit;
                 }
