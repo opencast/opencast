@@ -37,11 +37,14 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
+import org.opencastproject.util.data.Option;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.policy.Policy;
 import com.amazonaws.auth.policy.Principal;
 import com.amazonaws.auth.policy.Statement;
@@ -111,9 +114,6 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
   /** Interval time in millis to sleep between checks of availability */
   private static final long SLEEP_INTERVAL = 30000L;
 
-  /** The default AWS region name */
-  private static final String DEFAULT_AWS_REGION = "us-east-1";
-
   /** The AWS client and transfer manager */
   private AmazonS3 s3 = null;
   private TransferManager s3TransferManager = null;
@@ -165,17 +165,24 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
       }
       logger.info("AWS distribution url is {}", opencastDistributionUrl);
 
-      String accessKeyId = getAWSConfigKey(cc, AWS_S3_ACCESS_KEY_ID_CONFIG);
-      String accessKeySecret = getAWSConfigKey(cc, AWS_S3_SECRET_ACCESS_KEY_CONFIG);
+      // Explicit credentials are optional.
+      AWSCredentialsProvider provider = null;
+      Option<String> accessKeyIdOpt = OsgiUtil.getOptCfg(cc.getProperties(), AWS_S3_ACCESS_KEY_ID_CONFIG);
+      Option<String> accessKeySecretOpt = OsgiUtil.getOptCfg(cc.getProperties(), AWS_S3_SECRET_ACCESS_KEY_CONFIG);
 
-      // Create AWS client.
-      // Use the default credentials provider chain, which
+      // Keys not informed so use default credentials provider chain, which
       // will look at the environment variables, java system props, credential files, and instance
       // profile credentials
-      BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKeyId, accessKeySecret);
+      if (accessKeyIdOpt.isNone() && accessKeySecretOpt.isNone())
+        provider = new DefaultAWSCredentialsProviderChain();
+      else
+        provider = new AWSStaticCredentialsProvider(
+                new BasicAWSCredentials(accessKeyIdOpt.get(), accessKeySecretOpt.get()));
+
+      // Create AWS client.
       s3 = AmazonS3ClientBuilder.standard()
               .withRegion(regionStr)
-              .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
+              .withCredentials(provider)
               .build();
 
       s3TransferManager = new TransferManager(s3);
@@ -193,7 +200,9 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
   }
 
   public void deactivate() {
-    s3TransferManager.shutdownNow();
+    // Transfer manager is null if service disabled
+    if (s3TransferManager != null)
+      s3TransferManager.shutdownNow();
 
     logger.info("AwsS3DistributionService deactivated!");
   }
