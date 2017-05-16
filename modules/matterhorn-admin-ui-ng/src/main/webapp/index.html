@@ -56,7 +56,21 @@
                     </a>
                 </div>
 
-                <div ng-if="documentationUrl || restdocsUrl" title="{{ 'HELP.HELP' | translate}}" class="nav-dd"
+                <div class="nav-dd info-dd" id="info-dd" old-admin-ng-dropdown="">
+                  <i class="fa fa-bell-o" aria-hidden="true"></i>
+                      <span id="error-count" class="badge" ng-show="service.error">{{ service.numErr }}</span>
+                    <ul class="dropdown-ul">
+                      <li><!-- service directive -->
+                        <a href="#">
+                          <span>{{ service.name }}</span>
+                          <span class="ng-multi-value ng-multi-value-red" ng-if="service.error">{{ service.status }}</span>
+                          <span class="ng-multi-value ng-multi-value-green" ng-if="!service.error">{{ service.status }}</span>
+                        </a>
+                      </li><!-- directive end -->
+                    </ul>
+                </div>
+
+              <div ng-if="documentationUrl || restdocsUrl" title="{{ 'HELP.HELP' | translate}}" class="nav-dd"
                     id="help-dd" old-admin-ng-dropdown="">
                     <div class="fa fa-question-circle"></div>
                     <ul class="dropdown-ul">
@@ -148,6 +162,7 @@
         <script src="scripts/shared/services/regexService.js"></script>
         <script src="scripts/shared/services/eventHelperService.js"></script>
         <script src="scripts/shared/services/hotkeysService.js"></script>
+        <script src="scripts/shared/services/restServiceMonitor.js"></script>
         <script src="scripts/shared/resources/resources.js"></script>
         <script src="scripts/shared/resources/identityResource.js"></script>
         <script src="scripts/shared/resources/versionResource.js"></script>
