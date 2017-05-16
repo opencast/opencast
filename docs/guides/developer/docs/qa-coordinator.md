@@ -5,7 +5,7 @@ Role
 ----
 
 The QA coordinator is ultimately responsible for making sure that quality assurance (QA) processes are occurring during
-each release window, and for other project related tasks
+each release window, and for other project related tasks.
 
 The QA Coordinator has the following duties:
 
@@ -13,7 +13,7 @@ Establish and manage QA process, technologies, and methods
 
  - Manage CI infrastructure
  - Create and expand automated testing infrastructure
- - Ensure committers are folowing testing procedures
+ - Ensure committers are following testing procedures
 
 Ensure codebase stability
 
