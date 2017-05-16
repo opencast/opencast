@@ -172,7 +172,7 @@ public class WorkflowSetImpl implements WorkflowSet {
     this.totalCount = totalCount;
   }
 
-  static class Adapter extends XmlAdapter<WorkflowSetImpl, WorkflowSet> {
+  public static class Adapter extends XmlAdapter<WorkflowSetImpl, WorkflowSet> {
     public WorkflowSetImpl marshal(WorkflowSet set) throws Exception {
       return (WorkflowSetImpl) set;
     }
