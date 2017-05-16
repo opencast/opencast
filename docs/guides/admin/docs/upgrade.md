@@ -14,7 +14,7 @@ How to Upgrade
 4. [Upgrade the database](#database-migration)
 5. Update the third party tools
 6. Replace Opencast 3.0 with 4.0
-7. Review the configuration changes and adjust your configuration accordingly
+7. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
 8. [Re-build the search indexes](#re-build-search-indexes)
 
 
@@ -29,3 +29,17 @@ It should be needless to say that this migration should not take a lot of time a
 all database migrations, we recommend to make a database backup before attempting the upgrade.
 
 You can find the database upgrade script at `…/docs/upgrade/3.0_to_4.0/mysql5.sql`.
+
+
+Configuration Changes
+---------------------
+
+Opencast 4.0 has following configuration changes:
+
+1. The Working File Repository URL can be set per tenant.
+
+The Configuration key `org.opencastproject.file.repo.url` was moved from `etc/custom.properties` to
+`etc/org.opencastproject.organization-mh_default_org.cfg` as `prop.org.opencastproject.file.repo.url`.
+The fallback value is same as before (set to `${org.opencastproject.server.url}`).
+On a multiple server setup the value should be same on all nodes.
+For more information read the [Configure Opencast](installation/multiple-servers/#step-5-configure-opencast) section.
