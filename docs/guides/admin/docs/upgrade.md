@@ -35,3 +35,5 @@ Configuration Changes
 ------------------
 
 1. The parameter "karaf.shutdown.pid.file" is renamed to "karaf.pid.file" (MH-12188)
+2. The optional organization property 'prop.adminui.user.listname' can be used to set the display format of users in
+    the group editor (MH-12211)
