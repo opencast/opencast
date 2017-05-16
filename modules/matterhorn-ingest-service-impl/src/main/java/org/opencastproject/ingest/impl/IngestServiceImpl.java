@@ -281,8 +281,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     logger.info("Ingest Service started.");
     defaultWorkflowDefinionId = StringUtils.trimToNull(cc.getBundleContext().getProperty(WORKFLOW_DEFINITION_DEFAULT));
     if (defaultWorkflowDefinionId == null) {
-      logger.info("No default workflow definition specified. Ingest operations without a specified workflow "
-              + "definition will fail");
+        defaultWorkflowDefinionId = "ng-schedule-and-upload";
     }
     registerMXBean = JmxUtil.registerMXBean(ingestStatistics, "IngestStatistics");
   }

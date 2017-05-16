@@ -78,11 +78,12 @@ module.exports = function (grunt, appPath) {
       console.log('Proxy ' + req.method + ' ' + req.url + ' -> ' + host + req.url);
 
       var onReadFromBackend = function (error, response, body) {
-        if (error) {
+        if (error && (typeof error != 'object' || !error.hasOwnProperty('statusCode') || !error.hasOwnProperty('body'))) {
           throw error;
         }
         // forward to client
-        res.statusCode = response.statusCode;
+        res.statusCode = (response || error).statusCode;
+        body = body || (error ? error.body : '');
         res.write(body);
         res.end();
       };

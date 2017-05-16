@@ -20,7 +20,7 @@
       description="Mark the recording for cutting">
       <configurations>
         <configuration key="description">Processing failed</configuration>
-        <configuration key="reason">EVENTS.COMMENTS.REASONS.PROCESSING_FAILURE</configuration>
+        <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.PROCESSING_FAILURE</configuration>
         <configuration key="action">create</configuration>
       </configurations>
     </operation>

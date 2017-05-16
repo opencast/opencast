@@ -212,7 +212,7 @@
       description="Mark the recording for review">
       <configurations>
         <configuration key="description">Recording has not been reviewed yet.</configuration>
-        <configuration key="reason">EVENTS.COMMENTS.REASONS.REVIEW</configuration>
+        <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.REVIEW</configuration>
         <configuration key="action">create</configuration>
       </configurations>
     </operation>

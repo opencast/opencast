@@ -22,13 +22,14 @@ angular.module('adminNg.services')
         };
 
         this.updatePagination = function () {
-            var p = me.pagination, i;
+            var p = me.pagination, i, numberOfPages = p.totalItems / p.limit;
 
             p.pages = [];
-            for (i = 0; i < (p.totalItems / p.limit); i++) {
+            for (i = 0; i < numberOfPages || (i === 0 && numberOfPages === 0); i++) {
                 p.pages.push({
-                    number : i,
-                    active : i === p.offset
+                    number: i,
+                    label: (i + 1).toString(),
+                    active: i === p.offset
                 });
             }
         };
@@ -130,19 +131,6 @@ angular.module('adminNg.services')
             }
         };
 
-        this.updatePagination = function () {
-            var p = me.pagination, i, numberOfPages = p.totalItems / p.limit;
-
-            p.pages = [];
-            for (i = 0; i < numberOfPages || (i === 0 && numberOfPages === 0); i++) {
-                p.pages.push({
-                    number: i,
-                    label: (i + 1).toString(),
-                    active: i === p.offset
-                });
-            }
-        };
-
         this.configure = function (options) {
             var pagination;
             me.allSelected = false;
@@ -173,7 +161,7 @@ angular.module('adminNg.services')
 
             // Load pagination configuration from local storage
             pagination = Storage.get('pagination', me.resource);
-            if (angular.isUndefined(pagination)) {
+            if (angular.isDefined(pagination)) {
                 if (angular.isDefined(pagination.limit)) {
                     me.pagination.limit = pagination.limit;
                 }
@@ -239,9 +227,16 @@ angular.module('adminNg.services')
         /**
          * Retrieve data from the defined API with the given filter values.
          */
-        this.fetch = function () {
+        this.fetch = function (reset) {
             if (angular.isUndefined(me.apiService)) {
                 return;
+            }
+
+            if(reset) {
+              me.rows = [];
+              me.pagination.totalItems = 0;
+              me.updatePagination();
+              me.updateAllSelected();
             }
 
             var query = {},
@@ -278,7 +273,12 @@ angular.module('adminNg.services')
             query.limit = me.pagination.limit;
             query.offset = me.pagination.offset * me.pagination.limit;
 
-            me.apiService.query(query).$promise.then(function (data) {
+            (function(resource){
+              me.apiService.query(query).$promise.then(function (data) {
+                if(resource != me.resource) {
+                  return;
+                }
+
                 var selected = [];
                 angular.forEach(me.rows, function (row) {
                     if (row.selected) {
@@ -306,7 +306,8 @@ angular.module('adminNg.services')
 
                 me.updatePagination();
                 me.updateAllSelected();
-            });
+              });
+            })(me.resource);
 
             if (me.refreshScheduler.on) {
                 me.refreshScheduler.newSchedule();

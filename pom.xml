@@ -763,7 +763,7 @@
       <dependency>
         <groupId>javax.ws.rs</groupId>
         <artifactId>jsr311-api</artifactId>
-        <version>1.1.A</version>
+        <version>1.1.1</version>
       </dependency>
 
       <!-- JPA -->
@@ -1336,17 +1336,6 @@
       <timezone>+1</timezone>
     </developer>
     <developer>
-      <id>etmoyo</id>
-      <name>Edmore Moyo</name>
-      <email>edmore.moyo@uct.ac.za</email>
-      <organization>University of Cape Town</organization>
-      <organizationUrl>http://www.uct.ac.za</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>+2</timezone>
-    </developer>
-    <developer>
       <id>jamesp</id>
       <name>James Perrin</name>
       <email>james.perrin@manchester.ac.uk</email>
@@ -1446,6 +1435,17 @@
       <properties>
         <irc.nick>stauber</irc.nick>
       </properties>
+    </developer>
+    <developer>
+      <id>smarquard</id>
+      <name>Stephen Marquard</name>
+      <email>stephen.marquard@uct.ac.za</email>
+      <organization>University of Cape Town</organization>
+      <organizationUrl>http://www.cilt.uct.ac.za</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+2</timezone>
     </developer>
   </developers>
 
@@ -1550,6 +1550,10 @@
     <contributor>
       <name>Pascal Aubort</name>
       <email>pascal@entwinemedia.com</email>
+    </contributor>
+    <contributor>
+      <name>Edmore Moyo</name>
+      <email>edmore.moyo@uct.ac.za</email>
     </contributor>
   </contributors>
 
