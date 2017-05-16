@@ -29,6 +29,8 @@ Organize community/committers
  - Encourage additional committers to join the project
  - Manage crowdin translators - ensure join requests are dealt with
  - Handle (security issue reports)[security.md], and notifications once handled
+ - Occasionally purge non-active committers, moving them to the emeritus list in the main pom, and removing their
+   permissions in JIRA
 
 Expand documentation
 
