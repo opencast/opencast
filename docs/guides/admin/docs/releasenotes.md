@@ -20,8 +20,8 @@ New Features and Improvements
   - **Improved User Experience** - The user experience has been approved and streamlined at many other locations. For
     example, the user is presented configurable defaults for the input masks used to schedule recordings. The capture
     agent status is now additional indicated colors. The event counter filters have been reordered to match the life
-    cycly of recordings. Series dropdowns are now sorted alphabetically. The access policy page now supports search and
-    filtering.
+    cycly of recordings. Series dropdowns are now sorted alphabetically and can be searched. The access policy page now
+    supports search and filtering.
   
   - **Piwik Integration** - The Opencast video player now comes with out-of-the-box Piwik support so that user
     statistics for the player can be easily gathered and visualized
@@ -38,10 +38,11 @@ New Features and Improvements
     A new OAI-PMH metadata prefix provides direct access to Dublincore metadata catalogs, promoting a strong decoupling
     from external OAI-PMH harverster
 
-  - **Improved LDAP Integration** - Many shortcomings considering the integration of LDAP have been adressed.
+  - **Fixed basic LDAP Integration** - Updated format of the configuration files and fixed basic authentication and
+    authorization via LDAP. Opencast groups are still not supported.
 
   - **AAI Support** - Opencast now provides out-of-the-box support for the Authentication and Authorization
-    Infrastructre (AAI).
+    Infrastructre (AAI). This enables adopters to use their existing single sign-on log-in for Opencast.
 
   - **Sakai User Provider** - Opencast now out-of-the-box provides an Sakai user provider.
 
