@@ -68,6 +68,7 @@ angular.module('adminNg.controllers')
                 name:  'presenter',
                 label: 'EVENTS.EVENTS.TABLE.PRESENTERS'
             }, {
+                template: 'modules/events/partials/eventsSeriesCell.html',
                 name:  'series_name',
                 label: 'EVENTS.EVENTS.TABLE.SERIES'
             }, {
@@ -80,6 +81,7 @@ angular.module('adminNg.controllers')
                 name:  'end_date',
                 label: 'EVENTS.EVENTS.TABLE.STOP'
             }, {
+                template: 'modules/events/partials/eventsLocationCell.html',
                 name:  'location',
                 label: 'EVENTS.EVENTS.TABLE.LOCATION'
             }, {
