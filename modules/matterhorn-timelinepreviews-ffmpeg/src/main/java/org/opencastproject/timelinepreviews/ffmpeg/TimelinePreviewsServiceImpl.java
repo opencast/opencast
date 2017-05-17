@@ -61,7 +61,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.List;
@@ -83,7 +82,7 @@ TimelinePreviewsService, ManagedService {
   public static final String COLLECTION_ID = "timelinepreviews";
 
   /** List of available operations on jobs */
-  private enum Operation {
+  protected enum Operation {
     TimelinePreview
   };
 
@@ -257,21 +256,19 @@ TimelinePreviewsService, ManagedService {
           parameters,
           timelinepreviewsJobLoad);
     } catch (ServiceRegistryException e) {
-      logger.info("e: {}", e);
-      e.printStackTrace();
       throw new TimelinePreviewsException("Unable to create timelinepreviews job", e);
     }
   }
 
   /**
-   * Starts segmentation on the video track identified by ***TODO: change javadoc
-   * <code>mediapackageId</code> and <code>elementId</code> and returns a
-   * receipt containing the final result in the form of anMpeg7Catalog.
+   * Starts generation of timeline preview images for the given video track
+   * and returns an attachment containing one image that contains all the
+   * timeline preview images.
    *
    * @param job
    * @param track the element to analyze
    * @param imageCount number of preview images that will be generated
-   * @return a receipt containing the resulting mpeg-7 catalog
+   * @return an attachment containing the resulting timeline previews image
    * @throws TimelinePreviewsException
    * @throws org.opencastproject.mediapackage.MediaPackageException
    */
@@ -285,91 +282,38 @@ TimelinePreviewsService, ManagedService {
     }
 
     try {
-      File mediaFile = null;
-      URL mediaUrl = null;
-      try {
-        mediaFile = workspace.get(track.getURI());
-        mediaUrl = mediaFile.toURI().toURL();
-      } catch (NotFoundException e) {
-        throw new TimelinePreviewsException(
-            "Error finding the video file in the workspace", e);
-      } catch (IOException e) {
-        throw new TimelinePreviewsException(
-            "Error reading the video file in the workspace", e);
-      }
 
       if (track.getDuration() == null)
         throw new MediaPackageException("Track " + track + " does not have a duration");
-      logger.info("Track {} loaded, duration is {} s", mediaUrl, track.getDuration() / 1000);
+
+      double duration = track.getDuration() / 1000.0;
+      double seconds = duration / (double)(imageCount);
+      seconds = seconds <= 0.0 ? 1.0 : seconds;
+
+      // calculate number of tiles for row and column in tiled image
+      int imageSize = (int) Math.ceil(Math.sqrt(imageCount));
+
+      Attachment composedImage = createPreviewsFFmpeg(track, seconds, resolutionX, resolutionY, imageSize, imageSize, duration);
 
 
-      int testCount = 0;
+      if (composedImage == null)
+        throw new IllegalStateException("Unable to compose image");
 
-        //parameters so far:
-        double seconds = 10;
-        int width = resolutionX;//160;
-        int height = resolutionY;//-1;
-//          int imageSize = 10;
-
-        // calculate number of images
-//          int duration = (int)Math.ceil(track.getDuration() / 1000.0);
-        double duration = track.getDuration() / 1000.0;
-        int tileNum = (int)Math.ceil(duration / (float)seconds);
-        // +1 to be sure to have enough space?
-        //seconds = Math.round(duration / 100.0f); // TODO: breaks everything -> file not found. maybe check if value is ok before ffmpeg call?
-//          seconds = Math.round(duration / (float)(imageSize * imageSize)); // TODO: breaks everything -> file not found. maybe check if value is ok before ffmpeg call?
-        seconds = duration / (double)(imageCount);
-        seconds = seconds <= 0 ? 1 : seconds;
-        int seconds10 = Math.round((float)duration / (float)(imageCount));
-
-        logger.info("test " + testCount++ + " trackDuration: " + duration);
-
-        // optional: calculate best number of tiles for row in tiled image, so that approx. quadratic
-        int tileX = tileNum;
-        int tileY = 1;
-
-        int imageSize = (int) Math.ceil(Math.sqrt(imageCount));
-//        int imageSizeX = 1;
-//        int imageSizeY = 1;
-
-
-//          int[] dimensions = calculateOptimalImageDimension(duration, seconds);
-
-        logger.info("test BEFORE " + testCount++);
-//          Attachment composedImage = createPreviews(track, seconds, width, height, dimensions[0], dimensions[1]);
-        logger.info("duration: {}, seconds10: {}", duration, seconds10);
-        logger.info("1:");
-        Attachment composedImage = createPreviewsFFmpeg(track, seconds, width, height, imageSize, imageSize, 0, duration);
-        logger.info("2:");
-//          Attachment composedImage1 = createPreviewsFFmpeg(track, seconds, width, height, 10, 10, 0, seconds10);
-//          logger.info("3:");
-//          Attachment composedImage2 = createPreviewsFFmpeg(track, seconds, width, height, 10, 10, seconds10, seconds10);
-//          logger.info("test AFTER " + testCount++);
-
-//           Attachment composedImage = (Attachment) element;
-        if (composedImage == null)
-          throw new IllegalStateException("Unable to compose image");
-
-        // Set the mimetype
-        try {
-          composedImage.setMimeType(MimeTypes.parseMimeType(mimetype));
-        } catch (IllegalArgumentException e) {
-          logger.warn("Invalid mimetype provided for timeline previews image");
-          try  {
-            composedImage.setMimeType(MimeTypes.fromURI(composedImage.getURI()));
-          } catch (UnknownFileTypeException ex) {
-            logger.warn("No valid mimetype could be found for timeline previews image");
-          }
+      // Set the mimetype
+      try {
+        composedImage.setMimeType(MimeTypes.parseMimeType(mimetype));
+      } catch (IllegalArgumentException e) {
+        logger.warn("Invalid mimetype provided for timeline previews image");
+        try  {
+          composedImage.setMimeType(MimeTypes.fromURI(composedImage.getURI()));
+        } catch (UnknownFileTypeException ex) {
+          logger.warn("No valid mimetype could be found for timeline previews image");
         }
+      }
 
-//        composedImage.addTag("imageSize=" + imageCount);
+      composedImage.addProperty("imageCount", String.valueOf(imageCount));
 
-        composedImage.addProperty("imageCount=" + imageCount, String.valueOf(imageCount));
-        composedImage.addProperty("tileResolutionX=" + resolutionX, String.valueOf(imageCount));
-        composedImage.addProperty("tileResolutionY=" + resolutionY, String.valueOf(imageCount));
-
-
-        return composedImage;
+      return composedImage;
 
     } catch (Exception e) {
       logger.warn("Error creating timeline preview images for " + track, e);
@@ -412,8 +356,21 @@ TimelinePreviewsService, ManagedService {
     }
   }
 
-  protected Attachment createPreviewsFFmpeg(Track track, double seconds, int width, int height, int tileX, int tileY, int start, double duration)
-          throws TimelinePreviewsException, IOException {
+  /**
+   * Executes the FFmpeg command to generate a timeline previews image
+   *
+   * @param track the track to generate the timeline previews image for
+   * @param seconds the length of a segment that one preview image should represent
+   * @param width the width of a single preview image
+   * @param height the height of a single preview image
+   * @param tileX the horizontal number of preview images that are stored in the timeline previews image
+   * @param tileY the vertical number of preview images that are stored in the timeline previews image
+   * @param duration the duration for which preview images should be generated
+   * @return an attachment containing the timeline previews image
+   * @throws TimelinePreviewsException
+   */
+  protected Attachment createPreviewsFFmpeg(Track track, double seconds, int width, int height, int tileX, int tileY, double duration)
+          throws TimelinePreviewsException {
 
     // copy source file into workspace
     File mediaFile = null;
@@ -431,10 +388,11 @@ TimelinePreviewsService, ManagedService {
     int trialCount = 0;
     int exitCode = 1;
     boolean ffmpegSuccess = false;
+
     while (trialCount < 3 && !ffmpegSuccess) {
 
-  //    String imageFilePath = FilenameUtils.removeExtension(mediaFile.getAbsolutePath()).concat("_timelinepreviews.png");
-      imageFilePath = FilenameUtils.removeExtension(mediaFile.getAbsolutePath()).concat("_timelinepreviews" + outputFormat);
+      imageFilePath = FilenameUtils.removeExtension(mediaFile.getAbsolutePath()).concat("_timelinepreviews"
+              + outputFormat);
 
       String[] command = new String[] {
         binary,
@@ -445,8 +403,6 @@ TimelinePreviewsService, ManagedService {
         "-vf", "fps=1/" + seconds + ",scale=" + width + ":" + height + ",tile=" + tileX + "x" + tileY,
         imageFilePath.replaceAll(" ", "\\ ")
       };
-
-      logger.info("imageFilePath: " + imageFilePath);
 
       logger.debug("Start timeline previews ffmpeg process: {}", StringUtils.join(command, " "));
       logger.info("Create timeline preview images file for track '{}' at {}", track.getIdentifier(), imageFilePath);
@@ -533,16 +489,21 @@ TimelinePreviewsService, ManagedService {
     // it is up to the workflow operation handler to set the attachment flavor
     Attachment timelinepreviewsMpe = (Attachment) mpElementBuilder.elementFromURI(
             previewsFileUri, MediaPackageElement.Type.Attachment, track.getFlavor());
+
+    // add reference to track
+    timelinepreviewsMpe.referTo(track);
+
+    // add additional properties to attachment
+    timelinepreviewsMpe.addProperty("imageSizeX", String.valueOf(tileX));
+    timelinepreviewsMpe.addProperty("imageSizeY", String.valueOf(tileY));
+    timelinepreviewsMpe.addProperty("resolutionX", String.valueOf(resolutionX));
+    timelinepreviewsMpe.addProperty("resolutionY", String.valueOf(resolutionY));
+
+    // set the flavor and an ID
+    timelinepreviewsMpe.setFlavor(track.getFlavor());
     timelinepreviewsMpe.setIdentifier(IdBuilderFactory.newInstance().newIdBuilder().createNew().compact());
 
-    // add reference to track and image size
-//    timelinepreviewsMpe.referTo(track);
-//    timelinepreviewsMpe.getReference().setProperty("imageSize", tileX + "x" + tileY);
-      timelinepreviewsMpe.addProperty("imageSizeX=" + tileX, String.valueOf(0));
-      timelinepreviewsMpe.addProperty("imageSizeY=" + tileY, String.valueOf(0));
-
     return timelinepreviewsMpe;
-
   }
 
   /**
