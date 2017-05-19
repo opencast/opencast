@@ -55,7 +55,7 @@ Without any further actions, the administrative user interface will label those 
 "Custom".
 You can specify both the displayable name (label) and a displayable icon for such custom publication channels in the
 configuration files `etc/listproviders/publication.channel.labels.properties` and
-`etc/listproviders/ppublication.channel.icons.properties`.
+`etc/listproviders/publication.channel.icons.properties`.
 
 ## Operation Examples
 
