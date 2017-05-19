@@ -14,8 +14,8 @@
                     chosen
                     disable_search_threshold="10"
                     search_contains="true"
-                    placeholder-text-single="'TABLE_FILTERS.FILTER_SELECTION.PLACEHOLDER' | translate"
-                    no-results-text="'TABLE_FILTERS.FILTER_SELECTION.NO_OPTIONS' | translate"
+                    placeholder-text-single="'{{'TABLE_FILTERS.FILTER_SELECTION.PLACEHOLDER' | translate}}'"
+                    no-results-text="'{{'TABLE_FILTERS.FILTER_SELECTION.NO_OPTIONS' | translate}}'"
                     class="main-filter"
                     ng-model="selectedFilter"
                     ng-change="filter = selectedFilter"  
@@ -30,8 +30,8 @@
                 <div ng-switch-when="select">
                     <select 
                         chosen
-                        placeholder-text-single="'TABLE_FILTERS.FILTER_VALUE_SELECTION.PLACEHOLDER' | translate"
-                        no-results-text="'TABLE_FILTERS.FILTER_VALUE_SELECTION.NO_OPTIONS' | translate"
+                        placeholder-text-single="'{{'TABLE_FILTERS.FILTER_VALUE_SELECTION.PLACEHOLDER' | translate}}'"
+                        no-results-text="'{{'TABLE_FILTERS.FILTER_VALUE_SELECTION.NO_OPTIONS' | translate}}'"
                         disable_search_threshold="10"
                         search_contains="true"
                         ng-model="filterValue"
