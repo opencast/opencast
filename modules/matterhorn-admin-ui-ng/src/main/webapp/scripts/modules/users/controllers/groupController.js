@@ -1,6 +1,6 @@
 angular.module('adminNg.controllers')
-.controller('GroupCtrl', ['$scope', 'UserRolesResource', 'ResourcesListResource', 'GroupResource', 'GroupsResource', 'Notifications', 'Modal',
-    function ($scope, UserRolesResource, ResourcesListResource, GroupResource, GroupsResources, Notifications, Modal) {
+.controller('GroupCtrl', ['$scope', 'AuthService', 'UserRolesResource', 'ResourcesListResource', 'GroupResource', 'GroupsResource', 'Notifications', 'Modal',
+    function ($scope, AuthService, UserRolesResource, ResourcesListResource, GroupResource, GroupsResources, Notifications, Modal) {
 
         var reloadSelectedUsers = function () {
             $scope.group.$promise.then(function() {
@@ -44,9 +44,13 @@ angular.module('adminNg.controllers')
           reloadSelectedRoles();
         };
 
-        var reloadUsers = function () {
+        var reloadUsers = function (current_user) {
+          $scope.orgProperties = {};
+          if (angular.isDefined(current_user) && angular.isDefined(current_user.org) && angular.isDefined(current_user.org.properties)) {
+               $scope.orgProperties = current_user.org.properties;
+          }
           $scope.user = {
-              available: ResourcesListResource.query({ resource: 'USERS.INVERSE'}),
+              available: ResourcesListResource.query({ resource: $scope.orgProperties['adminui.user.listname'] || 'USERS.INVERSE.WITH.USERNAME'}),
               selected:  [],
               i18n: 'USERS.GROUPS.DETAILS.USERS',
               searchable: true
@@ -98,6 +102,8 @@ angular.module('adminNg.controllers')
         };
 
         reloadRoles();
-        reloadUsers();
+        AuthService.getUser().$promise.then(function(current_user) {
+          reloadUsers(current_user);
+        });
     }
 ]);

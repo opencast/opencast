@@ -62,6 +62,7 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo,
 
   private static final String CFG_DEFAULT_REPOSITORY = "default-repository";
   private static final String CFG_OAIPMH_MOUNTPOINT = "org.opencastproject.oaipmh.mountpoint";
+  private static final String CFG_DEFAULT_OAIPMH_MOUNTPOINT = "/oaipmh";
 
   private SecurityService securityService;
 
@@ -112,7 +113,12 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo,
     logger.info("Activate");
     this.componentContext = cc;
     // get mount point
-    mountPoint = UrlSupport.concat("/", getContextProperty(componentContext, CFG_OAIPMH_MOUNTPOINT));
+    try {
+        mountPoint = UrlSupport.concat("/", StringUtils.trimToNull(getContextProperty(componentContext, CFG_OAIPMH_MOUNTPOINT)));
+    } catch (RuntimeException e) {
+        mountPoint = CFG_DEFAULT_OAIPMH_MOUNTPOINT;
+    }
+
   }
 
   /** Called by the ConfigurationAdmin service. This method actually sets up the server. */

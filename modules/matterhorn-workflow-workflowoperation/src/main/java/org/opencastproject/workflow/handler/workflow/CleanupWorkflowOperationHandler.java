@@ -21,6 +21,7 @@
 
 package org.opencastproject.workflow.handler.workflow;
 
+import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -29,6 +30,7 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -111,6 +113,37 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
   }
 
   /**
+   * Deletes JobArguments for every finished Job of the WorkfloInstance
+   * 
+   * @param workflowInstance
+   */
+  public void cleanUpJobArgument(WorkflowInstance workflowInstance) {
+    List<WorkflowOperationInstance> workflowOperationInstance = workflowInstance.getOperations();
+    for (WorkflowOperationInstance iterworkflowInstance : workflowOperationInstance) {
+      logger.debug("Delete JobArguments for Job id from Workflowinstance" + iterworkflowInstance.getId());
+
+      //delete job Arguments
+      try {
+        Job jobWorkflowinstance = (serviceRegistry.getJob(iterworkflowInstance.getId()));
+        List<String> list = new ArrayList<>();
+        jobWorkflowinstance.setArguments(list);
+        serviceRegistry.updateJob(jobWorkflowinstance);
+
+        List<Job> jobs = serviceRegistry.getChildJobs(iterworkflowInstance.getId());
+        for (Job job : jobs) {
+          if (job.getStatus() == Job.Status.FINISHED) {
+            logger.debug("Deleting Arguments:  " + job.getArguments());
+            job.setArguments(list);
+            serviceRegistry.updateJob(job);
+          }
+        }
+      } catch (ServiceRegistryException | NotFoundException ex) {
+        logger.error("Deleting JobArguments faild Job id:{} ", workflowInstance.getId(), ex);
+      }
+    }
+  }
+
+  /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
@@ -119,6 +152,9 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
+
+    cleanUpJobArgument(workflowInstance);
+
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
 

@@ -22,6 +22,8 @@ pages:
    - Development: 'development-process.md'
    - Reviewing, Merging and Declining Pull Requests: 'reviewing-and-merging.md'
    - Release Manager: 'release-manager.md'
+   - QA Coordinator: 'qa-coordinator.md'
+   - Security Issues: 'security.md'
 - Decision Making:
    - Overview: 'decision-making/index.md'
    - Lazy Consensus: 'decision-making/lazy-consensus.md'
@@ -30,6 +32,7 @@ pages:
 - Development Environment:
    - Overview: 'development-environment.md'
    - With Docker: 'development-environment-docker.md'
+- Committers: 'committer.md'
 - Licenses and Legal Matters: 'license.md'
 - Localization: 'localization.md'
 - Packaging: 'packaging.md'
