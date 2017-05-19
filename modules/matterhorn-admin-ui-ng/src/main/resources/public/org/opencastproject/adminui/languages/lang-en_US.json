@@ -1539,7 +1539,15 @@
      "LOGIN":    "Login",
      "ERROR":    "Incorrect username and / or password"
    },
-   "TABLE_FILTERS": {
+   "TABLE_FILTERS": { 
+     "FILTER_SELECTION": { 
+       "PLACEHOLDER": "Please select a filter…", 
+       "NO_OPTIONS": "No filters found" 
+     }, 
+     "FILTER_VALUE_SELECTION": { 
+       "PLACEHOLDER": "Please select a value…", 
+       "NO_OPTIONS": "No values found" 
+     },
      "CLEAR":       "Clear all filters",
      "REMOVE":      "Remove filter",
      "ADD":         "Add filters",
