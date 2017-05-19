@@ -475,6 +475,7 @@
          },
          "GENERAL": {
            "PUBLICATION_STATUS":         "Publication status",
+           "NO_PUBLICATIONS_AVAILABLE":  "This event has no publications",
            "SCHEDULING_STATUS":          "Status",
            "READY_FOR_RECORDING":        "Ready for recording",
            "OPTED_OUT":                  "Opted-out",
@@ -1538,7 +1539,15 @@
      "LOGIN":    "Login",
      "ERROR":    "Incorrect username and / or password"
    },
-   "TABLE_FILTERS": {
+   "TABLE_FILTERS": { 
+     "FILTER_SELECTION": { 
+       "PLACEHOLDER": "Please select a filter…", 
+       "NO_OPTIONS": "No filters found" 
+     }, 
+     "FILTER_VALUE_SELECTION": { 
+       "PLACEHOLDER": "Please select a value…", 
+       "NO_OPTIONS": "No values found" 
+     },
      "CLEAR":       "Clear all filters",
      "REMOVE":      "Remove filter",
      "ADD":         "Add filters",
