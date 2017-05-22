@@ -166,7 +166,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
           throws DistributionException, MediaPackageException {
     Set<String> elementIds = new HashSet<String>();
     elementIds.add(elementId);
-    return distribute(channelId, mediapackage, elementIds, checkAvailability);
+    return distribute(channelId, mediapackage, elementIds, checkAvailability, false);
   }
 
   @Override
