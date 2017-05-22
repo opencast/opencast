@@ -284,7 +284,7 @@ public class EventsEndpoint implements ManagedService {
       logger.info("Preview subtype is '{}'", previewSubtype);
     } else {
       previewSubtype = DEFAULT_PREVIEW_SUBTYPE;
-      logger.warn("No preview subtype configured, using '{}'", previewSubtype);
+      logger.info("No preview subtype configured, using '{}'", previewSubtype);
     }
   }
 
