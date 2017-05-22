@@ -83,7 +83,7 @@ public class ErrorResolutionWorkflowOperationHandler extends ResumableWorkflowOp
       switch (s) {
         case NONE:
           logger.info("Error resolution 'fail' was triggered for workflow '{}'", workflowInstance);
-          return createResult(null, properties, Action.CONTINUE, 0);
+          throw new WorkflowOperationException("Workflow " + workflowInstance + " was failed by user");
         case RETRY:
           logger.info("Error resolution 'retry' was triggered for workflow '{}'", workflowInstance);
           return createResult(null, properties, Action.CONTINUE, 0);

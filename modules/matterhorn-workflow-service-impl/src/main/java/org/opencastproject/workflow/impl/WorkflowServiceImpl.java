@@ -1504,7 +1504,18 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     currentOperation.setFailedAttempts(failedAttempt);
     currentOperation.addToExecutionHistory(currentOperation.getId());
 
-    if (currentOperation.getMaxAttempts() != -1 && failedAttempt == currentOperation.getMaxAttempts()) {
+    // Operation was aborted by the user, after going into hold state
+    if (ERROR_RESOLUTION_HANDLER_ID.equals(currentOperation.getTemplate())
+            && OperationState.FAILED.equals(currentOperation.getState())) {
+      int position = currentOperation.getPosition();
+      // Advance to operation that actually failed
+      if (workflow.getOperations().size() > position + 1) { // This should always be true...
+        currentOperation = (WorkflowOperationInstanceImpl) workflow.getOperations().get(position + 1);
+        // It's currently in RETRY state, change to FAILED
+        currentOperation.setState(OperationState.FAILED);
+      }
+      handleFailedOperation(workflow, currentOperation);
+    } else if (currentOperation.getMaxAttempts() != -1 && failedAttempt == currentOperation.getMaxAttempts()) {
       handleFailedOperation(workflow, currentOperation);
     } else {
       switch (currentOperation.getRetryStrategy()) {
@@ -1518,7 +1529,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           currentOperation.setState(OperationState.RETRY);
           List<WorkflowOperationInstance> operations = workflow.getOperations();
           WorkflowOperationDefinitionImpl errorResolutionDefinition = new WorkflowOperationDefinitionImpl(
-                  ERROR_RESOLUTION_HANDLER_ID, "Error Resolution Operation", "error", true);
+                  ERROR_RESOLUTION_HANDLER_ID, "Error Resolution Operation", "error", false);
           WorkflowOperationInstanceImpl errorResolutionInstance = new WorkflowOperationInstanceImpl(
                   errorResolutionDefinition, currentOperation.getPosition());
           errorResolutionInstance.setExceptionHandlingWorkflow(currentOperation.getExceptionHandlingWorkflow());
@@ -1673,7 +1684,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           break;
         case RETRY:
           currentOperation = (WorkflowOperationInstanceImpl) workflow.getCurrentOperation();
-          currentOperation.setRetryStrategy(RetryStrategy.NONE);
           break;
         default:
           throw new WorkflowDatabaseException("Retry strategy not implemented yet!");

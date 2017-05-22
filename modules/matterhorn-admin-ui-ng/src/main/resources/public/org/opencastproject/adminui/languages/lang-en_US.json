@@ -28,7 +28,7 @@
       "SPANISH":"Spanish",
       "ROMANSH":"Romansh",
       "POLISH":"Polish",
-      "PORTUGESE":"Portugese",
+      "PORTUGESE":"Portuguese",
       "SLOVENIAN":"Slovenian",
       "SWEDISH":"Swedish",
       "RUSSIAN":"Russian",
@@ -169,7 +169,11 @@
      "VIDEO_CUT_PROCESSING": "The video is being processed…",
      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Please try again later.",
      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Please try again later.",
-     "ACTIVE_TRANSACTION": "This event can not be edited while there is an active workflow or transaction."
+     "ACTIVE_TRANSACTION": "This event can not be edited while there is an active workflow or transaction.",
+     "PROCESSING_ACTION_RETRY": "Processing being resumed...",
+     "PROCESSING_ACTION_NOT_RETRY": "Processing could not be resumed.",
+     "PROCESSING_ACTION_NONE": "Processing being aborted...",
+     "PROCESSING_ACTION_NOT_NONE": "Processing could not be aborted."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
@@ -459,7 +463,13 @@
          "PROCESSED": "Finished",
          "RECORDING_FAILURE": "Recording failure",
          "PROCESSING_FAILURE": "Processing failure",
-         "PROCESSING_CANCELED": "Processing canceled"
+         "PROCESSING_CANCELED": "Processing canceled",
+         "PROCESSING_PAUSED": {
+           "ERROR": "Processing paused due to error",
+           "ACTION": "Choose action below:",
+           "ABORT": "Abort",
+           "RETRY": "Retry"
+         }         
        },
        "DETAILS": {
          "HEADER": "Event details - {{resourceId}}",

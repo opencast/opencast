@@ -11,6 +11,8 @@
 <!-- Hamburger Icon -->
 [icon_hamburger]:data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAPCAYAAAAGRPQsAAAARklEQVQ4y2Ow6L3SCsQ/gfg/BRikv5WBCgbB8GcGKrnsF9hlIwSQEGY/CYYLiYH/mVouG1ExRqUwIxy7FGalz9RyGUbsAgCNXmeVduHT9gAAAABJRU5ErkJggg== "Edit Icon"
 
+<!-- Warning Icon -->
+[icon_warning]:data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAABiklEQVQ4T6XUvWsVURDG4SeaRrCyMVWaiF9NOlFiEbGwCbEQ9S+IYOIXBqxCooWFjWKMEsFeEAvBTiyigiJ2EQWNYCHYBCvRypgwMhfWw+4mlwxcmH3nnd+dPefs6bF+DGABKziCr20tPevzPMaJ9EV+cjPAg3hTAEJ72wRtmzBqL3G4aA5tGKt10DbgcTxpmGQUT7sB9uI99mIJn7N5D3bhIwbxp4Q2TXgG99N8FvOZn8ds5mN4sBHg9pyqL82XcSvzK7iR+Xfsxq8qtG7CaVyrmKZwPZ+vYqah9k8ugTvxBTFlJwIW0IiYLqbsxE/EwV/uCCXwLsaLdbmJydTu4FxRD+1CHTDWI3Zva9HwCc9TO5a7XLXETu/LN/vvlaufWLXhN76l0I9t5c7iEU5X1/AQXtcYQ4pjcjFr9xDHqC4O4F2sYfxeYajBeBuXsjaHiQbfi7iNAtb2iUXvM8TCRwT4aAMw5JEAfsD+FlM3pcUA/sCObrpavMsBjPvtFLZsEvoXDzdyY3f1P2tRN0FRA1m1pwAAAABJRU5ErkJggg== "Warning icon"
 
 # Overview
 
@@ -40,7 +42,7 @@ The progress column shows in which state the event is. These are the possible va
 * **Ingesting**: The recorded files are being ingested by Opencast
 * **Pending**: The Event is in the processing queue and waiting to be processed
 * **Processing**: The Event is currently being processed
-* **Paused**: The task is paused and requires manual action (for example cutting) to proceed
+* **Paused**: The task is paused due to an error and requires manual action to proceed
 * **Processing canceled**: The processing of the event has been stopped
 * **Processed**: The Event has been successfully processed
 
@@ -71,6 +73,11 @@ From the Event page you have the capability to delete a single or multiple event
 Use the delete icon ( ![icon_delete][] ) in the actions column of each row to delete individual events. To delete Events in bulk, **select the items to be deleted** and then **Actions > Delete**.
 
 > When events are deleted from the asset management layer of Opencast, their link to various publication channels will be lost, i. e. there will no longer be an easy way to un-publish them. It is therefore recommended to first un-publish the events in question. See the [Processing section](processing.md) on how to start a task on an Event.
+
+
+## How to retry/abort Event processing if an error occurs
+
+If the processing is **Paused**, use the warning icon ( ![icon_warning][] ) to retry or abort it.
 
 
 ## Working with comments on Events
