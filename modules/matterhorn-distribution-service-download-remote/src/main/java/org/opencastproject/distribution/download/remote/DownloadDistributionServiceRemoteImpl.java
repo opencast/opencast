@@ -32,7 +32,6 @@ import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.util.OsgiUtil;
@@ -58,6 +57,7 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
   private static final String PARAM_MEDIAPACKAGE = "mediapackage";
   private static final String PARAM_ELEMENT_ID = "elementId";
   private static final String PARAM_CHECK_AVAILABILITY = "checkAvailability";
+  private static final String PARAM_PRESERVE_REFERENCE = "preserverReference";
 
   private final Gson gson = new Gson();
 
@@ -96,11 +96,18 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
   public Job distribute(String channelId, final MediaPackage mediaPackage, Set<String> elementIds,
                         boolean checkAvailability)
           throws DistributionException {
+    return distribute(channelId, mediaPackage, elementIds, checkAvailability, false);
+  }
+  @Override
+  public Job distribute(String channelId, final MediaPackage mediaPackage, Set<String> elementIds,
+                        boolean checkAvailability, boolean preserveReference)
+          throws DistributionException {
     logger.info(format("Distributing %s elements to %s@%s", elementIds.size(), channelId, distributionChannel));
     final HttpPost req = post(param(PARAM_CHANNEL_ID, channelId),
                               param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
                               param(PARAM_ELEMENT_ID, gson.toJson(elementIds)),
-                              param(PARAM_CHECK_AVAILABILITY, Boolean.toString(checkAvailability)));
+                              param(PARAM_CHECK_AVAILABILITY, Boolean.toString(checkAvailability)),
+                              param(PARAM_PRESERVE_REFERENCE,Boolean.toString(preserveReference)));
     for (Job job : join(runRequest(req, jobFromHttpResponse))) {
       return job;
     }
@@ -129,11 +136,5 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
     throw new DistributionException(format("Unable to retract '%s' elements of "
                                                    + "mediapackage '%s' using a remote destribution service proxy",
                                            elementIds.size(), mediaPackage.getIdentifier().toString()));
-  }
-
-  @Override
-  public Job distribute(String pubChannelId, MediaPackage mediaPackage, Set<String> downloadIds, boolean checkAvailability, boolean preserveReference) throws DistributionException, MediaPackageException {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-  //stub function
   }
 }

@@ -161,8 +161,9 @@ public class AwsS3DistributionServiceRemoteImpl extends RemoteBase implements Aw
   }
 
   @Override
-  public Job distribute(String pubChannelId, MediaPackage mediaPackage, Set<String> downloadIds, boolean checkAvailability, boolean preserveReference) throws DistributionException, MediaPackageException {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  public Job distribute(String pubChannelId, MediaPackage mediaPackage, Set<String> downloadIds,
+    boolean checkAvailability, boolean preserveReference) throws DistributionException, MediaPackageException {
+    throw new UnsupportedOperationException("Not supported yet.");
   //stub function
   }
 }

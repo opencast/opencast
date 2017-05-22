@@ -172,20 +172,10 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
   @Override
   public Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds, boolean checkAvailability)
           throws DistributionException, MediaPackageException {
-    notNull(mediapackage, "mediapackage");
-    notNull(elementIds, "elementIds");
-    notNull(channelId, "channelId");
-    try {
-      return serviceRegistry.createJob(
-              JOB_TYPE,
-              Operation.Distribute.toString(),
-              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), gson.toJson(elementIds),
-                      Boolean.toString(checkAvailability)), distributeJobLoad);
-    } catch (ServiceRegistryException e) {
-      throw new DistributionException("Unable to create a job", e);
-    }
+    return distribute(channelId, mediapackage, elementIds, checkAvailability, false);
   }
 
+  @Override
   public Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds, boolean checkAvailability, boolean preserveRefernece)
           throws DistributionException, MediaPackageException {
     notNull(mediapackage, "mediapackage");
@@ -220,18 +210,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    */
   public MediaPackageElement[] distributeElements(String channelId, MediaPackage mediapackage, Set<String> elementIds,
           boolean checkAvailability) throws DistributionException {
-    notNull(mediapackage, "mediapackage");
-    notNull(elementIds, "elementIds");
-    notNull(channelId, "channelId");
-
-    final Set<MediaPackageElement> elements = getElements(mediapackage, elementIds);
-    List<MediaPackageElement> distributedElements = new ArrayList<MediaPackageElement>();
-
-    for (MediaPackageElement element : elements) {
-      MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, element, checkAvailability);
-      distributedElements.add(distributedElement);
-    }
-    return distributedElements.toArray(new MediaPackageElement[distributedElements.size()]);
+    return distributeElements(channelId, mediapackage, elementIds, checkAvailability, false);
   }
 
   /**
@@ -246,7 +225,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    * @param checkAvailability
    *          Check the availability of the distributed element via http.
    * @param preserveReference
-   *          copy actual Reference to the new distributed element         
+   *          copy actual Reference to the new distributed element
    * @return A reference to the MediaPackageElements that have been distributed.
    * @throws DistributionException
    *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
@@ -262,7 +241,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     List<MediaPackageElement> distributedElements = new ArrayList<MediaPackageElement>();
 
     for (MediaPackageElement element : elements) {
-      MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, element, checkAvailability,preserveReference);
+      MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, element, checkAvailability, preserveReference);
       distributedElements.add(distributedElement);
     }
     return distributedElements.toArray(new MediaPackageElement[distributedElements.size()]);
@@ -301,7 +280,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    * @param checkAvailability
    *          Check the availability of the distributed element via http.
    * @param preserveReference
-   *           Preserve Refernce
+   *           Copy existing Track-Refernce to the new distributed Track
    * @return A reference to the MediaPackageElement that has been distributed.
    * @throws DistributionException
    *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
@@ -393,6 +372,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     return retract(channelId, mediapackage, elementIds);
   }
 
+  @Override
   public Job retract(String channelId, MediaPackage mediapackage, Set<String> elementIds)
         throws DistributionException {
     notNull(mediapackage, "mediapackage");
@@ -513,12 +493,10 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
       switch (op) {
         case Distribute:
           Boolean checkAvailability = Boolean.parseBoolean(arguments.get(3));
-           Boolean preserveRefernece = false;
-          if (arguments.size() > 4) {
-            preserveRefernece = Boolean.parseBoolean(arguments.get(4));
-          }
+           Boolean preserveReference = false;
+            preserveReference = Boolean.parseBoolean(arguments.get(4));
           MediaPackageElement[] distributedElements = distributeElements(channelId, mediapackage, elementIds,
-                  checkAvailability,preserveRefernece);
+                  checkAvailability, preserveReference);
           return (distributedElements != null)
                   ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(distributedElements)) : null;
         case Retract:

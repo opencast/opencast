@@ -309,8 +309,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     final List<Job> jobs = new ArrayList<>();
     final String pubChannelId = publicationChannelId(repository);
     try {
-        boolean preserveReference = true;
-        Job job = downloadDistributionService.distribute(pubChannelId, mediaPackage, downloadIds, checkAvailability,preserveReference);
+        Job job = downloadDistributionService.distribute(pubChannelId, mediaPackage, downloadIds, checkAvailability, true);
         jobs.add(job);
 
       for (String elementId : streamingIds) {
@@ -329,8 +328,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     }
 
     // Wait until all distribution jobs have returned
-    final List<Job> waitForJobs = jobs;
-    if (!waitForJobs(parentJob, serviceRegistry, waitForJobs).isSuccess())
+    if (!waitForJobs(parentJob, serviceRegistry, jobs).isSuccess())
       throw new PublicationException("One of the distribution jobs did not complete successfully");
 
     logger.debug("Distribute operation completed");
@@ -456,31 +454,26 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
 
     for (Job job : jobs) {
      try {
-     final List <MediaPackageElement> distributedElements = (List <MediaPackageElement>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
-     for (MediaPackageElement distributedElement: distributedElements) {
+       final List <MediaPackageElement> distributedElements = (List <MediaPackageElement>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
+       for (MediaPackageElement distributedElement: distributedElements) {
+         // If there is no payload, then the item has not been distributed.
+          if (job.getPayload() == null)
+            continue;
 
-      // If there is no payload, then the item has not been distributed.
-      if (job.getPayload() == null)
-        continue;
+          // If the job finished successfully, but returned no new element, the channel simply doesn't support this
+          // kind of element. So we just keep on looping.
+          if (distributedElement == null)
+            continue;
 
-      //Get distributed Elements
+          // Make sure the mediapackage is prompted to create a new identifier for this element
+          distributedElement.setIdentifier(null);
 
-      // If the job finished successfully, but returned no new element, the channel simply doesn't support this
-      // kind of element. So we just keep on looping.
-      if (distributedElement == null)
-        continue;
-
-      // Make sure the mediapackage is prompted to create a new identifier for this element
-      distributedElement.setIdentifier(null);
-
-      // Add the new element to the mediapackage
-      mp.add(distributedElement);
-      elementsToPublish.add(distributedElement.getIdentifier());
-      distributedElementIds.put(distributedElement.getIdentifier(), distributedElement.getIdentifier());
-
-    } }
-     catch (Exception e)
-     {
+          // Add the new element to the mediapackage
+          mp.add(distributedElement);
+          elementsToPublish.add(distributedElement.getIdentifier());
+          distributedElementIds.put(distributedElement.getIdentifier(), distributedElement.getIdentifier());
+       }
+     } catch (Exception e) {
        logger.error("Exception" + e);
      }
 
