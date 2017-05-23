@@ -22,17 +22,17 @@ New Features and Improvements
     agent status is now additional indicated colors. The event counter filters have been reordered to match the life
     cycly of recordings. Series dropdowns are now sorted alphabetically and can be searched. The access policy page now
     supports search and filtering.
-  
+
   - **Piwik Integration** - The Opencast video player now comes with out-of-the-box Piwik support so that user
     statistics for the player can be easily gathered and visualized
 
   - **Caption Support** - The Opencast video player now supports captions
 
   - **Users and roles** - The management of users and roles has been significantly improved to better support
-    intergration of third-party user providers (e.g. LDAP, Sakai). The administrative user interface has been 
+    intergration of third-party user providers (e.g. LDAP, Sakai). The administrative user interface has been
     extended to better support externally provided roles. A new custom role provider allows Adopters to integrate
     their custom roles in a seamless way.
-  
+
   - **OAI-PMH** - The OAI-PMH implementation has been completely revised. Now implemented as independent communication
     channels, an arbitrary number of OAI-PMH repositories can be handled by the Opencast OAI-PMH server.
     A new OAI-PMH metadata prefix provides direct access to Dublincore metadata catalogs, promoting a strong decoupling
@@ -51,7 +51,7 @@ New Features and Improvements
   - **Extended Themes** - The themes facility that allows producers to let Opencast brand their produced video content
     using intro and outro videos has been extended to support title slides (metadata within video content) and
     watermarks.
-  
+
   - **New Workflow Operation Handlers**
     - **WOH tag-by-dcterm** allows media package element tagging based on Dublincore metadata values
     - **WOH configure-by-dcterm** can be used to set workflow instance variables based on Dublincore metadata which in
@@ -92,3 +92,19 @@ Configuration Changes
 ---------------------
 
 - MH-11861 needs the admin search index to be rebuilded
+
+
+Release Schedule
+----------------
+
+|Date                    |Phase
+|------------------------|--------------------------------
+|March 27th              |Feature Freeze
+|March 27th - April 16th |Internal QA and bug fixing phase
+|March 27th - April 10th |Review Test Cases
+|April 11th - April 16th |Documentation Review
+|April 16th - May 7th    |Public QA phase
+|May 7th - May 25th      |Additional bug fixing phase
+|May 18th - May 25th     |Translation week
+|May 26th - June 3rd     |Final QA phase
+|June 7th                |Release of Opencast 3
