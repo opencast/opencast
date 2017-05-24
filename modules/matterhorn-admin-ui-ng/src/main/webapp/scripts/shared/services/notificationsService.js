@@ -81,10 +81,16 @@ angular.module('adminNg.services')
                     message    : 'NOTIFICATIONS.' + key,
                     parameters : messageParams,
                     duration   : duration,
-                    id         : uniqueId
+                    id         : uniqueId,
+                    hidden     : false
                 };
 
                 scope.$emit('added', context);
+            } else {
+              var notification = _.find(notifications.global, function(a) {return a.key === key});
+              if(notification) {
+                  notification.hidden = false;
+              }
             }
             return uniqueId;
         };
