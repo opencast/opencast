@@ -71,10 +71,12 @@ Publishing to multiple distribution services
 --------------------------------------------
 
 Currently we do not support publication to multiple distribution services simultaneously.  This means that whichever
-workflow operation is *last* in the workflow will be the final publication.  For example, if you workflow publishes to
-the local publication node, then to AWS, then the publication will be hosted in AWS once the workflow reaches a finished
-state.  If those operations are reversed then your workflow will publish to AWS, and then replace the listing in the
-publication index with the publication hosted by your publication node!
+workflow operation is *last* in the workflow will be the final publication.  For example, if you were able to select
+both options for publishing to the Opencast Index with the default workflow you would end up with the data being hosted
+in AWS.  This is because the default workflow has publication to the Opencast Media Module listed before publication to
+AWS.  If these operations were reversed then the data would be hosted by the Opencast Media Module!  In both cases the
+Media Module is still required since it hosts the publication index, however the load is significantly reduced when AWS
+is used to host the actual media.
 
 Migrating to S3 Distribution with Pre-Existing Data
 ---------------------------------------------------
