@@ -35,5 +35,6 @@ These guides will help you if you want to participate in Opencast development.
             - [References](modules/admin-ui/style/references.md)
     - [Stream Security](modules/stream-security.md)
     - […](modules/index.md)
+ - [External API](api/index.md)
  - [Project Infrastructure](infrastructure/index.md)
     - [Nexus Maven Repository](infrastructure/nexus.md)
