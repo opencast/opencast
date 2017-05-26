@@ -29,6 +29,7 @@ angular.module('adminNg.resources')
                     row.series_id = r.series.id;
                 }
                 row.review_status = r.review_status;
+                row.event_status_raw = r.event_status;
                 $translate(r.event_status).then(function (translation) {
                 	row.event_status = translation;
                 });

@@ -90,6 +90,7 @@ angular.module('adminNg.controllers')
                 template: 'modules/events/partials/publishedCell.html',
                 dontSort: true
             }, {
+                template: 'modules/events/partials/eventsStatusCell.html',
                 name:  'event_status',
                 label: 'EVENTS.EVENTS.TABLE.SCHEDULING_STATUS'
             }, {
