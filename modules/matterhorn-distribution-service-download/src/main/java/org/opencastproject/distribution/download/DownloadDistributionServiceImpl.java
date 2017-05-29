@@ -186,7 +186,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
               JOB_TYPE,
               Operation.Distribute.toString(),
               Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), gson.toJson(elementIds),
-                      Boolean.toString(checkAvailability),Boolean.toString(preserveRefernece)), distributeJobLoad);
+                      Boolean.toString(checkAvailability), Boolean.toString(preserveRefernece)), distributeJobLoad);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -280,7 +280,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    * @param checkAvailability
    *          Check the availability of the distributed element via http.
    * @param preserveReference
-   *           Copy existing Track-Refernce to the new distributed Track
+   *           Copy existing Track-Reference to the new distributed Track
    * @return A reference to the MediaPackageElement that has been distributed.
    * @throws DistributionException
    *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement

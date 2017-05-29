@@ -141,7 +141,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
       Gson gson = new Gson();
       Set<String> setElementIds = gson.fromJson(elementId, new TypeToken<Set<String>>() { }.getType());
       final MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
-      final Job job = service.distribute(channelId, mediapackage, setElementIds, checkAvailability,preserveReference);
+      final Job job = service.distribute(channelId, mediapackage, setElementIds, checkAvailability, preserveReference);
       return ok(new JaxbJob(job));
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to distribute element: {}", e.getMessage());
