@@ -15,8 +15,8 @@
     cardinality="1..1" policy="static" bind="setServiceRegistry" />
   <reference name="Workspace" interface="org.opencastproject.workspace.api.Workspace"
     cardinality="1..1" policy="static" bind="setWorkspace" />
-  <reference name="SeriesCatalogUIAdapter" interface="org.opencastproject.index.service.catalog.adapter.series.SeriesCatalogUIAdapter"
-    cardinality="0..n" policy="dynamic" bind="addCatalogUIAdapter" unbind="removeCatalogUIAdapter" />          
+  <reference name="SeriesCatalogUIAdapter" interface="org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter"
+    cardinality="0..n" policy="dynamic" bind="addCatalogUIAdapter" unbind="removeCatalogUIAdapter" />
   <reference name="SecurityService" interface="org.opencastproject.security.api.SecurityService"
     cardinality="1..1" policy="static" bind="setSecurityService" />
 </scr:component>
