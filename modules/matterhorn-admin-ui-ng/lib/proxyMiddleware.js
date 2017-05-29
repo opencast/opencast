@@ -89,11 +89,13 @@ module.exports = function (grunt, appPath) {
       };
 
       var parsed = urlParser(req.url);
+      var parsedHost = urlParser(host);
       var escapedQuery = parsed.query.replace(',','%2C');
 
       var onForwardToBackend = function (body) {
         var authConfig = {
-          host: host,
+          host: parsedHost.protocol + '//' + parsedHost.hostname,
+          port: parsedHost.port,
           path: parsed.pathname + escapedQuery,
           method: req.method,
           headers: {
