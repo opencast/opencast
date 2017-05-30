@@ -503,7 +503,7 @@ public class ToolsEndpoint implements ManagedService {
    */
   MediaPackage addSmilToArchive(MediaPackage mediaPackage, final Smil smil) throws IOException {
    MediaPackageElementFlavor mediaPackageElementFlavor = adminUIConfiguration.getSmilCatalogFlavor();
-   //set defaul catalog Id if there is none existing
+   //set default catalog Id if there is none existing
     String catalogId = smil.getId();
     Catalog[] catalogs = mediaPackage.getCatalogs();
 
