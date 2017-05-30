@@ -64,7 +64,7 @@ public final class OpencastArchive extends ArchiveBase<OpencastResultSet> {
   }
 
   @Override
-  public synchronized void add(final MediaPackage mp) throws ArchiveException {
+  public void add(final MediaPackage mp) throws ArchiveException {
     if (mp.getCatalogs(MediaPackageElements.EPISODE).length == 0)
       throw new ArchiveException("Archived Mediapackage didn't contain a necessary " + MediaPackageElements.EPISODE
               + " catalog.");
