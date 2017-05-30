@@ -86,6 +86,7 @@ angular.module('adminNg.directives')
                     // Leaving the edit mode causes a blur which in turn triggers
                     // the submit action.
                     scope.editMode = false;
+                    angular.element(event.target).blur();
                 } else if (event.keyCode === 27) {
                     // Restore original value on ESC
                     scope.params.value = scope.original;

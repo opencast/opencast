@@ -47,6 +47,15 @@ These are the variables that are available when you define the url-pattern confi
 |${publication_id} |The id of this publication.                                                              |54f6c12d-8e68-4ec8-badf-cd045b33d01e |
 |${series_id}      |The id of the series if available, empty if not.                                         |36f3c5d8-ad4d-4dab-beb1-1400ffab4a69 |
 
+## Publication Channel Labels and Icons
+
+Using this workflow operation, you can create arbitrary custom publication channels as technically identified by the
+identifier specified using the configuration key `channel-id`.
+Without any further actions, the administrative user interface will label those custom publication channels as
+"Custom".
+You can specify both the displayable name (label) and a displayable icon for such custom publication channels in the
+configuration files `etc/listproviders/publication.channel.labels.properties` and
+`etc/listproviders/publication.channel.icons.properties`.
 
 ## Operation Examples
 
