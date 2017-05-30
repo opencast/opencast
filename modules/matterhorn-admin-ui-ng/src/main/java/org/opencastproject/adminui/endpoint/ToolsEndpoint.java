@@ -415,14 +415,14 @@ public class ToolsEndpoint implements ManagedService {
         return R.serverError();
       }
 
-     if (editingInfo.getPostProcessingWorkflow().isSome()) {
-     final String workflowId = editingInfo.getPostProcessingWorkflow().get();
+      if (editingInfo.getPostProcessingWorkflow().isSome()) {
+        final String workflowId = editingInfo.getPostProcessingWorkflow().get();
         try {
           archive.applyWorkflow(ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId)),
-                  mpElementProvider.getUriRewriter(), $(mediaPackage.getIdentifier().toString()).toList());
+            mpElementProvider.getUriRewriter(), $(mediaPackage.getIdentifier().toString()).toList());
         } catch (ArchiveException e) {
           logger.warn("Unable to start workflow '{}' on archived media package '{}': {}",
-                  new Object[] { workflowId, mediaPackage, getStackTrace(e) });
+            new Object[]{workflowId, mediaPackage, getStackTrace(e)});
           return R.serverError();
         } catch (WorkflowDatabaseException e) {
           logger.warn("Unable to load workflow '{}' from workflow service: {}", workflowId, getStackTrace(e));
@@ -432,7 +432,6 @@ public class ToolsEndpoint implements ManagedService {
           return R.badRequest("Workflow not found");
         }
       }
-
     }
 
     return R.ok();
@@ -505,7 +504,7 @@ public class ToolsEndpoint implements ManagedService {
   MediaPackage addSmilToArchive(MediaPackage mediaPackage, final Smil smil) throws IOException {
    MediaPackageElementFlavor mediaPackageElementFlavor = adminUIConfiguration.getSmilCatalogFlavor();
    //set defaul catalog Id if there is none existing
-    String catalogId = mediaPackage.getIdentifier().compact();
+    String catalogId = smil.getId();
     Catalog[] catalogs = mediaPackage.getCatalogs();
 
     //get the first smil/cutting  catalog-ID to overwrite it with new smil info
@@ -520,7 +519,7 @@ public class ToolsEndpoint implements ManagedService {
 
     URI smilURI;
     try (InputStream is = IOUtils.toInputStream(smil.toXML(), "UTF-8")) {
-      smilURI = workspace.put(mediaPackage.getIdentifier().compact(), smil.getId(), TARGET_FILE_NAME, is);
+      smilURI = workspace.put(mediaPackage.getIdentifier().compact(), catalogId, TARGET_FILE_NAME, is);
     } catch (SAXException e) {
       logger.error("Error while serializing the SMIL catalog to XML: {}", e.getMessage());
       throw new IOException(e);

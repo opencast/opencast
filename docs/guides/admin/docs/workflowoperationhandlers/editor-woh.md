@@ -14,7 +14,7 @@ distributed systems) to be installed.
 |source-flavors    |`*/work`   |the subtype of all media files to use                          |
 |smil-flavors      |`*/smil`   |the smil file(s) to be used                                    |
 |skipped-flavors   |`*/work`   |the subtype of all media files to be used if the editor skipped|
-|target-smil-flavor| `smil/cutting` | the target-smil-falvor, should be the same as 'smil.catalog.flavor' in org.opencastproject.adminui.cfg| 
+|target-smil-flavor| `smil/cutting` | the target-smil-flavor, should be the same as 'smil.catalog.flavor' in org.opencastproject.adminui.cfg| 
 
 ## Operation Example
 
