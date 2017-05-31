@@ -29,7 +29,6 @@ import org.opencastproject.util.data.Tuple;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -189,7 +188,7 @@ public interface SchedulerServiceIndex {
    * @throws SchedulerServiceDatabaseException
    *           if exception occurred
    */
-  Map<String, Date> getLastModifiedDate(SchedulerQuery filter) throws SchedulerServiceDatabaseException;
+  Date getLastModifiedDate(SchedulerQuery filter) throws SchedulerServiceDatabaseException;
 
   /**
    * Returns the opt out status of an event with the given event id

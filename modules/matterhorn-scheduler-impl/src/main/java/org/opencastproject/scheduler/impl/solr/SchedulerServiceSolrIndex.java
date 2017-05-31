@@ -68,10 +68,8 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -1062,13 +1060,13 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
   }
 
   @Override
-  public Map<String, Date> getLastModifiedDate(SchedulerQuery filter) throws SchedulerServiceDatabaseException {
+  public Date getLastModifiedDate(SchedulerQuery filter) throws SchedulerServiceDatabaseException {
+    String solrQueryString = buildSolrQueryString(filter);
+    SolrQuery q = new SolrQuery(solrQueryString);
+    q.addSortField(SolrFields.LAST_MODIFIED + "_sort", SolrQuery.ORDER.desc);
+    q.setRows(1);
     QueryResponse response;
     try {
-      String solrQueryString = buildSolrQueryString(filter);
-      SolrQuery q = new SolrQuery(solrQueryString);
-      q.addSortField(SolrFields.LAST_MODIFIED + "_sort", SolrQuery.ORDER.desc);
-      q.setRows(Integer.MAX_VALUE);
       response = solrServer.query(q);
     } catch (SolrServerException e) {
       logger.error("Could not complete query request: {}", e);
@@ -1076,23 +1074,10 @@ public class SchedulerServiceSolrIndex implements SchedulerServiceIndex {
     }
     if (response.getResults().isEmpty()) {
       logger.debug("No events scheduled for {}", filter);
-      return new HashMap<String, Date>();
+      return null;
     }
 
-    try {
-      // Iterate through the results
-      Map<String, Date> lastModifiedDates = new HashMap<String, Date>();
-      for (SolrDocument doc : response.getResults()) {
-        String agentId = (String) doc.get(SolrFields.SPATIAL_KEY);
-        if (agentId == null || lastModifiedDates.containsKey(agentId))
-          continue;
-        Date date = (Date) doc.get(SolrFields.LAST_MODIFIED);
-        lastModifiedDates.put(agentId, date);
-      }
-      return lastModifiedDates;
-    } catch (Exception e) {
-      throw new SchedulerServiceDatabaseException(e);
-    }
+    return (Date) response.getResults().get(0).get(SolrFields.LAST_MODIFIED);
   }
 
   /**

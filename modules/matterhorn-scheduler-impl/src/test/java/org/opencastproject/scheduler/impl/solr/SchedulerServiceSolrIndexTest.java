@@ -43,7 +43,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -115,8 +114,7 @@ public class SchedulerServiceSolrIndexTest {
 
     SchedulerQuery filter = new SchedulerQuery().setSpatial("Device one");
 
-    Map<String, Date> lastModifiedResult = index.getLastModifiedDate(filter);
-    Date lastModified = lastModifiedResult.values().iterator().next();
+    Date lastModified = index.getLastModifiedDate(filter);
     Assert.assertTrue("Wrong last modified returned",
             !beforeIndexing.after(lastModified) && !afterIndexing.before(lastModified));
 
@@ -130,8 +128,7 @@ public class SchedulerServiceSolrIndexTest {
     index.index(dc);
     afterIndexing = new Date();
 
-    lastModifiedResult = index.getLastModifiedDate(filter);
-    lastModified = lastModifiedResult.values().iterator().next();
+    lastModified = index.getLastModifiedDate(filter);
     Assert.assertTrue("Wrong last modified returned",
             !beforeIndexing.after(lastModified) && !afterIndexing.before(lastModified));
 
@@ -158,47 +155,6 @@ public class SchedulerServiceSolrIndexTest {
     filter = new SchedulerQuery().setOptOut(true).setBlacklisted(true);
     search = index.search(filter);
     Assert.assertEquals(1, search.getTotalCount());
-  }
-
-  @Test
-  public void testLastModified() throws Exception {
-    DublinCoreCatalog firstCatalog = dcService.newInstance();
-    firstCatalog.add(DublinCore.PROPERTY_IDENTIFIER, "1");
-    firstCatalog.add(DublinCore.PROPERTY_TITLE, "First");
-    firstCatalog.add(DublinCore.PROPERTY_SPATIAL, "Device one");
-
-    DublinCoreCatalog secondCatalog = dcService.newInstance();
-    secondCatalog.add(DublinCore.PROPERTY_IDENTIFIER, "2");
-    secondCatalog.add(DublinCore.PROPERTY_TITLE, "Second");
-    secondCatalog.add(DublinCore.PROPERTY_SPATIAL, "Device one");
-
-    DublinCoreCatalog thirdCatalog = dcService.newInstance();
-    thirdCatalog.add(DublinCore.PROPERTY_IDENTIFIER, "1");
-    thirdCatalog.add(DublinCore.PROPERTY_TITLE, "Third");
-    thirdCatalog.add(DublinCore.PROPERTY_SPATIAL, "Device two");
-
-    index.index(firstCatalog);
-    Date beforeSecondIndexing = new Date();
-    index.index(secondCatalog);
-    Date afterSecondIndexing = new Date();
-    index.index(thirdCatalog);
-
-    SchedulerQuery filter = new SchedulerQuery().setSpatial("Device one");
-
-    Map<String, Date> lastModified = index.getLastModifiedDate(filter);
-    Date lastModifiedDate = lastModified.values().iterator().next();
-    Assert.assertTrue("Wrong last modified returned", !beforeSecondIndexing.after(lastModifiedDate)
-            && !afterSecondIndexing.before(lastModifiedDate));
-
-    filter = new SchedulerQuery();
-
-    lastModified = index.getLastModifiedDate(filter);
-    Date lastModifedFirst = lastModified.get("Device one");
-    Assert.assertTrue("Wrong last modified returned", !beforeSecondIndexing.after(lastModifedFirst)
-            && !afterSecondIndexing.before(lastModifedFirst));
-
-    Date lastModifedSecond = lastModified.get("Device two");
-    Assert.assertTrue("Wrong last modified returned", afterSecondIndexing.before(lastModifedSecond));
   }
 
   @Test
