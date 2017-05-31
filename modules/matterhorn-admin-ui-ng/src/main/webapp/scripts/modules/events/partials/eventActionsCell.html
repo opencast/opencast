@@ -48,8 +48,9 @@
 </a>
 
 <a ng-if="row.workflow_state == 'PAUSED'"
-	data-open-modal="workflow-action-modal"
+	data-open-modal="event-details"
 	data-resource-id="{{ row.id }}"
-	class="fa fa-warning"
-	with-role="ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT">
+	data-tab="workflows"
+	with-role="ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT"
+	class="fa fa-warning">
 </a>

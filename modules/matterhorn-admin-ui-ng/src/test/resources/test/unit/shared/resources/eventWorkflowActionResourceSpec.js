@@ -11,9 +11,10 @@ describe('EventWorkflowActionResource Test', function () {
 
     describe('#save', function () {
         it('PUTs to the API', function () {
-            $httpBackend.expectPUT('/admin-ng/event/1234/workflow/action/RETRY').respond(200, '{}');
+            $httpBackend.expectPUT('/admin-ng/event/1234/workflows/5678/action/RETRY').respond(200, '{}');
             EventWorkflowActionResource.save({}, {
-                id: '1234',
+            	id: '1234',
+            	wfId: '5678',
                 action: 'RETRY'
             });
             $httpBackend.flush();

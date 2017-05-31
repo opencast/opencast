@@ -12,7 +12,11 @@
 [icon_hamburger]:data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAPCAYAAAAGRPQsAAAARklEQVQ4y2Ow6L3SCsQ/gfg/BRikv5WBCgbB8GcGKrnsF9hlIwSQEGY/CYYLiYH/mVouG1ExRqUwIxy7FGalz9RyGUbsAgCNXmeVduHT9gAAAABJRU5ErkJggg== "Edit Icon"
 
 <!-- Warning Icon -->
-[icon_warning]:data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAABiklEQVQ4T6XUvWsVURDG4SeaRrCyMVWaiF9NOlFiEbGwCbEQ9S+IYOIXBqxCooWFjWKMEsFeEAvBTiyigiJ2EQWNYCHYBCvRypgwMhfWw+4mlwxcmH3nnd+dPefs6bF+DGABKziCr20tPevzPMaJ9EV+cjPAg3hTAEJ72wRtmzBqL3G4aA5tGKt10DbgcTxpmGQUT7sB9uI99mIJn7N5D3bhIwbxp4Q2TXgG99N8FvOZn8ds5mN4sBHg9pyqL82XcSvzK7iR+Xfsxq8qtG7CaVyrmKZwPZ+vYqah9k8ugTvxBTFlJwIW0IiYLqbsxE/EwV/uCCXwLsaLdbmJydTu4FxRD+1CHTDWI3Zva9HwCc9TO5a7XLXETu/LN/vvlaufWLXhN76l0I9t5c7iEU5X1/AQXtcYQ4pjcjFr9xDHqC4O4F2sYfxeYajBeBuXsjaHiQbfi7iNAtb2iUXvM8TCRwT4aAMw5JEAfsD+FlM3pcUA/sCObrpavMsBjPvtFLZsEvoXDzdyY3f1P2tRN0FRA1m1pwAAAABJRU5ErkJggg== "Warning icon"
+[icon_warning]:data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABJklEQVQ4T53TvyvGURTH8dczmPyYkNWvSCwGEskgq0iZLSJ/g9//ghhsZgwWg8FCkcEghTAzUdiETt2nvn17niec6Zx7P+d9z73n3ILyVoMLfKEf76WkhQqAZayk/fDX/gJowj2qU9IHWvGch5SrYAtzOfEmFn4D6MA1nrCbEqbRgC7cZSGlKtjHBI4wlsTHGMEepioBBnGSBKcYSv45+pI/gLMiJFtB+JEUgrBL9Cb/Ct3JjwOG8R1xFjCZSizCb9GZgge0ZEofx0EWUJUerj33yo/pkObc+g168FmsYB7RpqxFz2fSwg7qc/uz2A5AbRqaxpwge4UYqhikrEWb2wKwiqXcZoQvWE/rMdJ1JTSLAXhDfJz/2GsANjD6n2wcVvqNv2L+AGp3Mha6UJqoAAAAAElFTkSuQmCC "Warning icon"
+
+<!-- Refresh Icon -->
+[icon_refresh]:data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABLElEQVQ4T63SvyuvYRjH8ZcMlD/AogiFDErJr8Um4RwDgwySwT9htMi/cAY6CYMSsRkosfhVTojRfmYGdNX96PH0fAdxj/d9X+/rc12fT5VvnqqS+jrMYhTN6f0BO1jHM2rRhusiYABbaKgg7BFzWEQjOvKAKD5M9NfU8SyB+vAb1TnwPdozQEi6RROe8AuXBRX9OEFW8wkwjz94QzeuCsXRIHYwXEnBCsZxhIWS+buwmeseX84xU+bCl4z9McA2QmZ2YhcT+Fci5y9ioatYyhSEvy25z3uYxEsB0IvM2jHslwGi+xCOC8WRhXCiHhfowWslBQE5wGmCRMhGkgv/MZhy8xGKyHoEaRlrhXHyQu4whZvsMlPQiYDEzDWYTmlsTeGKHe1io7iXb9v4DuVKPRFyZ7ArAAAAAElFTkSuQmCC "Refresh icon"
+
 
 # Overview
 
@@ -77,7 +81,7 @@ Use the delete icon ( ![icon_delete][] ) in the actions column of each row to de
 
 ## How to retry/abort Event processing if an error occurs
 
-If the processing is **Paused**, use the warning icon ( ![icon_warning][] ) to retry or abort it.
+If processing is **Paused**, use the warning icon ( ![icon_warning][] ) to open the Event's details workflow tab, where you can *Retry* ( ![icon_refresh][] ) or *Abort* ( ![icon_delete][] ) processing.
 
 
 ## Working with comments on Events

@@ -2062,18 +2062,20 @@ public abstract class AbstractEventEndpoint {
   };
 
   @PUT
-  @Path("{id}/workflow/action/{action}")
+  @Path("{eventId}/workflows/{workflowId}/action/{action}")
   @RestQuery(name = "workflowAction", description = "Resumes current workflow instance if paused due to error.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "id", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING),
+          @RestParameter(name = "eventId", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING),
+          @RestParameter(name = "workflowId", description = "The id of the workflow", isRequired = true, type = RestParameter.Type.STRING),
           @RestParameter(name = "action", description = "The action to take: RETRY or NONE (abort processing)", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
                   @RestResponse(responseCode = SC_OK, description = "Workflow resumed."),
                   @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance found."),
                   @RestResponse(responseCode = SC_BAD_REQUEST, description = "Invalid action entered."),
                   @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you need to authenticate."),
                   @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "An exception occurred.") })
-  public Response workflowAction(@PathParam("id") String id, @PathParam("action") String action)
+  public Response workflowAction(@PathParam("eventId") String id, @PathParam("workflowId") String wfId,
+          @PathParam("action") String action)
           throws NotFoundException, UnauthorizedException {
-    if (StringUtils.isEmpty(id) || StringUtils.isEmpty(action)
+    if (StringUtils.isEmpty(id) || StringUtils.isEmpty(wfId) || StringUtils.isEmpty(action)
             || (!RetryStrategy.RETRY.toString().equalsIgnoreCase(action)
                     && !RetryStrategy.NONE.toString().equalsIgnoreCase(action)))
       return badRequest();
@@ -2081,23 +2083,24 @@ public abstract class AbstractEventEndpoint {
     Map<String, String> props = new HashMap<String, String>();
     props.put("retryStrategy", action);
 
-    Event event = null;
     try {
       Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
       if (optEvent.isNone())
         return notFound("Cannot find an event with id '%s'.", id);
 
-      event = optEvent.get();
-      long wfId = event.getWorkflowId();
-      if (wfId <= 0 || !WorkflowState.PAUSED.toString().equalsIgnoreCase(event.getWorkflowState()))
-        return notFound("There's no paused workflow associated with event: %s.", id);
+      long workflowInstanceId = Long.parseLong(wfId);
 
       WorkflowService workflowService = getWorkflowService();
-      WorkflowInstance wfInstance = workflowService.getWorkflowById(event.getWorkflowId());
-      workflowService.resume(wfInstance.getId(), props);
+      WorkflowInstance wfInstance = workflowService.getWorkflowById(workflowInstanceId);
+      if (!WorkflowState.PAUSED.equals(wfInstance.getState()))
+        return notFound("Workflow %s is NOT paused.", wfId);
+      if (!wfInstance.getMediaPackage().getIdentifier().toString().equals(id))
+        return badRequest(String.format("Workflow %s is not associated to event %s", wfId, id));
+
+      workflowService.resume(workflowInstanceId, props);
       return ok();
     } catch (NotFoundException e) {
-      return notFound("Workflow not found: '%d'.", event.getWorkflowId());
+      return notFound("Workflow not found: '%d'.", wfId);
     } catch (IllegalStateException e) {
       return notFound("There's no paused workflow associated with event: %s.", id);
     } catch (UnauthorizedException e) {

@@ -24,12 +24,12 @@
 angular.module('adminNg.controllers')
 .controller('EventCtrl', [
     '$scope', 'Notifications', 'EventTransactionResource', 'EventMetadataResource', 'EventAssetsResource',
-    'EventCatalogsResource', 'CommentResource', 'EventWorkflowsResource',
+    'EventCatalogsResource', 'CommentResource', 'EventWorkflowsResource', 'EventWorkflowActionResource',
     'ResourcesListResource', 'UserRolesResource', 'EventAccessResource', 'EventGeneralResource',
     'OptoutsResource', 'EventParticipationResource', 'NewEventProcessingResource',
     'OptoutSingleResource', 'CaptureAgentsResource', 'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService',
     function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource, EventCatalogsResource, CommentResource,
-        EventWorkflowsResource, ResourcesListResource, UserRolesResource, EventAccessResource, EventGeneralResource,
+        EventWorkflowsResource, EventWorkflowActionResource, ResourcesListResource, UserRolesResource, EventAccessResource, EventGeneralResource,
         OptoutsResource, EventParticipationResource, NewEventProcessingResource,
         OptoutSingleResource, CaptureAgentsResource, ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService) {
 
@@ -764,5 +764,16 @@ angular.module('adminNg.controllers')
             $scope.modal_close();
         };
         checkForActiveTransactions();
+        
+        $scope.workflowAction = function (wfId, action) {
+        	EventWorkflowActionResource.save({id: $scope.resourceId, wfId: wfId, action: action}, function () {
+                Notifications.add('success', 'EVENTS_PROCESSING_ACTION_' + action);
+                $scope.modal_close();
+            }, function () {
+                Notifications.add('error', 'EVENTS_PROCESSING_ACTION_' + action);
+                $scope.modal_close();
+            });
+        };
+
     }
 ]);
