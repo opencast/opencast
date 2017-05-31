@@ -336,6 +336,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-textanalyzer-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-timelinepreviews-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-timelinepreviews-remote/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-timelinepreviews-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-api/${project.version}</bundle>
@@ -444,6 +447,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-textanalyzer-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-timelinepreviews-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-timelinepreviews-remote/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-timelinepreviews-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-api/${project.version}</bundle>
@@ -502,6 +508,8 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-textanalyzer-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-textanalyzer-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-textextractor-tesseract/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-timelinepreviews-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-timelinepreviews-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-ffmpeg-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videosegmenter-api/${project.version}</bundle>
@@ -590,6 +598,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-textextractor-tesseract/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-timelinepreviews-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-timelinepreviews-ffmpeg/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-timelinepreviews-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-api/${project.version}</bundle>
