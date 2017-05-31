@@ -47,7 +47,6 @@ angular.module('adminNg.directives')
                 optionsObj.timeFormat = "HH:mm:ss";
                 optionsObj.showButtonPanel = true;
                 optionsObj.onSelect = function (dateTxt) {
-                    console.log("DateTxt: " + dateTxt);
                     var day = parseInt(dateTxt.substring(0, dateTxt.indexOf("/"))),
                         month = parseInt(dateTxt.substring(dateTxt.indexOf("/")+1, dateTxt.lastIndexOf("/"))) - 1,
                         year = parseInt(dateTxt.substring(dateTxt.lastIndexOf("/")+1, dateTxt.indexOf(","))),
@@ -55,8 +54,6 @@ angular.module('adminNg.directives')
                         minute = parseInt(dateTxt.substring(dateTxt.indexOf(":")+1, dateTxt.lastIndexOf(":"))),
                         second = parseInt(dateTxt.substring(dateTxt.lastIndexOf(":")+1)),
                         newDate = new Date(year, month, day, hour, minute, second);
-                    console.log("Date: " + day +"."+month+"."+year + ", " + hour + ":"+minute+":" + second);
-                    console.log(newDate.toISOString());
                     setTimeout(function(){
                         updateModel(newDate);
                         if (scope.select) {
