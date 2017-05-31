@@ -706,7 +706,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     try {
       index.index(event);
-      updateLastModifiedCache(event.getFirst(DublinCore.PROPERTY_SPATIAL));
+      invalidateLastModifiedCache(event.getFirst(DublinCore.PROPERTY_SPATIAL));
     } catch (Exception e) {
       logger.warn("Unable to index event with ID '{}': {}", eventId, e.getMessage());
       throw new SchedulerException(e);
@@ -832,7 +832,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     try {
       index.index(event);
-      updateLastModifiedCache(event.getFirst(DublinCore.PROPERTY_SPATIAL));
+      invalidateLastModifiedCache(event.getFirst(DublinCore.PROPERTY_SPATIAL));
     } catch (Exception e) {
       logger.warn("Unable to index event with ID '{}': {}", eventId, e.getMessage());
       throw new SchedulerException(e);
@@ -1002,7 +1002,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     try {
       DublinCoreCatalog event = index.getDublinCore(eventId);
       index.delete(eventId);
-      updateLastModifiedCache(event.getFirst(DublinCore.PROPERTY_SPATIAL));
+      invalidateLastModifiedCache(event.getFirst(DublinCore.PROPERTY_SPATIAL));
     } catch (Exception e) {
       logger.warn("Unable to delete event '{}' from index: {}", eventId, e);
       throw new SchedulerException(e);
@@ -1052,7 +1052,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     try {
       DublinCoreCatalog event = index.getDublinCore(eventId);
       index.delete(eventId);
-      updateLastModifiedCache(event.getFirst(DublinCore.PROPERTY_SPATIAL));
+      invalidateLastModifiedCache(event.getFirst(DublinCore.PROPERTY_SPATIAL));
     } catch (Exception e) {
       logger.warn("Unable to delete event '{}' from index: {}", eventId, e);
       throw new SchedulerException(e);
@@ -1232,6 +1232,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       throw new SchedulerException(e);
     }
     return lastModified;
+  }
+
+  private void invalidateLastModifiedCache(String agentId) {
+    lastModifiedCache.invalidate(agentId);
   }
 
   private String generateLastModifiedHash(Date lastModifiedDate) {
