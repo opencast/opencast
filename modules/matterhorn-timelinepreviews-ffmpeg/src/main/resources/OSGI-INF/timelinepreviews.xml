@@ -24,7 +24,7 @@
     <property name="service.description" value="Timeline previews REST Endpoint" />
 
     <property name="opencast.service.type" value="org.opencastproject.timelinepreviews" />
-    <property name="opencast.service.path" value="/analysis/timelinepreviews" />
+    <property name="opencast.service.path" value="/timelinepreviews" />
     <property name="opencast.service.jobproducer" value="true" />
 
     <service>

@@ -194,7 +194,7 @@
     <module>modules/matterhorn-themes-workflowoperation</module>
     <module>modules/matterhorn-timelinepreviews-api</module>
     <module>modules/matterhorn-timelinepreviews-ffmpeg</module>
-    <!--module>modules/matterhorn-timelinepreviews-remote</module-->
+    <module>modules/matterhorn-timelinepreviews-remote</module>
     <module>modules/matterhorn-timelinepreviews-workflowoperation</module>
     <module>modules/matterhorn-urlsigning-common</module>
     <module>modules/matterhorn-urlsigning-service-api</module>

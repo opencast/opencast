@@ -26,8 +26,8 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.RemoteBase;
-import org.opencastproject.waveform.api.WaveformService;
-import org.opencastproject.waveform.api.WaveformServiceException;
+import org.opencastproject.timelinepreviews.api.TimelinePreviewsException;
+import org.opencastproject.timelinepreviews.api.TimelinePreviewsService;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -41,7 +41,8 @@ import java.util.List;
 
 
 /**
- * This is a remote timeline previews service that will call the timeline previews service implementation on a remote host.
+ * This is a remote timeline previews service that will call the timeline previews service implementation on a
+ * remote host.
  */
 public class TimelinePreviewsServiceRemote extends RemoteBase implements TimelinePreviewsService {
   private static final Logger logger = LoggerFactory.getLogger(TimelinePreviewsServiceRemote.class);
@@ -55,19 +56,22 @@ public class TimelinePreviewsServiceRemote extends RemoteBase implements Timelin
    * Takes the given track and returns the job that will create timeline preview images using a remote service.
    *
    * @param sourceTrack the track to create preview images from
+   * @param imageCount number of preview images that will be generated
    * @return a job that will create timeline preview images
    * @throws MediaPackageException if the serialization of the given track fails
    * @throws TimelinePreviewsException if the job can't be created for any reason
    */
   @Override
-  public Job createTimelinePreviewImages(Track sourceTrack) throws MediaPackageException, TimelinePreviewsServiceException {
+  public Job createTimelinePreviewImages(Track sourceTrack, int imageCount)
+          throws MediaPackageException, TimelinePreviewsException {
     HttpPost post = new HttpPost("/create");
     try {
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("track", MediaPackageElementParser.getAsXml(sourceTrack)));
+      params.add(new BasicNameValuePair("imageCount", Integer.toString(imageCount)));
       post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
-      throw new TimelinePreviewsServiceException(e);
+      throw new TimelinePreviewsException(e);
     }
     HttpResponse response = null;
     try {
@@ -78,14 +82,15 @@ public class TimelinePreviewsServiceRemote extends RemoteBase implements Timelin
           logger.info("Create timeline preview images from {}", sourceTrack);
           return receipt;
         } catch (Exception e) {
-          throw new TimelinePreviewsServiceException(
+          throw new TimelinePreviewsException(
                   "Unable to create timeline preview images from " + sourceTrack + " using a remote service", e);
         }
       }
     } finally {
       closeConnection(response);
     }
-    throw new TimelinePreviewsServiceException("Unable to create timeline preview images from " + sourceTrack + " using a remote service");
+    throw new TimelinePreviewsException("Unable to create timeline preview images from " + sourceTrack
+            + " using a remote service");
   }
 
 }
