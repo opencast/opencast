@@ -11,6 +11,7 @@ function (Notifications, $timeout) {
             message    : '@',
             parameters : '@',
             show       : '=',
+            hidden     : '=',
             duration   : '@'
         },
         link: function (scope, element) {
