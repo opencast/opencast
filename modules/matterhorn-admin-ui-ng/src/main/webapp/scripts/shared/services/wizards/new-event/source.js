@@ -73,6 +73,7 @@ angular.module('adminNg.services')
         this.loadCaptureAgents();
 
         this.reset = function (opts) {
+            self.createStartDate();
             self.weekdays = _.clone(WEEKDAYS);
             self.ud = {
                 upload: {},
