@@ -66,14 +66,8 @@ import java.util.Dictionary;
 import java.util.List;
 
 /**
- * Media analysis plugin that takes a video stream and extracts video segments
- * by trying to detect slide and/or scene changes.
- *
- * This plugin runs
- *
- * <pre>
- * ffmpeg -nostats -i in.mp4 -filter:v 'select=gt(scene\,0.04),showinfo' -f null - 2&gt;&amp;1 | grep Parsed_showinfo_1
- * </pre>
+ * Media analysis plugin that takes a video stream and generates preview images that can be shown on the timeline.
+ * This will be done using FFmpeg.
  */
 public class TimelinePreviewsServiceImpl extends AbstractJobProducer implements
 TimelinePreviewsService, ManagedService {
@@ -293,7 +287,8 @@ TimelinePreviewsService, ManagedService {
       // calculate number of tiles for row and column in tiled image
       int imageSize = (int) Math.ceil(Math.sqrt(imageCount));
 
-      Attachment composedImage = createPreviewsFFmpeg(track, seconds, resolutionX, resolutionY, imageSize, imageSize, duration);
+      Attachment composedImage = createPreviewsFFmpeg(track, seconds, resolutionX, resolutionY, imageSize, imageSize,
+              duration);
 
 
       if (composedImage == null)
@@ -369,8 +364,8 @@ TimelinePreviewsService, ManagedService {
    * @return an attachment containing the timeline previews image
    * @throws TimelinePreviewsException
    */
-  protected Attachment createPreviewsFFmpeg(Track track, double seconds, int width, int height, int tileX, int tileY, double duration)
-          throws TimelinePreviewsException {
+  protected Attachment createPreviewsFFmpeg(Track track, double seconds, int width, int height, int tileX, int tileY,
+          double duration) throws TimelinePreviewsException {
 
     // copy source file into workspace
     File mediaFile = null;
@@ -404,7 +399,7 @@ TimelinePreviewsService, ManagedService {
         imageFilePath.replaceAll(" ", "\\ ")
       };
 
-      logger.debug("Start timeline previews ffmpeg process: {}", StringUtils.join(command, " "));
+      logger.info("Start timeline previews ffmpeg process: {}", StringUtils.join(command, " "));
       logger.info("Create timeline preview images file for track '{}' at {}", track.getIdentifier(), imageFilePath);
 
       ProcessBuilder pbuilder = new ProcessBuilder(command);
@@ -429,7 +424,8 @@ TimelinePreviewsService, ManagedService {
       } catch (IOException ex) {
         throw new TimelinePreviewsException("Starting ffmpeg process failed", ex);
       } catch (InterruptedException ex) {
-        throw new TimelinePreviewsException("Waiting until timeline previews process exited was interrupted unexpectly", ex);
+        throw new TimelinePreviewsException("Waiting until timeline previews process exited was interrupted unexpectly",
+                ex);
       } finally {
         IoSupport.closeQuietly(ffmpegProcess);
         IoSupport.closeQuietly(errStream);

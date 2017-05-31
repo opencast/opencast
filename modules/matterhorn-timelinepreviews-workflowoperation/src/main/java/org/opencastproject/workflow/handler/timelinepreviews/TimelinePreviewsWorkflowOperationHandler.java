@@ -82,7 +82,6 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
   /** Default value for image size. */
   private static final int DEFAULT_IMAGE_SIZE = 10;
 
-  // TODO: more options needed? (e.g. encoding profile, reference-flavor...)
 
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
@@ -167,8 +166,6 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
       logger.info("Property {} not set, using default value: {}", IMAGE_SIZE_PROPERTY, DEFAULT_IMAGE_SIZE);
     }
 
-    logger.info("imageSize: " + imageSize);
-
     TrackSelector trackSelector = new TrackSelector();
     for (String flavor : asList(sourceFlavorProperty)) {
       trackSelector.addFlavor(flavor);
@@ -208,7 +205,6 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
                       mediaPackage.getIdentifier().compact()));
     }
 
-    logger.info("TEST after wait for job");
 
     try {
       // copy timeline previews attachments into workspace and add them to the media package
@@ -234,11 +230,6 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
           FileInputStream timelinePreviewsInputStream = null;
           logger.info("Put timeline preview images file {} from media package {} to the media package work space",
                   timelinePreviewsMpe.getURI(), mediaPackage.getIdentifier().compact());
-
-          logger.info("################################");
-          logger.info("filename: {}", FilenameUtils.getName(timelinePreviewsMpe.getURI().getPath()));
-          logger.info("path: {}", timelinePreviewsMpe.getURI().getPath());
-          logger.info("################################");
 
           try {
             timelinePreviewsInputStream = new FileInputStream(timelinePreviewsFile);

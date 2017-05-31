@@ -53,13 +53,15 @@ import javax.ws.rs.core.Response;
  * The REST endpoint for the {@link TimelinePreviewsService} service
  */
 @Path("/")
-@RestService(name = "TimelinePreviewsEndpoint", title = "Timeline Previews Service REST Endpoint", abstractText = "This service generates timeline preview images from media files that contain a video.", notes = {
+@RestService(name = "TimelinePreviewsEndpoint", title = "Timeline Previews Service REST Endpoint",
+        abstractText = "This service generates timeline preview images from media files that contain a video.",
+        notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
                 + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                + "other words, there is a bug! You should file an error report with your server logs from the time "
+                + "when the error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class TimelinePreviewsRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -95,22 +97,22 @@ public class TimelinePreviewsRestEndpoint extends AbstractJobProducerEndpoint {
   }
 
   /**
-   * Segments a track.
+   * Generates timeline preview images for a track.
    *
    * @param trackAsXml
-   *          the track xml to segment
+   *          the track xml to create preview images for
    * @return the job in the body of a JAX-RS response
    * @throws Exception
    */
   @POST
   @Path("/create")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "create", description = "Create previews images from the given track.",
+  @RestQuery(name = "create", description = "Create preview images from the given track.",
           restParameters = {
             @RestParameter(description = "The track to generate timeline preview images for.",
                     isRequired = true, name = "track", type = RestParameter.Type.FILE),
             @RestParameter(description = "The number of timeline preview images to generate.",
-                    isRequired = true, name = "imageSize", type = RestParameter.Type.INTEGER)
+                    isRequired = true, name = "imageCount", type = RestParameter.Type.INTEGER)
           },
           reponses = {
             @RestResponse(description = "Timeline previews job successfully created",
@@ -121,9 +123,9 @@ public class TimelinePreviewsRestEndpoint extends AbstractJobProducerEndpoint {
                     responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
           },
           returnDescription = "The job ID to use when polling for the resulting media package attachment, "
-                  + "that contains the gererated timeline preview images.")
+                  + "that contains the generated timeline preview images.")
   //)
-  public Response createTimelinePreviews(@FormParam("track") String trackAsXml, @FormParam("imageSize") int imageSize)
+  public Response createTimelinePreviews(@FormParam("track") String trackAsXml, @FormParam("imageCount") int imageCount)
           throws Exception {
     // Ensure that the POST parameters are present
     if (StringUtils.isBlank(trackAsXml))
@@ -135,7 +137,7 @@ public class TimelinePreviewsRestEndpoint extends AbstractJobProducerEndpoint {
       return Response.status(Response.Status.BAD_REQUEST).entity("mediapackage element must be of type track").build();
 
     try {
-      Job job = service.createTimelinePreviewImages((Track) sourceTrack, imageSize);
+      Job job = service.createTimelinePreviewImages((Track) sourceTrack, imageCount);
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (TimelinePreviewsException e) {
       logger.warn("Generation of timeline preview images failed: " + e.getMessage());

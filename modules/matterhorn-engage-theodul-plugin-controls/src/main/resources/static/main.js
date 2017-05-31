@@ -1247,7 +1247,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
       try {
         $('#' + id_timeline_preview_img).attr('src', timelinePreview.get(0).url);
 
-        console.log(timelinePreviewsTileResolution);
         // if no valid resolution is stored within the timeline previews attachment, read out the size of the image
         if (timelinePreviewsTileResolution[0] <= 0 || timelinePreviewsTileResolution[1] <= 0
                 || typeof timelinePreviewsTileResolution[0] === 'undefined'
@@ -1492,6 +1491,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
           // size of each of the images
           var width = timelinePreviewsTileResolution[0];
           var height = timelinePreviewsTileResolution[1];
+
+          // make sure the image size was set correctly
+          if (width <= 0 || height <= 0) {
+            setTimelinePreviewsImage();
+            width = timelinePreviewsTileResolution[0];
+            height = timelinePreviewsTileResolution[1];
+          }
 
           var wrapperOffset = Math.ceil($('#' + id_slider).offset().left);
 
