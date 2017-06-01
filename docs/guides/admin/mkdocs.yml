@@ -41,6 +41,8 @@ pages:
    - Multi Tenancy: 'configuration/multi.tenancy.md'
    - Security:
       - General Security: 'configuration/security.md'
+      - LDAP User Provider: 'configuration/security.user.ldap.md'
+      - Sakai User Provider: 'configuration/security.user.sakai.md'
       - Central Authentication Service (CAS): 'configuration/security.cas.md'
       - LDAP Authentication and Authorization (without CAS): 'configuration/security.ldap.md'
       - Authentication and Authorization Infrastructure (AAI): 'configuration/security.aai.md'
