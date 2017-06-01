@@ -67,9 +67,6 @@
     <!-- Enable 2-legged OAuth access ("signed fetch") to the LTI launch servlet -->
     <sec:intercept-url pattern="/lti" access="ROLE_OAUTH_USER" />
 
-    <!-- Enable access to the LTI sample tool -->
-    <sec:intercept-url pattern="/ltisample/**" access="ROLE_OAUTH_USER" />
-
     <!-- Enable access to the LTI tools -->
     <sec:intercept-url pattern="/ltitools/**" access="ROLE_OAUTH_USER" />
 
