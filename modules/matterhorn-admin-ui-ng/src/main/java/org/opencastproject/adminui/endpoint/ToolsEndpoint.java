@@ -53,6 +53,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.security.api.SecurityService;
@@ -376,7 +377,7 @@ public class ToolsEndpoint implements ManagedService {
                   @RestResponse(description = "Media package not found", responseCode = HttpServletResponse.SC_NOT_FOUND),
                   @RestResponse(description = "The editing information cannot be parsed", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
   public Response editVideo(@PathParam("mediapackageid") final String mediaPackageId,
-          @Context HttpServletRequest request) throws IndexServiceException, NotFoundException {
+          @Context HttpServletRequest request) throws IndexServiceException, NotFoundException, WorkflowDatabaseException {
     String details;
     try (InputStream is = request.getInputStream()) {
       details = IOUtils.toString(is);
@@ -418,10 +419,10 @@ public class ToolsEndpoint implements ManagedService {
         final String workflowId = editingInfo.getPostProcessingWorkflow().get();
         try {
           archive.applyWorkflow(ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId)),
-                  mpElementProvider.getUriRewriter(), $(mediaPackage.getIdentifier().toString()).toList());
+            mpElementProvider.getUriRewriter(), $(mediaPackage.getIdentifier().toString()).toList());
         } catch (ArchiveException e) {
           logger.warn("Unable to start workflow '{}' on archived media package '{}': {}",
-                  new Object[] { workflowId, mediaPackage, getStackTrace(e) });
+            new Object[]{workflowId, mediaPackage, getStackTrace(e)});
           return R.serverError();
         } catch (WorkflowDatabaseException e) {
           logger.warn("Unable to load workflow '{}' from workflow service: {}", workflowId, getStackTrace(e));
@@ -431,7 +432,6 @@ public class ToolsEndpoint implements ManagedService {
           return R.badRequest("Workflow not found");
         }
       }
-
     }
 
     return R.ok();
@@ -502,12 +502,24 @@ public class ToolsEndpoint implements ManagedService {
    *           if the SMIL catalog cannot be read or not be written to the archive
    */
   MediaPackage addSmilToArchive(MediaPackage mediaPackage, final Smil smil) throws IOException {
-    final String catalogId = "editor-cutting-information";
-    Catalog catalog = mediaPackage.getCatalog(catalogId);
+   MediaPackageElementFlavor mediaPackageElementFlavor = adminUIConfiguration.getSmilCatalogFlavor();
+   //set default catalog Id if there is none existing
+    String catalogId = smil.getId();
+    Catalog[] catalogs = mediaPackage.getCatalogs();
+
+    //get the first smil/cutting  catalog-ID to overwrite it with new smil info
+    for (Catalog p: catalogs) {
+       if (p.getFlavor().matches(mediaPackageElementFlavor)) {
+         logger.debug("Set Idendifier for Smil-Catalog to: " + p.getIdentifier());
+         catalogId = p.getIdentifier();
+       break;
+       }
+     }
+     Catalog catalog = mediaPackage.getCatalog(catalogId);
 
     URI smilURI;
     try (InputStream is = IOUtils.toInputStream(smil.toXML(), "UTF-8")) {
-      smilURI = workspace.put(mediaPackage.getIdentifier().compact(), smil.getId(), TARGET_FILE_NAME, is);
+      smilURI = workspace.put(mediaPackage.getIdentifier().compact(), catalogId, TARGET_FILE_NAME, is);
     } catch (SAXException e) {
       logger.error("Error while serializing the SMIL catalog to XML: {}", e.getMessage());
       throw new IOException(e);

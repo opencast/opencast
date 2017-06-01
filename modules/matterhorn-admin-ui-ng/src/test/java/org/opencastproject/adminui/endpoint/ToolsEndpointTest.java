@@ -289,7 +289,7 @@ public class ToolsEndpointTest {
     endpoint.addSmilToArchive(mp, smil);
 
     assertEquals(1, mp.getCatalogs().length);
-    assertEquals("editor-cutting-information", mp.getCatalogs()[0].getIdentifier());
+    assertEquals(smil.getId(), mp.getCatalogs()[0].getIdentifier());
     assertEquals("smil/cutting", mp.getCatalogs()[0].getFlavor().toString());
   }
 
