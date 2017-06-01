@@ -183,7 +183,7 @@ public class LtiServlet extends HttpServlet {
 
     // The URL of the LTI tool. If no specific tool is passed we use the test tool
     String toolReq = req.getParameter("custom_tool");
-    String toolUrl = "/ltisample/";
+    String toolUrl = "/ltitools/";
     if (toolReq != null) {
       toolUrl = toolReq;
       if (!(toolUrl.indexOf("/") == 0)) {
