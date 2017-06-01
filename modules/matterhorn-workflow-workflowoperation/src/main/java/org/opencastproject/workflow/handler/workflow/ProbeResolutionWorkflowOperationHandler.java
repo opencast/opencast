@@ -54,10 +54,10 @@ public class ProbeResolutionWorkflowOperationHandler extends AbstractWorkflowOpe
   static final String OPT_SOURCE_FLAVOR = "source-flavor";
 
   /** Configuration key for video resolutions to check */
-  static final String OPT_VAR_PREFIX = "var-";
+  static final String OPT_VAR_PREFIX = "var:";
 
   /** Configuration key for value to set */
-  static final String OPT_VAL_PREFIX = "val-";
+  static final String OPT_VAL_PREFIX = "val:";
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory
