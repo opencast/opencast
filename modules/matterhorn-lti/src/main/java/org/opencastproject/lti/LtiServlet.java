@@ -47,6 +47,8 @@ import javax.servlet.http.HttpSession;
 public class LtiServlet extends HttpServlet {
 
   private static final String LTI_CUSTOM_PREFIX = "custom_";
+  private static final String LTI_CUSTOM_TOOL = "custom_tool";
+  private static final String LTI_CUSTOM_TEST = "custom_test";
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(LtiServlet.class);
@@ -182,7 +184,7 @@ public class LtiServlet extends HttpServlet {
     // We must return a 200 for some oauth client libraries to accept this as a valid response
 
     // The URL of the LTI tool. If no specific tool is passed we use the test tool
-    String toolReq = req.getParameter("custom_tool");
+    String toolReq = req.getParameter(LTI_CUSTOM_TOOL);
     String toolUrl = "/ltitools/";
     if (toolReq != null) {
       toolUrl = toolReq;
@@ -192,8 +194,9 @@ public class LtiServlet extends HttpServlet {
       }
     }
 
+    // We need to add the custom params to the outgoing request
     String customParams = getCustomParams(req);
-    if (customParams != null) {
+    if (!StringUtils.isEmpty(customParams)) {
       toolUrl = toolUrl + "?" + customParams;
     }
 
@@ -201,19 +204,17 @@ public class LtiServlet extends HttpServlet {
     resp.setHeader("Set-Cookie", "JSESSIONID=" + session.getId() + ";Path=/");
 
     // The client can specify debug option by passing a value to test
-    String testString = req.getParameter("custom_test");
+    String testString = req.getParameter(LTI_CUSTOM_TEST);
     boolean test = false;
     if (testString != null) {
-      logger.debug("test: {}", req.getParameter("custom_test"));
+      logger.debug("test: {}", testString);
       test = Boolean.valueOf(testString).booleanValue();
     }
 
-    //we need to add the custom params to the outgoing request
-
-
     // if in test mode display details where we go
     if (test) {
-      resp.getWriter().write("<html><body>Welcome to matterhorn lti, you are going to " + toolUrl + "<br>");
+      resp.setContentType("text/html");
+      resp.getWriter().write("<html><body>Welcome to Opencast LTI; you are going to " + toolUrl + "<br>");
       resp.getWriter().write("<a href=\"" + toolUrl + "\">continue...</a></body></html>");
       //TODO we should probably print the paramaters.
     } else {
@@ -235,18 +236,16 @@ public class LtiServlet extends HttpServlet {
     while (iterator.hasNext()) {
       String key = iterator.next();
       logger.debug("got key: " + key);
-      if (key.indexOf(LTI_CUSTOM_PREFIX) >= 0) {
+      if ((key.indexOf(LTI_CUSTOM_PREFIX) >= 0) && (!LTI_CUSTOM_TOOL.equals(key))) {
         String paramValue = req.getParameter(key);
-        //we need to remove the prefix _custom
+        // we need to remove the prefix custom_
         String paramName = key.substring(LTI_CUSTOM_PREFIX.length());
         logger.debug("Found custom var: " + paramName + ":" + paramValue);
         builder.append(paramName + "=" + paramValue + "&");
       }
     }
 
-
-    return builder.toString();
-
+    return StringUtils.removeEnd(builder.toString(), "&");
   }
 
   /**
