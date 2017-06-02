@@ -1206,11 +1206,15 @@ public class SchedulerRestService {
       }
     }
 
-    try { // If the etag matches the if-not-modified header,return a 304
-      String lastModified = service.getScheduleLastModified(captureAgentId);
-      String ifNoneMatch = request.getHeader(HttpHeaders.IF_NONE_MATCH);
-      if (StringUtils.isNotBlank(ifNoneMatch) && ifNoneMatch.equals(lastModified)) {
-        return Response.notModified(lastModified).expires(null).build();
+    try {
+      String lastModified = "";
+      if (StringUtils.isNotBlank(captureAgentId)) {
+        // If the etag matches the if-not-modified header,return a 304
+        lastModified = service.getScheduleLastModified(captureAgentId);
+        String ifNoneMatch = request.getHeader(HttpHeaders.IF_NONE_MATCH);
+        if (StringUtils.isNotBlank(ifNoneMatch) && ifNoneMatch.equals(lastModified)) {
+          return Response.notModified(lastModified).expires(null).build();
+        }
       }
       SchedulerQuery filter = new SchedulerQuery().setSpatial(captureAgentId).setSeriesId(seriesId)
               .setEndsFrom(DateTime.now().minusHours(1).toDate());

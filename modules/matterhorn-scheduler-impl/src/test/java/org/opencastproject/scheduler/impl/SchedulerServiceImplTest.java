@@ -89,6 +89,8 @@ import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.google.common.cache.CacheBuilder;
+
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
@@ -642,7 +644,7 @@ public class SchedulerServiceImplTest {
    */
   public void testUpdateExpiredEvent() throws Exception {
 
-    SchedulerServiceImpl schedSvc2 = EasyMock.createMockBuilder(SchedulerServiceImpl.class)
+    SchedulerServiceImpl schedSvc2 = EasyMock.createMockBuilder(SchedulerServiceImpl.class).withConstructor()
             .addMockedMethod("getCurrentDate").createMock();
 
     // Mock the getCurrentDate method to skip to the future
@@ -731,6 +733,7 @@ public class SchedulerServiceImplTest {
     schedulerServiceImpl.setMessageSender(messageSender);
     schedulerServiceImpl.setMessageReceiver(messageReceiver);
     schedulerServiceImpl.setDublinCoreCatalogService(new DublinCoreCatalogService());
+    schedulerServiceImpl.lastModifiedCache = CacheBuilder.newBuilder().build();
 
     int optedOutCount = 3;
     int blacklistedCount = 5;
@@ -790,8 +793,7 @@ public class SchedulerServiceImplTest {
     final long currentTime = System.currentTimeMillis();
     for (int i = 0; i < number; i++) {
 
-      final DublinCoreCatalog event = generateEvent("Device A", none(0L), some(titlePrefix + "-" + i), new Date(
-              currentTime + 10 * 1000), new Date(currentTime + 3610000));
+      final DublinCoreCatalog event = generateEvent("Device A", none(0L), some(titlePrefix + "-" + i), new Date(currentTime + 10 * 1000), new Date(currentTime + 3610000));
       try {
         long eventId = schedulerServiceImpl.addEvent(event, wfProperties);
         String mediaPackageId = schedulerServiceImpl.getMediaPackageId(eventId);
@@ -960,31 +962,34 @@ public class SchedulerServiceImplTest {
   }
 
   private SchedulerServiceIndex createIndex(long[] ids, boolean throwSchedulerException,
-          boolean throwNullPointerException) throws SchedulerServiceDatabaseException {
+          boolean throwNullPointerException) throws SchedulerServiceDatabaseException, NotFoundException {
     LinkedList<DublinCoreCatalog> catalogs = new LinkedList<DublinCoreCatalog>();
+    SchedulerServiceIndex mockIndex = EasyMock.createMock(SchedulerServiceIndex.class);
     for (long id : ids) {
       DublinCoreCatalog catalog = EasyMock.createMock(DublinCoreCatalog.class);
-      EasyMock.expect(catalog.getFirst(EasyMock.anyObject(EName.class))).andReturn(Long.toString(id));
+      EasyMock.expect(catalog.getFirst(EasyMock.anyObject(EName.class))).andReturn(Long.toString(id)).anyTimes();
+      EasyMock.expect(mockIndex.getDublinCore(id)).andReturn(catalog).anyTimes();
       EasyMock.replay(catalog);
       catalogs.add(catalog);
     }
     DublinCoreCatalogList list = new DublinCoreCatalogList(catalogs, catalogs.size());
-    SchedulerServiceIndex index = EasyMock.createMock(SchedulerServiceIndex.class);
+
     if (throwSchedulerException) {
-      EasyMock.expect(index.search(EasyMock.anyObject(SchedulerQuery.class))).andThrow(
+      EasyMock.expect(mockIndex.search(EasyMock.anyObject(SchedulerQuery.class))).andThrow(
               new SchedulerException("Mock scheduler exception"));
     } else if (throwNullPointerException) {
-      EasyMock.expect(index.search(EasyMock.anyObject(SchedulerQuery.class))).andThrow(
+      EasyMock.expect(mockIndex.search(EasyMock.anyObject(SchedulerQuery.class))).andThrow(
               new NullPointerException("Mock null exception"));
     } else {
-      EasyMock.expect(index.search(EasyMock.anyObject(SchedulerQuery.class))).andReturn(list);
+      EasyMock.expect(mockIndex.search(EasyMock.anyObject(SchedulerQuery.class))).andReturn(list);
       for (long id : ids) {
-        index.delete(id);
-        EasyMock.expectLastCall();
+        mockIndex.delete(id);
+        EasyMock.expectLastCall().anyTimes();
       }
     }
-    EasyMock.replay(index);
-    return index;
+    EasyMock.expect(mockIndex.getLastModifiedDate(EasyMock.anyObject(SchedulerQuery.class))).andReturn(null).anyTimes();
+    EasyMock.replay(mockIndex);
+    return mockIndex;
   }
 
   @Test
