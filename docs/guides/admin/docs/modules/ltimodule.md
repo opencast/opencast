@@ -10,7 +10,8 @@ or any other system which supports the LTI standard as an LTI _tool consumer_.
 Typically, students enrolled in a course access Opencast through an LTI tool in the LMS course site, 
 and can play back videos in an Opencast series set up for the course. 
 
-More information about the Learning Tools Interoperability specifications is available at [IMS LTI](http://www.imsglobal.org/toolsinteroperability2.cfm) or [developers.imsglobal.org](http://developers.imsglobal.org/).
+More information about the LTI specifications is available at 
+[IMS Learning Tools Interoperability](http://www.imsglobal.org/activity/learning-tools-interoperability).
 
 Configure Opencast 
 ------------------------
