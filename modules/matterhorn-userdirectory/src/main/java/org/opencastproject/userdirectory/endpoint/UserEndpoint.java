@@ -24,6 +24,7 @@ package org.opencastproject.userdirectory.endpoint;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_CONFLICT;
 import static org.apache.http.HttpStatus.SC_CREATED;
+import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -34,6 +35,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.JaxbUserList;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
@@ -221,11 +223,13 @@ public class UserEndpoint {
         description = "User has been created."),
       @RestResponse(
         responseCode = SC_CONFLICT,
-        description = "An user with this username already exist.")
+        description = "An user with this username already exist."),
+      @RestResponse(
+        responseCode = SC_FORBIDDEN,
+        description = "Not enough permissions to create a user with the admin role.")
     })
   public Response createUser(@FormParam("username") String username, @FormParam("password") String password,
-          @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles)
-          throws NotFoundException {
+          @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles) {
 
     if (jpaUserAndRoleProvider.loadUser(username) != null) {
       return Response.status(SC_CONFLICT).build();
@@ -239,8 +243,13 @@ public class UserEndpoint {
       JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
       JpaUser user = new JpaUser(username, password, organization, name, email, jpaUserAndRoleProvider.getName(), true,
               rolesSet);
+      try {
       jpaUserAndRoleProvider.addUser(user);
       return Response.created(uri(endpointBaseUrl, user.getUsername() + ".json")).build();
+    } catch (UnauthorizedException ex) {
+      logger.debug("Create user failed", ex);
+      return Response.status(Response.Status.FORBIDDEN).build();
+    }
 
     } catch (IllegalArgumentException e) {
       logger.debug("Request with malformed ROLE data: {}", roles);
@@ -285,26 +294,33 @@ public class UserEndpoint {
         responseCode = SC_BAD_REQUEST,
         description = "Malformed request syntax."),
       @RestResponse(
+        responseCode = SC_FORBIDDEN,
+        description = "Not enough permissions to update a user with the admin role."),
+      @RestResponse(
         responseCode = SC_OK,
         description = "User has been updated.")    })
   public Response setUser(@PathParam("username") String username, @FormParam("password") String password,
-          @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles)
-          throws NotFoundException {
-
-    User user = jpaUserAndRoleProvider.loadUser(username);
-    if (user == null) {
-      return createUser(username, password, name, email, roles);
-    }
+          @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles) {
 
     try {
+      User user = jpaUserAndRoleProvider.loadUser(username);
+      if (user == null) {
+        return createUser(username, password, name, email, roles);
+      }
+
       Set<JpaRole> rolesSet = parseRoles(roles);
 
       logger.debug("Updating user {}", username);
       JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
       jpaUserAndRoleProvider.updateUser(new JpaUser(username, password, organization, name, email,
-            jpaUserAndRoleProvider.getName(), true, rolesSet));
+                jpaUserAndRoleProvider.getName(), true, rolesSet));
       return Response.status(SC_OK).build();
-
+    } catch (NotFoundException e) {
+      logger.debug("User {} not found.", username);
+      return Response.status(SC_NOT_FOUND).build();
+    } catch (UnauthorizedException e) {
+      logger.debug("Update user failed", e);
+      return Response.status(Response.Status.FORBIDDEN).build();
     } catch (IllegalArgumentException e) {
       logger.debug("Request with malformed ROLE data: {}", roles);
       return Response.status(SC_BAD_REQUEST).build();
@@ -327,15 +343,21 @@ public class UserEndpoint {
         responseCode = SC_OK,
         description = "User has been deleted."),
       @RestResponse(
+        responseCode = SC_FORBIDDEN,
+        description = "Not enough permissions to delete a user with the admin role."),
+      @RestResponse(
         responseCode = SC_NOT_FOUND,
         description = "User not found.")
     })
-  public Response deleteUser(@PathParam("username") String username) throws NotFoundException {
+  public Response deleteUser(@PathParam("username") String username) {
     try {
       jpaUserAndRoleProvider.deleteUser(username, securityService.getOrganization().getId());
     } catch (NotFoundException e) {
       logger.debug("User {} not found.", username);
       return Response.status(SC_NOT_FOUND).build();
+    } catch (UnauthorizedException e) {
+      logger.debug("Error during deletion of user {}: {}", username, e);
+      return Response.status(SC_FORBIDDEN).build();
     } catch (Exception e) {
       logger.error("Error during deletion of user {}: {}", username, e);
       return Response.status(SC_INTERNAL_SERVER_ERROR).build();

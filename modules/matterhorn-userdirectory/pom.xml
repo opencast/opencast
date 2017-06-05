@@ -119,7 +119,11 @@
             <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.userdirectory;version=${project.version},
+              org.opencastproject.userdirectory.endpoint;version=${project.version},
             </Export-Package>
+            <Private-Package>
+              org.opencastproject.userdirectory.utils;version=${project.version},
+            </Private-Package>
             <Service-Component>
               OSGI-INF/admin-user-and-group-loader.xml,
               OSGI-INF/userdirectory-service.xml,

@@ -27,6 +27,7 @@ import static com.entwinemedia.fn.data.json.Jsons.j;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static java.lang.String.CASE_INSENSITIVE_ORDER;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.apache.http.HttpStatus.SC_CONFLICT;
@@ -47,6 +48,7 @@ import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
@@ -268,7 +270,8 @@ public class UsersEndpoint {
           @RestParameter(description = "The email.", isRequired = false, name = "email", type = STRING),
           @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array") }, reponses = {
           @RestResponse(responseCode = SC_CREATED, description = "User has been created."),
-          @RestResponse(responseCode = SC_CONFLICT, description = "An user with this username already exist.") })
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to create a user with a admin role."),
+          @RestResponse(responseCode = SC_CONFLICT, description = "An user with this username already exist.")})
   public Response createUser(@FormParam("username") String username, @FormParam("password") String password,
           @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles)
           throws NotFoundException {
@@ -304,9 +307,12 @@ public class UsersEndpoint {
 
     JpaUser user = new JpaUser(username, password, organization, name, email, jpaUserAndRoleProvider.getName(), true,
             rolesSet);
-    jpaUserAndRoleProvider.addUser(user);
-
-    return Response.created(uri(endpointBaseUrl, user.getUsername() + ".json")).build();
+    try {
+      jpaUserAndRoleProvider.addUser(user);
+      return Response.created(uri(endpointBaseUrl, user.getUsername() + ".json")).build();
+    } catch (UnauthorizedException e) {
+      return Response.status(Response.Status.FORBIDDEN).build();
+    }
   }
 
   @GET
@@ -336,7 +342,8 @@ public class UsersEndpoint {
           @RestParameter(description = "The email.", isRequired = false, name = "email", type = STRING),
           @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array") }, pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), reponses = {
           @RestResponse(responseCode = SC_OK, description = "User has been updated."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to update a user with admin role."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.")})
   public Response updateUser(@PathParam("username") String username, @FormParam("password") String password,
           @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles)
           throws NotFoundException {
@@ -365,15 +372,20 @@ public class UsersEndpoint {
       }
     }
 
-    jpaUserAndRoleProvider.updateUser(new JpaUser(username, password, organization, name, email, jpaUserAndRoleProvider
-            .getName(), true, rolesSet));
-    return Response.status(SC_OK).build();
+    try {
+      jpaUserAndRoleProvider.updateUser(new JpaUser(username, password, organization, name, email, jpaUserAndRoleProvider
+              .getName(), true, rolesSet));
+      return Response.status(SC_OK).build();
+    } catch (UnauthorizedException ex) {
+      return Response.status(Response.Status.FORBIDDEN).build();
+    }
   }
 
   @DELETE
   @Path("{username}.json")
   @RestQuery(name = "deleteUser", description = "Deleter a new  user", returnDescription = "Status ok", pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), reponses = {
           @RestResponse(responseCode = SC_OK, description = "User has been deleted."),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to delete a user with admin role."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })
   public Response deleteUser(@PathParam("username") String username) throws NotFoundException {
     Organization organization = securityService.getOrganization();
@@ -383,6 +395,8 @@ public class UsersEndpoint {
     } catch (NotFoundException e) {
       logger.error("User {} not found.", username);
       return Response.status(SC_NOT_FOUND).build();
+    } catch (UnauthorizedException e) {
+      return Response.status(SC_FORBIDDEN).build();
     } catch (Exception e) {
       logger.error("Error during deletion of user {}: {}", username, e);
       return Response.status(SC_INTERNAL_SERVER_ERROR).build();
