@@ -71,12 +71,27 @@ Publishing to multiple distribution services
 --------------------------------------------
 
 Currently we do not support publication to multiple distribution services simultaneously.  This means that whichever
-workflow operation is *last* in the workflow will be the final publication.  For example, if you were able to select
-both options for publishing to the Opencast Index with the default workflow you would end up with the data being hosted
-in AWS.  This is because the default workflow has publication to the Opencast Media Module listed before publication to
-AWS.  If these operations were reversed then the data would be hosted by the Opencast Media Module!  In both cases the
-Media Module is still required since it hosts the publication index, however the load is significantly reduced when AWS
-is used to host the actual media.
+workflow operation is *last* in the workflow will be the final publication.
+
+Using this handler in custom workflows
+--------------------------------------
+
+If your workflow contains both `publish-engage` and `publish-aws`, in that order, and without a 
+[conditional](../configuration/workflowmd) you would have publication files stored both locally *and* in AWS.  This is
+likely not what you want, so protect your workflow operations appropriately.  If you really do need these files stored
+in both places (for example, in cases where you need to make the files available immediately, and only push to AWS in 
+some cases) then remember to add a [retract-engage](../workflowoperationhandlers/retract-engage-woh.md) in between the
+publication operations.  Note that if this step is omitted the files will remain available locally, but will not be 
+used.  Of further note, if you retract after publication to AWS then your workflow *will not be available* to users.
+To summarize, this table presents a subset of the various situations that are possible
+
+|Workflow Operations|Files present in the Media Module|Files present in AWS|Files served from|
+|publish-engage | Yes | No | Opencast Media Module |
+|publish-aws| No | Yes | AWS |
+|publish-engage, publish-aws| Yes | Yes | AWS |
+|publish-aws, publish-engage| Yes | Yes | Opencast Media Module|
+|publish-engage, retract-engage, publish-aws | Temporary | Yes | AWS |
+|publish-engage, publish-aws, retract-engage | No | Yes | Not available |
 
 Migrating to S3 Distribution with Pre-Existing Data
 ---------------------------------------------------
