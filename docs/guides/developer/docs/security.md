@@ -13,7 +13,7 @@ For Users and Administrators
 What to do if you find a security issue
 ---------------------------------------
 
-Report it to security@opencast.org! Please include a complete description of the issue, including which version(s) it
+Report it to `security@opencast.org`! Please include a complete description of the issue, including which version(s) it
 affects, as well as any steps required to reproduce it. This email will be sent privately to the full list of
 committers for the project. You should receive an email acknowledging the issue from the QA coordinator, or release
 manager(s) within 3 business days. At this point, depending on the issue, you may be asked for your JIRA and BitBucket
@@ -30,9 +30,25 @@ servers).
 
 What happens once the issue has been fixed?
 -------------------------------------------
-A notice to security-notices@opencast.org will be released once the issue has been resolved and proper patches applied
+A notice to `security-notices@opencast.org` will be released once the issue has been resolved and proper patches applied
 to the codebase. This notice may be accompanied by a release, or instructions on how to patch a live system depending
 on the issue.
+
+Security Contacts
+-----------------
+
+The Opencast project encourages institutions and organizations that download and install Opencast to consider
+contacting the committers group to provide the name(s) and contact details of one or more individuals to serve as
+security contacts. Security contact information should be emailed to `security@opencast.org`.  Opencast security
+contacts receive security updates in advance of public release in order their institution or organization time to patch
+their installations before any Opencast security vulnerability becomes general knowledge. Designated security contacts
+are also provided access rights to view, comment and address issues flagged as security items in Opencast's JIRA issue
+tracking application. Security-related JIRA issues are hidden from public view. We do not grant access to these JIRA
+items lightly and we verify the identity and role of each person who is designated as a security contact.
+
+Email traffic sent to `security@opencast.org` should be treated confidentially and should not be forwarded to other
+Opencast or public email lists or discussed elsewhere in order to help protect institutions and organizations running
+Opencast from security-related exploits or attacks.
 
 ----------------------------
 
@@ -43,7 +59,7 @@ What to do with a security report
 ---------------------------------
 
 If no one else has, create a JIRA issue with a 'Committer' security level, and the details in the security report.
-Assign the ticket either to yourself (if you intend on working on it) or nobody, and reply on committers@opencast.org
+Assign the ticket either to yourself (if you intend on working on it) or nobody, and reply on `committers@opencast.org`
 with the ticket. Thus far most of our security issues have come with patches attached, however this will not always be
 true. Issues which require work beyond application of a provided patch should be treated the same as any other JIRA
 issue, aside from the security level. Note that that security level will keep non-committers from viewing the ticket
