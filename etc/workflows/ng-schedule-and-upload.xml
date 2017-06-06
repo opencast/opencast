@@ -100,7 +100,7 @@
             }
         });
         <!-- Remove the line below if you wish to publish to AWS S3 -->
-        $('#publishToAws').prop('disabled', disabled);
+        $('#publishToAws').prop('disabled', true);
         <!-- Remove the line above if you wish to publish to AWS S3 -->
       </script>
     ]]>
