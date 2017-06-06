@@ -1625,7 +1625,7 @@ public abstract class AbstractEventEndpoint {
       timeZone = TimeZone.getTimeZone(timezone);
     }
 
-    String eventId = (String) metadataJson.get("id");
+    String mediaPackageId = (String) metadataJson.get("id");
 
     try {
       DublinCoreCatalogList events = null;
@@ -1638,11 +1638,19 @@ public abstract class AbstractEventEndpoint {
       if (!events.getCatalogList().isEmpty()) {
         List<JValue> eventsJSON = new ArrayList<>();
         for (DublinCoreCatalog event : events.getCatalogList()) {
-          final DCMIPeriod period = EncodingSchemeUtils
-                  .decodeMandatoryPeriod(event.getFirst(DublinCore.PROPERTY_TEMPORAL));
-          eventsJSON.add(obj(f("start", v(DateTimeSupport.toUTC(period.getStart().getTime()))),
-                  f("end", v(DateTimeSupport.toUTC(period.getEnd().getTime()))),
-                  f("title", v(event.getFirst(DublinCoreCatalog.PROPERTY_TITLE)))));
+          String eventId = event.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER).toString();
+          String eventMp = null;
+          try {
+            eventMp = getSchedulerService().getMediaPackageId(Long.parseLong(eventId));
+          } finally {
+            if (StringUtils.isEmpty(mediaPackageId) || !mediaPackageId.equals(eventMp)) {
+              final DCMIPeriod period = EncodingSchemeUtils
+                      .decodeMandatoryPeriod(event.getFirst(DublinCore.PROPERTY_TEMPORAL));
+              eventsJSON.add(obj(f("start", v(DateTimeSupport.toUTC(period.getStart().getTime()))),
+                      f("end", v(DateTimeSupport.toUTC(period.getEnd().getTime()))),
+                      f("title", v(event.getFirst(DublinCoreCatalog.PROPERTY_TITLE)))));
+            }
+          }
         }
         if (!eventsJSON.isEmpty())
           return conflictJson(arr(eventsJSON));

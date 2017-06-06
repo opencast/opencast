@@ -1,5 +1,5 @@
 <div ng-click="enterEditMode()" ng-form="innerForm">
-    &nbsp;<span ng-show="!editMode">{{ presentableValue | localizeDate:params.type:'short' }}</span>
+    &nbsp;<span ng-show="!editMode">{{ ( params.id == 'location' ? params.value : (presentableValue | localizeDate:params.type:'short') ) }}</span>
 
     <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-focus="enterEditMode()"
        tabindex="{{ params.tabindex }}" focushere="{{ params.tabindex }}"></i>
@@ -9,9 +9,9 @@
         ng-model="params.value" ng-blur="submit(); editMode = false" class="editable" tabindex="{{ params.tabindex }}"
         ng-show="params.type === 'text_long' && editMode" ng-required="params.required" name="{{ params.name }}"/>
 
-    <input ng-keyup="keyUp($event)" type="{{ (params.type === 'time') ? 'text' : (params.type || 'text') }}"
-        ng-model="params.value" ng-blur="submit(); editMode = false" tabindex="{{ params.tabindex }}"
-        ng-show="editMode && params.type === 'text'" ng-required="params.required" name="{{ params.name }}"/>
+    <input ng-keyup="keyUp($event)" ng-if="params.id != 'location' && params.type != 'time' " type="{{ (params.type === 'time') ? 'text' : (params.type || 'text') }}"
+        ng-model="params.value" ng-blur="submit()" tabindex="{{ params.tabindex }}"
+        ng-show="editMode && params.type === 'text'" ng-required="params.required" name="{{ params.id }}"/>
 
     <select chosen
         ng-if="params.type === 'time' && editMode"
@@ -37,4 +37,17 @@
         data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
         ng-options="m.index as m.value for m in minutes"
     />
+    <select chosen
+        ng-if="params.id == 'location' && editMode "
+        ng-model="params.value"
+        ng-change="submit()"
+        data-width="'250px'"
+        data-disable-search-threshold="5"
+        ng-disabled="!editMode && params.id == 'location'"
+        ng-required="params.required" name="{{ params.id }}"
+        data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate}}"
+        ng-options="value as label|translate for (label, value) in params.collection"
+    >
+        <option ng-if="params.required && Object.keys(params.collection).length === 0" value="" ng-selected="params.value == '' || !params.collection.hasOwnProperty(params.value) ">-- {{ 'SELECT_NO_OPTIONS' | translate | limitTo: 70 }} --</option>
+    </select>
 </div>
