@@ -1,6 +1,14 @@
 Opencast 2.2.x
 ==============
 
+Opencast 2.2.5
+--------------
+*Released on June 7, 2017*
+
+[[MH-11983]](https://opencast.jira.com/browse/MH-11983) - Only admins should be able to modify other admins
+[[MH-12006]](https://opencast.jira.com/browse/MH-12006) - Security Issue Allowing Arbitrary Code Execution
+[[MH-11962]](https://opencast.jira.com/browse/MH-11962) - Missing slidetext.xml should not break re-indexing
+
 
 Opencast 2.2.4
 --------------
