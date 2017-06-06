@@ -34,21 +34,6 @@ A notice to `security-notices@opencast.org` will be released once the issue has 
 to the codebase. This notice may be accompanied by a release, or instructions on how to patch a live system depending
 on the issue.
 
-Security Contacts
------------------
-
-The Opencast project encourages institutions and organizations that download and install Opencast to consider
-contacting the committers group to provide the name(s) and contact details of one or more individuals to serve as
-security contacts. Security contact information should be emailed to `security@opencast.org`.  Opencast security
-contacts receive security updates in advance of public release in order their institution or organization time to patch
-their installations before any Opencast security vulnerability becomes general knowledge. Designated security contacts
-are also provided access rights to view, comment and address issues flagged as security items in Opencast's JIRA issue
-tracking application. Security-related JIRA issues are hidden from public view. We do not grant access to these JIRA
-items lightly and we verify the identity and role of each person who is designated as a security contact.
-
-Email traffic sent to `security@opencast.org` should be treated confidentially and should not be forwarded to other
-Opencast or public email lists or discussed elsewhere in order to help protect institutions and organizations running
-Opencast from security-related exploits or attacks.
 
 ----------------------------
 
