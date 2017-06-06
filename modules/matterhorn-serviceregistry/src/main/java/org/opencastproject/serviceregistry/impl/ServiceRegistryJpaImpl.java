@@ -274,6 +274,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       hostName = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
     }
 
+    // Check hostname for sanity. It should be the hosts URL with protocol but without any part of the service paths.
+    if (hostName.endsWith("/")) {
+      logger.warn("The configured value of {} ends with '/'. This is very likely a configuration error which could "
+              + "lead to services not working properly. Note that this configuration should not contain any part of "
+              + "the service paths.", MatterhornConstants.SERVER_URL_PROPERTY);
+    }
+
     // Clean all undispatchable jobs that were orphaned when this host was last deactivated
     cleanUndispatchableJobs(hostName);
 
