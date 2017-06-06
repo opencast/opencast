@@ -299,13 +299,13 @@ public class CleanupWorkflowOperationHandlerTest {
   }
 
   /** This class should cache all URIs that are passed to mocked {@link TrustedHttpClient} execute method */
-  public static class StoreUrisArgumentMatcher implements IArgumentMatcher {
+  private static final class StoreUrisArgumentMatcher implements IArgumentMatcher {
 
     /** URI's cache */
     private List<URI> uriStore = null;
 
     /** Base URI to test matches */
-    URI matchBaseUri = null;
+    private URI matchBaseUri = null;
 
     /** Constructor */
     private StoreUrisArgumentMatcher(List<URI> uriCache, URI matchBaseUri) {
