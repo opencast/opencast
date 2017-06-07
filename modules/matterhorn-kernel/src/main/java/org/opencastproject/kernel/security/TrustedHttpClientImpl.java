@@ -284,10 +284,10 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
       result = Integer.parseInt(StringUtils.trimToNull(stringValue));
     } catch (Exception e) {
       if (cc != null && cc.getBundleContext() != null && cc.getBundleContext().getProperty(key) != null) {
-        logger.warn("Unable to get property with key " + key + " with value " + cc.getBundleContext().getProperty(key)
+        logger.info("Unable to get property with key " + key + " with value " + cc.getBundleContext().getProperty(key)
                             + " so using default of " + defaultValue + " because of " + e.getMessage());
       } else {
-        logger.warn("Unable to get property with key " + key + " so using default of " + defaultValue + " because of "
+        logger.info("Unable to get property with key " + key + " so using default of " + defaultValue + " because of "
                             + e.getMessage());
       }
       result = defaultValue;
