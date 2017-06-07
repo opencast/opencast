@@ -9,15 +9,6 @@
   <description/>
   <configuration_panel>
     <![CDATA[
-      <style type="text/css">
-      <!--
-        #workflow-configuration legend { padding-top:20px; padding-bottom:5px }
-        #workflow-configuration li { padding:2px 20px;}
-        #workflow-configuration input[type=checkbox] { padding: 0px; }
-        #workflow-configuration label { display: inline-block; padding: 0px 5px; }
-        #workflow-configuration input:disabled+label{ opacity: 0.5; }
-      -->
-      </style>
       <div id="workflow-configuration">
         <fieldset>
           <legend>Update metadata at:</legend>
