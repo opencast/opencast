@@ -108,6 +108,11 @@ angular.module('adminNg', [
 .config(function(hotkeysProvider) {
     hotkeysProvider.includeCheatSheet = false;
 })
+.config(['chosenProvider', function (chosenProvider) {
+    chosenProvider.setOption({
+        'search_contains': true,
+    });
+}])
 .run(['$rootScope', function ($rootScope) {
     // Define wrappers around non-mockable native functions.
     $rootScope.location = {};
