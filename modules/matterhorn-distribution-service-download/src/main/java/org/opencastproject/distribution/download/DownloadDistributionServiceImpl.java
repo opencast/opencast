@@ -176,7 +176,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
   }
 
   @Override
-  public Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds, boolean checkAvailability, boolean preserveRefernece)
+  public Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds, boolean checkAvailability, boolean preserveReference)
           throws DistributionException, MediaPackageException {
     notNull(mediapackage, "mediapackage");
     notNull(elementIds, "elementIds");
@@ -186,7 +186,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
               JOB_TYPE,
               Operation.Distribute.toString(),
               Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), gson.toJson(elementIds),
-                      Boolean.toString(checkAvailability), Boolean.toString(preserveRefernece)), distributeJobLoad);
+                      Boolean.toString(checkAvailability), Boolean.toString(preserveReference)), distributeJobLoad);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -247,7 +247,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     return distributedElements.toArray(new MediaPackageElement[distributedElements.size()]);
   }
 
-    /**
+  /**
    * Distribute a Mediapackage element to the download distribution service.
    *
    * @param channelId
@@ -265,7 +265,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    */
   public MediaPackageElement distributeElement(String channelId, MediaPackage mediapackage, MediaPackageElement element,
           boolean checkAvailability) throws DistributionException {
-  return distributeElement(channelId, mediapackage, element, checkAvailability, false);
+    return distributeElement(channelId, mediapackage, element, checkAvailability, false);
   }
 
   /**
@@ -493,8 +493,8 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
       switch (op) {
         case Distribute:
           Boolean checkAvailability = Boolean.parseBoolean(arguments.get(3));
-           Boolean preserveReference = false;
-            preserveReference = Boolean.parseBoolean(arguments.get(4));
+          Boolean preserveReference = false;
+          preserveReference = Boolean.parseBoolean(arguments.get(4));
           MediaPackageElement[] distributedElements = distributeElements(channelId, mediapackage, elementIds,
                   checkAvailability, preserveReference);
           return (distributedElements != null)
