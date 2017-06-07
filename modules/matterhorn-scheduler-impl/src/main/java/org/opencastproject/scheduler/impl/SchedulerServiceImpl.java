@@ -70,7 +70,6 @@ import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -118,7 +117,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TimeZone;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of {@link SchedulerService}.
@@ -156,20 +154,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The immediate workflow creation configuration key */
   public static final String IMMEDIATE_WORKFLOW_CREATION = "immediate.workflow.creation";
 
-  /** The last modifed cache configuration key */
-  private static final String CFG_KEY_LAST_MODIFED_CACHE_EXPIRE = "last_modified_cache_expire";
-
-  /** The default cache expire time in seconds */
-  private static final int DEFAULT_CACHE_EXPIRE = 60;
-
   /** The Etag for an empty calendar */
   private static final String EMPTY_CALENDAR_ETAG = "mod0";
 
   private ComponentContext cc;
 
   /** The last modified cache */
-  protected Cache<String, String> lastModifiedCache = CacheBuilder.newBuilder()
-          .expireAfterWrite(DEFAULT_CACHE_EXPIRE, TimeUnit.SECONDS).build();
+  protected Cache<String, String> lastModifiedCache = CacheBuilder.newBuilder().build();
 
   /** Whether to immediate create and start a workflow for the event */
   protected boolean immediateWorkflowCreation = true;
@@ -648,10 +639,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         if (immediateBoolean != null)
           immediateWorkflowCreation = immediateBoolean.booleanValue();
       }
-      for (Integer cacheExpireDuration : OsgiUtil.getOptCfg(properties, CFG_KEY_LAST_MODIFED_CACHE_EXPIRE).bind(
-              Strings.toInt)) {
-        lastModifiedCache = CacheBuilder.newBuilder().expireAfterWrite(cacheExpireDuration, TimeUnit.SECONDS).build();
-      }
     }
   }
 
@@ -719,6 +706,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     try {
       index.index(event);
+      invalidateLastModifiedCache(event.getFirst(DublinCore.PROPERTY_SPATIAL));
     } catch (Exception e) {
       logger.warn("Unable to index event with ID '{}': {}", eventId, e.getMessage());
       throw new SchedulerException(e);
@@ -844,6 +832,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     try {
       index.index(event);
+      invalidateLastModifiedCache(event.getFirst(DublinCore.PROPERTY_SPATIAL));
     } catch (Exception e) {
       logger.warn("Unable to index event with ID '{}': {}", eventId, e.getMessage());
       throw new SchedulerException(e);
@@ -1011,7 +1000,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
 
     try {
+      DublinCoreCatalog event = index.getDublinCore(eventId);
       index.delete(eventId);
+      invalidateLastModifiedCache(event.getFirst(DublinCore.PROPERTY_SPATIAL));
     } catch (Exception e) {
       logger.warn("Unable to delete event '{}' from index: {}", eventId, e);
       throw new SchedulerException(e);
@@ -1059,7 +1050,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
 
     try {
+      DublinCoreCatalog event = index.getDublinCore(eventId);
       index.delete(eventId);
+      invalidateLastModifiedCache(event.getFirst(DublinCore.PROPERTY_SPATIAL));
     } catch (Exception e) {
       logger.warn("Unable to delete event '{}' from index: {}", eventId, e);
       throw new SchedulerException(e);
@@ -1222,29 +1215,27 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     if (lastModified != null)
       return lastModified;
 
-    populateLastModifiedCache();
+    lastModified = updateLastModifiedCache(agentId);
 
-    lastModified = lastModifiedCache.getIfPresent(agentId);
+    return lastModified;
+  }
 
-    // If still null set the empty calendar ETag
-    if (lastModified == null) {
-      lastModified = EMPTY_CALENDAR_ETAG;
+  private String updateLastModifiedCache(String agentId) throws SchedulerException {
+    String lastModified = null;
+    SchedulerQuery filter = new SchedulerQuery().setSpatial(agentId);
+    try {
+      Date lastModifiedDate = index.getLastModifiedDate(filter);
+      lastModified = lastModifiedDate == null ? EMPTY_CALENDAR_ETAG : generateLastModifiedHash(lastModifiedDate);
       lastModifiedCache.put(agentId, lastModified);
+    } catch (SchedulerServiceDatabaseException e) {
+      logger.error("Failed to retrieve last modified for CA {}: {}", agentId, ExceptionUtils.getStackTrace(e));
+      throw new SchedulerException(e);
     }
     return lastModified;
   }
 
-  private void populateLastModifiedCache() throws SchedulerException {
-    try {
-      Map<String, Date> lastModifiedDates = index.getLastModifiedDate(new SchedulerQuery());
-      for (Entry<String, Date> entry : lastModifiedDates.entrySet()) {
-        Date lastModifiedDate = entry.getValue() != null ? entry.getValue() : new Date();
-        lastModifiedCache.put(entry.getKey(), generateLastModifiedHash(lastModifiedDate));
-      }
-    } catch (SchedulerServiceDatabaseException e) {
-      logger.error("Failed to retrieve last modified for CA: {}", ExceptionUtils.getStackTrace(e));
-      throw new SchedulerException(e);
-    }
+  private void invalidateLastModifiedCache(String agentId) {
+    lastModifiedCache.invalidate(agentId);
   }
 
   private String generateLastModifiedHash(Date lastModifiedDate) {

@@ -9,16 +9,10 @@
   <description/>
   <configuration_panel>
     <![CDATA[
-      <style type="text/css">
-      <!--
-          #workflow-configuration legend { padding-top:20px; padding-bottom:5px }
-          #workflow-configuration li { padding-top:5px; padding-bottom:5px; line-height:14px }
-      -->
-      </style>
       <div id="workflow-configuration">
         <fieldset>
           <legend>Publish to:</legend>
-                      <ul>
+          <ul>
             <li>
               <input id="holdOrPublishToggle_hold" type="radio" name="holdOrPublishToggle" value="hold" />
               <label for="holdOrPublishToggle_hold">Hold</label>
@@ -48,6 +42,10 @@
                   <label for="publishToApi">External Applications</label>
                 </li>
                 <li>
+                  <input id="publishToOaiPmh" name="publishToOaiPmh" type="checkbox" checked="checked" class="configField" value="true" />
+                  <label for="publishToOaiPmh">OAI-PMH Default Repository</label>
+                </li>
+                <li>
                   <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
                   <label for="publishToYouTube">YouTube</label>
                 </li>
@@ -59,6 +57,11 @@
 
       <!-- Show or hide the hold and publication configuration panel -->
       <script type="text/javascript">
+        $('input[name="holdOrPublishToggle"]').change(function(){
+            var show = $(this).val() == 'publish';
+            $('#publicationConfigurationPanel').toggle(show);
+            $('#straightToPublishing').val(show);
+        });
         $('input[name="publishToSearch"]').change(function(){
             if ($(this).is(':checked')) {
               $('#publishToAws').prop('disabled', false);
@@ -88,7 +91,9 @@
       <configurations>
         <configuration key="publishToEngage">true</configuration>
         <configuration key="publishToApi">true</configuration>
+        <configuration key="publishToOaiPmh">true</configuration>
         <configuration key="publishToYouTube">false</configuration>
+        <configuration key="publishToAws">false</configuration>
       </configurations>
     </operation>
 

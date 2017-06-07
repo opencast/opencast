@@ -43,10 +43,14 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 
 /**
  * An in-memory role provider containing administratively-defined custom roles
@@ -59,11 +63,17 @@ public class CustomRoleProvider implements RoleProvider {
   /** Configuration key for the custom role list */
   public static final String CUSTOM_ROLES_KEY = "org.opencastproject.security.custom.roles";
 
+  /** Configuration key for the custom role pattern */
+  public static final String CUSTOM_ROLES_PATTERN_KEY = "org.opencastproject.security.custom.roles.pattern";
+
   /** The security service */
   protected SecurityService securityService = null;
 
   /** The list of custom roles */
   private Set<String> roles = null;
+
+  /** The custom roles pattern */
+  private Pattern rolematch = null;
 
   /**
    * @param securityService
@@ -92,7 +102,20 @@ public class CustomRoleProvider implements RoleProvider {
       }
     }
 
-    logger.info("CustomRoleProvider activated, {} custom role(s)", roles.size());
+    String rolePattern = StringUtils.trimToNull(cc.getBundleContext().getProperty(CUSTOM_ROLES_PATTERN_KEY));
+    if (rolePattern != null) {
+      try {
+        rolematch = Pattern.compile(rolePattern);
+      } catch (PatternSyntaxException e) {
+        logger.warn("Invalid regular expression for custom roles pattern: {}", rolePattern);
+      }
+    }
+
+    if (rolematch != null) {
+        logger.info("CustomRoleProvider activated, {} custom role(s), custom role pattern {}", roles.size(), rolePattern);
+    } else {
+        logger.info("CustomRoleProvider activated, {} custom role(s)", roles.size());
+    }
   }
 
   /**
@@ -131,6 +154,20 @@ public class CustomRoleProvider implements RoleProvider {
       throw new IllegalArgumentException("Query must be set");
 
     Organization organization = securityService.getOrganization();
+
+    // Match the custom regular expression first if this is an ACL role query
+    if ((target == Role.Target.ACL) && (rolematch != null)) {
+      String exactQuery = StringUtils.removeEnd(query, "%");
+      Matcher m = rolematch.matcher(exactQuery);
+      if (m.matches()) {
+          List<Role> roles = new LinkedList<Role>();
+          JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
+          roles.add(new JaxbRole(exactQuery, jaxbOrganization, "Custom Role", Role.Type.EXTERNAL));
+          return roles.iterator();
+      }
+    }
+
+    // Otherwise match on the custom roles specified in a list
     return Stream.$(roles).filter(filterByName._2(query)).drop(offset)
             .apply(limit > 0 ? StreamOp.<String> id().take(limit) : StreamOp.<String> id()).map(toRole._2(organization))
             .iterator();

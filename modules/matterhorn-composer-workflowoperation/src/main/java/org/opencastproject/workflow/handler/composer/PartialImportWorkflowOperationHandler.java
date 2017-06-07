@@ -990,7 +990,8 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
 
   private Track getFromOriginal(String trackId, List<Track> originalTracks, VCell<String> type) {
     for (Track t : originalTracks) {
-      if (t.getURI().toString().contains(trackId)) {
+      if (t.getIdentifier().contains(trackId)) {
+        logger.debug("Track-Id from smil found in Mediapackage ID: " + t.getIdentifier());
         if (EMPTY_VALUE.equals(type.get())) {
           String suffix = (t.hasAudio() && !t.hasVideo()) ? FLAVOR_AUDIO_SUFFIX : "";
           type.set(t.getFlavor().getType() + suffix);

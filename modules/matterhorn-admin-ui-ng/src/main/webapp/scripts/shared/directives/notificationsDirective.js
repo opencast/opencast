@@ -24,12 +24,17 @@ angular.module('adminNg.directives')
                 updateNotifications(context);
             });
 
+            scope.deregisterChanged = Notifications.$on('changed', function (event, context) {
+                updateNotifications(context);
+            });
+
             scope.deregisterDelete = Notifications.$on('deleted', function (event, context) {
                 updateNotifications(context);
             });
 
             scope.$on('$destroy', function () {
                 scope.deregisterAdd();
+                scope.deregisterChanged();
                 scope.deregisterDelete();
                 Notifications.$destroy();
             });

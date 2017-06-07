@@ -82,6 +82,8 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
   /** The key to look for in the service configuration file to override the {@link DEFAULT_YOUTUBE_RETRACT_JOB_LOAD} */
   public static final String YOUTUBE_RETRACT_LOAD_KEY = "job.load.youtube.retract";
 
+  public static final String YOUTUBE_ENABLED_KEY = "org.opencastproject.publication.youtube.enabled";
+
   /** The load on the system introduced by creating a publish job */
   private float youtubePublishJobLoad = DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD;
 
@@ -122,6 +124,8 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
 
   /** Youtube configuration instance */
   private final YouTubeAPIVersion3Service youTubeService;
+
+  private boolean enabled = false;
 
   /**
    * The default playlist to publish to, in case there is not enough information in the mediapackage to find a playlist
@@ -168,25 +172,32 @@ public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer impleme
   public void updated(final Dictionary props) throws ConfigurationException {
     properties.merge(props);
 
+    enabled = Boolean.valueOf((String) properties.get(YOUTUBE_ENABLED_KEY));
+
     final String dataStore = YouTubeUtils.get(properties, YouTubeKey.credentialDatastore);
 
     try {
-      final ClientCredentials clientCredentials = new ClientCredentials();
-      clientCredentials.setCredentialDatastore(dataStore);
-      final String path = YouTubeUtils.get(properties, YouTubeKey.clientSecretsV3);
-      File secretsFile = new File(path);
-      if (secretsFile.exists() && !secretsFile.isDirectory()) {
-        clientCredentials.setClientSecrets(secretsFile);
-        clientCredentials.setDataStoreDirectory(YouTubeUtils.get(properties, YouTubeKey.dataStore));
-        //
-        youTubeService.initialize(clientCredentials);
-        //
-        tags = StringUtils.split(YouTubeUtils.get(properties, YouTubeKey.keywords), ',');
-        defaultPlaylist = YouTubeUtils.get(properties, YouTubeKey.defaultPlaylist);
-        makeVideosPrivate = StringUtils.containsIgnoreCase(YouTubeUtils.get(properties, YouTubeKey.makeVideosPrivate), "true");
-        defaultMaxFieldLength(YouTubeUtils.get(properties, YouTubeKey.maxFieldLength, false));
+      if (enabled) {
+        final ClientCredentials clientCredentials = new ClientCredentials();
+        clientCredentials.setCredentialDatastore(dataStore);
+        final String path = YouTubeUtils.get(properties, YouTubeKey.clientSecretsV3);
+        File secretsFile = new File(path);
+        if (secretsFile.exists() && !secretsFile.isDirectory()) {
+          clientCredentials.setClientSecrets(secretsFile);
+          clientCredentials.setDataStoreDirectory(YouTubeUtils.get(properties, YouTubeKey.dataStore));
+          //
+          youTubeService.initialize(clientCredentials);
+          //
+          tags = StringUtils.split(YouTubeUtils.get(properties, YouTubeKey.keywords), ',');
+          defaultPlaylist = YouTubeUtils.get(properties, YouTubeKey.defaultPlaylist);
+          makeVideosPrivate = StringUtils
+                  .containsIgnoreCase(YouTubeUtils.get(properties, YouTubeKey.makeVideosPrivate), "true");
+          defaultMaxFieldLength(YouTubeUtils.get(properties, YouTubeKey.maxFieldLength, false));
+        } else {
+          logger.warn("Client information file does not exist: " + path);
+        }
       } else {
-        logger.warn("Client information file does not exist: " + path);
+        logger.info("YouTube v3 publication service is disabled");
       }
     } catch (final Exception e) {
       throw new ConfigurationException("Failed to load YouTube v3 properties", dataStore, e);

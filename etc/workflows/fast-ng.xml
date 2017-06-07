@@ -14,42 +14,32 @@
   </description>
 
   <configuration_panel>
-      <![CDATA[
-        <style type="text/css">
-        <!--
-            #workflow-configuration legend { padding-top:20px; padding-bottom:5px }
-            #workflow-configuration li { padding-top:5px; padding-bottom:5px; line-height:14px }
-            #workflow-configuration input[type=checkbox] { padding: 0px 5px; }
-            #workflow-configuration label { display: inline-block; padding: 0px }
-        -->
-        </style>
-        <div id="workflow-configuration">
-          <fieldset>
-            <legend>Add a comment that the recording needs:</legend>
-            <ul>
-              <li>
-                <input id="comment" name="comment" type="checkbox" class="configField" value="true" />
-                <label for=comment>Review / Cutting</label>
-              </li>
-            </ul>
-          </fieldset>
-          <fieldset>
-            <legend>Immediately distribute the recording to:</legend>
-            <ul>
-              <li>
-                <input id="publishToMediaModule" name="publishToMediaModule" type="checkbox" class="configField" value="true" checked=checked />
-                <label for=publishToMediaModule>Opencast Media Module</label>
-              </li>
-            </ul>
-            <ul>
-              <li>
-                <input id="publishToOaiPmh" name="publishToOaiPmh" type="checkbox" class="configField" value="true" checked=checked />
-                <label for=publishToOaiPmh>Default OAI-PMH Repository</label>
-              </li>
-            </ul>
-          </fieldset>
-        </div>
-      ]]>
+    <![CDATA[
+      <div id="workflow-configuration">
+        <fieldset>
+          <legend>Add a comment that the recording needs:</legend>
+          <ul>
+            <li>
+              <input id="comment" name="comment" type="checkbox" class="configField" value="true" />
+              <label for="comment">Review / Cutting</label>
+            </li>
+          </ul>
+        </fieldset>
+        <fieldset>
+          <legend>Immediately distribute the recording to:</legend>
+          <ul>
+            <li>
+              <input id="publishToMediaModule" name="publishToMediaModule" type="checkbox" class="configField" value="true" checked=checked />
+              <label for="publishToMediaModule">Opencast Media Module</label>
+            </li>
+            <li>
+              <input id="publishToOaiPmh" name="publishToOaiPmh" type="checkbox" class="configField" value="true" checked=checked />
+              <label for="publishToOaiPmh">Default OAI-PMH Repository</label>
+            </li>
+          </ul>
+        </fieldset>
+      </div>
+    ]]>
   </configuration_panel>
 
   <operations>
