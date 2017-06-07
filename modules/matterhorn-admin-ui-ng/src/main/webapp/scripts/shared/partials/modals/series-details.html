@@ -1,7 +1,8 @@
 <section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="series-details-modal" ng-controller="SerieCtrl">
     <header>
         <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2><span translate="EVENTS.SERIES.DETAILS.HEADER" translate-values="{{ titleParams }}">
+        <h2>
+            {{'EVENTS.SERIES.DETAILS.HEADER' | translate:titleParams}}
             <!-- Series details - {{resourceId}} -->
         </h2>
     </header>
