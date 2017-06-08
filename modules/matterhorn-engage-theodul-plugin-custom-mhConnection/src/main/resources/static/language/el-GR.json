@@ -1,6 +1,8 @@
 {
   "value_locale":"en",
-  "error_mediaPackageInformationNotLoaded":"Υπάρχουν δύο πιθανές αιτίες για αυτό το σφάλμα: <ul><li>το αρχείο πολυμέσων δεν είναι πια διαθέσιμο</li> <li>Το αρχείο πολυμέσων προστατεύεται και θα πρέπει να συνδεθείτε</li></ul>",
+  "error_mediaPackageInformationNotLoaded":"Υπάρχουν δύο πιθανές αιτίες για αυτό το σφάλμα:",
+  "error_mediaPackageInformationNotLoaded_reason1":"Το αρχείο πολυμέσων δεν είναι πια διαθέσιμο",
+  "error_mediaPackageInformationNotLoaded_reason2":"Το αρχείο πολυμέσων προστατεύεται και θα πρέπει να συνδεθείτε",
   "error_noMediaInformationAvailable":"Οι πληροφορίες του αρχείου πολυμέσων δεν είναι διαθέσιμες.",
   "error_endpointNotAvailable":"Η υπηρεσία αναζήτησης δεν είναι διαθέσιμη αυτήν τη στιγμή."
 }

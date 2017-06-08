@@ -1,6 +1,8 @@
 {
   "value_locale":"sv",
-  "error_mediaPackageInformationNotLoaded":"Det finns två möjliga orsaker till felet:<ul><li>Mediat finns inte tillgängligt längre</li><li>Mediat är skyddat och du behöver logga in</li></ul>",
+  "error_mediaPackageInformationNotLoaded":"There are two possible reasons for this error:",
+  "error_mediaPackageInformationNotLoaded_reason1":"The media is not available any more",
+  "error_mediaPackageInformationNotLoaded_reason2":"The media is protected and you need to log in",
   "error_noMediaInformationAvailable":"Ingen mediainformation tillgänglig.",
   "error_endpointNotAvailable":"Söktjänsten är inte tillgänglig för tillfället."
 }
