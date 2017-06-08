@@ -46,7 +46,9 @@ New Features and Improvements
 
   - **Sakai User Provider** - Opencast now out-of-the-box provides an Sakai user provider.
 
-  - **AWS S3 Support** - Opencast now supports distribution to Amazon S3
+  - **AWS S3 and Cloudfront Support** - Opencast now supports distribution to Amazon S3 and Cloudfront.  This support is
+    built into the workflow engine by default and requires only minor configuration.  Details on how to set up S3 and
+    Cloudfront distribution can be found [here](modules/awss3distribution.md)
 
   - **Extended Themes** - The themes facility that allows producers to let Opencast brand their produced video content
     using intro and outro videos has been extended to support title slides (metadata within video content) and
