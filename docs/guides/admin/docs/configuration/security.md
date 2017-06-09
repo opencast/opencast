@@ -47,7 +47,7 @@ an administrative username and password in `custom.properties`:
 Opencast allows user and role information to be supplied from external systems through user and role providers.
 Two user providers are available by default:
 
-* [LDAP User Provider](security.user.ldap.md)
+* LDAP User Provider, described in [LDAP Security and Authorization](security.ldap.md)
 * [Sakai User Provider](security.user.sakai.md)
 
 The set of user and role providers can be configured. If you do not want to keep users and passwords in Opencast's
@@ -56,4 +56,6 @@ matterhorn-userdirectory-jpa jar with the matterhorn-userdirectory-ldap jar.
 
 ## Further Authentication Configuration
 
-[Configure Central Authentication Service (CAS)](security.cas.md)
+* [Configure Central Authentication Service (CAS)](security.cas.md)
+* [Configure LDAP Authentication and Authorization](security.ldap.md)
+* [Configure Authentication and Authorization Infrastructure (AAI))](security.aai.md)
