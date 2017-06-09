@@ -81,24 +81,24 @@ describe('adminNg.directives.adminNgTableFilter', function () {
     });
 
     it('allows selecting a filter', function () {
-        expect(element.find('select[ng-model="filter.value"]')).not.toExist();
+        expect(element.find('select[ng-model="filterValue"]')).not.toExist();
         expect(element.find('div').scope().filter).toBeUndefined();
 
-        element.find('select[ng-model="selectedFilter"] option:first').prop({selected: true});
+        element.find('select[ng-model="selectedFilter"] option[value="color"]').prop({selected: true});
         element.find('select[ng-model="selectedFilter"]').change();
 
-        expect(element.find('select[ng-model="filter.value"] option').length).toBe(4);
-        expect(element.find('div').scope().selectedFilter).toEqual('color');
+        expect(element.find('select[ng-model="filterValue"] option').length).toBe(4);
+        expect(element.find('div').scope().filter.label).toEqual('COLOR');
     });
 
     it('overwrites existing filters when selecting a new value', function () {
-        element.find('select[ng-model="selectedFilter"] option:first').prop({selected: true});
+        element.find('select[ng-model="selectedFilter"] option[value="color"]').prop({selected: true});
         element.find('select[ng-model="selectedFilter"]').change();
 
-        element.find('select[ng-model="filter.value"] option:last').prop({selected: true});
-        element.find('select[ng-model="filter.value"]').change();
-        //expect(element.find('span.ng-multi-value')).toHaveText(/COLOR: WHITE/);
+        element.find('select[ng-model="filterValue"] option:last').prop({selected: true});
+        element.find('select[ng-model="filterValue"]').change();
 
+        expect(element.scope().filters.map.color.value).toEqual('white');
     });
 
     describe('#removeFilter', function () {
@@ -134,7 +134,7 @@ describe('adminNg.directives.adminNgTableFilter', function () {
             it('does not set a filter value', function () {
                 var filter = { period: { from: 'from-date' } };
                 spyOn(Storage, 'put');
-                element.find('div').scope().selectFilterPeriodValue('filter-name', filter);
+                element.find('div').scope().selectFilterPeriodValue(filter);
                 expect(Storage.put).not.toHaveBeenCalled();
             });
         });
@@ -144,7 +144,7 @@ describe('adminNg.directives.adminNgTableFilter', function () {
             it('does not set a filter value', function () {
                 var filter = { period: { to: 'to-date' } };
                 spyOn(Storage, 'put');
-                element.find('div').scope().selectFilterPeriodValue('filter-name', filter);
+                element.find('div').scope().selectFilterPeriodValue(filter);
                 expect(Storage.put).not.toHaveBeenCalled();
             });
         });
@@ -154,10 +154,10 @@ describe('adminNg.directives.adminNgTableFilter', function () {
             it('sets the time period filter value', function () {
                 var fromDate = new Date('2015-01-01');
                 var toDate = new Date('2015-01-02');
-                var filter = { period: { from: fromDate, to: toDate } };
+                var filter = { period: { type: "period", from: fromDate, to: toDate } };
                 spyOn(Storage, 'put');
-                element.find('div').scope().selectFilterPeriodValue('filter-name', filter);
-                expect(Storage.put).toHaveBeenCalledWith('filter', 'furniture', 'filter-name', fromDate.toISOString() + '/' + toDate.toISOString());
+                element.find('div').scope().selectFilterPeriodValue(filter);
+                expect(Storage.put).toHaveBeenCalledWith('filter', 'furniture', undefined, fromDate.toISOString() + '/' + toDate.toISOString());
             });
         });
     });
