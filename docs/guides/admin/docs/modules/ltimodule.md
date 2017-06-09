@@ -20,41 +20,41 @@ To enable LTI authentication in Opencast, edit `OPENCAST/etc/security/mh_default
 
 * In the Authentication Filters section, uncomment the oAuthProtectedResourceFilter: 
 ````
-<!-- 2-legged OAuth is used by trusted 3rd party applications, including LTI. -->
-<!-- Uncomment the line below to support LTI or other OAuth clients.          -->
-<ref bean="oauthProtectedResourceFilter" />
+    <!-- 2-legged OAuth is used by trusted 3rd party applications, including LTI. -->
+    <!-- Uncomment the line below to support LTI or other OAuth clients.          -->
+    <ref bean="oauthProtectedResourceFilter" />
 ````
 
 * Replace CONSUMER_KEY and CONSUMER_SECRET with LTI the key and secret values that you will use in your LMS:
 ````
-<!-- ####################### -->
-<!-- # OAuth (LTI) Support # -->
-<!-- ####################### -->
+    <!-- ####################### -->
+    <!-- # OAuth (LTI) Support # -->
+    <!-- ####################### -->
 
-<!-- This is required for LTI. If you are using LTI and have enabled the oauthProtectedResourceFilter  -->
-<!-- in the list of authenticationFilters above, set custom values for CONSUMERKEY and CONSUMERSECRET. -->
+    <!-- This is required for LTI. If you are using LTI and have enabled the oauthProtectedResourceFilter  -->
+    <!-- in the list of authenticationFilters above, set custom values for CONSUMERKEY and CONSUMERSECRET. -->
 
-<bean name="oAuthConsumerDetailsService" class="org.opencastproject.kernel.security.OAuthSingleConsumerDetailsService">
-<constructor-arg index="0" ref="userDetailsService" />
-<constructor-arg index="1" value="CONSUMERKEY" />
-<constructor-arg index="2" value="CONSUMERSECRET" />
-<constructor-arg index="3" value="constructorName" />
-</bean>
+    <bean name="oAuthConsumerDetailsService" class="org.opencastproject.kernel.security.OAuthSingleConsumerDetailsService">
+    <constructor-arg index="0" ref="userDetailsService" />
+    <constructor-arg index="1" value="CONSUMERKEY" />
+    <constructor-arg index="2" value="CONSUMERSECRET" />
+    <constructor-arg index="3" value="constructorName" />
+    </bean>
 ````
 
 * To give LMS users the same username in Opencast as the LMS username, uncomment the constructor arguments 
 below and update CONSUMERKEY to the same key used above:
 
 ````
-<!-- Uncomment to trust usernames from the LTI consumer identified by CONSUMERKEY.           -->
-<!-- Users from untrusted systems will be prefixed with "lti:" and the consumer domain name. -->
+    <!-- Uncomment to trust usernames from the LTI consumer identified by CONSUMERKEY.           -->
+    <!-- Users from untrusted systems will be prefixed with "lti:" and the consumer domain name. -->
 
-<constructor-arg index="1" ref="securityService" />
-<constructor-arg index="2">
-  <list>
-    <value>CONSUMERKEY</value>
-  </list>
-</constructor-arg>
+    <constructor-arg index="1" ref="securityService" />
+    <constructor-arg index="2">
+      <list>
+        <value>CONSUMERKEY</value>
+      </list>
+    </constructor-arg>
 ````
 
 Configure and test an LTI tool in the LMS
@@ -67,7 +67,6 @@ Configure an LTI tool in the LMS with these values:
 * LTI secret: the value chosen for CONSUMERSECRET in `mh_default_org.xml`
 
 In a clustered Opencast system, choose the URL of the presentation server where the media module and player are available.
-LTI authentication may also be used to give LTI users access to admin services, if LTI users are granted additional roles.
 
 Access the LTI tool configured for Opencast in the LMS. The Opencast LTI Welcome page should appear. Click on the links 
 provided to `OPENCAST-URL/lti` and `OPENCAST-URL/info/me.json` to verify the LTI parameters provided to Opencast by the LMS,
