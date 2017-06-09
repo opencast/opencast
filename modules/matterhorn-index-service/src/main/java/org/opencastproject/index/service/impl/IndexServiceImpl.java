@@ -22,6 +22,7 @@
 package org.opencastproject.index.service.impl;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
@@ -76,6 +77,7 @@ import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPORAL;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
@@ -108,6 +110,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.util.data.Effect0;
+import static org.opencastproject.util.data.Option.option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowException;
@@ -526,11 +529,23 @@ public class IndexServiceImpl implements IndexService {
       }
     }
 
+    Date startDate = null;
+    MetadataField<?> starttime = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_TEMPORAL.getLocalName());
+    if(starttime != null && starttime.isUpdated() && starttime.getValue().isSome()) {
+      DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod((DublinCoreValue)starttime.getValue().get());
+      startDate = period.getStart();
+
+    }
+
     MetadataField<?> created = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName());
     if (created == null || !created.isUpdated() || created.getValue().isNone()) {
       eventMetadata.removeField(created);
       MetadataField<String> newCreated = MetadataUtils.copyMetadataField(created);
-      newCreated.setValue(EncodingSchemeUtils.encodeDate(new Date(), Precision.Second).getValue());
+      if (startDate != null) {
+        newCreated.setValue(EncodingSchemeUtils.encodeDate(startDate, Precision.Second).getValue());
+      } else {
+        newCreated.setValue(EncodingSchemeUtils.encodeDate(new Date(), Precision.Second).getValue());
+      }
       eventMetadata.addField(newCreated);
     }
 
