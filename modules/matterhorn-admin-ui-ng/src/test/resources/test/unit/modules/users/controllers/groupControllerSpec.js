@@ -1,5 +1,5 @@
 describe('Group controller', function () {
-    var $scope, $controller, GroupResource, GroupsResource;
+    var $scope, $controller, $httpBackend, GroupResource, GroupsResource;
 
     beforeEach(module('adminNg'));
     beforeEach(module(function ($provide) {
@@ -11,7 +11,7 @@ describe('Group controller', function () {
         $provide.value('Language', service);
     }));
 
-    beforeEach(inject(function ($rootScope, _$controller_, _GroupResource_, _GroupsResource_) {
+    beforeEach(inject(function ($rootScope, _$controller_, _$httpBackend_, _GroupResource_, _GroupsResource_) {
         $scope = $rootScope.$new();
         $scope.group = {
             $promise : {
@@ -20,10 +20,19 @@ describe('Group controller', function () {
             }
         };
         $controller = _$controller_;
+        $httpBackend = _$httpBackend_;
         GroupResource = _GroupResource_;
         GroupsResource = _GroupsResource_;
-        $controller('GroupCtrl', {$scope: $scope});
     }));
+
+    beforeEach(function () {
+        jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
+        $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:USER&limit=0&offset=0').respond(JSON.stringify(getJSONFixture('roles/roles.json')));
+        $httpBackend.whenGET('/admin-ng/resources/USERS.INVERSE.WITH.USERNAME.json').respond(JSON.stringify(getJSONFixture('admin-ng/resources/USERS.INVERSE.WITH.USERNAME.json')));
+        $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
+        $controller('GroupCtrl', {$scope: $scope});
+        $httpBackend.flush();
+    });
 
     it('instantiates', function () {
         expect($scope.user).toBeDefined();
