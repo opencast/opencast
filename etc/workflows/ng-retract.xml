@@ -15,8 +15,8 @@
           <legend>Retract the recording from:</legend>
           <ul>
             <li>
-               <input id="retractFromEngage" type="checkbox" checked="checked" class="configField" value="true" />
-               <label for="retractFromEngage">Opencast Media Module</label>
+              <input id="retractFromEngage" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="retractFromEngage">Opencast Media Module</label>
             </li>
             <li>
               <input id="retractFromAws" type="checkbox" checked="checked" class="configField" value="true" />
