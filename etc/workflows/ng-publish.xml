@@ -22,7 +22,7 @@
                   <label for="publishToEngage">Opencast Media Module</label>
                 </li>
                 <li>
-                  <input id="publishToAws" name="searchPublishType" type="radio" class="configField" value="true"/>
+                  <input id="publishToAws" name="searchPublishType" type="radio" class="configField" value="true" disabled="disabled"/>
                   <label for="publishToAws">AWS</label>
                  </li>
               </ul>
@@ -45,10 +45,6 @@
 
       <!-- Show or hide the hold and publication configuration panel -->
       <script type="text/javascript">
-        <!-- Remove the line below if you wish to publish to AWS S3 -->
-        $('#publishToAws').prop('disabled', true);
-        <!-- Remove the line above if you wish to publish to AWS S3 -->
-
         awsWasDisabled = $('#publishToAws').prop('disabled');
         awsWasChecked = $('#publishToAws').prop('checked');
         engageWasChecked = $('#publishToEngage').prop('checked');
@@ -59,14 +55,11 @@
               $('#publishToEngage').prop('checked', engageWasChecked);
               $('#publishToAws').prop('disabled', awsWasDisabled);
               $('#publishToEngage').prop('disabled', false);
-            } else if (!$(this).is(':checked')) {
+            } else {
               awsWasChecked = $('#publishToAws').prop('checked');
               engageWasChecked = $('#publishToEngage').prop('checked');
-
-              $('#publishToAws').prop('disabled', true);
-              $('#publishToEngage').prop('disabled', true);
-              $('#publishToAws').prop('checked', false);
-              $('#publishToEngage').prop('checked', false);
+              $('#searchConfigurationPanel input').prop('disabled', true)
+                                                  .prop('checked', false);
             }
         });
       </script>
