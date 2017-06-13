@@ -86,16 +86,6 @@ New Features and Improvements
   - **Library Update** - Many libraries have been updated to more recent versions. Most noteworthy, Karaf has
     been updated to version 4.0.8
 
-
-- Database connection pooling (SPS: Too detailed for my taste)
-
-
-Configuration Changes
----------------------
-
-- MH-11861 needs the admin search index to be rebuilded
-
-
 Release Schedule
 ----------------
 
