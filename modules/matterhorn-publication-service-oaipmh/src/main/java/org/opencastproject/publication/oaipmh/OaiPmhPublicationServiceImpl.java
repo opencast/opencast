@@ -72,9 +72,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -450,7 +448,6 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
 
     // All the jobs have passed, let's update the mediapackage with references to the distributed elements
     List<String> elementsToPublish = new ArrayList<>();
-    Map<String, String> distributedElementIds = new HashMap<>();
 
     for (Job job : jobs) {
      try {
@@ -471,7 +468,6 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
           // Add the new element to the mediapackage
           mp.add(distributedElement);
           elementsToPublish.add(distributedElement.getIdentifier());
-          distributedElementIds.put(distributedElement.getIdentifier(), distributedElement.getIdentifier());
        }
      } catch (Exception e) {
        logger.error("Exception" + e);
@@ -498,9 +494,12 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
         continue;
 
       // See if the element has been distributed
-      String distributedElementId = distributedElementIds.get(reference.getIdentifier());
-      if (distributedElementId == null)
+      String distributedElementId = null;
+      if (elementsToPublish.contains(reference.getIdentifier())) {
+        distributedElementId =  elementsToPublish.get(elementsToPublish.indexOf(reference.getIdentifier()));
+      } else {
         continue;
+      }
 
       MediaPackageReference translatedReference = new MediaPackageReferenceImpl(mp.getElementById(distributedElementId));
       if (reference.getProperties() != null) {
