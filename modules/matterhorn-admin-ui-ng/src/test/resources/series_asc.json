@@ -5,11 +5,6 @@
    "limit":0,
    "results":[
       {
-         "events":{
-           "READY":1,
-           "OPTED_OUT":1,
-           "BLACKLISTED":1
-         },
          "optedOut":false,
          "organizers":[
             "organizer 1"
@@ -22,11 +17,6 @@
          "title":"title 1"
       },
       {
-         "events":{
-           "READY":0,
-           "OPTED_OUT":0,
-           "BLACKLISTED":0
-         },
          "optedOut":false,
          "organizers":[
             "organizer 2"
@@ -39,11 +29,6 @@
          "title":"title 2"
       },
       {
-         "events":{
-           "READY":0,
-           "OPTED_OUT":2,
-           "BLACKLISTED":1
-         },
          "optedOut":false,
          "organizers":[
             "organizer 3"
