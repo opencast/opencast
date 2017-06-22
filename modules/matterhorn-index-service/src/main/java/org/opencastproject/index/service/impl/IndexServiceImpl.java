@@ -562,7 +562,7 @@ public class IndexServiceImpl implements IndexService {
         dc.set(DublinCores.OC_PROPERTY_AGENT_TIMEZONE, tz.getID());
       } else { // No timezone was present, assume the serve's local timezone.
         tz = TimeZone.getDefault();
-        logger.warn(
+        logger.debug(
                 "The field 'capture.device.timezone' has not been set in the agent configuration. The default server timezone will be used.");
       }
 
