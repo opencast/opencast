@@ -71,13 +71,13 @@ angular.module('adminNg.controllers')
                 name:  'series_name',
                 label: 'EVENTS.EVENTS.TABLE.SERIES'
             }, {
-                name:  'date',
+                name:  'technical_date',
                 label: 'EVENTS.EVENTS.TABLE.DATE'
             }, {
-                name:  'start_date',
+                name:  'technical_start',
                 label: 'EVENTS.EVENTS.TABLE.START'
             }, {
-                name:  'end_date',
+                name:  'technical_end',
                 label: 'EVENTS.EVENTS.TABLE.STOP'
             }, {
                 name:  'location',

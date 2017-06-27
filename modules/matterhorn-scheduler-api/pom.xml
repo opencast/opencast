@@ -16,8 +16,17 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-kernel</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-dublincore</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.fortuna.ical4j</groupId>
+      <artifactId>ical4j</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -30,6 +39,10 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
+            <Import-Package>
+              net.fortuna.ical4j.*,
+              *
+            </Import-Package>
             <Export-Package>
               org.opencastproject.scheduler.api;version=${project.version}
             </Export-Package>

@@ -26,11 +26,11 @@ angular.module('adminNg.controllers')
     '$scope', 'Notifications', 'EventTransactionResource', 'EventMetadataResource', 'EventAssetsResource',
     'EventCatalogsResource', 'CommentResource', 'EventWorkflowsResource',
     'ResourcesListResource', 'UserRolesResource', 'EventAccessResource', 'EventGeneralResource',
-    'OptoutsResource', 'EventParticipationResource', 'NewEventProcessingResource',
+    'OptoutsResource', 'EventParticipationResource', 'EventSchedulingResource', 'NewEventProcessingResource',
     'OptoutSingleResource', 'CaptureAgentsResource', 'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService',
     function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource, EventCatalogsResource, CommentResource,
         EventWorkflowsResource, ResourcesListResource, UserRolesResource, EventAccessResource, EventGeneralResource,
-        OptoutsResource, EventParticipationResource, NewEventProcessingResource,
+        OptoutsResource, EventParticipationResource, EventSchedulingResource, NewEventProcessingResource,
         OptoutSingleResource, CaptureAgentsResource, ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService) {
 
         var roleSlice = 100;
@@ -307,6 +307,30 @@ angular.module('adminNg.controllers')
                     }
                 });
 
+                $scope.source = EventSchedulingResource.get({ id: id }, function (source) {
+                    source.presenters = angular.isArray(source.presenters) ? source.presenters.join(', ') : '';
+                    $scope.scheduling.hasProperties = true;
+                    CaptureAgentsResource.query({inputs: true}).$promise.then(function (data) {
+                        $scope.captureAgents = data.rows;
+                        angular.forEach(data.rows, function (agent) {
+                            var inputs;
+                            if (agent.id === $scope.source.agentId) {
+                                source.device = agent;
+                                // Retrieve agent inputs configuration
+                                if (angular.isDefined(source.agentConfiguration['capture.device.names'])) {
+                                    inputs = source.agentConfiguration['capture.device.names'].split(',');
+                                    source.device.inputMethods = {};
+                                    angular.forEach(inputs, function (input) {
+                                        source.device.inputMethods[input] = true;
+                                    });
+                                }
+                            }
+                        });
+                    });
+                }, function () {
+                   $scope.scheduling.hasProperties = false;
+                });
+
                 $scope.access = EventAccessResource.get({ id: id }, function (data) {
                     if (angular.isDefined(data.episode_access)) {
                         var json = angular.fromJson(data.episode_access.acl);
@@ -431,6 +455,11 @@ angular.module('adminNg.controllers')
                             }
                             $scope.source.agentConfiguration['capture.device.names'] += key;
                         }
+                    });
+
+                    EventSchedulingResource.save({
+                        id: $scope.resourceId,
+                        entries: $scope.source
                     });
                 }, me.conflictsDetected);
             }

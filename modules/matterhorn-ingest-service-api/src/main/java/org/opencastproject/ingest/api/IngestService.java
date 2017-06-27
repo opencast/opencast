@@ -130,8 +130,13 @@ public interface IngestService extends JobProducer {
    * @throws NotFoundException
    *           if either one of the workflow definition or workflow instance was not found
    * @throws UnauthorizedException
-   *           if the current user does not have read permissions on the workflow instance's mediapackage.
+   *           if the current user does not have {@link org.opencastproject.security.api.Permissions.Action#READ} on the
+   *           workflow instance's mediapackage.
+   *
+   * @deprecated As of release 2.4, the scheduler service is able to store a mediapackage. Thereby the concept of the
+   *             pre-procesing workflow is obsolete and there is no more need to resume such a workflow by this method.
    */
+  @Deprecated
   WorkflowInstance addZippedMediaPackage(InputStream zippedMediaPackage, String workflowDefinitionID,
           Map<String, String> wfConfig, Long workflowId) throws MediaPackageException, IOException, IngestException,
           NotFoundException, UnauthorizedException;
@@ -465,8 +470,13 @@ public interface IngestService extends JobProducer {
    * @throws NotFoundException
    *           if either one of the workflow definition or workflow instance was not found
    * @throws UnauthorizedException
-   *           if the current user does not have read permissions on the workflow instance's mediapackage.
+   *           if the current user does not have {@link org.opencastproject.security.api.Permissions.Action#READ} on the
+   *           workflow instance's mediapackage.
+   *
+   * @deprecated As of release 2.4, the scheduler service is able to store a mediapackage. Thereby the concept of the
+   *             pre-procesing workflow is obsolete and there is no more need to resume such a workflow by this method.
    */
+  @Deprecated
   WorkflowInstance ingest(MediaPackage mediaPackage, String workflowDefinitionID, Map<String, String> properties,
           Long workflowId) throws IllegalStateException, IngestException, NotFoundException, UnauthorizedException;
 

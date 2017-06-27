@@ -23,7 +23,6 @@ package org.opencastproject.capture.admin.api;
 
 import org.opencastproject.util.NotFoundException;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -131,54 +130,5 @@ public interface CaptureAgentStateService {
    * @return One of the constants defined in this class
    */
   boolean setAgentConfiguration(String agentName, Properties capabilities);
-
-  /**
-   * Gets the state of a recording, if it exists.
-   *
-   * @param id
-   *          The id of the recording.
-   * @return The state of the recording, or null if it does not exist. This should be defined from
-   *         {@link org.opencastproject.capture.admin.api.RecordingState}.
-   * @see RecordingState
-   * @throws NotFoundException
-   *           if the recording with the given id has not been found
-   */
-  Recording getRecordingState(String id) throws NotFoundException;
-
-  /**
-   * Updates the state of a recording with the given state, if it exists.
-   *
-   * @param id
-   *          The id of the recording in the system.
-   * @param state
-   *          The state to set for that recording. This should be defined from
-   *          {@link org.opencastproject.capture.admin.api.RecordingState}.
-   * @see RecordingState
-   */
-  boolean setRecordingState(String id, String state);
-
-  /**
-   * Removes a recording from the system, if the recording exists.
-   *
-   * @param id
-   *          The id of the recording to remove.
-   * @throws NotFoundException
-   *           if the recording with the given id has not been found
-   */
-  void removeRecording(String id) throws NotFoundException;
-
-  /**
-   * Gets the state of all recordings in the system.
-   *
-   * @return A map of recording-state pairs.
-   */
-  Map<String, Recording> getKnownRecordings();
-
-  /**
-   * Gets a Set of ids of all known recordings.
-   *
-   * @return recording ids
-   */
-  List<String> getKnownRecordingsIds();
 
 }

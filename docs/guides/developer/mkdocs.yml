@@ -38,6 +38,7 @@ pages:
 - Packaging: 'packaging.md'
 - Proposal Log: 'proposal-log.md'
 - Asset Manager: 'asset-manager.md'
+- Scheduler: 'scheduler.md'
 - Modules:
    - Overview: 'modules/index.md'
    - Admin UI:

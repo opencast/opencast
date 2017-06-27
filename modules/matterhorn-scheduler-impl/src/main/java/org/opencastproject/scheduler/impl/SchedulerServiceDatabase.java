@@ -21,375 +21,175 @@
 
 package org.opencastproject.scheduler.impl;
 
-import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
-import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.scheduler.api.Blacklist;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Tuple;
 
 import java.util.Date;
-import java.util.Properties;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Permanent storage for events. Each event consist of {@link DublinCoreCatalog} and optionally capture agent
- * Properties. Does not support searching.
- *
+ * Permanent storage for events. Does not support searching.
  */
 public interface SchedulerServiceDatabase {
 
   /**
-   * Removes event from persistent storage.
+   * Touches the most recent entry by updating its last modification date.
    *
-   * @param eventId
+   * @param agentId
+   *          the capture agent identifier
+   * @throws SchedulerServiceDatabaseException
+   *           if updating of the last modified value fails
+   */
+  void touchLastEntry(String agentId) throws SchedulerServiceDatabaseException;
+
+  /**
+   * Get the last modification date by an agent identifier
+   *
+   * @param agentId
+   *          the capture agent identifier
+   * @return the last modification date
+   * @throws NotFoundException
+   *           if the agent could not be found
+   * @throws SchedulerServiceDatabaseException
+   *           if exception occurred
+   */
+  Date getLastModified(String agentId) throws NotFoundException, SchedulerServiceDatabaseException;
+
+  /**
+   * Get a {@link Map} of last modification dates of all existing capture agents.
+   *
+   * @return the last modified map
+   * @throws SchedulerServiceDatabaseException
+   *           if exception occurred
+   */
+  Map<String, Date> getLastModifiedDates() throws SchedulerServiceDatabaseException;
+
+  /**
+   * Get a {@link List} of active transaction identifiers.
+   *
+   * @return a list of active transaction identifiers
+   * @throws SchedulerServiceDatabaseException
+   *           if exception occurred
+   */
+  List<String> getTransactions() throws SchedulerServiceDatabaseException;
+
+  /**
+   * Get the transaction identifier by the source
+   *
+   * @param source
+   *          the source
+   * @return the transaction identifier
+   * @throws NotFoundException
+   *           if the transaction could not be found
+   * @throws SchedulerServiceDatabaseException
+   *           if exception occurred
+   */
+  String getTransactionId(String source) throws NotFoundException, SchedulerServiceDatabaseException;
+
+  /**
+   * Get the transaction source by the identifier
+   *
+   * @param id
+   *          the transaction identifier
+   * @return the source
+   * @throws NotFoundException
+   *           if the transaction could not be found
+   * @throws SchedulerServiceDatabaseException
+   *           if exception occurred
+   */
+  String getTransactionSource(String id) throws NotFoundException, SchedulerServiceDatabaseException;
+
+  /**
+   * Get the transaction last modified date by the transaction identifier
+   *
+   * @param id
+   *          the transaction identifier
+   * @return the transaction last modified date
+   * @throws NotFoundException
+   *           if the transaction could not be found
+   * @throws SchedulerServiceDatabaseException
+   *           if exception occurred
+   */
+  Date getTransactionLastModified(String id) throws NotFoundException, SchedulerServiceDatabaseException;
+
+  /**
+   * Returns whether the source has an active transaction or not
+   *
+   * @param source
+   *          the source
+   * @return whether the source has an active transaction <code>true</code> or not <code>false</code>
+   */
+  boolean hasTransaction(String source) throws SchedulerServiceDatabaseException;
+
+  /**
+   * Stores the given transaction
+   *
+   * @param id
+   *          the transaction identifier
+   * @param source
+   *          the transaction source
+   * @throws SchedulerServiceDatabaseException
+   *           if exception occurred
+   */
+  void storeTransaction(String id, String source) throws SchedulerServiceDatabaseException;
+
+  /**
+   * Delete the transaction by the given identifier
+   *
+   * @param id
+   *          the transaction identifier
+   * @throws NotFoundException
+   *           if the transaction could not be found
+   * @throws SchedulerServiceDatabaseException
+   *           if exception occurred
+   */
+  void deleteTransaction(String id) throws NotFoundException, SchedulerServiceDatabaseException;
+
+  /**
+   * Removes the extended event from persistent storage.
+   *
+   * @param mediapackageId
    *          ID of event to be removed
    * @throws NotFoundException
    *           if there is no element with specified ID
    * @throws SchedulerServiceDatabaseException
    *           if exception occurred
    */
-  void deleteEvent(long eventId) throws NotFoundException, SchedulerServiceDatabaseException;
+  void deleteEvent(String mediapackageId) throws NotFoundException, SchedulerServiceDatabaseException;
+
+  // TODO
+  List<Tuple<String, Boolean>> updateBlacklist(Blacklist blacklist) throws SchedulerServiceDatabaseException;
 
   /**
-   * Count the number of events currently in the database.
+   * Returns the blacklist status of the agent with the given ID
    *
-   * @return The number of events in the database.
-   * @throws SchedulerServiceDatabaseException
-   */
-  int countEvents() throws SchedulerServiceDatabaseException;
-
-  /**
-   * Returns all events in persistent storage.
-   *
-   * @return {@link DublinCoreCatalog} array representing events
-   * @throws SchedulerServiceDatabaseException
-   */
-  DublinCoreCatalog[] getAllEvents() throws SchedulerServiceDatabaseException;
-
-  /**
-   * Returns CA metadata associated with specified event
-   *
-   * @param eventId
-   *          event of which metadata should be returned
-   * @return metadata as properties
-   * @throws NotFoundException
-   *           if event with given ID does not exist
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  Properties getEventMetadata(long eventId) throws NotFoundException, SchedulerServiceDatabaseException;
-
-  /**
-   * Store event(s).
-   *
-   * @param event
-   *          {@link DublinCoreCatalog} representing event
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  void storeEvents(DublinCoreCatalog... event) throws SchedulerServiceDatabaseException;
-
-  /**
-   * Updates event.
-   *
-   * @param event
-   *          {@link DublinCoreCatalog} representing event to be updated
-   * @throws NotFoundException
-   *           if there is no previous event with the same ID
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  void updateEvent(DublinCoreCatalog event) throws NotFoundException, SchedulerServiceDatabaseException;
-
-  /**
-   * Adds metadata to events. Event must already be created, otherwise not found exception will be fired.
-   *
-   * @param eventId
-   *          ID of events for which metadata will be added
-   * @param caProperties
-   *          Capture Agent properties to be added to metadata
-   * @throws NotFoundException
-   *           if there is no event with specified ID
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  void updateEventWithMetadata(long eventId, Properties caProperties) throws NotFoundException,
-          SchedulerServiceDatabaseException;
-
-  /**
-   * Update the event access control list
-   *
-   * @param eventId
-   *          ID of events for which access control list will be updated
-   * @param accessControlList
-   *          the access control list
-   * @throws NotFoundException
-   *           if there is no event with specified ID
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  void updateEventAccessControlList(long eventId, AccessControlList accessControlList) throws NotFoundException,
-          SchedulerServiceDatabaseException;
-
-  /**
-   * Update the event mediapackage identifier
-   *
-   * @param eventId
-   *          ID of event for which the mediapackage will be updated
-   * @param mediaPackageId
-   *          the mediapackage ID to update
-   * @throws NotFoundException
-   *           if there is no event with the same ID
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  void updateEventMediaPackageId(long eventId, String mediaPackageId) throws NotFoundException,
-          SchedulerServiceDatabaseException;
-
-  /**
-   * Returns the access control list of the event with the id
-   *
-   * @param eventId
-   *          the event ID
-   * @return the access control list
-   * @throws NotFoundException
-   *           if there is no event with the same ID
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  AccessControlList getAccessControlList(long eventId) throws NotFoundException, SchedulerServiceDatabaseException;
-
-  /**
-   * Returns the mediapackage of the event with the id
-   *
-   * @param eventId
-   *          the event ID
-   * @return the mediapackage identifier
-   * @throws NotFoundException
-   *           if there is no event with the same ID
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  String getMediaPackageId(long eventId) throws NotFoundException, SchedulerServiceDatabaseException;
-
-  /**
-   * Returns the event identifier of the event with the given mediapackage id
-   *
-   * @param mediaPackageId
-   *          the event's mediapackage id
-   * @return the event identifier
-   * @throws NotFoundException
-   *           if there is no event with the given mediapackage id
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  Long getEventId(String mediaPackageId) throws NotFoundException, SchedulerServiceDatabaseException;
-
-  /**
-   * Returns the opt out status of an event with the given mediapackage id
-   *
-   * @param mediapackageId
-   *          the mediapackage id
-   * @return the opt out status
-   * @throws NotFoundException
-   *           if there is no event with specified mediapackage ID
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  boolean isOptOut(String mediapackageId) throws NotFoundException, SchedulerServiceDatabaseException;
-
-  /**
-   * Returns the opt out status of an event with the given event id
-   *
-   * @param eventId
-   *          the event's id
-   * @return the opt out status
-   * @throws NotFoundException
-   *           if there is no event with specified event ID
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  boolean isOptOut(Long eventId) throws NotFoundException, SchedulerServiceDatabaseException;
-
-  /**
-   * Update the event opted out status
-   *
-   * @param mediapackageId
-   *          ID of events mediapackage for which the opted out status will be updated
-   * @param optOut
-   *          the opted out status
-   * @throws NotFoundException
-   *           if there is no previous event with the same ID
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  void updateEventOptOutStatus(String mediapackageId, boolean optOut) throws NotFoundException,
-          SchedulerServiceDatabaseException;
-
-  /**
-   * Update the event blacklist status
-   *
-   * @param eventId
-   *          ID of event for which the blacklist status will be updated
-   * @param blacklisted
-   *          the blacklist status
-   * @throws NotFoundException
-   *           if there is no previous event with the same ID
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  void updateEventOptOutStatus(Long eventId, boolean blacklisted) throws NotFoundException,
-          SchedulerServiceDatabaseException;
-
-  /**
-   * Returns the review status of an event with the given mediapackage id
-   *
-   * @param mediapackageId
-   *          the mediapackage id
-   * @return the review status
-   * @throws NotFoundException
-   *           if there is no event with specified mediapackage ID
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  ReviewStatus getReviewStatus(String mediapackageId) throws NotFoundException, SchedulerServiceDatabaseException;
-
-  /**
-   * Returns the review date of an event with the given mediapackage id
-   *
-   * @param mediapackageId
-   *          the mediapackage id
-   * @return the review date
-   * @throws NotFoundException
-   *           if there is no event with specified mediapackage ID
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  Date getReviewDate(String mediapackageId) throws NotFoundException, SchedulerServiceDatabaseException;
-
-  /**
-   * Update the event review status
-   *
-   * @param mediapackageId
-   *          ID of events mediapackage for which the review status will be updated
-   * @param reviewStatus
-   *          the review status
-   * @param modificationDate
-   *          the modification date
-   * @throws NotFoundException
-   *           if there is no previous event with the same ID
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  void updateEventReviewStatus(String mediapackageId, ReviewStatus reviewStatus, Date modificationDate)
-          throws NotFoundException, SchedulerServiceDatabaseException;
-
-  /**
-   * Returns the blacklist status of an event with the given mediapackage id
-   *
-   * @param mediapackageId
-   *          the mediapackage id
+   * @param agentId
+   *          the agent identifier
+   * @param start
+   *          the start date
+   * @param end
+   *          the end date
    * @return the blacklist status
-   * @throws NotFoundException
-   *           if there is no event with specified mediapackage ID
    * @throws SchedulerServiceDatabaseException
    *           if exception occurred
    */
-  boolean isBlacklisted(String mediapackageId) throws NotFoundException, SchedulerServiceDatabaseException;
+  boolean isBlacklisted(String agentId, Date start, Date end) throws SchedulerServiceDatabaseException;
 
   /**
-   * Returns the blacklist status of an event with the given id
+   * Returns the blacklist status of the given presenters
    *
-   * @param eventId
-   *          the event's id
+   * @param presenters
+   *          the list of presenters
+   * @param start
+   *          the start date
+   * @param end
+   *          the end date
    * @return the blacklist status
-   * @throws NotFoundException
-   *           if there is no event with specified event ID
    * @throws SchedulerServiceDatabaseException
    *           if exception occurred
    */
-  boolean isBlacklisted(Long eventId) throws NotFoundException, SchedulerServiceDatabaseException;
-
-  /**
-   * Update the event blacklist status
-   *
-   * @param mediapackageId
-   *          ID of events mediapackage for which the blacklist status will be updated
-   * @param blacklisted
-   *          the blacklist status
-   * @throws NotFoundException
-   *           if there is no previous event with the same ID
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  void updateEventBlacklistStatus(String mediapackageId, boolean blacklisted) throws NotFoundException,
-          SchedulerServiceDatabaseException;
-
-  /**
-   * Update the event blacklist status
-   *
-   * @param eventId
-   *          ID of event for which the blacklist status will be updated
-   * @param blacklisted
-   *          the blacklist status
-   * @throws NotFoundException
-   *           if there is no previous event with the same ID
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  void updateEventBlacklistStatus(Long eventId, boolean blacklisted) throws NotFoundException,
-          SchedulerServiceDatabaseException;
-
-  /**
-   * Returns the count of reviewed events
-   *
-   * @return the number of reviewd events
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  long countTotalResponses() throws SchedulerServiceDatabaseException;
-
-  /**
-   * Returns the count of confirmed events
-   *
-   * @return the number of confirmed events
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  long countConfirmedResponses() throws SchedulerServiceDatabaseException;
-
-  /**
-   * Returns the quarter count of confirmed events
-   *
-   * @return the querter number of confirmed events
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  long countQuarterConfirmedResponses() throws SchedulerServiceDatabaseException;
-
-  /**
-   * Returns the daily count of confirmed events
-   *
-   * @return the daily number of confirmed events
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  long countDailyConfirmedResponses() throws SchedulerServiceDatabaseException;
-
-  /**
-   * Returns the count of unconfirmed events
-   *
-   * @return the number of unconfirmed events
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  long countUnconfirmedResponses() throws SchedulerServiceDatabaseException;
-
-  /**
-   * Returns the count of opted out events
-   *
-   * @return the number of opted out events
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  long countOptedOutResponses() throws SchedulerServiceDatabaseException;
+  boolean isBlacklisted(List<String> presenters, Date start, Date end) throws SchedulerServiceDatabaseException;
 
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  name="org.opencastproject.scheduler.conflict.handler.DefaultSchedulerConflictHandler" immediate="true">
+  <implementation class="org.opencastproject.scheduler.conflict.handler.DefaultSchedulerConflictHandler" />
+  <property name="service.description" value="Default Scheduler Conflict Handler" />
+  <service>
+    <provide interface="org.osgi.service.cm.ManagedService" />
+    <provide interface="org.opencastproject.scheduler.api.ConflictHandler" />
+  </service>
+</scr:component>

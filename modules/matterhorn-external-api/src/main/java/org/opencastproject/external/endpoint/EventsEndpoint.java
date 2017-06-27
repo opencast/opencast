@@ -324,51 +324,50 @@ public class EventsEndpoint implements ManagedService {
     ArrayList<TrackImpl> tracks = new ArrayList<>();
 
     for (final Event event : indexService.getEvent(id, externalIndex)) {
-      for (final MediaPackage mp : indexService.getEventMediapackage(event)) {
-        for (Track track : mp.getTracks()) {
-          if (track instanceof TrackImpl) {
-            tracks.add((TrackImpl) track);
-          }
+      final MediaPackage mp = indexService.getEventMediapackage(event);
+      for (Track track : mp.getTracks()) {
+        if (track instanceof TrackImpl) {
+          tracks.add((TrackImpl) track);
         }
-
-        List<JValue> tracksJson = new ArrayList<>();
-        for (Track track : tracks) {
-          List<Field> fields = new ArrayList<>();
-          if (track.getChecksum() != null)
-            fields.add(f("checksum", v(track.getChecksum().toString())));
-          if (track.getDescription() != null)
-            fields.add(f("description", v(track.getDescription())));
-          if (track.getDuration() != null)
-            fields.add(f("duration", v(track.getDuration())));
-          if (track.getElementDescription() != null)
-            fields.add(f("element-description", v(track.getElementDescription())));
-          if (track.getFlavor() != null)
-            fields.add(f("flavor", v(track.getFlavor().toString())));
-          if (track.getIdentifier() != null)
-            fields.add(f("identifier", v(track.getIdentifier())));
-          if (track.getMimeType() != null)
-            fields.add(f("identifier", v(track.getMimeType().toString())));
-          fields.add(f("size", v(track.getSize())));
-          if (track.getStreams() != null) {
-            List<Field> streams = new ArrayList<>();
-            for (Stream stream : track.getStreams()) {
-              streams.add(f(stream.getIdentifier(), getJsonStream(stream)));
-            }
-            fields.add(f("streams", obj(streams)));
-          }
-          if (track.getTags() != null) {
-            List<JValue> tags = new ArrayList<>();
-            for (String tag : track.getTags()) {
-              tags.add(v(tag));
-            }
-            fields.add(f("tags", arr(tags)));
-          }
-          if (track.getURI() != null)
-            fields.add(f("uri", v(track.getURI().toString())));
-          tracksJson.add(obj(fields));
-        }
-        return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(tracksJson));
       }
+
+      List<JValue> tracksJson = new ArrayList<>();
+      for (Track track : tracks) {
+        List<Field> fields = new ArrayList<>();
+        if (track.getChecksum() != null)
+          fields.add(f("checksum", v(track.getChecksum().toString())));
+        if (track.getDescription() != null)
+          fields.add(f("description", v(track.getDescription())));
+        if (track.getDuration() != null)
+          fields.add(f("duration", v(track.getDuration())));
+        if (track.getElementDescription() != null)
+          fields.add(f("element-description", v(track.getElementDescription())));
+        if (track.getFlavor() != null)
+          fields.add(f("flavor", v(track.getFlavor().toString())));
+        if (track.getIdentifier() != null)
+          fields.add(f("identifier", v(track.getIdentifier())));
+        if (track.getMimeType() != null)
+          fields.add(f("identifier", v(track.getMimeType().toString())));
+        fields.add(f("size", v(track.getSize())));
+        if (track.getStreams() != null) {
+          List<Field> streams = new ArrayList<>();
+          for (Stream stream : track.getStreams()) {
+            streams.add(f(stream.getIdentifier(), getJsonStream(stream)));
+          }
+          fields.add(f("streams", obj(streams)));
+        }
+        if (track.getTags() != null) {
+          List<JValue> tags = new ArrayList<>();
+          for (String tag : track.getTags()) {
+            tags.add(v(tag));
+          }
+          fields.add(f("tags", arr(tags)));
+        }
+        if (track.getURI() != null)
+          fields.add(f("uri", v(track.getURI().toString())));
+        tracksJson.add(obj(fields));
+      }
+      return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(tracksJson));
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
   }
@@ -933,11 +932,11 @@ public class EventsEndpoint implements ManagedService {
     MetadataList metadataList = new MetadataList();
     List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
     catalogUIAdapters.remove(this.eventCatalogUIAdapter);
-    Opt<MediaPackage> optMediaPackage = indexService.getEventMediapackage(event);
-    if (catalogUIAdapters.size() > 0 && optMediaPackage.isSome()) {
+    MediaPackage mediaPackage = indexService.getEventMediapackage(event);
+    if (catalogUIAdapters.size() > 0) {
       for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
         // TODO: This is very slow:
-        metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(optMediaPackage.get()));
+        metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
       }
     }
     // TODO: This is slow:
@@ -977,11 +976,11 @@ public class EventsEndpoint implements ManagedService {
       // Try the other catalogs
       List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
       catalogUIAdapters.remove(eventCatalogUIAdapter);
-      Opt<MediaPackage> optMediaPackage = indexService.getEventMediapackage(event);
-      if (catalogUIAdapters.size() > 0 && optMediaPackage.isSome()) {
+      MediaPackage mediaPackage = indexService.getEventMediapackage(event);
+      if (catalogUIAdapters.size() > 0) {
         for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
           if (flavor.get().equals(catalogUIAdapter.getFlavor())) {
-            MetadataCollection fields = catalogUIAdapter.getFields(optMediaPackage.get());
+            MetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
             ExternalMetadataUtils.removeCollectionList(fields);
             return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, fields.toJSON());
           }
@@ -1045,14 +1044,14 @@ public class EventsEndpoint implements ManagedService {
       // Try the other catalogs
       List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
       catalogUIAdapters.remove(eventCatalogUIAdapter);
-      Opt<MediaPackage> optMediaPackage = indexService.getEventMediapackage(event);
-      if (catalogUIAdapters.size() > 0 && optMediaPackage.isSome()) {
+      MediaPackage mediaPackage = indexService.getEventMediapackage(event);
+      if (catalogUIAdapters.size() > 0) {
         for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
           if (flavor.get().equals(catalogUIAdapter.getFlavor())) {
-            collection = catalogUIAdapter.getFields(optMediaPackage.get());
+            collection = catalogUIAdapter.getFields(mediaPackage);
             adapter = eventCatalogUIAdapter;
           } else {
-            metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(optMediaPackage.get()));
+            metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
           }
         }
       }

@@ -21,17 +21,12 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-asset-manager-api</artifactId>
+      <artifactId>matterhorn-scheduler-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-search-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-search-service-impl</artifactId>
+      <artifactId>matterhorn-series-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -62,6 +57,24 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.mchange</groupId>
+      <artifactId>c3p0</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.mchange</groupId>
+      <artifactId>mchange-commons-java</artifactId>
+      <version>0.2.11</version>
+    </dependency>
+    <dependency>
+      <groupId>com.typesafe</groupId>
+      <artifactId>config</artifactId>
+      <version>1.2.1</version>
+    </dependency>
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -88,6 +101,11 @@
       <artifactId>easymock</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -102,8 +120,22 @@
             <Export-Package>
               org.opencastproject.migration;version=${project.version}
             </Export-Package>
+            <Import-Package>
+              !com.vividsolutions.jts.*,
+              !org.apache.lucene.*,
+              !org.jboss.resource.adapter.jdbc.*,
+              !org.hibernate.*,
+              org.w3c.dom;version=0,
+              *;resolution:=optional
+            </Import-Package>
+            <Embed-Dependency>
+              c3p0;inline=true,
+              config;inline=true,
+              mchange-commons-java;inline=true,
+              mysql-connector-java;inline=true
+            </Embed-Dependency>
             <Service-Component>
-              OSGI-INF/distribution-migration-service.xml
+              OSGI-INF/scheduler-migration-service.xml
             </Service-Component>
           </instructions>
         </configuration>

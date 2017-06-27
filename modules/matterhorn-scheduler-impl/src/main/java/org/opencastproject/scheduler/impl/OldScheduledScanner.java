@@ -28,6 +28,7 @@ import org.opencastproject.kernel.scanner.AbstractScanner;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NeedleEye;
 import org.opencastproject.util.data.Effect0;
 
@@ -51,7 +52,6 @@ public class OldScheduledScanner extends AbstractBufferScanner implements Manage
 
   /** Reference to the scheduler service. */
   private SchedulerService service;
-
 
   public OldScheduledScanner() {
     try {
@@ -111,7 +111,6 @@ public class OldScheduledScanner extends AbstractBufferScanner implements Manage
     return TRIGGER_NAME;
   }
 
-
   @Override
   public String getScannerName() {
     return SCANNER_NAME;
@@ -121,6 +120,8 @@ public class OldScheduledScanner extends AbstractBufferScanner implements Manage
   public void scan() {
     try {
       service.removeScheduledRecordingsBeforeBuffer(getBuffer());
+    } catch (UnauthorizedException e) {
+      logger.error("Unable to scan for finished recordings, not authorized: ", e);
     } catch (SchedulerException e) {
       logger.error("Unable to scan for finished recordings: ", e);
     }
