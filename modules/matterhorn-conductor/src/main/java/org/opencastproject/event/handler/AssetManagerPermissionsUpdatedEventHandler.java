@@ -159,7 +159,6 @@ public class AssetManagerPermissionsUpdatedEventHandler {
         final String orgId = snapshot.getOrganizationId();
         final Organization organization = organizationDirectoryService.getOrganization(orgId);
         if (organization == null) {
-          logger.warn("Skipping update of episode {} since organization {} is unkown", snapshot.getMediaPackage().getIdentifier(), orgId);
           logger.warn("Skipping update of episode {} since organization {} is unkown",
                   snapshot.getMediaPackage().getIdentifier(), orgId);
           continue;
