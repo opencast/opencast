@@ -23,6 +23,7 @@ package org.opencastproject.ingest.endpoint;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 
+import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.ingest.impl.IngestServiceImpl;
 import org.opencastproject.job.api.JobProducer;
@@ -41,7 +42,10 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
+import org.opencastproject.scheduler.api.SchedulerException;
+import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.TrustedHttpClient;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UploadJob;
@@ -148,6 +152,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           "provenance", "publisher", "references", "relation", "replaces", "requires", "rights", "rightsHolder",
           "source", "spatial", "subject", "tableOfContents", "temporal", "title", "type", "valid");
 
+  private SchedulerService schedulerService = null;
   private MediaPackageBuilderFactory factory = null;
   private IngestService ingestService;
   private ServiceRegistry serviceRegistry;
@@ -1089,6 +1094,58 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @POST
+  @Path("schedule/{wdID}")
+  @RestQuery(name = "schedule", description = "Schedule an event based on the given media package",
+          pathParameters = {
+          @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) },
+          restParameters = {
+          @RestParameter(description = "The media package", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) },
+          reponses = {
+          @RestResponse(description = "Event scheduled", responseCode = HttpServletResponse.SC_CREATED),
+          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) },
+          returnDescription = "")
+  public Response schedule(@PathParam("wdID") String wdID, MultivaluedMap<String, String> formData) {
+    if (StringUtils.isBlank(wdID)) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    Map<String, String> wfConfig = getWorkflowConfig(formData);
+    wfConfig.put(WORKFLOW_DEFINITION_ID_PARAM, wdID);
+
+    String mediaPackageXml = formData.getFirst("mediaPackage");
+    if (StringUtils.isBlank(mediaPackageXml)) {
+      logger.debug("Rejected schedule without media package");
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+
+    MediaPackage mp = null;
+    try {
+      mp = factory.newMediaPackageBuilder().loadFromXml(mediaPackageXml);
+      if (MediaPackageSupport.sanityCheck(mp).isSome()) {
+        throw new MediaPackageException("Insane media package");
+      }
+    } catch (MediaPackageException e) {
+      logger.debug("Rejected ingest with invalid media package {}", mp);
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+
+    MediaPackageElement[] mediaPackageElements = mp.getElementsByFlavor(MediaPackageElements.EPISODE);
+    if (mediaPackageElements.length != 1) {
+      logger.debug("There can be only one (and exactly one) episode dublin core catalog: https://youtu.be/_J3VeogFUOs");
+      return Response.status(Status.BAD_REQUEST).build();
+    }
+
+    try {
+      ingestService.schedule(mp, wdID, wfConfig);
+      return Response.status(Status.CREATED).build();
+    } catch (IngestException e) {
+      return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+    } catch (NotFoundException | UnauthorizedException | SchedulerException e) {
+      return Response.serverError().build();
     }
   }
 

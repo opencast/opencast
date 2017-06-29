@@ -695,6 +695,7 @@ public class SchedulerRestService {
     return Response.ok().build();
   }
 
+
   /**
    * Creates new event based on parameters. All times and dates are in milliseconds.
    */
@@ -828,12 +829,23 @@ public class SchedulerRestService {
     if (StringUtils.isBlank(origin))
       origin = SchedulerService.ORIGIN;
 
+    if (startTime != null) {
+      if (startTime < 0) {
+        logger.debug("Cannot add event with negative start time ({} < 0)", startTime);
+        return RestUtil.R.badRequest("Cannot add event with negative start time");
+      }
+      if (endTime != null && endTime <= startTime) {
+        logger.debug("Cannot add event without proper end time ({} <= {})", startTime, endTime);
+        return RestUtil.R.badRequest("Cannot add event without proper end time");
+      }
+    }
+
     MediaPackage mediaPackage = null;
     if (StringUtils.isNotBlank(mediaPackageXml)) {
       try {
         mediaPackage = MediaPackageParser.getFromXml(mediaPackageXml);
       } catch (Exception e) {
-        logger.info("Could not parse media package: {}", e);
+        logger.debug("Could not parse media packagey", e);
         return Response.status(Status.BAD_REQUEST).build();
       }
     }
@@ -845,7 +857,7 @@ public class SchedulerRestService {
         caProperties = new HashMap<>();
         caProperties.putAll((Map) prop);
       } catch (Exception e) {
-        logger.info("Could not parse capture agent properties: {}", agentParameters);
+        logger.debug("Could not parse capture agent properties: {}", agentParameters, e);
         return Response.status(Status.BAD_REQUEST).build();
       }
     }
@@ -857,40 +869,41 @@ public class SchedulerRestService {
         wfProperties = new HashMap<>();
         wfProperties.putAll((Map) prop);
       } catch (IOException e) {
-        logger.info("Could not parse workflow configuration properties: {}", workflowProperties);
+        logger.debug("Could not parse workflow configuration properties: {}", workflowProperties, e);
         return Response.status(Status.BAD_REQUEST).build();
       }
     }
 
     Set<String> userIds = null;
     String[] ids = StringUtils.split(StringUtils.trimToNull(users), ",");
-    if (ids != null)
+    if (ids != null) {
       userIds = new HashSet<>(Arrays.asList(ids));
+    }
 
     Date startDate = null;
-    if (startTime != null)
+    if (startTime != null) {
       startDate = new DateTime(startTime).toDateTime(DateTimeZone.UTC).toDate();
+    }
 
     Date endDate = null;
-    if (endTime != null)
+    if (endTime != null) {
       endDate = new DateTime(endTime).toDateTime(DateTimeZone.UTC).toDate();
+    }
 
     final Opt<Opt<Boolean>> optOut;
     if (updateOptOut) {
       optOut = Opt.some(Opt.nul(optOutBoolean));
     } else {
-      optOut = Opt.<Opt<Boolean>> none();
+      optOut = Opt.none();
     }
     try {
       service.updateEvent(eventID, Opt.nul(startDate), Opt.nul(endDate), Opt.nul(StringUtils.trimToNull(agentId)),
               Opt.nul(userIds), Opt.nul(mediaPackage), Opt.nul(wfProperties), Opt.nul(caProperties), optOut, origin);
       return Response.ok().build();
-    } catch (SchedulerTransactionLockException e) {
-      return Response.status(Status.CONFLICT).entity(generateErrorResponse(e)).type(MediaType.APPLICATION_JSON).build();
-    } catch (SchedulerConflictException e) {
+    } catch (SchedulerTransactionLockException | SchedulerConflictException e) {
       return Response.status(Status.CONFLICT).entity(generateErrorResponse(e)).type(MediaType.APPLICATION_JSON).build();
     } catch (SchedulerException e) {
-      logger.warn("Error updating event with id '{}': {}", eventID, getMessage(e));
+      logger.warn("Error updating event with id '{}'", eventID, e);
       return Response.status(Status.FORBIDDEN).build();
     } catch (NotFoundException e) {
       logger.info("Event with id '{}' does not exist.", eventID);
@@ -898,8 +911,8 @@ public class SchedulerRestService {
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to update event with id '{}': {}", eventID, e);
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+      logger.error("Unable to update event with id '{}'", eventID, e);
+      return Response.serverError().build();
     }
   }
 

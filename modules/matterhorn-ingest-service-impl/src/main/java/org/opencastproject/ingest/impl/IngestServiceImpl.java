@@ -35,6 +35,7 @@ import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
+import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -48,9 +49,12 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.identifier.HandleException;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
+import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.metadata.dublincore.DublinCoreValue;
+import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AccessControlEntry;
@@ -1179,6 +1183,82 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     } catch (WorkflowException e) {
       ingestStatistics.failed();
       throw new IngestException(e);
+    }
+  }
+
+  @Override
+  public void schedule(MediaPackage mediaPackage, String workflowDefinitionID, Map<String, String> properties)
+          throws IllegalStateException, IngestException, NotFoundException, UnauthorizedException, SchedulerException {
+    MediaPackageElement[] mediaPackageElements = mediaPackage.getElementsByFlavor(MediaPackageElements.EPISODE);
+    if (mediaPackageElements.length != 1) {
+      logger.debug("There can be only one (and exactly one) episode dublin core catalog: https://youtu.be/_J3VeogFUOs");
+      throw new IngestException("There can be only one (and exactly one) episode dublin core catalog");
+    }
+    InputStream inputStream;
+    DublinCoreCatalog dublinCoreCatalog;
+    try {
+      inputStream = workingFileRepository.get(mediaPackage.getIdentifier().toString(),
+              mediaPackageElements[0].getIdentifier());
+      dublinCoreCatalog = dublinCoreService.load(inputStream);
+    } catch (IOException e) {
+      throw new IngestException(e);
+    }
+
+    EName temporal = new EName(DublinCore.TERMS_NS_URI, "temporal");
+    List<DublinCoreValue> periods = dublinCoreCatalog.get(temporal);
+    if (periods.size() != 1) {
+      logger.debug("There can be only one (and exactly one) period");
+      throw new IngestException("There can be only one (and exactly one) period");
+    }
+    DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(periods.get(0));
+    if (!period.hasStart() || !period.hasEnd()) {
+      logger.debug("A scheduled recording needs to have a start and end.");
+      throw new IngestException("A scheduled recording needs to have a start and end.");
+    }
+    EName createdEName = new EName(DublinCore.TERMS_NS_URI, "created");
+    List<DublinCoreValue> created = dublinCoreCatalog.get(createdEName);
+    if (created.size() == 0) {
+      logger.debug("Created not set");
+    } else if (created.size() == 1) {
+      Date date = EncodingSchemeUtils.decodeMandatoryDate(created.get(0));
+      if (date.getTime() != period.getStart().getTime()) {
+        logger.debug("start and created date differ ({} vs {})", date.getTime(), period.getStart().getTime());
+        throw new IngestException("Temporal start and created date differ");
+      }
+    } else {
+      logger.debug("There can be only one created date");
+      throw new IngestException("There can be only one created date");
+    }
+    // spatial
+    EName spatial = new EName(DublinCore.TERMS_NS_URI, "spatial");
+    List<DublinCoreValue> captureAgents = dublinCoreCatalog.get(spatial);
+    if (captureAgents.size() != 1) {
+      logger.debug("Exactly one capture agent needs to be set");
+      throw new IngestException("Exactly one capture agent needs to be set");
+    }
+    String captureAgent = captureAgents.get(0).getValue();
+
+    // Go through properties
+    Map<String, String> agentProperties = new HashMap<>();
+    Map<String, String> workflowProperties = new HashMap<>();
+    for (String key: properties.keySet()) {
+      if (key.startsWith("org.opencastproject.workflow.config.")) {
+        workflowProperties.put(key, properties.get(key));
+      } else {
+        agentProperties.put(key, properties.get(key));
+      }
+    }
+    try {
+      schedulerService.addEvent(period.getStart(), period.getEnd(), captureAgent, new HashSet<>(), mediaPackage,
+              workflowProperties, agentProperties, Opt.none(), Opt.none(), "ingest-service");
+    } finally {
+      for (MediaPackageElement mediaPackageElement : mediaPackage.getElements()) {
+        try {
+          workingFileRepository.delete(mediaPackage.getIdentifier().toString(), mediaPackageElement.getIdentifier());
+        } catch (IOException e) {
+          logger.warn("Failed to delete media package element", e);
+        }
+      }
     }
   }
 
