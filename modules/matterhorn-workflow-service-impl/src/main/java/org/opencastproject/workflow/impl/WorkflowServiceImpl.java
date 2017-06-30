@@ -49,6 +49,7 @@ import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.message.broker.api.workflow.WorkflowItem;
 import org.opencastproject.metadata.api.MediaPackageMetadata;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
+import org.opencastproject.metadata.api.util.MediaPackageMetadataSupport;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AclScope;
@@ -1696,75 +1697,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     }
     for (MediaPackageMetadataService metadataService : metadataServices) {
       MediaPackageMetadata metadata = metadataService.getMetadata(mp);
-      if (metadata != null) {
-
-        // Series identifier
-        if (isNotBlank(metadata.getSeriesIdentifier())) {
-          mp.setSeries(metadata.getSeriesIdentifier());
-        }
-
-        // Series title
-        if (isNotBlank(metadata.getSeriesTitle())) {
-          mp.setSeriesTitle(metadata.getSeriesTitle());
-        }
-
-        // Episode title
-        if (isNotBlank(metadata.getTitle())) {
-          mp.setTitle(metadata.getTitle());
-        }
-
-        // Episode date
-        if (metadata.getDate() != null) {
-          mp.setDate(metadata.getDate());
-        }
-
-        // Episode subjects
-        if (metadata.getSubjects().length > 0) {
-          if (mp.getSubjects() != null) {
-            for (String subject : mp.getSubjects()) {
-              mp.removeSubject(subject);
-            }
-          }
-          for (String subject : metadata.getSubjects()) {
-            mp.addSubject(subject);
-          }
-        }
-
-        // Episode contributers
-        if (metadata.getContributors().length > 0) {
-          if (mp.getContributors() != null) {
-            for (String contributor : mp.getContributors()) {
-              mp.removeContributor(contributor);
-            }
-          }
-          for (String contributor : metadata.getContributors()) {
-            mp.addContributor(contributor);
-          }
-        }
-
-        // Episode creators
-        if (mp.getCreators().length == 0 && metadata.getCreators().length > 0) {
-          if (mp.getCreators() != null) {
-            for (String creator : mp.getCreators()) {
-              mp.removeCreator(creator);
-            }
-          }
-          for (String creator : metadata.getCreators()) {
-            mp.addCreator(creator);
-          }
-        }
-
-        // Episode license
-        if (isNotBlank(metadata.getLicense())) {
-          mp.setLicense(metadata.getLicense());
-        }
-
-        // Episode language
-        if (isNotBlank(metadata.getLanguage())) {
-          mp.setLanguage(metadata.getLanguage());
-        }
-
-      }
+      MediaPackageMetadataSupport.populateMediaPackageMetadata(mp, metadata);
     }
   }
 

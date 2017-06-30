@@ -33,15 +33,22 @@ import org.opencastproject.job.api.JobBarrier.Result;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.MediaPackageSupport;
+import org.opencastproject.mediapackage.Publication;
+import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.series.SeriesItem;
+import org.opencastproject.metadata.api.MediaPackageMetadata;
+import org.opencastproject.metadata.api.util.MediaPackageMetadataSupport;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
 import org.opencastproject.oaipmh.persistence.OaiPmhDatabaseException;
+import org.opencastproject.oaipmh.persistence.Query;
 import org.opencastproject.oaipmh.persistence.QueryBuilder;
 import org.opencastproject.oaipmh.persistence.SearchResult;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
@@ -64,6 +71,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OaiPmhUpdatedEventHandler {
 
@@ -321,4 +330,75 @@ public class OaiPmhUpdatedEventHandler {
     return true;
   }
 
+  public void handleEvent(AssetManagerItem.TakeSnapshot snapshotItem) {
+    //An episode or its' ACL has been updated. Construct the MediaPackage and publish it to OAI-PMH.
+    logger.debug("Handling {}", snapshotItem);
+
+    // The MediaPackage has all changed elements (including dublin core). However, its' meta data is not updated, yet.
+    final MediaPackage mp = (MediaPackage) snapshotItem.getMediapackage().clone();
+
+    // We must be an administrative user to make a query to the OaiPmhPublicationService
+    final User prevUser = securityService.getUser();
+    final Organization prevOrg = securityService.getOrganization();
+
+    try {
+      securityService.setUser(SecurityUtil.createSystemUser(systemAccount, prevOrg));
+      Query query = QueryBuilder.query().mediaPackageId(snapshotItem.getMediapackage()).build();
+      SearchResult result = oaiPmhPersistence.search(query);
+      if (result.getItems().size() != 1) {
+        logger.info("Unexpected number of items: {}", result.getItems().size());
+        return;
+      }
+
+      SearchResultItem item = result.getItems().get(0);
+
+      // distribute all changed elements of mp.
+      List<MediaPackageElement> distributedElements = new ArrayList<>();
+      for (MediaPackageElement mpe : mp.elements()) {
+        if (mpe instanceof Publication) {
+          continue;
+        }
+        Job distributionJob = distributionService.distribute(PUBLICATION_CHANNEL_PREFIX.concat(item.getRepository()),
+            mp, mpe.getIdentifier());
+        JobBarrier barrier = new JobBarrier(null, serviceRegistry, distributionJob);
+        Result jobResult = barrier.waitForJobs();
+        if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
+          distributedElements.add(getFromXml(serviceRegistry.getJob(distributionJob.getId()).getPayload()));
+        } else {
+          logger.error("Unable to distribute media package element {}", mpe.getIdentifier());
+        }
+      }
+
+      // We have to update all the elements after they are distributed, since the URLs were updated.
+      for (MediaPackageElement mpe : distributedElements) {
+        MediaPackageSupport.updateElement(mp, mpe);
+      }
+
+      // We now apply the new meta data to mp
+      final MediaPackageMetadata metadata = dublinCoreService.getMetadata(snapshotItem.getMediapackage());
+      MediaPackageMetadataSupport.populateMediaPackageMetadata(mp, metadata);
+
+      // item contains the old MediaPackage with all elements. Since unchanged elements are missing in mp, we have to
+      // merge the two media packages.
+      MediaPackage oldMp = item.getMediaPackage();
+
+      // Merge old, unchanged elements
+      MediaPackageSupport.merge(mp, oldMp, MediaPackageSupport.MergeMode.Skip);
+
+      // Does the media package have a title and track?
+      if (!MediaPackageSupport.isPublishable(mp)) {
+        logger.info("Media package does not meet criteria for publication");
+        return;
+      }
+
+      // Update the OAI-PMH persistence with the updated mediapackage
+      oaiPmhPersistence.store(mp, item.getRepository());
+    } catch (DistributionException | MediaPackageException | ServiceRegistryException | OaiPmhDatabaseException
+        | NotFoundException e) {
+      logger.warn(e.getMessage());
+    } finally {
+      securityService.setOrganization(prevOrg);
+      securityService.setUser(prevUser);
+    }
+  }
 }
