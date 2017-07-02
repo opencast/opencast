@@ -1098,6 +1098,19 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   }
 
   @POST
+  @Path("schedule")
+  @RestQuery(name = "schedule", description = "Schedule an event based on the given media package",
+          restParameters = {
+                  @RestParameter(description = "The media package", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) },
+          reponses = {
+                  @RestResponse(description = "Event scheduled", responseCode = HttpServletResponse.SC_CREATED),
+                  @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) },
+          returnDescription = "")
+  public Response schedule(MultivaluedMap<String, String> formData) {
+    return this.schedule(defaultWorkflowDefinitionId, formData);
+  }
+
+  @POST
   @Path("schedule/{wdID}")
   @RestQuery(name = "schedule", description = "Schedule an event based on the given media package",
           pathParameters = {
@@ -1114,7 +1127,10 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     }
 
     Map<String, String> wfConfig = getWorkflowConfig(formData);
-    wfConfig.put(WORKFLOW_DEFINITION_ID_PARAM, wdID);
+    if (StringUtils.isNotBlank(wdID)) {
+      wfConfig.put(WORKFLOW_DEFINITION_ID_PARAM, wdID);
+    }
+    logger.debug("Schedule with workflow definition '{}'", wfConfig.get(WORKFLOW_DEFINITION_ID_PARAM));
 
     String mediaPackageXml = formData.getFirst("mediaPackage");
     if (StringUtils.isBlank(mediaPackageXml)) {
