@@ -148,16 +148,16 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
             }
 
             $segment-height: 24px;
-            $segment-background: $segment-height;
+            $segment-background: ($segment-height - $thin-border * 2);
             $segment-main-height: 60px;
-            $segment-main-background: $segment-main-height;
+            $segment-main-background: ($segment-main-height - $thin-border * 2);
 
             .segments {
                 // background image set inline
                 overflow: hidden;
                 background-repeat: no-repeat;
                 background-size: 100% $segment-background;
-                background-position: bottom left;
+                background-position: center left;
                 height: $segment-height;
 
                 // needed for zoom offset
@@ -275,6 +275,7 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
                 .segments {
                     background-size: 100% $segment-main-background;
                     height: $segment-main-height;
+                    background-position: center left;
 
                     .segment-container {
                         height: $segment-main-height;
