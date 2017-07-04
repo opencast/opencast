@@ -331,10 +331,10 @@ public class OaiPmhUpdatedEventHandler {
   }
 
   public void handleEvent(AssetManagerItem.TakeSnapshot snapshotItem) {
-    //An episode or its' ACL has been updated. Construct the MediaPackage and publish it to OAI-PMH.
+    //An episode or its ACL has been updated. Construct the MediaPackage and publish it to OAI-PMH.
     logger.debug("Handling {}", snapshotItem);
 
-    // The MediaPackage has all changed elements (including dublin core). However, its' meta data is not updated, yet.
+    // The MediaPackage has all changed elements (including dublin core). However, its meta data is not updated, yet.
     final MediaPackage mp = (MediaPackage) snapshotItem.getMediapackage().clone();
 
     // We must be an administrative user to make a query to the OaiPmhPublicationService
