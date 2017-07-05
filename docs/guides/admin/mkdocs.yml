@@ -86,6 +86,7 @@ pages:
    - Editor: 'workflowoperationhandlers/editor-woh.md'
    - Email: 'workflowoperationhandlers/email-woh.md'
    - Encode: 'workflowoperationhandlers/encode-woh.md'
+   - Execute: 'workflowoperationhandlers/execute-woh.md'
    - Export Workflow Properties: 'workflowoperationhandlers/export-wf-properties-woh.md'
    - Extract Text: 'workflowoperationhandlers/extracttext-woh.md'
    - HTTP Notify: 'workflowoperationhandlers/httpnotify-woh.md'

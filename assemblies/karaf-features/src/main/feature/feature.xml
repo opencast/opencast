@@ -187,6 +187,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-video-videojs/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-external-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>
@@ -281,6 +284,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-email-template-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-email-template-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-remote/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-external-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>
@@ -387,6 +393,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-video-videojs/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-remote/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-external-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>
@@ -475,6 +484,8 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-cover-image-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-dictionary-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-dictionary-regexp/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-inspection-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-inspection-service-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-api/${project.version}</bundle>
@@ -536,6 +547,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-email-template-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-email-template-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-external-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>
