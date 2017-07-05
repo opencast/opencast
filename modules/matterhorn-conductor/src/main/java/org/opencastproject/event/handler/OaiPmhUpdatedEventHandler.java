@@ -267,17 +267,17 @@ public class OaiPmhUpdatedEventHandler {
         oaiPmhPersistence.store(mp, item.getRepository());
       }
     } catch (ServiceRegistryException e) {
-      logger.warn(e.getMessage());
+      logger.error(e.getMessage());
     } catch (NotFoundException e) {
-      logger.warn(e.getMessage());
+      logger.error(e.getMessage());
     } catch (MediaPackageException e) {
-      logger.warn(e.getMessage());
+      logger.error(e.getMessage());
     } catch (IOException e) {
-      logger.warn(e.getMessage());
+      logger.error(e.getMessage());
     } catch (DistributionException e) {
-      logger.warn(e.getMessage());
+      logger.error(e.getMessage());
     } catch (OaiPmhDatabaseException e) {
-      logger.warn(e.getMessage());
+      logger.error(e.getMessage());
     } finally {
       securityService.setOrganization(prevOrg);
       securityService.setUser(prevUser);
@@ -345,8 +345,14 @@ public class OaiPmhUpdatedEventHandler {
       securityService.setUser(SecurityUtil.createSystemUser(systemAccount, prevOrg));
       Query query = QueryBuilder.query().mediaPackageId(snapshotItem.getMediapackage()).build();
       SearchResult result = oaiPmhPersistence.search(query);
-      if (result.getItems().size() != 1) {
-        logger.info("Unexpected number of items: {}", result.getItems().size());
+      if (result.getItems().size() > 1) {
+        logger.error("Found multiple ({}) OAI-PMH records for media package: {}", result.getItems().size(),
+            snapshotItem.getMediapackage().getIdentifier());
+        return;
+      }
+      if (result.getItems().size() < 1) {
+        logger.trace("There is no OAI-PMH record to update for media package {}. Skipping.",
+            snapshotItem.getMediapackage().getIdentifier());
         return;
       }
 
@@ -387,7 +393,7 @@ public class OaiPmhUpdatedEventHandler {
 
       // Does the media package have a title and track?
       if (!MediaPackageSupport.isPublishable(mp)) {
-        logger.info("Media package does not meet criteria for publication");
+        logger.trace("Media package {} does not meet criteria for publication", mp.getIdentifier());
         return;
       }
 
@@ -395,7 +401,7 @@ public class OaiPmhUpdatedEventHandler {
       oaiPmhPersistence.store(mp, item.getRepository());
     } catch (DistributionException | MediaPackageException | ServiceRegistryException | OaiPmhDatabaseException
         | NotFoundException e) {
-      logger.warn(e.getMessage());
+      logger.error(e.getMessage());
     } finally {
       securityService.setOrganization(prevOrg);
       securityService.setUser(prevUser);

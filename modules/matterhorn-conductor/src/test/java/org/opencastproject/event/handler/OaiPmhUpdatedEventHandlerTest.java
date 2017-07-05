@@ -256,7 +256,7 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
   private void mockOaiPmhDatabase(MediaPackage mp) {
     SearchResult searchResultMock = mock(MockType.NICE, SearchResult.class);
     SearchResultItem searchResultItemMock = mock(MockType.NICE, SearchResultItem.class);
-    expect(searchResultMock.getItems()).andReturn(Collections.singletonList(searchResultItemMock)).times(2);
+    expect(searchResultMock.getItems()).andReturn(Collections.singletonList(searchResultItemMock)).anyTimes();
     expect(searchResultItemMock.getRepository()).andReturn(OAIPMH_REPOSITORY).anyTimes();
     expect(searchResultItemMock.getMediaPackage()).andReturn(mp);
     queryCapture = Capture.newInstance();
