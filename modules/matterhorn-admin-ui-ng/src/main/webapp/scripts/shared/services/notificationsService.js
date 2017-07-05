@@ -76,17 +76,20 @@ angular.module('adminNg.services')
 
         scope.add = function (type, key, context, duration, messageParams) {
             if (angular.isUndefined(duration)) {
+                // fall back to defaults
                 switch (type) {
                     case 'error':
-                        duration = notificationDurationError * 1000;
+                        duration = notificationDurationError;
                         break;
                     case 'success':
-                        duration = notificationDurationSuccess * 1000;
+                        duration = notificationDurationSuccess;
                         break;
                     case 'warning':
-                        duration = notificationDurationWarning * 1000;
+                        duration = notificationDurationWarning;
                         break;
                 }
+                // default durations are in seconds. duration needs to be in milliseconds
+                if (duration > 0) duration *= 1000;
             }
 
             if (!context) {
