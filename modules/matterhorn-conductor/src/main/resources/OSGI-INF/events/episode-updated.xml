@@ -15,6 +15,4 @@
                interface="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"
                cardinality="1..1" policy="dynamic" bind="setOaiPmhUpdatedEventHandler"/>
   </scr:component>
-
-
 </scr:components>
