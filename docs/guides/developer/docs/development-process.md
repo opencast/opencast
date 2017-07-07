@@ -110,6 +110,20 @@ Everything else:
 - If in doubt, ask on list
 
 
+Logging Rules
+-------------
+
+The following is a list of logging levels and their use.
+
+Level | Description
+------|---------------------------------------------------------------------------
+TRACE | Information that would only be useful when debugging a specific subsystem.
+DEBUG | Information relevant to development. Used to provide detailed information for developers
+INFO  | Information relevant to server administrators.  Creating, updating, and deleting files should be logged here.
+WARN  | Handled exceptions. A warning should be logged any time there is a problem handling a user action or background process.
+ERROR | Unhandled exceptions. Any problem with an Opencast system that was not automatically handled.  This should be things like components failing to activate correctly.
+
+
 Git Repository Branching Model
 ------------------------------
 
