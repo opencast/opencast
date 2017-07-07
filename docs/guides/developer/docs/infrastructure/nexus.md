@@ -133,3 +133,76 @@ settings. To do that, create a user specific Maven settings file in `~/.m2/setti
 
 This will let Maven overwrite the `opencast.nexus.url` property used by Opencast to determine the Nexus server during
 the build process.
+
+Pushing artifacts to Maven
+--------------------------
+
+#### Pushing to your local Maven repository
+
+The following command will add a file to your local Maven repository.  This is useful for testing if your artifacts are
+correctly placed prior to pushing to the mainline Nexus repository.
+
+    mvn install:install-file \
+     -Dfile=$filename \
+     -DgroupId=$groupId \
+     -DartifactId=$artifactId \
+     -Dpackaging=$packaging \
+     -Dversion=$version \
+     -DgeneratePom=$generatePom
+
+Variable Map
+
+Variable    | What it does                                                              | Example
+------------|---------------------------------------------------------------------------|--------------------
+filename    | The path to the local file you want in your repository                    | audio_out.mp2
+groupId     | The Opencast group ID                                                     | org.opencastproject
+artifactId  | The artifact ID. This is the name of the artifact according to Maven      | audio
+packaging   | The file type (effectively), this should match the filename's extension   | mp2
+version     | The artifact's version                                                    | 1.1
+generatePom | Whether or not to generate a pom file automatically                       | true
+
+#### Pushing to the remote Nexus repository
+
+The following command will push a file to the remote Nexus repository.  Normally builds are pushed to to the remote
+automatically as part of the CI server build, however if there is a need to push to the repo this is the command you
+need. To deploy to the remote repository you will first need a username and password. This can be obtained from the QA
+coordinator. Once you have that, put them in your `.m2/settings.xml` file. It should look like this
+
+    <settings>
+      <servers>
+        <server>
+          <id>opencast</id>
+          <username>$username</username>
+          <password>$password</password>
+        </server>
+        ...
+      </servers>
+      ....
+    </settings>
+
+The command to push the file looks like this. Not that pushing files from your local Maven repository directly is not
+possible, instead you must copy them *outside* the repository and push from there.
+
+    mvn deploy:deploy-file \
+      -DrepositoryId=$repo_id \
+      -Durl=$url \
+      -Dfile=$filename \
+      -DgroupId=$groupId \
+      -DartifactId=$artifactId \
+      -Dpackaging=$packaging \
+      -Dversion=$version \
+      -DgeneratePom=$generatePom
+
+Variable Map
+
+Variable    | What it does                                                               | Example
+------------|----------------------------------------------------------------------------|--------------------
+repo_id     | Identifies which set of credentials from your .m2/settings.xml file to use | opencast
+url         | Where to push the file                                                     | http://nexus.virtuos.uos.de:8081/nexus/content/repositories/snapshots
+filename    | The path to the local file you want in your repository                     | audio_out.mp2
+groupId     | The Opencast group ID                                                      | org.opencastproject
+artifactId  | The artifact ID. This is the name of the artifact according to Maven       | audio
+packaging   | The file type (effectively), this should match the filename's extension    | mp2
+version     | The artifact's version                                                     | 1.1
+generatePom | Whether or not to generate a pom file automatically                        | true
+
