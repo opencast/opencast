@@ -16,6 +16,22 @@ A proposal is accepted when no veto (`-1`) is voted within a time spawn of 72 ho
 Passed Proposals
 ----------------
 
+### Minor documentation changes do not require JIRA issues or PRs
+Proposed by Stephen Marquard <stephen.marquard@uct.ac.za>, passed on June 9, 2017
+
+```no-highlight
+To reduce the overhead involved in improving our documentation, I #propose that minor fixes
+to documentation may be committed to either maintenance branches or develop without requiring
+a JIRA issue or pull request.
+
+Markdown docs can be edited directly on bitbucket (and git should we move to that), which is 
+a very fast and convenient way for developers to fix documentation.
+
+Constraints: documentation fixes committed in this way should be minor changes only;
+for example fixing typos, layout, formatting, links or small changes to existing content, 
+but no significant new content (which should continue to go through the usual review process).
+```
+
 ### Requiring Java 1.8 for 3.0
 Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on June 12, 2017
 
