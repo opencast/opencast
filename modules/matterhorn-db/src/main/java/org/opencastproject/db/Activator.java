@@ -43,6 +43,9 @@ public class Activator implements BundleActivator {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(Activator.class);
 
+  /** The default max idle time for the connection pool */
+  private static final int DEFAULT_MAX_IDLE_TIME = 3600;
+
   private String rootDir;
   private ServiceRegistration<?> datasourceRegistration;
   private ComboPooledDataSource pooledDataSource;
@@ -88,8 +91,16 @@ public class Activator implements BundleActivator {
       pooledDataSource.setMaxStatements(maxStatements);
     if (loginTimeout != null)
       pooledDataSource.setLoginTimeout(loginTimeout);
+
+    // maxIdleTime should not be zero, otherwise the connection pool will hold on to stale connections
+    // that have been closed by the database.
     if (maxIdleTime != null)
       pooledDataSource.setMaxIdleTime(maxIdleTime);
+    else if (pooledDataSource.getMaxIdleTime() == 0) {
+        logger.debug("Setting database connection pool max.idle.time to default of {}", DEFAULT_MAX_IDLE_TIME);
+        pooledDataSource.setMaxIdleTime(DEFAULT_MAX_IDLE_TIME);
+    }
+
     if (maxConnectionAge != null)
       pooledDataSource.setMaxConnectionAge(maxConnectionAge);
 
@@ -110,6 +121,8 @@ public class Activator implements BundleActivator {
     }
 
     logger.info("Database connection pool established at {}", jdbcUrl);
+    logger.info("Database connection pool parameters: max.size={}, min.size={}, max.idle.time={}",
+      pooledDataSource.getMaxPoolSize(), pooledDataSource.getMinPoolSize(), pooledDataSource.getMaxIdleTime());
   }
 
   @Override
