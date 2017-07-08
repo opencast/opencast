@@ -9,6 +9,7 @@ These guides will help you if you want to participate in Opencast development.
     - [Release Manager](release-manager.md)
     - [QA Coordinator](qa-coordinator.md)
     - [Security Issues](security.md)
+    - [Documentation](documentation.md)
  - [Committers](committer.md)
  - [Decision Making](decision-making)
  - [Development Environment](development-environment.md)

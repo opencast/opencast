@@ -81,49 +81,6 @@ While a committer may accept a patch even if it does not meet these expectations
 a pull request ensures that they meet these expectations.
 
 
-Coding Rules
-------------
-
-Maven will automatically check for coding style violations for Java and interrupt the build process if any are found,
-displaying a message about it. Apart from that, here are some general rules:
-
-Everything:
-
-- UTF-8 encoded
-
-Java, HTML and JavaScript:
-
-- Indentation is done with exactly two spaces
-- No line of code should be wider than 120 columns
-- No trailing spaces
-- Avoid unnecessary code style changes
-
-Markdown:
-
-- Avoid lines wider than 120 columns
-- Avoid trailing spaces
-- Avoid unnecessary style changes
-
-Everything else:
-
-- Try applying the Java style rules
-- If in doubt, ask on list
-
-
-Logging Rules
--------------
-
-The following is a list of logging levels and their use.
-
-Level | Description
-------|---------------------------------------------------------------------------
-TRACE | Information that would only be useful when debugging a specific subsystem.
-DEBUG | Information relevant to development. Used to provide detailed information for developers
-INFO  | Information relevant to server administrators.  Creating, updating, and deleting files should be logged here.
-WARN  | Handled exceptions. A warning should be logged any time there is a problem handling a user action or background process.
-ERROR | Unhandled exceptions. Any problem with an Opencast system that was not automatically handled.  This should be things like components failing to activate correctly.
-
-
 Git Repository Branching Model
 ------------------------------
 
