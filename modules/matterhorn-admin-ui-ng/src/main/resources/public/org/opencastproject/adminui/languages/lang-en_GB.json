@@ -1400,6 +1400,7 @@
           "FILE_UPLOADED":"File uploaded: ",
           "DESCRIPTION":"Semi-transparent image overlaid on every frame of the recording.",
           "ACTIVE":"Active",
+          "ENABLE":"Enable watermark",
           "TOP_LEFT":"Top left",
           "TOP_RIGHT":"Top right",
           "BOTTOM_LEFT":"Bottom left",

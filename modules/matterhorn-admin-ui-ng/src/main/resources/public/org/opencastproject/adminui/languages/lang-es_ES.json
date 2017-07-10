@@ -1400,6 +1400,7 @@
           "FILE_UPLOADED":"Archivo subido: ",
           "DESCRIPTION":"Imagen semitransparente que se superpone sobre cada fotograma de la grabación.",
           "ACTIVE":"Activada",
+          "ENABLE":"Activar marca de agua",
           "TOP_LEFT":"Esquina superior izquierda",
           "TOP_RIGHT":"Esquina superior derecha",
           "BOTTOM_LEFT":"Esquina inferior izquierda",
