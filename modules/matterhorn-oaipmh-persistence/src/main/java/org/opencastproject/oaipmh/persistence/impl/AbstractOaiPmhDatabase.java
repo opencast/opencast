@@ -18,37 +18,40 @@
  * the License.
  *
  */
-package org.opencastproject.oaipmh.persistence;
+package org.opencastproject.oaipmh.persistence.impl;
 
 import static com.entwinemedia.fn.Stream.$;
 import static java.lang.String.format;
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.authorization.xacml.XACMLUtils;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
-import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
+import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
+import org.opencastproject.oaipmh.persistence.OaiPmhDatabaseException;
+import org.opencastproject.oaipmh.persistence.OaiPmhElementEntity;
+import org.opencastproject.oaipmh.persistence.OaiPmhEntity;
+import org.opencastproject.oaipmh.persistence.Query;
+import org.opencastproject.oaipmh.persistence.SearchResult;
+import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
+import org.opencastproject.util.XmlUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.fns.Strings;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -142,7 +145,7 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
     }
   }
 
-  private void updateEntity(OaiPmhEntity entity, MediaPackage mediaPackage,
+  public void updateEntity(OaiPmhEntity entity, MediaPackage mediaPackage,
                             String repository) throws OaiPmhDatabaseException {
     entity.setOrganization(getSecurityService().getOrganization().getId());
     entity.setDeleted(false);
@@ -150,61 +153,83 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
 
     entity.setMediaPackageId(mediaPackage.getIdentifier().toString());
     entity.setMediaPackageXML(MediaPackageParser.getAsXml(mediaPackage));
+    entity.setSeries(mediaPackage.getSeries());
+    entity.removeAllMediaPackageElements();
 
-    //
-    // episode
-    Catalog[] episodeCatalog = mediaPackage.getCatalogs(MediaPackageElements.EPISODE);
-    if (episodeCatalog.length != 0) {
-      entity.setEpisodeDublinCoreXML(toXml(DublinCoreUtil.loadDublinCore(getWorkspace(), episodeCatalog[0])));
-    } else {
-      entity.setEpisodeDublinCoreXML(null);
-    }
-
-    //
-    // series DublinCore and ACL
-    final Opt<String> seriesId = Opt.nul(mediaPackage.getSeries());
-    final Opt<Catalog> seriesDcCatalog = $(mediaPackage.getCatalogs(MediaPackageElements.SERIES)).head();
-    final Opt<Catalog> seriesAclCatalog = $(mediaPackage.getCatalogs(MediaPackageElements.XACML_POLICY_SERIES)).head();
-
-    if (seriesId.isNone()) {
-      entity.setSeries(null);
-    }
-    if (seriesDcCatalog.isNone()) {
-      entity.setSeriesDublinCoreXML(null);
-    }
-    if (seriesAclCatalog.isNone()) {
-      entity.setSeriesAclXML(null);
-    }
-    if (seriesId.isSome()) {
-      // series ID is set
-      final DublinCoreCatalog seriesDc = getSeriesDc(seriesId.get());
-      entity.setSeries(seriesDc.getFirst(DublinCore.PROPERTY_IDENTIFIER));
-      entity.setSeriesDublinCoreXML(toXml(seriesDc));
-      for (final AccessControlList acl : getSeriesAcl(seriesId.get())) {
-        entity.setSeriesAclXML(toXml(mediaPackage, acl));
+    String seriesId = null;
+    boolean seriesXacmlFound = false;
+    DublinCoreCatalog dcEpisode = null;
+    DublinCoreCatalog dcSeries = null;
+    for (MediaPackageElement mpe : mediaPackage.getElements()) {
+      if (mpe.getFlavor() == null) {
+        logger.debug("A flavor must be set on mediapackage elements for publishing");
+        continue;
       }
-    } else {
-      // no series ID, take everything from the media package
-      if (seriesDcCatalog.isSome()) {
-        final DublinCoreCatalog seriesDc = DublinCoreUtil.loadDublinCore(getWorkspace(), seriesDcCatalog.get());
-        entity.setSeries(seriesDc.getFirst(DublinCore.PROPERTY_IDENTIFIER));
-        entity.setSeriesDublinCoreXML(toXml(seriesDc));
-        // only attach the series ACL if a series catalog is present
-        // assume data inconsistency otherwise
-        if (seriesAclCatalog.isSome()) {
-          entity.setSeriesAclXML(loadAclXml(seriesAclCatalog.get()));
+
+      if (mpe.getElementType() != MediaPackageElement.Type.Catalog
+              && mpe.getElementType() != MediaPackageElement.Type.Attachment) {
+        logger.debug("Only catalog and attachment types are currently supported");
+        continue;
+      }
+
+      String catalogXml = null;
+      // read/parse xml content
+      if (mpe.getFlavor().matches(MediaPackageElements.EPISODE) || mpe.getFlavor().matches(MediaPackageElements.SERIES)) {
+        DublinCoreCatalog dcCatalog = DublinCoreUtil.loadDublinCore(getWorkspace(), mpe);
+        catalogXml = toXml(dcCatalog);
+        if (mpe.getFlavor().matches(MediaPackageElements.EPISODE)) {
+          dcEpisode = dcCatalog;
+        } else if (mpe.getFlavor().matches(MediaPackageElements.SERIES)) {
+          dcSeries = dcCatalog;
+          seriesId = dcSeries.getFirst(DublinCore.PROPERTY_IDENTIFIER);
+        }
+      } else {
+        if (mpe.getMimeType() == null || !mpe.getMimeType().isEquivalentTo("text", "xml")) {
+          logger.debug("Only media package elements with mime type XML are supported");
+          continue;
+        }
+        catalogXml = loadCatalogXml(mpe);
+        if (!XmlUtil.parseNs(catalogXml).isRight())
+          throw new OaiPmhDatabaseException(String.format("The catalog %s isn't a valid XML file",
+                  mpe.getURI().toString()));
+
+        if (mpe.getFlavor().matches(MediaPackageElements.XACML_POLICY_SERIES))
+          seriesXacmlFound = true;
+      }
+
+      entity.addMediaPackageElement(new OaiPmhElementEntity(
+              mpe.getElementType().name(), mpe.getFlavor().toString(), catalogXml));
+    }
+
+    // ensure series dublincore catalog has been applied if series is set
+    if (seriesId == null && mediaPackage.getSeries() != null) {
+      seriesId = mediaPackage.getSeries();
+      dcSeries = getSeriesDc(seriesId);
+
+      if (dcSeries != null) {
+        entity.addMediaPackageElement(new OaiPmhElementEntity(Catalog.TYPE.name(),
+              MediaPackageElements.SERIES.toString(), toXml(dcSeries)));
+      }
+    }
+
+    // apply series ACL if not done before
+    if (seriesId != null && !seriesXacmlFound) {
+      for (final AccessControlList acl : getSeriesAcl(seriesId)) {
+        for (AccessControlList seriesAcl : getSeriesAcl(seriesId)) {
+          entity.addMediaPackageElement(new OaiPmhElementEntity(Attachment.TYPE.name(),
+                  MediaPackageElements.XACML_POLICY_SERIES.toString(), toXml(mediaPackage, seriesAcl)));
         }
       }
     }
   }
 
-  @Nullable private String loadAclXml(MediaPackageElement element) {
+  @Nullable private String loadCatalogXml(MediaPackageElement element) {
     InputStream in = null;
     try {
       in = new FileInputStream(getWorkspace().get(element.getURI()));
       return IOUtils.toString(in, "UTF-8");
     } catch (Exception e) {
-      logger.warn("Unable to load ACL from catalog '{}'", element);
+      logger.warn("Unable to load catalog '{}'", element);
       return null;
     } finally {
       IOUtils.closeQuietly(in);
@@ -337,108 +362,16 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
     // Create and configure the query result
     final long offset = query.getFirstResult();
     final long limit = query.getMaxResults() != Integer.MAX_VALUE ? query.getMaxResults() : 0;
-    // Walk through response and create new items with title, creator, etc.
-    final List<SearchResultItem> items = mlist(query.getResultList()).map(toResultItem).value();
-    return new SearchResult() {
-      @Override
-      public List<SearchResultItem> getItems() {
-        return items;
-      }
-
-      @Override
-      public long size() {
-        return items.size();
-      }
-
-      @Override
-      public long getOffset() {
-        return offset;
-      }
-
-      @Override
-      public long getLimit() {
-        return limit;
-      }
-    };
-  }
-
-  private final Function<OaiPmhEntity, SearchResultItem> toResultItem = new Function<OaiPmhEntity, SearchResultItem>() {
-    @Override
-    public SearchResultItem apply(final OaiPmhEntity entity) {
-      final MediaPackage mp;
+    final List<SearchResultItem> items = new ArrayList<>();
+    for (OaiPmhEntity oaipmhEntity : query.getResultList()) {
       try {
-        mp = MediaPackageParser.getFromXml(entity.getMediaPackageXML());
-      } catch (MediaPackageException e) {
-        logger.error("Unable to read media package from OAI-PMH search result entity {}: {}", entity, e);
-        return chuck(e);
+        items.add(new SearchResultItemImpl(oaipmhEntity));
+      } catch (Exception ex) {
+        logger.warn("Unable to parse an OAI-PMH database entry", ex);
       }
-      final Opt<String> seriesDcXml = Opt.nul(entity.getSeriesDublinCoreXML()).bind(Strings.trimToNone);
-      final Opt<DublinCoreCatalog> seriesDc = seriesDcXml.bind(DublinCoreXmlFormat.readOptFromString);
-      final Opt<String> seriesXacml = Opt.nul(entity.getSeriesAclXML()).bind(Strings.trimToNone);
-      final Opt<String> episodeDcXml = Opt.nul(entity.getEpisodeDublinCoreXML()).bind(Strings.trimToNone);
-      final Opt<DublinCoreCatalog> episodeDc = episodeDcXml.bind(DublinCoreXmlFormat.readOptFromString);
-      return new SearchResultItem() {
-        @Override
-        public String getId() {
-          return entity.getMediaPackageId();
-        }
-
-        @Override
-        public MediaPackage getMediaPackage() {
-          return mp;
-        }
-
-        @Override
-        public String getMediaPackageXml() {
-          return entity.getMediaPackageXML();
-        }
-
-        @Override
-        public String getOrganization() {
-          return entity.getOrganization();
-        }
-
-        @Override
-        public String getRepository() {
-          return entity.getRepositoryId();
-        }
-
-        @Override
-        public Date getModificationDate() {
-          return entity.getModificationDate();
-        }
-
-        @Override
-        public boolean isDeleted() {
-          return entity.isDeleted();
-        }
-
-        @Override
-        public Option<DublinCoreCatalog> getSeriesDublinCore() {
-          return Option.fromOpt(seriesDc);
-        }
-
-        @Override
-        public Option<String> getSeriesDublinCoreXml() {
-          return Option.fromOpt(seriesDcXml);
-        }
-
-        @Override
-        public Option<DublinCoreCatalog> getEpisodeDublinCore() {
-          return Option.fromOpt(episodeDc);
-        }
-
-        @Override
-        public Option<String> getEpisodeDublinCoreXml() {
-          return Option.fromOpt(episodeDcXml);
-        }
-
-        @Override public Option<String> getSeriesAclXml() {
-          return Option.fromOpt(seriesXacml);
-        }
-      };
     }
-  };
+    return new SearchResultImpl(offset, limit, items);
+  }
 
   public static String forSwitch(Opt<?>... opts) {
     return $(opts).map(new Fn<Opt<?>, String>() {

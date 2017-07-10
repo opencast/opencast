@@ -18,7 +18,7 @@
  * the License.
  *
  */
-package org.opencastproject.oaipmh.persistence;
+package org.opencastproject.oaipmh.persistence.impl;
 
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.series.api.SeriesService;

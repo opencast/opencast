@@ -40,10 +40,12 @@ import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.oaipmh.Granularity;
 import org.opencastproject.oaipmh.OaiPmhConstants;
 import org.opencastproject.oaipmh.harvester.OaiPmhNamespaceContext;
-import org.opencastproject.oaipmh.persistence.AbstractOaiPmhDatabase;
 import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
-import org.opencastproject.oaipmh.persistence.OaiPmhDatabaseImpl;
+import org.opencastproject.oaipmh.persistence.impl.AbstractOaiPmhDatabase;
+import org.opencastproject.oaipmh.persistence.impl.OaiPmhDatabaseImpl;
 import org.opencastproject.oaipmh.util.XmlGen;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
@@ -53,6 +55,7 @@ import org.opencastproject.util.data.Option;
 import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Test;
@@ -249,6 +252,12 @@ public class OaiPmhRepositoryPersistenceTest {
       expect(secSvc.getOrganization()).andReturn(org).anyTimes();
       expect(secSvc.getUser()).andReturn(user).anyTimes();
       EasyMock.replay(secSvc);
+      // series service
+      final SeriesService seriesService = EasyMock.createNiceMock(SeriesService.class);
+      final String xacml = IOUtils.toString(OaiPmhRepositoryPersistenceTest.class.getResource("/xacml.xml").toURI());
+      final AccessControlList securityACL = AccessControlParser.parseAcl(xacml);
+      EasyMock.expect(seriesService.getSeriesAccessControl("10.0000/1")).andReturn(securityACL).anyTimes();
+      EasyMock.replay(seriesService);
       // workspace
       final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
       final File episodeDublinCore = new File(OaiPmhRepositoryPersistenceTest.class.getResource(
@@ -283,7 +292,7 @@ public class OaiPmhRepositoryPersistenceTest {
 
         @Override
         public SeriesService getSeriesService() {
-          return null;
+          return seriesService;
         }
 
         @Override

@@ -18,28 +18,36 @@
  * the License.
  *
  */
-package org.opencastproject.oaipmh.persistence;
+package org.opencastproject.oaipmh.persistence.impl;
 
 import static org.opencastproject.oaipmh.persistence.QueryBuilder.query;
 import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
+import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
+import org.opencastproject.oaipmh.persistence.SearchResult;
+import org.opencastproject.oaipmh.persistence.SearchResultElementItem;
+import org.opencastproject.oaipmh.persistence.SearchResultItem;
+import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Date;
 
 /**
@@ -66,21 +74,38 @@ public class OaiPmhPersistenceTest {
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
 
-    mp1 = MediaPackageSupport.loadFromClassPath("/manifest-full.xml");
-    mp2 = MediaPackageSupport.loadFromClassPath("/manifest2-full.xml");
+    mp1 = MediaPackageSupport.loadFromClassPath("/mp1.xml");
+    mp2 = MediaPackageSupport.loadFromClassPath("/mp2.xml");
 
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(uri("series-dublincore.xml")))
             .andReturn(new File(getClass().getResource("/series-dublincore.xml").toURI())).anyTimes();
-    EasyMock.expect(workspace.get(uri("dublincore.xml")))
+    EasyMock.expect(workspace.get(uri("episode-dublincore.xml")))
             .andReturn(new File(getClass().getResource("/episode-dublincore.xml").toURI())).anyTimes();
-    EasyMock.expect(workspace.get(uri("xacml.xml"))).andReturn(new File(getClass().getResource("/xacml.xml").toURI()))
-            .anyTimes();
+    EasyMock.expect(workspace.get(uri("mpeg7.xml")))
+            .andReturn(new File(getClass().getResource("/mpeg7.xml").toURI())).anyTimes();
+    EasyMock.expect(workspace.get(uri("series-xacml.xml")))
+            .andReturn(new File(getClass().getResource("/series-xacml.xml").toURI())).anyTimes();
     EasyMock.replay(workspace);
+
+    SeriesService seriesService = EasyMock.createNiceMock(SeriesService.class);
+    AccessControlList seriesXacml = null;
+    InputStream inputStream = null;
+    try {
+      inputStream = getClass().getResourceAsStream("/series-xacml.xml");
+      seriesXacml = XACMLUtils.parseXacml(inputStream);
+    } catch (Exception e) {
+    } finally {
+      IOUtils.closeQuietly(inputStream);
+    }
+    Assert.assertNotNull("failed to parse XACML", seriesXacml);
+    EasyMock.expect(seriesService.getSeriesAccessControl("series-1")).andReturn(seriesXacml).anyTimes();
+    EasyMock.replay(seriesService);
 
     oaiPmhDatabase = new OaiPmhDatabaseImpl();
     oaiPmhDatabase.setEntityManagerFactory(newTestEntityManagerFactory(OaiPmhDatabaseImpl.PERSISTENCE_UNIT_NAME));
     oaiPmhDatabase.setSecurityService(securityService);
+    oaiPmhDatabase.setSeriesService(seriesService);
     oaiPmhDatabase.setWorkspace(workspace);
     oaiPmhDatabase.activate(null);
   }
@@ -88,9 +113,10 @@ public class OaiPmhPersistenceTest {
   @Test
   public void testAdding() throws Exception {
     oaiPmhDatabase.store(mp1, REPOSITORY_ID_1);
+    oaiPmhDatabase.store(mp1, REPOSITORY_ID_2);
   }
 
-  @Test
+  //@Test
   public void testMerging() throws Exception {
     oaiPmhDatabase.store(mp1, REPOSITORY_ID_1);
     oaiPmhDatabase.store(mp2, REPOSITORY_ID_1);
@@ -121,35 +147,50 @@ public class OaiPmhPersistenceTest {
 
     SearchResult search = oaiPmhDatabase.search(query().mediaPackageId(mp1).build());
     Assert.assertEquals(1, search.size());
-    Assert.assertEquals(REPOSITORY_ID_1, search.getItems().get(0).getRepository());
-    Assert.assertEquals(mp1.getIdentifier().toString(), search.getItems().get(0).getId());
-    Assert.assertEquals(mp1, search.getItems().get(0).getMediaPackage());
-    Assert.assertFalse(search.getItems().get(0).isDeleted());
-    Assert.assertEquals(DefaultOrganization.DEFAULT_ORGANIZATION_ID, search.getItems().get(0).getOrganization());
-    Assert.assertTrue(search.getItems().get(0).getModificationDate() != null);
-    Date modificationDate = search.getItems().get(0).getModificationDate();
-    Assert.assertTrue(search.getItems().get(0).getSeriesDublinCore().isSome());
-    Assert.assertTrue(search.getItems().get(0).getEpisodeDublinCore().isSome());
-    Assert.assertTrue(search.getItems().get(0).getSeriesAclXml().isSome());
+    SearchResultItem searchResultItem = search.getItems().get(0);
+    Assert.assertEquals(REPOSITORY_ID_1, searchResultItem.getRepository());
+    Assert.assertEquals(mp1.getIdentifier().toString(), searchResultItem.getId());
+    Assert.assertEquals(mp1, searchResultItem.getMediaPackage());
+    Assert.assertFalse(searchResultItem.isDeleted());
+    Assert.assertEquals(DefaultOrganization.DEFAULT_ORGANIZATION_ID, searchResultItem.getOrganization());
+    Assert.assertTrue(searchResultItem.getModificationDate() != null);
+    Date modificationDate = searchResultItem.getModificationDate();
+    Assert.assertEquals(3, searchResultItem.getElements().size());
+    for (SearchResultElementItem catalogItem : searchResultItem.getElements()) {
+      Assert.assertNotNull(catalogItem.getFlavor());
+      Assert.assertNotNull(catalogItem.getXml());
+      Assert.assertEquals("dublincore/episode".equals(catalogItem.getFlavor().toLowerCase()),
+              catalogItem.isEpisodeDublinCore());
+      Assert.assertEquals("dublincore/series".equals(catalogItem.getFlavor().toLowerCase()),
+              catalogItem.isSeriesDublinCore());
+    }
 
     Date dateBeforeStoring = new Date();
 
-    oaiPmhDatabase.store(mp2, REPOSITORY_ID_2);
+    oaiPmhDatabase.store(mp1, REPOSITORY_ID_2);
 
     search = oaiPmhDatabase.search(query().mediaPackageId(mp1).build());
     Assert.assertEquals(2, search.size());
 
     search = oaiPmhDatabase.search(query().mediaPackageId(mp1).repositoryId(REPOSITORY_ID_2).build());
     Assert.assertEquals(1, search.size());
-    Assert.assertEquals(REPOSITORY_ID_2, search.getItems().get(0).getRepository());
-    Assert.assertEquals(mp2.getIdentifier().toString(), search.getItems().get(0).getId());
-    Assert.assertEquals(mp2, search.getItems().get(0).getMediaPackage());
-    Assert.assertFalse(search.getItems().get(0).isDeleted());
-    Assert.assertEquals(DefaultOrganization.DEFAULT_ORGANIZATION_ID, search.getItems().get(0).getOrganization());
-    Assert.assertTrue(search.getItems().get(0).getModificationDate() != null);
-    Assert.assertTrue(search.getItems().get(0).getModificationDate().after(modificationDate));
-    Assert.assertTrue(search.getItems().get(0).getEpisodeDublinCore().isSome());
-    Assert.assertFalse(search.getItems().get(0).getSeriesDublinCore().isSome());
+    searchResultItem = search.getItems().get(0);
+    Assert.assertEquals(REPOSITORY_ID_2, searchResultItem.getRepository());
+    Assert.assertEquals(mp1.getIdentifier().toString(), searchResultItem.getId());
+    Assert.assertEquals(mp1, searchResultItem.getMediaPackage());
+    Assert.assertFalse(searchResultItem.isDeleted());
+    Assert.assertEquals(DefaultOrganization.DEFAULT_ORGANIZATION_ID, searchResultItem.getOrganization());
+    Assert.assertTrue(searchResultItem.getModificationDate() != null);
+    Assert.assertTrue(searchResultItem.getModificationDate().after(modificationDate));
+    Assert.assertEquals(3, searchResultItem.getElements().size());
+    for (SearchResultElementItem catalogItem : searchResultItem.getElements()) {
+      Assert.assertNotNull(catalogItem.getFlavor());
+      Assert.assertNotNull(catalogItem.getXml());
+      Assert.assertEquals("dublincore/episode".equals(catalogItem.getFlavor().toLowerCase()),
+              catalogItem.isEpisodeDublinCore());
+      Assert.assertEquals("dublincore/series".equals(catalogItem.getFlavor().toLowerCase()),
+              catalogItem.isSeriesDublinCore());
+    }
 
     search = oaiPmhDatabase.search(query().mediaPackageId(mp1).repositoryId(REPOSITORY_ID_1).build());
     Assert.assertEquals(1, search.size());
