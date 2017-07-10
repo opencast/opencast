@@ -38,7 +38,6 @@ angular.module('adminNg.controllers')
             off = $scope.$on('$locationChangeSuccess', function () {
                 $route.current = lastRoute;
                 off();
-                $window.location.reload();
             });
             $location.path(path).replace();
         };
@@ -56,6 +55,14 @@ angular.module('adminNg.controllers')
         $scope.event.eventId = $scope.id;
 
         $scope.openTab = function (tab) {
+            $scope.tab = tab;
+            // Find elements by video tag
+            var videoArray = [].slice.call(document.querySelectorAll("video"));
+            // Loop through each video element
+            angular.forEach(videoArray, function(player) {
+                // Apply pause to the object
+                player.pause();
+            });
             $scope.navigateTo('events/' + $scope.resource + '/' +
                 $scope.id + '/tools/' + tab);
         };
