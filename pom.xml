@@ -178,8 +178,6 @@
     <module>modules/matterhorn-sox-impl</module>
     <module>modules/matterhorn-sox-remote</module>
     <module>modules/matterhorn-sox-workflowoperation</module>
-    <module>modules/matterhorn-speech-recognition-service-api</module>
-    <module>modules/matterhorn-speech-recognition-workflowoperation</module>
     <module>modules/matterhorn-static</module>
     <module>modules/matterhorn-static-file-service-api</module>
     <module>modules/matterhorn-static-file-service-impl</module>
