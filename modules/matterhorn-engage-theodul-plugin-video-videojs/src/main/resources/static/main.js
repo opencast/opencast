@@ -995,14 +995,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
     if ((aspectRatio != null) && (videoDisplays.length > 0)) {
       calculateAspectRatioForVideos(videoDataView, videoDisplays, aspectRatio);
+      registerZoomLevelEvents();
     } else {
       Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
     }
 
     // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
     $('.' + class_vjsposter).show();
-
-    registerZoomLevelEvents();
 
     Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
 
@@ -1635,19 +1634,18 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     var $videoDisplay = $('#' + videoDisplay);
 
     if (!isMobileMode) {
-      videodisplayMaster
-        .on('play', function () {
+      videodisplayMaster.on('play', function () {
           startVideoPlayer(videodisplayMaster);
-        })
-        .on('pause', function () {
+      });
+      videodisplayMaster.on('pause', function () {
           Engage.trigger(plugin.events.pause.getName(), true);
-        })
-        .on('ended', function () {
+      });
+      videodisplayMaster.on('ended', function () {
           Engage.trigger(plugin.events.ended.getName(), true);
-        })
-        .on('timeupdate', function () {
+      });
+      videodisplayMaster.on('timeupdate', function () {
           Engage.trigger(plugin.events.timeupdate.getName(), videodisplayMaster.currentTime(), true);
-        });
+      });
     } else {
       // To get rid of the undesired "click on poster to play" functionality,
       // we remove all event listeners attached to the vjs posters by cloning the dom element.
@@ -1887,13 +1885,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       }
     });
 
-    videodisplayMaster
-      .on(event_html5player_volumechange, function () {
+    videodisplayMaster.on(event_html5player_volumechange, function () {
         Engage.trigger(plugin.events.volumechange.getName(), videodisplayMaster.volume());
-      })
-      .on(event_html5player_fullscreenchange, function () {
+    });
+    videodisplayMaster.on(event_html5player_fullscreenchange, function () {
         Engage.trigger(plugin.events.fullscreenChange.getName());
-      });
+    });
 
     var $videoDisplayClass = $('.' + id_videoDisplayClass);
 
@@ -2159,10 +2156,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     var flavors = '';
     var mimetypes = '';
 
-    var allowedTags = Engage.model.get('meInfo').get('allowedtags');
-    var allowedFormats = Engage.model.get('meInfo').get('allowedformats');
-    mediaInfo.tracks = filterTracksByFormat(filterTracksByTag(mediaInfo.tracks, allowedTags), allowedFormats);
-
     if (mediaInfo.tracks && (mediaInfo.tracks.length > 0)) {
       for (var k = 0; k < mediaInfo.tracks.length; ++k) {
         if (flavors.indexOf(mediaInfo.tracks[k].type) < 0) {
@@ -2188,6 +2181,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         }
       }
     }
+
+    var allowedTags = Engage.model.get('meInfo').get('allowedtags');
+    var allowedFormats = Engage.model.get('meInfo').get('allowedformats');
+    mediaInfo.tracks = filterTracksByFormat(filterTracksByTag(mediaInfo.tracks, allowedTags), allowedFormats);
 
     return {
       flavors: flavors.substring(0, flavors.length - 1),
@@ -2218,8 +2215,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
             // filter for different video sources
             Engage.log('Video: Adding video source: ' + track.url + ' (' + track.mimetype + ')');
             if (track.mimetype == 'application/dash+xml') {
+              if (loadDash) return; //patch for broken Distribution Service that may contain Adaptive Streaming format multiple times
               loadDash = true;
             } else if (track.mimetype == 'application/x-mpegURL') {
+              if (loadHls) return; //patch for broken Distribution Service that may contain Adaptive Streaming format multiple times
               loadHls = true;
             }
             videoSources[Utils.extractFlavorMainType(track.type)].push({
