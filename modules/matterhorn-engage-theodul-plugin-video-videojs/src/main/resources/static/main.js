@@ -155,10 +155,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var videojs_swf_path = 'lib/video-js/video-js.swf';
   var synchronizePath = 'lib/synchronize-min';
   /* https://github.com/CallToPower/Synchronize.js */
-  var mediaSourcesPath = 'lib/video-js/videojs-media-sources.min';
-  /* https://github.com/videojs/videojs-contrib-media-sources */
-  var hlsPath = 'lib/video-js/videojs.hls.min';
+  var hlsPath = 'lib/video-js/videojs-contrib-hls.min';
   /* https://github.com/videojs/videojs-contrib-hls */
+  var dashPath = 'lib/video-js/dash.all.min';
+  var dashPluginPath = 'lib/video-js/videojs-dash.min';
+  /* https://github.com/videojs/videojs-contrib-dash */
   var videoAreaAspectRatio;
   var checkVideoDisplaySizeTimeout = 1500;
   var audioLoadTimeoutCheckDelay = 5000;
@@ -183,6 +184,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var aspectRatio = null;
   var singleVideoPaddingTop = '56.25%';
   var initCount = 7;
+  var videoDisplayReady = 0;
   var infoMeChange = 'change:infoMe';
   var mediapackageError = false;
   var videoDisplayNamePrefix = 'videojs_videodisplay_';
@@ -233,6 +235,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var globalVideoSource = [];
   var videoResultions = [];
   var loadHls = false;
+  var loadDash = false;
   var flavors = '';
   var mimetypes = '';
   var translations = [];
@@ -1243,15 +1246,30 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   }
 
   function prepareRenderingVideoDisplay(videoDataView) {
+    if (loadHls) videoDisplayReady++;
+    if (loadDash) videoDisplayReady++;
     if (loadHls) {
-      require([relative_plugin_path + mediaSourcesPath], function () {
-        Engage.log('Video: Lib videojs media sources loaded');
-        require([relative_plugin_path + hlsPath], function () {
-          Engage.log('Video: Lib videojs HLS playback loaded');
-          renderVideoDisplay(videoDataView);
+      require([relative_plugin_path + hlsPath], function () {
+        Engage.log('Video: Lib videojs HLS playback loaded');
+        videoDisplayReady--;
+        renderVideoDisplayIfReady(videoDataView);
+      });
+    }
+    if (loadDash) {
+      require([relative_plugin_path + dashPath], function () {
+        require([relative_plugin_path + dashPluginPath], function () {
+          Engage.log('Video: Lib videojs DASH playback loaded');
+          videoDisplayReady--;
+          renderVideoDisplayIfReady(videoDataView);
         });
       });
-    } else {
+    }
+
+    renderVideoDisplayIfReady(videoDataView);
+  }
+
+  function renderVideoDisplayIfReady(videoDataView) {
+    if (videoDisplayReady === 0) {
       renderVideoDisplay(videoDataView);
     }
   }

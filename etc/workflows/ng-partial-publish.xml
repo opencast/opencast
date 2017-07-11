@@ -116,7 +116,7 @@
         <configuration key="target-tags">-engage-download</configuration>
       </configurations>
     </operation>
-    
+
     <operation
       id="image"
       exception-handler-workflow="ng-partial-error"
@@ -279,43 +279,66 @@
     <!-- Encode presenter (camera) to Engage player format -->
 
     <operation
+      if="NOT (${flagMultiQuality})"
       id="compose"
       exception-handler-workflow="ng-partial-error"
-      description="Encoding presenter (camera) video to MP4 download">
+      description="Encoding single-quality videos to MP4 download">
       <configurations>
-        <configuration key="source-flavor">presenter/themed</configuration>
-        <configuration key="target-flavor">presenter/delivery</configuration>
+        <configuration key="source-flavor">*/themed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
         <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">mp4-medium.http</configuration>
+        <configuration key="encoding-profile">mp4-hd.http</configuration>
       </configurations>
     </operation>
 
-    <!-- Encode presentation (vga) to Engage player format -->
-
     <operation
-      id="compose"
+      if="${flagMultiQuality}"
+      id="encode"
       exception-handler-workflow="ng-partial-error"
-      description="Encoding presentation (screen) to MP4 download">
+      description="Encoding multi-quality video to MP4 download">
       <configurations>
-        <configuration key="source-flavor">presentation/themed</configuration>
-        <configuration key="target-flavor">presentation/delivery</configuration>
+        <configuration key="source-flavor">*/themed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
         <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">mp4-vga-medium.http</configuration>
+        <configuration key="encoding-profile">adaptive-parallel.http</configuration>
       </configurations>
     </operation>
 
-    <!-- Encode presentater (camera) to Engage player audio only format -->
 
     <operation
+      if="${flagMultiQuality}"
       id="compose"
-      fail-on-error="false"
       exception-handler-workflow="ng-partial-error"
-      description="Encoding presenter (screen) to MP3 audio download">
+      description="Encoding multi-quality video to MP4 download">
       <configurations>
-        <configuration key="source-flavor">presenter/themed</configuration>
-        <configuration key="target-flavor">presenter/delivery</configuration>
+        <configuration key="source-flavor">*/themed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
         <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">mp3.http</configuration>
+        <configuration key="encoding-profile">adaptive-1080p.http</configuration>
+      </configurations>
+    </operation>
+    <operation
+      if="${flagMultiQuality}"
+      id="compose"
+      exception-handler-workflow="ng-partial-error"
+      description="Encoding multi-quality video to MP4 download">
+      <configurations>
+        <configuration key="source-flavor">*/themed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming</configuration>
+        <configuration key="encoding-profile">adaptive-720p.http</configuration>
+      </configurations>
+    </operation>
+    <operation
+      if="${flagMultiQuality}"
+      id="compose"
+      exception-handler-workflow="ng-partial-error"
+      description="Encoding multi-quality video to MP4 download">
+      <configurations>
+        <configuration key="source-flavor">*/themed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming</configuration>
+        <configuration key="encoding-profile">adaptive-480p.http</configuration>
       </configurations>
     </operation>
 

@@ -20,6 +20,16 @@
       -->
       </style>
       <div id="workflow-configuration">
+
+        <fieldset>
+          <legend>Video Quality</legend>
+          <ul>
+            <li>
+              <input id="flagMultiQuality" name="flagMultiQuality" type="checkbox" class="configField" value="false" />
+              <label for="flagMultiQuality">Multi Quality Videos for Adaptive Streaming</label>
+            </li>
+          </ul>
+        </fieldset>
         <fieldset>
           <legend>Add a comment that the recording needs:</legend>
           <ul>
@@ -117,6 +127,7 @@
         <configuration key="straightToPublishing">true</configuration>
         <configuration key="flagForCutting">false</configuration>
         <configuration key="flagForReview">false</configuration>
+        <configuration key="flagMultiQuality">false</configuration>
         <configuration key="publishToEngage">true</configuration>
         <configuration key="publishToApi">true</configuration>
         <configuration key="publishToOaiPmh">true</configuration>
@@ -124,6 +135,17 @@
         <configuration key="publishToAws">false</configuration>
       </configurations>
     </operation>
+
+    <operation
+      id="export-wf-properties"
+      fail-on-error="true"
+      exception-handler-workflow="ng-partial-error"
+      description="Export workflow settings to Java properties file">
+      <configurations>
+        <configuration key="target-flavor">processing/defaults</configuration>
+      </configurations>
+    </operation>
+
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Prepare asset                                                     -->
