@@ -26,13 +26,6 @@ angular.module('adminNg.controllers')
     function ($scope, $route, $location, $window, ToolsResource, Notifications, EventHelperService) {
 
         $scope.navigateTo = function (path) {
-            // FIMXE When changing tabs, video playback breaks. Using playback
-            // controls after a tab change works for audio, but there is no
-            // video. Perhaps it results in an orphaned <video> element.
-            //
-            // The following hack prevents a racing condition between setting
-            // the path and a reload by preventing the path change from
-            // triggering a render sync before the reload takes place.
             var lastRoute, off;
             lastRoute = $route.current;
             off = $scope.$on('$locationChangeSuccess', function () {
