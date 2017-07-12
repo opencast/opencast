@@ -211,8 +211,8 @@ angular.module('adminNg.controllers')
                             roles[key] = key;
                         }
                     }, this);
-		            return roles;
-		        });
+                    return roles;
+                });
               }, this);
             },
             fetchChildResources = function (id) {
@@ -317,8 +317,9 @@ angular.module('adminNg.controllers')
                             if (agent.id === $scope.source.agentId) {
                                 source.device = agent;
                                 // Retrieve agent inputs configuration
-                                if (angular.isDefined(source.agentConfiguration['capture.device.names'])) {
-                                    inputs = source.agentConfiguration['capture.device.names'].split(',');
+                                var dev = ((source.metadata || {}).agentConfiguration || {})['capture.device.names'];
+                                if (angular.isDefined(dev)) {
+                                    inputs = dev.split(',');
                                     source.device.inputMethods = {};
                                     angular.forEach(inputs, function (input) {
                                         source.device.inputMethods[input] = true;
@@ -446,14 +447,14 @@ angular.module('adminNg.controllers')
                     }
 
                     $scope.source.agentId = $scope.source.device.id;
-                    $scope.source.agentConfiguration['capture.device.names'] = '';
+                    $scope.source.metadata.agentConfiguration['capture.device.names'] = '';
 
                     angular.forEach($scope.source.device.inputMethods, function (value, key) {
                         if (value) {
-                            if ($scope.source.agentConfiguration['capture.device.names'] !== '') {
-                                $scope.source.agentConfiguration['capture.device.names'] += ',';
+                            if ($scope.source.metadata.agentConfiguration['capture.device.names'] !== '') {
+                                $scope.source.metadata.agentConfiguration['capture.device.names'] += ',';
                             }
-                            $scope.source.agentConfiguration['capture.device.names'] += key;
+                            $scope.source.metadata.agentConfiguration['capture.device.names'] += key;
                         }
                     });
 
@@ -744,12 +745,12 @@ angular.module('adminNg.controllers')
         };
 
         $scope.comment = function () {
-        	$scope.myComment.saving = true;
+            $scope.myComment.saving = true;
             CommentResource.save({ resource: 'event', resourceId: $scope.resourceId, type: 'comment' },
                 { text: $scope.myComment.text, reason: $scope.myComment.reason },
                 function () {
-                	$scope.myComment.saving = false;
-                	$scope.myComment.text = '';
+                    $scope.myComment.saving = false;
+                    $scope.myComment.text = '';
 
                     $scope.comments = CommentResource.query({
                         resource: 'event',
@@ -757,18 +758,18 @@ angular.module('adminNg.controllers')
                         type: 'comments'
                     });
                 }, function () {
-                	$scope.myComment.saving = false;
+                    $scope.myComment.saving = false;
                 }
             );
         };
 
         $scope.reply = function () {
-        	$scope.myComment.saving = true;
+            $scope.myComment.saving = true;
             CommentResource.save({ resource: 'event', resourceId: $scope.resourceId, id: $scope.replyToId, type: 'comment', reply: 'reply' },
                 { text: $scope.myComment.text, resolved: $scope.myComment.resolved },
                 function () {
-                	$scope.myComment.saving = false;
-                	$scope.myComment.text = '';
+                    $scope.myComment.saving = false;
+                    $scope.myComment.text = '';
 
                     $scope.comments = CommentResource.query({
                         resource: 'event',
@@ -776,7 +777,7 @@ angular.module('adminNg.controllers')
                         type: 'comments'
                     });
                 }, function () {
-                	$scope.myComment.saving = false;
+                    $scope.myComment.saving = false;
                 }
 
             );
