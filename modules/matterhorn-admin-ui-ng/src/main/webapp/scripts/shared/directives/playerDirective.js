@@ -14,7 +14,6 @@ angular.module('adminNg.directives')
         },
         link: function (scope, element, attrs) {
             function loadPlayerAdapter(element) {
-              console.log("loading player for element " + element + " adapter " + attrs.adapter.toUpperCase());
                 scope.player.adapter = PlayerAdapterRepository.
                     createNewAdapter(
                         attrs.adapter.toUpperCase(),
@@ -103,7 +102,6 @@ angular.module('adminNg.directives')
             }
 
             scope.$on('$destroy', function () {
-                console.log("Player destroyed");
                 $timeout.cancel(scope.checkTimeout);
             });
 
