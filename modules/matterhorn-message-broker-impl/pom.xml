@@ -133,7 +133,6 @@
               !org.springframework.xml.transform,
               !sun.management,
               org.opencastproject.message.broker.api.acl,
-              org.opencastproject.message.broker.api.agent,
               org.opencastproject.message.broker.api.assetmanager,
               org.opencastproject.message.broker.api.comments,
               org.opencastproject.message.broker.api.group,

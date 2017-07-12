@@ -153,6 +153,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-working-file-repository-service-impl</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.fileinstall</artifactId>
       <exclusions>
@@ -191,6 +197,7 @@
               !org.apache.tools.bzip2,
               !org.apache.tools.tar,
               !org.bouncycastle.crypto.*,
+              org.w3c.dom;version=0,
               *
             </Import-Package>
             <Private-Package>

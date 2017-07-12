@@ -92,11 +92,7 @@ public class AuthenticationSuccessHandler implements
     }
 
     // None of the user's roles are in the welcome pages map, so try the wildcard. If that's not present, redirect to /
-    if (welcomePages.containsKey(WILDCARD)) {
-      response.sendRedirect(welcomePages.get(WILDCARD));
-    } else {
-      response.sendRedirect(ROOT);
-    }
+    response.sendRedirect(welcomePages.getOrDefault(WILDCARD, ROOT));
   }
 
   /**

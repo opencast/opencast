@@ -39,6 +39,8 @@ import org.opencastproject.util.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+
 public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<SchedulerItem> {
 
   private static final Logger logger = LoggerFactory.getLogger(SchedulerMessageReceiverImpl.class);
@@ -104,8 +106,35 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
         // Persist the scheduling event
         updateEvent(event);
         return;
+      case UpdateAgentId:
+        logger.debug("Received update event '{}' with agent id to '{}'", schedulerItem.getId(),
+                schedulerItem.getAgentId());
+        // Load the corresponding recording event
+        try {
+          event = EventIndexUtils.getOrCreateEvent(schedulerItem.getMediaPackageId(), organization, user,
+                  getSearchIndex());
+          event.setAgentId(schedulerItem.getAgentId());
+        } catch (SearchIndexException e) {
+          logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
+          return;
+        }
+        // Persist the scheduling event
+        updateEvent(event);
+        return;
       case UpdateProperties:
-        logger.debug("Received Update Properties");
+        logger.debug("Received update event '{}' CA Properties '{}'", schedulerItem.getId(),
+                schedulerItem.getProperties());
+        // Load the corresponding recording event
+        try {
+          event = EventIndexUtils.getOrCreateEvent(schedulerItem.getMediaPackageId(), organization, user,
+                  getSearchIndex());
+          event.setAgentConfiguration(schedulerItem.getProperties());
+        } catch (SearchIndexException e) {
+          logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
+          return;
+        }
+        // Persist the scheduling event
+        updateEvent(event);
         return;
       case UpdateOptOut:
         logger.debug("Received Update opt out status");
@@ -154,6 +183,82 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
           return;
         }
 
+        // Persist the scheduling event
+        updateEvent(event);
+        return;
+      case UpdateRecordingStatus:
+        logger.debug("Received Update Recording {}", schedulerItem.getMediaPackageId());
+
+        // Load the corresponding recording event
+        try {
+          event = EventIndexUtils.getOrCreateEvent(schedulerItem.getMediaPackageId(), organization, user,
+                  getSearchIndex());
+          event.setRecordingStatus(schedulerItem.getRecordingState());
+        } catch (SearchIndexException e) {
+          logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
+          return;
+        }
+
+        // Persist the scheduling event
+        updateEvent(event);
+        return;
+      case DeleteRecordingStatus:
+        logger.debug("Received Delete recording status {}", schedulerItem.getMediaPackageId());
+
+        // Load the corresponding recording event
+        try {
+          event = EventIndexUtils.getOrCreateEvent(schedulerItem.getMediaPackageId(), organization, user,
+                  getSearchIndex());
+          event.setRecordingStatus(null);
+        } catch (SearchIndexException e) {
+          logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
+          return;
+        }
+
+        // Persist the scheduling event
+        updateEvent(event);
+        return;
+      case UpdateEnd:
+        String endTime = schedulerItem.getEnd() == null ? null : DateTimeSupport.toUTC(schedulerItem.getEnd().getTime());
+        logger.debug("Received update event '{}' end time '{}'", schedulerItem.getId(), endTime);
+        // Load the corresponding recording event
+        try {
+          event = EventIndexUtils.getOrCreateEvent(schedulerItem.getMediaPackageId(), organization, user,
+                  getSearchIndex());
+          event.setTechnicalEndTime(endTime);
+        } catch (SearchIndexException e) {
+          logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
+          return;
+        }
+        // Persist the scheduling event
+        updateEvent(event);
+        return;
+      case UpdateStart:
+        String startTime = schedulerItem.getStart() == null ? null : DateTimeSupport.toUTC(schedulerItem.getStart().getTime());
+        logger.debug("Received update event '{}' start time '{}'", schedulerItem.getId(), startTime);
+        // Load the corresponding recording event
+        try {
+          event = EventIndexUtils.getOrCreateEvent(schedulerItem.getMediaPackageId(), organization, user,
+                  getSearchIndex());
+          event.setTechnicalStartTime(startTime);
+        } catch (SearchIndexException e) {
+          logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
+          return;
+        }
+        // Persist the scheduling event
+        updateEvent(event);
+        return;
+      case UpdatePresenters:
+        logger.debug("Received update event '{}' with presenters '{}'", schedulerItem.getId(),
+                schedulerItem.getPresenters());
+        try {
+          event = EventIndexUtils.getOrCreateEvent(schedulerItem.getMediaPackageId(), organization, user,
+                  getSearchIndex());
+          event.setTechnicalPresenters(new ArrayList<>(schedulerItem.getPresenters()));
+        } catch (SearchIndexException e) {
+          logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
+          return;
+        }
         // Persist the scheduling event
         updateEvent(event);
         return;

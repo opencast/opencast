@@ -102,16 +102,6 @@
           </virtualDestinationInterceptor>
           <virtualDestinationInterceptor>
             <virtualDestinations>
-              <compositeQueue name="RECORDING.QUEUE">
-                <forwardTo>
-                  <queue physicalName="RECORDING.Adminui" />
-                  <queue physicalName="RECORDING.Externalapi" />
-                </forwardTo>
-              </compositeQueue>
-            </virtualDestinations>
-          </virtualDestinationInterceptor>
-          <virtualDestinationInterceptor>
-            <virtualDestinations>
               <compositeQueue name="SCHEDULER.QUEUE">
                 <forwardTo>
                   <queue physicalName="SCHEDULER.Adminui" />

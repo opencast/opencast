@@ -119,8 +119,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
 
     EasyMock.expect(indexService.getEvent(DELETE_EVENT_METADATA, externalIndex))
             .andReturn(Opt.some(deleteMetadataEvent)).anyTimes();
-    EasyMock.expect(indexService.getEventMediapackage(deleteMetadataEvent)).andReturn(Opt.some(deleteMetadataMP))
-            .anyTimes();
+    EasyMock.expect(indexService.getEventMediapackage(deleteMetadataEvent)).andReturn(deleteMetadataMP).anyTimes();
 
     indexService.removeCatalogByFlavor(deleteMetadataEvent,
             new MediaPackageElementFlavor(DELETE_CATALOG_TYPE, "episode"));
@@ -146,8 +145,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
     EasyMock.expect(noPublicationsMP.getPublications()).andReturn(new Publication[] {}).anyTimes();
     EasyMock.expect(indexService.getEvent(NO_PUBLICATIONS_EVENT, externalIndex))
             .andReturn(Opt.some(noPublicationsEvent)).anyTimes();
-    EasyMock.expect(indexService.getEventMediapackage(noPublicationsEvent)).andReturn(Opt.some(noPublicationsMP))
-            .anyTimes();
+    EasyMock.expect(indexService.getEventMediapackage(noPublicationsEvent)).andReturn(noPublicationsMP).anyTimes();
     // Two Pubs
     Event twoPublicationsEvent = new Event(TWO_PUBLICATIONS, defaultOrg.getId());
     MediaPackage twoPublicationsMP = EasyMock.createMock(MediaPackage.class);
@@ -161,8 +159,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
             .anyTimes();
     EasyMock.expect(indexService.getEvent(TWO_PUBLICATIONS, externalIndex)).andReturn(Opt.some(twoPublicationsEvent))
             .anyTimes();
-    EasyMock.expect(indexService.getEventMediapackage(twoPublicationsEvent)).andReturn(Opt.some(twoPublicationsMP))
-            .anyTimes();
+    EasyMock.expect(indexService.getEventMediapackage(twoPublicationsEvent)).andReturn(twoPublicationsMP).anyTimes();
 
     // Replay all mocks
     EasyMock.replay(deleteMetadataMP, indexService, noPublicationsMP, twoPublicationsMP);

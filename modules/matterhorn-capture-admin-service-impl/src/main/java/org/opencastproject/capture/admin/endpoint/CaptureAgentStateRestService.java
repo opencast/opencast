@@ -31,8 +31,10 @@ import static org.opencastproject.capture.admin.api.AgentState.KNOWN_STATES;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentStateUpdate;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.capture.admin.api.Recording;
-import org.opencastproject.capture.admin.api.RecordingStateUpdate;
+import org.opencastproject.capture.admin.impl.RecordingStateUpdate;
+import org.opencastproject.scheduler.api.Recording;
+import org.opencastproject.scheduler.api.SchedulerException;
+import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesResponse;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -46,6 +48,7 @@ import com.google.gson.JsonSyntaxException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +62,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -66,6 +70,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -88,6 +93,7 @@ public class CaptureAgentStateRestService {
 
   private static final Logger logger = LoggerFactory.getLogger(CaptureAgentStateRestService.class);
   private CaptureAgentStateService service;
+  private SchedulerService schedulerService;
 
   /**
    * Callback from OSGi that is called when this service is activated.
@@ -104,6 +110,10 @@ public class CaptureAgentStateRestService {
 
   public void unsetService(CaptureAgentStateService service) {
     this.service = null;
+  }
+
+  public void setSchedulerService(SchedulerService schedulerService) {
+    this.schedulerService = schedulerService;
   }
 
   public CaptureAgentStateRestService() {
@@ -375,16 +385,18 @@ public class CaptureAgentStateRestService {
     }, returnDescription = "")
   public Response getRecordingState(@PathParam("id") String id, @PathParam("type") String type)
           throws NotFoundException {
-    if (service == null)
-      return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
+    try {
+      Recording rec = schedulerService.getRecordingState(id);
 
-    Recording rec = service.getRecordingState(id);
-
-    logger.debug("Submitting state for recording {}", id);
-    if ("json".equals(type)) {
-      return Response.ok(new RecordingStateUpdate(rec)).type(MediaType.APPLICATION_JSON).build();
-    } else {
-      return Response.ok(new RecordingStateUpdate(rec)).type(MediaType.TEXT_XML).build();
+      logger.debug("Submitting state for recording {}", id);
+      if ("json".equals(type)) {
+        return Response.ok(new RecordingStateUpdate(rec)).type(MediaType.APPLICATION_JSON).build();
+      } else {
+        return Response.ok(new RecordingStateUpdate(rec)).type(MediaType.TEXT_XML).build();
+      }
+    } catch (SchedulerException e) {
+      logger.debug("Unable to get recording state of {}: {}", id, ExceptionUtils.getStackTrace(e));
+      return Response.serverError().build();
     }
   }
 
@@ -402,19 +414,21 @@ public class CaptureAgentStateRestService {
     }, reponses = {
       @RestResponse(description = "{id} set to {state}", responseCode = SC_OK),
       @RestResponse(description = "{id} or {state} is empty or {state} is not known", responseCode = SC_BAD_REQUEST),
-      @RestResponse(description = "Capture agent state service not available", responseCode = SC_SERVICE_UNAVAILABLE)
+      @RestResponse(description = "Recording with {id} could not be found", responseCode = HttpServletResponse.SC_NOT_FOUND)
     }, returnDescription = "")
-  public Response setRecordingState(@PathParam("id") String id, @FormParam("state") String state) {
-    if (service == null)
-      return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
-
+  public Response setRecordingState(@PathParam("id") String id, @FormParam("state") String state) throws NotFoundException {
     if (StringUtils.isEmpty(id) || StringUtils.isEmpty(state))
       return Response.serverError().status(Response.Status.BAD_REQUEST).build();
 
-    if (service.setRecordingState(id, state)) {
-      return Response.ok(id + " set to " + state).build();
-    } else {
-      return Response.status(Response.Status.BAD_REQUEST).build();
+    try {
+      if (schedulerService.updateRecordingState(id, state)) {
+        return Response.ok(id + " set to " + state).build();
+      } else {
+        return Response.status(Response.Status.BAD_REQUEST).build();
+      }
+    } catch (SchedulerException e) {
+      logger.debug("Unable to set recording state of {}: {}", id, ExceptionUtils.getStackTrace(e));
+      return Response.serverError().build();
     }
   }
 
@@ -429,17 +443,18 @@ public class CaptureAgentStateRestService {
       @RestResponse(description = "{id} removed", responseCode = SC_OK),
       @RestResponse(description = "{id} is empty", responseCode = SC_BAD_REQUEST),
       @RestResponse(description = "Recording with {id} could not be found", responseCode = SC_NOT_FOUND),
-      @RestResponse(description = "Capture agent state service not available", responseCode = SC_SERVICE_UNAVAILABLE)
     }, returnDescription = "")
   public Response removeRecording(@PathParam("id") String id) throws NotFoundException {
-    if (service == null)
-      return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
-
     if (StringUtils.isEmpty(id))
       return Response.serverError().status(Response.Status.BAD_REQUEST).build();
 
-    service.removeRecording(id);
-    return Response.ok(id + " removed").build();
+    try {
+      schedulerService.removeRecording(id);
+      return Response.ok(id + " removed").build();
+    } catch (SchedulerException e) {
+      logger.debug("Unable to remove recording with id '{}': {}", id, ExceptionUtils.getStackTrace(e));
+      return Response.serverError().build();
+    }
   }
 
   @GET
@@ -450,17 +465,18 @@ public class CaptureAgentStateRestService {
       @RestResponse(description = "Returns all known recordings.", responseCode = SC_OK) },
     returnDescription = "")
   public List<RecordingStateUpdate> getAllRecordings() {
-    LinkedList<RecordingStateUpdate> update = new LinkedList<RecordingStateUpdate>();
-    if (service != null) {
-      Map<String, Recording> data = service.getKnownRecordings();
+    try {
+      LinkedList<RecordingStateUpdate> update = new LinkedList<RecordingStateUpdate>();
+      Map<String, Recording> data = schedulerService.getKnownRecordings();
       // Run through and build a map of updates (rather than states)
       for (Entry<String, Recording> e : data.entrySet()) {
         update.add(new RecordingStateUpdate(e.getValue()));
       }
-    } else {
-      logger.info("Service was null for getAllRecordings");
+      return update;
+    } catch (SchedulerException e) {
+      logger.debug("Unable to get all recordings: {}", ExceptionUtils.getStackTrace(e));
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
-    return update;
   }
 
 }

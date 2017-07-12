@@ -57,6 +57,7 @@ public class MockHttpServletRequest implements HttpServletRequest {
   private String mStrContentType;
   @SuppressWarnings("unchecked")
   private Map mHeaders = new java.util.HashMap();
+  private String pathInfo;
 
   /**
    * Creates a new instance with the given request data and content type.
@@ -159,7 +160,11 @@ public class MockHttpServletRequest implements HttpServletRequest {
    */
   @Override
   public String getPathInfo() {
-    return null;
+    return pathInfo;
+  }
+
+  public void setPathInfo(String pathInfo) {
+    this.pathInfo = pathInfo;
   }
 
   /**

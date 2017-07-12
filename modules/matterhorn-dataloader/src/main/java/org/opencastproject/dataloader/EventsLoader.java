@@ -21,6 +21,7 @@
 
 package org.opencastproject.dataloader;
 
+import static com.entwinemedia.fn.Prelude.chuck;
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -56,7 +57,6 @@ import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Effect0;
-import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
@@ -88,6 +88,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -189,8 +190,13 @@ public class EventsLoader {
     workflowService.update(workflowInstance);
   }
 
-  private void addSchedulerEntry(EventEntry event, DublinCoreCatalog episodeDublinCore) throws Exception {
-    schedulerService.addEvent(episodeDublinCore, new HashMap<String, String>());
+  private void addSchedulerEntry(EventEntry event, MediaPackage mediaPackage) throws Exception {
+    Date endDate = new DateTime(event.getRecordingDate().getTime()).plusMinutes(event.getDuration()).toDate();
+    schedulerService.addEvent(event.getRecordingDate(), endDate, event.getCaptureAgent(),
+            Collections.<String> emptySet(), mediaPackage, Collections.<String, String> emptyMap(),
+            Collections.<String, String> emptyMap(), Opt.<Boolean> none(), Opt.some("org.opencastproject.dataloader"),
+            SchedulerService.ORIGIN);
+    cleanUpMediaPackage(mediaPackage);
   }
 
   private void execute(CSVParser csv) throws Exception {
@@ -204,20 +210,33 @@ public class EventsLoader {
 
       createSeries(event);
 
-      Tuple<MediaPackage, DublinCoreCatalog> basicMediaPackage = getBasicMediaPackage(event);
+      MediaPackage mediaPackage = getBasicMediaPackage(event);
 
       if (now.after(event.getRecordingDate())) {
-        addWorkflowEntry(basicMediaPackage.getA());
+        addWorkflowEntry(mediaPackage);
         if (event.isArchive())
-          addArchiveEntry(basicMediaPackage.getA());
+          addArchiveEntry(mediaPackage);
       } else {
-        addSchedulerEntry(event, basicMediaPackage.getB());
+        addSchedulerEntry(event, mediaPackage);
       }
       logger.info("Finished populating event {}", i++);
     }
   }
 
-  private Tuple<MediaPackage, DublinCoreCatalog> getBasicMediaPackage(EventEntry event) throws Exception {
+  private void cleanUpMediaPackage(MediaPackage mp) {
+    for (MediaPackageElement element : mp.getElements()) {
+      try {
+        workspace.delete(element.getURI());
+      } catch (NotFoundException e) {
+        logger.warn("Unable to find (and hence, delete), this mediapackage '{}' element '{}'", mp.getIdentifier(),
+                element.getIdentifier());
+      } catch (IOException e) {
+        chuck(e);
+      }
+    }
+  }
+
+  private MediaPackage getBasicMediaPackage(EventEntry event) throws Exception {
     URL baseMediapackageUrl = EventsLoader.class.getResource("/base_mediapackage.xml");
     MediaPackage mediaPackage = MediaPackageParser.getFromXml(IOUtils.toString(baseMediapackageUrl));
     DublinCoreCatalog episodeDublinCore = getBasicEpisodeDublinCore(event);
@@ -254,7 +273,7 @@ public class EventsLoader {
         IOUtils.closeQuietly(in);
       }
     }
-    return Tuple.tuple(mediaPackage, episodeDublinCore);
+    return mediaPackage;
   }
 
   private void createSeries(EventEntry event) throws SeriesException, UnauthorizedException, NotFoundException {

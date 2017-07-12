@@ -291,7 +291,7 @@ public class ToolsEndpoint implements ManagedService {
 
     // Select tracks
     final Event event = getEvent(mediaPackageId).get();
-    final MediaPackage mp = index.getEventMediapackage(event).orError(new NotFoundException()).get();
+    final MediaPackage mp = index.getEventMediapackage(event);
     List<MediaPackageElement> previewPublications = getPreviewElementsFromPublication(getInternalPublication(mp));
 
     // Collect previews and tracks
@@ -398,7 +398,7 @@ public class ToolsEndpoint implements ManagedService {
     if (optEvent.isNone()) {
       return R.notFound();
     } else {
-      MediaPackage mediaPackage = index.getEventMediapackage(optEvent.get()).orError(new NotFoundException()).get();
+      MediaPackage mediaPackage = index.getEventMediapackage(optEvent.get());
       Smil smil;
       try {
         smil = createSmilCuttingCatalog(editingInfo, mediaPackage);
