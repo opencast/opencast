@@ -743,7 +743,7 @@
            }
          },
           "SCHEDULING": {
-            "CAPTION": "Participation status",
+            "CAPTION": "Scheduling configuration",
             "REVIEW_STATUS": {
               "CAPTION": "Review status"
             },

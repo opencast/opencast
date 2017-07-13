@@ -16,6 +16,48 @@ A proposal is accepted when no veto (`-1`) is voted within a time spawn of 72 ho
 Passed Proposals
 ----------------
 
+### Make Maintenance Releases Easier
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on April 24, 2017
+
+```no-highlight
+Hi everyone,
+over the last years, I have cut a lot of Opencast maintenance releases.
+The process is to announce that a release will be cut, create a release
+candidate and wait 72h without veto to actually release.
+
+I have always sent out the voting mail as required by our release
+process and I can always count on the usual response: No reply.
+
+This is actually not very surprising since for example now for the
+2.3.3 release, people have either already tested the latest state of
+r/2.3.3 or are involved in the next big release already.
+
+In short this means that we always have a three day waiting period in
+which basically nothing happens. That is why I would like to change the
+process for *maintenance releases* in the following way:
+
+  A release manager may cut new maintenance releases at any time
+  without prior release candidate.
+  He should openly announce the date for a new release a week before
+  the release or at any earlier point in time.
+
+Note that this will also allow a release manager to release as fast as
+possible if necessary (e.g. security fix) since the announcement is not
+strictly required but only a strong advise.
+
+This should lessen the work for the a release managers and will enable
+more agile release processes. We also should not really loose any QA
+work since everyone knows when releases will happen and people can
+always test the latest state of a release branch which will become the
+new release.
+
+This proposal will not affect major releases where release candidates
+with three days testing period would still be required.
+
+I hope you agree with this change,
+Lars
+```
+
 ### Officially declare the Admin UI Facade as internal API for exclusive use by the module matterhorn-adminui-ng
 Proposed by Sven Stauber <sven.stauber@switch.ch>, passed on December 16, 2016
 

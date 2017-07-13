@@ -1492,7 +1492,7 @@ public final class MediaPackageImpl implements MediaPackage {
   /**
    * A JAXB adapter that allows the {@link MediaPackage} interface to be un/marshalled
    */
-  static class Adapter extends XmlAdapter<MediaPackageImpl, MediaPackage> {
+  public static class Adapter extends XmlAdapter<MediaPackageImpl, MediaPackage> {
     @Override
     public MediaPackageImpl marshal(MediaPackage mp) throws Exception {
       return (MediaPackageImpl) mp;

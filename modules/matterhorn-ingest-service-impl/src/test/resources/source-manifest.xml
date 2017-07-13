@@ -1,4 +1,17 @@
-<oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org" id="00000/2" start="2007-12-05T13:40:00" duration="10044">
+<mediapackage xmlns="http://mediapackage.opencastproject.org" id="00000/2" start="2007-12-05T13:40:00" duration="10044">
+  <title>t1</title>
+  <series>s1</series>
+  <seriestitle>st1</seriestitle>
+  <creators>
+    <creator>p1</creator>
+  </creators>
+  <contributors>
+    <contributor>sd1</contributor>
+  </contributors>
+  <subjects>
+    <subject>s1</subject>
+  </subjects>
+  <license>l1</license>
   <media>
     <track id="track-1" type="presentation/source">
       <mimetype>video/quicktime</mimetype>
@@ -22,4 +35,4 @@
       <checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</checksum>
     </attachment>    
   </attachments>
-</oc:mediapackage>
+</mediapackage>

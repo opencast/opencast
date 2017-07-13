@@ -303,7 +303,7 @@ public interface IndexService {
           UnauthorizedException;
 
   // TODO remove when it is no longer needed by AbstractEventEndpoint.
-  Opt<MediaPackage> getEventMediapackage(Event event) throws IndexServiceException;
+  MediaPackage getEventMediapackage(Event event) throws IndexServiceException;
 
   // TODO remove when it is no longer needed by AbstractEventEndpoint
   Source getEventSource(Event event);

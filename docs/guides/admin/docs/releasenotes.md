@@ -1,110 +1,28 @@
-Opencast 3.0: Release Notes
-============================
-
-Opencast 3.0 has been streamlined to better address Adopters' needs when it comes to their processes. This means
-the user experience and the efficiency of users performing their tasks have been significantly enhanced.
-Other major improvements are new features for the Opencast Player and even more flexibiity when it comes to the
-integration of Opencast into external authentication and authorization systems.
-
-New Features and Improvements
------------------------------
-
-  - **Streamlined Video Editor** - The video editor has been streamlined to better support the Adopters' processes,
-    significantly enhancing the efficiency when it comes to publishing content. Metadata and comments can now be edited
-    directly in the video editor - saving the time to navigate within the UI to perform this almost always required
-    steps. Keyboard shortcuts can be used to gain further efficiency.
-
-  - **Streamlined Keyboard Accessibility** - The introduction of keyboard shortcuts and vastly improved support for
-    tab navigation across the administrative UI allow users to more efficiently interact with Opencast.
-
-  - **Improved User Experience** - The user experience has been approved and streamlined at many other locations. For
-    example, the user is presented configurable defaults for the input masks used to schedule recordings. The capture
-    agent status is now additional indicated colors. The event counter filters have been reordered to match the life
-    cycly of recordings. Series dropdowns are now sorted alphabetically and can be searched. The access policy page now
-    supports search and filtering.
-
-  - **Piwik Integration** - The Opencast video player now comes with out-of-the-box Piwik support so that user
-    statistics for the player can be easily gathered and visualized
-
-  - **Caption Support** - The Opencast video player now supports captions
-
-  - **Users and roles** - The management of users and roles has been significantly improved to better support
-    intergration of third-party user providers (e.g. LDAP, Sakai). The administrative user interface has been
-    extended to better support externally provided roles. A new custom role provider allows Adopters to integrate
-    their custom roles in a seamless way.
-
-  - **OAI-PMH** - The OAI-PMH implementation has been completely revised. Now implemented as independent communication
-    channels, an arbitrary number of OAI-PMH repositories can be handled by the Opencast OAI-PMH server.
-    A new OAI-PMH metadata prefix provides direct access to Dublincore metadata catalogs, promoting a strong decoupling
-    from external OAI-PMH harverster
-
-  - **Fixed basic LDAP Integration** - Updated format of the configuration files and fixed basic authentication and
-    authorization via LDAP. Opencast groups are still not supported.
-
-  - **AAI Support** - Opencast now provides out-of-the-box support for the Authentication and Authorization
-    Infrastructre (AAI). This enables adopters to use their existing single sign-on log-in for Opencast.
-
-  - **Sakai User Provider** - Opencast now out-of-the-box provides an Sakai user provider.
-
-  - **AWS S3 Support** - Opencast now supports distribution to Amazon S3
-
-  - **Extended Themes** - The themes facility that allows producers to let Opencast brand their produced video content
-    using intro and outro videos has been extended to support title slides (metadata within video content) and
-    watermarks.
-
-  - **New Workflow Operation Handlers**
-    - **WOH tag-by-dcterm** allows media package element tagging based on Dublincore metadata values
-    - **WOH configure-by-dcterm** can be used to set workflow instance variables based on Dublincore metadata which in
-      turn can be used to conditionally execute workflow operations
-    - **WOH probe-resolution** allows workflow operations to be executed based on specific properties ...
-    - **WOH publish-oaipmh, retract-oaipmh and republish-oaipmh** support publication management for OAI-PMH
-      repositories
-    - **WOH publish-aws** enables the publication of distribution artefacts to Amazon S3
-    - **WOH send-mail** is a powerful E-mail notification facility that allows workflows to send E-mail containing
-      detailed data about media packages and processing incidents
-  - **Improved Workflow Operation Handlers**
-    - **WOH analyze-tracks** now allows workflow operations to be conditionally executed based on video resolution
-      and aspect ratio critera
-    - **WOH composite** can now be configured to take the input resolution as output resolution which makes it
-      fully capable of generating Picture-in-Picture (PiP) outputs
-    - **And Even More** A lot of minor improvements have been added to other worfklow operation handlers.
-
-  - **New Waveform Service** - Waveform generation has been completely rewritten and implemented as an independet
-     service. It is now faster and more flexible.
-
-  - **REST Documentation** - The REST endpoint documentation interface comes with a new look & feel and search
-    capabilities
-
-  - **Capture Agent API** - The capture agent API supports a new error state that can be set by capture agents
-    to indicate errors. Note that the API is, of course, backwards compatible.
-
-  - **Migration Aid** - The Ingest REST endpoint has been extended to offer functionality required when migrating
-    data from older Opencast versions. A workflow specifically designed for data migration has been added.
-
-  - **Library Update** - Many libraries have been updated to more recent versions. Most noteworthy, Karaf has
-    been updated to version 4.0.8
-
-
-- Database connection pooling (SPS: Too detailed for my taste)
-
-
-Configuration Changes
----------------------
-
-- MH-11861 needs the admin search index to be rebuilded
-
+Opencast 4: Release Notes
+=========================
 
 Release Schedule
 ----------------
 
-|Date                    |Phase
-|------------------------|--------------------------------
-|March 27th              |Feature Freeze
-|March 27th - April 16th |Internal QA and bug fixing phase
-|March 27th - April 10th |Review Test Cases
-|April 11th - April 16th |Documentation Review
-|April 16th - May 7th    |Public QA phase
-|May 7th - May 25th      |Additional bug fixing phase
-|May 18th - May 25th     |Translation week
-|May 26th - June 3rd     |Final QA phase
-|June 7th                |Release of Opencast 3
+|Date                          |Phase
+|------------------------------|------------------------------------------
+|Sept 22th                     |Feature Freeze
+|Sept 25th - Oct 13th          |Internal QA and bug fixing phase
+|Oct 16th  - Nov 3th           |Public QA phase
+|Nov 6th   - Nov 24th          |Additional bug fixing phase
+|Nov 20th  - Nov 24th          |Translation week
+|Nov 27th  - Nov 3rd           |Final QA phase
+|Dez 7th                       |Release of Opencast 3
+
+New Features and Improvements
+-----------------------------
+
+
+Capture Agent API Changes
+-------------------------
+
+- The new scheduler now creates a media package for each event which holds all assets as soon as the schedule is
+  created. This makes it unnecessary for any capture agent to download and re-ingest any media package elements unless
+  they are modified by the capture agent. Note that re-ingested media package elements will overwrite scheduled
+  elements. Hence a capture agent may modify these data. If not required for the inner workings of the capture agent, we
+  advise to not download, modify and upload any media package elements to avoid errors.

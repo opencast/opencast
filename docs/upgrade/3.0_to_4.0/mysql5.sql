@@ -193,3 +193,30 @@ ADD INDEX IX_mh_assets_asset_mediapackage_element_id (mediapackage_element_id);
 
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE mh_scheduled_last_modified (
+  capture_agent_id VARCHAR(255) NOT NULL,
+  last_modified DATETIME NOT NULL,
+  PRIMARY KEY (capture_agent_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_mh_scheduled_last_modified_last_modified ON mh_scheduled_last_modified (last_modified);
+
+CREATE TABLE mh_scheduled_extended_event (
+  mediapackage_id VARCHAR(128) NOT NULL,
+  organization VARCHAR(128) NOT NULL,
+  PRIMARY KEY (mediapackage_id, organization),
+  CONSTRAINT FK_mh_scheduled_extended_event_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE mh_scheduled_transaction (
+  id VARCHAR(128) NOT NULL,
+  organization VARCHAR(128) NOT NULL,
+  source VARCHAR(255) NOT NULL,
+  last_modified DATETIME NOT NULL,
+  PRIMARY KEY (id, organization),
+  CONSTRAINT UNQ_mh_scheduled_transaction UNIQUE (id, organization, source),
+  CONSTRAINT FK_mh_scheduled_transaction_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_mh_scheduled_transaction_source ON mh_scheduled_transaction (source);

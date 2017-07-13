@@ -34,13 +34,13 @@ import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.capture.admin.api.Recording;
-import org.opencastproject.capture.admin.api.RecordingState;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.rest.NotFoundExceptionMapper;
 import org.opencastproject.rest.RestServiceTestEnv;
+import org.opencastproject.scheduler.api.Recording;
+import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
@@ -258,6 +258,19 @@ public class AbstractEventEndpointTest {
 
     given().pathParam("eventId", "asdasd").formParam("metadata", metadataJson).expect().statusCode(HttpStatus.SC_OK)
             .when().put(rt.host("{eventId}/metadata"));
+  }
+
+  @Test
+  public void testGetEventScheduling() throws Exception {
+    String eventSchedulingString = IOUtils.toString(getClass().getResource("/eventScheduling.json"));
+
+    given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
+            .get(rt.host("{eventId}/scheduling.json"));
+
+    String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
+            .get(rt.host("{eventId}/scheduling.json")).asString();
+
+    assertThat(eventSchedulingString, SameJSONAs.sameJSONAs(result));
   }
 
   @Test
@@ -560,8 +573,48 @@ public class AbstractEventEndpointTest {
     assertThat(eventProcessingString, SameJSONAs.sameJSONAs(result));
   }
 
-  @Ignore
   @Test
+  public void testApplyAclToEvent() throws Exception {
+    // post nothing
+    given().expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("notExists/access"));
+
+    // invalid acl format
+    given().formParam("acl", "INVALID").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
+            .post(rt.host("asdasd/access"));
+
+    // post an acl update
+    String acl = "{\"acl\":{\"ace\":[{\"allow\":true,\"role\":\"ROLE_ADMIN\",\"action\":\"read\"},{\"allow\":true,\"role\":\"ROLE_ADMIN\",\"action\":\"write\"}]}}";
+    given().formParam("acl", acl).expect().statusCode(HttpStatus.SC_OK).when().post(rt.host("asdasd/access"));
+
+    // post an acl update for an scheduled event
+    given().formParam("acl", acl).expect().statusCode(HttpStatus.SC_OK).when().post(rt.host("asdasd/access"));
+
+    // post an acl update for an archived event
+    given().formParam("acl", acl).expect().statusCode(HttpStatus.SC_OK).when().post(rt.host("archivedid/access"));
+
+    // post an acl update for an workflow event - forbidden
+    given().formParam("acl", acl).expect().statusCode(HttpStatus.SC_FORBIDDEN).when()
+            .post(rt.host("workflowid/access"));
+  }
+
+  @Test
+  public void testGetNewConflicts() throws Exception {
+    given().expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("new/conflicts"));
+    given().formParam("metadata", "asdt").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
+            .post(rt.host("new/conflicts"));
+
+    String expected = IOUtils.toString(getClass().getResource("/conflicts.json"));
+    String metadataString = IOUtils.toString(getClass().getResource("/conflictRequest.json"));
+
+    String result = given().formParam("metadata", metadataString).expect().statusCode(HttpStatus.SC_CONFLICT).when()
+            .post(rt.host("new/conflicts")).asString();
+
+    assertThat(expected, SameJSONAs.sameJSONAs(result));
+
+  }
+
+  @Test
+  @Ignore
   public void testCreateNewTask() throws Exception {
     given().expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("task"));
     given().formParam("metadata", "asdt").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("task"));

@@ -525,7 +525,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
       }
     } else {
       stabilityThreshold = DEFAULT_STABILITY_THRESHOLD;
-      logger.warn("Using the default value of {} frames for the videosegmenter stability threshold", DEFAULT_STABILITY_THRESHOLD);
+      logger.info("Using the default value of {} frames for the videosegmenter stability threshold", DEFAULT_STABILITY_THRESHOLD);
     }
   }
 

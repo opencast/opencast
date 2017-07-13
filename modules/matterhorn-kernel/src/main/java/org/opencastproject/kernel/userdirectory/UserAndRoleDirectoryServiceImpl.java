@@ -122,17 +122,25 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
     if (cc != null) {
       String stringValue = cc.getBundleContext().getProperty(USER_CACHE_SIZE_KEY);
-      try {
-        cacheSize = Integer.parseInt(StringUtils.trimToNull(stringValue));
-      } catch (Exception e) {
-        logger.warn("Ignoring invalid value {} for user cache size", stringValue);
+      if (StringUtils.isNotEmpty(stringValue)) {
+        try {
+          cacheSize = Integer.parseInt(StringUtils.trimToNull(stringValue));
+        } catch (Exception e) {
+          logger.warn("Ignoring invalid value {} for user cache size", stringValue);
+        }
+      } else {
+        logger.info("Using default value {} for user cache size", cacheSize);
       }
 
       stringValue = cc.getBundleContext().getProperty(USER_CACHE_EXPIRY_KEY);
-      try {
-        cacheExpiryTimeInMinutes = Integer.parseInt(StringUtils.trimToNull(stringValue));
-      } catch (Exception e) {
-        logger.warn("Ignoring invalid value {} for user cache expiry time", stringValue);
+      if (StringUtils.isNotBlank(stringValue)) {
+        try {
+          cacheExpiryTimeInMinutes = Integer.parseInt(StringUtils.trimToNull(stringValue));
+        } catch (Exception e) {
+          logger.warn("Ignoring invalid value {} for user cache expiry time", stringValue);
+        }
+      } else {
+        logger.info("Using default value {} for user cache expiry time", cacheExpiryTimeInMinutes);
       }
     }
 

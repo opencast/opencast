@@ -1220,12 +1220,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         }
       });
 
-      if (isMobileMode) {
-        // retrigger the event in case the videoFormatsFound event from the video plugin
-        // was fired before the controls plugin was initialized
-        // to make sure the quality dropdown menu is shown
-        Engage.trigger(plugin.events.videoFormatsFound.getName(), true);
-      }
+      // retrigger the event in case the videoFormatsFound event from the video plugin
+      // was fired before the controls plugin was initialized
+      // to make sure the quality dropdown menu is shown
+      Engage.trigger(plugin.events.videoFormatsFound.getName(), true);
 
       Engage.on(plugin.events.numberOfVideodisplaysSet.getName(), function (number) {
         numberVideos = number;

@@ -29,12 +29,6 @@ import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentState;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.capture.admin.api.Recording;
-import org.opencastproject.capture.admin.api.RecordingState;
-import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.agent.RecordingItem;
-import org.opencastproject.scheduler.api.SchedulerException;
-import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
@@ -44,7 +38,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple3;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -53,7 +46,6 @@ import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.component.ComponentContext;
@@ -62,13 +54,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
@@ -98,20 +87,11 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
 
-  /** The scheduler service */
-  protected SchedulerService schedulerService;
-
   /** The security service */
   protected SecurityService securityService;
 
-  /** The message broker service sender */
-  protected MessageSender messageSender;
-
-  // TODO: Remove the in-memory recordings map, and use the database instead
-  private HashMap<String, Recording> recordings;
-
   /** Maps the configuration PID to the agent ID, so agents can be updated via the configuration factory pattern */
-  protected Map<String, String> pidMap = new ConcurrentHashMap<String, String>();
+  protected Map<String, String> pidMap = new ConcurrentHashMap<>();
 
   /** A cache of CA properties, which lightens the load on the SQL server */
   private LoadingCache<String, Object> agentCache = null;
@@ -127,21 +107,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     this.emf = emf;
   }
 
-  /** OSGi DI */
-  void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
-  }
-
-  /**
-   * Sets the scheduler service
-   *
-   * @param schedulerService
-   *          the schedulerService to set
-   */
-  public void setSchedulerService(SchedulerService schedulerService) {
-    this.schedulerService = schedulerService;
-  }
-
   /**
    * @param securityService
    *          the securityService to set
@@ -152,7 +117,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
 
   public CaptureAgentStateServiceImpl() {
     logger.info("CaptureAgentStateServiceImpl starting.");
-    recordings = new HashMap<String, Recording>();
   }
 
   public void activate(ComponentContext cc) {
@@ -396,7 +360,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    */
   @Override
   public void removeAgent(String agentName) throws NotFoundException {
-    agentCache.invalidate(agentName);
     deleteAgentFromDatabase(agentName);
   }
 
@@ -443,7 +406,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       }
 
       // Build the map that the API defines as agent name->agent
-      Map<String, Agent> map = new TreeMap<String, Agent>();
+      Map<String, Agent> map = new TreeMap<>();
       for (AgentImpl agent : agents) {
         map.put(agent.getName(), updateCachedLastHeardFrom(agent, org.getId()));
       }
@@ -613,126 +576,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getRecordingState(java.lang.String)
-   */
-  @Override
-  public Recording getRecordingState(String id) throws NotFoundException {
-    Recording req = recordings.get(id);
-    // If that recording doesn't exist, return null
-    if (req == null) {
-      logger.debug("Recording {} does not exist in the system.", id);
-      throw new NotFoundException();
-    }
-
-    logger.debug("Recording {} found, returning state.", id);
-    return req;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#setRecordingState(java.lang.String,
-   *      java.lang.String)
-   * @throws IllegalArgumentException
-   */
-  @Override
-  public boolean setRecordingState(String id, String state) {
-    if (StringUtils.isBlank(id))
-      throw new IllegalArgumentException("id can not be null");
-    if (StringUtils.isBlank(state))
-      throw new IllegalArgumentException("state can not be null");
-    if (!RecordingState.KNOWN_STATES.contains(state)) {
-      logger.warn("Invalid recording state: {}.", state);
-      return false;
-    }
-    Recording req = recordings.get(id);
-    if (req != null) {
-      if (state.equals(req.getState())) {
-        logger.debug("Recording state not changed");
-        // Reset the state anyway so that the last-heard-from time is correct...
-        req.setState(state);
-        return true;
-      } else {
-        logger.debug("Setting Recording {} to state {}.", id, state);
-        req.setState(state);
-        sendRecordingUpdate(req);
-        return true;
-      }
-    } else {
-      logger.debug("Creating Recording {} with state {}.", id, state);
-      Recording r = new RecordingImpl(id, state);
-      recordings.put(id, r);
-      sendRecordingUpdate(r);
-      return true;
-    }
-  }
-
-  private void sendRecordingUpdate(Recording recording) {
-    if (RecordingState.UNKNOWN.equals(recording.getState()))
-      return;
-
-    Opt<String> eventId = getEventId(recording.getID());
-    if (eventId.isNone())
-      return;
-
-    messageSender.sendObjectMessage(RecordingItem.RECORDING_QUEUE, MessageSender.DestinationType.Queue,
-            RecordingItem.updateRecording(eventId.get(), recording.getState(), recording.getLastCheckinTime()));
-  }
-
-  private Opt<String> getEventId(String recordingId) {
-    Opt<String> eventId = Opt.<String> none();
-    try {
-      eventId = Opt.some(schedulerService.getMediaPackageId(Long.parseLong(recordingId)));
-    } catch (NumberFormatException e) {
-      logger.info("Recording id '{}' is not a long, assuming an unscheduled capture", recordingId);
-    } catch (NotFoundException e) {
-      logger.warn("Unable to find a scheduling with id='{}'", recordingId);
-    } catch (SchedulerException e) {
-      logger.warn("Unable to get scheduling for recording {}: {}", recordingId, ExceptionUtils.getStackTrace(e));
-    }
-    return eventId;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#removeRecording(java.lang.String)
-   */
-  @Override
-  public void removeRecording(String id) throws NotFoundException {
-    logger.debug("Removing Recording {}.", id);
-    Recording removed = recordings.remove(id);
-    if (removed == null)
-      throw new NotFoundException();
-
-    Opt<String> eventId = getEventId(id);
-    if (eventId.isSome())
-      messageSender.sendObjectMessage(RecordingItem.RECORDING_QUEUE, MessageSender.DestinationType.Queue,
-              RecordingItem.delete(eventId.get()));
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#getKnownRecordings()
-   */
-  @Override
-  public Map<String, Recording> getKnownRecordings() {
-    return recordings;
-  }
-
-  @Override
-  public List<String> getKnownRecordingsIds() {
-    LinkedList<String> ids = new LinkedList<String>();
-    for (Entry<String, Recording> e : recordings.entrySet()) {
-      ids.add(e.getValue().getID());
-    }
-    return ids;
-  }
-
   // // ManagedServiceFactory Methods ////
 
   /**
@@ -748,7 +591,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   protected void setupAgentCache(int count, TimeUnit unit) {
     // Setup the agent cache
     RemovalListener<String, Object> removalListener = new RemovalListener<String, Object>() {
-      private Set<String> ignoredStates = new LinkedHashSet<String>(Arrays.asList(AgentState.UNKNOWN, AgentState.OFFLINE));
+      private Set<String> ignoredStates = new LinkedHashSet<>(Arrays.asList(AgentState.UNKNOWN, AgentState.OFFLINE));
       @Override
       public void onRemoval(RemovalNotification<String, Object> removal) {
         if (RemovalCause.EXPIRED.equals(removal.getCause())) {
@@ -788,8 +631,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    * @see org.osgi.service.cm.ManagedServiceFactory#updated(java.lang.String, java.util.Dictionary)
    */
   @Override
-  public void updated(String pid, Dictionary properties) throws ConfigurationException {
-
+  public void updated(String pid, Dictionary<String, ?> properties) throws ConfigurationException {
     // Get the agent properties
     String nameConfig = (String) properties.get("id");
     if (isBlank(nameConfig))
@@ -847,7 +689,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       logger.warn("{} was not a managed capture agent pid", pid);
     } else {
       try {
-        agentCache.invalidate(agentId);
         deleteAgentFromDatabase(agentId);
       } catch (NotFoundException e) {
         logger.warn("Unable to delete capture agent '{}'", agentId);

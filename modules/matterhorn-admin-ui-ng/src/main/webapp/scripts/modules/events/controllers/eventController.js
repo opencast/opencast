@@ -26,11 +26,11 @@ angular.module('adminNg.controllers')
     '$scope', 'Notifications', 'EventTransactionResource', 'EventMetadataResource', 'EventAssetsResource',
     'EventCatalogsResource', 'CommentResource', 'EventWorkflowsResource', 'EventWorkflowActionResource',
     'ResourcesListResource', 'UserRolesResource', 'EventAccessResource', 'EventGeneralResource',
-    'OptoutsResource', 'EventParticipationResource', 'NewEventProcessingResource',
+    'OptoutsResource', 'EventParticipationResource', 'EventSchedulingResource', 'NewEventProcessingResource',
     'OptoutSingleResource', 'CaptureAgentsResource', 'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService',
     function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource, EventCatalogsResource, CommentResource,
         EventWorkflowsResource, EventWorkflowActionResource, ResourcesListResource, UserRolesResource, EventAccessResource, EventGeneralResource,
-        OptoutsResource, EventParticipationResource, NewEventProcessingResource,
+        OptoutsResource, EventParticipationResource, EventSchedulingResource, NewEventProcessingResource,
         OptoutSingleResource, CaptureAgentsResource, ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService) {
 
         var roleSlice = 100;
@@ -211,8 +211,8 @@ angular.module('adminNg.controllers')
                             roles[key] = key;
                         }
                     }, this);
-		            return roles;
-		        });
+                    return roles;
+                });
               }, this);
             },
             fetchChildResources = function (id) {
@@ -305,6 +305,31 @@ angular.module('adminNg.controllers')
                             setWorkflowConfig();
                         });
                     }
+                });
+
+                $scope.source = EventSchedulingResource.get({ id: id }, function (source) {
+                    source.presenters = angular.isArray(source.presenters) ? source.presenters.join(', ') : '';
+                    $scope.scheduling.hasProperties = true;
+                    CaptureAgentsResource.query({inputs: true}).$promise.then(function (data) {
+                        $scope.captureAgents = data.rows;
+                        angular.forEach(data.rows, function (agent) {
+                            var inputs;
+                            if (agent.id === $scope.source.agentId) {
+                                source.device = agent;
+                                // Retrieve agent inputs configuration
+                                var dev = ((source.metadata || {}).agentConfiguration || {})['capture.device.names'];
+                                if (angular.isDefined(dev)) {
+                                    inputs = dev.split(',');
+                                    source.device.inputMethods = {};
+                                    angular.forEach(inputs, function (input) {
+                                        source.device.inputMethods[input] = true;
+                                    });
+                                }
+                            }
+                        });
+                    });
+                }, function () {
+                   $scope.scheduling.hasProperties = false;
                 });
 
                 $scope.access = EventAccessResource.get({ id: id }, function (data) {
@@ -422,15 +447,20 @@ angular.module('adminNg.controllers')
                     }
 
                     $scope.source.agentId = $scope.source.device.id;
-                    $scope.source.agentConfiguration['capture.device.names'] = '';
+                    $scope.source.metadata.agentConfiguration['capture.device.names'] = '';
 
                     angular.forEach($scope.source.device.inputMethods, function (value, key) {
                         if (value) {
-                            if ($scope.source.agentConfiguration['capture.device.names'] !== '') {
-                                $scope.source.agentConfiguration['capture.device.names'] += ',';
+                            if ($scope.source.metadata.agentConfiguration['capture.device.names'] !== '') {
+                                $scope.source.metadata.agentConfiguration['capture.device.names'] += ',';
                             }
-                            $scope.source.agentConfiguration['capture.device.names'] += key;
+                            $scope.source.metadata.agentConfiguration['capture.device.names'] += key;
                         }
+                    });
+
+                    EventSchedulingResource.save({
+                        id: $scope.resourceId,
+                        entries: $scope.source
                     });
                 }, me.conflictsDetected);
             }
@@ -715,12 +745,12 @@ angular.module('adminNg.controllers')
         };
 
         $scope.comment = function () {
-        	$scope.myComment.saving = true;
+            $scope.myComment.saving = true;
             CommentResource.save({ resource: 'event', resourceId: $scope.resourceId, type: 'comment' },
                 { text: $scope.myComment.text, reason: $scope.myComment.reason },
                 function () {
-                	$scope.myComment.saving = false;
-                	$scope.myComment.text = '';
+                    $scope.myComment.saving = false;
+                    $scope.myComment.text = '';
 
                     $scope.comments = CommentResource.query({
                         resource: 'event',
@@ -728,18 +758,18 @@ angular.module('adminNg.controllers')
                         type: 'comments'
                     });
                 }, function () {
-                	$scope.myComment.saving = false;
+                    $scope.myComment.saving = false;
                 }
             );
         };
 
         $scope.reply = function () {
-        	$scope.myComment.saving = true;
+            $scope.myComment.saving = true;
             CommentResource.save({ resource: 'event', resourceId: $scope.resourceId, id: $scope.replyToId, type: 'comment', reply: 'reply' },
                 { text: $scope.myComment.text, resolved: $scope.myComment.resolved },
                 function () {
-                	$scope.myComment.saving = false;
-                	$scope.myComment.text = '';
+                    $scope.myComment.saving = false;
+                    $scope.myComment.text = '';
 
                     $scope.comments = CommentResource.query({
                         resource: 'event',
@@ -747,7 +777,7 @@ angular.module('adminNg.controllers')
                         type: 'comments'
                     });
                 }, function () {
-                	$scope.myComment.saving = false;
+                    $scope.myComment.saving = false;
                 }
 
             );

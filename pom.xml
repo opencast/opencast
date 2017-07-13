@@ -149,9 +149,11 @@
     <module>modules/matterhorn-runtime-info-ui</module>
     <module>modules/matterhorn-runtime-info-ui-ng</module>
     <module>modules/matterhorn-scheduler-api</module>
+    <module>modules/matterhorn-scheduler-conflict-handler</module>
+    <module>modules/matterhorn-scheduler-conflict-notifier-comment</module>
+    <module>modules/matterhorn-scheduler-conflict-notifier-email</module>
     <module>modules/matterhorn-scheduler-impl</module>
     <module>modules/matterhorn-scheduler-remote</module>
-    <module>modules/matterhorn-scheduler-workflowoperation</module>
     <module>modules/matterhorn-schema</module>
     <module>modules/matterhorn-search</module>
     <module>modules/matterhorn-search-api</module>

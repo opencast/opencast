@@ -23,22 +23,21 @@ package org.opencastproject.message.broker.api.scheduler;
 
 import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * {@link Serializable} class that represents all of the possible messages sent through a SchedulerService queue.
@@ -54,14 +53,20 @@ public class SchedulerItem implements MessageItem, Serializable {
   private final String event;
   private final String properties;
   private final String acl;
+  private final String agentId;
+  private final Date end;
   private final Boolean optOut;
+  private final Set<String> presenters;
   private final Boolean blacklisted;
   private final String reviewStatus;
   private final Date reviewDate;
+  private final String recordingState;
+  private final Date start;
+  private final Long lastHeardFrom;
   private final Type type;
 
   public enum Type {
-    UpdateCatalog, UpdateProperties, UpdateAcl, UpdateOptOut, UpdateBlacklist, UpdateReviewStatus, Delete
+    UpdateCatalog, UpdateProperties, UpdateAcl, UpdateAgentId, UpdateOptOut, UpdateBlacklist, UpdateEnd, UpdatePresenters, UpdateReviewStatus, UpdateRecordingStatus, UpdateStart, DeleteRecordingStatus, Delete
   };
 
   /**
@@ -142,6 +147,72 @@ public class SchedulerItem implements MessageItem, Serializable {
   }
 
   /**
+   * @param mediaPackageId
+   *          The event id
+   * @param state
+   *          The recording state
+   * @param lastHeardFrom
+   *          The recording last heard from date
+   * @return Builds {@link SchedulerItem} for updating a recording.
+   */
+  public static SchedulerItem updateRecordingStatus(String mediaPackageId, String state, Long lastHeardFrom) {
+    return new SchedulerItem(mediaPackageId, state, lastHeardFrom);
+  }
+
+  /**
+   * @param mpId
+   *        The mediapackage id
+   * @param start
+   *        The new start time for the event.
+   * @return Builds {@link SchedulerItem} for updating the start of an event.
+   */
+  public static SchedulerItem updateStart(String mpId, Date start) {
+    return new SchedulerItem(mpId, start, null, Type.UpdateStart);
+  }
+
+  /**
+   * @param mpId
+   *        The mediapackage id
+   * @param end
+   *        The new end time for the event.
+   * @return Builds {@link SchedulerItem} for updating the end of an event.
+   */
+  public static SchedulerItem updateEnd(String mpId, Date end) {
+    return new SchedulerItem(mpId, null, end, Type.UpdateEnd);
+  }
+
+  /**
+   * @param mpId
+   *        The mediapackage id
+   * @param presenters
+   *        The new set of presenters for the event.
+   * @return Builds {@link SchedulerItem} for updating the presenters of an event.
+   */
+  public static SchedulerItem updatePresenters(String mpId, Set<String> presenters) {
+    return new SchedulerItem(mpId, presenters);
+  }
+
+  /**
+   * @param mpId
+   *        The mediapackage id
+   * @param agentId
+   *        The new agent id for the event.
+   * @return Builds {@link SchedulerItem} for updating the agent id of an event.
+   */
+  public static SchedulerItem updateAgent(String mpId, String agentId) {
+    return new SchedulerItem(mpId, agentId);
+  }
+
+  /**
+   * @param mediaPackageId
+   *          The unique id of the recording to delete.
+   * @return Builds {@link SchedulerItem} for deleting a recording.
+   */
+  public static SchedulerItem deleteRecordingState(String mediaPackageId) {
+    return new SchedulerItem(mediaPackageId, Type.DeleteRecordingStatus);
+  }
+
+  /**
    * Constructor to build an update event {@link SchedulerItem}.
    *
    * @param event
@@ -156,10 +227,16 @@ public class SchedulerItem implements MessageItem, Serializable {
     }
     this.properties = null;
     this.acl = null;
-    this.optOut = null;
+    this.agentId = null;
     this.blacklisted = null;
+    this.end = null;
+    this.optOut = null;
+    this.presenters = null;
     this.reviewStatus = null;
     this.reviewDate = null;
+    this.recordingState = null;
+    this.start = null;
+    this.lastHeardFrom = null;
     this.type = Type.UpdateCatalog;
   }
 
@@ -176,10 +253,16 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.event = null;
     this.properties = serializeProperties(properties);
     this.acl = null;
+    this.agentId = null;
+    this.blacklisted = null;
+    this.end = null;
+    this.optOut = null;
+    this.presenters = null;
     this.reviewStatus = null;
     this.reviewDate = null;
-    this.optOut = null;
-    this.blacklisted = null;
+    this.recordingState = null;
+    this.start = null;
+    this.lastHeardFrom = null;
     this.type = Type.UpdateProperties;
   }
 
@@ -194,10 +277,16 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.event = null;
     this.properties = null;
     this.acl = null;
-    this.optOut = null;
+    this.agentId = null;
     this.blacklisted = null;
+    this.end = null;
+    this.optOut = null;
+    this.presenters = null;
     this.reviewStatus = null;
     this.reviewDate = null;
+    this.recordingState = null;
+    this.start = null;
+    this.lastHeardFrom = null;
     this.type = type;
   }
 
@@ -218,10 +307,16 @@ public class SchedulerItem implements MessageItem, Serializable {
     } catch (IOException e) {
       throw new IllegalStateException();
     }
+    this.agentId = null;
+    this.blacklisted = null;
+    this.end = null;
+    this.optOut = null;
+    this.presenters = null;
     this.reviewStatus = null;
     this.reviewDate = null;
-    this.optOut = null;
-    this.blacklisted = null;
+    this.recordingState = null;
+    this.start = null;
+    this.lastHeardFrom = null;
     this.type = Type.UpdateAcl;
   }
 
@@ -238,10 +333,16 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.event = null;
     this.properties = null;
     this.acl = null;
-    this.optOut = optOut;
+    this.agentId = null;
     this.blacklisted = null;
+    this.end = null;
+    this.optOut = optOut;
+    this.presenters = null;
     this.reviewStatus = null;
     this.reviewDate = null;
+    this.recordingState = null;
+    this.start = null;
+    this.lastHeardFrom = null;
     this.type = Type.UpdateOptOut;
   }
 
@@ -258,10 +359,16 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.event = null;
     this.properties = null;
     this.acl = null;
-    this.optOut = null;
+    this.agentId = null;
     this.blacklisted = blacklisted;
+    this.end = null;
+    this.optOut = null;
+    this.presenters = null;
     this.reviewStatus = null;
     this.reviewDate = null;
+    this.recordingState = null;
+    this.start = null;
+    this.lastHeardFrom = null;
     this.type = Type.UpdateBlacklist;
   }
 
@@ -280,11 +387,99 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.event = null;
     this.properties = null;
     this.acl = null;
-    this.optOut = null;
+    this.agentId = null;
     this.blacklisted = null;
+    this.end = null;
+    this.optOut = null;
+    this.presenters = null;
     this.reviewStatus = reviewStatus.toString();
     this.reviewDate = reviewDate;
+    this.recordingState = null;
+    this.start = null;
+    this.lastHeardFrom = null;
     this.type = Type.UpdateReviewStatus;
+  }
+
+  /**
+   * Constructor to build an update recording status event {@link SchedulerItem}.
+   *
+   * @param mediaPackageId
+   *          The mediapackage id
+   * @param state
+   *          the recording status
+   * @param lastHeardFrom
+   *          the last heard from time
+   */
+  public SchedulerItem(String mediaPackageId, String state, Long lastHeardFrom) {
+    this.mediaPackageId = mediaPackageId;
+    this.event = null;
+    this.properties = null;
+    this.acl = null;
+    this.agentId = null;
+    this.blacklisted = null;
+    this.end = null;
+    this.optOut = null;
+    this.presenters = null;
+    this.reviewStatus = null;
+    this.reviewDate = null;
+    this.recordingState = state;
+    this.start = null;
+    this.lastHeardFrom = lastHeardFrom;
+    this.type = Type.UpdateRecordingStatus;
+  }
+
+  public SchedulerItem(String mediaPackageId, Date start, Date end, Type type) {
+    this.mediaPackageId = mediaPackageId;
+    this.event = null;
+    this.acl = null;
+    this.agentId = null;
+    this.blacklisted = null;
+    this.end = end;
+    this.lastHeardFrom = null;
+    this.optOut = null;
+    this.presenters = null;
+    this.properties = null;
+    this.recordingState = null;
+    this.reviewDate = null;
+    this.reviewStatus = null;
+    this.start = start;
+    this.type = type;
+  }
+
+  public SchedulerItem(String mediaPackageId, String agentId) {
+    this.mediaPackageId = mediaPackageId;
+    this.event = null;
+    this.acl = null;
+    this.agentId = agentId;
+    this.blacklisted = null;
+    this.end = null;
+    this.lastHeardFrom = null;
+    this.optOut = null;
+    this.presenters = null;
+    this.properties = null;
+    this.recordingState = null;
+    this.reviewDate = null;
+    this.reviewStatus = null;
+    this.start = null;
+    this.type = Type.UpdateAgentId;
+  }
+
+  public SchedulerItem(String mediaPackageId, Set<String> presenters) {
+    this.mediaPackageId = mediaPackageId;
+    this.event = null;
+    this.acl = null;
+    this.agentId = null;
+    this.blacklisted = null;
+    this.end = null;
+    this.lastHeardFrom = null;
+    this.optOut = null;
+    this.presenters = presenters;
+    this.properties = null;
+    this.recordingState = null;
+    this.reviewDate = null;
+    this.reviewStatus = null;
+    this.start = null;
+    this.type = Type.UpdatePresenters;
   }
 
   @Override
@@ -300,11 +495,7 @@ public class SchedulerItem implements MessageItem, Serializable {
     if (StringUtils.isBlank(event))
       return null;
 
-    try (InputStream in = IOUtils.toInputStream(event, "UTF-8")) {
-      return DublinCores.read(in);
-    } catch (Exception e) {
-      return null;
-    }
+    return DublinCoreXmlFormat.readOpt(event).orNull();
   }
 
   public Map<String, String> getProperties() {
@@ -323,12 +514,28 @@ public class SchedulerItem implements MessageItem, Serializable {
     }
   }
 
-  public Boolean getOptOut() {
-    return optOut;
+  public String getAgentId() {
+    return agentId;
   }
 
   public Boolean getBlacklisted() {
     return blacklisted;
+  }
+
+  public Date getEnd() {
+    return end;
+  }
+
+  public Long getLastHeardFrom() {
+    return lastHeardFrom;
+  }
+
+  public Boolean getOptOut() {
+    return optOut;
+  }
+
+  public Set<String> getPresenters() {
+    return presenters;
   }
 
   public ReviewStatus getReviewStatus() {
@@ -337,6 +544,14 @@ public class SchedulerItem implements MessageItem, Serializable {
 
   public Date getReviewDate() {
     return reviewDate;
+  }
+
+  public String getRecordingState() {
+    return recordingState;
+  }
+
+  public Date getStart() {
+    return start;
   }
 
   public Type getType() {
