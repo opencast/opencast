@@ -1,10 +1,18 @@
 Opencast 4: Release Notes
 =========================
 
-Opencast 3.0 has been streamlined to better address Adopters' needs when it comes to their processes. This means
-the user experience and the efficiency of users performing their tasks have been significantly enhanced.
-Other major improvements are new features for the Opencast Player and even more flexibiity when it comes to the
-integration of Opencast into external authentication and authorization systems.
+Release Schedule
+----------------
+
+|Date                          |Phase
+|------------------------------|------------------------------------------
+|Sept 22th                     |Feature Freeze
+|Sept 25th - Oct 13th          |Internal QA and bug fixing phase
+|Oct 16th  - Nov 3th           |Public QA phase
+|Nov 6th   - Nov 24th          |Additional bug fixing phase
+|Nov 20th  - Nov 24th          |Translation week
+|Nov 27th  - Nov 3rd           |Final QA phase
+|Dez 7th                       |Release of Opencast 3
 
 New Features and Improvements
 -----------------------------
