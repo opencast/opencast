@@ -56,6 +56,7 @@ import java.net.URISyntaxException;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.Map;
 
 import javax.management.ObjectInstance;
@@ -856,6 +857,40 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     int total = Math.round(getTotalSpace().get() / 1024 / 1024 / 1024);
     long percent = Math.round(100.0 * getUsableSpace().get() / (1 + getTotalSpace().get()));
     return "Usable space " + usable + " Gb out of " + total + " Gb (" + percent + "%)";
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#cleanupOldFilesFromCollection
+   */
+  @Override
+  public boolean cleanupOldFilesFromCollection(String collectionId, long days) throws IOException {
+    File colDir = getCollectionDirectory(collectionId, false);
+    // Collection doesn't exist?
+    if (colDir == null) {
+      logger.trace("Collection {} does not exist", collectionId);
+      return false;
+    }
+
+    logger.info("Cleaning up files older than {} days from collection {}", days, collectionId);
+
+    if (!colDir.isDirectory())
+      throw new IllegalStateException(colDir + " is not a directory");
+
+    long referenceTime = System.currentTimeMillis() - days * 24 * 3600 * 1000;
+    for (File f : colDir.listFiles()) {
+      long lastModified = f.lastModified();
+      logger.trace("{} last modified: {}, reference date: {}",
+              new Object[] { f.getName(), new Date(lastModified), new Date(referenceTime) });
+      if (lastModified <= referenceTime) {
+        // Delete file
+        deleteFromCollection(collectionId, f.getName());
+        logger.info("Cleaned up file {} from collection {}", f.getName(), collectionId);
+      }
+    }
+
+    return true;
   }
 
   /**

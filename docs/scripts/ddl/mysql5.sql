@@ -651,3 +651,15 @@ CREATE TABLE mh_themes (
     PRIMARY KEY (id),
     CONSTRAINT FK_mh_themes_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE mh_ibm_watson_transcript_job (
+    id BIGINT(20) NOT NULL,
+    media_package_id VARCHAR(128) NOT NULL,
+    track_id VARCHAR(128) NOT NULL,
+    job_id  VARCHAR(128) NOT NULL,
+    date_created datetime NOT NULL,
+    date_completed datetime DEFAULT NULL,
+    status VARCHAR(128) DEFAULT NULL,
+    track_duration BIGINT NOT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

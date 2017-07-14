@@ -246,6 +246,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-textextractor-tesseract/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-ibm-watson-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-api/${project.version}</bundle>
@@ -339,6 +342,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-ibm-watson-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-workflowoperation/${project.version}</bundle>    
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-workflowoperation/${project.version}</bundle>
@@ -447,6 +453,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-textanalyzer-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-ibm-watson-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-workflowoperation/${project.version}</bundle>    
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-api/${project.version}</bundle>
@@ -595,8 +604,11 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-textextractor-tesseract/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-ibm-watson-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-workflowoperation/${project.version}</bundle>    
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-impl/${project.version}</bundle>    
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-ffmpeg-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-workflowoperation/${project.version}</bundle>
