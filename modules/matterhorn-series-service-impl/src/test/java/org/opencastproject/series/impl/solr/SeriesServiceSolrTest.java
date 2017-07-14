@@ -51,6 +51,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Tests indexing: indexing, removing, retrieving, merging and searching.
@@ -146,6 +147,36 @@ public class SeriesServiceSolrTest {
     q = new SeriesQuery().setText("cat");
     result = index.search(q);
     Assert.assertTrue("Both Dublin Cores contains 'cat'", result.size() == 2);
+  }
+
+  @Test
+  public void testQueryIdTitleMap() throws Exception {
+    Map<String, String> emptyResult = index.queryIdTitleMap();
+    Assert.assertTrue("The result should be empty", emptyResult.isEmpty());
+
+    DublinCoreCatalog firstCatalog = dcService.newInstance();
+    firstCatalog.add(DublinCore.PROPERTY_IDENTIFIER, "10.0000/1");
+    firstCatalog.add(DublinCore.PROPERTY_TITLE, "Cats and Dogs");
+    firstCatalog.add(DublinCore.PROPERTY_DESCRIPTION, "This lecture tries to give an explanation...");
+
+    DublinCoreCatalog secondCatalog = dcService.newInstance();
+    secondCatalog.add(DublinCore.PROPERTY_IDENTIFIER, "10.0000/2");
+    secondCatalog.add(DublinCore.PROPERTY_TITLE, "Nature of Dogs");
+    secondCatalog.add(DublinCore.PROPERTY_DESCRIPTION, "Why do dogs chase cats?");
+
+    index.updateIndex(firstCatalog);
+    index.updateIndex(secondCatalog);
+
+    Map<String, String> queryResult = index.queryIdTitleMap();
+    Assert.assertEquals(2, queryResult.size());
+    Assert.assertTrue("The result contains the first series catalog Id",
+            queryResult.containsKey("10.0000/1"));
+    Assert.assertEquals("The result matches the first series title",
+            "Cats and Dogs", queryResult.get("10.0000/1"));
+    Assert.assertTrue("The result contains the second series catalog Id",
+            queryResult.containsKey("10.0000/2"));
+    Assert.assertEquals("The result matches the second series title",
+            "Nature of Dogs", queryResult.get("10.0000/2"));
   }
 
   @Test

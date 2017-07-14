@@ -128,9 +128,20 @@ public interface SeriesService {
   DublinCoreCatalogList getSeries(SeriesQuery query) throws SeriesException, UnauthorizedException;
 
   /**
+   * Returns a map of series Id to title of all series the user can access
+   *
+   * @return a map of series Id to title of all series the user can access
+   * @throws UnauthorizedException
+   *           if the current user is not authorized to perform this action
+   * @throws SeriesException
+   *           if query could not be performed
+   */
+  Map<String, String> getIdTitleMapOfAllSeries() throws SeriesException, UnauthorizedException;
+
+  /**
    * Returns all the elements of a series in a map. The key of the map marks the element type. If the series does not
    * contain any elements, an empty map is returned. If the series does not exist, {@code Opt.none()} is returned.
-   * 
+   *
    * @param seriesId
    *          the series identifier
    * @return the map of elements
@@ -142,7 +153,7 @@ public interface SeriesService {
   /**
    * Returns the element data of the series with the given type. If the series or the element with the given type do not
    * exist, {@code Opt.none()} is returned.
-   * 
+   *
    * @param seriesId
    *          the series identifier
    * @param type
@@ -155,7 +166,7 @@ public interface SeriesService {
 
   /**
    * Adds a new element to a series.
-   * 
+   *
    * @param seriesId
    *          the series identifier
    * @param type
@@ -171,7 +182,7 @@ public interface SeriesService {
 
   /**
    * Updates an existing element of a series.
-   * 
+   *
    * @param seriesId
    *          the series identifier
    * @param type
@@ -186,7 +197,7 @@ public interface SeriesService {
 
   /**
    * Deletes an element from a series.
-   * 
+   *
    * @param seriesId
    *          the series identifier
    * @param type

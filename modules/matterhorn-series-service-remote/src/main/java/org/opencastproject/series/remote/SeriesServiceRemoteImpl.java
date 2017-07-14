@@ -52,6 +52,7 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -330,6 +331,46 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       closeConnection(response);
     }
     throw new SeriesException("Unable to get series from query from remote series index: " + getSeriesUrl(query));
+  }
+
+  @Override
+  public Map<String, String> getIdTitleMapOfAllSeries() throws SeriesException, UnauthorizedException {
+    HttpGet get = new HttpGet("/allSeriesIdTitle.json");
+    HttpResponse response = getResponse(get, SC_OK, SC_UNAUTHORIZED, SC_INTERNAL_SERVER_ERROR);
+    try {
+      if (response != null) {
+        int statusCode = response.getStatusLine().getStatusCode();
+
+        if (SC_UNAUTHORIZED == statusCode) {
+          throw new UnauthorizedException("Not authorized to get series");
+        } else if (SC_OK == statusCode) {
+          String seriesJSON = EntityUtils.toString(response.getEntity(), "UTF-8");
+          Object resultContainer = new JSONParser().parse(seriesJSON);
+          if (resultContainer instanceof JSONObject) {
+            Map <String, String> result = new HashMap<>();
+            JSONObject resultContainerJsonObj = (JSONObject) resultContainer;
+            JSONArray seriesJsonArr = resultContainerJsonObj.optJSONArray("series");
+            if (seriesJsonArr != null) {
+              for (int idx = 0; idx < seriesJsonArr.length(); idx++) {
+                JSONObject seriesJsonObj = seriesJsonArr.getJSONObject(idx);
+                String seriesId = seriesJsonObj.optString("identifier");
+                String seriesTitle = seriesJsonObj.optString("title");
+                if (StringUtils.isNotBlank(seriesId) && StringUtils.isNotEmpty(seriesTitle))
+                  result.put(seriesId, seriesTitle);
+              }
+            }
+            return result;
+          }
+        }
+      }
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SeriesException("Unable to get series from remote series index: " + e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new SeriesException("Unable to get series from remote series index");
   }
 
   @Override
