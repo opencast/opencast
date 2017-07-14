@@ -181,7 +181,7 @@ coordinator. Once you have that, put them in your `.m2/settings.xml` file. It sh
     </settings>
 
 The command to push the file looks like this. Not that pushing files from your local Maven repository directly is not
-possible, instead you must copy them *outside* the repository and push from there.
+possible, instead you must copy them *outside* the repository and push from there. See below for help on that.
 
     mvn deploy:deploy-file \
       -DrepositoryId=$repo_id \
@@ -205,4 +205,27 @@ artifactId  | The artifact ID. This is the name of the artifact according to Mav
 packaging   | The file type (effectively), this should match the filename's extension    | mp2
 version     | The artifact's version                                                     | 1.1
 generatePom | Whether or not to generate a pom file automatically                        | true
+
+#### Help with push to the remote Nexus repository
+
+Uploading to Nexus is more difficult than it should be: You can't just run deploy:deploy-file. This script is handy
+when you need to manually upload something like a previous release.  Make a copy of
+`~/.m2/repository/org/opencastproject/*` to `$SOURCE_FILES` inside of your git clone, check out the version you're
+uploading, then run this script.  There will be numerous errors as it processes things that either don't have
+artifacts, or don't have artifacts in the version you're uploading, but those can be ignored.
+
+    #!/bin/bash
+
+    CORE_NEXUS="nexus.virtuos.uos.de:8081"
+    SOURCE_FILES="nexus_copy"
+
+    uploadVersion() {
+      ls $1 | while read line
+      do
+        mvn deploy:deploy-file -DrepositoryId=opencast -Durl=http://$CORE_NEXUS/nexus/content/repositories/releases -Dfile=$SOURCE_FILES/$line/$2/$line-$2.jar -DgroupId=org.opencastproject -DartifactId=$line -Dversion=$2 -DgeneratePom=true -Dpackaging=jar
+      done
+    }
+
+    git checkout <VERSION>
+    uploadVersion ~/.m2/repository/org/opencastproject <VERSION>
 
