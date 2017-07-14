@@ -25,9 +25,19 @@ angular.module('adminNg.controllers')
 .controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource', 'ResourcesListResource', 'Notifications',
     function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications) {
         // Configure the table service
+        $scope.todayFilterValue = function() {
+            var now = new Date();
+            var from = new Date(now.setHours(0, 0, 0, 0)).toISOString();
+            var to = new Date(now.setHours(23, 59, 59, 999)).toISOString();
+            return from + "/" + to;
+        };
         $scope.stats = Stats;
         $scope.stats.configure({
             stats: [
+            {filters: [{name: 'startDate',
+                        filter:'FILTERS.EVENTS.START_DATE',
+                        value: $scope.todayFilterValue()}],
+             description: 'DATES.TODAY'},
             {filters: [{name: 'status',
                         filter: 'FILTERS.EVENTS.STATUS.LABEL',
                         value: 'EVENTS.EVENTS.STATUS.SCHEDULED'}],
