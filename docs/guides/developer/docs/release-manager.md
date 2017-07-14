@@ -104,11 +104,12 @@ At this point, the developer community should then be notified. Consider using t
     during the public QA phase.  Please report any bugs or issues you encounter.
 
 
-### Adjust Pull Request Filter
+### Creating the Merge Ticket
 
 The [Opencast pull request filter](http://pullrequests.opencast.org) links the versions currently in development. The
-merge ticket identifier needs to be added to that filter. As release manager, please talk to the [administrator
-](https://bitbucket.org/opencast-community/opencast-infrastructure) of that tool to ensure the ticket is added.
+merge ticket identifier needs to be added to that filter. To do this, create a ticket with a title in the format of
+`Merge the result of the current peer review to <VERSION>`. The ticket will be automatically detected by the pull 
+request filter and will appear shortly.
 
 
 ### Release Documentation
