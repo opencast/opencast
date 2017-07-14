@@ -160,6 +160,12 @@ To merge the release branch into `develop`. As example, we do that for 3.0. Plea
 
 6. Leave a comment in the merge ticket and assign it back to the next pull request in line on `develop`.
 
+
+### Updating Translations
+
+Updating the [localization translations](localization.md) is easy, and should be done at minimum as part of every release candidate.
+
+
 ### Beta Versions and Release Candidates
 
 For testing purposes, the release manager should regularly create beta versions. Especially before the public QA phase,
@@ -176,22 +182,24 @@ Create a version/tag. Again, version 3.0 is used as example. Please adjust the v
 
         git checkout -b r/3.0-beta1
 
-3. Make version changes for release. You can use `sed` to make things easier. Please make sure, the changes are correct:
+3. Update the [localization translations](localization.md).
+
+4. Make version changes for release. You can use `sed` to make things easier. Please make sure, the changes are correct:
 
         for i in `find . -name pom.xml`; do \
           sed -i 's/<version>3.0-SNAPSHOT</<version>3.0-beta1</' $i; done
 
-4. Commit changes and create release tag:
+5. Commit changes and create release tag:
 
         git commit -asS -m 'Opencast 3.0-beta1'
         git tag -s 3.0-beta1
 
-5. Switch back to release branch and push tags:
+6. Switch back to release branch and push tags:
 
         git checkout r/3.x
         git push <remote> 3.0-beta1:3.0-beta1
 
-6. You can remove the new branch afterwards:
+7. You can remove the new branch afterwards:
 
         git branch -D r/3.0-beta1
 
@@ -247,29 +255,31 @@ assume the final release should be based on `3.0-rc2`.
         vim docs/guides/admin/docs/release.notes.md
         git commit docs/guides/admin/docs/release.notes.md -sS
 
-5. Merge release notes into release branch:
+5. Update the [localization translations](localization.md).
+
+6. Merge release notes into release branch:
 
         git checkout r/3.x
         git merge r/3.0
         git checkout r/3.0
 
-6. Make version changes for release. You can use `sed` to make things easier. Please make sure, the changes are correct:
+7. Make version changes for release. You can use `sed` to make things easier. Please make sure, the changes are correct:
 
         for i in `find . -name pom.xml`; do \
           sed -i 's/<version>3.0-SNAPSHOT</<version>3.0</' $i; done
 
-7. Commit changes and create release tag:
+8. Commit changes and create release tag:
 
         git commit -asS -m 'Opencast 3.0'
         git tag -s 3.0
 
-8. Switch back to release branch, push release notes and tags:
+9. Switch back to release branch, push release notes and tags:
 
         git checkout r/3.x
         git push <remote> 3.0:3.0
         git push <remote> r/3.x
 
-9. You can remove the new branch afterwards:
+10. You can remove the new branch afterwards:
 
         git branch -D r/3.0
 
