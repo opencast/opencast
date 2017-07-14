@@ -112,6 +112,13 @@ merge ticket identifier needs to be added to that filter. To do this, create a t
 request filter and will appear shortly.
 
 
+### Creating the Release Version
+
+The release manager is responsible for creating, or triggering the creation of, the appropriate fix version for the new
+release. You may be able to do this yourself by assigning a new fix version to their newly created merge ticket. If you
+are unable to do that, please contact one of the JIRA administrators so we can create it for you!
+
+
 ### Release Documentation
 
 The [Opencast release documentation](http://docs.opencast.org) will be built automatically from available release tags.
@@ -282,6 +289,55 @@ assume the final release should be based on `3.0-rc2`.
 10. You can remove the new branch afterwards:
 
         git branch -D r/3.0
+
+11. Release the branch in JIRA. Talk to your JIRA administrators to have this done.
+
+12. Push the built artifacts to Maven. Bug the QA Coordinator to do this so that he remembers to set this up from the CI servers.
+
+13. Push the built artifacts back to BitBucket:
+
+        #!/bin/bash
+
+        VERSION=<VERSION>
+        BITBUCKET_USER=greg_logan
+
+        mvn -e clean install
+        cd build
+
+        #Download and create the source archive
+        echo "Downloading the source for $VERSION"
+        wget -c https://bitbucket.org/opencast-community/matterhorn/get/$VERSION.tar.gz
+        echo "Recompressing the source for $VERSION"
+        tar xzf $VERSION.tar.gz
+        mv opencast-community-matterhorn-* opencast-$VERSION-source
+        tar cfJ opencast-$VERSION-source.tar.xz opencast-$VERSION-source
+
+        #Recompress the variable profiles
+        echo "Recompressing Opencast profiles"
+        for i in opencast-dist-*.tar.gz
+        do
+          echo "Processing $i"
+          tar xf $i
+          tar cfJ "${i%.*}.xz" $i
+        done
+
+        #Checksum and sign the files
+        echo "Checksumming and signing checksum file"
+        sha512sum *.xz > opencast-$VERSION-sha512sum.txt
+        gpg --clearsign -a opencast-$VERSION-sha512sum.txt
+
+        echo "Input BitBucket password"
+        read bitbucketpass
+
+        #Push the files to BitBucket
+        echo "Pushing files to BitBucket"
+        for i in *.tar.xz
+        do
+          echo "Pushing $i"
+          curl -u "$BITBUCKET_USER:${bitbucketpass}" -X POST https://api.bitbucket.org/2.0/repositories/opencast-community/matterhorn/downloads -F files=@$i
+        done
+        echo "Pushing opencast-$VERSION-sha512sum.txt.asc"
+        curl -u "$BITBUCKET_USER:${bitbucketpass}" -X POST https://api.bitbucket.org/2.0/repositories/opencast-community/matterhorn/downloads -F files=@opencast-$VERSION-sha512sum.txt.asc
 
 
 Finally, send a release notice to list. You may use the following template:
