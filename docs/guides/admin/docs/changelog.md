@@ -1,6 +1,16 @@
 Opencast 3.x
 ============
 
+Opencast 3.1
+------------
+*Released on July 14, 2017*
+
+- [[MH-12157]](https://opencast.jira.com/browse/MH-12157) - Series index query performs bad on system with many series
+- [[MH-12278]](https://opencast.jira.com/browse/MH-12278) - NullPointerException in CleanupWorkflowOperationHandler
+- [[MH-12279]](https://opencast.jira.com/browse/MH-12279) - As a user, I expect the video editor to correctly visualize the audio track
+- [[MH-12291]](https://opencast.jira.com/browse/MH-12291) - Remove obsolete Speech Recognition API
+- [[MH-12296]](https://opencast.jira.com/browse/MH-12296) - getSeries Performance Issue
+
 Opencast 3.0
 ------------
 *Released on June 13, 2017*

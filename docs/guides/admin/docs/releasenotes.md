@@ -86,6 +86,14 @@ New Features and Improvements
   - **Library Update** - Many libraries have been updated to more recent versions. Most noteworthy, Karaf has
     been updated to version 4.0.8
 
+
+Additional Notes about 3.1
+--------------------------
+
+Opencast 3.1 fixes a critical security issue which allowed unauthenticated remote users to access the OSGI shell. This
+could lead to exposure of all bundle configuration values, potentially including some authentication data. This issue 
+was resolved by updating Karaf to 4.0.9 as part of MH-12295. The underlying issue in Karaf was filed as KARAF-4993.
+
 Release Schedule
 ----------------
 
