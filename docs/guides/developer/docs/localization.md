@@ -1,5 +1,8 @@
-Introduction
+Localization
 ============
+
+Introduction
+------------
 
 The Opencast project uses the
 [Crowdin Localization Management Platform](https://crowdin.com/project/opencast-matterhorn) for translating
@@ -17,13 +20,13 @@ Note that Crowdin managers take care of uploading the English sources (and possi
 others translations from Crowdin.
 
 I would like Opencast to support my language. Is this possible?
-===============================================================
+---------------------------------------------------------------
 
 Yes, absolutely! If you are willing to take the effort to provide the translation, we are happy to include your
 favorite language in Opencast!
 
 How can I provide a language translation?
-=========================================
+-----------------------------------------
 
 We use the [Crowdin Localization Management Platform](https://crowdin.com/project/opencast-matterhorn) - an easy to
 use web service for localization management. To provide a language translation, please perform the following steps:
@@ -38,7 +41,7 @@ of translations just below.
 In case you have questions, we are happy to answer them on the Opencast Users mailing list.
 
 Inclusion and Exclusion of Translations
-=======================================
+---------------------------------------
 
 Opencast supports a number of languages right out-of-the-box. Please find the criteria for inclusion and exlusion of
 language translations in Opencast releases below:
@@ -62,14 +65,15 @@ Note that [Crowdin](https://crowdin.com/project/opencast-matterhorn) is displayi
 each language. It is the percentages shown on that page that act as reference.
 Considering the dates when releases branch are cut, the respective releases schedules act as reference.
 
-Crowdin Managers
-================
+
+Crowdin Management And Administration
+-------------------------------------
 
 Crowdin managers are persons with privileged access to Crowdin needed to upload new files to be translated to Crowdin.
 The rest of document should help future Crowdin managers to get familiar with Crowdin quickly.
 
-Versioning
-----------
+
+### Versioning
 
 Crowdin supports versions management by allowing the management of multiple branches. The relation of
 Opencast code repository branches to Crowdin branches follows the following convention:
@@ -89,21 +93,19 @@ repository in sync with Crowdin:
 5. Upload sources of Opencast branch `develop` to Crowdin branch `develop`
 6. Upload translations of Opencast branch `develop` to Crodwin branch `develop`
 
-Working with Crowdin CLI
-------------------------
+### Working with Crowdin CLI
 
 The Crowdin CLI command line tool is used to synchronize the source language files and
-translations between the Opencast code repository and the Crowdin project *Opencast*. 
+translations between the Opencast code repository and the Crowdin project Opencast.
 
 The Crowdin CLI configuration can be found in `/.crowdin.yaml`
 
 Please perform the following steps to get the tool running on your local host:
 
 1. Download the [Crowdin CLI tool](https://crowdin.com/page/cli-tool)
-2. Get the API key for the project *Opencast* 
-[here](https://crowdin.com/project/opencast-matterhorn/settings#integration)
-3. Add the following line to the Crowdin configuration file found in the Opencast code repository just after
-the first line:
+2. [Get the API key for the project Opencast
+   ](https://crowdin.com/project/opencast-matterhorn/settings#integration)
+3. Add the following line to your local Crowdin configuration file (`~/.crowdin.yaml`):
 
         api_key: <secret key>
 
@@ -123,8 +125,9 @@ To download the translations from Crowdin, use the following command:
 
     java -jar crowdin-cli.jar --config .crowdin.yaml download -b <branch>
 
-References
-----------
+
+Further Information
+-------------------
 
  - [Crowdin Opencast Project](https://crowdin.com/project/opencast-matterhorn)
  - [Crowdin CLI Documentation](https://crowdin.com/page/cli-tool)
