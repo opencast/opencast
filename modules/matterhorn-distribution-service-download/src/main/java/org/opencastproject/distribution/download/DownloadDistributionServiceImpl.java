@@ -493,8 +493,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
       switch (op) {
         case Distribute:
           Boolean checkAvailability = Boolean.parseBoolean(arguments.get(3));
-          Boolean preserveReference = false;
-          preserveReference = Boolean.parseBoolean(arguments.get(4));
+          Boolean preserveReference = Boolean.parseBoolean(arguments.get(4));
           MediaPackageElement[] distributedElements = distributeElements(channelId, mediapackage, elementIds,
                   checkAvailability, preserveReference);
           return (distributedElements != null)
