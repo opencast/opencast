@@ -70,7 +70,7 @@ public class ArchiveMessageReceiverImpl extends BaseMessageReceiverImpl<ArchiveI
 
     switch (archiveItem.getType()) {
       case Update:
-        logger.debug("Received Update Archive Entry");
+        logger.debug("Received Update Archive Entry for index {}", getSearchIndex().getIndexName());
 
         Option<DublinCoreCatalog> loadedDC = none();
         MediaPackage mp = archiveItem.getMediapackage();
@@ -118,7 +118,7 @@ public class ArchiveMessageReceiverImpl extends BaseMessageReceiverImpl<ArchiveI
         // Persist the scheduling event
         try {
           getSearchIndex().addOrUpdate(event);
-          logger.debug("Archive entry {} updated in the adminui search index", event.getIdentifier());
+          logger.debug("Archive entry {} updated in the search index", event.getIdentifier());
         } catch (SearchIndexException e) {
           logger.error("Error retrieving the recording event from the search index: {}", e.getMessage());
           return;
@@ -132,7 +132,7 @@ public class ArchiveMessageReceiverImpl extends BaseMessageReceiverImpl<ArchiveI
         // Remove the archived entry from the search index
         try {
           getSearchIndex().deleteArchive(organization, user, eventId);
-          logger.debug("Archived mediapackage {} removed from adminui search index", eventId);
+          logger.debug("Archived mediapackage {} removed from search index", eventId);
         } catch (NotFoundException e) {
           logger.warn("Archived mediapackage {} not found for deletion", eventId);
         } catch (SearchIndexException e) {

@@ -165,7 +165,8 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
         // Remove the scheduling from the search index
         try {
           getSearchIndex().deleteScheduling(organization, user, schedulerItem.getMediaPackageId());
-          logger.debug("Scheduled recording {} removed from adminui search index", schedulerItem.getMediaPackageId());
+          logger.debug("Scheduled recording {} removed from the {} search index",
+            schedulerItem.getMediaPackageId(), getSearchIndex().getIndexName());
         } catch (NotFoundException e) {
           logger.warn("Scheduled recording {} not found for deletion", schedulerItem.getMediaPackageId());
         } catch (SearchIndexException e) {
@@ -181,7 +182,8 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
   private void updateEvent(Event event) {
     try {
       getSearchIndex().addOrUpdate(event);
-      logger.debug("Scheduled recording {} updated in the adminui search index", event.getIdentifier());
+      logger.debug("Scheduled recording {} updated in the {} search index",
+        event.getIdentifier(), getSearchIndex().getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Error retrieving the recording event from the search index: {}", ExceptionUtils.getStackTrace(e));
     }
