@@ -97,21 +97,18 @@ module.exports = function (grunt) {
               host: 'localhost',
               port: '<%= proxyPort %>',
               https: false,
-              changeOrigin: true
            },
            {
               context: '/acl-manager',
               host: 'localhost',
               port: '<%= proxyPort %>',
               https: false,
-              changeOrigin: true
           },
           {
               context: '/i18n',
               host: 'localhost',
               port: '<%= proxyPort %>',
               https: false,
-              changeOrigin: true
           }]
       },
       test: {
@@ -477,7 +474,7 @@ module.exports = function (grunt) {
     'build'
   ]);
 
-  grunt.loadNpmTasks('grunt-connect-proxy');
+  grunt.loadNpmTasks('grunt-middleware-proxy');
   grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-postcss');
   grunt.loadNpmTasks('grunt-contrib-watch');
@@ -489,7 +486,7 @@ module.exports = function (grunt) {
     'wiredep',
     'concurrent:server',
     'postcss:server',
-    'configureProxies:proxy',
+    'setupProxies:proxy',
     'connect:proxy',
     'watch'
   ]);
