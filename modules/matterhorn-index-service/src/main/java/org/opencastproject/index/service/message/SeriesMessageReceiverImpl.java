@@ -65,7 +65,7 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
     User user = getSecurityService().getUser();
     switch (seriesItem.getType()) {
       case UpdateCatalog:
-        logger.debug("Received Update Series");
+        logger.debug("Received Update Series for index {}", getSearchIndex().getIndexName());
 
         DublinCoreCatalog dc = seriesItem.getMetadata();
         String seriesId = dc.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER);
@@ -94,7 +94,7 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
         update(seriesItem.getSeriesId(), series);
         break;
       case UpdateAcl:
-        logger.debug("Received Update Series ACL");
+        logger.debug("Received Update Series ACL for index {}", getSearchIndex().getIndexName());
 
         // Load or create the corresponding series
         try {
@@ -116,7 +116,7 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
         update(seriesItem.getSeriesId(), series);
         break;
       case UpdateOptOut:
-        logger.debug("Received update opt out status of series {}", seriesItem.getSeriesId());
+        logger.debug("Received update opt out status of series {} for index {}", seriesItem.getSeriesId(), getSearchIndex().getIndexName());
 
         // Load or create the corresponding series
         try {
@@ -132,7 +132,7 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
         update(seriesItem.getSeriesId(), series);
         break;
       case UpdateProperty:
-        logger.debug("Received update property of series {}", seriesItem.getSeriesId());
+        logger.debug("Received update property of series {} for index {}", seriesItem.getSeriesId(), getSearchIndex().getIndexName());
 
         if (!THEME_PROPERTY_NAME.equals(seriesItem.getPropertyName()))
           break;
@@ -151,12 +151,12 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
         update(seriesItem.getSeriesId(), series);
         break;
       case Delete:
-        logger.debug("Received Delete Series Event {}", seriesItem.getSeriesId());
+        logger.debug("Received Delete Series Event {} for index {}", seriesItem.getSeriesId(), getSearchIndex().getIndexName());
 
         // Remove the series from the search index
         try {
           getSearchIndex().delete(Series.DOCUMENT_TYPE, seriesItem.getSeriesId().concat(organization));
-          logger.debug("Series {} removed from adminui search index", seriesItem.getSeriesId());
+          logger.debug("Series {} removed from search index", seriesItem.getSeriesId());
         } catch (SearchIndexException e) {
           logger.error("Error deleting the series {} from the search index: {}", seriesItem.getSeriesId(),
                   ExceptionUtils.getStackTrace(e));
@@ -171,7 +171,7 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
   private void update(String seriesId, Series series) {
     try {
       getSearchIndex().addOrUpdate(series);
-      logger.debug("Series {} updated in the adminui search index", seriesId);
+      logger.debug("Series {} updated in the search index", seriesId);
     } catch (SearchIndexException e) {
       logger.error("Error storing the series {} to the search index: {}", seriesId, ExceptionUtils.getStackTrace(e));
     }

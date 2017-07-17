@@ -27,6 +27,8 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.util.NotFoundException;
 
+import java.util.Map;
+
 /**
  * Defines methods for indexing, retrieving and searching through index.
  *
@@ -140,6 +142,15 @@ public interface SeriesServiceIndex {
    *           if query cannot be executed
    */
   DublinCoreCatalogList search(SeriesQuery query) throws SeriesServiceDatabaseException;
+
+  /**
+   * Query Id and title of all series
+   *
+   * @return Map of series Id to series title for all series
+   * @throws SeriesServiceDatabaseException
+   *           if query can not be executed
+   */
+  Map<String, String> queryIdTitleMap() throws SeriesServiceDatabaseException;
 
   /**
    * Returns number of series in search index, across all organizations.

@@ -27,10 +27,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -39,6 +40,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * A servlet to accept an LTI login via POST. The actual authentication happens in LtiProcessingFilter. GET requests
@@ -47,6 +49,8 @@ import javax.servlet.http.HttpSession;
 public class LtiServlet extends HttpServlet {
 
   private static final String LTI_CUSTOM_PREFIX = "custom_";
+  private static final String LTI_CUSTOM_TOOL = "custom_tool";
+  private static final String LTI_CUSTOM_TEST = "custom_test";
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(LtiServlet.class);
@@ -56,6 +60,9 @@ public class LtiServlet extends HttpServlet {
 
   /** The key used to store the LTI attributes in the HTTP session */
   public static final String SESSION_ATTRIBUTE_KEY = "org.opencastproject.lti.LtiServlet";
+
+  /** Path under which all the LTI tools are available */
+  private static final String TOOLS_URL = "/ltitools";
 
   /** See the LTI specification */
   public static final String LTI_MESSAGE_TYPE = "lti_message_type";
@@ -179,74 +186,61 @@ public class LtiServlet extends HttpServlet {
     HttpSession session = req.getSession(false);
     session.setAttribute(SESSION_ATTRIBUTE_KEY, getLtiValuesAsMap(req));
 
-    // We must return a 200 for some oauth client libraries to accept this as a valid response
+    // We must return a 200 for some OAuth client libraries to accept this as a valid response
 
     // The URL of the LTI tool. If no specific tool is passed we use the test tool
-    String toolReq = req.getParameter("custom_tool");
-    String toolUrl = "/ltisample/";
-    if (toolReq != null) {
-      toolUrl = toolReq;
-      if (!(toolUrl.indexOf("/") == 0)) {
-        //if not supplied we assume this is a root path to the tool
-        toolUrl = "/" + toolUrl;
+    UriBuilder builder = null;
+    try {
+      URI toolUri = new URI(StringUtils.trimToEmpty(req.getParameter(LTI_CUSTOM_TOOL)));
+
+      if (toolUri.getPath().isEmpty())
+        throw new URISyntaxException(toolUri.toString(), "Provided 'custom_tool' has an empty path");
+
+      // Make sure that the URI path starts with '/'. Otherwise, UriBuilder handles URIs incorrectly
+      if (!toolUri.isOpaque() && !toolUri.getPath().startsWith("/")) {
+        // Also, remove the schema and "authority" parts of the URI for security reasons
+        builder = UriBuilder
+                .fromUri(new URI(null, null, '/' + toolUri.getPath(), toolUri.getQuery(), toolUri.getFragment()));
+      } else {
+        // Remove the schema and "authority" parts of the URI for security reasons.
+        // "authority" consists of user-info, host and port.
+        builder = UriBuilder.fromUri(toolUri).scheme(null).host(null).userInfo(null).port(-1);
+      }
+    } catch (URISyntaxException ex) {
+      logger.warn("The 'custom_tool' parameter was invalid: '{}'. Reverting to default: '{}'",
+              Arrays.toString(req.getParameterValues(LTI_CUSTOM_TOOL)), TOOLS_URL);
+      builder = UriBuilder.fromPath(TOOLS_URL);
+    }
+
+    // We need to add the custom params to the outgoing request
+    for (String key : req.getParameterMap().keySet()) {
+      logger.debug("Found query parameter '{}'", key);
+      if (key.startsWith(LTI_CUSTOM_PREFIX) && (!LTI_CUSTOM_TOOL.equals(key))) {
+        String paramValue = req.getParameter(key);
+        // we need to remove the prefix custom_
+        String paramName = key.substring(LTI_CUSTOM_PREFIX.length());
+        logger.debug("Found custom var: {}:{}", paramName, paramValue);
+        builder.queryParam(paramName, paramValue);
       }
     }
 
-    String customParams = getCustomParams(req);
-    if (customParams != null) {
-      toolUrl = toolUrl + "?" + customParams;
-    }
+    // Build the final URL (as a string)
+    String redirectUrl = builder.build().toString();
 
     // Always set the session cookie
     resp.setHeader("Set-Cookie", "JSESSIONID=" + session.getId() + ";Path=/");
 
     // The client can specify debug option by passing a value to test
-    String testString = req.getParameter("custom_test");
-    boolean test = false;
-    if (testString != null) {
-      logger.debug("test: {}", req.getParameter("custom_test"));
-      test = Boolean.valueOf(testString).booleanValue();
-    }
-
-    //we need to add the custom params to the outgoing request
-
-
     // if in test mode display details where we go
-    if (test) {
-      resp.getWriter().write("<html><body>Welcome to matterhorn lti, you are going to " + toolUrl + "<br>");
-      resp.getWriter().write("<a href=\"" + toolUrl + "\">continue...</a></body></html>");
-      //TODO we should probably print the paramaters.
+    if (Boolean.valueOf(StringUtils.trimToEmpty(req.getParameter(LTI_CUSTOM_TEST)))) {
+      resp.setContentType("text/html");
+      resp.getWriter().write("<html><body>Welcome to Opencast LTI; you are going to " + redirectUrl + "<br>");
+      resp.getWriter().write("<a href=\"" + redirectUrl + "\">continue...</a></body></html>");
+      // TODO we should probably print the parameters.
     } else {
-      logger.debug(toolUrl);
-      resp.sendRedirect(toolUrl);
+      logger.debug(redirectUrl);
+      resp.sendRedirect(redirectUrl);
     }
-  }
-
-  /**
-   * Get a list of custom params to pass to the tool
-   * @param req
-   * @return
-   */
-  protected String getCustomParams(HttpServletRequest req) {
-    Map<String, String[]> paramMap = req.getParameterMap();
-    StringBuilder builder = new StringBuilder();
-    Set<String> entries = paramMap.keySet();
-    Iterator<String> iterator = entries.iterator();
-    while (iterator.hasNext()) {
-      String key = iterator.next();
-      logger.debug("got key: " + key);
-      if (key.indexOf(LTI_CUSTOM_PREFIX) >= 0) {
-        String paramValue = req.getParameter(key);
-        //we need to remove the prefix _custom
-        String paramName = key.substring(LTI_CUSTOM_PREFIX.length());
-        logger.debug("Found custom var: " + paramName + ":" + paramValue);
-        builder.append(paramName + "=" + paramValue + "&");
-      }
-    }
-
-
-    return builder.toString();
-
   }
 
   /**
@@ -278,7 +272,8 @@ public class LtiServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     HttpSession session = req.getSession(false);
     if (session == null) {
-      resp.sendError(HttpServletResponse.SC_NOT_FOUND); // If there is no session, there is nothing to see here
+      // If there is no session, there is nothing to see here
+      resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     } else {
       Map<String, String> ltiAttributes = (Map<String, String>) session.getAttribute(SESSION_ATTRIBUTE_KEY);
       if (ltiAttributes == null) {

@@ -292,12 +292,21 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
 
       Set<JaxbRole> roles = new HashSet<JaxbRole>();
 
+      boolean isInstructor = false;
+
       for (String r : sakaiRoles) {
         roles.add(new JaxbRole(r, jaxbOrganization, "Sakai external role", Role.Type.EXTERNAL));
+
+        if (r.endsWith(LTI_INSTRUCTOR_ROLE))
+          isInstructor = true;
       }
 
-      // Add a group role for testing
-      roles.add(new JaxbRole(Group.ROLE_PREFIX + "SAKAI", jaxbOrganization, "Sakai Group", Role.Type.EXTERNAL_GROUP));
+      // Group role for all Sakai users
+      roles.add(new JaxbRole(Group.ROLE_PREFIX + "SAKAI", jaxbOrganization, "Sakai Users", Role.Type.EXTERNAL_GROUP));
+
+      // Group role for Sakai users who are an instructor in one more sites
+      if (isInstructor)
+        roles.add(new JaxbRole(Group.ROLE_PREFIX + "SAKAI_INSTRUCTOR", jaxbOrganization, "Sakai Instructors", Role.Type.EXTERNAL_GROUP));
 
       logger.debug("Returning JaxbRoles: " + roles);
 

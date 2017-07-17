@@ -2,7 +2,7 @@
   "value_locale":"de",
   "value_dateFormatFull":"Do MMMM YYYY, h:mm:ss a",
   "error_videoLoading":"Das Video wird geladen. Bitte einen Moment warten.",
-  "error_audioLoading":"Das Audio wird geladen. Bitte einen Moment warten.",
+  "error_audioLoading":"Audio wird geladen. Bitte einen Moment warten.",
   "msg_videoLoadedSuccessfully":"Das Video ist erfolgreich geladen worden.",
   "msg_audioLoadedSuccessfully":"Das Audio ist erfolgreich geladen worden.",
   "msg_videoBuffering":"Das Video puffert gerade. Bitte einen Moment warten.",

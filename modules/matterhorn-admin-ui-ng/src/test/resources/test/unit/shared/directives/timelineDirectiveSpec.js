@@ -114,7 +114,7 @@ describe('adminNg.directives.timelineDirective', function () {
             expect(element.find('.field-of-vision .field').width()).toBe(59.592326139088726);
         });
 
-        fit('zoom in - dropdown', function() {
+        it('zoom in - dropdown', function() {
 
             element.isolateScope().zoomSelected = { name: 'All', time: 0 };
             element.isolateScope().changeZoomSelected($.Event(''));

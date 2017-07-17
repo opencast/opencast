@@ -1,6 +1,8 @@
 {
   "value_locale":"gl",
-  "error_mediaPackageInformationNotLoaded":"Existen dúas causas posibles para este erro:<ul><li>Os arquivos xa non están dispoñibles</li><li>Os arquivos están protexidos e é necesario iniciar sesión</li></ul>",
+  "error_mediaPackageInformationNotLoaded":"Hai dúas causas posibles para este erro:",
+  "error_mediaPackageInformationNotLoaded_reason1":"Os vídeos xa non están dispoñibles",
+  "error_mediaPackageInformationNotLoaded_reason2":"Os vídeos están protexidos e requiren iniciar sesión",
   "error_noMediaInformationAvailable":"Non hai información dispoñible sobre os vídeos.",
   "error_endpointNotAvailable":"O servizo de busca non está dispoñible nestes momentos."
 }

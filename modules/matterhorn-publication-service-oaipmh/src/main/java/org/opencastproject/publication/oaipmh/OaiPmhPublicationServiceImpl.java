@@ -448,6 +448,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
 
     // All the jobs have passed, let's update the mediapackage with references to the distributed elements
     List<String> elementsToPublish = new ArrayList<>();
+    Map<String, String> distributedElementIds = new HashMap<>();
 
     for (Job job : jobs) {
      try {
@@ -474,6 +475,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
      }
 
     }
+
     // Mark everything that is set for removal
     List<MediaPackageElement> removals = new ArrayList<>();
     for (MediaPackageElement element : mp.getElements()) {

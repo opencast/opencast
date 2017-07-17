@@ -1,7 +1,7 @@
 {
   "value_locale":"de",
   "error_AudioCodecNotSupported":"Fehler: Der Audio-Codec wird nicht von diesem Browser unterstützt",
-  "error_AudioElementNotSupported":"Fehler: Dieser Browser unterstützt nicht das Audio-Element.",
+  "error_AudioElementNotSupported":"Fehler: Dieser Browser unterstützt das Audio-Element nicht.",
   "video":"Video",
   "video_short":"Vid.",
   "openInPlayer":"Im Player öffnen",
@@ -9,7 +9,7 @@
   "hasToBeSmallerThanDuration":"muss kleiner sein als die Länge des Videos",
   "msg_waitToSetTime":"Bitte warten, bis das Video geladen wurde, um eine Playback-Zeit zu setzen.",
   "msg_startPlayingToSetTime":"Bitte das Video einmal starten, um eine Playback-Zeit zu setzen.",
-  "msg_waitToSeek":"Zu seeken ist nicht möglich, bis das Video geladen wurde.",
+  "msg_waitToSeek":"Im Video zu springen ist nicht möglich, bevor das Video geladen wurde.",
   "msg_startPlayingToSeek":"Zu seeken ist nicht möglich, bis das Video einmal gestartet wurde.",
-  "chromeBuffer":"Der Puffer-Checker aufgrund von Einschränkungen von Chrome deaktiviert worden. Es ist möglich, dass Video-Abspiel-Probleme auftreten werden."
+  "chromeBuffer":"Der Puffer-Checker ist aufgrund von Einschränkungen in Chrome deaktiviert worden. Es ist möglich, dass Probleme mit dem Video-Abspielen auftreten werden."
 }

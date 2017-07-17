@@ -266,9 +266,6 @@
     <!-- Enable 2-legged OAuth access ("signed fetch") to the LTI launch servlet -->
     <sec:intercept-url pattern="/lti" access="ROLE_OAUTH_USER" />
 
-    <!-- Enable access to the LTI sample tool -->
-    <sec:intercept-url pattern="/ltisample/**" access="ROLE_OAUTH_USER" />
-
     <!-- Enable access to the LTI tools -->
     <sec:intercept-url pattern="/ltitools/**" access="ROLE_OAUTH_USER" />
 
@@ -337,8 +334,8 @@
         <!-- Basic authentication  -->
         <!-- <ref bean="basicAuthenticationFilter" /> -->
 
-        <!-- 2-legged oauth is used by trusted 3rd party applications, including LTI producers. -->
-        <!-- If you do not plan to use OAuth, comment this out. -->
+        <!-- 2-legged OAuth is used by trusted 3rd party applications, including LTI. -->
+        <!-- Uncomment the line below to support LTI or other OAuth clients.          -->
         <!-- <ref bean="oauthProtectedResourceFilter" /> -->
       </list>
     </property>
@@ -438,12 +435,13 @@
   <!-- # OAuth (LTI) Support # -->
   <!-- ####################### -->
 
-  <!-- This is required for LTI. If you plan to use LTI, uncomment this and set
-       custom values for consumerkey and consumersecret:
+  <!-- This is required for LTI. If you are using LTI and have enabled the oauthProtectedResourceFilter  -->
+  <!-- in the list of authenticationFilters above, set custom values for CONSUMERKEY and CONSUMERSECRET. -->
+
   <bean name="oAuthConsumerDetailsService" class="org.opencastproject.kernel.security.OAuthSingleConsumerDetailsService">
     <constructor-arg index="0" ref="userDetailsService" />
-    <constructor-arg index="1" value="consumerkey" />
-    <constructor-arg index="2" value="consumersecret" />
+    <constructor-arg index="1" value="CONSUMERKEY" />
+    <constructor-arg index="2" value="CONSUMERSECRET" />
     <constructor-arg index="3" value="constructorName" />
   </bean>
 
@@ -458,19 +456,22 @@
     <property name="authHandler">
       <bean class="org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler">
         <constructor-arg index="0" ref="userDetailsService" />
-        < ! - - Uncomment to allow the included keys to be trusted to provide known user details
+
+        <!-- Uncomment to trust usernames from the LTI consumer identified by CONSUMERKEY.           -->
+        <!-- Users from untrusted systems will be prefixed with "lti:" and the consumer domain name. -->
+
+        <!--
         <constructor-arg index="1" ref="securityService" />
         <constructor-arg index="2">
           <list>
-            <value>trustedKey</value>
-            <value>trustedKey2</value>
+            <value>CONSUMERKEY</value>
           </list>
         </constructor-arg>
-        - - >
+        -->
+
       </bean>
     </property>
   </bean>
-  -->
 
   <!-- ###################### -->
   <!-- # Shibboleth Support # -->

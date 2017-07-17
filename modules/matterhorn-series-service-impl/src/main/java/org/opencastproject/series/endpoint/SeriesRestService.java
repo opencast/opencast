@@ -743,6 +743,34 @@ public class SeriesRestService {
   }
 
   @GET
+  @Path("allSeriesIdTitle.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getAll", description = "Returns a list of identifier and title of all series",
+          returnDescription = "Json list of identifier and title of all series", reponses = {
+            @RestResponse(responseCode = SC_OK, description = "A list with series"),
+            @RestResponse(responseCode = SC_FORBIDDEN, description = "A user is not allowed to list all series"),
+            @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error while processing the request") })
+  public Response getAllSeriesIdTitle() {
+    try {
+      Map<String, String> allSeries = seriesService.getIdTitleMapOfAllSeries();
+      JSONArray seriesJsonArr = new JSONArray();
+      for (String seriesId : allSeries.keySet()) {
+        JSONObject seriesJsonObj = new JSONObject();
+        seriesJsonObj.put("identifier", seriesId);
+        seriesJsonObj.put("title", allSeries.get(seriesId));
+        seriesJsonArr.add(seriesJsonObj);
+      }
+      JSONObject resultJson = new JSONObject();
+      resultJson.put("series", seriesJsonArr);
+      return Response.ok(resultJson.toJSONString()).build();
+    } catch (SeriesException ex) {
+      return R.serverError();
+    } catch (UnauthorizedException ex) {
+      return R.forbidden();
+    }
+  }
+
+  @GET
   @Path("{seriesId}/elements.json")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "getSeriesElements", description = "Returns all the element types of a series", returnDescription = "Returns a JSON array with all the types of elements of the given series.", pathParameters = { @RestParameter(name = "seriesId", description = "The series identifier", type = STRING, isRequired = true) }, reponses = {

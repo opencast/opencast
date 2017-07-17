@@ -49,12 +49,12 @@ public class CommentMessageReceiverImpl extends BaseMessageReceiverImpl<CommentI
     User user = getSecurityService().getUser();
     switch (commentItem.getType()) {
       case Update:
-        logger.debug("Received Comment update");
+        logger.debug("Received Comment update for {} search index", getSearchIndex().getIndexName());
 
         try {
           EventIndexUtils.updateComments(commentItem.getEventId(), commentItem.hasComments(),
                   commentItem.hasOpenComments(), commentItem.needsCutting(), organization, user, getSearchIndex());
-          logger.debug("Event {} comment status updated from adminui search index", commentItem.getEventId());
+          logger.debug("Event {} comment status updated from search index", commentItem.getEventId());
         } catch (SearchIndexException e) {
           logger.error("Error updating comment status of event {} from the search index: {}", commentItem.getEventId(),
                   ExceptionUtils.getStackTrace(e));

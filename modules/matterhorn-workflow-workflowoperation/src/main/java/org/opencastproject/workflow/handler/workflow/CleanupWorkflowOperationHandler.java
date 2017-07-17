@@ -71,6 +71,9 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /** Deleting external URI's config key */
   public static final String DELETE_EXTERNAL = "delete-external";
 
+  /** Time to wait in seconds before removing files */
+  public static final String DELAY = "delay";
+
   /** The configuration properties */
   protected SortedMap<String, String> configurationOptions = null;
 
@@ -90,6 +93,8 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
                     + "remove any files.");
     configurationOptions.put(DELETE_EXTERNAL,
             "Whether to try to delete external working file repository URIs. Default is false.");
+    configurationOptions.put(DELAY,
+            "Time to wait in seconds before removing files. Default is 1s.");
   }
 
   /**
@@ -114,31 +119,36 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /**
    * Deletes JobArguments for every finished Job of the WorkfloInstance
-   * 
+   *
    * @param workflowInstance
    */
   public void cleanUpJobArgument(WorkflowInstance workflowInstance) {
-    List<WorkflowOperationInstance> workflowOperationInstance = workflowInstance.getOperations();
-    for (WorkflowOperationInstance iterworkflowInstance : workflowOperationInstance) {
-      logger.debug("Delete JobArguments for Job id from Workflowinstance" + iterworkflowInstance.getId());
+    List<WorkflowOperationInstance> operationInstances = workflowInstance.getOperations();
+    for (WorkflowOperationInstance operationInstance : operationInstances) {
+      logger.debug("Delete JobArguments for Job id from Workflowinstance" + operationInstance.getId());
 
-      //delete job Arguments
+      // delete job Arguments
+      Long operationInstanceId = null;
       try {
-        Job jobWorkflowinstance = (serviceRegistry.getJob(iterworkflowInstance.getId()));
-        List<String> list = new ArrayList<>();
-        jobWorkflowinstance.setArguments(list);
-        serviceRegistry.updateJob(jobWorkflowinstance);
+        operationInstanceId = operationInstance.getId();
+        // instanceId can be null if the operation never run
+        if (operationInstanceId != null) {
+          Job operationInstanceJob = (serviceRegistry.getJob(operationInstanceId));
+          List<String> list = new ArrayList<>();
+          operationInstanceJob.setArguments(list);
+          serviceRegistry.updateJob(operationInstanceJob);
 
-        List<Job> jobs = serviceRegistry.getChildJobs(iterworkflowInstance.getId());
-        for (Job job : jobs) {
-          if (job.getStatus() == Job.Status.FINISHED) {
-            logger.debug("Deleting Arguments:  " + job.getArguments());
-            job.setArguments(list);
-            serviceRegistry.updateJob(job);
+          List<Job> jobs = serviceRegistry.getChildJobs(operationInstanceId);
+          for (Job job : jobs) {
+            if (job.getStatus() == Job.Status.FINISHED) {
+              logger.debug("Deleting Arguments:  " + job.getArguments());
+              job.setArguments(list);
+              serviceRegistry.updateJob(job);
+            }
           }
         }
       } catch (ServiceRegistryException | NotFoundException ex) {
-        logger.error("Deleting JobArguments faild Job id:{} ", workflowInstance.getId(), ex);
+        logger.error("Deleting JobArguments failed for Job {}: {} ", operationInstanceId, ex);
       }
     }
   }
@@ -162,6 +172,26 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
     final List<MediaPackageElementFlavor> flavorsToPreserve = new ArrayList<MediaPackageElementFlavor>();
 
     boolean deleteExternal = BooleanUtils.toBoolean(currentOperation.getConfiguration(DELETE_EXTERNAL));
+
+    String delayStr = currentOperation.getConfiguration(DELAY);
+    int delay = 1;
+
+    if (delayStr != null) {
+      try {
+        delay = Integer.parseInt(delayStr);
+      } catch (NumberFormatException e) {
+        logger.warn("Invalid value '{}' for delay in workflow operation configuration (should be integer)", delayStr);
+      }
+    }
+
+    if (delay > 0) {
+      try {
+        logger.debug("Sleeping {}s before removing workflow files", delay);
+        Thread.sleep(delay * 1000);
+      } catch (InterruptedException e) {
+        // ignore
+      }
+    }
 
     // If the configuration does not specify flavors, remove them all
     for (String flavor : asList(flavors)) {
@@ -212,7 +242,8 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
           if (elementUri.startsWith(UrlSupport.concat(wfrBaseUrl, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX))) {
             String wfrDeleteUrl = elementUri.substring(0, elementUri.lastIndexOf("/"));
             delete = new HttpDelete(wfrDeleteUrl);
-          } else if (elementUri.startsWith(UrlSupport.concat(wfrBaseUrl, WorkingFileRepository.COLLECTION_PATH_PREFIX))) {
+          } else if (elementUri
+                  .startsWith(UrlSupport.concat(wfrBaseUrl, WorkingFileRepository.COLLECTION_PATH_PREFIX))) {
             delete = new HttpDelete(elementUri);
           } else {
             logger.info("Unable to handle URI {}", elementUri);

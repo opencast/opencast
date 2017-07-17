@@ -450,15 +450,16 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     try {
       directory = getCollectionDirectory(collectionId, false);
       if (directory == null)
-        throw new NotFoundException(fileName);
+        throw new NotFoundException(directory.getAbsolutePath());
     } catch (IOException e) {
       // can be ignored, since we don't want the directory to be created, so it will never happen
     }
     File sourceFile = new File(directory, PathSupport.toSafeName(fileName));
     File md5File = getMd5File(sourceFile);
-    if (!sourceFile.exists() || !md5File.exists()) {
-      throw new NotFoundException(fileName);
-    }
+    if (!sourceFile.exists())
+      throw new NotFoundException(sourceFile.getAbsolutePath());
+    if (!md5File.exists())
+      throw new NotFoundException(md5File.getAbsolutePath());
     return sourceFile;
   }
 

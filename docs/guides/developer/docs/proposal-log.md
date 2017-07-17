@@ -89,34 +89,75 @@ I hope you agree with this change,
 Lars
 ```
 
+### Minor documentation changes do not require JIRA issues or PRs
+Proposed by Stephen Marquard <stephen.marquard@uct.ac.za>, passed on June 9, 2017
+
+```no-highlight
+To reduce the overhead involved in improving our documentation, I #propose that minor fixes
+to documentation may be committed to either maintenance branches or develop without requiring
+a JIRA issue or pull request.
+
+Markdown docs can be edited directly on bitbucket (and git should we move to that), which is 
+a very fast and convenient way for developers to fix documentation.
+
+Constraints: documentation fixes committed in this way should be minor changes only;
+for example fixing typos, layout, formatting, links or small changes to existing content, 
+but no significant new content (which should continue to go through the usual review process).
+```
+
+### Requiring Java 1.8 for 3.0
+Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on June 12, 2017
+
+```no-highlight
+Hi folks,
+
+For those following along, James Perrin has identified an issue where 3.0
+requires Java 1.8 at runtime.  We haven't formally included that
+requirement for 3.0 yet (it's already required for 4.0), but I hereby
+propose that we do.  No one seems to have noticed this requirement was
+already present in 3.0 (not even me!), even at this late in the release
+cycle which speaks, I think, to the already widespread adoption of Java
+1.8.  We would also have to go back and redo all of our testing were we to
+change the problematic jar to an earlier version, which would be
+unfortunate for our release timelines.
+
+This proposal closes EOD 2017-06-12 UTC -6, at which point I should be able
+to cut the release.
+
+G
+```
+
 ### Officially declare the Admin UI Facade as internal API for exclusive use by the module matterhorn-adminui-ng
 Proposed by Sven Stauber <sven.stauber@switch.ch>, passed on December 16, 2016
 
 ```no-highlight
 Dear all,
-I hereby propose to officially declare the Admin UI Facade as internal API for exclusive use by the module
-matterhorn-adminui-ng.
+I hereby propose to officially declare the Admin UI Facade as internal API for
+exclusive use by the module matterhorn-adminui-ng.
 
 Reason:
-The Admin UI Facade is essentially the backend of the Admin UI.
-While it would be technically possible to use this API for other purposes, this would introduce dependencies to
-components other than the Admin UI.
-Allowing such dependencies to come into existence would cause changes to the Admin UI Facade to potentially break
-other (possibly unknown external) components.
-Hence, we would need to announce, coordinate and discuss changes to this API to not break dependencies to components
-we potentially don't even know.
-This would unnecessarily slow down the future development of the Admin UI.
-In addition, Opencast 2.3 introduces the External API which has been explicitly designed to meet the requirements of
-an API used to integrate other components.
+The Admin UI Facade is essentially the backend of the Admin UI.  While it would
+be technically possible to use this API for other purposes, this would introduce
+dependencies to components other than the Admin UI.
+
+Allowing such dependencies to come into existence would cause changes to the
+Admin UI Facade to potentially break other (possibly unknown external)
+components.  Hence, we would need to announce, coordinate and discuss changes to
+this API to not break dependencies to components we potentially don't even know.
+This would unnecessarily slow down the future development of the Admin UI.  In
+addition, Opencast 2.3 introduces the External API which has been explicitly
+designed to meet the requirements of an API used to integrate other components.
 
 Changes needed:
-The documentation needs to reflect that the Admin UI Facade is an internal API that will be changed without prior
-announcement whenever needed without respecting dependencies other than the Admin UI itself and therefore people shall
-not use this API for integration purposes.
+The documentation needs to reflect that the Admin UI Facade is an internal API
+that will be changed without prior announcement whenever needed without
+respecting dependencies other than the Admin UI itself and therefore people
+shall not use this API for integration purposes.
 
 Best,
 Sven
 ```
+
 ### Opencast Next: Code Cleanup
 Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Thu, 7 July 2016 15:21:19 UTC
 

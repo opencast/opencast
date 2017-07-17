@@ -2,7 +2,8 @@
 
     <header>
         <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2 translate="EVENTS.EVENTS.DETAILS.HEADER" translate-values="{{ titleParams }}">
+        <h2>
+            {{ 'EVENTS.EVENTS.DETAILS.HEADER' | translate:titleParams }}
             <!-- Event details - {{resourceId}} -->
         </h2>
     </header>

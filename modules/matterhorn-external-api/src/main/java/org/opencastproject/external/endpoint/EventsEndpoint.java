@@ -85,7 +85,6 @@ import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.UrlSupport;
@@ -123,6 +122,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -154,7 +154,7 @@ public class EventsEndpoint implements ManagedService {
   protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
 
   /** The default time before a piece of signed content expires. 2 Hours. */
-  protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
+  protected static final Long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60L;
 
   /** Subtype of previews required by the video editor */
   private static final String PREVIEW_SUBTYPE = "preview.subtype";
@@ -267,30 +267,27 @@ public class EventsEndpoint implements ManagedService {
   /** OSGi callback if properties file is present */
   @Override
   public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    // Ensure properties is not null
     if (properties == null) {
-      logger.info("No configuration available, using defaults");
-      return;
+      properties = new Hashtable();
+      logger.debug("No configuration set");
     }
 
-    Opt<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY).toOpt()
-            .map(com.entwinemedia.fn.fns.Strings.toLongF);
-    if (expiration.isSome()) {
-      expireSeconds = expiration.get();
-      logger.info("The property {} has been configured to expire signed URLs in {}.",
-              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
-    } else {
-      expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
-      logger.info("The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
-              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
+    // Read URL Signing Expiration duration
+    // Default to DEFAULT_URL_SIGNING_EXPIRE_DURATION.toString()));
+    try {
+      expireSeconds = Long.parseLong(StringUtils.defaultString(
+              (String) properties.get(URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY),
+              DEFAULT_URL_SIGNING_EXPIRE_DURATION.toString()));
+    } catch (NumberFormatException e) {
+      logger.error("Error parsing URL signing expiration configuration value", e);
     }
+    logger.debug("URLs signatures are configured to expire in {}.", Log.getHumanReadableTimeString(expireSeconds));
 
-    if ((properties != null) && (properties.get(PREVIEW_SUBTYPE) != null)) {
-      previewSubtype = StringUtils.trimToNull((String) properties.get(PREVIEW_SUBTYPE));
-      logger.info("Preview subtype is '{}'", previewSubtype);
-    } else {
-      previewSubtype = DEFAULT_PREVIEW_SUBTYPE;
-      logger.info("No preview subtype configured, using '{}'", previewSubtype);
-    }
+    // Read preview subtype configuration
+    // Default to DEFAULT_PREVIEW_SUBTYPE
+    previewSubtype = StringUtils.defaultString((String) properties.get(PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
+    logger.debug("Preview subtype is '{}'", previewSubtype);
   }
 
   @GET

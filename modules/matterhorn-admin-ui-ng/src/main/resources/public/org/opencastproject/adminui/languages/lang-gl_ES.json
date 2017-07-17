@@ -169,7 +169,7 @@
     "VIDEO_CUT_PROCESSING":"Estase a procesar o vídeo…",
     "SERVER_UNRESPONSIVE":"Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
     "SERVICE_UNAVAILABLE":"Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
-    "ACTIVE_TRANSACTION":"Non se pode modificar o evento actual porque forma parte dunha transacción en curso."
+    "ACTIVE_TRANSACTION":"Este evento non se pode editar mentres exista un fluxo de traballo ou unha transacción activos."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Accións",
@@ -382,7 +382,8 @@
             "REPEATS":"Repetir",
             "REPEAT_ON":"Repetir",
             "WEEKDAYS":"Días da semana"
-          }
+          },
+          "NO_SOURCE_AVAILABLE":"Non hai axentes de captura dispoñibles"
         },
         "PROCESSING":{
           "CAPTION":"Procesamento",
@@ -473,6 +474,7 @@
         },
         "GENERAL":{
           "PUBLICATION_STATUS":"Estado de publicación",
+          "NO_PUBLICATIONS_AVAILABLE":"Este evento non ten publicacións",
           "SCHEDULING_STATUS":"Estado",
           "READY_FOR_RECORDING":"Preparado para gravar",
           "OPTED_OUT":"Non se gravará",
@@ -683,7 +685,7 @@
           "RESOLVED":"Resolto",
           "REPLY":"Responder",
           "REPLY_TO":"Responder a",
-          "CANCEL_REPLY":"Rexeitar",
+          "CANCEL_REPLY":"Cancelar",
           "DELETE":"Borrar",
           "REASON":"Motivo",
           "REASONS":{
@@ -970,7 +972,7 @@
     "ACTIONS":{
       "EXPORT":"Exportar",
       "ADD_BLACKLIST":"Engadir lista negra",
-      "REMOVE":"Remove"
+      "REMOVE":"Eliminar"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1050,7 +1052,7 @@
         "EMAIL":"Correo electrónico",
         "ROLES":"Roles",
         "TYPE":"Tipo",
-        "PROVIDER":"Provider",
+        "PROVIDER":"Fornecedor",
         "BLACKLIST_FROM":"Na lista negra dende",
         "BLACKLIST_TO":"Na lista negra ata",
         "ACTION":"Accións"
@@ -1060,7 +1062,14 @@
         "EDITCAPTION":"Modificar usuario",
         "TABS":{
           "USER":"Usuario",
-          "ROLES":"Roles"
+          "ROLES":"Roles",
+          "EXTERNALROLES":"Roles externos",
+          "EFFECTIVEROLES":"Roles efectivos"
+        },
+        "DESCRIPTION":{
+          "ROLES":"Roles e grupos que se poden asignar ou xa están asignados ó usuario.",
+          "EXTERNALROLES":"A lista de roles externos asignados ó usuario, que proveñen de fornecedor(es) externo(s).",
+          "EFFECTIVEROLES":"A lista de roles efectivos directamente asignados ó usuario máis os roles obtidos indirectamente por pertencer a grupos."
         },
         "FORM":{
           "USERNAME":"Nome de usuario",
@@ -1475,12 +1484,14 @@
     }
   },
   "VIDEO_TOOL":{
+    "TIMELINE":"Liña de tempo",
+    "ZOOMLEVEL":"Nivel de zoom",
+    "ZOOM":"Zoom",
     "BUTTONS":{
-      "COMMENTS":"Ver",
-      "METADATA":"Modificar",
       "CLOSE":"Pechar",
       "SAVE":"Gardar",
-      "PROCESS":"Gardar e procesar"
+      "PROCESS":"Gardar e continuar",
+      "ADD_COMMENT":"Engadir comentario"
     },
     "TABS":{
       "PLAY":"Reprodución",
@@ -1488,13 +1499,25 @@
       "CAPTIONS":"Subtítulos",
       "ANNOTATIONS":"Anotacións"
     },
+    "AREAS":{
+      "METADATA":"Metadatos",
+      "COMMENTS":"Comentarios",
+      "SEGMENTS":"Segmentos"
+    },
     "ACTIONS":{
       "SPLIT":"Dividir",
       "CUT":"Cortar",
       "REPLAY_SEGMENT":"Reproducir segmento",
+      "REPLAY_END_OF_SEGMENT":"Fin de segmento",
+      "REPLAY_SEGMENT_WITH_PREROLL":"Comprobar a transición",
       "UNDO":"Desfacer",
       "REDO":"Refacer",
-      "CLEAR_SEGMENTS":"Borrar segmentos"
+      "CLEAR_SEGMENTS":"Borrar segmentos",
+      "CLEAR_SELECTED_SEGMENT":"Borrar segmento seleccionado"
+    },
+    "SEGMENTS":{
+      "REMOVE_SEGMENT":"Eliminar segmento",
+      "USE_SEGMENT":"Usar este segmento"
     },
     "PLAYER":{
       "PLAY":"Reproducir",
@@ -1516,6 +1539,14 @@
     "ERROR":"Contrasinal e / ou nome de usuario incorrecto"
   },
   "TABLE_FILTERS":{
+    "FILTER_SELECTION":{
+      "PLACEHOLDER":"Por favor, seleccione un filtro…",
+      "NO_OPTIONS":"Non se atopou ningún filtro"
+    },
+    "FILTER_VALUE_SELECTION":{
+      "PLACEHOLDER":"Por favor, seleccione un valor…",
+      "NO_OPTIONS":"Non se atopou ningún valor"
+    },
     "CLEAR":"Limpar todos os filtros",
     "REMOVE":"Eliminar filtro",
     "ADD":"Engadir filtros",
@@ -1532,6 +1563,11 @@
     }
   },
   "FILTERS":{
+    "ACLS":{
+      "NAME":{
+        "LABEL":"Nome"
+      }
+    },
     "AGENTS":{
       "NAME":{
         "LABEL":"Nome"
@@ -1753,6 +1789,7 @@
     "FINISHED":"Finalizado",
     "FAILED":"Errado",
     "FINISHED_WITH_COMMENTS":"Pendente",
-    "SCHEDULED":"Programado"
+    "SCHEDULED":"Programado",
+    "RECORDING":"Gravando"
   }
 }
