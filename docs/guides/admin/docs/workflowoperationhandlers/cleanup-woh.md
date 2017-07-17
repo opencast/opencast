@@ -11,6 +11,7 @@ It is used as last workflow operation in a workflow to ensure that temporary pro
 |-----------------|-----------------------|--------------------------------------------------|
 |preserve-flavors  |security/\*,\*/source |Comma-separated list of flavors to be preserved.  |
 |delete-external   |true                  |Whether to try to delete external working file repository URIs using HTTP delete. Default is false.|
+|delay             |5                     |Time to wait in seconds before removing files. Default is 1s.|
 
 \* mandatory configuration key
 
@@ -27,6 +28,7 @@ Notes:
       <configurations>
         <configuration key="preserve-flavors">security/*</configuration>
         <configuration key="delete-external">true</configuration>
+        <configuration key="delay">5</configuration>
       </configurations>
     </operation>
 
