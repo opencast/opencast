@@ -374,7 +374,7 @@
                   <pluginExecutionFilter>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <versionRange>[0.0.23,)</versionRange>
+                    <version>1.5</version>
                     <goals>
                       <goal>install-node-and-npm</goal>
                       <goal>npm</goal>
