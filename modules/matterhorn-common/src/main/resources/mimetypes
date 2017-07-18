@@ -23,6 +23,7 @@ application/f4m+xml             f4m
 application/dash+xml            mpd
 audio/basic                     au
 audio/midi                      midi mid
+audio/ogg                       opus
 audio/x-aifc                    aifc
 audio/x-aiff                    aif aiff
 audio/x-flac                    flac

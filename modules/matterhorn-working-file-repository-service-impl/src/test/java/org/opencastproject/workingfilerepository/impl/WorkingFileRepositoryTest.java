@@ -206,4 +206,37 @@ public class WorkingFileRepositoryTest {
       IOUtils.closeQuietly(in);
     }
   }
+
+  @Test
+  public void testCleanupOldFilesFromCollectionNothingToDelete() throws Exception {
+    // Cleanup files older than 1 day, nothing should be deleted
+    boolean result = repo.cleanupOldFilesFromCollection(collectionId, 1);
+    Assert.assertTrue(result);
+    InputStream in = null;
+    try {
+      in = repo.getFromCollection(collectionId, filename);
+      Assert.assertNotNull(in);
+    } finally {
+      IOUtils.closeQuietly(in);
+    }
+  }
+
+  @Test
+  public void testCleanupOldFilesFromCollectionSomethingToDelete() throws Exception {
+    // Cleanup files older than 0 days, file should be deleted
+    boolean result = repo.cleanupOldFilesFromCollection(collectionId, 0);
+    Assert.assertTrue(result);
+    try {
+      Assert.assertTrue(repo.getFromCollection(collectionId, filename) == null);
+    } catch (NotFoundException e) {
+      // This is intended
+    }
+  }
+
+  @Test
+  public void testCleanupOldFilesFromNonExistentCollection() throws Exception {
+    boolean result = repo.cleanupOldFilesFromCollection("UNKNOWN", 0);
+    Assert.assertFalse(result);
+  }
+
 }

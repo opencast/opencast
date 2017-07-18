@@ -51,6 +51,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Tests indexing: indexing, removing, retrieving, merging and searching.
@@ -149,6 +150,36 @@ public class SeriesServiceSolrTest {
   }
 
   @Test
+  public void testQueryIdTitleMap() throws Exception {
+    Map<String, String> emptyResult = index.queryIdTitleMap();
+    Assert.assertTrue("The result should be empty", emptyResult.isEmpty());
+
+    DublinCoreCatalog firstCatalog = dcService.newInstance();
+    firstCatalog.add(DublinCore.PROPERTY_IDENTIFIER, "10.0000/1");
+    firstCatalog.add(DublinCore.PROPERTY_TITLE, "Cats and Dogs");
+    firstCatalog.add(DublinCore.PROPERTY_DESCRIPTION, "This lecture tries to give an explanation...");
+
+    DublinCoreCatalog secondCatalog = dcService.newInstance();
+    secondCatalog.add(DublinCore.PROPERTY_IDENTIFIER, "10.0000/2");
+    secondCatalog.add(DublinCore.PROPERTY_TITLE, "Nature of Dogs");
+    secondCatalog.add(DublinCore.PROPERTY_DESCRIPTION, "Why do dogs chase cats?");
+
+    index.updateIndex(firstCatalog);
+    index.updateIndex(secondCatalog);
+
+    Map<String, String> queryResult = index.queryIdTitleMap();
+    Assert.assertEquals(2, queryResult.size());
+    Assert.assertTrue("The result contains the first series catalog Id",
+            queryResult.containsKey("10.0000/1"));
+    Assert.assertEquals("The result matches the first series title",
+            "Cats and Dogs", queryResult.get("10.0000/1"));
+    Assert.assertTrue("The result contains the second series catalog Id",
+            queryResult.containsKey("10.0000/2"));
+    Assert.assertEquals("The result matches the second series title",
+            "Nature of Dogs", queryResult.get("10.0000/2"));
+  }
+
+  @Test
   public void testCreatedRangedTest() throws Exception {
     DublinCoreCatalog firstCatalog = dcService.newInstance();
     firstCatalog.add(DublinCore.PROPERTY_IDENTIFIER, "10.0000/1");
@@ -233,7 +264,9 @@ public class SeriesServiceSolrTest {
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
-
+    // deactivate the default index created in setUp()
+    index.deactivate();
+    // create a new index with the security service anonymous user
     index = new SeriesServiceSolrIndex();
     index.solrRoot = PathSupport.concat("target", Long.toString(System.currentTimeMillis()));
     dcService = new DublinCoreCatalogService();

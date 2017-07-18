@@ -20,17 +20,18 @@
  */
 package org.opencastproject.scheduler.impl;
 
-import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPORAL;
 
+import org.opencastproject.mediapackage.Catalog;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
+import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.scheduler.api.SchedulerException;
-import org.opencastproject.scheduler.api.SchedulerQuery;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -41,9 +42,15 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Effect0;
+import org.opencastproject.workspace.api.Workspace;
 
+import com.entwinemedia.fn.data.Opt;
+
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -58,9 +65,13 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.Date;
 import java.util.Dictionary;
-import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /** Prolong immediate recordings before reaching the end, as long as there are no conflicts */
 public class CaptureNowProlongingService implements ManagedService {
@@ -97,6 +108,9 @@ public class CaptureNowProlongingService implements ManagedService {
   /** The organization directory service */
   private OrganizationDirectoryService orgDirectoryService;
 
+  /** The workspace */
+  private Workspace workspace;
+
   /** The bundle context for this osgi component */
   private ComponentContext componentContext;
 
@@ -118,6 +132,11 @@ public class CaptureNowProlongingService implements ManagedService {
   /** Sets the organization directory service */
   public void setOrgDirectoryService(OrganizationDirectoryService orgDirectoryService) {
     this.orgDirectoryService = orgDirectoryService;
+  }
+
+  /** Sets the workspace */
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
   }
 
   /**
@@ -151,20 +170,23 @@ public class CaptureNowProlongingService implements ManagedService {
   }
 
   @Override
-  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
-    initialTime = OsgiUtil.getCfgAsInt(properties, CFG_KEY_INITIAL_TIME);
-    if (initialTime <= 90) {
-      initialTime = 90000;
-    } else {
-      initialTime *= 1000; // Configuration holds initial time in seconds, value must be in milliseconds
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    // Read configuration for the default initial duration
+    try {
+      initialTime = Integer.parseInt(StringUtils.defaultIfBlank((String) properties.get(CFG_KEY_INITIAL_TIME), "300"));
+    } catch (NumberFormatException e) {
+      throw new ConfigurationException(CFG_KEY_INITIAL_TIME, "Not an integer", e);
     }
+    initialTime = Math.max(initialTime, 90) * 1000;
 
-    prolongingTime = OsgiUtil.getCfgAsInt(properties, CFG_KEY_PROLONGING_TIME);
-    if (prolongingTime <= 90) {
-      prolongingTime = 90000;
-    } else {
-      prolongingTime *= 1000; // Configuration holds prolonging time in seconds, value must be in milliseconds
+    // Read configuration for the prolonging time
+    try {
+      prolongingTime = Integer.parseInt(
+              StringUtils.defaultIfBlank((String) properties.get(CFG_KEY_PROLONGING_TIME), "300"));
+    } catch (NumberFormatException e) {
+      throw new ConfigurationException(CFG_KEY_PROLONGING_TIME, "Not an integer", e);
     }
+    prolongingTime = Math.max(prolongingTime, 90) * 1000;
   }
 
   /**
@@ -243,6 +265,10 @@ public class CaptureNowProlongingService implements ManagedService {
     return orgDirectoryService;
   }
 
+  public Workspace getWorkspace() {
+    return workspace;
+  }
+
   // --
 
   /** Quartz work horse. */
@@ -250,105 +276,155 @@ public class CaptureNowProlongingService implements ManagedService {
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-      logger.debug("Start capture prolonging job for agent '{}'", jobExecutionContext.getTrigger().getName());
+      logger.debug("Starting ad-hoc prolonging job for agent '{}'", jobExecutionContext.getTrigger().getName());
       try {
         execute((CaptureNowProlongingService) jobExecutionContext.getJobDetail().getJobDataMap().get(JOB_PARAM_PARENT),
                 jobExecutionContext.getTrigger().getName());
       } catch (Exception e) {
-        throw new JobExecutionException("An error occurred while prolonging captures", e);
+        throw new JobExecutionException("An error occurred while prolonging ad-hoc recordings", e);
       }
-      logger.debug("Finished capture prolonging job for agent '{}'", jobExecutionContext.getTrigger().getName());
+      logger.debug("Finished ad-hoc prolonging job for agent '{}'", jobExecutionContext.getTrigger().getName());
     }
 
     private void execute(final CaptureNowProlongingService prolongingService, final String agentId) {
-      try {
-        DublinCoreCatalog eventCatalog = prolongingService.getImmediateEvent(agentId);
-        Date endDate = EncodingSchemeUtils.decodeMandatoryPeriod(eventCatalog.getFirst(DublinCore.PROPERTY_TEMPORAL))
-                .getEnd();
-
-        if (endDate.before(DateTime.now().plusSeconds(90).toDate())) {
-          prolong(prolongingService, eventCatalog, agentId);
-        } else {
-          logger.debug("Wait another minute to check for prolinging the immediate recording for agent '{}'", agentId);
-        }
-      } catch (Exception e) {
-        logger.error("Unable to get the immediate recording for agent '{}': {}", agentId, e);
+      for (Organization organization : prolongingService.getOrgDirectoryService().getOrganizations()) {
+        User user = SecurityUtil.createSystemUser(prolongingService.getComponentContext(), organization);
+        SecurityUtil.runAs(prolongingService.getSecurityService(), organization, user, new Effect0() {
+          @Override
+          protected void run() {
+            try {
+              MediaPackage mp = prolongingService.getCurrentRecording(agentId);
+              Opt<DublinCoreCatalog> dublinCore = DublinCoreUtil.loadEpisodeDublinCore(prolongingService.getWorkspace(),
+                      mp);
+              if (dublinCore.isSome()
+                      && EncodingSchemeUtils.decodeMandatoryPeriod(dublinCore.get().getFirst(PROPERTY_TEMPORAL))
+                              .getEnd().before(DateTime.now().plusSeconds(90).toDate())) {
+                prolong(prolongingService, mp, dublinCore.get(), agentId);
+              } else {
+                logger.debug("Wait another minute before extending the ad-hoc recording for agent '{}'", agentId);
+              }
+            } catch (NotFoundException e) {
+              logger.info("Unable to extend the ad-hoc recording for agent '{}': No ad-hoc recording found", agentId);
+            } catch (Exception e) {
+              logger.error("Error extending the ad-hoc recording for agent '{}': {}", agentId,
+                      ExceptionUtils.getStackTrace(e));
+            }
+          }
+        });
       }
     }
 
-    private void prolong(final CaptureNowProlongingService prolongingService, final DublinCoreCatalog eventCatalog,
-            final String agentId) throws NotFoundException, ServiceRegistryException {
-      long eventId = Long.parseLong(eventCatalog.getFirst(PROPERTY_IDENTIFIER));
-      org.opencastproject.job.api.Job job = prolongingService.getServiceRegistry().getJob(eventId);
-      Organization organization = prolongingService.getOrgDirectoryService().getOrganization(job.getOrganization());
-
-      User user = SecurityUtil.createSystemUser(prolongingService.getComponentContext(), organization);
-      SecurityUtil.runAs(prolongingService.getSecurityService(), organization, user, new Effect0() {
-        @Override
-        protected void run() {
-          try {
-            prolongingService.prolongEvent(eventCatalog, agentId);
-            logger.info("Prolonged immediate recording for agent '{}'", agentId);
-          } catch (UnauthorizedException e) {
-            logger.error(
-                    "Unable to update the prolonged recording for agent '{}': You don't have the right permissions!",
-                    agentId);
-          } catch (NotFoundException e) {
-            logger.warn(
-                    "Unable to update the prolonged recording for agent '{}': No immedia capture found for updating!",
-                    agentId);
-          } catch (Exception e) {
-            logger.error("Unable to update the prolonged recording for agent '{}': {}", agentId, e);
-          }
-        }
-      });
-
+    private void prolong(final CaptureNowProlongingService prolongingService, final MediaPackage event,
+            final DublinCoreCatalog dublinCore, final String agentId)
+            throws NotFoundException, ServiceRegistryException {
+      try {
+        logger.info("Extending ad-hoc recording for agent '{}'", agentId);
+        prolongingService.prolongEvent(event, dublinCore, agentId);
+      } catch (UnauthorizedException e) {
+        logger.error("Error extending the ad-hoc recording for agent '{}': Permission denied", agentId);
+      } catch (NotFoundException e) {
+        logger.warn("Error extending the ad-hoc recording for agent '{}': No ad-hoc recording found", agentId);
+      } catch (Exception e) {
+        logger.error("Error extending the ad-hoc recording for agent '{}': {}", agentId, e);
+      }
     }
 
   }
 
-  public DublinCoreCatalog getImmediateEvent(String agentId) throws NotFoundException, SchedulerException {
-    SchedulerQuery q = new SchedulerQuery().setSpatial(agentId).setStartsTo(new Date()).setEndsFrom(new Date());
-    DublinCoreCatalogList search = schedulerService.search(q);
-    if (search.getCatalogList().isEmpty()) {
-      logger.warn("Unable to prolong capture, no recording found for agent '{}'!", agentId);
-      throw new NotFoundException("No immediate recording found for agent: " + agentId);
+  /**
+   * Returns the current event for the given capture agent.
+   *
+   * @param agentId
+   *          the capture agent
+   * @return the recording
+   * @throws NotFoundException
+   *           if the there is no current recording
+   * @throws UnauthorizedException
+   *           if the event cannot be read due to a lack of access rights
+   * @throws SchedulerException
+   *           if accessing the scheduling database fails
+   */
+  public MediaPackage getCurrentRecording(String agentId)
+          throws NotFoundException, UnauthorizedException, SchedulerException {
+    List<MediaPackage> search = schedulerService.search(Opt.some(agentId), Opt.<Date> none(), Opt.some(new Date()),
+            Opt.some(new Date()), Opt.<Date> none());
+    if (search.isEmpty()) {
+      logger.warn("Unable to load the current recording for agent '{}': no recording found", agentId);
+      throw new NotFoundException("No current recording found for agent '" + agentId + "'");
     }
-    return search.getCatalogList().get(0);
+    return search.get(0);
   }
 
-  public void prolongEvent(DublinCoreCatalog eventCatalog, String agentId)
-          throws UnauthorizedException, NotFoundException, SchedulerException {
-    long eventId = Long.parseLong(eventCatalog.getFirst(PROPERTY_IDENTIFIER));
+  /**
+   * Extends the current recording.
+   *
+   * @param event
+   *          the recording's media package
+   * @param dublinCore
+   *          the recording's dublin core catalog
+   * @param agentId
+   *          the agent
+   * @throws UnauthorizedException
+   *           if the event cannot be updated due to a lack of access rights
+   * @throws NotFoundException
+   *           if the event cannot be found
+   * @throws SchedulerException
+   *           if updating the scheduling data fails
+   * @throws IOException
+   *           if updating the calendar to the worksapce fails
+   * @throws IllegalArgumentException
+   *           if a URI cannot be created using the arguments provided
+   */
+  public void prolongEvent(MediaPackage event, DublinCoreCatalog dublinCore, String agentId)
+          throws UnauthorizedException, NotFoundException, SchedulerException, IllegalArgumentException, IOException {
+    String eventId = event.getIdentifier().compact();
 
-    DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(eventCatalog.getFirst(DublinCore.PROPERTY_TEMPORAL));
+    DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(dublinCore.getFirst(DublinCore.PROPERTY_TEMPORAL));
 
     Date prolongedEndDate = new DateTime(period.getEnd()).plus(getProlongingTime()).toDate();
 
-    eventCatalog.set(PROPERTY_TEMPORAL,
+    dublinCore.set(PROPERTY_TEMPORAL,
             EncodingSchemeUtils.encodePeriod(new DCMIPeriod(period.getStart(), prolongedEndDate), Precision.Second));
 
-    DublinCoreCatalogList events = schedulerService.findConflictingEvents(agentId, period.getStart(), prolongedEndDate);
-    for (DublinCoreCatalog conflictCatalog : events.getCatalogList()) {
-      if (eventId == Long.parseLong(conflictCatalog.getFirst(PROPERTY_IDENTIFIER)))
+    List<MediaPackage> events = schedulerService.findConflictingEvents(agentId, period.getStart(), prolongedEndDate);
+    for (MediaPackage conflictMediaPackage : events) {
+      if (eventId.equals(conflictMediaPackage.getIdentifier().compact()))
+        continue;
+
+      Opt<DublinCoreCatalog> conflictingDc = DublinCoreUtil.loadEpisodeDublinCore(workspace, conflictMediaPackage);
+      if (conflictingDc.isNone())
         continue;
 
       Date conflictingStartDate = EncodingSchemeUtils
-              .decodeMandatoryPeriod(conflictCatalog.getFirst(DublinCore.PROPERTY_TEMPORAL)).getStart();
+              .decodeMandatoryPeriod(conflictingDc.get().getFirst(DublinCore.PROPERTY_TEMPORAL)).getStart();
 
       prolongedEndDate = new DateTime(conflictingStartDate).minusMinutes(1).toDate();
 
-      eventCatalog.set(PROPERTY_TEMPORAL,
+      dublinCore.set(PROPERTY_TEMPORAL,
               EncodingSchemeUtils.encodePeriod(new DCMIPeriod(period.getStart(), prolongedEndDate), Precision.Second));
 
       logger.info(
-              "An existing event is in a conflict with the one to be prolong on the agent '{}'. Prolong to a minute before the conflicting event.",
+              "A scheduled event is preventing the current recording on agent '{}' to be further extended. Extending to one minute before the conflicting event",
               agentId);
       stop(agentId);
       break;
     }
 
-    schedulerService.updateEvent(eventId, eventCatalog, new HashMap<String, String>());
+    // Update the episode dublin core
+    Catalog[] episodeCatalogs = event.getCatalogs(MediaPackageElements.EPISODE);
+    if (episodeCatalogs.length > 0) {
+      Catalog c = episodeCatalogs[0];
+      String filename = FilenameUtils.getName(c.getURI().toString());
+      URI uri = workspace.put(event.getIdentifier().toString(), c.getIdentifier(), filename,
+              IOUtils.toInputStream(dublinCore.toXmlString(), "UTF-8"));
+      c.setURI(uri);
+      // setting the URI to a new source so the checksum will most like be invalid
+      c.setChecksum(null);
+    }
+
+    schedulerService.updateEvent(eventId, Opt.<Date> none(), Opt.some(prolongedEndDate), Opt.<String> none(),
+            Opt.<Set<String>> none(), Opt.some(event), Opt.<Map<String, String>> none(),
+            Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
   }
 
 }

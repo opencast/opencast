@@ -21,9 +21,6 @@
 
 package org.opencastproject.scheduler.impl;
 
-import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.parameter.Value;
@@ -39,30 +36,6 @@ import java.util.TimeZone;
 
 public final class Util {
   private Util() {
-  }
-
-  public static long getEventIdentifier(DublinCoreCatalog dc) {
-    try {
-      return Long.parseLong(dc.getFirst(DublinCore.PROPERTY_IDENTIFIER));
-    } catch (Exception e) {
-      throw new IllegalArgumentException("DublinCore does not have an identifier of type long");
-    }
-  }
-
-  /** Sets the dcterms:identifier property of a copy of dc. */
-  public static DublinCoreCatalog setEventIdentifierImmutable(long eventId, DublinCoreCatalog dc) {
-    if (dc instanceof DublinCoreCatalog) {
-      final DublinCoreCatalog copy = (DublinCoreCatalog) dc.clone();
-      copy.set(DublinCore.PROPERTY_IDENTIFIER, Long.toString(eventId));
-      return copy;
-    } else {
-      throw new IllegalArgumentException("Dublin core catalog must be of type DublinCoreCatalog");
-    }
-  }
-
-  /** Mutates the dcterms:identifier property of dc. */
-  public static void setEventIdentifierMutable(long eventId, DublinCoreCatalog dc) {
-    dc.set(DublinCore.PROPERTY_IDENTIFIER, Long.toString(eventId));
   }
 
   /**

@@ -21,7 +21,7 @@
     "HINDI":"Hindi",
     "ITALIAN":"Italienisch",
     "JAPANESE":"Japanisch",
-    "DUTCH":"Holländisch",
+    "DUTCH":"Niederländisch",
     "NORWEGIAN":"Norwegisch",
     "FRENCH":"Französisch",
     "ENGLISH":"English",
@@ -49,7 +49,7 @@
     "CONTINUE_ACTION":"Sind Sie sicher, dass Sie fortfahren möchten?",
     "METADATA":{
       "NOTICE":{
-        "UNKNOWN":"Das folgendes Element wird gelöscht",
+        "UNKNOWN":"Das folgende Element wird gelöscht",
         "EVENT":"Die folgende Aufzeichnung wird gelöscht",
         "SERIES":"Die folgende Serie wird gelöscht",
         "ACL":"Folgende Zugriffsrichtlinie wird gelöscht",
@@ -57,7 +57,7 @@
         "USER":"Der folgende Benutzer wird gelöscht",
         "USER_BLACKLIST":"Die folgende Benutzer-Blacklist wird gelöscht",
         "THEME":"Das folgende Branding wird gelöscht",
-        "EMAIL":"Das folgende E-Mail-Vorlage wird gelöscht",
+        "EMAIL":"Die folgende E-Mail-Vorlage wird gelöscht",
         "LOCATION":"Folgender Raum wird entfernt",
         "LOCATION_BLACKLIST":"Die folgende Raum-Blacklist wird entfernt"
       },
@@ -72,7 +72,7 @@
     "HELP":"Hilfe",
     "USERS_GUIDE":"Benutzerrichtlinie",
     "DOCUMENTATION":"Dokumentation",
-    "REST_DOC":"REST-API Docs"
+    "REST_DOC":"REST-API-Docs"
   },
   "NOTIFICATIONS":{
     "ACL_ADDED":"Die Zugriffsrichtlinie wurde erstellt",
@@ -95,21 +95,21 @@
     "ACCESS_DENIED":"Zugriff verweigert. Sie sind nicht berechtigt, diese Seite anzusehen.",
     "SERIES_ADDED":"Die Serie wurde angelegt",
     "SERIES_NOT_SAVED":"Die Serie konnte nicht gespeichert werden",
-    "EVENTS_CREATED":"Das Ereignis wurde angelegt",
+    "EVENTS_CREATED":"Die Aufzeichnung wurde angelegt",
     "EVENTS_UPLOAD_STARTED":"Die Aufzeichnung wird hochgeladen…",
-    "EVENTS_NOT_CREATED":"Das Ereignis konnte nicht angelegt werden",
+    "EVENTS_NOT_CREATED":"Die Aufzeichnung konnte nicht angelegt werden",
     "EVENTS_UPDATED_NB":"{{ number }} Aufzeichnungen wurden erfolgreich hochgeladen.",
     "EVENTS_UPDATED_ALL":"Alle Aufzeichnungen wurden erfolgreich hochgeladen.",
-    "EVENTS_NOT_UPDATED":"Das Ereignis konnte nicht gespeichert werden",
+    "EVENTS_NOT_UPDATED":"Die Aufzeichnung konnte nicht gespeichert werden",
     "EVENTS_NOT_UPDATED_ID":"Die Aufzeichnung {{ id }} konnte nicht übernommen werden.",
     "EVENTS_NOT_UPDATED_ALL":"Keine der Aufzeichnungen konnte gespeichert werden",
-    "SERIES_UPDATED_NB":"{{ number }} Serien erfolgreich aktualisiert.",
-    "SERIES_UPDATED_ALL":"Alle Serien erfolgreich aktualisiert.",
+    "SERIES_UPDATED_NB":"{{ number }} Serie(n) erfolgreich aktualisiert",
+    "SERIES_UPDATED_ALL":"Alle Serien erfolgreich aktualisiert",
     "SERIES_NOT_UPDATED":"Diese Serie konnte nicht gespeichert werden",
-    "SERIES_NOT_UPDATED_ID":"Die Serie {{ id }} konnte nicht übernommen werden.",
+    "SERIES_NOT_UPDATED_ID":"Die Serie {{ id }} konnte nicht gespeichert werden",
     "SERIES_NOT_UPDATED_ALL":"Keine der Serien konnte gespeichert werden",
-    "EVENTS_DELETED":"Das Ereignis wurde gelöscht",
-    "EVENTS_NOT_DELETED":"Die Ereignisse konnten nicht gelöscht werden",
+    "EVENTS_DELETED":"Die Aufzeichnung wurde gelöscht",
+    "EVENTS_NOT_DELETED":"Die Aufzeichnung(en) konnten nicht gelöscht werden",
     "SERIES_DELETED":"Die Serie wurde gelöscht",
     "SERIES_NOT_DELETED":"Die Serie konnte nicht gelöscht werden",
     "USER_BLACKLIST_CREATED":"Die Sperrliste wurde erstellt",
@@ -137,12 +137,12 @@
     "EMAIL_NOT_SENT":"Die Nachricht konnte nicht gesendet werden",
     "CONFLICT_DETECTED":"Planungskonflikt: Die neue Aufzeichnung überlappt zeitlich mit einer bereits bestehenden Aufzeichnung. Bitte Ort, Datum oder Zeit anpassen.",
     "CONFLICT_ALREADY_ENDED":"Planungskonflikt: Aufzeichnungen können nicht in der Vergangenheit geplant werden.",
-    "CONFLICT_END_BEFORE_START":"Planungskonflikt: Die Aufzeichnungen können nicht enden bevor sie starten.",
+    "CONFLICT_END_BEFORE_START":"Planungskonflikt: Der Endzeitpunkt der Aufzeichnung muss nach dem Anfangszeitpunkt liegen.",
     "INVALID_ACL_RULES":"Regeln müssen eine gültige Rolle und Lese-/Schreibrechte enthalten.",
     "MISSING_ACL_RULES":"Es ist mindestens eine Rolle mit Lese- und Schreibberechtigungen erforderlich!",
     "SAVED_ACL_RULES":"Die Zugriffsregeln wurden gespeichert.",
     "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Die vorhandenen Aufzeichnungen in dieser Serie müssen neu verarbeitet werden",
-    "SERIES_ACL_LOCKED":"Das Editieren von Zugriffsrichtlinien ist nicht erlaubt solange Aufnahmen verarbeitet werden, die Teil der Serie sind",
+    "SERIES_ACL_LOCKED":"Das Editieren von Zugriffsrichtlinien ist nicht erlaubt, solange Aufnahmen verarbeitet werden, die Teil der Serie sind",
     "SERIES_ACL_MISSING_READWRITE_ROLE":"Der Zugriffsrichtlinie erfordert mindestens eine Rolle mit Lese- und Schreibberechtigungen.",
     "EVENT_ACL_MISSING_READWRITE_ROLE":"Der Zugriffsrichtlinie erfordert mindestens eine Rolle mit Lese- und Schreibberechtigungen.",
     "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS":"Opt-Out-Status wurde aktualisiert.",
@@ -165,11 +165,11 @@
     "TASK_CREATED":"Der Task wurde erstellt",
     "TASK_NOT_CREATED":"Der Task konnte nicht erstellt werden",
     "VIDEO_CUT_NOT_SAVED":"Die Bearbeitungsinformationen konnten nicht gespeichert werden",
-    "VIDEO_CUT_SAVED":"Die Bearbeitungsinformationen wurde gespeichert",
+    "VIDEO_CUT_SAVED":"Die Bearbeitungsinformationen wurden gespeichert",
     "VIDEO_CUT_PROCESSING":"Das Video wird verarbeitet…",
     "SERVER_UNRESPONSIVE":"Hoppla! Der Server scheint nicht zu reagieren. Bitte versuchen Sie es später erneut.",
     "SERVICE_UNAVAILABLE":"Hoppla! Der Server scheint nicht zu reagieren. Bitte versuchen Sie es später erneut.",
-    "ACTIVE_TRANSACTION":"Die aktuelle Aufzeichnung kann zurzeit nicht bearbeitet werden, da es an einer aktiven Transaktion beteiligt ist."
+    "ACTIVE_TRANSACTION":"Dieses Ereignis kann nicht bearbeitet werden, während ein Workflow oder eine Transaktion auf diesem aktiv sind."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Aktionen",
@@ -189,15 +189,15 @@
         "CAPTION":"Löschen",
         "DELETE_EVENTS":"Aufzeichnungen löschen",
         "PUBLISHED":{
-          "NONE":"Keines der ausgewählten Aufzeichnungen müssen vor dem Löschen zurückgezogen werden.",
-          "WARNING":"Die folgenden Ereignisse können nicht gelöscht werden, da sie veröffentlicht sind. Das Löschen würde keine Möglichkeit lassen, die veröffentlichten Dateien zu entfernen. Wählen Sie stattdessen einen Workflow aus, um die Ereignisse zuerst zurückziehen und dann zu löschen."
+          "NONE":"Keine der ausgewählten Aufzeichnungen muss vor dem Löschen zurückgezogen werden.",
+          "WARNING":"Die folgenden Aufzeichnungen können nicht gelöscht werden, da sie veröffentlicht sind. Das Löschen würde keine Möglichkeit lassen, die veröffentlichten Dateien zu entfernen. Wählen Sie stattdessen einen Workflow aus, um die Aufzeichnungen zuerst zurückzuziehen und dann zu löschen."
         },
-        "RETRACT_EVENTS":"Aufzeichnung zurückziehen.",
+        "RETRACT_EVENTS":"Aufzeichnungen zurückziehen",
         "SELECT_RETRACT_TASK":"Wählen Sie einen Task für das Zurückziehen aus.",
         "SUMMARY":{
           "EVENTS_DELETED":"Zu löschende Aufzeichnungen",
           "EVENTS_RETRACTED":"Zurückzuziehende Aufzeichnungen",
-          "RETRACT_WORKFLOW":"Workflow zum Zurückziehen der Aufzeichnungen"
+          "RETRACT_WORKFLOW":"Workflow zum Zurückziehen von Aufzeichnungen"
         },
         "UNPUBLISHED":{
           "NONE":"Keine der ausgewählten Veranstaltungen kann gelöscht werden, ohne dass verwaiste Dateien übrig bleiben."
@@ -286,7 +286,7 @@
       "ID":"ID",
       "SELECT_TASK":"Task auswählen",
       "SUMMARY":"Zusammenfassung",
-      "WARNING":"Diese Aufzeichnung ist mindestens einmal veröffentlicht worden. Sie muss zurückgezogen werden, bevor sie gelöscht werden kann. Wählen Sie folgend den Task um die Aufzeichnung zurückzuziehen."
+      "WARNING":"Diese Aufzeichnung ist mindestens einmal veröffentlicht worden. Sie muss zurückgezogen werden, bevor sie gelöscht werden kann. Wählen Sie aus den Tasks unten, um die Aufzeichnung zurückzuziehen."
     },
     "LICENSE":{
       "ALLRIGHTS":"Alle Rechte vorbehalten",
@@ -382,7 +382,8 @@
             "REPEATS":"Wiederholt sich",
             "REPEAT_ON":"Wiederholen am",
             "WEEKDAYS":"Wochentage"
-          }
+          },
+          "NO_SOURCE_AVAILABLE":"Kein Capture-Agent zur Planung einer Aufzeichnung verfügbar"
         },
         "PROCESSING":{
           "CAPTION":"In Verarbeitung",
@@ -464,15 +465,16 @@
         "TABS":{
           "GENERAL":"Allgemein",
           "METADATA":"Metadaten",
-          "EXTENDED-METADATA":"Metadaten-II",
+          "EXTENDED-METADATA":"Metadaten II",
           "ASSETS":"Anlagen",
           "SCHEDULING":"Planung",
-          "WORKFLOWS":"Arbeitsabläufe",
+          "WORKFLOWS":"Workflows",
           "ACCESS":"Zugriffsrechte",
           "COMMENTS":"Kommentare"
         },
         "GENERAL":{
           "PUBLICATION_STATUS":"Publikations-Status",
+          "NO_PUBLICATIONS_AVAILABLE":"Aufzeichnung nicht publiziert",
           "SCHEDULING_STATUS":"Status",
           "READY_FOR_RECORDING":"Bereit zur Aufnahme",
           "OPTED_OUT":"Wird nicht aufgezeichnet",
@@ -611,14 +613,14 @@
               "RECORDING_DATE":"Aufnahmedatum",
               "FLAVOR":"Flavor",
               "TAGS":"Stichwörter",
-              "DURATION":"Dauer",
+              "DURATION":"Länge",
               "STREAM_AUDIO":"Audiospuren",
               "STREAM_VIDEO":"Videospuren",
               "CHANNELS":"Kanäle",
               "BITRATE":"Bitrate",
               "BITDEPTH":"Bittiefe",
               "SAMPLINGRATE":"Samplingrate",
-              "FRAMECOUNT":"Frame Anzahl",
+              "FRAMECOUNT":"Frameanzahl",
               "PEAKLEVELDB":"Spitzenpegel (dB)",
               "RMSLEVELDB":"RMS-Pegel (dB)",
               "RMSPEAKDB":"RMS-Spitzenpegel (dB)",
@@ -683,7 +685,7 @@
           "RESOLVED":"Gelöst",
           "REPLY":"Antworten",
           "REPLY_TO":"Antworten",
-          "CANCEL_REPLY":"Verwerfen",
+          "CANCEL_REPLY":"Abbrechen",
           "DELETE":"Löschen",
           "REASON":"Grund",
           "REASONS":{
@@ -880,7 +882,7 @@
         "CONTRIBUTORS":"Mitwirkende",
         "CREATED":"Erstellt",
         "MANAGED_ACL":"Zugriffsrechte",
-        "EVENTS":"Ereignisse",
+        "EVENTS":"Aufzeichnungen",
         "ACTION":"Aktionen"
       },
       "DETAILS":{
@@ -889,7 +891,7 @@
           "METADATA":"Metadaten",
           "EXTENDED_METADATA":"Metadaten II",
           "PARTICIPATION":"Beteiligung",
-          "EVENTS":"Ereignisse",
+          "EVENTS":"Aufzeichnungen",
           "PERMISSIONS":"Zugriffsrechte",
           "THEME":"Branding"
         },
@@ -934,7 +936,7 @@
         },
         "PARTICIPATION":{
           "CAPTION":"Teilnahme-Status-Vorlage",
-          "WARNING_TEMPLATE":"Der Serien-Teilnahme-Status wird als Standardwert für alle neuen Ereignisse der Serie verwendet.",
+          "WARNING_TEMPLATE":"Der Serien-Teilnahme-Status wird als Standardwert für alle neuen Aufzeichnungen der Serie verwendet.",
           "REVIEW_STATUS":{
             "CAPTION":"Prüfstatus"
           },
@@ -970,7 +972,7 @@
     "ACTIONS":{
       "EXPORT":"Exportieren",
       "ADD_BLACKLIST":"Sperrliste hinzufügen",
-      "REMOVE":"Remove"
+      "REMOVE":"Entfernen"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1060,7 +1062,14 @@
         "EDITCAPTION":"Benutzer bearbeiten",
         "TABS":{
           "USER":"Benutzer",
-          "ROLES":"Rollen"
+          "ROLES":"Rollen",
+          "EXTERNALROLES":"Externe Rollen",
+          "EFFECTIVEROLES":"Effektive Rollen"
+        },
+        "DESCRIPTION":{
+          "ROLES":"Rollen und Gruppen, die dem Benutzer zugeordnet sind oder ihm zugeordnet werden können.",
+          "EXTERNALROLES":"Liste von Rollen, die dem Nutzer von externen Providern zugewiesen sind.",
+          "EFFECTIVEROLES":"Dies Liste der effektiven Rollen die dem Nutzer entweder diekt zugewiesen sind oder die er indirekt durch eine Gruppenmitgliedschaft erhalten hat."
         },
         "FORM":{
           "USERNAME":"Benutzername",
@@ -1283,7 +1292,7 @@
         },
         "TITLE":{
           "CAPTION":"Titel",
-          "DESCRIPTION":"Folie mit Metadaten die am Anfang oder Ende einer Aufzeichnung angefügt wird.",
+          "DESCRIPTION":"Folie mit Metadaten, die am Anfang oder Ende einer Aufzeichnung angefügt wird.",
           "ACTIVE":"Aktiv"
         },
         "WATERMARK":{
@@ -1377,7 +1386,7 @@
         "TITLE":{
           "CAPTION":"Titel",
           "FILE_UPLOADED":"Datei hochgeladen: ",
-          "DESCRIPTION":"Folie mit Metadaten die am Anfang oder Ende einer Aufzeichnung angefügt wird.",
+          "DESCRIPTION":"Folie mit Metadaten, die am Anfang oder Ende einer Aufzeichnung angefügt wird.",
           "ACTIVE":"Aktiv",
           "ENABLE":"Titelfolie aktivieren",
           "BACKGROUND":"Hintergrund",
@@ -1475,12 +1484,14 @@
     }
   },
   "VIDEO_TOOL":{
+    "TIMELINE":"Zeitleiste",
+    "ZOOMLEVEL":"Zoomlevel",
+    "ZOOM":"Zoom",
     "BUTTONS":{
-      "COMMENTS":"Anschauen",
-      "METADATA":"Bearbeiten",
       "CLOSE":"Schliessen",
       "SAVE":"Speichern",
-      "PROCESS":"Speichern & verarbeiten"
+      "PROCESS":"Speichern & Fortfahren",
+      "ADD_COMMENT":"Kommentar hinzufügen"
     },
     "TABS":{
       "PLAY":"Abspielen",
@@ -1488,21 +1499,33 @@
       "CAPTIONS":"Untertitel",
       "ANNOTATIONS":"Anmerkungen"
     },
+    "AREAS":{
+      "METADATA":"Metadaten",
+      "COMMENTS":"Kommentare",
+      "SEGMENTS":"Segmente"
+    },
     "ACTIONS":{
       "SPLIT":"Auftrennen",
       "CUT":"Schneiden",
       "REPLAY_SEGMENT":"Segment erneut abspielen",
+      "REPLAY_END_OF_SEGMENT":"Segmentende",
+      "REPLAY_SEGMENT_WITH_PREROLL":"Übergang testen",
       "UNDO":"Widerrufen",
       "REDO":"Wiederholen",
-      "CLEAR_SEGMENTS":"Segmente löschen"
+      "CLEAR_SEGMENTS":"Segmente löschen",
+      "CLEAR_SELECTED_SEGMENT":"Ausgewähltes Segment löschen"
+    },
+    "SEGMENTS":{
+      "REMOVE_SEGMENT":"Segment löschen",
+      "USE_SEGMENT":"Dieses Segment nutzen"
     },
     "PLAYER":{
       "PLAY":"Abspielen",
       "PAUSE":"Pause",
       "NEXT_FRAME":"Nächstes Bild",
       "PREVIOUS_FRAME":"Vorheriges Bild",
-      "NEXT_SEGMENT":"Nächstes Segment / Zum Ende springen",
-      "PREVIOUS_SEGMENT":"Vorheriges Segment / Zum Start springen",
+      "NEXT_SEGMENT":"Nächstes Segment/zum Ende springen",
+      "PREVIOUS_SEGMENT":"Vorheriges Segment/zum Start springen",
       "MUTE":"Stummschalten",
       "VOLUME":"Lautstärke"
     }
@@ -1516,6 +1539,14 @@
     "ERROR":"Falscher Benutzername und/oder Passwort"
   },
   "TABLE_FILTERS":{
+    "FILTER_SELECTION":{
+      "PLACEHOLDER":"Bitte einen Filter wählen…",
+      "NO_OPTIONS":"Keine Filter gefunden"
+    },
+    "FILTER_VALUE_SELECTION":{
+      "PLACEHOLDER":"Bitte einen Wert wählen…",
+      "NO_OPTIONS":"Keine Werte gefunden"
+    },
     "CLEAR":"Alle Filter löschen",
     "REMOVE":"Filter entfernen",
     "ADD":"Filter hinzufügen",
@@ -1532,6 +1563,11 @@
     }
   },
   "FILTERS":{
+    "ACLS":{
+      "NAME":{
+        "LABEL":"Name"
+      }
+    },
     "AGENTS":{
       "NAME":{
         "LABEL":"Name"
@@ -1753,6 +1789,7 @@
     "FINISHED":"Verarbeitet",
     "FAILED":"Fehlgeschlagen",
     "FINISHED_WITH_COMMENTS":"Offen",
-    "SCHEDULED":"Geplant"
+    "SCHEDULED":"Geplant",
+    "RECORDING":"Aufnahme"
   }
 }

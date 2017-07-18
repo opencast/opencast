@@ -30,7 +30,7 @@ import org.opencastproject.caption.api.CaptionService;
 import org.opencastproject.caption.api.UnsupportedCaptionFormatException;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
-import org.opencastproject.mediapackage.Catalog;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -139,11 +139,12 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.caption.api.CaptionService#convert(org.opencastproject.mediapackage.Catalog,
+   * @see org.opencastproject.caption.api.CaptionService#convert(org.opencastproject.mediapackage.MediaPackageElement,
    *      java.lang.String, java.lang.String)
    */
   @Override
-  public Job convert(Catalog input, String inputFormat, String outputFormat) throws UnsupportedCaptionFormatException,
+  public Job convert(MediaPackageElement input, String inputFormat, String outputFormat)
+          throws UnsupportedCaptionFormatException,
           CaptionConverterException, MediaPackageException {
 
     if (input == null)
@@ -164,11 +165,11 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.caption.api.CaptionService#convert(org.opencastproject.mediapackage.Catalog,
+   * @see org.opencastproject.caption.api.CaptionService#convert(org.opencastproject.mediapackage.MediaPackageElement,
    *      java.lang.String, java.lang.String, java.lang.String)
    */
   @Override
-  public Job convert(Catalog input, String inputFormat, String outputFormat, String language)
+  public Job convert(MediaPackageElement input, String inputFormat, String outputFormat, String language)
           throws UnsupportedCaptionFormatException, CaptionConverterException, MediaPackageException {
 
     if (input == null)
@@ -193,13 +194,14 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
    *
    * @return the converted catalog
    */
-  protected Catalog convert(Job job, Catalog input, String inputFormat, String outputFormat, String language)
+  protected MediaPackageElement convert(Job job, MediaPackageElement input, String inputFormat, String outputFormat,
+          String language)
           throws UnsupportedCaptionFormatException, CaptionConverterException, MediaPackageException {
     try {
 
       // check parameters
       if (input == null)
-        throw new IllegalArgumentException("Input catalog can't be null");
+        throw new IllegalArgumentException("Input element can't be null");
       if (StringUtils.isBlank(inputFormat))
         throw new IllegalArgumentException("Input format is null");
       if (StringUtils.isBlank(outputFormat))
@@ -239,14 +241,19 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
       }
 
       // create catalog and set properties
+      CaptionConverter converter = getCaptionConverter(outputFormat);
       MediaPackageElementBuilder elementBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-      Catalog catalog = (Catalog) elementBuilder.elementFromURI(exported, Catalog.TYPE, new MediaPackageElementFlavor(
+      MediaPackageElement mpe = elementBuilder.elementFromURI(exported, converter.getElementType(),
+              new MediaPackageElementFlavor(
               "captions", outputFormat));
-      String[] mimetype = FileTypeMap.getDefaultFileTypeMap().getContentType(exported.getPath()).split("/");
-      catalog.setMimeType(mimeType(mimetype[0], mimetype[1]));
-      catalog.addTag("lang:" + language);
+      if (mpe.getMimeType() == null) {
+        String[] mimetype = FileTypeMap.getDefaultFileTypeMap().getContentType(exported.getPath()).split("/");
+        mpe.setMimeType(mimeType(mimetype[0], mimetype[1]));
+      }
+      if (language != null)
+        mpe.addTag("lang:" + language);
 
-      return catalog;
+      return mpe;
 
     } catch (Exception e) {
       logger.warn("Error converting captions in " + input, e);
@@ -266,7 +273,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
    *
    */
   @Override
-  public String[] getLanguageList(Catalog input, String format) throws UnsupportedCaptionFormatException,
+  public String[] getLanguageList(MediaPackageElement input, String format) throws UnsupportedCaptionFormatException,
           CaptionConverterException {
 
     if (format == null) {
@@ -442,11 +449,11 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
     try {
       op = Operation.valueOf(operation);
 
-      Catalog catalog = (Catalog) MediaPackageElementParser.getFromXml(arguments.get(0));
+      MediaPackageElement catalog = MediaPackageElementParser.getFromXml(arguments.get(0));
       String inputFormat = arguments.get(1);
       String outputFormat = arguments.get(2);
 
-      Catalog resultingCatalog = null;
+      MediaPackageElement resultingCatalog = null;
 
       switch (op) {
         case Convert:

@@ -34,6 +34,7 @@ describe('Application controller', function () {
     });
 
     it('stores the current user', function () {
+        $httpBackend.whenGET('/broker/status').respond({});
         $httpBackend.flush();
 
         expect($scope.currentUser.user.name).toEqual('Oliver Queen');
@@ -45,6 +46,7 @@ describe('Application controller', function () {
             $httpBackend.whenGET('/sysinfo/bundles/version?prefix=matterhorn').respond(
                 {'buildNumber': '01b60ff', 'consistent': true, 'version': '1.6.0.SNAPSHOT'}
             );
+            $httpBackend.whenGET('/broker/status').respond({});
 
             $httpBackend.flush();
             expect($scope.version.version).toEqual('1.6.0.SNAPSHOT');
@@ -54,6 +56,7 @@ describe('Application controller', function () {
             $httpBackend.whenGET('/sysinfo/bundles/version?prefix=matterhorn').respond(
                 {versions: [{'buildNumber': '01b60ff', 'consistent': true, 'version': '1.6.0.SNAPSHOT'}]}
             );
+            $httpBackend.whenGET('/broker/status').respond({});
 
             $httpBackend.flush();
             expect($scope.version.version).toEqual('1.6.0.SNAPSHOT');

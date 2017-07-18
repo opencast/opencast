@@ -26,17 +26,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-ingest-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-series-service-impl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workflow-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -56,12 +46,17 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-solr</artifactId>
+      <artifactId>matterhorn-message-broker-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-message-broker-api</artifactId>
+      <artifactId>matterhorn-asset-manager-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-authorization-xacml</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -101,6 +96,14 @@
       <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
     </dependency>
     <dependency>
+      <groupId>net.fortuna.ical4j</groupId>
+      <artifactId>ical4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>javax.persistence</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
@@ -131,17 +134,14 @@
       <version>1.1.1</version>
     </dependency>
     <dependency>
-      <groupId>net.fortuna.ical4j</groupId>
-      <artifactId>ical4j</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.persistence</groupId>
-      <artifactId>javax.persistence</artifactId>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-asset-manager-impl</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>org.eclipse.persistence.core</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
@@ -164,6 +164,15 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <!-- Earlier drivers yield an error:
+        - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException:
+        - You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OPTION SQL_SELECT_LIMIT=DEFAULT' at line 1
+        -->
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.mchange</groupId>
       <artifactId>c3p0</artifactId>
       <scope>test</scope>
@@ -171,6 +180,12 @@
     <dependency>
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- contains javax.inject.Provider -->
+    <dependency>
+      <groupId>com.mysema.querydsl</groupId>
+      <artifactId>querydsl-apt</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -190,7 +205,6 @@
             <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.scheduler.impl;version=${project.version},
-              org.opencastproject.scheduler.impl.solr;version=${project.version},
               org.opencastproject.scheduler.impl.persistence;version=${project.version},
               org.opencastproject.scheduler.endpoint;version=${project.version}
             </Export-Package>
@@ -202,7 +216,6 @@
             <Service-Component>
               OSGI-INF/capture-prolonging-service.xml,
               OSGI-INF/scheduler-service-cleanup-finished-recordings-scanner.xml,
-              OSGI-INF/scheduler-service-index.xml,
               OSGI-INF/scheduler-service-persistence.xml,
               OSGI-INF/scheduler-service.xml,
               OSGI-INF/scheduler-service-rest.xml

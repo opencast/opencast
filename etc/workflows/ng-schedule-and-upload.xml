@@ -10,15 +10,6 @@
   <description/>
   <configuration_panel>
     <![CDATA[
-      <style type="text/css">
-      <!--
-        #workflow-configuration legend { padding-top:20px; padding-bottom:5px }
-        #workflow-configuration li { padding:2px 20px;}
-        #workflow-configuration input[type=checkbox] { padding: 0px; }
-        #workflow-configuration label { display: inline-block; padding: 0px 5px; }
-        #workflow-configuration input:disabled+label{ opacity: 0.5; }
-      -->
-      </style>
       <div id="workflow-configuration">
         <fieldset>
           <legend>Add a comment that the recording needs:</legend>
@@ -54,7 +45,7 @@
                         <label for="publishToEngage">Opencast Media Module</label>
                       </li>
                       <li>
-                        <input id="publishToAws" name="searchPublishType" type="radio" class="configField" disabled="disabled" value="true"/>
+                        <input id="publishToAws" name="searchPublishType" type="radio" class="configField" value="true"/>
                         <label for="publishToAws">AWS</label>
                       </li>
                     </ul>
@@ -87,21 +78,31 @@
             $('#publicationConfigurationPanel').toggle(show);
             $('#straightToPublishing').val(show);
         });
+
+        <!-- Remove the line below if you wish to publish to AWS S3 -->
+        $('#publishToAws').prop('disabled', true);
+        <!-- Remove the line above if you wish to publish to AWS S3 -->
+
+        awsWasDisabled = $('#publishToAws').prop('disabled');
+        awsWasChecked = $('#publishToAws').prop('checked');
+        engageWasChecked = $('#publishToEngage').prop('checked');
+
         $('input[name="publishToSearch"]').change(function(){
             if ($(this).is(':checked')) {
-              $('#publishToAws').prop('disabled', false);
+              $('#publishToAws').prop('checked', awsWasChecked);
+              $('#publishToEngage').prop('checked', engageWasChecked);
+              $('#publishToAws').prop('disabled', awsWasDisabled);
               $('#publishToEngage').prop('disabled', false);
-              $('#publishToEngage').prop('checked', true);
             } else if (!$(this).is(':checked')) {
+              awsWasChecked = $('#publishToAws').prop('checked');
+              engageWasChecked = $('#publishToEngage').prop('checked');
+
               $('#publishToAws').prop('disabled', true);
               $('#publishToEngage').prop('disabled', true);
               $('#publishToAws').prop('checked', false);
               $('#publishToEngage').prop('checked', false);
             }
         });
-        <!-- Remove the line below if you wish to publish to AWS S3 -->
-        $('#publishToAws').prop('disabled', false);
-        <!-- Remove the line above if you wish to publish to AWS S3 -->
       </script>
     ]]>
   </configuration_panel>

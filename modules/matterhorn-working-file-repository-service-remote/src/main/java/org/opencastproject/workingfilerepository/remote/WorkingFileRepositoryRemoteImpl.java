@@ -229,6 +229,25 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
     return (String) getStorageReport().get("summary");
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#cleanupOldFilesFromCollection
+   */
+  @Override
+  public boolean cleanupOldFilesFromCollection(String collectionId, long days) throws IOException {
+    String url = UrlSupport.concat(new String[] { COLLECTION_PATH_PREFIX, collectionId, Long.toString(days) });
+    HttpDelete del = new HttpDelete(url);
+    HttpResponse response = getResponse(del, SC_NO_CONTENT, SC_NOT_FOUND);
+    try {
+      if (response != null)
+        return SC_NO_CONTENT == response.getStatusLine().getStatusCode();
+    } finally {
+      closeConnection(response);
+    }
+    throw new RuntimeException("Error removing older files from collection");
+  }
+
   protected JSONObject getStorageReport() {
     String url = UrlSupport.concat(new String[] { "storage" });
     HttpGet get = new HttpGet(url);

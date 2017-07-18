@@ -219,6 +219,27 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
     }
   }
 
+  @DELETE
+  @Path(WorkingFileRepository.COLLECTION_PATH_PREFIX + "cleanup/{collectionId}/{numberOfDays}")
+  @RestQuery(name = "cleanupOldFilesFromCollection", description = "Remove the files from the working repository under /collectionId that are older than N days", returnDescription = "No content", pathParameters = {
+          @RestParameter(name = "collectionId", description = "the collection identifier", isRequired = true, type = STRING),
+          @RestParameter(name = "numberOfDays", description = "files older than this number of days will be deleted", isRequired = true, type = STRING) }, reponses = {
+                  @RestResponse(responseCode = SC_NO_CONTENT, description = "Files deleted"),
+                  @RestResponse(responseCode = SC_NOT_FOUND, description = "Collection not found") })
+  public Response restCleanupOldFilesFromCollection(@PathParam("collectionId") String collectionId,
+          @PathParam("numberOfDays") long days) {
+    try {
+      if (this.cleanupOldFilesFromCollection(collectionId, days))
+        return Response.noContent().build();
+      else
+        return Response.status(SC_NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.error("Unable to delete files older than '{}' days from collection '{}': {}",
+              new Object[] { days, collectionId, e });
+      return Response.serverError().entity(e.getMessage()).build();
+    }
+  }
+
   @GET
   @Path(WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX + "{mediaPackageID}/{mediaPackageElementID}")
   @RestQuery(name = "get", description = "Gets the file from the working repository under /mediaPackageID/mediaPackageElementID", returnDescription = "The file", pathParameters = {

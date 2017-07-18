@@ -52,7 +52,6 @@ import org.opencastproject.mediapackage.identifier.HandleException;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -68,6 +67,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.ConfigurationException;
+import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
@@ -77,6 +77,8 @@ import org.opencastproject.util.data.VCell;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.entwinemedia.fn.data.Opt;
 
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
@@ -495,9 +497,11 @@ public class IndexServiceImplTest {
     Capture<Date> captureStart = EasyMock.newCapture();
     Capture<Date> captureEnd = EasyMock.newCapture();
     SchedulerService schedulerService = EasyMock.createNiceMock(SchedulerService.class);
-    EasyMock.expect(
-            schedulerService.addEvent(anyObject(DublinCoreCatalog.class), EasyMock.<Map<String, String>> anyObject()))
-            .andReturn(1L).once();
+    schedulerService.addEvent(EasyMock.capture(captureStart), EasyMock.capture(captureEnd), EasyMock.anyString(),
+            EasyMock.<Set<String>> anyObject(), EasyMock.anyObject(MediaPackage.class),
+            EasyMock.<Map<String, String>> anyObject(), EasyMock.<Map<String, String>> anyObject(),
+            EasyMock.<Opt<Boolean>> anyObject(), EasyMock.<Opt<String>> anyObject(), EasyMock.anyString());
+    EasyMock.expectLastCall().once();
     EasyMock.replay(schedulerService);
 
     // Run Test
@@ -523,6 +527,10 @@ public class IndexServiceImplTest {
     assertTrue("The mediapackage should have had its title updated", catalogResult.hasCaptured());
     assertEquals("The mediapackage title should have been updated.", expectedTitle, mediapackageTitleResult.getValue());
     assertTrue("The catalog should have been created", catalogResult.hasCaptured());
+    assertTrue(captureStart.hasCaptured());
+    assertTrue(captureEnd.hasCaptured());
+    Assert.assertEquals(new Date(DateTimeSupport.fromUTC("2008-03-16T14:00:00Z")), captureStart.getValue());
+    Assert.assertEquals(new Date(DateTimeSupport.fromUTC("2008-03-16T14:01:00Z")), captureEnd.getValue());
   }
 
   private AuthorizationService setupAuthorizationService(MediaPackage mediapackage) {
@@ -592,8 +600,11 @@ public class IndexServiceImplTest {
     Capture<Date> captureStart = EasyMock.newCapture();
     Capture<Date> captureEnd = EasyMock.newCapture();
     SchedulerService schedulerService = EasyMock.createNiceMock(SchedulerService.class);
-    EasyMock.expect(schedulerService.addEvent(EasyMock.anyObject(DublinCoreCatalog.class),
-            EasyMock.<Map<String, String>> anyObject())).andReturn(2L).atLeastOnce();
+    schedulerService.addEvent(EasyMock.capture(captureStart), EasyMock.capture(captureEnd), EasyMock.anyString(),
+            EasyMock.<Set<String>> anyObject(), EasyMock.anyObject(MediaPackage.class),
+            EasyMock.<Map<String, String>> anyObject(), EasyMock.<Map<String, String>> anyObject(),
+            EasyMock.<Opt<Boolean>> anyObject(), EasyMock.<Opt<String>> anyObject(), EasyMock.anyString());
+    EasyMock.expectLastCall().atLeastOnce();
     EasyMock.replay(schedulerService);
 
     // Run Test
@@ -619,6 +630,13 @@ public class IndexServiceImplTest {
     assertTrue("The mediapackage should have had its title updated", catalogResult.hasCaptured());
     assertEquals("The mediapackage title should have been updated.", expectedTitle, mediapackageTitleResult.getValue());
     assertTrue("The catalog should have been created", catalogResult.hasCaptured());
+    assertTrue(captureStart.hasCaptured());
+    assertTrue(captureEnd.hasCaptured());
+    List<Date> endDates = captureEnd.getValues();
+    int i = 0;
+    for (Date start : captureStart.getValues()) {
+      Assert.assertEquals(new Date(start.getTime() + 60000), endDates.get(i++));
+    }
   }
 
   /**

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
+
   <id>ng-republish-metadata</id>
   <title>Republish metadata</title>
   <tags>
@@ -8,34 +9,22 @@
   <description/>
   <configuration_panel>
     <![CDATA[
-      <style type="text/css">
-      <!--
-          #workflow-configuration legend { padding-top:20px; padding-bottom:5px }
-          #workflow-configuration li { padding-top:5px; padding-bottom:5px; line-height:14px }
-      -->
-      </style>
       <div id="workflow-configuration">
         <fieldset>
           <legend>Update metadata at:</legend>
           <ul>
             <li>
-              <span>
-                <input id="publishToEngage" name="publishToEngage" type="checkbox" checked="checked" class="configField" value="true" />
-                <span>&nbsp;Opencast Media Module</span>
-              </span>
+              <input id="publishToEngage" name="publishToEngage" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="publishToEngage">Opencast Media Module</label>
             </li>
             <li>
-              <span>
-                <input id="publishToOaiPmh" name="publishToOaiPmh" type="checkbox" checked="checked" class="configField" value="true" />
-                <span>&nbsp;Default OAI-PMH Repository</span>
-              </span>
+              <input id="publishToOaiPmh" name="publishToOaiPmh" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="publishToOaiPmh">Default OAI-PMH Repository</label>
             </li>
             <!-- Fixme: uncomment as soon as the publish-youtube workflow operation handler supports merging
             <li>
-              <span>
-                <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" />
-                <span>&nbsp;YouTube</span>
-              </span>
+              <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" />
+              <label for="publishToYouTube">YouTube</label>
             </li>
             -->
           </ul>

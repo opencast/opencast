@@ -344,6 +344,16 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
+  public Map<String, String> getIdTitleMapOfAllSeries() throws SeriesException, UnauthorizedException {
+    try {
+      return index.queryIdTitleMap();
+    } catch (SeriesServiceDatabaseException e) {
+      logger.error("Failed to execute search query: {}", e.getMessage());
+      throw new SeriesException(e);
+    }
+  }
+
+  @Override
   public DublinCoreCatalog getSeries(String seriesID) throws SeriesException, NotFoundException {
     try {
       return index.getDublinCore(notNull(seriesID, "seriesID"));

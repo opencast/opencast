@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  name="org.opencastproject.migration.SchedulerMigrationService" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.migration.SchedulerMigrationService" />
+  <property name="service.description" value="Scheduler Migration Service" />
+  <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
+    cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+    cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+  <reference name="authorization" interface="org.opencastproject.security.api.AuthorizationService"
+    cardinality="1..1" policy="static" bind="setAuthorizationService"/>
+  <reference name="schedulerService" interface="org.opencastproject.scheduler.api.SchedulerService"
+    cardinality="1..1" policy="static" bind="setSchedulerService"/>
+  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+    cardinality="1..1" policy="static" bind="setWorkspace"/>
+  <reference name="dataSource" interface="javax.sql.DataSource"
+    cardinality="1..1" policy="static" bind="setDataSource"/>
+</scr:component>

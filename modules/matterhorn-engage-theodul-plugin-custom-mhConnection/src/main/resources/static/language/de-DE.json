@@ -1,6 +1,8 @@
 {
   "value_locale":"de",
-  "error_mediaPackageInformationNotLoaded":"Es gibt zwei mögliche Gründe fur diesen Fehler:<ul><li>Die Aufzeichnung ist nicht mehr verfügbar</li><li>Die Aufzeichnung ist geschützt und ist nur für eingeloggte Nutzer verfügbar</li></ul>",
+  "error_mediaPackageInformationNotLoaded":"Es gibt zwei mögliche Ursachen für diesen Fehler:",
+  "error_mediaPackageInformationNotLoaded_reason1":"Das Video ist nicht mehr verfügbar",
+  "error_mediaPackageInformationNotLoaded_reason2":"Das Video ist geschützt und Sie müssen sich einloggen",
   "error_noMediaInformationAvailable":"Es sind keine Medien-Informationen verfügbar.",
   "error_endpointNotAvailable":"Der Such-Service ist momentan nicht verfügbar."
 }

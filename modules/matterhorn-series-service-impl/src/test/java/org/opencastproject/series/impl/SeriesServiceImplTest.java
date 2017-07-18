@@ -211,6 +211,22 @@ public class SeriesServiceImplTest {
       Assert.assertEquals(2, r.getCatalogList().size());
       Assert.assertEquals("x, y, z", r.getCatalogList().get(0).getFirst(DublinCore.PROPERTY_SUBJECT));
     }
+    { // sort by series id, verify sort asc
+      SeriesQuery q = new SeriesQuery().withSort(SeriesQuery.Sort.IDENTIFIER, true);
+      DublinCoreCatalogList r = seriesService.getSeries(q);
+      Assert.assertEquals(2, r.getCatalogList().size());
+      String id1 = r.getCatalogList().get(0).getFirst(DublinCore.PROPERTY_IDENTIFIER);
+      String id2 = r.getCatalogList().get(1).getFirst(DublinCore.PROPERTY_IDENTIFIER);
+      Assert.assertTrue(id1.compareTo(id2) < 1);
+    }
+    { // sort by series id, verify sort desc
+      SeriesQuery q = new SeriesQuery().withSort(SeriesQuery.Sort.IDENTIFIER, false);
+      DublinCoreCatalogList r = seriesService.getSeries(q);
+      Assert.assertEquals(2, r.getCatalogList().size());
+      String id1 = r.getCatalogList().get(0).getFirst(DublinCore.PROPERTY_IDENTIFIER);
+      String id2 = r.getCatalogList().get(1).getFirst(DublinCore.PROPERTY_IDENTIFIER);
+      Assert.assertTrue(id1.compareTo(id2) > -1);
+    }
   }
 
   @Test
@@ -224,6 +240,16 @@ public class SeriesServiceImplTest {
     testCatalog.set(DublinCore.PROPERTY_TITLE, "Some other title");
     seriesService.updateSeries(testCatalog);
     result = seriesService.getSeries(q).getCatalogList();
+    Assert.assertEquals(1, result.size());
+  }
+
+  @Test
+  public void testSeriesFuzzyIdSearchQuery() throws Exception {
+    testCatalog.set(DublinCore.PROPERTY_IDENTIFIER, "20160119999");
+    seriesService.updateSeries(testCatalog);
+    SeriesQuery q = new SeriesQuery().setSeriesId("201601");
+    q.setFuzzyMatch(true);
+    List<DublinCoreCatalog> result = seriesService.getSeries(q).getCatalogList();
     Assert.assertEquals(1, result.size());
   }
 

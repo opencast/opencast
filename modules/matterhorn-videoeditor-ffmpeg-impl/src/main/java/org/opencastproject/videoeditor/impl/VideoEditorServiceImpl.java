@@ -319,7 +319,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     } catch (MediaPackageException ex) {
       throw new ProcessFailedException("Unable to serialize edited Track! " + ex.getMessage());
     } catch (Exception ex) {
-      throw new ProcessFailedException(ex.getMessage());
+      throw new ProcessFailedException("Unable to process SMIL: " + ex.getMessage(), ex);
     } finally {
       FileUtils.deleteQuietly(tempDirectory);
     }

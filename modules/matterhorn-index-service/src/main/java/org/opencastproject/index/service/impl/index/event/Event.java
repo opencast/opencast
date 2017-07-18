@@ -21,9 +21,9 @@
 
 package org.opencastproject.index.service.impl.index.event;
 
-import org.opencastproject.capture.admin.api.RecordingState;
 import org.opencastproject.index.service.impl.index.IndexObject;
 import org.opencastproject.mediapackage.Publication;
+import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;

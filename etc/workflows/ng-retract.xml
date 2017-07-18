@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
+
   <id>ng-retract</id>
   <title>Retract</title>
   <tags>
@@ -8,57 +9,39 @@
   </tags>
   <description>Retract a recording</description>
   <configuration_panel>
-      <![CDATA[
-        <style type="text/css">
-        <!-- 
-            #workflow-configuration legend { padding-top:20px; padding-bottom:5px; }
-            #workflow-configuration li { padding-top:5px; padding-bottom:5px; line-height:14px }
-        -->
-        </style>
-        <div id="workflow-configuration">
-          <fieldset>
-            <legend>Retract the recording from:</legend>
-            <ul>
-              <li>
-                <span>
-                  <input id="retractFromEngage" type="checkbox" checked="checked" class="configField" value="true" />
-                  <span>&nbsp;Opencast Media Module</span>
-                </span>
-              </li>
-              <li>
-                <span>
-                  <input id="retractFromAws" type="checkbox" checked="checked" class="configField" value="true" />
-                  <span>&nbsp;AWS</span>
-                </span>
-              </li>
-              <li>
-                <span>
-                  <input id="retractFromApi" type="checkbox" checked="checked" class="configField" value="true" />
-                  <span>&nbsp;External Applications</span>
-                </span>
-              </li>
-              <li>
-                <span>
-                  <input id="retractPreview" type="checkbox" checked="checked" class="configField" value="true" />
-                  <span>&nbsp;Preview and Editing Media</span>
-                </span>
-              </li>
-              <li>
-                <span>
-                  <input id="retractFromOaiPmh" type="checkbox" checked="checked" class="configField" value="true" />
-                  <span>&nbsp;Default OAI-PMH Repository</span>
-                </span>
-              </li>
-              <li>
-                <span>
-                  <input id="retractFromYouTube" type="checkbox" class="configField" value="true" />
-                  <span>&nbsp;YouTube</span>
-                </span>
-              </li>
-            </ul>
-          </fieldset>
-        </div>
-      ]]>
+    <![CDATA[
+      <div id="workflow-configuration">
+        <fieldset>
+          <legend>Retract the recording from:</legend>
+          <ul>
+            <li>
+              <input id="retractFromEngage" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="retractFromEngage">Opencast Media Module</label>
+            </li>
+            <li>
+              <input id="retractFromAws" type="checkbox" class="configField" value="true" disabled="disabled" />
+              <label for="retractFromAws">AWS</label>
+            </li>
+            <li>
+              <input id="retractFromApi" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="retractFromApi">External Applications</label>
+            </li>
+            <li>
+              <input id="retractPreview" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="retractPreview">Preview and Editing Media</label>
+            </li>
+            <li>
+              <input id="retractFromOaiPmh" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="retractFromOaiPmh">Default OAI-PMH Repository</label>
+            </li>
+            <li>
+              <input id="retractFromYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
+              <label for="retractFromYouTube">YouTube</label>
+            </li>
+          </ul>
+        </fieldset>
+      </div>
+    ]]>
   </configuration_panel>
   <operations>
   

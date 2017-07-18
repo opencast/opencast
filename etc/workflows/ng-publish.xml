@@ -9,49 +9,35 @@
   <description/>
   <configuration_panel>
     <![CDATA[
-      <style type="text/css">
-      <!--
-          #workflow-configuration legend { padding-top:20px; padding-bottom:5px }
-          #workflow-configuration li { padding-top:5px; padding-bottom:5px; line-height:14px }
-      -->
-      </style>
       <div id="workflow-configuration">
         <fieldset>
           <legend>Publish to:</legend>
-                      <ul>
+          <ul id="publicationConfigurationPanel" class="workflow-configuration-subpanel">
             <li>
-              <input id="holdOrPublishToggle_hold" type="radio" name="holdOrPublishToggle" value="hold" />
-              <label for="holdOrPublishToggle_hold">Hold</label>
+              <input id="publishToSearch" name="publishToSearch" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="publishToSearch">Opencast Index</label>
+              <ul id="searchConfigurationPanel" class="workflow-configuration-subpanel">
+                <li>
+                  <input id="publishToEngage" name="searchPublishType" type="radio" checked="checked" class="configField" value="true" />
+                  <label for="publishToEngage">Opencast Media Module</label>
+                </li>
+                <li>
+                  <input id="publishToAws" name="searchPublishType" type="radio" class="configField" value="true" disabled="disabled"/>
+                  <label for="publishToAws">AWS</label>
+                 </li>
+              </ul>
             </li>
             <li>
-              <input id="holdOrPublishToggle_publish" type="radio" name="holdOrPublishToggle" value="publish" checked="checked" />
-              <label for="holdOrPublishToggle_publish">Publish right away to</label>
-              <ul id="publicationConfigurationPanel" class="workflow-configuration-subpanel">
-                <li>
-                  <input id="publishToSearch" name="publishToSearch" type="checkbox" checked="checked" class="configField" value="true" />
-                  <label for="publishToSearch">Opencast Index</label>
-                  <fieldset>
-                    <ul id="searchConfigurationPanel" class="workflow-configuration-subpanel">
-                      <li>
-                        <input id="publishToEngage" name="searchPublishType" type="radio" checked="checked" class="configField" value="true" />
-                        <label for="publishToEngage">Opencast Media Module</label>
-                      </li>
-                      <li>
-                        <input id="publishToAws" name="searchPublishType" type="radio" class="configField" disabled="disabled" value="true"/>
-                        <label for="publishToAws">AWS</label>
-                      </li>
-                    </ul>
-                  </fieldset>
-                </li>
-                <li>
-                  <input id="publishToApi" name="publishToApi" type="checkbox" checked="checked" class="configField" value="true" />
-                  <label for="publishToApi">External Applications</label>
-                </li>
-                <li>
-                  <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
-                  <label for="publishToYouTube">YouTube</label>
-                </li>
-              </ul>
+              <input id="publishToApi" name="publishToApi" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="publishToApi">External Applications</label>
+            </li>
+            <li>
+              <input id="publishToOaiPmh" name="publishToOaiPmh" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="publishToOaiPmh">OAI-PMH Default Repository</label>
+            </li>
+            <li>
+              <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
+              <label for="publishToYouTube">YouTube</label>
             </li>
           </ul>
         </fieldset>
@@ -59,21 +45,23 @@
 
       <!-- Show or hide the hold and publication configuration panel -->
       <script type="text/javascript">
+        awsWasDisabled = $('#publishToAws').prop('disabled');
+        awsWasChecked = $('#publishToAws').prop('checked');
+        engageWasChecked = $('#publishToEngage').prop('checked');
+
         $('input[name="publishToSearch"]').change(function(){
             if ($(this).is(':checked')) {
-              $('#publishToAws').prop('disabled', false);
+              $('#publishToAws').prop('checked', awsWasChecked);
+              $('#publishToEngage').prop('checked', engageWasChecked);
+              $('#publishToAws').prop('disabled', awsWasDisabled);
               $('#publishToEngage').prop('disabled', false);
-              $('#publishToEngage').prop('checked', true);
-            } else if (!$(this).is(':checked')) {
-              $('#publishToAws').prop('disabled', true);
-              $('#publishToEngage').prop('disabled', true);
-              $('#publishToAws').prop('checked', false);
-              $('#publishToEngage').prop('checked', false);
+            } else {
+              awsWasChecked = $('#publishToAws').prop('checked');
+              engageWasChecked = $('#publishToEngage').prop('checked');
+              $('#searchConfigurationPanel input').prop('disabled', true)
+                                                  .prop('checked', false);
             }
         });
-        <!-- Remove the line below if you wish to publish to AWS S3 -->
-        $('#publishToAws').prop('disabled', false);
-        <!-- Remove the line above if you wish to publish to AWS S3 -->
       </script>
     ]]>
   </configuration_panel>
@@ -88,7 +76,9 @@
       <configurations>
         <configuration key="publishToEngage">true</configuration>
         <configuration key="publishToApi">true</configuration>
+        <configuration key="publishToOaiPmh">true</configuration>
         <configuration key="publishToYouTube">false</configuration>
+        <configuration key="publishToAws">false</configuration>
       </configurations>
     </operation>
 

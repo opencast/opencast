@@ -21,7 +21,11 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static org.easymock.EasyMock.anyString;
+import static org.easymock.EasyMock.expect;
+import static org.opencastproject.capture.CaptureParameters.INGEST_WORKFLOW_DEFINITION;
 import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
+import static org.opencastproject.util.DateTimeSupport.fromUTC;
 import static org.opencastproject.util.IoSupport.withResource;
 import static org.opencastproject.util.PropertiesUtil.toDictionary;
 import static org.opencastproject.util.data.Collections.map;
@@ -75,17 +79,20 @@ import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.mediapackage.track.AbstractStreamImpl;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl;
+import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
+import org.opencastproject.scheduler.api.TechnicalMetadata;
+import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -126,6 +133,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
 
+import net.fortuna.ical4j.model.property.RRule;
+
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -148,6 +157,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TimeZone;
 
 import javax.ws.rs.Path;
 
@@ -459,16 +470,50 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     endpoint.activate(null);
     env.setJobService(endpoint);
 
-    List<DublinCoreCatalog> catalogs = new ArrayList<>();
+    // date, duration, title
+    List<MediaPackage> events = new ArrayList<>();
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
-    catalogs.add(DublinCores.read(TestEventEndpoint.class.getResourceAsStream("/dublincore2.xml")));
-    DublinCoreCatalogList dublinCoreCatalogList = new DublinCoreCatalogList(catalogs, 1);
+    mp.setTitle("Land and Vegetation: Key players on the Climate Scene");
+    mp.setDuration(36000L);
+    mp.setDate(new Date());
+    mp.setIdentifier(new IdImpl("asdasd"));
+    events.add(mp);
     SchedulerService schedulerService = EasyMock.createNiceMock(SchedulerService.class);
+    EasyMock.expect(schedulerService.search(EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
+            EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class)))
+            .andReturn(events).anyTimes();
+    EasyMock.expect(schedulerService.findConflictingEvents(EasyMock.anyString(), EasyMock.anyObject(RRule.class),
+            EasyMock.anyObject(Date.class), EasyMock.anyObject(Date.class), EasyMock.anyLong(),
+            EasyMock.anyObject(TimeZone.class))).andReturn(events).anyTimes();
     EasyMock.expect(schedulerService.findConflictingEvents(EasyMock.anyString(), EasyMock.anyObject(Date.class),
-            EasyMock.anyObject(Date.class))).andReturn(dublinCoreCatalogList).anyTimes();
-    EasyMock.expect(schedulerService.findConflictingEvents(EasyMock.anyString(), EasyMock.anyString(),
-            EasyMock.anyObject(Date.class), EasyMock.anyObject(Date.class), EasyMock.anyLong(), EasyMock.anyString()))
-            .andReturn(dublinCoreCatalogList).anyTimes();
+            EasyMock.anyObject(Date.class))).andReturn(events).anyTimes();
+    schedulerService.updateEvent(EasyMock.anyString(), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
+            EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
+            EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
+            EasyMock.anyString());
+    EasyMock.expectLastCall().anyTimes();
+    EasyMock.expect(schedulerService.getWorkflowConfig("asdasd")).andThrow(new NotFoundException()).anyTimes();
+    Map<String, String> workFlowConfig = new HashMap<>();
+    workFlowConfig.put("someworkflowconfig", "somevalue");
+    EasyMock.expect(schedulerService.getWorkflowConfig("workflowid")).andReturn(workFlowConfig).anyTimes();
+    Map<String, String> captureAgentConfig = new HashMap<>();
+    captureAgentConfig.put(INGEST_WORKFLOW_DEFINITION, "somevalue");
+    expect(schedulerService.getCaptureAgentConfiguration("workflowid")).andReturn(captureAgentConfig).anyTimes();
+
+    Set<String> userIds = new HashSet<>();
+    userIds.add("user1");
+    userIds.add("user2");
+    Map<String, String> caProperties = new HashMap<>();
+    caProperties.put("test", "true");
+    caProperties.put("clear", "all");
+    Map<String, String> wfProperties = new HashMap<>();
+    wfProperties.put("test", "false");
+    wfProperties.put("skip", "true");
+    TechnicalMetadata technicalMetadata = new TechnicalMetadataImpl("asdasd", "demo",
+            new Date(fromUTC("2017-01-27T10:00:37Z")), new Date(fromUTC("2017-01-27T10:10:37Z")), false, userIds,
+            wfProperties, caProperties, Opt.<Recording> none());
+    expect(schedulerService.getTechnicalMetadata(anyString())).andReturn(technicalMetadata).anyTimes();
+
     EasyMock.replay(schedulerService);
     env.setSchedulerService(schedulerService);
 
@@ -521,7 +566,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(indexService.getEvent("workflowid", searchIndex)).andReturn(Opt.some(event3)).anyTimes();
     EasyMock.expect(indexService.getEvent("notExists", searchIndex)).andReturn(Opt.<Event> none()).anyTimes();
     EasyMock.expect(indexService.getSeries("seriesId", searchIndex)).andReturn(Opt.some(series)).anyTimes();
-    EasyMock.expect(indexService.getEventMediapackage(event)).andReturn(Opt.some(mp1)).anyTimes();
+    EasyMock.expect(indexService.getEventMediapackage(event)).andReturn(mp1).anyTimes();
     EasyMock.expect(indexService.getEventCatalogUIAdapters()).andReturn(eventCatalogAdapterList).anyTimes();
     EasyMock.expect(indexService.getCommonEventCatalogUIAdapter()).andReturn(eventCatalogAdapterList.get(0)).anyTimes();
     EasyMock.expect(indexService.getEventSource(event)).andReturn(Source.SCHEDULE).anyTimes();
@@ -553,6 +598,8 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
             .andReturn(
                     "{\"acl\":{\"ace\":[{\"allow\":true,\"action\":\"read\",\"role\":\"ROLE_ADMIN\"},{\"allow\":true,\"action\":\"write\",\"role\":\"ROLE_ADMIN\"}]}}\"")
             .anyTimes();
+
+    EasyMock.expect(event.hasRecordingStarted()).andReturn(true);
 
     // Simulate different event sources
     switch (source) {

@@ -169,7 +169,7 @@
     "VIDEO_CUT_PROCESSING":"Nagranie jest przetwarzane…",
     "SERVER_UNRESPONSIVE":"Oops! Serwer nie odpowiada. Proszę spróbować ponownie później.",
     "SERVICE_UNAVAILABLE":"Oops! Serwer nie odpowiada. Proszę spróbować ponownie później.",
-    "ACTIVE_TRANSACTION":"Wydarzenie nie może być modyfikowane, ponieważ w chwili obecnej system wykonuje operacje z jego udziałem."
+    "ACTIVE_TRANSACTION":"This event can not be edited while there is an active workflow or transaction."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Działania",
@@ -382,7 +382,8 @@
             "REPEATS":"Powtórzenia",
             "REPEAT_ON":"Powtórz w",
             "WEEKDAYS":"Dni tygodnia"
-          }
+          },
+          "NO_SOURCE_AVAILABLE":"No capture agents available for scheduling"
         },
         "PROCESSING":{
           "CAPTION":"Przetwarzanie",
@@ -473,6 +474,7 @@
         },
         "GENERAL":{
           "PUBLICATION_STATUS":"Stan publikacji",
+          "NO_PUBLICATIONS_AVAILABLE":"This event has no publications",
           "SCHEDULING_STATUS":"Status",
           "READY_FOR_RECORDING":"Gotowy do nagrywania",
           "OPTED_OUT":"Wykluczone",
@@ -683,7 +685,7 @@
           "RESOLVED":"Rozwiązane",
           "REPLY":"Powtórzenie",
           "REPLY_TO":"Odpowiedź na",
-          "CANCEL_REPLY":"Anuluj",
+          "CANCEL_REPLY":"Cancel",
           "DELETE":"Usuń",
           "REASON":"Przyczyna",
           "REASONS":{
@@ -1060,7 +1062,14 @@
         "EDITCAPTION":"Edycja użytkownika",
         "TABS":{
           "USER":"Użytkownik",
-          "ROLES":"Role"
+          "ROLES":"Role",
+          "EXTERNALROLES":"External Roles",
+          "EFFECTIVEROLES":"Effective Roles"
+        },
+        "DESCRIPTION":{
+          "ROLES":"Roles and groups that can be or are already assigned to the user.",
+          "EXTERNALROLES":"The list of external roles assigned to the user granted by the external role provider(s).",
+          "EFFECTIVEROLES":"The list of effective roles directly assigned to the user and the roles indirectly loaded through group membership."
         },
         "FORM":{
           "USERNAME":"Nazwa Użytkownika",
@@ -1475,12 +1484,14 @@
     }
   },
   "VIDEO_TOOL":{
+    "TIMELINE":"Timeline",
+    "ZOOMLEVEL":"Zoom Level",
+    "ZOOM":"Zoom",
     "BUTTONS":{
-      "COMMENTS":"Podgląd",
-      "METADATA":"Edycja",
       "CLOSE":"Zamknij",
       "SAVE":"Zapisz",
-      "PROCESS":"Zapisz & przetwarzaj"
+      "PROCESS":"Save & Continue",
+      "ADD_COMMENT":"Add Comment"
     },
     "TABS":{
       "PLAY":"Odtwarzanie",
@@ -1488,13 +1499,25 @@
       "CAPTIONS":"Napisy",
       "ANNOTATIONS":"Adnotacje"
     },
+    "AREAS":{
+      "METADATA":"Metadata",
+      "COMMENTS":"Comments",
+      "SEGMENTS":"Segments"
+    },
     "ACTIONS":{
       "SPLIT":"Podziel",
       "CUT":"Wytnij",
       "REPLAY_SEGMENT":"Powtórzenie segmentu",
+      "REPLAY_END_OF_SEGMENT":"End of segment",
+      "REPLAY_SEGMENT_WITH_PREROLL":"Check transition",
       "UNDO":"Cofnij",
       "REDO":"Wykonaj ponownie",
-      "CLEAR_SEGMENTS":"Wyczyść segmenty"
+      "CLEAR_SEGMENTS":"Wyczyść segmenty",
+      "CLEAR_SELECTED_SEGMENT":"Clear selected segment"
+    },
+    "SEGMENTS":{
+      "REMOVE_SEGMENT":"Remove Segment",
+      "USE_SEGMENT":"Use this Segment"
     },
     "PLAYER":{
       "PLAY":"Odtwarzaj",
@@ -1516,6 +1539,14 @@
     "ERROR":"Niepoprawna nazwa użytkownika lub hasło"
   },
   "TABLE_FILTERS":{
+    "FILTER_SELECTION":{
+      "PLACEHOLDER":"Please select a filter…",
+      "NO_OPTIONS":"No filters found"
+    },
+    "FILTER_VALUE_SELECTION":{
+      "PLACEHOLDER":"Please select a value…",
+      "NO_OPTIONS":"No values found"
+    },
     "CLEAR":"Wyczyść wszystkie filtry",
     "REMOVE":"Usuń filtr",
     "ADD":"Dodaj filtry",
@@ -1532,6 +1563,11 @@
     }
   },
   "FILTERS":{
+    "ACLS":{
+      "NAME":{
+        "LABEL":"Name"
+      }
+    },
     "AGENTS":{
       "NAME":{
         "LABEL":"Nazwa"
@@ -1753,6 +1789,7 @@
     "FINISHED":"Zakończone",
     "FAILED":"Zakończone niepowodzeniem",
     "FINISHED_WITH_COMMENTS":"Do zrobienia",
-    "SCHEDULED":"Zaplanowane"
+    "SCHEDULED":"Zaplanowane",
+    "RECORDING":"Recording"
   }
 }

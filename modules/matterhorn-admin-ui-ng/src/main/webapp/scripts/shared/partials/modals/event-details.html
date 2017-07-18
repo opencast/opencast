@@ -2,7 +2,8 @@
 
     <header>
         <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2 translate="EVENTS.EVENTS.DETAILS.HEADER" translate-values="{{ titleParams }}">
+        <h2>
+            {{ 'EVENTS.EVENTS.DETAILS.HEADER' | translate:titleParams }}
             <!-- Event details - {{resourceId}} -->
         </h2>
     </header>
@@ -21,7 +22,9 @@
         <a ng-click="openTab('assets')" data-modal-tab="assets" ng-class="{ active: tab == 'assets' }" translate="EVENTS.EVENTS.DETAILS.TABS.ASSETS" with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW">
             <!-- Assets -->
         </a>
-<!--        <a ng-click="openTab('scheduling')" data-modal-tab="scheduling" ng-class="{ active: tab == 'scheduling' }" translate="EVENTS.EVENTS.DETAILS.TABS.SCHEDULING" with-role="ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW">Scheduling</a> -->
+        <a ng-click="openTab('scheduling')" data-modal-tab="scheduling" ng-class="{ active: tab == 'scheduling' }" translate="EVENTS.EVENTS.DETAILS.TABS.SCHEDULING" with-role="ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW" ng-if="scheduling.hasProperties">
+            <!-- Scheduling -->
+        </a>
         <a ng-click="openTab('workflows')" data-modal-tab="workflows" ng-class="{ active: tab == 'workflows' }" translate="EVENTS.EVENTS.DETAILS.TABS.WORKFLOWS" with-role="ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW">
             <!-- Workflows -->
         </a>
@@ -184,7 +187,7 @@
                 <!-- Scheduling configuration -->
                 <div class="obj tbl-details" ng-if="scheduling.hasProperties">
                     <header>
-                        <span translate="EVENTS.EVENTS.DETAILS.HEADER">
+                        <span translate="EVENTS.EVENTS.DETAILS.SCHEDULING.CAPTION">
                             <!-- Scheduling configuration -->
                         </span>
                     </header>
@@ -287,15 +290,15 @@
 
                 </div>
 
-                <!-- Participation status -->
+                <!-- Participation status: Uncomment once participation management comes in
                 <div class="obj">
                     <header translate="EVENTS.EVENTS.DETAILS.SCHEDULING.CAPTION">
-                        <!-- Participation Status -->
+                        Participation Status
                     </header>
                     <div class="obj-container padded">
                         <p>
                             <span translate="EVENTS.EVENTS.DETAILS.SCHEDULING.REVIEW_STATUS.CAPTION">
-                                <!-- Review status -->
+                                Review status
                             </span>
                             : {{ participation.review_status }}
                         </p>
@@ -303,19 +306,19 @@
                             <div class="row">
                                 <input type="radio" name="execute-toggle" id="executeNow-toggle" ng-disabled="participation.read_only || transactions.read_only" ng-model="participation.opt_out" ng-change="updateOptout(false)" value="false" >
                                 <label translate="EVENTS.EVENTS.DETAILS.SCHEDULING.OPTEDOUT.READY" for="executeNow-toggle">
-                                    <!-- Ready for recording -->
+                                    Ready for recording
                                 </label>
                             </div>
                             <div class="row">
                                 <input type="radio" name="execute-toggle" id="executeLater-toggle" ng-disabled="participation.read_only || transactions.read_only" ng-model="participation.opt_out" ng-change="updateOptout(true)" value="true" >
                                 <label translate="EVENTS.EVENTS.DETAILS.SCHEDULING.OPTEDOUT.OPTEDOUT" for="executeLater-toggle">
-                                    <!-- Opted out -->
+                                    Opted out
                                 </label>
                             </div>
                         </div>
                     </div>
                 </div>
-
+                -->
             </div>
         </div>
     </div>

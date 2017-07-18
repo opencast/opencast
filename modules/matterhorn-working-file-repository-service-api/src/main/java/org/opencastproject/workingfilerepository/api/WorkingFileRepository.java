@@ -248,4 +248,13 @@ public interface WorkingFileRepository extends StorageUsage {
    */
   String getDiskSpace();
 
+  /**
+   * Cleans up collection files older than the number of days passed.
+   *
+   * @param collectionId
+   *          the collection identifier
+   * @param days
+   *          files older than that will be deleted
+   */
+  boolean cleanupOldFilesFromCollection(String collectionId, long days) throws IOException;
 }

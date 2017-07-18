@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mediapackage xmlns="http://mediapackage.opencastproject.org" start="2016-09-19T18:15:00Z"
+    id="mpId1" duration="10501">
+    <title>Audio-only 2</title>
+    <license>Creative Commons 3.0: Attribution-NonCommercial-NoDerivs</license>
+    <media>
+        <track type="presenter/source" id="audioTrack1">
+            <mimetype>audio/ogg</mimetype>
+            <url>audio.opus</url>
+            <checksum type="md5">1526db42b267df6cdf8e74f6d6deee15</checksum>
+            <duration>10501</duration>
+            <audio id="audio-1">
+                <device/>
+                <encoder type="Vorbis"/>
+                <channels>1</channels>
+                <bitrate>16000.0</bitrate>
+            </audio>
+        </track>
+    </media>
+    <metadata>
+        <catalog type="dublincore/episode" id="episode1">
+            <mimetype>text/xml</mimetype>
+            <url>dublincore.xml</url>
+        </catalog>
+    </metadata>
+    <attachments/>
+    <publications/>
+</mediapackage>

@@ -38,8 +38,9 @@ describe('adminNg.directives.adminNgEditableSingleSelect', function () {
         expect(element.find('span')).not.toHaveClass('ng-hide');
         element.click();
         $timeout.flush();
+        expect(element.find('div')).not.toHaveClass('ng-hide');
+        expect(element.find('span')).toHaveClass('ng-hide');
         expect(element.find('select')).not.toHaveClass('ng-hide');
-        expect(element.find('div')).toHaveClass('ng-hide');
     });
 
     // it('saves the value when it changes', function () {

@@ -23,6 +23,7 @@ package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.Opt.nul;
+import static com.entwinemedia.fn.data.Opt.some;
 import static com.entwinemedia.fn.data.json.Jsons.BLANK;
 import static com.entwinemedia.fn.data.json.Jsons.NULL;
 import static com.entwinemedia.fn.data.json.Jsons.arr;
@@ -60,9 +61,9 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.api.TransitionQuery;
+import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.capture.admin.api.Recording;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentException;
 import org.opencastproject.event.comment.EventCommentReply;
@@ -80,6 +81,7 @@ import org.opencastproject.index.service.resources.list.provider.EventCommentsLi
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider.Comments;
 import org.opencastproject.index.service.resources.list.query.EventListQuery;
 import org.opencastproject.index.service.util.AccessInformationUtil;
+import org.opencastproject.index.service.util.JSONUtils;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.matterhorn.search.SearchResult;
@@ -95,17 +97,15 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.track.AudioStreamImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
-import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
-import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.rest.RestConstants;
+import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
+import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
@@ -163,8 +163,10 @@ import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -202,6 +204,15 @@ import javax.ws.rs.core.Response.Status;
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
 public abstract class AbstractEventEndpoint {
+
+  /**
+   * Scheduling JSON keys
+   */
+  private static final String SCHEDULING_AGENT_ID_KEY = "agentId";
+  private static final String SCHEDULING_START_KEY = "start";
+  private static final String SCHEDULING_END_KEY = "end";
+  private static final String SCHEDULING_AGENT_CONFIGURATION_KEY = "agentConfiguration";
+  private static final String SCHEDULING_OPT_OUT_KEY = "optOut";
 
   /** The logging facility */
   static final Logger logger = LoggerFactory.getLogger(AbstractEventEndpoint.class);
@@ -391,6 +402,108 @@ public abstract class AbstractEventEndpoint {
     return pubJSON;
   }
 
+  @GET
+  @Path("{eventId}/scheduling.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getEventSchedulingMetadata", description = "Returns all of the scheduling metadata for an event", returnDescription = "All the technical metadata related to scheduling as JSON", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id (mediapackage id).", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+                  @RestResponse(description = "Returns all the data related to the event scheduling tab as JSON", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  public Response getEventScheduling(@PathParam("eventId") String eventId)
+          throws NotFoundException, UnauthorizedException, SearchIndexException {
+    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isNone())
+      return notFound("Cannot find an event with id '%s'.", eventId);
+
+    try {
+      TechnicalMetadata technicalMetadata = getSchedulerService().getTechnicalMetadata(eventId);
+      JObject technicalMetadataJson = technicalMetadataToJson.apply(technicalMetadata);
+      return okJson(obj(f("source", v(getIndexService().getEventSource(optEvent.get()).toString())),
+              f("metadata", technicalMetadataJson)));
+    } catch (SchedulerException e) {
+      logger.error("Unable to get technical metadata for event with id {}", eventId);
+      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @PUT
+  @Path("{eventId}/scheduling")
+  @RestQuery(name = "updateEventScheduling", description = "Updates the scheduling information of an event", returnDescription = "The method doesn't return any content", pathParameters = {
+          @RestParameter(name = "eventId", isRequired = true, description = "The event identifier", type = RestParameter.Type.STRING) }, restParameters = {
+                  @RestParameter(name = "scheduling", isRequired = true, description = "The updated scheduling (JSON object)", type = RestParameter.Type.TEXT) }, reponses = {
+                          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required params were missing in the request."),
+                          @RestResponse(responseCode = SC_NOT_FOUND, description = "If the event has not been found."),
+                          @RestResponse(responseCode = SC_NO_CONTENT, description = "The method doesn't return any content") })
+  public Response updateEventScheduling(@PathParam("eventId") String eventId,
+          @FormParam("scheduling") String scheduling)
+          throws NotFoundException, UnauthorizedException, SearchIndexException {
+    if (StringUtils.isBlank(scheduling))
+      return RestUtil.R.badRequest("Missing parameters");
+
+    try {
+      final Event event = getEventOrThrowNotFoundException(eventId);
+      TechnicalMetadata technicalMetadata = getSchedulerService().getTechnicalMetadata(eventId);
+      final org.codehaus.jettison.json.JSONObject schedulingJson = new org.codehaus.jettison.json.JSONObject(
+              scheduling);
+      Opt<String> agentId = Opt.none();
+      if (schedulingJson.has(SCHEDULING_AGENT_ID_KEY)) {
+        agentId = Opt.some(schedulingJson.getString(SCHEDULING_AGENT_ID_KEY));
+        logger.trace("Updating agent id of event '{}' from '{}' to '{}'",
+                new Object[] { eventId, technicalMetadata.getAgentId(), agentId });
+      }
+
+      Opt<Date> start = Opt.none();
+      if (schedulingJson.has(SCHEDULING_START_KEY)) {
+        start = Opt.some(new Date(DateTimeSupport.fromUTC(schedulingJson.getString(SCHEDULING_START_KEY))));
+        logger.trace("Updating start time of event '{}' id from '{}' to '{}'",
+                new Object[] { eventId, DateTimeSupport.toUTC(technicalMetadata.getStartDate().getTime()),
+                        DateTimeSupport.toUTC(start.get().getTime()) });
+      }
+
+      Opt<Date> end = Opt.none();
+      if (schedulingJson.has(SCHEDULING_END_KEY)) {
+        end = Opt.some(new Date(DateTimeSupport.fromUTC(schedulingJson.getString(SCHEDULING_END_KEY))));
+        logger.trace("Updating end time of event '{}' id from '{}' to '{}'",
+                new Object[] { eventId, DateTimeSupport.toUTC(technicalMetadata.getEndDate().getTime()),
+                        DateTimeSupport.toUTC(end.get().getTime()) });
+      }
+
+      Opt<Map<String, String>> agentConfiguration = Opt.none();
+      if (schedulingJson.has(SCHEDULING_AGENT_CONFIGURATION_KEY)) {
+        agentConfiguration = Opt.some(JSONUtils.toMap(schedulingJson.getJSONObject(SCHEDULING_AGENT_CONFIGURATION_KEY)));
+        logger.trace("Updating agent configuration of event '{}' id from '{}' to '{}'",
+                new Object[] { eventId, technicalMetadata.getCaptureAgentConfiguration(), agentConfiguration });
+      }
+
+      Opt<Opt<Boolean>> optOut = Opt.none();
+      if (schedulingJson.has(SCHEDULING_OPT_OUT_KEY)) {
+        optOut = Opt.some(Opt.some(schedulingJson.getBoolean(SCHEDULING_OPT_OUT_KEY)));
+        logger.trace("Updating optout status of event '{}' id from '{}' to '{}'",
+                new Object[] { eventId, event.getOptedOut(), optOut });
+      }
+
+      if (start.isNone() && end.isNone() && agentId.isNone() && agentConfiguration.isNone() && optOut.isNone())
+        return Response.noContent().build();
+
+      if ((start.isSome() || end.isSome())
+              && end.getOr(technicalMetadata.getEndDate()).before(start.getOr(technicalMetadata.getStartDate())))
+        return RestUtil.R.badRequest("The end date is before the start date");
+
+      getSchedulerService().updateEvent(eventId, start, end, agentId, Opt.<Set<String>> none(),
+              Opt.<MediaPackage> none(), Opt.<Map<String, String>> none(), agentConfiguration, optOut,
+              SchedulerService.ORIGIN);
+      return Response.noContent().build();
+    } catch (JSONException e) {
+      return RestUtil.R.badRequest("The scheduling object is not valid");
+    } catch (ParseException e) {
+      return RestUtil.R.badRequest("The UTC dates in the scheduling object is not valid");
+    } catch (SchedulerException e) {
+      logger.error("Unable to update scheduling technical metadata of event {}: {}", eventId,
+              ExceptionUtils.getStackTrace(e));
+      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+    }
+  }
+
   private Event getEventOrThrowNotFoundException(final String eventId) throws NotFoundException, SearchIndexException {
     Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
     if (optEvent.isSome()) {
@@ -566,8 +679,11 @@ public abstract class AbstractEventEndpoint {
                 + "being used by the distribution channel.");
         return forbidden("Unable to edit an ACL for a current workflow.");
       } else {
-        // The event doesn't exist as a mediapackage yet so use the scheduler service to update the ACL
-        getSchedulerService().updateAccessControlList(getSchedulerService().getEventId(eventId), accessControlList);
+        MediaPackage mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
+        mediaPackage = getAuthorizationService().setAcl(mediaPackage, AclScope.Episode, accessControlList).getA();
+        getSchedulerService().updateEvent(eventId, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
+                Opt.<Set<String>> none(), some(mediaPackage), Opt.<Map<String, String>> none(),
+                Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
         return ok();
       }
     } catch (AclServiceException e) {
@@ -855,12 +971,10 @@ public abstract class AbstractEventEndpoint {
     MetadataList metadataList = new MetadataList();
     List<EventCatalogUIAdapter> catalogUIAdapters = getIndexService().getEventCatalogUIAdapters();
     catalogUIAdapters.remove(getIndexService().getCommonEventCatalogUIAdapter());
-    Opt<MediaPackage> optMediaPackage = getIndexService().getEventMediapackage(optEvent.get());
+    MediaPackage mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
     if (catalogUIAdapters.size() > 0) {
-      if (optMediaPackage.isSome()) {
-        for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
-          metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(optMediaPackage.get()));
-        }
+      for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
+        metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
       }
     }
     metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(),
@@ -900,17 +1014,11 @@ public abstract class AbstractEventEndpoint {
     Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", id);
-    Opt<MediaPackage> mp = getIndexService().getEventMediapackage(optEvent.get());
-    int attachments = 0;
-    int catalogs = 0;
-    int media = 0;
-    int publications = 0;
-    if (mp.isSome()) {
-      attachments = mp.get().getAttachments().length;
-      catalogs = mp.get().getCatalogs().length;
-      media = mp.get().getTracks().length;
-      publications = mp.get().getPublications().length;
-    }
+    MediaPackage mp = getIndexService().getEventMediapackage(optEvent.get());
+    int attachments = mp.getAttachments().length;
+    int catalogs = mp.getCatalogs().length;
+    int media = mp.getTracks().length;
+    int publications = mp.getPublications().length;
     return okJson(obj(f("attachments", v(attachments)), f("catalogs", v(catalogs)), f("media", v(media)),
             f("publications", v(publications))));
   }
@@ -925,12 +1033,8 @@ public abstract class AbstractEventEndpoint {
     Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", id);
-    Opt<MediaPackage> mp = getIndexService().getEventMediapackage(optEvent.get());
-    List<JValue> attachments = new ArrayList<JValue>();
-    if (mp.isSome()) {
-      attachments = getEventMediaPackageElements(mp.get().getAttachments());
-    }
-    return okJson(arr(attachments));
+    MediaPackage mp = getIndexService().getEventMediapackage(optEvent.get());
+    return okJson(arr(getEventMediaPackageElements(mp.getAttachments())));
   }
 
   @GET
@@ -961,12 +1065,8 @@ public abstract class AbstractEventEndpoint {
     Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", id);
-    Opt<MediaPackage> mp = getIndexService().getEventMediapackage(optEvent.get());
-    List<JValue> catalogs = new ArrayList<JValue>();
-    if (mp.isSome()) {
-      catalogs = getEventMediaPackageElements(mp.get().getCatalogs());
-    }
-    return okJson(arr(catalogs));
+    MediaPackage mp = getIndexService().getEventMediapackage(optEvent.get());
+    return okJson(arr(getEventMediaPackageElements(mp.getCatalogs())));
   }
 
   @GET
@@ -997,12 +1097,8 @@ public abstract class AbstractEventEndpoint {
     Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", id);
-    Opt<MediaPackage> mp = getIndexService().getEventMediapackage(optEvent.get());
-    List<JValue> media = new ArrayList<JValue>();
-    if (mp.isSome()) {
-      media = getEventMediaPackageElements(mp.get().getTracks());
-    }
-    return okJson(arr(media));
+    MediaPackage mp = getIndexService().getEventMediapackage(optEvent.get());
+    return okJson(arr(getEventMediaPackageElements(mp.getTracks())));
   }
 
   @GET
@@ -1033,12 +1129,8 @@ public abstract class AbstractEventEndpoint {
     Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", id);
-    Opt<MediaPackage> mp = getIndexService().getEventMediapackage(optEvent.get());
-    List<JValue> publications = new ArrayList<JValue>();
-    if (mp.isSome()) {
-      publications = getEventPublications(mp.get().getPublications());
-    }
-    return okJson(arr(publications));
+    MediaPackage mp = getIndexService().getEventMediapackage(optEvent.get());
+    return okJson(arr(getEventPublications(mp.getPublications())));
   }
 
   @GET
@@ -1080,9 +1172,81 @@ public abstract class AbstractEventEndpoint {
       return notFound("Cannot find an event with id '%s'.", id);
 
     try {
-      return okJson(getJobService().getTasksAsJSON(new WorkflowQuery().withMediaPackage(id)));
+      if (!optEvent.get().hasRecordingStarted()) {
+        List<Field> fields = new ArrayList<Field>();
+        Map<String, String> workflowConfig = getSchedulerService().getWorkflowConfig(id);
+        for (Entry<String, String> entry : workflowConfig.entrySet()) {
+          fields.add(f(entry.getKey(), v(entry.getValue(), Jsons.BLANK)));
+        }
+
+        Map<String, String> agentConfiguration = getSchedulerService().getCaptureAgentConfiguration(id);
+        return okJson(obj(f("workflowId", v(agentConfiguration.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION), Jsons.BLANK)),
+                f("configuration", obj(fields))));
+      } else {
+        return okJson(getJobService().getTasksAsJSON(new WorkflowQuery().withMediaPackage(id)));
+      }
     } catch (NotFoundException e) {
       return notFound("Cannot find workflows for event %s", id);
+    } catch (SchedulerException e) {
+      logger.error("Unable to get workflow data for event with id {}", id);
+      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @PUT
+  @Path("{eventId}/workflows")
+  @RestQuery(name = "updateEventWorkflow", description = "Update the workflow configuration for the scheduled event with the given id", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = {
+                  @RestParameter(name = "configuration", isRequired = true, description = "The workflow configuration as JSON", type = RestParameter.Type.TEXT) }, reponses = {
+                          @RestResponse(description = "Request executed succesfully", responseCode = HttpServletResponse.SC_NO_CONTENT),
+                          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "The method does not retrun any content.")
+  public Response updateEventWorkflow(@PathParam("eventId") String id, @FormParam("configuration") String configuration)
+          throws SearchIndexException, UnauthorizedException {
+    Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
+    if (optEvent.isNone())
+      return notFound("Cannot find an event with id '%s'.", id);
+
+    if (!optEvent.get().hasRecordingStarted()) {
+      try {
+
+        JSONObject configJSON;
+        try {
+          configJSON = (JSONObject) new JSONParser().parse(configuration);
+        } catch (Exception e) {
+          logger.warn("Unable to parse the workflow configuration {}", configuration);
+          return badRequest();
+        }
+
+        Opt<Map<String, String>> caMetadataOpt = Opt.none();
+        Opt<Map<String, String>> workflowConfigOpt = Opt.none();
+
+        String workflowId = (String) configJSON.get("id");
+        Map<String, String> caMetadata = new HashMap<>(getSchedulerService().getCaptureAgentConfiguration(id));
+        if (!workflowId.equals(caMetadata.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION))) {
+          caMetadata.put(CaptureParameters.INGEST_WORKFLOW_DEFINITION, workflowId);
+          caMetadataOpt = Opt.some(caMetadata);
+        }
+
+        Map<String, String> workflowConfig = new HashMap<>((JSONObject) configJSON.get("configuration"));
+        Map<String, String> oldWorkflowConfig = new HashMap<>(getSchedulerService().getWorkflowConfig(id));
+        if (!oldWorkflowConfig.equals(workflowConfig))
+          workflowConfigOpt = Opt.some(workflowConfig);
+
+        if (caMetadataOpt.isNone() && workflowConfigOpt.isNone())
+          return Response.noContent().build();
+
+        getSchedulerService().updateEvent(id, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
+                Opt.<Set<String>> none(), Opt.<MediaPackage> none(), workflowConfigOpt, caMetadataOpt,
+                Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
+        return Response.noContent().build();
+      } catch (NotFoundException e) {
+        return notFound("Cannot find event %s in scheduler service", id);
+      } catch (SchedulerException e) {
+        logger.error("Unable to update scheduling workflow data for event with id {}", id);
+        throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+      }
+    } else {
+      return badRequest(String.format("Event %s workflow can not be updated as the recording already started.", id));
     }
   }
 
@@ -1625,31 +1789,29 @@ public abstract class AbstractEventEndpoint {
       timeZone = TimeZone.getTimeZone(timezone);
     }
 
-    String mediaPackageId = (String) metadataJson.get("id");
+    String eventId = (String) metadataJson.get("id");
 
     try {
-      DublinCoreCatalogList events = null;
+      List<MediaPackage> events = null;
       if (StringUtils.isNotEmpty(rruleString)) {
-        events = getSchedulerService().findConflictingEvents(device, rruleString, start, end,
-                Long.parseLong(durationString), timeZone.getID());
+        events = getSchedulerService().findConflictingEvents(device, rrule, start, end, Long.parseLong(durationString),
+                timeZone);
       } else {
         events = getSchedulerService().findConflictingEvents(device, start, end);
       }
-      if (!events.getCatalogList().isEmpty()) {
+      if (!events.isEmpty()) {
         List<JValue> eventsJSON = new ArrayList<>();
-        for (DublinCoreCatalog event : events.getCatalogList()) {
-          String eventId = event.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER).toString();
-          String eventMp = null;
-          try {
-            eventMp = getSchedulerService().getMediaPackageId(Long.parseLong(eventId));
-          } finally {
-            if (StringUtils.isEmpty(mediaPackageId) || !mediaPackageId.equals(eventMp)) {
-              final DCMIPeriod period = EncodingSchemeUtils
-                      .decodeMandatoryPeriod(event.getFirst(DublinCore.PROPERTY_TEMPORAL));
-              eventsJSON.add(obj(f("start", v(DateTimeSupport.toUTC(period.getStart().getTime()))),
-                      f("end", v(DateTimeSupport.toUTC(period.getEnd().getTime()))),
-                      f("title", v(event.getFirst(DublinCoreCatalog.PROPERTY_TITLE)))));
-            }
+        for (MediaPackage event : events) {
+          Opt<Event> eventOpt = getIndexService().getEvent(event.getIdentifier().compact(), getIndex());
+          if (eventOpt.isSome()) {
+            final Event e = eventOpt.get();
+            if (StringUtils.isNotEmpty(eventId) && eventId.equals(e.getIdentifier()))
+              continue;
+            eventsJSON.add(obj(f("start", v(e.getTechnicalStartTime())), f("end", v(e.getTechnicalEndTime())),
+                    f("title", v(e.getTitle()))));
+          } else {
+            logger.warn("Index out of sync! Conflicting event catalog {} not found on event index!",
+                    event.getIdentifier().compact());
           }
         }
         if (!eventsJSON.isEmpty())
@@ -1748,8 +1910,8 @@ public abstract class AbstractEventEndpoint {
       if (EventListQuery.FILTER_STARTDATE_NAME.equals(name)) {
         try {
           Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(filters.get(name));
-          query.withStartFrom(fromAndToCreationRange.getA());
-          query.withStartTo(fromAndToCreationRange.getB());
+          query.withTechnicalStartFrom(fromAndToCreationRange.getA());
+          query.withTechnicalStartTo(fromAndToCreationRange.getB());
         } catch (IllegalArgumentException e) {
           return RestUtil.R.badRequest(e.getMessage());
         }
@@ -1845,10 +2007,7 @@ public abstract class AbstractEventEndpoint {
     Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
     if (optEvent.isNone())
       throw new NotFoundException(format("Cannot find an event with id '%s'.", eventId));
-    Opt<MediaPackage> mp = getIndexService().getEventMediapackage(optEvent.get());
-    if (mp.isNone())
-      throw new NotFoundException(format("No mediapackage availalbe on event with id '%s'.", eventId));
-    return mp.get();
+    return getIndexService().getEventMediapackage(optEvent.get());
   }
 
   private URI getCommentUrl(String eventId, long commentId) {
@@ -2050,6 +2209,23 @@ public abstract class AbstractEventEndpoint {
       String url = publication.getURI() == null ? "" : signUrl(publication.getURI()).toString();
       return obj(f("id", v(publication.getChannel())),
               f("name", v(channel.getOr("EVENTS.EVENTS.DETAILS.GENERAL.CUSTOM"))), f("url", v(url, NULL)));
+    }
+  };
+
+  protected static final Fn<TechnicalMetadata, JObject> technicalMetadataToJson = new Fn<TechnicalMetadata, JObject>() {
+    @Override
+    public JObject apply(TechnicalMetadata technicalMetadata) {
+      JValue agentConfig = technicalMetadata.getCaptureAgentConfiguration() == null ? v("")
+              : JSONUtils.mapToJSON(technicalMetadata.getCaptureAgentConfiguration());
+      JValue start = technicalMetadata.getStartDate() == null ? v("")
+              : v(DateTimeSupport.toUTC(technicalMetadata.getStartDate().getTime()));
+      JValue end = technicalMetadata.getEndDate() == null ? v("")
+              : v(DateTimeSupport.toUTC(technicalMetadata.getEndDate().getTime()));
+      return obj(f("agentId", v(technicalMetadata.getAgentId(), BLANK)), f("agentConfiguration", agentConfig),
+              f("start", start), f("end", end), f("eventId", v(technicalMetadata.getEventId(), BLANK)),
+              f("presenters", JSONUtils.setToJSON(technicalMetadata.getPresenters())),
+              f("optOut", v(technicalMetadata.isOptOut())),
+              f("recording", recordingToJson.apply(technicalMetadata.getRecording())));
     }
   };
 
