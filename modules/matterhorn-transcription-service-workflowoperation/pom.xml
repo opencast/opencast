@@ -78,6 +78,7 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Service-Component>
               OSGI-INF/start-watson-transcription.xml,
               OSGI-INF/attach-watson-transcription.xml
