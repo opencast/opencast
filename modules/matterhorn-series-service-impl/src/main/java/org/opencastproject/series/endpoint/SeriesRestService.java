@@ -417,6 +417,7 @@ public class SeriesRestService {
   @RestQuery(name = "listSeriesAsJson", description = "Returns the series matching the query parameters", returnDescription = "Returns the series search results as JSON", restParameters = {
           @RestParameter(name = "q", isRequired = false, description = "Free text search", type = STRING),
           @RestParameter(name = "edit", isRequired = false, description = "Whether this query should return only series that are editable", type = BOOLEAN),
+          @RestParameter(name = "fuzzyMatch", isRequired = false, description = "Whether the seriesId can be used for a partial match. The default is an exact match", type = BOOLEAN),
           @RestParameter(name = "seriesId", isRequired = false, description = "The series identifier", type = STRING),
           @RestParameter(name = "seriesTitle", isRequired = false, description = "The series title", type = STRING),
           @RestParameter(name = "creator", isRequired = false, description = "The series creator", type = STRING),
@@ -437,7 +438,7 @@ public class SeriesRestService {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   // CHECKSTYLE:OFF
   public Response getSeriesAsJson(@QueryParam("q") String text, @QueryParam("seriesId") String seriesId,
-          @QueryParam("edit") Boolean edit, @QueryParam("seriesTitle") String seriesTitle,
+          @QueryParam("edit") Boolean edit, @QueryParam("fuzzyMatch") Boolean fuzzyMatch, @QueryParam("seriesTitle") String seriesTitle,
           @QueryParam("creator") String creator, @QueryParam("contributor") String contributor,
           @QueryParam("publisher") String publisher, @QueryParam("rightsholder") String rightsHolder,
           @QueryParam("createdfrom") String createdFrom, @QueryParam("createdto") String createdTo,
@@ -449,7 +450,7 @@ public class SeriesRestService {
     try {
       DublinCoreCatalogList result = getSeries(text, seriesId, edit, seriesTitle, creator, contributor, publisher,
               rightsHolder, createdFrom, createdTo, language, license, subject, seriesAbstract, description, sort,
-              startPage, count);
+              startPage, count, fuzzyMatch);
       return Response.ok(result.getResultsAsJson()).build();
     } catch (UnauthorizedException e) {
       throw e;
@@ -465,6 +466,7 @@ public class SeriesRestService {
   @RestQuery(name = "listSeriesAsXml", description = "Returns the series matching the query parameters", returnDescription = "Returns the series search results as XML", restParameters = {
           @RestParameter(name = "q", isRequired = false, description = "Free text search", type = STRING),
           @RestParameter(name = "edit", isRequired = false, description = "Whether this query should return only series that are editable", type = BOOLEAN),
+          @RestParameter(name = "fuzzyMatch", isRequired = false, description = "Whether the seriesId can be used for a partial match. The default is an exact match", type = BOOLEAN),
           @RestParameter(name = "seriesId", isRequired = false, description = "The series identifier", type = STRING),
           @RestParameter(name = "seriesTitle", isRequired = false, description = "The series title", type = STRING),
           @RestParameter(name = "creator", isRequired = false, description = "The series creator", type = STRING),
@@ -485,7 +487,7 @@ public class SeriesRestService {
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   // CHECKSTYLE:OFF
   public Response getSeriesAsXml(@QueryParam("q") String text, @QueryParam("seriesId") String seriesId,
-          @QueryParam("edit") Boolean edit, @QueryParam("seriesTitle") String seriesTitle,
+          @QueryParam("edit") Boolean edit, @QueryParam("fuzzyMatch") Boolean fuzzyMatch, @QueryParam("seriesTitle") String seriesTitle,
           @QueryParam("creator") String creator, @QueryParam("contributor") String contributor,
           @QueryParam("publisher") String publisher, @QueryParam("rightsholder") String rightsHolder,
           @QueryParam("createdfrom") String createdFrom, @QueryParam("createdto") String createdTo,
@@ -497,7 +499,7 @@ public class SeriesRestService {
     try {
       DublinCoreCatalogList result = getSeries(text, seriesId, edit, seriesTitle, creator, contributor, publisher,
               rightsHolder, createdFrom, createdTo, language, license, subject, seriesAbstract, description, sort,
-              startPage, count);
+              startPage, count, fuzzyMatch);
       return Response.ok(result.getResultsAsXML()).build();
     } catch (UnauthorizedException e) {
       throw e;
@@ -641,7 +643,7 @@ public class SeriesRestService {
   private DublinCoreCatalogList getSeries(String text, String seriesId, Boolean edit, String seriesTitle,
           String creator, String contributor, String publisher, String rightsHolder, String createdFrom,
           String createdTo, String language, String license, String subject, String seriesAbstract, String description,
-          String sort, String startPageString, String countString) throws SeriesException, UnauthorizedException {
+          String sort, String startPageString, String countString, Boolean fuzzyMatch) throws SeriesException, UnauthorizedException {
     // CHECKSTYLE:ON
     int startPage = 0;
     if (StringUtils.isNotEmpty(startPageString)) {
@@ -707,6 +709,9 @@ public class SeriesRestService {
     }
     if (StringUtils.isNotEmpty(rightsHolder)) {
       q.setRightsHolder(rightsHolder.toLowerCase());
+    }
+    if (fuzzyMatch != null) {
+      q.setFuzzyMatch(fuzzyMatch.booleanValue());
     }
     try {
       if (StringUtils.isNotEmpty(createdFrom)) {

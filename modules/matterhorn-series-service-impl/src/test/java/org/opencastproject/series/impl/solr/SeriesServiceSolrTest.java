@@ -264,7 +264,9 @@ public class SeriesServiceSolrTest {
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
-
+    // deactivate the default index created in setUp()
+    index.deactivate();
+    // create a new index with the security service anonymous user
     index = new SeriesServiceSolrIndex();
     index.solrRoot = PathSupport.concat("target", Long.toString(System.currentTimeMillis()));
     dcService = new DublinCoreCatalogService();

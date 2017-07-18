@@ -261,6 +261,7 @@
    <field name="dc_spatial" type="text" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
    <field name="dc_temporal" type="text" indexed="true" stored="true" omitNorms="true"/>
    <field name="dc_is_part_of" type="string" indexed="true" stored="true" omitNorms="true"/>
+   <field name="dc_identifier" type="string" indexed="true" stored="true" omitNorms="true"/>
    <field name="dc_replaces" type="string" indexed="true" stored="true" omitNorms="true"/>
    <field name="dc_type" type="text" indexed="true" stored="true" omitNorms="true"/>
    <field name="dc_access_rights" type="text" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
@@ -298,6 +299,7 @@
    <field name="dc_spatial_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
    <field name="dc_temporal_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
    <field name="dc_is_part_of_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
+   <field name="dc_identifier_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
    <field name="dc_replaces_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
    <field name="dc_type_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
    <field name="dc_access_rights_sort" type="caseInsensitiveString" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
@@ -330,6 +332,7 @@
    <copyField source="dc_description" dest="fulltext"/>
    <copyField source="dc_publisher" dest="fulltext"/>
    <copyField source="dc_contributor" dest="fulltext"/>
+   <copyField source="dc_identifier" dest="fulltext"/>
 
   <!-- Similarity is the scoring routine for each document vs. a query.
       A custom similarity may be specified here, but the default is fine
@@ -353,6 +356,7 @@
   <copyField source="dc_spatial" dest="dc_spatial_sort" />
   <copyField source="dc_temporal" dest="dc_temporal_sort" />
   <copyField source="dc_is_part_of" dest="dc_is_part_of_sort" />
+  <copyField source="dc_identifier" dest="dc_identifier_sort" />
   <copyField source="dc_replaces" dest="dc_replaces_sort" />
   <copyField source="dc_type" dest="dc_type_sort" />
   <copyField source="dc_access_rights" dest="dc_access_rights_sort" />
