@@ -20,61 +20,26 @@
       <artifactId>matterhorn-common</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!--dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-inspection-workflowoperation</artifactId>
-      <version>${project.version}</version>
-    </dependency-->
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-timelinepreviews-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!--dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-series-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-smil-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-workflow-service-api</artifactId>
       <version>${project.version}</version>
-    </dependency-->
+    </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-workspace-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!--dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-caption-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-dublincore</artifactId>
-      <version>${project.version}</version>
-    </dependency-->
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-mpeg7</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!--dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <scope>test</scope>
-    </dependency-->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
@@ -87,12 +52,6 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workflow-service-api</artifactId>
-      <version>2.1-SNAPSHOT</version>
-      <type>jar</type>
     </dependency>
   </dependencies>
   <build>
