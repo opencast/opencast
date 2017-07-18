@@ -111,6 +111,9 @@ describe('adminNg.directives.timelineDirective', function () {
             expect(element.isolateScope().zoomLevel).toBe(50);
             expect(element.isolateScope().zoomSelected).toBe('');
             expect(element.find('.zoom-control .zoom-level').val()).toBe('50');
+            //Note: This value has excessive accurracy and causes npm run build to fail as of 20170718
+            //Rounding the value such that npm run build works causes mvn test to fail however...
+            //I don't have time to fix this properly, so when this inevitably bites someone else, hopefully they can fix
             expect(element.find('.field-of-vision .field').width()).toBe(59.592326139088726);
         });
 
@@ -132,6 +135,9 @@ describe('adminNg.directives.timelineDirective', function () {
             expect(element.isolateScope().zoomValue).toBe(1000);
             expect(element.isolateScope().zoomOffset).toBe(0);
             expect(element.isolateScope().zoomFieldOffset).toBe(0);
+            //Note: This value has excessive accurracy and causes npm run build to fail as of 20170718
+            //Rounding the value such that npm run build works causes mvn test to fail however...
+            //I don't have time to fix this properly, so when this inevitably bites someone else, hopefully they can fix
             expect(element.find('.field-of-vision .field').width()).toBe(1.9184652278177459);        
         });
     });

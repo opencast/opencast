@@ -36,6 +36,7 @@ describe('Event controller', function () {
         $httpBackend.whenGET('/admin-ng/event/40518/asset/catalog/catalogs.json').respond({});
         $httpBackend.whenGET('/admin-ng/event/40518/asset/publication/publications.json').respond({});
         $httpBackend.whenGET('/admin-ng/event/40518/asset/assets.json').respond({});
+        $httpBackend.whenGET('/admin-ng/event/40518/scheduling.json').respond({});
         $httpBackend.whenGET('/admin-ng/event/40518/workflows.json').respond({});
         $httpBackend.whenGET('/admin-ng/event/40518/access.json')
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/access.json')));
@@ -51,6 +52,7 @@ describe('Event controller', function () {
         $httpBackend.whenGET('/admin-ng/event/new/processing?tags=schedule-ng').respond({});
         $httpBackend.whenGET('/admin-ng/event/40518/hasActiveTransaction').respond('false');
         $httpBackend.whenGET('/admin-ng/capture-agents/agents.json').respond(JSON.stringify({"results":[],"total":0}));
+        $httpBackend.whenGET('/admin-ng/capture-agents/agents.json?inputs=true').respond(JSON.stringify({"results":[],"total":0}));
 
         $controller('EventCtrl', {$scope: $scope});
     });
