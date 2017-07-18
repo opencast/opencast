@@ -343,12 +343,12 @@
                             </execution>
 
                             <execution>
-                                <id>frontend build</id>
+                                <id>grunt build</id>
                                 <goals>
-                                    <goal>npm</goal>
+                                    <goal>grunt</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>run build --no-color --skipTests=${skipTests}</arguments>
+                                    <arguments>build --skipTests=${skipTests}</arguments>
                                 </configuration>
                             </execution>
                         </executions>
