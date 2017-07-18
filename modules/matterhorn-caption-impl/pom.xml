@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-caption-impl</artifactId>
@@ -57,7 +58,7 @@
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
-    </dependency>     
+    </dependency>
     <!-- testing -->
     <dependency>
       <groupId>junit</groupId>
@@ -92,7 +93,7 @@
             </Export-Package>
             <Private-Package>
               org.opencastproject.caption.util
-			</Private-Package>
+            </Private-Package>
             <Service-Component>
               OSGI-INF/caption-service.xml,
               OSGI-INF/converters/dfxp-caption-converter.xml,

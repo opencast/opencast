@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-themes</artifactId>
   <name>matterhorn-themes</name>
@@ -41,7 +41,7 @@
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
     </dependency>
-	<dependency>
+    <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>javax.persistence</artifactId>
     </dependency>
@@ -57,9 +57,7 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    
     <!-- Testing -->
-
     <!-- REST test environment -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -100,7 +98,7 @@
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>org.eclipse.persistence.antlr</artifactId>
       <scope>test</scope>
-    </dependency> 
+    </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
@@ -110,7 +108,7 @@
       <groupId>com.mchange</groupId>
       <artifactId>c3p0</artifactId>
       <scope>test</scope>
-    </dependency> 
+    </dependency>
   </dependencies>
   <build>
     <plugins>

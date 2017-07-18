@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-security-aai</artifactId>
   <name>matterhorn-security-aai</name>
@@ -14,38 +14,30 @@
     <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
-
   <dependencies>
-
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-security-shibboleth</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-userdirectory</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
-
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
@@ -75,5 +67,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

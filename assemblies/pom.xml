@@ -1,33 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
     <version>4.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-
   <properties>
     <checkstyle.skip>true</checkstyle.skip>
     <opencast.basedir>${project.basedir}/..</opencast.basedir>
     <packaging.definition>${opencast.basedir}/assemblies/package.xml</packaging.definition>
   </properties>
-
   <groupId>org.opencastproject.assemblies</groupId>
   <artifactId>opencast-assemblies</artifactId>
   <packaging>pom</packaging>
   <name>Assemblies</name>
-
   <profiles>
     <profile>
       <id>dist</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
-
       <modules>
         <module>karaf-features</module>
         <module>dist-admin</module>
@@ -39,22 +33,18 @@
         <module>dist-worker</module>
       </modules>
     </profile>
-
     <profile>
       <id>dev</id>
-
       <modules>
         <module>karaf-features</module>
         <module>dist-develop</module>
       </modules>
     </profile>
-
     <profile>
       <id>none</id>
-      <modules />
+      <modules/>
     </profile>
   </profiles>
-
   <build>
     <plugins>
       <!-- Make sure to clean build dir before rebuilding assemblies -->
@@ -115,7 +105,6 @@
             </installedFeatures>
             <libraries>
               <library>xerces-2.11.0.jar;url:="wrap:mvn:xerces/xercesImpl/2.11.0$Export-Package=org.apache.*;version=2.11.0";type:=endorsed;export:=true;delegate:=true</library>
-
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxp-api-1.4/2.8.0;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.2/2.8.0;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxws-api-2.2/2.8.0;type:=endorsed;export:=true</library>
@@ -125,7 +114,6 @@
               <library>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan/2.7.2_3;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan-serializer/2.7.2_1;type:=endorsed;export:=true</library>
               <library>mvn:javax.annotation/javax.annotation-api/1.2;type:=endorsed;export:=true</library>
-
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activator/2.8.0;type:=default;export:=true</library>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.locator/2.8.0;type:=default;export:=true</library>
             </libraries>
@@ -142,23 +130,11 @@
               <configuration>
                 <target>
                   <!-- Make sure to deactivate JMX by default -->
-                  <replaceregexp
-                    file="target/assembly/bin/karaf"
-                    match="-Dcom.sun.management.jmxremote"
-                    replace=""
-                    byline="true" />
+                  <replaceregexp file="target/assembly/bin/karaf" match="-Dcom.sun.management.jmxremote" replace="" byline="true"/>
                   <!-- Correct the start script name -->
-                  <replaceregexp
-                    file="target/assembly/bin/karaf"
-                    match="^KARAF_SCRIPT=.*$"
-                    replace="KARAF_SCRIPT='start-opencast'"
-                    byline="true" />
+                  <replaceregexp file="target/assembly/bin/karaf" match="^KARAF_SCRIPT=.*$" replace="KARAF_SCRIPT='start-opencast'" byline="true"/>
                   <!-- Make sure bundle cache gets cleared by default -->
-                  <replaceregexp
-                    file="target/assembly/etc/system.properties"
-                    match="^karaf.clean.cache .*=.*$"
-                    replace="karaf.clean.cache = true"
-                    byline="true" />
+                  <replaceregexp file="target/assembly/etc/system.properties" match="^karaf.clean.cache .*=.*$" replace="karaf.clean.cache = true" byline="true"/>
                   <!-- Additional config lines to system.properties -->
                   <concat destfile="target/assembly/etc/system.properties" append="true">
                     <filelist dir="../resources" files="system.properties.append"/>
@@ -168,27 +144,12 @@
                     <filelist dir="../resources" files="startup.properties.append"/>
                   </concat>
                   <!-- Adding extra OSGi system packages to configuration -->
-                  <replace
-                    file="target/assembly/etc/config.properties"
-                    token="org.osgi.framework.system.packages= \"
-                    value="org.osgi.framework.system.packages= \ com.sun.image.codec.jpeg, \" />
+                  <replace file="target/assembly/etc/config.properties" token="org.osgi.framework.system.packages= \" value="org.osgi.framework.system.packages= \ com.sun.image.codec.jpeg, \"/>
                   <!-- Disabled write permissions on karaf configuration by deactivating config saves -->
-                  <replaceregexp
-                    file="target/assembly/etc/config.properties"
-                    match="^felix.fileinstall.enableConfigSave .*=.*$"
-                    replace="felix.fileinstall.enableConfigSave = false"
-                    byline="true" />
+                  <replaceregexp file="target/assembly/etc/config.properties" match="^felix.fileinstall.enableConfigSave .*=.*$" replace="felix.fileinstall.enableConfigSave = false" byline="true"/>
                   <!-- Special configuration for development -->
-                  <replaceregexp
-                    file="target/classes/package.xml"
-                    match="tar\.gz"
-                    replace="dir"
-                    byline="true" />
-                  <replaceregexp
-                    file="target/classes/package.xml"
-                    match="baseDirectory&gt;.*&lt;/baseDirectory&gt;"
-                    replace="includeBaseDirectory&gt;false&lt;/includeBaseDirectory&gt;"
-                    byline="true" />
+                  <replaceregexp file="target/classes/package.xml" match="tar\.gz" replace="dir" byline="true"/>
+                  <replaceregexp file="target/classes/package.xml" match="baseDirectory&gt;.*&lt;/baseDirectory&gt;" replace="includeBaseDirectory&gt;false&lt;/includeBaseDirectory&gt;" byline="true"/>
                 </target>
               </configuration>
               <goals>
@@ -231,5 +192,4 @@
       </plugins>
     </pluginManagement>
   </build>
-
 </project>

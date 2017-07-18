@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-search-service-impl</artifactId>
@@ -77,17 +78,17 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
-   <dependency>
+    <dependency>
       <groupId>com.rometools</groupId>
       <artifactId>rome</artifactId>
       <version>1.7.0</version>
     </dependency>
-   <dependency>
+    <dependency>
       <groupId>com.rometools</groupId>
       <artifactId>rome-modules</artifactId>
       <version>1.7.0</version>
     </dependency>
-   <dependency>
+    <dependency>
       <groupId>com.rometools</groupId>
       <artifactId>rome-utils</artifactId>
       <version>1.7.0</version>
