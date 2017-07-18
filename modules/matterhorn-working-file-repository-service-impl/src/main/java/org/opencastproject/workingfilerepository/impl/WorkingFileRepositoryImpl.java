@@ -457,8 +457,11 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     File directory = null;
     try {
       directory = getCollectionDirectory(collectionId, false);
-      if (directory == null)
+      if (directory == null) {
+        //getCollectionDirectory returns null on a non-existant directory which is not being created...
+        directory = new File(PathSupport.concat(new String[] { rootDirectory, COLLECTION_PATH_PREFIX, collectionId }));
         throw new NotFoundException(directory.getAbsolutePath());
+      }
     } catch (IOException e) {
       // can be ignored, since we don't want the directory to be created, so it will never happen
     }
