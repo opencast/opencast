@@ -111,7 +111,9 @@ describe('adminNg.directives.timelineDirective', function () {
             expect(element.isolateScope().zoomLevel).toBe(50);
             expect(element.isolateScope().zoomSelected).toBe('');
             expect(element.find('.zoom-control .zoom-level').val()).toBe('50');
-            expect(element.find('.field-of-vision .field').width()).toBe(59.592326139088726);
+            var fovWidth = element.find('.field-of-vision .field').width();
+            expect(fovWidth).toBeGreaterThan(59.5);
+            expect(fovWidth).toBeLessThan(59.7);
         });
 
         it('zoom in - dropdown', function() {
@@ -132,7 +134,9 @@ describe('adminNg.directives.timelineDirective', function () {
             expect(element.isolateScope().zoomValue).toBe(1000);
             expect(element.isolateScope().zoomOffset).toBe(0);
             expect(element.isolateScope().zoomFieldOffset).toBe(0);
-            expect(element.find('.field-of-vision .field').width()).toBe(1.9184652278177459);        
+            var fovWidth = element.find('.field-of-vision .field').width();
+            expect(fovWidth).toBeGreaterThan(1.9);
+            expect(fovWidth).toBeLessThan(2.0);
         });
     });
 
