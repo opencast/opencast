@@ -479,8 +479,7 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('default', [
-    'test',
-    'build'
+    'serve'
   ]);
 
   grunt.loadNpmTasks('grunt-connect-proxy');
