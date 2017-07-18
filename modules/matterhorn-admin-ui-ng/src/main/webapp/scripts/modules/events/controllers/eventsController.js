@@ -34,14 +34,14 @@ angular.module('adminNg.controllers')
         $scope.stats = Stats;
         $scope.stats.configure({
             stats: [
-            {filters: [{name: 'startDate',
-                        filter:'FILTERS.EVENTS.START_DATE',
-                        value: $scope.todayFilterValue()}],
-             description: 'DATES.TODAY'},
             {filters: [{name: 'status',
                         filter: 'FILTERS.EVENTS.STATUS.LABEL',
                         value: 'EVENTS.EVENTS.STATUS.SCHEDULED'}],
              description: 'DASHBOARD.SCHEDULED'},
+            {filters: [{name: 'startDate',
+                        filter:'FILTERS.EVENTS.START_DATE',
+                        value: $scope.todayFilterValue()}],
+             description: 'DATES.TODAY'},
             {filters: [{name: 'status',
                         filter: 'FILTERS.EVENTS.STATUS.LABEL',
                         value: 'EVENTS.EVENTS.STATUS.RECORDING'}],
