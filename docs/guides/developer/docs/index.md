@@ -16,6 +16,7 @@ These guides will help you if you want to participate in Opencast development.
     - [Docker](development-environment-docker.md)
  - [Proposal Log](proposal-log.md)
  - [Licenses and Legal Matters](license.md)
+ - [Governance](governance.md)
  - [Localization](localization.md)
  - [Packaging Guidelines](packaging.md)
  - [Modules](modules/index.md)

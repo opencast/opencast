@@ -36,6 +36,7 @@ pages:
    - With Docker: 'development-environment-docker.md'
 - Committers: 'committer.md'
 - Licenses and Legal Matters: 'license.md'
+- Governance: 'governance.md'
 - Localization: 'localization.md'
 - Packaging: 'packaging.md'
 - Proposal Log: 'proposal-log.md'
