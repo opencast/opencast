@@ -3,7 +3,7 @@
 
 ## Description
 
-The PublishEngageWorkflowOperation will bring your media to the engage distribution channels (streaming, progressive download, …)
+The PublishEngageWorkflowOperation will bring your media to the engage distribution channels (streaming, progressive download,...)
 
 
 ## Parameter Table
@@ -20,7 +20,7 @@ The PublishEngageWorkflowOperation will bring your media to the engage distribut
 |		   	    |merges new publication with existing publication				   |
 |streaming-source-flavors   |Specifies which media should be published to the streaming server             |
 |streaming-source-tags      |Specifies which media should be published to the streaming server             |
-|streaming-tagret-tags      |Modify tags of published media                                                |
+|streaming-target-tags      |Modify tags of published media                                                |
 |streaming-target-subflavors|Subflavor to use for distributed material                                     |
 
 
