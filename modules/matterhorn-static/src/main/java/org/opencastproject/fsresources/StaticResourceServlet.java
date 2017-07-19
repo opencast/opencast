@@ -158,8 +158,8 @@ public class StaticResourceServlet extends HttpServlet {
           try {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
-          } catch (IOException e1) {
-            logger.warn("unable to send http 500 error: {}", e1);
+          } catch (Exception e1) {
+            logger.warn("unable to send http 500 error. {}: {}", e1.getClass().getName(), e1.getMessage());
             return;
           }
         }
@@ -188,8 +188,8 @@ public class StaticResourceServlet extends HttpServlet {
             try {
               resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
               return;
-            } catch (IOException e1) {
-              logger.warn("unable to send http 500 error: {}", e1);
+            } catch (Exception e1) {
+              logger.warn("unable to send http 500 error. {}: {}", e1.getClass().getName(), e1.getMessage());
               return;
             }
           }
@@ -390,6 +390,7 @@ public class StaticResourceServlet extends HttpServlet {
     try {
       istream.skip(start);
     } catch (IOException e) {
+      logger.warn("Unable to skip to input stream position {}, {}", start, e.getMessage());
       return e;
     }
     // MH-10447, fix for files of size 2048*C bytes
@@ -401,7 +402,7 @@ public class StaticResourceServlet extends HttpServlet {
       if (len > 0) {
         len = istream.read(buffer, 0, len);
         if (len > 0) {
-          // This test coud actually be "if (len != -1)"
+          // This test could actually be "if (len != -1)"
           ostream.write(buffer, 0, len);
           bytesToRead -= len;
           if (bytesToRead == 0)
@@ -417,6 +418,8 @@ public class StaticResourceServlet extends HttpServlet {
           break;
       }
     } catch (IOException e) {
+      logger.warn("IOException after starting the byte copy, current length {}, buffer {},  {}", len, buffer,
+              e.getMessage());
       return e;
     }
     return null;
