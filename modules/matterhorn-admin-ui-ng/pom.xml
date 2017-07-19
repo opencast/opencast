@@ -321,8 +321,8 @@
                                     <goal>install-node-and-npm</goal>
                                 </goals>
                                 <configuration>
-                                    <nodeVersion>v6.10.0</nodeVersion>
-                                    <npmVersion>3.10.10</npmVersion>
+                                    <nodeVersion>v8.1.4</nodeVersion>
+                                    <npmVersion>5.3.0</npmVersion>
                                 </configuration>
                             </execution>
 
@@ -332,7 +332,7 @@
                                     <goal>npm</goal>
                                 </goals>
                                 <configuration>
-                                  <arguments>cache clean</arguments>
+                                  <arguments>cache verify</arguments>
                                 </configuration>
                             </execution>
 
