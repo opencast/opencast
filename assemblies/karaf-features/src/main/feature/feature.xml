@@ -7,7 +7,6 @@
     <feature>http</feature>
     <feature>http-whiteboard</feature>
     <feature>scr</feature>
-    <feature>webconsole</feature>
     <feature>cxf-jaxrs</feature>
     <feature>cxf-http-jetty</feature>
 
@@ -16,9 +15,6 @@
     <bundle start-level="55">mvn:org.apache.httpcomponents/httpcore-osgi/${httpcomponents-httpcore.version}</bundle>
     <bundle start-level="55">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/3.1_7</bundle>
     <bundle start-level="55">mvn:commons-codec/commons-codec/1.9</bundle>
-
-    <!-- Webconsole plugins -->
-    <bundle>mvn:org.apache.felix/org.apache.felix.webconsole.plugins.ds/2.0.6</bundle>
 
     <!-- General specifications -->
     <bundle>mvn:javax.el/javax.el-api/3.0.0</bundle>
