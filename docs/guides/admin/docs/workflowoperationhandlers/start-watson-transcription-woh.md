@@ -1,7 +1,7 @@
 # Start Watson Transcription
 ## Description
 
-The Start Watson Transcription invokes the IBM Watson Speech-to-Text service, passing an audio file to be tranlated to 
+The Start Watson Transcription invokes the IBM Watson Speech-to-Text service, passing an audio file to be translated to 
 text.
 
 ## Parameter Table
@@ -9,7 +9,7 @@ text.
 |configuration keys|description|default value|example|
 |------------------|-------|-----------|-------------|
 |source-flavor|The flavor of the audio file to be sent for translation.|EMPTY|presenter/delivery|
-|source-tag|The flavor of the audio file to be sent for translation..|EMPTY|transcript-audio|
+|source-tag|The flavor of the audio file to be sent for translation.|EMPTY|transcript-audio|
 |skip-if-flavor-exists|If this flavor already exists in the media package, skip this operation.<br/>To be used when the media package already has a transcript file.|false|captions/timedtext|
 
 **One of source-flavor or source-tag must be specified.**
