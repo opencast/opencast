@@ -158,8 +158,12 @@ public class StaticResourceServlet extends HttpServlet {
           try {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
-          } catch (Exception e1) {
-            logger.warn("unable to send http 500 error. {}: {}", e1.getClass().getName(), e1.getMessage());
+          } catch (IOException e1) {
+            logger.warn("unable to send http 500 error: {}", e1);
+            return;
+          } catch (IllegalStateException e2) {
+            logger.info("unable to send http 500 error. Client side was probably closed during file copy. {}: {}",
+                    e2.getClass().getName(), e2.getMessage());
             return;
           }
         }
@@ -188,8 +192,12 @@ public class StaticResourceServlet extends HttpServlet {
             try {
               resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
               return;
-            } catch (Exception e1) {
-              logger.warn("unable to send http 500 error. {}: {}", e1.getClass().getName(), e1.getMessage());
+            } catch (IOException e1) {
+              logger.warn("unable to send http 500 error: {}", e1);
+              return;
+            } catch (IllegalStateException e2) {
+              logger.info("unable to send http 500 error. Client side was probably closed during file copy. {}: {}",
+                      e2.getClass().getName(), e2.getMessage());
               return;
             }
           }
@@ -390,7 +398,9 @@ public class StaticResourceServlet extends HttpServlet {
     try {
       istream.skip(start);
     } catch (IOException e) {
-      logger.warn("Unable to skip to input stream position {}, {}", start, e.getMessage());
+      logger.info("Cannot skip to input stream position {}. The user probably closed the client side. {}", start,
+              e.getMessage());
+      logger.trace("IOException when skipping input stream position", e);
       return e;
     }
     // MH-10447, fix for files of size 2048*C bytes
@@ -418,8 +428,8 @@ public class StaticResourceServlet extends HttpServlet {
           break;
       }
     } catch (IOException e) {
-      logger.warn("IOException after starting the byte copy, current length {}, buffer {},  {}", len, buffer,
-              e.getMessage());
+      logger.info("The user probably closed the client side after the file started copying. {}", e.getMessage());
+      logger.trace("IOException after starting the byte copy, current length {}, buffer {}", len, buffer, e);
       return e;
     }
     return null;
