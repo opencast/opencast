@@ -441,7 +441,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * Local utility to assemble player path for this class
    *
    * @param engageUri
-   * @param mediapackage
+   * @param mp
    * @return the assembled player URI for this mediapackage
    */
   protected URI createEngageUri(URI engageUri, MediaPackage mp) {
