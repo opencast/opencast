@@ -122,5 +122,10 @@ angular.module('adminNg.controllers')
                 Notifications.add('error', 'EVENTS_NOT_DELETED');
             });
         };
+
+        $scope.$on('$destroy', function() {
+            // stop polling event stats on an inactive tab
+            $scope.stats.refreshScheduler.cancel();
+        });
     }
 ]);

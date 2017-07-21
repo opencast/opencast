@@ -310,8 +310,8 @@
                   <goal>install-node-and-npm</goal>
                 </goals>
                 <configuration>
-                  <nodeVersion>v6.10.0</nodeVersion>
-                  <npmVersion>3.10.10</npmVersion>
+                  <nodeVersion>v8.1.4</nodeVersion>
+                  <npmVersion>5.3.0</npmVersion>
                 </configuration>
               </execution>
               <execution>
@@ -320,7 +320,7 @@
                   <goal>npm</goal>
                 </goals>
                 <configuration>
-                  <arguments>cache clean</arguments>
+                  <arguments>cache verify</arguments>
                 </configuration>
               </execution>
               <execution>
@@ -371,11 +371,11 @@
                             org.opencastproject.index.service.message,
                             *
                         </Import-Package>
-            <Private-Package>
+                        <Private-Package>
                             org.opencastproject.adminui.util,
                             org.opencastproject.adminui.exception
                         </Private-Package>
-            <Export-Package>
+                        <Export-Package>
                             org.opencastproject.adminui.api;version=${project.version},
                             org.opencastproject.adminui.endpoint;version=${project.version},
                             org.opencastproject.adminui.exception;version=${project.version},
@@ -386,7 +386,7 @@
                             org.opencastproject.adminui.usersettings.persistence;version=${project.version},
                             org.opencastproject.adminui.util;version=${project.version}
                         </Export-Package>
-            <Service-Component>
+                        <Service-Component>
                             OSGI-INF/acl_endpoint.xml,
                             OSGI-INF/adminui_configuration.xml,
                             OSGI-INF/captureagents_endpoint.xml,
@@ -418,12 +418,12 @@
                             OSGI-INF/users_endpoint.xml,
                             OSGI-INF/list_providers_endpoint.xml
                         </Service-Component>
-            <Meta-Persistence>
+                        <Meta-Persistence>
                             META-INF/persistence.xml
                         </Meta-Persistence>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
