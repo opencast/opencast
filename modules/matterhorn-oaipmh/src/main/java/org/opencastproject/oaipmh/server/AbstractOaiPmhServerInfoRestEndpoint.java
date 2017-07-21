@@ -45,7 +45,9 @@ public abstract class AbstractOaiPmhServerInfoRestEndpoint {
              description = "Ask if the OAI-PMH server knows about a repository",
              returnDescription = "true|false",
              pathParameters = {
-                     @RestParameter(name = "repoId", isRequired = true, description = "The id of the repository", type = RestParameter.Type.TEXT)},
+                     @RestParameter(name = "repoId", isRequired = true,
+                             description = "The id of the repository",
+                             type = RestParameter.Type.STRING)},
              reponses = {
                      @RestResponse(responseCode = SC_OK, description = "true|false")})
   public Response hasRepo(@PathParam("repoId") String repoId) {

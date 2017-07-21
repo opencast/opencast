@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-messages</artifactId>
   <name>matterhorn-messages</name>
@@ -57,7 +57,7 @@
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-frontend-jaxrs</artifactId>
     </dependency>
-	<dependency>
+    <dependency>
       <groupId>org.eclipse.persistence</groupId>
       <artifactId>javax.persistence</artifactId>
     </dependency>
@@ -73,9 +73,7 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-
     <!-- Testing -->
-
     <!-- REST test environment -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -141,11 +139,11 @@
     </dependency>
     <!-- for xml matchers equivalence tests -->
     <dependency>
-	  <groupId>xmlunit</groupId>
+      <groupId>xmlunit</groupId>
       <artifactId>xmlunit</artifactId>
       <version>1.5</version>
       <scope>test</scope>
-  	</dependency>
+    </dependency>
     <!-- for xml matchers (org.w3c.dom.ElementTraversal) -->
     <dependency>
       <groupId>org.apache.servicemix.specs</groupId>
