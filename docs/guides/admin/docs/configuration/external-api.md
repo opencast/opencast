@@ -116,6 +116,8 @@ directly in the Opencast administrative user interface.
 The External API supports user- and role-switching, i.e. it is possible to perform requests on behalf of another
 user or role. The be able to perform this kind of requests, the user doing the actual requests needs to own ROLE_SUDO.
 
+For more details on this API, please take a look at the developer documentation under External API.
+
 Testing
 -------
 

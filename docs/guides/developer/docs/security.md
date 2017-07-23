@@ -13,7 +13,7 @@ For Users and Administrators
 What to do if you find a security issue
 ---------------------------------------
 
-Report it to security@opencast.org! Please include a complete description of the issue, including which version(s) it
+Report it to `security@opencast.org`! Please include a complete description of the issue, including which version(s) it
 affects, as well as any steps required to reproduce it. This email will be sent privately to the full list of
 committers for the project. You should receive an email acknowledging the issue from the QA coordinator, or release
 manager(s) within 3 business days. At this point, depending on the issue, you may be asked for your JIRA and BitBucket
@@ -30,9 +30,10 @@ servers).
 
 What happens once the issue has been fixed?
 -------------------------------------------
-A notice to security-notices@opencast.org will be released once the issue has been resolved and proper patches applied
+A notice to `security-notices@opencast.org` will be released once the issue has been resolved and proper patches applied
 to the codebase. This notice may be accompanied by a release, or instructions on how to patch a live system depending
 on the issue.
+
 
 ----------------------------
 
@@ -43,7 +44,7 @@ What to do with a security report
 ---------------------------------
 
 If no one else has, create a JIRA issue with a 'Committer' security level, and the details in the security report.
-Assign the ticket either to yourself (if you intend on working on it) or nobody, and reply on committers@opencast.org
+Assign the ticket either to yourself (if you intend on working on it) or nobody, and reply on `committers@opencast.org`
 with the ticket. Thus far most of our security issues have come with patches attached, however this will not always be
 true. Issues which require work beyond application of a provided patch should be treated the same as any other JIRA
 issue, aside from the security level. Note that that security level will keep non-committers from viewing the ticket

@@ -24,6 +24,7 @@ pages:
    - Release Manager: 'release-manager.md'
    - QA Coordinator: 'qa-coordinator.md'
    - Security Issues: 'security.md'
+   - Documentation: 'documentation.md'
 - Decision Making:
    - Overview: 'decision-making/index.md'
    - Lazy Consensus: 'decision-making/lazy-consensus.md'
