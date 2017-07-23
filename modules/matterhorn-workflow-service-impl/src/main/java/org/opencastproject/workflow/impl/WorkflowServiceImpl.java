@@ -2462,6 +2462,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     if (jobs.size() > 0) {
       logger.info("Populating index '{}' with {} workflows", indexName, jobs.size());
       final int total = jobs.size();
+      final int responseInterval = (total < 100) ? 1 : (total / 100);
       final int[] errors = new int[1];
       errors[0] = 0;
       final int[] current = new int[1];
@@ -2481,9 +2482,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                       instance = WorkflowParser.parseWorkflowInstance(job.getPayload());
                       messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                               WorkflowItem.updateInstance(instance));
-                      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE,
+                      if (((current[0] % responseInterval) == 0) || (current[0] == total)) {
+                        messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE,
                               MessageSender.DestinationType.Queue, IndexRecreateObject.update(indexName,
                                       IndexRecreateObject.Service.Workflow, total, current[0]));
+                      }
                       current[0] += 1;
                       return false;
                     } catch (WorkflowParsingException e) {
