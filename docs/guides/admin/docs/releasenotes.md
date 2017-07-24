@@ -4,15 +4,15 @@ Opencast 4: Release Notes
 Release Schedule
 ----------------
 
-|Date                          |Phase
-|------------------------------|------------------------------------------
-|Sept 22th                     |Feature Freeze
-|Sept 25th - Oct 13th          |Internal QA and bug fixing phase
-|Oct 16th  - Nov 3th           |Public QA phase
-|Nov 6th   - Nov 24th          |Additional bug fixing phase
-|Nov 20th  - Nov 24th          |Translation week
-|Nov 27th  - Nov 3rd           |Final QA phase
-|Dez 7th                       |Release of Opencast 4
+|Date                         |Phase
+|-----------------------------|------------------------------------------
+|Sep 22th                     |Feature Freeze
+|Sep 25th - Oct 13th          |Internal QA and bug fixing phase
+|Oct 16th - Nov 3th           |Public QA phase
+|Nov 6th  - Nov 24th          |Additional bug fixing phase
+|Nov 20th - Nov 24th          |Translation week
+|Nov 27th - Nov 3rd           |Final QA phase
+|Dec 7th                      |Release of Opencast 4
 
 New Features and Improvements
 -----------------------------
