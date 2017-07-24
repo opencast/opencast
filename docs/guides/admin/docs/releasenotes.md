@@ -12,7 +12,7 @@ Release Schedule
 |Nov 6th   - Nov 24th          |Additional bug fixing phase
 |Nov 20th  - Nov 24th          |Translation week
 |Nov 27th  - Nov 3rd           |Final QA phase
-|Dez 7th                       |Release of Opencast 3
+|Dez 7th                       |Release of Opencast 4
 
 New Features and Improvements
 -----------------------------

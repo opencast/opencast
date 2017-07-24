@@ -3,12 +3,12 @@
 
 ## Description
 
-The ConfigurablePublishWorkflowOperationHandler will distribute the given elements and create a publication element for it. In default it will retract all publications before publishing the new.
+The ConfigurablePublishWorkflowOperationHandler will distribute the given elements and create a publication element for it. By default it will retract all publications before publishing the new.
  
 
 ## Parameter Table
 
-These are the keys that are configured through the workflow definition (The files located in /opt/matterhorn/etc/workflows used to process files). At least one mediapackage element must match the supplied source-flavors or source-tags or else the operation won't know what to publish. The channel-id and url-pattern are also mandatory.
+These are the keys that are configured through the workflow definition. At least one mediapackage element must match the supplied source-flavors or source-tags or else the operation won't know what to publish. The channel-id and url-pattern are also mandatory.
 
 |Configuration Key       |Description                                                                                             |Example                                        |
 |------------------------|--------------------------------------------------------------------------------------------------------|-----------------------------------------------|
@@ -19,7 +19,7 @@ These are the keys that are configured through the workflow definition (The file
 |url-pattern             |The pattern to insert the variables into to create the uri for the published element.                   |http://api.opencast.org/api/events/${event_id} |
 |with-published-elements |Use the current contents of the mediapackage instead of publishing elements to a channel                |true                                           |
 |check-availability      |Check if the media if reachable (default: false)                                                        |true                                           |
-|strategy                |Strategy if there is allready published material default is retract                                     |fail                                           |
+|strategy                |Strategy if there is already published material default is retract                                     |fail                                           |
 |mode                    |Control how elements are distributed: single, mixed or bulk (default: bulk)                             |mixed                                          |
 
 ## Mode

@@ -1,8 +1,8 @@
 # CleanupWorkflowOperationHandler
 
 ## Description
-This opertaion removes all files in the working file repository for mediapackage elements that don't match one of the
-*preserve-flavors* configuration value.
+This operation removes all files in the working file repository for mediapackage elements that doesn't match one of the
+*preserve-flavors* configuration values.
 It is used as last workflow operation in a workflow to ensure that temporary processing artefacts are removed from the
 working file repository.
 
