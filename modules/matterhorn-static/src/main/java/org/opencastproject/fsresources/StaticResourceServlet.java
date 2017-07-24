@@ -162,8 +162,7 @@ public class StaticResourceServlet extends HttpServlet {
             logger.warn("unable to send http 500 error: {}", e1);
             return;
           } catch (IllegalStateException e2) {
-            logger.info("unable to send http 500 error. Client side was probably closed during file copy. {}: {}",
-                    e2.getClass().getName(), e2.getMessage());
+            logger.trace("unable to send http 500 error. Client side was probably closed during file copy.", e2);
             return;
           }
         }
@@ -196,8 +195,7 @@ public class StaticResourceServlet extends HttpServlet {
               logger.warn("unable to send http 500 error: {}", e1);
               return;
             } catch (IllegalStateException e2) {
-              logger.info("unable to send http 500 error. Client side was probably closed during file copy. {}: {}",
-                      e2.getClass().getName(), e2.getMessage());
+              logger.trace("unable to send http 500 error. Client side was probably closed during file copy.", e2);
               return;
             }
           }
@@ -398,9 +396,7 @@ public class StaticResourceServlet extends HttpServlet {
     try {
       istream.skip(start);
     } catch (IOException e) {
-      logger.info("Cannot skip to input stream position {}. The user probably closed the client side. {}", start,
-              e.getMessage());
-      logger.trace("IOException when skipping input stream position", e);
+      logger.trace("Cannot skip to input stream position {}. The user probably closed the client side.", start, e);
       return e;
     }
     // MH-10447, fix for files of size 2048*C bytes
@@ -428,8 +424,9 @@ public class StaticResourceServlet extends HttpServlet {
           break;
       }
     } catch (IOException e) {
-      logger.info("The user probably closed the client side after the file started copying. {}", e.getMessage());
-      logger.trace("IOException after starting the byte copy, current length {}, buffer {}", len, buffer, e);
+      logger.trace("IOException after starting the byte copy, current length {}, buffer {}."
+              + " The user probably closed the client side after the file started copying.",
+              len, buffer, e);
       return e;
     }
     return null;
