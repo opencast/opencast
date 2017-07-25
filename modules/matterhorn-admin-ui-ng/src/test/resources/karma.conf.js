@@ -42,19 +42,12 @@ module.exports = function (config) {
             'test/lib/jasmine-jquery.js',
             'test/lib/jquery-deparam.js',
 
-            {pattern: '../../main/webapp/scripts/lib/angular/angular-*.map', watched: false, served: true, included: false},
             // fixtures
             {pattern: '../../main/resources/public/**/*.json', watched: true, served: true, included: false},
             {pattern: 'test/unit/fixtures/**/*.json', watched: true, served: true, included: false},
             {pattern: 'app/GET/**/*', watched: true, served: true, included: false},
 
             'test/unit/**/*Spec.js'
-        ],
-
-        exclude : [
-            '../../main/webapp/scripts/lib/angular/angular-loader.js',
-            '../../main/webapp/scripts/lib/angular/*.min.js',
-            '../../main/webapp/scripts/lib/angular/angular-scenario.js'
         ],
 
         autoWatch : true,
