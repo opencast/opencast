@@ -65,7 +65,6 @@ angular.module('adminNg.directives')
                 scope.save(scope.params.id, function () {
                     scope.params.input = scope.params.value.toLocaleString("EN-GB");
                     scope.original = scope.params.input;
-                    //scope.original = scope.params.value;
                 });
             };
 
