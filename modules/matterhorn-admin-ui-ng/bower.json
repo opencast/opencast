@@ -14,7 +14,9 @@
     "angular-wizard": "0.6.0",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "angular-mocks": "1.4.14"
+  },
   "overrides": {
     "angular-wizard": {
       "main": "dist/angular-wizard.js"
