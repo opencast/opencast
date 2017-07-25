@@ -407,10 +407,8 @@ module.exports = function (grunt) {
 
     // Test settings
     karma: {
-      options: {
-        configFile: 'src/test/resources/karma.conf.js'
-      },
       unit: {
+        configFile: 'src/test/resources/karma.conf.js',
         singleRun: true
       },
       coverage: {
