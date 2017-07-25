@@ -2,13 +2,13 @@
   "name": "adminui",
   "version": "0.0.0",
   "dependencies": {
-    "angular": "1.3.20",
+    "angular": "1.4.14",
     "angular-md5": "0.1.8",
     "angular-translate": "2.15.2",
-    "angular-route": "1.3.6",
-    "angular-resource": "1.3.6",
-    "angular-animate": "1.3.6",
-    "angular-messages": "1.3.6",
+    "angular-route": "1.4.14",
+    "angular-resource": "1.4.14",
+    "angular-animate": "1.4.14",
+    "angular-messages": "1.4.14",
     "angular-wizard": "0.6.0",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0"
   },
