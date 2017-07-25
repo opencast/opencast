@@ -88,7 +88,7 @@ Create the Branch:
 
 At this point, the developer community should then be notified. Consider using the following as a template email:
 
-    To: matterhorn@opencast.org
+    To: dev@opencast.org
     Subject: Release Branch for Opencast <VERSION> Cut
 
     Hi everyone,
@@ -170,7 +170,8 @@ To merge the release branch into `develop`. As example, we do that for 3.0. Plea
 
 ### Updating Translations
 
-Updating the [localization translations](localization.md) is easy, and should be done at minimum as part of every release candidate.
+Updating the [localization translations](localization.md) is easy, and should be done at minimum as part of every
+release candidate.
 
 
 ### Beta Versions and Release Candidates
@@ -214,7 +215,7 @@ For a release candidate, instead of `A.B-betaX` the tag should be named `A.B-rcX
 
 At this point the developer community should then be notified. Consider using the following email template:
 
-    To: matterhorn@opencast.org
+    To: dev@opencast.org
     Subject: <VERSION> Available for testing!
 
     Hi everyone,
@@ -232,7 +233,7 @@ At this point the developer community should then be notified. Consider using th
     Please test this release as thoroughly as
     possible.
 
-    [1] https://bitbucket.org/opencast-community/matterhorn/downloads
+    [1] https://bitbucket.org/opencast-community/opencast/downloads
 
 If the version is a release candidate, you probably want to highlight that there are no *Blockers* left at the moment
 and *#propose* this to become the final release.
@@ -292,57 +293,52 @@ assume the final release should be based on `3.0-rc2`.
 
 11. Release the branch in JIRA. Talk to your JIRA administrators to have this done.
 
-12. Push the built artifacts to Maven. Bug the QA Coordinator to do this so that he remembers to set this up from the CI servers.
+12. Push the built artifacts to Maven. Bug the QA Coordinator to do this so that he remembers to set this up from the CI
+    servers.
 
-13. Push the built artifacts back to BitBucket:
+13. Push the built artifacts back to BitBucket. Please review the following commands carefully before executing them. If
+    in doubt, use the [graphical user interface](https://bitbucket.org/opencast-community/opencast/downloads/) to upload
+    the distribution tarballs manually.
 
-        #!/bin/bash
-
-        VERSION=<VERSION>
-        BITBUCKET_USER=greg_logan
+        # Get Opencast version, BitBucket username and password
+        read VERSION
+        read BITBUCKET_USER
+        read bitbucketpass
 
         mvn -e clean install
         cd build
 
-        #Download and create the source archive
-        echo "Downloading the source for $VERSION"
-        wget -c https://bitbucket.org/opencast-community/matterhorn/get/$VERSION.tar.gz
-        echo "Recompressing the source for $VERSION"
+        # Download and create the source archive
+        curl -O https://bitbucket.org/opencast-community/opencast/get/$VERSION.tar.gz
         tar xzf $VERSION.tar.gz
-        mv opencast-community-matterhorn-* opencast-$VERSION-source
+        mv opencast-community-opencast-* opencast-$VERSION-source
         tar cfJ opencast-$VERSION-source.tar.xz opencast-$VERSION-source
 
-        #Recompress the variable profiles
-        echo "Recompressing Opencast profiles"
+        # Recompress the distribution tarballs
         for i in opencast-dist-*.tar.gz
         do
-          echo "Processing $i"
           tar xf $i
           tar cfJ "${i%.*}.xz" $i
         done
 
-        #Checksum and sign the files
-        echo "Checksumming and signing checksum file"
+        # Checksum and sign the files
         sha512sum *.xz > opencast-$VERSION-sha512sum.txt
         gpg --clearsign -a opencast-$VERSION-sha512sum.txt
 
-        echo "Input BitBucket password"
-        read bitbucketpass
-
-        #Push the files to BitBucket
-        echo "Pushing files to BitBucket"
+        # Push the files to BitBucket
         for i in *.tar.xz
         do
           echo "Pushing $i"
-          curl -u "$BITBUCKET_USER:${bitbucketpass}" -X POST https://api.bitbucket.org/2.0/repositories/opencast-community/matterhorn/downloads -F files=@$i
+          curl -u "$BITBUCKET_USER:${bitbucketpass}" -X POST -F files=@$i \
+            https://api.bitbucket.org/2.0/repositories/opencast-community/opencast/downloads
         done
-        echo "Pushing opencast-$VERSION-sha512sum.txt.asc"
-        curl -u "$BITBUCKET_USER:${bitbucketpass}" -X POST https://api.bitbucket.org/2.0/repositories/opencast-community/matterhorn/downloads -F files=@opencast-$VERSION-sha512sum.txt.asc
+        curl -u "$BITBUCKET_USER:${bitbucketpass}" -X POST -F files=@opencast-$VERSION-sha512sum.txt.asc \
+          https://api.bitbucket.org/2.0/repositories/opencast-community/opencast/downloads
 
 
 Finally, send a release notice to list. You may use the following template:
 
-    To: matterhorn@opencast.org
+    To: announcements@opencast.org
     Subject: Opencast <VERSION> Released
     Hi all,
     it is my pleasure to announce that Opencast <VERSION> has been released and
@@ -361,7 +357,7 @@ Finally, send a release notice to list. You may use the following template:
     This could not have happened without you and I am glad we were able to work
     together and get this release out.
 
-    [1] https://bitbucket.org/opencast-community/matterhorn/downloads
+    [1] https://bitbucket.org/opencast-community/opencast/downloads
 
 
 ### Appointment of Next Release Manager
@@ -374,7 +370,7 @@ job of release manager for the next release.
 
 For that, this email template may be used:
 
-    To: matterhorn@opencast.org
+    To: dev@opencast.org
     Subject: Opencast <NEXT_RELEASE_VERSION> release manager wanted
 
     Hi everyone,

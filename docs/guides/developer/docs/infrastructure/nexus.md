@@ -197,9 +197,9 @@ Variable Map
 
 Variable    | What it does                                                               | Example
 ------------|----------------------------------------------------------------------------|--------------------
-repo_id     | Identifies which set of credentials from your .m2/settings.xml file to use | opencast
+repo\_id    | Identifies which set of credentials from your .m2/settings.xml file to use | opencast
 url         | Where to push the file                                                     | http://nexus.virtuos.uos.de:8081/nexus/content/repositories/snapshots
-filename    | The path to the local file you want in your repository                     | audio_out.mp2
+filename    | The path to the local file you want in your repository                     | audio\_out.mp2
 groupId     | The Opencast group ID                                                      | org.opencastproject
 artifactId  | The artifact ID. This is the name of the artifact according to Maven       | audio
 packaging   | The file type (effectively), this should match the filename's extension    | mp2
@@ -222,10 +222,16 @@ artifacts, or don't have artifacts in the version you're uploading, but those ca
     uploadVersion() {
       ls $1 | while read line
       do
-        mvn deploy:deploy-file -DrepositoryId=opencast -Durl=http://$CORE_NEXUS/nexus/content/repositories/releases -Dfile=$SOURCE_FILES/$line/$2/$line-$2.jar -DgroupId=org.opencastproject -DartifactId=$line -Dversion=$2 -DgeneratePom=true -Dpackaging=jar
+        mvn deploy:deploy-file \
+          -DrepositoryId=opencast \
+          -Durl=http://$CORE_NEXUS/nexus/content/repositories/releases \
+          -Dfile=$SOURCE_FILES/$line/$2/$line-$2.jar \
+          -DgroupId=org.opencastproject -DartifactId=$line \
+          -Dversion=$2 \
+          -DgeneratePom=true \
+          -Dpackaging=jar
       done
     }
 
     git checkout <VERSION>
     uploadVersion ~/.m2/repository/org/opencastproject <VERSION>
-

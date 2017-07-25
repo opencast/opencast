@@ -24,6 +24,7 @@ pages:
    - Release Manager: 'release-manager.md'
    - QA Coordinator: 'qa-coordinator.md'
    - Security Issues: 'security.md'
+   - Code Style: 'code-style.md'
    - Documentation: 'documentation.md'
 - Decision Making:
    - Overview: 'decision-making/index.md'
