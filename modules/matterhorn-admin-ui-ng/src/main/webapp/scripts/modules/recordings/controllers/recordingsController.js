@@ -32,6 +32,7 @@ angular.module('adminNg.controllers')
                 template: 'modules/recordings/partials/recordingStatusCell.html',
                 label: 'RECORDINGS.RECORDINGS.TABLE.STATUS'
             }, {
+                template: 'modules/recordings/partials/recordingsNameCell.html',
                 name:  'name',
                 label: 'RECORDINGS.RECORDINGS.TABLE.NAME'
             }, {
