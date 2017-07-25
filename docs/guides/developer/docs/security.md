@@ -60,7 +60,7 @@ that this repository is private to committers, and reporters. Add the security r
 command:
 
 ```no-highlight
-git remote add security git@bitbucket.org:opencast-community/matterhorn-security.git
+git remote add security git@bitbucket.org:opencast-community/opencast-security.git
 ```
 
 Then create your branch locally. When the branch is ready to be pushed to the security repo do something like this:
@@ -112,7 +112,7 @@ Patching the system:
 
    Patches for this issue are included in Opencast 2.2.4 and 2.3.0.
    A patch can also be found at
-   https://bitbucket.org/opencast-community/matterhorn/pull-requests/1236
+   https://bitbucket.org/opencast-community/opencast/pull-requests/1236
 
 
 Credits:
