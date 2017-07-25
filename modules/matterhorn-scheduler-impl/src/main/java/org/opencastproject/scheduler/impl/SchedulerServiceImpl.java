@@ -1512,6 +1512,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         int current = 1;
         try {
           total = persistence.countEvents();
+          final int responseInterval = (total < 100) ? 1 : (total / 100);
           logger.info(
                   "Re-populating '{}' index with scheduled events. There are {} scheduled events to add to the index.",
                   indexName, total);
@@ -1537,8 +1538,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                     SchedulerItem.updateBlacklist(eventId, persistence.isBlacklisted(id)));
               messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                     SchedulerItem.updateReviewStatus(eventId, reviewStatus, reviewDate));
-              messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+
+              if (((current % responseInterval) == 0) || (current == total)) {
+                messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                     IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Scheduler, total, current));
+              }
               current++;
             } catch (Exception e) {
               logger.warn("Unable to add scheduled event with id {} to the index, skipping", current, id);
