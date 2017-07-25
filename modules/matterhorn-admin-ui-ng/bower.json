@@ -9,6 +9,7 @@
     "angular-messages": "1.4.14",
     "angular-md5": "0.1.8",
     "angular-translate": "2.15.2",
+    "angular-translate-loader-static-files": "2.15.2",
     "angular-local-storage": "0.7.1",
     "angular-wizard": "0.6.0",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0"

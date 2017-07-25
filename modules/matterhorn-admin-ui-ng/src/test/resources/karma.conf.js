@@ -13,12 +13,12 @@ module.exports = function (config) {
             '../../../bower_components/angular-messages/angular-messages.js',
             '../../../bower_components/angular-md5/angular-md5.js',
             '../../../bower_components/angular-translate/angular-translate.js',
+            '../../../bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js',
             '../../../bower_components/angular-local-storage/dist/angular-local-storage.js',
             '../../../bower_components/angular-wizard/dist/angular-wizard.js',
             '../../../bower_components/angular-hotkeys/build/hotkeys.css',
             '../../../bower_components/angular-hotkeys/build/hotkeys.js',
             // endbower
-            '../../main/webapp/scripts/lib/angular/angular-translate-loader-static-files.js',
             '../../main/webapp/scripts/lib/angular-file-upload/angular-file-upload.js',
             '../../main/webapp/scripts/lib/chosen.jquery.js',
             '../../main/webapp/scripts/lib/angular-chosen.js',
