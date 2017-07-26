@@ -51,6 +51,20 @@ public interface Workspace extends StorageUsage {
   File get(URI uri) throws NotFoundException, IOException;
 
   /**
+   * Get the {@link File} for the given URI directly from the working file repository.
+   * If shared storage is not available, then fall back to get(uri).
+   *
+   * @param uri
+   * @return The file
+   * @throws NotFoundException
+   *           if the file does not exist
+   * @throws IOException
+   *           if reading the file from the working file repository fails
+   */
+  File read(URI uri) throws NotFoundException, IOException;
+
+
+  /**
    * Gets the base URI for files stored using this service.
    *
    * @return The base URI

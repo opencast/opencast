@@ -89,7 +89,7 @@ public class SolrIndexManagerTest {
 
     // workspace mock to return the test data
     workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andAnswer(new IAnswer<File>() {
+    EasyMock.expect(workspace.read((URI) EasyMock.anyObject())).andAnswer(new IAnswer<File>() {
       @Override
       public File answer() throws Throwable {
         String pathString = EasyMock.getCurrentArguments()[0].toString();
