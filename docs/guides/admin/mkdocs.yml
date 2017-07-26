@@ -54,6 +54,7 @@ pages:
    - Overview: 'modules/index.md'
    - Atom/RSS Feed: 'modules/atomrss.md'
    - AWS S3 Distribution: 'modules/awss3distribution.md'
+   - Execute Service: 'modules/execute.md'
    - LTI Module: 'modules/ltimodule.md'
    - Media Module: 'modules/mediamodule.configuration.md'
    - Player:
@@ -86,7 +87,8 @@ pages:
    - Editor: 'workflowoperationhandlers/editor-woh.md'
    - Email: 'workflowoperationhandlers/email-woh.md'
    - Encode: 'workflowoperationhandlers/encode-woh.md'
-   - Execute: 'workflowoperationhandlers/execute-woh.md'
+   - Execute Once: 'workflowoperationhandlers/execute-once-woh.md'
+   - Execute Many: 'workflowoperationhandlers/execute-many-woh.md'
    - Export Workflow Properties: 'workflowoperationhandlers/export-wf-properties-woh.md'
    - Extract Text: 'workflowoperationhandlers/extracttext-woh.md'
    - HTTP Notify: 'workflowoperationhandlers/httpnotify-woh.md'
