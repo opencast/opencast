@@ -2,7 +2,7 @@ angular.module('adminNg.directives')
 .directive('datetimepicker', ['Language', function (Language) {
 
     function getCurrentLanguageCode() {
-        var lc = Language.getLanguageCode();
+        var lc = Language.getLanguageCode() || 'en';
         lc = lc.replace(/\_.*/, ''); // remove long locale, as the datepicker does not support this
         return lc;
     }
@@ -20,40 +20,32 @@ angular.module('adminNg.directives')
             // right scope
         },
         link: function (scope, element, attrs, ngModel) {
-
-            var defaultDate;
+            var dateValue;
 
             if (scope.params) {
-                defaultDate = new Date(scope.params);
-            } else if (scope.$parent && scope.$parent.params && scope.$parent.params.input) {
-                defaultDate = scope.$parent.params.input;
+                dateValue = new Date(scope.params);
+            } else if (scope.$parent && scope.$parent.params && scope.$parent.params.value) {
+                dateValue = new Date(scope.$parent.params.value);
             }
 
 
             if (ngModel) {
 
-                var updateModel = function (dateTxt) {
+                var updateModel = function (date) {
                     scope.$apply(function () {
                         // Call the internal AngularJS helper to
                         // update the two-way binding
-                        ngModel.$setViewValue(dateTxt);
+                        ngModel.$setViewValue(date.toISOString());
                     });
                 };
 
 
                 var optionsObj = {};
-                optionsObj.defaultDate = defaultDate;
-                optionsObj.dateFormat = "dd/mm/yy','";
-                optionsObj.timeFormat = "HH:mm:ss";
+                optionsObj.timeInput = true;
                 optionsObj.showButtonPanel = true;
-                optionsObj.onSelect = function (dateTxt) {
-                    var day = parseInt(dateTxt.substring(0, dateTxt.indexOf("/"))),
-                        month = parseInt(dateTxt.substring(dateTxt.indexOf("/")+1, dateTxt.lastIndexOf("/"))) - 1,
-                        year = parseInt(dateTxt.substring(dateTxt.lastIndexOf("/")+1, dateTxt.indexOf(","))),
-                        hour = parseInt(dateTxt.substring(dateTxt.indexOf(" ")+1, dateTxt.indexOf(":"))),
-                        minute = parseInt(dateTxt.substring(dateTxt.indexOf(":")+1, dateTxt.lastIndexOf(":"))),
-                        second = parseInt(dateTxt.substring(dateTxt.lastIndexOf(":")+1)),
-                        newDate = new Date(year, month, day, hour, minute, second);
+                optionsObj.onClose = function () {
+                    console.log('onClose');
+                    var newDate = element.datetimepicker('getDate');
                     setTimeout(function(){
                         updateModel(newDate);
                         if (scope.select) {
@@ -62,19 +54,20 @@ angular.module('adminNg.directives')
                             });
                         }
                     });
-
-                    $.datepicker._hideDatepicker();
                 };
 
-                $.datepicker.setDefaults($.datepicker.regional[getCurrentLanguageCode()]);
+                var lc = getCurrentLanguageCode();
+                $.datepicker.setDefaults($.datepicker.regional[lc]);
+                $.timepicker.setDefaults($.timepicker.regional[lc === 'en' ? '' : lc]);
 
                 element.datetimepicker(optionsObj);
+                element.datetimepicker('setDate', dateValue);
             }
 
             scope.$on('$destroy', function () {
                 try {
-                    element.datepicker('destroy');
-                } catch (e) { }
+                    element.datetimepicker('destroy');
+                } catch (e) {}
             });
         }
     };
