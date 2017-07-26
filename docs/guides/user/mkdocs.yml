@@ -1,5 +1,5 @@
 site_name: Opencast - Users Guide
-repo_url: https://bitbucket.org/opencast-community/matterhorn/src/develop/docs/guides/user/docs
+repo_url: https://bitbucket.org/opencast-community/opencast/src/develop/docs/guides/user/docs
 
 # Default theme used is readthedocs
 theme: readthedocs

@@ -1,5 +1,5 @@
 site_name: Opencast - Administration Guide
-repo_url: https://bitbucket.org/opencast-community/matterhorn/src/develop/docs/guides/admin/docs
+repo_url: https://bitbucket.org/opencast-community/opencast/src/develop/docs/guides/admin/docs
 
 # Default theme used is readthedocs
 theme: readthedocs
@@ -18,7 +18,6 @@ pages:
 - Release Notes: 'releasenotes.md'
 - Upgrade: 'upgrade.md'
 - Changelog: 'changelog.md'
-- Glossary: 'glossary.md'
 - Installation:
    - Overview: 'installation/index.md'
    - Multiple Servers: 'installation/multiple-servers.md'

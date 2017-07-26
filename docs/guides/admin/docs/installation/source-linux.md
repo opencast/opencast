@@ -19,16 +19,16 @@ prior option, the tarball download, needs less tools and you do not have to down
 Using the tarball:
 
 Select the tarball for the version you want to install from the [BitBucket downloads section
-](https://bitbucket.org/opencast-community/matterhorn/downloads).
+](https://bitbucket.org/opencast-community/opencast/downloads).
 
     # Download desired tarball
-    curl -O https://bitbucket.org/opencast-community/matterhorn/...
+    curl -O https://bitbucket.org/opencast-community/opencast/...
     tar xf ....tar.gz
     cd opencast-community-...
 
 Cloning the Git repository:
 
-    git clone https://bitbucket.org/opencast-community/matterhorn.git
+    git clone https://bitbucket.org/opencast-community/opencast.git
     cd matterhorn
     git tag   <-  List all available versions
     git checkout TAG   <-  Switch to desired version
