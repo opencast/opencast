@@ -14,7 +14,7 @@ regarding older versions as best we can, but developer time will usually not be 
 Extended Support
 ----------------
 
-I rare cases versions may get extended support, meaning new minor releases are provided for more than two years. For
+In rare cases versions may get extended support, meaning new minor releases are provided for more than two years. For
 example, the 1.6.x versions have been getting new minor releases for almost two years due to community interest and the
 backing of some developers and institutions. Such extended support requires community members to fund such an effort, or
 provide additional support time themselves.  If you are in need of extended support we encourage you to reach out to the
