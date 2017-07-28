@@ -38,7 +38,6 @@ import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.mediapackage.track.TrackImpl;
