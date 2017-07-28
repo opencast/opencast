@@ -1,6 +1,6 @@
 # Retry Strategies
 
-An operations can have a retry-strategy specified to define what will happen if the operation **fails**:
+An operation can have a retry-strategy specified to define what will happen if the operation **fails**:
 
 |Strategy | Description|
 |---------|------------|

@@ -30,6 +30,7 @@ import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowOperationAbortedException;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -170,11 +171,16 @@ final class WorkflowOperationWorker {
     } catch (JobCanceledException e) {
       logger.info(e.getMessage());
     } catch (Exception e) {
-      Throwable t = e.getCause();
-      if (t != null) {
-        logger.error("Workflow operation '" + operation + "' failed", t);
-      } else {
-        logger.error("Workflow operation '" + operation + "' failed", e);
+      if (e instanceof WorkflowOperationAbortedException)
+        // Don't log it as error because it was aborted by the user
+        logger.info("Workflow operation '" + operation + "' aborted by user");
+      else {
+        Throwable t = e.getCause();
+        if (t != null) {
+          logger.error("Workflow operation '" + operation + "' failed", t);
+        } else {
+          logger.error("Workflow operation '" + operation + "' failed", e);
+        }
       }
       // the associated job shares operation's id
       service.getServiceRegistry().incident().unhandledException(operation.getId(), Severity.FAILURE, e);

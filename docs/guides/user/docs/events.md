@@ -17,6 +17,8 @@
 <!-- Refresh Icon -->
 [icon_refresh]:data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABLElEQVQ4T63SvyuvYRjH8ZcMlD/AogiFDErJr8Um4RwDgwySwT9htMi/cAY6CYMSsRkosfhVTojRfmYGdNX96PH0fAdxj/d9X+/rc12fT5VvnqqS+jrMYhTN6f0BO1jHM2rRhusiYABbaKgg7BFzWEQjOvKAKD5M9NfU8SyB+vAb1TnwPdozQEi6RROe8AuXBRX9OEFW8wkwjz94QzeuCsXRIHYwXEnBCsZxhIWS+buwmeseX84xU+bCl4z9McA2QmZ2YhcT+Fci5y9ioatYyhSEvy25z3uYxEsB0IvM2jHslwGi+xCOC8WRhXCiHhfowWslBQE5wGmCRMhGkgv/MZhy8xGKyHoEaRlrhXHyQu4whZvsMlPQiYDEzDWYTmlsTeGKHe1io7iXb9v4DuVKPRFyZ7ArAAAAAElFTkSuQmCC "Refresh icon"
 
+<!-- Hand Stop Icon -->
+[icon_hand_stop]:data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABS0lEQVQ4T5XTQSjecRzH8ZfDJLWrk5TT7LKDSCl3tlpy2WETJxeJKEUOO+ygtVrK5iRlPbk6SZFSSkpElCI5KDeJJTXa+q7fUzz9n+fJ//j9/77v3+f7/Xx+FYp/ExjDJXqwlnW0oqD4Al/xFnV4h9YEOsEkFh73FAL6MYxRdKIbrzGAfUzhFc7ykELANB4wmFQsoSHVjnGKPfzESkCyAPcYQjuWEyBqMcImDvAR77H6XECMtYhZXGEkD3iJmjT/nxIK8qpi1P9KA9CFX6hOxR/PBVzgc7InlradACUi4omCW3RgHbXoxZdS3TwFfEuBacZvVOGuDGAe5xiPHVRiA0cpsn/LNMfvXcTFubwL9dhJLsyVAcSFN2jE4eMchMc5tKSwFOO8wRbC+vvCIH1PCYzXd51BiPN9aEJbVpRD3gw+pd1kqYj38CHZ7R8c9VgR4YnamQAAAABJRU5ErkJggg== "Hand Stop icon"
 
 # Overview
 
@@ -46,7 +48,7 @@ The progress column shows in which state the event is. These are the possible va
 * **Ingesting**: The recorded files are being ingested by Opencast
 * **Pending**: The Event is in the processing queue and waiting to be processed
 * **Processing**: The Event is currently being processed
-* **Paused**: The task is paused due to an error and requires manual action to proceed
+* **Paused**: The task is paused and requires manual action to proceed
 * **Processing canceled**: The processing of the event has been stopped
 * **Processed**: The Event has been successfully processed
 
@@ -81,7 +83,7 @@ Use the delete icon ( ![icon_delete][] ) in the actions column of each row to de
 
 ## How to retry/abort Event processing if an error occurs
 
-If processing is **Paused**, use the warning icon ( ![icon_warning][] ) to open the Event's details workflow tab, where you can *Retry* ( ![icon_refresh][] ) or *Abort* ( ![icon_delete][] ) processing.
+If processing is **Paused**, use the warning icon ( ![icon_warning][] ) to open the Event's details workflow tab, where you can *Retry* ( ![icon_refresh][] ) or *Abort* ( ![icon_hand_stop][] ) processing.
 
 
 ## Working with comments on Events
