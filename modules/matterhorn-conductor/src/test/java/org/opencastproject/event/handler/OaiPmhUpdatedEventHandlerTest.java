@@ -120,8 +120,7 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
     MediaPackage newMp = createMediaPackage(new PublicationImpl(), new TrackImpl(), new AttachmentImpl());
     MediaPackage oldMp = createMediaPackage(new PublicationImpl(), new PublicationImpl(), newMp.getTracks()[0],
         newMp.getAttachments()[0]);
-    MediaPackage expectedMediaPackage = MediaPackageSupport.merge((MediaPackage) newMp.clone(), oldMp,
-        MediaPackageSupport.MergeMode.Skip);
+    MediaPackage expectedMediaPackage = (MediaPackage) oldMp.clone();
     MediaPackageMetadataSupport.populateMediaPackageMetadata(expectedMediaPackage, metadata);
     AssetManagerItem.TakeSnapshot snapshot = createSnapshot(newMp);
 

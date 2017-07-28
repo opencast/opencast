@@ -24,6 +24,7 @@ import static org.opencastproject.job.api.Job.Status.FINISHED;
 import static org.opencastproject.mediapackage.MediaPackageElementParser.getFromXml;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_SERIES;
 import static org.opencastproject.publication.api.OaiPmhPublicationService.PUBLICATION_CHANNEL_PREFIX;
+import static org.opencastproject.util.OsgiUtil.getOptCfg;
 
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
@@ -34,6 +35,7 @@ import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageSupport;
@@ -62,19 +64,34 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.List;
 
-public class OaiPmhUpdatedEventHandler {
+public class OaiPmhUpdatedEventHandler implements ManagedService {
+
+  // config keys
+  private static final String CFG_FLAVORS = "flavors";
+  private static final String CFG_TAGS = "tags";
+
+  /** List of flavors to redistribute */
+  private List<MediaPackageElementFlavor> flavors = new ArrayList<>();
+
+  /** List of tags to redistribute */
+  private List<String> tags = new ArrayList<>();
 
   /** The logger */
   protected static final Logger logger = LoggerFactory.getLogger(OaiPmhUpdatedEventHandler.class);
@@ -334,9 +351,6 @@ public class OaiPmhUpdatedEventHandler {
     //An episode or its ACL has been updated. Construct the MediaPackage and publish it to OAI-PMH.
     logger.debug("Handling {}", snapshotItem);
 
-    // The MediaPackage has all changed elements (including dublin core). However, its meta data is not updated, yet.
-    final MediaPackage mp = (MediaPackage) snapshotItem.getMediapackage().clone();
-
     // We must be an administrative user to make a query to the OaiPmhPublicationService
     final User prevUser = securityService.getUser();
     final Organization prevOrg = securityService.getOrganization();
@@ -357,48 +371,41 @@ public class OaiPmhUpdatedEventHandler {
       }
 
       SearchResultItem item = result.getItems().get(0);
+      MediaPackage repoMp = item.getMediaPackage(); // This is the media package from OAI-PMH which has to be updated.
 
-      // distribute all changed elements of mp.
-      List<MediaPackageElement> distributedElements = new ArrayList<>();
-      for (MediaPackageElement mpe : mp.elements()) {
-        if (mpe instanceof Publication) {
+      // distribute all changed elements of media package.
+      MediaPackage newMp = snapshotItem.getMediapackage();
+      for (MediaPackageElement mpe : newMp.elements()) {
+        if (mpe instanceof Publication || !containsFlavor(flavors, mpe.getFlavor()) || !containsTag(tags, mpe.getTags())) {
           continue;
         }
         Job distributionJob = distributionService.distribute(PUBLICATION_CHANNEL_PREFIX.concat(item.getRepository()),
-            mp, mpe.getIdentifier());
+                newMp, mpe.getIdentifier());
         JobBarrier barrier = new JobBarrier(null, serviceRegistry, distributionJob);
         Result jobResult = barrier.waitForJobs();
         if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
-          distributedElements.add(getFromXml(serviceRegistry.getJob(distributionJob.getId()).getPayload()));
+          MediaPackageElement distributedElement = getFromXml(serviceRegistry.getJob(distributionJob.getId()).getPayload());
+          MediaPackageElement toRemove = (MediaPackageElement) distributedElement.clone();
+          toRemove.setIdentifier(null); // We cannot use id here because it differs when package is published initially.
+          repoMp.remove(toRemove);
+          repoMp.add(distributedElement);
         } else {
           logger.error("Unable to distribute media package element {}", mpe.getIdentifier());
         }
       }
 
-      // We have to update all the elements after they are distributed, since the URLs were updated.
-      for (MediaPackageElement mpe : distributedElements) {
-        MediaPackageSupport.updateElement(mp, mpe);
-      }
-
-      // We now apply the new meta data to mp
-      final MediaPackageMetadata metadata = dublinCoreService.getMetadata(snapshotItem.getMediapackage());
-      MediaPackageMetadataSupport.populateMediaPackageMetadata(mp, metadata);
-
-      // item contains the old MediaPackage with all elements. Since unchanged elements are missing in mp, we have to
-      // merge the two media packages.
-      MediaPackage oldMp = item.getMediaPackage();
-
-      // Merge old, unchanged elements
-      MediaPackageSupport.merge(mp, oldMp, MediaPackageSupport.MergeMode.Skip);
+      // We now apply the new meta data to the media package
+      final MediaPackageMetadata metadata = dublinCoreService.getMetadata(newMp);
+      MediaPackageMetadataSupport.populateMediaPackageMetadata(repoMp, metadata);
 
       // Does the media package have a title and track?
-      if (!MediaPackageSupport.isPublishable(mp)) {
-        logger.trace("Media package {} does not meet criteria for publication", mp.getIdentifier());
+      if (!MediaPackageSupport.isPublishable(repoMp)) {
+        logger.trace("Media package {} does not meet criteria for publication", repoMp.getIdentifier());
         return;
       }
 
       // Update the OAI-PMH persistence with the updated mediapackage
-      oaiPmhPersistence.store(mp, item.getRepository());
+      oaiPmhPersistence.store(repoMp, item.getRepository());
     } catch (DistributionException | MediaPackageException | ServiceRegistryException | OaiPmhDatabaseException
         | NotFoundException e) {
       logger.error(e.getMessage());
@@ -406,5 +413,44 @@ public class OaiPmhUpdatedEventHandler {
       securityService.setOrganization(prevOrg);
       securityService.setUser(prevUser);
     }
+  }
+
+  @Override
+  public void updated(Dictionary<String, ?> dictionary) throws ConfigurationException {
+    this.flavors = new ArrayList<>();
+    this.tags = new ArrayList<>();
+
+    final Option<String> flavorsRaw = getOptCfg(dictionary, CFG_FLAVORS);
+    if (flavorsRaw.isSome()) {
+      final String[] flavorStrings = flavorsRaw.get().split("\\s*,\\s*");
+      for (String flavorString : flavorStrings) {
+        final String[] typeAndSubtype = flavorString.split("\\s*/\\s*");
+        if (typeAndSubtype.length == 2) {
+          flavors.add(new MediaPackageElementFlavor(typeAndSubtype[0], typeAndSubtype[1]));
+        } else {
+          throw new ConfigurationException(flavorsRaw.get(), "Flavors must be of format <type>/<subtype|*>");
+        }
+      }
+    }
+
+    final Option<String> tagsRaw = getOptCfg(dictionary, CFG_TAGS);
+    if (tagsRaw.isSome()) {
+      final String[] tags = tagsRaw.get().split("\\s*,\\s*");
+      this.tags.addAll(Arrays.asList(tags));
+    }
+  }
+
+  private static boolean containsFlavor(List<MediaPackageElementFlavor> flavors, MediaPackageElementFlavor flavor) {
+    for (MediaPackageElementFlavor current : flavors) {
+      if (current.matches(flavor)) return true;
+    }
+    return flavors.isEmpty();
+  }
+
+  private static boolean containsTag(List<String> tags, String[] mpeTags) {
+    for (String current : mpeTags) {
+      if (tags.contains(current)) return true;
+    }
+    return tags.isEmpty();
   }
 }
