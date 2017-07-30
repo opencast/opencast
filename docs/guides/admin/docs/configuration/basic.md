@@ -26,10 +26,16 @@ your own domain name:
 processed media. At least not without an extra amount of work involving modifications to the database. That is why you
 should think about this setting carefully.
 
-Second, adjust the binding address in `org.ops4j.pax.web.cfg`. The binding address can be set to `0.0.0.0` for general
-network access. The property to modify is:
+Second, adjust the binding address in `org.ops4j.pax.web.cfg` and `jetty-opencast.xml`. The binding address can be set
+to `0.0.0.0` for general network access.
+
+The property to modify in `org.ops4j.pax.web.cfg` is:
 
     org.ops4j.pax.web.listening.addresses=127.0.0.1
+
+In `jetty-opencast.xml`, modify:
+
+    <Set name="host">127.0.0.1</Set>
 
 
 Step 2: Setting the Login Details
