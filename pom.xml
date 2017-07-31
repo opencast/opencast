@@ -159,6 +159,7 @@
     <module>modules/matterhorn-search-service-remote</module>
     <module>modules/matterhorn-search-workflowoperation</module>
     <module>modules/matterhorn-security-aai</module>
+    <module>modules/matterhorn-security-cas-client-wrapper</module>
     <module>modules/matterhorn-security-cas</module>
     <module>modules/matterhorn-security-ldap</module>
     <module>modules/matterhorn-security-openid</module>
@@ -951,17 +952,17 @@
         <artifactId>spring-security-ldap</artifactId>
         <version>3.1.4.RELEASE</version>
       </dependency>
-
-      <dependency>
-        <groupId>org.jasig.cas</groupId>
-        <artifactId>com.springsource.org.jasig.cas.client</artifactId>
-        <version>3.1.12</version>
-      </dependency>
-
+      
       <dependency>
         <groupId>org.opensaml</groupId>
-        <artifactId>com.springsource.org.opensaml</artifactId>
-        <version>1.1.0</version>
+        <artifactId>opensaml</artifactId>
+        <version>1.1</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.jasig.cas.client</groupId>
+        <artifactId>cas-client-core</artifactId>
+        <version>3.1.12</version>
       </dependency>
 
       <dependency>
