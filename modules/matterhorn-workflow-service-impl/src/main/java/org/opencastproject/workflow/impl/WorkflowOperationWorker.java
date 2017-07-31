@@ -168,28 +168,28 @@ final class WorkflowOperationWorker {
         }
       }
       workflow = service.handleOperationResult(workflow, result);
+      return workflow;
     } catch (JobCanceledException e) {
       logger.info(e.getMessage());
+      return workflow;
+    } catch (WorkflowOperationAbortedException e) {
+      // Don't log it as error because it was aborted by the user
+      logger.info("Workflow operation '" + operation + "' aborted by user");
     } catch (Exception e) {
-      if (e instanceof WorkflowOperationAbortedException)
-        // Don't log it as error because it was aborted by the user
-        logger.info("Workflow operation '" + operation + "' aborted by user");
-      else {
-        Throwable t = e.getCause();
-        if (t != null) {
-          logger.error("Workflow operation '" + operation + "' failed", t);
-        } else {
-          logger.error("Workflow operation '" + operation + "' failed", e);
-        }
+      Throwable t = e.getCause();
+      if (t != null) {
+        logger.error("Workflow operation '" + operation + "' failed", t);
+      } else {
+        logger.error("Workflow operation '" + operation + "' failed", e);
       }
       // the associated job shares operation's id
       service.getServiceRegistry().incident().unhandledException(operation.getId(), Severity.FAILURE, e);
-      try {
-        workflow = service.handleOperationException(workflow, operation);
-      } catch (Exception e2) {
-        logger.error("Error handling workflow operation '{}' failure: {}", new Object[] { operation, e2.getMessage(),
-                e2 });
-      }
+    }
+    try {
+      workflow = service.handleOperationException(workflow, operation);
+    } catch (Exception e2) {
+      logger.error("Error handling workflow operation '{}' failure: {}",
+              new Object[] { operation, e2.getMessage(), e2 });
     }
     return workflow;
   }
