@@ -39,6 +39,7 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,19 +62,21 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ExecuteRestEndpoint.class);
 
-  /** The text analyzer */
-  protected ExecuteService service;
+  /** The service registry */
+  protected ServiceRegistry serviceRegistry = null;
 
+  /** The execute service */
+  protected ExecuteService service;
 
   @POST
   @Produces(MediaType.TEXT_XML)
   @Path(ExecuteService.ENDPOINT_NAME)
   @RestQuery(name = "name", description = "Executes the given command", restParameters = {
           @RestParameter(description = "The command to execute", isRequired = true, name = ExecuteService.EXEC_FORM_PARAM, type = RestParameter.Type.STRING),
-          @RestParameter(description = "The mediapackage to apply the command to. Either this or " + ExecuteService.INPUT_ELEM_FORM_PARAM + " are required",
-          isRequired = false, name = ExecuteService.INPUT_MP_FORM_PARAM, type = RestParameter.Type.TEXT),
           @RestParameter(description = "The arguments to the command", isRequired = true, name = ExecuteService.PARAMS_FORM_PARAM, type = RestParameter.Type.STRING),
           @RestParameter(description = "The estimated load placed on the system by this command", isRequired = false, name = ExecuteService.LOAD_FORM_PARAM, type = RestParameter.Type.FLOAT),
+          @RestParameter(description = "The mediapackage to apply the command to. Either this or " + ExecuteService.INPUT_ELEM_FORM_PARAM + " are required",
+          isRequired = false, name = ExecuteService.INPUT_MP_FORM_PARAM, type = RestParameter.Type.TEXT),
           @RestParameter(description = "The mediapackage element to apply the command to. Either this or " + ExecuteService.INPUT_MP_FORM_PARAM + " are required",
           isRequired = false, name = ExecuteService.INPUT_ELEM_FORM_PARAM, type = RestParameter.Type.TEXT),
           @RestParameter(description = "The mediapackage element produced by the command", isRequired = false, name = ExecuteService.OUTPUT_NAME_FORM_PARAMETER,
@@ -98,14 +101,14 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
     try {
 
       MediaPackageElement.Type expectedType = null;
-      if (elementTypeStr != null) {
+      if (StringUtils.isNotBlank(elementTypeStr)) {
         for (MediaPackageElement.Type candidateType : MediaPackageElement.Type.values())
           if (candidateType.toString().equalsIgnoreCase(elementTypeStr)) {
             expectedType = candidateType;
             break;
           }
         if (expectedType == null) {
-          logger.error("Wrong element type specified: {}.", elementTypeStr);
+          logger.error("Wrong element type specified: {}", elementTypeStr);
           return Response.status(Response.Status.BAD_REQUEST).build();
         }
       }
@@ -116,17 +119,17 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
       }
 
       Job retJob = null;
-      if ((inputElementStr != null) && (inputMpStr != null)) {
+      if (StringUtils.isNotBlank(inputElementStr) && StringUtils.isNotBlank(inputMpStr)) {
         logger.error("Only one input MediaPackage OR input MediaPackageElement can be set at the same time");
         return Response.status(Response.Status.BAD_REQUEST).build();
-      } else if ((inputElementStr != null) && (inputMpStr == null)) {
+      } else if (StringUtils.isNotBlank(inputElementStr)) {
         MediaPackageElement inputElement = MediaPackageElementParser.getFromXml(inputElementStr);
         retJob = service.execute(exec, params, inputElement, outputFileName, expectedType, load);
-      } else if ((inputElementStr == null) && (inputMpStr != null)) {
+      } else if (StringUtils.isNotBlank(inputMpStr)) {
         MediaPackage inputMp = MediaPackageParser.getFromXml(inputMpStr);
         retJob = service.execute(exec, params, inputMp, outputFileName, expectedType, load);
       } else {
-        logger.error("Not input MediaPackage OR not input MediaPackageElement");
+        logger.error("A MediaPackage OR MediaPackageElement must be provided");
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
 
@@ -183,12 +186,23 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
     }
   }
 
+  /**
+   * Callback from the OSGi declarative services to set the service registry.
+   *
+   * @param serviceRegistry
+   *          the service registry
+   */
+  protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
+  }
 
-  /* (non-Javadoc)
+  /**
+   * {@inheritDoc}
+   *
    * @see org.opencastproject.rest.AbstractJobProducerEndpoint#getServiceRegistry()
    */
+  @Override
   public ServiceRegistry getServiceRegistry() {
-    // FIXME: Why is this in the abstract ancestor?
-    return null;
+    return serviceRegistry;
   }
 }

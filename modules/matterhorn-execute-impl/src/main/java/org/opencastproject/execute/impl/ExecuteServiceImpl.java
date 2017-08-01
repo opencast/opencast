@@ -141,9 +141,11 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
     if (properties != null) {
       String commandString = (String) properties.get(COMMANDS_ALLOWED_PROPERTY);
-      if (commandString != null)
+      if (StringUtils.isNotBlank(commandString)) {
+        logger.info("Execute Service permitted commands: {}", commandString);
         for (String command : commandString.split("\\s+"))
           allowedCommands.add(command);
+      }
     }
 
     this.bundleContext = cc.getBundleContext();
@@ -352,7 +354,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
 
   /**
-   * Does the actual processing
+   * Does the actual processing, given a mediapackage (Execute Once WOH)
    *
    * @param arguments
    *          The list containing the program and its arguments
@@ -402,10 +404,10 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
         } else if (matcher.group(1).equals("flavor")) {
           elementsByFlavor = mp.getElementsByFlavor(MediaPackageElementFlavor.parseFlavor(matcher.group(2)));
           if (elementsByFlavor.length == 0)
-            throw new ExecuteException("No elements in the MediaPackage match the flavor '" + matcher.group(1) + "'.");
+            throw new ExecuteException("No elements in the MediaPackage match the flavor '" + matcher.group(2) + "'.");
 
           if (elementsByFlavor.length > 1)
-            logger.warn("Found more than one element with flavor '{}'. Using {} by default...", matcher.group(1),
+            logger.warn("Found more than one element with flavor '{}'. Using {} by default...", matcher.group(2),
                     elementsByFlavor[0].getIdentifier());
 
           File elementFile = workspace.get(elementsByFlavor[0].getURI());
@@ -436,7 +438,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
   }
 
   /**
-   * Does the actual processing
+   * Does the actual processing, given a mediapackage element (Execute Many WOH)
    *
    * @param arguments
    *          The list containing the program and its arguments
