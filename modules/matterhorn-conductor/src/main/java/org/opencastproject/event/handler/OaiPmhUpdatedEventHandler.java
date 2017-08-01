@@ -397,6 +397,7 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
       // We now apply the new meta data to the media package
       final MediaPackageMetadata metadata = dublinCoreService.getMetadata(newMp);
       MediaPackageMetadataSupport.populateMediaPackageMetadata(repoMp, metadata);
+      repoMp.setSeriesTitle(newMp.getSeriesTitle());
 
       // Does the media package have a title and track?
       if (!MediaPackageSupport.isPublishable(repoMp)) {
