@@ -247,7 +247,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
           size = Integer.MAX_VALUE;
       }
     } catch (NumberFormatException e) {
-      logger.warn("Unable to set the size of the feed to {}", sizeAsString);
+      logger.warn("Unable to set the size of the feed to {}", sizeAsString, e);
     }
     name = (String) properties.get(PROP_NAME);
     description = (String) properties.get(PROP_DESCRIPTION);
@@ -547,7 +547,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     // Have the concrete implementation load the feed data
     result = loadFeedData(type, query, size, DEFAULT_OFFSET);
     if (result == null) {
-      logger.debug("Cannot retrieve solr result for feed '" + type.toString() + "' with query '" + query + "'.");
+      logger.debug("Cannot retrieve solr result for feed '{}' with query '{}'", type.toString(), query);
       return null;
     }
 
@@ -576,8 +576,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
         else
           addEpisode(f, query, resultItem, organization);
       } catch (Throwable t) {
-        logger.error("Error creating entry with id " + resultItem.getId() + " for feed " + this + ": " + t.getMessage(),
-                t);
+        logger.error("Error creating entry with id {} for feed {}", resultItem.getId(), this, t);
       }
       itemCount++;
       if (itemCount >= size)
@@ -654,7 +653,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
         if (iTunesFeed != null)
           iTunesFeed.setImage(new URL(coverUrl));
       } catch (MalformedURLException e) {
-        logger.error("Error creating cover URL from " + coverUrl);
+        logger.error("Error creating cover URL: {}", coverUrl, e);
       }
     }
     return feed;
@@ -680,7 +679,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     // Get the media enclosures
     List<MediaPackageElement> enclosures = getEnclosures(feed, resultItem);
     if (enclosures.size() == 0) {
-      logger.debug("No media formats found for feed entry {}", title);
+      logger.debug("No media formats found for feed entry: {}", title);
       return feed;
     }
 
@@ -1126,7 +1125,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     }
 
     if (candidateElements.size() == 0) {
-      logger.debug("No distributed media found for feed entry");
+      logger.debug("No distributed media found for feed entry '{}'", resultItem.getDcTitle());
     }
 
     return candidateElements;
