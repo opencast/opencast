@@ -425,12 +425,7 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
     if (flavorsRaw.isSome()) {
       final String[] flavorStrings = flavorsRaw.get().split("\\s*,\\s*");
       for (String flavorString : flavorStrings) {
-        final String[] typeAndSubtype = flavorString.split("\\s*/\\s*");
-        if (typeAndSubtype.length == 2) {
-          flavors.add(new MediaPackageElementFlavor(typeAndSubtype[0], typeAndSubtype[1]));
-        } else {
-          throw new ConfigurationException(flavorsRaw.get(), "Flavors must be of format <type>/<subtype|*>");
-        }
+        flavors.add(MediaPackageElementFlavor.parseFlavor(flavorString));
       }
     }
 
