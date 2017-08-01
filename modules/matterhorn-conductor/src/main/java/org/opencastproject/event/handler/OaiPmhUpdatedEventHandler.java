@@ -25,6 +25,7 @@ import static org.opencastproject.mediapackage.MediaPackageElementParser.getFrom
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_SERIES;
 import static org.opencastproject.publication.api.OaiPmhPublicationService.PUBLICATION_CHANNEL_PREFIX;
 import static org.opencastproject.util.OsgiUtil.getOptCfg;
+import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
 
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
@@ -84,8 +85,12 @@ import java.util.List;
 public class OaiPmhUpdatedEventHandler implements ManagedService {
 
   // config keys
+  private static final String CFG_PROPAGATE_EPISODE = "propagate.episode";
   private static final String CFG_FLAVORS = "flavors";
   private static final String CFG_TAGS = "tags";
+
+  /** Whether to propagate episode meta data changes to OAI-PMH or not */
+  private boolean propagateEpisode = false;
 
   /** List of flavors to redistribute */
   private List<MediaPackageElementFlavor> flavors = new ArrayList<>();
@@ -348,6 +353,11 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
   }
 
   public void handleEvent(AssetManagerItem.TakeSnapshot snapshotItem) {
+    if (!propagateEpisode) {
+      logger.trace("Skipping automatic propagation of episode meta data to OAI-PMH since it is turned off.");
+      return;
+    }
+
     //An episode or its ACL has been updated. Construct the MediaPackage and publish it to OAI-PMH.
     logger.debug("Handling {}", snapshotItem);
 
@@ -420,6 +430,11 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
   public void updated(Dictionary<String, ?> dictionary) throws ConfigurationException {
     this.flavors = new ArrayList<>();
     this.tags = new ArrayList<>();
+
+    final Option<Boolean> propagateEpisode = getOptCfgAsBoolean(dictionary, CFG_PROPAGATE_EPISODE);
+    if (propagateEpisode.isSome()) {
+      this.propagateEpisode = propagateEpisode.get();
+    }
 
     final Option<String> flavorsRaw = getOptCfg(dictionary, CFG_FLAVORS);
     if (flavorsRaw.isSome()) {

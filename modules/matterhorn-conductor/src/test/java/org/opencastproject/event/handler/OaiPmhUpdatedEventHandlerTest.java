@@ -71,6 +71,7 @@ import org.junit.Test;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.Hashtable;
 
 /**
  * This class contains some tests for the {@link OaiPmhUpdatedEventHandler}.
@@ -105,8 +106,11 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
   private Capture<Query> queryCapture;
 
   @Before
-  public void setup() {
+  public void setup() throws Exception {
     cut.systemAccount = SYSTEM_ACCOUNT;
+    Hashtable<String, String> props = new Hashtable<>();
+    props.put("propagate.episode", "true");
+    cut.updated(props);
   }
 
   /**
