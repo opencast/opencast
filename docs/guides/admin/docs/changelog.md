@@ -1,6 +1,16 @@
 Opencast 2.3.x
 ==============
 
+Opencast 2.3.4
+--------------
+*Released on August 03, 2017*
+
+- [[MH-12183]](https://opencast.jira.com/browse/MH-12183) - Theodul does not load
+- [[MH-12203]](https://opencast.jira.com/browse/MH-12203) - Unescaped event and series titles when editing event or series (XSS)
+- [[MH-12242]](https://opencast.jira.com/browse/MH-12242) - Theodul: Quality selector does not display/load
+- [[MH-12246]](https://opencast.jira.com/browse/MH-12246) - Series WOH does not apply series DublinCore catalogs
+- [[MH-12249]](https://opencast.jira.com/browse/MH-12249) - Media Module: Paging forgets search parameters
+
 Opencast 2.3.3
 --------------
 *Released on May 02, 2017*
