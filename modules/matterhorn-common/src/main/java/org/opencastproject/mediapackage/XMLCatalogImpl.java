@@ -69,8 +69,8 @@ import javax.xml.transform.stream.StreamResult;
  * key-value data.
  * <p>
  * For a definition of the terms <code>expanded name</code>, <code>qualified name</code> or <code>QName</code>,
- * <code>namespace prefix</code>, <code>local part</code> and <code>local name</code>, please see <a
- * href="http://www.w3.org/TR/REC-xml-names">http://www.w3.org/TR/REC-xml-names</a>
+ * <code>namespace prefix</code>, <code>local part</code> and <code>local name</code>, please see
+ * <a href="http://www.w3.org/TR/REC-xml-names">http://www.w3.org/TR/REC-xml-names</a>
  * <p>
  * By default the following namespace prefixes are bound:
  * <ul>
@@ -80,6 +80,7 @@ import javax.xml.transform.stream.StreamResult;
  * </ul>
  * <p>
  * <h3>Limitations</h3>
+ *
  * XMLCatalog supports only <em>one</em> prefix binding per namespace name, so you cannot create documents like the
  * following using XMLCatalog:
  *
@@ -116,8 +117,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
   protected XmlNamespaceContext bindings;
 
   /**
-   * Create an empty catalog and register the {@link javax.xml.XMLConstants#W3C_XML_SCHEMA_INSTANCE_NS_URI}
-   * namespace.
+   * Create an empty catalog and register the {@link javax.xml.XMLConstants#W3C_XML_SCHEMA_INSTANCE_NS_URI} namespace.
    */
   protected XMLCatalogImpl() {
     super();
@@ -549,8 +549,10 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
   private static String[] splitQName(String qName) {
     final String[] parts = qName.split(":", 3);
     switch (parts.length) {
-      case 1: return new String[] { DEFAULT_NS_PREFIX, parts[0] };
-      case 2: return parts;
+      case 1:
+        return new String[] { DEFAULT_NS_PREFIX, parts[0] };
+      case 2:
+        return parts;
       default:
         throw new IllegalArgumentException("Local name must not contain ':'");
     }
@@ -687,7 +689,8 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
       return hash(name, value);
     }
 
-    @Override public boolean equals(Object that) {
+    @Override
+    public boolean equals(Object that) {
       return (this == that) || (that instanceof CatalogEntry && eqFields((CatalogEntry) that));
     }
 
@@ -753,8 +756,12 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
       String namespace = name.getNamespaceURI();
       // Do not bind the "xml" namespace. It is bound by default
       if (!XML_NS_URI.equals(namespace)) {
-        root.setAttribute(XMLNS_ATTRIBUTE + ":" + XMLCatalogImpl.this.getPrefix(name.getNamespaceURI()),
-                name.getNamespaceURI());
+        String prefix = XMLCatalogImpl.this.getPrefix(name.getNamespaceURI());
+        if (DEFAULT_NS_PREFIX.equals(prefix)) {
+          root.setAttribute(XMLNS_ATTRIBUTE, name.getNamespaceURI());
+        } else {
+          root.setAttribute(XMLNS_ATTRIBUTE + ":" + prefix, name.getNamespaceURI());
+        }
       }
     }
 
