@@ -580,7 +580,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   /**
    * Allows JAXB handling of {@link WorkflowInstance} interfaces.
    */
-  static class Adapter extends XmlAdapter<WorkflowInstanceImpl, WorkflowInstance> {
+  public static class Adapter extends XmlAdapter<WorkflowInstanceImpl, WorkflowInstance> {
     @Override
     public WorkflowInstanceImpl marshal(WorkflowInstance instance) throws Exception {
       return (WorkflowInstanceImpl) instance;
