@@ -570,19 +570,22 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   public AccessControlList getAccessControlList(String eventId)
           throws NotFoundException, UnauthorizedException, SchedulerException {
     HttpGet get = new HttpGet(eventId.concat("/acl"));
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
+    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_NO_CONTENT, SC_UNAUTHORIZED);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-          throw new NotFoundException("Event '" + eventId + "' not found on remote scheduler service!");
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
-          logger.info("Unauthorized to get acl of the event {}.", eventId);
-          throw new UnauthorizedException("Unauthorized to get acl of the event " + eventId);
-        } else {
-          String aclString = EntityUtils.toString(response.getEntity(), UTF_8);
-          AccessControlList accessControlList = AccessControlParser.parseAcl(aclString);
-          logger.info("Successfully get event {} access control list from the remote scheduler service", eventId);
-          return accessControlList;
+        switch (response.getStatusLine().getStatusCode()) {
+          case SC_NOT_FOUND:
+            throw new NotFoundException("Event '" + eventId + "' not found on remote scheduler service!");
+          case SC_NO_CONTENT:
+            return null;
+          case SC_UNAUTHORIZED:
+            logger.info("Unauthorized to get acl of the event {}.", eventId);
+            throw new UnauthorizedException("Unauthorized to get acl of the event " + eventId);
+          default:
+            String aclString = EntityUtils.toString(response.getEntity(), "UTF-8");
+            AccessControlList accessControlList = AccessControlParser.parseAcl(aclString);
+            logger.info("Successfully get event {} access control list from the remote scheduler service", eventId);
+            return accessControlList;
         }
       }
     } catch (NotFoundException e) {

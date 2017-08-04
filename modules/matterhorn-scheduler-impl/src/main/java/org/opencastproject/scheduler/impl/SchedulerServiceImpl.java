@@ -1027,7 +1027,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       Opt<AccessControlList> acl = loadEpisodeAclFromAsset(record.get().getSnapshot().get());
       if (acl.isNone())
-        throw new NotFoundException();
+        return null;
 
       return acl.get();
     } catch (NotFoundException e) {
