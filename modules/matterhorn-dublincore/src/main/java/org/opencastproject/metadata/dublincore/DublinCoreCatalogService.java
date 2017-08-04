@@ -65,7 +65,7 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
     this.workspace = workspace;
   }
 
-  public void activate(@SuppressWarnings("unchecked") Map properties) {
+  public void activate(Map<String, ?> properties) {
     logger.debug("activate()");
     if (properties != null) {
       String priorityString = (String) properties.get(PRIORITY_KEY);
@@ -156,10 +156,8 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
         // Series Title and Identifier
         metadata.setSeriesTitle(dc.getFirst(DublinCore.PROPERTY_TITLE));
         metadata.setSeriesIdentifier(dc.getFirst(DublinCore.PROPERTY_IDENTIFIER));
-      } else if (catalog.getFlavor().getSubtype().startsWith(MediaPackageElements.OAIPMH.getSubtype())) {
-        // ignoring OAI-PMH dublincore flavors
       } else {
-        logger.warn("Unexpected dublin core catalog flavor found, ignoring '" + catalog.getFlavor() + "'");
+        logger.debug("Unexpected dublin core catalog flavor found, ignoring '{}'", catalog.getFlavor());
       }
     }
     return metadata;
