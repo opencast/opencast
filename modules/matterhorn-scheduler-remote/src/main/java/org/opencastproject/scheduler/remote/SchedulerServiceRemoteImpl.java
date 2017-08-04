@@ -23,6 +23,7 @@ package org.opencastproject.scheduler.remote;
 
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
@@ -426,16 +427,19 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   @Override
   public AccessControlList getAccessControlList(long eventId) throws NotFoundException, SchedulerException {
     HttpGet get = new HttpGet(Long.toString(eventId).concat("/acl"));
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
+    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_NO_CONTENT);
     try {
       if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-          throw new NotFoundException("Event '" + eventId + "' not found on remote scheduler service!");
-        } else {
-          String aclString = EntityUtils.toString(response.getEntity(), "UTF-8");
-          AccessControlList accessControlList = AccessControlParser.parseAcl(aclString);
-          logger.info("Successfully get event {} access control list from the remote scheduler service", eventId);
-          return accessControlList;
+        switch (response.getStatusLine().getStatusCode()) {
+          case SC_NOT_FOUND:
+            throw new NotFoundException("Event '" + eventId + "' not found on remote scheduler service!");
+          case SC_NO_CONTENT:
+            return null;
+          default:
+            String aclString = EntityUtils.toString(response.getEntity(), "UTF-8");
+            AccessControlList accessControlList = AccessControlParser.parseAcl(aclString);
+            logger.info("Successfully get event {} access control list from the remote scheduler service", eventId);
+            return accessControlList;
         }
       }
     } catch (NotFoundException e) {
