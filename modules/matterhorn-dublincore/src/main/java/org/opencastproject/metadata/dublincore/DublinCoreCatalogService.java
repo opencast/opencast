@@ -157,7 +157,8 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
         metadata.setSeriesTitle(dc.getFirst(DublinCore.PROPERTY_TITLE));
         metadata.setSeriesIdentifier(dc.getFirst(DublinCore.PROPERTY_IDENTIFIER));
       } else {
-        logger.debug("Unexpected dublin core catalog flavor found, ignoring '{}'", catalog.getFlavor());
+        logger.debug("Excluding unknown catalog flavor '{}' from the top level metadata of mediapackage '{}'",
+                catalog.getFlavor(), mp.getIdentifier());
       }
     }
     return metadata;
