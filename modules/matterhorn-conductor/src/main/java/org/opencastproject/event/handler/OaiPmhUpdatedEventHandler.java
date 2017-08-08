@@ -39,7 +39,6 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.series.SeriesItem;
@@ -408,12 +407,6 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
       final MediaPackageMetadata metadata = dublinCoreService.getMetadata(newMp);
       MediaPackageMetadataSupport.populateMediaPackageMetadata(repoMp, metadata);
       repoMp.setSeriesTitle(newMp.getSeriesTitle());
-
-      // Does the media package have a title and track?
-      if (!MediaPackageSupport.isPublishable(repoMp)) {
-        logger.trace("Media package {} does not meet criteria for publication", repoMp.getIdentifier());
-        return;
-      }
 
       // Update the OAI-PMH persistence with the updated mediapackage
       oaiPmhPersistence.store(repoMp, item.getRepository());

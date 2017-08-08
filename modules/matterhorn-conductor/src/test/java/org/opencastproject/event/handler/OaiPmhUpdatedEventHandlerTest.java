@@ -176,42 +176,6 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
     verifyAll();
   }
 
-  /**
-   * Tests if publishing to OAI-PMH is skipped, if the episode is not publishable.
-   */
-  @Test
-  public void testEpisodeNotPublishable() throws Exception {
-
-    MediaPackageMetadata metadata = createMetaData();
-    // No track --> episode is not publishable
-    MediaPackage newMp = createMediaPackage(new PublicationImpl(), new AttachmentImpl());
-    MediaPackage oldMp = createMediaPackage(new PublicationImpl(), new PublicationImpl(), newMp.getAttachments()[0]);
-    AssetManagerItem.TakeSnapshot snapshot = createSnapshot(newMp);
-
-    //These are the interactions we expect with the security service
-    mockSecurityService();
-
-    //These are the interactions we expect fo the Oai-Pmh database
-    mockOaiPmhDatabase(oldMp);
-
-    //These are the interactions we expect fo the distribution service
-    Job jobMock = mockDistributionService(snapshot);
-
-    //These are the interactions we expect fo the service registry
-    expect(serviceRegistryMock.getJob(anyLong())).andReturn(jobMock).atLeastOnce();
-
-    //These are the interactions we expect fo the dublin core service
-    expect(dublinCoreCatalogServiceMock.getMetadata(snapshot.getMediapackage())).andReturn(metadata);
-
-    replayAll();
-
-    cut.handleEvent(snapshot);
-
-    verifyAll();
-    assertThat(queryCapture.getValue().getMediaPackageId().get(), is(newMp.getIdentifier().toString()));
-    assertThat(adminUserCapture.getValue().getUsername(), is(SYSTEM_ACCOUNT));
-  }
-
   private AssetManagerItem.TakeSnapshot createSnapshot(MediaPackage mediaPackage) throws MediaPackageException {
 
     Workspace workspaceMock = mock(MockType.NICE, Workspace.class);
