@@ -26,13 +26,13 @@
     <bundle start-level="55">mvn:commons-codec/commons-codec/1.9</bundle>
 
     <!-- Webconsole plugins -->
-    <bundle>mvn:org.apache.felix/org.apache.felix.webconsole.plugins.ds/2.0.2</bundle>
+    <bundle>mvn:org.apache.felix/org.apache.felix.webconsole.plugins.ds/2.0.6</bundle>
 
     <!-- General specifications -->
     <bundle>mvn:javax.el/javax.el-api/3.0.0</bundle>
     <bundle>mvn:javax.servlet.jsp/javax.servlet.jsp-api/2.3.1</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle>
-    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr311-api-1.1.1/2.5.0</bundle>
+    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr311-api-1.1.1/2.8.0</bundle>
 
     <!-- JPA -->
     <feature>jndi</feature>
@@ -76,7 +76,10 @@
     <bundle>mvn:org.apache.tika/tika-core/1.1</bundle>
     <bundle>mvn:org.codehaus.jettison/jettison/1.3.1</bundle>
     <bundle>mvn:org.codehaus.groovy/groovy/2.4.3</bundle>
-    <bundle>mvn:org.jdom/com.springsource.org.jdom/1.0.0</bundle>
+    <!-- At least matterhorn-ingest-service-impl need JDOM in version 1.x -->
+    <!-- JDOM 1.x updates will be bug fixes as new features are gone to 2.x (see http://www.jdom.org/) -->
+    <bundle>mvn:org.jdom/com.springsource.org.jdom/1.1.0</bundle>
+    <!-- At least matterhorn-search-service-impl need JDOM in version 2.x -->
     <bundle>mvn:org.jdom/com.springsource.org.jdom/2.0.1</bundle>
     <bundle>mvn:org.opencastproject/android-mms/1.1</bundle>
     <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
@@ -220,8 +223,10 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-oaipmh/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-youtube-v3/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-runtime-info-ui-ng/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-conflict-handler/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-conflict-notifier-comment/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-conflict-notifier-email/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-schema/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-api/${project.version}</bundle>
@@ -244,6 +249,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-textextractor-tesseract/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-ibm-watson-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-api/${project.version}</bundle>
@@ -311,8 +319,10 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-oaipmh-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-youtube-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-runtime-info-ui-ng/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-conflict-handler/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-conflict-notifier-comment/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-conflict-notifier-email/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-schema/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-api/${project.version}</bundle>
@@ -335,6 +345,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-ibm-watson-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-workflowoperation/${project.version}</bundle>    
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-workflowoperation/${project.version}</bundle>
@@ -418,8 +431,10 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-oaipmh/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-youtube-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-runtime-info-ui-ng/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-conflict-handler/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-conflict-notifier-comment/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-conflict-notifier-email/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-schema/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-service-api/${project.version}</bundle>
@@ -441,6 +456,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-textanalyzer-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-ibm-watson-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-workflowoperation/${project.version}</bundle>    
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-api/${project.version}</bundle>
@@ -564,8 +582,10 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-oaipmh-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-youtube-v3/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-runtime-info-ui-ng/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-conflict-handler/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-conflict-notifier-comment/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-conflict-notifier-email/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-schema/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-service-api/${project.version}</bundle>
@@ -587,8 +607,11 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-textextractor-tesseract/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-themes/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-ibm-watson-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-transcription-service-workflowoperation/${project.version}</bundle>    
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-impl/${project.version}</bundle>    
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-ffmpeg-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-videoeditor-workflowoperation/${project.version}</bundle>

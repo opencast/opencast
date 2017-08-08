@@ -74,6 +74,9 @@ function($, bootbox, _, alertify) {
         var $name_loginlogout = "#name-loginlogout";
         var $glyph_loginlogout = "#glyph-loginlogout";
 
+        var epFromGet = "",
+            searchQuery = "";
+
         function log(args) {
             if (debug && window.console) {
                 console.log(args);
@@ -253,11 +256,11 @@ function($, bootbox, _, alertify) {
             page = pageNotGet ? 1 : parseInt(GetURLParameter("p"));
 
             // load episodes from specific series
-            var epFromGet = GetURLParameter("epFrom");
+            epFromGet = GetURLParameter("epFrom");
             epFromGet = epFromGet == undefined ? "" : "sid=" + epFromGet + "&";
 
             // search query from form
-            var searchQuery = GetURLParameter("q") == undefined ? "" : "q=" + GetURLParameter("q") + "&";
+            searchQuery = GetURLParameter("q") == undefined ? "" : "q=" + GetURLParameter("q") + "&";
             log("Searching for: " + searchQuery);
             if (searchQuery != "") $("#searchInput").val(decodeURI(GetURLParameter("q")));
 
@@ -346,9 +349,9 @@ function($, bootbox, _, alertify) {
                         log("loading data");
                         $($more_content).show();
                         if (active == "series") {
-                            loadSeries(false);
+                            loadSeries(false, epFromGet + searchQuery + sort);
                         } else {
-                            loadEpisodes(false);
+                            loadEpisodes(false, epFromGet + searchQuery + sort);
                         }
                     }
 

@@ -19,6 +19,7 @@ application/x-troff         t tr roff
 application/x-javascript    js json
 audio/basic                 au
 audio/midi                  midi mid
+audio/ogg                   opus
 audio/x-aifc                aifc
 audio/x-aiff                aif aiff
 audio/x-flac                flac

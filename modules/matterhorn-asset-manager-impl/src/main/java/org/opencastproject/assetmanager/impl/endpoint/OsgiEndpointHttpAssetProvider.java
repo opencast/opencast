@@ -32,6 +32,7 @@ import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.impl.AbstractAssetManager;
 import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.MimeType;
@@ -64,23 +65,25 @@ public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
 
   /** Calculate the server url based on the current organization. */
   private String calcServerUrl() {
-    if (securityService.getOrganization() != null) {
-      final String orgServerUrl = securityService.getOrganization().getProperties()
-          .get(MatterhornConstants.ASSET_MANAGER_URL_ORG_PROPERTY);
-      if (StringUtils.isNotBlank(orgServerUrl)) {
-        return orgServerUrl;
-      } else {
-        logger.warn("No asset manager URL ({}) for organization '{}' found! Using default server url ({})",
-                    new Object[]{
-                        MatterhornConstants.ASSET_MANAGER_URL_ORG_PROPERTY,
-                        securityService.getOrganization(),
-                        serverUrl});
-        return serverUrl;
-      }
-    } else {
+    Organization organization = securityService.getOrganization();
+    if (organization == null) {
       logger.warn("No organization found! Using default server url ({})", serverUrl);
-      return serverUrl;
+      return serverUrl.trim();
     }
+
+    // Get asset manager URL. Default to admin node URL or to server URL
+    String orgServerUrl = organization.getProperties().get(MatterhornConstants.ASSET_MANAGER_URL_ORG_PROPERTY);
+    if (StringUtils.isBlank(orgServerUrl)) {
+      orgServerUrl = organization.getProperties().get(MatterhornConstants.ADMIN_URL_ORG_PROPERTY);
+      logger.debug("No asset manager URL for organization '{}'. Falling back to admin node url ({})",
+                   organization, orgServerUrl);
+    }
+    if (StringUtils.isBlank(orgServerUrl)) {
+      logger.debug("No admin node URL for organization '{}' set. Falling back to default server url ({})",
+                   organization, serverUrl);
+      orgServerUrl = serverUrl;
+    }
+    return orgServerUrl.trim();
   }
 
   @Override public Snapshot prepareForDelivery(final Snapshot snapshot) {

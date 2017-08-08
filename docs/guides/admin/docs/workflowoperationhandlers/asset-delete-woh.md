@@ -1,12 +1,17 @@
-# AssetManagerDeleteWorkflowOperationHandler
+AssetManagerDeleteWorkflowOperationHandler
+==========================================
 
-## Description
-The delete handler is responsible for deleting an episode, identified by the workflow’s current media package, from the asset manager.
+Description
+-----------
 
-## Parameter Table
-The handler does not take any parameters. The episode to delete is determined from the current media package of the workflow. 
+The delete handler is responsible for deleting an episode, identified by the workflow’s current media package, from the
+asset manager.
 
-## Operation Example
+The handler does not take any parameters. The episode to delete is already identified by the media package.
+
+
+Operation Example
+-----------------
 
     <operation
       id="asset-delete"

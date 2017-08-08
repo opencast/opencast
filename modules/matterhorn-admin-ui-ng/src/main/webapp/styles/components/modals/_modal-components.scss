@@ -710,24 +710,25 @@
             color: $dark-prim-color;
         }
     }
-}
 
-// Workflow Definition Configuration Panel
-#workflow-configuration {
-  legend {
-    padding-top: 20px;
-    padding-bottom: 5px
-  }
-  li {
-    padding-top:5px;
-    padding-bottom:5px;
-    line-height:14px
-  }
-  input[type=checkbox] {
-    padding: 0px 5px;
-  }
-  label {
-    display: inline-block;
-    padding: 0px
-  }
+    // Workflow Definition Configuration Panel
+    #workflow-configuration {
+        legend {
+          padding-top: 20px;
+          padding-bottom: 5px
+        }
+        li {
+          padding: 2px 20px;
+        }
+        input[type=checkbox] {
+          padding: 0px 5px;
+        }
+        label {
+          display: inline-block;
+          padding: 0px
+        }
+        input:disabled+label {
+          opacity: 0.5;
+        }
+    }
 }

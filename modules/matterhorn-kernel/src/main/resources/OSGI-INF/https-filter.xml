@@ -7,7 +7,7 @@
     <property name="httpContext.id" value="opencast.httpcontext" />
     <property name="httpContext.shared" value="true" />
     <!-- The CleanSessionsFilter must have the highest service.ranking value. See CleanSessionsFilter.java for details. -->
-    <property name="service.ranking" value="9" />
+    <property name="service.ranking" value="2" />
     <property name="urlPatterns" value="*" />
     <service>
       <provide interface="javax.servlet.Filter" />

@@ -104,6 +104,62 @@ At this point, the developer community should then be notified. Consider using t
     during the public QA phase.  Please report any bugs or issues you encounter.
 
 
+### Check Status of Language Translations
+
+On the date when the release branch is cut, the release manager is responsible to check whether there are language
+translations that need to be included or excluded for the upcoming release.
+Have a look at [Inclusion and Exclusion of Languages](localization.md) for the criteria.
+
+1. Check whether translations not yet included in Opencast meet the inclusion criteria (candidates for includsion)
+2. Check whether translations in Opencast meet the exclusion criteria (endangered translations)
+3. Publish an announcement on the Opencast Users list that specifies:
+    a. Translations that will be included in the upcoming release
+    b. Endangered translations
+
+Please create a single post on the Opencast Users list:
+
+    To: matterhorn@opencast.org
+    Subject: Opencast <VERSION>: Language translation status
+
+    Hi everyone,
+
+    While checking the translation statuses of the languages available on Crowdin (see [1]), we have found
+    that the following language translations meet the criteria to be included in Opencast <VERSION>:
+
+    - <LANGUAGE1> (<PERCENTAGE1>)
+    - <LANGUAGE2> (<PERCENTAGE2>)
+    - ....
+
+    Sincerly,
+    Your Opencast <VERSION> Release Manager
+
+    [1] Opencast project on Crowdin, https://crowdin.com/project/opencast-matterhorn
+    [2] Inclusion and Exclusion of Translations, https://docs.opencast.org/develop/developer/... 
+
+In case endangered languages have been identified, this needs to be communicated immediately to the Opencast community.
+Please create a post for each endangered translation on the Opencast Users list:
+
+    To: matterhorn@opencast.org
+    Subject: Opencast <VERSION>: <LANGUAGE> translation is endangered! [HELP NEEDED!]
+
+    Hi everyone,
+
+    While checking the translation status of the <LANGUAGE> translation, we have found that it is
+    only <PERCENTAGE> translated.
+
+    This is not enough to justify its inclusion in the upcoming Opencast release (see [1]).
+
+    We hereby declare the <LANGUAGE> translation endangered! This means that it will not be included in
+    Opencast <VERSION> unless it is saved by the community.
+
+    To save the <LANGUAGE> translation from removal from the Opencast release, <LANGUAGE> needs to be
+    translated at least 90% until <DATE>.
+
+    Sincerly,
+    Your Opencast <VERSION> Release Managers
+
+    [1] Inclusion and Exclusion of Translations, https://docs.opencast.org/
+
 ### Adjust Pull Request Filter
 
 The [Opencast pull request filter](http://pullrequests.opencast.org) links the versions currently in development. The

@@ -5,21 +5,17 @@
   <artifactId>${artifactId}</artifactId>
   <packaging>bundle</packaging>
   <name>${artifactId}</name>
-
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
     <version>4.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
-
   <properties>
     <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
-
   <version>${version}</version>
-
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -63,7 +59,6 @@
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
@@ -114,5 +109,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

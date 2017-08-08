@@ -169,7 +169,7 @@
     "VIDEO_CUT_PROCESSING":"La vidéo est en cours de traitement…",
     "SERVER_UNRESPONSIVE":"Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
     "SERVICE_UNAVAILABLE":"Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
-    "ACTIVE_TRANSACTION":"L'événement en cours ne peut actuellement pas être modifié car il est impliqué d'une transaction active."
+    "ACTIVE_TRANSACTION":"Cet événement ne peut pas être affiché, pendant qu’il y a un flux de travail actif ou une transaction."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Actions",
@@ -382,7 +382,8 @@
             "REPEATS":"Répétitions",
             "REPEAT_ON":"Répéter",
             "WEEKDAYS":"Jours de la semaine"
-          }
+          },
+          "NO_SOURCE_AVAILABLE":"Aucun agent de capture disponibles pour la planification"
         },
         "PROCESSING":{
           "CAPTION":"Traitement",
@@ -473,6 +474,7 @@
         },
         "GENERAL":{
           "PUBLICATION_STATUS":"Statut de publication",
+          "NO_PUBLICATIONS_AVAILABLE":"Cet événement n’a pas de publications",
           "SCHEDULING_STATUS":"Statut",
           "READY_FOR_RECORDING":"Prêt pour l'enregistrement",
           "OPTED_OUT":"Abstention",
@@ -970,7 +972,7 @@
     "ACTIONS":{
       "EXPORT":"Exporter",
       "ADD_BLACKLIST":"Ajouter liste de blocage",
-      "REMOVE":"Remove"
+      "REMOVE":"Supprimer"
     },
     "RECORDINGS":{
       "TABLE":{
@@ -1050,7 +1052,7 @@
         "EMAIL":"E-mail",
         "ROLES":"Rôles",
         "TYPE":"Type",
-        "PROVIDER":"Provider",
+        "PROVIDER":"Fournisseur",
         "BLACKLIST_FROM":"Bloqué de",
         "BLACKLIST_TO":"Bloqué jusqu'au",
         "ACTION":"Actions"
@@ -1060,7 +1062,14 @@
         "EDITCAPTION":"Modifier l’utilisateur",
         "TABS":{
           "USER":"Utilisateur",
-          "ROLES":"Rôles"
+          "ROLES":"Rôles",
+          "EXTERNALROLES":"Rôles externes",
+          "EFFECTIVEROLES":"Rôles efficaces"
+        },
+        "DESCRIPTION":{
+          "ROLES":"Rôles et groupes qui peuvent être ou sont déjà attribués à l’utilisateur.",
+          "EXTERNALROLES":"La liste des rôles externes affectées à l’utilisateur par le(s) fournisseur(s) de rôle externe.",
+          "EFFECTIVEROLES":"La liste des rôles efficaces directement attribuée à l’utilisateur et les rôles indirectement chargé via l’appartenance à un groupe."
         },
         "FORM":{
           "USERNAME":"Nom d'utilisateur",
@@ -1475,12 +1484,14 @@
     }
   },
   "VIDEO_TOOL":{
+    "TIMELINE":"Chronologie",
+    "ZOOMLEVEL":"Niveau de zoom",
+    "ZOOM":"Zoom",
     "BUTTONS":{
-      "COMMENTS":"Voir",
-      "METADATA":"Éditer",
       "CLOSE":"Fermer",
       "SAVE":"Enregistrer",
-      "PROCESS":"Sauver & démarrer"
+      "PROCESS":"Enregistrer & Continuer",
+      "ADD_COMMENT":"Ajouter un commentaire"
     },
     "TABS":{
       "PLAY":"Lecture",
@@ -1488,13 +1499,25 @@
       "CAPTIONS":"Sous-titres",
       "ANNOTATIONS":"Annotations"
     },
+    "AREAS":{
+      "METADATA":"Métadonnées",
+      "COMMENTS":"Commentaires",
+      "SEGMENTS":"Segments"
+    },
     "ACTIONS":{
       "SPLIT":"Segmenter",
       "CUT":"Couper",
       "REPLAY_SEGMENT":"Rejouer segment",
+      "REPLAY_END_OF_SEGMENT":"Fin du segment",
+      "REPLAY_SEGMENT_WITH_PREROLL":"Vérifier la transition",
       "UNDO":"Annuler",
       "REDO":"Répéter",
-      "CLEAR_SEGMENTS":"Effacer les segments"
+      "CLEAR_SEGMENTS":"Effacer les segments",
+      "CLEAR_SELECTED_SEGMENT":"Nettoyer segment sélectionné"
+    },
+    "SEGMENTS":{
+      "REMOVE_SEGMENT":"Enlever Segment",
+      "USE_SEGMENT":"Utiliser ce Segment"
     },
     "PLAYER":{
       "PLAY":"Jouer",
@@ -1516,6 +1539,14 @@
     "ERROR":"Nom d'utilisateur et/ou mot de passe incorrects"
   },
   "TABLE_FILTERS":{
+    "FILTER_SELECTION":{
+      "PLACEHOLDER":"Veuillez sélectionner un filtre…",
+      "NO_OPTIONS":"Pas de filtres trouvés"
+    },
+    "FILTER_VALUE_SELECTION":{
+      "PLACEHOLDER":"Veuillez sélectionner une valeur…",
+      "NO_OPTIONS":"Pas de valeurs trouvées"
+    },
     "CLEAR":"Supprimer tous les filtres",
     "REMOVE":"Enlever le filtre",
     "ADD":"Ajouter des filtres",
@@ -1532,6 +1563,11 @@
     }
   },
   "FILTERS":{
+    "ACLS":{
+      "NAME":{
+        "LABEL":"Nom"
+      }
+    },
     "AGENTS":{
       "NAME":{
         "LABEL":"Nom"
@@ -1753,6 +1789,7 @@
     "FINISHED":"Terminé",
     "FAILED":"Echoué",
     "FINISHED_WITH_COMMENTS":"À faire",
-    "SCHEDULED":"Programmé"
+    "SCHEDULED":"Programmé",
+    "RECORDING":"Enregistrement"
   }
 }

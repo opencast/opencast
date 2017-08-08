@@ -146,6 +146,7 @@ describe('Source Step in New Event Wizard', function () {
             singleTestData = getJSONFixture('conflictCheckSingle.json');
             $httpBackend.expectPOST('/admin-ng/event/new/conflicts').respond(409, conflictResponse);
             $httpBackend.whenGET('/admin-ng/capture-agents/agents.json?inputs=true').respond(JSON.stringify(captureAgents));
+            $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
             NewEventSource.ud = singleTestData;
             NewEventSource.checkConflicts();
             $httpBackend.flush();

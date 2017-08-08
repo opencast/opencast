@@ -739,7 +739,7 @@
            }
          },
           "SCHEDULING": {
-            "CAPTION": "Participation status",
+            "CAPTION": "Scheduling configuration",
             "REVIEW_STATUS": {
               "CAPTION": "Review status"
             },
@@ -1401,6 +1401,7 @@
            "FILE_UPLOADED": "File uploaded: ",
            "DESCRIPTION": "Semi-transparent image that is overlaid on every frame of the recording.",
            "ACTIVE": "Active",
+           "ENABLE":"Enable watermark",
            "TOP_LEFT": "Top left",
            "TOP_RIGHT": "Top right",
            "BOTTOM_LEFT": "Bottom left",

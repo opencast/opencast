@@ -1479,6 +1479,30 @@ matterhorn-themes
   org.slf4j                              slf4j-api                                        MIT License
 
 
+matterhorn-transcription-service-ibm-watson-impl
+  GroupId                                ArtifactId                                       License
+  com.googlecode.json-simple             json-simple                                      Apache License, Version 2.0
+  com.mchange                            c3p0                                             GNU LESSER GENERAL PUBLIC LICENSE
+  com.h2database                         h2                                               The H2 License, Version 1.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.jpa                      Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.asm                      Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.antlr                    Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  org.osgi                               org.osgi.compendium                              -
+  org.osgi                               org.osgi.core                                    -
+  org.slf4j                              slf4j-log4j12                                    MIT License
+
+
+matterhorn-transcription-service-workflowoperation
+  GroupId                                ArtifactId                                       License
+  org.osgi                               org.osgi.compendium                              -
+  org.osgi                               org.osgi.core                                    -
+  org.slf4j                              slf4j-log4j12                                    MIT License
+
+
 matterhorn-userdirectory
   GroupId                                ArtifactId                                       License
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
@@ -1547,7 +1571,7 @@ matterhorn-workflow-service-impl
   org.apache.solr                        solr-solrj                                       Apache 2
 
 
-rn-workflow-service-remote
+matterhorn-workflow-service-remote
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
 

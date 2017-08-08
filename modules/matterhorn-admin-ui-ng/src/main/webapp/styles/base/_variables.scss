@@ -100,7 +100,8 @@ $primary-color-green-dark-3: darken($primary-color-green, 20%);     // #20724b
 $main-border-color:            #c9d0d3;
 $light-border-color:           #cfd3d5;
 $main-border-radius:           4px;
-$thin-border-stroke:           1px solid;
+$thin-border:                  1px;
+$thin-border-stroke:           $thin-border solid;
 $mid-border-stroke:            2px solid;
 
 $dark-bg-border-color: #0e1b25;

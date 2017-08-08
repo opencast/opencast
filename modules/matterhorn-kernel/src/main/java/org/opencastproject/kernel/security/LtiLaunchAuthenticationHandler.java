@@ -133,11 +133,11 @@ public class LtiLaunchAuthenticationHandler
       return null;
     }
 
-    // Get the comser guid if provided
+    // Get the consumer guid if provided
     String consumerGUID = request.getParameter(LTI_CONSUMER_GUID);
-    // This is an optional field it could be blank
+    // This is an optional field, so it could be blank
     if (StringUtils.isBlank(consumerGUID)) {
-      consumerGUID = "UknownConsumer";
+      consumerGUID = "UnknownConsumer";
     }
 
     // We need to construct a complex ID to avoid confusion

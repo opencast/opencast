@@ -66,6 +66,7 @@ import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -575,7 +576,7 @@ public class IndexServiceImpl implements IndexService {
         dc.set(DublinCores.OC_PROPERTY_AGENT_TIMEZONE, tz.getID());
       } else { // No timezone was present, assume the serve's local timezone.
         tz = TimeZone.getDefault();
-        logger.warn(
+        logger.debug(
                 "The field 'capture.device.timezone' has not been set in the agent configuration. The default server timezone will be used.");
       }
 
@@ -608,6 +609,7 @@ public class IndexServiceImpl implements IndexService {
     eventHttpServletRequest.setMediaPackage(authorizationService.setAcl(eventHttpServletRequest.getMediaPackage().get(),
             AclScope.Episode, eventHttpServletRequest.getAcl().get()).getA());
 
+    MediaPackage mediaPackage;
     switch (type) {
       case UPLOAD:
       case UPLOAD_LATER:
@@ -618,12 +620,22 @@ public class IndexServiceImpl implements IndexService {
                 workflowTemplate, configuration);
         return eventHttpServletRequest.getMediaPackage().get().getIdentifier().compact();
       case SCHEDULE_SINGLE:
-        eventHttpServletRequest
-                .setMediaPackage(updateDublincCoreCatalog(eventHttpServletRequest.getMediaPackage().get(), dc));
-        Long id = schedulerService.addEvent(dc, configuration);
-        schedulerService.updateCaptureAgentMetadata(caProperties, Tuple.tuple(id, dc));
-        schedulerService.updateAccessControlList(id, eventHttpServletRequest.getAcl().get());
-        return eventHttpServletRequest.getMediaPackage().get().getIdentifier().compact();
+        mediaPackage = updateDublincCoreCatalog(eventHttpServletRequest.getMediaPackage().get(), dc);
+        eventHttpServletRequest.setMediaPackage(mediaPackage);
+        try {
+          schedulerService.addEvent(start.toDate(), start.plus(duration).toDate(), captureAgentId, presenterUsernames,
+                  mediaPackage, configuration, (Map) caProperties, Opt.<Boolean> none(), Opt.<String> none(),
+                  SchedulerService.ORIGIN);
+        } finally {
+          for (MediaPackageElement mediaPackageElement : mediaPackage.getElements()) {
+            try {
+              workspace.delete(mediaPackage.getIdentifier().toString(), mediaPackageElement.getIdentifier());
+            } catch (NotFoundException | IOException e) {
+              logger.warn("Failed to delete media package element", e);
+            }
+          }
+        }
+        return mediaPackage.getIdentifier().compact();
       case SCHEDULE_MULTIPLE:
         List<Period> periods = calculatePeriods(start.toDate(), end.toDate(), duration, rRule, tz);
         int i = 1;
@@ -633,10 +645,10 @@ public class IndexServiceImpl implements IndexService {
         for (Period period : periods) {
           Date startDate = new Date(period.getStart().getTime());
           Date endDate = new Date(period.getEnd().getTime());
-          Id idImpl = new IdImpl(UUID.randomUUID().toString());
+          Id id = new IdImpl(UUID.randomUUID().toString());
 
           // Set the new media package identifier
-          eventHttpServletRequest.getMediaPackage().get().setIdentifier(idImpl);
+          eventHttpServletRequest.getMediaPackage().get().setIdentifier(id);
 
           // Update dublincore title and temporal
           String newTitle = initialTitle + String.format(" %0" + length + "d", i++);
@@ -644,14 +656,22 @@ public class IndexServiceImpl implements IndexService {
           DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(startDate, endDate),
                   Precision.Second);
           dc.set(DublinCore.PROPERTY_TEMPORAL, eventTime);
-          eventHttpServletRequest
-                  .setMediaPackage(updateDublincCoreCatalog(eventHttpServletRequest.getMediaPackage().get(), dc));
-          eventHttpServletRequest.getMediaPackage().get().setTitle(newTitle);
+          mediaPackage = updateDublincCoreCatalog(eventHttpServletRequest.getMediaPackage().get(), dc);
+          mediaPackage.setTitle(newTitle);
 
-          Long schedulerId = schedulerService.addEvent(dc, configuration);
-          schedulerService.updateCaptureAgentMetadata(caProperties, Tuple.tuple(schedulerId, dc));
-          schedulerService.updateAccessControlList(schedulerId, eventHttpServletRequest.getAcl().get());
-          ids.add(idImpl.compact());
+          try {
+            schedulerService.addEvent(startDate, endDate, captureAgentId, presenterUsernames, mediaPackage,
+                    configuration, (Map) caProperties, Opt.none(), Opt.none(), SchedulerService.ORIGIN);
+          } finally {
+            for (MediaPackageElement mediaPackageElement : mediaPackage.getElements()) {
+              try {
+                workspace.delete(mediaPackage.getIdentifier().toString(), mediaPackageElement.getIdentifier());
+              } catch (NotFoundException | IOException e) {
+                logger.warn("Failed to delete media package element", e);
+              }
+            }
+          }
+          ids.add(id.compact());
         }
         return StringUtils.join(ids, ",");
       default:
@@ -818,45 +838,49 @@ public class IndexServiceImpl implements IndexService {
   @Override
   public void removeCatalogByFlavor(Event event, MediaPackageElementFlavor flavor)
           throws IndexServiceException, NotFoundException, UnauthorizedException {
-    Opt<MediaPackage> mpOpt = getEventMediapackage(event);
-    if (mpOpt.isSome()) {
-      MediaPackage mediaPackage = mpOpt.get();
-      Catalog[] catalogs = mediaPackage.getCatalogs(flavor);
-      if (catalogs.length == 0) {
-        throw new NotFoundException(String.format("Cannot find a catalog with flavor '%s' for event with id '%s'.",
-                flavor.toString(), event.getIdentifier()));
-      }
-      for (Catalog catalog : catalogs) {
-        mediaPackage.remove(catalog);
-      }
-      switch (getEventSource(event)) {
-        case WORKFLOW:
-          Opt<WorkflowInstance> workflowInstance = getCurrentWorkflowInstance(event.getIdentifier());
-          if (workflowInstance.isNone()) {
-            logger.error("No workflow instance for event {} found!", event.getIdentifier());
-            throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
-          }
-          try {
-            WorkflowInstance instance = workflowInstance.get();
-            instance.setMediaPackage(mediaPackage);
-            updateWorkflowInstance(instance);
-          } catch (WorkflowException e) {
-            logger.error("Unable to remove catalog with flavor {} by updating workflow event {} because {}",
-                    new Object[] { flavor, event.getIdentifier(), getStackTrace(e) });
-            throw new IndexServiceException("Unable to update workflow event " + event.getIdentifier());
-          }
-          break;
-        case ARCHIVE:
-          assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
-          break;
-        case SCHEDULE:
-          // Ignoring as there are no mediapackages attached to scheduled items
-          throw new IllegalStateException(
-                  "Unable to remove a catalog from a Scheduled event as there is no mediapackage.");
-        default:
-          throw new IndexServiceException(
-                  String.format("Unable to handle event source type '%s'", getEventSource(event)));
-      }
+    MediaPackage mediaPackage = getEventMediapackage(event);
+    Catalog[] catalogs = mediaPackage.getCatalogs(flavor);
+    if (catalogs.length == 0) {
+      throw new NotFoundException(String.format("Cannot find a catalog with flavor '%s' for event with id '%s'.",
+              flavor.toString(), event.getIdentifier()));
+    }
+    for (Catalog catalog : catalogs) {
+      mediaPackage.remove(catalog);
+    }
+    switch (getEventSource(event)) {
+      case WORKFLOW:
+        Opt<WorkflowInstance> workflowInstance = getCurrentWorkflowInstance(event.getIdentifier());
+        if (workflowInstance.isNone()) {
+          logger.error("No workflow instance for event {} found!", event.getIdentifier());
+          throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
+        }
+        try {
+          WorkflowInstance instance = workflowInstance.get();
+          instance.setMediaPackage(mediaPackage);
+          updateWorkflowInstance(instance);
+        } catch (WorkflowException e) {
+          logger.error("Unable to remove catalog with flavor {} by updating workflow event {} because {}",
+                  new Object[] { flavor, event.getIdentifier(), getStackTrace(e) });
+          throw new IndexServiceException("Unable to update workflow event " + event.getIdentifier());
+        }
+        break;
+      case ARCHIVE:
+        assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+        break;
+      case SCHEDULE:
+        try {
+          schedulerService.updateEvent(event.getIdentifier(), Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
+                  Opt.<Set<String>> none(), Opt.some(mediaPackage), Opt.<Map<String, String>> none(),
+                  Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
+        } catch (SchedulerException e) {
+          logger.error("Unable to remove catalog with flavor {} by updating scheduled event {} because {}",
+                  new Object[] { flavor, event.getIdentifier(), getStackTrace(e) });
+          throw new IndexServiceException("Unable to update scheduled event " + event.getIdentifier());
+        }
+        break;
+      default:
+        throw new IndexServiceException(
+                String.format("Unable to handle event source type '%s'", getEventSource(event)));
     }
   }
 
@@ -891,13 +915,13 @@ public class IndexServiceImpl implements IndexService {
       throw new NotFoundException("Cannot find an event with id " + id);
 
     Event event = optEvent.get();
-    Opt<MediaPackage> mpOpt = getEventMediapackage(event);
-    MediaPackage mediaPackage;
+    MediaPackage mediaPackage = getEventMediapackage(event);
     Opt<Set<String>> presenters = Opt.none();
     Opt<MetadataCollection> eventCatalog = metadataList.getMetadataByAdapter(getCommonEventCatalogUIAdapter());
     if (eventCatalog.isSome()) {
       presenters = updatePresenters(eventCatalog.get());
     }
+    updateMediaPackageMetadata(mediaPackage, metadataList);
     switch (getEventSource(event)) {
       case WORKFLOW:
         Opt<WorkflowInstance> workflowInstance = getCurrentWorkflowInstance(event.getIdentifier());
@@ -906,11 +930,6 @@ public class IndexServiceImpl implements IndexService {
           throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
         }
         try {
-          if (mpOpt.isNone()) {
-            logger.error("No mediapackage found for workflow event {}!", id);
-            throw new IndexServiceException("No mediapackage found for workflow event {}!" + id);
-          }
-          mediaPackage = mpOpt.get();
           WorkflowInstance instance = workflowInstance.get();
           instance.setMediaPackage(mediaPackage);
           updateWorkflowInstance(instance);
@@ -921,23 +940,13 @@ public class IndexServiceImpl implements IndexService {
         }
         break;
       case ARCHIVE:
-        if (mpOpt.isNone()) {
-          logger.error("No mediapackage found for archived event {}!", id);
-          throw new IndexServiceException("No mediapackage found for archived event {}!" + id);
-        }
-        mediaPackage = mpOpt.get();
-        updateMediaPackageMetadata(mediaPackage, metadataList);
         assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
         break;
       case SCHEDULE:
         try {
-          Long eventId = schedulerService.getEventId(event.getIdentifier());
-          DublinCoreCatalog dc = schedulerService.getEventDublinCore(eventId);
-          Opt<MetadataCollection> abstractMetadata = metadataList.getMetadataByAdapter(eventCatalogUIAdapter);
-          if (abstractMetadata.isSome()) {
-            DublinCoreMetadataUtil.updateDublincoreCatalog(dc, abstractMetadata.get());
-          }
-          schedulerService.updateEvent(eventId, dc, new HashMap<String, String>());
+          schedulerService.updateEvent(id, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(), presenters,
+                  Opt.some(mediaPackage), Opt.<Map<String, String>> none(), Opt.<Map<String, String>> none(),
+                  Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
         } catch (SchedulerException e) {
           logger.error("Unable to update scheduled event {} with metadata {} because {}",
                   new Object[] { id, RestUtils.getJsonStringSilent(metadataList.toJSON()), getStackTrace(e) });
@@ -986,25 +995,21 @@ public class IndexServiceImpl implements IndexService {
       throw new NotFoundException("Cannot find an event with id " + id);
 
     Event event = optEvent.get();
-    Opt<MediaPackage> mpOpt = getEventMediapackage(event);
-    MediaPackage mediaPackage;
+    MediaPackage mediaPackage = getEventMediapackage(event);
     switch (getEventSource(event)) {
       case WORKFLOW:
         // Not updating the acl as the workflow might have already passed the point of distribution.
         throw new IllegalArgumentException("Unable to update the ACL of this event as it is currently processing.");
       case ARCHIVE:
-        if (mpOpt.isNone()) {
-          logger.error("No mediapackage found for archived event {}!", id);
-          throw new IndexServiceException("No mediapackage found for archived event {}!" + id);
-        }
-        mediaPackage = mpOpt.get();
         mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
         assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
         return acl;
       case SCHEDULE:
+        mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
         try {
-          Long eventId = schedulerService.getEventId(event.getIdentifier());
-          schedulerService.updateAccessControlList(eventId, acl);
+          schedulerService.updateEvent(id, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
+                  Opt.<Set<String>> none(), Opt.some(mediaPackage), Opt.<Map<String, String>> none(),
+                  Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
         } catch (SchedulerException e) {
           throw new IndexServiceException("Unable to update the acl for the scheduled event", e);
         }
@@ -1132,7 +1137,7 @@ public class IndexServiceImpl implements IndexService {
     boolean notFoundScheduler = false;
     boolean removedScheduler = true;
     try {
-      schedulerService.removeEvent(schedulerService.getEventId(id));
+      schedulerService.removeEvent(id);
     } catch (NotFoundException e) {
       notFoundScheduler = true;
     } catch (UnauthorizedException e) {
@@ -1220,27 +1225,42 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public Opt<MediaPackage> getEventMediapackage(Event event) throws IndexServiceException {
+  public MediaPackage getEventMediapackage(Event event) throws IndexServiceException {
     switch (getEventSource(event)) {
       case WORKFLOW:
         Opt<WorkflowInstance> currentWorkflowInstance = getCurrentWorkflowInstance(event.getIdentifier());
-        if (currentWorkflowInstance.isSome()) {
-          logger.debug("Found event in workflow with id {}", event.getIdentifier());
-          return Opt.some(currentWorkflowInstance.get().getMediaPackage());
+        if (currentWorkflowInstance.isNone()) {
+          logger.error("No workflow instance for event {} found!", event.getIdentifier());
+          throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
         }
-        return Opt.none();
+        return currentWorkflowInstance.get().getMediaPackage();
       case ARCHIVE:
         final AQueryBuilder q = assetManager.createQuery();
         final AResult r = q.select(q.snapshot())
                 .where(q.mediaPackageId(event.getIdentifier()).and(q.version().isLatest())).run();
         if (r.getSize() > 0) {
           logger.debug("Found event in archive with id {}", event.getIdentifier());
-          return Opt.some(enrich(r).getSnapshots().head2().getMediaPackage());
+          return enrich(r).getSnapshots().head2().getMediaPackage();
         }
         logger.error("No event with id {} found from archive!", event.getIdentifier());
         throw new IndexServiceException("No archived event found with id " + event.getIdentifier());
       case SCHEDULE:
-        return Opt.none();
+        try {
+          MediaPackage mediaPackage = schedulerService.getMediaPackage(event.getIdentifier());
+          logger.debug("Found event in scheduler with id {}", event.getIdentifier());
+          return mediaPackage;
+        } catch (NotFoundException e) {
+          logger.error("No scheduled event with id {} found!", event.getIdentifier());
+          throw new IndexServiceException(e.getMessage(), e);
+        } catch (UnauthorizedException e) {
+          logger.error("Unauthorized to get event with id {} from scheduler because {}", event.getIdentifier(),
+                  getStackTrace(e));
+          throw new IndexServiceException(e.getMessage(), e);
+        } catch (SchedulerException e) {
+          logger.error("Unable to get event with id {} from scheduler because {}", event.getIdentifier(),
+                  getStackTrace(e));
+          throw new IndexServiceException(e.getMessage(), e);
+        }
       default:
         throw new IllegalStateException("Unknown event type!");
     }
@@ -1469,10 +1489,6 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public void updateCommentCatalog(final Event event, final List<EventComment> comments) throws Exception {
-    final Opt<MediaPackage> mpOpt = getEventMediapackage(event);
-    if (mpOpt.isNone())
-      return;
-
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
             securityService.getUser());
     executorService.execute(new Runnable() {
@@ -1482,7 +1498,7 @@ public class IndexServiceImpl implements IndexService {
           @Override
           protected void run() {
             try {
-              MediaPackage mediaPackage = mpOpt.get();
+              MediaPackage mediaPackage = getEventMediapackage(event);
               updateMediaPackageCommentCatalog(mediaPackage, comments);
               switch (getEventSource(event)) {
                 case WORKFLOW:
@@ -1499,6 +1515,13 @@ public class IndexServiceImpl implements IndexService {
                 case ARCHIVE:
                   logger.info("Update archive mediapacakge {} with updated comments catalog.", event.getIdentifier());
                   assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+                  break;
+                case SCHEDULE:
+                  logger.info("Update scheduled mediapacakge {} with updated comments catalog.", event.getIdentifier());
+                  schedulerService.updateEvent(event.getIdentifier(), Opt.<Date> none(), Opt.<Date> none(),
+                          Opt.<String> none(), Opt.<Set<String>> none(), Opt.some(mediaPackage),
+                          Opt.<Map<String, String>> none(), Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(),
+                          SchedulerService.ORIGIN);
                   break;
                 default:
                   logger.error("Unkown event source {}!", event.getSource().toString());
@@ -1561,7 +1584,9 @@ public class IndexServiceImpl implements IndexService {
     if (optEvent.isNone())
       throw new NotFoundException("Cannot find an event with id " + eventId);
 
-    schedulerService.updateOptOutStatus(eventId, optout);
+    schedulerService.updateEvent(eventId, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
+            Opt.<Set<String>> none(), Opt.<MediaPackage> none(), Opt.<Map<String, String>> none(),
+            Opt.<Map<String, String>> none(), Opt.some(Opt.some(optout)), SchedulerService.ORIGIN);
     logger.debug("Setting event {} to opt out status of {}", eventId, optout);
   }
 
@@ -1669,7 +1694,15 @@ public class IndexServiceImpl implements IndexService {
   @Override
   public boolean hasActiveTransaction(String eventId)
           throws NotFoundException, UnauthorizedException, IndexServiceException {
-    return false;
+    try {
+      return schedulerService.hasActiveTransaction(eventId);
+    } catch (SchedulerException e) {
+      logger.error("Unable to get active transaction for scheduled event {} because {}", eventId, getStackTrace(e));
+      throw new IndexServiceException("Unable to get active transaction for scheduled event " + eventId);
+    } catch (NotFoundException e) {
+      logger.trace("The event was not found by the scheduler so it can't be in an active transaction.");
+      return false;
+    }
   }
 
 }

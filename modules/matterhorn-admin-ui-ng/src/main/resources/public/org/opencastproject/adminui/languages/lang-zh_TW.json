@@ -169,7 +169,7 @@
     "VIDEO_CUT_PROCESSING":"正在處理的視頻...",
     "SERVER_UNRESPONSIVE":"伺服器沒有回應，請稍後再試。",
     "SERVICE_UNAVAILABLE":"服務沒有回應，請稍後再試。",
-    "ACTIVE_TRANSACTION":"現有事件正在程序轉換中，無法編輯。"
+    "ACTIVE_TRANSACTION":"This event can not be edited while there is an active workflow or transaction."
   },
   "BULK_ACTIONS":{
     "CAPTION":"操作",
@@ -382,7 +382,8 @@
             "REPEATS":"重複",
             "REPEAT_ON":"重複的",
             "WEEKDAYS":"平日"
-          }
+          },
+          "NO_SOURCE_AVAILABLE":"No capture agents available for scheduling"
         },
         "PROCESSING":{
           "CAPTION":"處理程序",
@@ -473,6 +474,7 @@
         },
         "GENERAL":{
           "PUBLICATION_STATUS":"發佈狀態",
+          "NO_PUBLICATIONS_AVAILABLE":"This event has no publications",
           "SCHEDULING_STATUS":"狀態",
           "READY_FOR_RECORDING":"準備錄製",
           "OPTED_OUT":"選擇退出",
@@ -683,7 +685,7 @@
           "RESOLVED":"已解決",
           "REPLY":"回覆",
           "REPLY_TO":"回覆給",
-          "CANCEL_REPLY":"解除",
+          "CANCEL_REPLY":"Cancel",
           "DELETE":"刪除",
           "REASON":"理由",
           "REASONS":{
@@ -1060,7 +1062,14 @@
         "EDITCAPTION":"編輯使用者",
         "TABS":{
           "USER":"使用者",
-          "ROLES":"角色"
+          "ROLES":"角色",
+          "EXTERNALROLES":"External Roles",
+          "EFFECTIVEROLES":"Effective Roles"
+        },
+        "DESCRIPTION":{
+          "ROLES":"Roles and groups that can be or are already assigned to the user.",
+          "EXTERNALROLES":"The list of external roles assigned to the user granted by the external role provider(s).",
+          "EFFECTIVEROLES":"The list of effective roles directly assigned to the user and the roles indirectly loaded through group membership."
         },
         "FORM":{
           "USERNAME":"使用者名稱",
@@ -1475,12 +1484,14 @@
     }
   },
   "VIDEO_TOOL":{
+    "TIMELINE":"Timeline",
+    "ZOOMLEVEL":"Zoom Level",
+    "ZOOM":"Zoom",
     "BUTTONS":{
-      "COMMENTS":"瀏覽",
-      "METADATA":"編輯",
       "CLOSE":"關閉",
       "SAVE":"儲存",
-      "PROCESS":"保存進程"
+      "PROCESS":"Save & Continue",
+      "ADD_COMMENT":"Add Comment"
     },
     "TABS":{
       "PLAY":"播放",
@@ -1488,13 +1499,25 @@
       "CAPTIONS":"字幕",
       "ANNOTATIONS":"註解"
     },
+    "AREAS":{
+      "METADATA":"Metadata",
+      "COMMENTS":"Comments",
+      "SEGMENTS":"Segments"
+    },
     "ACTIONS":{
       "SPLIT":"分割",
       "CUT":"切段",
       "REPLAY_SEGMENT":"重播段",
+      "REPLAY_END_OF_SEGMENT":"End of segment",
+      "REPLAY_SEGMENT_WITH_PREROLL":"Check transition",
       "UNDO":"還原",
       "REDO":"重做",
-      "CLEAR_SEGMENTS":"清除片段"
+      "CLEAR_SEGMENTS":"清除片段",
+      "CLEAR_SELECTED_SEGMENT":"Clear selected segment"
+    },
+    "SEGMENTS":{
+      "REMOVE_SEGMENT":"Remove Segment",
+      "USE_SEGMENT":"Use this Segment"
     },
     "PLAYER":{
       "PLAY":"開始",
@@ -1516,6 +1539,14 @@
     "ERROR":"不正確的使用者名稱 和/或 密碼"
   },
   "TABLE_FILTERS":{
+    "FILTER_SELECTION":{
+      "PLACEHOLDER":"Please select a filter…",
+      "NO_OPTIONS":"No filters found"
+    },
+    "FILTER_VALUE_SELECTION":{
+      "PLACEHOLDER":"Please select a value…",
+      "NO_OPTIONS":"No values found"
+    },
     "CLEAR":"清除所有搜尋過濾器",
     "REMOVE":"刪除搜尋過濾器",
     "ADD":"新增搜尋過濾器",
@@ -1532,6 +1563,11 @@
     }
   },
   "FILTERS":{
+    "ACLS":{
+      "NAME":{
+        "LABEL":"Name"
+      }
+    },
     "AGENTS":{
       "NAME":{
         "LABEL":"名稱"
@@ -1753,6 +1789,7 @@
     "FINISHED":"已完成",
     "FAILED":"失敗",
     "FINISHED_WITH_COMMENTS":"待辦事項",
-    "SCHEDULED":"已排程"
+    "SCHEDULED":"已排程",
+    "RECORDING":"Recording"
   }
 }

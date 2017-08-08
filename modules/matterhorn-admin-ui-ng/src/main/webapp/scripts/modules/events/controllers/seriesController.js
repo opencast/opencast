@@ -28,6 +28,7 @@ angular.module('adminNg.controllers')
         $scope.table = Table;
         $scope.table.configure({
             columns: [{
+                template: 'modules/events/partials/seriesTitleCell.html',
                 name:  'title',
                 label: 'EVENTS.SERIES.TABLE.TITLE'
             }, {

@@ -231,18 +231,32 @@ CREATE TABLE mh_incident_text (
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE mh_scheduled_event (
-  id BIGINT NOT NULL,
-  mediapackage_id VARCHAR(128),
-  dublin_core TEXT(65535),
-  capture_agent_metadata TEXT(65535),
-  access_control TEXT(65535),
-  opt_out TINYINT(1) NOT NULL DEFAULT '0',
-  blacklisted TINYINT(1) NOT NULL DEFAULT '0',
-  review_status VARCHAR(255) DEFAULT NULL,
-  review_date DATETIME DEFAULT NULL,
-  PRIMARY KEY (id)
+CREATE TABLE mh_scheduled_last_modified (
+  capture_agent_id VARCHAR(255) NOT NULL,
+  last_modified DATETIME NOT NULL,
+  PRIMARY KEY (capture_agent_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_mh_scheduled_last_modified_last_modified ON mh_scheduled_last_modified (last_modified);
+
+CREATE TABLE mh_scheduled_extended_event (
+  mediapackage_id VARCHAR(128) NOT NULL,
+  organization VARCHAR(128) NOT NULL,
+  PRIMARY KEY (mediapackage_id, organization),
+  CONSTRAINT FK_mh_scheduled_extended_event_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE mh_scheduled_transaction (
+  id VARCHAR(128) NOT NULL,
+  organization VARCHAR(128) NOT NULL,
+  source VARCHAR(255) NOT NULL,
+  last_modified DATETIME NOT NULL,
+  PRIMARY KEY (id, organization),
+  CONSTRAINT UNQ_mh_scheduled_transaction UNIQUE (id, organization, source),
+  CONSTRAINT FK_mh_scheduled_transaction_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_mh_scheduled_transaction_source ON mh_scheduled_transaction (source);
 
 CREATE TABLE mh_search (
   id VARCHAR(128) NOT NULL,
@@ -636,4 +650,16 @@ CREATE TABLE mh_themes (
     watermark_file VARCHAR(128),
     PRIMARY KEY (id),
     CONSTRAINT FK_mh_themes_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE mh_ibm_watson_transcript_job (
+    id BIGINT(20) NOT NULL,
+    media_package_id VARCHAR(128) NOT NULL,
+    track_id VARCHAR(128) NOT NULL,
+    job_id  VARCHAR(128) NOT NULL,
+    date_created datetime NOT NULL,
+    date_completed datetime DEFAULT NULL,
+    status VARCHAR(128) DEFAULT NULL,
+    track_duration BIGINT NOT NULL,
+    PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -41,8 +41,8 @@ Please make sure to install the following dependencies. Note that not all depend
 
 Required:
 
-    java-devel / openjdk >= 1.7.0
-    ffmpeg >= 3.0.1
+    java-devel / openjdk >= 1.8.0
+    ffmpeg >= 3.2.4
     maven >= 3.1
     unzip
     gcc-c++

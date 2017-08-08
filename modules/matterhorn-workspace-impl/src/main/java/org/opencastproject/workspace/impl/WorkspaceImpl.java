@@ -203,13 +203,27 @@ public final class WorkspaceImpl implements Workspace {
     if (pathMappable != null) {
       String wfrRoot = pathMappable.getPathPrefix();
       File srcFile = new File(wfrRoot, ".linktest");
-      File targetFile = new File(wsRoot, ".linktest");
       try {
         FileUtils.touch(srcFile);
       } catch (IOException e) {
         throw new IllegalStateException("The working file repository seems read-only", e);
       }
+
+      // Create a unique target file
+      File targetFile = null;
+      try {
+        targetFile = File.createTempFile(".linktest.", ".tmp", new File(wsRoot));
+        targetFile.delete();
+      } catch (IOException e) {
+        throw new IllegalStateException("The workspace seems read-only", e);
+      }
+
+      // Test hard linking
       linkingEnabled = FileSupport.supportsLinking(srcFile, targetFile);
+
+      // Clean up
+      FileUtils.deleteQuietly(targetFile);
+
       if (linkingEnabled)
         logger.info("Hard links between the working file repository and the workspace enabled");
       else {
