@@ -33,7 +33,7 @@ angular.module('adminNg.directives')
             scope.enterEditMode = function () {
                 // Store the original value for later comparision or undo
                 if (!angular.isDefined(scope.original)) {
-                    scope.original = scope.params.value;
+                    scope.original = scope.params.input;
                 }
                 scope.editMode = true;
                 scope.focusTimer = $timeout(function () {
@@ -44,7 +44,9 @@ angular.module('adminNg.directives')
             scope.keyUp = function (event) {
                 if (event.keyCode === 27) {
                     // Restore original value on ESC
-                    scope.params.value = scope.original;
+                    scope.params.input = scope.params.value.toLocaleString("EN-GB");
+                    scope.original = scope.params.input;
+                    //scope.params.value = scope.original;
                     scope.editMode = false;
                     // Prevent the modal from closing.
                     event.stopPropagation();
@@ -56,11 +58,13 @@ angular.module('adminNg.directives')
 
             scope.submit = function () {
                 // Prevent submission if value has not changed.
-                if (scope.params.value === scope.original) { return; }
-
+                if (scope.params.input === scope.original) { return; }
+                scope.params.value = new Date(scope.params.input);
                 scope.editMode = false;
                 scope.save(scope.params.id, function () {
-                    scope.original = scope.params.value;
+                    scope.params.input = scope.params.value.toLocaleString("EN-GB");
+                    scope.original = scope.params.input;
+                    //scope.original = scope.params.value;
                 });
             };
 
