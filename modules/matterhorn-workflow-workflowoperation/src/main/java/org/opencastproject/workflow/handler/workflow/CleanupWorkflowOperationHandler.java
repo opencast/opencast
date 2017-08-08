@@ -21,6 +21,8 @@
 
 package org.opencastproject.workflow.handler.workflow;
 
+import static org.opencastproject.mediapackage.MediaPackageElement.Type.Publication;
+
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -241,13 +243,18 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
   }
 
   /**
-   * Returns true, if elements flavor matches one of the preserved flavors, false otherwise
+   * Returns if elements flavor matches one of the preserved flavors or the element is a publication.
+   * Publications cannot be deleted but need to be retracted and will hence always be preserved. Note that publications
+   * should also never directly correspond to files in the workspace or the working file repository.
    *
    * @param element Media package element to test
    * @param flavorsToPreserve Flavors to preserve
    * @return true, if elements flavor matches one of the preserved flavors, false otherwise
    */
   private boolean isPreserved(MediaPackageElement element, List<MediaPackageElementFlavor> flavorsToPreserve) {
+    if (Publication == element.getElementType())
+      return true;
+
     for (MediaPackageElementFlavor flavor : flavorsToPreserve) {
       if (flavor.matches(element.getFlavor())) {
         return true;
