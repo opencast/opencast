@@ -27,9 +27,7 @@ processed media. At least not without an extra amount of work involving modifica
 should think about this setting carefully.
 
 Second, adjust the binding address in `org.ops4j.pax.web.cfg`. The binding address can be set to `0.0.0.0` for general
-network access.
-
-The property to modify in `org.ops4j.pax.web.cfg` is:
+network access. The property to modify is:
 
     org.ops4j.pax.web.listening.addresses=127.0.0.1
 
