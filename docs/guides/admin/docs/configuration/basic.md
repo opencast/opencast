@@ -26,14 +26,19 @@ your own domain name:
 processed media. At least not without an extra amount of work involving modifications to the database. That is why you
 should think about this setting carefully.
 
-Second, adjust the binding address in `org.ops4j.pax.web.cfg` and `jetty-opencast.xml`. The binding address can be set
-to `0.0.0.0` for general network access.
+Second, adjust the binding address in `org.ops4j.pax.web.cfg`. The binding address can be set to `0.0.0.0` for general
+network access.
 
 The property to modify in `org.ops4j.pax.web.cfg` is:
 
     org.ops4j.pax.web.listening.addresses=127.0.0.1
 
-In `jetty-opencast.xml`, modify:
+It may be necessary to adjust the jetty http connector idleTimeout value for processing large files in some configurations.
+To do so, uncomment this line in `org.ops4j.pax.web.cfg`:
+
+    org.ops4j.pax.web.config.file=${karaf.etc}/jetty-opencast.xml
+
+and modify the host and if necessary port values in `jetty-opencast.xml` to match the ops4j configuration:
 
     <Set name="host">127.0.0.1</Set>
 
