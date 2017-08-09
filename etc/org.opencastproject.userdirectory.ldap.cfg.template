@@ -9,6 +9,10 @@
 ## Then, fill in the properties for the new LDAP connection below and ideally delete this header to avoid confusion
 
 
+## A unique identifier for this connection. It only has effect within Opencast.
+## May be different as the <ID> used above, but this is not recommended for clarity
+org.opencastproject.userdirectory.ldap.id=
+
 ## The URL to the LDAP server
 ## Example: ldap://ldap.berkeley.edu
 org.opencastproject.userdirectory.ldap.url=
@@ -40,6 +44,12 @@ org.opencastproject.userdirectory.ldap.roleattributes=
 ## The organization for this provider
 org.opencastproject.userdirectory.ldap.org=mh_default_org
 
-## A prefix to be added to all the roles read by this provider. It defaults to "ROLE_".
-## Please note that if no prefix (i.e. an empty prefix) is desired, it must be EXPLICITLY set to an EMPTY STRING
+## A prefix to be added to all the roles read by this provider. It defaults to an empty string "", i.e. no prefix added.
+## Please note that this property had previous a default value of "ROLE_", which is still recommended, but not mandatory.
 org.opencastproject.userdirectory.ldap.roleprefix=ROLE_
+
+## Whether or not the role names should be converted to uppercase. It defaults to "true"
+org.opencastproject.userdirectory.ldap.uppercase=true
+
+## A comma-separated list of extra roles to apply to all the user authenticated with this LDAP instance
+org.opencastproject.userdirectory.ldap.extra.roles=

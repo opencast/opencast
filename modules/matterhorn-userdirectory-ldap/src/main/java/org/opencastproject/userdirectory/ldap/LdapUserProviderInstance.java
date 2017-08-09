@@ -26,8 +26,10 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
+import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -83,6 +85,9 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   /** A cache of users, which lightens the load on the LDAP server */
   private LoadingCache<String, Object> cache = null;
 
+  /** A service providing the different role groups */
+  private JpaGroupRoleProvider groupRoleProvider = null;
+
   /** A token to store in the miss cache */
   protected Object nullToken = new Object();
 
@@ -114,8 +119,8 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
    */
   // CHECKSTYLE:OFF
   LdapUserProviderInstance(String pid, Organization organization, String searchBase, String searchFilter, String url,
-          String userDn, String password, String roleAttributesGlob, String rolePrefix, int cacheSize,
-          int cacheExpiration) {
+          String userDn, String password, String roleAttributesGlob, String rolePrefix, boolean convertToUppercase,
+          int cacheSize, int cacheExpiration, JpaGroupRoleProvider groupRoleProvider) {
     // CHECKSTYLE:ON
     this.organization = organization;
     logger.debug("Creating LdapUserProvider instance with pid=" + pid + ", and organization=" + organization
@@ -143,15 +148,21 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
 
     if (StringUtils.isNotBlank(roleAttributesGlob)) {
       LdapUserDetailsMapper mapper = new LdapUserDetailsMapper();
-      if (rolePrefix != null) {
-        mapper.setRolePrefix(rolePrefix);
-        logger.debug("Role prefix set to: \"{}\"", rolePrefix);
-      } else {
-        logger.debug("Using default role prefix (\"ROLE_\")");
+
+      if (StringUtils.isBlank(rolePrefix)) {
+        rolePrefix = "";
       }
+      mapper.setRolePrefix(rolePrefix);
+      logger.debug("Role prefix set to: \"{}\"", rolePrefix);
+
+      mapper.setConvertToUpperCase(convertToUppercase);
+
       mapper.setRoleAttributes(roleAttributesGlob.split(","));
       this.delegate.setUserDetailsMapper(mapper);
     }
+
+    // Set the provider to resolve all the roles belonging to a group
+    this.groupRoleProvider = groupRoleProvider;
 
     // Setup the caches
     cache = CacheBuilder.newBuilder().maximumSize(cacheSize).expireAfterWrite(cacheExpiration, TimeUnit.MINUTES)
@@ -258,6 +269,11 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
       if (authorities != null) {
         for (GrantedAuthority authority : authorities) {
           roles.add(new JaxbRole(authority.getAuthority(), jaxbOrganization));
+
+          // Check if this role is a group role and assign the groups appropriately
+          for (Role role : groupRoleProvider.getRolesForGroup(authority.getAuthority())) {
+            roles.add(JaxbRole.fromRole(role));
+          }
         }
       }
       User user = new JaxbUser(userDetails.getUsername(), PROVIDER_NAME, jaxbOrganization, roles);
@@ -305,5 +321,4 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   public void invalidate(String userName) {
     cache.invalidate(userName);
   }
-
 }

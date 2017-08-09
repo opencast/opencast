@@ -297,6 +297,7 @@
               org.springframework.security.ldap,
               org.springframework.security.ldap.authentication,
               org.springframework.security.ldap.search,
+              org.springframework.security.ldap.userdetails,
               org.xml.sax;version=0,
               *
             </Import-Package>
