@@ -11,6 +11,8 @@
 
 ## A unique identifier for this connection. It only has effect within Opencast.
 ## May be different as the <ID> used above, but this is not recommended for clarity
+## IMPORTANT: This identifier must be the same as the one used in the security.xml
+## file to get a reference to an 'authoritiesPopulator'
 org.opencastproject.userdirectory.ldap.id=
 
 ## The URL to the LDAP server
@@ -48,16 +50,21 @@ org.opencastproject.userdirectory.ldap.org=mh_default_org
 ##
 ## The prefix is *NOT* added to a role if any of the following conditions is met:
 ##
-##   * The role is found to be a "group role", i.e. it represent a role already defined in Opencast.
+##   * The role is found to be a "group role", i.e. it represents a user group already defined in Opencast.
 ##   * The role starts with any of the prefixes defined in the parameter 'exclude.prefixes'
+##   * The role was not actually read from the provider, but defined in the 'extra.roles' list below
 org.opencastproject.userdirectory.ldap.roleprefix=
 
 ## A comma-separated list of prefixes. When the roles read from LDAP start with any of these, then the prefix defined
-## above is not appended to the role
+## above is not appended to the role.
+## Please note that if the "uppercase" parameter was provided, these prefixes are converted accordingly
 org.opencastproject.userdirectory.ldap.exclude.prefixes=
 
-## Whether or not the role names should be converted to uppercase. It defaults to "true"
+## Whether or not the role names should be converted to uppercase. It defaults to "true".
+## Please note that this setting affects the prefix defined above.
 org.opencastproject.userdirectory.ldap.uppercase=true
 
 ## A comma-separated list of extra roles to apply to all the users authenticated with this LDAP instance
+## The roles in this list are converted to uppercase if the corresponding parameter is set. However, the 'roleprefix'
+## setting does not affect them -i.e. they will not be further modified even if 'roleprefix' is set.
 org.opencastproject.userdirectory.ldap.extra.roles=
