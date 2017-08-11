@@ -13,11 +13,27 @@
       <div id="workflow-configuration">
 
         <fieldset>
-          <legend>Video Quality</legend>
+          <legend>Video Qualities</legend>
           <ul>
             <li>
-              <input id="flagMultiQuality" name="flagMultiQuality" type="checkbox" class="configField" value="false" />
-              <label for="flagMultiQuality">Multi Quality Videos for Adaptive Streaming</label>
+              <input id="flagQuality360p" name="flagQuality360p" type="checkbox" class="configField" value="false" />
+              <label for="flagMultiQuality">360p resolution</label>
+            </li>
+            <li>
+              <input id="flagQuality480p" name="flagQuality480p" type="checkbox" class="configField" value="false" />
+              <label for="flagMultiQuality">480p resolution</label>
+            </li>
+            <li>
+              <input id="flagQuality720p" name="flagQuality720p" type="checkbox" class="configField" value="true" checked="checked"/>
+              <label for="flagMultiQuality">720p resolution (HDready)</label>
+            </li>
+            <li>
+              <input id="flagQuality1080p" name="flagQuality1080p" type="checkbox" class="configField" value="false" />
+              <label for="flagMultiQuality">1080p resolution (FullHD)</label>
+            </li>
+            <li>
+              <input id="flagQuality2160p" name="flagQuality2160p" type="checkbox" class="configField" value="false" />
+              <label for="flagMultiQuality">2160p resolution (UltraHD)</label>
             </li>
           </ul>
         </fieldset>
@@ -128,7 +144,11 @@
         <configuration key="straightToPublishing">true</configuration>
         <configuration key="flagForCutting">false</configuration>
         <configuration key="flagForReview">false</configuration>
-        <configuration key="flagMultiQuality">false</configuration>
+        <configuration key="flagQuality360p">false</configuration>
+        <configuration key="flagQuality480p">false</configuration>
+        <configuration key="flagQuality720p">true</configuration>
+        <configuration key="flagQuality1080p">false</configuration>
+        <configuration key="flagQuality2160p">false</configuration>
         <configuration key="publishToEngage">true</configuration>
         <configuration key="publishToApi">true</configuration>
         <configuration key="publishToOaiPmh">true</configuration>
