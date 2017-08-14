@@ -76,9 +76,7 @@ public final class DublinCoreMetadataUtil {
         final String namespace = field.getNamespace().getOr(DublinCore.TERMS_NS_URI);
         final EName ename = new EName(namespace, field.getInputID());
         if (field.getType() == MetadataField.Type.START_DATE) {
-          setTemporalStartDate(dc, field, ename);
-        } else if (field.getType() == MetadataField.Type.START_TIME) {
-          setTemporalStartTime(dc, field, ename);
+          setStartDate(dc, field, ename);
         } else if (field.getType() == MetadataField.Type.DURATION) {
           setDuration(dc, field, ename);
         } else if (field.getType() == Type.DATE) {
@@ -177,56 +175,6 @@ public final class DublinCoreMetadataUtil {
   }
 
   /**
-   * Gets the current hour, minute and second from a dublin core period if available.
-   *
-   * @param period
-   *          The current period from dublin core.
-   * @return A new DateTime with the current hour, minute and second.
-   */
-  static DateTime getCurrentStartTime(Opt<DCMIPeriod> period) {
-    DateTime currentStartTime = new DateTime();
-    currentStartTime = currentStartTime.withZone(DateTimeZone.UTC);
-    currentStartTime = currentStartTime.withHourOfDay(0);
-    currentStartTime = currentStartTime.withMinuteOfHour(0);
-    currentStartTime = currentStartTime.withSecondOfMinute(0);
-
-    if (period.isSome() && period.get().hasStart()) {
-      DateTime fromDC = new DateTime(period.get().getStart().getTime());
-      fromDC = fromDC.withZone(DateTimeZone.UTC);
-      currentStartTime = currentStartTime.withZone(DateTimeZone.UTC);
-      currentStartTime = currentStartTime.withHourOfDay(fromDC.getHourOfDay());
-      currentStartTime = currentStartTime.withMinuteOfHour(fromDC.getMinuteOfHour());
-      currentStartTime = currentStartTime.withSecondOfMinute(fromDC.getSecondOfMinute());
-    }
-    return currentStartTime;
-  }
-
-  /**
-   * Gets the current hour, minute and second from a dublin core period if available.
-   *
-   * @param period
-   *          The current period from dublin core.
-   * @return A new DateTime with the current hour, minute and second.
-   */
-  static DateTime getCurrentStartDate(Opt<DCMIPeriod> period) {
-    DateTime currentStartDate = new DateTime();
-    currentStartDate = currentStartDate.withZone(DateTimeZone.UTC);
-    currentStartDate = currentStartDate.withYear(2001);
-    currentStartDate = currentStartDate.withMonthOfYear(1);
-    currentStartDate = currentStartDate.withDayOfMonth(1);
-
-    if (period.isSome() && period.get().hasStart()) {
-      DateTime fromDC = new DateTime(period.get().getStart().getTime());
-      fromDC = fromDC.withZone(DateTimeZone.UTC);
-      currentStartDate = currentStartDate.withZone(DateTimeZone.UTC);
-      currentStartDate = currentStartDate.withYear(fromDC.getYear());
-      currentStartDate = currentStartDate.withMonthOfYear(fromDC.getMonthOfYear());
-      currentStartDate = currentStartDate.withDayOfMonth(fromDC.getDayOfMonth());
-    }
-    return currentStartDate;
-  }
-
-  /**
    * Sets the start date in a dublin core catalog to the right value and keeps the start time and duration the same.
    *
    * @param dc
@@ -236,7 +184,7 @@ public final class DublinCoreMetadataUtil {
    * @param ename
    *          The EName in the catalog to identify the property that has the dublin core period.
    */
-  static void setTemporalStartDate(DublinCoreCatalog dc, MetadataField<?> field, EName ename) {
+  static void setStartDate(DublinCoreCatalog dc, MetadataField<?> field, EName ename) {
     if (field.getValue().isNone()
             || (field.getValue().get() instanceof String && StringUtils.isBlank(field.getValue().get().toString()))) {
       logger.debug("No value was set for metadata field with dublin core id '{}' and json id '{}'", field.getInputID(),
@@ -251,17 +199,9 @@ public final class DublinCoreMetadataUtil {
       Opt<DCMIPeriod> period = getPeriodFromCatalog(dc, ename);
       // Get the current duration
       Long duration = getDuration(period);
-      // Get the current start time hours, minutes and seconds
-      DateTime currentStartTime = getCurrentStartTime(period);
-      // Setup the new start time
-      DateTime startDateTime = new DateTime(startDate.getTime());
-      startDateTime = startDateTime.withZone(DateTimeZone.UTC);
-      startDateTime = startDateTime.withHourOfDay(currentStartTime.getHourOfDay());
-      startDateTime = startDateTime.withMinuteOfHour(currentStartTime.getMinuteOfHour());
-      startDateTime = startDateTime.withSecondOfMinute(currentStartTime.getSecondOfMinute());
       // Get the current end date based on new date and duration.
-      DateTime endDate = new DateTime(startDateTime.toDate().getTime() + duration);
-      dc.set(ename, EncodingSchemeUtils.encodePeriod(new DCMIPeriod(startDateTime.toDate(), endDate.toDate()),
+      DateTime endDate = new DateTime(startDate.getTime() + duration);
+      dc.set(ename, EncodingSchemeUtils.encodePeriod(new DCMIPeriod(startDate, endDate.toDate()),
               Precision.Second));
     } catch (ParseException e) {
       logger.error("Not able to parse date {} to update the dublin core because: {}", field.getValue(),
@@ -298,50 +238,6 @@ public final class DublinCoreMetadataUtil {
       currentStartTime = currentStartTime.withSecondOfMinute(fromDC.getSecondOfMinute());
     }
     return currentStartTime;
-  }
-
-  /**
-   * Sets the start time in a dublin core catalog to the right value and keeps the start date and duration the same.
-   *
-   * @param dc
-   *          The dublin core catalog to adjust
-   * @param field
-   *          The metadata field that contains the start time.
-   * @param ename
-   *          The EName in the catalog to identify the property that has the dublin core period.
-   */
-  static void setTemporalStartTime(DublinCoreCatalog dc, MetadataField<?> field, EName ename) {
-    if (field.getValue().isNone()
-            || (field.getValue().get() instanceof String && StringUtils.isBlank(field.getValue().get().toString()))) {
-      logger.debug("No value was set for metadata field with dublin core id '{}' and json id '{}'", field.getInputID(),
-              field.getOutputID());
-      return;
-    }
-    try {
-      // Get the current date
-      SimpleDateFormat dateFormat = MetadataField.getSimpleDateFormatter(field.getPattern().get());
-      Date startDate = dateFormat.parse((String) field.getValue().get());
-      // Get the current period
-      Opt<DCMIPeriod> period = getPeriodFromCatalog(dc, ename);
-      // Get the current duration
-      Long duration = getDuration(period);
-      // Get the current start date
-      DateTime currentStartDate = getCurrentStartDate(period);
-      // Setup the new start time
-      DateTime startDateTime = new DateTime(startDate.getTime());
-      startDateTime = startDateTime.withZone(DateTimeZone.UTC);
-      startDateTime = startDateTime.withYear(currentStartDate.getYear());
-      startDateTime = startDateTime.withMonthOfYear(currentStartDate.getMonthOfYear());
-      startDateTime = startDateTime.withDayOfMonth(currentStartDate.getDayOfMonth());
-
-      // Get the current end date based on new date and duration.
-      DateTime endDate = new DateTime(startDateTime.toDate().getTime() + duration);
-      dc.set(ename, EncodingSchemeUtils.encodePeriod(new DCMIPeriod(startDateTime.toDate(), endDate.toDate()),
-              Precision.Second));
-    } catch (ParseException e) {
-      logger.error("Not able to parse date {} to update the dublin core because: {}", field.getValue(),
-              ExceptionUtils.getStackTrace(e));
-    }
   }
 
   /**

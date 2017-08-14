@@ -1665,13 +1665,20 @@ public abstract class AbstractEventEndpoint {
             .getMetadataByAdapter(getIndexService().getCommonEventCatalogUIAdapter());
     if (optMetadataByAdapter.isSome()) {
       MetadataCollection collection = optMetadataByAdapter.get();
-      collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName()));
-      collection.removeField(collection.getOutputFields().get("duration"));
-      collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName()));
-      collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_SOURCE.getLocalName()));
-      collection.removeField(collection.getOutputFields().get("startDate"));
-      collection.removeField(collection.getOutputFields().get("startTime"));
-      collection.removeField(collection.getOutputFields().get("location"));
+      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_CREATED.getLocalName()))
+        collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName()));
+      if (collection.getOutputFields().containsKey("duration"))
+        collection.removeField(collection.getOutputFields().get("duration"));
+      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_IDENTIFIER.getLocalName()))
+        collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName()));
+      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_SOURCE.getLocalName()))
+        collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_SOURCE.getLocalName()));
+      if (collection.getOutputFields().containsKey("startDate"))
+        collection.removeField(collection.getOutputFields().get("startDate"));
+      if (collection.getOutputFields().containsKey("startTime"))
+        collection.removeField(collection.getOutputFields().get("startTime"));
+      if (collection.getOutputFields().containsKey("location"))
+        collection.removeField(collection.getOutputFields().get("location"));
       metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), collection);
     }
     return okJson(metadataList.toJSON());
