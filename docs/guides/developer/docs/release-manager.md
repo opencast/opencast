@@ -258,10 +258,10 @@ assume the final release should be based on `3.0-rc2`.
 
         git checkout -b r/3.0
 
-4. Add release notes and commit them:
+4. Add release notes, and update the changelog, then commit them:
 
-        vim docs/guides/admin/docs/release.notes.md
-        git commit docs/guides/admin/docs/release.notes.md -sS
+        vim docs/guides/admin/docs/releasenotes.md docs/guides/admin/docs/changelog.md
+        git commit docs/guides/admin/docs/releasenotes.md docs/guides/admin/docs/changelog.md -sS
 
 5. Update the [localization translations](localization.md).
 
