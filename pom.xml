@@ -1583,8 +1583,8 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:https://bitbucket.org/opencast-community/matterhorn.git</connection>
-    <developerConnection>scm:git:git@bitbucket.org:opencast-community/matterhorn.git</developerConnection>
+    <connection>scm:git:https://bitbucket.org/opencast-community/opencast.git</connection>
+    <developerConnection>scm:git:git@bitbucket.org:opencast-community/opencast.git</developerConnection>
     <url>https://bitbucket.org/opencast-community</url>
   </scm>
 
