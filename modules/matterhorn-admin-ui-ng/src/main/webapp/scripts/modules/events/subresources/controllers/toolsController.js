@@ -40,7 +40,7 @@ angular.module('adminNg.controllers')
         $scope.tab      = $route.current.params.tab;
         if ($scope.tab === "editor") {
           $scope.area   = "segments";
-        } else {
+        } else if ($scope.tab === "playback") {
           $scope.area   = "metadata";
         }
         $scope.id       = $route.current.params.itemId;
@@ -49,6 +49,11 @@ angular.module('adminNg.controllers')
 
         $scope.openTab = function (tab) {
             $scope.tab = tab;
+            if ($scope.tab === "editor") {
+              $scope.area   = "segments";
+            } else if ($scope.tab === "playback") {
+              $scope.area   = "metadata";
+            }
             // Find elements by video tag
             var videoArray = [].slice.call(document.querySelectorAll("video"));
             // Loop through each video element
