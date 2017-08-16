@@ -94,6 +94,13 @@ Opencast 3.1 fixes a critical security issue which allowed unauthenticated remot
 could lead to exposure of all bundle configuration values, potentially including some authentication data. This issue 
 was resolved by updating Karaf to 4.0.9 as part of MH-12295. The underlying issue in Karaf was filed as KARAF-4993.
 
+
+Additional Notes about 3.2
+--------------------------
+
+Opencast 3.2 contains minor bug fixes which were merged after the release of 3.1.
+
+
 Release Schedule
 ----------------
 
