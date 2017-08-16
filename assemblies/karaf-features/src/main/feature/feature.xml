@@ -15,7 +15,6 @@
     <feature>http</feature>
     <feature>http-whiteboard</feature>
     <feature>scr</feature>
-    <feature>webconsole</feature>
     <feature>cxf-jaxrs</feature>
     <feature>cxf-http-jetty</feature>
 
@@ -24,9 +23,6 @@
     <bundle start-level="55">mvn:org.apache.httpcomponents/httpcore-osgi/${httpcomponents-httpcore.version}</bundle>
     <bundle start-level="55">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/3.1_7</bundle>
     <bundle start-level="55">mvn:commons-codec/commons-codec/1.9</bundle>
-
-    <!-- Webconsole plugins -->
-    <bundle>mvn:org.apache.felix/org.apache.felix.webconsole.plugins.ds/2.0.6</bundle>
 
     <!-- General specifications -->
     <bundle>mvn:javax.el/javax.el-api/3.0.0</bundle>
@@ -95,10 +91,10 @@
     <bundle>mvn:org.springframework.osgi/spring-osgi-core/1.2.1</bundle>
     <bundle>mvn:org.springframework.osgi/spring-osgi-extender/1.2.1</bundle>
     <bundle>mvn:org.springframework.osgi/spring-osgi-io/1.2.1</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-config/3.1.0.RELEASE</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-core/3.1.0.RELEASE</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-ldap/3.1.0.RELEASE</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-web/3.1.0.RELEASE</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-config/3.1.4.RELEASE</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-core/3.1.4.RELEASE</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-ldap/3.1.4.RELEASE</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-web/3.1.4.RELEASE</bundle>
     <bundle>mvn:org.springframework/spring-aop/3.1.4.RELEASE</bundle>
     <bundle>mvn:org.springframework/spring-asm/3.1.4.RELEASE</bundle>
     <bundle>mvn:org.springframework/spring-beans/3.1.4.RELEASE</bundle>
@@ -201,6 +197,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-video-videojs/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-external-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>
@@ -299,6 +298,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-email-template-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-email-template-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-remote/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-external-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>
@@ -409,6 +411,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-theodul-plugin-video-videojs/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-engage-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-remote/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-external-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>
@@ -502,6 +507,8 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-cover-image-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-dictionary-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-dictionary-regexp/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-inspection-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-inspection-service-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-publication-service-api/${project.version}</bundle>
@@ -562,6 +569,9 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-email-template-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-email-template-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-event-comment/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-execute-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-external-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-fileupload/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-incident-workflowoperation/${project.version}</bundle>
@@ -671,14 +681,14 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-migration/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-contrib-cas">
-    <bundle>mvn:net.sourceforge.nekohtml/com.springsource.org.cyberneko.html/1.9.13</bundle>
-    <bundle>mvn:org.apache.xml/com.springsource.org.apache.xml.security/1.4.2</bundle>
-    <bundle>mvn:org.jasig.cas/com.springsource.org.jasig.cas.client/3.1.12</bundle>
-    <bundle>mvn:org.openid4java/com.springsource.org.openid4java/0.9.5</bundle>
-    <bundle>mvn:org.opensaml/com.springsource.org.opensaml/1.1.0</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-cas/3.1.0.RELEASE</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-openid/3.1.0.RELEASE</bundle>
+  <feature name="opencast-security-cas" version="0.0.0">
+    <bundle start-level="82">mvn:org.apache.xml/com.springsource.org.apache.xml.security/1.4.2</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-security-cas-client-wrapper/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.springframework.security/spring-security-core/3.1.4.RELEASE</bundle>
+    <bundle start-level="82">mvn:org.springframework.security/spring-security-web/3.1.4.RELEASE</bundle>
+    <bundle start-level="82">mvn:org.springframework.security/spring-security-cas/3.1.4.RELEASE</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/matterhorn-security-cas/${project.version}</bundle>
   </feature>
+
 
 </features>

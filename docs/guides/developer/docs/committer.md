@@ -49,9 +49,9 @@ activities such as:
  - 20% of the time a committer invests to the project is to be allocated for general purposes, i.e. work not directly
    associated with the committer's individual or institutional concerns.
 
-All committers must signed a CLA. The privileges and rights of being a committer do not come into effect until a CLA
-has been received and processed. The CLA, as well as the list of CLA signatories, can be found
-[here](http://licensing.apereo.org/). Your employer may also need to sign a CCLA as well.
+All committers must signed a ICLA. The privileges and rights of being a committer do not come into effect until an ICLA
+has been received and processed. The ICLA, as well as the list of ICLA signatories, can be found
+[here](http://licensing.apereo.org/). Your employer will also need to sign a CCLA as well.
 
 How do I become a committer?
 ----------------------------

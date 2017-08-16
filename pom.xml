@@ -157,6 +157,7 @@
     <module>modules/matterhorn-search-service-remote</module>
     <module>modules/matterhorn-search-workflowoperation</module>
     <module>modules/matterhorn-security-aai</module>
+    <module>modules/matterhorn-security-cas-client-wrapper</module>
     <module>modules/matterhorn-security-cas</module>
     <module>modules/matterhorn-security-ldap</module>
     <module>modules/matterhorn-security-openid</module>
@@ -270,6 +271,10 @@
           <shortRevisionLength>7</shortRevisionLength>
         </configuration>
       </plugin>
+      <!-- Attach sources for all builds -->
+      <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-source-plugin</artifactId> <executions>
+        <execution> <id>attach-sources</id> <phase>verify</phase> <goals> <goal>jar-no-fork</goal> <goal>test-jar-no-fork</goal>
+        </goals> </execution> </executions> </plugin> -->
       <!-- Run tests and display test output in the console -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -463,6 +468,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.19.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>2.17</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -878,14 +888,14 @@
         <version>3.1.4.RELEASE</version>
       </dependency>
       <dependency>
-        <groupId>org.jasig.cas</groupId>
-        <artifactId>com.springsource.org.jasig.cas.client</artifactId>
-        <version>3.1.12</version>
+        <groupId>org.opensaml</groupId>
+        <artifactId>opensaml</artifactId>
+        <version>1.1</version>
       </dependency>
       <dependency>
-        <groupId>org.opensaml</groupId>
-        <artifactId>com.springsource.org.opensaml</artifactId>
-        <version>1.1.0</version>
+        <groupId>org.jasig.cas.client</groupId>
+        <artifactId>cas-client-core</artifactId>
+        <version>3.1.12</version>
       </dependency>
       <dependency>
         <groupId>org.openid4java</groupId>

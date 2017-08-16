@@ -255,7 +255,7 @@ public class OaiPmhRepositoryPersistenceTest {
               "/episode-dublincore.xml").toURI());
       final File seriesDublinCore = new File(OaiPmhRepositoryPersistenceTest.class
               .getResource("/series-dublincore.xml").toURI());
-      expect(workspace.get(EasyMock.<URI> anyObject())).andAnswer(new IAnswer<File>() {
+      expect(workspace.read(EasyMock.<URI> anyObject())).andAnswer(new IAnswer<File>() {
         @Override
         public File answer() throws Throwable {
           final String uri = getCurrentArguments()[0].toString();

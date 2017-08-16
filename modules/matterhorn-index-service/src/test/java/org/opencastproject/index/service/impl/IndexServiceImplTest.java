@@ -565,7 +565,7 @@ public class IndexServiceImplTest {
     Workspace workspace = EasyMock.createMock(Workspace.class);
     EasyMock.expect(workspace.put(EasyMock.capture(mediapackageIdResult), EasyMock.capture(catalogIdResult),
             EasyMock.capture(filenameResult), EasyMock.capture(catalogResult))).andReturn(new URI("catalog.xml"));
-    EasyMock.expect(workspace.get(getClass().getResource("/dublincore.xml").toURI()))
+    EasyMock.expect(workspace.read(getClass().getResource("/dublincore.xml").toURI()))
             .andReturn(new File(getClass().getResource("/dublincore.xml").toURI())).anyTimes();
     EasyMock.replay(workspace);
 

@@ -53,6 +53,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -253,32 +256,40 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
           throws IOException {
     checkPathSafe(mediaPackageID);
     checkPathSafe(mediaPackageElementID);
-    File f = null;
     File dir = getElementDirectory(mediaPackageID, mediaPackageElementID);
+
+    File[] filesToDelete = null;
+
     if (dir.exists()) {
-      // clear the directory
-      File[] filesToDelete = dir.listFiles();
-      if (filesToDelete != null && filesToDelete.length > 0) {
-        for (File fileToDelete : filesToDelete) {
-          if (!fileToDelete.delete()) {
-            throw new IllegalStateException("Unable to delete file: " + fileToDelete.getAbsolutePath());
-          }
-        }
-      }
+      filesToDelete = dir.listFiles();
     } else {
       logger.debug("Attempting to create a new directory at {}", dir.getAbsolutePath());
       FileUtils.forceMkdir(dir);
     }
-    f = new File(dir, PathSupport.toSafeName(filename));
-    logger.debug("Attempting to write a file to {}", f.getAbsolutePath());
+
+    // Destination files
+    File f = new File(dir, PathSupport.toSafeName(filename));
+    File md5File = getMd5File(f);
+
+    // Temporary files while adding
+    File fTmp = null;
+    File md5FileTmp = null;
+
+    if (f.exists()) {
+      logger.debug("Updating file {}", f.getAbsolutePath());
+    } else {
+      logger.debug("Adding file {}", f.getAbsolutePath());
+    }
+
     FileOutputStream out = null;
     try {
-      if (!f.exists()) {
-        f.createNewFile();
-      } else {
-        logger.debug("Attempting to overwrite the file at {}", f.getAbsolutePath());
-      }
-      out = new FileOutputStream(f);
+
+      fTmp = File.createTempFile(f.getName(), ".tmp", dir);
+      md5FileTmp = File.createTempFile(md5File.getName(), ".tmp", dir);
+
+      logger.trace("Writing to new temporary file {}", fTmp.getAbsolutePath());
+
+      out = new FileOutputStream(fTmp);
 
       // Wrap the input stream and copy the input stream to the file
       MessageDigest messageDigest = null;
@@ -293,12 +304,10 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
 
       // Store the hash
       String md5 = Checksum.convertToHex(dis.getMessageDigest().digest());
-      File md5File = null;
       try {
-        md5File = getMd5File(f);
-        FileUtils.writeStringToFile(md5File, md5);
+        FileUtils.writeStringToFile(md5FileTmp, md5);
       } catch (IOException e) {
-        FileUtils.deleteQuietly(md5File);
+        FileUtils.deleteQuietly(md5FileTmp);
         throw e;
       } finally {
         IOUtils.closeQuietly(dis);
@@ -311,6 +320,29 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       IOUtils.closeQuietly(out);
       IOUtils.closeQuietly(in);
     }
+
+    // Rename temporary files to the final version atomically
+    try {
+      Files.move(md5FileTmp.toPath(), md5File.toPath(), StandardCopyOption.ATOMIC_MOVE);
+      Files.move(fTmp.toPath(), f.toPath(), StandardCopyOption.ATOMIC_MOVE);
+    } catch (AtomicMoveNotSupportedException e) {
+      logger.trace("Atomic move not supported by this filesystem: using replace instead");
+      Files.move(md5FileTmp.toPath(), md5File.toPath(), StandardCopyOption.REPLACE_EXISTING);
+      Files.move(fTmp.toPath(), f.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    // Clean up any other files
+    if (filesToDelete != null && filesToDelete.length > 0) {
+      for (File fileToDelete : filesToDelete) {
+        if (!fileToDelete.equals(f) && !fileToDelete.equals(md5File)) {
+          logger.trace("delete {}", fileToDelete.getAbsolutePath());
+          if (!fileToDelete.delete()) {
+            throw new IllegalStateException("Unable to delete file: " + fileToDelete.getAbsolutePath());
+          }
+        }
+      }
+    }
+
     return getURI(mediaPackageID, mediaPackageElementID, filename);
   }
 

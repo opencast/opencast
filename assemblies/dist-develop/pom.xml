@@ -111,13 +111,11 @@
             <feature>service</feature>
             <feature>system</feature>
             <feature>config</feature>
-            <feature>jaas</feature>
             <!-- Opencast external features -->
             <feature>jpa</feature>
             <feature>http</feature>
             <feature>http-whiteboard</feature>
             <feature>scr</feature>
-            <feature>webconsole</feature>
             <feature>cxf-jaxrs</feature>
             <feature>cxf-http-jetty</feature>
             <feature>transaction</feature>

@@ -162,7 +162,7 @@ public class DublinCoreCatalogUIAdapterTest {
     writtenCatalog = new Capture<InputStream>();
 
     workspace = EasyMock.createMock(Workspace.class);
-    EasyMock.expect(workspace.get(eventDublincoreURI)).andReturn(new File(eventDublincoreURI));
+    EasyMock.expect(workspace.read(eventDublincoreURI)).andReturn(new File(eventDublincoreURI));
     EasyMock.expect(
             workspace.put(EasyMock.capture(mediapackageIDCapture), EasyMock.capture(catalogIDCapture),
                     EasyMock.capture(filenameCapture), EasyMock.capture(writtenCatalog))).andReturn(

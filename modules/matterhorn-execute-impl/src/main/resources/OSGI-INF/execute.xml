@@ -34,6 +34,8 @@
 
     <reference name="execute" interface="org.opencastproject.execute.api.ExecuteService"
       cardinality="1..1" policy="static" bind="setExecuteService" />
+    <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+      cardinality="1..1" policy="static" bind="setServiceRegistry" />
   </scr:component>
 
 </scr:components>
