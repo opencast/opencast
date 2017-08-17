@@ -64,6 +64,11 @@ public class UnitTestWorkspace implements Workspace {
   }
 
   @Override
+  public File read(URI uri) throws NotFoundException, IOException {
+    return get(uri);
+  }
+
+  @Override
   public URI getBaseUri() {
     return baseDir.toURI();
   }
