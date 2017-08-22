@@ -40,7 +40,6 @@ import org.opencastproject.authorization.xacml.manager.impl.AclServiceImpl;
 import org.opencastproject.authorization.xacml.manager.impl.AclTransitionDb;
 import org.opencastproject.authorization.xacml.manager.impl.persistence.JpaAclDb;
 import org.opencastproject.authorization.xacml.manager.impl.persistence.OsgiJpaAclTransitionDb;
-import org.opencastproject.distribution.download.DownloadDistributionServiceImpl;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
@@ -98,7 +97,6 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
   public static final AuthorizationService authorizationService;
   public static final Archive<?> archive;
   public static final ServiceRegistry serviceRegistry;
-  public static final DownloadDistributionServiceImpl distributionService = new DownloadDistributionServiceImpl();
   public static final MessageSender messageSender;
   public static final EntityManagerFactory authorizationEMF = newTestEntityManagerFactory(OsgiJpaAclTransitionDb.PERSISTENCE_UNIT);
 
