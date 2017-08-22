@@ -840,23 +840,16 @@ function formatTime(seconds) {
     var h = "00";
     var m = "00";
     var s = "00";
+    var ms = "000";
     if (!isNaN(seconds) && (seconds >= 0)) {
         var tmpH = Math.floor(seconds / 3600);
         var tmpM = Math.floor((seconds - (tmpH * 3600)) / 60);
         var tmpS = Math.floor(seconds - (tmpH * 3600) - (tmpM * 60));
-        var tmpMS = seconds - tmpS;
         h = (tmpH < 10) ? "0" + tmpH : (Math.floor(seconds / 3600) + "");
         m = (tmpM < 10) ? "0" + tmpM : (tmpM + "");
         s = (tmpS < 10) ? "0" + tmpS : (tmpS + "");
-        ms = tmpMS + "";
-        var indexOfSDot = ms.indexOf(".");
-        if (indexOfSDot != -1) {
-            ms = ms.substr(indexOfSDot + 1, ms.length);
-        }
-        ms = ms.substr(0, 2);
-        while (ms.length < 2) {
-            ms += "0";
-        }
+        // seconds remainder: ms to 3 digits, in string form
+        ms = (seconds % 1).toFixed(3).substring(2);
     }
     return h + ":" + m + ":" + s + "." + ms;
 }
