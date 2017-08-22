@@ -139,17 +139,20 @@ public class MessageBaseFacility {
       connectionFactory.setTransportListener(new TransportListener() {
         @Override
         public void transportResumed() {
+          enable(true);
           logger.info("Connection to ActiveMQ is working");
         }
 
         @Override
         public void transportInterupted() {
-          logger.error("Connection to ActiveMQ message broker interupted ({}, username: {})",
+          enable(false);
+          logger.error("Connection to ActiveMQ message broker interrupted ({}, username: {})",
               new Object[] {url, username});
         }
 
         @Override
         public void onException(IOException ex) {
+          enable(false);
           logger.error("ActiveMQ transport exception: {}", ex.getMessage());
         }
 
