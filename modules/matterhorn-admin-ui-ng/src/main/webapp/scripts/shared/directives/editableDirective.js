@@ -54,7 +54,7 @@ angular.module('adminNg.directives')
                     }
                 }
             }
-            
+
             if (scope.mode !== 'readOnly') {
                 element.addClass('editable');
             }
