@@ -1,5 +1,5 @@
 site_name: Opencast - Developer Guide
-repo_url: https://bitbucket.org/opencast-community/matterhorn/src/develop/docs/guides/developer/docs
+repo_url: https://bitbucket.org/opencast-community/opencast/src/develop/docs/guides/developer/docs
 
 # Default theme used is readthedocs
 theme: readthedocs
@@ -24,6 +24,8 @@ pages:
    - Release Manager: 'release-manager.md'
    - QA Coordinator: 'qa-coordinator.md'
    - Security Issues: 'security.md'
+   - Code Style: 'code-style.md'
+   - Documentation: 'documentation.md'
 - Decision Making:
    - Overview: 'decision-making/index.md'
    - Lazy Consensus: 'decision-making/lazy-consensus.md'
@@ -41,9 +43,10 @@ pages:
 - Scheduler: 'scheduler.md'
 - Modules:
    - Overview: 'modules/index.md'
-   - Admin UI:
+   - Administrative user Interface:
       - Development: 'modules/admin-ui/development.md'
       - Style Guide:
+        - Overview: 'modules/admin-ui/style/index.md'
         - Color Palette: 'modules/admin-ui/style/color-palette.md'
         - Typeface: 'modules/admin-ui/style/typeface.md'
         - View Structure: 'modules/admin-ui/style/view-structure.md'

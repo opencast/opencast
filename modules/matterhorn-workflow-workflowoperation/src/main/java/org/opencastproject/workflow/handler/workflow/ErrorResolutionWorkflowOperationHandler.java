@@ -24,6 +24,7 @@ package org.opencastproject.workflow.handler.workflow;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowOperationAbortedException;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -83,7 +84,7 @@ public class ErrorResolutionWorkflowOperationHandler extends ResumableWorkflowOp
       switch (s) {
         case NONE:
           logger.info("Error resolution 'fail' was triggered for workflow '{}'", workflowInstance);
-          return createResult(null, properties, Action.CONTINUE, 0);
+          throw new WorkflowOperationAbortedException("Workflow " + workflowInstance + " was failed by user");
         case RETRY:
           logger.info("Error resolution 'retry' was triggered for workflow '{}'", workflowInstance);
           return createResult(null, properties, Action.CONTINUE, 0);

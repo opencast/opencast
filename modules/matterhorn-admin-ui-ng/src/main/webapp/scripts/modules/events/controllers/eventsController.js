@@ -42,6 +42,10 @@ angular.module('adminNg.controllers')
              description: 'DASHBOARD.RUNNING'},
             {filters: [{name: 'status',
                         filter:'FILTERS.EVENTS.STATUS.LABEL',
+                        value: 'EVENTS.EVENTS.STATUS.PAUSED'}],
+             description: 'DASHBOARD.PAUSED'},
+            {filters: [{name: 'status',
+                        filter:'FILTERS.EVENTS.STATUS.LABEL',
                         value: 'EVENTS.EVENTS.STATUS.PROCESSING_FAILURE'}],
              description: 'DASHBOARD.FAILED'},
             {filters: [{name: 'comments',
@@ -68,6 +72,7 @@ angular.module('adminNg.controllers')
                 name:  'presenter',
                 label: 'EVENTS.EVENTS.TABLE.PRESENTERS'
             }, {
+                template: 'modules/events/partials/eventsSeriesCell.html',
                 name:  'series_name',
                 label: 'EVENTS.EVENTS.TABLE.SERIES'
             }, {
@@ -80,6 +85,7 @@ angular.module('adminNg.controllers')
                 name:  'technical_end',
                 label: 'EVENTS.EVENTS.TABLE.STOP'
             }, {
+                template: 'modules/events/partials/eventsLocationCell.html',
                 name:  'location',
                 label: 'EVENTS.EVENTS.TABLE.LOCATION'
             }, {
@@ -88,6 +94,7 @@ angular.module('adminNg.controllers')
                 template: 'modules/events/partials/publishedCell.html',
                 dontSort: true
             }, {
+                template: 'modules/events/partials/eventsStatusCell.html',
                 name:  'event_status',
                 label: 'EVENTS.EVENTS.TABLE.SCHEDULING_STATUS'
             }, {

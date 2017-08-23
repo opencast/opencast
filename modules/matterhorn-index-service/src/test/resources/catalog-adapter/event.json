@@ -49,15 +49,7 @@
       "id":"startDate",
       "label":"EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
       "type":"date",
-      "value":"2015-03-24",
-      "required":false
-   },
-   {
-      "readOnly":false,
-      "id":"startTime",
-      "label":"EVENTS.EVENTS.DETAILS.METADATA.START_TIME",
-      "type":"time",
-      "value":"14:15",
+      "value":"2015-03-24T14:15:00.000Z",
       "required":false
    },
    {

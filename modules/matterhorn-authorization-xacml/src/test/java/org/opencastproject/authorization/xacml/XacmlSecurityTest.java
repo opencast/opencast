@@ -207,6 +207,11 @@ public class XacmlSecurityTest {
     }
 
     @Override
+    public File read(URI uri) throws NotFoundException, IOException {
+      return new File(uri);
+    }
+
+    @Override
     public URI getBaseUri() {
       throw new Error();
     }

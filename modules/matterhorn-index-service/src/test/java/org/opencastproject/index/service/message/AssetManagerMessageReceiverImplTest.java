@@ -57,7 +57,7 @@ public class AssetManagerMessageReceiverImplTest {
   @Before
   public void setUp() throws Exception {
     workspace = createNiceMock(Workspace.class);
-    expect(workspace.get(EasyMock.anyObject(URI.class)))
+    expect(workspace.read(EasyMock.anyObject(URI.class)))
             .andReturn(new File(getClass().getResource("/dublincore.xml").toURI())).anyTimes();
     replay(workspace);
 

@@ -72,6 +72,9 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
         addField(booleanField);
         break;
       case DATE:
+        if (metadataField.getPattern().isNone()) {
+          metadataField.setPattern(Opt.some("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+        }
         MetadataField<Date> dateField = MetadataField.createDateMetadata(metadataField.getInputID(),
                 Opt.some(metadataField.getOutputID()), metadataField.getLabel(), metadataField.isReadOnly(),
                 metadataField.isRequired(), metadataField.getPattern().get(), metadataField.getOrder(),
@@ -169,9 +172,8 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
         addField(textLongField);
         break;
       case START_DATE:
-        if (metadataField.getPattern().isNone() || StringUtils.isBlank(metadataField.getPattern().get())) {
-          throw new IllegalArgumentException("For temporal metadata field " + metadataField.getInputID() + " of type "
-                  + metadataField.getType() + " there needs to be a pattern.");
+        if (metadataField.getPattern().isNone()) {
+          metadataField.setPattern(Opt.some("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
         }
         MetadataField<String> startDate = MetadataField.createTemporalStartDateMetadata(metadataField.getInputID(),
                 Opt.some(metadataField.getOutputID()), metadataField.getLabel(), metadataField.isReadOnly(),
@@ -181,20 +183,6 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
           startDate.setValue(value);
         }
         addField(startDate);
-        break;
-      case START_TIME:
-        if (metadataField.getPattern().isNone() || StringUtils.isBlank(metadataField.getPattern().get())) {
-          throw new IllegalArgumentException("For temporal metadata field " + metadataField.getInputID() + " of type "
-                  + metadataField.getType() + " there needs to be a pattern.");
-        }
-        MetadataField<String> startTime = MetadataField.createTemporalStartTimeMetadata(metadataField.getInputID(),
-                Opt.some(metadataField.getOutputID()), metadataField.getLabel(), metadataField.isReadOnly(),
-                metadataField.isRequired(), metadataField.getPattern().get(), metadataField.getOrder(),
-                metadataField.getNamespace());
-        if (StringUtils.isNotBlank(value)) {
-          startTime.setValue(value);
-        }
-        addField(startTime);
         break;
       default:
         throw new IllegalArgumentException("Unknown metadata type! " + metadataField.getType());

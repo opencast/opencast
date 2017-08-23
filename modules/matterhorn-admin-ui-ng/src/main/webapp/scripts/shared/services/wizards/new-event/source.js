@@ -1,6 +1,6 @@
 angular.module('adminNg.services')
-.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', '$translate', 'underscore', '$timeout', 'localStorageService', 'AuthService',
-    function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate, _, $timeout, localStorageService, AuthService) {
+.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', '$translate', 'underscore', '$timeout', 'localStorageService', 'AuthService', 'NewEventMetadata',
+    function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate, _, $timeout, localStorageService, AuthService, NewEventMetadata) {
 
     // -- constants ------------------------------------------------------------------------------------------------- --
 
@@ -25,6 +25,31 @@ angular.module('adminNg.services')
     var Source = function () {
         var self = this;
 
+        this.save = function () {
+          if (self.startDate.index) {
+            NewEventMetadata.ud['dublincore/episode'].fields[self.startDate.index] = self.startDate;
+          } else {
+            self.startDate.index = NewEventMetadata.ud['dublincore/episode'].fields.length;
+            NewEventMetadata.ud['dublincore/episode'].fields.push(self.startDate);
+          }
+        };
+
+        this.createStartDate = function () {
+          self.startDate = {
+            "id": "startDate",
+            "label": "EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
+            "value": new Date(Date.now()).toISOString(),
+            "type": "date",
+            "readOnly": false,
+            "required": false,
+            "tabindex": 7
+          };
+          self.metadata = new Array();
+          self.metadata.push(self.startDate);
+        };
+
+        this.createStartDate();
+
         self.isSourceState = true;
 
         this.defaultsSet = false;
@@ -48,6 +73,7 @@ angular.module('adminNg.services')
         this.loadCaptureAgents();
 
         this.reset = function (opts) {
+            self.createStartDate();
             self.weekdays = _.clone(WEEKDAYS);
             self.ud = {
                 upload: {},

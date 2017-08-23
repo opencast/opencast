@@ -28,7 +28,7 @@
       "SPANISH":"Spanish",
       "ROMANSH":"Romansh",
       "POLISH":"Polish",
-      "PORTUGESE":"Portugese",
+      "PORTUGESE":"Portuguese",
       "SLOVENIAN":"Slovenian",
       "SWEDISH":"Swedish",
       "RUSSIAN":"Russian",
@@ -103,6 +103,10 @@
      "EVENTS_NOT_UPDATED":  "The event could not be saved",
      "EVENTS_NOT_UPDATED_ID":  "The event {{ id }} could not be saved",
      "EVENTS_NOT_UPDATED_ALL":  "None of the events could be saved",
+     "EVENTS_PROCESSING_ACTION_RETRY": "Processing being resumed...",
+     "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Processing could not be resumed.",
+     "EVENTS_PROCESSING_ACTION_NONE": "Processing being aborted...",
+     "EVENTS_PROCESSING_ACTION_NOT_NONE": "Processing could not be aborted.",
      "SERIES_UPDATED_NB":   "{{ number }} series have been successfully updated",
      "SERIES_UPDATED_ALL":   "All series have been successfully updated",
      "SERIES_NOT_UPDATED":  "The series could not be saved",
@@ -354,6 +358,7 @@
            "UPLOAD": {
                "CAPTION": "Upload",
                "RECORDING_ELEMENTS": "Recording elements",
+               "RECORDING_METADATA": "Recording metadata",
                "SEGMENTABLE": {
                    "SHORT" : "Slides",
                    "DETAIL": "The file contains a recording of a slide presentation (Keynote, Powerpoint, etc)."
@@ -459,7 +464,7 @@
          "PROCESSED": "Finished",
          "RECORDING_FAILURE": "Recording failure",
          "PROCESSING_FAILURE": "Processing failure",
-         "PROCESSING_CANCELED": "Processing canceled"
+         "PROCESSING_CANCELED": "Processing canceled"         
        },
        "DETAILS": {
          "HEADER": "Event details - {{resourceId}}",
@@ -759,6 +764,7 @@
            }
           },
           "WORKFLOWS": {
+            "ACTIONS": "Actions",
             "DETAILS": "Details",
             "DESCRIPTION": "",
             "ID": "ID",
@@ -1070,7 +1076,7 @@
          "DESCRIPTION": {
             "ROLES": "Roles and groups that can be or are already assigned to the user.",
             "EXTERNALROLES": "The list of external roles assigned to the user granted by the external role provider(s).",
-            "EFFECTIVEROLES": "The list of effective roles directly assigned to the user and the roles indirectly loaded through group membership." 
+            "EFFECTIVEROLES": "The list of effective roles directly assigned to the user and the roles indirectly loaded through group membership."
          },
          "FORM": {
             "USERNAME":        "Username",
@@ -1540,14 +1546,14 @@
      "LOGIN":    "Login",
      "ERROR":    "Incorrect username and / or password"
    },
-   "TABLE_FILTERS": { 
-     "FILTER_SELECTION": { 
-       "PLACEHOLDER": "Please select a filter…", 
-       "NO_OPTIONS": "No filters found" 
-     }, 
-     "FILTER_VALUE_SELECTION": { 
-       "PLACEHOLDER": "Please select a value…", 
-       "NO_OPTIONS": "No values found" 
+   "TABLE_FILTERS": {
+     "FILTER_SELECTION": {
+       "PLACEHOLDER": "Please select a filter…",
+       "NO_OPTIONS": "No filters found"
+     },
+     "FILTER_VALUE_SELECTION": {
+       "PLACEHOLDER": "Please select a value…",
+       "NO_OPTIONS": "No values found"
      },
      "CLEAR":       "Clear all filters",
      "REMOVE":      "Remove filter",
@@ -1789,6 +1795,7 @@
    "DASHBOARD":{
        "RUNNING":   "Running",
        "FINISHED":  "Finished",
+       "PAUSED" :   "Paused",
        "FAILED" :   "Failed",
        "FINISHED_WITH_COMMENTS": "Todo",
        "SCHEDULED" : "Scheduled",

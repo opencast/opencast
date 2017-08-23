@@ -1,6 +1,26 @@
 Opencast 3.x
 ============
 
+Opencast 3.2
+------------
+*Released on August 16, 2017*
+
+- [[MH-10523]](https://opencast.jira.com/browse/MH-10523) - Misleading exception parameter in getFileFromCollection
+- [[MH-10650]](https://opencast.jira.com/browse/MH-10650) - Intermittent failure to detect hard links when starting a cluster
+- [[MH-12079]](https://opencast.jira.com/browse/MH-12079) - Misleading logging in some indexing message receivers
+- [[MH-12270]](https://opencast.jira.com/browse/MH-12270) - Don't swallow unknown SMIL exceptions
+- [[MH-12275]](https://opencast.jira.com/browse/MH-12275) - Avoid race condition between index and cleanup operations
+- [[MH-12280]](https://opencast.jira.com/browse/MH-12280) - Create an Opencast group for Sakai instructors
+- [[MH-12288]](https://opencast.jira.com/browse/MH-12288) - Set default max idle time if not configured and log key pool parameters
+- [[MH-12313]](https://opencast.jira.com/browse/MH-12313) - Expose additional LTI parameters for course offering and course section
+- [[MH-12324]](https://opencast.jira.com/browse/MH-12324) - Reduce frequency of index update messages for rebuilds
+- [[MH-12333]](https://opencast.jira.com/browse/MH-12333) - Feed generator separates lists of tags incorrectly
+- [[MH-12342]](https://opencast.jira.com/browse/MH-12342) - A "Scanner" instance in the ExecuteServiceImpl class is not properly closed: possible resource leak
+- [[MH-12345]](https://opencast.jira.com/browse/MH-12345) - Ingest fails because /recordings/{id}/acls returns 500 if event has not ACLs
+- [[MH-12347]](https://opencast.jira.com/browse/MH-12347) - Opencast generates invalid XML catalogs when a "default" (empty) Namespace is used.
+- [[MH-12351]](https://opencast.jira.com/browse/MH-12351) - DublinCoreCatalogService should not complain about "unexpected" dublincore flavors
+
+
 Opencast 3.1
 ------------
 *Released on July 14, 2017*

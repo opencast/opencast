@@ -561,8 +561,10 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
   private static String[] splitQName(String qName) {
     final String[] parts = qName.split(":", 3);
     switch (parts.length) {
-      case 1: return new String[] { DEFAULT_NS_PREFIX, parts[0] };
-      case 2: return parts;
+      case 1:
+        return new String[] { DEFAULT_NS_PREFIX, parts[0] };
+      case 2:
+        return parts;
       default:
         throw new IllegalArgumentException("Local name must not contain ':'");
     }
