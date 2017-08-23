@@ -124,7 +124,6 @@ public class TimelinePreviewsRestEndpoint extends AbstractJobProducerEndpoint {
           },
           returnDescription = "The job ID to use when polling for the resulting media package attachment, "
                   + "that contains the generated timeline preview images.")
-  //)
   public Response createTimelinePreviews(@FormParam("track") String trackAsXml, @FormParam("imageCount") int imageCount)
           throws Exception {
     // Ensure that the POST parameters are present

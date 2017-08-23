@@ -40,53 +40,10 @@ public interface Attachment extends MediaPackageElement {
   /** Element flavor definition */
   MediaPackageElementFlavor FLAVOR = new MediaPackageElementFlavor("attachment", "(unkown)", "Unspecified attachment");
 
-
-  /**
-   * Returns <code>true</code> if the media package element contains the given property.
-   *
-   * @param propertyName
-   *          name of the property
-   * @return <code>true</code> if the element contains the property
-   */
-  boolean containsProperty(String propertyName);
-
   /**
    * Returns a map containing the properties for this media package element or an empty map if there are no properties.
    *
    * @return the properties
    */
   Map<String, String> getProperties();
-
-  /**
-   * Returns the value of the property for this media package element or null if it does not contain that property.
-   *
-   * @param propertyName name of the property
-   * @return the properties
-   */
-  String getPropertyValue(String propertyName);
-
-  /**
-   * Adds a property to the media package element.
-   *
-   * @param name
-   *          name of the property
-   * @param value
-   *          value of the property
-   */
-  void addProperty(String name, String value);
-
-  /**
-   * Removes the property from the media package element.
-   *
-   * @param propertyName
-   *          name of the property
-   * @return true if the media package element contained the specified property
-   *
-   */
-  boolean removeProperty(String propertyName);
-
-  /**
-   * Removes all properties associated with this element
-   */
-  void clearProperties();
 }

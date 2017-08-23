@@ -1248,9 +1248,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         $('#' + id_timeline_preview_img).attr('src', timelinePreview.get(0).url);
 
         // if no valid resolution is stored within the timeline previews attachment, read out the size of the image
-        if (timelinePreviewsTileResolution[0] <= 0 || timelinePreviewsTileResolution[1] <= 0
-                || typeof timelinePreviewsTileResolution[0] === 'undefined'
-                || typeof timelinePreviewsTileResolution[1] === 'undefined') {
+        if (typeof timelinePreviewsTileResolution[0] === 'undefined' || timelinePreviewsTileResolution[0] <= 0
+                || typeof timelinePreviewsTileResolution[1] === 'undefined' || timelinePreviewsTileResolution[1] <= 0) {
           var img = document.getElementById(id_timeline_preview_img);
 
           timelinePreviewsTileResolution[0] = img.naturalWidth / timelinePreviewsImageSize[0];
@@ -1525,7 +1524,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
           var img = document.getElementById(id_timeline_preview_img);
           ctx.drawImage(img, offsetX, offsetY, width, height, 0, 0, width, height);
 
-          var wrapperHeight = $('#navigation_wrapper').height();          
+          var wrapperHeight = $('#navigation_wrapper').height();
           var offsetLeft = (pos - wrapperOffset) - (width / 2);
 
           // clamp left: in case the preview image would exceed the page on the left, move it back to window border
@@ -1545,7 +1544,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
           $('#' + id_timeline_preview).css({'left': Math.round(offsetLeft) + 'px'});
         }
       });
-      
+
       // no pip in mobile mode
       if (!isMobileMode) {
         Engage.on(plugin.events.togglePiP.getName(), function (pip) {

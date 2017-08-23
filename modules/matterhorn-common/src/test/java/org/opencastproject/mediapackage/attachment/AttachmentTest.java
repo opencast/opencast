@@ -21,9 +21,6 @@
 
 package org.opencastproject.mediapackage.attachment;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -38,7 +35,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.HashMap;
 
 /**
  * Test case for the {@link AttachmentImpl} attachment implementation.
@@ -88,35 +84,6 @@ public class AttachmentTest {
     // Type test
     assertTrue("Type mismatch", packageElement instanceof Attachment);
 
-  }
-
-  /**
-   * Test method for the additional properties and the methods to get and set them
-   */
-  @Test
-  public void testAdditionalProperties() {
-    Attachment attachment = new AttachmentImpl();
-    attachment.addProperty("imageSize", "10");
-    attachment.addProperty("resolutionX", "180");
-    attachment.addProperty("resolutionY", "90");
-
-    HashMap<String, String> testMap = new HashMap();
-    testMap.put("imageSize", "10");
-    testMap.put("resolutionX", "180");
-    testMap.put("resolutionY", "90");
-
-    assertEquals("10", attachment.getPropertyValue("imageSize"));
-    assertNull(attachment.getPropertyValue("invalidName"));
-    assertEquals(testMap, attachment.getProperties());
-    assertTrue(attachment.containsProperty("resolutionX"));
-
-    attachment.removeProperty("resolutionY");
-    testMap.remove("resolutionY");
-    assertEquals(testMap, attachment.getProperties());
-
-    attachment.clearProperties();
-    assertFalse(attachment.containsProperty("resolutionX"));
-    assertNull(attachment.getPropertyValue("imageSize"));
   }
 
 }

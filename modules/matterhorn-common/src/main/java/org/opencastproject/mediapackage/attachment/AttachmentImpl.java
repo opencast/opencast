@@ -30,17 +30,18 @@ import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.UnknownFileTypeException;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * Basic implementation of an attachment.
@@ -53,15 +54,16 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
   private static final long serialVersionUID = 6626531251856698138L;
 
   /** The object properties */
-  @XmlElementWrapper(name = "additionalProperties")
-  @XmlElement(name = "property")
-  protected List<Property> properties = null;
+  @XmlElement(name = "additionalProperties")
+  @XmlJavaTypeAdapter(PropertiesXmlAdapter.class)
+  protected Map<String, String> properties = null;
 
   /**
    * Needed by JAXB
    */
   public AttachmentImpl() {
     super(Type.Attachment, null, null);
+    properties = new HashMap<>();
   }
 
   /**
@@ -145,68 +147,60 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
   }
 
   @Override
-  public boolean containsProperty(String propertyName) {
-    if (properties != null) {
-      for (Property property : properties) {
-          if (property.key.equals(propertyName)) {
-            return true;
-          }
-      }
-    }
-    return false;
+  public Map<String, String> getProperties() {
+    if (properties == null)
+      properties = new HashMap<String, String>();
+
+    return properties;
   }
 
-  @Override
-  public HashMap<String, String> getProperties() {
-    HashMap<String, String> map = new HashMap();
-    if (properties != null) {
-      for (Property property : properties) {
-        map.put(property.key, property.value);
-      }
-    }
-    return map;
-  }
+  /**
+   * JAXB properties xml adapter class.
+   */
+  private static class PropertiesXmlAdapter extends XmlAdapter<PropertiesAdapter, Map<String, String>> {
 
-  @Override
-  public String getPropertyValue(String propertyName) {
-    if (properties != null) {
-      for (Property property : properties) {
-        if (property.key.equals(propertyName)) {
-          return property.value;
+    @Override
+    public Map<String, String> unmarshal(PropertiesAdapter pa) throws Exception {
+      Map<String, String> properties = new HashMap<>();
+      if (pa != null) {
+        for (Property p : pa.propertiesList) {
+          properties.put(p.key, p.value);
         }
       }
+      return properties;
     }
-    return null;
-  }
 
-  @Override
-  public void addProperty(String name, String value) {
-    if (properties == null) {
-      properties = new ArrayList();
-    }
-    properties.add(new Property(name, value));
-  }
+    @Override
+    public PropertiesAdapter marshal(Map<String, String> p) throws Exception {
+      if (p == null || p.size() == 0) return null;
 
-  @Override
-  public boolean removeProperty(String propertyName) {
-    if (properties != null) {
-      for (Property property : properties) {
-        if (property.key.equals(propertyName)) {
-          return properties.remove(property);
+      PropertiesAdapter pa = new PropertiesAdapter();
+        for (String key : p.keySet()) {
+          pa.propertiesList.add(new Property(key, p.get(key)));
         }
-      }
-    }
-    return false;
-  }
-
-  @Override
-  public void clearProperties() {
-    if (properties != null) {
-      properties.clear();
-      properties = null;
+      return pa;
     }
   }
 
+  /**
+   * Properties map to list of entries adapter class.
+   */
+  private static class PropertiesAdapter {
+    @XmlElement(name = "property")
+    private List<Property> propertiesList;
+
+    PropertiesAdapter() {
+      this(new LinkedList<Property>());
+    }
+
+    PropertiesAdapter(List<Property> propertiesList) {
+      this.propertiesList = propertiesList;
+    }
+  }
+
+  /**
+   * Properties entry adapter class.
+   */
   private static class Property {
     @XmlAttribute(name = "key")
     private String key;
@@ -220,14 +214,6 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
     Property(String key, String value) {
       this.key = key;
       this.value = value;
-    }
-
-    public String getKey() {
-      return key;
-    }
-
-    public String getValue() {
-      return value;
     }
   }
 

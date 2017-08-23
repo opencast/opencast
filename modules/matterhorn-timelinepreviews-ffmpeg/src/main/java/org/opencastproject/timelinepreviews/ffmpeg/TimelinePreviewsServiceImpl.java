@@ -42,6 +42,7 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -191,7 +192,8 @@ TimelinePreviewsService, ManagedService {
         resolutionX = Integer.parseInt(res);
         logger.info("Horizontal resolution set to {} pixels", resolutionX);
       } catch (Exception e) {
-        logger.warn("Found illegal value '{}' for timeline previews horizontal resolution", res);
+        throw new ConfigurationException(OPT_RESOLUTION_X, "Found illegal value '" + res
+                + "' for timeline previews horizontal resolution");
       }
     }
     // Vertical resolution
@@ -201,7 +203,8 @@ TimelinePreviewsService, ManagedService {
         resolutionY = Integer.parseInt(res);
         logger.info("Vertical resolution set to {} pixels", resolutionY);
       } catch (Exception e) {
-        logger.warn("Found illegal value '{}' for timeline previews vertical resolution", res);
+        throw new ConfigurationException(OPT_RESOLUTION_Y, "Found illegal value '" + res
+                + "' for timeline previews vertical resolution");
       }
     }
     // Output file format
@@ -211,7 +214,8 @@ TimelinePreviewsService, ManagedService {
         outputFormat = format;
         logger.info("Output file format set to \"{}\"", outputFormat);
       } catch (Exception e) {
-        logger.warn("Found illegal value '{}' for timeline previews output file format", format);
+        throw new ConfigurationException(OPT_OUTPUT_FORMAT, "Found illegal value '" + format
+                + "' for timeline previews output file format");
       }
     }
     // Output mimetype
@@ -221,7 +225,8 @@ TimelinePreviewsService, ManagedService {
         mimetype = type;
         logger.info("Mime type set to \"{}\"", mimetype);
       } catch (Exception e) {
-        logger.warn("Found illegal value '{}' for timeline previews mimetype", type);
+        throw new ConfigurationException(OPT_MIMETYPE, "Found illegal value '" + type
+                + "' for timeline previews mimetype");
       }
     }
 
@@ -238,11 +243,6 @@ TimelinePreviewsService, ManagedService {
   public Job createTimelinePreviewImages(Track track, int imageCount) throws TimelinePreviewsException,
          MediaPackageException {
     try {
-      logger.info("track: {}", track);
-      logger.info("job_type: {}", JOB_TYPE);
-      logger.info("operation: {}", Operation.TimelinePreview.toString());
-      logger.info("jobLoad: {}", timelinepreviewsJobLoad);
-
       List<String> parameters = Arrays.asList(MediaPackageElementParser.getAsXml(track), Integer.toString(imageCount));
 
       return serviceRegistry.createJob(JOB_TYPE,
@@ -271,7 +271,7 @@ TimelinePreviewsService, ManagedService {
 
     // Make sure the element can be analyzed using this analysis implementation
     if (!track.hasVideo()) {
-      logger.warn("Element {} is not a video track", track);
+      logger.error("Element {} is not a video track", track.getIdentifier());
       throw new TimelinePreviewsException("Element is not a video track");
     }
 
@@ -306,7 +306,7 @@ TimelinePreviewsService, ManagedService {
         }
       }
 
-      composedImage.addProperty("imageCount", String.valueOf(imageCount));
+      composedImage.getProperties().put("imageCount", String.valueOf(imageCount));
 
       return composedImage;
 
@@ -379,84 +379,59 @@ TimelinePreviewsService, ManagedService {
           "Error reading the media file in the workspace", e);
     }
 
-    String imageFilePath = "";
-    int trialCount = 0;
+    String imageFilePath = PathSupport.changeFileExtension(FilenameUtils.removeExtension(mediaFile.getAbsolutePath())
+            .concat("_timelinepreviews"), outputFormat);
     int exitCode = 1;
-    boolean ffmpegSuccess = false;
+    String[] command = new String[] {
+      binary,
+      "-loglevel", "error",
+      "-t", String.valueOf(duration - seconds / 2.0),
+      "-y", "-i",
+      mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
+      "-vf", "fps=1/" + seconds + ",scale=" + width + ":" + height + ",tile=" + tileX + "x" + tileY,
+      imageFilePath.replaceAll(" ", "\\ ")
+    };
 
-    while (trialCount < 3 && !ffmpegSuccess) {
+    logger.debug("Start timeline previews ffmpeg process: {}", StringUtils.join(command, " "));
+    logger.info("Create timeline preview images file for track '{}' at {}", track.getIdentifier(), imageFilePath);
 
-      imageFilePath = FilenameUtils.removeExtension(mediaFile.getAbsolutePath()).concat("_timelinepreviews"
-              + outputFormat);
+    ProcessBuilder pbuilder = new ProcessBuilder(command);
 
-      String[] command = new String[] {
-        binary,
-        "-loglevel", "error",
-        "-t", String.valueOf(duration - seconds / 2.0),
-        "-y", "-i",
-        mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
-        "-vf", "fps=1/" + seconds + ",scale=" + width + ":" + height + ",tile=" + tileX + "x" + tileY,
-        imageFilePath.replaceAll(" ", "\\ ")
-      };
+    pbuilder.redirectErrorStream(true);
+    Process ffmpegProcess = null;
+    exitCode = 1;
+    String errorMessage = "";
+    BufferedReader errStream = null;
+    try {
+      ffmpegProcess = pbuilder.start();
 
-      logger.info("Start timeline previews ffmpeg process: {}", StringUtils.join(command, " "));
-      logger.info("Create timeline preview images file for track '{}' at {}", track.getIdentifier(), imageFilePath);
-
-      ProcessBuilder pbuilder = new ProcessBuilder(command);
-
-      pbuilder.redirectErrorStream(true);
-      Process ffmpegProcess = null;
-      exitCode = 1;
-      String errorMessage = "";
-      BufferedReader errStream = null;
-      try {
-        ffmpegProcess = pbuilder.start();
-
-        errStream = new BufferedReader(new InputStreamReader(ffmpegProcess.getInputStream()));
-        String line = errStream.readLine();
-        while (line != null) {
-          logger.error("FFmpeg error: " + line);
-          errorMessage = line;
-          line = errStream.readLine();
-        }
-
-        exitCode = ffmpegProcess.waitFor();
-      } catch (IOException ex) {
-        throw new TimelinePreviewsException("Starting ffmpeg process failed", ex);
-      } catch (InterruptedException ex) {
-        throw new TimelinePreviewsException("Waiting until timeline previews process exited was interrupted unexpectly",
-                ex);
-      } finally {
-        IoSupport.closeQuietly(ffmpegProcess);
-        IoSupport.closeQuietly(errStream);
-        if (exitCode != 0) {
-          try {
-            FileUtils.forceDelete(new File(imageFilePath));
-          } catch (IOException e) {
-            // it is ok, no output file was generated by ffmpeg
-          }
+      errStream = new BufferedReader(new InputStreamReader(ffmpegProcess.getInputStream()));
+      String line = errStream.readLine();
+      while (line != null) {
+        logger.error("FFmpeg error: " + line);
+        errorMessage = line;
+        line = errStream.readLine();
+      }
+      exitCode = ffmpegProcess.waitFor();
+    } catch (IOException ex) {
+      throw new TimelinePreviewsException("Starting ffmpeg process failed", ex);
+    } catch (InterruptedException ex) {
+      throw new TimelinePreviewsException("Timeline preview creation was unexpectedly interrupted", ex);
+    } finally {
+      IoSupport.closeQuietly(ffmpegProcess);
+      IoSupport.closeQuietly(errStream);
+      if (exitCode != 0) {
+        try {
+          FileUtils.forceDelete(new File(imageFilePath));
+        } catch (IOException e) {
+          // it is ok, no output file was generated by ffmpeg
         }
       }
-
-      // if there was a problem in the ffmpeg call try to resolve it
-      if (exitCode == 0) {
-        ffmpegSuccess = true;
-      } else {
-        if (errorMessage.contains("frame filename number 2 from pattern")) {
-          tileX++;
-        }
-        if (errorMessage.contains("Unable to find a suitable output format")) {
-          if (!outputFormat.contains(".")) {
-            outputFormat = "." + outputFormat;
-          }
-        }
-      }
-      trialCount++;
     }
 
     if (exitCode != 0)
-      throw new TimelinePreviewsException("The timeline previews process exited abnormally with exit code " + exitCode);
-
+      throw new TimelinePreviewsException("Generating timeline preview for track " + track.getIdentifier()
+              + " failed: ffmpeg process exited abnormally with exit code " + exitCode);
 
     // put timeline previews image into workspace
     FileInputStream timelinepreviewsFileInputStream = null;
@@ -490,10 +465,10 @@ TimelinePreviewsService, ManagedService {
     timelinepreviewsMpe.referTo(track);
 
     // add additional properties to attachment
-    timelinepreviewsMpe.addProperty("imageSizeX", String.valueOf(tileX));
-    timelinepreviewsMpe.addProperty("imageSizeY", String.valueOf(tileY));
-    timelinepreviewsMpe.addProperty("resolutionX", String.valueOf(resolutionX));
-    timelinepreviewsMpe.addProperty("resolutionY", String.valueOf(resolutionY));
+    timelinepreviewsMpe.getProperties().put("imageSizeX", String.valueOf(tileX));
+    timelinepreviewsMpe.getProperties().put("imageSizeY", String.valueOf(tileY));
+    timelinepreviewsMpe.getProperties().put("resolutionX", String.valueOf(resolutionX));
+    timelinepreviewsMpe.getProperties().put("resolutionY", String.valueOf(resolutionY));
 
     // set the flavor and an ID
     timelinepreviewsMpe.setFlavor(track.getFlavor());
