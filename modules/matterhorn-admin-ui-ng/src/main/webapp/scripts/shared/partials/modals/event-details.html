@@ -339,8 +339,9 @@
                                             <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TYPE"><!-- Type --></th>
                                             <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STATE"><!-- State --></th>
                                             <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTED">
-                                                <!-- Submitted -->
+                                            <!-- Submitted -->
                                             </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ACTIONS" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" class="fit"><!-- Actions --></th>
                                             <th class="medium"></th>
                                         </tr>
                                     </thead>
@@ -350,6 +351,12 @@
                                             <td>{{ item.workflow }}</td>
                                             <td>{{ item.status }}</td>
                                             <td>{{ item.submitted | localizeDate : 'dateTime' : 'medium' }}</td>
+                                            <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" >
+                                                <a ng-show="item.status == 'PAUSED'" ng-click="workflowAction(item.id, 'NONE')" class="fa fa-hand-stop-o fa-fw" style="color:red"><!-- Abort -->
+                                                </a>           
+                                                <a ng-show="item.status == 'PAUSED'" ng-click="workflowAction(item.id, 'RETRY')" class="fa fa-refresh fa-fw"><!-- Retry -->
+                                                </a>
+                                            </td>
                                             <td>
                                                 <a class="details-link" ng-click="openSubTab('workflow-details', 'EventWorkflowDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">
                                                     <!-- Details -->

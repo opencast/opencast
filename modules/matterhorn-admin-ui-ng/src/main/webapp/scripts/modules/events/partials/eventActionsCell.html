@@ -46,3 +46,11 @@
 	data-tab="comments"
 	class="fa fa-comment">
 </a>
+
+<a ng-if="row.workflow_state == 'PAUSED'"
+	data-open-modal="event-details"
+	data-resource-id="{{ row.id }}"
+	data-tab="workflows"
+	with-role="ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT"
+	class="fa fa-warning">
+</a>
