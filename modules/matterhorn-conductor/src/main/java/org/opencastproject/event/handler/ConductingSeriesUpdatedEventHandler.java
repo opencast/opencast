@@ -101,7 +101,7 @@ public class ConductingSeriesUpdatedEventHandler {
           BaseMessage baseMessage = (BaseMessage) future.get();
           if (null == baseMessage) {
             //This message appears every 100th of a second or so, so let's throttle this...
-            if (counter == 0 || counter % 1000 == 0) {
+            if (counter % 1000 == 0) {
               logger.error("Problem while receiving series update messages: Message is null");
               logger.error("The connection with ActiveMQ is probably down!");
             }
