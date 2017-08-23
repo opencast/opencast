@@ -30,9 +30,16 @@ import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.UnknownFileTypeException;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
@@ -44,6 +51,11 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
 
   /** Serial version UID */
   private static final long serialVersionUID = 6626531251856698138L;
+
+  /** The object properties */
+  @XmlElementWrapper(name = "additionalProperties")
+  @XmlElement(name = "property")
+  protected List<Property> properties = null;
 
   /**
    * Needed by JAXB
@@ -130,6 +142,93 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
    */
   public static Attachment fromURI(URI uri) {
     return new AttachmentImpl(uri);
+  }
+
+  @Override
+  public boolean containsProperty(String propertyName) {
+    if (properties != null) {
+      for (Property property : properties) {
+          if (property.key.equals(propertyName)) {
+            return true;
+          }
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public HashMap<String, String> getProperties() {
+    HashMap<String, String> map = new HashMap();
+    if (properties != null) {
+      for (Property property : properties) {
+        map.put(property.key, property.value);
+      }
+    }
+    return map;
+  }
+
+  @Override
+  public String getPropertyValue(String propertyName) {
+    if (properties != null) {
+      for (Property property : properties) {
+        if (property.key.equals(propertyName)) {
+          return property.value;
+        }
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public void addProperty(String name, String value) {
+    if (properties == null) {
+      properties = new ArrayList();
+    }
+    properties.add(new Property(name, value));
+  }
+
+  @Override
+  public boolean removeProperty(String propertyName) {
+    if (properties != null) {
+      for (Property property : properties) {
+        if (property.key.equals(propertyName)) {
+          return properties.remove(property);
+        }
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public void clearProperties() {
+    if (properties != null) {
+      properties.clear();
+      properties = null;
+    }
+  }
+
+  private static class Property {
+    @XmlAttribute(name = "key")
+    private String key;
+    @XmlValue
+    private String value;
+
+    Property() {
+      // Default constructor
+    }
+
+    Property(String key, String value) {
+      this.key = key;
+      this.value = value;
+    }
+
+    public String getKey() {
+      return key;
+    }
+
+    public String getValue() {
+      return value;
+    }
   }
 
   public static class Adapter extends XmlAdapter<AttachmentImpl, Attachment> {

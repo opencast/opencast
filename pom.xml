@@ -187,6 +187,10 @@
     <module>modules/matterhorn-textextractor-tesseract</module>
     <module>modules/matterhorn-themes</module>
     <module>modules/matterhorn-themes-workflowoperation</module>
+    <module>modules/matterhorn-timelinepreviews-api</module>
+    <module>modules/matterhorn-timelinepreviews-ffmpeg</module>
+    <module>modules/matterhorn-timelinepreviews-remote</module>
+    <module>modules/matterhorn-timelinepreviews-workflowoperation</module>
     <module>modules/matterhorn-transcription-service-api</module>
     <module>modules/matterhorn-transcription-service-ibm-watson-impl</module>
     <module>modules/matterhorn-transcription-service-workflowoperation</module>
