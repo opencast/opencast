@@ -27,7 +27,7 @@ angular.module('adminNg.services')
             }
 
             if (typeof adapters[adapterType][element.id] === 'undefined') {
-                adapters[adapterType][element.id] = createNewAdapter(adapterType, element);
+                adapters[adapterType][element.id] = this.createNewAdapter(adapterType, element);
             }
             return adapters[adapterType][element.id];
         };
