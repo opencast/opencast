@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:attachment xmlns:ns2="http://mediapackage.opencastproject.org" type="captions/timedtext"
+    id="dc560f38-fde0-46df-b9f0-2cc196b4911b">
+    <ns2:mimetype>text/vtt</ns2:mimetype>
+    <ns2:url>http://opencast.server.com/137e416e-111b-49f9-b6c0-24b55877a2ce/dc560f38-fde0-46df-b9f0-2cc196b4911b.vtt</ns2:url>
+    <ns2:checksum type="md5">84da724b3f17c163a043c7afd5a6c956</ns2:checksum>
+</ns2:attachment>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:dcterms="http://purl.org/dc/terms/">
+  <dcterms:title>Aurelien</dcterms:title>
+  <dcterms:creator>Louis Aragon</dcterms:creator>
+  <dcterms:created xsi:type="dcterms:W3CDTF">1944-01-01</dcterms:created>
+  <dcterms:language>eng</dcterms:language>
+  <dcterms:type>MovingImage/LectureRecording</dcterms:type>
+  <dcterms:identifier>mp-a</dcterms:identifier>
+  <dcterms:isPartOf>series-a</dcterms:isPartOf>
+</dublincore>

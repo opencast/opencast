@@ -1,6 +1,8 @@
 {
   "value_locale":"fr",
-  "error_mediaPackageInformationNotLoaded":"Cette erreur peut provenir de:<ul><li>La vidéo n'est plus disponible</li><li>La vidéo est protégée et nécessite que l'utilisateur soit connecté</li></ul>",
+  "error_mediaPackageInformationNotLoaded":"Il y a deux raisons possibles pour cette erreur :",
+  "error_mediaPackageInformationNotLoaded_reason1":"Les médias ne sont plus disponible",
+  "error_mediaPackageInformationNotLoaded_reason2":"Les média sont protégés et vous devez vous connecter",
   "error_noMediaInformationAvailable":"Aucune information disponible sur cette vidéo.",
   "error_endpointNotAvailable":"Le service de recherche n'est actuellement pas disponible."
 }

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-security-cas</artifactId>
@@ -15,40 +16,13 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>org.springframework.security.core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>org.springframework.security.web</artifactId>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-security-cas-client-wrapper</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-cas</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jasig.cas</groupId>
-      <artifactId>com.springsource.org.jasig.cas.client</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opensaml</groupId>
-      <artifactId>com.springsource.org.opensaml</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>org.springframework.osgi.core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -67,12 +41,14 @@
               org.jasig.cas.client.session;resolution:=optional,
               org.jasig.cas.client.util;resolution:=optional,
               org.jasig.cas.client.validation;resolution:=optional,
-              org.springframework.security.cas;resolution:=optional,
-              org.springframework.security.cas.authentication;resolution:=optional,
-              org.springframework.security.cas.web;resolution:=optional,
-              org.springframework.security.cas.web.authentication;resolution:=optional
+              org.springframework.security.cas,
+              org.springframework.security.cas.authentication,
+              org.springframework.security.cas.userdetails,
+              org.springframework.security.cas.web,
+              org.springframework.security.cas.web.authentication,
+              *
             </Import-Package>
-            <Fragment-Host>matterhorn-kernel</Fragment-Host>
+            <Fragment-Host>matterhorn-kernel</Fragment-Host> 
           </instructions>
         </configuration>
       </plugin>

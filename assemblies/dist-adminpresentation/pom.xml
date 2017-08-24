@@ -1,23 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.opencastproject.assemblies</groupId>
     <artifactId>opencast-assemblies</artifactId>
     <version>4.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
   </properties>
-
   <artifactId>opencast-dist-adminpresentation</artifactId>
   <packaging>karaf-assembly</packaging>
   <name>Assemblies // Distribution Admin/Presentation</name>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.karaf.features</groupId>
@@ -66,7 +61,6 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
-
   <build>
     <resources>
       <resource>
@@ -84,7 +78,6 @@
         </includes>
       </resource>
     </resources>
-
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -110,13 +103,11 @@
             <feature>service</feature>
             <feature>system</feature>
             <feature>config</feature>
-            <feature>jaas</feature>
             <!-- Opencast external features -->
             <feature>jpa</feature>
             <feature>http</feature>
             <feature>http-whiteboard</feature>
             <feature>scr</feature>
-            <feature>webconsole</feature>
             <feature>cxf-jaxrs</feature>
             <feature>cxf-http-jetty</feature>
             <feature>transaction</feature>
@@ -137,5 +128,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

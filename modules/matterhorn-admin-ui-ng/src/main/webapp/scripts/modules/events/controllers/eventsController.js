@@ -42,6 +42,10 @@ angular.module('adminNg.controllers')
              description: 'DASHBOARD.RUNNING'},
             {filters: [{name: 'status',
                         filter:'FILTERS.EVENTS.STATUS.LABEL',
+                        value: 'EVENTS.EVENTS.STATUS.PAUSED'}],
+             description: 'DASHBOARD.PAUSED'},
+            {filters: [{name: 'status',
+                        filter:'FILTERS.EVENTS.STATUS.LABEL',
                         value: 'EVENTS.EVENTS.STATUS.PROCESSING_FAILURE'}],
              description: 'DASHBOARD.FAILED'},
             {filters: [{name: 'comments',
@@ -68,18 +72,20 @@ angular.module('adminNg.controllers')
                 name:  'presenter',
                 label: 'EVENTS.EVENTS.TABLE.PRESENTERS'
             }, {
+                template: 'modules/events/partials/eventsSeriesCell.html',
                 name:  'series_name',
                 label: 'EVENTS.EVENTS.TABLE.SERIES'
             }, {
-                name:  'date',
+                name:  'technical_date',
                 label: 'EVENTS.EVENTS.TABLE.DATE'
             }, {
-                name:  'start_date',
+                name:  'technical_start',
                 label: 'EVENTS.EVENTS.TABLE.START'
             }, {
-                name:  'end_date',
+                name:  'technical_end',
                 label: 'EVENTS.EVENTS.TABLE.STOP'
             }, {
+                template: 'modules/events/partials/eventsLocationCell.html',
                 name:  'location',
                 label: 'EVENTS.EVENTS.TABLE.LOCATION'
             }, {
@@ -88,6 +94,7 @@ angular.module('adminNg.controllers')
                 template: 'modules/events/partials/publishedCell.html',
                 dontSort: true
             }, {
+                template: 'modules/events/partials/eventsStatusCell.html',
                 name:  'event_status',
                 label: 'EVENTS.EVENTS.TABLE.SCHEDULING_STATUS'
             }, {
@@ -122,5 +129,10 @@ angular.module('adminNg.controllers')
                 Notifications.add('error', 'EVENTS_NOT_DELETED');
             });
         };
+
+        $scope.$on('$destroy', function() {
+            // stop polling event stats on an inactive tab
+            $scope.stats.refreshScheduler.cancel();
+        });
     }
 ]);

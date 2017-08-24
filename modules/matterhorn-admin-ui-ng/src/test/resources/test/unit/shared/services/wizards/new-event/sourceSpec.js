@@ -23,6 +23,7 @@ describe('Source Step in New Event Wizard', function () {
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         captureAgents = getJSONFixture('admin-ng/capture-agents/agents.json');
+        $httpBackend.whenGET('/admin-ng/event/new/metadata').respond(JSON.stringify(getJSONFixture('admin-ng/event/new/metadata')));
     });
 
     describe('#isValid', function () {
@@ -146,6 +147,7 @@ describe('Source Step in New Event Wizard', function () {
             singleTestData = getJSONFixture('conflictCheckSingle.json');
             $httpBackend.expectPOST('/admin-ng/event/new/conflicts').respond(409, conflictResponse);
             $httpBackend.whenGET('/admin-ng/capture-agents/agents.json?inputs=true').respond(JSON.stringify(captureAgents));
+            $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
             NewEventSource.ud = singleTestData;
             NewEventSource.checkConflicts();
             $httpBackend.flush();

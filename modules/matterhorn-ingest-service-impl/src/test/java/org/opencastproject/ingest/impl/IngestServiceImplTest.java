@@ -26,11 +26,14 @@ import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobImpl;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.track.AudioStreamImpl;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
@@ -53,18 +56,20 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
+import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlUtil;
 import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
+import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
+import org.opencastproject.workingfilerepository.impl.WorkingFileRepositoryImpl;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -73,6 +78,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
@@ -90,11 +96,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Properties;
 
 public class IngestServiceImplTest {
   private IngestServiceImpl service = null;
@@ -147,95 +153,88 @@ public class IngestServiceImplTest {
 
     // set up service and mock workspace
     wfr = EasyMock.createNiceMock(WorkingFileRepository.class);
-    EasyMock.expect(
-            wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andReturn(urlTrack);
-    EasyMock.expect(
-            wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andReturn(urlCatalog);
-    EasyMock.expect(
-            wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andReturn(urlAttachment);
-    EasyMock.expect(
-            wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andReturn(urlTrack1);
-    EasyMock.expect(
-            wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andReturn(urlTrack2);
-    EasyMock.expect(
-            wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andReturn(urlCatalog1);
-    EasyMock.expect(
-            wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andReturn(urlCatalog2);
-    EasyMock.expect(
-            wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andReturn(urlCatalog);
+    EasyMock.expect(wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andReturn(urlTrack);
+    EasyMock.expect(wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andReturn(urlCatalog);
+    EasyMock.expect(wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andReturn(urlAttachment);
+    EasyMock.expect(wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andReturn(urlTrack1);
+    EasyMock.expect(wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andReturn(urlTrack2);
+    EasyMock.expect(wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andReturn(urlCatalog1);
+    EasyMock.expect(wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andReturn(urlCatalog2);
+    EasyMock.expect(wfr.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andReturn(urlCatalog);
 
-    EasyMock.expect(
-            wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andReturn(urlTrack1);
-    EasyMock.expect(
-            wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andReturn(urlTrack2);
-    EasyMock.expect(
-            wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andReturn(urlCatalog1);
-    EasyMock.expect(
-            wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andReturn(urlCatalog2);
-    EasyMock.expect(
-            wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andReturn(urlCatalog);
+    EasyMock.expect(wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andReturn(urlTrack1);
+    EasyMock.expect(wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andReturn(urlTrack2);
+    EasyMock.expect(wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andReturn(urlCatalog1);
+    EasyMock.expect(wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andReturn(urlCatalog2);
+    EasyMock.expect(wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andReturn(urlCatalog);
 
-    EasyMock.expect(
-            wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andReturn(urlPackage);
+    EasyMock.expect(wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andReturn(urlPackage);
 
-    EasyMock.expect(
-            wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andReturn(urlPackageOld);
+    EasyMock.expect(wfr.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (InputStream) EasyMock.anyObject())).andReturn(urlPackageOld);
 
     workflowInstance = EasyMock.createNiceMock(WorkflowInstance.class);
     EasyMock.expect(workflowInstance.getId()).andReturn(workflowInstanceID);
     EasyMock.expect(workflowInstance.getState()).andReturn(WorkflowState.STOPPED);
 
+    final Capture<MediaPackage> mp = EasyMock.newCapture();
     workflowService = EasyMock.createNiceMock(WorkflowService.class);
-    EasyMock.expect(
-            workflowService.start((WorkflowDefinition) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject(),
-                    (Map) EasyMock.anyObject())).andReturn(workflowInstance);
-    EasyMock.expect(
-            workflowService.start((WorkflowDefinition) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject(),
-                    (Map) EasyMock.anyObject())).andReturn(workflowInstance);
+    EasyMock.expect(workflowService.start((WorkflowDefinition) EasyMock.anyObject(), EasyMock.capture(mp),
+            (Map) EasyMock.anyObject())).andReturn(workflowInstance);
+    EasyMock.expect(workflowInstance.getMediaPackage()).andAnswer(new IAnswer<MediaPackage>() {
+      @Override
+      public MediaPackage answer() throws Throwable {
+        return mp.getValue();
+      }
+    });
+    EasyMock.expect(workflowService.start((WorkflowDefinition) EasyMock.anyObject(),
+            (MediaPackage) EasyMock.anyObject(), (Map) EasyMock.anyObject())).andReturn(workflowInstance);
     EasyMock.expect(
             workflowService.start((WorkflowDefinition) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject()))
             .andReturn(workflowInstance);
-    EasyMock.expect(workflowService.getWorkflowDefinitionById((String) EasyMock.anyObject())).andReturn(
-            new WorkflowDefinitionImpl());
+    EasyMock.expect(workflowService.getWorkflowDefinitionById((String) EasyMock.anyObject()))
+            .andReturn(new WorkflowDefinitionImpl());
     EasyMock.expect(workflowService.getWorkflowById(EasyMock.anyLong())).andReturn(workflowInstance);
 
     SchedulerService schedulerService = EasyMock.createNiceMock(SchedulerService.class);
 
-    Properties properties = new Properties();
+    Map<String, String> properties = new HashMap<>();
     properties.put(CaptureParameters.INGEST_WORKFLOW_DEFINITION, "sample");
     properties.put("agent-name", "matterhorn-agent");
-    EasyMock.expect(schedulerService.getEventCaptureAgentConfiguration(EasyMock.anyLong())).andReturn(properties)
+    EasyMock.expect(schedulerService.getCaptureAgentConfiguration(EasyMock.anyString())).andReturn(properties)
             .anyTimes();
-    EasyMock.expect(schedulerService.getEventDublinCore(EasyMock.anyLong()))
+    EasyMock.expect(schedulerService.getDublinCore(EasyMock.anyString()))
             .andReturn(DublinCores.read(urlCatalog1.toURL().openStream())).anyTimes();
+    MediaPackage schedulerMediaPackage = MediaPackageParser
+            .getFromXml(IOUtils.toString(getClass().getResourceAsStream("/source-manifest.xml"), "UTF-8"));
+    EasyMock.expect(schedulerService.getMediaPackage(EasyMock.anyString())).andReturn(schedulerMediaPackage).anyTimes();
 
     EasyMock.replay(wfr, workflowInstance, workflowService, schedulerService);
 
-    User anonymous = new JaxbUser("anonymous", "test", new DefaultOrganization(), new JaxbRole(
-            DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, new DefaultOrganization()));
+    User anonymous = new JaxbUser("anonymous", "test", new DefaultOrganization(),
+            new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, new DefaultOrganization(), "test"));
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);
 
     Organization organization = new DefaultOrganization();
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
-    EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
-            .andReturn(organization).anyTimes();
+    EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject())).andReturn(organization)
+            .anyTimes();
     EasyMock.replay(organizationDirectoryService);
 
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
@@ -322,7 +321,7 @@ public class IngestServiceImplTest {
     MediaPackage mediaPackage = null;
 
     mediaPackage = service.createMediaPackage();
-    mediaPackage = service.addTrack(urlTrack, null, mediaPackage);
+    mediaPackage = service.addTrack(urlTrack, MediaPackageElements.PRESENTATION_SOURCE, mediaPackage);
     mediaPackage = service.addCatalog(urlCatalog1, MediaPackageElements.EPISODE, mediaPackage);
     mediaPackage = service.addAttachment(urlAttachment, MediaPackageElements.MEDIAPACKAGE_COVER_FLAVOR, mediaPackage);
     WorkflowInstance instance = service.ingest(mediaPackage);
@@ -375,23 +374,6 @@ public class IngestServiceImplTest {
   }
 
   @Test
-  public void testStartOver() throws Exception {
-    MediaPackage mediaPackage = null;
-    Map<String, String> properties = new HashMap<String, String>();
-    properties.put("archive", "true");
-
-    mediaPackage = service.createMediaPackage();
-    mediaPackage = service.addTrack(urlTrack, null, mediaPackage);
-    mediaPackage = service.addAttachment(urlAttachment, MediaPackageElements.MEDIAPACKAGE_COVER_FLAVOR, mediaPackage);
-
-    service.ingest(mediaPackage, null, properties, 121L);
-
-    Assert.assertEquals(1, mediaPackage.getTracks().length);
-    Assert.assertEquals(1, mediaPackage.getCatalogs().length);
-    Assert.assertEquals(1, mediaPackage.getAttachments().length);
-  }
-
-  @Test
   public void testContentDisposition() throws Exception {
     MediaPackage mediaPackage = null;
 
@@ -412,7 +394,23 @@ public class IngestServiceImplTest {
 
   @Test
   public void testSmilCreation() throws Exception {
-    service.setWorkingFileRepository(new WorkingFileRepositoryMockImpl());
+    service.setWorkingFileRepository(new WorkingFileRepositoryImpl() {
+      @Override
+      public URI put(String mediaPackageID, String mediaPackageElementID, String filename, InputStream in)
+              throws IOException {
+        File file = new File(FileUtils.getTempDirectory(), mediaPackageElementID);
+        file.deleteOnExit();
+        FileUtils.write(file, IOUtils.toString(in), "UTF-8");
+        return file.toURI();
+      }
+
+      @Override
+      public InputStream get(String mediaPackageID, String mediaPackageElementID)
+              throws NotFoundException, IOException {
+        File file = new File(FileUtils.getTempDirectory(), mediaPackageElementID);
+        return new FileInputStream(file);
+      }
+    });
 
     URI presenterUri = URI.create("http://localhost:8080/presenter.mp4");
     URI presenterUri2 = URI.create("http://localhost:8080/presenter2.mp4");
@@ -444,7 +442,71 @@ public class IngestServiceImplTest {
     Assert.assertEquals(2, document.getElementsByTagName("seq").getLength());
     Assert.assertEquals(2, document.getElementsByTagName("video").getLength());
     Assert.assertEquals(1, document.getElementsByTagName("audio").getLength());
+  }
 
+  @Test
+  public void testMergeScheduledMediaPackage() throws Exception {
+    MediaPackage ingestMediaPackage = MediaPackageParser
+            .getFromXml(IOUtils.toString(getClass().getResourceAsStream("/source-manifest-partial.xml"), "UTF-8"));
+    WorkflowInstance instance = service.ingest(ingestMediaPackage);
+    MediaPackage mergedMediaPackage = instance.getMediaPackage();
+    Assert.assertEquals(4, mergedMediaPackage.getTracks().length);
+    Track track = mergedMediaPackage.getTrack("track-1");
+    Assert.assertEquals("/vonlya1.mov", track.getURI().toString());
+    Assert.assertEquals(3, mergedMediaPackage.getCatalogs().length);
+    Assert.assertEquals(1, mergedMediaPackage.getAttachments().length);
+    Attachment attachment = mergedMediaPackage.getAttachment("cover");
+    Assert.assertEquals("attachments/cover.png", attachment.getURI().toString());
+
+    // Validate fields
+    Assert.assertEquals(new Date(DateTimeSupport.fromUTC("2007-12-05T13:45:00")), mergedMediaPackage.getDate());
+    Assert.assertEquals(10045L, mergedMediaPackage.getDuration().doubleValue(), 0L);
+    Assert.assertEquals("t2", mergedMediaPackage.getTitle());
+    Assert.assertEquals("s2", mergedMediaPackage.getSeries());
+    Assert.assertEquals("st2", mergedMediaPackage.getSeriesTitle());
+    Assert.assertEquals("l2", mergedMediaPackage.getLicense());
+    Assert.assertEquals(1, mergedMediaPackage.getSubjects().length);
+    Assert.assertEquals("s2", mergedMediaPackage.getSubjects()[0]);
+    Assert.assertEquals(1, mergedMediaPackage.getContributors().length);
+    Assert.assertEquals("sd2", mergedMediaPackage.getContributors()[0]);
+    Assert.assertEquals(1, mergedMediaPackage.getCreators().length);
+    Assert.assertEquals("p2", mergedMediaPackage.getCreators()[0]);
+  }
+
+  @Test
+  public void testLegacyMediaPackageId() throws Exception {
+    SchedulerService schedulerService = EasyMock.createNiceMock(SchedulerService.class);
+
+    Map<String, String> properties = new HashMap<>();
+    properties.put(CaptureParameters.INGEST_WORKFLOW_DEFINITION, "sample");
+    properties.put("agent-name", "matterhorn-agent");
+    EasyMock.expect(schedulerService.getCaptureAgentConfiguration(EasyMock.anyString())).andReturn(properties)
+            .anyTimes();
+    EasyMock.expect(schedulerService.getDublinCore(EasyMock.anyString()))
+            .andReturn(DublinCores.read(urlCatalog1.toURL().openStream())).anyTimes();
+    MediaPackage schedulerMediaPackage = MediaPackageParser
+            .getFromXml(IOUtils.toString(getClass().getResourceAsStream("/source-manifest.xml"), "UTF-8"));
+    EasyMock.expect(schedulerService.getMediaPackage(EasyMock.anyString())).andThrow(new NotFoundException()).once();
+    EasyMock.expect(schedulerService.getMediaPackage(EasyMock.anyString())).andReturn(schedulerMediaPackage).once();
+    EasyMock.expect(schedulerService.getMediaPackage(EasyMock.anyString())).andThrow(new NotFoundException())
+            .anyTimes();
+    EasyMock.replay(schedulerService);
+    service.setSchedulerService(schedulerService);
+
+    final Capture<Map<String, String>> captureConfig = EasyMock.newCapture();
+    WorkflowService workflowService = EasyMock.createNiceMock(WorkflowService.class);
+    EasyMock.expect(workflowService.start(EasyMock.anyObject(WorkflowDefinition.class),
+            EasyMock.anyObject(MediaPackage.class), EasyMock.capture(captureConfig)))
+            .andReturn(new WorkflowInstanceImpl()).once();
+    EasyMock.replay(workflowService);
+    service.setWorkflowService(workflowService);
+
+    MediaPackage ingestMediaPackage = MediaPackageParser
+            .getFromXml(IOUtils.toString(getClass().getResourceAsStream("/target-manifest.xml"), "UTF-8"));
+    Map<String, String> wfConfig = new HashMap<>();
+    wfConfig.put(IngestServiceImpl.LEGACY_MEDIAPACKAGE_ID_KEY, "6f7a7850-3232-4719-9064-24c9bad2832f");
+    service.ingest(ingestMediaPackage, null, wfConfig);
+    Assert.assertFalse(captureConfig.getValue().containsKey(IngestServiceImpl.LEGACY_MEDIAPACKAGE_ID_KEY));
   }
 
   /**
@@ -456,7 +518,7 @@ public class IngestServiceImplTest {
   @Test
   public void testVarySeriesOverwriteConfiguration() throws Exception {
     boolean isOverwriteSeries;
-    Dictionary<String, String> properties = new Hashtable<String, String>();
+    Dictionary<String, String> properties = new Hashtable<>();
 
     // Test with no properties
     // NOTE: This test only works if the serivce.update() was not triggered by any previous tests
@@ -504,8 +566,7 @@ public class IngestServiceImplTest {
     if (properties != null) {
       service.updated(properties);
       try {
-        boolean testForValue = Boolean.parseBoolean(((String) properties.get(IngestServiceImpl.PROPKEY_OVERWRITE_SERIES))
-                .trim());
+        boolean testForValue = Boolean.parseBoolean(properties.get(IngestServiceImpl.PROPKEY_OVERWRITE_SERIES).trim());
         isExpectSeriesOverwrite = testForValue;
       } catch (Exception e) {
         // If key or value not found or not boolean, use the default overwrite expectation
@@ -522,8 +583,8 @@ public class IngestServiceImplTest {
 
     // Set dublinCore service to return test dublin core
     dublinCoreService = org.easymock.EasyMock.createNiceMock(DublinCoreCatalogService.class);
-    org.easymock.EasyMock.expect(dublinCoreService.load((InputStream) EasyMock.anyObject()))
-            .andReturn(series).anyTimes();
+    org.easymock.EasyMock.expect(dublinCoreService.load((InputStream) EasyMock.anyObject())).andReturn(series)
+            .anyTimes();
     org.easymock.EasyMock.replay(dublinCoreService);
     service.setDublinCoreService(dublinCoreService);
 
@@ -536,8 +597,7 @@ public class IngestServiceImplTest {
 
     // This is true or false depending on the isOverwrite value
     Assert.assertEquals("Desire to update series is " + String.valueOf(isExpectSeriesOverwrite) + ".",
-            isExpectSeriesOverwrite,
-            service.updateSeries(urlCatalog2));
+            isExpectSeriesOverwrite, service.updateSeries(urlCatalog2));
 
     // Test with mock not found exception
     EasyMock.reset(seriesService);
@@ -552,125 +612,4 @@ public class IngestServiceImplTest {
 
   }
 
-  /**
-   * Mockup Impl stub of the WorkingFileRepository API for Ingest unit tests
-   *
-   */
-  class WorkingFileRepositoryMockImpl implements WorkingFileRepository {
-
-    @Override
-    public URI put(String mediaPackageID, String mediaPackageElementID, String filename, InputStream in)
-            throws IOException {
-      File file = new File(FileUtils.getTempDirectory(), mediaPackageElementID);
-      file.deleteOnExit();
-      FileUtils.write(file, IOUtils.toString(in), "UTF-8");
-      return file.toURI();
-    }
-
-    @Override
-    public InputStream get(String mediaPackageID, String mediaPackageElementID) throws NotFoundException, IOException {
-      File file = new File(FileUtils.getTempDirectory(), mediaPackageElementID);
-      return new FileInputStream(file);
-    }
-
-    @Override
-    public Option<Long> getTotalSpace() {
-      // TODO change mock stub as needed for future unit tests
-      return null;
-    }
-
-    @Override
-    public Option<Long> getUsableSpace() {
-      // TODO change mock stub as needed for future unit tests
-      return null;
-    }
-
-    @Override
-    public Option<Long> getUsedSpace() {
-      // TODO change mock stub as needed for future unit tests
-      return null;
-    }
-
-    @Override
-    public URI copyTo(String arg0, String arg1, String arg2, String arg3, String arg4)
-            throws NotFoundException, IOException {
-      // TODO change mock stub as needed for future unit tests
-      return null;
-    }
-
-    @Override
-    public boolean delete(String arg0, String arg1) throws IOException {
-      // TODO change mock stub as needed for future unit tests
-      return false;
-    }
-
-    @Override
-    public boolean deleteFromCollection(String arg0, String arg1) throws IOException {
-      // TODO change mock stub as needed for future unit tests
-      return false;
-    }
-
-    @Override
-    public URI getBaseUri() {
-      // TODO change mock stub as needed for future unit tests
-      return null;
-    }
-
-    @Override
-    public URI[] getCollectionContents(String arg0) throws NotFoundException {
-      // TODO change mock stub as needed for future unit tests
-      return null;
-    }
-
-    @Override
-    public long getCollectionSize(String arg0) throws NotFoundException {
-      // TODO change mock stub as needed for future unit tests
-      return 0;
-    }
-
-    @Override
-    public URI getCollectionURI(String arg0, String arg1) throws IllegalArgumentException {
-      // TODO change mock stub as needed for future unit tests
-      return null;
-    }
-
-    @Override
-    public String getDiskSpace() {
-      // TODO change mock stub as needed for future unit tests
-      return null;
-    }
-
-    @Override
-    public InputStream getFromCollection(String arg0, String arg1) throws NotFoundException, IOException {
-      // TODO change mock stub as needed for future unit tests
-      return null;
-    }
-
-    @Override
-    public URI getURI(String arg0, String arg1) throws IllegalArgumentException {
-      // TODO change mock stub as needed for future unit tests
-      return null;
-    }
-
-    @Override
-    public URI getURI(String arg0, String arg1, String arg2) throws IllegalArgumentException {
-      // TODO change mock stub as needed for future unit tests
-      return null;
-    }
-
-    @Override
-    public URI moveTo(String arg0, String arg1, String arg2, String arg3, String arg4)
-            throws NotFoundException, IOException {
-      // TODO change mock stub as needed for future unit tests
-      return null;
-    }
-
-    @Override
-    public URI putInCollection(String arg0, String arg1, InputStream arg2) throws IOException {
-      // TODO change mock stub as needed for future unit tests
-      return null;
-    }
-
-  }
 }
-

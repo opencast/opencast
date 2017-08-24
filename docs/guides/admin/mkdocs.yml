@@ -1,5 +1,5 @@
 site_name: Opencast - Administration Guide
-repo_url: https://bitbucket.org/opencast-community/matterhorn/src/develop/docs/guides/admin/docs
+repo_url: https://bitbucket.org/opencast-community/opencast/src/develop/docs/guides/admin/docs
 
 # Default theme used is readthedocs
 theme: readthedocs
@@ -42,18 +42,21 @@ pages:
    - Multi Tenancy: 'configuration/multi.tenancy.md'
    - Security:
       - General Security: 'configuration/security.md'
+      - Access Control Lists: 'configuration/acl.md'
+      - Authentication and Authorization Infrastructure (AAI): 'configuration/security.aai.md'
       - Central Authentication Service (CAS): 'configuration/security.cas.md'
       - LDAP Authentication and Authorization (without CAS): 'configuration/security.ldap.md'
-      - Authentication and Authorization Infrastructure (AAI): 'configuration/security.aai.md'
+      - Sakai User Provider: 'configuration/security.user.sakai.md'
       - Stream Security: 'configuration/stream-security.md'
-      - Access Control Lists: 'configuration/acl.md'
    - Workflow: 'configuration/workflow.md'
    - External API: 'configuration/external-api.md'
    - OAI-PMH: 'configuration/oaipmh.md'
+- Version Support: 'version-support.md'
 - Modules:
    - Overview: 'modules/index.md'
    - Atom/RSS Feed: 'modules/atomrss.md'
    - AWS S3 Distribution: 'modules/awss3distribution.md'
+   - Execute Service: 'modules/execute.md'
    - LTI Module: 'modules/ltimodule.md'
    - Media Module: 'modules/mediamodule.configuration.md'
    - Player:
@@ -63,6 +66,7 @@ pages:
    - Search Index: 'modules/searchindex.md'
    - Stream Security: 'modules/stream-security.md'
    - Text Extraction: 'modules/textextraction.md'
+   - Transcripts (IBM Watson): 'modules/watsontranscripts.md'
    - Video Editor:
       - Setup: 'modules/videoeditor.setup.md'
       - Architecture: 'modules/videoeditor.architecture.md'
@@ -71,10 +75,12 @@ pages:
    - YouTube Publication: 'modules/youtubepublication.md'
 - Workflow Operation Handler:
    - Overview: 'workflowoperationhandlers/index.md'
+   - Retry Strategies: 'workflowoperationhandlers/retry-strategies.md'
    - Analyze Tracks: 'workflowoperationhandlers/analyze-tracks-woh.md'
    - Analyze Audio: 'workflowoperationhandlers/analyzeaudio-woh.md'
-   - Asset Snapshot WOH: 'workflowoperationhandlers/asset-snapshot-woh.md'
-   - Asset Delete WOH: 'workflowoperationhandlers/asset-delete-woh.md'
+   - Asset Snapshot: 'workflowoperationhandlers/snapshot-woh.md'
+   - Asset Delete: 'workflowoperationhandlers/asset-delete-woh.md'
+   - Attach Watson Transcription: 'workflowoperationhandlers/attach-watson-transcription-woh.md'
    - Cleanup: 'workflowoperationhandlers/cleanup-woh.md'
    - Comment: 'workflowoperationhandlers/comment-woh.md'
    - Compose: 'workflowoperationhandlers/compose-woh.md'
@@ -87,6 +93,8 @@ pages:
    - Editor: 'workflowoperationhandlers/editor-woh.md'
    - Email: 'workflowoperationhandlers/email-woh.md'
    - Encode: 'workflowoperationhandlers/encode-woh.md'
+   - Execute Once: 'workflowoperationhandlers/execute-once-woh.md'
+   - Execute Many: 'workflowoperationhandlers/execute-many-woh.md'
    - Export Workflow Properties: 'workflowoperationhandlers/export-wf-properties-woh.md'
    - Extract Text: 'workflowoperationhandlers/extracttext-woh.md'
    - HTTP Notify: 'workflowoperationhandlers/httpnotify-woh.md'
@@ -106,12 +114,15 @@ pages:
    - Publish Engage: 'workflowoperationhandlers/publishengage-woh.md'
    - Publish OAI-PMH: 'workflowoperationhandlers/publish-oaipmh-woh.md'
    - Republish OAI-PMH: 'workflowoperationhandlers/republish-oaipmh-woh.md'
+   - Retract AWS S3 and Cloudfront: 'workflowoperationhandlers/retract-aws-woh.md'
+   - Retract Engage: 'workflowoperationhandlers/retract-engage-woh.md'
    - Retract Configure: 'workflowoperationhandlers/retractconfigure-woh.md'
    - Retract OAI-PMH: 'workflowoperationhandlers/retract-oaipmh-woh.md'
    - Segment Previews: 'workflowoperationhandlers/segmentpreviews-woh.md'
    - Segment Video: 'workflowoperationhandlers/segmentvideo-woh.md'
    - Series: 'workflowoperationhandlers/series-woh.md'
    - Silence: 'workflowoperationhandlers/silence-woh.md'
+   - Start Watson Transcription: 'workflowoperationhandlers/start-watson-transcription-woh.md'
    - Tag: 'workflowoperationhandlers/tag-woh.md'
    - Tag-By-DCTerm: 'workflowoperationhandlers/tag-by-dcterm-woh.md'
    - Theme: 'workflowoperationhandlers/theme-woh.md'

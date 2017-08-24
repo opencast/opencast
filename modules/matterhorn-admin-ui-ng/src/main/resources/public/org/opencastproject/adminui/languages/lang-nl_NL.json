@@ -169,7 +169,7 @@
     "VIDEO_CUT_PROCESSING":"De video wordt verwerkt…",
     "SERVER_UNRESPONSIVE":"Oops! De server lijkt momenteel niet te reageren. Gelieve het later nogmaals te proberen.",
     "SERVICE_UNAVAILABLE":"Oops! De server lijkt momenteel niet te reageren. Gelieve het later nogmaals te proberen.",
-    "ACTIVE_TRANSACTION":"Het huidige evenement kan momenteel niet worden bewerkt aangezien het bij een actieve transactie betrokken is."
+    "ACTIVE_TRANSACTION":"This event can not be edited while there is an active workflow or transaction."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Acties",
@@ -382,7 +382,8 @@
             "REPEATS":"Herhaalt",
             "REPEAT_ON":"Herhalen op",
             "WEEKDAYS":"Weekdagen"
-          }
+          },
+          "NO_SOURCE_AVAILABLE":"No capture agents available for scheduling"
         },
         "PROCESSING":{
           "CAPTION":"In verwerking",
@@ -473,6 +474,7 @@
         },
         "GENERAL":{
           "PUBLICATION_STATUS":"Publicatiestatus",
+          "NO_PUBLICATIONS_AVAILABLE":"This event has no publications",
           "SCHEDULING_STATUS":"Status",
           "READY_FOR_RECORDING":"Klaar voor opname",
           "OPTED_OUT":"Uitgeschreven",
@@ -683,7 +685,7 @@
           "RESOLVED":"Opgelost",
           "REPLY":"Beantwoorden",
           "REPLY_TO":"Antwoord aan",
-          "CANCEL_REPLY":"Afwijzen",
+          "CANCEL_REPLY":"Cancel",
           "DELETE":"Verwijder",
           "REASON":"Reden",
           "REASONS":{
@@ -1060,7 +1062,14 @@
         "EDITCAPTION":"Gebruiker editeren",
         "TABS":{
           "USER":"Gebruiker",
-          "ROLES":"Rollen"
+          "ROLES":"Rollen",
+          "EXTERNALROLES":"External Roles",
+          "EFFECTIVEROLES":"Effective Roles"
+        },
+        "DESCRIPTION":{
+          "ROLES":"Roles and groups that can be or are already assigned to the user.",
+          "EXTERNALROLES":"The list of external roles assigned to the user granted by the external role provider(s).",
+          "EFFECTIVEROLES":"The list of effective roles directly assigned to the user and the roles indirectly loaded through group membership."
         },
         "FORM":{
           "USERNAME":"Gebruikersnaam",
@@ -1475,12 +1484,14 @@
     }
   },
   "VIDEO_TOOL":{
+    "TIMELINE":"Timeline",
+    "ZOOMLEVEL":"Zoom Level",
+    "ZOOM":"Zoom",
     "BUTTONS":{
-      "COMMENTS":"Bekijk",
-      "METADATA":"Editeer",
       "CLOSE":"Afsluiten",
       "SAVE":"Opslaan",
-      "PROCESS":"Opslaan en verwerken"
+      "PROCESS":"Save & Continue",
+      "ADD_COMMENT":"Add Comment"
     },
     "TABS":{
       "PLAY":"Afspelen",
@@ -1488,13 +1499,25 @@
       "CAPTIONS":"Ondertitels",
       "ANNOTATIONS":"Annotaties"
     },
+    "AREAS":{
+      "METADATA":"Metadata",
+      "COMMENTS":"Comments",
+      "SEGMENTS":"Segments"
+    },
     "ACTIONS":{
       "SPLIT":"Segmenteer",
       "CUT":"Knippen",
       "REPLAY_SEGMENT":"Segment opnieuw afspelen",
+      "REPLAY_END_OF_SEGMENT":"End of segment",
+      "REPLAY_SEGMENT_WITH_PREROLL":"Check transition",
       "UNDO":"Ongedaan maken",
       "REDO":"Opnieuw toepassen",
-      "CLEAR_SEGMENTS":"Segmenten verwijderen"
+      "CLEAR_SEGMENTS":"Segmenten verwijderen",
+      "CLEAR_SELECTED_SEGMENT":"Clear selected segment"
+    },
+    "SEGMENTS":{
+      "REMOVE_SEGMENT":"Remove Segment",
+      "USE_SEGMENT":"Use this Segment"
     },
     "PLAYER":{
       "PLAY":"Afspelen",
@@ -1516,6 +1539,14 @@
     "ERROR":"Onjuiste gebruikersnaam en / of wachtwoord"
   },
   "TABLE_FILTERS":{
+    "FILTER_SELECTION":{
+      "PLACEHOLDER":"Please select a filter…",
+      "NO_OPTIONS":"No filters found"
+    },
+    "FILTER_VALUE_SELECTION":{
+      "PLACEHOLDER":"Please select a value…",
+      "NO_OPTIONS":"No values found"
+    },
     "CLEAR":"Alle filters verwijderen",
     "REMOVE":"Filter verwijderen",
     "ADD":"Filters toevoegen",
@@ -1532,6 +1563,11 @@
     }
   },
   "FILTERS":{
+    "ACLS":{
+      "NAME":{
+        "LABEL":"Name"
+      }
+    },
     "AGENTS":{
       "NAME":{
         "LABEL":"Naam"
@@ -1753,6 +1789,7 @@
     "FINISHED":"Voltooid",
     "FAILED":"Mislukt",
     "FINISHED_WITH_COMMENTS":"Taak",
-    "SCHEDULED":"Gepland"
+    "SCHEDULED":"Gepland",
+    "RECORDING":"Recording"
   }
 }

@@ -19,16 +19,16 @@ prior option, the tarball download, needs less tools and you do not have to down
 Using the tarball:
 
 Select the tarball for the version you want to install from the [BitBucket downloads section
-](https://bitbucket.org/opencast-community/matterhorn/downloads).
+](https://bitbucket.org/opencast-community/opencast/downloads).
 
     # Download desired tarball
-    curl -O https://bitbucket.org/opencast-community/matterhorn/...
+    curl -O https://bitbucket.org/opencast-community/opencast/...
     tar xf ....tar.gz
     cd opencast-community-...
 
 Cloning the Git repository:
 
-    git clone https://bitbucket.org/opencast-community/matterhorn.git
+    git clone https://bitbucket.org/opencast-community/opencast.git
     cd matterhorn
     git tag   <-  List all available versions
     git checkout TAG   <-  Switch to desired version
@@ -41,8 +41,8 @@ Please make sure to install the following dependencies. Note that not all depend
 
 Required:
 
-    java-devel / openjdk >= 1.7.0
-    ffmpeg >= 3.0.1
+    java-devel / openjdk >= 1.8.0
+    ffmpeg >= 3.2.4
     maven >= 3.1
     unzip
     gcc-c++

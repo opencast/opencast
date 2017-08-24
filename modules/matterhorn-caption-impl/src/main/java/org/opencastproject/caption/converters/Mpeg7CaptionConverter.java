@@ -28,6 +28,8 @@ import org.opencastproject.caption.api.IllegalTimeFormatException;
 import org.opencastproject.caption.api.Time;
 import org.opencastproject.caption.impl.CaptionImpl;
 import org.opencastproject.caption.impl.TimeImpl;
+import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.metadata.mpeg7.Audio;
 import org.opencastproject.metadata.mpeg7.AudioSegment;
 import org.opencastproject.metadata.mpeg7.FreeTextAnnotation;
@@ -279,4 +281,8 @@ public class Mpeg7CaptionConverter implements CaptionConverter {
     return EXTENSION;
   }
 
+  @Override
+  public Type getElementType() {
+    return MediaPackageElement.Type.Catalog;
+  }
 }

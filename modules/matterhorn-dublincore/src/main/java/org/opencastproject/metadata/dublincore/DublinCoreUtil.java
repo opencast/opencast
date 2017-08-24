@@ -104,7 +104,7 @@ public final class DublinCoreUtil {
   public static DublinCoreCatalog loadDublinCore(Workspace workspace, MediaPackageElement mpe) {
     InputStream in = null;
     try {
-      in = new FileInputStream(workspace.get(mpe.getURI()));
+      in = new FileInputStream(workspace.read(mpe.getURI()));
       return DublinCores.read(in);
     } catch (Exception e) {
       logger.error("Unable to load metadata from catalog '{}': {}", mpe, e);

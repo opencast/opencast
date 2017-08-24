@@ -57,9 +57,10 @@ import java.io.InputStream;
 import java.net.URI;
 
 /**
- * Utility class to apply workflows to episodes.
+ * Utility class to apply workflows to episodes. Removed 'final class' so that we can mock it for
+ * unit tests.
  */
-public final class Workflows {
+public class Workflows {
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(Workflows.class);
 

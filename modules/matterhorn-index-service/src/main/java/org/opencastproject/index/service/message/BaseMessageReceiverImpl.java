@@ -119,7 +119,7 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
 
     @Override
     public void run() {
-      logger.info("Starting to listen for {} Messages", clazzName);
+      logger.info("Starting to listen for {} Messages for {}", clazzName, destinationId);
       while (listening) {
         future = messageReceiver.receiveSerializable(getDestinationId(), getDestinationType());
         executor.execute(future);

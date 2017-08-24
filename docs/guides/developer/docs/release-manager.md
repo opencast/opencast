@@ -88,7 +88,7 @@ Create the Branch:
 
 At this point, the developer community should then be notified. Consider using the following as a template email:
 
-    To: matterhorn@opencast.org
+    To: dev@opencast.org
     Subject: Release Branch for Opencast <VERSION> Cut
 
     Hi everyone,
@@ -104,11 +104,76 @@ At this point, the developer community should then be notified. Consider using t
     during the public QA phase.  Please report any bugs or issues you encounter.
 
 
-### Adjust Pull Request Filter
+### Check Status of Language Translations
+
+On the date when the release branch is cut, the release manager is responsible to check whether there are language
+translations that need to be included or excluded for the upcoming release.
+Have a look at [Inclusion and Exclusion of Languages](localization.md) for the criteria.
+
+1. Check whether translations not yet included in Opencast meet the inclusion criteria (candidates for includsion)
+2. Check whether translations in Opencast meet the exclusion criteria (endangered translations)
+3. Publish an announcement on the Opencast Users list that specifies:
+    a. Translations that will be included in the upcoming release
+    b. Endangered translations
+
+Please create a single post on the Opencast Users list:
+
+    To: users@opencast.org
+    Subject: Opencast <VERSION>: Language translation status
+
+    Hi everyone,
+
+    While checking the translation statuses of the languages available on Crowdin (see [1]), we have found
+    that the following language translations meet the criteria to be included in Opencast <VERSION>:
+
+    - <LANGUAGE1> (<PERCENTAGE1>)
+    - <LANGUAGE2> (<PERCENTAGE2>)
+    - ....
+
+    Sincerly,
+    Your Opencast <VERSION> Release Manager
+
+    [1] Opencast project on Crowdin, https://crowdin.com/project/opencast-matterhorn
+    [2] Inclusion and Exclusion of Translations, https://docs.opencast.org/develop/developer/... 
+
+In case endangered languages have been identified, this needs to be communicated immediately to the Opencast community.
+Please create a post for each endangered translation on the Opencast Users list:
+
+    To: users@opencast.org
+    Subject: Opencast <VERSION>: <LANGUAGE> translation is endangered! [HELP NEEDED!]
+
+    Hi everyone,
+
+    While checking the translation status of the <LANGUAGE> translation, we have found that it is
+    only <PERCENTAGE> translated.
+
+    This is not enough to justify its inclusion in the upcoming Opencast release (see [1]).
+
+    We hereby declare the <LANGUAGE> translation endangered! This means that it will not be included in
+    Opencast <VERSION> unless it is saved by the community.
+
+    To save the <LANGUAGE> translation from removal from the Opencast release, <LANGUAGE> needs to be
+    translated at least 90% until <DATE>.
+
+    Sincerly,
+    Your Opencast <VERSION> Release Managers
+
+    [1] Inclusion and Exclusion of Translations, https://docs.opencast.org/
+
+
+### Creating the Merge Ticket
 
 The [Opencast pull request filter](http://pullrequests.opencast.org) links the versions currently in development. The
-merge ticket identifier needs to be added to that filter. As release manager, please talk to the [administrator
-](https://bitbucket.org/opencast-community/opencast-infrastructure) of that tool to ensure the ticket is added.
+merge ticket identifier needs to be added to that filter. To do this, create a ticket with a title in the format of
+`Merge the result of the current peer review to <VERSION>`. The ticket will be automatically detected by the pull 
+request filter and will appear shortly.
+
+
+### Creating the Release Version
+
+The release manager is responsible for creating, or triggering the creation of, the appropriate fix version for the new
+release. You may be able to do this yourself by assigning a new fix version to their newly created merge ticket. If you
+are unable to do that, please contact one of the JIRA administrators so we can create it for you!
 
 
 ### Release Documentation
@@ -159,6 +224,13 @@ To merge the release branch into `develop`. As example, we do that for 3.0. Plea
 
 6. Leave a comment in the merge ticket and assign it back to the next pull request in line on `develop`.
 
+
+### Updating Translations
+
+Updating the [localization translations](localization.md) is easy, and should be done at minimum as part of every
+release candidate.
+
+
 ### Beta Versions and Release Candidates
 
 For testing purposes, the release manager should regularly create beta versions. Especially before the public QA phase,
@@ -175,22 +247,24 @@ Create a version/tag. Again, version 3.0 is used as example. Please adjust the v
 
         git checkout -b r/3.0-beta1
 
-3. Make version changes for release. You can use `sed` to make things easier. Please make sure, the changes are correct:
+3. Update the [localization translations](localization.md).
+
+4. Make version changes for release. You can use `sed` to make things easier. Please make sure, the changes are correct:
 
         for i in `find . -name pom.xml`; do \
           sed -i 's/<version>3.0-SNAPSHOT</<version>3.0-beta1</' $i; done
 
-4. Commit changes and create release tag:
+5. Commit changes and create release tag:
 
         git commit -asS -m 'Opencast 3.0-beta1'
         git tag -s 3.0-beta1
 
-5. Switch back to release branch and push tags:
+6. Switch back to release branch and push tags:
 
         git checkout r/3.x
         git push <remote> 3.0-beta1:3.0-beta1
 
-6. You can remove the new branch afterwards:
+7. You can remove the new branch afterwards:
 
         git branch -D r/3.0-beta1
 
@@ -198,7 +272,7 @@ For a release candidate, instead of `A.B-betaX` the tag should be named `A.B-rcX
 
 At this point the developer community should then be notified. Consider using the following email template:
 
-    To: matterhorn@opencast.org
+    To: dev@opencast.org
     Subject: <VERSION> Available for testing!
 
     Hi everyone,
@@ -216,7 +290,7 @@ At this point the developer community should then be notified. Consider using th
     Please test this release as thoroughly as
     possible.
 
-    [1] https://bitbucket.org/opencast-community/matterhorn/downloads
+    [1] https://bitbucket.org/opencast-community/opencast/downloads
 
 If the version is a release candidate, you probably want to highlight that there are no *Blockers* left at the moment
 and *#propose* this to become the final release.
@@ -241,41 +315,89 @@ assume the final release should be based on `3.0-rc2`.
 
         git checkout -b r/3.0
 
-4. Add release notes and commit them:
+4. Add release notes, and update the changelog, then commit them:
 
-        vim docs/guides/admin/docs/release.notes.md
-        git commit docs/guides/admin/docs/release.notes.md -sS
+        vim docs/guides/admin/docs/releasenotes.md docs/guides/admin/docs/changelog.md
+        git commit docs/guides/admin/docs/releasenotes.md docs/guides/admin/docs/changelog.md -sS
 
-5. Merge release notes into release branch:
+5. Update the [localization translations](localization.md).
+
+6. Merge release notes into release branch:
 
         git checkout r/3.x
         git merge r/3.0
         git checkout r/3.0
 
-6. Make version changes for release. You can use `sed` to make things easier. Please make sure, the changes are correct:
+7. Make version changes for release. You can use `sed` to make things easier. Please make sure, the changes are correct:
 
         for i in `find . -name pom.xml`; do \
           sed -i 's/<version>3.0-SNAPSHOT</<version>3.0</' $i; done
 
-7. Commit changes and create release tag:
+8. Commit changes and create release tag:
 
         git commit -asS -m 'Opencast 3.0'
         git tag -s 3.0
 
-8. Switch back to release branch, push release notes and tags:
+9. Switch back to release branch, push release notes and tags:
 
         git checkout r/3.x
         git push <remote> 3.0:3.0
         git push <remote> r/3.x
 
-9. You can remove the new branch afterwards:
+10. You can remove the new branch afterwards:
 
         git branch -D r/3.0
 
+11. Release the branch in JIRA. Talk to your JIRA administrators to have this done.
 
-Finally, send a release notice to list. You may use the following template:
+12. Push the built artifacts to Maven. Bug the QA Coordinator to do this so that he remembers to set this up from the CI
+    servers.
 
-    To: matterhorn@opencast.org
+13. Push the built artifacts back to BitBucket. Please review the following commands carefully before executing them. If
+    in doubt, use the [graphical user interface](https://bitbucket.org/opencast-community/opencast/downloads/) to upload
+    the distribution tarballs manually.
+
+        # Get Opencast version, BitBucket username and password
+        read VERSION
+        read BITBUCKET_USER
+        read bitbucketpass
+
+        mvn -e clean install
+        cd build
+
+        # Download and create the source archive
+        curl -O https://bitbucket.org/opencast-community/opencast/get/$VERSION.tar.gz
+        tar xzf $VERSION.tar.gz
+        mv opencast-community-opencast-* opencast-$VERSION-source
+        tar cfJ opencast-$VERSION-source.tar.xz opencast-$VERSION-source
+
+        # Recompress the distribution tarballs
+        for i in opencast-dist-*.tar.gz
+        do
+          tar xf $i
+          tar cfJ "${i%.*}.xz" $i
+        done
+
+        # Checksum and sign the files
+        sha512sum *.xz > opencast-$VERSION-sha512sum.txt
+        gpg --clearsign -a opencast-$VERSION-sha512sum.txt
+
+        # Push the files to BitBucket
+        for i in *.tar.xz
+        do
+          echo "Pushing $i"
+          curl -u "$BITBUCKET_USER:${bitbucketpass}" -X POST -F files=@$i \
+            https://api.bitbucket.org/2.0/repositories/opencast-community/opencast/downloads
+        done
+        curl -u "$BITBUCKET_USER:${bitbucketpass}" -X POST -F files=@opencast-$VERSION-sha512sum.txt.asc \
+          https://api.bitbucket.org/2.0/repositories/opencast-community/opencast/downloads
+
+
+Finally, send a release notice to Opencast's announcement list. Note that posting to this list is restricted to those
+who need access to avoid general discussions on that list. In case you do not already have permissions to post on this
+list, please ask to be given permission. For the message, you may use the following template:
+
+    To: announcements@opencast.org
     Subject: Opencast <VERSION> Released
     Hi all,
     it is my pleasure to announce that Opencast <VERSION> has been released and
@@ -283,18 +405,14 @@ Finally, send a release notice to list. You may use the following template:
 
     The documentation for this release can be found at [http://docs.opencast.org].
 
-    Issue Count:
-
-      Blockers   0
-      Critical   <CRITICAL_ISSUE_COUNT>
-      Major      <MAJOR_ISSUE_COUNT>
-      Minor      <MINOR_ISSUE_COUNT>
+    RPM and Debian packages will be available soon. Watch for announcements on
+    the users list.
 
     To all committers and involved contributors, thank you for all your work.
     This could not have happened without you and I am glad we were able to work
     together and get this release out.
 
-    [1] https://bitbucket.org/opencast-community/matterhorn/downloads
+    [1] https://bitbucket.org/opencast-community/opencast/downloads
 
 
 ### Appointment of Next Release Manager
@@ -307,7 +425,7 @@ job of release manager for the next release.
 
 For that, this email template may be used:
 
-    To: matterhorn@opencast.org
+    To: dev@opencast.org
     Subject: Opencast <NEXT_RELEASE_VERSION> release manager wanted
 
     Hi everyone,

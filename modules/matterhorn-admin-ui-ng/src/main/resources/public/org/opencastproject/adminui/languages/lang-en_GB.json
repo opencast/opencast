@@ -169,7 +169,7 @@
     "VIDEO_CUT_PROCESSING":"The video is being processed…",
     "SERVER_UNRESPONSIVE":"Oops! The server seems to be unresponsive. Please try again later.",
     "SERVICE_UNAVAILABLE":"Oops! The server seems to be unresponsive. Please try again later.",
-    "ACTIVE_TRANSACTION":"The current event can currently not be edited as it is involved of an active transaction."
+    "ACTIVE_TRANSACTION":"This event can not be edited while there is an active workflow or transaction."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Actions",
@@ -382,7 +382,8 @@
             "REPEATS":"Repeats",
             "REPEAT_ON":"Repeat on",
             "WEEKDAYS":"Weekdays"
-          }
+          },
+          "NO_SOURCE_AVAILABLE":"No capture agents available for scheduling"
         },
         "PROCESSING":{
           "CAPTION":"Processing",
@@ -473,6 +474,7 @@
         },
         "GENERAL":{
           "PUBLICATION_STATUS":"Publication status",
+          "NO_PUBLICATIONS_AVAILABLE":"This event has no publications",
           "SCHEDULING_STATUS":"Status",
           "READY_FOR_RECORDING":"Ready for recording",
           "OPTED_OUT":"Opted-out",
@@ -683,7 +685,7 @@
           "RESOLVED":"Resolved",
           "REPLY":"Reply",
           "REPLY_TO":"Reply to",
-          "CANCEL_REPLY":"Dismiss",
+          "CANCEL_REPLY":"Cancel",
           "DELETE":"Delete",
           "REASON":"Reason",
           "REASONS":{
@@ -1060,7 +1062,14 @@
         "EDITCAPTION":"Edit user",
         "TABS":{
           "USER":"User",
-          "ROLES":"Roles"
+          "ROLES":"Roles",
+          "EXTERNALROLES":"External Roles",
+          "EFFECTIVEROLES":"Effective Roles"
+        },
+        "DESCRIPTION":{
+          "ROLES":"Roles and groups that can be or are already assigned to the user.",
+          "EXTERNALROLES":"The list of external roles assigned to the user granted by the external role provider(s).",
+          "EFFECTIVEROLES":"The list of effective roles directly assigned to the user and the roles indirectly loaded through group membership."
         },
         "FORM":{
           "USERNAME":"Username",
@@ -1391,6 +1400,7 @@
           "FILE_UPLOADED":"File uploaded: ",
           "DESCRIPTION":"Semi-transparent image overlaid on every frame of the recording.",
           "ACTIVE":"Active",
+          "ENABLE":"Enable watermark",
           "TOP_LEFT":"Top left",
           "TOP_RIGHT":"Top right",
           "BOTTOM_LEFT":"Bottom left",
@@ -1475,12 +1485,14 @@
     }
   },
   "VIDEO_TOOL":{
+    "TIMELINE":"Timeline",
+    "ZOOMLEVEL":"Zoom Level",
+    "ZOOM":"Zoom",
     "BUTTONS":{
-      "COMMENTS":"View",
-      "METADATA":"Edit",
       "CLOSE":"Close",
       "SAVE":"Save",
-      "PROCESS":"Save & process"
+      "PROCESS":"Save & Continue",
+      "ADD_COMMENT":"Add Comment"
     },
     "TABS":{
       "PLAY":"Playback",
@@ -1488,13 +1500,25 @@
       "CAPTIONS":"Captions",
       "ANNOTATIONS":"Annotations"
     },
+    "AREAS":{
+      "METADATA":"Metadata",
+      "COMMENTS":"Comments",
+      "SEGMENTS":"Segments"
+    },
     "ACTIONS":{
       "SPLIT":"Split",
       "CUT":"Cut",
       "REPLAY_SEGMENT":"Replay segment",
+      "REPLAY_END_OF_SEGMENT":"End of segment",
+      "REPLAY_SEGMENT_WITH_PREROLL":"Check transition",
       "UNDO":"Undo",
       "REDO":"Redo",
-      "CLEAR_SEGMENTS":"Clear segments"
+      "CLEAR_SEGMENTS":"Clear segments",
+      "CLEAR_SELECTED_SEGMENT":"Clear selected segment"
+    },
+    "SEGMENTS":{
+      "REMOVE_SEGMENT":"Remove Segment",
+      "USE_SEGMENT":"Use this Segment"
     },
     "PLAYER":{
       "PLAY":"Play",
@@ -1516,6 +1540,14 @@
     "ERROR":"Incorrect username and / or password"
   },
   "TABLE_FILTERS":{
+    "FILTER_SELECTION":{
+      "PLACEHOLDER":"Please select a filter…",
+      "NO_OPTIONS":"No filters found"
+    },
+    "FILTER_VALUE_SELECTION":{
+      "PLACEHOLDER":"Please select a value…",
+      "NO_OPTIONS":"No values found"
+    },
     "CLEAR":"Clear all filters",
     "REMOVE":"Remove filter",
     "ADD":"Add filters",
@@ -1532,6 +1564,11 @@
     }
   },
   "FILTERS":{
+    "ACLS":{
+      "NAME":{
+        "LABEL":"Name"
+      }
+    },
     "AGENTS":{
       "NAME":{
         "LABEL":"Name"
@@ -1753,6 +1790,7 @@
     "FINISHED":"Finished",
     "FAILED":"Failed",
     "FINISHED_WITH_COMMENTS":"Todo",
-    "SCHEDULED":"Scheduled"
+    "SCHEDULED":"Scheduled",
+    "RECORDING":"Recording"
   }
 }

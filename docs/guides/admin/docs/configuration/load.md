@@ -62,6 +62,7 @@ is running.  The current files with relevant configuration keys are:
 | org.opencastproject.distribution.acl.AclDistributionService.cfg                          | ACL file distribution              |
 | org.opencastproject.distribution.distribution.streaming.StreamingDistributionService.cfg | Streaming distribution             |
 | org.opencastproject.distribution.download.DownloadDistributionServiceImpl.cfg            | Download distribution              |
+| org.opencastproject.execute.impl.ExecuteServiceImpl.cfg                                  | Execute service                    |
 | org.opencastproject.ingest.impl.IngestServiceImpl.cfg                                    | Ingest services                    |
 | org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl.cfg                     | Media inspection using ffmpeg      |
 | org.opencastproject.inspection.impl.MediaInspectionServiceImpl.cfg                       | Media inspection using mediainfo   |

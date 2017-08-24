@@ -1,6 +1,8 @@
 {
   "value_locale":"pl",
-  "error_mediaPackageInformationNotLoaded":"Istnieją dwie możliwe przyczyny tego błędu: <ul><li>nagranie już nie jest dostępne</li> lub <li>nagranie jest zabezpieczone i musisz się zalogować</li></ul>",
+  "error_mediaPackageInformationNotLoaded":"There are two possible reasons for this error:",
+  "error_mediaPackageInformationNotLoaded_reason1":"The media is not available any more",
+  "error_mediaPackageInformationNotLoaded_reason2":"The media is protected and you need to log in",
   "error_noMediaInformationAvailable":"Brak informacji o mediach.",
   "error_endpointNotAvailable":"Usługa wyszukiwania jest obecnie niedostępna."
 }

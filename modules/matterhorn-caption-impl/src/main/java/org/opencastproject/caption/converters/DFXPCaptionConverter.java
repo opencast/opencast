@@ -29,6 +29,8 @@ import org.opencastproject.caption.api.Time;
 import org.opencastproject.caption.impl.CaptionImpl;
 import org.opencastproject.caption.impl.TimeImpl;
 import org.opencastproject.caption.util.TimeUtil;
+import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElement.Type;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -325,6 +327,11 @@ public class DFXPCaptionConverter implements CaptionConverter {
   @Override
   public String getExtension() {
     return EXTENSION;
+  }
+
+  @Override
+  public Type getElementType() {
+    return MediaPackageElement.Type.Catalog;
   }
 
 }

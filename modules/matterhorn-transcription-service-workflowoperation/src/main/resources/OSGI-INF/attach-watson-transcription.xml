@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+	name="org.opencastproject.transcription.workflowoperation.AttachTranscriptionOperationHandler"
+	immediate="true" activate="activate">
+	<implementation
+		class="org.opencastproject.transcription.workflowoperation.AttachTranscriptionOperationHandler" />
+	<property name="service.description"
+		value="Attach Transcription Workflow Operation Handler" />
+	<property name="workflow.operation" value="attach-watson-transcription" />
+	<service>
+		<provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+	</service>
+	<reference name="ServiceRegistry" cardinality="1..1"
+		interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+		policy="static" bind="setServiceRegistry" />
+	<reference cardinality="1..1"
+		interface="org.opencastproject.transcription.api.TranscriptionService"
+		name="TranscriptionService" policy="static"target="(provider=ibm.watson)" bind="setTranscriptionService" />
+	<reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+		cardinality="1..1" policy="static" bind="setWorkspace" />
+	<reference name="captionService"
+		interface="org.opencastproject.caption.api.CaptionService" policy="static"
+		cardinality="1..1" bind="setCaptionService" />
+</scr:component>

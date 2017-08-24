@@ -1,5 +1,5 @@
 'use strict';
-var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
+var proxyMiddleware = require('grunt-middleware-proxy/lib/Utils').getProxyMiddleware();
 var requestDigest = require('request-digest');
 var serveStatic = require('serve-static');
 var httpModule = require('http');
@@ -120,7 +120,7 @@ module.exports = function (grunt, appPath) {
     }).listen(serverOptions.proxyPort);
 
     //Setup the proxy routes
-    middlewares.push(proxySnippet);
+    middlewares.push(proxyMiddleware);
 
     middlewares.push(serveStatic(appPath));
 

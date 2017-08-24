@@ -78,6 +78,18 @@ public final class TimeUtil {
             time.getMilliseconds());
   }
 
+  /**
+   * Exports {@link Time} instance to the WebVTT time format representation.
+   *
+   * @param time
+   *          {@link Time} instance to be exported
+   * @return time exported to WebVTT time format
+   */
+  public static String exportToVtt(Time time) {
+    return String.format("%02d:%02d:%02d.%03d", time.getHours(), time.getMinutes(), time.getSeconds(),
+            time.getMilliseconds());
+  }
+
   // DFXP TT time format
 
   /**

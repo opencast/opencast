@@ -38,6 +38,9 @@ public interface DownloadDistributionService extends DistributionService {
   Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds, boolean checkAvailability)
           throws DistributionException, MediaPackageException;
 
+  Job distribute(String pubChannelId, MediaPackage mediaPackage, Set<String> downloadIds, boolean checkAvailability, boolean preserveReference)
+           throws DistributionException, MediaPackageException;
+
   Job retract(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
           throws DistributionException;
 }

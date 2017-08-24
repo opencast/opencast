@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+	name="org.opencastproject.transcription.ibmwatson.persistence.TranscriptionDatabase"
+	immediate="true" activate="activate" >
+	<implementation
+		class="org.opencastproject.transcription.ibmwatson.persistence.TranscriptionDatabase" />
+	<property name="service.description" value="IBM Watson Transcription Persistence" />
+	<service>
+		<provide
+			interface="org.opencastproject.transcription.ibmwatson.persistence.TranscriptionDatabase" />
+	</service>
+    <reference name="entityManagerFactory" interface="javax.persistence.EntityManagerFactory"
+      target="(osgi.unit.name=org.opencastproject.transcription.ibmwatson.persistence)" cardinality="1..1" 
+      policy="static" bind="setEntityManagerFactory" />
+</scr:component>

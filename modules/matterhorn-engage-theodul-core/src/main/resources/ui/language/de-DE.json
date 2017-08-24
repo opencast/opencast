@@ -9,10 +9,10 @@
   "password":"Passwort",
   "rememberMe":"Speichern",
   "cancel":"Abbrechen",
-  "loginSuccessful":"Sie wurden erfolgreich eingeloggt. Bitte laden Sie diese Seite neu, falls sie nicht autoamtisch neu geladen wird.",
-  "logoutSuccessful":"Sie wurden erfolgreich ausgeloggt. Bitte laden Sie diese Seite neu, falls sie nicht autoamtisch neu geladen wird.",
+  "loginSuccessful":"Sie wurden erfolgreich eingeloggt. Bitte laden Sie diese Seite neu, falls sie nicht automatisch neu geladen wird.",
+  "logoutSuccessful":"Sie wurden erfolgreich ausgeloggt. Bitte laden Sie diese Seite neu, falls sie nicht automatisch neu geladen wird.",
   "loginFailed":"Einloggen fehlgeschlagen.",
   "description":"Beschreibung",
   "slideText":"Folientext",
-  "shortcuts":"Tastaturkürzel"
+  "shortcuts":"Tastenkürzel"
 }

@@ -252,6 +252,15 @@
                 color: #808080;
             }
 
+            &.crosslink {
+                border-bottom: 1px solid transparent;
+                color: darken($color-darkgray, 12%);
+
+                &:hover {
+                    border-bottom: 1px solid $color-gray;
+                }
+             }
+
             .notification {
                 position: absolute;
                 top: -3px;
@@ -293,7 +302,7 @@
         span[data-status=idle]:before {
             background: $green;
         }
-        
+
         span[data-status="shutting_down"]:before,span[data-status=unknown]:before {
             background: $yellow;
         }

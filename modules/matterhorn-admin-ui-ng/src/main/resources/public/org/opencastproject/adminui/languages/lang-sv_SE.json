@@ -169,7 +169,7 @@
     "VIDEO_CUT_PROCESSING":"Videon bearbetas…",
     "SERVER_UNRESPONSIVE":"Oops! Servern svarar inte. Försök igen senare.",
     "SERVICE_UNAVAILABLE":"Oops! Servern svarar inte. Försök igen senare.",
-    "ACTIVE_TRANSACTION":"Den aktuella händelsen kan för närvarande inte redigeras för att den deltar i en aktiv transaktion."
+    "ACTIVE_TRANSACTION":"This event can not be edited while there is an active workflow or transaction."
   },
   "BULK_ACTIONS":{
     "CAPTION":"Åtgärder",
@@ -382,7 +382,8 @@
             "REPEATS":"Upprepningar",
             "REPEAT_ON":"Upprepa på",
             "WEEKDAYS":"Vardagar"
-          }
+          },
+          "NO_SOURCE_AVAILABLE":"No capture agents available for scheduling"
         },
         "PROCESSING":{
           "CAPTION":"Bearbetar",
@@ -473,6 +474,7 @@
         },
         "GENERAL":{
           "PUBLICATION_STATUS":"Publiceringsstatus",
+          "NO_PUBLICATIONS_AVAILABLE":"This event has no publications",
           "SCHEDULING_STATUS":"Status",
           "READY_FOR_RECORDING":"Redo för inspelning",
           "OPTED_OUT":"Avhoppad",
@@ -683,7 +685,7 @@
           "RESOLVED":"Löst",
           "REPLY":"Svara",
           "REPLY_TO":"Svara på",
-          "CANCEL_REPLY":"Stäng",
+          "CANCEL_REPLY":"Cancel",
           "DELETE":"Ta bort",
           "REASON":"Orsak",
           "REASONS":{
@@ -1060,7 +1062,14 @@
         "EDITCAPTION":"Redigera användare",
         "TABS":{
           "USER":"Användare",
-          "ROLES":"Roller"
+          "ROLES":"Roller",
+          "EXTERNALROLES":"External Roles",
+          "EFFECTIVEROLES":"Effective Roles"
+        },
+        "DESCRIPTION":{
+          "ROLES":"Roles and groups that can be or are already assigned to the user.",
+          "EXTERNALROLES":"The list of external roles assigned to the user granted by the external role provider(s).",
+          "EFFECTIVEROLES":"The list of effective roles directly assigned to the user and the roles indirectly loaded through group membership."
         },
         "FORM":{
           "USERNAME":"Användarnamn",
@@ -1475,12 +1484,14 @@
     }
   },
   "VIDEO_TOOL":{
+    "TIMELINE":"Timeline",
+    "ZOOMLEVEL":"Zoom Level",
+    "ZOOM":"Zoom",
     "BUTTONS":{
-      "COMMENTS":"Visa",
-      "METADATA":"Redigera",
       "CLOSE":"Stäng",
       "SAVE":"Spara",
-      "PROCESS":"Spara & bearbeta"
+      "PROCESS":"Save & Continue",
+      "ADD_COMMENT":"Add Comment"
     },
     "TABS":{
       "PLAY":"Uppspelning",
@@ -1488,13 +1499,25 @@
       "CAPTIONS":"Bildtexter",
       "ANNOTATIONS":"Noteringar"
     },
+    "AREAS":{
+      "METADATA":"Metadata",
+      "COMMENTS":"Comments",
+      "SEGMENTS":"Segments"
+    },
     "ACTIONS":{
       "SPLIT":"Dela",
       "CUT":"Klipp ut",
       "REPLAY_SEGMENT":"Spel upp segment igen",
+      "REPLAY_END_OF_SEGMENT":"End of segment",
+      "REPLAY_SEGMENT_WITH_PREROLL":"Check transition",
       "UNDO":"Ångra",
       "REDO":"Gör om",
-      "CLEAR_SEGMENTS":"Rensa segment"
+      "CLEAR_SEGMENTS":"Rensa segment",
+      "CLEAR_SELECTED_SEGMENT":"Clear selected segment"
+    },
+    "SEGMENTS":{
+      "REMOVE_SEGMENT":"Remove Segment",
+      "USE_SEGMENT":"Use this Segment"
     },
     "PLAYER":{
       "PLAY":"Spela",
@@ -1516,6 +1539,14 @@
     "ERROR":"Felaktigt användarnamn, e-post och/eller lösenord"
   },
   "TABLE_FILTERS":{
+    "FILTER_SELECTION":{
+      "PLACEHOLDER":"Please select a filter…",
+      "NO_OPTIONS":"No filters found"
+    },
+    "FILTER_VALUE_SELECTION":{
+      "PLACEHOLDER":"Please select a value…",
+      "NO_OPTIONS":"No values found"
+    },
     "CLEAR":"Rensa alla filter",
     "REMOVE":"Ta bort filter",
     "ADD":"Lägg till filter",
@@ -1532,6 +1563,11 @@
     }
   },
   "FILTERS":{
+    "ACLS":{
+      "NAME":{
+        "LABEL":"Name"
+      }
+    },
     "AGENTS":{
       "NAME":{
         "LABEL":"Namn"
@@ -1753,6 +1789,7 @@
     "FINISHED":"Avslutade",
     "FAILED":"Misslyckad",
     "FINISHED_WITH_COMMENTS":"Todo",
-    "SCHEDULED":"Schemalagd"
+    "SCHEDULED":"Schemalagd",
+    "RECORDING":"Recording"
   }
 }

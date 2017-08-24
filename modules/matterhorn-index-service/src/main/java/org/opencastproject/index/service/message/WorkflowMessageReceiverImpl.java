@@ -76,7 +76,8 @@ public class WorkflowMessageReceiverImpl extends BaseMessageReceiverImpl<Workflo
     String eventId = null;
     switch (workflowItem.getType()) {
       case UpdateInstance:
-        logger.debug("Received Update Workflow instance Entry");
+
+        logger.debug("Received Update Workflow instance Entry for index {}", getSearchIndex().getIndexName());
 
         WorkflowInstance wf = workflowItem.getWorkflowInstance();
         MediaPackage mp = wf.getMediaPackage();
@@ -122,7 +123,7 @@ public class WorkflowMessageReceiverImpl extends BaseMessageReceiverImpl<Workflo
         // Persist the scheduling event
         try {
           getSearchIndex().addOrUpdate(event);
-          logger.debug("Worfklow instance {} updated in the adminui search index", event.getIdentifier());
+          logger.debug("Workflow instance {} updated in the search index", event.getIdentifier());
         } catch (SearchIndexException e) {
           logger.error("Error retrieving the recording event from the search index: {}", e.getMessage());
           return;
@@ -136,7 +137,7 @@ public class WorkflowMessageReceiverImpl extends BaseMessageReceiverImpl<Workflo
         // Remove the Workflow instance entry from the search index
         try {
           getSearchIndex().deleteWorkflow(organization, user, eventId);
-          logger.debug("Workflow instance mediapackage {} removed from adminui search index", eventId);
+          logger.debug("Workflow instance mediapackage {} removed from search index", eventId);
         } catch (NotFoundException e) {
           logger.warn("Workflow instance mediapackage {} not found for deletion", eventId);
         } catch (SearchIndexException e) {
