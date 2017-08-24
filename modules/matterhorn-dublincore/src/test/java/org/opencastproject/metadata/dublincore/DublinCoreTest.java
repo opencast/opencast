@@ -139,6 +139,7 @@ public class DublinCoreTest {
       throw new Exception("Unable to access test catalog 2");
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(catalogFile).anyTimes();
+    EasyMock.expect(workspace.read((URI) EasyMock.anyObject())).andReturn(catalogFile).anyTimes();
     EasyMock.replay(workspace);
     service = new DublinCoreCatalogService();
     service.setWorkspace(workspace);

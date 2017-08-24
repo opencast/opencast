@@ -60,6 +60,8 @@ public class AssetManagerWithMessagingTest extends AssetManagerTestBase<AssetMan
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
             .andReturn(new File(getClass().getResource("/dublincore-a.xml").toURI())).anyTimes();
+    EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class)))
+            .andReturn(new File(getClass().getResource("/dublincore-a.xml").toURI())).anyTimes();
     EasyMock.replay(workspace);
     final AuthorizationService authSvc = EasyMock.createNiceMock(AuthorizationService.class);
     final AccessControlList acl = new AccessControlList(new AccessControlEntry("admin", "write", true));

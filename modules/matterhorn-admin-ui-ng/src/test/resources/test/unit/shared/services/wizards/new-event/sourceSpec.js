@@ -23,6 +23,7 @@ describe('Source Step in New Event Wizard', function () {
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         captureAgents = getJSONFixture('admin-ng/capture-agents/agents.json');
+        $httpBackend.whenGET('/admin-ng/event/new/metadata').respond(JSON.stringify(getJSONFixture('admin-ng/event/new/metadata')));
     });
 
     describe('#isValid', function () {

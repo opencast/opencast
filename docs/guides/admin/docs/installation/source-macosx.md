@@ -18,7 +18,7 @@ You can get the Opencast source code by either downloading a tarball of the sour
 
 Cloning the Git repository:
 
-    git clone https://bitbucket.org/opencast-community/matterhorn.git
+    git clone https://bitbucket.org/opencast-community/opencast.git
     cd matterhorn
     git tag   <-  List all available versions
     git checkout TAG   <-  Switch to desired version
@@ -26,10 +26,10 @@ Cloning the Git repository:
 Using the tarball:
 
 Select the tarball for the version you want to install from the [BitBucket downloads section
-](https://bitbucket.org/opencast-community/matterhorn/downloads) under the "Tags" tab and download it directly from there or with the curl command specified below.
+](https://bitbucket.org/opencast-community/opencast/downloads) under the "Tags" tab and download it directly from there or with the curl command specified below.
 
     # Download desired tarball, replace [...] with the desired version
-    curl -O https://bitbucket.org/opencast-community/matterhorn/get/[...].tar.gz
+    curl -O https://bitbucket.org/opencast-community/opencast/get/[...].tar.gz
     tar xf [...].tar.gz
 
 

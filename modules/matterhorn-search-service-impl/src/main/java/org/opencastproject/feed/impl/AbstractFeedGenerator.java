@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.feed.impl;
 
 import org.opencastproject.feed.api.Content;
@@ -58,7 +57,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 /**
  * This class provides basic functionality for creating feeds and is used as the base implementation for the default
@@ -138,6 +136,9 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   /** Default rss media type */
   public static final String PROP_RSS_MEDIA_TYPE_DEFAULT = "*";
 
+  /** A regular expression to split the strings representing lists of elements */
+  private static final String splitRegExp = "[\\s,;]+";
+
   /** Link to the user interface */
   private String linkTemplate = null;
 
@@ -186,8 +187,8 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   /**
    * Creates a new abstract feed generator.
    * <p>
-   * <b>Note:</b> Subclasses using this constructor need to set required member variables prior to calling
-   * createFeed for the first time.
+   * <b>Note:</b> Subclasses using this constructor need to set required member variables prior to calling createFeed
+   * for the first time.
    */
   protected AbstractFeedGenerator() {
     atomTrackFlavors = new HashSet<MediaPackageElementFlavor>();
@@ -246,7 +247,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
           size = Integer.MAX_VALUE;
       }
     } catch (NumberFormatException e) {
-      logger.warn("Unable to set the size of the feed to {}", sizeAsString);
+      logger.warn("Unable to set the size of the feed to {}", sizeAsString, e);
     }
     name = (String) properties.get(PROP_NAME);
     description = (String) properties.get(PROP_DESCRIPTION);
@@ -261,38 +262,36 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     linkTemplate = (String) properties.get(PROP_ENTRY);
     if (properties.get(PROP_SELF) != null)
       linkSelf = (String) properties.get(PROP_SELF);
+
     String rssFlavors = (String) properties.get(PROP_RSSFLAVORS);
     if (rssFlavors != null) {
-      StringTokenizer tok = new StringTokenizer(rssFlavors, " ,;");
-      while (tok.hasMoreTokens()) {
-        addRssTrackFlavor(MediaPackageElementFlavor.parseFlavor(tok.nextToken()));
+      for (String flavor : rssFlavors.split(splitRegExp)) {
+        addRssTrackFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
       }
     }
     String rssMediaTypes = (String) properties.get(PROP_RSS_MEDIA_TYPE);
-    if (rssFlavors == null) {
+    if (rssMediaTypes == null) {
       this.rssMediaTypes.add(PROP_RSS_MEDIA_TYPE_DEFAULT);
     } else {
-      StringTokenizer tok = new StringTokenizer(rssMediaTypes, " ,;");
-      while (tok.hasMoreTokens()) {
-        this.rssMediaTypes.add(tok.nextToken());
+      for (String mediaType : rssMediaTypes.split(splitRegExp)) {
+        this.rssMediaTypes.add(mediaType);
       }
     }
     String atomFlavors = (String) properties.get(PROP_ATOMFLAVORS);
     if (atomFlavors != null) {
-      StringTokenizer tok = new StringTokenizer(atomFlavors, " ,;");
-      while (tok.hasMoreTokens()) {
-        addAtomTrackFlavor(MediaPackageElementFlavor.parseFlavor(tok.nextToken()));
+      for (String flavor : atomFlavors.split(splitRegExp)) {
+        addAtomTrackFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
       }
     }
     String rssTags = (String) properties.get(PROP_RSSTAGS);
     if (rssTags != null) {
-      for (String tag : rssTags.split("\\W")) {
+      for (String tag : rssTags.split(splitRegExp)) {
         addRSSTag(tag);
       }
     }
     String atomTags = (String) properties.get(PROP_ATOMTAGS);
     if (atomTags != null) {
-      for (String tag : atomTags.split("\\W")) {
+      for (String tag : atomTags.split(splitRegExp)) {
         addAtomTag(tag);
       }
     }
@@ -548,7 +547,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     // Have the concrete implementation load the feed data
     result = loadFeedData(type, query, size, DEFAULT_OFFSET);
     if (result == null) {
-      logger.debug("Cannot retrieve solr result for feed '" + type.toString() + "' with query '" + query + "'.");
+      logger.debug("Cannot retrieve solr result for feed '{}' with query '{}'", type.toString(), query);
       return null;
     }
 
@@ -577,8 +576,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
         else
           addEpisode(f, query, resultItem, organization);
       } catch (Throwable t) {
-        logger.error(
-                "Error creating entry with id " + resultItem.getId() + " for feed " + this + ": " + t.getMessage(), t);
+        logger.error("Error creating entry with id {} for feed {}", resultItem.getId(), this, t);
       }
       itemCount++;
       if (itemCount >= size)
@@ -655,7 +653,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
         if (iTunesFeed != null)
           iTunesFeed.setImage(new URL(coverUrl));
       } catch (MalformedURLException e) {
-        logger.error("Error creating cover URL from " + coverUrl);
+        logger.error("Error creating cover URL: {}", coverUrl, e);
       }
     }
     return feed;
@@ -681,7 +679,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     // Get the media enclosures
     List<MediaPackageElement> enclosures = getEnclosures(feed, resultItem);
     if (enclosures.size() == 0) {
-      logger.debug("No media formats found for feed entry {}", title);
+      logger.debug("No media formats found for feed entry: {}", title);
       return feed;
     }
 
@@ -737,7 +735,8 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    *          the media enclosures
    * @return the enriched item
    */
-  private FeedEntry populateFeedEntry(FeedEntry entry, SearchResultItem metadata, List<MediaPackageElement> enclosures) {
+  private FeedEntry populateFeedEntry(FeedEntry entry, SearchResultItem metadata,
+          List<MediaPackageElement> enclosures) {
     Date d = metadata.getDcCreated();
     Date updatedDate = metadata.getModified();
     String title = metadata.getDcTitle();
@@ -1126,7 +1125,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     }
 
     if (candidateElements.size() == 0) {
-      logger.debug("No distributed media found for feed entry");
+      logger.debug("No distributed media found for feed entry '{}'", resultItem.getDcTitle());
     }
 
     return candidateElements;
@@ -1189,9 +1188,8 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   }
 
   /**
-   * Generates a link for the current feed entry by using the entry identifier and the result of
-   * getLinkTemplate() to create the url. Overwrite this method to provide your own way of generating links to
-   * feed entries.
+   * Generates a link for the current feed entry by using the entry identifier and the result of getLinkTemplate() to
+   * create the url. Overwrite this method to provide your own way of generating links to feed entries.
    *
    * @param feed
    *          the feed
@@ -1206,8 +1204,8 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   }
 
   /**
-   * Generates a link for the current feed entry by using the entry identifier and the result of #getLinkSelf()
-   * to create the url. Overwrite this method to provide your own way of generating links to feed entries.
+   * Generates a link for the current feed entry by using the entry identifier and the result of #getLinkSelf() to
+   * create the url. Overwrite this method to provide your own way of generating links to feed entries.
    *
    * @param feed
    *          the feed

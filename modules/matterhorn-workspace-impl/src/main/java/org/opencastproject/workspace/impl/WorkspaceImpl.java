@@ -307,6 +307,29 @@ public final class WorkspaceImpl implements Workspace {
     return locked(inWs, downloadIfNecessary(uri));
   }
 
+  @Override
+  public File read(final URI uri) throws NotFoundException, IOException {
+
+    if (pathMappable != null) {
+      if (uri.toString().startsWith(pathMappable.getUrlPrefix())) {
+        final String localPath = uri.toString().substring(pathMappable.getUrlPrefix().length());
+        final File wfrCopy = workingFileRepositoryFile(localPath);
+        // does the file exist?
+        logger.trace("Looking up {} at {} for read", uri.toString(), wfrCopy.getAbsolutePath());
+        if (wfrCopy.isFile()) {
+          logger.debug("Getting {} directly from working file repository root at {} for read", uri,  wfrCopy.getAbsolutePath());
+          return new File(wfrCopy.getAbsolutePath());
+        } else {
+          logger.warn("The working file repository URI and paths don't match for read. Looking up {} at {} failed",
+                  uri.toString(), wfrCopy.getAbsolutePath());
+        }
+      }
+    }
+
+    // fall back to get() which should download the file into local workspace if necessary
+    return get(uri);
+  }
+
   /** Copy or link <code>src</code> to <code>dst</code>. */
   private void copyOrLink(final File src, final File dst) throws IOException {
     if (linkingEnabled) {

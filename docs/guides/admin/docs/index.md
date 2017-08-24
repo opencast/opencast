@@ -21,8 +21,8 @@ Release Documentation
 The Opencast Release Documentation is the official Opencast documentation for each release. It contains:
 
  - [Release Notes](releasenotes.md)
- - [Upgrade](upgrade.md)
- - [Changelog](changelog.md)
+    - [Upgrade](upgrade.md)
+    - [Changelog](changelog.md)
  - [Installation Guides](installation/index.md)
  - [Configuration Guides](configuration/index.md)
     - [Basic Configuration](configuration/basic.md)
@@ -39,6 +39,7 @@ The Opencast Release Documentation is the official Opencast documentation for ea
     - [Video Segmentation](modules/videosegmentation.md)
     - [YouTube Publication](modules/youtubepublication.md)
     - [more...](modules/index.md)
+ - [Version Support](version-support.md)
 
 
 Further Documentation

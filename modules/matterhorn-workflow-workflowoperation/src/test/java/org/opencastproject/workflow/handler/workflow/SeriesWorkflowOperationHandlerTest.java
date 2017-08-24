@@ -86,6 +86,7 @@ public class SeriesWorkflowOperationHandlerTest {
 
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class))).andReturn(file).anyTimes();
+    EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class))).andReturn(file).anyTimes();
     EasyMock.expect(workspace.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString(),
             EasyMock.anyObject(InputStream.class))).andReturn(uri).anyTimes();
     EasyMock.replay(workspace);
