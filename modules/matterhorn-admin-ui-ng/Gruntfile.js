@@ -109,6 +109,18 @@ module.exports = function (grunt) {
               host: 'localhost',
               port: '<%= proxyPort %>',
               https: false,
+          },
+          {
+              context: '/broker',
+              host: 'localhost',
+              port: '<%= proxyPort %>',
+              https: false,
+          },
+          {
+              context: '/services',
+              host: 'localhost',
+              port: '<%= proxyPort %>',
+              https: false,
           }]
       },
       test: {

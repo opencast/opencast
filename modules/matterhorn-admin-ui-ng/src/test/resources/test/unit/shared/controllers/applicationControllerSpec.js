@@ -24,6 +24,16 @@ describe('Application controller', function () {
         $httpBackend.whenGET('/sysinfo/bundles/version?prefix=matterhorn').respond(
             {'buildNumber': '01b60ff', 'consistent': true, 'version': '1.6.0.SNAPSHOT'}
         );
+        $httpBackend.whenGET('/broker/status').respond({});
+        $httpBackend.whenGET('/services/services.json').respond(
+                   {"services":
+                     {"service":[
+                      {"type":"fake","host":"localhost","path":"\/fake","active":true,"online":true,"maintenance":false,
+                       "jobproducer":false,"onlinefrom":"2017-08-24T10:33:29-06:00","service_state":"NORMAL",
+                       "state_changed":"2017-08-24T10:33:29-06:00","error_state_trigger":0,"warning_state_trigger":0}
+                     ]}
+                   });
+
         $scope = $rootScope.$new();
 
         $controller('ApplicationCtrl', {$scope: $scope});
@@ -34,7 +44,6 @@ describe('Application controller', function () {
     });
 
     it('stores the current user', function () {
-        $httpBackend.whenGET('/broker/status').respond({});
         $httpBackend.flush();
 
         expect($scope.currentUser.user.name).toEqual('Oliver Queen');
@@ -46,7 +55,6 @@ describe('Application controller', function () {
             $httpBackend.whenGET('/sysinfo/bundles/version?prefix=matterhorn').respond(
                 {'buildNumber': '01b60ff', 'consistent': true, 'version': '1.6.0.SNAPSHOT'}
             );
-            $httpBackend.whenGET('/broker/status').respond({});
 
             $httpBackend.flush();
             expect($scope.version.version).toEqual('1.6.0.SNAPSHOT');
@@ -56,7 +64,6 @@ describe('Application controller', function () {
             $httpBackend.whenGET('/sysinfo/bundles/version?prefix=matterhorn').respond(
                 {versions: [{'buildNumber': '01b60ff', 'consistent': true, 'version': '1.6.0.SNAPSHOT'}]}
             );
-            $httpBackend.whenGET('/broker/status').respond({});
 
             $httpBackend.flush();
             expect($scope.version.version).toEqual('1.6.0.SNAPSHOT');
