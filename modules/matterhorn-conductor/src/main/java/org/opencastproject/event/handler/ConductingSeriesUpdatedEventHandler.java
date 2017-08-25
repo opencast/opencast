@@ -93,11 +93,21 @@ public class ConductingSeriesUpdatedEventHandler {
     @Override
     public void run() {
       logger.info("Starting to listen for series update Messages");
+      long counter = 0;
       while (listening) {
         future = messageReceiver.receiveSerializable(QUEUE_ID, MessageSender.DestinationType.Queue);
         executor.execute(future);
         try {
           BaseMessage baseMessage = (BaseMessage) future.get();
+          if (null == baseMessage) {
+            //This message appears every 100th of a second or so, so let's throttle this...
+            if (counter % 1000 == 0) {
+              logger.error("Problem while receiving series update messages: Message is null");
+              logger.error("The connection with ActiveMQ is probably down!");
+            }
+            counter++;
+            continue;
+          }
           securityService.setOrganization(baseMessage.getOrganization());
           securityService.setUser(baseMessage.getUser());
           SeriesItem seriesItem = (SeriesItem) baseMessage.getObject();
@@ -113,6 +123,7 @@ public class ConductingSeriesUpdatedEventHandler {
               oaiPmhUpdatedEventHandler.handleEvent(seriesItem);
             }
           }
+          counter = 0;
         } catch (InterruptedException e) {
           logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(e));
         } catch (ExecutionException e) {

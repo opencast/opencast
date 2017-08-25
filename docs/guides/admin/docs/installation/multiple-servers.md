@@ -162,8 +162,8 @@ set the login credentials etc. After that continue with the following steps:
 
 ### custom.properties
 
-Set the server URL to the public url of each server (admin URL on admin, worker URL on worker, engage URL on engage, …).
-This may either be this nodes IP address or preferable its domain name:
+Set the server URL to the public URL of each server (admin URL on admin, worker URL on worker, presentation URL on
+presentation, …).  This may either be this nodes IP address or preferable its domain name:
 
     org.opencastproject.server.url=http://<URL>:8080
 
@@ -175,14 +175,14 @@ Define that the file repository shall access all files locally:
 
     org.opencastproject.file.repo.url=${org.opencastproject.admin.ui.url}
 
-### org.opencastproject.organization-mh_default_org.cfg
+### org.opencastproject.organization-mh\_default\_org.cfg
 
 Set the base URL of the server hosting the administrative tools. Again use a domain name instead of an IP address if
 possible:
 
     org.opencastproject.admin.ui.url=http://<ADMIN-URL>:8080
 
-Set the base URL of the server hosting the engage tools:
+Set the base URL of the server hosting the engage tools (usually the presentation node):
 
     org.opencastproject.engage.ui.url=http://<ENGAGE-URL>:8080
 
