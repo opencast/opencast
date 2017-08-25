@@ -24,7 +24,7 @@ package org.opencastproject.event.handler;
 import org.opencastproject.message.broker.api.BaseMessage;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.series.SeriesItem;
+import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.security.api.SecurityService;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -34,43 +34,35 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
 /**
- * Very simple approach to serialize the work of all three dependend update handlers. Todo: Merge all handlers into one
- * to avoid unnecessary distribution updates etc.
+ * This handler listens for changes to episodes. Whenever a change is done, this is propagated to OAI-PMH.
  */
-public class ConductingSeriesUpdatedEventHandler {
+public class ConductingEpisodeUpdatedEventHandler {
 
-  private static final Logger logger = LoggerFactory.getLogger(ConductingSeriesUpdatedEventHandler.class);
-  private static final String QUEUE_ID = "SERIES.Conductor";
+  private static final Logger logger = LoggerFactory.getLogger(ConductingEpisodeUpdatedEventHandler.class);
+  private static final String QUEUE_ID = "ASSETMANAGER.Conductor";
 
   private SecurityService securityService;
   private MessageReceiver messageReceiver;
 
-  private AssetManagerPermissionsUpdatedEventHandler assetManagerPermissionsUpdatedEventHandler;
-  private SeriesUpdatedEventHandler seriesUpdatedEventHandler;
-  private WorkflowPermissionsUpdatedEventHandler workflowPermissionsUpdatedEventHandler;
   private OaiPmhUpdatedEventHandler oaiPmhUpdatedEventHandler;
 
-  // Use a single thread executor to ensure that only one update is handled at a time.
-  // This is because Matterhorn lacks a distributed synchronization model on media packages and/or series.
-  // Note that this measure only _reduces_ the chance of data corruption cause by concurrent modifications.
   private final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
 
   private MessageWatcher messageWatcher;
 
   public void activate(ComponentContext cc) {
-    logger.info("Activating {}", ConductingSeriesUpdatedEventHandler.class.getName());
+    logger.info("Activating {}", ConductingEpisodeUpdatedEventHandler.class.getName());
     messageWatcher = new MessageWatcher();
     singleThreadExecutor.execute(messageWatcher);
   }
 
   public void deactivate(ComponentContext cc) {
-    logger.info("Deactivating {}", ConductingSeriesUpdatedEventHandler.class.getName());
+    logger.info("Deactivating {}", ConductingEpisodeUpdatedEventHandler.class.getName());
     if (messageWatcher != null)
       messageWatcher.stopListening();
 
@@ -81,7 +73,7 @@ public class ConductingSeriesUpdatedEventHandler {
 
     private final Logger logger = LoggerFactory.getLogger(MessageWatcher.class);
 
-    private boolean listening = true;
+    private volatile boolean listening = true;
     private FutureTask<Serializable> future;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -92,7 +84,7 @@ public class ConductingSeriesUpdatedEventHandler {
 
     @Override
     public void run() {
-      logger.info("Starting to listen for series update messages");
+      logger.info("Starting to listen for episode update messages");
       while (listening) {
         future = messageReceiver.receiveSerializable(QUEUE_ID, MessageSender.DestinationType.Queue);
         executor.execute(future);
@@ -100,63 +92,44 @@ public class ConductingSeriesUpdatedEventHandler {
           BaseMessage baseMessage = (BaseMessage) future.get();
           securityService.setOrganization(baseMessage.getOrganization());
           securityService.setUser(baseMessage.getUser());
-          SeriesItem seriesItem = (SeriesItem) baseMessage.getObject();
-
-          if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())
-                  || SeriesItem.Type.UpdateAcl.equals(seriesItem.getType())
-                  || SeriesItem.Type.Delete.equals(seriesItem.getType())) {
-            seriesUpdatedEventHandler.handleEvent(seriesItem);
-            assetManagerPermissionsUpdatedEventHandler.handleEvent(seriesItem);
-            workflowPermissionsUpdatedEventHandler.handleEvent(seriesItem);
+          AssetManagerItem.TakeSnapshot snapshotItem = (AssetManagerItem.TakeSnapshot) baseMessage.getObject();
+          if (AssetManagerItem.Type.Update.equals(snapshotItem.getType())) {
             // the OAI-PMH handler is a dynamic dependency
             if (oaiPmhUpdatedEventHandler != null) {
-              oaiPmhUpdatedEventHandler.handleEvent(seriesItem);
+              oaiPmhUpdatedEventHandler.handleEvent(snapshotItem);
             }
           }
-        } catch (InterruptedException e) {
-          logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(e));
-        } catch (ExecutionException e) {
-          logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(e));
         } catch (CancellationException e) {
-          logger.trace("Listening for series update messages has been cancelled.");
+          logger.trace("Listening for episode update messages has been cancelled.");
         } catch (Throwable t) {
-          logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(t));
+          logger.error("Problem while getting episode update message events {}", ExceptionUtils.getStackTrace(t));
         } finally {
           securityService.setOrganization(null);
           securityService.setUser(null);
         }
       }
-      logger.info("Stopping listening for series update messages");
+      logger.info("Stopping listening for episode update messages");
     }
 
   }
 
-  /** OSGi DI callback. */
-  public void setAssetManagerPermissionsUpdatedEventHandler(AssetManagerPermissionsUpdatedEventHandler h) {
-    this.assetManagerPermissionsUpdatedEventHandler = h;
-  }
-
-  /** OSGi DI callback. */
-  public void setSeriesUpdatedEventHandler(SeriesUpdatedEventHandler h) {
-    this.seriesUpdatedEventHandler = h;
-  }
-
-  /** OSGi DI callback. */
-  public void setWorkflowPermissionsUpdatedEventHandler(WorkflowPermissionsUpdatedEventHandler h) {
-    this.workflowPermissionsUpdatedEventHandler = h;
-  }
-
-  /** OSGi DI callback. */
+  /**
+   * OSGi DI callback.
+   */
   public void setOaiPmhUpdatedEventHandler(OaiPmhUpdatedEventHandler h) {
     this.oaiPmhUpdatedEventHandler = h;
   }
 
-  /** OSGi DI callback. */
+  /**
+   * OSGi DI callback.
+   */
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
   }
 
-  /** OSGi DI callback. */
+  /**
+   * OSGi DI callback.
+   */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
