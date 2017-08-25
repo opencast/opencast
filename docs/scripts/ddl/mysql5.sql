@@ -283,17 +283,14 @@ CREATE TABLE mh_series (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_oaipmh (
-  id VARCHAR(128) NOT NULL,
+  mp_id VARCHAR(128) NOT NULL,
   organization VARCHAR(128) NOT NULL,
   repo_id VARCHAR(255) NOT NULL,
   series_id VARCHAR(128),
   deleted tinyint(1) DEFAULT '0',
   modification_date DATETIME DEFAULT NULL,
   mediapackage_xml TEXT(65535) NOT NULL,
-  series_dublincore_xml TEXT(65535),
-  episode_dublincore_xml TEXT(65535),
-  series_acl_xml TEXT(65535),
-  PRIMARY KEY (id, repo_id, organization),
+  PRIMARY KEY (mp_id, repo_id, organization),
   CONSTRAINT UNQ_mh_oaipmh UNIQUE (modification_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -306,6 +303,21 @@ FOR EACH ROW SET NEW.modification_date = NOW();
 -- set to current date and time on update
 CREATE TRIGGER mh_update_oaipmh_date BEFORE UPDATE ON `mh_oaipmh`
 FOR EACH ROW SET NEW.modification_date = NOW();
+
+CREATE TABLE mh_oaipmh_elements (
+  id INT(20) NOT NULL AUTO_INCREMENT,
+  element_type VARCHAR(16) NOT NULL,
+  flavor varchar(255) NOT NULL,
+  xml TEXT(65535) NOT NULL,
+  mp_id VARCHAR(128) NOT NULL,
+  organization VARCHAR(128) NOT NULL,
+  repo_id VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT FK_mh_oaipmh_elements
+    FOREIGN KEY (mp_id, repo_id, organization)
+    REFERENCES mh_oaipmh (mp_id, repo_id, organization)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_user_session (
   session_id VARCHAR(50) NOT NULL,
