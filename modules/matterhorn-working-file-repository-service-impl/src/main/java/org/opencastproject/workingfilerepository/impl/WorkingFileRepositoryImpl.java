@@ -322,7 +322,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       }
 
     } catch (IOException e) {
-      FileUtils.deleteDirectory(dir);
+      IOUtils.closeQuietly(out);
+      FileUtils.deleteQuietly(dir);
       throw e;
     } finally {
       IOUtils.closeQuietly(out);
