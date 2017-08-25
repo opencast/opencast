@@ -98,7 +98,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   var plugins_loaded = {};
   var loadingDelay1 = 500;
   var loadingDelay2 = 1000;
-  var errorCheckDelay = 7500;
+  var errorCheckDelay = 15000;
   var mediapackageError = false;
   var numberOfPlugins = 0;
   var translationData = null;
