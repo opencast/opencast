@@ -149,11 +149,27 @@ public interface Workspace extends StorageUsage {
    * @param fileName
    *          the filename to remove
    * @throws NotFoundException
-   *           if there was not file stored under this combination of mediapackage and element IDs.
+   *           if there was no file with the provided name stored under this collection.
    * @throws IOException
    *           if deleting the data from the workspace fails
    */
   void deleteFromCollection(String collectionId, String fileName) throws NotFoundException, IOException;
+
+  /**
+   * Removes a file from a collection, removing the parent collection folder if empty
+   *
+   * @param collectionId
+   *          the collection identifier
+   * @param fileName
+   *          the filename to remove
+   * @param removeCollection
+   *          remove the parent collection folder if empty
+   * @throws NotFoundException
+   *           if there was no file with the provided name stored under this collection.
+   * @throws IOException
+   *           if deleting the data from the workspace fails
+   */
+  void deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws NotFoundException, IOException;
 
   /**
    * Get the URL for a file stored under the given media package and element IDs. MediaPackages may reference elements

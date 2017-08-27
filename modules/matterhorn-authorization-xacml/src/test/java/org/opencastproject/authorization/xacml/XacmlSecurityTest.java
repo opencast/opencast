@@ -253,6 +253,11 @@ public class XacmlSecurityTest {
     }
 
     @Override
+    public void deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws NotFoundException, IOException {
+      throw new Error();
+    }
+
+    @Override
     public URI getURI(String mediaPackageID, String mediaPackageElementID) {
       throw new Error();
     }

@@ -105,7 +105,7 @@ public class UnitTestWorkspace implements Workspace {
   }
 
   @Override
-  public void deleteFromCollection(String collectionId, String fileName) throws NotFoundException, IOException {
+  public void deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws NotFoundException, IOException {
     final File file = IoSupport.file(baseDir.getAbsolutePath(), "COLLECTIONS", collectionId, fileName);
     if (file.isFile()) {
       if (!file.delete()) {
@@ -114,6 +114,11 @@ public class UnitTestWorkspace implements Workspace {
     } else {
       throw new NotFoundException("Cannot find file " + file.getAbsolutePath());
     }
+  }
+
+  @Override
+  public void deleteFromCollection(String collectionId, String fileName) throws NotFoundException, IOException {
+    deleteFromCollection(collectionId, fileName, false);
   }
 
   @Override

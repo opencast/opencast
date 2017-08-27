@@ -732,10 +732,10 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * {@inheritDoc}
    *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#deleteFromCollection(java.lang.String,
-   * java.lang.String)
+   * java.lang.String,boolean)
    */
   @Override
-  public boolean deleteFromCollection(String collectionId, String fileName) throws IOException {
+  public boolean deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws IOException {
     File f = null;
     try {
       f = getFileFromCollection(collectionId, fileName);
@@ -754,17 +754,30 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     if (!f.delete())
       throw new IOException(f + " cannot be deleted");
 
-    File parentDirectory = f.getParentFile();
-    if (parentDirectory.isDirectory() && parentDirectory.list().length == 0) {
-      logger.debug("Attempting to delete empty collection directory {}", parentDirectory.getAbsolutePath());
-      try {
-        FileUtils.forceDelete(parentDirectory);
-      } catch (IOException e) {
-        logger.warn("Unable to delete empty collection directory {}", parentDirectory.getAbsolutePath());
-        return false;
+    if (removeCollection) {
+      File parentDirectory = f.getParentFile();
+      if (parentDirectory.isDirectory() && parentDirectory.list().length == 0) {
+        logger.debug("Attempting to delete empty collection directory {}", parentDirectory.getAbsolutePath());
+        try {
+          FileUtils.forceDelete(parentDirectory);
+        } catch (IOException e) {
+          logger.warn("Unable to delete empty collection directory {}", parentDirectory.getAbsolutePath());
+          return false;
+        }
       }
     }
     return true;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#deleteFromCollection(java.lang.String,
+   * java.lang.String)
+   */
+  @Override
+  public boolean deleteFromCollection(String collectionId, String fileName) throws IOException {
+    return deleteFromCollection(collectionId, fileName, false);
   }
 
   /**

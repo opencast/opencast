@@ -611,6 +611,12 @@ public class IngestServiceImplTest {
     }
 
     @Override
+    public boolean deleteFromCollection(String arg0, String arg1, boolean arg2) throws IOException {
+      // TODO change mock stub as needed for future unit tests
+      return false;
+    }
+
+    @Override
     public URI getBaseUri() {
       // TODO change mock stub as needed for future unit tests
       return null;

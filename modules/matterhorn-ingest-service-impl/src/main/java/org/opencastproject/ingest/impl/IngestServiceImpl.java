@@ -584,7 +584,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       IOUtils.closeQuietly(zis);
       finallyUpdateJob(job);
       for (String filename : collectionFilenames) {
-        workingFileRepository.deleteFromCollection(Long.toString(job.getId()), filename);
+        workingFileRepository.deleteFromCollection(Long.toString(job.getId()), filename, true);
       }
     }
   }
