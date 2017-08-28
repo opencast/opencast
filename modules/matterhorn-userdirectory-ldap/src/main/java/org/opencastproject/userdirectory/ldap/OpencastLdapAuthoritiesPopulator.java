@@ -173,6 +173,10 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     if ((securityService.getOrganization().equals(this.organization))
             && ((securityService.getUser() == null) || (securityService.getUser().getUsername().equals(username)))) {
       Set<JaxbRole> roles = new HashSet<JaxbRole>();
+      // Get the current roles
+      for (Role existingRole : securityService.getUser().getRoles()) {
+        authorities.add(new SimpleGrantedAuthority(existingRole.getName()));
+      }
       // Convert GrantedAuthority's into JaxbRole's
       for (GrantedAuthority authority : authorities)
         roles.add(new JaxbRole(authority.getAuthority(), JaxbOrganization.fromOrganization(this.organization)));

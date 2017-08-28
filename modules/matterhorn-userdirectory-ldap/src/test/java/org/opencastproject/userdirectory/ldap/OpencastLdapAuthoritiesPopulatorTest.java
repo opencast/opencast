@@ -27,6 +27,7 @@ import static org.junit.Assert.fail;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +54,7 @@ public class OpencastLdapAuthoritiesPopulatorTest {
   private static final Logger logger = LoggerFactory.getLogger(OpencastLdapAuthoritiesPopulatorTest.class);
 
   private static final Set<String> DEFAULT_ATTRIBUTE_NAMES;
+  private static final Set<Role> DEFAULT_INTERNAL_ROLES;
   private static final String DEFAULT_STR_ATTRIBUTE_NAMES;
 
   private static final String DEFAULT_PREFIX = "ROLE_";
@@ -67,13 +69,23 @@ public class OpencastLdapAuthoritiesPopulatorTest {
   private static final int N_GROUP_ROLES = 3;
   private static final int N_LDAP_ATTRIBUTES = 3;
   private static final int N_EXTRA_ROLES = 2;
+  private static final int N_INTERNAL_ROLES = 3;
 
   static {
-    HashSet<String> tempSet = new HashSet<String>();
+    HashSet<String> tempSet = new HashSet<>();
     for (int i = 1; i <= N_LDAP_ATTRIBUTES; i++)
       tempSet.add(format("ldap_attribute_%d", i));
     DEFAULT_ATTRIBUTE_NAMES = Collections.unmodifiableSet(tempSet);
     DEFAULT_STR_ATTRIBUTE_NAMES = StringUtils.join(DEFAULT_ATTRIBUTE_NAMES, ", ");
+
+    HashSet<Role> roleSet = new HashSet<>();
+    for (int i = 1; i <= N_INTERNAL_ROLES; i++) {
+      Role r = EasyMock.createNiceMock(Role.class);
+      EasyMock.expect(r.getName()).andReturn("internal_role_" + (i + 1)).anyTimes();
+      EasyMock.replay(r);
+      roleSet.add(r);
+    }
+    DEFAULT_INTERNAL_ROLES = Collections.unmodifiableSet(roleSet);
 
     DEFAULT_EXTRA_ROLES = new String[N_EXTRA_ROLES];
     for (int i = 0; i < N_EXTRA_ROLES; i++)
@@ -97,12 +109,12 @@ public class OpencastLdapAuthoritiesPopulatorTest {
   @Before
   public void setUp() {
 
-    mappings = new HashMap<String, String[]>();
+    mappings = new HashMap<>();
 
     org = EasyMock.createNiceMock(Organization.class);
     EasyMock.expect(org.getId()).andReturn(ORG_NAME).anyTimes();
 
-    Set<Role> groupRoles = new HashSet<Role>();
+    Set<Role> groupRoles = new HashSet<>();
     for (int i = 1; i <= N_GROUP_ROLES; i++) {
       Role r = EasyMock.createNiceMock(Role.class);
       EasyMock.expect(r.getOrganization()).andReturn(org).anyTimes();
@@ -111,13 +123,18 @@ public class OpencastLdapAuthoritiesPopulatorTest {
       groupRoles.add(r);
     }
 
+    User mockUser = EasyMock.createNiceMock(User.class);
+    EasyMock.expect(mockUser.getUsername()).andReturn(USERNAME).anyTimes();
+    EasyMock.expect(mockUser.getRoles()).andReturn(DEFAULT_INTERNAL_ROLES).anyTimes();
+
     securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
+    EasyMock.expect(securityService.getUser()).andReturn(mockUser).anyTimes();
 
     groupRoleProvider = EasyMock.createNiceMock(JpaGroupRoleProvider.class);
     EasyMock.expect(groupRoleProvider.getRolesForGroup(GROUP_ROLE)).andReturn(new ArrayList<>(groupRoles)).anyTimes();
 
-    EasyMock.replay(org, securityService, groupRoleProvider);
+    EasyMock.replay(org, securityService, groupRoleProvider, mockUser);
   }
 
   @Test
@@ -378,7 +395,7 @@ public class OpencastLdapAuthoritiesPopulatorTest {
                 doTest(populator, mappings, prefix, excludePrefixes, upper, extraRoles, groupRoleProvider);
                 fail(format(
                         "Request came from a different organization (\"%s\") as the expected (\"%s\") but no exception was thrown",
-                        otherOrg, this.org));
+                        otherOrg, org));
               } catch (SecurityException e) {
                 // OK
               }
@@ -410,7 +427,7 @@ public class OpencastLdapAuthoritiesPopulatorTest {
     EasyMock.replay(dirContextMock);
 
     // Prepare the expected result
-    HashSet<GrantedAuthority> expectedResult = new HashSet<GrantedAuthority>();
+    HashSet<GrantedAuthority> expectedResult = new HashSet<>();
     for (String attrName : mappings.keySet()) {
       if (mappings.get(attrName) != null) {
         for (String attrValues : mappings.get(attrName)) {
@@ -418,6 +435,11 @@ public class OpencastLdapAuthoritiesPopulatorTest {
                   attrValues.split(","));
         }
       }
+    }
+
+    // Add the internal roles
+    for (Role role : DEFAULT_INTERNAL_ROLES) {
+      expectedResult.add(new SimpleGrantedAuthority(role.getName()));
     }
 
     // Add the additional authorities
@@ -430,12 +452,13 @@ public class OpencastLdapAuthoritiesPopulatorTest {
   private void addRoles(Set<GrantedAuthority> roles, String thePrefix, String[] excludePrefixes, boolean toUpper,
           JpaGroupRoleProvider groupProvider, Organization org, String... strRoles) {
 
-    /* The whitespace around the roles and "thePrefix" is always trimmed.
+    /*
+     * The whitespace around the roles and "thePrefix" is always trimmed.
      * The special characters and internal spaces in roles and "thePrefix" are always converted to underscores
      * The roles and prefix are always converted to uppercase when the 'toUpper' is true.
      * The (trimmed, possibly uppercased) prefix is appended if, and only if:
-     *    - The role does not match a group role, and
-     *    - The role does not start with any of the "excludePrefixes" provided
+     * - The role does not match a group role, and
+     * - The role does not start with any of the "excludePrefixes" provided
      */
 
     if (toUpper)
