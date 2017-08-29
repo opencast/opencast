@@ -1276,7 +1276,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         if (Engage.model.get('videoDataModel') && ! inited) {
           initPlugin();
         }
-      }, 500);
+      }, 2000);
       Engage.log("Controls: videoDataModel not available at start.");
       return;
     }

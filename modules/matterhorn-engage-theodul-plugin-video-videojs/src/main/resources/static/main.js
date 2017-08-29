@@ -2460,6 +2460,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       initPlugin();
     }
   });
+  requirejs.config({
+    waitSeconds: 60
+  });
 
   // load utils class
   require([relative_plugin_path + 'utils'], function (utils) {
