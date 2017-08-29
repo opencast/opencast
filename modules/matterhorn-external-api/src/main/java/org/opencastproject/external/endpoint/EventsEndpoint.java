@@ -36,6 +36,7 @@ import org.opencastproject.external.impl.index.ExternalIndex;
 import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
+import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.MetadataList.Locked;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
@@ -120,12 +121,15 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -177,6 +181,8 @@ public class EventsEndpoint implements ManagedService {
   private static long expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
   private String previewSubtype = DEFAULT_PREVIEW_SUBTYPE;
+
+  private Map<String, MetadataField<?>> dublinCoreProperties = new TreeMap<>();
 
   /** The resolutions */
   private enum CommentResolution {
@@ -288,6 +294,8 @@ public class EventsEndpoint implements ManagedService {
     // Default to DEFAULT_PREVIEW_SUBTYPE
     previewSubtype = StringUtils.defaultString((String) properties.get(PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
     logger.debug("Preview subtype is '{}'", previewSubtype);
+
+    dublinCoreProperties = DublinCoreMetadataUtil.getDublinCoreProperties(properties);
   }
 
   @GET
@@ -909,12 +917,60 @@ public class EventsEndpoint implements ManagedService {
           @QueryParam("type") String type) throws Exception {
     if (StringUtils.trimToNull(type) == null) {
       Opt<MetadataList> metadataList = getEventMetadataById(id);
-      if (metadataList.isSome())
-        return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, metadataList.get().toJSON());
+      if (metadataList.isSome()) {
+        MetadataList actualList = metadataList.get();
+
+        // API v1 should return a two separate fields for start date and start time. Since those fields were merged in index service, we have to split them up.
+        Opt<MetadataCollection> collection = actualList.getMetadataByFlavor("dublincore/episode");
+        if (collection.isSome()) convertStartDateTimeToApiV1(collection.get());
+
+        return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, actualList.toJSON());
+      }
       else
         return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
     } else {
       return getEventMetadataByType(id, type);
+    }
+  }
+
+  private void convertStartDateTimeToApiV1(MetadataCollection collection) throws java.text.ParseException {
+
+    if (!collection.getOutputFields().containsKey("startDate")) return;
+
+    MetadataField<String> oldStartDateField = (MetadataField<String>) collection.getOutputFields().get("startDate");
+    SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(oldStartDateField.getPattern().get());
+    Date startDate = sdf.parse(oldStartDateField.getValue().get());
+
+    if (dublinCoreProperties.containsKey("startDate")) {
+      MetadataField<String> startDateField = (MetadataField<String>) dublinCoreProperties.get("startDate");
+      startDateField = MetadataField.createTemporalStartDateMetadata(startDateField.getInputID(),
+              Opt.some(startDateField.getOutputID()),
+              startDateField.getLabel(),
+              startDateField.isReadOnly(),
+              startDateField.isRequired(),
+              startDateField.getPattern().getOr("yyyy-MM-dd"),
+              startDateField.getOrder(),
+              startDateField.getNamespace());
+      sdf.applyPattern(startDateField.getPattern().get());
+      startDateField.setValue(sdf.format(startDate));
+      collection.removeField(oldStartDateField);
+      collection.addField(startDateField);
+    }
+
+    if (dublinCoreProperties.containsKey("startTime")) {
+      MetadataField<String> startTimeField = (MetadataField<String>) dublinCoreProperties.get("startTime");
+      startTimeField = MetadataField.createTemporalStartTimeMetadata(
+              startTimeField.getInputID(),
+              Opt.some(startTimeField.getOutputID()),
+              startTimeField.getLabel(),
+              startTimeField.isReadOnly(),
+              startTimeField.isRequired(),
+              startTimeField.getPattern().getOr("HH:mm"),
+              startTimeField.getOrder(),
+              startTimeField.getNamespace());
+      sdf.applyPattern(startTimeField.getPattern().get());
+      startTimeField.setValue(sdf.format(startDate));
+      collection.addField(startTimeField);
     }
   }
 
@@ -969,6 +1025,7 @@ public class EventsEndpoint implements ManagedService {
         MetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
         ExternalMetadataUtils.changeSubjectToSubjects(collection);
         ExternalMetadataUtils.removeCollectionList(collection);
+        convertStartDateTimeToApiV1(collection);
         return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, collection.toJSON());
       }
       // Try the other catalogs
@@ -980,6 +1037,7 @@ public class EventsEndpoint implements ManagedService {
           if (flavor.get().equals(catalogUIAdapter.getFlavor())) {
             MetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
             ExternalMetadataUtils.removeCollectionList(fields);
+            convertStartDateTimeToApiV1(fields);
             return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, fields.toJSON());
           }
         }
