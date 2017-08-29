@@ -109,6 +109,7 @@ import com.entwinemedia.fn.data.json.Jsons.Functions;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -1119,30 +1120,59 @@ public class EventsEndpoint implements ManagedService {
       for (String key : updatedFields.keySet()) {
         if ("subjects".equals(key)) {
           MetadataField<?> field = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
-          if (field == null) {
-            return ApiResponses.notFound(
-                    "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.",
-                    key, id, type);
-          } else if (field.isRequired() && StringUtils.isBlank(updatedFields.get(key))) {
-            return R.badRequest(String.format(
-                    "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
-                    key, type));
+          Opt<Response> error = validateField(field, key, id, type, updatedFields);
+          if (error.isSome()) {
+            return error.get();
           }
           collection.removeField(field);
           JSONArray subjectArray = (JSONArray) parser.parse(updatedFields.get(key));
           collection.addField(
                   MetadataField.copyMetadataFieldWithValue(field, StringUtils.join(subjectArray.iterator(), ",")));
+        } else if ("startDate".equals(key)) {
+          // Special handling for start date since in API v1 we expect start date and start time to be separate fields.
+          MetadataField<String> field = (MetadataField<String>) collection.getOutputFields().get(key);
+          Opt<Response> error = validateField(field, key, id, type, updatedFields);
+          if (error.isSome()) {
+            return error.get();
+          }
+          String apiPattern = field.getPattern().get();
+          if (dublinCoreProperties.containsKey("startDate")) {
+            apiPattern = dublinCoreProperties.get("startDate").getPattern().getOr(apiPattern);
+          }
+          SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(apiPattern);
+          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern().get());
+          DateTime oldStartDate = new DateTime(sdf.parse(field.getValue().get()), DateTimeZone.UTC);
+          DateTime newStartDate = new DateTime(apiSdf.parse(updatedFields.get(key)), DateTimeZone.UTC);
+          DateTime updatedStartDate = oldStartDate.withDate(newStartDate.year().get(), newStartDate.monthOfYear().get(), newStartDate.dayOfMonth().get());
+          collection.removeField(field);
+          collection.addField(MetadataField.copyMetadataFieldWithValue(field, sdf.format(updatedStartDate.toDate())));
+        } else if ("startTime".equals(key)) {
+          // Special handling for start time since in API v1 we expect start date and start time to be separate fields.
+          MetadataField<String> field = (MetadataField<String>) collection.getOutputFields().get("startDate");
+          Opt<Response> error = validateField(field, "startDate", id, type, updatedFields);
+          if (error.isSome()) {
+            return error.get();
+          }
+          String apiPattern = "HH:mm";
+          if (dublinCoreProperties.containsKey("startTime")) {
+            apiPattern = dublinCoreProperties.get("startTime").getPattern().getOr(apiPattern);
+          }
+          SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(apiPattern);
+          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern().get());
+          DateTime oldStartDate = new DateTime(sdf.parse(field.getValue().get()), DateTimeZone.UTC);
+          DateTime newStartDate = new DateTime(apiSdf.parse(updatedFields.get(key)), DateTimeZone.UTC);
+          DateTime updatedStartDate = oldStartDate.withTime(
+                  newStartDate.hourOfDay().get(),
+                  newStartDate.minuteOfHour().get(),
+                  newStartDate.secondOfMinute().get(),
+                  newStartDate.millisOfSecond().get());
+          collection.removeField(field);
+          collection.addField(MetadataField.copyMetadataFieldWithValue(field, sdf.format(updatedStartDate.toDate())));
         } else {
-
           MetadataField<?> field = collection.getOutputFields().get(key);
-          if (field == null) {
-            return ApiResponses.notFound(
-                    "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.",
-                    key, id, type);
-          } else if (field.isRequired() && StringUtils.isBlank(updatedFields.get(key))) {
-            return R.badRequest(String.format(
-                    "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
-                    key, type));
+          Opt<Response> error = validateField(field, key, id, type, updatedFields);
+          if (error.isSome()) {
+            return error.get();
           }
           collection.removeField(field);
           collection.addField(MetadataField.copyMetadataFieldWithValue(field, updatedFields.get(key)));
@@ -1154,6 +1184,19 @@ public class EventsEndpoint implements ManagedService {
       return ApiResponses.Json.noContent(ApiVersion.VERSION_1_0_0);
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
+  }
+
+  private Opt<Response> validateField(MetadataField<?> field, String key, String id, String type, Map<String, String> updatedFields) {
+    if (field == null) {
+      return Opt.some(ApiResponses.notFound(
+              "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.",
+              key, id, type));
+    } else if (field.isRequired() && StringUtils.isBlank(updatedFields.get(key))) {
+      return Opt.some(R.badRequest(String.format(
+              "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
+              key, type)));
+    }
+    return Opt.none();
   }
 
   @DELETE
