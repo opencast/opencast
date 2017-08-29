@@ -413,9 +413,11 @@ public class EventsEndpoint implements ManagedService {
 
   private Response updateEvent(String eventId, HttpServletRequest request) {
     try {
+      Opt<String> startDatePattern = dublinCoreProperties.containsKey("startDate") ? dublinCoreProperties.get("startDate").getPattern() : Opt.none();
+      Opt<String> startTimePattern = dublinCoreProperties.containsKey("startTime") ? dublinCoreProperties.get("startTime").getPattern() : Opt.none();
       for (final Event event : indexService.getEvent(eventId, externalIndex)) {
         EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.updateFromHttpServletRequest(event,
-                request, getEventCatalogUIAdapters());
+                request, getEventCatalogUIAdapters(), startDatePattern, startTimePattern);
         if (eventHttpServletRequest.getMetadataList().isSome()) {
           indexService.updateEventMetadata(eventId, eventHttpServletRequest.getMetadataList().get(), externalIndex);
         }
@@ -483,8 +485,10 @@ public class EventsEndpoint implements ManagedService {
           IngestException, NotFoundException, SchedulerException, UnauthorizedException {
     JSONObject source = new JSONObject();
     source.put("type", "UPLOAD");
+    Opt<String> startDatePattern = dublinCoreProperties.containsKey("startDate") ? dublinCoreProperties.get("startDate").getPattern() : Opt.none();
+    Opt<String> startTimePattern = dublinCoreProperties.containsKey("startTime") ? dublinCoreProperties.get("startTime").getPattern() : Opt.none();
     EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.createFromHttpServletRequest(request,
-            ingestService, getEventCatalogUIAdapters(), source);
+            ingestService, getEventCatalogUIAdapters(), source, startDatePattern, startTimePattern);
     String eventId = indexService.createEvent(eventHttpServletRequest);
     return ApiResponses.Json.created(VERSION_1_0_0, URI.create(getEventUrl(eventId)), obj(f("identifier", v(eventId))));
   }
