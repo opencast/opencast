@@ -933,7 +933,8 @@ public class EventsEndpoint implements ManagedService {
     if (catalogUIAdapters.size() > 0) {
       for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
         // TODO: This is very slow:
-        metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
+        MetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
+        if (fields != null) metadataList.add(catalogUIAdapter, fields);
       }
     }
     // TODO: This is slow:
