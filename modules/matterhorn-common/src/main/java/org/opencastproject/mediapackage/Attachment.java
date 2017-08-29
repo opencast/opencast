@@ -24,6 +24,8 @@ package org.opencastproject.mediapackage;
 
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 
+import java.util.Map;
+
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
@@ -38,4 +40,10 @@ public interface Attachment extends MediaPackageElement {
   /** Element flavor definition */
   MediaPackageElementFlavor FLAVOR = new MediaPackageElementFlavor("attachment", "(unkown)", "Unspecified attachment");
 
+  /**
+   * Returns a map containing the properties for this media package element or an empty map if there are no properties.
+   *
+   * @return the properties
+   */
+  Map<String, String> getProperties();
 }

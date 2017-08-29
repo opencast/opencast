@@ -21,6 +21,8 @@
 
 package org.opencastproject.metadata.dublincore;
 
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPORAL;
+
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -112,10 +114,16 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
         // Title
         metadata.setTitle(dc.getFirst(DublinCore.PROPERTY_TITLE));
 
-        // Created date
-        if (dc.hasValue(DublinCore.PROPERTY_CREATED))
-          metadata.setDate(EncodingSchemeUtils.decodeDate(dc.get(DublinCore.PROPERTY_CREATED).get(0)));
-
+        // use started date as created date (see MH-12250)
+        if (dc.hasValue(DublinCore.PROPERTY_TEMPORAL) && dc.getFirst(PROPERTY_TEMPORAL) != null) {
+          DCMIPeriod period = EncodingSchemeUtils
+            .decodeMandatoryPeriod(dc.getFirst(PROPERTY_TEMPORAL));
+          metadata.setDate(period.getStart());
+        } else {
+          // ...and only if started date is not available the created date
+          if (dc.hasValue(DublinCore.PROPERTY_CREATED))
+            metadata.setDate(EncodingSchemeUtils.decodeDate(dc.get(DublinCore.PROPERTY_CREATED).get(0)));
+        }
         // Series id
         if (dc.hasValue(DublinCore.PROPERTY_IS_PART_OF))
           metadata.setSeriesIdentifier(dc.get(DublinCore.PROPERTY_IS_PART_OF).get(0).getValue());

@@ -92,7 +92,7 @@ public class ConductingSeriesUpdatedEventHandler {
 
     @Override
     public void run() {
-      logger.info("Starting to listen for series update Messages");
+      logger.info("Starting to listen for series update messages");
       while (listening) {
         future = messageReceiver.receiveSerializable(QUEUE_ID, MessageSender.DestinationType.Queue);
         executor.execute(future);
@@ -126,7 +126,7 @@ public class ConductingSeriesUpdatedEventHandler {
           securityService.setUser(null);
         }
       }
-      logger.info("Stopping listening for series update Messages");
+      logger.info("Stopping listening for series update messages");
     }
 
   }
