@@ -420,10 +420,11 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
    * {@inheritDoc}
    *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#deleteFromCollection(java.lang.String,
-   *      java.lang.String)
+   *      java.lang.String,boolean)
    */
   @Override
-  public boolean deleteFromCollection(String collectionId, String fileName) {
+  public boolean deleteFromCollection(String collectionId, String fileName, boolean removeCollection) {
+    // The removeCollection parameter is ignored here, as this remote implementation is not currently used.
     String url = UrlSupport.concat(new String[] { COLLECTION_PATH_PREFIX, collectionId, fileName });
     HttpDelete del = new HttpDelete(url);
     HttpResponse response = getResponse(del, SC_NO_CONTENT, SC_NOT_FOUND);
@@ -434,6 +435,17 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
       closeConnection(response);
     }
     throw new RuntimeException("Error removing file from collection");
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#deleteFromCollection(java.lang.String,
+   *      java.lang.String)
+   */
+  @Override
+  public boolean deleteFromCollection(String collectionId, String fileName) {
+    return deleteFromCollection(collectionId, fileName, false);
   }
 
   /**

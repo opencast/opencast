@@ -206,6 +206,19 @@ public interface WorkingFileRepository extends StorageUsage {
   boolean deleteFromCollection(String collectionId, String fileName) throws IOException;
 
   /**
+   * Removes a file from a collection, and the parent folder if empty
+   *
+   * @param collectionId
+   *          the collection identifier
+   * @param fileName
+   *          the filename to remove
+   * @param removeCollection
+   *          remove the parent collection folder if empty
+   * @return <code>true</code> if the file existed and was removed
+   */
+  boolean deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws IOException;
+
+  /**
    * Moves a file from a collection into a mediapackage
    *
    * @param fromCollection
