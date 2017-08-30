@@ -33,13 +33,13 @@
     <bundle>mvn:com.google.guava/guava/18.0</bundle>
     <bundle>mvn:com.google.code.gson/gson/2.7</bundle>
     <bundle>mvn:commons-collections/commons-collections/3.2.2</bundle>
-    <bundle>mvn:commons-fileupload/commons-fileupload/1.2.1</bundle>
+    <bundle>mvn:commons-fileupload/commons-fileupload/1.3.3</bundle>
     <bundle>mvn:commons-io/commons-io/2.1</bundle>
     <!-- FIXME: commons-lang 2.6 only needed for the ical library in the matterhorn-commons bundle -->
     <bundle>mvn:commons-lang/commons-lang/2.6</bundle>
     <bundle>mvn:joda-time/joda-time/2.9.4</bundle>
     <bundle>mvn:org.aopalliance/com.springsource.org.aopalliance/1.0.0</bundle>
-    <bundle>mvn:org.apache.commons/com.springsource.org.apache.commons.beanutils/1.7.0</bundle>
+    <bundle>mvn:org.apache.commons/com.springsource.org.apache.commons.beanutils/1.8.3</bundle>
     <bundle>mvn:org.apache.commons/commons-compress/${commons-compress.version}</bundle>
     <bundle>mvn:org.apache.commons/commons-csv/1.0</bundle>
     <bundle>mvn:org.apache.commons/commons-lang3/3.4</bundle>
