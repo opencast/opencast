@@ -29,7 +29,7 @@ Select the tarball for the version you want to install from the [BitBucket downl
 Cloning the Git repository:
 
     git clone https://bitbucket.org/opencast-community/opencast.git
-    cd matterhorn
+    cd opencast
     git tag   <-  List all available versions
     git checkout TAG   <-  Switch to desired version
 

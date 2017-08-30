@@ -31,6 +31,15 @@ network access. The property to modify is:
 
     org.ops4j.pax.web.listening.addresses=127.0.0.1
 
+It may be necessary to adjust the jetty http connector idleTimeout value for processing large files in some configurations.
+To do so, uncomment this line in `org.ops4j.pax.web.cfg`:
+
+    org.ops4j.pax.web.config.file=${karaf.etc}/jetty-opencast.xml
+
+and modify the host and if necessary port values in `jetty-opencast.xml` to match the ops4j configuration:
+
+    <Set name="host">127.0.0.1</Set>
+
 
 Step 2: Setting the Login Details
 ---------------------------------
