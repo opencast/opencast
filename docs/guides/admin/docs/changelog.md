@@ -5,20 +5,32 @@ Opencast 3.2
 ------------
 *Released on August 16, 2017*
 
-- [[MH-10523]](https://opencast.jira.com/browse/MH-10523) - Misleading exception parameter in getFileFromCollection
-- [[MH-10650]](https://opencast.jira.com/browse/MH-10650) - Intermittent failure to detect hard links when starting a cluster
-- [[MH-12079]](https://opencast.jira.com/browse/MH-12079) - Misleading logging in some indexing message receivers
-- [[MH-12270]](https://opencast.jira.com/browse/MH-12270) - Don't swallow unknown SMIL exceptions
-- [[MH-12275]](https://opencast.jira.com/browse/MH-12275) - Avoid race condition between index and cleanup operations
-- [[MH-12280]](https://opencast.jira.com/browse/MH-12280) - Create an Opencast group for Sakai instructors
-- [[MH-12288]](https://opencast.jira.com/browse/MH-12288) - Set default max idle time if not configured and log key pool parameters
-- [[MH-12313]](https://opencast.jira.com/browse/MH-12313) - Expose additional LTI parameters for course offering and course section
-- [[MH-12324]](https://opencast.jira.com/browse/MH-12324) - Reduce frequency of index update messages for rebuilds
-- [[MH-12333]](https://opencast.jira.com/browse/MH-12333) - Feed generator separates lists of tags incorrectly
-- [[MH-12342]](https://opencast.jira.com/browse/MH-12342) - A "Scanner" instance in the ExecuteServiceImpl class is not properly closed: possible resource leak
-- [[MH-12345]](https://opencast.jira.com/browse/MH-12345) - Ingest fails because /recordings/{id}/acls returns 500 if event has not ACLs
 - [[MH-12347]](https://opencast.jira.com/browse/MH-12347) - Opencast generates invalid XML catalogs when a "default" (empty) Namespace is used.
-- [[MH-12351]](https://opencast.jira.com/browse/MH-12351) - DublinCoreCatalogService should not complain about "unexpected" dublincore flavors
+- [[MH-12345]](https://opencast.jira.com/browse/MH-12345) - Ingest fails because /recordings/{id}/acls returns 500 if event has not ACLs
+- [[MH-12342]](https://opencast.jira.com/browse/MH-12342) - A "Scanner" instance in the ExecuteServiceImpl class is not properly closed: possible resource leak
+- [[MH-12333]](https://opencast.jira.com/browse/MH-12333) - Feed generator separates lists of tags incorrectly
+- [[MH-12327]](https://opencast.jira.com/browse/MH-12327) - CAS Authentication is not working
+- [[MH-12324]](https://opencast.jira.com/browse/MH-12324) - Reduce frequency of index update messages for rebuilds
+- [[MH-12318]](https://opencast.jira.com/browse/MH-12318) - Remove Webconsole Default Installation
+- [[MH-12316]](https://opencast.jira.com/browse/MH-12316) - IllegalStateException: Committed
+- [[MH-12315]](https://opencast.jira.com/browse/MH-12315) - Database Query of Users from UserlistProvider is very slow
+- [[MH-12311]](https://opencast.jira.com/browse/MH-12311) - Update Admin UI build tools
+- [[MH-12307]](https://opencast.jira.com/browse/MH-12307) - OAI-PMH REST endpoint docs fix
+- [[MH-12305]](https://opencast.jira.com/browse/MH-12305) - Admin UI should stop polling event stats if the event tab isn't shown
+- [[MH-12288]](https://opencast.jira.com/browse/MH-12288) - Set default max idle time if not configured and log key pool parameters
+- [[MH-12280]](https://opencast.jira.com/browse/MH-12280) - Create an Opencast group for Sakai instructors
+- [[MH-12278]](https://opencast.jira.com/browse/MH-12278) - NullPointerException in CleanupWorkflowOperationHandler
+- [[MH-12275]](https://opencast.jira.com/browse/MH-12275) - MH-12261 / Avoid race condition between index and cleanup operations
+- [[MH-12271]](https://opencast.jira.com/browse/MH-12271) - MH-12261 / Update WFR put action to update files atomically
+- [[MH-12270]](https://opencast.jira.com/browse/MH-12270) - Don't swallow unknown SMIL exceptions
+- [[MH-12263]](https://opencast.jira.com/browse/MH-12263) - MH-12261 / FileSupport > link - copy file action should use overwrite argument (Throws FileFileAlreadyExists)
+- [[MH-12261]](https://opencast.jira.com/browse/MH-12261) - Race condition leads to FileAlreadyExistsException and FileNotFoundException
+- [[MH-12079]](https://opencast.jira.com/browse/MH-12079) - Misleading logging in some indexing message receivers
+- [[MH-12007]](https://opencast.jira.com/browse/MH-12007) - Revive the Execute Service
+- [[MH-11542]](https://opencast.jira.com/browse/MH-11542) - Failed test: Process video after cutting (Safari)
+- [[MH-10650]](https://opencast.jira.com/browse/MH-10650) - Intermittent failure to detect hard links when starting a cluster
+- [[MH-10523]](https://opencast.jira.com/browse/MH-10523) - Misleading exception parameter in getFileFromCollection
+
 
 
 Opencast 3.1
