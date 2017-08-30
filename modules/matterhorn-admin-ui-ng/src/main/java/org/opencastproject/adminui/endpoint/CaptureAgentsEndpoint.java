@@ -50,6 +50,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
+import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -61,6 +62,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -91,6 +93,9 @@ public class CaptureAgentsEndpoint {
 
   /** The capture agent service */
   private CaptureAgentStateService service;
+
+  /** GSON for JSON processing (thread-safe) */
+  private static final Gson gson = new Gson();
 
   /**
    * Sets the capture agent service
@@ -209,6 +214,48 @@ public class CaptureAgentsEndpoint {
 
     logger.debug("The agent {} was successfully removed", agentName);
     return Response.status(SC_OK).build();
+  }
+
+  @GET
+  @Path("{name}/configuration.json")
+  @Produces({ MediaType.APPLICATION_JSON })
+  @RestQuery(
+    name = "getAgentConfiguration",
+    description = "Return the configuration of a given capture agent",
+    pathParameters = {
+      @RestParameter(description = "Name of the capture agent", isRequired = true, name = "name", type = RestParameter.Type.STRING),
+    }, restParameters = {}, reponses = {
+      @RestResponse(description = "A JSON representation of the agent configuration", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "The agent {name} does not exist in the system", responseCode = HttpServletResponse.SC_NOT_FOUND)
+    }, returnDescription = "")
+  public Response getConfiguration(@PathParam("name") String agentName, @PathParam("type") String type)
+          throws NotFoundException {
+    if (service == null) {
+      return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
+    }
+    Properties configuration = (service.getAgentConfiguration(agentName));
+    return Response.ok(gson.toJson(configuration)).type(MediaType.APPLICATION_JSON).build();
+  }
+
+  @GET
+  @Produces({ MediaType.APPLICATION_JSON })
+  @Path("{name}/capabilities.json")
+  @RestQuery(
+    name = "getAgentCapabilities",
+    description = "Return the capabilities of a given capture agent",
+    pathParameters = {
+      @RestParameter(description = "Name of the capture agent", isRequired = true, name = "name", type = RestParameter.Type.STRING),
+    }, restParameters = {}, reponses = {
+      @RestResponse(description = "A JSON representation of the agent capabilities", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "The agent {name} does not exist in the system", responseCode = HttpServletResponse.SC_NOT_FOUND)
+    }, returnDescription = "")
+  public Response getCapabilities(@PathParam("name") String agentName, @PathParam("type") String type)
+          throws NotFoundException {
+    if (service == null) {
+      return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
+    }
+    Properties capabilities = service.getAgentCapabilities(agentName);
+    return Response.ok(gson.toJson(capabilities)).type(MediaType.APPLICATION_JSON).build();
   }
 
   /**
