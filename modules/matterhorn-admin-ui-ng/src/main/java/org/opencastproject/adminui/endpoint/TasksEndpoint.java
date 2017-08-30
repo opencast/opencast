@@ -101,9 +101,6 @@ public class TasksEndpoint {
 
   private HttpMediaPackageElementProvider httpMediaPackageElementProvider;
 
-  /** A parser for handling JSON documents inside the body of a request. **/
-  private final JSONParser parser = new JSONParser();
-
   /** OSGi callback for the workflow service. */
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
@@ -160,6 +157,7 @@ public class TasksEndpoint {
       return RestUtil.R.badRequest("No metadata set");
     }
 
+    JSONParser parser = new JSONParser();
     JSONObject metadataJson;
     try {
       metadataJson = (JSONObject) parser.parse(metadata);
