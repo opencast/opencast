@@ -704,20 +704,27 @@ public final class WorkspaceImpl implements Workspace {
   }
 
   @Override
-  public void deleteFromCollection(String collectionId, String fileName) throws NotFoundException, IOException {
+  public void deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws NotFoundException, IOException {
     // local delete
     final File f = workspaceFile(WorkingFileRepository.COLLECTION_PATH_PREFIX, collectionId,
             PathSupport.toSafeName(fileName));
     FileUtils.deleteQuietly(f);
-    FileSupport.delete(f.getParentFile());
+    if (removeCollection) {
+      FileSupport.delete(f.getParentFile());
+    }
     // delete in WFR
     try {
-      wfr.deleteFromCollection(collectionId, fileName);
+      wfr.deleteFromCollection(collectionId, fileName, removeCollection);
     } catch (IllegalArgumentException e) {
       throw new NotFoundException(e);
     }
     // wait for WFR
     waitForResource(wfr.getCollectionURI(collectionId, fileName), SC_NOT_FOUND, "File %s does not disappear in WFR");
+  }
+
+  @Override
+  public void deleteFromCollection(String collectionId, String fileName) throws NotFoundException, IOException {
+    deleteFromCollection(collectionId, fileName, false);
   }
 
   /**

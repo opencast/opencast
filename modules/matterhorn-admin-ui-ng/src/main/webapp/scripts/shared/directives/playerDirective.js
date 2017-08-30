@@ -15,7 +15,7 @@ angular.module('adminNg.directives')
         link: function (scope, element, attrs) {
             function loadPlayerAdapter(element) {
                 scope.player.adapter = PlayerAdapterRepository.
-                    findByAdapterTypeAndElementId(
+                    createNewAdapter(
                         attrs.adapter.toUpperCase(),
                         element
                     );
@@ -58,7 +58,25 @@ angular.module('adminNg.directives')
                     scope.muted = scope.player.adapter.muted();
                     scope.volume = scope.player.adapter.volume();
                 });
+
+                scope.$watch(function (){
+                  if (controlsVisible !== scope.controls) {
+                    controlsVisible = scope.controls;
+                    var videoObj = angular.element("#player")[0];
+                    if (videoObj) {
+                      if (scope.controls == "true") {
+                        videoObj.setAttribute("controls", "controls");
+                      } else {
+                        if (videoObj.hasAttribute("controls")) {
+                          videoObj.removeAttribute("controls");
+                        }
+                      }
+                    }
+                  }
+                });
             }
+
+            var controlsVisible;
 
             // Check if the player element is loaded,
             function checkPlayerElement(tries, callback) {

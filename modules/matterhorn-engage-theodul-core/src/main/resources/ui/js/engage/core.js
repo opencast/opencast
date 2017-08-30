@@ -98,7 +98,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   var plugins_loaded = {};
   var loadingDelay1 = 500;
   var loadingDelay2 = 1000;
-  var errorCheckDelay = 3500;
+  var errorCheckDelay = 15000;
   var mediapackageError = false;
   var numberOfPlugins = 0;
   var translationData = null;
@@ -151,7 +151,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
         (Bowser.msie && Bowser.version >= browser_minVersion_msie) ||
         (Bowser.mobile) || (Bowser.ios);
   }
-  
+
   function setMinBrowserVersions() {
       $("#" + id_min_firefox_version).text(browser_minVersion_firefox);
       $("#" + id_min_chrome_version).text(browser_minVersion_chrome);
@@ -164,7 +164,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   function detectLanguage() {
     return navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage || "en";
   }
-  
+
   function getDefaultLanguage(language) {
       switch (language) {
           case "en": return "en-US";

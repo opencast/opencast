@@ -190,11 +190,13 @@ angular.module('adminNg.controllers')
                       if (!angular.isUndefined(me.transactionNotification)) {
                           Notifications.remove(me.transactionNotification, NOTIFICATION_CONTEXT);
                       }
-                      me.transactionNotification = Notifications.add('warning', 'ACTIVE_TRANSACTION', NOTIFICATION_CONTEXT, 3000);
+                      me.transactionNotification = Notifications.add('warning', 'ACTIVE_TRANSACTION', NOTIFICATION_CONTEXT);
+                      $scope.$emit('ACTIVE_TRANSACTION');
                     } else {
                       if (!angular.isUndefined(me.transactionNotification)) {
                           Notifications.remove(me.transactionNotification, NOTIFICATION_CONTEXT);
                       }
+                      $scope.$emit('NO_ACTIVE_TRANSACTION');
                     }
                 });
 
@@ -785,11 +787,11 @@ angular.module('adminNg.controllers')
         };
 
         this.accessSaved = function () {
-          Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 5000);
+          Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT);
         };
 
         this.accessNotSaved = function () {
-          Notifications.add('error', 'ACL_NOT_SAVED', NOTIFICATION_CONTEXT, 30000);
+          Notifications.add('error', 'ACL_NOT_SAVED', NOTIFICATION_CONTEXT);
 
           $scope.access = EventAccessResource.get({ id: $scope.resourceId }, function (data) {
               if (angular.isDefined(data.episode_access)) {
@@ -951,7 +953,7 @@ angular.module('adminNg.controllers')
                         .collection = agentCollection;
                     $scope.setSourceFields($scope.episodeCatalog);
                 });
-        
+
         }
     }
 ]);

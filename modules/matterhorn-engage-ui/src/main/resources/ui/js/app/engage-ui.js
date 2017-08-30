@@ -301,7 +301,7 @@ function($, bootbox, _, alertify) {
                         $("#lastPage").attr("href", (pageNotGet ? location.href + prefix + (Math.floor(totalEntries / bufferEntries) + 1) :
                             location.href.replace(/(p=[\d]*)/, "p=" + (Math.floor(totalEntries / bufferEntries) + 1))));
 
-                        $("#nextPage").attr("href", (pageNotGet ? location.href + prefix + (page + 1).toString() :
+                        $("#nextPage").attr("href", (pageNotGet ? location.href + prefix + (page + 1) :
                             location.href.replace(/(p=[\d]*)/, "p=" + (page - 1))));
                     } else {
                         $($next).addClass("disabled");
@@ -772,7 +772,7 @@ function($, bootbox, _, alertify) {
         function loadSeries(cleanGrid, rest, callback) {
             log("Loading Series with: " + rest);
             active = "series";
-            var requestUrl = restEndpoint + "/series.json?limit=6&offset=" + (page - 1) * 6 + "&" + rest;
+            var requestUrl = restEndpoint + "/series.json?limit=" + bufferEntries + "&offset=" + (page - 1) * bufferEntries + "&" + rest;
             $.ajax({
                 url: requestUrl,
                 dataType: "json",
@@ -799,7 +799,7 @@ function($, bootbox, _, alertify) {
                             $($previous).addClass("disabled");
                         };
 
-                        if (result.length < 6 || total < 6) {
+                        if (result.length < bufferEntries || total < bufferEntries) {
                             $($next).addClass("disabled");
                         } else {
                             $($next).removeClass("disabled");

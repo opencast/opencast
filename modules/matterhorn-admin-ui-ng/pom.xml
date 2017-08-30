@@ -333,12 +333,12 @@
                 </configuration>
               </execution>
               <execution>
-                <id>frontend build</id>
+                <id>grunt build</id>
                 <goals>
-                  <goal>npm</goal>
+                  <goal>grunt</goal>
                 </goals>
                 <configuration>
-                  <arguments>run build --no-color --skipTests=${skipTests}</arguments>
+                  <arguments>build --skipTests=${skipTests}</arguments>
                 </configuration>
               </execution>
             </executions>
@@ -367,63 +367,63 @@
             <Http-Classpath>/webapp</Http-Classpath>
             <Http-Welcome>index.html</Http-Welcome>
             <Import-Package>
-                            net.fortuna.ical4j.*,
-                            org.opencastproject.index.service.message,
-                            *
-                        </Import-Package>
-                        <Private-Package>
-                            org.opencastproject.adminui.util,
-                            org.opencastproject.adminui.exception
-                        </Private-Package>
-                        <Export-Package>
-                            org.opencastproject.adminui.api;version=${project.version},
-                            org.opencastproject.adminui.endpoint;version=${project.version},
-                            org.opencastproject.adminui.exception;version=${project.version},
-                            org.opencastproject.adminui.impl;version=${project.version},
-                            org.opencastproject.adminui.impl.index;version=${project.version},
-                            org.opencastproject.adminui.userdirectory;version=${project.version},
-                            org.opencastproject.adminui.usersettings;version=${project.version},
-                            org.opencastproject.adminui.usersettings.persistence;version=${project.version},
-                            org.opencastproject.adminui.util;version=${project.version}
-                        </Export-Package>
-                        <Service-Component>
-                            OSGI-INF/acl_endpoint.xml,
-                            OSGI-INF/adminui_configuration.xml,
-                            OSGI-INF/captureagents_endpoint.xml,
-                            OSGI-INF/event_endpoint.xml,
-                            OSGI-INF/groups_endpoint.xml,
-                            OSGI-INF/index_endpoint.xml,
-                            OSGI-INF/job_endpoint.xml,
-                            OSGI-INF/language-service.xml,
-                            OSGI-INF/languages_endpoint.xml,
-                            OSGI-INF/message-receiver-acl.xml,
-                            OSGI-INF/message-receiver-assetmanager.xml,
-                            OSGI-INF/message-receiver-comment.xml,
-                            OSGI-INF/message-receiver-group.xml,
-                            OSGI-INF/message-receiver-scheduler.xml,
-                            OSGI-INF/message-receiver-series.xml,
-                            OSGI-INF/message-receiver-theme.xml,
-                            OSGI-INF/message-receiver-workflow.xml,
-                            OSGI-INF/presets_endpoint.xml,
-                            OSGI-INF/search-index.xml,
-                            OSGI-INF/server_endpoint.xml,
-                            OSGI-INF/series_endpoint.xml,
-                            OSGI-INF/services_endpoint.xml,
-                            OSGI-INF/tasks_endpoint.xml,
-                            OSGI-INF/themes_endpoint.xml,
-                            OSGI-INF/tools_endpoint.xml,
-                            OSGI-INF/ui-roles-role-provider.xml,
-                            OSGI-INF/user_settings_endpoint.xml,
-                            OSGI-INF/user_settings_service.xml,
-                            OSGI-INF/users_endpoint.xml,
-                            OSGI-INF/list_providers_endpoint.xml
-                        </Service-Component>
-                        <Meta-Persistence>
-                            META-INF/persistence.xml
-                        </Meta-Persistence>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+              net.fortuna.ical4j.*,
+              org.opencastproject.index.service.message,
+              *
+            </Import-Package>
+            <Private-Package>
+              org.opencastproject.adminui.util,
+              org.opencastproject.adminui.exception
+            </Private-Package>
+            <Export-Package>
+              org.opencastproject.adminui.api;version=${project.version},
+              org.opencastproject.adminui.endpoint;version=${project.version},
+              org.opencastproject.adminui.exception;version=${project.version},
+              org.opencastproject.adminui.impl;version=${project.version},
+              org.opencastproject.adminui.impl.index;version=${project.version},
+              org.opencastproject.adminui.userdirectory;version=${project.version},
+              org.opencastproject.adminui.usersettings;version=${project.version},
+              org.opencastproject.adminui.usersettings.persistence;version=${project.version},
+              org.opencastproject.adminui.util;version=${project.version}
+            </Export-Package>
+            <Service-Component>
+              OSGI-INF/acl_endpoint.xml,
+              OSGI-INF/adminui_configuration.xml,
+              OSGI-INF/captureagents_endpoint.xml,
+              OSGI-INF/event_endpoint.xml,
+              OSGI-INF/groups_endpoint.xml,
+              OSGI-INF/index_endpoint.xml,
+              OSGI-INF/job_endpoint.xml,
+              OSGI-INF/language-service.xml,
+              OSGI-INF/languages_endpoint.xml,
+              OSGI-INF/message-receiver-acl.xml,
+              OSGI-INF/message-receiver-assetmanager.xml,
+              OSGI-INF/message-receiver-comment.xml,
+              OSGI-INF/message-receiver-group.xml,
+              OSGI-INF/message-receiver-scheduler.xml,
+              OSGI-INF/message-receiver-series.xml,
+              OSGI-INF/message-receiver-theme.xml,
+              OSGI-INF/message-receiver-workflow.xml,
+              OSGI-INF/presets_endpoint.xml,
+              OSGI-INF/search-index.xml,
+              OSGI-INF/server_endpoint.xml,
+              OSGI-INF/series_endpoint.xml,
+              OSGI-INF/services_endpoint.xml,
+              OSGI-INF/tasks_endpoint.xml,
+              OSGI-INF/themes_endpoint.xml,
+              OSGI-INF/tools_endpoint.xml,
+              OSGI-INF/ui-roles-role-provider.xml,
+              OSGI-INF/user_settings_endpoint.xml,
+              OSGI-INF/user_settings_service.xml,
+              OSGI-INF/users_endpoint.xml,
+              OSGI-INF/list_providers_endpoint.xml
+            </Service-Component>
+            <Meta-Persistence>
+              META-INF/persistence.xml
+            </Meta-Persistence>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

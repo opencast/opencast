@@ -155,9 +155,13 @@ describe('adminNg.directives.adminNgTableFilter', function () {
                 var fromDate = new Date('2015-01-01');
                 var toDate = new Date('2015-01-02');
                 var filter = { period: { type: "period", from: fromDate, to: toDate } };
+                var expectedFromDate = new Date(fromDate);
+                expectedFromDate.setHours(0, 0, 0, 0);
+                var expectedToDate = new Date(toDate);
+                expectedToDate.setHours(23, 59, 59, 999);
                 spyOn(Storage, 'put');
                 element.find('div').scope().selectFilterPeriodValue(filter);
-                expect(Storage.put).toHaveBeenCalledWith('filter', 'furniture', undefined, fromDate.toISOString() + '/' + toDate.toISOString());
+                expect(Storage.put).toHaveBeenCalledWith('filter', 'furniture', undefined, expectedFromDate.toISOString() + '/' + expectedToDate.toISOString());
             });
         });
     });

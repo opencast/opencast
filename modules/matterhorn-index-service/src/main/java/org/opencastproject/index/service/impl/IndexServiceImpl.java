@@ -22,6 +22,7 @@
 package org.opencastproject.index.service.impl;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
@@ -527,11 +528,22 @@ public class IndexServiceImpl implements IndexService {
       }
     }
 
+    Date currentStartDate = null;
+    MetadataField<?> starttime = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_TEMPORAL.getLocalName());
+    if (starttime != null && starttime.isUpdated() && starttime.getValue().isSome()) {
+      DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod((DublinCoreValue)starttime.getValue().get());
+      currentStartDate = period.getStart();
+    }
+
     MetadataField<?> created = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName());
     if (created == null || !created.isUpdated() || created.getValue().isNone()) {
       eventMetadata.removeField(created);
       MetadataField<String> newCreated = MetadataUtils.copyMetadataField(created);
-      newCreated.setValue(EncodingSchemeUtils.encodeDate(new Date(), Precision.Second).getValue());
+      if (currentStartDate != null) {
+        newCreated.setValue(EncodingSchemeUtils.encodeDate(currentStartDate, Precision.Second).getValue());
+      } else {
+        newCreated.setValue(EncodingSchemeUtils.encodeDate(new Date(), Precision.Second).getValue());
+      }
       eventMetadata.addField(newCreated);
     }
 

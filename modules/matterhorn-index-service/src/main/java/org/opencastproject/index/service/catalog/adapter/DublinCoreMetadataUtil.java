@@ -80,7 +80,9 @@ public final class DublinCoreMetadataUtil {
         } else if (field.getType() == MetadataField.Type.DURATION) {
           setDuration(dc, field, ename);
         } else if (field.getType() == Type.DATE) {
-          setDate(dc, field, ename);
+          // DC created should only be modified by changing the start date, see MH-12250
+          if (! DublinCore.PROPERTY_CREATED.equals(ename))
+            setDate(dc, field, ename);
         } else if (field.getType() == MetadataField.Type.MIXED_TEXT || field.getType() == Type.ITERABLE_TEXT) {
           setIterableString(dc, field, ename);
         } else {
@@ -203,6 +205,8 @@ public final class DublinCoreMetadataUtil {
       DateTime endDate = new DateTime(startDate.getTime() + duration);
       dc.set(ename, EncodingSchemeUtils.encodePeriod(new DCMIPeriod(startDate, endDate.toDate()),
               Precision.Second));
+      // ensure that DC created is start date, see MH-12250
+      setDate(dc, field, DublinCore.PROPERTY_CREATED);
     } catch (ParseException e) {
       logger.error("Not able to parse date {} to update the dublin core because: {}", field.getValue(),
               ExceptionUtils.getStackTrace(e));
