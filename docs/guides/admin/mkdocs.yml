@@ -24,7 +24,8 @@ pages:
    - Installation from Source:
       - Linux: 'installation/source-linux.md'
       - MacOS X: 'installation/source-macosx.md'
-   - Installation from Package (RPM):
+   - Installation from Package:
+      - Debian/Ubuntu: 'installation/debs.md'
       - Fedora: 'installation/rpm-fedora.md'
       - RHEL/CentOS: 'installation/rpm-rhel-sl-centos.md'
    - Installation with Docker:
