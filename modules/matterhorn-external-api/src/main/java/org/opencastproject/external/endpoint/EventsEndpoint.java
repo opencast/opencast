@@ -183,7 +183,7 @@ public class EventsEndpoint implements ManagedService {
 
   private String previewSubtype = DEFAULT_PREVIEW_SUBTYPE;
 
-  private Map<String, MetadataField<?>> dublinCoreProperties = new TreeMap<>();
+  private Map<String, MetadataField<?>> configuredMetadataFields = new TreeMap<>();
 
   /** The resolutions */
   private enum CommentResolution {
@@ -296,7 +296,7 @@ public class EventsEndpoint implements ManagedService {
     previewSubtype = StringUtils.defaultString((String) properties.get(PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
     logger.debug("Preview subtype is '{}'", previewSubtype);
 
-    dublinCoreProperties = DublinCoreMetadataUtil.getDublinCoreProperties(properties);
+    configuredMetadataFields = DublinCoreMetadataUtil.getDublinCoreProperties(properties);
   }
 
   @GET
@@ -413,8 +413,8 @@ public class EventsEndpoint implements ManagedService {
 
   private Response updateEvent(String eventId, HttpServletRequest request) {
     try {
-      Opt<String> startDatePattern = dublinCoreProperties.containsKey("startDate") ? dublinCoreProperties.get("startDate").getPattern() : Opt.none();
-      Opt<String> startTimePattern = dublinCoreProperties.containsKey("startTime") ? dublinCoreProperties.get("startTime").getPattern() : Opt.none();
+      Opt<String> startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : Opt.none();
+      Opt<String> startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : Opt.none();
       for (final Event event : indexService.getEvent(eventId, externalIndex)) {
         EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.updateFromHttpServletRequest(event,
                 request, getEventCatalogUIAdapters(), startDatePattern, startTimePattern);
@@ -485,8 +485,8 @@ public class EventsEndpoint implements ManagedService {
           IngestException, NotFoundException, SchedulerException, UnauthorizedException {
     JSONObject source = new JSONObject();
     source.put("type", "UPLOAD");
-    Opt<String> startDatePattern = dublinCoreProperties.containsKey("startDate") ? dublinCoreProperties.get("startDate").getPattern() : Opt.none();
-    Opt<String> startTimePattern = dublinCoreProperties.containsKey("startTime") ? dublinCoreProperties.get("startTime").getPattern() : Opt.none();
+    Opt<String> startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : Opt.none();
+    Opt<String> startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : Opt.none();
     EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.createFromHttpServletRequest(request,
             ingestService, getEventCatalogUIAdapters(), source, startDatePattern, startTimePattern);
     String eventId = indexService.createEvent(eventHttpServletRequest);
@@ -946,8 +946,8 @@ public class EventsEndpoint implements ManagedService {
     SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(oldStartDateField.getPattern().get());
     Date startDate = sdf.parse(oldStartDateField.getValue().get());
 
-    if (dublinCoreProperties.containsKey("startDate")) {
-      MetadataField<String> startDateField = (MetadataField<String>) dublinCoreProperties.get("startDate");
+    if (configuredMetadataFields.containsKey("startDate")) {
+      MetadataField<String> startDateField = (MetadataField<String>) configuredMetadataFields.get("startDate");
       startDateField = MetadataField.createTemporalStartDateMetadata(startDateField.getInputID(),
               Opt.some(startDateField.getOutputID()),
               startDateField.getLabel(),
@@ -962,8 +962,8 @@ public class EventsEndpoint implements ManagedService {
       collection.addField(startDateField);
     }
 
-    if (dublinCoreProperties.containsKey("startTime")) {
-      MetadataField<String> startTimeField = (MetadataField<String>) dublinCoreProperties.get("startTime");
+    if (configuredMetadataFields.containsKey("startTime")) {
+      MetadataField<String> startTimeField = (MetadataField<String>) configuredMetadataFields.get("startTime");
       startTimeField = MetadataField.createTemporalStartTimeMetadata(
               startTimeField.getInputID(),
               Opt.some(startTimeField.getOutputID()),
@@ -1140,8 +1140,8 @@ public class EventsEndpoint implements ManagedService {
             return error.get();
           }
           String apiPattern = field.getPattern().get();
-          if (dublinCoreProperties.containsKey("startDate")) {
-            apiPattern = dublinCoreProperties.get("startDate").getPattern().getOr(apiPattern);
+          if (configuredMetadataFields.containsKey("startDate")) {
+            apiPattern = configuredMetadataFields.get("startDate").getPattern().getOr(apiPattern);
           }
           SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(apiPattern);
           SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern().get());
@@ -1158,8 +1158,8 @@ public class EventsEndpoint implements ManagedService {
             return error.get();
           }
           String apiPattern = "HH:mm";
-          if (dublinCoreProperties.containsKey("startTime")) {
-            apiPattern = dublinCoreProperties.get("startTime").getPattern().getOr(apiPattern);
+          if (configuredMetadataFields.containsKey("startTime")) {
+            apiPattern = configuredMetadataFields.get("startTime").getPattern().getOr(apiPattern);
           }
           SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(apiPattern);
           SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern().get());
