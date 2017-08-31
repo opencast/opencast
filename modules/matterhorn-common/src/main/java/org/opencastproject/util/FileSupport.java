@@ -496,10 +496,14 @@ public final class FileSupport {
       return false;
     if (f.isDirectory()) {
       String[] children = f.list();
-      if (children.length > 0 && !recurse)
-        return false;
-      for (String child : children) {
-        delete(new File(f, child), true);
+      if (children != null) {
+        if (children.length > 0 && !recurse)
+          return false;
+        for (String child : children) {
+          delete(new File(f, child), true);
+        }
+      } else {
+        logger.debug("Unexpected null listing files in {}", f.getAbsolutePath());
       }
     }
     return f.delete();
