@@ -22,7 +22,6 @@
 package org.opencastproject.ingest.impl;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.JobUtil.waitForJob;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
@@ -505,7 +504,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         throw new MediaPackageException("No manifest found in this zip");
 
       // Determine the mediapackage identifier
-      if (mp.getIdentifier() == null || StringUtils.isBlank(mp.getIdentifier().toString()))
+      if (mp.getIdentifier() == null || isBlank(mp.getIdentifier().toString()))
         mp.setIdentifier(new UUIDIdBuilderImpl().createNew());
 
       String mediaPackageId = mp.getIdentifier().toString();
@@ -611,8 +610,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @see org.opencastproject.ingest.api.IngestService#createMediaPackage()
    */
   @Override
-  public MediaPackage createMediaPackage() throws MediaPackageException,
-          org.opencastproject.util.ConfigurationException, HandleException {
+  public MediaPackage createMediaPackage() throws MediaPackageException, ConfigurationException, HandleException {
     MediaPackage mediaPackage;
     try {
       mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
@@ -631,8 +629,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @see org.opencastproject.ingest.api.IngestService#createMediaPackage()
    */
   @Override
-  public MediaPackage createMediaPackage(String mediaPackageId) throws MediaPackageException,
-          org.opencastproject.util.ConfigurationException, HandleException {
+  public MediaPackage createMediaPackage(String mediaPackageId) throws MediaPackageException, ConfigurationException,
+          HandleException {
     MediaPackage mediaPackage;
     try {
       mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew(new UUIDIdBuilderImpl().fromString(mediaPackageId));
@@ -1296,13 +1294,11 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           } catch (NotFoundException e1) {
             logger.info("No scheduler mediapackage found with legacy mediapackage id {}, skip merging", mediaPackageId);
           } catch (Exception e1) {
-            logger.error("Unable to get event mediapackage from scheduler event {}: {}", mediaPackageId,
-                    ExceptionUtils.getStackTrace(e));
+            logger.error("Unable to get event mediapackage from scheduler event {}", mediaPackageId, e);
             throw new IngestException(e);
           }
         } catch (Exception e) {
-          logger.error("Unable to get event mediapackage from scheduler event {}: {}", mp.getIdentifier().compact(),
-                  ExceptionUtils.getStackTrace(e));
+          logger.error("Unable to get event mediapackage from scheduler event {}", mp.getIdentifier().compact(), e);
           throw new IngestException(e);
         }
       }
@@ -1322,7 +1318,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   }
 
   private Map<String, String> mergeWorkflowConfiguration(Map<String, String> properties, String mediaPackageId) {
-    if (StringUtils.isBlank(mediaPackageId) || schedulerService == null)
+    if (isBlank(mediaPackageId) || schedulerService == null)
       return properties;
 
     HashMap<String, String> mergedProperties = new HashMap<>();
@@ -1373,8 +1369,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.debug("No scheduler mediapackage found with id {}, skip merging", mp.getIdentifier().compact());
       return mp;
     } catch (Exception e) {
-      logger.error("Unable to get event mediapackage from scheduler event {}: {}", mp.getIdentifier().compact(),
-              getStackTrace(e));
+      logger.error("Unable to get event mediapackage from scheduler event {}", mp.getIdentifier().compact(), e);
       throw new IngestException(e);
     }
   }
@@ -1445,7 +1440,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   private WorkflowDefinition getWorkflowDefinition(String workflowDefinitionID, MediaPackage mediapackage)
           throws NotFoundException, WorkflowDatabaseException, IngestException {
     // If the workflow definition and instance ID are null, use the default, or throw if there is none
-    if (StringUtils.isBlank(workflowDefinitionID)) {
+    if (isBlank(workflowDefinitionID)) {
       String mediaPackageId = mediapackage.getIdentifier().compact();
       if (schedulerService != null) {
         logger.info("Determining workflow template for ingested mediapckage {} from capture event {}", mediapackage,
@@ -1455,7 +1450,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           workflowDefinitionID = recordingProperties.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION);
           logger.info("Ingested mediapackage {} will be processed using workflow template '{}'", mediapackage,
                   workflowDefinitionID);
-          if (StringUtils.isBlank(workflowDefinitionID))
+          if (isBlank(workflowDefinitionID))
             throw new IngestException("No value found for key '" + CaptureParameters.INGEST_WORKFLOW_DEFINITION
                     + "' from capture event configuration of scheduler event '" + mediaPackageId + "'");
         } catch (NotFoundException e) {
@@ -1479,7 +1474,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
 
     // Use the default workflow definition if nothing was determined
-    if (StringUtils.isBlank(workflowDefinitionID) && defaultWorkflowDefinionId != null) {
+    if (isBlank(workflowDefinitionID) && defaultWorkflowDefinionId != null) {
       logger.info("Using default workflow definition '{}' to process ingested mediapackage {}",
               defaultWorkflowDefinionId, mediapackage);
       workflowDefinitionID = defaultWorkflowDefinionId;
@@ -1498,7 +1493,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
 
     // Have we been able to find a workflow definition id?
-    if (StringUtils.isBlank(workflowDefinitionID)) {
+    if (isBlank(workflowDefinitionID)) {
       ingestStatistics.failed();
       throw new IllegalStateException(
               "Can not ingest a workflow without a workflow definition or an existing instance. No default definition is specified");
@@ -1540,10 +1535,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         in = uri.toURL().openStream();
       }
       String fileName = FilenameUtils.getName(uri.getPath());
-      if (StringUtils.isBlank(FilenameUtils.getExtension(fileName)))
+      if (isBlank(FilenameUtils.getExtension(fileName)))
         fileName = getContentDispositionFileName(response);
 
-      if (StringUtils.isBlank(FilenameUtils.getExtension(fileName)))
+      if (isBlank(FilenameUtils.getExtension(fileName)))
         throw new IOException("No filename extension found: " + fileName);
       return addContentToRepo(mp, elementId, fileName, in);
     } finally {
@@ -1776,8 +1771,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
                   in = workingFileRepository.get(mpe.getMediaPackage().getIdentifier().compact(), mpe.getIdentifier());
                   return SmilUtil.loadSmilDocument(in, mpe);
                 } catch (Exception e) {
-                  logger.warn("Unable to load smil document from catalog '{}': {}", mpe,
-                          ExceptionUtils.getStackTrace(e));
+                  logger.warn("Unable to load smil document from catalog '{}'", mpe, e);
                   return Misc.chuck(e);
                 } finally {
                   IOUtils.closeQuietly(in);

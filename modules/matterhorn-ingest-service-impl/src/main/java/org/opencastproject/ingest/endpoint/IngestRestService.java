@@ -212,7 +212,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       }
       if (cc.getBundleContext().getProperty(MAX_INGESTS_KEY) != null) {
         try {
-          ingestLimit = Integer.parseInt(StringUtils.trimToNull(cc.getBundleContext().getProperty(MAX_INGESTS_KEY)));
+          ingestLimit = Integer.parseInt(trimToNull(cc.getBundleContext().getProperty(MAX_INGESTS_KEY)));
           if (ingestLimit == 0) {
             ingestLimit = -1;
           }
@@ -1106,9 +1106,9 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         }
 
         if (workflowInstanceId != null) {
-          return ingestService.ingest(mp, StringUtils.trimToNull(workflowDefinition), wfConfig, workflowInstanceId);
+          return ingestService.ingest(mp, trimToNull(workflowDefinition), wfConfig, workflowInstanceId);
         } else {
-          return ingestService.ingest(mp, StringUtils.trimToNull(workflowDefinition), wfConfig);
+          return ingestService.ingest(mp, trimToNull(workflowDefinition), wfConfig);
         }
       }
     };
@@ -1328,7 +1328,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           } else if ("file".equalsIgnoreCase(fieldName)) {
             fileName = item.getName();
             job.setFilename(fileName);
-            if ((mp != null) && (flavor != null) && (fileName != null)) {
+            if (mp != null && flavor != null && fileName != null) {
               // decide which element type to add
               if ("TRACK".equalsIgnoreCase(elementType)) {
                 mp = ingestService.addTrack(item.openStream(), fileName, flavor, mp);
