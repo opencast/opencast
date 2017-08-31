@@ -162,9 +162,6 @@ public class ToolsEndpoint implements ManagedService {
 
   private Boolean signWithClientIP = UrlSigningServiceOsgiUtil.DEFAULT_SIGN_WITH_CLIENT_IP;
 
-  /** A parser for handling JSON documents inside the body of a request. **/
-  private final JSONParser parser = new JSONParser();
-
   // service references
   private AdminUIConfiguration adminUIConfiguration;
   private AdminUISearchIndex searchIndex;
@@ -386,6 +383,7 @@ public class ToolsEndpoint implements ManagedService {
       return R.serverError();
     }
 
+    JSONParser parser = new JSONParser();
     EditingInfo editingInfo;
     try {
       JSONObject detailsJSON = (JSONObject) parser.parse(details);

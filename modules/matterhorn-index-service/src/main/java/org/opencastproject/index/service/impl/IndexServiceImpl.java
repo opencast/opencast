@@ -173,9 +173,6 @@ public class IndexServiceImpl implements IndexService {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(IndexServiceImpl.class);
 
-  /** A parser for handling JSON documents inside the body of a request. **/
-  private static final JSONParser parser = new JSONParser();
-
   private final List<EventCatalogUIAdapter> eventCatalogUIAdapters = new ArrayList<EventCatalogUIAdapter>();
   private final List<SeriesCatalogUIAdapter> seriesCatalogUIAdapters = new ArrayList<SeriesCatalogUIAdapter>();
   private EventCatalogUIAdapter eventCatalogUIAdapter;
@@ -343,6 +340,7 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public String createEvent(HttpServletRequest request) throws IndexServiceException {
+    JSONParser parser = new JSONParser();
     JSONObject metadataJson = null;
     MediaPackage mp = null;
     try {

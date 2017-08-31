@@ -50,9 +50,6 @@ public final class PolicyUtils {
   /** The JSON key for the main object of the policy. */
   private static final String STATEMENT_KEY = "Statement";
 
-  /** Parser used to parse policy content */
-  private static JSONParser jsonParser = new JSONParser();
-
   private PolicyUtils() {
 
   }
@@ -99,6 +96,7 @@ public final class PolicyUtils {
    */
   public static Policy fromJson(String policyJson) {
     JSONObject jsonPolicy = null;
+    JSONParser jsonParser = new JSONParser();
     try {
       jsonPolicy = (JSONObject) jsonParser.parse(policyJson);
     } catch (ParseException e) {

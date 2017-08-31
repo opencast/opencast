@@ -44,8 +44,6 @@ public final class AclUtils {
   private static final String ACTION_JSON_KEY = "action";
   private static final String ALLOW_JSON_KEY = "allow";
   private static final String ROLE_JSON_KEY = "role";
-  /** A parser for handling JSON documents inside the body of a request. **/
-  private static final JSONParser parser = new JSONParser();
 
   private AclUtils() {
   }
@@ -65,6 +63,7 @@ public final class AclUtils {
    */
   public static AccessControlList deserializeJsonToAcl(String json, boolean assumeAllow)
           throws IllegalArgumentException, ParseException {
+    JSONParser parser = new JSONParser();
     JSONArray aclJson = (JSONArray) parser.parse(json);
     @SuppressWarnings("unchecked")
     ListIterator<Object> iterator = aclJson.listIterator();

@@ -167,9 +167,6 @@ public class SeriesEndpoint {
   /** Default server URL */
   private String serverUrl = "http://localhost:8080";
 
-  /** A parser for handling JSON documents inside the body of a request. **/
-  private final JSONParser parser = new JSONParser();
-
   /** OSGi callback for the series service. */
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
@@ -317,6 +314,7 @@ public class SeriesEndpoint {
                   @RestResponse(description = "Returns a JSON object with the results for the different opted out or in elements such as ok, notFound or error.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "Unable to parse boolean value to opt out, or parse JSON array of opt out series", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
   public Response changeOptOuts(@FormParam("optout") boolean optout, @FormParam("seriesIds") String seriesIds) {
+    JSONParser parser = new JSONParser();
     JSONArray seriesIdsArray;
     try {
       seriesIdsArray = (JSONArray) parser.parse(seriesIds);
@@ -570,6 +568,7 @@ public class SeriesEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
     }
 
+    JSONParser parser = new JSONParser();
     JSONArray seriesIdsArray;
     try {
       seriesIdsArray = (JSONArray) parser.parse(seriesIdsContent);

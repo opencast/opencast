@@ -104,9 +104,6 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesServiceRemoteImpl.class);
 
-  /** A parser for handling JSON documents inside the body of a request. **/
-  private JSONParser parser = new JSONParser();
-
   public SeriesServiceRemoteImpl() {
     super(JOB_TYPE);
   }
@@ -509,6 +506,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
           UnauthorizedException {
     HttpGet get = new HttpGet(seriesID + "/properties.json");
     HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
+    JSONParser parser = new JSONParser();
     try {
       if (response != null) {
         if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
@@ -638,6 +636,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   public Opt<Map<String, byte[]>> getSeriesElements(String seriesID) throws SeriesException {
     HttpGet get = new HttpGet("/" + seriesID + "/elements.json");
     HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_INTERNAL_SERVER_ERROR);
+    JSONParser parser = new JSONParser();
 
     try {
       if (response == null) {
