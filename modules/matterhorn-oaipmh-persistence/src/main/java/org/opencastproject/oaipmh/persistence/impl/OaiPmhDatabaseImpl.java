@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManagerFactory;
 
-/** Implements {@link OaiPmhDatabase}. Defines permanent storage for OAI-PMH. */
+/** Implements {@link org.opencastproject.oaipmh.persistence.OaiPmhDatabase}. Defines permanent storage for OAI-PMH. */
 public class OaiPmhDatabaseImpl extends AbstractOaiPmhDatabase {
 
   public static final String PERSISTENCE_UNIT_NAME = "org.opencastproject.oaipmh";
