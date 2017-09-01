@@ -631,6 +631,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
         protected void run() {
           final List<JpaGroup> groups = UserDirectoryPersistenceUtil.findGroups(organization.getId(), 0, 0, emf);
           int total = groups.size();
+          final int responseInterval = (total < 100) ? 1 : (total / 100);
           int current = 1;
           logger.info(
                   "Re-populating index '{}' with groups of organization {}. There are {} group(s) to add to the index.",
@@ -638,8 +639,10 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
           for (JpaGroup group : groups) {
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                     GroupItem.update(JaxbGroup.fromGroup(group)));
-            messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+            if (((current % responseInterval) == 0) || (current == total)) {
+              messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                     IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Groups, total, current));
+            }
             current++;
           }
         }

@@ -79,6 +79,11 @@ modules/matterhorn-admin-ui-ng/src/main/webapp/lib/datepicker/*
   http://jqueryui.com
   Copyright 2013 jQuery Foundation and other contributors; Licensed MIT
 
+modules/matterhorn-admin-ui-ng/src/main/webapp/lib/timepicker/*
+  jQuery Timepicker Addon - v1.6.3 - 2016-04-20
+  http://trentrichardson.com/examples/timepicker
+  Copyright (c) 2016 Trent Richardson; Licensed MIT 
+
 modules/matterhorn-admin-ui-ng/src/main/webapp/lib/font-awesome/*
   Font Awesome 4.2.0 by @davegandy - http://fontawesome.io - @fontawesome
   License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)

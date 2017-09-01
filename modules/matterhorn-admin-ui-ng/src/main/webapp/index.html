@@ -15,12 +15,15 @@
         <link rel="stylesheet" href="styles/main.css">
         <!-- endbuild -->
         <link type="text/css" href="lib/datepicker/themes/smoothness/jquery-ui-1.10.3.min.css" rel="stylesheet">
+        <link type="text/css" href="lib/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet">
         <link rel="shortcut icon" href="img/favicon.ico">
         <script>
             window.jQuery || document.write('<script src="lib/jquery-1.10.2.js"><\/script>')
         </script>
         <script type="text/javascript" src="lib/jquery-ui.js"></script>
         <script type="text/javascript" src="lib/datepicker/i18n/jquery-ui-i18n.js"></script>
+        <script type="text/javascript" src="lib/timepicker/jquery-ui-timepicker-addon.js"></script>
+        <script type="text/javascript" src="lib/timepicker/i18n/jquery-ui-timepicker-addon-i18n.js"></script>
         <script type="text/javascript" src="lib/underscore-1.5.2.js"></script>
         <script type="text/javascript" src="lib/backbone-1.1.0.js"></script>
         <script type="text/javascript" src="lib/visualsearch.js"></script>
@@ -132,7 +135,6 @@
         <script src="../../bower_components/ng-file-upload/angular-file-upload.js"></script>
         <!-- endbower -->
         <!-- endbuild -->
-
         <!-- build:js({.tmp,src/main/webapp}) scripts/vendor.js -->
         <script src="scripts/lib/angular-chosen.js"></script>
         <script src="scripts/lib/angular-sortable.js"></script>
@@ -198,6 +200,7 @@
         <script src="scripts/shared/resources/eventWorkflowDetailsResource.js"></script>
         <script src="scripts/shared/resources/eventWorkflowOperationsResource.js"></script>
         <script src="scripts/shared/resources/eventWorkflowOperationDetailsResource.js"></script>
+        <script src="scripts/shared/resources/eventWorkflowActionResource.js"></script>
         <script src="scripts/shared/resources/eventAttachmentsResource.js"></script>
         <script src="scripts/shared/resources/eventCatalogsResource.js"></script>
         <script src="scripts/shared/resources/eventAssetsResource.js"></script>
@@ -281,6 +284,7 @@
         <script src="scripts/shared/directives/directives.js"></script>
         <script src="scripts/shared/directives/customIcon.js"></script>
         <script src="scripts/shared/directives/datepickerDirective.js"></script>
+        <script src="scripts/shared/directives/datetimepickerDirective.js"></script>
         <script src="scripts/shared/directives/focushere.js"></script>
         <script src="scripts/shared/directives/oldDropdownDirective.js"></script>
         <script src="scripts/shared/directives/passwordCheckDirective.js"></script>

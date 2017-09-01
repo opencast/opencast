@@ -181,7 +181,9 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
           maxAttempts = 2;
         break;
       case HOLD:
-        maxAttempts = -1;
+        // Can hold and retry until max-attempts
+        if (maxAttempts < 2)
+          maxAttempts = 2;
         break;
       default:
         // Nothing to do

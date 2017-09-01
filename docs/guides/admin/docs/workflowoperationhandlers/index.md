@@ -25,7 +25,6 @@ The following table contains the workflow operations that are available in an ou
 |--------------------|---------------------------------------------------------------|------------------------------------|
 |analyze-tracks      |Analyze tracks in media package                                |[Documentation](analyze-tracks-woh.md)|
 |analyze-audio       |Analyze first audio stream                                     |[Documentation](analyzeaudio-woh.md)|
-|asset-snapshot      |Archive the current state of the mediapackage                  |[Documentation](asset-snapshot-woh.md)|
 |asset-delete        |Deletes the current mediapackage from the Archive              |[Documentation](asset-delete-woh.md)|
 |attach-watson-transcription|Attaches automated transcripts to mediapackage|[Documentation](attach-watson-transcription-woh.md)|
 |cleanup             |Cleanup the working file repository                            |[Documentation](cleanup-woh.md)|
@@ -40,6 +39,8 @@ The following table contains the workflow operations that are available in an ou
 |editor              |Waiting for user to review, then cut video based on edit-list  |[Documentation](editor-woh.md)|
 |email               |Sends email notifications at any part of a workflow            |[Documentation](email-woh.md)|
 |encode              |Encode media files to differents formats in parallel           |[Documentation](encode-woh.md)|
+|execute-once        |Execute a command for a MediaPackage                           |[Documentation](execute-once-woh.md)
+|execute-many        |Execute a command for each matching element in a MediaPackage  |[Documentation](execute-many-woh.md)
 |export-wf-properties|Export workflow properties                                     |[Documentation](export-wf-properties-woh.md)|
 |extract-text        |Extracting text from presentation segments                     |[Documentation](extracttext-woh.md)|
 |http-notify         |Notifies an HTTP endpoint about the process of the workflow    |[Documentation](httpnotify-woh.md)|
@@ -67,7 +68,8 @@ The following table contains the workflow operations that are available in an ou
 |segmentpreviews     |Extract segment images from a video using FFmpeg               |[Documentation](segmentpreviews-woh.md)|
 |series              |Apply series to the mediapackage                               |[Documentation](series-woh.md)|
 |silence             |Silence detection on audio of the mediapackage                 |[Documentation](silence-woh.md)|
-|start-watson-transcription|Starts automated transcription provided by IBM Watson|[Documentation](start-watson-transcription-woh.md)|
+|snapshot            |Archive the current state of the mediapackage                  |[Documentation](snapshot-woh.md)|
+|start-watson-transcription|Starts automated transcription provided by IBM Watson    |[Documentation](start-watson-transcription-woh.md)|
 |tag                 |Modify the tag sets of media package elements                  |[Documentation](tag-woh.md)|
 |tag-by-dcterm       |Modify the tags if dublincore term matches value               |[Documentation](tag-by-dcterm-woh.md)|
 |theme               |Make settings of themes available to processing                |[Documentation](theme-woh.md)|

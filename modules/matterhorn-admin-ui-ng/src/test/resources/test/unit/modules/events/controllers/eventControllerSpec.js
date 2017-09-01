@@ -1,5 +1,5 @@
 describe('Event controller', function () {
-    var $scope, $httpBackend, $controller, UsersResource, EventAccessResource, EventMetadataResource;
+    var $scope, $httpBackend, $controller, UsersResource, EventAccessResource, EventMetadataResource, Notifications;
 
     beforeEach(module('adminNg'));
 
@@ -13,13 +13,14 @@ describe('Event controller', function () {
         $provide.value('Language', service);
     }));
 
-    beforeEach(inject(function ($rootScope, _$controller_, _$httpBackend_, _UsersResource_, _EventAccessResource_, _EventMetadataResource_) {
+    beforeEach(inject(function ($rootScope, _$controller_, _$httpBackend_, _UsersResource_, _EventAccessResource_, _EventMetadataResource_, _Notifications_) {
         $scope = $rootScope.$new();
         $scope.resourceId = '40518';
         $controller = _$controller_;
         UsersResource = _UsersResource_;
         EventAccessResource = _EventAccessResource_;
         EventMetadataResource = _EventMetadataResource_;
+        Notifications = _Notifications_;
         $httpBackend = _$httpBackend_;
     }));
 
@@ -287,4 +288,56 @@ describe('Event controller', function () {
             expect($scope.severityColor('warning')).toEqual('yellow');
         });
     });
+    
+    describe('#workflowAction', function () {
+        beforeEach(function () {
+            spyOn(Notifications, 'add');
+            $scope.modal_close = jasmine.createSpy();
+        });
+
+        describe('on success', function () {
+            beforeEach(function () {
+            	$httpBackend.expectPUT(/\/admin-ng\/event\/.+\/workflows\/.+\/action\/.+/g).respond(200, '{}');
+            });
+
+            it('resumes workflow, shows notification, closes', function () {
+                $scope.workflowAction(1234, 'RETRY'); // wfId
+                $httpBackend.flush();
+
+                expect(Notifications.add).toHaveBeenCalledWith('success', jasmine.any(String));
+                expect($scope.modal_close).toHaveBeenCalled();
+            });
+
+            it('aborts workflow, shows notification, closes', function () {
+                $scope.workflowAction(1234, 'NONE'); // wfId
+                $httpBackend.flush();
+
+                expect(Notifications.add).toHaveBeenCalledWith('success', jasmine.any(String));
+                expect($scope.modal_close).toHaveBeenCalled();
+            });
+        });
+
+        describe('on error', function () {
+            beforeEach(function () {
+            	$httpBackend.expectPUT(/\/admin-ng\/event\/.+\/workflows\/.+\/action\/.+/g).respond(500, '{}');
+            });
+
+        	it('shows notification, closes', function () {
+                $scope.workflowAction(1234, 'RETRY'); // wfId
+                $httpBackend.flush();
+
+                expect(Notifications.add).toHaveBeenCalledWith('error', jasmine.any(String));
+                expect($scope.modal_close).toHaveBeenCalled();
+            });
+
+            it('shows notification, closes', function () {
+                $scope.workflowAction(1234, 'NONE'); // wfId
+                $httpBackend.flush();
+
+                expect(Notifications.add).toHaveBeenCalledWith('error', jasmine.any(String));
+                expect($scope.modal_close).toHaveBeenCalled();
+            });
+        });
+    });
+    
 });

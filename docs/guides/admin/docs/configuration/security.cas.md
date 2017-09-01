@@ -1,23 +1,36 @@
 Configure Central Authentication Service (CAS)
 ==============================================
 
-CAS
----
+Authentication
+--------------
 
 Many campuses use some kind of single sign on, such as JASIG's Central Authentication Service, or CAS. This guide
 describes how to integrate Opencast into such a system.
 
 ### Step 1
 
-First, install the optional CAS feature. Via the Karaf console, this can be done like this:
+First, you need to edit the file `etc/org.apache.karaf.features.cfg` and add the `opencast-security-cas` to the `featuresBoot` variable.
 
-    feature:install opencast-contrib-cas
+    featuresBoot = ..., opencast-security-cas
 
 ### Step 2
 
-To configure Opencast to use CAS, simply replace the default `mh_default_org.xml` with the contents of
-`security_sample_cas.xml`, available in the Opencast source. You must modify several settings in the sample to point to
-your CAS server:
+In a single-tenant deployment, your `security.xml` file is under `OPENCAST_HOME/etc/security/mh_default_org.xml`. In an
+RPM/DEB based installation, it is located in `/etc/opencast/security/mh_default_org.xml`. You should make a backup copy of
+the file and substitute it by the sample file named `security_sample_cas.xml-example`. In other words:
+
+    $> cd etc/security
+    $> mv mh_default_org.xml mh_default_org.xml.old
+    $> cp security_sample_cas.xml-example mh_default_org.xml
+
+The sample file should be exactly the same as the default security file, except for the parts only relevant to the
+CAS. If you have done custom modifications to your security file, make sure to incorporate them to the new file, too.
+
+### Step 3
+
+Add the necessary configuration values to the CAS section of the new security file. The comments should be self-explanatory.
+
+You must modify several settings in the sample to point to your CAS server:
 
     <bean id="casEntryPoint" class="org.springframework.security.cas.web.CasAuthenticationEntryPoint">
       <property name="loginUrl" value="https://auth-test.berkeley.edu/cas/login"/>
@@ -42,19 +55,19 @@ You will also need to set the public URL for your Opencast server:
       <property name="sendRenew" value="false"/>
     </bean>
 
-### Step 3
 
-Assuming you are using Opencast version 1.4 and are using LDAP for user provisioning, you will need to build and deploy
-relevant modules with:
+Authorization
+-------------
 
-    mvn clean install -Pdirectory-ldap,directory-cas,directory-openid -DdeployTo={your runtime server location here}
+Now the system knows all the information necessary to authenticate users against CAS, but also need some authorization information, to tell which services the user is allowed to use and which resources is allowed to see and/or modify.
 
-If not using LDAP, of course, you don't need the directory-ldap module but CAS alone will require deploying both the
-directory-cas and directory-openid modules.
+You will need to configure a UserProvider to look up users as identified by CAS.
 
-### Step 4
+  - [Sakai User Provider](security.user.sakai.md)
+  - [LDAP User Provider](security.ldap.md) (Section `Authorization/Step 2`)
 
-Finally, you will need to configure a UserProvider to look up users as identified by CAS, for example see:
 
-[University of Saskatchewan CAS and LDAP integration
-](https://opencast.jira.com/wiki/display/MH/University+of+Saskatchewan+CAS+and+LDAP+integration)
+Original documentation from University of Saskatchewan
+------------------------------------------------------
+
+[University of Saskatchewan CAS and LDAP integration](https://opencast.jira.com/wiki/display/MH/University+of+Saskatchewan+CAS+and+LDAP+integration)

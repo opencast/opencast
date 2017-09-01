@@ -148,8 +148,10 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
       mediaPackage.remove(existingPropsElem.get());
     mediaPackage.add(attachment);
 
-    logger.info("Exported workflow properties with flavor '{}' and content: {}", targetFlavorString,
-            propertiesAsString(workflowProps));
+    logger.info("Added properties from {} as Attachment with flavor {}", workflowInstance, targetFlavorString);
+
+    logger.debug("Workflow properties: {}", propertiesAsString(workflowProps));
+
     return createResult(mediaPackage, null, Action.CONTINUE, 0);
   }
 

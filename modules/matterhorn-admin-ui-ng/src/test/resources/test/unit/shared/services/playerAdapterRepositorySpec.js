@@ -13,7 +13,7 @@ describe('playerAdapterRepository', function () {
     it('finds my adapter', function () {
         var element, adapter;
         element = $('<video id="heinz"/>')[0];
-        adapter = PlayerAdapterRepository.findByAdapterTypeAndElementId('VIDEOJS', element);
+        adapter = PlayerAdapterRepository.createNewAdapter('VIDEOJS', element);
         expect(adapter).toBeDefined();
     });
 });
