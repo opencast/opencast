@@ -10,6 +10,7 @@ These guides will help you if you want to participate in Opencast development.
 - [Proposal Log](proposal-log.md)
 - [QA Coordinator](qa-coordinator.md)
 - [Release Manager](release-manager.md)
+- [Committers](committer.md)
 - [Reviewing, Merging and Declining Pull Requests](reviewing-and-merging.md)
 - [Security Issues](security.md)
 - [Licenses and Legal Matters](license.md)
