@@ -1962,7 +1962,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       logger.warn(e, "Exception while accepting job " + job);
       try {
         if (workflowInstance != null) {
-          logger.warn("Marking workflow instance %s as failed", workflowInstance);
+          logger.warn("Marking job {} and workflow instance {} as failed", job, workflowInstance);
+          updateOperationJob(job.getId(), OperationState.FAILED);
           workflowInstance.setState(FAILED);
           update(workflowInstance);
         } else {
