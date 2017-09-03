@@ -1132,17 +1132,16 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       tx.begin();
       HostRegistrationJpaImpl existingHostRegistration = fetchHostRegistration(em, host);
       if (existingHostRegistration == null) {
-        throw new ServiceRegistryException("Host '" + host
-                + "' is not currently registered, so it can not be unregistered");
-      } else {
-        existingHostRegistration.setOnline(false);
-        for (ServiceRegistration serviceRegistration : getServiceRegistrationsByHost(host)) {
-          unRegisterService(serviceRegistration.getServiceType(), serviceRegistration.getHost());
-        }
-        em.merge(existingHostRegistration);
+        throw new IllegalArgumentException("Host '" + host + "' is not registered, so it can not be unregistered");
       }
+      existingHostRegistration.setOnline(false);
+      for (ServiceRegistration serviceRegistration : getServiceRegistrationsByHost(host)) {
+        unRegisterService(serviceRegistration.getServiceType(), serviceRegistration.getHost());
+      }
+      em.merge(existingHostRegistration);
       logger.info("Unregistering {}", host);
       tx.commit();
+      logger.info("Host {} unregistered", host);
       hostsStatistics.updateHost(existingHostRegistration);
     } catch (Exception e) {
       if (tx != null && tx.isActive()) {
