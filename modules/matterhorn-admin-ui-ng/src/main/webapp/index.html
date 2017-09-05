@@ -64,7 +64,7 @@
                       <span id="error-count" class="badge" ng-show="services.error">{{ services.numErr }}</span>
                     <ul class="dropdown-ul">
                       <li ng-repeat="(key, value) in services.service"><!-- service directive -->
-                        <a href="#">
+                        <a href="#/systems/services">
                           <span>{{ key }}</span>
                           <span class="ng-multi-value ng-multi-value-red" ng-if="value.error">{{ value.status }}</span>
                           <span class="ng-multi-value ng-multi-value-green" ng-if="!value.error">{{ value.status }}</span>
