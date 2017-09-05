@@ -33,6 +33,7 @@ describe('Application controller', function () {
                        "state_changed":"2017-08-24T10:33:29-06:00","error_state_trigger":0,"warning_state_trigger":0}
                      ]}
                    });
+        $httpBackend.whenGET('/services/health').respond({});
 
         $scope = $rootScope.$new();
 
