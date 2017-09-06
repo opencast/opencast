@@ -129,10 +129,14 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
         }
       }
 
-    this.additionalAuthorities = additionalAuthorities;
-    if (logger.isDebugEnabled() && (additionalAuthorities != null)) {
+    if (additionalAuthorities == null)
+      this.additionalAuthorities = new String[0];
+    else
+      this.additionalAuthorities = additionalAuthorities;
+
+    if (logger.isDebugEnabled()) {
       debug("Authenticated users will receive the following extra roles:");
-      for (String role : additionalAuthorities) {
+      for (String role : this.additionalAuthorities) {
         logger.debug("\t* {}", role);
       }
     }
@@ -231,10 +235,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
    * @return A {@link Collection} of {@link String}s representing the additional roles
    */
   public String[] getAdditionalAuthorities() {
-    if (additionalAuthorities != null)
-      return additionalAuthorities.clone();
-    else
-      return null;
+    return additionalAuthorities.clone();
   }
 
   /**

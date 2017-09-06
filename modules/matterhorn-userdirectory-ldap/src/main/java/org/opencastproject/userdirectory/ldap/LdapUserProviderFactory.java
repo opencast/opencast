@@ -200,7 +200,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     if (StringUtils.isBlank(strUppercase)) {
       convertToUppercase = true;
     }
-    String[] extraRoles = null;
+    String[] extraRoles = new String[0];
     String strExtraRoles = (String) properties.get(EXTRA_ROLES_KEY);
     if (StringUtils.isNotBlank(strExtraRoles)) {
       extraRoles = strExtraRoles.split(",");

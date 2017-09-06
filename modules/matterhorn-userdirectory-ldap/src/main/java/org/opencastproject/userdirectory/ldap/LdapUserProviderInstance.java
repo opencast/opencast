@@ -237,13 +237,15 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
     }
 
     // Process extra roles
-    for (String extraRole : extraRoles) {
-      String finalRole = StringUtils.trimToEmpty(extraRole);
-      if (!finalRole.isEmpty()) {
-        if (convertToUppercase) {
-          setExtraRoles.add(new SimpleGrantedAuthority(finalRole.toUpperCase()));
-        } else {
-          setExtraRoles.add(new SimpleGrantedAuthority(finalRole));
+    if (extraRoles != null) {
+      for (String extraRole : extraRoles) {
+        String finalRole = StringUtils.trimToEmpty(extraRole);
+        if (!finalRole.isEmpty()) {
+          if (convertToUppercase) {
+            setExtraRoles.add(new SimpleGrantedAuthority(finalRole.toUpperCase()));
+          } else {
+            setExtraRoles.add(new SimpleGrantedAuthority(finalRole));
+          }
         }
       }
     }
