@@ -165,9 +165,6 @@ public class EventsEndpoint implements ManagedService {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(EventsEndpoint.class);
 
-  /** A parser for handling JSON documents inside the body of a request. **/
-  public static final JSONParser parser = new JSONParser();
-
   /** Default server URL */
   protected String serverUrl = "http://localhost:8080";
 
@@ -1001,6 +998,7 @@ public class EventsEndpoint implements ManagedService {
   public Response updateEventMetadataByType(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type, @FormParam("metadata") String metadataJSON) throws Exception {
     Map<String, String> updatedFields;
+    JSONParser parser = new JSONParser();
     try {
       updatedFields = RequestUtils.getKeyValueMap(metadataJSON);
     } catch (ParseException e) {
@@ -1319,6 +1317,7 @@ public class EventsEndpoint implements ManagedService {
    */
   protected MetadataList deserializeMetadataList(String json) throws ParseException, NotFoundException {
     MetadataList metadataList = new MetadataList();
+    JSONParser parser = new JSONParser();
     JSONArray jsonCatalogs = (JSONArray) parser.parse(json);
     for (int i = 0; i < jsonCatalogs.size(); i++) {
       JSONObject catalog = (JSONObject) jsonCatalogs.get(i);

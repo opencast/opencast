@@ -35,9 +35,6 @@ public final class RequestUtils {
   public static final String VALUE_JSON_KEY = "value";
   public static final String REQUIRED_JSON_KEY = "required";
 
-  /** A parser for handling JSON documents inside the body of a request. **/
-  public static final JSONParser parser = new JSONParser();
-
   private RequestUtils() {
   }
 
@@ -51,6 +48,7 @@ public final class RequestUtils {
    *           Thrown if the json is malformed.
    */
   public static Map<String, String> getKeyValueMap(String json) throws ParseException {
+    JSONParser parser = new JSONParser();
     JSONArray updatedFields = (JSONArray) parser.parse(json);
     Map<String, String> fieldMap = new TreeMap<String, String>();
     JSONObject field;
