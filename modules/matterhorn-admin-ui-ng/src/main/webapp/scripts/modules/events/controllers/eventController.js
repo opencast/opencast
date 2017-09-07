@@ -28,10 +28,12 @@ angular.module('adminNg.controllers')
     'ResourcesListResource', 'UserRolesResource', 'EventAccessResource', 'EventGeneralResource',
     'OptoutsResource', 'EventParticipationResource', 'EventSchedulingResource', 'NewEventProcessingResource',
     'OptoutSingleResource', 'CaptureAgentsResource', 'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService',
+    'UploadAssetOptions', 'EventUploadAssetResource', 'Table',
     function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource, EventCatalogsResource, CommentResource,
         EventWorkflowsResource, EventWorkflowActionResource, ResourcesListResource, UserRolesResource, EventAccessResource, EventGeneralResource,
         OptoutsResource, EventParticipationResource, EventSchedulingResource, NewEventProcessingResource,
-        OptoutSingleResource, CaptureAgentsResource, ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService) {
+        OptoutSingleResource, CaptureAgentsResource, ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
+        EventUploadAssetResource, Table) {
 
         var roleSlice = 100;
         var roleOffset = 0;
@@ -273,6 +275,56 @@ angular.module('adminNg.controllers')
                         metadata.entries.splice(episodeCatalogIndex, 1);
                     }
                 });
+
+                //<===============================
+                // Enable asset upload (catalogs and attachments) to existing events
+
+                // Retrieve option configuration for asset upload
+                UploadAssetOptions.getOptionsPromise().then(function(data){
+                    if (data) {
+                        $scope.assetUploadWorkflowDefId = data.workflow;
+                        $scope.uploadAssetOptions = data.options;
+                        $scope.newAssets = {};
+                    }
+                });
+                $scope.saveAssetsKeyUp = function (event) {
+                    if (event.keyCode === 13 || event.keyCode === 32) {
+                        $scope.saveAssets();
+                    }
+                };
+
+                // Save and start upload asset request and workflow
+                $scope.saveAssets = function() {
+                    // The transaction becomes read-only if a workflow is running for this event.
+                    // Ref endpoint hasActiveTransaction(@PathParam("eventId") String eventId)
+                    if ($scope.transactions.read_only) {
+                        me.transactionNotification = Notifications.add('warning', 'ACTIVE_TRANSACTION', NOTIFICATION_CONTEXT, 3000);
+                        return;
+                    }
+                    // Verify there are assets to upload
+                    if (angular.equals($scope.newAssets, {})) {
+                        return;
+                    }
+                    var userdata = { metadata: {}};
+
+                    // save metadata map (contains flavor mapping used by the server)
+                    userdata.metadata["assets"] = ($scope.uploadAssetOptions);
+
+                    // save file assets (passed in a separate request field from its metadata map)
+                    userdata["upload-asset"] = $scope.newAssets;
+
+                    // save workflow definition id (defined in the asset upload configuration provided-list)
+                    userdata["workflow"] = $scope.assetUploadWorkflowDefId;
+
+                    EventUploadAssetResource.save({id: $scope.resourceId }, userdata, function (data) {
+                        me.transactionNotification = Notifications.add('success', 'EVENTS_CREATED', NOTIFICATION_CONTEXT, 6000);
+                        $scope.openTab('assets');
+                        }, function () {
+                        me.transactionNotification = Notifications.add('error', 'EVENTS_NOT_CREATED', NOTIFICATION_CONTEXT, 6000);
+                        $scope.openTab('assets');
+                    });
+                };
+                // <==========================
 
                 $scope.acls = ResourcesListResource.get({ resource: 'ACL' });
                 $scope.actions = {};

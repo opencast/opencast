@@ -21,10 +21,6 @@
 
 package org.opencastproject.index.service.impl;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.capture;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -45,9 +41,11 @@ import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.CatalogImpl;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.mediapackage.identifier.HandleException;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
@@ -88,6 +86,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.Assert;
@@ -104,6 +103,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -158,16 +158,19 @@ public class IndexServiceImplTest {
   private IngestService setupIngestService(MediaPackage mediapackage, Capture<InputStream> captureInputStream)
           throws MediaPackageException, HandleException, IOException, IngestException, NotFoundException {
     // Setup ingest service.
-    WorkflowInstance workflowInstance = createMock(WorkflowInstance.class);
-    IngestService ingestService = createMock(IngestService.class);
-    expect(ingestService.createMediaPackage()).andReturn(mediapackage).anyTimes();
-    expect(ingestService.addTrack(anyObject(InputStream.class), EasyMock.anyString(),
-            anyObject(MediaPackageElementFlavor.class), anyObject(MediaPackage.class))).andReturn(mediapackage)
+    WorkflowInstance workflowInstance = EasyMock.createMock(WorkflowInstance.class);
+    IngestService ingestService = EasyMock.createMock(IngestService.class);
+    EasyMock.expect(ingestService.createMediaPackage()).andReturn(mediapackage).anyTimes();
+    EasyMock.expect(ingestService.addTrack(EasyMock.anyObject(InputStream.class), EasyMock.anyString(),
+            EasyMock.anyObject(MediaPackageElementFlavor.class), EasyMock.anyObject(MediaPackage.class))).andReturn(mediapackage)
                     .anyTimes();
-    expect(ingestService.addCatalog(capture(captureInputStream), anyObject(String.class),
-            anyObject(MediaPackageElementFlavor.class), anyObject(MediaPackage.class))).andReturn(mediapackage)
-                    .anyTimes();
-    expect(ingestService.ingest(anyObject(MediaPackage.class), anyObject(String.class),
+    EasyMock.expect(ingestService.addCatalog(EasyMock.capture(captureInputStream), EasyMock.anyObject(String.class),
+            EasyMock.anyObject(MediaPackageElementFlavor.class), EasyMock.anyObject(MediaPackage.class)))
+            .andReturn(mediapackage).anyTimes();
+    EasyMock.expect(ingestService.addAttachment(EasyMock.capture(captureInputStream), EasyMock.anyObject(String.class),
+            EasyMock.anyObject(MediaPackageElementFlavor.class), EasyMock.anyObject(MediaPackage.class)))
+            .andReturn(mediapackage).anyTimes();
+    EasyMock.expect(ingestService.ingest(EasyMock.anyObject(MediaPackage.class), EasyMock.anyObject(String.class),
             EasyMock.<Map<String, String>> anyObject())).andReturn(workflowInstance).anyTimes();
     EasyMock.replay(ingestService);
     return ingestService;
@@ -351,6 +354,13 @@ public class IndexServiceImplTest {
 
     IngestService ingestService = setupIngestService(mediapackage, Capture.<InputStream> newInstance());
 
+    // Setup Authorization Service
+    Tuple<MediaPackage, Attachment> returnValue = new Tuple<MediaPackage, Attachment>(mediapackage, null);
+    AuthorizationService authorizationService = EasyMock.createMock(AuthorizationService.class);
+    EasyMock.expect(authorizationService.setAcl(EasyMock.anyObject(MediaPackage.class),
+            EasyMock.anyObject(AclScope.class), EasyMock.anyObject(AccessControlList.class))).andReturn(returnValue);
+    EasyMock.replay(authorizationService);
+
     // Run Test
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setAuthorizationService(setupAuthorizationService(mediapackage));
@@ -420,6 +430,13 @@ public class IndexServiceImplTest {
     EasyMock.replay(mediapackage);
 
     IngestService ingestService = setupIngestService(mediapackage, Capture.<InputStream> newInstance());
+
+    // Setup Authorization Service
+    Tuple<MediaPackage, Attachment> returnValue = new Tuple<MediaPackage, Attachment>(mediapackage, null);
+    AuthorizationService authorizationService = EasyMock.createMock(AuthorizationService.class);
+    EasyMock.expect(authorizationService.setAcl(EasyMock.anyObject(MediaPackage.class),
+            EasyMock.anyObject(AclScope.class), EasyMock.anyObject(AccessControlList.class))).andReturn(returnValue);
+    EasyMock.replay(authorizationService);
 
     // Run Test
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
@@ -492,6 +509,13 @@ public class IndexServiceImplTest {
 
     IngestService ingestService = setupIngestService(mediapackage, Capture.<InputStream> newInstance());
 
+    // Setup Authorization Service
+    Tuple<MediaPackage, Attachment> returnValue = new Tuple<MediaPackage, Attachment>(mediapackage, null);
+    AuthorizationService authorizationService = EasyMock.createMock(AuthorizationService.class);
+    EasyMock.expect(authorizationService.setAcl(EasyMock.anyObject(MediaPackage.class),
+            EasyMock.anyObject(AclScope.class), EasyMock.anyObject(AccessControlList.class))).andReturn(returnValue);
+    EasyMock.replay(authorizationService);
+
     CaptureAgentStateService captureAgentStateService = setupCaptureAgentStateService();
 
     Capture<Date> captureStart = EasyMock.newCapture();
@@ -542,6 +566,33 @@ public class IndexServiceImplTest {
             .anyTimes();
     EasyMock.replay(authorizationService);
     return authorizationService;
+  }
+
+  @Test
+  public void testAddAssetsToMp() throws org.json.simple.parser.ParseException, IOException, ConfigurationException, MediaPackageException, HandleException, IngestException, NotFoundException {
+    MediaPackage mediapackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
+    JSONArray assetMetadata =  (JSONArray) new JSONParser().parse("[{\"id\":\"attachment_attachment_notes\", "
+      + "\"title\": \"class handout notes\","
+      + "\"flavorType\": \"attachment\","
+      + "\"flavorSubType\": \"notes\","
+      + "\"type\": \"attachment\"}]");
+
+    // a test asset input stream
+    List<String> assetList = new LinkedList<String>();
+    assetList.add("attachment_attachment_notes");
+    MediaPackageElementFlavor elemflavor = new MediaPackageElementFlavor("attachment_attachment_notes", "*");
+    MediaPackageElementFlavor newElemflavor = new MediaPackageElementFlavor("attachment", "notes");
+
+    // Set up the mock Ingest Service's attachment
+    Attachment attachment = new AttachmentImpl();
+    attachment.setFlavor(elemflavor);
+    mediapackage.add(attachment);
+
+    // Run Test
+    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+    indexServiceImpl.setIngestService(setupIngestService(mediapackage, Capture.<InputStream> newInstance()));
+    mediapackage = indexServiceImpl.updateMpAssetFlavor(assetList, mediapackage, assetMetadata, true);
+    assertTrue("The mediapackage attachment has the updated flavor", mediapackage.getAttachments(newElemflavor).length == 1);
   }
 
   @Test

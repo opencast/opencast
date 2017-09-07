@@ -198,6 +198,35 @@ public interface IndexService {
   boolean removeEvent(String id) throws NotFoundException, UnauthorizedException;
 
   /**
+   * Create or Update an existing event asset.
+   *
+   * The request contains a JSON describing asset type,
+   *  flavor, subflavor, the mpId, a workflow description id to initiate on the event,
+   *  and the asset file streams in a multipart form.
+   *  Existing type-flavor matches are updated, otherwise the asset is added.
+   *
+   * @param request
+   *          The http servlet request containing metadata, workflow id, and file streams
+   * @param mp
+   *          The mediapackage to update
+   * @return the workflow instance id that was started
+   * @throws ParseException
+   *           Thrown if unable to parse the start and end UTC date and time.
+   * @throws IOException
+   *           Thrown if unable to update the event's DublinCoreCatalog
+   * @throws MediaPackageException
+   *           Thrown if unable to update the event's {@link MediaPackage}
+   * @throws NotFoundException
+   *           Thrown if the specified workflow definition cannot be found.
+   * @throws UnauthorizedException
+   *           Thrown if the current user is unable to create the new event.
+   * @throws IndexServiceException
+   *            Thrown if the update assets workflow cannot be started
+   */
+  String updateEventAssets(MediaPackage mp, HttpServletRequest request) throws ParseException, IOException,
+          MediaPackageException, NotFoundException, UnauthorizedException, IndexServiceException;
+
+  /**
    * Update an event's metadata using a {@link MetadataList}
    *
    * @param id
