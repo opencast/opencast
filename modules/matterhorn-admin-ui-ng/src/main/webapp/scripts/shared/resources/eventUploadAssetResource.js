@@ -43,6 +43,10 @@ angular.module('adminNg.resources')
                assetMetadata.forEach(function(dataItem) {
                    if (tempAssetList.indexOf(dataItem.id) >= 0) {
                      flavorList.push(dataItem.flavorType + "/" + dataItem.flavorSubType);
+                     // Special case to flag workflow to skip the "search+preview" image operation.
+                     // If more than one special case comes up in the future,
+                     // consider generalizing variable creation with
+                     //   camelCase('uploaded', flavor, subflavor)
                      if (dataItem.flavorSubType == "search+preview") {
                        workflowConfiguration["uploadedSearchPreview"] = "true";
                      }

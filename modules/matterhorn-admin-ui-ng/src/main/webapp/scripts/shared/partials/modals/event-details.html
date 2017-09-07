@@ -125,7 +125,7 @@
                                     <th translate="EVENTS.EVENTS.DETAILS.ASSETS.TYPE"><!-- Type --></th>
                                     <th translate="EVENTS.EVENTS.DETAILS.ASSETS.SIZE"><!-- Size --></th>
                                     <th class="medium">
-                                      <a translate="EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD" class="details-link" ng-show="uploadAssetOptions" ng-click="openSubTab('newAssetUpload', 'EventAttachmentsResource', 'newassetupload', false, true)">
+                                      <a translate="EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD" class="details-link" ng-show="(uploadAssetOptions && !transactions.read_only)" ng-click="openSubTab('newAssetUpload', 'EventAttachmentsResource', 'newassetupload', false, true)">
                                       </a>
                                     </th>
                                 </tr>

@@ -404,21 +404,14 @@
          "UPLOAD_ASSET": {
            "CAPTION": "Asset Upload",
            "SELECT_TYPE": "Select asset type",
-           "FLAVOR": "Flavor",
-           "FILE": "File",
-           "NEW": "New Asset",
            "ADD": "Add Asset",
-           "UPLOAD": {
-               "SHORT" : "Asset",
-               "DETAIL": "The file of the asset to attach to this event."
-           },
            "OPTION": {
-               "CLASS_HANDOUT_NOTES":"class handout notes",
-               "CAPTIONS_DFXP" : "captions DFXP",
-               "CAPTIONS_VTT" : "captions VTT",
-               "MEDIA_MODULE_VIDEO_THUMBNAIL" : "video list thumbnail",
-               "SMIL": "smil catalog",
-               "TRACK_PARTS": "track parts"
+               "CLASS_HANDOUT_NOTES":"Class handout notes",
+               "CAPTIONS_DFXP" : "Captions DFXP",
+               "CAPTIONS_WEBVTT" : "Captions WebVTT",
+               "PREVIEW_IMAGE" : "Preview image",
+               "SMIL": "Smil catalog",
+               "TRACK_PARTS": "Track parts"
            }
          },
          "ACCESS": {

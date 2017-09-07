@@ -22,7 +22,6 @@
 package org.opencastproject.index.service.impl;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
@@ -220,101 +219,200 @@ public class IndexServiceImpl implements IndexService {
   /** The single thread executor service */
   private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param aclServiceFactory
+   *          the factory to set
+   */
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param authorizationService
+   *          the service to set
+   */
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param captureAgentStateService
+   *          the service to set
+   */
   public void setCaptureAgentStateService(CaptureAgentStateService captureAgentStateService) {
     this.captureAgentStateService = captureAgentStateService;
   }
 
-  /** OSGi callback for the event comment service. */
+  /**
+   * OSGi callback for the event comment service.
+   *
+   * @param eventCommentService
+   *          the service to set
+   */
   public void setEventCommentService(EventCommentService eventCommentService) {
     this.eventCommentService = eventCommentService;
   }
 
-  /** OSGi callback to add the event dublincore {@link EventCatalogUIAdapter} instance. */
+  /**
+   * OSGi callback to add the event dublincore {@link EventCatalogUIAdapter} instance.
+   *
+   * @param eventCatalogUIAdapter
+   *          the adapter to set
+   */
   public void setCommonEventCatalogUIAdapter(CommonEventCatalogUIAdapter eventCatalogUIAdapter) {
     this.eventCatalogUIAdapter = eventCatalogUIAdapter;
   }
 
-  /** OSGi callback to add the series dublincore {@link SeriesCatalogUIAdapter} instance. */
+  /**
+   * OSGi callback to add the series dublincore {@link SeriesCatalogUIAdapter} instance.
+   *
+   * @param seriesCatalogUIAdapter
+   *          the adapter to set
+   */
   public void setCommonSeriesCatalogUIAdapter(CommonSeriesCatalogUIAdapter seriesCatalogUIAdapter) {
     this.seriesCatalogUIAdapter = seriesCatalogUIAdapter;
   }
 
-  /** OSGi callback to add {@link EventCatalogUIAdapter} instance. */
+  /**
+   * OSGi callback to add {@link EventCatalogUIAdapter} instance.
+   *
+   * @param catalogUIAdapter
+   *          the adapter to add
+   */
   public void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     eventCatalogUIAdapters.add(catalogUIAdapter);
   }
 
-  /** OSGi callback to remove {@link EventCatalogUIAdapter} instance. */
+  /**
+   * OSGi callback to remove {@link EventCatalogUIAdapter} instance.
+   *
+   * @param catalogUIAdapter
+   *          the adapter to remove
+   */
   public void removeCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     eventCatalogUIAdapters.remove(catalogUIAdapter);
   }
 
-  /** OSGi callback to add {@link SeriesCatalogUIAdapter} instance. */
+  /**
+   * OSGi callback to add {@link SeriesCatalogUIAdapter} instance.
+   *
+   * @param catalogUIAdapter
+   *          the adapter to add
+   */
   public void addCatalogUIAdapter(SeriesCatalogUIAdapter catalogUIAdapter) {
     seriesCatalogUIAdapters.add(catalogUIAdapter);
   }
 
-  /** OSGi callback to remove {@link SeriesCatalogUIAdapter} instance. */
+  /**
+   * OSGi callback to remove {@link SeriesCatalogUIAdapter} instance.
+   *
+   * @param catalogUIAdapter
+   *          the adapter to remove
+   */
   public void removeCatalogUIAdapter(SeriesCatalogUIAdapter catalogUIAdapter) {
     seriesCatalogUIAdapters.remove(catalogUIAdapter);
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param ingestService
+   *          the service to set
+   */
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param assetManager
+   *          the manager to set
+   */
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param schedulerService
+   *          the service to set
+   */
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param securityService
+   *          the service to set
+   */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param seriesService
+   *          the service to set
+   */
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param workflowService
+   *          the service to set
+   */
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param workspace
+   *          the workspace to set
+   */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param userDirectoryService
+   *          the service to set
+   */
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param jpaGroupRoleProvider
+   *          the provider to set
+   */
   public void setGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
     this.jpaGroupRoleProvider = jpaGroupRoleProvider;
   }
 
+  /**
+   *
+   * @return the acl service
+   */
   public AclService getAclService() {
     return aclServiceFactory.serviceFor(securityService.getOrganization());
   }
@@ -453,9 +551,7 @@ public class IndexServiceImpl implements IndexService {
       throw new IndexServiceException(e.getMessage());
     }
   }
-   /**
-   *   * Add or create asset
-   * @throws IndexServiceException   */
+
   @Override
   public String updateEventAssets(MediaPackage mp, HttpServletRequest request) throws IndexServiceException {
     JSONObject metadataJson = null;
@@ -954,6 +1050,20 @@ public class IndexServiceImpl implements IndexService {
     }
   }
 
+  /**
+   *
+   * @param mp
+   *          the mediapackage to update
+   * @param dc
+   *          the dublincore metadata to use to update the mediapackage
+   * @return the updated mediapackage
+   * @throws IOException
+   *           Thrown if an IO error occurred adding the dc catalog file
+   * @throws MediaPackageException
+   *           Thrown if an error occurred updating the mediapackage
+   * @throws IngestException
+   *           Thrown if an error occurred attaching the catalog to the mediapackage
+   */
   private MediaPackage updateDublincCoreCatalog(MediaPackage mp, DublinCoreCatalog dc)
           throws IOException, MediaPackageException, IngestException {
     try (InputStream inputStream = IOUtils.toInputStream(dc.toXmlString(), "UTF-8")) {
@@ -986,6 +1096,7 @@ public class IndexServiceImpl implements IndexService {
    * @param rRule
    *          the recurrence rule
    * @param tz
+   *          the timezone
    * @return a list of scheduling periods
    */
   protected List<Period> calculatePeriods(Date start, Date end, long duration, RRule rRule, TimeZone tz) {
@@ -1032,9 +1143,15 @@ public class IndexServiceImpl implements IndexService {
 
   /**
    * Update the flavor of newly added asset with the passed metadata
-   *   * @param assetList
-   * @param mediapackage to update
+   *
+   * @param assetList
+   *          the list of assets to update
+   * @param mp
+   *          the mediapackage to update
    * @param assetMetadata
+   *          a set of mapping metadata for the asset list
+   * @param overwriteExisting
+   *          true if the existing asset of the same flavor should be overwritten
    * @return mediapackage updated with assets
    */
   @SuppressWarnings("unchecked")
@@ -1422,14 +1539,6 @@ public class IndexServiceImpl implements IndexService {
     return jpaGroupRoleProvider.createGroup(name, description, roles, members);
   }
 
-  /**
-   * Get a single event
-   *
-   * @param id
-   *          the mediapackage id
-   * @return an event or none if not found wrapped in an option
-   * @throws SearchIndexException
-   */
   @Override
   public Opt<Event> getEvent(String id, AbstractSearchIndex index) throws SearchIndexException {
     SearchResult<Event> result = index

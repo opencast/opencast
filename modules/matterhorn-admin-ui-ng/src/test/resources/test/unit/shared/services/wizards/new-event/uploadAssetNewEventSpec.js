@@ -58,7 +58,7 @@ describe('Upload Asset New Event Step in New Event Wizard', function () {
             expect(NewEventUploadAsset.visible).toBe(false);
         });
 
-        it('becomes visible when an asset option is available and source is upload', function () {
+        it('is still invisible when source is upload but there are no non-track options', function () {
             NewEventUploadAsset.wizard = {
                 getStateControllerByName:function() {
                   return {
@@ -69,6 +69,22 @@ describe('Upload Asset New Event Step in New Event Wizard', function () {
                 }
             };
             NewEventUploadAsset.ud.defaults = {'foo':'bar'};
+            NewEventUploadAsset.checkIfVisible();
+            expect(NewEventUploadAsset.visible).toBe(false);
+        });
+
+        it('becomes visible when source is upload and there are non-track options', function () {
+            NewEventUploadAsset.wizard = {
+                getStateControllerByName:function() {
+                  return {
+                    isUpload: function() {
+                      return true;
+                    }
+                  }
+                }
+            };
+            NewEventUploadAsset.ud.defaults = {'foo':'bar'};
+            NewEventUploadAsset.ud.hasNonTrackOptions = true;
             NewEventUploadAsset.checkIfVisible();
             expect(NewEventUploadAsset.visible).toBe(true);
         });

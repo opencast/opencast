@@ -21,10 +21,10 @@ function (ResourcesListResource, UploadAssetOptions, JsHelper, Notifications, $i
       "flavorType": "captions",
       "flavorSubType": "timedtext",
       "type": "catalog"
-    },{"id": "attachment_text_vtt",
-      "title": "captions VTT",
+    },{"id": "attachment_text_webvtt",
+      "title": "Captions WebVTT",
       "flavorType": "text",
-      "flavorSubType": "vtt",
+      "flavorSubType": "webvtt",
       "type": "attachment"
     },{"id":"attachment_presenter_search_preview",
       "title": "video list thumbnail",
@@ -45,6 +45,7 @@ function (ResourcesListResource, UploadAssetOptions, JsHelper, Notifications, $i
     self.ud.defaults = {};
     self.ud.namemap = {};
     self.ud.assetlistforsummary = [];
+    self.ud.hasNonTrackOptions = false;
 
     // This is used as the callback from the uploadAssetDirective
     self.onAssetUpdate = function() {
@@ -76,14 +77,19 @@ function (ResourcesListResource, UploadAssetOptions, JsHelper, Notifications, $i
     self.addSharedDataPromise = function() {
       UploadAssetOptions.getOptionsPromise().then(function(data){
         self.ud.defaults = data;
+        self.visible = false;
         if (!self.wizard.sharedData) {
            self.wizard.sharedData = {};
         }
         self.wizard.sharedData.uploadAssetOptions = data.options;
+        // Filter out asset options of type "track" for the asset upload tab
+        // Track source options are uploaded on a different tab
         angular.forEach(data.options, function(option) {
           self.ud.namemap[option.id] = option;
-          // options exist, Ok to be visible
-          self.visible = true;
+          if (option.type !== 'track') {
+            self.ud.hasNonTrackOptions = true;
+            self.visible = true;
+          }
         });
         self.wizard.sharedData.uploadNameMap = self.ud.namemap;
       });
@@ -92,12 +98,11 @@ function (ResourcesListResource, UploadAssetOptions, JsHelper, Notifications, $i
     // This step is visible when event.upload.asset.options.properties
     // listprovider contains options for asset upload.
     self.checkIfVisible = function () {
-      self.visible = false;
-      if (self.wizard.getStateControllerByName("source").isUpload()) {
-        angular.forEach(self.ud.defaults, function(option) {
-          self.visible = true;
-        });
+      // Prohibit uploading assets to scheduled events
+      if (self.ud.hasNonTrackOptions && self.wizard.getStateControllerByName("source").isUpload()) {
+        self.visible = true;
       } else {
+        self.visible = false;
         self.ud.assets = {};
       }
     };

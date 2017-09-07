@@ -36,7 +36,7 @@ pages:
    - Asset Manager: 'configuration/asset-manager.md'
    - Message Broker: 'configuration/message-broker.md'
    - Metadata: 'configuration/metadata.md'
-   - Manual Asset Upload: 'configuration/asset-upload-ui.md'
+   - Manual Asset Upload: 'configuration/asset-upload-ui/index.md'
    - Encoding: 'configuration/encoding.md'
    - Load: 'configuration/load.md'
    - Logging and Privacy: 'configuration/logging.and.privacy.md'
