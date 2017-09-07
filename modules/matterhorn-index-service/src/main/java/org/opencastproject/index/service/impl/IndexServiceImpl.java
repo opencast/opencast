@@ -178,9 +178,6 @@ public class IndexServiceImpl implements IndexService {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(IndexServiceImpl.class);
 
-  /** A parser for handling JSON documents inside the body of a request. **/
-  private static final JSONParser parser = new JSONParser();
-
   private final List<EventCatalogUIAdapter> eventCatalogUIAdapters = new ArrayList<>();
   private final List<SeriesCatalogUIAdapter> seriesCatalogUIAdapters = new ArrayList<>();
   private EventCatalogUIAdapter eventCatalogUIAdapter;
@@ -364,7 +361,7 @@ public class IndexServiceImpl implements IndexService {
             if ("metadata".equals(fieldName)) {
               String metadata = Streams.asString(item.openStream());
               try {
-                metadataJson = (JSONObject) parser.parse(metadata);
+                metadataJson = (JSONObject) new JSONParser().parse(metadata);
               } catch (Exception e) {
                 logger.warn("Unable to parse metadata {}", metadata);
                 throw new IllegalArgumentException("Unable to parse metadata");
