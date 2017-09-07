@@ -361,7 +361,7 @@ public class IndexServiceImpl implements IndexService {
             if ("metadata".equals(fieldName)) {
               String metadata = Streams.asString(item.openStream());
               try {
-                metadataJson = (JSONObject) parser.parse(metadata);
+                metadataJson = (JSONObject) new JSONParser().parse(metadata);
               } catch (Exception e) {
                 logger.warn("Unable to parse metadata {}", metadata);
                 throw new IllegalArgumentException("Unable to parse metadata");
