@@ -72,6 +72,7 @@ angular.module('adminNg.directives')
                 scope.selectedFilter = null;
                 scope.showFilterSelector = false;
                 Storage.remove('filter');
+                angular.element('.main-filter').val('').trigger('chosen:updated');
             };
 
             scope.removeFilter = function (name, filter) {
