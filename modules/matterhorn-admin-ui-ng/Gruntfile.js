@@ -215,7 +215,7 @@ module.exports = function (grunt) {
       },
       test: {
         devDependencies: true,
-        src: '<%= karma.unit.configFile %>',
+        src: '<%= karma.options.configFile %>',
         ignorePath:  /\.\.\//,
         fileTypes:{
           js: {

@@ -87,7 +87,7 @@ angular.module('adminNg.directives')
 
             scope.getFilterName = function(){
                 for(var i in scope.filters.filters){
-                    if(scope.filters.filters[i] === scope.selectedFilter){
+                    if (angular.equals(scope.filters.filters[i], scope.selectedFilter)) {
                         return i;
                     }
                 }
@@ -197,7 +197,7 @@ angular.module('adminNg.directives')
                 scope.activeProfile = index;
             };
 
-            scope.onChnageSelectMainFilter = function(selectedFilter) {
+            scope.onChangeSelectMainFilter = function(selectedFilter) {
                 scope.filter = selectedFilter;
                 scope.openSecondFilter(selectedFilter);
             }
