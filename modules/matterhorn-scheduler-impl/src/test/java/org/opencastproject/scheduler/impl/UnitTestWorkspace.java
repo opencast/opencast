@@ -64,6 +64,11 @@ public class UnitTestWorkspace implements Workspace {
   }
 
   @Override
+  public File read(URI uri) throws NotFoundException, IOException {
+    return get(uri);
+  }
+
+  @Override
   public URI getBaseUri() {
     return baseDir.toURI();
   }
@@ -111,6 +116,11 @@ public class UnitTestWorkspace implements Workspace {
     } else {
       throw new NotFoundException("Cannot find file " + file.getAbsolutePath());
     }
+  }
+
+  @Override
+  public void deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws NotFoundException, IOException {
+    throw new RuntimeException("Not yet implemented");
   }
 
   @Override

@@ -16,6 +16,7 @@ describe('adminNg.directives.adminNgEditable', function () {
             configureFromServer: function () {},
             formatDate: function (val, date) { return date; },
             formatTime: function (val, date) { return date; },
+            formatDateTime: function (val, dt) { return dt; },
             getLanguageCode: function () { return 'en'; }
         };
         $provide.value('Language', service);
@@ -85,16 +86,16 @@ describe('adminNg.directives.adminNgEditable', function () {
         beforeEach(function(){
             $rootScope.params = {
                 value: '2015-12-05',
-                type:'date'
+                type:'date',
+                mode:'dateValue'
             };
 
             element = $compile('<div admin-ng-editable="" params="params"></div>')($rootScope);
             $rootScope.$digest();
         });
 
-        it('displays a datepicker', function(){
-            expect(element.find('input')).toHaveAttr('datepicker');
-
+        it('displays a datetimepicker', function(){
+            expect(element.find('input')).toHaveAttr('datetimepicker');
         });
     });
 

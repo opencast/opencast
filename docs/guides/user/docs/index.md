@@ -57,6 +57,6 @@ website](http://www.opencast.org/community).
 ## Licenses
 
 Opencast Projects, including source code, are licensed under [Educational Community License
-2.0](https://bitbucket.org/opencast-community/matterhorn/src/develop/LICENSE) Except where otherwise noted,
+2.0](https://bitbucket.org/opencast-community/opencast/src/develop/LICENSE) Except where otherwise noted,
 documentation on this site is licensed under a [Creative Commons Attribution 4.0 International
 license](http://creativecommons.org/licenses/by/4.0/deed.en_US)

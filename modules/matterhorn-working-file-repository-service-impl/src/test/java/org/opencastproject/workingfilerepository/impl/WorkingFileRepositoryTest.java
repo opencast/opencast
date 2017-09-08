@@ -81,6 +81,14 @@ public class WorkingFileRepositoryTest {
       IOUtils.closeQuietly(in);
     }
 
+    // Repeat the put
+    try {
+      in = getClass().getClassLoader().getResourceAsStream("opencast_header.gif");
+      repo.put(mediaPackageID, mediaPackageElementID, "opencast_header.gif", in);
+    } finally {
+      IOUtils.closeQuietly(in);
+    }
+
     // Put an image file into the repository into a collection
     try {
       in = getClass().getClassLoader().getResourceAsStream("opencast_header.gif");

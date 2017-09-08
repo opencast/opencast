@@ -87,6 +87,11 @@
       <runtime>tesseract</runtime>
     </requirement>
     <requirement>
+      <module>timelinepreviews-ffmpeg</module>
+      <build>ffmpeg</build>
+      <runtime>ffmpeg</runtime>
+    </requirement>
+    <requirement>
       <module>videoeditor-ffmpeg-impl</module>
       <build>ffmpeg</build>
       <runtime>ffmpeg</runtime>
@@ -164,6 +169,10 @@
     <conflict>
       <module>textanalyzer-impl</module>
       <module>textanalyzer-remote</module>
+    </conflict>
+    <conflict>
+      <module>timelinepreviews-ffmpeg</module>
+      <module>timelinepreviews-remote</module>
     </conflict>
     <conflict>
       <module>videoeditor-ffmpeg-impl</module>

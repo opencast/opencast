@@ -161,6 +161,9 @@ public class StaticResourceServlet extends HttpServlet {
           } catch (IOException e1) {
             logger.warn("unable to send http 500 error: {}", e1);
             return;
+          } catch (IllegalStateException e2) {
+            logger.trace("unable to send http 500 error. Client side was probably closed during file copy.", e2);
+            return;
           }
         }
       } else {
@@ -190,6 +193,9 @@ public class StaticResourceServlet extends HttpServlet {
               return;
             } catch (IOException e1) {
               logger.warn("unable to send http 500 error: {}", e1);
+              return;
+            } catch (IllegalStateException e2) {
+              logger.trace("unable to send http 500 error. Client side was probably closed during file copy.", e2);
               return;
             }
           }
@@ -390,6 +396,7 @@ public class StaticResourceServlet extends HttpServlet {
     try {
       istream.skip(start);
     } catch (IOException e) {
+      logger.trace("Cannot skip to input stream position {}. The user probably closed the client side.", start, e);
       return e;
     }
     // MH-10447, fix for files of size 2048*C bytes
@@ -401,7 +408,7 @@ public class StaticResourceServlet extends HttpServlet {
       if (len > 0) {
         len = istream.read(buffer, 0, len);
         if (len > 0) {
-          // This test coud actually be "if (len != -1)"
+          // This test could actually be "if (len != -1)"
           ostream.write(buffer, 0, len);
           bytesToRead -= len;
           if (bytesToRead == 0)
@@ -417,6 +424,9 @@ public class StaticResourceServlet extends HttpServlet {
           break;
       }
     } catch (IOException e) {
+      logger.trace("IOException after starting the byte copy, current length {}, buffer {}."
+              + " The user probably closed the client side after the file started copying.",
+              len, buffer, e);
       return e;
     }
     return null;

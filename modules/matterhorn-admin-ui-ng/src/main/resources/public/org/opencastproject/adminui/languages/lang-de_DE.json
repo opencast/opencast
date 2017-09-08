@@ -353,6 +353,7 @@
           "UPLOAD":{
             "CAPTION":"Hochladen",
             "RECORDING_ELEMENTS":"Aufnahme-Elemente",
+            "RECORDING_METADATA":"Aufnahme-Daten",
             "SEGMENTABLE":{
               "SHORT":"Folien",
               "DETAIL":"Die Datei enthält die Aufnahme einer Präsentation (Keynote, Powerpoint, etc.)."

@@ -76,6 +76,7 @@
                 <forwardTo>
                   <queue physicalName="ASSETMANAGER.Adminui" />
                   <queue physicalName="ASSETMANAGER.Externalapi" />
+                  <queue physicalName="ASSETMANAGER.Conductor" />
                 </forwardTo>
               </compositeQueue>
             </virtualDestinations>

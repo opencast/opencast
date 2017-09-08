@@ -28,6 +28,7 @@ module.exports = function (config) {
             '../../main/webapp/scripts/lib/video-js/video.js',
             '../../main/webapp/scripts/lib/moment.min.js',
             '../../main/webapp/scripts/lib/javascript-md5/js/md5.min.js',
+            '../../main/webapp/scripts/lib/timepicker/jquery-ui-timepicker-addon.js',
 
             '../../main/webapp/scripts/app.js',
             '../../main/webapp/scripts/shared/filters/filters.js',

@@ -5,8 +5,9 @@ Documentation for modules included in Opencast.
 - [Atom and RSS Feed](atomrss.md)
 - Amazon Services
     - [Amazon S3 Distribution](awss3distribution.md)
-- [Media Module](mediamodule.configuration.md)
+- [Execute Service](execute.md)
 - [LTI Module](ltimodule.md)
+- [Media Module](mediamodule.configuration.md)
 - Player
     - [Configuration](player.configuration.md)
     - [URL Parameter](player.url.parameter.md)

@@ -59,9 +59,9 @@ describe('adminNg.directives.timelineDirective', function () {
         expect(f('number', false)).toBe('');
 
         // displayZoomLevel
-        var testArray = [ 
-                [ 0, '≈ 0 s'], [ 1, '≈ 0 s'], [ 10, '≈ 0 s'], [ 1234, '≈ 1 s'], [ 12345, '≈ 12 s'] 
-                ,[ 130000, '≈ 2 m'], [ 1700000, '≈ 28 m'], [ 1900000, '≈ 32 m'], [ 100000000, '≈ 4 h'] 
+        var testArray = [
+                [ 0, '≈ 0 s'], [ 1, '≈ 0 s'], [ 10, '≈ 0 s'], [ 1234, '≈ 1 s'], [ 12345, '≈ 12 s']
+                ,[ 130000, '≈ 2 m'], [ 1700000, '≈ 28 m'], [ 1900000, '≈ 32 m'], [ 100000000, '≈ 4 h']
         ];
 
         for (var i = 0, len = testArray.length; i < len; i ++) {
@@ -121,7 +121,7 @@ describe('adminNg.directives.timelineDirective', function () {
             element.isolateScope().zoomSelected = { name: 'All', time: 0 };
             element.isolateScope().changeZoomSelected($.Event(''));
             $rootScope.$digest();
-            
+
             expect(element.isolateScope().zoomValue).toBe(52125);
             expect(element.isolateScope().zoomOffset).toBe(0);
             expect(element.isolateScope().zoomFieldOffset).toBe(0);
@@ -130,7 +130,7 @@ describe('adminNg.directives.timelineDirective', function () {
             element.isolateScope().zoomSelected = { name: '1 Sec', time: 1000 };
             element.isolateScope().changeZoomSelected($.Event(''));
             $rootScope.$digest();
-            
+
             expect(element.isolateScope().zoomValue).toBe(1000);
             expect(element.isolateScope().zoomOffset).toBe(0);
             expect(element.isolateScope().zoomFieldOffset).toBe(0);

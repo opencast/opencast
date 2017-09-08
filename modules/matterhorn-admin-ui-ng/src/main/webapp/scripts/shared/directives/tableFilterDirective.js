@@ -113,7 +113,9 @@ angular.module('adminNg.directives')
                     return;
                 }
                 if (filter.period.to && filter.period.from) {
-                    filter.value = new Date(filter.period.from).toISOString() + '/' + new Date(filter.period.to).toISOString();
+                    var from = new Date(new Date(filter.period.from).setHours(0, 0, 0, 0));
+                    var to = new Date(new Date(filter.period.to).setHours(23, 59, 59, 999));
+                    filter.value = from.toISOString() + '/' + to.toISOString();
                 }
 
                 if (filter.value) {

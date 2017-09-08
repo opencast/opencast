@@ -136,11 +136,14 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
     String exec = StringUtils.trimToNull(operation.getConfiguration(EXEC_PROPERTY));
     String params = StringUtils.trimToNull(operation.getConfiguration(PARAMS_PROPERTY));
     float load = 1.0f;
-    try {
-      load = Float.parseFloat(StringUtils.trimToEmpty(operation.getConfiguration(LOAD_PROPERTY)));
-    } catch (NumberFormatException e) {
-      String description = StringUtils.trimToEmpty(operation.getDescription());
-      logger.warn("Bad load value on execute operation with description {}, assuming load of 1.0", description);
+    String loadPropertyStr = StringUtils.trimToEmpty(operation.getConfiguration(LOAD_PROPERTY));
+    if (StringUtils.isNotBlank(loadPropertyStr)) {
+      try {
+        load = Float.parseFloat(loadPropertyStr);
+      } catch (NumberFormatException e) {
+        String description = StringUtils.trimToEmpty(operation.getDescription());
+        logger.warn("Ignoring invalid load value '{}' on execute operation with description '{}'", loadPropertyStr, description);
+      }
     }
     String sourceFlavor = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR_PROPERTY));
     String sourceTags = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS_PROPERTY));

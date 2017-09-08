@@ -21,6 +21,8 @@
 
 package org.opencastproject.metadata.dublincore;
 
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPORAL;
+
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -65,7 +67,7 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
     this.workspace = workspace;
   }
 
-  public void activate(@SuppressWarnings("unchecked") Map properties) {
+  public void activate(Map<String, ?> properties) {
     logger.debug("activate()");
     if (properties != null) {
       String priorityString = (String) properties.get(PRIORITY_KEY);
@@ -112,10 +114,16 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
         // Title
         metadata.setTitle(dc.getFirst(DublinCore.PROPERTY_TITLE));
 
-        // Created date
-        if (dc.hasValue(DublinCore.PROPERTY_CREATED))
-          metadata.setDate(EncodingSchemeUtils.decodeDate(dc.get(DublinCore.PROPERTY_CREATED).get(0)));
-
+        // use started date as created date (see MH-12250)
+        if (dc.hasValue(DublinCore.PROPERTY_TEMPORAL) && dc.getFirst(PROPERTY_TEMPORAL) != null) {
+          DCMIPeriod period = EncodingSchemeUtils
+            .decodeMandatoryPeriod(dc.getFirst(PROPERTY_TEMPORAL));
+          metadata.setDate(period.getStart());
+        } else {
+          // ...and only if started date is not available the created date
+          if (dc.hasValue(DublinCore.PROPERTY_CREATED))
+            metadata.setDate(EncodingSchemeUtils.decodeDate(dc.get(DublinCore.PROPERTY_CREATED).get(0)));
+        }
         // Series id
         if (dc.hasValue(DublinCore.PROPERTY_IS_PART_OF))
           metadata.setSeriesIdentifier(dc.get(DublinCore.PROPERTY_IS_PART_OF).get(0).getValue());
@@ -156,10 +164,9 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
         // Series Title and Identifier
         metadata.setSeriesTitle(dc.getFirst(DublinCore.PROPERTY_TITLE));
         metadata.setSeriesIdentifier(dc.getFirst(DublinCore.PROPERTY_IDENTIFIER));
-      } else if (catalog.getFlavor().getSubtype().startsWith(MediaPackageElements.OAIPMH.getSubtype())) {
-        // ignoring OAI-PMH dublincore flavors
       } else {
-        logger.warn("Unexpected dublin core catalog flavor found, ignoring '" + catalog.getFlavor() + "'");
+        logger.debug("Excluding unknown catalog flavor '{}' from the top level metadata of mediapackage '{}'",
+                catalog.getFlavor(), mp.getIdentifier());
       }
     }
     return metadata;

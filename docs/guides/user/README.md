@@ -5,7 +5,7 @@ This guide is the official Opencast user's manual for the open-source video capt
 # Setup
 
 ### Git Repository
-The source documentation is hosted on this Git repository: https://bitbucket.org/opencast-community/matterhorn
+The source documentation is hosted on this Git repository: https://bitbucket.org/opencast-community/opencast
 
 ### Building Locally
 The documentation is written in standard markdown. The tool that is used to build the documentation is

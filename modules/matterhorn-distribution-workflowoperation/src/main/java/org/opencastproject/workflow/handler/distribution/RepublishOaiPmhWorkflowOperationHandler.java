@@ -22,7 +22,6 @@ package org.opencastproject.workflow.handler.distribution;
 
 import static com.entwinemedia.fn.fns.Strings.trimToNone;
 import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.data.Collections.smap;
@@ -160,7 +159,7 @@ public final class RepublishOaiPmhWorkflowOperationHandler extends AbstractWorkf
       publishedMp = filteredMp;
     }
     // Does the media package have a title and track?
-    if (!isPublishable(publishedMp)) {
+    if (!MediaPackageSupport.isPublishable(publishedMp)) {
       throw new WorkflowOperationException("Media package does not meet criteria for publication");
     }
     // Publish the media package to the search index
@@ -340,17 +339,6 @@ public final class RepublishOaiPmhWorkflowOperationHandler extends AbstractWorkf
       }
     }
     return mergedMp;
-  }
-
-  /**
-   * Media package must have a title and contain tracks in order to be published.
-   *
-   * @param mp
-   *          the media package
-   * @return <code>true</code> if the media package can be published
-   */
-  private boolean isPublishable(MediaPackage mp) {
-    return !isBlank(mp.getTitle()) && mp.hasTracks();
   }
 
   /** OSGi DI. */

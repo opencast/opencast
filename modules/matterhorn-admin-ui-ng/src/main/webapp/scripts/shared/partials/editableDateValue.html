@@ -1,9 +1,9 @@
 <div ng-click="enterEditMode()" ng-form="innerForm">
-    <span ng-show="!editMode">{{ params.value | localizeDate:'date':'short' }}</span>
+  <span ng-show="!editMode">{{ params.value | localizeDate:'dateTime'  }}</span>
     <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-focus="enterEditMode()" tabindex="{{ params.tabindex }}"></i>
     <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
 
-    <input ng-keyup="keyUp($event)" type="text" datepicker select="submit()"
-        ng-model="params.value" editMode = "false" tabindex="{{ params.tabindex }}"
+    <input ng-keyup="keyUp($event)" type="text" datetimepicker
+        ng-model="params.value" editMode="false" tabindex="{{ params.tabindex }}" select="submit()"
         ng-show="editMode" ng-required="params.required" name="{{ params.name }}"/>
 </div>

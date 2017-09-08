@@ -70,7 +70,7 @@ public class TagByDublinCoreTermWOHTest {
     instance.setMediaPackage(mp);
 
     workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(
+    EasyMock.expect(workspace.read((URI) EasyMock.anyObject())).andReturn(
             new File(this.getClass().getResource("/dublincore.xml").toURI()));
     EasyMock.replay(workspace);
     operationHandler.setWorkspace(workspace);

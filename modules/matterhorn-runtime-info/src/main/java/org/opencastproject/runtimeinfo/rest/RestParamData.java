@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public final class RestParamData {
   public enum Type {
-    BOOLEAN, FILE, STRING, TEXT, INTEGER
+    BOOLEAN, FILE, STRING, TEXT, INTEGER, FLOAT
   };
 
   private String name; // unique key
@@ -93,7 +93,7 @@ public final class RestParamData {
     this.name = name;
     this.type = type.name().toLowerCase();
     if ((defaultValue == null) || (defaultValue.isEmpty())) {
-      if (type == Type.INTEGER) {
+      if ((type == Type.INTEGER) || (type == Type.FLOAT)) {
         this.defaultValue = "0";
       } else {
         this.defaultValue = null;
