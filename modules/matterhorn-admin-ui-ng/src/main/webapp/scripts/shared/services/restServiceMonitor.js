@@ -7,60 +7,81 @@ angular.module('adminNg.services')
         numErr: 0
     };
 
+    var amqName = "ActiveMQ";
+    var statesName = "Service States";
+    var backendName = "Backend Services";
+    var ok = "OK";
+
     Monitoring.run = function() {
-  //Clear existing data
-        services.service = {};
-        services.error = false;
-        services.numErr = 0;
+      //Clear existing data
+      services.service = {};
+      services.error = false;
+      services.numErr = 0;
 
-        var amqName = "ActiveMQ";
-        var statesName = "Service States";
-        var backendName = "Backend Services";
-  var ok = "OK";
+      Monitoring.getActiveMQStats();
+      Monitoring.getBasicServiceStats();
+    };
 
-        $http.get('/broker/status')
-            .then(function(data) {
+    Monitoring.getActiveMQStats = function() {
+      $http.get('/broker/status')
+           .then(function(data) {
+             Monitoring.populateService(amqName);
+             if (data.status === 204) {
+               services.service[amqName].status = ok;
+               services.service[amqName].error = false;
+             } else {
+               services.service[amqName].status = data.statusText;
+               services.service[amqName].error = true;
+             }
+           }, function(err) {
+             Monitoring.populateService(amqName);
+             services.service[amqName].status = err.statusText;
+             services.service[amqName].error = true;
+             services.error = true;
+             services.numErr++;
+           });
+    };
 
-                Monitoring.populateService(amqName);
-                if (data.status === 204) {
-                    services.service[amqName].status = ok;
-                    services.service[amqName].error = false;
-                } else {
-                    services.service[amqName].status = data.statusText;
-                    services.service[amqName].error = true;
-                }
-            }, function(err) {
-                Monitoring.populateService(amqName);
-                services.service[amqName].status = err.statusText;
-                services.service[amqName].error = true;
-                services.error = true;
-                services.numErr++;
-            });
-        $http.get('/services/health')
-            .then(function(data) {
-                Monitoring.populateService(backendName);
-                services.service[backendName].status = ok;
-              }, function(err) {
-                $http.get('/services/services.json')
-                  .then(function(data) {
-                    angular.forEach(data.data.services.service, function(service, key) {
-                    name = service.type.split('opencastproject.')[1];
-                    if (service.service_state != "NORMAL") {
-                      Monitoring.populateService(name);
-                      services.service[name].status = service.service_state;
-                      services.service[name].error = true;
-                      services.error = true;
-                      services.numErr++;
-                    }
-                  });
-                }, function(err) {
-                  Monitoring.populateService(statesName);
-                  services.service[statesName].status = err.statusText;
-                  services.service[statesName].error = true;
-                  services.error = true;
-                  services.numErr++;
-                });
-            });
+    Monitoring.getBasicServiceStats = function() {
+      $http.get('/services/health.json')
+           .then(function(data) {
+             var abnormal = 0;
+             abnormal = data.data.health['warning'] + data.data.health['error'];
+             if (abnormal == 0) {
+               Monitoring.populateService(backendName);
+               services.service[backendName].status = ok;
+             } else {
+               Monitoring.getDetailedServiceStats();
+             }
+           }, function(err) {
+             Monitoring.populateService(statesName);
+             services.service[statesName].status = err.statusText;
+             services.service[statesName].error = true;
+             services.error = true;
+             services.numErr++;
+           });
+    };
+
+    Monitoring.getDetailedServiceStats = function() {
+      $http.get('/services/services.json')
+           .then(function(data) {
+             angular.forEach(data.data.services.service, function(service, key) {
+               name = service.type.split('opencastproject.')[1];
+               if (service.service_state != "NORMAL") {
+                 Monitoring.populateService(name);
+                 services.service[name].status = service.service_state;
+                 services.service[name].error = true;
+                 services.error = true;
+                 services.numErr++;
+               }
+             });
+           }, function(err) {
+             Monitoring.populateService(backendName);
+             services.service[backendName].status = err.statusText;
+             services.service[backendName].error = true;
+             services.error = true;
+             services.numErr++;
+           });
     };
 
     Monitoring.populateService = function(name) {
