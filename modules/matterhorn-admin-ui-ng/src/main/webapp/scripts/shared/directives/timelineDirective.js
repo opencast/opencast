@@ -1,6 +1,7 @@
 angular.module('adminNg.directives')
 .directive('adminNgTimeline', ['PlayerAdapter', '$document', 'VideoService', '$timeout',
 function (PlayerAdapter, $document, VideoService, $timeout) {
+
     return {
         templateUrl: 'shared/partials/timeline.html',
         priority: 0,
@@ -154,8 +155,14 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
              * @return {String} Width of the segment in percent
              */
             scope.getSegmentWidth = function (segment) {
+                if (angular.isUndefined(segment)) {
+                    return 0;
+                }
+
                 if (angular.isUndefined(scope.video.duration)) {
                     return 0;
+                } else{
+                    scope.video.duration = parseInt(scope.video.duration, 10);
                 }
 
                 var zoom = 1,
@@ -443,6 +450,10 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     event.stopPropagation();
                 }
 
+                if (!scope.isRemovalAllowed(segment)) {
+                    return;
+                }
+
                 var index = scope.video.segments.indexOf(segment);
 
                 if (scope.video.segments[index - 1]) {
@@ -467,6 +478,10 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 if (event) {
                     event.preventDefault();
                     event.stopPropagation();
+                }
+
+                if (!scope.isRemovalAllowed(segment)) {
+                    return;
                 }
 
                 segment.deleted = !segment.deleted;
@@ -507,6 +522,17 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
               scope.$root.$broadcast("segmentTimesUpdated");
             };
 
+            scope.isRemovalAllowed = function(segment) {
+                if (!segment) {
+                    return false;
+                }
+
+                return (segment.deleted || scope.video.segments
+                                               .filter(function(seg) {
+                                                   return !seg.deleted;
+                                               }).length > 1);
+            }
+
             /**
              * Catch all method to track the mouse movement on the page,
              * to calculate the movement of elements properly.
@@ -537,7 +563,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 if (scope.canMove) {
                     scope.canMove = false;
 
-                    if (scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
+                    if (scope.player.adapter.getStatus && scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
 
                         var cursor = element.find('#cursor_fake'),
                         handle = element.find('#cursor_fake .handle');
@@ -588,9 +614,16 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                         // pulled start point of segment past end of start
                         // so we flip it
                         segment.start = segment.end;
-                        segment.end = position;
+                        segment.end = !scope.isRemovalAllowed(segment) ? Math.max(segment.start + 3000, position) : position;
                     } else {
                         segment.start = position;
+                        if (!scope.isRemovalAllowed(segment) && segment.end - position  < 3000) {
+                            segment.start = segment.end - 3000;                                  //arbitrary minimum duration choice
+                        }
+                        var prevSegment = scope.video.segments[scope.video.segments.indexOf(segment) - 1];
+                        if (!scope.isRemovalAllowed(prevSegment) && position - prevSegment.start < 3000) {
+                            segment.start = prevSegment.start + 3000;
+                        }
                     }
 
                     // update the segments around the one that was changed
@@ -602,8 +635,13 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                         if (before.end - before.start <= 0) {
                             // empty segment
-                            segment.start = before.start;
-                            scope.video.segments.splice(index - 1, 1);
+                            if (!scope.isRemovalAllowed(before)) {
+                                before.end = segment.start = before.start + 3000; //3000 - arbitrary minimum length
+                            }
+                            else {
+                                segment.start = before.start;
+                                scope.video.segments.splice(index - 1, 1);
+                            }
                         }
                     }
 
@@ -629,7 +667,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     scope.movingSegment.css('left', '-4px');
                     scope.movingSegment = null;
 
-                    if (segment.end - segment.start <= 4) {
+                    if (segment.end - segment.start <= 100) {
                         // i'm really small so should probably not exist anymore
                         scope.mergeSegment(null, segment);
                     }
@@ -766,7 +804,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 scope.doSplitSegment = target.hasClass('split');
 
                 // We are currently playing - use fake handle
-                if (scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
+                if (scope.player.adapter.getStatus && scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
 
                     var cursorFake = element.find('#cursor_fake'),
                         handle = element.find('#cursor_fake .handle');
@@ -878,14 +916,15 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
              */
             scope.dragSegement = function (event, segment) {
               event.preventDefault();
+              event.stopImmediatePropagation();
 
               scope.movingSegment = true;
 
               var handle = $(event.currentTarget),
                   track = element.find('.segments').parent();
 
-              handle.data('dx', $document.mx - handle.offset().left);
-              handle.data('dy', $document.my - handle.offset().top);
+              handle.data('dx', ($document.mx || event.pageX) - handle.offset().left);
+              handle.data('dy', ($document.my || event.pageY) - handle.offset().top);
               handle.data('px', handle.parent().offset().left);
               handle.data('py', handle.parent().offset().top);
               handle.data('track_left', (handle.data('px') *-1) + track.offset().left - 4);
@@ -931,6 +970,9 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 scope.setWrapperClasses();
             };
 
+            /**
+             * Remove listeners and timer associated with this directive
+             */
             scope.$on('$destroy', function () {
                 $document.unbind('mouseup');
                 $document.unbind('mousemove');
