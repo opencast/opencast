@@ -51,7 +51,6 @@ import org.opencastproject.util.doc.rest.RestService;
 import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
-import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -94,9 +93,6 @@ public class CaptureAgentsEndpoint {
 
   /** The capture agent service */
   private CaptureAgentStateService service;
-
-  /** GSON for JSON processing (thread-safe) */
-  private static final Gson gson = new Gson();
 
   /**
    * Sets the capture agent service
