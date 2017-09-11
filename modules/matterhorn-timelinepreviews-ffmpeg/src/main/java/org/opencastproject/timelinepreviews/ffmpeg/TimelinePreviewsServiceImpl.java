@@ -237,7 +237,7 @@ TimelinePreviewsService, ManagedService {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.timelinepreviews.api.TimelinePreviewsService#createTimelinePreviewImages(org.opencastproject.mediapackage.Track)
+   * @see org.opencastproject.timelinepreviews.api.TimelinePreviewsService#createTimelinePreviewImages(org.opencastproject.mediapackage.Track, int)
    */
   @Override
   public Job createTimelinePreviewImages(Track track, int imageCount) throws TimelinePreviewsException,

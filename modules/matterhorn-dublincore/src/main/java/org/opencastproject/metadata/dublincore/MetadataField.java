@@ -114,9 +114,6 @@ public class MetadataField<A> {
     BOOLEAN, DATE, NUMBER, TEXT, MIXED_TEXT, TEXT_LONG, TIME
   }
 
-  /** A parser for handling JSON values that are strings. **/
-  public static final JSONParser parser = new JSONParser();
-
   /** The id of a collection to validate values against. */
   private Opt<String> collectionID = Opt.none();
   /** The format to use for temporal date properties. */
@@ -573,6 +570,7 @@ public class MetadataField<A> {
     Fn<Object, Iterable<String>> jsonToIterable = new Fn<Object, Iterable<String>>() {
       @Override
       public Iterable<String> apply(Object arrayIn) {
+        JSONParser parser = new JSONParser();
         JSONArray array;
         if (arrayIn instanceof String) {
           try {

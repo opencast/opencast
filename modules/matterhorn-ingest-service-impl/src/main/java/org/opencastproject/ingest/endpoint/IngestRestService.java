@@ -42,6 +42,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
+import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.TrustedHttpClient;
@@ -1188,6 +1189,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       return Response.status(Status.CREATED).build();
     } catch (IngestException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+    } catch (SchedulerConflictException e) {
+      return Response.status(Status.CONFLICT).entity(e.getMessage()).build();
     } catch (NotFoundException | UnauthorizedException | SchedulerException e) {
       return Response.serverError().build();
     }
