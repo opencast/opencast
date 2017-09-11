@@ -40,9 +40,6 @@ public class BulkOperationResult {
   public static final String NOT_FOUND_KEY = "notFound";
   public static final String ERROR_KEY = "error";
 
-  /** A parser for parsing raw JSON into a  BulkOperationResult **/
-  private static JSONParser parser = new JSONParser();
-
   private JSONArray ok = new JSONArray();
   private JSONArray badRequest = new JSONArray();
   private JSONArray notFound = new JSONArray();
@@ -113,6 +110,7 @@ public class BulkOperationResult {
   public void fromJson(InputStream jsonContent) throws IOException, ParseException {
     StringWriter writer = new StringWriter();
     IOUtils.copy(jsonContent, writer);
+    JSONParser parser = new JSONParser();
     JSONObject result =  (JSONObject) parser.parse(writer.toString());
     this.ok = (JSONArray) result.get(OK_KEY);
     this.badRequest = (JSONArray) result.get(BAD_REQUEST_KEY);
