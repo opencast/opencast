@@ -995,6 +995,29 @@
          "BLACKLIST_FROM": "Blacklisted from",
          "BLACKLIST_TO":   "Blacklisted until",
          "ACTION":    "Actions"
+       },
+       "DETAILS": {
+          "HEADER": "Location details - {{resourceId}}",
+          "TAB": {
+           "GENERAL": "General",
+           "CONFIGURATION": "Configuration",
+           "CAPABILITIES": "Capabilities"
+          },
+          "GENERAL": {
+            "CAPTION": "General",
+            "NAME": "Name",
+            "URL": "Url",
+            "STATUS": "Status",
+            "UPDATE": "Last heard from"
+          },
+          "CONFIGURATION": {
+            "CAPTION": "Configuration",
+            "NO_CONFIGURATION": "No configuration provided"
+          },
+          "CAPABILITIES": {
+            "CAPTION": "Capabilities",
+            "NO_CAPABILITIES": "No capabilities provided"
+          }
        }
      },
      "BLACKLISTS": {

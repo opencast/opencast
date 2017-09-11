@@ -22,12 +22,16 @@
 
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
-.controller('RecordingCtrl', ['$scope', 'CaptureAgentConfigurationResource',
-        function ($scope, CaptureAgentConfigurationResource ) {
+.controller('RecordingCtrl', ['$scope', 'CaptureAgentResource',
+    function ($scope, CaptureAgentResource ) {
 
-    $scope.configuration = CaptureAgentConfigurationResource.get({name: $scope.resourceId}, function (data){
-		console.log("Loading ca configuratoin...");
-		console.log(data);
-    });
+      var fetchResources = function(id) {
+        $scope.agent = CaptureAgentResource.get({name: id});
+      };
 
+      $scope.$on('change', function (event, id) {
+        fetchResources(id);
+      });
+
+     fetchResources($scope.resourceId);
 }]);
