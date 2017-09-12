@@ -1406,11 +1406,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       CalendarGenerator cal = new CalendarGenerator(seriesService);
       for (ARecord record : records) {
         boolean blacklisted;
-        try {
-          blacklisted = isBlacklisted(record.getMediaPackageId());
-        } catch (NotFoundException e) {
-          continue;
-        }
+        // isBlacklisted() methods are not implemented in the persistence layer and return always false
+//        try {
+//          //blacklisted = isBlacklisted(record.getMediaPackageId());
+//        } catch (NotFoundException e) {
+//          continue;
+//        }
+        blacklisted = false;
 
         // Skip blacklisted events
         if (blacklisted)
