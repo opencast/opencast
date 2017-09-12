@@ -24,6 +24,7 @@ describe('Application controller', function () {
         $httpBackend.whenGET('/sysinfo/bundles/version?prefix=matterhorn').respond(
             {'buildNumber': '01b60ff', 'consistent': true, 'version': '1.6.0.SNAPSHOT'}
         );
+        $httpBackend.whenGET('/broker/status').respond({});
         $scope = $rootScope.$new();
 
         $controller('ApplicationCtrl', {$scope: $scope});
