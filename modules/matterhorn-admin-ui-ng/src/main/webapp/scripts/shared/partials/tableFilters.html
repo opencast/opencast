@@ -18,8 +18,8 @@
                     no-results-text="'{{'TABLE_FILTERS.FILTER_SELECTION.NO_OPTIONS' | translate}}'"
                     class="main-filter"
                     ng-model="selectedFilter"
-                    ng-change="onChnageSelectMainFilter(selectedFilter)"
-                    ng-options="value as value.label | translate | limitTo : 70 for (key,value) in filters.filters"
+                    ng-change="onChangeSelectMainFilter(selectedFilter)"
+                    ng-options="value as value.label | translate | limitTo : 70 for (key,value) in filters.filters track by key"
                     >
                     <option value=""></option>
                 </select>
@@ -37,7 +37,7 @@
                         search_contains="true"
                         ng-model="filterValue"
                         ng-change="selectFilterSelectValue(filterValue)"
-                        ng-options="option as option.label | translate | limitTo : 70 for option in selectedFilter.options"
+                        ng-options="option as option.label | translate | limitTo : 70 for option in selectedFilter.options track by option.value"
                         >
                         <option value=""></option>
                     </select>

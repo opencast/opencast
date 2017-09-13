@@ -85,7 +85,7 @@ public final class JpaGroup implements Group {
   @Column(name = "member")
   private Set<String> members;
 
-  @ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.EAGER)
+  @ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.LAZY)
   @JoinTable(name = "mh_group_role", joinColumns = { @JoinColumn(name = "group_id") }, inverseJoinColumns = { @JoinColumn(name = "role_id") }, uniqueConstraints = { @UniqueConstraint(columnNames = {
           "group_id", "role_id" }) })
   private Set<JpaRole> roles;

@@ -7,27 +7,27 @@ module.exports = function (config) {
             '../../main/webapp/scripts/lib/jquery-ui.js',
             // bower:js
             '../../../bower_components/angular/angular.js',
-            '../../../bower_components/angular-md5/angular-md5.js',
-            '../../../bower_components/angular-translate/angular-translate.js',
             '../../../bower_components/angular-route/angular-route.js',
             '../../../bower_components/angular-resource/angular-resource.js',
             '../../../bower_components/angular-animate/angular-animate.js',
             '../../../bower_components/angular-messages/angular-messages.js',
+            '../../../bower_components/angular-md5/angular-md5.js',
+            '../../../bower_components/angular-translate/angular-translate.js',
+            '../../../bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js',
+            '../../../bower_components/angular-local-storage/dist/angular-local-storage.js',
             '../../../bower_components/angular-wizard/dist/angular-wizard.js',
-            '../../../bower_components/angular-hotkeys/build/hotkeys.css',
             '../../../bower_components/angular-hotkeys/build/hotkeys.js',
+            '../../../bower_components/ng-file-upload/angular-file-upload.js',
+            '../../../bower_components/angular-mocks/angular-mocks.js',
             // endbower
-            '../../main/webapp/scripts/lib/angular/angular-translate-loader-static-files.js',
-            '../../main/webapp/scripts/lib/angular/angular-local-storage.js',
-            '../../main/webapp/scripts/lib/angular-file-upload/angular-file-upload.js',
             '../../main/webapp/scripts/lib/chosen.jquery.js',
             '../../main/webapp/scripts/lib/angular-chosen.js',
-            '../../main/webapp/scripts/lib/angular/angular-*.js',
             '../../main/webapp/scripts/lib/angular-sortable.js',
             '../../main/webapp/scripts/lib/underscore-1.5.2.js',
             '../../main/webapp/scripts/lib/video-js/video.js',
             '../../main/webapp/scripts/lib/moment.min.js',
             '../../main/webapp/scripts/lib/javascript-md5/js/md5.min.js',
+            '../../main/webapp/scripts/lib/timepicker/jquery-ui-timepicker-addon.js',
 
             '../../main/webapp/scripts/app.js',
             '../../main/webapp/scripts/shared/filters/filters.js',
@@ -42,19 +42,12 @@ module.exports = function (config) {
             'test/lib/jasmine-jquery.js',
             'test/lib/jquery-deparam.js',
 
-            {pattern: '../../main/webapp/scripts/lib/angular/angular-*.map', watched: false, served: true, included: false},
             // fixtures
             {pattern: '../../main/resources/public/**/*.json', watched: true, served: true, included: false},
             {pattern: 'test/unit/fixtures/**/*.json', watched: true, served: true, included: false},
             {pattern: 'app/GET/**/*', watched: true, served: true, included: false},
 
             'test/unit/**/*Spec.js'
-        ],
-
-        exclude : [
-            '../../main/webapp/scripts/lib/angular/angular-loader.js',
-            '../../main/webapp/scripts/lib/angular/*.min.js',
-            '../../main/webapp/scripts/lib/angular/angular-scenario.js'
         ],
 
         autoWatch : true,

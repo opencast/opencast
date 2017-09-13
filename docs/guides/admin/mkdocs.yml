@@ -1,5 +1,5 @@
 site_name: Opencast - Administration Guide
-repo_url: https://bitbucket.org/opencast-community/matterhorn/src/develop/docs/guides/admin/docs
+repo_url: https://bitbucket.org/opencast-community/opencast/src/develop/docs/guides/admin/docs
 
 # Default theme used is readthedocs
 theme: readthedocs
@@ -36,6 +36,7 @@ pages:
    - Asset Manager: 'configuration/asset-manager.md'
    - Message Broker: 'configuration/message-broker.md'
    - Metadata: 'configuration/metadata.md'
+   - Manual Asset Upload: 'configuration/asset-upload-ui/index.md'
    - Encoding: 'configuration/encoding.md'
    - Load: 'configuration/load.md'
    - Logging and Privacy: 'configuration/logging.and.privacy.md'
@@ -51,10 +52,12 @@ pages:
    - Workflow: 'configuration/workflow.md'
    - External API: 'configuration/external-api.md'
    - OAI-PMH: 'configuration/oaipmh.md'
+- Version Support: 'version-support.md'
 - Modules:
    - Overview: 'modules/index.md'
    - Atom/RSS Feed: 'modules/atomrss.md'
    - AWS S3 Distribution: 'modules/awss3distribution.md'
+   - Execute Service: 'modules/execute.md'
    - LTI Module: 'modules/ltimodule.md'
    - Media Module: 'modules/mediamodule.configuration.md'
    - Player:
@@ -73,6 +76,7 @@ pages:
    - YouTube Publication: 'modules/youtubepublication.md'
 - Workflow Operation Handler:
    - Overview: 'workflowoperationhandlers/index.md'
+   - Retry Strategies: 'workflowoperationhandlers/retry-strategies.md'
    - Analyze Tracks: 'workflowoperationhandlers/analyze-tracks-woh.md'
    - Analyze Audio: 'workflowoperationhandlers/analyzeaudio-woh.md'
    - Asset Snapshot: 'workflowoperationhandlers/snapshot-woh.md'
@@ -90,6 +94,8 @@ pages:
    - Editor: 'workflowoperationhandlers/editor-woh.md'
    - Email: 'workflowoperationhandlers/email-woh.md'
    - Encode: 'workflowoperationhandlers/encode-woh.md'
+   - Execute Once: 'workflowoperationhandlers/execute-once-woh.md'
+   - Execute Many: 'workflowoperationhandlers/execute-many-woh.md'
    - Export Workflow Properties: 'workflowoperationhandlers/export-wf-properties-woh.md'
    - Extract Text: 'workflowoperationhandlers/extracttext-woh.md'
    - HTTP Notify: 'workflowoperationhandlers/httpnotify-woh.md'

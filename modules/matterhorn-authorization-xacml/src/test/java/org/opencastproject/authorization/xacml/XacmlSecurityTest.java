@@ -207,6 +207,11 @@ public class XacmlSecurityTest {
     }
 
     @Override
+    public File read(URI uri) throws NotFoundException, IOException {
+      return new File(uri);
+    }
+
+    @Override
     public URI getBaseUri() {
       throw new Error();
     }
@@ -244,6 +249,11 @@ public class XacmlSecurityTest {
 
     @Override
     public void deleteFromCollection(String collectionId, String fileName) throws NotFoundException, IOException {
+      throw new Error();
+    }
+
+    @Override
+    public void deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws NotFoundException, IOException {
       throw new Error();
     }
 

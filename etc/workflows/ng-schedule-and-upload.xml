@@ -154,6 +154,7 @@
         <configuration key="publishToOaiPmh">true</configuration>
         <configuration key="publishToYouTube">false</configuration>
         <configuration key="publishToAws">false</configuration>
+        <configuration key="uploadedSearchPreview">false</configuration>
       </configurations>
     </operation>
 

@@ -29,7 +29,7 @@ describe('adminNg.directives.adminNgFileUpload', function () {
             name: 'foo.bar'
         };
         element.trigger($.Event('change'));
-
-        expect($rootScope.file).toBeUndefined();
+        // can have multiple files
+        expect($rootScope.file.length).toEqual(0);
     });
 });

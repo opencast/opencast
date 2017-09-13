@@ -95,7 +95,9 @@
     immediate="true" activate="activate">
     <implementation class="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler" />
     <property name="service.description" value="OAI-PMH Updated Event Handler" />
+    <property name="service.pid" value="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"/>
     <service>
+      <provide interface="org.osgi.service.cm.ManagedService"/>
       <provide interface="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler" />
     </service>
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"

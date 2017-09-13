@@ -128,9 +128,11 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
+import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowUtil;
@@ -256,9 +258,6 @@ public abstract class AbstractEventEndpoint {
   /** Service url */
   protected String serviceUrl = null;
 
-  /** A parser for handling JSON documents inside the body of a request. **/
-  private final JSONParser parser = new JSONParser();
-
   /**
    * Activates REST service.
    *
@@ -332,6 +331,7 @@ public abstract class AbstractEventEndpoint {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
+    JSONParser parser = new JSONParser();
     JSONArray eventIdsJsonArray;
     try {
       eventIdsJsonArray = (JSONArray) parser.parse(eventIdsContent);
@@ -1568,6 +1568,35 @@ public abstract class AbstractEventEndpoint {
     }
   }
 
+  // MH-12085 Add manually uploaded assets, multipart file upload has to be a POST
+  @POST
+  @Path("{eventId}/assets")
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @RestQuery(name = "updateAssets", description = "Update or create an asset for the eventId by the given metadata as JSON and files in the body",
+  pathParameters = {
+  @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) },
+  restParameters = {
+  @RestParameter(name = "metadata", isRequired = true, type = RestParameter.Type.TEXT, description = "The list of asset metadata") },
+  reponses = {
+  @RestResponse(description = "The asset has been added.", responseCode = HttpServletResponse.SC_OK),
+  @RestResponse(description = "Could not add asset, problem with the metadata or files.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) },
+  returnDescription = "The workflow identifier")
+  public Response updateAssets(@PathParam("eventId") final String eventId,
+          @Context HttpServletRequest request)  throws Exception {
+    try {
+      MediaPackage mp = getMediaPackageByEventId(eventId);
+      String result = getIndexService().updateEventAssets(mp, request);
+      return Response.status(Status.CREATED).entity(result).build();
+    }  catch (NotFoundException e) {
+      return notFound("Cannot find an event with id '%s'.", eventId);
+    } catch (IllegalArgumentException e) {
+      return RestUtil.R.badRequest(e.getMessage());
+    } catch (Exception e) {
+      return RestUtil.R.serverError();
+    }
+  }
+
   @PUT
   @Path("{eventId}/optout/{optout}")
   @RestQuery(name = "updateEventOptoutStatus", description = "Updates an event's opt out status.", returnDescription = "The method doesn't return any content", pathParameters = {
@@ -1599,6 +1628,7 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "Returns a JSON object with the results for the different opted out or in elements such as ok, notFound or error.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "Unable to parse boolean value to opt out, or parse JSON array of opt out events", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
   public Response changeOptOuts(@FormParam("optout") boolean optout, @FormParam("eventIds") String eventIds) {
+    JSONParser parser = new JSONParser();
     JSONArray eventIdsArray;
     try {
       eventIdsArray = (JSONArray) parser.parse(eventIds);
@@ -1665,13 +1695,20 @@ public abstract class AbstractEventEndpoint {
             .getMetadataByAdapter(getIndexService().getCommonEventCatalogUIAdapter());
     if (optMetadataByAdapter.isSome()) {
       MetadataCollection collection = optMetadataByAdapter.get();
-      collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName()));
-      collection.removeField(collection.getOutputFields().get("duration"));
-      collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName()));
-      collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_SOURCE.getLocalName()));
-      collection.removeField(collection.getOutputFields().get("startDate"));
-      collection.removeField(collection.getOutputFields().get("startTime"));
-      collection.removeField(collection.getOutputFields().get("location"));
+      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_CREATED.getLocalName()))
+        collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName()));
+      if (collection.getOutputFields().containsKey("duration"))
+        collection.removeField(collection.getOutputFields().get("duration"));
+      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_IDENTIFIER.getLocalName()))
+        collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName()));
+      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_SOURCE.getLocalName()))
+        collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_SOURCE.getLocalName()));
+      if (collection.getOutputFields().containsKey("startDate"))
+        collection.removeField(collection.getOutputFields().get("startDate"));
+      if (collection.getOutputFields().containsKey("startTime"))
+        collection.removeField(collection.getOutputFields().get("startTime"));
+      if (collection.getOutputFields().containsKey("location"))
+        collection.removeField(collection.getOutputFields().get("location"));
       metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), collection);
     }
     return okJson(metadataList.toJSON());
@@ -1718,6 +1755,7 @@ public abstract class AbstractEventEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
     }
 
+    JSONParser parser = new JSONParser();
     JSONObject metadataJson;
     try {
       metadataJson = (JSONObject) parser.parse(metadata);
@@ -2241,5 +2279,54 @@ public abstract class AbstractEventEndpoint {
               f("state", v(recording.get().getState(), BLANK)));
     }
   };
+
+  @PUT
+  @Path("{eventId}/workflows/{workflowId}/action/{action}")
+  @RestQuery(name = "workflowAction", description = "Resumes current workflow instance if paused due to error.", returnDescription = "", pathParameters = {
+          @RestParameter(name = "eventId", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING),
+          @RestParameter(name = "workflowId", description = "The id of the workflow", isRequired = true, type = RestParameter.Type.STRING),
+          @RestParameter(name = "action", description = "The action to take: RETRY or NONE (abort processing)", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = SC_OK, description = "Workflow resumed."),
+                  @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance found."),
+                  @RestResponse(responseCode = SC_BAD_REQUEST, description = "Invalid action entered."),
+                  @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you need to authenticate."),
+                  @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "An exception occurred.") })
+  public Response workflowAction(@PathParam("eventId") String id, @PathParam("workflowId") String wfId,
+          @PathParam("action") String action)
+          throws NotFoundException, UnauthorizedException {
+    if (StringUtils.isEmpty(id) || StringUtils.isEmpty(wfId) || StringUtils.isEmpty(action)
+            || (!RetryStrategy.RETRY.toString().equalsIgnoreCase(action)
+                    && !RetryStrategy.NONE.toString().equalsIgnoreCase(action)))
+      return badRequest();
+
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("retryStrategy", action);
+
+    try {
+      Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
+      if (optEvent.isNone())
+        return notFound("Cannot find an event with id '%s'.", id);
+
+      long workflowInstanceId = Long.parseLong(wfId);
+
+      WorkflowService workflowService = getWorkflowService();
+      WorkflowInstance wfInstance = workflowService.getWorkflowById(workflowInstanceId);
+      if (!WorkflowState.PAUSED.equals(wfInstance.getState()))
+        return notFound("Workflow %s is NOT paused.", wfId);
+      if (!wfInstance.getMediaPackage().getIdentifier().toString().equals(id))
+        return badRequest(String.format("Workflow %s is not associated to event %s", wfId, id));
+
+      workflowService.resume(workflowInstanceId, props);
+      return ok();
+    } catch (NotFoundException e) {
+      return notFound("Workflow not found: '%d'.", wfId);
+    } catch (IllegalStateException e) {
+      return notFound("There's no paused workflow associated with event: %s.", id);
+    } catch (UnauthorizedException e) {
+      return forbidden();
+    } catch (Exception e) {
+      return serverError();
+    }
+  }
 
 }

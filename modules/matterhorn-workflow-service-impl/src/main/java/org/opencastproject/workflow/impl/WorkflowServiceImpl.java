@@ -49,6 +49,7 @@ import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.message.broker.api.workflow.WorkflowItem;
 import org.opencastproject.metadata.api.MediaPackageMetadata;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
+import org.opencastproject.metadata.api.util.MediaPackageMetadataSupport;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AclScope;
@@ -1504,7 +1505,18 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     currentOperation.setFailedAttempts(failedAttempt);
     currentOperation.addToExecutionHistory(currentOperation.getId());
 
-    if (currentOperation.getMaxAttempts() != -1 && failedAttempt == currentOperation.getMaxAttempts()) {
+    // Operation was aborted by the user, after going into hold state
+    if (ERROR_RESOLUTION_HANDLER_ID.equals(currentOperation.getTemplate())
+            && OperationState.FAILED.equals(currentOperation.getState())) {
+      int position = currentOperation.getPosition();
+      // Advance to operation that actually failed
+      if (workflow.getOperations().size() > position + 1) { // This should always be true...
+        currentOperation = (WorkflowOperationInstanceImpl) workflow.getOperations().get(position + 1);
+        // It's currently in RETRY state, change to FAILED
+        currentOperation.setState(OperationState.FAILED);
+      }
+      handleFailedOperation(workflow, currentOperation);
+    } else if (currentOperation.getMaxAttempts() != -1 && failedAttempt == currentOperation.getMaxAttempts()) {
       handleFailedOperation(workflow, currentOperation);
     } else {
       switch (currentOperation.getRetryStrategy()) {
@@ -1518,7 +1530,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           currentOperation.setState(OperationState.RETRY);
           List<WorkflowOperationInstance> operations = workflow.getOperations();
           WorkflowOperationDefinitionImpl errorResolutionDefinition = new WorkflowOperationDefinitionImpl(
-                  ERROR_RESOLUTION_HANDLER_ID, "Error Resolution Operation", "error", true);
+                  ERROR_RESOLUTION_HANDLER_ID, "Error Resolution Operation", "error", false);
           WorkflowOperationInstanceImpl errorResolutionInstance = new WorkflowOperationInstanceImpl(
                   errorResolutionDefinition, currentOperation.getPosition());
           errorResolutionInstance.setExceptionHandlingWorkflow(currentOperation.getExceptionHandlingWorkflow());
@@ -1673,7 +1685,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           break;
         case RETRY:
           currentOperation = (WorkflowOperationInstanceImpl) workflow.getCurrentOperation();
-          currentOperation.setRetryStrategy(RetryStrategy.NONE);
           break;
         default:
           throw new WorkflowDatabaseException("Retry strategy not implemented yet!");
@@ -1696,75 +1707,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     }
     for (MediaPackageMetadataService metadataService : metadataServices) {
       MediaPackageMetadata metadata = metadataService.getMetadata(mp);
-      if (metadata != null) {
-
-        // Series identifier
-        if (isNotBlank(metadata.getSeriesIdentifier())) {
-          mp.setSeries(metadata.getSeriesIdentifier());
-        }
-
-        // Series title
-        if (isNotBlank(metadata.getSeriesTitle())) {
-          mp.setSeriesTitle(metadata.getSeriesTitle());
-        }
-
-        // Episode title
-        if (isNotBlank(metadata.getTitle())) {
-          mp.setTitle(metadata.getTitle());
-        }
-
-        // Episode date
-        if (metadata.getDate() != null) {
-          mp.setDate(metadata.getDate());
-        }
-
-        // Episode subjects
-        if (metadata.getSubjects().length > 0) {
-          if (mp.getSubjects() != null) {
-            for (String subject : mp.getSubjects()) {
-              mp.removeSubject(subject);
-            }
-          }
-          for (String subject : metadata.getSubjects()) {
-            mp.addSubject(subject);
-          }
-        }
-
-        // Episode contributers
-        if (metadata.getContributors().length > 0) {
-          if (mp.getContributors() != null) {
-            for (String contributor : mp.getContributors()) {
-              mp.removeContributor(contributor);
-            }
-          }
-          for (String contributor : metadata.getContributors()) {
-            mp.addContributor(contributor);
-          }
-        }
-
-        // Episode creators
-        if (mp.getCreators().length == 0 && metadata.getCreators().length > 0) {
-          if (mp.getCreators() != null) {
-            for (String creator : mp.getCreators()) {
-              mp.removeCreator(creator);
-            }
-          }
-          for (String creator : metadata.getCreators()) {
-            mp.addCreator(creator);
-          }
-        }
-
-        // Episode license
-        if (isNotBlank(metadata.getLicense())) {
-          mp.setLicense(metadata.getLicense());
-        }
-
-        // Episode language
-        if (isNotBlank(metadata.getLanguage())) {
-          mp.setLanguage(metadata.getLanguage());
-        }
-
-      }
+      MediaPackageMetadataSupport.populateMediaPackageMetadata(mp, metadata);
     }
   }
 
@@ -2462,6 +2405,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     if (jobs.size() > 0) {
       logger.info("Populating index '{}' with {} workflows", indexName, jobs.size());
       final int total = jobs.size();
+      final int responseInterval = (total < 100) ? 1 : (total / 100);
       final int[] errors = new int[1];
       errors[0] = 0;
       final int[] current = new int[1];
@@ -2481,9 +2425,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                       instance = WorkflowParser.parseWorkflowInstance(job.getPayload());
                       messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                               WorkflowItem.updateInstance(instance));
-                      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE,
+                      if (((current[0] % responseInterval) == 0) || (current[0] == total)) {
+                        messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE,
                               MessageSender.DestinationType.Queue, IndexRecreateObject.update(indexName,
                                       IndexRecreateObject.Service.Workflow, total, current[0]));
+                      }
                       current[0] += 1;
                       return false;
                     } catch (WorkflowParsingException e) {

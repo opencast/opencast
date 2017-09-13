@@ -69,7 +69,7 @@ import java.util.regex.Pattern;
 /**
  * Implements a service that runs CLI commands with MediaPackage elements as arguments
  */
-public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteService, ManagedService  {
+public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteService, ManagedService {
 
   public enum Operation {
     Execute_Element, Execute_Mediapackage
@@ -94,8 +94,8 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
   protected Workspace workspace;
 
   /**
-   * List of allowed commands that can be run with an executor. By convention, an empty set doesn't mean any command can be run.
-   * An '*'  in the service configuration means any command can be executed
+   * List of allowed commands that can be run with an executor. By convention, an empty set doesn't mean any command can
+   * be run. An '*' in the service configuration means any command can be executed
    */
   protected final Set<String> allowedCommands = new HashSet<String>();
 
@@ -129,7 +129,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
   /**
    * Activates this component with its properties once all of the collaborating services have been set
-   * 
+   *
    * @param cc
    *          The component's context, containing the properties used for configuration
    */
@@ -141,9 +141,11 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
     if (properties != null) {
       String commandString = (String) properties.get(COMMANDS_ALLOWED_PROPERTY);
-      if (commandString != null)
+      if (StringUtils.isNotBlank(commandString)) {
+        logger.info("Execute Service permitted commands: {}", commandString);
         for (String command : commandString.split("\\s+"))
           allowedCommands.add(command);
+      }
     }
 
     this.bundleContext = cc.getBundleContext();
@@ -153,7 +155,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    * {@inheritDoc}
    *
    * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
-   *                                                             org.opencastproject.mediapackage.MediaPackageElement)
+   *      org.opencastproject.mediapackage.MediaPackageElement)
    */
   @Override
   public Job execute(String exec, String params, MediaPackageElement inElement) throws ExecuteException {
@@ -164,44 +166,40 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    * {@inheritDoc}
    *
    * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
-   *                                                             org.opencastproject.mediapackage.MediaPackageElement,
-   *                                                             float)
+   *      org.opencastproject.mediapackage.MediaPackageElement, float)
    */
   @Override
   public Job execute(String exec, String params, MediaPackageElement inElement, float load) throws ExecuteException {
     return execute(exec, params, inElement, null, null, load);
   }
 
-
   /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
-   *                                                             org.opencastproject.mediapackage.MediaPackageElement,
-   *                                                             java.lang.String,
-   *                                                             org.opencastproject.mediapackage.MediaPackageElement.Type)
+   *      org.opencastproject.mediapackage.MediaPackageElement, java.lang.String,
+   *      org.opencastproject.mediapackage.MediaPackageElement.Type)
    */
   @Override
   public Job execute(String exec, String params, MediaPackageElement inElement, String outFileName, Type expectedType)
           throws ExecuteException, IllegalArgumentException {
     return execute(exec, params, inElement, null, null, executeJobLoad);
   }
+
   /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
-   *                                                             org.opencastproject.mediapackage.MediaPackageElement,
-   *                                                             java.lang.String,
-   *                                                             org.opencastproject.mediapackage.MediaPackageElement.Type,
-   *                                                             float)
+   *      org.opencastproject.mediapackage.MediaPackageElement, java.lang.String,
+   *      org.opencastproject.mediapackage.MediaPackageElement.Type, float)
    * @throws IllegalArgumentException
    *           if the input arguments are incorrect
    * @throws ExecuteException
    *           if an internal error occurs
    */
   @Override
-  public Job execute(String exec, String params, MediaPackageElement inElement, String outFileName, Type expectedType, float load)
-          throws ExecuteException, IllegalArgumentException {
+  public Job execute(String exec, String params, MediaPackageElement inElement, String outFileName, Type expectedType,
+          float load) throws ExecuteException, IllegalArgumentException {
 
     logger.debug("Creating Execute Job for command: {}", exec);
 
@@ -239,9 +237,8 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    * {@inheritDoc}
    *
    * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
-   *                                                             org.opencastproject.mediapackage.MediaPackage,
-   *                                                             java.lang.String,
-   *                                                             org.opencastproject.mediapackage.MediaPackageElement.Type)
+   *      org.opencastproject.mediapackage.MediaPackage, java.lang.String,
+   *      org.opencastproject.mediapackage.MediaPackageElement.Type)
    */
   @Override
   public Job execute(String exec, String params, MediaPackage mp, String outFileName, Type expectedType)
@@ -253,10 +250,8 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    * {@inheritDoc}
    *
    * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
-   *                                                             org.opencastproject.mediapackage.MediaPackage,
-   *                                                             java.lang.String,
-   *                                                             org.opencastproject.mediapackage.MediaPackageElement.Type,
-   *                                                             float)
+   *      org.opencastproject.mediapackage.MediaPackage, java.lang.String,
+   *      org.opencastproject.mediapackage.MediaPackageElement.Type, float)
    */
   @Override
   public Job execute(String exec, String params, MediaPackage mp, String outFileName, Type expectedType, float load)
@@ -316,15 +311,15 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
       int nargs = arguments.size();
 
       if (nargs != 3 && nargs != 5) {
-        throw new IndexOutOfBoundsException("Incorrect number of parameters for operation execute_" + op + ": "
-                + arguments.size());
+        throw new IndexOutOfBoundsException(
+                "Incorrect number of parameters for operation execute_" + op + ": " + arguments.size());
       }
       if (nargs == 5) {
         strAux = arguments.remove(4);
         expectedType = (strAux == null) ? null : Type.valueOf(strAux);
         outFileName = StringUtils.trimToNull(arguments.remove(3));
         if ((StringUtils.isNotBlank(outFileName) && (expectedType == null))
-            || (StringUtils.isBlank(outFileName) && (expectedType != null))) {
+                || (StringUtils.isBlank(outFileName) && (expectedType != null))) {
           throw new ExecuteException("The output type and filename must be both specified");
         }
         outFileName = (outFileName == null) ? null : job.getId() + "_" + outFileName;
@@ -350,9 +345,8 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
     }
   }
 
-
   /**
-   * Does the actual processing
+   * Does the actual processing, given a mediapackage (Execute Once WOH)
    *
    * @param arguments
    *          The list containing the program and its arguments
@@ -402,10 +396,10 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
         } else if (matcher.group(1).equals("flavor")) {
           elementsByFlavor = mp.getElementsByFlavor(MediaPackageElementFlavor.parseFlavor(matcher.group(2)));
           if (elementsByFlavor.length == 0)
-            throw new ExecuteException("No elements in the MediaPackage match the flavor '" + matcher.group(1) + "'.");
+            throw new ExecuteException("No elements in the MediaPackage match the flavor '" + matcher.group(2) + "'.");
 
           if (elementsByFlavor.length > 1)
-            logger.warn("Found more than one element with flavor '{}'. Using {} by default...", matcher.group(1),
+            logger.warn("Found more than one element with flavor '{}'. Using {} by default...", matcher.group(2),
                     elementsByFlavor[0].getIdentifier());
 
           File elementFile = workspace.get(elementsByFlavor[0].getURI());
@@ -423,8 +417,8 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
     } catch (IllegalArgumentException e) {
       throw new ExecuteException("Tag 'flavor' must specify a valid MediaPackage element flavor.", e);
     } catch (NotFoundException e) {
-      throw new ExecuteException("The element '" + elementsByFlavor[0].getURI().toString()
-              + "' does not exist in the workspace.", e);
+      throw new ExecuteException(
+              "The element '" + elementsByFlavor[0].getURI().toString() + "' does not exist in the workspace.", e);
     } catch (IOException e) {
       throw new ExecuteException("Error retrieving MediaPackage element from workspace: '"
               + elementsByFlavor[0].getURI().toString() + "'.", e);
@@ -436,7 +430,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
   }
 
   /**
-   * Does the actual processing
+   * Does the actual processing, given a mediapackage element (Execute Many WOH)
    *
    * @param arguments
    *          The list containing the program and its arguments
@@ -477,8 +471,8 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
             continue;
           } else {
             logger.error("{} pattern found, but no valid output filename was specified", OUTPUT_FILE_PATTERN);
-            throw new ExecuteException(OUTPUT_FILE_PATTERN
-                    + " pattern found, but no valid output filename was specified");
+            throw new ExecuteException(
+                    OUTPUT_FILE_PATTERN + " pattern found, but no valid output filename was specified");
           }
         }
       }
@@ -501,7 +495,8 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
     try {
       logger.info("Running command {}", command.get(0));
-      logger.debug("Starting subprocess {} with arguments {}", command.get(0), StringUtils.join(command.subList(1, command.size()), ", "));
+      logger.debug("Starting subprocess {} with arguments {}", command.get(0),
+              StringUtils.join(command.subList(1, command.size()), ", "));
 
       ProcessBuilder pb = new ProcessBuilder(command);
       pb.redirectErrorStream(true);
@@ -531,8 +526,9 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
         // By telling a Scanner to use the 'beginning of the input boundary' character as delimiter, which of course
         // will never find, yields the whole String as the next token.
         String line;
-        try {
-          line = new Scanner(p.getInputStream()).useDelimiter("\\A").next();
+        try (Scanner scanner = new Scanner(p.getInputStream())) {
+          scanner.useDelimiter("\\A");
+          line = scanner.next();
         } catch (NoSuchElementException e) {
           line = "";
         }
@@ -592,7 +588,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
   /**
    * Sets the receipt service
-   * 
+   *
    * @param serviceRegistry
    *          the service registry
    */
@@ -602,7 +598,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
    */
   @Override
@@ -612,7 +608,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
    */
   @Override
@@ -622,7 +618,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
   /**
    * Callback for setting the security service.
-   * 
+   *
    * @param securityService
    *          the securityService to set
    */
@@ -632,7 +628,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
   /**
    * Callback for setting the user directory service.
-   * 
+   *
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
@@ -642,7 +638,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
    */
   @Override
@@ -652,7 +648,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
    */
   @Override
@@ -662,7 +658,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
   /**
    * Sets a reference to the organization directory service.
-   * 
+   *
    * @param organizationDirectory
    *          the organization directory
    */
@@ -672,7 +668,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
   /**
    * Sets a reference to the workspace service.
-   * 
+   *
    * @param workspace
    */
   public void setWorkspace(Workspace workspace) {
@@ -680,8 +676,10 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
   }
 
   @Override
-  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws org.osgi.service.cm.ConfigurationException {
-    executeJobLoad = LoadUtil.getConfiguredLoadValue(properties, EXECUTE_JOB_LOAD_KEY, DEFAULT_EXECUTE_JOB_LOAD, serviceRegistry);
+  public void updated(@SuppressWarnings("rawtypes") Dictionary properties)
+          throws org.osgi.service.cm.ConfigurationException {
+    executeJobLoad = LoadUtil.getConfiguredLoadValue(properties, EXECUTE_JOB_LOAD_KEY, DEFAULT_EXECUTE_JOB_LOAD,
+            serviceRegistry);
   }
 
 }

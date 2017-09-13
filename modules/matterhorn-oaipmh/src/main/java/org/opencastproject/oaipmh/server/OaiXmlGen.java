@@ -32,6 +32,7 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.oaipmh.OaiPmhConstants;
+import org.opencastproject.oaipmh.persistence.OaiPmhDatabaseException;
 import org.opencastproject.oaipmh.persistence.SearchResult;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.oaipmh.util.XmlGen;
@@ -92,10 +93,11 @@ public abstract class OaiXmlGen extends XmlGen {
    * Create the dublin core tag from a search result item. Note: Sets are currently not supported.
    */
   @SuppressWarnings("unchecked") Element dc(final SearchResultItem item, Option<String> set) {
-    if (item.getEpisodeDublinCore().isNone())
+    try {
+      return getDublincoreElement(item.getEpisodeDublinCore());
+    } catch (OaiPmhDatabaseException ex) {
       return dc($e("dc:identifier", $txtBlank(item.getId())));
-    else
-      return getDublincoreElement(item.getEpisodeDublinCore().get());
+    }
   }
 
   // <dcterms:description xml:lang="en">

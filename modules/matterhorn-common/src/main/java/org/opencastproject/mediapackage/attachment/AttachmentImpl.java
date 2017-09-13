@@ -30,10 +30,18 @@ import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.UnknownFileTypeException;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * Basic implementation of an attachment.
@@ -45,11 +53,17 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
   /** Serial version UID */
   private static final long serialVersionUID = 6626531251856698138L;
 
+  /** The object properties */
+  @XmlElement(name = "additionalProperties")
+  @XmlJavaTypeAdapter(PropertiesXmlAdapter.class)
+  protected Map<String, String> properties = null;
+
   /**
    * Needed by JAXB
    */
   public AttachmentImpl() {
     super(Type.Attachment, null, null);
+    properties = new HashMap<>();
   }
 
   /**
@@ -130,6 +144,77 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
    */
   public static Attachment fromURI(URI uri) {
     return new AttachmentImpl(uri);
+  }
+
+  @Override
+  public Map<String, String> getProperties() {
+    if (properties == null)
+      properties = new HashMap<String, String>();
+
+    return properties;
+  }
+
+  /**
+   * JAXB properties xml adapter class.
+   */
+  private static class PropertiesXmlAdapter extends XmlAdapter<PropertiesAdapter, Map<String, String>> {
+
+    @Override
+    public Map<String, String> unmarshal(PropertiesAdapter pa) throws Exception {
+      Map<String, String> properties = new HashMap<>();
+      if (pa != null) {
+        for (Property p : pa.propertiesList) {
+          properties.put(p.key, p.value);
+        }
+      }
+      return properties;
+    }
+
+    @Override
+    public PropertiesAdapter marshal(Map<String, String> p) throws Exception {
+      if (p == null || p.size() == 0) return null;
+
+      PropertiesAdapter pa = new PropertiesAdapter();
+        for (String key : p.keySet()) {
+          pa.propertiesList.add(new Property(key, p.get(key)));
+        }
+      return pa;
+    }
+  }
+
+  /**
+   * Properties map to list of entries adapter class.
+   */
+  private static class PropertiesAdapter {
+    @XmlElement(name = "property")
+    private List<Property> propertiesList;
+
+    PropertiesAdapter() {
+      this(new LinkedList<Property>());
+    }
+
+    PropertiesAdapter(List<Property> propertiesList) {
+      this.propertiesList = propertiesList;
+    }
+  }
+
+  /**
+   * Properties entry adapter class.
+   */
+  private static class Property {
+    @XmlAttribute(name = "key")
+    private String key;
+    @XmlValue
+    private String value;
+
+    Property() {
+      // Default constructor
+    }
+
+    Property(String key, String value) {
+      this.key = key;
+      this.value = value;
+    }
   }
 
   public static class Adapter extends XmlAdapter<AttachmentImpl, Attachment> {

@@ -15,6 +15,9 @@ describe('adminNg.directives.adminNgPwCheck', function () {
             this.$$setOptions = jasmine.createSpy();
             this.$formatters = [];
             this.$viewValue = 'foo';
+            this.$$parentForm = {
+                $addControl: angular.noop
+            };
             NgModelController = this;
         };
     }));

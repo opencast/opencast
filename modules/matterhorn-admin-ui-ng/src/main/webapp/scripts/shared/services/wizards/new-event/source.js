@@ -1,6 +1,6 @@
 angular.module('adminNg.services')
-.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', '$translate', 'underscore', '$timeout', 'localStorageService', 'AuthService',
-    function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate, _, $timeout, localStorageService, AuthService) {
+.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', '$translate', '$filter', 'underscore', '$timeout', 'localStorageService', 'AuthService', 'NewEventMetadata',
+    function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate, $filter, _, $timeout, localStorageService, AuthService, NewEventMetadata) {
 
     // -- constants ------------------------------------------------------------------------------------------------- --
 
@@ -25,6 +25,31 @@ angular.module('adminNg.services')
     var Source = function () {
         var self = this;
 
+        this.save = function () {
+          if (self.startDate.index) {
+            NewEventMetadata.ud['dublincore/episode'].fields[self.startDate.index] = self.startDate;
+          } else {
+            self.startDate.index = NewEventMetadata.ud['dublincore/episode'].fields.length;
+            NewEventMetadata.ud['dublincore/episode'].fields.push(self.startDate);
+          }
+        };
+
+        this.createStartDate = function () {
+          self.startDate = {
+            "id": "startDate",
+            "label": "EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
+            "value": new Date(Date.now()).toISOString(),
+            "type": "date",
+            "readOnly": false,
+            "required": false,
+            "tabindex": 7
+          };
+          self.metadata = new Array();
+          self.metadata.push(self.startDate);
+        };
+
+        this.createStartDate();
+
         self.isSourceState = true;
 
         this.defaultsSet = false;
@@ -48,6 +73,7 @@ angular.module('adminNg.services')
         this.loadCaptureAgents();
 
         this.reset = function (opts) {
+            self.createStartDate();
             self.weekdays = _.clone(WEEKDAYS);
             self.ud = {
                 upload: {},
@@ -145,7 +171,8 @@ angular.module('adminNg.services')
         var validators = {
             later: function() { return true; },
             UPLOAD: function() {
-                return isDefined(self.ud.upload.segmentable) || isDefined(self.ud.upload.nonSegmentable) || isDefined(self.ud.upload.audioOnly);
+                // test for any type of upload source (MH-12085)
+                return Object.keys(self.ud.upload).length > 0;
             },
             SCHEDULE_SINGLE: function () {
                 return !self.hasConflicts && _.every(fields, function(field) {
@@ -193,6 +220,30 @@ angular.module('adminNg.services')
             } else {
                 return result;
             }
+        };
+
+        // Sort source select options by short title
+        this.translatedSourceShortTitle = function(asset) {
+            return $filter('translate')(asset.title + '.SHORT');
+        }
+
+        // Create the data array for use in the summary view
+        this.updateUploadTracksForSummary =  function () {
+            self.ud.trackuploadlistforsummary = [];
+            var namemap = self.wizard.sharedData.uploadNameMap;
+            angular.forEach(self.ud.upload, function ( value, key) {
+                var item = {};
+                var fileNames = [];
+                item.id = key;
+                item.title = namemap[key].title;
+                angular.forEach(value, function (file) {
+                    fileNames.push(file.name);
+                });
+                item.filename =  fileNames.join(", ");
+                item.type = namemap[key].type;
+                item.flavor = namemap[key].flavorType + "/" + namemap[key].flavorSubType;
+                self.ud.trackuploadlistforsummary.push(item);
+            });
         };
 
         this.checkConflicts = function () {
@@ -362,6 +413,18 @@ angular.module('adminNg.services')
                 return validators[getType()];
             }
         };
+
+        // Update summary when exiting this step
+        // One-time update prevents an infinite loop in
+        // summary's ng-repeat.
+        this.ud.trackuploadlistforsummary = [];
+        this.getTrackUploadSummary = function() {
+            return this.ud.trackuploadlistforsummary;
+        }
+        this.onExitStep = function () {
+            // update summary of selections
+            this.updateUploadTracksForSummary();
+        }
 
         this.isValid = function () {
             var validator = getValidatorByType();

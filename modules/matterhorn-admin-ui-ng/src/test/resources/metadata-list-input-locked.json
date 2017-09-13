@@ -39,14 +39,6 @@
             "required":false
          },
          {
-            "id":"startTime",
-            "readOnly":true,
-            "value":"",
-            "label":"EVENTS.EVENTS.DETAILS.METADATA.START_TIME",
-            "type":"time",
-            "required":false
-         },
-         {
             "id":"isPartOf",
             "readOnly":true,
             "value":"",

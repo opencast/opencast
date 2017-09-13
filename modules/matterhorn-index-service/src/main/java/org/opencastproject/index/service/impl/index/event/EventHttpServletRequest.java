@@ -75,9 +75,6 @@ public class EventHttpServletRequest {
   private static final String ROLE_JSON_KEY = "role";
   private static final String VALUE_JSON_KEY = "value";
 
-  /** A parser for handling JSON documents inside the body of a request. **/
-  private static final JSONParser parser = new JSONParser();
-
   private Opt<AccessControlList> acl = Opt.none();
   private Opt<MediaPackage> mediaPackage = Opt.none();
   private Opt<MetadataList> metadataList = Opt.none();
@@ -246,6 +243,7 @@ public class EventHttpServletRequest {
       }
     } else if ("processing".equals(item.getFieldName())) {
       String processing = Streams.asString(item.openStream());
+      JSONParser parser = new JSONParser();
       try {
         eventHttpServletRequest.setProcessing((JSONObject) parser.parse(processing));
       } catch (Exception e) {
@@ -307,6 +305,7 @@ public class EventHttpServletRequest {
    * @throws ParseException
    */
   protected static AccessControlList deserializeJsonToAcl(String json, boolean assumeAllow) throws ParseException {
+    JSONParser parser = new JSONParser();
     JSONArray aclJson = (JSONArray) parser.parse(json);
     @SuppressWarnings("unchecked")
     ListIterator<Object> iterator = aclJson.listIterator();
@@ -349,6 +348,7 @@ public class EventHttpServletRequest {
   protected static MetadataList deserializeMetadataList(String json, List<EventCatalogUIAdapter> catalogAdapters)
           throws ParseException, NotFoundException {
     MetadataList metadataList = new MetadataList();
+    JSONParser parser = new JSONParser();
     JSONArray jsonCatalogs = (JSONArray) parser.parse(json);
     for (int i = 0; i < jsonCatalogs.size(); i++) {
       JSONObject catalog = (JSONObject) jsonCatalogs.get(i);

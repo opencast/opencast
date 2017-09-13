@@ -38,14 +38,6 @@
             "required":false
          },
          {
-            "id":"startTime",
-            "readOnly":false,
-            "value":"2013-03-20T04:00:00Z",
-            "label":"EVENTS.EVENTS.DETAILS.METADATA.START_TIME",
-            "type":"time",
-            "required":false
-         },
-         {
             "id":"isPartOf",
             "readOnly":false,
             "value":"seriesId",

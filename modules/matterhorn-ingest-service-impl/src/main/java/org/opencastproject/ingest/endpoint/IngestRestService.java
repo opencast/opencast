@@ -42,6 +42,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
+import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.TrustedHttpClient;
@@ -154,8 +155,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   private SchedulerService schedulerService = null;
   private MediaPackageBuilderFactory factory = null;
-  private IngestService ingestService;
-  private ServiceRegistry serviceRegistry;
+  private IngestService ingestService = null;
+  private ServiceRegistry serviceRegistry = null;
   private DublinCoreCatalogService dublinCoreService;
   // For the progress bar -1 bug workaround, keeping UploadJobs in memory rather than saving them using JPA
   private HashMap<String, UploadJob> jobs;
@@ -294,6 +295,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
   public Response addMediaPackageTrack(@FormParam("url") String url, @FormParam("flavor") String flavor,  @FormParam("tags")  String tags,
           @FormParam("mediaPackage") String mpx) {
+    logger.trace("add media package from url: {} flavor: {} tags: {} mediaPackage: {}", url, flavor, tags, mpx);
     try {
       MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
       if (MediaPackageSupport.sanityCheck(mp).isSome())
@@ -328,6 +330,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
     returnDescription = "")
   public Response addMediaPackageTrack(@Context HttpServletRequest request) {
+    logger.trace("add track as multipart-form-data");
     return addMediaPackageElement(request, MediaPackageElement.Type.Track);
   }
 
@@ -344,6 +347,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
   public Response addMediaPackagePartialTrack(@FormParam("url") String url, @FormParam("flavor") String flavor,
           @FormParam("startTime") Long startTime, @FormParam("mediaPackage") String mpx) {
+    logger.trace("add partial track with url: {} flavor: {} startTime: {} mediaPackage: {}",
+            url, flavor, startTime, mpx);
     try {
       MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
       if (MediaPackageSupport.sanityCheck(mp).isSome())
@@ -369,6 +374,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
   public Response addMediaPackagePartialTrack(@Context HttpServletRequest request) {
+    logger.trace("add partial track as multipart-form-data");
     return addMediaPackageElement(request, MediaPackageElement.Type.Track);
   }
 
@@ -384,6 +390,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
   public Response addMediaPackageCatalog(@FormParam("url") String url, @FormParam("flavor") String flavor,
           @FormParam("mediaPackage") String mpx) {
+    logger.trace("add catalog with url: {} flavor: {} mediaPackage: {}", url, flavor, mpx);
     try {
       MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
       if (MediaPackageSupport.sanityCheck(mp).isSome())
@@ -408,6 +415,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
   public Response addMediaPackageCatalog(@Context HttpServletRequest request) {
+    logger.trace("add catalog as multipart-form-data");
     return addMediaPackageElement(request, MediaPackageElement.Type.Catalog);
   }
 
@@ -423,6 +431,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
   public Response addMediaPackageAttachment(@FormParam("url") String url, @FormParam("flavor") String flavor,
           @FormParam("mediaPackage") String mpx) {
+    logger.trace("add attachment with url: {} flavor: {} mediaPackage: {}", url, flavor, mpx);
     try {
       MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
       if (MediaPackageSupport.sanityCheck(mp).isSome())
@@ -446,6 +455,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
   public Response addMediaPackageAttachment(@Context HttpServletRequest request) {
+    logger.trace("add attachment as multipart-form-data");
     return addMediaPackageElement(request, MediaPackageElement.Type.Attachment);
   }
 
@@ -459,6 +469,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       String[] tags = null;
       /* Only accept multipart/form-data */
       if (!ServletFileUpload.isMultipartContent(request)) {
+        logger.trace("request isn't multipart-form-data");
         return Response.serverError().status(Status.BAD_REQUEST).build();
       }
       boolean isDone = false;
@@ -467,29 +478,38 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         String fieldName = item.getFieldName();
         if (item.isFormField()) {
           if ("flavor".equals(fieldName)) {
-            String flavorString = Streams.asString(item.openStream());
+            String flavorString = Streams.asString(item.openStream(), "UTF-8");
+            logger.trace("flavor: {}", flavorString);
             if (flavorString != null) {
               flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
             }
           } else if ("tags".equals(fieldName)) {
-              tags = Streams.asString(item.openStream()).split(",");
+            String tagsString = Streams.asString(item.openStream(), "UTF-8");
+            logger.trace("tags: {}", tagsString);
+            tags = tagsString.split(",");
           } else if ("mediaPackage".equals(fieldName)) {
             try {
-              mp = factory.newMediaPackageBuilder().loadFromXml(item.openStream());
+              String mediaPackageString = Streams.asString(item.openStream(), "UTF-8");
+              logger.trace("mediaPackage: {}", mediaPackageString);
+              mp = factory.newMediaPackageBuilder().loadFromXml(mediaPackageString);
             } catch (MediaPackageException e) {
+              logger.debug("Unable to parse the 'mediaPackage' parameter: {}", ExceptionUtils.getMessage(e));
               return Response.serverError().status(Status.BAD_REQUEST).build();
             }
           } else if ("startTime".equals(fieldName) && "/addPartialTrack".equals(request.getPathInfo())) {
+            String startTimeString = Streams.asString(item.openStream(), "UTF-8");
+            logger.trace("startTime: {}", startTime);
             try {
-              startTime = Long.parseLong(IOUtils.toString(item.openStream()));
+              startTime = Long.parseLong(startTimeString);
             } catch (Exception e) {
-              logger.info("Unable to parse the 'startTime' parameter: {}", ExceptionUtils.getMessage(e));
+              logger.debug("Unable to parse the 'startTime' parameter: {}", ExceptionUtils.getMessage(e));
               return Response.serverError().status(Status.BAD_REQUEST).build();
             }
           }
         } else {
           if (flavor == null) {
             /* A flavor has to be specified in the request prior the video file */
+            logger.debug("A flavor has to be specified in the request prior to the content BODY");
             return Response.serverError().status(Status.BAD_REQUEST).build();
           }
           fileName = item.getName();
@@ -524,7 +544,6 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         default:
           throw new IllegalStateException("Type must be one of track, catalog, or attachment");
       }
-      // ingestService.ingest(mp);
       return Response.ok(MediaPackageParser.getAsXml(mp)).build();
     } catch (Exception e) {
       logger.warn(e.getMessage(), e);
@@ -606,6 +625,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
       returnDescription = "")
   public Response addMediaPackage(@Context HttpServletRequest request) {
+    logger.trace("add mediapackage as multipart-form-data");
     return addMediaPackage(request, null);
   }
 
@@ -683,6 +703,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
       returnDescription = "")
   public Response addMediaPackage(@Context HttpServletRequest request, @PathParam("wdID") String wdID) {
+    logger.trace("add mediapackage as multipart-form-data with workflow definition id: {}", wdID);
     MediaPackageElementFlavor flavor = null;
     try {
       MediaPackage mp = ingestService.createMediaPackage();
@@ -697,6 +718,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           if (item.isFormField()) {
             String fieldName = item.getFieldName();
             String value = Streams.asString(item.openStream(), "UTF-8");
+            logger.trace("form field {}: {}", fieldName, value);
             /* Ignore empty fields */
             if ("".equals(value)) {
               continue;
@@ -784,6 +806,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           } else {
             if (flavor == null) {
               /* A flavor has to be specified in the request prior the video file */
+              logger.debug("A flavor has to be specified in the request prior to the content BODY");
               return Response.serverError().status(Status.BAD_REQUEST).build();
             }
             ingestService.addTrack(item.openStream(), item.getName(), flavor, mp);
@@ -879,7 +902,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
   public Response addZippedMediaPackage(@Context HttpServletRequest request,
           @PathParam("workflowDefinitionId") String wdID, @QueryParam("id") String wiID) {
-    logger.debug("addZippedMediaPackage(HttpRequest)");
+    logger.trace("add zipped media package with workflow definition id: {} and workflow instance id: {}", wdID, wiID);
     if (!isIngestLimitEnabled() || getIngestLimit() > 0) {
       return ingestZippedMediaPackage(request, wdID, wiID);
     } else {
@@ -903,7 +926,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_NOT_FOUND),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
   public Response addZippedMediaPackage(@Context HttpServletRequest request) {
-    logger.debug("addZippedMediaPackage(HttpRequest)");
+    logger.trace("add zipped media package");
     if (!isIngestLimitEnabled() || getIngestLimit() > 0) {
       return ingestZippedMediaPackage(request, null, null);
     } else {
@@ -932,15 +955,18 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
-            if (WORKFLOW_INSTANCE_ID_PARAM.equals(item.getFieldName())) {
-              workflowIdAsString = IOUtils.toString(item.openStream(), "UTF-8");
+            String fieldName = item.getFieldName();
+            String value = Streams.asString(item.openStream(), "UTF-8");
+            logger.trace("{}: {}", fieldName, value);
+            if (WORKFLOW_INSTANCE_ID_PARAM.equals(fieldName)) {
+              workflowIdAsString = value;
               continue;
-            } else if (WORKFLOW_DEFINITION_ID_PARAM.equals(item.getFieldName())) {
-              workflowDefinitionId = IOUtils.toString(item.openStream(), "UTF-8");
+            } else if (WORKFLOW_DEFINITION_ID_PARAM.equals(fieldName)) {
+              workflowDefinitionId = value;
               continue;
             } else {
-              logger.debug("Processing form field: " + item.getFieldName());
-              workflowConfig.put(item.getFieldName(), IOUtils.toString(item.openStream(), "UTF-8"));
+              logger.debug("Processing form field: " + fieldName);
+              workflowConfig.put(fieldName, value);
             }
           } else {
             logger.debug("Processing file item");
@@ -1010,6 +1036,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestResponse(description = "Returns the media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response ingest(MultivaluedMap<String, String> formData) {
+    logger.trace("ingest media package");
     return ingest(formData, null);
   }
 
@@ -1020,6 +1047,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestResponse(description = "Returns the media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response ingest(@PathParam("wdID") String wdID, MultivaluedMap<String, String> formData) {
+    logger.trace("ingest media package with workflow definition id: {}", wdID);
     if (StringUtils.isBlank(wdID)) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
@@ -1042,7 +1070,6 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
      * Note: We use a MultivaluedMap here to ensure that we can get any arbitrary form parameters. This is required to
      * enable things like holding for trim or distributing to YouTube.
      */
-    logger.debug("ingest(MediaPackage)");
     final Map<String, String> wfConfig = getWorkflowConfig(formData);
     if (StringUtils.isNotBlank(wdID))
       wfConfig.put(WORKFLOW_DEFINITION_ID_PARAM, wdID);
@@ -1107,6 +1134,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
                   @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) },
           returnDescription = "")
   public Response schedule(MultivaluedMap<String, String> formData) {
+    logger.trace("pass schedule with default workflow definition id {}", defaultWorkflowDefinitionId);
     return this.schedule(defaultWorkflowDefinitionId, formData);
   }
 
@@ -1123,6 +1151,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           returnDescription = "")
   public Response schedule(@PathParam("wdID") String wdID, MultivaluedMap<String, String> formData) {
     if (StringUtils.isBlank(wdID)) {
+      logger.trace("workflow definition id is not specified");
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
@@ -1160,6 +1189,8 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       return Response.status(Status.CREATED).build();
     } catch (IngestException e) {
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
+    } catch (SchedulerConflictException e) {
+      return Response.status(Status.CONFLICT).entity(e.getMessage()).build();
     } catch (NotFoundException | UnauthorizedException | SchedulerException e) {
       return Response.serverError().build();
     }
@@ -1288,12 +1319,12 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           if ("mediaPackage".equalsIgnoreCase(fieldName)) {
             mp = factory.newMediaPackageBuilder().loadFromXml(item.openStream());
           } else if ("flavor".equals(fieldName)) {
-            String flavorString = Streams.asString(item.openStream());
+            String flavorString = Streams.asString(item.openStream(), "UTF-8");
             if (flavorString != null) {
               flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
             }
           } else if ("elementType".equalsIgnoreCase(fieldName)) {
-            String typeString = Streams.asString(item.openStream());
+            String typeString = Streams.asString(item.openStream(), "UTF-8");
             if (typeString != null) {
               elementType = typeString;
             }
@@ -1377,6 +1408,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
   public Response addDCCatalog(@FormParam("mediaPackage") String mp, @FormParam("dublinCore") String dc,
           @FormParam("flavor") String flavor) {
+    logger.trace("add DC catalog: {} with flavor: {} to media package: {}", dc, flavor, mp);
     MediaPackageElementFlavor dcFlavor = MediaPackageElements.EPISODE;
     if (flavor != null) {
       try {

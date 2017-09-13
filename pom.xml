@@ -157,6 +157,7 @@
     <module>modules/matterhorn-search-service-remote</module>
     <module>modules/matterhorn-search-workflowoperation</module>
     <module>modules/matterhorn-security-aai</module>
+    <module>modules/matterhorn-security-cas-client-wrapper</module>
     <module>modules/matterhorn-security-cas</module>
     <module>modules/matterhorn-security-ldap</module>
     <module>modules/matterhorn-security-openid</module>
@@ -186,6 +187,10 @@
     <module>modules/matterhorn-textextractor-tesseract</module>
     <module>modules/matterhorn-themes</module>
     <module>modules/matterhorn-themes-workflowoperation</module>
+    <module>modules/matterhorn-timelinepreviews-api</module>
+    <module>modules/matterhorn-timelinepreviews-ffmpeg</module>
+    <module>modules/matterhorn-timelinepreviews-remote</module>
+    <module>modules/matterhorn-timelinepreviews-workflowoperation</module>
     <module>modules/matterhorn-transcription-service-api</module>
     <module>modules/matterhorn-transcription-service-ibm-watson-impl</module>
     <module>modules/matterhorn-transcription-service-workflowoperation</module>
@@ -270,6 +275,10 @@
           <shortRevisionLength>7</shortRevisionLength>
         </configuration>
       </plugin>
+      <!-- Attach sources for all builds -->
+      <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-source-plugin</artifactId> <executions>
+        <execution> <id>attach-sources</id> <phase>verify</phase> <goals> <goal>jar-no-fork</goal> <goal>test-jar-no-fork</goal>
+        </goals> </execution> </executions> </plugin> -->
       <!-- Run tests and display test output in the console -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -368,7 +377,7 @@
                   <pluginExecutionFilter>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <versionRange>[0.0.23,)</versionRange>
+                    <version>1.5</version>
                     <goals>
                       <goal>install-node-and-npm</goal>
                       <goal>npm</goal>
@@ -463,6 +472,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.19.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>2.17</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -878,14 +892,14 @@
         <version>3.1.4.RELEASE</version>
       </dependency>
       <dependency>
-        <groupId>org.jasig.cas</groupId>
-        <artifactId>com.springsource.org.jasig.cas.client</artifactId>
-        <version>3.1.12</version>
+        <groupId>org.opensaml</groupId>
+        <artifactId>opensaml</artifactId>
+        <version>1.1</version>
       </dependency>
       <dependency>
-        <groupId>org.opensaml</groupId>
-        <artifactId>com.springsource.org.opensaml</artifactId>
-        <version>1.1.0</version>
+        <groupId>org.jasig.cas.client</groupId>
+        <artifactId>cas-client-core</artifactId>
+        <version>3.1.12</version>
       </dependency>
       <dependency>
         <groupId>org.openid4java</groupId>
@@ -1470,8 +1484,8 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:git:https://bitbucket.org/opencast-community/matterhorn.git</connection>
-    <developerConnection>scm:git:git@bitbucket.org:opencast-community/matterhorn.git</developerConnection>
+    <connection>scm:git:https://bitbucket.org/opencast-community/opencast.git</connection>
+    <developerConnection>scm:git:git@bitbucket.org:opencast-community/opencast.git</developerConnection>
     <url>https://bitbucket.org/opencast-community</url>
   </scm>
   <issueManagement>

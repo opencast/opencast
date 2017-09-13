@@ -64,6 +64,9 @@ public class LtiServlet extends HttpServlet {
   /** Path under which all the LTI tools are available */
   private static final String TOOLS_URL = "/ltitools";
 
+  // The following LTI launch parameters are made available to GET requests at the /lti endpoint.
+  // See https://www.imsglobal.org/specs/ltiv1p2/implementation-guide for the meaning of each.
+
   /** See the LTI specification */
   public static final String LTI_MESSAGE_TYPE = "lti_message_type";
 
@@ -142,6 +145,12 @@ public class LtiServlet extends HttpServlet {
   /** See the LTI specification */
   public static final String CONSUMER_CONTACT = "tool_consumer_instance_contact_email";
 
+  /** See the LTI specification */
+  public static final String COURSE_OFFERING = "lis_course_offering_sourcedid";
+
+  /** See the LTI specification */
+  public static final String COURSE_SECTION = "lis_course_section_sourcedid";
+
   public static final SortedSet<String> LTI_CONSTANTS;
 
   static {
@@ -172,6 +181,8 @@ public class LtiServlet extends HttpServlet {
     LTI_CONSTANTS.add(CONSUMER_DESCRIPTION);
     LTI_CONSTANTS.add(CONSUMER_URL);
     LTI_CONSTANTS.add(CONSUMER_CONTACT);
+    LTI_CONSTANTS.add(COURSE_OFFERING);
+    LTI_CONSTANTS.add(COURSE_SECTION);
   }
 
   /**

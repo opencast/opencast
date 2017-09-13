@@ -1,5 +1,6 @@
 #######################################################################################
 # Migrate archive to asset manager, schema and data.                                  #
+# Migrate OAI-PMH, schema and data.                                                   #
 #######################################################################################
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -100,6 +101,32 @@ CREATE TABLE `mh_assets_properties` (
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
+####
+# mh_oaipmh
+##
+
+ALTER TABLE `mh_oaipmh`
+CHANGE COLUMN `id` `mp_id` VARCHAR(128) NOT NULL;
+
+####
+# mh_oaipmh_elements
+##
+
+CREATE TABLE `mh_oaipmh_elements` (
+  `id` INT(20) NOT NULL AUTO_INCREMENT,
+  `element_type` VARCHAR(16) NOT NULL,
+  `flavor` varchar(255) NOT NULL,
+  `xml` TEXT(65535) NOT NULL,
+  `mp_id` VARCHAR(128) NOT NULL,
+  `organization` VARCHAR(128) NOT NULL,
+  `repo_id` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `FK_mh_oaipmh_elements`
+    FOREIGN KEY (`mp_id`, `repo_id`, `organization`)
+    REFERENCES `mh_oaipmh` (`mp_id`, `repo_id`, `organization`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 #######################################################################################
 # Data migration                                                                      #
@@ -155,6 +182,27 @@ INSERT INTO SEQUENCE
 VALUES ((SELECT max(id) + 1
          FROM mh_assets_snapshot), 'seq_mh_assets_snapshot');
 
+####
+# mh_oaipmh_elements data migration
+##
+
+# move episode dublincore from mh_oaipmh.episode_dublincore_xml to mh_oaipmh_elements.xml
+INSERT INTO mh_oaipmh_elements (element_type, flavor, xml, mp_id, organization, repo_id)
+SELECT 'Catalog', 'dublincore/episode', o.episode_dublincore_xml, o.mp_id, o.organization, o.repo_id
+FROM mh_oaipmh AS o
+WHERE o.episode_dublincore_xml IS NOT NULL;
+
+# move series dublincore from mh_oaipmh.series_dublincore_xml to mh_oaipmh_elements.xml
+INSERT INTO mh_oaipmh_elements (element_type, flavor, xml, mp_id, organization, repo_id)
+SELECT 'Catalog', 'dublincore/series', o.series_dublincore_xml, o.mp_id, o.organization, o.repo_id
+FROM mh_oaipmh AS o
+WHERE o.series_dublincore_xml IS NOT NULL;
+
+# move series acl from mh_oaipmh.series_acl_xml to mh_oaipmh_elements.xml
+INSERT INTO mh_oaipmh_elements (element_type, flavor, xml, mp_id, organization, repo_id)
+SELECT 'Attachment', 'security/xacml+series', o.series_acl_xml, o.mp_id, o.organization, o.repo_id
+FROM mh_oaipmh AS o
+WHERE o.series_acl_xml IS NOT NULL;
 
 #######################################################################################
 # Data migration post processing                                                      #
@@ -190,6 +238,15 @@ DROP COLUMN mediapackage;
 ALTER TABLE mh_assets_asset
 ADD INDEX IX_mh_assets_asset_checksum (checksum),
 ADD INDEX IX_mh_assets_asset_mediapackage_element_id (mediapackage_element_id);
+
+####
+# mh_oaipmh
+##
+
+ALTER TABLE mh_oaipmh
+DROP COLUMN episode_dublincore_xml,
+DROP COLUMN series_dublincore_xml,
+DROP COLUMN series_acl_xml;
 
 
 SET FOREIGN_KEY_CHECKS = 1;
