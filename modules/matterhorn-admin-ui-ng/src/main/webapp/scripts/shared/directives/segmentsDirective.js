@@ -191,16 +191,14 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                   while (previousSegment && allow && previousSegment.start > newTime) {
                     scope.removeSegment(previousSegment);
                     previousSegment = scope.getPreviousSegment(segment);
-                    alow = scope.isRemovalAllowed(previousSegment);
+                    allow = scope.isRemovalAllowed(previousSegment);
                   }
                   if (!allow && previousSegment) {
-                    //previousSegment is the only remaining active segment
                     if (previousSegment.start > newTime) {
                         segment.start = previousSegment.end;
                     }
                     else {
-                        //Give previousSegment a minimum duration (arbitrarily chosen 3000ms)
-                        var endTime = Math.max(newTime, previousSegment.start + 3000);
+                        var endTime = Math.max(newTime, previousSegment.start + 1);
                         segment.start = previousSegment.end = endTime;
                     }
                     scope.$root.$broadcast("segmentTimesUpdated");

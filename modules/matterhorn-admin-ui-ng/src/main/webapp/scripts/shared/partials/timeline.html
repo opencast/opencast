@@ -50,11 +50,11 @@
 
                 <div class="{{wrapperClass}}">
                     <div class="segments" ng-style="getSegmentStyle(track)">
-                        <div class="segment-container"
+                        <div ng-class="{'segment-container': true, displayWaveform: getSegmentWidth(segment, true) < 0.5}"
                              ng-repeat="segment in video.segments | orderBy:'start'"
                              ng-style="{ width: getSegmentWidth(segment) }">
 
-                            <div class="segment-seperator" ng-mousedown="dragSegement($event, segment)"></div>
+                            <div class="segment-seperator" ng-mousedown="dragSegement($event, segment)" ng-style="::getWaveformBg(track)"></div>
                             <div class="segment"
                                   ng-click="skipToSegment($event, segment)"
                                   ng-class="getSegmentClass(segment)"

@@ -154,7 +154,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
              * @param {Object} segment Segment object
              * @return {String} Width of the segment in percent
              */
-            scope.getSegmentWidth = function (segment) {
+            scope.getSegmentWidth = function (segment, dropPercent) {
                 if (angular.isUndefined(segment)) {
                     return 0;
                 }
@@ -170,7 +170,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     relativeSize = absoluteSize / scope.video.duration,
                     scaledSize = relativeSize * zoom;
 
-                return (scaledSize * 100) + '%';
+                return (scaledSize * 100) + (!dropPercent ? '%' : 0);
             };
 
             /**
@@ -325,6 +325,13 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 return style;
             };
 
+            scope.getWaveformBg = function (track) {
+                return {
+                  'background-image': 'url(' + track.waveform + ')',
+                  'background-repeat': 'no-repeat',
+                };
+            };
+
             /**
              * Returns an object that describes the css classes for a given segment.
              *
@@ -332,7 +339,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
              * @return {Object} object with {class}: {boolean} values for CSS classes.
              */
             scope.getSegmentClass = function (segment) {
-                var result = { deleted: segment.deleted, selected: segment.selected, small: false, tiny: false };
+                var result = { deleted: segment.deleted, selected: segment.selected, small: false, tiny: false, sliver: false };
 
                 if (angular.isUndefined(scope.video.duration)) {
                     return result;
@@ -349,10 +356,14 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     if ( segment_width <= (total + 10)) {
 
                         if ( (single + 10) <= segment_width) {
-
                             // a single element can be shown
                             result.small = true;
-                        }   else {
+                        }
+                        else if (segment_width < 5) {
+                            //minimum segment width
+                            result.sliver = true;
+                        }
+                        else {
                             // smaller than a single element > show none
                             result.tiny = true;
                         }
@@ -614,17 +625,12 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                         // pulled start point of segment past end of start
                         // so we flip it
                         segment.start = segment.end;
-                        segment.end = !scope.isRemovalAllowed(segment) ? Math.max(segment.start + 3000, position) : position;
+                        segment.end = position;
                     } else {
                         segment.start = position;
-                        if (!scope.isRemovalAllowed(segment) && segment.end - position  < 3000) {
-                            segment.start = segment.end - 3000;                                  //arbitrary minimum duration choice
-                        }
-                        var prevSegment = scope.video.segments[scope.video.segments.indexOf(segment) - 1];
-                        if (!scope.isRemovalAllowed(prevSegment) && position - prevSegment.start < 3000) {
-                            segment.start = prevSegment.start + 3000;
-                        }
                     }
+
+                    scope.movingSegment.css('background-position', (-pxPosition + 4) + 'px 0px');
 
                     // update the segments around the one that was changed
                     if (index - 1 >= 0) {
@@ -636,7 +642,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                         if (before.end - before.start <= 0) {
                             // empty segment
                             if (!scope.isRemovalAllowed(before)) {
-                                before.end = segment.start = before.start + 3000; //3000 - arbitrary minimum length
+                                before.end = segment.start = before.start + 1;
                             }
                             else {
                                 segment.start = before.start;
@@ -904,7 +910,10 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 if (nx <= scope.movingSegment.data('track_left')) nx = scope.movingSegment.data('track_left');
                 if (nx >= scope.movingSegment.data('end')) nx = scope.movingSegment.data('end');
 
-                scope.movingSegment.css('left', nx);
+                scope.movingSegment.css({
+                    left: nx,
+                    'background-position': (-$document.mx + 37) + 'px'
+                });
             };
 
             /**
@@ -933,6 +942,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
               handle.data('end', track.width() + track.offset().left - handle.parent().offset().left);
               handle.data('segment', segment);
               handle.addClass('active');
+              handle.css('background-size', track.width() + 'px ' + handle.height() + 'px');
 
               scope.movingSegment = handle;
 

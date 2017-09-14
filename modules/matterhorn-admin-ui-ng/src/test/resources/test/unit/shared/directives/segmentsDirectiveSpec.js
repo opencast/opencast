@@ -134,15 +134,6 @@ describe('adminNg.directives.segmentsDirective', function () {
             scope.video.segments = scope.video.segments.map(function (segment) { segment.deleted = false; return segment; });
         });
 
-/*        it('does nothing on empty/non-valid input', function () {
-            $(targetInput).val('');
-            $(targetInput).trigger('change');
-            expect(scope.updateStartTime).toHaveBeenCalledWith(scope.video.segments[1]);
-            expect(scope.video.segments[1].startTime).toBe('00:00:17.003');
-            $(targetInput).val((Math.random()+1).toString(36).substring(2, 10));
-            expect(scope.video.segments[1].startTime).toBe('00:00:17.003');
-        });*/
-
         it('does nothing when start time exceeds video duration', function () {
             $(targetInput).val('00:01:00.000');
             $(targetInput).trigger('change');
@@ -190,10 +181,10 @@ describe('adminNg.directives.segmentsDirective', function () {
                     $(targetInput).trigger('change');
                     expect(scope.updateStartTime).toHaveBeenCalled();
                     expect(scope.video.segments.length).toEqual(3);
- //                   expect(scope.video.segments[1].startTime).toBe('00:00:10.000');
- //                   expect(scope.video.segments[1].start).toEqual(10000);
- //                   expect(scope.video.segments[0].endTime).toBe('00:00:10.000');
- //                   expect(scope.video.segments[0].end).toEqual(10000);
+                    expect(scope.video.segments[2].startTime).toBe('00:00:28.009');
+                    expect(scope.video.segments[2].start).toEqual(28009);
+                    expect(scope.video.segments[1].endTime).toBe('00:00:28.009');
+                    expect(scope.video.segments[1].end).toEqual(28009);
                 });
             });
         });
@@ -215,15 +206,6 @@ describe('adminNg.directives.segmentsDirective', function () {
             scope.$digest();
             scope.video.segments = scope.video.segments.map(function (segment) { segment.deleted = false; return segment; });
         });
-
-/*        it('does nothing on empty/non-valid input', function () {
-            $(targetInput).val('');
-            $(targetInput).trigger('change');
-            expect(scope.updateEndTime).toHaveBeenCalledWith(scope.video.segments[1]);
-            expect(scope.video.segments[1].startTime).toBe('00:00:17.003');
-            $(targetInput).val((Math.random()+1).toString(36).substring(2, 10));
-            expect(scope.video.segments[1].startTime).toBe('00:00:17.003');
-        });*/
 
         it('does nothing when start time exceeds video duration', function () {
             $(targetInput).val('00:01:00.000');
@@ -272,10 +254,10 @@ describe('adminNg.directives.segmentsDirective', function () {
                     $(targetInput).trigger('change');
                     expect(scope.updateEndTime).toHaveBeenCalled();
                     expect(scope.video.segments.length).toEqual(3);
- //                   expect(scope.video.segments[1].startTime).toBe('00:00:10.000');
- //                   expect(scope.video.segments[1].start).toEqual(10000);
- //                   expect(scope.video.segments[0].endTime).toBe('00:00:10.000');
- //                   expect(scope.video.segments[0].end).toEqual(10000);
+                    expect(scope.video.segments[1].startTime).toBe('00:00:17.003');
+                    expect(scope.video.segments[1].start).toEqual(17003);
+                    expect(scope.video.segments[0].endTime).toBe('00:00:17.003');
+                    expect(scope.video.segments[0].end).toEqual(17003);
                 });
             });
         });
