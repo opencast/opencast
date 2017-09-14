@@ -366,6 +366,7 @@ describe('adminNg.directives.timelineDirective', function () {
             it('sets segment durations as expected', function () {
                 expect($rootScope.video.segments[0].end).toBe(17003);
                 expect($rootScope.video.segments[1].start).toBe(17003);
+                var movePixels = 400;
                 $(separator).triggerHandler({
                     type: 'mousedown',
                     currentTarget: separator,
@@ -374,15 +375,16 @@ describe('adminNg.directives.timelineDirective', function () {
                 });
                 $document.triggerHandler({
                     type: 'mousemove',
-                    pageX: 400,
+                    pageX: movePixels,
                     pageY: 0
                 });
                 $document.triggerHandler({
                     type: 'mouseup',
                 });
-                //duration = 52125 => 52125 * (400 + 3) / 1000 = ~21006  ... the 3 is the initial -3px left offset
-                expect($rootScope.video.segments[0].end).toBe(21006);
-                expect($rootScope.video.segments[1].start).toBe(21006);
+
+                var timeFromPixels = $rootScope.video.duration * (movePixels + 3) / 1000 >> 0;
+                expect($rootScope.video.segments[0].end).toBe(timeFromPixels);
+                expect($rootScope.video.segments[1].start).toBe(timeFromPixels);
             });
         });
 
@@ -390,6 +392,7 @@ describe('adminNg.directives.timelineDirective', function () {
 
             beforeEach(function () {
                 $rootScope.video.segments = $rootScope.video.segments.map(function(segment, i) { segment.deleted = i !== 1; return segment });
+                separator = element.find('.segment-seperator')[2];
             });
 
             it('does not remove only active segment', function () {
@@ -402,13 +405,14 @@ describe('adminNg.directives.timelineDirective', function () {
                 });
                 $document.triggerHandler({
                     type: 'mousemove',
-                    pageX: 230,
+                    pageX: -230,
                     pageY: 0
                 });
                 $document.triggerHandler({
                     type: 'mouseup',
                 });
-                expect($rootScope.video.segments.length).toBe(3);
+                expect($rootScope.video.segments.length).toEqual(3);
+                expect($rootScope.video.segments[1].end - $rootScope.video.segments[1].start).toEqual(1);
             });
         });
 
