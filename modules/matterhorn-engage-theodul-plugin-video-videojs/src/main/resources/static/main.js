@@ -392,7 +392,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     var sortedResolutionsList = [];
     sortedResolutionsList = _.map(qualitiesList, function(quality) {
       var currentTrack = filterTracksByTag(tracks, quality + '-quality')[0];
-      return [quality, currentTrack.resolution.substring(0, currentTrack.resolution.indexOf('x'))];
+      if (currentTrack !== undefined && currentTrack.resolution !== undefined)
+        return [quality, currentTrack.resolution.substring(0, currentTrack.resolution.indexOf('x'))];
     });
     sortedResolutionsList.sort(compareQuality);
     foundQualities = [];
@@ -2123,7 +2124,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     });
     /* listen on videoFormatsFound event with query argument */
     Engage.on(plugin.events.videoFormatsFound.getName(), function (query) {
-      if (query === true) {
+      if (query === true && qualities.length > 1) {
         Engage.trigger(plugin.events.videoFormatsFound.getName(), qualities);
       }
     });
@@ -2213,15 +2214,18 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
             }
             var resolution = (track.video && track.video.resolution) ? track.video.resolution : '';
             // filter for different video sources
-            Engage.log('Video: Adding video source: ' + track.url + ' (' + track.mimetype + ')');
-            if (track.mimetype == 'application/dash+xml') {
-              if (loadDash) return; //patch for broken Distribution Service that may contain Adaptive Streaming format multiple times
+            var mainFlavor = Utils.extractFlavorMainType(track.type);
+            Engage.log('Video: Adding video source: ' + track.url + ' (' + track.mimetype + ') for flavor ' + mainFlavor );
+            if (track.mimetype === 'application/dash+xml') {
+              if (Utils.checkIfMimeTypeAvailableForFlavor(videoSources, 'application/dash+xml', mainFlavor)) return; //patch for broken Distribution Service that may contain Adaptive Streaming format multiple times
+              track = Utils.removeQualityTag(track);
               loadDash = true;
-            } else if (track.mimetype == 'application/x-mpegURL') {
-              if (loadHls) return; //patch for broken Distribution Service that may contain Adaptive Streaming format multiple times
+            } else if (track.mimetype === 'application/x-mpegURL') {
+              if (Utils.checkIfMimeTypeAvailableForFlavor(videoSources, 'application/x-mpegURL', mainFlavor)) return; //patch for broken Distribution Service that may contain Adaptive Streaming format multiple times
+              track = Utils.removeQualityTag(track);
               loadHls = true;
             }
-            videoSources[Utils.extractFlavorMainType(track.type)].push({
+            videoSources[mainFlavor].push({
               src: track.url,
               type: track.mimetype,
               typemh: track.type,
