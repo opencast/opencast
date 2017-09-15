@@ -400,12 +400,17 @@ public class SchedulerRestService {
   @RestQuery(name = "getaccesscontrollist", description = "Retrieves the access control list for specified event", returnDescription = "The access control list", pathParameters = {
           @RestParameter(name = "id", isRequired = true, description = "ID of event for which the access control list will be retrieved", type = Type.STRING) }, reponses = {
                   @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The access control list as JSON "),
+                  @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "The event has no access control list"),
                   @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
                   @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to remove the event. Maybe you need to authenticate.") })
   public Response getAccessControlList(@PathParam("id") String eventId) throws UnauthorizedException {
     try {
       AccessControlList accessControlList = service.getAccessControlList(eventId);
-      return Response.ok(AccessControlParser.toJson(accessControlList)).type(MediaType.APPLICATION_JSON_TYPE).build();
+      if (accessControlList != null) {
+        return Response.ok(AccessControlParser.toJson(accessControlList)).type(MediaType.APPLICATION_JSON_TYPE).build();
+      } else {
+        return Response.noContent().build();
+      }
     } catch (NotFoundException e) {
       logger.info("Event with id '{}' does not exist.", eventId);
       return Response.status(Status.NOT_FOUND).build();
