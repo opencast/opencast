@@ -24,12 +24,10 @@ package org.opencastproject.scheduler.impl;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
-import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
 
@@ -259,22 +257,11 @@ public class CalendarGenerator {
       return null;
     }
 
-    if (series.isEmpty()) {
-      try {
-        DublinCoreCatalogList seriesCatalogs = seriesService.getSeries(new SeriesQuery().setCount(Integer.MAX_VALUE));
-        for (DublinCoreCatalog dc : seriesCatalogs.getCatalogList()) {
-          series.put(dc.getFirst(DublinCore.PROPERTY_IDENTIFIER), dc);
-        }
-      } catch (SeriesException e) {
-        logger.error("Error loading DublinCoreCatalog for series '{}': {}", seriesID, ExceptionUtils.getStackTrace(e));
-        return null;
-      }
-    }
-
     DublinCoreCatalog seriesDC = series.get(seriesID);
     if (seriesDC == null) {
       try {
         seriesDC = seriesService.getSeries(seriesID);
+        series.put(seriesID, seriesDC);
       } catch (SeriesException e) {
         logger.error("Error loading DublinCoreCatalog for series '{}': {}", seriesID, ExceptionUtils.getStackTrace(e));
         return null;

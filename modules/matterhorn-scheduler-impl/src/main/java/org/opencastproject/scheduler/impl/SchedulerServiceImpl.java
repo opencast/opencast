@@ -1206,7 +1206,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       }
     }
 
-    return cal.getCalendar().toString(); // CalendarOutputter performance sucks (jmh)
+    return cal.getCalendar().toString();
   }
 
   @Override
