@@ -703,7 +703,8 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                 var track = element.find('.timeline-track'),
                     handle = element.find('#cursor .handle'),
-                    position = ($document.mx - handle.data('dx') - track.offset().left) / track.width() * scope.video.duration;
+                    position_absolute = $document.mx - handle.data('dx') + handle.width() / 2 - track.offset().left,
+                    position = position_absolute / track.width() * scope.video.duration;
 
                 // Limit position to the length of the video
                 if (position > scope.video.duration) {
@@ -733,7 +734,8 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 var track = element.find('.timeline-track'),
                     cursor = element.find('#cursor_fake'),
                     handle = element.find('#cursor_fake .handle'),
-                    position = ($document.mx - handle.data('dx') - track.offset().left) / track.width() * scope.video.duration;
+                    position_absolute = $document.mx - handle.data('dx') + handle.width() / 2 - track.offset().left,
+                    position = position_absolute / track.width() * scope.video.duration;
 
                 // Limit position to the length of the video
                 if (position > scope.video.duration) {
@@ -774,8 +776,14 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     cursorFake.css('left', cursor.css('left'));
                     cursorFake.show();
 
+                    // calculate initial value for "position" to allow splitting without dragging
+                    var track = element.find('.timeline-track'),
+                        position_absolute = handle.offset().left + handle.width() / 2 - track.offset().left,
+                        position = position_absolute / track.width() * scope.video.duration;
+
                     handle.data('dx', $document.mx - handle.offset().left);
                     handle.data('dy', $document.my - handle.offset().top);
+                    handle.data('position', position);
                     handle.addClass('active');
 
                     // Register global mouse move callback - Fake Playhead movement
