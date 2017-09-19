@@ -1098,7 +1098,7 @@
       <dependency>
         <groupId>postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>8.4-701.jdbc4</version>
+        <version>9.1-901-1.jdbc4</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>

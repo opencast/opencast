@@ -52,7 +52,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     seconds = parseInt(time.substring(6,8)),
                     millis = parseInt(time.substring(9));
 
-                return millis + (seconds * 1000) + (minutes * 60000) + (hours * 36000000);
+                return millis + (seconds * 1000) + (minutes * 60000) + (hours * 3600000);
               }
             };
 
