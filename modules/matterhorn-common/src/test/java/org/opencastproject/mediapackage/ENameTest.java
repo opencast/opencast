@@ -74,4 +74,62 @@ public class ENameTest {
     assertEquals(b1, eNames.get(3));
   }
 
+  @Test
+  public void testFromString() {
+    final String[] invalids = {
+            "",
+            "{", "}",
+            "{}",
+            "{http://localhost/a}",
+            "invalid{name",
+            "invalid}name",
+            "invalid name",
+            "\t invalid\nname",
+            "{invalid namespace}correct-name",
+            "{ invalidnamespace}correct-name",
+            "{invalid{namespace}correct-name",
+            "{invalid name{space}incorrect\t name"
+            };
+    for (String invalid : invalids) {
+      try {
+        EName.fromString(invalid);
+      } catch (IllegalArgumentException iae) {
+        // This is fine
+      }
+    }
+
+    final String[] valids = {
+            "validname",
+            "{}validwithemptyNS",
+            "{http://localhost/a}valid-with-namespace"
+    };
+    final EName[] validENames = {
+            new EName("", "validname"),
+            new EName("", "validwithemptyNS"),
+            new EName("http://localhost/a", "valid-with-namespace")
+    };
+
+    for (int i = 0; i < valids.length; i++) {
+      assertEquals(validENames[i], EName.fromString(valids[i]));
+    }
+  }
+
+@Test
+  public void testFromStringDefault() {
+    final String defaultNS = "http://default.na/mespace";
+    final String[] strings = {
+            "localname",
+            "{}with-empty-namespace",
+            "{http://myname.spa/ce}localname"
+    };
+    final EName[] eNames = {
+            new EName(defaultNS, "localname"),
+            new EName("", "with-empty-namespace"),
+            new EName("http://myname.spa/ce", "localname")
+    };
+
+    for (int i = 0; i < strings.length; i++) {
+      assertEquals(eNames[i], EName.fromString(strings[i], defaultNS));
+    }
+  }
 }

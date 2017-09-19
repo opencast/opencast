@@ -72,6 +72,7 @@ angular.module('adminNg.directives')
                 scope.selectedFilter = null;
                 scope.showFilterSelector = false;
                 Storage.remove('filter');
+                angular.element('.main-filter').val('').trigger('chosen:updated');
             };
 
             scope.removeFilter = function (name, filter) {
@@ -87,7 +88,7 @@ angular.module('adminNg.directives')
 
             scope.getFilterName = function(){
                 for(var i in scope.filters.filters){
-                    if(scope.filters.filters[i] === scope.selectedFilter){
+                    if (angular.equals(scope.filters.filters[i], scope.selectedFilter)) {
                         return i;
                     }
                 }
@@ -113,7 +114,9 @@ angular.module('adminNg.directives')
                     return;
                 }
                 if (filter.period.to && filter.period.from) {
-                    filter.value = new Date(filter.period.from).toISOString() + '/' + new Date(filter.period.to).toISOString();
+                    var from = new Date(new Date(filter.period.from).setHours(0, 0, 0, 0));
+                    var to = new Date(new Date(filter.period.to).setHours(23, 59, 59, 999));
+                    filter.value = from.toISOString() + '/' + to.toISOString();
                 }
 
                 if (filter.value) {
@@ -195,7 +198,7 @@ angular.module('adminNg.directives')
                 scope.activeProfile = index;
             };
 
-            scope.onChnageSelectMainFilter = function(selectedFilter) {
+            scope.onChangeSelectMainFilter = function(selectedFilter) {
                 scope.filter = selectedFilter;
                 scope.openSecondFilter(selectedFilter);
             }

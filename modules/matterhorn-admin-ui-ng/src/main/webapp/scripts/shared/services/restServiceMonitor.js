@@ -7,10 +7,11 @@ angular.module('adminNg.services')
         numErr: 0
     };
 
-    var amqName = "ActiveMQ";
-    var statesName = "Service States";
-    var backendName = "Backend Services";
-    var ok = "OK";
+    var AMQ_NAME = "ActiveMQ";
+    var STATES_NAME = "Service States";
+    var BACKEND_NAME = "Backend Services";
+    var MALFORMED_DATA = "Malformed Data";
+    var OK = "OK";
 
     Monitoring.run = function() {
       //Clear existing data
@@ -25,46 +26,58 @@ angular.module('adminNg.services')
     Monitoring.getActiveMQStats = function() {
       $http.get('/broker/status')
            .then(function(data) {
-             Monitoring.populateService(amqName);
+             Monitoring.populateService(AMQ_NAME);
              if (data.status === 204) {
-               services.service[amqName].status = ok;
-               services.service[amqName].error = false;
+               services.service[AMQ_NAME].status = OK;
+               services.service[AMQ_NAME].error = false;
              } else {
-               services.service[amqName].status = data.statusText;
-               services.service[amqName].error = true;
+               services.service[AMQ_NAME].status = data.statusText;
+               services.service[AMQ_NAME].error = true;
              }
            }, function(err) {
-             Monitoring.populateService(amqName);
-             services.service[amqName].status = err.statusText;
-             services.service[amqName].error = true;
+             Monitoring.populateService(AMQ_NAME);
+             services.service[AMQ_NAME].status = err.statusText;
+             services.service[AMQ_NAME].error = true;
              services.error = true;
              services.numErr++;
            });
     };
 
+    Monitoring.setError = function(service, text) {
+        Monitoring.populateService(service);
+        services.service[service].status = text;
+        services.service[service].error = true;
+        services.error = true;
+        services.numErr++;
+    };
+
     Monitoring.getBasicServiceStats = function() {
       $http.get('/services/health.json')
            .then(function(data) {
+             if (undefined === data.data || undefined === data.data.health) {
+               Monitoring.setError(STATES_NAME, MALFORMED_DATA);
+               return;
+             }
              var abnormal = 0;
              abnormal = data.data.health['warning'] + data.data.health['error'];
              if (abnormal == 0) {
-               Monitoring.populateService(backendName);
-               services.service[backendName].status = ok;
+               Monitoring.populateService(BACKEND_NAME);
+               services.service[BACKEND_NAME].status = OK;
              } else {
                Monitoring.getDetailedServiceStats();
              }
            }, function(err) {
-             Monitoring.populateService(statesName);
-             services.service[statesName].status = err.statusText;
-             services.service[statesName].error = true;
-             services.error = true;
-             services.numErr++;
+             Monitoring.setError(STATES_NAME, err.statusText);
            });
     };
 
     Monitoring.getDetailedServiceStats = function() {
       $http.get('/services/services.json')
            .then(function(data) {
+             if (undefined === data.data || undefined === data.data.services) {
+               Monitoring.setError(BACKEND_NAME, MALFORMED_DATA);
+               return;
+             }
              angular.forEach(data.data.services.service, function(service, key) {
                name = service.type.split('opencastproject.')[1];
                if (service.service_state != "NORMAL") {
@@ -76,11 +89,7 @@ angular.module('adminNg.services')
                }
              });
            }, function(err) {
-             Monitoring.populateService(backendName);
-             services.service[backendName].status = err.statusText;
-             services.service[backendName].error = true;
-             services.error = true;
-             services.numErr++;
+             Monitoring.setError(BACKEND_NAME, err.statusText);
            });
     };
 

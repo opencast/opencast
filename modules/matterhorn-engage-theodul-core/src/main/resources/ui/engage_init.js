@@ -1,6 +1,7 @@
 /* global require.js config */
 requirejs.config({
     baseUrl: "js/lib",
+    waitSeconds: 30,
     paths: {
         engage: "../engage",
         plugins: "/engage/plugin/*/static"

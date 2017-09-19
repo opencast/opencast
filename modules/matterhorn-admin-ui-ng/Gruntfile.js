@@ -227,7 +227,7 @@ module.exports = function (grunt) {
       },
       test: {
         devDependencies: true,
-        src: '<%= karma.unit.configFile %>',
+        src: '<%= karma.options.configFile %>',
         ignorePath:  /\.\.\//,
         fileTypes:{
           js: {
@@ -465,25 +465,30 @@ module.exports = function (grunt) {
     'newer:jscs'
   ]);
 
-  grunt.registerTask('build', [
-    'clean:dist',
-    'wiredep',
-    'useminPrepare',
-    'concurrent:dist',
-    'postcss',
-    'concat',
-    'ngAnnotate',
-    'copy:dist',
-    'cssmin',
-    'uglify',
-    'filerev',
-    'usemin',
-    'htmlmin'
-  ]);
+  grunt.registerTask('build', function() {
+    var skipTests = grunt.option('skipTests');
+    if (skipTests !== true) {
+      grunt.task.run(['test']);
+    }
+    grunt.task.run([
+      'clean:dist',
+      'wiredep',
+      'useminPrepare',
+      'concurrent:dist',
+      'postcss',
+      'concat',
+      'ngAnnotate',
+      'copy:dist',
+      'cssmin',
+      'uglify',
+      'filerev',
+      'usemin',
+      'htmlmin'
+    ]);
+  });
 
   grunt.registerTask('default', [
-    'test',
-    'build'
+    'serve'
   ]);
 
   grunt.loadNpmTasks('grunt-middleware-proxy');

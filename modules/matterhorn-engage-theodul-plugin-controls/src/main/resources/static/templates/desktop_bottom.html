@@ -30,6 +30,11 @@
         <% } %>
     </div>
     <div class="clear"></div>
+    <div class="timeline_preview_container">
+        <canvas id="timeline_preview_canvas" class ="timelinePreview">
+            <img id="timeline_preview_canvas_img">
+        </canvas>
+    </div>
     <div id="navigation_control">
         <div id="backward_button" class="controlbutton" role="button" aria-label="<%= str_prevChapter %>">
             <img src="<%= plugin_path %>images/backward.png" aria-label="<%= str_prevChapter %>" title="<%= str_prevChapter %>" alt="<%= str_prevChapter %>" />

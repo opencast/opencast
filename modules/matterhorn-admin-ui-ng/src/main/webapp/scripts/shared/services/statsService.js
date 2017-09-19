@@ -1,6 +1,6 @@
 angular.module('adminNg.services')
-.factory('Stats', ['$rootScope', '$filter', 'Storage', '$location', '$interval',
-    function ($rootScope, $filter, Storage, $location, $interval) {
+.factory('Stats', ['$rootScope', '$filter', 'Storage', '$location', '$timeout',
+    function ($rootScope, $filter, Storage, $location, $timeout) {
     var StatsService = function () {
         var me = this,
             DEFAULT_REFRESH_DELAY = 5000;
@@ -24,6 +24,7 @@ angular.module('adminNg.services')
             }
 
             me.loading = true;
+            me.runningQueries = 0;
 
             angular.forEach(me.stats, function (stat) {
                 var query = {};
@@ -40,17 +41,20 @@ angular.module('adminNg.services')
                  * See MH-11892 Implement event counters efficiently
                  */
                 query.limit = 1;
+                me.runningQueries++;
 
                 me.apiService.query(query).$promise.then(function (data) {
                     me.loading = false;
                     stat.counter = data.total;
                     stat.index = me.stats.indexOf(stat);
+
+                    me.runningQueries--;
+                    me.refreshScheduler.restartSchedule();
+                }, function () {
+                    me.runningQueries--;
+                    me.refreshScheduler.restartSchedule();
                 });
             });
-
-            if (me.refreshScheduler.on) {
-                me.refreshScheduler.newSchedule();
-            }
         };
 
         /**
@@ -58,13 +62,18 @@ angular.module('adminNg.services')
          */
         this.refreshScheduler = {
             on: true,
+            restartSchedule: function () {
+              if (me.refreshScheduler.on && (angular.isUndefined(me.runningQueries) || me.runningQueries <= 0)) {
+                  me.refreshScheduler.newSchedule();
+              }
+            },
             newSchedule: function () {
                 me.refreshScheduler.cancel();
-                me.refreshScheduler.nextTimeout = $interval(me.fetch, me.refreshDelay);
+                me.refreshScheduler.nextTimeout = $timeout(me.fetch, me.refreshDelay);
             },
             cancel: function () {
                 if (me.refreshScheduler.nextTimeout) {
-                    $interval.cancel(me.refreshScheduler.nextTimeout);
+                    $timeout.cancel(me.refreshScheduler.nextTimeout);
                 }
             }
         };

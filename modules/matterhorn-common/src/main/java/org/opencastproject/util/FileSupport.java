@@ -520,10 +520,14 @@ public final class FileSupport {
       if (children == null) {
         throw new IOException("Cannot list content of directory " + f.getAbsolutePath());
       }
-      if (children.length > 0 && !recurse)
-        return false;
-      for (String child : children) {
-        delete(new File(f, child), true);
+      if (children != null) {
+        if (children.length > 0 && !recurse)
+          return false;
+        for (String child : children) {
+          delete(new File(f, child), true);
+        }
+      } else {
+        logger.debug("Unexpected null listing files in {}", f.getAbsolutePath());
       }
     }
     return f.delete();

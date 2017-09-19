@@ -124,7 +124,10 @@
                                 <tr>
                                     <th translate="EVENTS.EVENTS.DETAILS.ASSETS.TYPE"><!-- Type --></th>
                                     <th translate="EVENTS.EVENTS.DETAILS.ASSETS.SIZE"><!-- Size --></th>
-                                    <th class="medium"></th>
+                                    <th class="medium">
+                                      <a translate="EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD" class="details-link" ng-show="(uploadAssetOptions && !transactions.read_only)" ng-click="openSubTab('newAssetUpload', 'EventAttachmentsResource', 'newassetupload', false, true)">
+                                      </a>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -339,8 +342,9 @@
                                             <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TYPE"><!-- Type --></th>
                                             <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STATE"><!-- State --></th>
                                             <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTED">
-                                                <!-- Submitted -->
+                                            <!-- Submitted -->
                                             </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ACTIONS" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" class="fit"><!-- Actions --></th>
                                             <th class="medium"></th>
                                         </tr>
                                     </thead>
@@ -350,6 +354,12 @@
                                             <td>{{ item.workflow }}</td>
                                             <td>{{ item.status }}</td>
                                             <td>{{ item.submitted | localizeDate : 'dateTime' : 'medium' }}</td>
+                                            <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" >
+                                                <a ng-show="item.status == 'PAUSED'" ng-click="workflowAction(item.id, 'NONE')" class="fa fa-hand-stop-o fa-fw" style="color:red"><!-- Abort -->
+                                                </a>           
+                                                <a ng-show="item.status == 'PAUSED'" ng-click="workflowAction(item.id, 'RETRY')" class="fa fa-refresh fa-fw"><!-- Retry -->
+                                                </a>
+                                            </td>
                                             <td>
                                                 <a class="details-link" ng-click="openSubTab('workflow-details', 'EventWorkflowDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">
                                                     <!-- Details -->
@@ -806,6 +816,29 @@
                </div>
            </div>
         </div>
+    </div>
+    <div class="modal-content" data-modal-tab-content="newAssetUpload" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD">
+      <div class="modal-body">
+        <div data-admin-ng-notifications="" context="events-access"></div>
+        <div class="full-col">
+          <div class="obj tbl-container operations-tbl">
+            <header translate="EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD"><!-- Attachments --></header>
+            <div class="obj-container">
+              <!-- Note: attributes passed to the upload Directive cannot be cammel cased or contain dashes -->
+              <div admin-ng-upload-asset assetoptions="uploadAssetOptions" filebindcontainer="newAssets" >
+                <!-- init "assetoptions" for content transcluded by the asset upload directive -->
+              </div>
+              <footer>
+                <a ng-click="saveAssets()" ng-keyup="saveAssetsKeyUp($event)"
+                  data-modal-tab="next" class="submit" tabindex="100"
+                  ng-class="active">
+                  {{ "EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD" | translate}}
+                </a>
+              </footer>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="modal-content" data-modal-tab-content="attachments" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.TITLE">

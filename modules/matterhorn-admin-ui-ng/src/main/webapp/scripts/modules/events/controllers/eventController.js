@@ -24,14 +24,16 @@
 angular.module('adminNg.controllers')
 .controller('EventCtrl', [
     '$scope', 'Notifications', 'EventTransactionResource', 'EventMetadataResource', 'EventAssetsResource',
-    'EventCatalogsResource', 'CommentResource', 'EventWorkflowsResource',
+    'EventCatalogsResource', 'CommentResource', 'EventWorkflowsResource', 'EventWorkflowActionResource',
     'ResourcesListResource', 'UserRolesResource', 'EventAccessResource', 'EventGeneralResource',
     'OptoutsResource', 'EventParticipationResource', 'EventSchedulingResource', 'NewEventProcessingResource',
     'OptoutSingleResource', 'CaptureAgentsResource', 'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService',
+    'UploadAssetOptions', 'EventUploadAssetResource', 'Table',
     function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource, EventCatalogsResource, CommentResource,
-        EventWorkflowsResource, ResourcesListResource, UserRolesResource, EventAccessResource, EventGeneralResource,
+        EventWorkflowsResource, EventWorkflowActionResource, ResourcesListResource, UserRolesResource, EventAccessResource, EventGeneralResource,
         OptoutsResource, EventParticipationResource, EventSchedulingResource, NewEventProcessingResource,
-        OptoutSingleResource, CaptureAgentsResource, ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService) {
+        OptoutSingleResource, CaptureAgentsResource, ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
+        EventUploadAssetResource, Table) {
 
         var roleSlice = 100;
         var roleOffset = 0;
@@ -190,11 +192,13 @@ angular.module('adminNg.controllers')
                       if (!angular.isUndefined(me.transactionNotification)) {
                           Notifications.remove(me.transactionNotification, NOTIFICATION_CONTEXT);
                       }
-                      me.transactionNotification = Notifications.add('warning', 'ACTIVE_TRANSACTION', NOTIFICATION_CONTEXT, 3000);
+                      me.transactionNotification = Notifications.add('warning', 'ACTIVE_TRANSACTION', NOTIFICATION_CONTEXT);
+                      $scope.$emit('ACTIVE_TRANSACTION');
                     } else {
                       if (!angular.isUndefined(me.transactionNotification)) {
                           Notifications.remove(me.transactionNotification, NOTIFICATION_CONTEXT);
                       }
+                      $scope.$emit('NO_ACTIVE_TRANSACTION');
                     }
                 });
 
@@ -271,6 +275,67 @@ angular.module('adminNg.controllers')
                         metadata.entries.splice(episodeCatalogIndex, 1);
                     }
                 });
+
+                //<===============================
+                // Enable asset upload (catalogs and attachments) to existing events
+
+                // Retrieve option configuration for asset upload
+                UploadAssetOptions.getOptionsPromise().then(function(data){
+                    if (data) {
+                        $scope.assetUploadWorkflowDefId = data.workflow;
+                        $scope.uploadAssetOptions = [];
+                        // Filter out asset options of type "track".
+                        // Not allowing tracks to be added to existing mediapackages
+                        // for this iteration of the upload option feature.
+                        // TODO: consider enabling track uploads to existing mps.
+                        angular.forEach(data.options, function(option) {
+                          if (option.type !== 'track') {
+                             $scope.uploadAssetOptions.push(option);
+                          }
+                        });
+                        // if no asset options, undefine the option variable
+                        $scope.uploadAssetOptions = $scope.uploadAssetOptions.length > 0 ? $scope.uploadAssetOptions : undefined;
+                        $scope.newAssets = {};
+                    }
+                });
+                $scope.saveAssetsKeyUp = function (event) {
+                    if (event.keyCode === 13 || event.keyCode === 32) {
+                        $scope.saveAssets();
+                    }
+                };
+
+                // Save and start upload asset request and workflow
+                $scope.saveAssets = function() {
+                    // The transaction becomes read-only if a workflow is running for this event.
+                    // Ref endpoint hasActiveTransaction(@PathParam("eventId") String eventId)
+                    if ($scope.transactions.read_only) {
+                        me.transactionNotification = Notifications.add('warning', 'ACTIVE_TRANSACTION', NOTIFICATION_CONTEXT, 3000);
+                        return;
+                    }
+                    // Verify there are assets to upload
+                    if (angular.equals($scope.newAssets, {})) {
+                        return;
+                    }
+                    var userdata = { metadata: {}};
+
+                    // save metadata map (contains flavor mapping used by the server)
+                    userdata.metadata["assets"] = ($scope.uploadAssetOptions);
+
+                    // save file assets (passed in a separate request field from its metadata map)
+                    userdata["upload-asset"] = $scope.newAssets;
+
+                    // save workflow definition id (defined in the asset upload configuration provided-list)
+                    userdata["workflow"] = $scope.assetUploadWorkflowDefId;
+
+                    EventUploadAssetResource.save({id: $scope.resourceId }, userdata, function (data) {
+                        me.transactionNotification = Notifications.add('success', 'EVENTS_CREATED', NOTIFICATION_CONTEXT, 6000);
+                        $scope.openTab('assets');
+                        }, function () {
+                        me.transactionNotification = Notifications.add('error', 'EVENTS_NOT_CREATED', NOTIFICATION_CONTEXT, 6000);
+                        $scope.openTab('assets');
+                    });
+                };
+                // <==========================
 
                 $scope.acls = ResourcesListResource.get({ resource: 'ACL' });
                 $scope.actions = {};
@@ -785,11 +850,11 @@ angular.module('adminNg.controllers')
         };
 
         this.accessSaved = function () {
-          Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 5000);
+          Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT);
         };
 
         this.accessNotSaved = function () {
-          Notifications.add('error', 'ACL_NOT_SAVED', NOTIFICATION_CONTEXT, 30000);
+          Notifications.add('error', 'ACL_NOT_SAVED', NOTIFICATION_CONTEXT);
 
           $scope.access = EventAccessResource.get({ id: $scope.resourceId }, function (data) {
               if (angular.isDefined(data.episode_access)) {
@@ -921,6 +986,16 @@ angular.module('adminNg.controllers')
             $scope.modal_close();
         };
         checkForActiveTransactions();
+        
+        $scope.workflowAction = function (wfId, action) {
+        	EventWorkflowActionResource.save({id: $scope.resourceId, wfId: wfId, action: action}, function () {
+                Notifications.add('success', 'EVENTS_PROCESSING_ACTION_' + action);
+                $scope.modal_close();
+            }, function () {
+                Notifications.add('error', 'EVENTS_PROCESSING_ACTION_' + action);
+                $scope.modal_close();
+            });
+        };
 
         $scope.setCaptureAgents = function(locationIndex) {
             var agentCollection = {};
@@ -941,7 +1016,7 @@ angular.module('adminNg.controllers')
                         .collection = agentCollection;
                     $scope.setSourceFields($scope.episodeCatalog);
                 });
-        
+
         }
     }
 ]);
