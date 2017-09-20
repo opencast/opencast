@@ -294,7 +294,7 @@ angular.module('adminNg.services.modal')
             if (!http) { return; }
 
             $scope.showAdjacent = me.showAdjacent;
-			$scope.hasAdjacent = me.hasAdjacent;
+            $scope.hasAdjacent = me.hasAdjacent;
             $scope.openTab = me.openTab;
             $scope.openSubTab = me.openSubTab;
             $scope.breadcrumbs = [];
