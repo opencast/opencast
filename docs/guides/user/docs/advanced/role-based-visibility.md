@@ -134,9 +134,19 @@ For the individual tabs, it is possible to further provide access:
 
 ### Capture: Locations
 
-|Role                                  |User Interface                           |
-|--------------------------------------|-----------------------------------------|
-|ROLE_UI_LOCATIONS_VIEW                |Display *Locations* page                 |
+|Role                                  |User Interface                                         |
+|--------------------------------------|-------------------------------------------------------|
+|ROLE_UI_LOCATIONS_VIEW                |Display *Locations* page                               |
+|ROLE_UI_LOCATIONS_DELETE              |Display *Delete* action in *Locations* table           |
+|ROLE_UI_LOCATIONS_DETAILS_VIEW        |Display *Location Details* action in *Locations* table |
+
+There are quite a number of roles to provide selective access to the tabs offered by the *Locations Details* modal:
+
+|Role                                         |User Interface                   |
+|---------------------------------------------|---------------------------------|
+|ROLE_UI_LOCATIONS_DETAILS_CAPABILITIES_VIEW  |Display tab *Capabilities*       |
+|ROLE_UI_LOCATIONS_DETAILS_CONFIGURATION_VIEW |Display tab *Configuration*      |
+|ROLE_UI_LOCATIONS_DETAILS_GENERAL_VIEW       |Display tab *General*            |
 
 ### Systems: Jobs, Servers and Services
 
