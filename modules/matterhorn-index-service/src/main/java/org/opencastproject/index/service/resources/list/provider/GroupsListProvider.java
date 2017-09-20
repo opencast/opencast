@@ -96,4 +96,9 @@ public class GroupsListProvider implements ResourceListProvider {
 
     return groupsList;
   }
+
+  @Override
+  public boolean isTranslatable(String listName) {
+    return false;
+  }
 }
