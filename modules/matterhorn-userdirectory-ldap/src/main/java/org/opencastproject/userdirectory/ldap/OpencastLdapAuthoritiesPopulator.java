@@ -70,16 +70,16 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     debug("Creating new instance");
 
     if (attributeNames == null) {
-      throw new NullPointerException("The attribute list cannot be null");
+      throw new IllegalArgumentException("The attribute list cannot be null");
     }
 
     if (securityService == null) {
-      throw new NullPointerException("The security service cannot be null");
+      throw new IllegalArgumentException("The security service cannot be null");
     }
     this.securityService = securityService;
 
     if (organization == null) {
-      throw new NullPointerException("The organization cannot be null");
+      throw new IllegalArgumentException("The organization cannot be null");
     }
     this.organization = organization;
 
