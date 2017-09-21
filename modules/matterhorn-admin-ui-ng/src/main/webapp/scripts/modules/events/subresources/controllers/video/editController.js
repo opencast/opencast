@@ -48,6 +48,9 @@ angular.module('adminNg.controllers')
             $scope.video.segments.sort(function (a, b) {
                 return a.start - b.start;
             });
+
+            // Notify segmentsDirective about changed segment times
+            $scope.$root.$broadcast("segmentTimesUpdated");
         };
 
         $scope.clearSelectedSegment = function () {
