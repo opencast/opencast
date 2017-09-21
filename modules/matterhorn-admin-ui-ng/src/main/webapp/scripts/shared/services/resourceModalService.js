@@ -293,8 +293,8 @@ angular.module('adminNg.services.modal')
 
             if (!http) { return; }
 
-            $scope.showAdjacent = me.showAdjacent;
             $scope.hasAdjacent = me.hasAdjacent;
+            $scope.showAdjacent = me.showAdjacent;
             $scope.openTab = me.openTab;
             $scope.openSubTab = me.openSubTab;
             $scope.breadcrumbs = [];
