@@ -101,7 +101,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     }
 
     if (groupRoleProvider == null) {
-      warn("Provided GroupRoleProvider was null. Group roles will therefore not be expanded");
+      info("Provided GroupRoleProvider was null. Group roles will therefore not be expanded");
     }
     this.groupRoleProvider = groupRoleProvider;
 
@@ -340,13 +340,13 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
   }
 
   /**
-   * Utility class to print this instance's hash code before the warning messages
+   * Utility class to print this instance's hash code before INFO messages
    *
    * @param message
    * @param params
    */
-  private void warn(String message, Object... params) {
-    logger.warn(format("(%s) %s", hashCode(), message), params);
+  private void info(String message, Object... params) {
+    logger.info(format("(%s) %s", hashCode(), message), params);
   }
 
   /** OSGi callback for setting the role group service. */
