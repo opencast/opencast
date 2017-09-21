@@ -400,7 +400,11 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
       logger.debug("Retracting element {} ({})", element, elementFile);
 
       // Try to remove the file and its parent folder representing the mediapackage element id
-      FileUtils.forceDelete(elementFile.getParentFile());
+      if (!FileUtils.deleteQuietly(elementFile.getParentFile())) {
+        // TODO Removing a folder containing deleted files may fail on NFS volumes. This needs a cleanup strategy.
+        logger.debug("Unable to delete folder {}", elementFile.getParentFile().getAbsolutePath());
+      }
+
       if (mediapackageDir.isDirectory() && mediapackageDir.list().length == 0)
         FileSupport.delete(mediapackageDir);
 
