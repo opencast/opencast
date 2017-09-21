@@ -101,6 +101,21 @@ Additional Notes about 3.2
 Opencast 3.2 contains minor bug fixes which were merged after the release of 3.1.
 
 
+Additional Notes about 3.3
+--------------------------
+
+Opencast 3.3 contains a number of bug fixes, as well as updated libraries, several of which contain security issues. The
+following is a non-exhaustive list of known issues fixed by this release.
+
+|commons-fileupload|cxf-core       |
+|------------------|---------------|
+| CVE-2013-0248    | CVE-2017-5656 |
+| CVE-2014-0050    | CVE-2017-5653 |
+| CVE-2016-3092    | CVE-2017-3156 |
+|                  | CVE-2016-8739 |
+|                  | CVE-2016-6812 |
+
+
 Release Schedule
 ----------------
 
