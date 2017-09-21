@@ -107,10 +107,10 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
   private static final String INSTANCE_ID_SERVICE_PROPERTY_KEY = "instanceId";
 
   /** A map of pid to ldap user provider instance */
-  private Map<String, ServiceRegistration> providerRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
+  private Map<String, ServiceRegistration> providerRegistrations = new ConcurrentHashMap<>();
 
   /** A map of pid to ldap authorities populator instance */
-  private Map<String, ServiceRegistration> authoritiesPopulatorRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
+  private Map<String, ServiceRegistration> authoritiesPopulatorRegistrations = new ConcurrentHashMap<>();
 
   /** The OSGI bundle context */
   protected BundleContext bundleContext = null;
@@ -147,7 +147,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
    */
   public void activate(ComponentContext cc) {
     logger.debug("Activate LdapUserProviderFactory");
-    this.bundleContext = cc.getBundleContext();
+    bundleContext = cc.getBundleContext();
   }
 
   /**
@@ -246,13 +246,13 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     }
 
     // Dictionary to include a property to identify this LDAP instance in the security.xml file
-    Hashtable<String, String> dict = new Hashtable<String, String>();
+    Hashtable<String, String> dict = new Hashtable<>();
     dict.put(INSTANCE_ID_SERVICE_PROPERTY_KEY, instanceId);
 
     // Instantiate this LDAP instance and register it as such
     LdapUserProviderInstance provider = new LdapUserProviderInstance(pid, org, searchBase, searchFilter, url, userDn,
             password, roleAttributes, rolePrefix, extraRoles, excludePrefixes, convertToUppercase, cacheSize,
-            cacheExpiration, this.groupRoleProvider);
+            cacheExpiration);
 
     providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
 

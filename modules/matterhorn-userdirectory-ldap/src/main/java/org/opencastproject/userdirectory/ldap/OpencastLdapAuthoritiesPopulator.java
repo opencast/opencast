@@ -53,7 +53,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
   private Set<String> attributeNames;
   private String[] additionalAuthorities;
   private String prefix = "";
-  private Set<String> excludedPrefixes = new HashSet<String>();
+  private Set<String> excludedPrefixes = new HashSet<>();
   private boolean uppercase = true;
   private Organization organization;
   private SecurityService securityService;
@@ -83,7 +83,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     }
     this.organization = organization;
 
-    this.attributeNames = new HashSet<String>();
+    this.attributeNames = new HashSet<>();
     for (String attributeName : attributeNames.split(",")) {
       String temp = attributeName.trim();
       if (!temp.isEmpty())
@@ -145,7 +145,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
   @Override
   public Collection<? extends GrantedAuthority> getGrantedAuthorities(DirContextOperations userData, String username) {
 
-    Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+    Set<GrantedAuthority> authorities = new HashSet<>();
     for (String attributeName : attributeNames) {
       try {
         String[] attributeValues = userData.getStringAttributes(attributeName);
@@ -174,18 +174,18 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     }
 
     // Update the user in the security service if it matches the user whose authorities are being returned
-    if ((securityService.getOrganization().equals(this.organization))
+    if ((securityService.getOrganization().equals(organization))
             && ((securityService.getUser() == null) || (securityService.getUser().getUsername().equals(username)))) {
-      Set<JaxbRole> roles = new HashSet<JaxbRole>();
+      Set<JaxbRole> roles = new HashSet<>();
       // Get the current roles
       for (Role existingRole : securityService.getUser().getRoles()) {
         authorities.add(new SimpleGrantedAuthority(existingRole.getName()));
       }
       // Convert GrantedAuthority's into JaxbRole's
       for (GrantedAuthority authority : authorities)
-        roles.add(new JaxbRole(authority.getAuthority(), JaxbOrganization.fromOrganization(this.organization)));
+        roles.add(new JaxbRole(authority.getAuthority(), JaxbOrganization.fromOrganization(organization)));
       JaxbUser user = new JaxbUser(username, LdapUserProviderInstance.PROVIDER_NAME,
-              JaxbOrganization.fromOrganization(this.organization), roles.toArray(new JaxbRole[0]));
+              JaxbOrganization.fromOrganization(organization), roles.toArray(new JaxbRole[0]));
 
       securityService.setUser(user);
     }
@@ -199,7 +199,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
    * @return a {@link Collection} containing such attribute names
    */
   public Collection<String> getAttributeNames() {
-    return new HashSet<String>(this.attributeNames);
+    return new HashSet<>(attributeNames);
   }
 
   /**
@@ -250,9 +250,9 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
 
     if (values != null) {
       Organization org = securityService.getOrganization();
-      if (!this.organization.equals(org)) {
+      if (!organization.equals(org)) {
         throw new SecurityException(String.format("Current request belongs to the organization \"%s\". Expected \"%s\"",
-                org.getId(), this.organization.getId()));
+                org.getId(), organization.getId()));
       }
 
       for (String value : values) {
@@ -267,7 +267,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
          * considerations
          */
         String authority;
-        if (this.uppercase)
+        if (uppercase)
           authority = StringUtils.trimToEmpty(value).replaceAll(ROLE_CLEAN_REGEXP, ROLE_CLEAN_REPLACEMENT)
                   .toUpperCase();
         else
@@ -282,32 +282,32 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
           else
             groupRoles = Collections.emptyList();
 
+          // Try to add the prefix if appropriate
+          String prefix = this.prefix;
+
+          if (!prefix.isEmpty()) {
+            boolean hasExcludePrefix = false;
+            for (String excludePrefix : excludedPrefixes) {
+              if (authority.startsWith(excludePrefix)) {
+                hasExcludePrefix = true;
+                break;
+              }
+            }
+            if (hasExcludePrefix)
+              prefix = "";
+          }
+
+          authority = (prefix + authority).replaceAll(ROLE_CLEAN_REGEXP, ROLE_CLEAN_REPLACEMENT);
+
+          debug("Parsed LDAP role \"{}\" to role \"{}\"", value, authority);
+
           if (!groupRoles.isEmpty()) {
             // The authority is a group role
-            debug("Found group for the group with group role \"{}\": {}", authority, authority);
+            debug("Found group for the group with group role \"{}\"", authority);
             for (Role role : groupRoles) {
               authorities.add(new SimpleGrantedAuthority(role.getName()));
               logger.debug("\tAdded role from role \"{}\"'s group: {}", authority, role);
             }
-          } else {
-            // The authority is not a group role
-            // Therefore try to add the prefix if appropriate
-            String prefix = this.prefix;
-
-            if (!prefix.isEmpty()) {
-              boolean hasExcludePrefix = false;
-              for (String excludePrefix : excludedPrefixes) {
-                if (authority.startsWith(excludePrefix)) {
-                  hasExcludePrefix = true;
-                  break;
-                }
-              }
-              if (hasExcludePrefix)
-                prefix = "";
-            }
-
-            authority = (prefix + authority).replaceAll(ROLE_CLEAN_REGEXP, ROLE_CLEAN_REPLACEMENT);
-            debug("Parsed LDAP role \"{}\" to non-group role \"{}\"", value, authority);
           }
 
           // Finally, add the authority itself
@@ -327,7 +327,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
    * @param params
    */
   private void debug(String message, Object... params) {
-    logger.debug(format("(%s) %s", this.hashCode(), message), params);
+    logger.debug(format("(%s) %s", hashCode(), message), params);
   }
 
   /**
@@ -337,7 +337,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
    * @param params
    */
   private void error(String message, Object... params) {
-    logger.error(format("(%s) %s", this.hashCode(), message), params);
+    logger.error(format("(%s) %s", hashCode(), message), params);
   }
 
   /**
@@ -347,7 +347,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
    * @param params
    */
   private void warn(String message, Object... params) {
-    logger.warn(format("(%s) %s", this.hashCode(), message), params);
+    logger.warn(format("(%s) %s", hashCode(), message), params);
   }
 
   /** OSGi callback for setting the role group service. */

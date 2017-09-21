@@ -26,10 +26,8 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
-import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -53,7 +51,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -87,9 +84,6 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   /** A cache of users, which lightens the load on the LDAP server */
   private LoadingCache<String, Object> cache = null;
 
-  /** A service providing the different role groups */
-  private JpaGroupRoleProvider groupRoleProvider = null;
-
   /** A token to store in the miss cache */
   protected Object nullToken = new Object();
 
@@ -97,37 +91,11 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   private String rolePrefix;
 
   /** A Set of roles to be added to all the users authenticated using this LDAP instance */
-  private Set<GrantedAuthority> setExtraRoles = new HashSet<GrantedAuthority>();
+  private Set<GrantedAuthority> setExtraRoles = new HashSet<>();
 
   /** A Set of prefixes. When a role starts with any of these, the role prefix defined above will not be appended */
-  private Set<String> setExcludePrefixes = new HashSet<String>();
+  private Set<String> setExcludePrefixes = new HashSet<>();
 
-  /**
-   * Constructs an ldap user provider with the needed settings.
-   *
-   * @param pid
-   *          the pid of this service
-   * @param organization
-   *          the organization
-   * @param searchBase
-   *          the ldap search base
-   * @param searchFilter
-   *          the ldap search filter
-   * @param url
-   *          the url of the ldap server
-   * @param userDn
-   *          the user to authenticate as
-   * @param password
-   *          the user credentials
-   * @param roleAttributesGlob
-   *          the comma separate list of ldap attributes to treat as roles
-   * @param rolePrefix
-   *          a prefix to be appended to all the roles read from the LDAP server
-   * @param cacheSize
-   *          the number of users to cache
-   * @param cacheExpiration
-   *          the number of minutes to cache users
-   */
   /**
    * Constructs an ldap user provider with the needed settings.
    *
@@ -152,7 +120,9 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
    * @param extraRoles
    *          an array of extra roles to add to all the users
    * @param excludePrefixes
+   *          an array of role prefixes. The roles starting with any of these will not be prepended with the rolePrefix
    * @param convertToUppercase
+   *          whether or not the role names will be converted to uppercase
    * @param cacheSize
    *          the number of users to cache
    * @param cacheExpiration
@@ -162,8 +132,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   // CHECKSTYLE:OFF
   LdapUserProviderInstance(String pid, Organization organization, String searchBase, String searchFilter, String url,
           String userDn, String password, String roleAttributesGlob, String rolePrefix, String[] extraRoles,
-          String[] excludePrefixes, boolean convertToUppercase, int cacheSize, int cacheExpiration,
-          JpaGroupRoleProvider groupRoleProvider) {
+          String[] excludePrefixes, boolean convertToUppercase, int cacheSize, int cacheExpiration) {
     // CHECKSTYLE:ON
     this.organization = organization;
     logger.debug("Creating LdapUserProvider instance with pid=" + pid + ", and organization=" + organization
@@ -187,7 +156,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
     }
     FilterBasedLdapUserSearch userSearch = new FilterBasedLdapUserSearch(searchBase, searchFilter, contextSource);
     userSearch.setReturningAttributes(roleAttributesGlob.split(","));
-    this.delegate = new LdapUserDetailsService(userSearch);
+    delegate = new LdapUserDetailsService(userSearch);
 
     if (StringUtils.isNotBlank(roleAttributesGlob)) {
       LdapUserDetailsMapper mapper = new LdapUserDetailsMapper();
@@ -206,7 +175,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
       // The default prefix value is "ROLE_", so we must explicitly set it to "" by default
       // Because of the parameters extraRoles and excludePrefixes, we must add the prefix manually
       mapper.setRolePrefix("");
-      this.delegate.setUserDetailsMapper(mapper);
+      delegate.setUserDetailsMapper(mapper);
 
       // Process the excludePrefixes if needed
       if (!this.rolePrefix.isEmpty()) {
@@ -249,9 +218,6 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
         }
       }
     }
-
-    // Set the provider to resolve all the roles belonging to a group
-    this.groupRoleProvider = groupRoleProvider;
 
     // Setup the caches
     cache = CacheBuilder.newBuilder().maximumSize(cacheSize).expireAfterWrite(cacheExpiration, TimeUnit.MINUTES)
@@ -355,11 +321,11 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
       JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
 
       // Get the roles and add the extra roles
-      Collection<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+      Collection<GrantedAuthority> authorities = new HashSet<>();
       authorities.addAll(userDetails.getAuthorities());
       authorities.addAll(setExtraRoles);
 
-      Set<JaxbRole> roles = new HashSet<JaxbRole>();
+      Set<JaxbRole> roles = new HashSet<>();
       if (authorities != null) {
         /*
          * Please note the prefix logic for roles:
@@ -374,25 +340,15 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
         for (GrantedAuthority authority : authorities) {
           String strAuthority = authority.getAuthority();
 
-          // Check if this role is a group role and assign the extra roles appropriately
-
-          List<Role> groupRoles = groupRoleProvider.getRolesForGroup(strAuthority);
-
-          if (!groupRoles.isEmpty()) {
-            for (Role role : groupRoles) {
-              roles.add(JaxbRole.fromRole(role));
+          boolean hasExcludePrefix = false;
+          for (String excludePrefix : setExcludePrefixes) {
+            if (strAuthority.startsWith(excludePrefix)) {
+              hasExcludePrefix = true;
+              break;
             }
-          } else {
-            boolean hasExcludePrefix = false;
-            for (String excludePrefix : setExcludePrefixes) {
-              if (strAuthority.startsWith(excludePrefix)) {
-                hasExcludePrefix = true;
-                break;
-              }
-            }
-            if (!hasExcludePrefix) {
-              strAuthority = rolePrefix + strAuthority;
-            }
+          }
+          if (!hasExcludePrefix) {
+            strAuthority = rolePrefix + strAuthority;
           }
 
           // Finally, add the role itself

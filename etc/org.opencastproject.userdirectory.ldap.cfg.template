@@ -50,7 +50,6 @@ org.opencastproject.userdirectory.ldap.org=mh_default_org
 ##
 ## The prefix is *NOT* added to a role if any of the following conditions is met:
 ##
-##   * The role is found to be a "group role", i.e. it represents a user group already defined in Opencast.
 ##   * The role starts with any of the prefixes defined in the parameter 'exclude.prefixes'
 ##   * The role was not actually read from the provider, but defined in the 'extra.roles' list below
 org.opencastproject.userdirectory.ldap.roleprefix=
