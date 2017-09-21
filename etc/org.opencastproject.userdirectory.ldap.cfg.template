@@ -55,7 +55,7 @@ org.opencastproject.userdirectory.ldap.org=mh_default_org
 org.opencastproject.userdirectory.ldap.roleprefix=
 
 ## A comma-separated list of prefixes. When the roles read from LDAP start with any of these, then the prefix defined
-## above is not appended to the role.
+## above is not prepended to the role.
 ## Please note that if the "uppercase" parameter was provided, these prefixes are converted accordingly
 org.opencastproject.userdirectory.ldap.exclude.prefixes=
 

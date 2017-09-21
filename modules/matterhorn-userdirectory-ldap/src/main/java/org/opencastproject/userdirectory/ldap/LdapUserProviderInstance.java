@@ -93,7 +93,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   /** A Set of roles to be added to all the users authenticated using this LDAP instance */
   private Set<GrantedAuthority> setExtraRoles = new HashSet<>();
 
-  /** A Set of prefixes. When a role starts with any of these, the role prefix defined above will not be appended */
+  /** A Set of prefixes. When a role starts with any of these, the role prefix defined above will not be prepended */
   private Set<String> setExcludePrefixes = new HashSet<>();
 
   /**
@@ -116,7 +116,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
    * @param roleAttributesGlob
    *          the comma separate list of ldap attributes to treat as roles
    * @param rolePrefix
-   *          a prefix to be appended to all the roles read from the LDAP server
+   *          a prefix to be prepended to all the roles read from the LDAP server
    * @param extraRoles
    *          an array of extra roles to add to all the users
    * @param excludePrefixes
@@ -332,7 +332,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
          *
          * - Group roles are left intact
          * - Roles that start with any of the "exclude prefixes" are left intact
-         * - In any other case, the "role prefix" is appended to the roles read from LDAP
+         * - In any other case, the "role prefix" is prepended to the roles read from LDAP
          *
          * This only applies to the prefix addition. The conversion to uppercase is independent from these
          * considerations

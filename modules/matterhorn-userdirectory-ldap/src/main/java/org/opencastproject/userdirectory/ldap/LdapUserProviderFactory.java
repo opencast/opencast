@@ -89,8 +89,8 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
   private static final String ROLE_PREFIX_KEY = "org.opencastproject.userdirectory.ldap.roleprefix";
 
   /**
-   * The key to indicate a comma-separated list of prefixes, the roles with which won't be appended the common prefix
-   * above
+   * The key to indicate a comma-separated list of prefixes.
+   * The "role prefix" defined with the ROLE_PREFIX_KEY will not be prepended to the roles starting with any of these
    */
   private static final String EXCLUDE_PREFIXES_KEY = "org.opencastproject.userdirectory.ldap.exclude.prefixes";
 

@@ -259,9 +259,8 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
         /*
          * Please note the prefix logic for roles:
          *
-         * - Group roles are left intact
          * - Roles that start with any of the "exclude prefixes" are left intact
-         * - In any other case, the "role prefix" is appended to the roles read from LDAP
+         * - In any other case, the "role prefix" is prepended to the roles read from LDAP
          *
          * This only applies to the prefix addition. The conversion to uppercase is independent from these
          * considerations
