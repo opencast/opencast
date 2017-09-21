@@ -253,7 +253,7 @@ angular.module('adminNg.services.modal')
          */
         this.showAdjacent = function (reverse) {
             var adjacentId,
-                adjacentIndex = me.getAdjacentIndex(reverse);
+                adjacentIndex = me.getAdjacentIndex(reverse),
                 params = $location.search();
 
             if (Table.rows[adjacentIndex]) {
