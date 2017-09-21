@@ -29,7 +29,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Export-Package> 
+            <Export-Package>
               org.opencastproject.silencedetection.api;version=${project.version}
             </Export-Package>
           </instructions>
@@ -46,7 +46,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.10</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
