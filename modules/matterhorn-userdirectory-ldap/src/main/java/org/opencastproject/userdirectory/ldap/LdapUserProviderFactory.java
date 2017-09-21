@@ -196,10 +196,8 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
     // Make sure that property convertToUppercase is true by default
     String strUppercase = (String) properties.get(UPPERCASE_KEY);
-    boolean convertToUppercase = Boolean.valueOf(strUppercase);
-    if (StringUtils.isBlank(strUppercase)) {
-      convertToUppercase = true;
-    }
+    boolean convertToUppercase = StringUtils.isBlank(strUppercase) ? true : Boolean.valueOf(strUppercase);
+
     String[] extraRoles = new String[0];
     String strExtraRoles = (String) properties.get(EXTRA_ROLES_KEY);
     if (StringUtils.isNotBlank(strExtraRoles)) {
