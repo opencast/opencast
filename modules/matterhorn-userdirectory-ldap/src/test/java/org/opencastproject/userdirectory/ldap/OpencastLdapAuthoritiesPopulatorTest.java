@@ -142,7 +142,7 @@ public class OpencastLdapAuthoritiesPopulatorTest {
     try {
       new OpencastLdapAuthoritiesPopulator(null, DEFAULT_PREFIX, DEFAULT_EXCLUDE_PREFIXES, false, org, securityService,
               groupRoleProvider, DEFAULT_EXTRA_ROLES);
-    } catch (NullPointerException e) {
+    } catch (IllegalArgumentException e) {
       // OK
       return;
     }
@@ -168,7 +168,7 @@ public class OpencastLdapAuthoritiesPopulatorTest {
     try {
       new OpencastLdapAuthoritiesPopulator(DEFAULT_STR_ATTRIBUTE_NAMES, DEFAULT_PREFIX, DEFAULT_EXCLUDE_PREFIXES, false,
               null, securityService, groupRoleProvider, DEFAULT_EXTRA_ROLES);
-    } catch (NullPointerException e) {
+    } catch (IllegalArgumentException e) {
       // OK
       return;
     }
@@ -181,7 +181,7 @@ public class OpencastLdapAuthoritiesPopulatorTest {
     try {
       new OpencastLdapAuthoritiesPopulator(DEFAULT_STR_ATTRIBUTE_NAMES, DEFAULT_PREFIX, DEFAULT_EXCLUDE_PREFIXES, false,
               org, null, groupRoleProvider, DEFAULT_EXTRA_ROLES);
-    } catch (NullPointerException e) {
+    } catch (IllegalArgumentException e) {
       // OK
       return;
     }
