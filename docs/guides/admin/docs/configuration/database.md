@@ -80,7 +80,7 @@ Next, create a database called `opencast` by executing:
 
     CREATE DATABASE opencast CHARACTER SET utf8 COLLATE utf8_general_ci;
 
-Then create a user `opencast` with the password `opencast_password` and grant him all necessary rights:
+Then create a user `opencast` with the password `opencast_password` and grant it all necessary rights:
 
     GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,INDEX,TRIGGER,CREATE TEMPORARY TABLES ON opencast.*
       TO 'opencast'@'localhost' IDENTIFIED BY 'opencast_password';
