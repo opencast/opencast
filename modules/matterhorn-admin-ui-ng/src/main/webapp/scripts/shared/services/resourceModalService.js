@@ -222,6 +222,26 @@ angular.module('adminNg.services.modal')
             subNav.show();
         };
 
+        this.getAdjacentIndex = function (reverse) {
+            var adjacentIndex;
+            angular.forEach(Table.rows, function (row, index) {
+                if (String(row.id) === String(me.$scope.resourceId)) {
+                    adjacentIndex = index;
+                    return;
+                }
+            });
+            if (reverse) {
+                adjacentIndex -= 1;
+            } else {
+                adjacentIndex += 1;
+            }
+            return adjacentIndex;
+        };
+
+        this.hasAdjacent = function (reverse) {
+            return Table.rows[me.getAdjacentIndex(reverse)];
+        };
+
         /**
          * @ngdoc function
          * @name Modal.showAdjacent
@@ -232,17 +252,9 @@ angular.module('adminNg.services.modal')
          * @param {boolean} reverse Choose the previous instead of the next record.
          */
         this.showAdjacent = function (reverse) {
-            var adjacentId, adjacentIndex, params = $location.search();
-
-            angular.forEach(Table.rows, function (row, index) {
-                if (String(row.id) === String(me.$scope.resourceId)) {
-                    adjacentIndex = index;
-                    return;
-                }
-            });
-
-            if (reverse) { adjacentIndex -= 1; }
-            else         { adjacentIndex += 1; }
+            var adjacentId,
+                adjacentIndex = me.getAdjacentIndex(reverse),
+                params = $location.search();
 
             if (Table.rows[adjacentIndex]) {
                 adjacentId = Table.rows[adjacentIndex].id;
@@ -281,6 +293,7 @@ angular.module('adminNg.services.modal')
 
             if (!http) { return; }
 
+            $scope.hasAdjacent = me.hasAdjacent;
             $scope.showAdjacent = me.showAdjacent;
             $scope.openTab = me.openTab;
             $scope.openSubTab = me.openSubTab;
