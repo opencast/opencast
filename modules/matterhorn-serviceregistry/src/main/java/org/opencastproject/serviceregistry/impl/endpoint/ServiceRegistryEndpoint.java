@@ -231,12 +231,20 @@ public class ServiceRegistryEndpoint {
 
   @POST
   @Path("unregisterhost")
-  @RestQuery(name = "unregisterhost", description = "Removes a server from the cluster.", returnDescription = "No content.", restParameters = { @RestParameter(name = "host", isRequired = true, description = "The host name, including the http(s) protocol", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was removed successfully") })
+  @RestQuery(name = "unregisterhost", description = "Removes a server from the cluster.",
+          returnDescription = "No content.",
+          restParameters = {
+          @RestParameter(name = "host", isRequired = true, description = "The host name, including the http(s) protocol", type = Type.STRING)
+          }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was removed successfully") })
   public Response unregister(@FormParam("host") String host) {
     try {
       serviceRegistry.unregisterHost(host);
       return Response.status(Status.NO_CONTENT).build();
     } catch (ServiceRegistryException e) {
+      if (e.getCause() instanceof IllegalArgumentException) {
+        return Response.status(Status.NOT_FOUND).entity(e.getMessage()).build();
+      }
       throw new WebApplicationException(e);
     }
   }
