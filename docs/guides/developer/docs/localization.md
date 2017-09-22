@@ -2,7 +2,7 @@ Introduction
 ============
 
 The Opencast project uses the
-[Crowdin Localization Management Platform](https://crowdin.com/project/opencast-matterhorn) for translating
+[Crowdin Localization Management Platform](https://crowdin.com/project/opencast-community) for translating
 Opencast into a variety of languages.
 
 The English translation (en-US) acts as source language that is translated to other languages using Crowdin.
@@ -55,7 +55,7 @@ Please perform the following steps to get the tool running on your local host:
 
 1. Download the [Crowdin CLI tool](https://crowdin.com/page/cli-tool)
 2. Get the API key for the project *Opencast* 
-[here](https://crowdin.com/project/opencast-matterhorn/settings#integration)
+[here](https://crowdin.com/project/opencast-community/settings#integration)
 3. Add the following line to the Crowdin configuration file found in the Opencast code repository just after
 the first line:
 
@@ -80,7 +80,7 @@ To download the translations from Crowdin, use the following command:
 References
 ----------
 
- - [Crowdin Opencast Project](https://crowdin.com/project/opencast-matterhorn)
+ - [Crowdin Opencast Project](https://crowdin.com/project/opencast-community)
  - [Crowdin CLI Documentation](https://crowdin.com/page/cli-tool)
  - [Crowdin Versions Management Documentation](https://support.crowdin.com/articles/versions-management/)
  - [Crowdin Language Codes](https://crowdin.com/page/api/language-codes)

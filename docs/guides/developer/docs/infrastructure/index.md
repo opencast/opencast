@@ -77,18 +77,10 @@ Account Management
     - Rüdiger Rolf
 - youtube.com/opencast
     - Rüdiger Rolf
-- crowdin.com/project/opencast-matterhorn
-    - Adam McKenzie
-    - Andy Wasklewicz
-    - Basil Brunner
+- crowdin.com/project/opencast-community
     - Greg Logan
     - Lars Kiesow
-    - Michael Stypa
-    - Rubén Pérez
     - Sven Stauber
-    - Tobias Schiebeck
-    - Tobias Wunden
-    - Waldemar Smirnow
 
 Video Conferencing
 ------------------
