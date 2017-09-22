@@ -27,6 +27,7 @@ import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.apache.http.HttpStatus.SC_OK;
+import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
@@ -61,6 +62,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -189,7 +191,7 @@ public class CaptureAgentsEndpoint {
     // Run through and build a map of updates (rather than states)
     List<JValue> agentsJSON = new ArrayList<>();
     for (Agent agent : filteredAgents) {
-      agentsJSON.add(generateJsonAgent(agent, /* Option.option(room), blacklist, */ inputs));
+      agentsJSON.add(generateJsonAgent(agent, /* Option.option(room), blacklist, */ inputs, false));
     }
 
     return okJsonList(agentsJSON, offset, limit, total);
@@ -211,6 +213,32 @@ public class CaptureAgentsEndpoint {
     return Response.status(SC_OK).build();
   }
 
+  @GET
+  @Path("{name}")
+  @Produces({ MediaType.APPLICATION_JSON })
+  @RestQuery(
+    name = "getAgent",
+    description = "Return the capture agent including its configuration and capabilities",
+    pathParameters = {
+      @RestParameter(description = "Name of the capture agent", isRequired = true, name = "name", type = RestParameter.Type.STRING),
+    }, restParameters = {}, reponses = {
+      @RestResponse(description = "A JSON representation of the capture agent", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "The agent {name} does not exist in the system", responseCode = HttpServletResponse.SC_NOT_FOUND)
+    }, returnDescription = "")
+  public Response getAgent(@PathParam("name") String agentName)
+          throws NotFoundException {
+    if (service != null) {
+      Agent agent = service.getAgent(agentName);
+      if (agent != null) {
+        return okJson(generateJsonAgent(agent, true, true));
+      } else {
+        return Response.status(Status.NOT_FOUND).build();
+      }
+    } else {
+      return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
+    }
+  }
+
   /**
    * Generate a JSON Object for the given capture agent with its related blacklist periods
    *
@@ -218,20 +246,45 @@ public class CaptureAgentsEndpoint {
    *          The target capture agent
    * @param withInputs
    *          Whether the agent has inputs
+   * @param details
+   *          Whether the configuration and capabilities should be serialized
    * @return A {@link JValue} representing the capture agent
    */
-  private JValue generateJsonAgent(Agent agent, boolean withInputs) {
+  private JValue generateJsonAgent(Agent agent, boolean withInputs, boolean details) {
     List<Field> fields = new ArrayList<>();
     fields.add(f("Status", v(agent.getState(), Jsons.BLANK)));
     fields.add(f("Name", v(agent.getName())));
     fields.add(f("Update", v(toUTC(agent.getLastHeardFrom()), Jsons.BLANK)));
+    fields.add(f("URL", v(agent.getUrl(), Jsons.BLANK)));
 
     if (withInputs) {
       String devices = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_NAMES);
       fields.add(f("inputs", (StringUtils.isEmpty(devices)) ? arr() : generateJsonDevice(devices.split(","))));
     }
 
+    if (details) {
+      fields.add(f("configuration", generateJsonProperties(agent.getConfiguration())));
+      fields.add(f("capabilities", generateJsonProperties(agent.getCapabilities())));
+    }
+
     return obj(fields);
+  }
+
+  /**
+   * Generate JSON property list
+   *
+   * @param properties
+   *          Java properties to be serialized
+   * @return A JSON array containing the Java properties as key/value paris
+   */
+  private JValue generateJsonProperties(Properties properties) {
+    List<JValue> fields = new ArrayList<>();
+    if (properties != null) {
+      for (String key : properties.stringPropertyNames()) {
+        fields.add(obj(f("key", v(key)), f("value", v(properties.getProperty(key)))));
+      }
+    }
+    return arr(fields);
   }
 
   /**
