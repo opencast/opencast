@@ -3101,6 +3101,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           }
         } catch (UndispatchableJobException e) {
           throw e;
+        } catch (TrustedHttpClientException e) {
+          // Will try another node. If no other node, it will be re-queued
+          logger.warn("Unable to dispatch job {}", job.getId(), e);
+          continue;
         } catch (Exception e) {
           logger.warn("Unable to dispatch job {}", job.getId(), e);
         } finally {
