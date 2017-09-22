@@ -36,7 +36,8 @@ angular.module('adminNg.controllers')
             caption:    'SYSTEMS.SERVICES.TABLE.CAPTION',
             resource:   'services',
             category:   'systems',
-            apiService: ServicesResource
+            apiService: ServicesResource,
+            sorter:     {"sorter":{"services":{"status":{"name":"status","priority":0,"order":"DESC"}}}}
         });
 
         $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });

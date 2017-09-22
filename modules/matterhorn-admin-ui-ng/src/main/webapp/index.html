@@ -61,13 +61,13 @@
 
                 <div class="nav-dd info-dd" id="info-dd" old-admin-ng-dropdown="">
                   <i class="fa fa-bell" aria-hidden="true"></i>
-                      <span id="error-count" class="badge" ng-show="service.error">{{ service.numErr }}</span>
+                      <span id="error-count" class="badge" ng-show="services.error">{{ services.numErr }}</span>
                     <ul class="dropdown-ul">
-                      <li><!-- service directive -->
-                        <a href="#">
-                          <span>{{ service.name }}</span>
-                          <span class="ng-multi-value ng-multi-value-red" ng-if="service.error">{{ service.status }}</span>
-                          <span class="ng-multi-value ng-multi-value-green" ng-if="!service.error">{{ service.status }}</span>
+                      <li ng-repeat="(key, value) in services.service"><!-- service directive -->
+                        <a href="#{{ value.link }}">
+                          <span>{{ key }}</span>
+                          <span class="ng-multi-value ng-multi-value-red" ng-if="value.error">{{ value.status }}</span>
+                          <span class="ng-multi-value ng-multi-value-green" ng-if="!value.error">{{ value.status }}</span>
                         </a>
                       </li><!-- directive end -->
                     </ul>

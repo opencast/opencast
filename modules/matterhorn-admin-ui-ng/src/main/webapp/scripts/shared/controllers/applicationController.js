@@ -19,8 +19,8 @@ angular.module('adminNg.controllers')
         $scope.documentationUrl = undefined;
         $scope.restdocsUrl = undefined;
         $scope.mediaModuleUrl = undefined;
-        RestServiceMonitor.setService('ActiveMQ');
-        $scope.service = RestServiceMonitor.getServiceStatus();
+        RestServiceMonitor.run();
+        $scope.services = RestServiceMonitor.getServiceStatus();
 
         AuthService.getUser().$promise.then(function (user) {
             $scope.currentUser = user;
