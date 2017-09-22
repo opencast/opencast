@@ -133,7 +133,7 @@ Please create a single post on the Opencast Users list:
     Sincerly,
     Your Opencast <VERSION> Release Manager
 
-    [1] Opencast project on Crowdin, https://crowdin.com/project/opencast-matterhorn
+    [1] Opencast project on Crowdin, https://crowdin.com/project/opencast-community
     [2] Inclusion and Exclusion of Translations, https://docs.opencast.org/develop/developer/... 
 
 In case endangered languages have been identified, this needs to be communicated immediately to the Opencast community.

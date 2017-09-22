@@ -28,11 +28,11 @@ favorite language in Opencast!
 How can I provide a language translation?
 -----------------------------------------
 
-We use the [Crowdin Localization Management Platform](https://crowdin.com/project/opencast-matterhorn) - an easy to
+We use the [Crowdin Localization Management Platform](https://crowdin.com/project/opencast-community) - an easy to
 use web service for localization management. To provide a language translation, please perform the following steps:
 
 1. Create a free account on [Crowdin](https://crowdin.com)
-2. Visit the [Opencast project](https://crowdin.com/project/opencast-matterhorn) on Crowdin and issue a join request
+2. Visit the [Opencast project](https://crowdin.com/project/opencast-community) on Crowdin and issue a join request
 3. Translate Opencast on Crowdin
 
 Once the translation reaches at least 90% (prefarable 100%), please read the section about include and exclusion
@@ -61,7 +61,7 @@ language translations in Opencast releases below:
 5.  An endangered translation may be saved by reaching at least 90% translated until at least two weeks before the
     release date of the next major release and a reviewer is found
 
-Note that [Crowdin](https://crowdin.com/project/opencast-matterhorn) is displaying the percentage translated for 
+Note that [Crowdin](https://crowdin.com/project/opencast-community) is displaying the percentage translated for 
 each language. It is the percentages shown on that page that act as reference.
 Considering the dates when releases branch are cut, the respective releases schedules act as reference.
 
