@@ -51,6 +51,7 @@
         <configuration key="comment">false</configuration>
         <configuration key="publishToMediaModule">true</configuration>
         <configuration key="publishToOaiPmh">true</configuration>
+        <configuration key="uploadedSearchPreview">false</configuration>
       </configurations>
     </operation>
 
@@ -77,6 +78,18 @@
       <configurations>
         <configuration key="source-flavors">*/*</configuration>
         <configuration key="target-tags">+archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Tag any optionally uploaded assets -->
+    <operation
+      id="tag"
+      if="${downloadSourceflavorsExist}"
+      exception-handler-workflow="ng-partial-error"
+      description="Tagging uploaded assets for distribution">
+      <configurations>
+        <configuration key="source-flavors">${download-source-flavors}</configuration>
+        <configuration key="target-tags">+engage-download</configuration>
       </configurations>
     </operation>
 
@@ -122,10 +135,10 @@
     </operation>
 
     <!-- encode to engage search result thumbnails -->
-
+    <!-- skip this when manually uploaded */search+preview -->
     <operation
       id="image"
-      if="${publishToMediaModule} OR ${publishToOaiPmh}"
+      if="(NOT ${uploadedSearchPreview}) AND (${publishToMediaModule} OR ${publishToOaiPmh})"
       fail-on-error="true"
       exception-handler-workflow="ng-partial-error"
       description="Creating Engage search result thumbnails">

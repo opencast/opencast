@@ -43,6 +43,8 @@ describe('Event controller', function () {
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/access.json')));
         $httpBackend.whenGET('/admin-ng/event/40518/participation.json').respond({});
         $httpBackend.whenGET('/admin-ng/resources/components.json').respond({});
+        $httpBackend.whenGET('/admin-ng/resources/eventUploadAssetOptions.json')
+            .respond(JSON.stringify(getJSONFixture('admin-ng/resources/eventUploadAssetOptions.json')));
         $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond({});
         $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond({});
         $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNEL.LABELS.json').respond({});

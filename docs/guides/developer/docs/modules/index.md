@@ -7,6 +7,7 @@ or subsystems of Opencast.
 - Administrative User Interface
     - [Development](admin-ui/development.md)
     - [Style Guide](admin-ui/style/index.md)
+- [Capture Agent](capture-agent.md)
 - Player
     - [Architecture](player/architecture.md)
     - [Core Reference](player/core.reference.md)

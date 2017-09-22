@@ -17,15 +17,21 @@ angular.module('adminNg.resources')
 
             transformRequest: function (data) {
                 if (angular.isUndefined(data)) {
-                    return data;
+                    return data = [];
                 }
 
                 // The end point expects a multipart request payload with two fields
                 // 1. A form field called 'metadata' containing all userdata
                 // 2. A non-form field either called 'presenter', 'presentation' or
                 //    'audio' which contains a File object
+                // 3. Optional asset config mapping and asset upload files
+                var fd = new FormData(), source, sourceType = data.source.type, assetConfig, tempAssetList = [], flavorList = [];
 
-                var fd = new FormData(), source, sourceType = data.source.type;
+                // If asset upload files exist, add asset mapping defaults
+                // IndexServiceImpl processes the catalog or attachment based on the asset metadata map
+                if (data['upload-asset'] && data['upload-asset'].assets) {
+                  assetConfig = data['upload-asset'].defaults;
+                }
 
                 source = {
                     type: sourceType
@@ -88,7 +94,42 @@ angular.module('adminNg.resources')
                     });
                 });
 
-                // Add metadata form field
+                // Dynamic source config and multiple source per type allowed
+                if (sourceType === 'UPLOAD') {
+                    if (data.source.upload) {
+                       angular.forEach(data.source.upload, function(files, name) {
+                          angular.forEach(files, function (file, index) {
+                             fd.append(name + "." + index, file);
+                          });
+                       });
+                    }
+                }
+
+                if (assetConfig) {
+                    angular.forEach(data['upload-asset'].assets, function(files, name) {
+                        angular.forEach(files, function (file, index) {
+                            fd.append(name + "." + index, file);
+                            tempAssetList.push(name);
+                        });
+                    });
+                    // special case to override creation of search preview when one is uploaded
+                    assetConfig["options"].forEach(function(dataItem) {
+                        if (tempAssetList.indexOf(dataItem.id) >= 0) {
+                           flavorList.push(dataItem.flavorType + "/" + dataItem.flavorSubType);
+                           if (dataItem.flavorSubType == "search+preview") {
+                               data.processing.workflow.selection.configuration["uploadedSearchPreview"] = "true";
+                           }
+                        }
+                    });
+                }
+
+                // set workflow boolean param and flavor list param
+                if (flavorList.length > 0) {
+                    data.processing.workflow.selection.configuration["downloadSourceflavorsExist"] = "true";
+                    data.processing.workflow.selection.configuration["download-source-flavors"] = flavorList.join(", ");
+                }
+
+               // Add metadata form field
                 fd.append('metadata', JSON.stringify({
                     metadata: data.metadata,
                     processing: {
@@ -96,23 +137,9 @@ angular.module('adminNg.resources')
                         configuration: data.processing.workflow.selection.configuration
                     },
                     access: data.access,
-                    source: source
+                    source: source,
+                    assets: assetConfig
                 }));
-
-                if (sourceType === 'UPLOAD') {
-                    // Add file field, depending on its source
-                    if (data.source.upload.audioOnly) {
-                        fd.append('audio', data.source.upload.audioOnly);
-                    }
-
-                    if (data.source.upload.segmentable) {
-                        fd.append('presentation', data.source.upload.segmentable);
-                    }
-
-                    if (data.source.upload.nonSegmentable) {
-                        fd.append('presenter', data.source.upload.nonSegmentable);
-                    }
-                }
 
                 return fd;
             }

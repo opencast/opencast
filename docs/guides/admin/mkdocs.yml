@@ -36,6 +36,7 @@ pages:
    - Asset Manager: 'configuration/asset-manager.md'
    - Message Broker: 'configuration/message-broker.md'
    - Metadata: 'configuration/metadata.md'
+   - Manual Asset Upload: 'configuration/asset-upload-ui/index.md'
    - Encoding: 'configuration/encoding.md'
    - Load: 'configuration/load.md'
    - Logging and Privacy: 'configuration/logging.and.privacy.md'
@@ -72,6 +73,7 @@ pages:
       - Architecture: 'modules/videoeditor.architecture.md'
    - Video Segmentation: 'modules/videosegmentation.md'
    - Waveform Service: 'modules/waveform.md'
+   - Wowza Adaptive Streaming Distribution Service: 'modules/adaptivestreaming-wowza.md'
    - YouTube Publication: 'modules/youtubepublication.md'
 - Workflow Operation Handler:
    - Overview: 'workflowoperationhandlers/index.md'
