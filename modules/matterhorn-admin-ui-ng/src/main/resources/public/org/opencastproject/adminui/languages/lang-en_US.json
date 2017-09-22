@@ -370,6 +370,10 @@
                "AUDIO_ONLY": {
                    "SHORT": "Audio only",
                    "DETAIL": "The file contains only audio."
+               },
+               "MULTIPLE_PARTS": {
+                   "SHORT": "Multiple parts",
+                   "DETAIL": "A set of files containing different parts of the event."
                }
            },
            "DATE_TIME": {
@@ -396,6 +400,19 @@
            "SELECT_WORKFLOW": "Select workflow",
            "SELECT_WORKFLOW_EMPTY": "No workflow found",
            "WORKFLOW": "Workflow"
+         },
+         "UPLOAD_ASSET": {
+           "CAPTION": "Asset Upload",
+           "SELECT_TYPE": "Select asset type",
+           "ADD": "Add Asset",
+           "OPTION": {
+               "CLASS_HANDOUT_NOTES":"Class handout notes",
+               "CAPTIONS_DFXP" : "Captions DFXP",
+               "CAPTIONS_WEBVTT" : "Captions WebVTT",
+               "PREVIEW_IMAGE" : "Preview image",
+               "SMIL": "Smil catalog",
+               "TRACK_PARTS": "Track parts"
+           }
          },
          "ACCESS": {
            "CAPTION": "Access policy",

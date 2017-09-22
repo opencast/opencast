@@ -91,6 +91,8 @@ public class ExecuteOnceWorkflowOperationHandlerTest {
             .andReturn(null).anyTimes();
     EasyMock.expect(operation.getConfiguration(ExecuteOnceWorkflowOperationHandler.OUTPUT_FILENAME_PROPERTY))
             .andReturn(null).anyTimes();
+    EasyMock.expect(operation.getConfiguration(ExecuteOnceWorkflowOperationHandler.SET_WF_PROPS_PROPERTY))
+            .andReturn("false").anyTimes();
     // these two need to supply a real string
     EasyMock.expect(operation.getConfiguration(ExecuteOnceWorkflowOperationHandler.EXPECTED_TYPE_PROPERTY))
             .andReturn(expectedTypeString).anyTimes();

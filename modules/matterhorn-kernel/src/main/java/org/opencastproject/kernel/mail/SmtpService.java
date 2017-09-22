@@ -50,6 +50,11 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
   private static final String OPT_MAIL_MODE = "mail.mode";
 
   /**
+   * Pattern to split strings containing lists of emails. This pattern matches any number of contiguous spaces or commas
+   */
+  private static final String SPLIT_PATTERN = "[\\s,]+";
+
+  /**
    * Callback from the OSGi <code>ConfigurationAdmin</code> on configuration changes.
    *
    * @param properties
@@ -150,11 +155,15 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
 
   /**
    * Method to send a message
-   * 
-   * @param to Recipient of the message
-   * @param subject Subject of the message
-   * @param body Body of the message
-   * @throws MessagingException if sending the message failed
+   *
+   * @param to
+   *          Recipient of the message
+   * @param subject
+   *          Subject of the message
+   * @param body
+   *          Body of the message
+   * @throws MessagingException
+   *           if sending the message failed
    */
   public void send(String to, String subject, String body) throws MessagingException {
     MimeMessage message = createMessage();
@@ -164,4 +173,85 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
     message.saveChanges();
     send(message);
   }
+
+  /**
+   * Send a message to multiple recipients
+   *
+   * @param to
+   *          "To:" message recipient(s), separated by commas and/or spaces
+   * @param cc
+   *          "CC:" message recipient(s), separated by commas and/or spaces
+   * @param bcc
+   *          "BCC:" message recipient(s), separated by commas and/or spaces
+   * @param subject
+   *          Subject of the message
+   * @param body
+   *          Body of the message
+   * @throws MessagingException
+   *           if sending the message failed
+   */
+  public void send(String to, String cc, String bcc, String subject, String body) throws MessagingException {
+    String[] toArray = null;
+    String[] ccArray = null;
+    String[] bccArray = null;
+
+    if (to != null)
+      toArray = to.trim().split(SPLIT_PATTERN, 0);
+
+    if (cc != null)
+      ccArray = cc.trim().split(SPLIT_PATTERN, 0);
+
+    if (bcc != null)
+      bccArray = bcc.trim().split(SPLIT_PATTERN, 0);
+
+    send(toArray, ccArray, bccArray, subject, body);
+  }
+
+  /**
+   * Send a message to multiple recipients
+   *
+   * @param to
+   *          Array with the "To:" recipients of the message
+   * @param cc
+   *          Array with the "CC:" recipients of the message
+   * @param bcc
+   *          Array with the "BCC:" recipients of the message
+   * @param subject
+   *          Subject of the message
+   * @param body
+   *          Body of the message
+   * @throws MessagingException
+   *           if sending the message failed
+   */
+  public void send(String[] to, String[] cc, String[] bcc, String subject, String body) throws MessagingException {
+    MimeMessage message = createMessage();
+    addRecipients(message, RecipientType.TO, to);
+    addRecipients(message, RecipientType.CC, cc);
+    addRecipients(message, RecipientType.BCC, bcc);
+    message.setSubject(subject);
+    message.setText(body);
+    message.saveChanges();
+    send(message);
+  }
+
+  /**
+   * Process an array of recipients with the given {@link javax.mail.Message.RecipientType}
+   *
+   * @param message
+   *          The message to add the recipients to
+   * @param type
+   *          The type of recipient
+   * @param addresses
+   * @throws MessagingException
+   */
+  private static void addRecipients(MimeMessage message, RecipientType type, String... strAddresses)
+          throws MessagingException {
+    if (strAddresses != null) {
+      InternetAddress[] addresses = new InternetAddress[strAddresses.length];
+      for (int i = 0; i < strAddresses.length; i++)
+        addresses[i] = new InternetAddress(strAddresses[i]);
+      message.addRecipients(type, addresses);
+    }
+  }
+
 }

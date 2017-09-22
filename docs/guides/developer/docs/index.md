@@ -21,6 +21,7 @@ These guides will help you if you want to participate in Opencast development.
     - Administrative User Interface
         - [Development](modules/admin-ui/development.md)
         - [Style Guide](modules/admin-ui/style/index.md)
+    - [Capture Agent](modules/capture-agent.md)
     - [Stream Security](modules/stream-security.md)
     - […](modules/index.md)
  - [External API](api/index.md)

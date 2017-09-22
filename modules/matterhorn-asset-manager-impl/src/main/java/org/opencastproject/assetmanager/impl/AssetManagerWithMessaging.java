@@ -132,15 +132,19 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator
                 (int) r.getSize());
         for (final Map.Entry<String, List<Snapshot>> es : byOrg.entrySet()) {
           final Organization organization = AssetManagerWithMessaging.this.orgDir.getOrganization(es.getKey());
-          for (final Snapshot e : es.getValue()) {
-            batch.update(organization, new P1Lazy<Serializable>() {
-              @Override
-              public Serializable get1() {
-                return mkTakeSnapshotMessage(e);
+            for (final Snapshot e : es.getValue()) {
+              try {
+                batch.update(organization, new P1Lazy<Serializable>() {
+                  @Override
+                  public Serializable get1() {
+                    return mkTakeSnapshotMessage(e);
+                  }
+                });
+              } catch (Exception excpt) {
+                logger.error("Skipping non existing Asset. " + excpt);
               }
-            });
+            }
           }
-        }
         logger.info("Populating index | end");
         Organization organization = new DefaultOrganization();
         SecurityUtil.runAs(getSecurityService(), organization,

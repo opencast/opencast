@@ -1568,6 +1568,35 @@ public abstract class AbstractEventEndpoint {
     }
   }
 
+  // MH-12085 Add manually uploaded assets, multipart file upload has to be a POST
+  @POST
+  @Path("{eventId}/assets")
+  @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @RestQuery(name = "updateAssets", description = "Update or create an asset for the eventId by the given metadata as JSON and files in the body",
+  pathParameters = {
+  @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) },
+  restParameters = {
+  @RestParameter(name = "metadata", isRequired = true, type = RestParameter.Type.TEXT, description = "The list of asset metadata") },
+  reponses = {
+  @RestResponse(description = "The asset has been added.", responseCode = HttpServletResponse.SC_OK),
+  @RestResponse(description = "Could not add asset, problem with the metadata or files.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) },
+  returnDescription = "The workflow identifier")
+  public Response updateAssets(@PathParam("eventId") final String eventId,
+          @Context HttpServletRequest request)  throws Exception {
+    try {
+      MediaPackage mp = getMediaPackageByEventId(eventId);
+      String result = getIndexService().updateEventAssets(mp, request);
+      return Response.status(Status.CREATED).entity(result).build();
+    }  catch (NotFoundException e) {
+      return notFound("Cannot find an event with id '%s'.", eventId);
+    } catch (IllegalArgumentException e) {
+      return RestUtil.R.badRequest(e.getMessage());
+    } catch (Exception e) {
+      return RestUtil.R.serverError();
+    }
+  }
+
   @PUT
   @Path("{eventId}/optout/{optout}")
   @RestQuery(name = "updateEventOptoutStatus", description = "Updates an event's opt out status.", returnDescription = "The method doesn't return any content", pathParameters = {

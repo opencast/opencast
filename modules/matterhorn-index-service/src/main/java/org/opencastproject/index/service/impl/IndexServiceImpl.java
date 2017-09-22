@@ -22,7 +22,6 @@
 package org.opencastproject.index.service.impl;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
@@ -32,6 +31,7 @@ import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.Predicate;
+import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.CaptureParameters;
@@ -64,6 +64,7 @@ import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SortCriterion;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -111,6 +112,7 @@ import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Tuple;
+import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -149,6 +151,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -163,6 +166,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
@@ -180,6 +184,21 @@ public class IndexServiceImpl implements IndexService {
 
   private final List<EventCatalogUIAdapter> eventCatalogUIAdapters = new ArrayList<>();
   private final List<SeriesCatalogUIAdapter> seriesCatalogUIAdapters = new ArrayList<>();
+
+  /** A parser for handling JSON documents inside the body of a request. **/
+  private static final JSONParser parser = new JSONParser();
+
+  private String attachmentRegex = "^attachment.*";
+  private String catalogRegex = "^catalog.*";
+  private String trackRegex = "^track.*";
+  private String numberedAssetRegex = "^\\*$";
+
+  private boolean isOverwriteExistingAsset = true;
+  private Pattern patternAttachment = Pattern.compile(attachmentRegex);
+  private Pattern patternCatalog = Pattern.compile(catalogRegex);
+  private Pattern patternTrack = Pattern.compile(trackRegex);
+  private Pattern patternNumberedAsset = Pattern.compile(numberedAssetRegex);
+
   private EventCatalogUIAdapter eventCatalogUIAdapter;
   private SeriesCatalogUIAdapter seriesCatalogUIAdapter;
 
@@ -200,101 +219,200 @@ public class IndexServiceImpl implements IndexService {
   /** The single thread executor service */
   private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param aclServiceFactory
+   *          the factory to set
+   */
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param authorizationService
+   *          the service to set
+   */
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param captureAgentStateService
+   *          the service to set
+   */
   public void setCaptureAgentStateService(CaptureAgentStateService captureAgentStateService) {
     this.captureAgentStateService = captureAgentStateService;
   }
 
-  /** OSGi callback for the event comment service. */
+  /**
+   * OSGi callback for the event comment service.
+   *
+   * @param eventCommentService
+   *          the service to set
+   */
   public void setEventCommentService(EventCommentService eventCommentService) {
     this.eventCommentService = eventCommentService;
   }
 
-  /** OSGi callback to add the event dublincore {@link EventCatalogUIAdapter} instance. */
+  /**
+   * OSGi callback to add the event dublincore {@link EventCatalogUIAdapter} instance.
+   *
+   * @param eventCatalogUIAdapter
+   *          the adapter to set
+   */
   public void setCommonEventCatalogUIAdapter(CommonEventCatalogUIAdapter eventCatalogUIAdapter) {
     this.eventCatalogUIAdapter = eventCatalogUIAdapter;
   }
 
-  /** OSGi callback to add the series dublincore {@link SeriesCatalogUIAdapter} instance. */
+  /**
+   * OSGi callback to add the series dublincore {@link SeriesCatalogUIAdapter} instance.
+   *
+   * @param seriesCatalogUIAdapter
+   *          the adapter to set
+   */
   public void setCommonSeriesCatalogUIAdapter(CommonSeriesCatalogUIAdapter seriesCatalogUIAdapter) {
     this.seriesCatalogUIAdapter = seriesCatalogUIAdapter;
   }
 
-  /** OSGi callback to add {@link EventCatalogUIAdapter} instance. */
+  /**
+   * OSGi callback to add {@link EventCatalogUIAdapter} instance.
+   *
+   * @param catalogUIAdapter
+   *          the adapter to add
+   */
   public void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     eventCatalogUIAdapters.add(catalogUIAdapter);
   }
 
-  /** OSGi callback to remove {@link EventCatalogUIAdapter} instance. */
+  /**
+   * OSGi callback to remove {@link EventCatalogUIAdapter} instance.
+   *
+   * @param catalogUIAdapter
+   *          the adapter to remove
+   */
   public void removeCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     eventCatalogUIAdapters.remove(catalogUIAdapter);
   }
 
-  /** OSGi callback to add {@link SeriesCatalogUIAdapter} instance. */
+  /**
+   * OSGi callback to add {@link SeriesCatalogUIAdapter} instance.
+   *
+   * @param catalogUIAdapter
+   *          the adapter to add
+   */
   public void addCatalogUIAdapter(SeriesCatalogUIAdapter catalogUIAdapter) {
     seriesCatalogUIAdapters.add(catalogUIAdapter);
   }
 
-  /** OSGi callback to remove {@link SeriesCatalogUIAdapter} instance. */
+  /**
+   * OSGi callback to remove {@link SeriesCatalogUIAdapter} instance.
+   *
+   * @param catalogUIAdapter
+   *          the adapter to remove
+   */
   public void removeCatalogUIAdapter(SeriesCatalogUIAdapter catalogUIAdapter) {
     seriesCatalogUIAdapters.remove(catalogUIAdapter);
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param ingestService
+   *          the service to set
+   */
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param assetManager
+   *          the manager to set
+   */
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param schedulerService
+   *          the service to set
+   */
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param securityService
+   *          the service to set
+   */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param seriesService
+   *          the service to set
+   */
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param workflowService
+   *          the service to set
+   */
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param workspace
+   *          the workspace to set
+   */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param userDirectoryService
+   *          the service to set
+   */
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
-  /** OSGi DI. */
+  /**
+   * OSGi DI.
+   *
+   * @param jpaGroupRoleProvider
+   *          the provider to set
+   */
   public void setGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
     this.jpaGroupRoleProvider = jpaGroupRoleProvider;
   }
 
+  /**
+   *
+   * @return the acl service
+   */
   public AclService getAclService() {
     return aclServiceFactory.serviceFor(securityService.getOrganization());
   }
@@ -350,6 +468,12 @@ public class IndexServiceImpl implements IndexService {
   public String createEvent(HttpServletRequest request) throws IndexServiceException {
     JSONObject metadataJson = null;
     MediaPackage mp = null;
+    // regex for form field name matching an attachment or a catalog
+    // The first sub items identifies if the file is an attachment or catalog
+    // The second is the item flavor
+    // Example form field names:  "catalog/captions/timedtext" and "attachment/captions/vtt"
+    // The prefix of field name for attachment and catalog
+    List<String> assetList = new LinkedList<String>();
     try {
       if (ServletFileUpload.isMultipartContent(request)) {
         mp = ingestService.createMediaPackage();
@@ -376,11 +500,38 @@ public class IndexServiceImpl implements IndexService {
             } else if ("audio".equals(item.getFieldName())) {
               mp = ingestService.addTrack(item.openStream(), item.getName(),
                       new MediaPackageElementFlavor("presenter-audio", "source"), mp);
-            } else {
+              // For dynamic uploads, cannot get flavor at this point, so saving with temporary flavor
+            } else if (item.getFieldName().toLowerCase().matches(attachmentRegex)) {
+              assetList.add(item.getFieldName());
+              mp =  ingestService.addAttachment(item.openStream(), item.getName(),
+                      new MediaPackageElementFlavor(item.getFieldName(), "*"), mp);
+            } else if (item.getFieldName().toLowerCase().matches(catalogRegex)) {
+              // Cannot get flavor at this point, so saving with temporary flavor
+              assetList.add(item.getFieldName());
+              mp =  ingestService.addCatalog(item.openStream(), item.getName(),
+                      new MediaPackageElementFlavor(item.getFieldName(), "*"), mp);
+            } else if (item.getFieldName().toLowerCase().matches(trackRegex)) {
+              // Cannot get flavor at this point, so saving with temporary flavor
+              assetList.add(item.getFieldName());
+              mp = ingestService.addTrack(item.openStream(), item.getName(),
+                      new MediaPackageElementFlavor(item.getFieldName(), "*"), mp);
+              } else {
               logger.warn("Unknown field name found {}", item.getFieldName());
             }
           }
         }
+        // MH-12085 update the flavors of any newly added assets.
+        try {
+          JSONArray assetMetadata = (JSONArray)((JSONObject) metadataJson.get("assets")).get("options");
+          if (assetMetadata != null) {
+            mp = updateMpAssetFlavor(assetList, mp, assetMetadata, isOverwriteExistingAsset);
+           }
+          } catch (Exception e) {
+            // Assuming a parse error versus a file error and logging the error type
+            logger.warn("Unable to process asset metadata {}", metadataJson.get("assets"), e);
+            throw new IllegalArgumentException("Unable to parse metadata", e);
+          }
+
       } else {
         throw new IllegalArgumentException("No multipart content");
       }
@@ -399,6 +550,167 @@ public class IndexServiceImpl implements IndexService {
       logger.error("Unable to create event: {}", getStackTrace(e));
       throw new IndexServiceException(e.getMessage());
     }
+  }
+
+  @Override
+  public String updateEventAssets(MediaPackage mp, HttpServletRequest request) throws IndexServiceException {
+    JSONObject metadataJson = null;
+    // regex for form field name matching an attachment or a catalog
+    // The first sub items identifies if the file is an attachment or catalog
+    // The second is the item flavor
+    // Example form field names:  "catalog/captions/timedtext" and "attachment/captions/vtt"
+    // The prefix of field name for attachment and catalog
+    // The metadata is expected to contain a workflow definition id and
+    // asset metadata mapped to the asset field id.
+    List<String> assetList = new LinkedList<String>();
+    // 1. save assets with temporary flavors
+    try {
+      if (!ServletFileUpload.isMultipartContent(request)) {
+        throw new IllegalArgumentException("No multipart content");
+      }
+      for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
+        FileItemStream item = iter.next();
+        String fieldName = item.getFieldName();
+        if (item.isFormField()) {
+          if ("metadata".equals(fieldName)) {
+            String metadata = Streams.asString(item.openStream());
+            try {
+              metadataJson = (JSONObject) parser.parse(metadata);
+            } catch (Exception e) {
+              logger.warn("Unable to parse metadata {}", metadata);
+              throw new IllegalArgumentException("Unable to parse metadata");
+            }
+          }
+        } else {
+          if (item.getFieldName().toLowerCase().matches(attachmentRegex)) {
+            assetList.add(item.getFieldName());
+            // Add attachment with field name as temporary flavor
+            mp =  ingestService.addAttachment(item.openStream(), item.getName(),
+                    new MediaPackageElementFlavor(item.getFieldName(), "*"), mp);
+          } else if (item.getFieldName().toLowerCase().matches(catalogRegex)) {
+
+            assetList.add(item.getFieldName());
+            // Add catalog with field name as temporary flavor
+            mp =  ingestService.addCatalog(item.openStream(), item.getName(),
+                    new MediaPackageElementFlavor(item.getFieldName(), "*"), mp);
+          } else {
+            logger.warn("Unknown field name found {}", item.getFieldName());
+          }
+        }
+      }
+      // 2. remove existing assets of the new flavor
+      // and correct the temporary flavor to the new flavor.
+      try {
+        JSONArray assetMetadata = (JSONArray)((JSONObject) metadataJson.get("assets")).get("options");
+        if (assetMetadata != null) {
+          mp = updateMpAssetFlavor(assetList, mp, assetMetadata, isOverwriteExistingAsset);
+        } else {
+          logger.warn("The asset option mapping parameter was not found");
+          throw new IndexServiceException("The asset option mapping parameter was not found");
+        }
+      } catch (Exception e) {
+        // Assuming a parse error versus a file error and logging the error type
+        logger.warn("Unable to process asset metadata {}", metadataJson.get("assets"), e);
+        throw new IllegalArgumentException("Unable to parse metadata", e);
+      }
+
+      return startAddAssetWorkflow(metadataJson, mp);
+    } catch (Exception e) {
+      logger.error("Unable to create event: {}", getStackTrace(e));
+      throw new IndexServiceException(e.getMessage());
+    }
+  }
+
+  /**
+   * Parses the processing information, including the workflowDefinitionId, from the metadataJson and starts the
+   * workflow with the passed mediapackage.
+   *
+   * TODO NOTE: This checks for running workflows, then takes a snapshot prior to starting a new workflow. This causes a
+   * potential race condition:
+   *
+   * 1. An existing workflow is running, the add asset workflow cannot start.
+   *
+   * 2. The snapshot(4x) archive(3x) is saved and the new workflow is started.
+   *
+   * 3. Possible race condition: No running workflow, a snapshot is saved but the workflow cannot start because another
+   * workflow has started between the time of checking and starting running.
+   *
+   * 4. If race condition: the Admin UI shows error that the workflow could not start.
+   *
+   * 5. If race condition: The interim snapshot(4x) archive(3x) is updated(4x-3x) by the running workflow's snapshots
+   * and resolves the inconsistency, eventually.
+   *
+   * Example of processing json:
+   *
+   * ...., "processing": { "workflow": "full", "configuration": { "videoPreview": "false", "trimHold": "false",
+   * "captionHold": "false", "archiveOp": "true", "publishEngage": "true", "publishHarvesting": "true" } }, ....
+   *
+   * @param metadataJson
+   * @param mp
+   * @return the created workflow instance id
+   * @throws IndexServiceException
+   */
+  private String startAddAssetWorkflow(JSONObject metadataJson, MediaPackage mediaPackage)
+          throws IndexServiceException {
+    String wfId = null;
+    String mpId = mediaPackage.getIdentifier().toString();
+
+    JSONObject processing = (JSONObject) metadataJson.get("processing");
+    if (processing == null)
+      throw new IllegalArgumentException("No processing field in metadata");
+
+    String workflowDefId = (String) processing.get("workflow");
+    if (workflowDefId == null)
+      throw new IllegalArgumentException("No workflow definition field in processing metadata");
+
+    JSONObject configJson = (JSONObject) processing.get("configuration");
+
+    try {
+      // 1. Check if any active workflows are running for this mediapackage id
+      WorkflowSet workflowSet  = workflowService.getWorkflowInstances(new WorkflowQuery().withMediaPackage(mpId));
+      for (WorkflowInstance wf : Arrays.asList(workflowSet.getItems())) {
+        if (wf.isActive()) {
+          logger.warn("Unable to start new workflow '{}' on archived media package '{}', existing workfow {} is running",
+                  new Object[] { workflowDefId, mediaPackage, wf.getId() });
+          throw new IllegalArgumentException("A workflow is already active for mp " + mpId + ", cannot start this workflow.");
+        }
+      }
+      // 2. Save the snapshot
+      // v4x uses asset manager, v3x used opencastArchive.add(mediaPackage);
+      assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+
+      // 3. start the new workflow on the snapshot
+      // Workflow params are assumed to be String (not mixed with Number)
+      Map<String, String> params = new HashMap<String, String>();
+      if (configJson != null) {
+        for (Object key: configJson.keySet()) {
+          params.put((String)key, (String) configJson.get(key));
+        }
+      }
+
+      // v4x uses Set, v3x used List
+      Set<String> mpIds = new HashSet<String>();
+      mpIds.add(mpId);
+
+      // v4x uses Asset Manager Workflows, v3x used opencastArchive.applyWorkflow
+      final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
+      List<WorkflowInstance> wfList = workflows
+              .applyWorkflowToLatestVersion(mpIds,
+                      ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowDefId), params))
+              .toList();
+      wfId = wfList.size() > 0 ? Long.toString(wfList.get(0).getId()) : "Unknown";
+      logger.info("Asset update and publish workflow {} scheduled for mp {}",wfId, mpId);
+
+    } catch (AssetManagerException e) {
+      logger.warn("Unable to start workflow '{}' on archived media package '{}': {}",
+              new Object[] { workflowDefId, mediaPackage, getStackTrace(e) });
+      throw new IndexServiceException("Unable to start workflow " + workflowDefId + " on " + mpId);
+    } catch (WorkflowDatabaseException e) {
+      logger.warn("Unable to load workflow '{}' from workflow service: {}", wfId, getStackTrace(e));
+    } catch (NotFoundException e) {
+      logger.warn("Workflow '{}' not found", wfId);
+    }
+    return wfId;
   }
 
   /**
@@ -738,6 +1050,20 @@ public class IndexServiceImpl implements IndexService {
     }
   }
 
+  /**
+   *
+   * @param mp
+   *          the mediapackage to update
+   * @param dc
+   *          the dublincore metadata to use to update the mediapackage
+   * @return the updated mediapackage
+   * @throws IOException
+   *           Thrown if an IO error occurred adding the dc catalog file
+   * @throws MediaPackageException
+   *           Thrown if an error occurred updating the mediapackage
+   * @throws IngestException
+   *           Thrown if an error occurred attaching the catalog to the mediapackage
+   */
   private MediaPackage updateDublincCoreCatalog(MediaPackage mp, DublinCoreCatalog dc)
           throws IOException, MediaPackageException, IngestException {
     try (InputStream inputStream = IOUtils.toInputStream(dc.toXmlString(), "UTF-8")) {
@@ -770,6 +1096,7 @@ public class IndexServiceImpl implements IndexService {
    * @param rRule
    *          the recurrence rule
    * @param tz
+   *          the timezone
    * @return a list of scheduling periods
    */
   protected List<Period> calculatePeriods(Date start, Date end, long duration, RRule rRule, TimeZone tz) {
@@ -812,6 +1139,99 @@ public class IndexServiceImpl implements IndexService {
 
     TimeZone.setDefault(null);
     return periods;
+  }
+
+  /**
+   * Update the flavor of newly added asset with the passed metadata
+   *
+   * @param assetList
+   *          the list of assets to update
+   * @param mp
+   *          the mediapackage to update
+   * @param assetMetadata
+   *          a set of mapping metadata for the asset list
+   * @param overwriteExisting
+   *          true if the existing asset of the same flavor should be overwritten
+   * @return mediapackage updated with assets
+   */
+  @SuppressWarnings("unchecked")
+  protected MediaPackage updateMpAssetFlavor(List<String> assetList, MediaPackage mp, JSONArray assetMetadata, Boolean overwriteExisting) {
+    // Create JSONObject data map
+    JSONObject assetDataMap = new JSONObject();
+    for (int i = 0; i < assetMetadata.size(); i++) {
+      try {
+        assetDataMap.put(((JSONObject) assetMetadata.get(i)).get("id"), assetMetadata.get(i));
+      } catch (Exception e) {
+        throw new IllegalArgumentException("Unable to parse metadata", e);
+      }
+    }
+    // Find the correct flavor for each asset.
+    for (String assetOrig: assetList) {
+      // expecting file assets to contain postfix "track_trackpart.0"
+      String asset = assetOrig;
+      String assetNumber = null;
+      String[] assetNameParts = asset.split(Pattern.quote("."));
+      if (assetNameParts.length > 1) {
+        asset = assetNameParts[0];
+        assetNumber = assetNameParts[1];
+      }
+      try {
+        if ((assetMetadata != null) && (assetDataMap.get(asset) != null)) {
+          String type = (String)((JSONObject) assetDataMap.get(asset)).get("type");
+          String flavorType = (String)((JSONObject) assetDataMap.get(asset)).get("flavorType");
+          String flavorSubType = (String)((JSONObject) assetDataMap.get(asset)).get("flavorSubType");
+          if (patternNumberedAsset.matcher(flavorSubType).matches() && (assetNumber != null)) {
+            flavorSubType = assetNumber;
+          }
+          MediaPackageElementFlavor newElemflavor = new MediaPackageElementFlavor(flavorType, flavorSubType);
+          if (patternAttachment.matcher(type).matches()) {
+            if (overwriteExisting) {
+              // remove existing attachments of the new flavor
+              Attachment[] existing = mp.getAttachments(newElemflavor);
+              for (int i = 0; i < existing.length; i++) {
+                mp.remove(existing[i]);
+                logger.info("Overwriting existing asset {} {}", type, newElemflavor);
+              }
+            }
+            // correct the flavor of the new attachment
+            Attachment[] elArray = mp.getAttachments(new MediaPackageElementFlavor(assetOrig, "*"));
+            elArray[0].setFlavor(newElemflavor);
+            logger.info("Updated asset {} {}", type, newElemflavor);
+          } else if (patternCatalog.matcher(type).matches()) {
+            if (overwriteExisting) {
+              // remove existing catalogs of the new flavor
+              Catalog[] existing = mp.getCatalogs(newElemflavor);
+              for (int i = 0; i < existing.length; i++) {
+                mp.remove(existing[i]);
+                logger.info("Overwriting existing asset {} {}", type, newElemflavor);
+              }
+            }
+            Catalog[] catArray = mp.getCatalogs(new MediaPackageElementFlavor(assetOrig, "*"));
+            if (catArray.length > 1) {
+              throw new IllegalArgumentException("More than one " + asset + " found, only one expected.");
+            }
+            catArray[0].setFlavor(newElemflavor);
+            logger.info("Update asset {} {}", type, newElemflavor);
+          } else if (patternTrack.matcher(type).matches()) {
+            // Overwriting of existing tracks of same flavor is currently not allowed.
+            // TODO: allow overwriting of existing tracks of same flavor
+            Track[]  trackArray = mp.getTracks(new MediaPackageElementFlavor(assetOrig, "*"));
+            if (trackArray.length > 1) {
+              throw new IllegalArgumentException("More than one " + asset + " found, only one expected.");
+            }
+            trackArray[0].setFlavor(newElemflavor);
+            logger.info("Update asset {} {}", type, newElemflavor);
+          } else {
+            logger.warn("Unknown asset type {} {} for field {}", type, newElemflavor, asset);
+          }
+        }
+      } catch (Exception e) {
+        // Assuming a parse error versus a file error and logging the error type
+        logger.warn("Unable to process asset metadata {}", assetMetadata.toJSONString(), e);
+        throw new IllegalArgumentException("Unable to parse metadata", e);
+      }
+    }
+    return mp;
   }
 
   @Override
@@ -1119,14 +1539,6 @@ public class IndexServiceImpl implements IndexService {
     return jpaGroupRoleProvider.createGroup(name, description, roles, members);
   }
 
-  /**
-   * Get a single event
-   *
-   * @param id
-   *          the mediapackage id
-   * @return an event or none if not found wrapped in an option
-   * @throws SearchIndexException
-   */
   @Override
   public Opt<Event> getEvent(String id, AbstractSearchIndex index) throws SearchIndexException {
     SearchResult<Event> result = index

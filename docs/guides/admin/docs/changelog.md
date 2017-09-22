@@ -1,6 +1,36 @@
 Opencast 3.x
 ============
 
+Opencast 3.3
+------------
+*Released on September 21, 2017*
+
+- [[MH-12383]](https://opencast.jira.com/browse/MH-12383) - Upgrade/Unify Library Versions
+- [[MH-12413]](https://opencast.jira.com/browse/MH-12413) - Don't present the user a previous/next item button if there is no previous/next item
+- [[MH-12405]](https://opencast.jira.com/browse/MH-12405) - Catastrophic Oveload in Calendar generation
+- [[MH-12400]](https://opencast.jira.com/browse/MH-12400) - Player: Embed Links disabled
+- [[MH-12393]](https://opencast.jira.com/browse/MH-12393) - Retract workflow fails if run when a video is being played (with nfs storage)
+- [[MH-12389]](https://opencast.jira.com/browse/MH-12389) - Set operation to failed when setting workflow to failed on exception path
+- [[MH-12386]](https://opencast.jira.com/browse/MH-12386) - Update Postgresql Connector
+- [[MH-12384]](https://opencast.jira.com/browse/MH-12384) - Catch possible NPE in FileSupport.delete()
+- [[MH-12366]](https://opencast.jira.com/browse/MH-12366) - authorization-manager depends on download-impl
+- [[MH-12365]](https://opencast.jira.com/browse/MH-12365) - Losing ActiveMQ connection spams the logs
+- [[MH-12364]](https://opencast.jira.com/browse/MH-12364) - /broker/status endpoint returns incorrect 204 when ActiveMQ is shut down
+- [[MH-12362]](https://opencast.jira.com/browse/MH-12362) - Less verbose logging for ExportWorkflowPropertiesWOH
+- [[MH-12360]](https://opencast.jira.com/browse/MH-12360) - Race condition in workspace collection add and delete
+- [[MH-12359]](https://opencast.jira.com/browse/MH-12359) - Milliseconds trim bug in videoeditor-workflowoperation formatTime() javaScript
+- [[MH-12358]](https://opencast.jira.com/browse/MH-12358) - Only 6 series were displayed on the distribution node
+- [[MH-12353]](https://opencast.jira.com/browse/MH-12353) - Theodul player does not load reliably after restart
+- [[MH-12350]](https://opencast.jira.com/browse/MH-12350) - Recreate adminui-Index stops, if Asset of Event ist missing
+- [[MH-12329]](https://opencast.jira.com/browse/MH-12329) - File copy can fail with jetty timeout
+- [[MH-12326]](https://opencast.jira.com/browse/MH-12326) - Reduce log level for IllegalStateException in StaticResourceServlet
+- [[MH-12317]](https://opencast.jira.com/browse/MH-12317) - AdminUI create every 5 seconds stats request and may crash on heavy server load
+- [[MH-12303]](https://opencast.jira.com/browse/MH-12303) - Sort the REST endpoints alphabetically
+- [[MH-12131]](https://opencast.jira.com/browse/MH-12131) - Migrate documentation of capture agent communication protocol to markdown
+- [[MH-12085]](https://opencast.jira.com/browse/MH-12085) - Make file upload in Admin UI more flexible
+- [[MH-11768]](https://opencast.jira.com/browse/MH-11768) - Timeline preview images
+
+
 Opencast 3.2
 ------------
 *Released on August 16, 2017*
