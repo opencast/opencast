@@ -81,6 +81,7 @@
     <module>modules/matterhorn-distribution-service-download</module>
     <module>modules/matterhorn-distribution-service-download-remote</module>
     <module>modules/matterhorn-distribution-service-streaming</module>
+    <module>modules/matterhorn-distribution-service-adaptive-streaming-wowza</module>
     <module>modules/matterhorn-distribution-service-streaming-remote</module>
     <module>modules/matterhorn-distribution-workflowoperation</module>
     <module>modules/matterhorn-dublincore</module>

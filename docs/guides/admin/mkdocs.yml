@@ -73,6 +73,7 @@ pages:
       - Architecture: 'modules/videoeditor.architecture.md'
    - Video Segmentation: 'modules/videosegmentation.md'
    - Waveform Service: 'modules/waveform.md'
+   - Wowza Adaptive Streaming Distribution Service: 'modules/adaptivestreaming-wowza.md'
    - YouTube Publication: 'modules/youtubepublication.md'
 - Workflow Operation Handler:
    - Overview: 'workflowoperationhandlers/index.md'
