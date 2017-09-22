@@ -313,12 +313,15 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   }
 
   /** Creates a new HttpClient to use to make requests. */
-  public HttpClient makeHttpClient() throws TrustedHttpClientException {
+  public HttpClient makeHttpClient(int connectionTimeout, int socketTimeout) throws TrustedHttpClientException {
     if (httpClientFactory == null) {
       throw new TrustedHttpClientException(new NullPointerException(
               "There is no DefaultHttpClientFactory service available so we cannot make a request"));
     }
-    return httpClientFactory.makeHttpClient();
+    HttpClient httpClient = httpClientFactory.makeHttpClient();
+    httpClient.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, connectionTimeout);
+    httpClient.getParams().setIntParameter(CoreConnectionPNames.SO_TIMEOUT, socketTimeout);
+    return httpClient;
   }
 
   @Override
@@ -343,8 +346,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   @Override
   public HttpResponse execute(HttpUriRequest httpUriRequest, int connectionTimeout, int socketTimeout)
           throws TrustedHttpClientException {
-    final HttpClient httpClient = makeHttpClient();
-    httpClient.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, connectionTimeout);
+    final HttpClient httpClient = makeHttpClient(connectionTimeout, socketTimeout);
     // Add the request header to elicit a digest auth response
     httpUriRequest.setHeader(REQUESTED_AUTH_HEADER, DIGEST_AUTH);
     httpUriRequest.setHeader(SecurityConstants.AUTHORIZATION_HEADER, "true");
@@ -470,7 +472,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     httpUriRequest.removeHeaders(AUTHORIZATION_HEADER_NAME);
 
     for (int i = 0; i < nonceTimeoutRetries; i++) {
-      HttpClient httpClient = makeHttpClient();
+      HttpClient httpClient = makeHttpClient(DEFAULT_CONNECTION_TIMEOUT, DEFAULT_SOCKET_TIMEOUT);
       int variableDelay = 0;
       // Make sure that we have a variable delay greater than 0.
       if (retryMaximumVariableTime > 0) {
@@ -599,7 +601,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    * @return A String[] containing the {realm, nonce}
    */
   protected String[] getRealmAndNonce(HttpRequestBase request) throws TrustedHttpClientException {
-    HttpClient httpClient = makeHttpClient();
+    HttpClient httpClient = makeHttpClient(DEFAULT_CONNECTION_TIMEOUT, DEFAULT_SOCKET_TIMEOUT);
     HttpResponse response;
     try {
       response = new HttpResponseWrapper(httpClient.execute(request));
