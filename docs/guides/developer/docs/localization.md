@@ -1,6 +1,6 @@
 Introduction
 ============
-opencast-community
+
 The Opencast project uses the
 [Crowdin Localization Management Platform](https://crowdin.com/project/opencast-community) for translating
 Opencast into a variety of languages.
