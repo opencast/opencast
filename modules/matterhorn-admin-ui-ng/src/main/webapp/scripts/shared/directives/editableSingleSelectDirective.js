@@ -37,7 +37,7 @@ angular.module('adminNg.directives')
                 // Wait until the change of the value propagated to the parent's
                 // metadata object.
                 scope.submitTimer = $timeout(function () {
-                    scope.save(scope.params.key);
+                    scope.save(scope.params.id);
                 });
                 scope.editMode = false;
             };
