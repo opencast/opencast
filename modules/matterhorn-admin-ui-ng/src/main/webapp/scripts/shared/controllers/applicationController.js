@@ -48,6 +48,10 @@ angular.module('adminNg.controllers')
             $scope.service = RestServiceMonitor.getServiceStatus();
         }, 60000);
 
+        $scope.toServices = function(event) {
+            RestServiceMonitor.jumpToServices(event);
+        };
+
         $scope.toDoc = function () {
             if ($scope.documentationUrl) {
                 $window.open ($scope.documentationUrl);
