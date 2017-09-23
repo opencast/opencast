@@ -1,5 +1,5 @@
 angular.module('adminNg.services')
-.factory('RestServiceMonitor', ['$http', function($http) {
+.factory('RestServiceMonitor', ['$http', '$location', 'Storage', function($http, $location, Storage) {
     var Monitoring = {};
     var services = {
         service: {},
@@ -12,7 +12,8 @@ angular.module('adminNg.services')
     var BACKEND_NAME = "Backend Services";
     var MALFORMED_DATA = "Malformed Data";
     var OK = "OK";
-    var SERVICES_FRAGMENT = "/systems/services?storage={'pagination':{'events':{'limit':10,'offset':0},'services':{'limit':10,'offset':0}},'sorter':{'services':{'status':{'name':'status','priority':0,'order':'DESC'}}}}";
+    var SERVICES_FRAGMENT = "/systems/services";
+    var SERVICE_NAME_ATTRIBUTE = "service-name";
 
     Monitoring.run = function() {
       //Clear existing data
@@ -27,7 +28,7 @@ angular.module('adminNg.services')
     Monitoring.getActiveMQStats = function() {
       $http.get('/broker/status')
            .then(function(data) {
-             Monitoring.populateServiceWithLink(AMQ_NAME, "");
+             Monitoring.populateService(AMQ_NAME);
              if (data.status === 204) {
                services.service[AMQ_NAME].status = OK;
                services.service[AMQ_NAME].error = false;
@@ -36,11 +37,11 @@ angular.module('adminNg.services')
                services.service[AMQ_NAME].error = true;
              }
            }, function(err) {
-             Monitoring.populateServiceWithLink(AMQ_NAME, "");
+             Monitoring.populateService(AMQ_NAME);
              services.service[AMQ_NAME].status = err.statusText;
              services.service[AMQ_NAME].error = true;
              services.error = true;
-             services.numErr++;
+             services.numErr++;le
            });
     };
 
@@ -95,13 +96,22 @@ angular.module('adminNg.services')
     };
 
     Monitoring.populateService = function(name) {
-        Monitoring.populateServiceWithLink(name, SERVICES_FRAGMENT);
-    }
-
-    Monitoring.populateServiceWithLink = function(name, link) {
         if (services.service[name] === undefined) {
-            services.service[name] = {link: link};
+            services.service[name] = {};
         }
+    };
+
+    Monitoring.jumpToServices = function(event) {
+      var serviceName = null;
+      if (event.target.tagName == "a")
+        serviceName = event.target.getAttribute(SERVICE_NAME_ATTRIBUTE)
+      else
+        serviceName = event.target.parentNode.getAttribute(SERVICE_NAME_ATTRIBUTE);
+
+      if (serviceName != AMQ_NAME) {
+        Storage.put('filter', 'services', 'actions', 'true');
+        $location.path(SERVICES_FRAGMENT).replace();
+      }
     };
 
     Monitoring.getServiceStatus = function() {
