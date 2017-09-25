@@ -41,7 +41,7 @@ angular.module('adminNg.services')
              services.service[AMQ_NAME].status = err.statusText;
              services.service[AMQ_NAME].error = true;
              services.error = true;
-             services.numErr++;le
+             services.numErr++;
            });
     };
 
