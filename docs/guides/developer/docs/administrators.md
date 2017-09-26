@@ -5,7 +5,7 @@ What is an administractor, and how does that differ from a committer?
 -----------------------------------------------------------------
 
 An administrator is someone within the Opencast community who has administrative access to one or more of our major
-tools.  These tools current stand as
+tools.  These tools are
 
  - JIRA
  - BitBucket
