@@ -61,7 +61,7 @@
 
                 <div class="nav-dd info-dd" id="info-dd" old-admin-ng-dropdown="">
                   <i class="fa fa-bell" aria-hidden="true"></i>
-                      <span id="error-count" class="badge" ng-show="services.error">{{ services.numErr }}</span>
+                    <span id="error-count" class="badge" ng-show="services.error">{{ services.numErr }}</span>
                     <ul class="dropdown-ul">
                       <li ng-repeat="(key, value) in services.service"><!-- service directive -->
                         <a ng-click="toServices($event)" service-name="{{ key }}">
