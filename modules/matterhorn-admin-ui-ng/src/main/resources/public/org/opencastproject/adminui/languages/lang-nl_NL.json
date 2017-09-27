@@ -1400,6 +1400,7 @@
           "FILE_UPLOADED":"Bestand geüpload: ",
           "DESCRIPTION":"Semi-transparante afbeelding die op elke frame van de opname toegepast wordt.",
           "ACTIVE":"Actief",
+          "ENABLE":"Enable watermark",
           "TOP_LEFT":"Linksboven",
           "TOP_RIGHT":"Rechtsboven",
           "BOTTOM_LEFT":"Linksonder",

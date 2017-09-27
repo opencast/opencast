@@ -1400,6 +1400,7 @@
           "FILE_UPLOADED":"Arquivo subido: ",
           "DESCRIPTION":"Imaxe semitransparente que se superpón sobre cada fotograma da gravación.",
           "ACTIVE":"Activo",
+          "ENABLE":"Enable watermark",
           "TOP_LEFT":"Esquina superior esquerda",
           "TOP_RIGHT":"Esquina superior dereita",
           "BOTTOM_LEFT":"Esquina inferior esquerda",

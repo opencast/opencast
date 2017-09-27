@@ -1400,6 +1400,7 @@
           "FILE_UPLOADED":"Fil har laddats upp: ",
           "DESCRIPTION":"Halvgenomskinlig bild som är överlagrad på varje bildruta av inspelningen.",
           "ACTIVE":"Aktiv",
+          "ENABLE":"Enable watermark",
           "TOP_LEFT":"Överst till vänster",
           "TOP_RIGHT":"Överst till höger",
           "BOTTOM_LEFT":"Nederst till vänster",

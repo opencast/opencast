@@ -1400,6 +1400,7 @@
           "FILE_UPLOADED":"已上传的文件: ",
           "DESCRIPTION":"是覆盖在录制上的每一帧半透明图像。",
           "ACTIVE":"启动",
+          "ENABLE":"Enable watermark",
           "TOP_LEFT":"左上",
           "TOP_RIGHT":"右上角",
           "BOTTOM_LEFT":"左下",
