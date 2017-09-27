@@ -1400,6 +1400,7 @@
           "FILE_UPLOADED":"Pliki wysłane: ",
           "DESCRIPTION":"Półprzezroczysty obraz, który jest nałożony na każdej klatce nagrania.",
           "ACTIVE":"Aktywne",
+          "ENABLE":"Enable watermark",
           "TOP_LEFT":"Lewy górny róg",
           "TOP_RIGHT":"Prawy góry róg",
           "BOTTOM_LEFT":"Lewy dolny",

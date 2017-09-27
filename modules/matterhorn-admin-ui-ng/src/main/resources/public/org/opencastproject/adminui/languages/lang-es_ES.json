@@ -18,7 +18,7 @@
     "GERMAN":"Alemán",
     "GERMAN_CH":"Alemán de Suiza",
     "FINNISH":"Finlandés",
-    "HINDI":"Hindi",
+    "HINDI":"Hindú",
     "ITALIAN":"Italiano",
     "JAPANESE":"Japonés",
     "DUTCH":"Neerlandés",
@@ -411,7 +411,7 @@
       },
       "NAVIGATION":{
         "EVENTS":"Eventos",
-        "SERIES":"Series",
+        "SERIES":"Serie",
         "OVERVIEW":"Resumen"
       },
       "UPLOAD":"Subir",
@@ -876,7 +876,7 @@
         }
       },
       "TABLE":{
-        "CAPTION":"Series",
+        "CAPTION":"Serie",
         "TITLE":"Serie",
         "CREATORS":"Organizador(es)",
         "CONTRIBUTORS":"Colaborador(es)",

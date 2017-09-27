@@ -1400,6 +1400,7 @@
           "FILE_UPLOADED":"Fichier transféré: ",
           "DESCRIPTION":"Image semi-transparente qui se superpose à toutes les images de l'enregistrement.",
           "ACTIVE":"Actif",
+          "ENABLE":"Enable watermark",
           "TOP_LEFT":"En haut à gauche",
           "TOP_RIGHT":"En haut à droite",
           "BOTTOM_LEFT":"En bas à gauche",

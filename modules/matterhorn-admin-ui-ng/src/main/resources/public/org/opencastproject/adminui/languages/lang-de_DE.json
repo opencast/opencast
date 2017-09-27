@@ -1400,6 +1400,7 @@
           "FILE_UPLOADED":"Datei hochgeladen: ",
           "DESCRIPTION":"Halbtransparentes Bild, als Wasserzeichen für die gesamte Aufnahme.",
           "ACTIVE":"Aktiv",
+          "ENABLE":"Enable watermark",
           "TOP_LEFT":"Oben links",
           "TOP_RIGHT":"Oben rechts",
           "BOTTOM_LEFT":"Unten links",
