@@ -103,6 +103,10 @@
     "EVENTS_NOT_UPDATED":"Die Aufzeichnung konnte nicht gespeichert werden",
     "EVENTS_NOT_UPDATED_ID":"Die Aufzeichnung {{ id }} konnte nicht übernommen werden.",
     "EVENTS_NOT_UPDATED_ALL":"Keine der Aufzeichnungen konnte gespeichert werden",
+    "EVENTS_PROCESSING_ACTION_RETRY":"Processing being resumed...",
+    "EVENTS_PROCESSING_ACTION_NOT_RETRY":"Processing could not be resumed.",
+    "EVENTS_PROCESSING_ACTION_NONE":"Processing being aborted...",
+    "EVENTS_PROCESSING_ACTION_NOT_NONE":"Processing could not be aborted.",
     "SERIES_UPDATED_NB":"{{ number }} Serie(n) erfolgreich aktualisiert",
     "SERIES_UPDATED_ALL":"Alle Serien erfolgreich aktualisiert",
     "SERIES_NOT_UPDATED":"Diese Serie konnte nicht gespeichert werden",
@@ -353,7 +357,7 @@
           "UPLOAD":{
             "CAPTION":"Hochladen",
             "RECORDING_ELEMENTS":"Aufnahme-Elemente",
-            "RECORDING_METADATA":"Aufnahme-Daten",
+            "RECORDING_METADATA":"Recording metadata",
             "SEGMENTABLE":{
               "SHORT":"Folien",
               "DETAIL":"Die Datei enthält die Aufnahme einer Präsentation (Keynote, Powerpoint, etc.)."
@@ -365,6 +369,10 @@
             "AUDIO_ONLY":{
               "SHORT":"Nur Audio",
               "DETAIL":"Die Datei enthält nur Audio."
+            },
+            "MULTIPLE_PARTS":{
+              "SHORT":"Multiple parts",
+              "DETAIL":"A set of files containing different parts of the event."
             }
           },
           "DATE_TIME":{
@@ -391,6 +399,19 @@
           "SELECT_WORKFLOW":"Workflow wählen",
           "SELECT_WORKFLOW_EMPTY":"Keinen Workflow gefunden",
           "WORKFLOW":"Workflow"
+        },
+        "UPLOAD_ASSET":{
+          "CAPTION":"Asset Upload",
+          "SELECT_TYPE":"Select asset type",
+          "ADD":"Add Asset",
+          "OPTION":{
+            "CLASS_HANDOUT_NOTES":"Class handout notes",
+            "CAPTIONS_DFXP":"Captions DFXP",
+            "CAPTIONS_WEBVTT":"Captions WebVTT",
+            "PREVIEW_IMAGE":"Preview image",
+            "SMIL":"Smil catalog",
+            "TRACK_PARTS":"Track parts"
+          }
         },
         "ACCESS":{
           "CAPTION":"Zugriffsrichtlinie",
@@ -759,6 +780,7 @@
           }
         },
         "WORKFLOWS":{
+          "ACTIONS":"Actions",
           "DETAILS":"Details",
           "DESCRIPTION":"",
           "ID":"ID",
@@ -989,6 +1011,29 @@
         "BLACKLIST_FROM":"Gesperrt von",
         "BLACKLIST_TO":"Gesperrt bis",
         "ACTION":"Aktionen"
+      },
+      "DETAILS":{
+        "HEADER":"Location details - {{resourceId}}",
+        "TAB":{
+          "GENERAL":"General",
+          "CONFIGURATION":"Configuration",
+          "CAPABILITIES":"Capabilities"
+        },
+        "GENERAL":{
+          "CAPTION":"General",
+          "NAME":"Name",
+          "URL":"Url",
+          "STATUS":"Status",
+          "UPDATE":"Last heard from"
+        },
+        "CONFIGURATION":{
+          "CAPTION":"Configuration",
+          "NO_CONFIGURATION":"No configuration provided"
+        },
+        "CAPABILITIES":{
+          "CAPTION":"Capabilities",
+          "NO_CAPABILITIES":"No capabilities provided"
+        }
       }
     },
     "BLACKLISTS":{
@@ -1401,6 +1446,7 @@
           "FILE_UPLOADED":"Datei hochgeladen: ",
           "DESCRIPTION":"Halbtransparentes Bild, als Wasserzeichen für die gesamte Aufnahme.",
           "ACTIVE":"Aktiv",
+          "ENABLE":"Enable watermark",
           "TOP_LEFT":"Oben links",
           "TOP_RIGHT":"Oben rechts",
           "BOTTOM_LEFT":"Unten links",
@@ -1788,6 +1834,7 @@
   "DASHBOARD":{
     "RUNNING":"In Verarbeitung",
     "FINISHED":"Verarbeitet",
+    "PAUSED":"Paused",
     "FAILED":"Fehlgeschlagen",
     "FINISHED_WITH_COMMENTS":"Offen",
     "SCHEDULED":"Geplant",
