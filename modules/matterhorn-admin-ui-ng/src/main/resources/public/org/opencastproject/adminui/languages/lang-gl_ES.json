@@ -103,6 +103,10 @@
     "EVENTS_NOT_UPDATED":"Non se puido gardar o evento",
     "EVENTS_NOT_UPDATED_ID":"Non se puido gardar o evento {{ id }}",
     "EVENTS_NOT_UPDATED_ALL":"Non se puido gardar ningún evento",
+    "EVENTS_PROCESSING_ACTION_RETRY":"Processing being resumed...",
+    "EVENTS_PROCESSING_ACTION_NOT_RETRY":"Processing could not be resumed.",
+    "EVENTS_PROCESSING_ACTION_NONE":"Processing being aborted...",
+    "EVENTS_PROCESSING_ACTION_NOT_NONE":"Processing could not be aborted.",
     "SERIES_UPDATED_NB":"{{ number }} series foron actualizadas correctamente",
     "SERIES_UPDATED_ALL":"Todas as series foron actualizadas correctamente",
     "SERIES_NOT_UPDATED":"Non se puido gardar a serie",
@@ -353,6 +357,7 @@
           "UPLOAD":{
             "CAPTION":"Subir",
             "RECORDING_ELEMENTS":"Elementos da gravación",
+            "RECORDING_METADATA":"Recording metadata",
             "SEGMENTABLE":{
               "SHORT":"Diapositivas",
               "DETAIL":"O arquivo contén a gravación dunha presentación de diapositivas (Keynote, Powerpoint, etc.)."
@@ -364,6 +369,10 @@
             "AUDIO_ONLY":{
               "SHORT":"Só audio",
               "DETAIL":"O arquivo só contén audio."
+            },
+            "MULTIPLE_PARTS":{
+              "SHORT":"Multiple parts",
+              "DETAIL":"A set of files containing different parts of the event."
             }
           },
           "DATE_TIME":{
@@ -390,6 +399,19 @@
           "SELECT_WORKFLOW":"Seleccionar fluxo de traballo",
           "SELECT_WORKFLOW_EMPTY":"Non hai fluxos de traballo dispoñibles",
           "WORKFLOW":"Fluxo de traballo"
+        },
+        "UPLOAD_ASSET":{
+          "CAPTION":"Asset Upload",
+          "SELECT_TYPE":"Select asset type",
+          "ADD":"Add Asset",
+          "OPTION":{
+            "CLASS_HANDOUT_NOTES":"Class handout notes",
+            "CAPTIONS_DFXP":"Captions DFXP",
+            "CAPTIONS_WEBVTT":"Captions WebVTT",
+            "PREVIEW_IMAGE":"Preview image",
+            "SMIL":"Smil catalog",
+            "TRACK_PARTS":"Track parts"
+          }
         },
         "ACCESS":{
           "CAPTION":"Política de acceso",
@@ -758,6 +780,7 @@
           }
         },
         "WORKFLOWS":{
+          "ACTIONS":"Actions",
           "DETAILS":"Detalles",
           "DESCRIPTION":"",
           "ID":"Id.",
@@ -988,6 +1011,29 @@
         "BLACKLIST_FROM":"Na lista negra dende",
         "BLACKLIST_TO":"Na lista negra ata",
         "ACTION":"Accións"
+      },
+      "DETAILS":{
+        "HEADER":"Location details - {{resourceId}}",
+        "TAB":{
+          "GENERAL":"General",
+          "CONFIGURATION":"Configuration",
+          "CAPABILITIES":"Capabilities"
+        },
+        "GENERAL":{
+          "CAPTION":"General",
+          "NAME":"Name",
+          "URL":"Url",
+          "STATUS":"Status",
+          "UPDATE":"Last heard from"
+        },
+        "CONFIGURATION":{
+          "CAPTION":"Configuration",
+          "NO_CONFIGURATION":"No configuration provided"
+        },
+        "CAPABILITIES":{
+          "CAPTION":"Capabilities",
+          "NO_CAPABILITIES":"No capabilities provided"
+        }
       }
     },
     "BLACKLISTS":{
@@ -1788,6 +1834,7 @@
   "DASHBOARD":{
     "RUNNING":"Procesando",
     "FINISHED":"Finalizado",
+    "PAUSED":"Paused",
     "FAILED":"Errado",
     "FINISHED_WITH_COMMENTS":"Pendente",
     "SCHEDULED":"Programado",

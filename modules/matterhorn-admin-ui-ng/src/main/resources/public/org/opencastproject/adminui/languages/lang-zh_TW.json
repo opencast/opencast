@@ -103,6 +103,10 @@
     "EVENTS_NOT_UPDATED":"事件無法儲存",
     "EVENTS_NOT_UPDATED_ID":"事件 {{ id }} 無法儲存",
     "EVENTS_NOT_UPDATED_ALL":"無可儲存的事件",
+    "EVENTS_PROCESSING_ACTION_RETRY":"Processing being resumed...",
+    "EVENTS_PROCESSING_ACTION_NOT_RETRY":"Processing could not be resumed.",
+    "EVENTS_PROCESSING_ACTION_NONE":"Processing being aborted...",
+    "EVENTS_PROCESSING_ACTION_NOT_NONE":"Processing could not be aborted.",
     "SERIES_UPDATED_NB":"{{ number }} 系列已成功更新",
     "SERIES_UPDATED_ALL":"已成功更新所有系列",
     "SERIES_NOT_UPDATED":"該系列無法儲存",
@@ -353,6 +357,7 @@
           "UPLOAD":{
             "CAPTION":"上傳",
             "RECORDING_ELEMENTS":"錄製內容",
+            "RECORDING_METADATA":"Recording metadata",
             "SEGMENTABLE":{
               "SHORT":"投影片",
               "DETAIL":"該文件包含投影片播放（Keynote和PowerPoint等）的記錄。"
@@ -364,6 +369,10 @@
             "AUDIO_ONLY":{
               "SHORT":"只有音訊",
               "DETAIL":"該文件只包含音訊檔。"
+            },
+            "MULTIPLE_PARTS":{
+              "SHORT":"Multiple parts",
+              "DETAIL":"A set of files containing different parts of the event."
             }
           },
           "DATE_TIME":{
@@ -390,6 +399,19 @@
           "SELECT_WORKFLOW":"選擇工作流程",
           "SELECT_WORKFLOW_EMPTY":"沒有找到工作流程",
           "WORKFLOW":"工作流程"
+        },
+        "UPLOAD_ASSET":{
+          "CAPTION":"Asset Upload",
+          "SELECT_TYPE":"Select asset type",
+          "ADD":"Add Asset",
+          "OPTION":{
+            "CLASS_HANDOUT_NOTES":"Class handout notes",
+            "CAPTIONS_DFXP":"Captions DFXP",
+            "CAPTIONS_WEBVTT":"Captions WebVTT",
+            "PREVIEW_IMAGE":"Preview image",
+            "SMIL":"Smil catalog",
+            "TRACK_PARTS":"Track parts"
+          }
         },
         "ACCESS":{
           "CAPTION":"存取權限",
@@ -758,6 +780,7 @@
           }
         },
         "WORKFLOWS":{
+          "ACTIONS":"Actions",
           "DETAILS":"詳細信息",
           "DESCRIPTION":"",
           "ID":"ID",
@@ -988,6 +1011,29 @@
         "BLACKLIST_FROM":"從黑名單",
         "BLACKLIST_TO":"直到黑名單",
         "ACTION":"操作"
+      },
+      "DETAILS":{
+        "HEADER":"Location details - {{resourceId}}",
+        "TAB":{
+          "GENERAL":"General",
+          "CONFIGURATION":"Configuration",
+          "CAPABILITIES":"Capabilities"
+        },
+        "GENERAL":{
+          "CAPTION":"General",
+          "NAME":"Name",
+          "URL":"Url",
+          "STATUS":"Status",
+          "UPDATE":"Last heard from"
+        },
+        "CONFIGURATION":{
+          "CAPTION":"Configuration",
+          "NO_CONFIGURATION":"No configuration provided"
+        },
+        "CAPABILITIES":{
+          "CAPTION":"Capabilities",
+          "NO_CAPABILITIES":"No capabilities provided"
+        }
       }
     },
     "BLACKLISTS":{
@@ -1788,6 +1834,7 @@
   "DASHBOARD":{
     "RUNNING":"運行中",
     "FINISHED":"已完成",
+    "PAUSED":"Paused",
     "FAILED":"失敗",
     "FINISHED_WITH_COMMENTS":"待辦事項",
     "SCHEDULED":"已排程",

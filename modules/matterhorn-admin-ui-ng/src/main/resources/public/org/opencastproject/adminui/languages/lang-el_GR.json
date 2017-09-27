@@ -103,6 +103,10 @@
     "EVENTS_NOT_UPDATED":"Δεν ήταν δυνατή η αποθήκευση της εκδήλωσης",
     "EVENTS_NOT_UPDATED_ID":"Δεν ήταν δυνατή η αποθήκευση της εκδήλωσης {{ id }}",
     "EVENTS_NOT_UPDATED_ALL":"Καμμία από τις εκδηλώσεις δεν μπορεί να αποθηκευτεί",
+    "EVENTS_PROCESSING_ACTION_RETRY":"Processing being resumed...",
+    "EVENTS_PROCESSING_ACTION_NOT_RETRY":"Processing could not be resumed.",
+    "EVENTS_PROCESSING_ACTION_NONE":"Processing being aborted...",
+    "EVENTS_PROCESSING_ACTION_NOT_NONE":"Processing could not be aborted.",
     "SERIES_UPDATED_NB":"{{ number }} σειρές έχουν ενημερωθεί με επιτυχία",
     "SERIES_UPDATED_ALL":"Έχουν ενημερωθεί με επιτυχία όλες οι σειρές",
     "SERIES_NOT_UPDATED":"Δεν ήταν δυνατή η αποθήκευση της σειράς",
@@ -353,6 +357,7 @@
           "UPLOAD":{
             "CAPTION":"Ανέβασμα αρχείων",
             "RECORDING_ELEMENTS":"Στοιχεία καταγραφής",
+            "RECORDING_METADATA":"Recording metadata",
             "SEGMENTABLE":{
               "SHORT":"Διαφάνειες",
               "DETAIL":"Το αρχείο περιέχει μια καταγραφή  παρουσίασης διαφανειών (Keynote, Powerpoint, κλπ)."
@@ -364,6 +369,10 @@
             "AUDIO_ONLY":{
               "SHORT":"Μόνο αρχείου ήχου",
               "DETAIL":"Το αρχείο περιέχει μόνο ήχο."
+            },
+            "MULTIPLE_PARTS":{
+              "SHORT":"Multiple parts",
+              "DETAIL":"A set of files containing different parts of the event."
             }
           },
           "DATE_TIME":{
@@ -390,6 +399,19 @@
           "SELECT_WORKFLOW":"Επιλέξτε ροή εργασίας",
           "SELECT_WORKFLOW_EMPTY":"Δεν βρέθηκε ροή εργασίας",
           "WORKFLOW":"Ροή εργασίας"
+        },
+        "UPLOAD_ASSET":{
+          "CAPTION":"Asset Upload",
+          "SELECT_TYPE":"Select asset type",
+          "ADD":"Add Asset",
+          "OPTION":{
+            "CLASS_HANDOUT_NOTES":"Class handout notes",
+            "CAPTIONS_DFXP":"Captions DFXP",
+            "CAPTIONS_WEBVTT":"Captions WebVTT",
+            "PREVIEW_IMAGE":"Preview image",
+            "SMIL":"Smil catalog",
+            "TRACK_PARTS":"Track parts"
+          }
         },
         "ACCESS":{
           "CAPTION":"Πολιτική πρόσβασης",
@@ -758,6 +780,7 @@
           }
         },
         "WORKFLOWS":{
+          "ACTIONS":"Actions",
           "DETAILS":"Λεπτομέρειες",
           "DESCRIPTION":"",
           "ID":"Αναγνωριστικό",
@@ -988,6 +1011,29 @@
         "BLACKLIST_FROM":"Στη μαύρη λίστα από",
         "BLACKLIST_TO":"Στη μαύρη λίστα μέχρι",
         "ACTION":"Ενέργειες"
+      },
+      "DETAILS":{
+        "HEADER":"Location details - {{resourceId}}",
+        "TAB":{
+          "GENERAL":"General",
+          "CONFIGURATION":"Configuration",
+          "CAPABILITIES":"Capabilities"
+        },
+        "GENERAL":{
+          "CAPTION":"General",
+          "NAME":"Name",
+          "URL":"Url",
+          "STATUS":"Status",
+          "UPDATE":"Last heard from"
+        },
+        "CONFIGURATION":{
+          "CAPTION":"Configuration",
+          "NO_CONFIGURATION":"No configuration provided"
+        },
+        "CAPABILITIES":{
+          "CAPTION":"Capabilities",
+          "NO_CAPABILITIES":"No capabilities provided"
+        }
       }
     },
     "BLACKLISTS":{
@@ -1788,6 +1834,7 @@
   "DASHBOARD":{
     "RUNNING":"Εκτελείται",
     "FINISHED":"Ολοκληρώθηκε",
+    "PAUSED":"Paused",
     "FAILED":"Απέτυχε",
     "FINISHED_WITH_COMMENTS":"Todo",
     "SCHEDULED":"Προγραμματισμένη",

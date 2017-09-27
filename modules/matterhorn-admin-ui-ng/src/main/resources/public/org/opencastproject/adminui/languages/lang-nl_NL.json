@@ -103,6 +103,10 @@
     "EVENTS_NOT_UPDATED":"Het event kon niet opgeslagen worden",
     "EVENTS_NOT_UPDATED_ID":"Het event {{ id }} kon niet opgeslagen worden",
     "EVENTS_NOT_UPDATED_ALL":"Geen van de evenementen konden worden opgeslagen",
+    "EVENTS_PROCESSING_ACTION_RETRY":"Processing being resumed...",
+    "EVENTS_PROCESSING_ACTION_NOT_RETRY":"Processing could not be resumed.",
+    "EVENTS_PROCESSING_ACTION_NONE":"Processing being aborted...",
+    "EVENTS_PROCESSING_ACTION_NOT_NONE":"Processing could not be aborted.",
     "SERIES_UPDATED_NB":"{{ number }} series zijn met succes bijgewerkt",
     "SERIES_UPDATED_ALL":"Alle series zijn met succes bijgewerkt",
     "SERIES_NOT_UPDATED":"De series konden niet opgeslagen worden",
@@ -353,6 +357,7 @@
           "UPLOAD":{
             "CAPTION":"Upload",
             "RECORDING_ELEMENTS":"Opname elementen",
+            "RECORDING_METADATA":"Recording metadata",
             "SEGMENTABLE":{
               "SHORT":"Slides",
               "DETAIL":"Het bestand bevat een opname van dia-presentaties ( Keynote, Powerpoint, etc.)."
@@ -364,6 +369,10 @@
             "AUDIO_ONLY":{
               "SHORT":"Alleen audio",
               "DETAIL":"Het bestand bevat enkel audio."
+            },
+            "MULTIPLE_PARTS":{
+              "SHORT":"Multiple parts",
+              "DETAIL":"A set of files containing different parts of the event."
             }
           },
           "DATE_TIME":{
@@ -390,6 +399,19 @@
           "SELECT_WORKFLOW":"Selecteer workflow",
           "SELECT_WORKFLOW_EMPTY":"Geen workflow gevonden",
           "WORKFLOW":"Workflow"
+        },
+        "UPLOAD_ASSET":{
+          "CAPTION":"Asset Upload",
+          "SELECT_TYPE":"Select asset type",
+          "ADD":"Add Asset",
+          "OPTION":{
+            "CLASS_HANDOUT_NOTES":"Class handout notes",
+            "CAPTIONS_DFXP":"Captions DFXP",
+            "CAPTIONS_WEBVTT":"Captions WebVTT",
+            "PREVIEW_IMAGE":"Preview image",
+            "SMIL":"Smil catalog",
+            "TRACK_PARTS":"Track parts"
+          }
         },
         "ACCESS":{
           "CAPTION":"Toegangspolicy",
@@ -758,6 +780,7 @@
           }
         },
         "WORKFLOWS":{
+          "ACTIONS":"Actions",
           "DETAILS":"Details",
           "DESCRIPTION":"",
           "ID":"ID",
@@ -988,6 +1011,29 @@
         "BLACKLIST_FROM":"Geblokkeerd van",
         "BLACKLIST_TO":"Geblokkeerd tot",
         "ACTION":"Acties"
+      },
+      "DETAILS":{
+        "HEADER":"Location details - {{resourceId}}",
+        "TAB":{
+          "GENERAL":"General",
+          "CONFIGURATION":"Configuration",
+          "CAPABILITIES":"Capabilities"
+        },
+        "GENERAL":{
+          "CAPTION":"General",
+          "NAME":"Name",
+          "URL":"Url",
+          "STATUS":"Status",
+          "UPDATE":"Last heard from"
+        },
+        "CONFIGURATION":{
+          "CAPTION":"Configuration",
+          "NO_CONFIGURATION":"No configuration provided"
+        },
+        "CAPABILITIES":{
+          "CAPTION":"Capabilities",
+          "NO_CAPABILITIES":"No capabilities provided"
+        }
       }
     },
     "BLACKLISTS":{
@@ -1788,6 +1834,7 @@
   "DASHBOARD":{
     "RUNNING":"In uitvoering",
     "FINISHED":"Voltooid",
+    "PAUSED":"Paused",
     "FAILED":"Mislukt",
     "FINISHED_WITH_COMMENTS":"Taak",
     "SCHEDULED":"Gepland",
