@@ -322,7 +322,8 @@
                                 </goals>
                                 <configuration>
                                     <nodeVersion>v8.1.4</nodeVersion>
-                                    <npmVersion>5.3.0</npmVersion>
+                                    <!-- npm 5.3.0 issue https://github.com/npm/npm/issues/17858 -->
+                                    <npmVersion>5.2.0</npmVersion>
                                 </configuration>
                             </execution>
 
