@@ -155,13 +155,11 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * @return the set of values
    */
   protected List<String> asList(String elements) {
-    elements = StringUtils.trimToNull(elements);
-    List<String> list = new ArrayList<String>();
-    if (elements != null) {
-      for (String s : StringUtils.split(elements, ",")) {
-        if (StringUtils.trimToNull(s) != null) {
-          list.add(s.trim());
-        }
+    elements = StringUtils.trimToEmpty(elements);
+    List<String> list = new ArrayList<>();
+    for (String s : StringUtils.split(elements, ",")) {
+      if (StringUtils.trimToNull(s) != null) {
+        list.add(s.trim());
       }
     }
     return list;
