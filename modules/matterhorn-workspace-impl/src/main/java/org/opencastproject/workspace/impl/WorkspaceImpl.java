@@ -58,8 +58,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.input.TeeInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -891,13 +889,7 @@ public final class WorkspaceImpl implements Workspace {
     logger.info("Starting cleanup of workspace at {}", workspaceDirectory);
 
     long now = new Date().getTime();
-    for (File file: FileUtils.listFilesAndDirs(workspaceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter
-            .DIRECTORY)) {
-
-      if (file == workspaceDirectory) {
-        logger.debug("Skipping workspace directory");
-        continue;
-      }
+    for (File file: FileUtils.listFiles(workspaceDirectory, null, true)) {
 
       // Ensure file/dir is older than maxAge
       long fileAgeInSeconds = (now - file.lastModified()) / 1000;
@@ -906,26 +898,11 @@ public final class WorkspaceImpl implements Workspace {
         continue;
       }
 
-      // Delete empty directories
-      if (file.isDirectory()) {
-        if (FileSupport.deleteHierarchyIfEmpty(workspaceDirectory, file)) {
-          logger.info("Deleted empty directory hierarchy {}", file);
-        }
-
+      // Delete old files
+      if (FileUtils.deleteQuietly(file)) {
+        logger.info("Deleted {}", file);
       } else {
-        // Delete old files
-        if (FileUtils.deleteQuietly(file)) {
-          // deleteQuietly logs a warning if the deletion fails
-          logger.info("Deleted {}", file);
-
-          // Clean up now possibly empty directories
-          File dir = file.getParentFile();
-          if (!workspaceDirectory.equals(dir) && FileSupport.deleteHierarchyIfEmpty(workspaceDirectory, dir)) {
-            logger.info("Deleted empty directory hierarchy {}", dir);
-          }
-        } else {
-          logger.warn("Could not delete {}", file);
-        }
+        logger.warn("Could not delete {}", file);
       }
     }
     logger.info("Finished cleanup of workspace");
