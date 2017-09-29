@@ -740,7 +740,7 @@ public class EventsEndpoint implements ManagedService {
       }
     }
     if (withPublications != null && withPublications) {
-      List<JValue> publications = getPublications(event.getIdentifier(), withSignedUrls);
+      List<JValue> publications = getPublications(event, withSignedUrls);
       fields.add(f("publications", arr(publications)));
     }
     return obj(fields);
@@ -1148,9 +1148,12 @@ public class EventsEndpoint implements ManagedService {
   public Response getEventPublications(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("sign") boolean sign) throws Exception {
     try {
-      return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(getPublications(id, sign)));
-    } catch (NotFoundException e) {
-      return ApiResponses.notFound(e.getMessage());
+      final Opt<Event> event = indexService.getEvent(id, externalIndex);
+      if (event.isSome()) {
+        return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(getPublications(event.get(), sign)));
+      } else {
+        return ApiResponses.notFound(String.format("Unable to find event with id '%s'", id));
+      }
     } catch (SearchIndexException e) {
       logger.error("Unable to get list of publications from event with id '{}' because {}", id,
               ExceptionUtils.getStackTrace(e));
@@ -1256,16 +1259,9 @@ public class EventsEndpoint implements ManagedService {
     }
   };
 
-  private List<JValue> getPublications(String id, Boolean withSignedUrls)
-          throws NotFoundException, SearchIndexException {
-    for (final Event event : indexService.getEvent(id, externalIndex)) {
-      List<JValue> pubJSON = new ArrayList<>();
-      pubJSON = new ArrayList<JValue>($(event.getPublications()).filter(EventUtils.internalChannelFilter)
-              .map(publicationToJson._2(withSignedUrls)).toList());
-
-      return pubJSON;
-    }
-    throw new NotFoundException(String.format("Unable to find event with id '%s'", id));
+  private List<JValue> getPublications(Event event, Boolean withSignedUrls) {
+    return new ArrayList<JValue>($(event.getPublications()).filter(EventUtils.internalChannelFilter)
+            .map(publicationToJson._2(withSignedUrls)).toList());
   }
 
   @GET
