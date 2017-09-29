@@ -79,12 +79,8 @@
         visibility: hidden;
         @extend %menu-dropdown-base;
 
-        div {
-            color: #666666;
+        a {
             font-weight: 600;
-            padding: 8px 15px;
-            text-decoration: none;
-            white-space: nowrap;
         }
     }
 }

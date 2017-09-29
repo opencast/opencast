@@ -1366,6 +1366,18 @@
       </roles>
       <timezone>+2</timezone>
     </developer>
+      <developer>
+      <id>cgreweling</id>
+      <name>Christian Greweling</name>
+      <email>christian.greweling@uni-osnabrueck.de</email>
+      <organization>ELAN e.V., University of Osnabrueck</organization>
+      <organizationUrl>http://www.virtuos.uos.de/</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+
   </developers>
   <!-- People having significantly contributed to Opencast in the past -->
   <contributors>
