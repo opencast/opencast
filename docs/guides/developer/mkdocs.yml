@@ -35,7 +35,6 @@ pages:
    - Overview: 'development-environment.md'
    - With Docker: 'development-environment-docker.md'
 - Committers: 'committer.md'
-- Administrators: 'administrators.md'
 - Licenses and Legal Matters: 'license.md'
 - Localization: 'localization.md'
 - Packaging: 'packaging.md'
