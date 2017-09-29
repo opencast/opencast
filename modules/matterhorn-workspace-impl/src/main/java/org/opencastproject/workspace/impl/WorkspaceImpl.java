@@ -78,6 +78,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.management.ObjectInstance;
 import javax.servlet.http.HttpServletResponse;
@@ -129,6 +130,8 @@ public final class WorkspaceImpl implements Workspace {
   private WorkingFileRepository wfr = null;
   private String wfrRoot = null;
   private String wfrUrl = null;
+
+  private CopyOnWriteArraySet<String> staticCollections = new CopyOnWriteArraySet<String>();
 
   private boolean waitForResourceFlag = false;
 
@@ -256,6 +259,23 @@ public final class WorkspaceImpl implements Workspace {
       workspaceCleaner = new WorkspaceCleaner(this, garbageCollectionPeriodInSeconds, maxAgeInSeconds);
       workspaceCleaner.schedule();
     }
+
+    // Initialize the list of static collections
+    // TODO MH-12440 replace with a different mechanism that doesn't hardcode collection names
+    staticCollections.add("archive");
+    staticCollections.add("captions");
+    staticCollections.add("composer");
+    staticCollections.add("composite");
+    staticCollections.add("coverimage");
+    staticCollections.add("executor");
+    staticCollections.add("inbox");
+    staticCollections.add("ocrtext");
+    staticCollections.add("sox");
+    staticCollections.add("uploaded");
+    staticCollections.add("videoeditor");
+    staticCollections.add("videosegments");
+    staticCollections.add("waveform");
+
   }
 
   /** Callback from OSGi on service deactivation. */
@@ -500,17 +520,23 @@ public final class WorkspaceImpl implements Workspace {
 
   @Override
   public void delete(URI uri) throws NotFoundException, IOException {
+
     String uriPath = uri.toString();
+    String[] uriElements = uriPath.split("/");
+    String collectionId = null;
+    boolean isMediaPackage = false;
+
+    logger.trace("delete {}", uriPath);
+
     if (uriPath.startsWith(wfr.getBaseUri().toString())) {
       if (uriPath.indexOf(WorkingFileRepository.COLLECTION_PATH_PREFIX) > 0) {
-        String[] uriElements = uriPath.split("/");
         if (uriElements.length > 2) {
-          String collectionId = uriElements[uriElements.length - 2];
+          collectionId = uriElements[uriElements.length - 2];
           String filename = uriElements[uriElements.length - 1];
           wfr.deleteFromCollection(collectionId, filename);
         }
       } else if (uriPath.indexOf(WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX) > 0) {
-        String[] uriElements = uriPath.split("/");
+        isMediaPackage = true;
         if (uriElements.length >= 3) {
           String mediaPackageId = uriElements[uriElements.length - 3];
           String elementId = uriElements[uriElements.length - 2];
@@ -525,11 +551,17 @@ public final class WorkspaceImpl implements Workspace {
       synchronized (lock) {
         File mpElementDir = f.getParentFile();
         FileUtils.forceDelete(f);
-        FileSupport.delete(mpElementDir);
+
+        // Remove containing folder if a mediapackage element or a not a static collection
+        if (isMediaPackage || !isStaticCollection(collectionId))
+          FileSupport.delete(mpElementDir);
+
         // Also delete mediapackage itself when empty
-        FileSupport.delete(mpElementDir.getParentFile());
+        if (isMediaPackage)
+          FileSupport.delete(mpElementDir.getParentFile());
       }
     }
+
     // wait for WFR
     waitForResource(uri, HttpServletResponse.SC_NOT_FOUND, "File %s does not disappear in WFR");
   }
@@ -679,7 +711,8 @@ public final class WorkspaceImpl implements Workspace {
       FileUtils.forceMkdir(copy.getParentFile());
       FileUtils.deleteQuietly(copy);
       FileUtils.moveFile(original, copy);
-      FileSupport.delete(original.getParentFile());
+      if (!isStaticCollection(collection))
+        FileSupport.delete(original.getParentFile());
     }
     // move in WFR
     final URI wfrUri = wfr.moveTo(collection, filename, toMediaPackage, toMediaPackageElement, toFileName);
@@ -780,6 +813,10 @@ public final class WorkspaceImpl implements Workspace {
     collection = collection.substring(collection.lastIndexOf("/"));
     collection = collection.substring(collection.lastIndexOf("/") + 1, collection.length());
     return collection;
+  }
+
+  private boolean isStaticCollection(String collection) {
+    return staticCollections.contains(collection);
   }
 
   @Override
