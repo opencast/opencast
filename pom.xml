@@ -316,7 +316,8 @@
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <consoleOutput>true</consoleOutput>
           <logViolationsToConsole>true</logViolationsToConsole>
-          <excludes>**/package-info.java</excludes>
+          <sourceDirectory>src</sourceDirectory>
+          <excludes>**/package-info.java,**/generated-sources/**/*</excludes>
           <failOnViolation>true</failOnViolation>
           <failsOnError>true</failsOnError>
         </configuration>
