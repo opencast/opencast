@@ -132,9 +132,11 @@ during the QA process (such as `1.6.0-beta1`) to mark the code evolution as bug 
 seems to be stable enough to be released, a release candidate (RC) is tagged and tested (`1.6.0-rc1`). New RCs can be
 tagged as long as new issues are found and fixed. When no severe issues are found, the final release is tagged.
 
-During the whole process the release manager will regularly merge back the release branch into `develop` so that bug
-fixes from the release branch will automatically become part of `develop` and the next Opencast version, without having
-to create an additional pull request. This is continued until the release branch for the next version is cut.
+During the whole process the release manager will regularly merge back the release branch into `develop` or, if
+existent, the next active release branch so that bug fixes from the release branch will automatically become part of the
+next Opencast versions and finally `develop`, without having to create additional pull requests. For example, a pull
+request may be merged into `r/3.x`, `r/3.x` will then be merged into `develop` or, if it already exists, `r/4.x` and
+from there into `develop`. That way patches bubble through all newer versions and finally end up in `develop`.
 
 The releases themselves are not part of the release branch. Instead, the release manager branches off, makes the
 necessary changes to the pom files (and possibly the UI) and creates a separately tagged commit.
@@ -145,22 +147,6 @@ if there are enough commits to be put into a maintenance release.
 Even after an Opencast version has been released, more bugs may be found and fixes for them merged into the release
 branch. When the release manager considers that the number or importance of such bug fixes is sufficient, he may decide
 to create a new maintenance release. The version `1.6.1` above is an example of that.
-
-The branching structure for multiple versions does not look much more complicated:
-
-    develop  -----*---------*----*------------------------*------>
-                   \       /    / \                      /
-            r/1.5.x *-----*----*------------*--->       /
-                           \        \        \         /
-                      1.5.0 *        \  1.5.1 *       /
-                                      \              /
-                               r/1.6.x *------------*----->
-                                                     \
-                                                1.6.0 *
-
-As you can see, the same principle, the same structure and the same rules apply. The only noteworthy thing is that,
-after a new release branch is cut, the old release branch will not be merged back into `develop`. This means that when
-a bug fix is relevant to several releases, a different pull request should be created for each of the release branches.
 
 
 Release Process
