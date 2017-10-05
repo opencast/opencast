@@ -266,7 +266,7 @@ public final class IoSupport {
         in = new DataInputStream(url.openStream());
       } else {
         if (trustedClient == null) {
-          logger.error("Unable to read from remote source {} because trusted client is null!", url.getFile());
+          logger.error("Unable to read from remote source {} because trusted client is null!", url);
           return null;
         }
         HttpGet get = new HttpGet(url.toURI());
@@ -675,18 +675,17 @@ public final class IoSupport {
   public static <A extends Serializable> A serializeDeserialize(final A a) {
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     try {
-      withResource(
-              new ObjectOutputStream(out),
-              new FnX<ObjectOutputStream, Unit>() {
-                @Override public Unit apx(ObjectOutputStream out) throws Exception {
-                  out.writeObject(a);
-                  return Unit.unit;
-                }
-              });
-      return withResource(
-              new ObjectInputStream(new ByteArrayInputStream(out.toByteArray())),
+      withResource(new ObjectOutputStream(out), new FnX<ObjectOutputStream, Unit>() {
+        @Override
+        public Unit apx(ObjectOutputStream out) throws Exception {
+          out.writeObject(a);
+          return Unit.unit;
+        }
+      });
+      return withResource(new ObjectInputStream(new ByteArrayInputStream(out.toByteArray())),
               new FnX<ObjectInputStream, A>() {
-                @Override public A apx(ObjectInputStream in) throws Exception {
+                @Override
+                public A apx(ObjectInputStream in) throws Exception {
                   return (A) in.readObject();
                 }
               });

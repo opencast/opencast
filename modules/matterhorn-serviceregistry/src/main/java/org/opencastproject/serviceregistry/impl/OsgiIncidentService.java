@@ -142,11 +142,11 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
 
   private void storeIncidentTexts(Bundle bundle) {
     logger.debug("Scanning bundle {}, (ID {}) for incident localizations", bundle.getSymbolicName(),
-        bundle.getBundleId());
-    final Enumeration l10n = bundle.findEntries(INCIDENT_L10N_DIR, PROPERTIES_GLOB, false);
+            bundle.getBundleId());
+    final Enumeration<?> l10n = bundle.findEntries(INCIDENT_L10N_DIR, PROPERTIES_GLOB, false);
     while (l10n != null && l10n.hasMoreElements()) {
       final URL resourceUrl = (URL) l10n.nextElement();
-      final String resourceFileName = resourceUrl.getFile();
+      final String resourceFileName = resourceUrl.getPath();
       // e.g. org.opencastproject.composer.properties or org.opencastproject.composer_de.properties
       final String fullResourceName = FilenameUtils.getBaseName(resourceFileName);
       final String[] fullResourceNameParts = fullResourceName.split("_");
