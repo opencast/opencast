@@ -42,7 +42,6 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -368,7 +367,7 @@ TimelinePreviewsService, ManagedService {
           double duration) throws TimelinePreviewsException {
 
     // copy source file into workspace
-    File mediaFile = null;
+    File mediaFile;
     try {
       mediaFile = workspace.get(track.getURI());
     } catch (NotFoundException e) {
@@ -379,17 +378,16 @@ TimelinePreviewsService, ManagedService {
           "Error reading the media file in the workspace", e);
     }
 
-    String imageFilePath = PathSupport.changeFileExtension(FilenameUtils.removeExtension(mediaFile.getAbsolutePath())
-            .concat("_timelinepreviews"), outputFormat);
+    String imageFilePath = FilenameUtils.removeExtension(mediaFile.getAbsolutePath())
+                           + "_timelinepreviews" + outputFormat;
     int exitCode = 1;
     String[] command = new String[] {
       binary,
       "-loglevel", "error",
       "-t", String.valueOf(duration - seconds / 2.0),
-      "-y", "-i",
-      mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
+      "-i", mediaFile.getAbsolutePath(),
       "-vf", "fps=1/" + seconds + ",scale=" + width + ":" + height + ",tile=" + tileX + "x" + tileY,
-      imageFilePath.replaceAll(" ", "\\ ")
+      imageFilePath
     };
 
     logger.debug("Start timeline previews ffmpeg process: {}", StringUtils.join(command, " "));
@@ -400,7 +398,6 @@ TimelinePreviewsService, ManagedService {
     pbuilder.redirectErrorStream(true);
     Process ffmpegProcess = null;
     exitCode = 1;
-    String errorMessage = "";
     BufferedReader errStream = null;
     try {
       ffmpegProcess = pbuilder.start();
@@ -409,7 +406,6 @@ TimelinePreviewsService, ManagedService {
       String line = errStream.readLine();
       while (line != null) {
         logger.error("FFmpeg error: " + line);
-        errorMessage = line;
         line = errStream.readLine();
       }
       exitCode = ffmpegProcess.waitFor();
