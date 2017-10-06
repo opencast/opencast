@@ -45,7 +45,6 @@ import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Misc;
@@ -75,9 +74,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.management.ObjectInstance;
@@ -879,39 +876,35 @@ public final class WorkspaceImpl implements Workspace {
       return;
     }
 
-    // Get root directly
-    final File rootDirecotry = new File(wsRoot);
-
-    // Get path for mediapackage and collection directly
-    final String mediapackageDirectory = new File(rootDirecotry, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX)
-            .getAbsolutePath();
-    final String collectionDirectory = new File(rootDirecotry, WorkingFileRepository.COLLECTION_PATH_PREFIX)
-            .getAbsolutePath();
-
-    logger.info("Starting cleanup of workspace at {}", rootDirecotry);
-    Collection<File> files = FileUtils.listFiles(rootDirecotry, null, true);
-    List<File> filesToDelete = Monadics.mlist(files).filter(new Function<File, Boolean>() {
-      @Override
-      public Boolean apply(File file) {
-        if (file.isDirectory()) {
-          return false;
-        }
-
-        String filePath = file.getAbsolutePath();
-        if (filePath.startsWith(mediapackageDirectory) || filePath.startsWith(collectionDirectory)) {
-          return false;
-        }
-
-        long fileAgeInSeconds = (new Date().getTime() - file.lastModified()) / 1000;
-        return fileAgeInSeconds >= maxAgeInSeconds;
-      }
-    }).value();
-
-    for (File file : filesToDelete) {
-      logger.info("Workspace cleanup: Deleting {}", file);
-      FileSupport.delete(file);
-      FileSupport.deleteHierarchyIfEmpty(rootDirecotry, file.getParentFile());
+    // Warn if time is very short since this operation is dangerous and *should* only be a fallback for if stuff
+    // remained in the workspace due to some errors. If we have a very short maxAge, we may delete file which are
+    // currently being processed. The warn value is 2 days:
+    if (maxAgeInSeconds < 60 * 60 * 24 * 2) {
+      logger.warn("The max age for the workspace cleaner is dangerously low. Please consider increasing the value to "
+              + "avoid deleting data in use by running workflows.");
     }
-    logger.debug("Finished cleanup of workspace!");
+
+    // Get workspace root directly
+    final File workspaceDirectory = new File(wsRoot);
+    logger.info("Starting cleanup of workspace at {}", workspaceDirectory);
+
+    long now = new Date().getTime();
+    for (File file: FileUtils.listFiles(workspaceDirectory, null, true)) {
+
+      // Ensure file/dir is older than maxAge
+      long fileAgeInSeconds = (now - file.lastModified()) / 1000;
+      if (fileAgeInSeconds < maxAgeInSeconds) {
+        logger.debug("File age ({}) < max age ({}): Skipping {} ",fileAgeInSeconds, maxAgeInSeconds, file);
+        continue;
+      }
+
+      // Delete old files
+      if (FileUtils.deleteQuietly(file)) {
+        logger.info("Deleted {}", file);
+      } else {
+        logger.warn("Could not delete {}", file);
+      }
+    }
+    logger.info("Finished cleanup of workspace");
   }
 }
