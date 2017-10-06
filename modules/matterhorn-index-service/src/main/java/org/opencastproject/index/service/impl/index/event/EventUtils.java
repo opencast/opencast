@@ -34,6 +34,8 @@ import org.opencastproject.workflow.handler.distribution.InternalPublicationChan
 import com.entwinemedia.fn.Fn;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,7 +44,8 @@ import java.util.Map;
 import java.util.TimeZone;
 
 public final class EventUtils {
-  private static final int CREATED_BY_UI_ORDER = 14;
+  /** The logging facility */
+  static final Logger logger = LoggerFactory.getLogger(EventUtils.class);
 
   public static final Map<String, String> PUBLICATION_CHANNELS = new HashMap<String, String>();
 

@@ -65,21 +65,24 @@ public class AbstractMetadataCollectionTest {
   @Before
   public void setUp() {
     first = MetadataField.createTextMetadataField(FIRST_ID, Opt.<String> none(), FIRST_ID, false, false,
-            Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(0), Opt.<String> none());
+            Opt.<Boolean> none(), Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(0),
+            Opt.<String> none());
     third = MetadataField.createTextMetadataField(THIRD_ID, Opt.<String> none(), THIRD_ID, false, false,
-            Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(2), Opt.<String> none());
+            Opt.<Boolean> none(), Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(2),
+            Opt.<String> none());
     seventh = MetadataField.createTextMetadataField(SEVENTH_ID, Opt.<String> none(), SEVENTH_ID, false, false,
-            Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(6), Opt.<String> none());
+            Opt.<Boolean> none(), Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(6),
+            Opt.<String> none());
 
     unorderedOne = MetadataField.createTextMetadataField(UNORDERED_ONE_ID, Opt.<String> none(), UNORDERED_ONE_ID,
-            false, false, Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.<Integer> none(),
-            Opt.<String> none());
+            false, false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(), Opt.<String> none(),
+            Opt.<Integer> none(), Opt.<String> none());
     unorderedTwo = MetadataField.createTextMetadataField(UNORDERED_TWO_ID, Opt.<String> none(), UNORDERED_TWO_ID,
-            false, false, Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.<Integer> none(),
-            Opt.<String> none());
+            false, false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(), Opt.<String> none(),
+            Opt.<Integer> none(), Opt.<String> none());
     unorderedThree = MetadataField.createTextMetadataField(UNORDERED_THREE_ID, Opt.<String> none(), UNORDERED_THREE_ID,
-            false, false, Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.<Integer> none(),
-            Opt.<String> none());
+            false, false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(), Opt.<String> none(),
+            Opt.<Integer> none(), Opt.<String> none());
   }
 
   @Test
@@ -219,8 +222,8 @@ public class AbstractMetadataCollectionTest {
     collection.addField(seventh);
 
     MetadataField<String> newFirst = MetadataField.createTextMetadataField("New first", Opt.<String> none(),
-            "New first", false, false, Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(0),
-            Opt.<String> none());
+            "New first", false, false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(), Opt.<String> none(),
+            Opt.some(0), Opt.<String> none());
 
     collection.addField(newFirst);
 
@@ -246,7 +249,8 @@ public class AbstractMetadataCollectionTest {
     collection.addField(seventh);
 
     MetadataField<String> newFirst = MetadataField.createTextMetadataField("first", Opt.<String> none(), "first",
-            false, false, Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(0), Opt.<String> none());
+            false, false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(0),
+            Opt.<String> none());
     String value = "Hello";
     newFirst.setValue(value);
     collection.addField(newFirst);

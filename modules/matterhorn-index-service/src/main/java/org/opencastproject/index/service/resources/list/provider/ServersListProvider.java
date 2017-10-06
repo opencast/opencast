@@ -154,4 +154,9 @@ public class ServersListProvider implements ResourceListProvider {
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
+
+  @Override
+  public boolean isTranslatable(String listName) {
+    return StringUtils.equalsIgnoreCase(LIST_STATUS, listName);
+  }
 }
