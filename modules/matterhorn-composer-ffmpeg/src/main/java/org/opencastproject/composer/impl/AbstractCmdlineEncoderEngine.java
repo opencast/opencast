@@ -46,9 +46,11 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,6 +79,9 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
 
   /** the logging facility provided by log4j */
   private static final Logger logger = LoggerFactory.getLogger(AbstractCmdlineEncoderEngine.class.getName());
+
+  /** Set of processes to clean up */
+  private Set<Process> processes = new HashSet<>();
 
   /**
    * Creates a new CmdlineEncoderEngine with <code>binary</code> as the workhorse.
@@ -249,6 +254,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
       ProcessBuilder pbuilder = new ProcessBuilder(command);
       pbuilder.redirectErrorStream(REDIRECT_ERROR_STREAM);
       encoderProcess = pbuilder.start();
+      processes.add(encoderProcess);
 
       // tell encoder listeners about output
       in = new BufferedReader(new InputStreamReader(encoderProcess.getInputStream()));
@@ -541,6 +547,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
       ProcessBuilder pbuilder = new ProcessBuilder(command);
       pbuilder.redirectErrorStream(REDIRECT_ERROR_STREAM);
       encoderProcess = pbuilder.start();
+      processes.add(encoderProcess);
 
       // tell encoder listeners about output
       in = new BufferedReader(new InputStreamReader(encoderProcess.getInputStream()));
@@ -579,6 +586,15 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
     ArrayList<String> tags = new ArrayList<String>();
 
     return tags;
+  }
+
+  public void close() {
+    for (Process process: processes) {
+      if (process.isAlive()) {
+        logger.debug("Destroying encoding process {}", process);
+        process.destroy();
+      }
+    }
   }
 
 }
