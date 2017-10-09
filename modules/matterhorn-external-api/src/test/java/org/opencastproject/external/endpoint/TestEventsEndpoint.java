@@ -27,6 +27,7 @@ import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatal
 
 import org.opencastproject.external.impl.index.ExternalIndex;
 import org.opencastproject.index.service.api.IndexService;
+import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.event.Event;
@@ -36,6 +37,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
@@ -46,11 +48,14 @@ import org.opencastproject.util.PropertiesUtil;
 
 import com.entwinemedia.fn.data.Opt;
 
+import org.apache.commons.io.IOUtils;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Ignore;
 import org.osgi.service.cm.ConfigurationException;
 
 import java.net.URI;
+import java.util.Hashtable;
 import java.util.Properties;
 
 import javax.ws.rs.Path;
@@ -69,6 +74,12 @@ public class TestEventsEndpoint extends EventsEndpoint {
   public static final String OAIPMH_PUBLICATION_ID = "oaipmh-id";
   public static final String TWO_PUBLICATIONS = "twopublications";
   public static final String UNAUTHORIZED_TYPE = "unauthorizedcatalog";
+  public static final String UPDATE_EVENT = "updateevent";
+  public static final String METADATA_UPDATE_EVENT = "metadataupdateevent";
+  public static final String METADATA_GET_EVENT = "metadatagetevent";
+
+  private static Capture<MetadataList> capturedMetadataList1;
+  private static Capture<MetadataList> capturedMetadataList2;
 
   private static Organization defaultOrg = new DefaultOrganization();
 
@@ -95,7 +106,10 @@ public class TestEventsEndpoint extends EventsEndpoint {
     EventCatalogUIAdapter deleteAdapter = EasyMock.createMock(EventCatalogUIAdapter.class);
     EasyMock.expect(deleteAdapter.getFlavor()).andReturn(new MediaPackageElementFlavor(DELETE_CATALOG_TYPE, "episode"))
             .anyTimes();
+    MetadataCollection collectionMock = EasyMock.createNiceMock(MetadataCollection.class);
     EasyMock.expect(deleteAdapter.getOrganization()).andReturn(defaultOrg.getId()).anyTimes();
+    EasyMock.expect(deleteAdapter.getFields(EasyMock.anyObject(MediaPackage.class))).andReturn(null).anyTimes();
+    EasyMock.expect(deleteAdapter.getUITitle()).andReturn(null).anyTimes();
     EasyMock.replay(deleteAdapter);
     addCatalogUIAdapter(deleteAdapter);
   }
@@ -161,6 +175,32 @@ public class TestEventsEndpoint extends EventsEndpoint {
             .anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(twoPublicationsEvent)).andReturn(twoPublicationsMP).anyTimes();
 
+    /**
+     * Update event external service mocking
+     */
+    capturedMetadataList1 = Capture.newInstance();
+    Event updateEvent = new Event(UPDATE_EVENT, defaultOrg.getId());
+    EasyMock.expect(indexService.getEvent(UPDATE_EVENT, externalIndex)).andReturn(Opt.some(updateEvent)).anyTimes();
+    EasyMock.expect(indexService.updateEventMetadata(EasyMock.eq(UPDATE_EVENT), EasyMock.capture(capturedMetadataList1), EasyMock.eq(externalIndex))).andReturn(null).anyTimes();
+
+    /**
+     * Update event metadata external service mocking
+     */
+    capturedMetadataList2 = Capture.newInstance();
+    Event updateEventMetadata = new Event(METADATA_UPDATE_EVENT, defaultOrg.getId());
+    updateEventMetadata.setRecordingStartDate("2017-08-29T00:05:00.000Z");
+    EasyMock.expect(indexService.getEvent(METADATA_UPDATE_EVENT, externalIndex)).andReturn(Opt.some(updateEventMetadata)).anyTimes();
+    EasyMock.expect(indexService.updateEventMetadata(EasyMock.eq(METADATA_UPDATE_EVENT), EasyMock.capture(capturedMetadataList2), EasyMock.eq(externalIndex))).andReturn(null).anyTimes();
+    EasyMock.expect(indexService.getEventMediapackage(updateEventMetadata)).andReturn(null).anyTimes();
+
+    /**
+     * Get event metadata external service mocking
+     */
+    Event getEvent = new Event(METADATA_GET_EVENT, defaultOrg.getId());
+    getEvent.setRecordingStartDate("2017-08-29T00:05:00.000Z");
+    EasyMock.expect(indexService.getEvent(METADATA_GET_EVENT, externalIndex)).andReturn(Opt.some(getEvent)).anyTimes();
+    EasyMock.expect(indexService.getEventMediapackage(getEvent)).andReturn(null).anyTimes();
+
     // Replay all mocks
     EasyMock.replay(deleteMetadataMP, indexService, noPublicationsMP, twoPublicationsMP);
 
@@ -168,6 +208,17 @@ public class TestEventsEndpoint extends EventsEndpoint {
     setIndexService(indexService);
     setupSecurityService();
     setupEventCatalogUIAdapters();
+    Properties properties = new Properties();
+    properties.load(IOUtils.toInputStream(IOUtils.toString(getClass().getResource("/events-endpoint.properties"))));
+    updated((Hashtable) properties);
+  }
+
+  public static Capture<MetadataList> getCapturedMetadataList1() {
+    return capturedMetadataList1;
+  }
+
+  public static Capture<MetadataList> getCapturedMetadataList2() {
+    return capturedMetadataList2;
   }
 
 }

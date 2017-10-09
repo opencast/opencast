@@ -36,6 +36,7 @@ import org.opencastproject.external.impl.index.ExternalIndex;
 import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
+import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.MetadataList.Locked;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
@@ -108,6 +109,7 @@ import com.entwinemedia.fn.data.json.Jsons.Functions;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -120,12 +122,15 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -174,6 +179,8 @@ public class EventsEndpoint implements ManagedService {
   private static long expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
   private String previewSubtype = DEFAULT_PREVIEW_SUBTYPE;
+
+  private Map<String, MetadataField<?>> configuredMetadataFields = new TreeMap<>();
 
   /** The resolutions */
   private enum CommentResolution {
@@ -285,6 +292,8 @@ public class EventsEndpoint implements ManagedService {
     // Default to DEFAULT_PREVIEW_SUBTYPE
     previewSubtype = StringUtils.defaultString((String) properties.get(PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
     logger.debug("Preview subtype is '{}'", previewSubtype);
+
+    configuredMetadataFields = DublinCoreMetadataUtil.getDublinCoreProperties(properties);
   }
 
   @GET
@@ -401,9 +410,11 @@ public class EventsEndpoint implements ManagedService {
 
   private Response updateEvent(String eventId, HttpServletRequest request) {
     try {
+      Opt<String> startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : Opt.none();
+      Opt<String> startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : Opt.none();
       for (final Event event : indexService.getEvent(eventId, externalIndex)) {
         EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.updateFromHttpServletRequest(event,
-                request, getEventCatalogUIAdapters());
+                request, getEventCatalogUIAdapters(), startDatePattern, startTimePattern);
         if (eventHttpServletRequest.getMetadataList().isSome()) {
           indexService.updateEventMetadata(eventId, eventHttpServletRequest.getMetadataList().get(), externalIndex);
         }
@@ -471,8 +482,10 @@ public class EventsEndpoint implements ManagedService {
           IngestException, NotFoundException, SchedulerException, UnauthorizedException {
     JSONObject source = new JSONObject();
     source.put("type", "UPLOAD");
+    Opt<String> startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : Opt.none();
+    Opt<String> startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : Opt.none();
     EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.createFromHttpServletRequest(request,
-            ingestService, getEventCatalogUIAdapters(), source);
+            ingestService, getEventCatalogUIAdapters(), source, startDatePattern, startTimePattern);
     String eventId = indexService.createEvent(eventHttpServletRequest);
     return ApiResponses.Json.created(VERSION_1_0_0, URI.create(getEventUrl(eventId)), obj(f("identifier", v(eventId))));
   }
@@ -906,12 +919,60 @@ public class EventsEndpoint implements ManagedService {
           @QueryParam("type") String type) throws Exception {
     if (StringUtils.trimToNull(type) == null) {
       Opt<MetadataList> metadataList = getEventMetadataById(id);
-      if (metadataList.isSome())
-        return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, metadataList.get().toJSON());
+      if (metadataList.isSome()) {
+        MetadataList actualList = metadataList.get();
+
+        // API v1 should return a two separate fields for start date and start time. Since those fields were merged in index service, we have to split them up.
+        Opt<MetadataCollection> collection = actualList.getMetadataByFlavor("dublincore/episode");
+        if (collection.isSome()) convertStartDateTimeToApiV1(collection.get());
+
+        return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, actualList.toJSON());
+      }
       else
         return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
     } else {
       return getEventMetadataByType(id, type);
+    }
+  }
+
+  private void convertStartDateTimeToApiV1(MetadataCollection collection) throws java.text.ParseException {
+
+    if (!collection.getOutputFields().containsKey("startDate")) return;
+
+    MetadataField<String> oldStartDateField = (MetadataField<String>) collection.getOutputFields().get("startDate");
+    SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(oldStartDateField.getPattern().get());
+    Date startDate = sdf.parse(oldStartDateField.getValue().get());
+
+    if (configuredMetadataFields.containsKey("startDate")) {
+      MetadataField<String> startDateField = (MetadataField<String>) configuredMetadataFields.get("startDate");
+      startDateField = MetadataField.createTemporalStartDateMetadata(startDateField.getInputID(),
+              Opt.some(startDateField.getOutputID()),
+              startDateField.getLabel(),
+              startDateField.isReadOnly(),
+              startDateField.isRequired(),
+              startDateField.getPattern().getOr("yyyy-MM-dd"),
+              startDateField.getOrder(),
+              startDateField.getNamespace());
+      sdf.applyPattern(startDateField.getPattern().get());
+      startDateField.setValue(sdf.format(startDate));
+      collection.removeField(oldStartDateField);
+      collection.addField(startDateField);
+    }
+
+    if (configuredMetadataFields.containsKey("startTime")) {
+      MetadataField<String> startTimeField = (MetadataField<String>) configuredMetadataFields.get("startTime");
+      startTimeField = MetadataField.createTemporalStartTimeMetadata(
+              startTimeField.getInputID(),
+              Opt.some(startTimeField.getOutputID()),
+              startTimeField.getLabel(),
+              startTimeField.isReadOnly(),
+              startTimeField.isRequired(),
+              startTimeField.getPattern().getOr("HH:mm"),
+              startTimeField.getOrder(),
+              startTimeField.getNamespace());
+      sdf.applyPattern(startTimeField.getPattern().get());
+      startTimeField.setValue(sdf.format(startDate));
+      collection.addField(startTimeField);
     }
   }
 
@@ -930,7 +991,8 @@ public class EventsEndpoint implements ManagedService {
     if (catalogUIAdapters.size() > 0) {
       for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
         // TODO: This is very slow:
-        metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
+        MetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
+        if (fields != null) metadataList.add(catalogUIAdapter, fields);
       }
     }
     // TODO: This is slow:
@@ -965,6 +1027,7 @@ public class EventsEndpoint implements ManagedService {
         MetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
         ExternalMetadataUtils.changeSubjectToSubjects(collection);
         ExternalMetadataUtils.removeCollectionList(collection);
+        convertStartDateTimeToApiV1(collection);
         return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, collection.toJSON());
       }
       // Try the other catalogs
@@ -976,6 +1039,7 @@ public class EventsEndpoint implements ManagedService {
           if (flavor.get().equals(catalogUIAdapter.getFlavor())) {
             MetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
             ExternalMetadataUtils.removeCollectionList(fields);
+            convertStartDateTimeToApiV1(fields);
             return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, fields.toJSON());
           }
         }
@@ -1058,30 +1122,59 @@ public class EventsEndpoint implements ManagedService {
       for (String key : updatedFields.keySet()) {
         if ("subjects".equals(key)) {
           MetadataField<?> field = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
-          if (field == null) {
-            return ApiResponses.notFound(
-                    "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.",
-                    key, id, type);
-          } else if (field.isRequired() && StringUtils.isBlank(updatedFields.get(key))) {
-            return R.badRequest(String.format(
-                    "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
-                    key, type));
+          Opt<Response> error = validateField(field, key, id, type, updatedFields);
+          if (error.isSome()) {
+            return error.get();
           }
           collection.removeField(field);
           JSONArray subjectArray = (JSONArray) parser.parse(updatedFields.get(key));
           collection.addField(
                   MetadataField.copyMetadataFieldWithValue(field, StringUtils.join(subjectArray.iterator(), ",")));
+        } else if ("startDate".equals(key)) {
+          // Special handling for start date since in API v1 we expect start date and start time to be separate fields.
+          MetadataField<String> field = (MetadataField<String>) collection.getOutputFields().get(key);
+          Opt<Response> error = validateField(field, key, id, type, updatedFields);
+          if (error.isSome()) {
+            return error.get();
+          }
+          String apiPattern = field.getPattern().get();
+          if (configuredMetadataFields.containsKey("startDate")) {
+            apiPattern = configuredMetadataFields.get("startDate").getPattern().getOr(apiPattern);
+          }
+          SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(apiPattern);
+          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern().get());
+          DateTime oldStartDate = new DateTime(sdf.parse(field.getValue().get()), DateTimeZone.UTC);
+          DateTime newStartDate = new DateTime(apiSdf.parse(updatedFields.get(key)), DateTimeZone.UTC);
+          DateTime updatedStartDate = oldStartDate.withDate(newStartDate.year().get(), newStartDate.monthOfYear().get(), newStartDate.dayOfMonth().get());
+          collection.removeField(field);
+          collection.addField(MetadataField.copyMetadataFieldWithValue(field, sdf.format(updatedStartDate.toDate())));
+        } else if ("startTime".equals(key)) {
+          // Special handling for start time since in API v1 we expect start date and start time to be separate fields.
+          MetadataField<String> field = (MetadataField<String>) collection.getOutputFields().get("startDate");
+          Opt<Response> error = validateField(field, "startDate", id, type, updatedFields);
+          if (error.isSome()) {
+            return error.get();
+          }
+          String apiPattern = "HH:mm";
+          if (configuredMetadataFields.containsKey("startTime")) {
+            apiPattern = configuredMetadataFields.get("startTime").getPattern().getOr(apiPattern);
+          }
+          SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(apiPattern);
+          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern().get());
+          DateTime oldStartDate = new DateTime(sdf.parse(field.getValue().get()), DateTimeZone.UTC);
+          DateTime newStartDate = new DateTime(apiSdf.parse(updatedFields.get(key)), DateTimeZone.UTC);
+          DateTime updatedStartDate = oldStartDate.withTime(
+                  newStartDate.hourOfDay().get(),
+                  newStartDate.minuteOfHour().get(),
+                  newStartDate.secondOfMinute().get(),
+                  newStartDate.millisOfSecond().get());
+          collection.removeField(field);
+          collection.addField(MetadataField.copyMetadataFieldWithValue(field, sdf.format(updatedStartDate.toDate())));
         } else {
-
           MetadataField<?> field = collection.getOutputFields().get(key);
-          if (field == null) {
-            return ApiResponses.notFound(
-                    "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.",
-                    key, id, type);
-          } else if (field.isRequired() && StringUtils.isBlank(updatedFields.get(key))) {
-            return R.badRequest(String.format(
-                    "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
-                    key, type));
+          Opt<Response> error = validateField(field, key, id, type, updatedFields);
+          if (error.isSome()) {
+            return error.get();
           }
           collection.removeField(field);
           collection.addField(MetadataField.copyMetadataFieldWithValue(field, updatedFields.get(key)));
@@ -1093,6 +1186,19 @@ public class EventsEndpoint implements ManagedService {
       return ApiResponses.Json.noContent(ApiVersion.VERSION_1_0_0);
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
+  }
+
+  private Opt<Response> validateField(MetadataField<?> field, String key, String id, String type, Map<String, String> updatedFields) {
+    if (field == null) {
+      return Opt.some(ApiResponses.notFound(
+              "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.",
+              key, id, type));
+    } else if (field.isRequired() && StringUtils.isBlank(updatedFields.get(key))) {
+      return Opt.some(R.badRequest(String.format(
+              "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
+              key, type)));
+    }
+    return Opt.none();
   }
 
   @DELETE
