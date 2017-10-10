@@ -35,10 +35,6 @@ angular.module('adminNg.services')
         };
 
         this.put = function (type, namespace, key, value) {
-            if (typeof me.storage == 'string') {
-                me.storage = JSON.parse(me.storage);
-            }
-
             if (angular.isUndefined(me.storage[type])) {
                 me.storage[type] = {};
             }
