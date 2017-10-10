@@ -22,7 +22,6 @@
 package org.opencastproject.composer.remote;
 
 import org.opencastproject.composer.api.ComposerService;
-import org.opencastproject.composer.api.EmbedderException;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.api.EncodingProfileBuilder;
@@ -34,7 +33,6 @@ import org.opencastproject.composer.layout.Serializer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.Attachment;
-import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
@@ -81,7 +79,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   public Job encode(Track sourceTrack, String profileId) throws EncoderException {
     HttpPost post = new HttpPost("/encode");
     try {
-      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
       params.add(new BasicNameValuePair("profileId", profileId));
       post.setEntity(new UrlEncodedFormEntity(params));
@@ -112,7 +110,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   public Job parallelEncode(Track sourceTrack, String profileId) throws EncoderException {
     HttpPost post = new HttpPost("/parallelencode");
     try {
-      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
       params.add(new BasicNameValuePair("profileId", profileId));
       post.setEntity(new UrlEncodedFormEntity(params));
@@ -145,7 +143,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   public Job trim(Track sourceTrack, String profileId, long start, long duration) throws EncoderException {
     HttpPost post = new HttpPost("/trim");
     try {
-      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
       params.add(new BasicNameValuePair("profileId", profileId));
       params.add(new BasicNameValuePair("start", Long.toString(start)));
@@ -329,37 +327,6 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       closeConnection(response);
     }
     throw new EncoderException("Unable to convert image at " + image + " using the remote composer service proxy");
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Job captions(Track mediaTrack, Catalog[] captions) throws EmbedderException {
-    HttpPost post = new HttpPost("/captions");
-    try {
-      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-      params.add(new BasicNameValuePair("mediaTrack", MediaPackageElementParser.getAsXml(mediaTrack)));
-      params.add(new BasicNameValuePair("captions", MediaPackageElementParser.getArrayAsXml(Arrays.asList(captions))));
-      post.setEntity(new UrlEncodedFormEntity(params));
-    } catch (Exception e) {
-      throw new EmbedderException(e);
-    }
-    HttpResponse response = null;
-    try {
-      response = getResponse(post);
-      if (response != null) {
-        Job r = JobParser.parseJob(response.getEntity().getContent());
-        logger.info("Caption embedding job {} started on a remote composer", r.getId());
-        return r;
-      }
-    } catch (Exception e) {
-      throw new EmbedderException(e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new EmbedderException("Unable to embed an captions from catalogs " + captions + " to track " + mediaTrack
-            + " using the remote composer service proxy");
   }
 
   /**

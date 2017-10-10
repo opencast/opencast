@@ -145,7 +145,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
     }
 
     // Find list of formats in properties
-    List<String> profileNames = new ArrayList<String>();
+    List<String> profileNames = new ArrayList<>();
     for (Object fullKey : properties.keySet()) {
       String key = fullKey.toString();
       if (key.startsWith(PROP_PREFIX) && key.endsWith(PROP_NAME)) {
@@ -181,15 +181,14 @@ public class EncodingProfileScanner implements ArtifactInstaller {
    */
   private EncodingProfile loadProfile(String profile, Properties properties, File artifact)
           throws ConfigurationException {
-    String identifier = profile;
-    List<String> defaultProperties = new ArrayList<String>(10);
+    List<String> defaultProperties = new ArrayList<>(10);
 
     String name = getDefaultProperty(profile, PROP_NAME, properties, defaultProperties);
     if (name == null || "".equals(name))
       throw new ConfigurationException("Distribution profile '" + profile + "' is missing a name (" + PROP_NAME
               + "). (Check web.xml profiles.)");
 
-    EncodingProfileImpl df = new EncodingProfileImpl(identifier, name, artifact);
+    EncodingProfileImpl df = new EncodingProfileImpl(profile, name, artifact);
 
     // Output Type
     String type = getDefaultProperty(profile, PROP_OUTPUT, properties, defaultProperties);
@@ -271,13 +270,9 @@ public class EncodingProfileScanner implements ArtifactInstaller {
    * @return the property value or <code>null</code>
    */
   private static String getDefaultProperty(String profile, String keySuffix, Properties properties, List<String> list) {
-    StringBuffer buf = new StringBuffer(PROP_PREFIX);
-    buf.append(profile);
-    buf.append(keySuffix);
-    String key = buf.toString();
+    String key = PROP_PREFIX + profile + keySuffix;
     list.add(key);
-    final String prop = properties.getProperty(key);
-    return prop != null ? prop.trim() : prop;
+    return StringUtils.trimToNull(properties.getProperty(key));
   }
 
   /**
@@ -293,12 +288,9 @@ public class EncodingProfileScanner implements ArtifactInstaller {
 
   private static List<String> getTags(String profile, Properties properties, List<String> list) {
     Set<Object> keys = properties.keySet();
-    StringBuffer buf = new StringBuffer(PROP_PREFIX);
-    buf.append(profile);
-    buf.append(PROP_SUFFIX);
-    String key = buf.toString();
+    String key = PROP_PREFIX + profile + PROP_SUFFIX;
 
-    ArrayList<String> tags = new ArrayList<String>();
+    ArrayList<String> tags = new ArrayList<>();
     for (Object o : keys) {
       String k = o.toString();
       if (k.startsWith(key)) {

@@ -33,7 +33,9 @@ import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.api.EncodingProfile.MediaType;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.net.URL;
@@ -49,10 +51,13 @@ public class EncodingProfileTest {
   private Map<String, EncodingProfile> profiles = null;
 
   /** Name of the h264 profile */
-  private String h264ProfileId = "h264.rtsp";
+  private String h264ProfileId = "h264-medium.http";
 
   /** Name of the cover ui profile */
   private String coverProfileId = "cover-ui.http";
+
+  @Rule
+  public TemporaryFolder tmp = new TemporaryFolder();
 
   /**
    * @throws java.lang.Exception
@@ -62,6 +67,24 @@ public class EncodingProfileTest {
     URL url = EncodingProfileTest.class.getResource("/encodingtestprofiles.properties");
     EncodingProfileScanner mgr = new EncodingProfileScanner();
     profiles = mgr.loadFromProperties(new File(url.toURI()));
+  }
+
+  /**
+   * Test (un)installing profiles
+   */
+  @Test
+  public void testInstall() throws Exception {
+    URL url = EncodingProfileTest.class.getResource("/encodingtestprofiles.properties");
+    File file = new File(url.toURI());
+
+    EncodingProfileScanner mgr = new EncodingProfileScanner();
+    mgr.install(file);
+    int profileCount = mgr.getProfiles().size();
+    assertTrue(profileCount > 0);
+    mgr.update(file);
+    assertEquals(mgr.getProfiles().size(), profileCount);
+    mgr.uninstall(file);
+    assertEquals(0, mgr.getProfiles().size());
   }
 
   /**
@@ -90,7 +113,7 @@ public class EncodingProfileTest {
   @Test
   public void testInitializationFromProperties() {
     assertNotNull(profiles);
-    assertEquals(11, profiles.size());
+    assertEquals(12, profiles.size());
   }
 
   /**
@@ -108,7 +131,7 @@ public class EncodingProfileTest {
   @Test
   public void testGetName() {
     EncodingProfile profile = profiles.get(h264ProfileId);
-    assertEquals("h.264 streaming medium quality", profile.getName());
+    assertEquals("h.264 download medium quality", profile.getName());
   }
 
   /**
@@ -126,7 +149,7 @@ public class EncodingProfileTest {
   @Test
   public void testGetSuffix() {
     EncodingProfile profile = profiles.get(h264ProfileId);
-    assertEquals("-sm.mp4", profile.getSuffix());
+    assertEquals("-dm.m4v", profile.getSuffix());
   }
 
   /**
@@ -156,7 +179,7 @@ public class EncodingProfileTest {
   @Test
   public void testGetMimeType() {
     EncodingProfile profile = profiles.get(h264ProfileId);
-    assertEquals("visual/mp4v-es", profile.getMimeType());
+    assertEquals("visual/x-m4v", profile.getMimeType());
   }
 
   /**

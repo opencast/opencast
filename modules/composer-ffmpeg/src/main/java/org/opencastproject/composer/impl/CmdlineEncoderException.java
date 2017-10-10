@@ -21,20 +21,19 @@
 
 package org.opencastproject.composer.impl;
 
-import org.opencastproject.composer.api.EncoderEngine;
 import org.opencastproject.composer.api.EncoderException;
 
 /** Specialized exception for command line encoders. */
 public class CmdlineEncoderException extends EncoderException {
   private final String commandLine;
 
-  public CmdlineEncoderException(EncoderEngine engine, String message, String commandLine, Throwable cause) {
-    super(engine, message, cause);
+  public CmdlineEncoderException(String message, String commandLine, Throwable cause) {
+    super(message, cause);
     this.commandLine = commandLine;
   }
 
-  public CmdlineEncoderException(EncoderEngine engine, String message, String commandLine) {
-    super(engine, message);
+  public CmdlineEncoderException(String message, String commandLine) {
+    super(message);
     this.commandLine = commandLine;
   }
 
