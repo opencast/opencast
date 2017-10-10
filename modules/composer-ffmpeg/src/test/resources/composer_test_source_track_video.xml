@@ -2,6 +2,7 @@
 <track xmlns="http://mediapackage.opencastproject.org" type="presentation/source" id="f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a">
   <mimetype>video/mpeg</mimetype>
   <url>video.mp4</url>
+  <duration>2000</duration>
   <video>
     <device type="UFG03" version="30112007" vendor="Unigraf" />
     <encoder type="H.264" version="53.4.0" vendor="Lavf53.4.0" />

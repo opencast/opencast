@@ -27,15 +27,6 @@ package org.opencastproject.composer.api;
  */
 public class EncoderException extends Exception {
 
-  /** serial version uid */
-  private static final long serialVersionUID = -8883994454091884800L;
-
-  /** The engine that threw the exception */
-  private EncoderEngine engine = null;
-
-  /** Exit code of external processes */
-  private int exitCode = -1;
-
   /**
    * Creates a new encoder exception with the given error message.
    *
@@ -66,60 +57,6 @@ public class EncoderException extends Exception {
    */
   public EncoderException(Throwable cause) {
     super(cause);
-  }
-
-  /**
-   * @param engine
-   *          the compression engine
-   * @param message
-   *          the error message
-   */
-  public EncoderException(EncoderEngine engine, String message) {
-    super(message);
-    this.engine = engine;
-  }
-
-  /**
-   * @param engine
-   *          the compression engine
-   * @param cause
-   *          the original cause
-   */
-  public EncoderException(EncoderEngine engine, Throwable cause) {
-    super(cause);
-    this.engine = engine;
-  }
-
-  /**
-   * @param engine
-   *          the compression engine
-   * @param message
-   *          the error message
-   * @param cause
-   *          the original cause
-   */
-  public EncoderException(EncoderEngine engine, String message, Throwable cause) {
-    super(message, cause);
-    this.engine = engine;
-  }
-
-  /**
-   * Returns the compression engine that threw the exception.
-   *
-   * @return the engine
-   */
-  public EncoderEngine getEngine() {
-    return engine;
-  }
-
-  /**
-   * Returns the exit code of the process if it was not 0. If the exception wasn't caused by an exit code unequal to 0,
-   * -1 is returned.
-   *
-   * @return the exit code
-   */
-  public int getExitCode() {
-    return exitCode;
   }
 
 }

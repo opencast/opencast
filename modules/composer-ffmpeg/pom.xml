@@ -55,11 +55,6 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.xmlrpc</groupId>
-      <artifactId>xmlrpc-client</artifactId>
-      <version>3.1.2</version>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
@@ -86,6 +81,10 @@
       <groupId>org.apache.cxf</groupId>
       <artifactId>cxf-rt-frontend-jaxrs</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -117,13 +116,9 @@
               !org.apache.ws.commons.*,
               *
             </Import-Package>
-            <Private-Package> org.apache.xmlrpc.* </Private-Package>
             <Export-Package>org.opencastproject.composer.impl.*;version=${project.version}</Export-Package>
-            <Embed-Dependency>xmlrpc-client;inline=true</Embed-Dependency>
             <Service-Component>
               OSGI-INF/composer-service.xml,
-              OSGI-INF/embedderengine.xml,
-              OSGI-INF/encoderengine.xml,
               OSGI-INF/profile-scanner.xml
             </Service-Component>
           </instructions>

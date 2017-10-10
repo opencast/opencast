@@ -24,7 +24,6 @@ package org.opencastproject.composer.api;
 import org.opencastproject.composer.layout.Dimension;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Attachment;
-import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.util.data.Option;
@@ -218,22 +217,6 @@ public interface ComposerService {
    *           if the mediapackage is invalid
    */
   Job convertImage(Attachment image, String profileId) throws EncoderException, MediaPackageException;
-
-  /**
-   * Insert captions in media package element identified by <code>mediaTrack</code> from catalog which contains
-   * captions.
-   *
-   * @param mediaTrack
-   *          media track to which captions will be embedded
-   * @param captions
-   *          captions to be inserted
-   * @return Receipt for this embedding job
-   * @throws EmbedderException
-   *           if exception occurs during embedding process
-   * @throws MediaPackageException
-   *           if the track is invalid
-   */
-  Job captions(Track mediaTrack, Catalog[] captions) throws EmbedderException, MediaPackageException;
 
   /**
    * Insert captions in media package element identified by <code>mediaTrack</code> from catalog which contains
