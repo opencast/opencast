@@ -196,27 +196,6 @@ public final class PathSupport {
   }
 
   /**
-   * Removes any existing file extension from the end of the path and replaces it with the given one.
-   *
-   * @param path
-   *          path to the file
-   * @param extension
-   *          the new file extension
-   * @return the path with the new extension
-   */
-  public static String changeFileExtension(String path, String extension) {
-    if (path != null) {
-      int index = path.lastIndexOf('.');
-      if (index > 0) {
-        if (path.charAt(index - 1) != File.separatorChar) {
-          path = path.substring(0, index);
-        }
-      }
-    }
-    return path + extension;
-  }
-
-  /**
    * Checks that the path only contains the system path separator. If not, wrong ones are replaced.
    */
   private static String adjustSeparator(String path) {

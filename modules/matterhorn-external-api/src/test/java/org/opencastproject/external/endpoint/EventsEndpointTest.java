@@ -39,6 +39,7 @@ import org.opencastproject.external.common.ApiFormat;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.external.util.AclUtils;
+import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.impl.index.IndexObject;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.util.RequestUtils;
@@ -56,6 +57,8 @@ import org.opencastproject.workflow.handler.distribution.InternalPublicationChan
 
 import org.apache.commons.io.IOUtils;
 import org.json.simple.parser.ParseException;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -77,15 +80,15 @@ public class EventsEndpointTest {
   private Organization defaultOrg = new DefaultOrganization();
   private static final RestServiceTestEnv env = testEnvForClasses(localhostRandomPort(), TestEventsEndpoint.class);
 
-  // @BeforeClass
-  // public static void oneTimeSetUp() {
-  // env.setUpServer();
-  // }
-  //
-  // @AfterClass
-  // public static void oneTimeTearDown() {
-  // env.tearDownServer();
-  // }
+   @BeforeClass
+   public static void oneTimeSetUp() {
+     env.setUpServer();
+   }
+
+   @AfterClass
+   public static void oneTimeTearDown() {
+     env.tearDownServer();
+   }
 
   @Ignore
   private List<Publication> getExamplePublications() throws URISyntaxException {
@@ -270,7 +273,7 @@ public class EventsEndpointTest {
 
     String updateMetadataJson = IOUtils.toString(getClass().getResource("/event-metadata-update.json"));
     fields = RequestUtils.getKeyValueMap(updateMetadataJson);
-    assertEquals(3, fields.size());
+    assertEquals(5, fields.size());
     assertEquals("Captivating title - edited", fields.get("title"));
     assertEquals("What this is about - edited", fields.get("subject"));
     assertEquals("", fields.get("description"));
@@ -392,4 +395,36 @@ public class EventsEndpointTest {
     result = given().log().all().expect().statusCode(SC_OK).when().get(env.host(oaipmhPublication)).asString();
     assertThat(expected, SameJSONAs.sameJSONAs(result).allowingAnyArrayOrdering());
   }
+
+  @Test
+  public void testUpdateEventMetadata() throws IOException {
+    String jsonString = IOUtils.toString(getClass().getResource("/event-update.json"));
+    String expectedJson = IOUtils.toString(getClass().getResource("/event-update-expected.json"));
+    String eventId = TestEventsEndpoint.UPDATE_EVENT;
+    given().multiPart("metadata", jsonString).pathParam("event_id", eventId).expect().statusCode(SC_NO_CONTENT)
+            .when().post(env.host("{event_id}"));
+    MetadataList actualMetadataList = TestEventsEndpoint.getCapturedMetadataList1().getValue();
+    assertThat(actualMetadataList.toJSON().toString(), SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
+  }
+
+  @Test
+  public void testGetAllEventMetadata() throws IOException {
+    String expectedJson = IOUtils.toString(getClass().getResource("/event-metadata-expected.json"));
+    String eventId = TestEventsEndpoint.METADATA_GET_EVENT;
+    String result = given().pathParam("event_id", eventId).expect().statusCode(SC_OK).when().get(env.host("{event_id}/metadata")).asString();
+    assertThat(result, SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
+  }
+
+  @Test
+  public void testUpdateEventMetadataByType() throws IOException {
+    String jsonString = IOUtils.toString(getClass().getResource("/event-metadata-update.json"));
+    String expectedJson = IOUtils.toString(getClass().getResource("/event-metadata-update-expected.json"));
+    String eventId = TestEventsEndpoint.METADATA_UPDATE_EVENT;
+    given().formParam("metadata", jsonString).pathParam("event_id", eventId).queryParam("type", "dublincore/episode")
+            .expect().statusCode(SC_NO_CONTENT).when().put(env.host("{event_id}/metadata"));
+    MetadataList actualMetadataList = TestEventsEndpoint.getCapturedMetadataList2().getValue();
+    assertThat(actualMetadataList.getMetadataByFlavor("dublincore/episode").get().toJSON().toString(),
+            SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
+  }
+
 }
