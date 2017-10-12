@@ -273,6 +273,11 @@ public class ContributorsListProvider implements ResourceListProvider {
     }
   }
 
+  @Override
+  public boolean isTranslatable(String listName) {
+    return false;
+  }
+
   private class Contributor {
     public String getKey() {
       return key;

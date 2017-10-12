@@ -79,4 +79,9 @@ public class AclListProvider implements ResourceListProvider {
 
     return ListProviderUtil.filterMap(aclsList, query);
   }
+
+  @Override
+  public boolean isTranslatable(String listName) {
+    return false;
+  }
 }
