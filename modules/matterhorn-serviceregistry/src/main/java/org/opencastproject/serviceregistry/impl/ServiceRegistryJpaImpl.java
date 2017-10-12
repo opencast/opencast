@@ -2974,6 +2974,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           String hostAcceptingJob = null;
           try {
             hostAcceptingJob = dispatchJob(em, job, candidateServices);
+            try {
+              systemLoad.updateNodeLoad(hostAcceptingJob, job.getJobLoad());
+            } catch (NotFoundException e) {
+              logger.debug("Host {} not found in load list, this is a bug.", hostAcceptingJob);
+            }
+
             dispatchPriorityList.remove(job.getId());
           } catch (ServiceUnavailableException e) {
             logger.debug("Jobs of type {} currently cannot be dispatched", job.getOperation());
