@@ -2110,15 +2110,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       statuses.add(status.ordinal());
     }
     q.setParameter("statuses", statuses);
+    q.setParameter("workflow_type", TYPE_WORKFLOW);
 
     // Accumulate the numbers for relevant job statuses per host
     for (Object result : q.getResultList()) {
       Object[] resultArray = (Object[]) result;
-      ServiceRegistrationJpaImpl service = (ServiceRegistrationJpaImpl) resultArray[0];
-
-      // Workflow related jobs are not counting. Workflows are load balanced by the workflow service directly
-      if (TYPE_WORKFLOW.equals(service.getServiceType()))
-        continue;
+      String host = String.valueOf(resultArray[0]);
 
       Status status = Status.values()[(int) resultArray[1]];
       float load = ((Number) resultArray[2]).floatValue();
@@ -2127,8 +2124,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       if (status == null || !JOB_STATUSES_INFLUENCING_LOAD_BALANCING.contains(status)) {
         load = 0.0f;
       }
-
-      String host = service.getHost();
 
       // Add the service registration
       NodeLoad serviceLoad;
