@@ -34,7 +34,7 @@ public interface ListProvidersService {
 
   /**
    * Returns the list for the given provider
-   * 
+   *
    * @param providerName
    *          The name of the source
    * @param query
@@ -47,8 +47,19 @@ public interface ListProvidersService {
           boolean inverseValueKey) throws ListProviderException;
 
   /**
+   * Defines if keys and values of the given list should be translated in the administrative user interface.
+   *
+   * @param listName the name of the list
+   * @return true, if the results should be translated, false otherwise
+   *
+   * @throws org.opencastproject.index.service.exception.ListProviderException
+   *              if no list provider found for the given list name
+   */
+  boolean isTranslatable(String listName) throws ListProviderException;
+
+  /**
    * Adds an source to the service
-   * 
+   *
    * @param name
    *          The name of the source
    * @param provider
@@ -58,7 +69,7 @@ public interface ListProvidersService {
 
   /**
    * Removes the given source
-   * 
+   *
    * @param name
    *          The provider to remove
    */
@@ -66,7 +77,7 @@ public interface ListProvidersService {
 
   /**
    * Returns if the given source name is or not available
-   * 
+   *
    * @param name
    *          The source to check
    * @return true if a source with the given name is available in the service
@@ -75,7 +86,7 @@ public interface ListProvidersService {
 
   /**
    * Returns the resources list providers available
-   * 
+   *
    * @return the list of available providers
    */
   List<String> getAvailableProviders();

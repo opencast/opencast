@@ -150,6 +150,9 @@ public class DublinCoreCatalogUIAdapterTest {
     EasyMock.expect(
             listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQueryImpl.class),
                     EasyMock.anyObject(Organization.class), EasyMock.anyBoolean())).andReturn(collection).anyTimes();
+    EasyMock.expect(
+            listProvidersService.isTranslatable(EasyMock.anyString()))
+            .andThrow(new ListProviderException("not implemented")).anyTimes();
     EasyMock.replay(listProvidersService);
 
     eventProperties = new Properties();
@@ -280,13 +283,13 @@ public class DublinCoreCatalogUIAdapterTest {
     DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
 
     MetadataField<String> titleField = MetadataField.createTextMetadataField(title, Opt.some(title),
-            "New Label for Title", true, false, Opt.<Map<String, String>> none(), Opt.<String> none(),
-            Opt.<Integer> none(), Opt.<String> none());
+            "New Label for Title", true, false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(),
+            Opt.<String> none(), Opt.<Integer> none(), Opt.<String> none());
     dublinCoreMetadata.addField(titleField, expectedTitle, listProvidersService);
 
     MetadataField<String> missingField = MetadataField.createTextMetadataField("missing", Opt.<String> none(),
-            "The Missing's Label", false, false, Opt.<Map<String, String>> none(), Opt.<String> none(),
-            Opt.<Integer> none(), Opt.<String> none());
+            "The Missing's Label", false, false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(),
+            Opt.<String> none(), Opt.<Integer> none(), Opt.<String> none());
     dublinCoreMetadata.addField(missingField, expectedMissing, listProvidersService);
 
     MetadataField<String> durationField = MetadataField.createDurationMetadataField(temporal, Opt.some("duration"),

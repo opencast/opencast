@@ -64,6 +64,7 @@ public class MetadataFieldTest {
   private Opt<String> optCollectionID = Opt.some(collectionID);
   private boolean readOnly = false;
   private boolean required = false;
+  private boolean isTranslatable = false;
   private String datePattern = "yyyy-MM-dd";
   private String timePattern = "hh-mm-ss";
   private String dateTimePattern = datePattern + " " + timePattern;
@@ -81,6 +82,8 @@ public class MetadataFieldTest {
     EasyMock.expect(
             listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQuery.class),
                     EasyMock.anyObject(Organization.class), EasyMock.anyBoolean())).andReturn(collection).anyTimes();
+    EasyMock.expect(
+            listProvidersService.isTranslatable(EasyMock.anyString())).andReturn(isTranslatable).anyTimes();
     EasyMock.replay(listProvidersService);
   }
 
@@ -137,8 +140,8 @@ public class MetadataFieldTest {
     String emptyValueJson = IOUtils.toString(getClass().getResource("/catalog-adapter/text/text-empty-value.json"));
     // Test JSON generated with no value.
     MetadataField<String> emptyValueTextField = MetadataField.createTextMetadataField(defaultInputID, optOutputID,
-            label, false, false, Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.<Integer> none(),
-            Opt.<String> none());
+            label, false, false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(), Opt.<String> none(),
+            Opt.<Integer> none(), Opt.<String> none());
     assertThat(emptyValueJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(emptyValueTextField.toJSON())));
   }
 
@@ -148,7 +151,8 @@ public class MetadataFieldTest {
     String withValueJson = IOUtils.toString(getClass().getResource("/catalog-adapter/text/text-with-value.json"));
     // Test JSON with value
     MetadataField<String> textField = MetadataField.createTextMetadataField(defaultInputID, optOutputID, label, false,
-            false, Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.<Integer> none(), Opt.<String> none());
+            false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.<Integer> none(),
+            Opt.<String> none());
     textField.setValue(textValue);
     assertThat(withValueJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(textField.toJSON())));
   }
@@ -159,7 +163,8 @@ public class MetadataFieldTest {
     String withCollectionJson = IOUtils.toString(getClass().getResource(
             "/catalog-adapter/text/text-with-collection.json"));
     MetadataField<String> textFieldWithCollection = MetadataField.createTextMetadataField(defaultInputID, optOutputID,
-            label, false, false, optCollection, Opt.<String> none(), Opt.<Integer> none(), Opt.<String> none());
+            label, false, false, Opt.some(true), optCollection, Opt.<String> none(), Opt.<Integer> none(),
+            Opt.<String> none());
     assertThat(withCollectionJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(textFieldWithCollection.toJSON())));
   }
 
@@ -169,8 +174,8 @@ public class MetadataFieldTest {
     String withCollectionIDJson = IOUtils.toString(getClass().getResource(
             "/catalog-adapter/text/text-with-collection-id.json"));
     MetadataField<String> textFieldWithCollectionID = MetadataField.createTextMetadataField(defaultInputID,
-            optOutputID, label, false, false, Opt.<Map<String, String>> none(), optCollectionID, Opt.<Integer> none(),
-            Opt.<String> none());
+            optOutputID, label, false, false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(), optCollectionID,
+            Opt.<Integer> none(), Opt.<String> none());
     assertThat(withCollectionIDJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(textFieldWithCollectionID.toJSON())));
   }
 
@@ -180,8 +185,8 @@ public class MetadataFieldTest {
     String withCollectionIDJson = IOUtils.toString(getClass().getResource(
             "/catalog-adapter/text/text-long-with-value.json"));
     MetadataField<String> textLongField = MetadataField.createTextLongMetadataField(defaultInputID, optOutputID, label,
-            false, false, Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.<Integer> none(),
-            Opt.<String> none());
+            false, false, Opt.<Boolean> none(),Opt.<Map<String, String>> none(), Opt.<String> none(),
+            Opt.<Integer> none(), Opt.<String> none());
     textLongField.setValue("This is the text value");
     assertThat(withCollectionIDJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(textLongField.toJSON())));
   }

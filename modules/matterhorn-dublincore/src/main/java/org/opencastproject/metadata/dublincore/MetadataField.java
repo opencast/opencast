@@ -89,6 +89,7 @@ public class MetadataField<A> {
   protected static final String JSON_KEY_TYPE = "type";
   protected static final String JSON_KEY_VALUE = "value";
   protected static final String JSON_KEY_COLLECTION = "collection";
+  protected static final String JSON_KEY_TRANSLATABLE = "translatable";
 
   /** Labels for the temporal date fields */
   private static final String LABEL_METADATA_PREFIX = "EVENTS.EVENTS.DETAILS.METADATA.";
@@ -139,6 +140,7 @@ public class MetadataField<A> {
   private JsonType jsonType;
 
   private Opt<A> value = Opt.none();
+  private Opt<Boolean> translatable = Opt.none();
   private boolean updated = false;
   private Opt<Map<String, String>> collection = Opt.none();
   private Fn<Opt<A>, JValue> valueToJSON;
@@ -177,8 +179,9 @@ public class MetadataField<A> {
    *           if the id, label, type, valueToJSON or/and jsonToValue parameters is/are null
    */
   private MetadataField(String inputID, Opt<String> outputID, String label, boolean readOnly, boolean required, A value,
-          Type type, JsonType jsonType, Opt<Map<String, String>> collection, Opt<String> collectionID,
-          Fn<Opt<A>, JValue> valueToJSON, Fn<Object, A> jsonToValue, Opt<Integer> order, Opt<String> namespace)
+          Opt<Boolean> translatable, Type type, JsonType jsonType, Opt<Map<String, String>> collection,
+          Opt<String> collectionID, Fn<Opt<A>, JValue> valueToJSON, Fn<Object, A> jsonToValue, Opt<Integer> order,
+          Opt<String> namespace)
                   throws IllegalArgumentException {
     if (valueToJSON == null)
       throw new IllegalArgumentException("The function 'valueToJSON' must not be null.");
@@ -200,6 +203,7 @@ public class MetadataField<A> {
       this.value = Opt.none();
     else
       this.value = Opt.some(value);
+    this.translatable = translatable;
     this.type = type;
     this.jsonType = jsonType;
     this.collection = collection;
@@ -237,6 +241,8 @@ public class MetadataField<A> {
       values.add(f(JSON_KEY_COLLECTION, mapToJSON(collection.get())));
     else if (collectionID.isSome())
       values.add(f(JSON_KEY_COLLECTION, v(collectionID.get())));
+    if (translatable.isSome())
+      values.add(f(JSON_KEY_TRANSLATABLE, v(translatable.get())));
     return j(values);
   }
 
@@ -252,6 +258,10 @@ public class MetadataField<A> {
     return value;
   }
 
+  public Opt<Boolean> isTranslatable() {
+    return translatable;
+  }
+
   public boolean isUpdated() {
     return updated;
   }
@@ -263,6 +273,10 @@ public class MetadataField<A> {
       this.value = Opt.some(value);
       this.updated = true;
     }
+  }
+
+  public void setIsTranslatable(Opt<Boolean> translatable) {
+    this.translatable = translatable;
   }
 
   public static SimpleDateFormat getSimpleDateFormatter(String pattern) {
@@ -320,7 +334,7 @@ public class MetadataField<A> {
       }
     };
 
-    return new MetadataField<Boolean>(inputID, outputID, label, readOnly, required, null, Type.BOOLEAN,
+    return new MetadataField<Boolean>(inputID, outputID, label, readOnly, required, null, Opt.<Boolean>none(), Type.BOOLEAN,
             JsonType.BOOLEAN, Opt.<Map<String, String>> none(), Opt.<String> none(), booleanToJson, jsonToBoolean,
             order, namespace);
   }
@@ -358,21 +372,22 @@ public class MetadataField<A> {
       case ITERABLE_TEXT:
         MetadataField<Iterable<String>> iterableTextField = MetadataField.createIterableStringMetadataField(
                 oldField.getInputID(), Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(),
-                oldField.isRequired(), oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(),
-                oldField.getNamespace());
+                oldField.isRequired(), oldField.isTranslatable(), oldField.getCollection(), oldField.getCollectionID(),
+                oldField.getOrder(), oldField.getNamespace());
         iterableTextField.fromJSON(value);
         return iterableTextField;
       case LONG:
         MetadataField<Long> longField = MetadataField.createLongMetadataField(oldField.getInputID(),
                 Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
-                oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(), oldField.getNamespace());
+                oldField.isTranslatable(), oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(),
+                oldField.getNamespace());
         longField.fromJSON(value);
         return longField;
       case MIXED_TEXT:
         MetadataField<Iterable<String>> mixedField = MetadataField.createMixedIterableStringMetadataField(
                 oldField.getInputID(), Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(),
-                oldField.isRequired(), oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(),
-                oldField.getNamespace());
+                oldField.isRequired(), oldField.isTranslatable(), oldField.getCollection(), oldField.getCollectionID(),
+                oldField.getOrder(), oldField.getNamespace());
         mixedField.fromJSON(value);
         return mixedField;
       case START_DATE:
@@ -390,13 +405,15 @@ public class MetadataField<A> {
       case TEXT:
         MetadataField<String> textField = MetadataField.createTextMetadataField(oldField.getInputID(),
                 Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
-                oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(), oldField.getNamespace());
+                oldField.isTranslatable(), oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(),
+                oldField.getNamespace());
         textField.fromJSON(value);
         return textField;
       case TEXT_LONG:
         MetadataField<String> textLongField = MetadataField.createTextLongMetadataField(oldField.getInputID(),
                 Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
-                oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(), oldField.getNamespace());
+                oldField.isTranslatable(), oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(),
+                oldField.getNamespace());
         textLongField.fromJSON(value);
         return textLongField;
       default:
@@ -454,7 +471,7 @@ public class MetadataField<A> {
       }
     };
 
-    MetadataField<Date> dateField = new MetadataField<Date>(inputID, outputID, label, readOnly, required, null,
+    MetadataField<Date> dateField = new MetadataField<Date>(inputID, outputID, label, readOnly, required, null, Opt.<Boolean> none(),
             Type.DATE, JsonType.DATE, Opt.<Map<String, String>> none(), Opt.<String> none(), dateToJSON, jsonToDate,
             order, namespace);
     if (StringUtils.isNotBlank(pattern)) {
@@ -465,13 +482,13 @@ public class MetadataField<A> {
 
   public static MetadataField<String> createDurationMetadataField(String inputID, Opt<String> outputID, String label,
           boolean readOnly, boolean required, Opt<Integer> order, Opt<String> namespace) {
-    return createDurationMetadataField(inputID, outputID, label, readOnly, required, Opt.<Map<String, String>> none(),
-            Opt.<String> none(), order, namespace);
+    return createDurationMetadataField(inputID, outputID, label, readOnly, required, Opt.<Boolean> none(),
+            Opt.<Map<String, String>> none(), Opt.<String> none(), order, namespace);
   }
 
   public static MetadataField<String> createDurationMetadataField(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Map<String, String>> collection, Opt<String> collectionId,
-          Opt<Integer> order, Opt<String> namespace) {
+          boolean readOnly, boolean required, Opt<Boolean> isTranslatable, Opt<Map<String, String>> collection,
+          Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
 
     Fn<Opt<String>, JValue> periodToJSON = new Fn<Opt<String>, JValue>() {
       @Override
@@ -512,7 +529,7 @@ public class MetadataField<A> {
         return returnValue.toString();
       }
     };
-    return new MetadataField<String>(inputID, outputID, label, readOnly, required, "", Type.DURATION, JsonType.TEXT,
+    return new MetadataField<String>(inputID, outputID, label, readOnly, required, "", isTranslatable, Type.DURATION, JsonType.TEXT,
             collection, collectionId, periodToJSON, jsonToPeriod, order, namespace);
   }
 
@@ -527,6 +544,8 @@ public class MetadataField<A> {
    *          Define if the new metadata field can be or not edited
    * @param required
    *          Define if the new metadata field is or not required
+   * @param isTranslatable
+   *          If the field value is not human readable and should be translated before
    * @param collection
    *          If the field has a limited list of possible value, the option should contain this one. Otherwise it should
    *          be none.
@@ -535,8 +554,8 @@ public class MetadataField<A> {
    * @return the new metadata field
    */
   public static MetadataField<Iterable<String>> createMixedIterableStringMetadataField(String inputID,
-          Opt<String> outputID, String label, boolean readOnly, boolean required, Opt<Map<String, String>> collection,
-          Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
+          Opt<String> outputID, String label, boolean readOnly, boolean required, Opt<Boolean> isTranslatable,
+          Opt<Map<String, String>> collection, Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
 
     Fn<Opt<Iterable<String>>, JValue> iterableToJSON = new Fn<Opt<Iterable<String>>, JValue>() {
       @Override
@@ -590,7 +609,7 @@ public class MetadataField<A> {
 
     };
 
-    return new MetadataField<Iterable<String>>(inputID, outputID, label, readOnly, required, new ArrayList<String>(),
+    return new MetadataField<Iterable<String>>(inputID, outputID, label, readOnly, required, new ArrayList<String>(), isTranslatable,
             Type.MIXED_TEXT, JsonType.MIXED_TEXT, collection, collectionId, iterableToJSON, jsonToIterable, order,
             namespace);
   }
@@ -606,6 +625,8 @@ public class MetadataField<A> {
    *          Define if the new metadata field can be or not edited
    * @param required
    *          Define if the new metadata field is or not required
+   * @param isTranslatable
+   *          If the field value is not human readable and should be translated before
    * @param collection
    *          If the field has a limited list of possible value, the option should contain this one. Otherwise it should
    *          be none.
@@ -614,8 +635,8 @@ public class MetadataField<A> {
    * @return the new metadata field
    */
   public static MetadataField<Iterable<String>> createIterableStringMetadataField(String inputID, Opt<String> outputID,
-          String label, boolean readOnly, boolean required, Opt<Map<String, String>> collection,
-          Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
+          String label, boolean readOnly, boolean required, Opt<Boolean> isTranslatable,
+          Opt<Map<String, String>> collection, Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
 
     Fn<Opt<Iterable<String>>, JValue> iterableToJSON = new Fn<Opt<Iterable<String>>, JValue>() {
       @Override
@@ -657,14 +678,14 @@ public class MetadataField<A> {
 
     };
 
-    return new MetadataField<Iterable<String>>(inputID, outputID, label, readOnly, required, new ArrayList<String>(),
+    return new MetadataField<Iterable<String>>(inputID, outputID, label, readOnly, required, new ArrayList<String>(), isTranslatable,
             Type.ITERABLE_TEXT, JsonType.TEXT, collection, collectionId, iterableToJSON, jsonToIterable, order,
             namespace);
   }
 
   public static MetadataField<Long> createLongMetadataField(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Map<String, String>> collection, Opt<String> collectionId,
-          Opt<Integer> order, Opt<String> namespace) {
+          boolean readOnly, boolean required, Opt<Boolean> isTranslatable, Opt<Map<String, String>> collection,
+          Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
 
     Fn<Opt<Long>, JValue> longToJSON = new Fn<Opt<Long>, JValue>() {
       @Override
@@ -688,7 +709,7 @@ public class MetadataField<A> {
       }
     };
 
-    return new MetadataField<Long>(inputID, outputID, label, readOnly, required, 0L, Type.TEXT, JsonType.NUMBER,
+    return new MetadataField<Long>(inputID, outputID, label, readOnly, required, 0L, isTranslatable, Type.TEXT, JsonType.NUMBER,
             collection, collectionId, longToJSON, jsonToLong, order, namespace);
   }
 
@@ -758,7 +779,7 @@ public class MetadataField<A> {
     };
 
     MetadataField<String> temporalStart = new MetadataField<String>(inputID, outputID, label, readOnly, required, null,
-            type, jsonType, Opt.<Map<String, String>> none(), Opt.<String> none(), dateToJSON, jsonToDate, order,
+            Opt.<Boolean> none(), type, jsonType, Opt.<Map<String, String>> none(), Opt.<String> none(), dateToJSON, jsonToDate, order,
             namespace);
     temporalStart.setPattern(Opt.some(pattern));
 
@@ -855,6 +876,8 @@ public class MetadataField<A> {
    *          Define if the new metadata field can be or not edited
    * @param required
    *          Define if the new metadata field is or not required
+   * @param isTranslatable
+   *          If the field value is not human readable and should be translated before
    * @param collection
    *          If the field has a limited list of possible value, the option should contain this one. Otherwise it should
    *          be none.
@@ -863,9 +886,9 @@ public class MetadataField<A> {
    * @return the new metadata field
    */
   public static MetadataField<String> createTextMetadataField(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Map<String, String>> collection, Opt<String> collectionId,
-          Opt<Integer> order, Opt<String> namespace) {
-    return createTextLongMetadataField(inputID, outputID, label, readOnly, required, collection, collectionId, order,
+          boolean readOnly, boolean required, Opt<Boolean> isTranslatable, Opt<Map<String, String>> collection,
+          Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
+    return createTextLongMetadataField(inputID, outputID, label, readOnly, required, isTranslatable, collection, collectionId, order,
             JsonType.TEXT, namespace);
   }
 
@@ -880,6 +903,8 @@ public class MetadataField<A> {
    *          Define if the new metadata field can be or not edited
    * @param required
    *          Define if the new metadata field is or not required
+   * @param isTranslatable
+   *          If the field value is not human readable and should be translated before
    * @param collection
    *          If the field has a limited list of possible value, the option should contain this one. Otherwise it should
    *          be none.
@@ -888,10 +913,10 @@ public class MetadataField<A> {
    * @return the new metadata field
    */
   public static MetadataField<String> createTextLongMetadataField(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Map<String, String>> collection, Opt<String> collectionId,
-          Opt<Integer> order, Opt<String> namespace) {
-    return createTextLongMetadataField(inputID, outputID, label, readOnly, required, collection, collectionId, order,
-            JsonType.TEXT_LONG, namespace);
+          boolean readOnly, boolean required, Opt<Boolean> isTranslatable, Opt<Map<String, String>> collection,
+          Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
+    return createTextLongMetadataField(inputID, outputID, label, readOnly, required, isTranslatable, collection,
+            collectionId, order, JsonType.TEXT_LONG, namespace);
   }
 
   /**
@@ -905,6 +930,8 @@ public class MetadataField<A> {
    *          Define if the new metadata field can be or not edited
    * @param required
    *          Define if the new metadata field is or not required
+   * @param isTranslatable
+   *          If the field value is not human readable and should be translated before
    * @param collection
    *          If the field has a limited list of possible value, the option should contain this one. Otherwise it should
    *          be none.
@@ -913,8 +940,8 @@ public class MetadataField<A> {
    * @return the new metadata field
    */
   private static MetadataField<String> createTextLongMetadataField(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Map<String, String>> collection, Opt<String> collectionId,
-          Opt<Integer> order, JsonType jsonType, Opt<String> namespace) {
+          boolean readOnly, boolean required, Opt<Boolean> isTranslatable, Opt<Map<String, String>> collection,
+          Opt<String> collectionId, Opt<Integer> order, JsonType jsonType, Opt<String> namespace) {
 
     Fn<Opt<String>, JValue> stringToJSON = new Fn<Opt<String>, JValue>() {
       @Override
@@ -936,7 +963,7 @@ public class MetadataField<A> {
       }
     };
 
-    return new MetadataField<String>(inputID, outputID, label, readOnly, required, "", Type.TEXT, jsonType, collection,
+    return new MetadataField<String>(inputID, outputID, label, readOnly, required, "", isTranslatable, Type.TEXT, jsonType, collection,
             collectionId, stringToJSON, jsonToString, order, namespace);
   }
 

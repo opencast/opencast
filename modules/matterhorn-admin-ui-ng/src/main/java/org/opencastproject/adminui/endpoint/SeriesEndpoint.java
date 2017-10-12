@@ -439,8 +439,8 @@ public class SeriesEndpoint {
 
     // Admin UI only field
     MetadataField<String> createdBy = MetadataField.createTextMetadataField("createdBy", Opt.<String> none(),
-            "EVENTS.SERIES.DETAILS.METADATA.CREATED_BY", true, false, Opt.<Map<String, String>> none(),
-            Opt.<String> none(), Opt.some(CREATED_BY_UI_ORDER), Opt.<String> none());
+            "EVENTS.SERIES.DETAILS.METADATA.CREATED_BY", true, false, Opt.<Boolean> none(),
+            Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(CREATED_BY_UI_ORDER), Opt.<String> none());
     createdBy.setValue(series.getCreator());
     metadata.addField(createdBy);
 

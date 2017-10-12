@@ -128,6 +128,11 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
       public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
         return new HashMap<String, String>();
       }
+
+      @Override
+      public boolean isTranslatable(String listName) {
+        return false;
+      }
     });
     listProvidersServiceImpl.activate(null);
     return listProvidersServiceImpl;

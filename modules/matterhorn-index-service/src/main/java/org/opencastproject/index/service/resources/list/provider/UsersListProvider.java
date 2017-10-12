@@ -139,4 +139,9 @@ public class UsersListProvider implements ResourceListProvider {
     assert (name != null);
     return name;
   }
+
+  @Override
+  public boolean isTranslatable(String listName) {
+    return false;
+  }
 }

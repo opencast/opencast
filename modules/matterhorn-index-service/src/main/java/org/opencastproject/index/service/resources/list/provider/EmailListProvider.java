@@ -135,4 +135,9 @@ public class EmailListProvider implements ResourceListProvider {
   public static String getListNameFromFilter(EmailFilterList filter) {
     return PROVIDER_PREFIX.toUpperCase() + "_" + filter.toString().toUpperCase();
   }
+
+  @Override
+  public boolean isTranslatable(String listName) {
+    return false;
+  }
 }
