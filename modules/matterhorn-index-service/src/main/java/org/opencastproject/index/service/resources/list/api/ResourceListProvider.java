@@ -51,7 +51,7 @@ public interface ResourceListProvider {
           throws ListProviderException;
 
   /**
-   * Weather the keys of this resources should be translated.
+   * Defines if keys and values of the given list should be translated in the administrative user interface.
    *
    * @return true if the keys should be translated, false otherwise
    */
