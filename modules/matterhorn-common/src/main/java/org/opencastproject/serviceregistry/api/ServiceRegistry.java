@@ -110,11 +110,9 @@ public interface ServiceRegistry {
   /**
    * Gets a map of hosts to the number of jobs currently loading that host
    *
-   * @param activeOnly
-   *          if true, the map will include only hosts that are online and have non-maintenance mode services
    * @return the map of hosts to job counts
    */
-  SystemLoad getCurrentHostLoads(boolean activeOnly) throws ServiceRegistryException;
+  SystemLoad getCurrentHostLoads() throws ServiceRegistryException;
 
   /**
    * Registers a host to handle a specific type of job

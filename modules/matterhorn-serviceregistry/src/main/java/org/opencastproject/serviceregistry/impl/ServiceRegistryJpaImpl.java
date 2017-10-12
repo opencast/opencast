@@ -2064,7 +2064,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      SystemLoad loadByHost = getHostLoads(em, true);
+      SystemLoad loadByHost = getHostLoads(em);
       List<HostRegistration> hostRegistrations = getHostRegistrations();
       List<ServiceRegistration> serviceRegistrations = getServiceRegistrationsByType(serviceType);
       return getServiceRegistrationsByLoad(serviceType, serviceRegistrations, hostRegistrations, loadByHost);
@@ -2077,14 +2077,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getCurrentHostLoads(boolean)
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getCurrentHostLoads()
    */
   @Override
-  public SystemLoad getCurrentHostLoads(boolean activeOnly) {
+  public SystemLoad getCurrentHostLoads() {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      return getHostLoads(em, activeOnly);
+      return getHostLoads(em);
     } finally {
       if (em != null)
         em.close();
@@ -2100,7 +2100,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *          if true, the map will include only hosts that are online and have non-maintenance mode services
    * @return the map of hosts to job counts
    */
-  SystemLoad getHostLoads(EntityManager em, boolean activeOnly) {
+  SystemLoad getHostLoads(EntityManager em) {
     final SystemLoad systemLoad = new SystemLoad();
 
     // Find all jobs that are currently running on any given host, or get all of them
@@ -2122,10 +2122,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       Status status = Status.values()[(int) resultArray[1]];
       float load = ((Number) resultArray[2]).floatValue();
-
-      if (activeOnly && (service.isInMaintenanceMode() || !service.isOnline())) {
-        continue;
-      }
 
       // Only queued, running and dispatching jobs are adding to the load, so every other status is discarded
       if (status == null || !JOB_STATUSES_INFLUENCING_LOAD_BALANCING.contains(status)) {
@@ -2895,6 +2891,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
      * @param jobsToDispatch list with dispatchable jobs to dispatch
      */
     private void dispatchDispatchableJobs(EntityManager em, List<JpaJob> jobsToDispatch) {
+      //Get the current system load
+      SystemLoad systemLoad = getHostLoads(em);
+
       for (JpaJob job : jobsToDispatch) {
 
         // Remember the job type
@@ -2932,7 +2931,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
         // Start dispatching
         try {
-          SystemLoad systemLoad = getHostLoads(em, true);
           List<ServiceRegistration> services = getServiceRegistrations(em);
           List<HostRegistration> hosts = $(getHostRegistrations(em)).filter(filterOutPriorityHosts._2(job.getId()))
                   .toList();
