@@ -176,8 +176,8 @@
                 }
             },
 
-            "text": { "type" : "string", "index" : "analyzed", "store" : "no" },
-            "text_fuzzy": { "type" : "string", "index" : "analyzed", "store" : "no" }
+            "text": { "type" : "string", "index" : "analyzed", "analyzer": "lowercasespaceanalyzer", "store" : "no" },
+            "text_fuzzy": { "type" : "string", "index" : "analyzed", "analyzer": "lowercasespaceanalyzer", "store" : "no" }
 
         },
         "dynamic_templates" : [
