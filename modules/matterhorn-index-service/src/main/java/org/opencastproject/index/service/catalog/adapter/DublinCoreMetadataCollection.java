@@ -43,20 +43,6 @@ import java.util.Map;
 public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
   private static final Logger logger = LoggerFactory.getLogger(DublinCoreMetadataCollection.class);
 
-  private Opt<Boolean> getCollectionIsTranslatable(MetadataField<?> metadataField,
-          ListProvidersService listProvidersService) {
-    if (listProvidersService != null && metadataField.getListprovider().isSome()) {
-      try {
-        boolean isTranslatable = listProvidersService.isTranslatable(metadataField.getListprovider().get());
-        return Opt.some(isTranslatable);
-      } catch (ListProviderException ex) {
-        // failed to get is-translatable property on list-provider-service
-        // as this field is optional, it is fine to pass here
-      }
-    }
-    return Opt.none();
-  }
-
   private Opt<Map<String, String>> getCollection(MetadataField<?> metadataField,
           ListProvidersService listProvidersService) {
     try {
@@ -98,8 +84,7 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
       case DURATION:
         MetadataField<String> durationField = MetadataField.createDurationMetadataField(metadataField.getInputID(),
                 Opt.some(metadataField.getOutputID()), metadataField.getLabel(), metadataField.isReadOnly(),
-                metadataField.isRequired(), getCollectionIsTranslatable(metadataField, listProvidersService),
-                getCollection(metadataField, listProvidersService),
+                metadataField.isRequired(), getCollection(metadataField, listProvidersService),
                 metadataField.getCollectionID(), metadataField.getOrder(), metadataField.getNamespace());
 
         DCMIPeriod period = EncodingSchemeUtils.decodePeriod(value);
@@ -132,7 +117,6 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
         MetadataField<Iterable<String>> iterableTextField = MetadataField.createIterableStringMetadataField(
                 metadataField.getInputID(), Opt.some(metadataField.getOutputID()), metadataField.getLabel(),
                 metadataField.isReadOnly(), metadataField.isRequired(),
-                getCollectionIsTranslatable(metadataField, listProvidersService),
                 getCollection(metadataField, listProvidersService), metadataField.getCollectionID(),
                 metadataField.getOrder(), metadataField.getNamespace());
         if (StringUtils.isNotBlank(value)) {
@@ -146,7 +130,6 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
         MetadataField<Iterable<String>> mixedIterableTextField = MetadataField.createMixedIterableStringMetadataField(
                 metadataField.getInputID(), Opt.some(metadataField.getOutputID()), metadataField.getLabel(),
                 metadataField.isReadOnly(), metadataField.isRequired(),
-                getCollectionIsTranslatable(metadataField, listProvidersService),
                 getCollection(metadataField, listProvidersService), metadataField.getCollectionID(),
                 metadataField.getOrder(), metadataField.getNamespace());
         if (StringUtils.isNotBlank(value)) {
@@ -158,8 +141,7 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
       case LONG:
         MetadataField<Long> longField = MetadataField.createLongMetadataField(metadataField.getInputID(),
                 Opt.some(metadataField.getOutputID()), metadataField.getLabel(), metadataField.isReadOnly(),
-                metadataField.isRequired(), getCollectionIsTranslatable(metadataField, listProvidersService),
-                getCollection(metadataField, listProvidersService),
+                metadataField.isRequired(), getCollection(metadataField, listProvidersService),
                 metadataField.getCollectionID(), metadataField.getOrder(), metadataField.getNamespace());
         if (StringUtils.isNotBlank(value)) {
           longField.setValue(Long.parseLong(value));
@@ -169,8 +151,7 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
       case TEXT:
         MetadataField<String> textField = MetadataField.createTextMetadataField(metadataField.getInputID(),
                 Opt.some(metadataField.getOutputID()), metadataField.getLabel(), metadataField.isReadOnly(),
-                metadataField.isRequired(), getCollectionIsTranslatable(metadataField, listProvidersService),
-                getCollection(metadataField, listProvidersService),
+                metadataField.isRequired(), getCollection(metadataField, listProvidersService),
                 metadataField.getCollectionID(), metadataField.getOrder(), metadataField.getNamespace());
         if (StringUtils.isNotBlank(value)) {
           textField.setValue(value);
@@ -180,8 +161,7 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
       case TEXT_LONG:
         MetadataField<String> textLongField = MetadataField.createTextLongMetadataField(metadataField.getInputID(),
                 Opt.some(metadataField.getOutputID()), metadataField.getLabel(), metadataField.isReadOnly(),
-                metadataField.isRequired(), getCollectionIsTranslatable(metadataField, listProvidersService),
-                getCollection(metadataField, listProvidersService),
+                metadataField.isRequired(), getCollection(metadataField, listProvidersService),
                 metadataField.getCollectionID(), metadataField.getOrder(), metadataField.getNamespace());
         if (StringUtils.isNotBlank(value)) {
           textLongField.setValue(value);

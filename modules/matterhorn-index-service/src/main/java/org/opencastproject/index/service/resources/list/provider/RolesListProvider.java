@@ -103,9 +103,4 @@ public class RolesListProvider implements ResourceListProvider {
 
     return rolesList;
   }
-
-  @Override
-  public boolean isTranslatable(String listName) {
-    return false;
-  }
 }

@@ -149,9 +149,4 @@ public class SeriesListProvider implements ResourceListProvider {
 
     return series;
   }
-
-  @Override
-  public boolean isTranslatable(String listName) {
-    return false;
-  }
 }

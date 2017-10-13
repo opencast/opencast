@@ -89,11 +89,6 @@ public class ListProvidersServiceImpl implements ListProvidersService {
         list.put("Location 3", "EVENTS.EVENT.TABLE.FILTER.LOCATION.LOCATION3");
         return list;
       }
-
-      @Override
-      public boolean isTranslatable(String listName) {
-        return false;
-      }
     });
 
     // TODO create a file for each resource and made it dynamic
@@ -111,11 +106,6 @@ public class ListProvidersServiceImpl implements ListProvidersService {
         list.put("Github", "EVENTS.EVENT.TABLE.FILTER.SOURCE.GITHUB");
         list.put("Facebook", "EVENTS.EVENT.TABLE.FILTER.SOURCE.FACEBOOK");
         return list;
-      }
-
-      @Override
-      public boolean isTranslatable(String listName) {
-        return false;
       }
     });
 
@@ -138,11 +128,6 @@ public class ListProvidersServiceImpl implements ListProvidersService {
         list.put("upload", "EVENTS.EVENT.TABLE.FILTER.STATUS.UPLOAD");
         list.put("On hold", "EVENTS.EVENT.TABLE.FILTER.STATUS.ONHOLD");
         return list;
-      }
-
-      @Override
-      public boolean isTranslatable(String listName) {
-        return true;
       }
     });
 
@@ -174,10 +159,6 @@ public class ListProvidersServiceImpl implements ListProvidersService {
 
       }
 
-      @Override
-      public boolean isTranslatable(String listName) {
-        return true;
-      }
     });
   }
 
@@ -207,10 +188,6 @@ public class ListProvidersServiceImpl implements ListProvidersService {
 
       }
 
-      @Override
-      public boolean isTranslatable(String listName) {
-        return true;
-      }
     });
   }
 
@@ -239,11 +216,6 @@ public class ListProvidersServiceImpl implements ListProvidersService {
         return ListProviderUtil.filterMap(countries, query);
       }
 
-
-      @Override
-      public boolean isTranslatable(String listName) {
-        return true;
-      }
     });
   }
 
@@ -259,14 +231,6 @@ public class ListProvidersServiceImpl implements ListProvidersService {
     }
 
     return list;
-  }
-
-  @Override
-  public boolean isTranslatable(String listName) throws ListProviderException {
-    ResourceListProvider provider = providers.get(listName);
-    if (provider == null)
-      throw new ListProviderException("No resources list found with the name " + listName);
-    return provider.isTranslatable(listName);
   }
 
   @Override

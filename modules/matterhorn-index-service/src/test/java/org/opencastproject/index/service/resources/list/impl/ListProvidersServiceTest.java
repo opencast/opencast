@@ -80,11 +80,6 @@ public class ListProvidersServiceTest {
           return filteredList;
         }
       }
-
-      @Override
-      public boolean isTranslatable(String listName) {
-        return false;
-      }
     };
   }
 

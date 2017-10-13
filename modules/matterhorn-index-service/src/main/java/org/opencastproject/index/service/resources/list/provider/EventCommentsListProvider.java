@@ -117,9 +117,4 @@ public class EventCommentsListProvider implements ResourceListProvider {
   public static String getListNameFromFilter(CommentsFilterList filter) {
     return PROVIDER_PREFIX.toLowerCase() + "_" + filter.toString().toLowerCase();
   }
-
-  @Override
-  public boolean isTranslatable(String listName) {
-    return true;
-  }
 }

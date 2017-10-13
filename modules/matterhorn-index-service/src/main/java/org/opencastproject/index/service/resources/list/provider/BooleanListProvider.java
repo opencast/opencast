@@ -94,9 +94,4 @@ public class BooleanListProvider implements ResourceListProvider {
       return (Option<Boolean>) Option.option(false);
     else return Option.<Boolean> none();
   }
-
-  @Override
-  public boolean isTranslatable(String listName) {
-    return true;
-  }
 }

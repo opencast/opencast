@@ -88,9 +88,4 @@ public class ParticipationListProvider implements ResourceListProvider {
   public static String getListNameFromFilter(ParticipationFilterList filter) {
     return PROVIDER_PREFIX.toLowerCase() + "_" + filter.toString().toLowerCase();
   }
-
-  @Override
-  public boolean isTranslatable(String listName) {
-    return true;
-  }
 }

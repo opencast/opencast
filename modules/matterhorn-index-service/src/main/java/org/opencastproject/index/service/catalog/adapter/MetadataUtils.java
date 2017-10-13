@@ -110,7 +110,6 @@ public final class MetadataUtils {
     newField.setCollection(other.getCollection());
     newField.setCollectionID(other.getCollectionID());
     newField.setInputId(other.getInputID());
-    newField.setIsTranslatable(other.isTranslatable());
     newField.setLabel(other.getLabel());
     newField.setListprovider(other.getListprovider());
     newField.setNamespace(other.getNamespace());

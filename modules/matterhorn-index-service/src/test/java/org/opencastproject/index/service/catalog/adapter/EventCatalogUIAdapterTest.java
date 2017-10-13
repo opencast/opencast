@@ -93,9 +93,6 @@ public class EventCatalogUIAdapterTest {
     EasyMock.expect(
             listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQueryImpl.class),
                     EasyMock.anyObject(Organization.class), EasyMock.anyBoolean())).andReturn(collection).anyTimes();
-    EasyMock.expect(
-            listProvidersService.isTranslatable(EasyMock.anyString()))
-            .andThrow(new ListProviderException("not implemented")).anyTimes();
     EasyMock.replay(listProvidersService);
 
     eventProperties = new Properties();

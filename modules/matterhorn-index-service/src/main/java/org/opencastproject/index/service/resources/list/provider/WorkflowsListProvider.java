@@ -88,9 +88,4 @@ public class WorkflowsListProvider implements ResourceListProvider {
 
     return workflowsList;
   }
-
-  @Override
-  public boolean isTranslatable(String listName) {
-    return false;
-  }
 }
