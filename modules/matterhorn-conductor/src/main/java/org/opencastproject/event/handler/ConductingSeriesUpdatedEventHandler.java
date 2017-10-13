@@ -51,7 +51,7 @@ public class ConductingSeriesUpdatedEventHandler {
   private SecurityService securityService;
   private MessageReceiver messageReceiver;
 
-  private AssetManagerPermissionsUpdatedEventHandler assetManagerPermissionsUpdatedEventHandler;
+  private AssetManagerUpdatedEventHandler assetManagerUpdatedEventHandler;
   private SeriesUpdatedEventHandler seriesUpdatedEventHandler;
   private WorkflowPermissionsUpdatedEventHandler workflowPermissionsUpdatedEventHandler;
   private OaiPmhUpdatedEventHandler oaiPmhUpdatedEventHandler;
@@ -112,13 +112,18 @@ public class ConductingSeriesUpdatedEventHandler {
           securityService.setUser(baseMessage.getUser());
           SeriesItem seriesItem = (SeriesItem) baseMessage.getObject();
 
-          if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())
+          if (SeriesItem.Type.UpdateElement.equals(seriesItem.getType())) {
+            assetManagerUpdatedEventHandler.handleEvent(seriesItem);
+            // the OAI-PMH handler is a dynamic dependency
+            if (oaiPmhUpdatedEventHandler != null) {
+              oaiPmhUpdatedEventHandler.handleEvent(seriesItem);
+            }
+          } else if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())
                   || SeriesItem.Type.UpdateAcl.equals(seriesItem.getType())
                   || SeriesItem.Type.Delete.equals(seriesItem.getType())) {
             seriesUpdatedEventHandler.handleEvent(seriesItem);
-            assetManagerPermissionsUpdatedEventHandler.handleEvent(seriesItem);
+            assetManagerUpdatedEventHandler.handleEvent(seriesItem);
             workflowPermissionsUpdatedEventHandler.handleEvent(seriesItem);
-            // the OAI-PMH handler is a dynamic dependency
             if (oaiPmhUpdatedEventHandler != null) {
               oaiPmhUpdatedEventHandler.handleEvent(seriesItem);
             }
@@ -143,8 +148,8 @@ public class ConductingSeriesUpdatedEventHandler {
   }
 
   /** OSGi DI callback. */
-  public void setAssetManagerPermissionsUpdatedEventHandler(AssetManagerPermissionsUpdatedEventHandler h) {
-    this.assetManagerPermissionsUpdatedEventHandler = h;
+  public void setAssetManagerUpdatedEventHandler(AssetManagerUpdatedEventHandler h) {
+    this.assetManagerUpdatedEventHandler = h;
   }
 
   /** OSGi DI callback. */

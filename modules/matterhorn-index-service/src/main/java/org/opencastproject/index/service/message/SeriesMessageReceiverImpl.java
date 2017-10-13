@@ -163,6 +163,9 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
           return;
         }
         return;
+      case UpdateElement:
+        // nothing to do
+        break;
       default:
         throw new IllegalArgumentException("Unhandled type of SeriesItem");
     }
