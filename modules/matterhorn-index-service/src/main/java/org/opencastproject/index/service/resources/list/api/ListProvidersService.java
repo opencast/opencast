@@ -47,7 +47,7 @@ public interface ListProvidersService {
           boolean inverseValueKey) throws ListProviderException;
 
   /**
-   * Defines if keys and values of the given list should be translated in the administrative user interface.
+   * Weather the keys or values of the given list should be translated for human readabality.
    *
    * @param listName the name of the list
    * @return true, if the results should be translated, false otherwise
