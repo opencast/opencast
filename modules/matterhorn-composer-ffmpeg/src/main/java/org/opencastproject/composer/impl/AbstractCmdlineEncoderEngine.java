@@ -359,7 +359,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
    *           in case of any error
    */
   protected List<String> buildCommand(EncodingProfile profile) throws EncoderException {
-    List<String> command = new ArrayList<String>();
+    List<String> command = new ArrayList<>();
     command.add(binary);
     List<String> arguments = buildArgumentList(profile);
     for (String arg : arguments) {
@@ -468,7 +468,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
         try {
           ((CmdlineEncoderListener) l).notifyEncoderOutput(format, message, sourceFiles);
         } catch (Throwable th) {
-          logger.error("EncoderListener " + l + " threw exception while processing callback", th);
+          logger.error("EncoderListener {} threw exception while processing callback", l, th);
         }
       }
     }
@@ -580,12 +580,6 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
       IoSupport.closeQuietly(in);
       IoSupport.closeQuietly(encoderProcess);
     }
-  }
-
-  protected List<String> getTags(EncodingProfile profile) {
-    ArrayList<String> tags = new ArrayList<String>();
-
-    return tags;
   }
 
   public void close() {
