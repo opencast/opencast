@@ -1448,11 +1448,15 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         try {
           Map<String, String> recordingProperties = schedulerService.getCaptureAgentConfiguration(mediaPackageId);
           workflowDefinitionID = recordingProperties.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION);
-          logger.info("Ingested mediapackage {} will be processed using workflow template '{}'", mediapackage,
-                  workflowDefinitionID);
-          if (isBlank(workflowDefinitionID))
+          if (isBlank(workflowDefinitionID)) {
+            workflowDefinitionID = defaultWorkflowDefinionId;
+            logger.debug("No workflow set. Falling back to default.");
+          }
+          if (isBlank(workflowDefinitionID)) {
             throw new IngestException("No value found for key '" + CaptureParameters.INGEST_WORKFLOW_DEFINITION
                     + "' from capture event configuration of scheduler event '" + mediaPackageId + "'");
+          }
+          logger.info("Ingested event {} will be processed using workflow '{}'", mediapackage, workflowDefinitionID);
         } catch (NotFoundException e) {
           logger.warn("Specified capture event {} was not found", mediaPackageId);
         } catch (UnauthorizedException e) {
