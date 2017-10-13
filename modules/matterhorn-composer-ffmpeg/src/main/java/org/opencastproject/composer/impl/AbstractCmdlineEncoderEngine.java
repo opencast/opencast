@@ -33,6 +33,7 @@ import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.data.Option;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -229,6 +230,7 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
             + (params.containsKey("time") ? "_" + properties.get("time").replace('.', '_') : "")
             // generate random name if multiple jobs are producing file with identical name (MH-7673)
             + "_" + UUID.randomUUID().toString();
+    File outFile = new File(outDir, outFileName + outSuffix);
     params.put("out.dir", outDir);
     params.put("out.name", outFileName);
     params.put("out.suffix", outSuffix);
@@ -262,36 +264,24 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
         throw new CmdlineEncoderException(this, "Encoder exited abnormally with status " + exitCode, commandStr);
       }
 
-      if (audioSource != null) {
-        logger.info("Audio track {} and video track {} successfully encoded using profile '{}'",
-                new String[] { (audioSource == null ? "N/A" : audioSource.getName()),
-                        (videoSource == null ? "N/A" : videoSource.getName()), profile.getIdentifier() });
-      } else {
-        logger.info("Video track {} successfully encoded using profile '{}'", new String[] { videoSource.getName(),
-                profile.getIdentifier() });
-      }
+      logger.info("Audio track {} and video track {} successfully encoded using profile '{}'",
+                (audioSource == null ? "N/A" : audioSource.getName()),
+                (videoSource == null ? "N/A" : videoSource.getName()), profile.getIdentifier());
       fireEncoded(this, profile, audioSource, videoSource);
-      if (profile.getOutputType() != EncodingProfile.MediaType.Nothing)
-        return some(new File(parentFile.getParent(), outFileName + outSuffix));
-      else
+      if (profile.getOutputType() == EncodingProfile.MediaType.Nothing)
         return none();
-    } catch (EncoderException e) {
-      if (audioSource != null) {
-        logger.warn(
-                "Error while encoding audio track {} and video track {} using '{}': {}",
-                new String[] { (audioSource == null ? "N/A" : audioSource.getName()),
-                        (videoSource == null ? "N/A" : videoSource.getName()), profile.getIdentifier(), e.getMessage() });
-      } else {
-        logger.warn("Error while encoding video track {} using '{}': {}", new String[] {
-                (videoSource == null ? "N/A" : videoSource.getName()), profile.getIdentifier(), e.getMessage() });
-      }
-      fireEncodingFailed(this, profile, e, audioSource, videoSource);
-      throw e;
+      return some(outFile);
     } catch (Exception e) {
-      logger.warn("Error while encoding audio {} and video {} to {}:{}, {}",
-              new Object[] { (audioSource == null ? "N/A" : audioSource.getName()),
-                      (videoSource == null ? "N/A" : videoSource.getName()), profile.getName(), e.getMessage() });
+      logger.warn("Error while encoding audio {} and video {} using profile '{}'",
+              (audioSource == null ? "N/A" : audioSource.getName()),
+              (videoSource == null ? "N/A" : videoSource.getName()), profile.getName(), e);
       fireEncodingFailed(this, profile, e, audioSource, videoSource);
+
+      // Ensure temporary data are removed
+      if (FileUtils.deleteQuietly(outFile)) {
+        logger.debug("Removed output file of failed encoding process: {}", outFile);
+      }
+
       throw new CmdlineEncoderException(this, e.getMessage(), commandStr, e);
     } finally {
       IoSupport.closeQuietly(in);
@@ -503,37 +493,41 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
     // build command
     BufferedReader in = null;
     Process encoderProcess = null;
+
+    // Set encoding parameters
+    String mediaInput = FilenameUtils.normalize(mediaSource.getAbsolutePath());
+    params.put("in.video.path", mediaInput);
+    params.put("in.video.name", FilenameUtils.getBaseName(mediaInput));
+    params.put("in.video.suffix", FilenameUtils.getExtension(mediaInput));
+    params.put("in.video.filename", FilenameUtils.getName(mediaInput));
+    String outDir = mediaSource.getAbsoluteFile().getParent();
+    String outFileName = FilenameUtils.getBaseName(mediaSource.getName());
+
+
+    if (params.containsKey("time")) {
+      outFileName += "_" + properties.get("time");
+    }
+
+    // generate random name if multiple jobs are producing file with identical name (MH-7673)
+    outFileName += "_" + UUID.randomUUID();
+
+    params.put("out.dir", outDir);
+    params.put("out.name", outFileName);
+
+    ArrayList<String> suffixes = new ArrayList<>();
+
+    for (String tag : profile.getTags()) {
+      String outSuffix = processParameters(profile.getSuffix(tag));
+      params.put("out.suffix" + "." + tag, outSuffix);
+      suffixes.add(outSuffix);
+    }
+
+    ArrayList<File> outFiles = new ArrayList<>();
+    for (String outSuffix : suffixes) {
+      outFiles.add(new File(mediaSource.getParent(), outFileName + outSuffix));
+    }
+
     try {
-      // Set encoding parameters
-      if (mediaSource != null) {
-        String mediaInput = FilenameUtils.normalize(mediaSource.getAbsolutePath());
-        params.put("in.video.path", mediaInput);
-        params.put("in.video.name", FilenameUtils.getBaseName(mediaInput));
-        params.put("in.video.suffix", FilenameUtils.getExtension(mediaInput));
-        params.put("in.video.filename", FilenameUtils.getName(mediaInput));
-      }
-      String outDir = mediaSource.getAbsoluteFile().getParent();
-      String outFileName = FilenameUtils.getBaseName(mediaSource.getName());
-
-
-      if (params.containsKey("time")) {
-        outFileName += "_" + properties.get("time");
-      }
-
-      // generate random name if multiple jobs are producing file with identical name (MH-7673)
-      outFileName += "_" + UUID.randomUUID().toString();
-
-      params.put("out.dir", outDir);
-      params.put("out.name", outFileName);
-
-      ArrayList<String> suffixes = new ArrayList<String>();
-
-      for (String tag : profile.getTags()) {
-        String outSuffix = processParameters(profile.getSuffix(tag));
-        params.put("out.suffix" + "." + tag, outSuffix);
-        suffixes.add(outSuffix);
-      }
-
       // create encoder process.
       // no special working dir is set which means the working dir of the
       // current java process is used.
@@ -562,23 +556,18 @@ public abstract class AbstractCmdlineEncoderEngine extends AbstractEncoderEngine
         throw new EncoderException(this, "Encoder exited abnormally with status " + exitCode);
       }
 
-      logger.info("Media track {} successfully encoded using profile '{}'", new String[] { mediaSource.getName(),
-             profile.getIdentifier() });
+      logger.info("Media track {} successfully encoded using profile '{}'", mediaSource.getName(),
+              profile.getIdentifier());
       fireEncoded(this, profile, mediaSource);
-      ArrayList<File> tracks = new ArrayList<File>();
-      for (String outSuffix : suffixes) {
-          tracks.add(new File(mediaSource.getParent(), outFileName + outSuffix));
-      }
-      return tracks;
-    } catch (EncoderException e) {
-      logger.warn("Error while encoding video track {} using '{}': {}", new String[] {
-             (mediaSource == null ? "N/A" : mediaSource.getName()), profile.getIdentifier(), e.getMessage() });
-      fireEncodingFailed(this, profile, e, mediaSource);
-      throw e;
+      return outFiles;
     } catch (Exception e) {
-      logger.warn("Error while encoding media {} to {}:{}, {}",
-              new Object[] { (mediaSource == null ? "N/A" : mediaSource.getName()), profile.getName(), e.getMessage() });
+      logger.warn("Error while encoding media {} using profile {}", mediaSource.getName(), profile.getName(), e);
       fireEncodingFailed(this, profile, e, mediaSource);
+      for (File file: outFiles) {
+        if (FileUtils.deleteQuietly(file)) {
+          logger.debug("Removed output file of failed encoding process: {}", file);
+        }
+      }
       throw new EncoderException(this, e.getMessage(), e);
     } finally {
       IoSupport.closeQuietly(in);
