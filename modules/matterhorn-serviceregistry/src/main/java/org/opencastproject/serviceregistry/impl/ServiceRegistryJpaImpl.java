@@ -2110,6 +2110,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       statuses.add(status.ordinal());
     }
     q.setParameter("statuses", statuses);
+    //Note: This is used in the query to filter out workflow jobs.
+    //These jobs are load balanced by the workflow service directly.
     q.setParameter("workflow_type", TYPE_WORKFLOW);
 
     // Accumulate the numbers for relevant job statuses per host
