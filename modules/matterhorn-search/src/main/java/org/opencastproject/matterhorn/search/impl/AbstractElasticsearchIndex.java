@@ -36,7 +36,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
@@ -55,7 +55,6 @@ import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -354,10 +353,12 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
 
     // Make sure the site index exists
     try {
-      IndicesAdminClient indexAdmin = nodeClient.admin().indices();
-      CreateIndexRequestBuilder siteIdxRequest = indexAdmin.prepareCreate(idx);
       logger.debug("Trying to create index for '{}'", idx);
-      CreateIndexResponse siteidxResponse = siteIdxRequest.execute().actionGet();
+      CreateIndexRequest indexCreateRequest = new CreateIndexRequest(idx);
+      String settings = getIndexSettings(idx);
+      if (settings != null)
+        indexCreateRequest.settings(settings);
+      CreateIndexResponse siteidxResponse = nodeClient.admin().indices().create(indexCreateRequest).actionGet();
       if (!siteidxResponse.isAcknowledged()) {
         throw new SearchIndexException("Unable to create index for '" + idx + "'");
       }
@@ -436,6 +437,54 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
       throw new IOException("Unable to load elasticsearch settings from " + configFile.getAbsolutePath());
     } finally {
       IOUtils.closeQuietly(fis);
+    }
+
+    return settings;
+  }
+
+  /**
+   * Loads the index settings. An initial attempt is made to get the configuration from
+   * <code>${matterhorn.home}/etc/index/&lt;index&gt;/settings.json</code>. If this file can't be found, the
+   * default mapping loaded from the classpath.
+   *
+   * @param index
+   *          the index identifier
+   * @return the string containing the configuration
+   * @throws SearchIndexException
+   *           if the index cannot be created
+   * @throws IOException
+   *           if reading the index mapping fails
+   */
+  protected String getIndexSettings(String index) throws SearchIndexException, IOException {
+    String settings = null;
+
+    File configFile = new File(PathSupport.concat(new String[] { indexSettingsPath, index, "settings.json" }));
+    if (configFile.isFile()) {
+      FileInputStream fis = null;
+      try {
+        fis = new FileInputStream(configFile);
+        settings = IOUtils.toString(fis);
+      } catch (IOException e) {
+        logger.warn("Unable to load index settings from {}: {}", configFile.getAbsolutePath(), e.getMessage());
+      } finally {
+        IOUtils.closeQuietly(fis);
+      }
+    }
+
+    // If no local settings were found, read them from the bundle resources
+    if (settings == null) {
+      InputStream is = null;
+      String resourcePath = PathSupport
+              .concat(new String[] { "/elasticsearch/", index, "settings.json" });
+      try {
+        is = this.getClass().getResourceAsStream(resourcePath);
+        if (is != null) {
+          logger.debug("Reading elastic search index settings '{}' from the bundle resource", index);
+          settings = IOUtils.toString(is);
+        }
+      } finally {
+        IOUtils.closeQuietly(is);
+      }
     }
 
     return settings;
