@@ -628,13 +628,11 @@ public class ServiceRegistryEndpoint {
   @RestQuery(name = "currentload", description = "Returns the current load on the servers in this service registry.  "
           + "If there is only one server in this service registry this will be the the load that one server.  "
           + "If it is a distributed install across many servers then this number will be a dictionary of the load on all nodes in the cluster.",
-          returnDescription = "The current load across the cluster", restParameters = {
-              @RestParameter(name = "activeOnly", isRequired = false, type = Type.BOOLEAN, description = "Whether to only get the load of active nodes.  Defaults to false.")
-          }, reponses = { @RestResponse(responseCode = SC_OK, description = "Current load for the cluster.") })
-  public Response getCurrentLoad(@QueryParam("activeOnly") String activeOnly) {
+          returnDescription = "The current load across the cluster", restParameters = {},
+          reponses = { @RestResponse(responseCode = SC_OK, description = "Current load for the cluster.") })
+  public Response getCurrentLoad() {
     try {
-      boolean activeOnlyBool = Boolean.valueOf(activeOnly);
-      return Response.ok(serviceRegistry.getCurrentHostLoads(activeOnlyBool)).build();
+      return Response.ok(serviceRegistry.getCurrentHostLoads()).build();
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }
