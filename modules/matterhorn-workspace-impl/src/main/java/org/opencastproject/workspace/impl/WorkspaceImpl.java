@@ -890,11 +890,11 @@ public final class WorkspaceImpl implements Workspace {
 
     long now = new Date().getTime();
     for (File file: FileUtils.listFiles(workspaceDirectory, null, true)) {
-
+      long fileLastModified = file.lastModified();
       // Ensure file/dir is older than maxAge
-      long fileAgeInSeconds = (now - file.lastModified()) / 1000;
-      if (fileAgeInSeconds < maxAgeInSeconds) {
-        logger.debug("File age ({}) < max age ({}): Skipping {} ",fileAgeInSeconds, maxAgeInSeconds, file);
+      long fileAgeInSeconds = (now - fileLastModified) / 1000;
+      if (fileLastModified == 0 || fileAgeInSeconds < maxAgeInSeconds) {
+        logger.debug("File age ({}) < max age ({}) or unknown: Skipping {} ", fileAgeInSeconds, maxAgeInSeconds, file);
         continue;
       }
 
