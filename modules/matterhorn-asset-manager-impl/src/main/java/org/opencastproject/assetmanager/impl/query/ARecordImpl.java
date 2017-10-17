@@ -26,6 +26,7 @@ import static com.entwinemedia.fn.Equality.hash;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.query.ARecord;
+import org.opencastproject.assetmanager.impl.persistence.SnapshotDto;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
@@ -35,18 +36,40 @@ public final class ARecordImpl implements ARecord {
   private final long snapshotId;
   private final String mediaPackageId;
   private final Stream<Property> properties;
-  private final Opt<Snapshot> snapshot;
+  private Opt<Snapshot> snapshot;
+  private Opt<SnapshotDto> snapshotDto;
+
+  public ARecordImpl(
+          long snapshotId,
+          String mediaPackageId,
+          Stream<Property> properties) {
+    this.snapshotId = snapshotId;
+    this.mediaPackageId = mediaPackageId;
+    this.properties = properties;
+    this.snapshot = Opt.none(Snapshot.class);
+    this.snapshotDto = Opt.none(SnapshotDto.class);
+  }
 
   public ARecordImpl(
           long snapshotId,
           String mediaPackageId,
           Stream<Property> properties,
-          Opt<Snapshot> snapshot) {
-    this.snapshotId = snapshotId;
-    this.mediaPackageId = mediaPackageId;
-    this.properties = properties;
-    this.snapshot = snapshot;
+          Snapshot snapshot) {
+    this(snapshotId, mediaPackageId, properties);
+    if (snapshot != null)
+      this.snapshot = Opt.some(snapshot);
   }
+
+  public ARecordImpl(
+          long snapshotId,
+          String mediaPackageId,
+          Stream<Property> properties,
+          SnapshotDto snapshotDto) {
+    this(snapshotId, mediaPackageId, properties);
+    if (snapshotDto != null)
+      this.snapshotDto = Opt.some(snapshotDto);
+  }
+
 
   /** Get the database ID of the snapshot. */
   public long getSnapshotId() {
@@ -61,8 +84,22 @@ public final class ARecordImpl implements ARecord {
     return properties;
   }
 
+  /**
+   * Get the snapshot if set.
+   * Otherwise try to convert snapshotDto to {@link Snapshot} with method call {@link SnapshotDto#toSnapshot()},
+   * cache and return the result.
+   *
+   * @return the snapshot
+   */
   @Override public Opt<Snapshot> getSnapshot() {
+    if (snapshot.isNone() && snapshotDto.isSome())
+      snapshot = Opt.some(snapshotDto.get().toSnapshot());
     return snapshot;
+  }
+
+  /** Get the snapshotDto. */
+  public Opt<SnapshotDto> getSnapshotDto() {
+    return snapshotDto;
   }
 
   @Override public int hashCode() {

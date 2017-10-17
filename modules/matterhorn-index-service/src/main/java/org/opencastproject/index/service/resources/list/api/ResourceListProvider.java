@@ -30,7 +30,7 @@ public interface ResourceListProvider {
 
   /**
    * Returns the names of the list(s) provided
-   * 
+   *
    * @return an array containing the lists available
    */
   String[] getListNames();
@@ -38,7 +38,7 @@ public interface ResourceListProvider {
   /**
    * Returns the key-value list for the generator resource filtered with the given filter and based on the given
    * organization context.
-   * 
+   *
    * @param listName
    *          the list name
    * @param query
@@ -50,4 +50,11 @@ public interface ResourceListProvider {
   Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException;
 
+  /**
+   * Defines if keys and values of the given list should be translated in the administrative user interface.
+   *
+   * @param listName the name of the list
+   * @return if the results should be translated
+   */
+  boolean isTranslatable(String listName);
 }
