@@ -171,4 +171,9 @@ public interface EncoderEngine {
    */
   boolean needsLocalWorkCopy();
 
+  /**
+   * Ensure all running sub-processes are shut down.
+   */
+  void close();
+
 }

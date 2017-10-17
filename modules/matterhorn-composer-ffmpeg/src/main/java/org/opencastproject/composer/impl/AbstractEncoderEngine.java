@@ -26,15 +26,11 @@ import org.opencastproject.composer.api.EncoderEngine;
 import org.opencastproject.composer.api.EncoderListener;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.api.EncodingProfile.MediaType;
-import org.opencastproject.mediapackage.Track;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,20 +104,6 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
   }
 
   /**
-   * Sets the supported profiles for this encoder engine. The method is called by the corresponding factory that knows
-   * about the relation between encoding engine and encoding profiles.
-   *
-   * @param profiles
-   *          the supported profiles
-   */
-  void setSupportedProfiles(Map<String, EncodingProfile> profiles) {
-    if (profiles == null) {
-      profiles = new HashMap<String, EncodingProfile>();
-    }
-    this.supportedProfiles = profiles;
-  }
-
-  /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.composer.api.EncoderEngine#supportsProfile(java.lang.String,
@@ -134,42 +116,6 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
       return p.isApplicableTo(type);
     }
     return false;
-  }
-
-  /**
-   * Downloads the track to the <code>java.io.tmpdir</code> directory if does not not already have a <code>file:</code>
-   * url associated.
-   *
-   * @param track
-   *          the track object
-   * @return a file reference to the track
-   * @throws IOException
-   *           if downloading the file fails
-   *
-   */
-  protected File download(Track track) throws IOException {
-    if (track == null || track.getURI() == null) {
-      throw new IOException("Caller provided either a null track or a track without a URI");
-    }
-    if ("file".equals(track.getURI().getScheme()))
-      return new File(track.getURI().getPath());
-
-    // The file does not seem to be inside the local filesystem.
-    // Let's download it and log a warning, since this shouldn't happen.
-    logger.warn("Downloading track " + track.getURI().toString() + " to temp directory");
-    File f = File.createTempFile(track.getURI().toString(), null);
-    logger.info("Temporary file created at " + f.toString());
-    FileOutputStream fos = new FileOutputStream(f);
-    InputStream is = track.getURI().toURL().openStream();
-    byte[] bytes = new byte[2048];
-    while (is.read(bytes) >= 0) {
-      fos.write(bytes);
-    }
-    fos.flush();
-    fos.close();
-    is.close();
-
-    return f;
   }
 
   /**
@@ -187,7 +133,7 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
       try {
         l.fileEncoded(engine, profile, sourceFiles);
       } catch (Throwable t) {
-        logger.error("Encoder listener " + l + " threw exception while handling callback");
+        logger.error("Encoder listener {} threw exception while handling callback", l);
       }
     }
   }
@@ -231,7 +177,7 @@ public abstract class AbstractEncoderEngine implements EncoderEngine {
       try {
         l.fileEncodingProgressed(engine, sourceFile, profile, progress);
       } catch (Throwable t) {
-        logger.error("Encoder listener " + l + " threw exception while handling callback");
+        logger.error("Encoder listener {} threw exception while handling callback", l);
       }
     }
   }

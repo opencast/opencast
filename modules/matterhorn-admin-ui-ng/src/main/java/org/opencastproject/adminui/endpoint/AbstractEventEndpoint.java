@@ -972,10 +972,8 @@ public abstract class AbstractEventEndpoint {
     List<EventCatalogUIAdapter> catalogUIAdapters = getIndexService().getEventCatalogUIAdapters();
     catalogUIAdapters.remove(getIndexService().getCommonEventCatalogUIAdapter());
     MediaPackage mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
-    if (catalogUIAdapters.size() > 0) {
-      for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
-        metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
-      }
+    for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
+      metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
     }
     metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(),
             EventUtils.getEventMetadata(optEvent.get(), getIndexService().getCommonEventCatalogUIAdapter()));

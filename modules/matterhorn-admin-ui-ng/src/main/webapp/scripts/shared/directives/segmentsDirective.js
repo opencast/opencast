@@ -234,11 +234,10 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 return scope.video.segments[index + 1];
             };
 
-            scope.setHumanReadableTimes();
-
-            $timeout(function () {
+            scope.video.$promise.then(function () {
               scope.$root.$broadcast("segmentTimesUpdated");
-            }, 300);
+            });
+
         }
     };
 }]);

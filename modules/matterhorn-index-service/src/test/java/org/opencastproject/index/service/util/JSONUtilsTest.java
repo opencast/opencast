@@ -144,6 +144,11 @@ public class JSONUtilsTest {
               throws ListProviderException {
         return ListProviderUtil.filterMap(license, query);
       }
+
+        @Override
+        public boolean isTranslatable(String listName) {
+          return false;
+        }
     });
 
     // Prepare mock query

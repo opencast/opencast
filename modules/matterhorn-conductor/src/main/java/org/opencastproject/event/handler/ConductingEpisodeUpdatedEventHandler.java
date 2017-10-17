@@ -90,6 +90,10 @@ public class ConductingEpisodeUpdatedEventHandler {
         executor.execute(future);
         try {
           BaseMessage baseMessage = (BaseMessage) future.get();
+          if (!(baseMessage.getObject() instanceof AssetManagerItem.TakeSnapshot)) {
+            // We don't want to handle anything but TakeSnapshot messages.
+            continue;
+          }
           securityService.setOrganization(baseMessage.getOrganization());
           securityService.setUser(baseMessage.getUser());
           AssetManagerItem.TakeSnapshot snapshotItem = (AssetManagerItem.TakeSnapshot) baseMessage.getObject();
