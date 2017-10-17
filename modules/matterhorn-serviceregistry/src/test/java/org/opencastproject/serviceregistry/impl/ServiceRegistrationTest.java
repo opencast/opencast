@@ -119,7 +119,7 @@ public class ServiceRegistrationTest {
   public void testServiceRegistrationsByLoad() throws Exception {
     List<ServiceRegistration> services = serviceRegistry.getServiceRegistrations();
     List<HostRegistration> hosts = serviceRegistry.getHostRegistrations();
-    SystemLoad hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager(), true);
+    SystemLoad hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager());
     List<ServiceRegistration> availableServices = serviceRegistry.getServiceRegistrationsByLoad(JOB_TYPE_1, services,
             hosts, hostLoads);
 
@@ -133,7 +133,7 @@ public class ServiceRegistrationTest {
     job = serviceRegistry.updateJob(job);
 
     // Recalculate the number of available services
-    hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager(), true);
+    hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager());
     availableServices = serviceRegistry.getServiceRegistrationsByLoad(JOB_TYPE_1, services, hosts, hostLoads);
 
     // Since the host load is not taken into account, still all tree services should show up
@@ -151,7 +151,7 @@ public class ServiceRegistrationTest {
   public void testHostCapacity() throws Exception {
     List<ServiceRegistration> services = serviceRegistry.getServiceRegistrations();
     List<HostRegistration> hosts = serviceRegistry.getHostRegistrations();
-    SystemLoad hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager(), true);
+    SystemLoad hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager());
     List<ServiceRegistration> availableServices = serviceRegistry.getServiceRegistrationsWithCapacity(JOB_TYPE_1,
             services, hosts, hostLoads);
 
@@ -165,7 +165,7 @@ public class ServiceRegistrationTest {
     job = serviceRegistry.updateJob(job);
 
     // Recalculate the number of available services
-    hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager(), true);
+    hostLoads = serviceRegistry.getHostLoads(serviceRegistry.emf.createEntityManager());
     availableServices = serviceRegistry.getServiceRegistrationsWithCapacity(JOB_TYPE_1, services, hosts, hostLoads);
 
     // Since host 1 is now maxed out, only two more services should show up

@@ -167,7 +167,7 @@ public abstract class AbstractJobProducer implements JobProducer {
       throw new ServiceRegistryException(e);
     }
 
-    SystemLoad systemLoad = getServiceRegistry().getCurrentHostLoads(true);
+    SystemLoad systemLoad = getServiceRegistry().getCurrentHostLoads();
     // Note: We are not adding the job load in the next line because it is already accounted for in the load values we
     // get back from the service registry.
     float currentLoad = systemLoad.get(getServiceRegistry().getRegistryHostname()).getLoadFactor();

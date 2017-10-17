@@ -15,6 +15,7 @@ These guides will help you if you want to participate in Opencast development.
 - [Security Issues](security.md)
 - [Licenses and Legal Matters](license.md)
 - [Localization](localization.md)
+- [Governance](governance.md)
 - [Development Environment](development-environment.md)
     - [Docker](development-environment-docker.md)
 - [Packaging Guidelines](packaging.md)
