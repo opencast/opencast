@@ -792,9 +792,8 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
   }
 
   @Override
-  public SystemLoad getCurrentHostLoads(boolean activeOnly) throws ServiceRegistryException {
+  public SystemLoad getCurrentHostLoads() throws ServiceRegistryException {
     QueryStringBuilder queryStringBuilder = new QueryStringBuilder("currentload");
-    queryStringBuilder.add("activeOnly", Boolean.toString(activeOnly));
 
     final HttpGet get = get(queryStringBuilder.toString());
     HttpResponse response = null;

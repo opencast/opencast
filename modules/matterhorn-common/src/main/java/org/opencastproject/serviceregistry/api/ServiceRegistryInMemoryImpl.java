@@ -1028,14 +1028,14 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   }
 
   @Override
-  public SystemLoad getCurrentHostLoads(boolean activeOnly) {
+  public SystemLoad getCurrentHostLoads() {
     SystemLoad systemLoad = new SystemLoad();
 
     for (String host : hosts.keySet()) {
       NodeLoad node = new NodeLoad();
       node.setHost(host);
       for (ServiceRegistration service : services.get(host)) {
-        if (activeOnly && (service.isInMaintenanceMode() || !service.isOnline())) {
+        if (service.isInMaintenanceMode() || !service.isOnline()) {
           continue;
         }
         Set<Job> hostJobs = jobHosts.get(service);
