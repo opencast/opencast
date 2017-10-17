@@ -406,6 +406,7 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
       // We now apply the new meta data to the media package
       final MediaPackageMetadata metadata = dublinCoreService.getMetadata(newMp);
       MediaPackageMetadataSupport.populateMediaPackageMetadata(repoMp, metadata);
+      repoMp.setSeries(newMp.getSeries());
       repoMp.setSeriesTitle(newMp.getSeriesTitle());
 
       // Update the OAI-PMH persistence with the updated mediapackage
