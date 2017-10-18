@@ -287,7 +287,6 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    *
    * @param formatString
    *          The string to parse with the supported formats.
-   * @return A {@link Set} of the supported formats to distribute.
    */
   protected void setSupportedFormats(String formatString) {
     supportedAdaptiveFormats = new TreeSet<StreamingProtocol>();
