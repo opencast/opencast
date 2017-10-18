@@ -18,6 +18,27 @@
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <skip>${checkstyle.skip}</skip>
+          <!-- disabled checking external w3c SMIL interfaces -->
+          <excludes>
+            **/EngagePluginImpl.java
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
     <extensions>
       <extension>
         <groupId>org.apache.maven.archetype</groupId>
