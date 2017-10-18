@@ -33,6 +33,7 @@ import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
 import javax.xml.XMLConstants;
@@ -167,12 +168,12 @@ public final class EName implements Serializable, Comparable<EName> {
    * </ul>
    *
    * @param strEName
-   *          A {@link java.io.String} representing an {@code EName}
+   *          A {@link java.lang.String} representing an {@code EName}
    * @param defaultNameSpace
    *          A NameSpace to apply if the provided {@code String} does not have any. Please note that a explicit empty
    *          NameSpace **is** a NameSpace. If this argument is blank or {@code null}, it has no effect.
    */
-  public static EName fromString(String strEName, String defaultNameSpace) throws IllegalArgumentException {
+  public static EName fromString(String strEName, @Nullable String defaultNameSpace) throws IllegalArgumentException {
     Matcher m = pattern.matcher(strEName);
 
     if (m.matches()) {
@@ -207,10 +208,8 @@ public final class EName implements Serializable, Comparable<EName> {
    * <li>contains{curly}braces
    * </ul>
    *
-   * This method is equivalent to calling {@link EName#fromString(String, null)}
-   *
    * @param strEName
-   *          A {@link java.io.String} representing an {@code EName}
+   *          A {@link java.lang.String} representing an {@code EName}
    *
    */
   public static EName fromString(String strEName) throws IllegalArgumentException {
