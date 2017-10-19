@@ -137,7 +137,7 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
       require([server + "piwik.js"], function(piwik) {
         Engage.log("Piwik: external piwik lib loaded");
 
-        tracker = Piwik.getTracker( server + "piwik.php", siteId );
+        tracker = Piwik.getAsyncTracker( server + "piwik.php", siteId );
         initTranslate(Engage.model.get("language"), function () {
           Engage.log('Piwik: Successfully translated.');
         }, function () {
@@ -271,6 +271,7 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
         tracker.setCustomVariable(4, "view_mode", Engage.model.get("mode"), "page");
         tracker.setDocumentTitle(mediapackage.get("title") + " - " + presenter);
         tracker.trackPageView(mediapackage.get("title") + " - " + presenter);
+        if (Piwik && Piwik.MediaAnalytics) Piwik.MediaAnalytics.scanForMedia();
         if (heartbeat > 0) tracker.enableHeartBeatTimer(heartbeat);
         Engage.trigger(plugin.events.customNotification.getName(),
             translate('piwik_tracking',
