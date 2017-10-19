@@ -103,4 +103,9 @@ public class JobsListProvider implements ResourceListProvider {
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
+
+  @Override
+  public boolean isTranslatable(String listName) {
+    return StringUtils.equalsIgnoreCase(LIST_STATUS, listName);
+  }
 }

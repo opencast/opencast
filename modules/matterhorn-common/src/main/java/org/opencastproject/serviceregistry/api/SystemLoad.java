@@ -21,6 +21,8 @@
 
 package org.opencastproject.serviceregistry.api;
 
+import org.opencastproject.util.NotFoundException;
+
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -70,6 +72,21 @@ public class SystemLoad {
     for (NodeLoad node : newLoads) {
       nodeLoads.put(node.getHost(), node);
     }
+  }
+
+  /**
+   * Updates the load factor for a node
+   * @param host
+   *   The host to update
+   * @param modifier
+   *   The modifier to apply to the load
+   */
+  public void updateNodeLoad(String host, float modifier) throws NotFoundException {
+    if (!nodeLoads.containsKey(host)) {
+      throw new NotFoundException("Host " + host + " not in this load object");
+    }
+    NodeLoad current = nodeLoads.get(host);
+    current.setLoadFactor(current.getLoadFactor() + modifier);
   }
 
   /**

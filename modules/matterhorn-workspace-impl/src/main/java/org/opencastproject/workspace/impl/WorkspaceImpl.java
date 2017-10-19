@@ -45,7 +45,6 @@ import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Misc;
@@ -75,9 +74,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.Collection;
 import java.util.Date;
-import java.util.List;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.management.ObjectInstance;
 import javax.servlet.http.HttpServletResponse;
@@ -132,6 +130,8 @@ public final class WorkspaceImpl implements Workspace {
 
   /** The path mappable */
   private PathMappable pathMappable = null;
+
+  private CopyOnWriteArraySet<String> staticCollections = new CopyOnWriteArraySet<String>();
 
   private boolean waitForResourceFlag = false;
 
@@ -265,6 +265,23 @@ public final class WorkspaceImpl implements Workspace {
       workspaceCleaner = new WorkspaceCleaner(this, garbageCollectionPeriodInSeconds, maxAgeInSeconds);
       workspaceCleaner.schedule();
     }
+
+    // Initialize the list of static collections
+    // TODO MH-12440 replace with a different mechanism that doesn't hardcode collection names
+    staticCollections.add("archive");
+    staticCollections.add("captions");
+    staticCollections.add("composer");
+    staticCollections.add("composite");
+    staticCollections.add("coverimage");
+    staticCollections.add("executor");
+    staticCollections.add("inbox");
+    staticCollections.add("ocrtext");
+    staticCollections.add("sox");
+    staticCollections.add("uploaded");
+    staticCollections.add("videoeditor");
+    staticCollections.add("videosegments");
+    staticCollections.add("waveform");
+
   }
 
   /** Callback from OSGi on service deactivation. */
@@ -510,17 +527,23 @@ public final class WorkspaceImpl implements Workspace {
 
   @Override
   public void delete(URI uri) throws NotFoundException, IOException {
+
     String uriPath = uri.toString();
+    String[] uriElements = uriPath.split("/");
+    String collectionId = null;
+    boolean isMediaPackage = false;
+
+    logger.trace("delete {}", uriPath);
+
     if (uriPath.startsWith(wfr.getBaseUri().toString())) {
       if (uriPath.indexOf(WorkingFileRepository.COLLECTION_PATH_PREFIX) > 0) {
-        String[] uriElements = uriPath.split("/");
         if (uriElements.length > 2) {
-          String collectionId = uriElements[uriElements.length - 2];
+          collectionId = uriElements[uriElements.length - 2];
           String filename = uriElements[uriElements.length - 1];
           wfr.deleteFromCollection(collectionId, filename);
         }
       } else if (uriPath.indexOf(WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX) > 0) {
-        String[] uriElements = uriPath.split("/");
+        isMediaPackage = true;
         if (uriElements.length >= 3) {
           String mediaPackageId = uriElements[uriElements.length - 3];
           String elementId = uriElements[uriElements.length - 2];
@@ -535,11 +558,17 @@ public final class WorkspaceImpl implements Workspace {
       synchronized (lock) {
         File mpElementDir = f.getParentFile();
         FileUtils.forceDelete(f);
-        FileSupport.delete(mpElementDir);
+
+        // Remove containing folder if a mediapackage element or a not a static collection
+        if (isMediaPackage || !isStaticCollection(collectionId))
+          FileSupport.delete(mpElementDir);
+
         // Also delete mediapackage itself when empty
-        FileSupport.delete(mpElementDir.getParentFile());
+        if (isMediaPackage)
+          FileSupport.delete(mpElementDir.getParentFile());
       }
     }
+
     // wait for WFR
     waitForResource(uri, HttpServletResponse.SC_NOT_FOUND, "File %s does not disappear in WFR");
   }
@@ -689,7 +718,8 @@ public final class WorkspaceImpl implements Workspace {
       FileUtils.forceMkdir(copy.getParentFile());
       FileUtils.deleteQuietly(copy);
       FileUtils.moveFile(original, copy);
-      FileSupport.delete(original.getParentFile());
+      if (!isStaticCollection(collection))
+        FileSupport.delete(original.getParentFile());
     }
     // move in WFR
     final URI wfrUri = wfr.moveTo(collection, filename, toMediaPackage, toMediaPackageElement, toFileName);
@@ -792,6 +822,10 @@ public final class WorkspaceImpl implements Workspace {
     return collection;
   }
 
+  private boolean isStaticCollection(String collection) {
+    return staticCollections.contains(collection);
+  }
+
   @Override
   public Option<Long> getTotalSpace() {
     return some(new File(wsRoot).getTotalSpace());
@@ -851,39 +885,35 @@ public final class WorkspaceImpl implements Workspace {
       return;
     }
 
-    // Get root directly
-    final File rootDirecotry = new File(wsRoot);
-
-    // Get path for mediapackage and collection directly
-    final String mediapackageDirectory = new File(rootDirecotry, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX)
-            .getAbsolutePath();
-    final String collectionDirectory = new File(rootDirecotry, WorkingFileRepository.COLLECTION_PATH_PREFIX)
-            .getAbsolutePath();
-
-    logger.info("Starting cleanup of workspace at {}", rootDirecotry);
-    Collection<File> files = FileUtils.listFiles(rootDirecotry, null, true);
-    List<File> filesToDelete = Monadics.mlist(files).filter(new Function<File, Boolean>() {
-      @Override
-      public Boolean apply(File file) {
-        if (file.isDirectory()) {
-          return false;
-        }
-
-        String filePath = file.getAbsolutePath();
-        if (filePath.startsWith(mediapackageDirectory) || filePath.startsWith(collectionDirectory)) {
-          return false;
-        }
-
-        long fileAgeInSeconds = (new Date().getTime() - file.lastModified()) / 1000;
-        return fileAgeInSeconds >= maxAgeInSeconds;
-      }
-    }).value();
-
-    for (File file : filesToDelete) {
-      logger.info("Workspace cleanup: Deleting {}", file);
-      FileSupport.deleteQuietly(file);
-      FileSupport.deleteHierarchyIfEmpty(rootDirecotry, file.getParentFile());
+    // Warn if time is very short since this operation is dangerous and *should* only be a fallback for if stuff
+    // remained in the workspace due to some errors. If we have a very short maxAge, we may delete file which are
+    // currently being processed. The warn value is 2 days:
+    if (maxAgeInSeconds < 60 * 60 * 24 * 2) {
+      logger.warn("The max age for the workspace cleaner is dangerously low. Please consider increasing the value to "
+              + "avoid deleting data in use by running workflows.");
     }
-    logger.debug("Finished cleanup of workspace!");
+
+    // Get workspace root directly
+    final File workspaceDirectory = new File(wsRoot);
+    logger.info("Starting cleanup of workspace at {}", workspaceDirectory);
+
+    long now = new Date().getTime();
+    for (File file: FileUtils.listFiles(workspaceDirectory, null, true)) {
+      long fileLastModified = file.lastModified();
+      // Ensure file/dir is older than maxAge
+      long fileAgeInSeconds = (now - fileLastModified) / 1000;
+      if (fileLastModified == 0 || fileAgeInSeconds < maxAgeInSeconds) {
+        logger.debug("File age ({}) < max age ({}) or unknown: Skipping {} ", fileAgeInSeconds, maxAgeInSeconds, file);
+        continue;
+      }
+
+      // Delete old files
+      if (FileUtils.deleteQuietly(file)) {
+        logger.info("Deleted {}", file);
+      } else {
+        logger.warn("Could not delete {}", file);
+      }
+    }
+    logger.info("Finished cleanup of workspace");
   }
 }

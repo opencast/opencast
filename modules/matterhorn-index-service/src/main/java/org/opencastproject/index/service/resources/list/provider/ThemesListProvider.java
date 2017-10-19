@@ -103,4 +103,8 @@ public class ThemesListProvider implements ResourceListProvider {
     return list;
   }
 
+  @Override
+  public boolean isTranslatable(String listName) {
+    return false;
+  }
 }

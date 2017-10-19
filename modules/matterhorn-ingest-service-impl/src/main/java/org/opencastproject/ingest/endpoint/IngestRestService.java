@@ -23,6 +23,7 @@ package org.opencastproject.ingest.endpoint;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 
+import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
 import org.opencastproject.ingest.impl.IngestServiceImpl;
@@ -1157,7 +1158,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
     Map<String, String> wfConfig = getWorkflowConfig(formData);
     if (StringUtils.isNotBlank(wdID)) {
-      wfConfig.put(WORKFLOW_DEFINITION_ID_PARAM, wdID);
+      wfConfig.put(CaptureParameters.INGEST_WORKFLOW_DEFINITION, wdID);
     }
     logger.debug("Schedule with workflow definition '{}'", wfConfig.get(WORKFLOW_DEFINITION_ID_PARAM));
 

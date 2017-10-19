@@ -67,6 +67,11 @@ public class TestListProvidersEndpoint extends ListProvidersEndpoint {
       public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
         return ListProviderUtil.filterMap(baseMap, query);
       }
+
+      @Override
+      public boolean isTranslatable(String listName) {
+        return false;
+      }
     });
 
     listProvidersService.addProvider(makeServicesListProvider());

@@ -215,6 +215,15 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   }
 
   /**
+   * OSGi callback on component deactivation.
+   */
+  public void deactivate() {
+    logger.info("Deactivating composer service");
+    encoderEngineFactory.close();
+    logger.debug("Closed encoder engine factory");
+  }
+
+  /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.composer.api.ComposerService#encode(org.opencastproject.mediapackage.Track,
@@ -329,6 +338,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         }
         incident().recordFailure(job, ENCODING_FAILED, e, params, detailsFor(e, encoderEngine));
         throw e;
+      } finally {
+        encoderEngineFactory.untrack(encoderEngine);
       }
 
       // mux did not return a file
@@ -407,7 +418,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       LinkedList<Track> encodedTracks = new LinkedList<Track>();
       // Do the work
       int i = 0;
-      for (File encodingOutput : encoderEngine.parallelEncode(mediaFile, profile, properties)) {
+      List<File> outputFiles = encoderEngine.parallelEncode(mediaFile, profile, properties);
+      encoderEngineFactory.untrack(encoderEngine);
+      for (File encodingOutput: outputFiles) {
         // Put the file in the workspace
         URI returnURL = null;
         InputStream in = null;
@@ -563,6 +576,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         params.put("duration", Long.toString(duration));
         incident().recordFailure(job, TRIMMING_FAILED, e, params, detailsFor(e, encoderEngine));
         throw e;
+      } finally {
+        encoderEngineFactory.untrack(encoderEngine);
       }
 
       // trim did not return a file
@@ -802,6 +817,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         params.put("properties", properties.toString());
         incident().recordFailure(job, COMPOSITE_FAILED, e, params, detailsFor(e, encoderEngine));
         throw e;
+      } finally {
+        encoderEngineFactory.untrack(encoderEngine);
       }
 
       // composite did not return a file
@@ -954,6 +971,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         params.put("properties", properties.toString());
         incident().recordFailure(job, CONCAT_FAILED, e, params, detailsFor(e, encoderEngine));
         throw e;
+      } finally {
+        encoderEngineFactory.untrack(encoderEngine);
       }
 
       // concat did not return a file
@@ -1050,6 +1069,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         params.put("properties", properties.toString());
         incident().recordFailure(job, IMAGE_TO_VIDEO_FAILED, e, params, detailsFor(e, encoderEngine));
         throw e;
+      } finally {
+        encoderEngineFactory.untrack(encoderEngine);
       }
 
       // encoding did not return a file
@@ -1241,6 +1262,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         params.put("positions", Arrays.toString(times));
         incident().recordFailure(job, IMAGE_EXTRACTION_FAILED, e, params, detailsFor(e, encoderEngine));
         throw e;
+      } finally {
+        encoderEngineFactory.untrack(encoderEngine);
       }
 
       int i = 0;
@@ -1377,6 +1400,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         params.put("profile", profile.getIdentifier());
         incident().recordFailure(job, CONVERT_IMAGE_FAILED, e, params, detailsFor(e, encoderEngine));
         throw e;
+      } finally {
+        encoderEngineFactory.untrack(encoderEngine);
       }
 
       // encoding did not return a file

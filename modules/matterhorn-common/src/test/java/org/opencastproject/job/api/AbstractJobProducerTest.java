@@ -106,13 +106,13 @@ public class AbstractJobProducerTest extends EasyMockSupport {
     expect(serviceRegistry.getMaxLoadOnNode("test")).andReturn(new NodeLoad("test", 4.0f)).anyTimes();
     SystemLoad systemLoad = new SystemLoad();
     systemLoad.addNodeLoad(new NodeLoad("test", 3.0f));
-    expect(serviceRegistry.getCurrentHostLoads(true)).andReturn(systemLoad);
+    expect(serviceRegistry.getCurrentHostLoads()).andReturn(systemLoad);
     SystemLoad systemLoad2 = new SystemLoad();
     systemLoad2.addNodeLoad(new NodeLoad("test", 12.0f));
-    expect(serviceRegistry.getCurrentHostLoads(true)).andReturn(systemLoad2);
+    expect(serviceRegistry.getCurrentHostLoads()).andReturn(systemLoad2);
     SystemLoad systemLoad3 = new SystemLoad();
     systemLoad3.addNodeLoad(new NodeLoad("test", 5.0f));
-    expect(serviceRegistry.getCurrentHostLoads(true)).andReturn(systemLoad3);
+    expect(serviceRegistry.getCurrentHostLoads()).andReturn(systemLoad3);
     replayAll();
 
     Job job = new JobImpl(3);

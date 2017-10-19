@@ -79,4 +79,9 @@ public class AgentsListProvider implements ResourceListProvider {
 
     return result;
   }
+
+  @Override
+  public boolean isTranslatable(String listName) {
+    return STATUS.equals(listName);
+  }
 }
