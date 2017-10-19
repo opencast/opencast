@@ -21,11 +21,12 @@
 package org.opencastproject.distribution.streaming.wowza;
 
 import static java.lang.String.format;
+
 import static org.opencastproject.util.RequireUtil.notNull;
 
+import org.opencastproject.distribution.api.AbstractDistributionService;
 import org.opencastproject.distribution.api.DistributionException;
-import org.opencastproject.distribution.api.DistributionService;
-import org.opencastproject.job.api.AbstractJobProducer;
+import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -34,18 +35,18 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.TrackImpl.StreamingProtocol;
-import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.FileSupport;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
+import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.workspace.api.Workspace;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -94,7 +95,7 @@ import javax.xml.transform.stream.StreamResult;
 /**
  * Distributes media to the local media delivery directory.
  */
-public class StreamingDistributionService extends AbstractJobProducer implements DistributionService, ManagedService {
+public class WowzaAdaptiveStreamingDistributionService extends AbstractDistributionService implements StreamingDistributionService, ManagedService {
   /** The key in the properties file that defines the streaming formats to distribute. */
   protected static final String STREAMING_FORMATS_KEY = "org.opencastproject.streaming.formats";
 
@@ -150,7 +151,7 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   protected static final String DEFAULT_STREAMING_URL = DEFAULT_STREAMING_SCHEME + "://localhost/matterhorn-engage";
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(StreamingDistributionService.class);
+  private static final Logger logger = LoggerFactory.getLogger(WowzaAdaptiveStreamingDistributionService.class);
 
   /** Receipt type */
   public static final String JOB_TYPE = "org.opencastproject.distribution.streaming";
@@ -160,23 +161,26 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     Distribute, Retract
   };
 
+  /** The load on the system introduced by creating a distribute job */
+  public static final float DEFAULT_DISTRIBUTE_JOB_LOAD = 0.1f;
+
+  /** The load on the system introduced by creating a retract job */
+  public static final float DEFAULT_RETRACT_JOB_LOAD = 1.0f;
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_DISTRIBUTE_JOB_LOAD} */
+  public static final String DISTRIBUTE_JOB_LOAD_KEY = "job.load.streaming.distribute";
+
+  /** The key to look for in the service configuration file to override the {@link DEFAULT_RETRACT_JOB_LOAD} */
+  public static final String RETRACT_JOB_LOAD_KEY = "job.load.streaming.retract";
+
+  /** The load on the system introduced by creating a distribute job */
+  private float distributeJobLoad = DEFAULT_DISTRIBUTE_JOB_LOAD;
+
+  /** The load on the system introduced by creating a retract job */
+  private float retractJobLoad = DEFAULT_RETRACT_JOB_LOAD;
+
   /** Default distribution directory */
   public static final String DEFAULT_DISTRIBUTION_DIR = "opencast" + File.separator;
-
-  /** The workspace reference */
-  protected Workspace workspace = null;
-
-  /** The service registry */
-  protected ServiceRegistry serviceRegistry = null;
-
-  /** The security service */
-  protected SecurityService securityService = null;
-
-  /** The user directory service */
-  protected UserDirectoryService userDirectoryService = null;
-
-  /** The organization directory service */
-  protected OrganizationDirectoryService organizationDirectoryService = null;
 
   /** The distribution directory */
   protected File distributionDirectory = null;
@@ -193,10 +197,12 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   /** Whether or not RTMP is supported */
   private boolean isRTMPSupported = false;
 
+  private final Gson gson = new Gson();
+
   /**
    * Creates a new instance of the streaming distribution service.
    */
-  public StreamingDistributionService() {
+  public WowzaAdaptiveStreamingDistributionService() {
     super(JOB_TYPE);
   }
 
@@ -280,6 +286,10 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       setDefaultSupportedFormats();
     }
     logger.info("The supported streaming formats are: {}", StringUtils.join(supportedAdaptiveFormats, ","));
+    distributeJobLoad = LoadUtil.getConfiguredLoadValue(properties, DISTRIBUTE_JOB_LOAD_KEY,
+            DEFAULT_DISTRIBUTE_JOB_LOAD, serviceRegistry);
+    retractJobLoad = LoadUtil.getConfiguredLoadValue(properties, RETRACT_JOB_LOAD_KEY, DEFAULT_RETRACT_JOB_LOAD,
+            serviceRegistry);
   }
 
   /**
@@ -368,14 +378,15 @@ public class StreamingDistributionService extends AbstractJobProducer implements
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.distribution.api.DistributionService#distribute(String,
-   *      org.opencastproject.mediapackage.MediaPackage, String)
+   * @see org.opencastproject.distribution.api.StreamingDistributionService#distribute(java.lang.String,
+   * org.opencastproject.mediapackage.MediaPackage, java.util.Set)
    */
   @Override
-  public Job distribute(String channelId, MediaPackage mediapackage, String elementId)
+  public Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds)
           throws DistributionException, MediaPackageException {
+
     notNull(mediapackage, "mediapackage");
-    notNull(elementId, "elementId");
+    notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
 
     if (streamingUri == null && adaptiveStreamingUri == null)
@@ -386,11 +397,60 @@ public class StreamingDistributionService extends AbstractJobProducer implements
               "Streaming distribution directory must be set (org.opencastproject.streaming.directory)");
 
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Distribute.toString(),
-              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), elementId));
+      return serviceRegistry.createJob(
+              JOB_TYPE,
+              Operation.Distribute.toString(),
+              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), gson.toJson(elementIds)), distributeJobLoad);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
+
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.distribution.api.DistributionService#distribute(String,
+   *      org.opencastproject.mediapackage.MediaPackage, String)
+   */
+  @Override
+  public Job distribute(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException, MediaPackageException {
+    Set<String> elmentIds = new HashSet();
+    elmentIds.add(elementId);
+    return (distribute(channelId, mediapackage, elmentIds));
+  }
+
+  /**
+   * Distribute Mediapackage elements to the download distribution service.
+   *
+   * @param channelId # The id of the publication channel to be distributed to.
+   * @param mediapackage The media package that contains the elements to be
+   * distributed.
+   * @param elementIds The ids of the elements that should be distributed
+   * contained within the media package.
+   * @return A reference to the MediaPackageElements that have been distributed.
+   * @throws DistributionException Thrown if the parent directory of the
+   * MediaPackageElement cannot be created, if the MediaPackageElement cannot be
+   * copied or another unexpected exception occurs.
+   */
+  public MediaPackageElement[] distributeElements(String channelId, MediaPackage mediapackage, Set<String> elementIds)
+    throws DistributionException {
+    notNull(mediapackage, "mediapackage");
+    notNull(elementIds, "elementIds");
+    notNull(channelId, "channelId");
+
+    final Set<MediaPackageElement> elements = getElements(mediapackage, elementIds);
+    List<MediaPackageElement> distributedElements = new ArrayList<>();
+
+    for (MediaPackageElement element : elements) {
+      MediaPackageElement[] distributed = distributeElement(channelId, mediapackage, element.getIdentifier());
+      if (distributed != null) {
+        for (MediaPackageElement e : distributed) {
+          if (e != null) distributedElements.add(e);
+        }
+      }
+    }
+    return distributedElements.toArray(new MediaPackageElement[distributedElements.size()]);
   }
 
   /**
@@ -705,17 +765,66 @@ public class StreamingDistributionService extends AbstractJobProducer implements
    *      org.opencastproject.mediapackage.MediaPackage, String) java.lang.String)
    */
   @Override
-  public Job retract(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException {
-    notNull(mediaPackage, "mediapackage");
-    notNull(elementId, "elementId");
-    notNull(channelId, "channelId");
+  public Job retract(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException {
+    Set<String> elementIds = new HashSet();
+    elementIds.add(elementId);
+    return retract(channelId, mediapackage, elementIds);
+  }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.distribution.api.StreamingDistributionService#retract(java.lang.String,
+   * org.opencastproject.mediapackage.MediaPackage, java.util.Set)
+   */
+  @Override
+  public Job retract(String channelId, MediaPackage mediaPackage, Set<String> elementIds) throws DistributionException {
+    RequireUtil.notNull(mediaPackage, "mediaPackage");
+    RequireUtil.notNull(elementIds, "elementIds");
+    RequireUtil.notNull(channelId, "channelId");
+    //
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(),
-              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediaPackage), elementId));
+              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediaPackage), gson.toJson(elementIds)),
+              retractJobLoad);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
+  }
+
+   /**
+   * Retract a media package element from the distribution channel. The retracted element must not necessarily be the
+   * one given as parameter <code>elementId</code>. Instead, the element's distribution URI will be calculated. This way
+   * you are able to retract elements by providing the "original" element here.
+   *
+   * @param channelId
+   *          the channel id
+   * @param mediapackage
+   *          the mediapackage
+   * @param elementIds
+   *          the element identifiers
+   * @return the retracted element or <code>null</code> if the element was not retracted
+   * @throws org.opencastproject.distribution.api.DistributionException
+   *           in case of an error
+   */
+  protected MediaPackageElement[] retractElements(String channelId, MediaPackage mediapackage, Set<String> elementIds)
+          throws DistributionException {
+    notNull(mediapackage, "mediapackage");
+    notNull(elementIds, "elementIds");
+    notNull(channelId, "channelId");
+
+    Set<MediaPackageElement> elements = getElements(mediapackage, elementIds);
+    List<MediaPackageElement> retractedElements = new ArrayList<>();
+
+    for (MediaPackageElement element : elements) {
+      MediaPackageElement[] retracted = retractElement(channelId, mediapackage, element.getIdentifier());
+      if (retracted != null) {
+        for (MediaPackageElement e : retracted) {
+          if (e != null) retractedElements.add(e);
+        }
+      }
+    }
+    return retractedElements.toArray(new MediaPackageElement[retractedElements.size()]);
   }
 
   /**
@@ -856,55 +965,58 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     final String orgId = securityService.getOrganization().getId();
     final Path distributionPath = distributionDirectory.toPath().resolve(orgId);
     final URI elementUri = element.getURI();
+    URI relativeUri;
 
-    URI relativeUri = adaptiveStreamingUri.relativize(elementUri);
-    if (relativeUri != elementUri) {
-      // SMIL file
+    if (adaptiveStreamingUri != null) {
+      relativeUri = adaptiveStreamingUri.relativize(elementUri);
+      if (relativeUri != elementUri) {
+        // SMIL file
 
-      // Get the relativized URL path
-      String uriPath = relativeUri.getPath();
-      // Remove the last part (corresponds to the part of the "virtual" manifests
-      uriPath = uriPath.substring(0, uriPath.lastIndexOf('/'));
-      // Remove the "smil:" tags, if any, and set the right extension if needed
-      uriPath = uriPath.replace("smil:", "");
-      if (!uriPath.endsWith(".smil"))
-        uriPath += ".smil";
+        // Get the relativized URL path
+        String uriPath = relativeUri.getPath();
+        // Remove the last part (corresponds to the part of the "virtual" manifests
+        uriPath = uriPath.substring(0, uriPath.lastIndexOf('/'));
+        // Remove the "smil:" tags, if any, and set the right extension if needed
+        uriPath = uriPath.replace("smil:", "");
+        if (!uriPath.endsWith(".smil"))
+          uriPath += ".smil";
 
-      String[] uriPathParts = uriPath.split("/");
+        String[] uriPathParts = uriPath.split("/");
 
-      if (uriPathParts.length > 1) {
-        logger.warn(
-                "Malformed URI path \"{}\". The SMIL files must be at the streaming application's root. Trying anyway...",
-                uriPath);
+        if (uriPathParts.length > 1) {
+          logger.warn(
+                  "Malformed URI path \"{}\". The SMIL files must be at the streaming application's root. Trying anyway...",
+                  uriPath);
+        }
+        return distributionPath.resolve(uriPath).toFile();
       }
-      return distributionPath.resolve(uriPath).toFile();
     }
 
-    relativeUri = streamingUri.relativize(elementUri);
-    if (relativeUri != elementUri) {
-      // RTMP file
+    if (streamingUri != null) {
+      relativeUri = streamingUri.relativize(elementUri);
+      if (relativeUri != elementUri) {
+        // RTMP file
 
-      // Get the relativized URL path
-      String urlPath = relativeUri.getPath();
-      // Remove the "mp4:" tags, if any, and set the right extension if needed
-      urlPath = urlPath.replace("mp4:", "");
-      if (!urlPath.endsWith(".mp4"))
-        urlPath += ".mp4";
+        // Get the relativized URL path
+        String urlPath = relativeUri.getPath();
+        // Remove the "mp4:" tags, if any, and set the right extension if needed
+        urlPath = urlPath.replace("mp4:", "");
+        if (!urlPath.endsWith(".mp4"))
+          urlPath += ".mp4";
 
-      String[] urlPathParts = urlPath.split("/");
+        String[] urlPathParts = urlPath.split("/");
 
-      if (urlPathParts.length < 5) {
-        logger.warn(
-                format("Malformed URI %s. Must be of format .../{orgId}/{channelId}/{mediapackageId}/{elementId}/{fileName}."
-                        + " Trying URI with current orgId", elementUri));
+        if (urlPathParts.length < 5) {
+          logger.warn(
+                  format("Malformed URI %s. Must be of format .../{orgId}/{channelId}/{mediapackageId}/{elementId}/{fileName}."
+                          + " Trying URI with current orgId", elementUri));
+        }
+        return distributionPath.resolve(urlPath).toFile();
       }
-      return distributionPath.resolve(urlPath).toFile();
-
-    } else {
-      // We have an ordinary file (not yet distributed)
-      return new File(getElementDirectory(channelId, mediapackage, element.getIdentifier()),
-              FilenameUtils.getName(elementUri.getPath()));
     }
+    // We have an ordinary file (not yet distributed)
+    return new File(getElementDirectory(channelId, mediapackage, element.getIdentifier()),
+            FilenameUtils.getName(elementUri.getPath()));
   }
 
   /**
@@ -982,40 +1094,40 @@ public class StreamingDistributionService extends AbstractJobProducer implements
       op = Operation.valueOf(operation);
       String channelId = arguments.get(0);
       MediaPackage mediapackage = MediaPackageParser.getFromXml(arguments.get(1));
-      String elementId = arguments.get(2);
+      Set<String> elementIds = gson.fromJson(arguments.get(2), new TypeToken<Set<String>>() {
+      }.getType());
       switch (op) {
         case Distribute:
-          MediaPackageElement[] distributedElement = null;
-          distributedElement = distributeElement(channelId, mediapackage, elementId);
+          MediaPackageElement[] distributedElements = distributeElements(channelId, mediapackage, elementIds);
           if (logger.isDebugEnabled()) {
-            for (MediaPackageElement element : distributedElement)
+            for (MediaPackageElement element : distributedElements)
               if (element != null)
                 logger.debug("Distributed element {} with URL {}", element.getIdentifier(), element.getURI());
           }
           ArrayList<MediaPackageElement> distributedElementsList = new ArrayList<MediaPackageElement>();
-          if (distributedElement != null) {
-            for (int i = 0; i < distributedElement.length; i++) {
-              if (distributedElement[i] != null) distributedElementsList.add(distributedElement[i]);
+          if (distributedElements != null) {
+            for (int i = 0; i < distributedElements.length; i++) {
+              if (distributedElements[i] != null) distributedElementsList.add(distributedElements[i]);
             }
           }
           return (! distributedElementsList.isEmpty())
                   ? MediaPackageElementParser.getArrayAsXml(distributedElementsList) : null;
         case Retract:
-          MediaPackageElement[] retractedElement = null;
+          MediaPackageElement[] retractedElements = null;
           if (distributionDirectory != null) {
             if (streamingUri != null || adaptiveStreamingUri != null) {
-              retractedElement = retractElement(channelId, mediapackage, elementId);
+              retractedElements = retractElements(channelId, mediapackage, elementIds);
               if (logger.isDebugEnabled()) {
-                for (MediaPackageElement element : retractedElement)
+                for (MediaPackageElement element : retractedElements)
                   if (element != null)
                     logger.debug("Retracted element {} with URL {}", element.getIdentifier(), element.getURI());
               }
             }
           }
           ArrayList<MediaPackageElement> retractedElementsList = new ArrayList<MediaPackageElement>();
-          if (retractedElement != null) {
-            for (int i = 0; i < retractedElement.length; i++) {
-              if (retractedElement[i] != null) retractedElementsList.add(retractedElement[i]);
+          if (retractedElements != null) {
+            for (int i = 0; i < retractedElements.length; i++) {
+              if (retractedElements[i] != null) retractedElementsList.add(retractedElements[i]);
             }
           }
           return (! retractedElementsList.isEmpty())
@@ -1032,93 +1144,18 @@ public class StreamingDistributionService extends AbstractJobProducer implements
     }
   }
 
-  /**
-   * Callback for the OSGi environment to set the workspace reference.
-   *
-   * @param workspace
-   *          the workspace
-   */
-  protected void setWorkspace(Workspace workspace) {
-    this.workspace = workspace;
+  private Set<MediaPackageElement> getElements(MediaPackage mediapackage, Set<String> elementIds)
+          throws IllegalStateException {
+    final Set<MediaPackageElement> elements = new HashSet<>();
+    for (String elementId : elementIds) {
+       MediaPackageElement element = mediapackage.getElementById(elementId);
+       if (element != null) {
+         elements.add(element);
+       } else {
+         logger.debug("No element " + elementId + " found in mediapackage " + mediapackage.getIdentifier());
+       }
+    }
+    return elements;
   }
 
-  /**
-   * Callback for the OSGi environment to set the service registry reference.
-   *
-   * @param serviceRegistry
-   *          the service registry
-   */
-  protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
-    this.serviceRegistry = serviceRegistry;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.job.api.AbstractJobProducer#getServiceRegistry()
-   */
-  @Override
-  protected ServiceRegistry getServiceRegistry() {
-    return serviceRegistry;
-  }
-
-  /**
-   * Callback for setting the security service.
-   *
-   * @param securityService
-   *          the securityService to set
-   */
-  public void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
-  }
-
-  /**
-   * Callback for setting the user directory service.
-   *
-   * @param userDirectoryService
-   *          the userDirectoryService to set
-   */
-  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
-    this.userDirectoryService = userDirectoryService;
-  }
-
-  /**
-   * Sets a reference to the organization directory service.
-   *
-   * @param organizationDirectory
-   *          the organization directory
-   */
-  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
-    this.organizationDirectoryService = organizationDirectory;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.job.api.AbstractJobProducer#getSecurityService()
-   */
-  @Override
-  protected SecurityService getSecurityService() {
-    return securityService;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.job.api.AbstractJobProducer#getUserDirectoryService()
-   */
-  @Override
-  protected UserDirectoryService getUserDirectoryService() {
-    return userDirectoryService;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.job.api.AbstractJobProducer#getOrganizationDirectoryService()
-   */
-  @Override
-  protected OrganizationDirectoryService getOrganizationDirectoryService() {
-    return organizationDirectoryService;
-  }
 }
