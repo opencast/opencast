@@ -34,6 +34,7 @@ audio/mpeg                      mp3
 video/mpeg                      mpeg mpg mpe
 video/quicktime                 qt mov
 video/x-msvideo                 avi
+video/x-flv                     flv
 video/mp4                       mp4 m4v
 video/x-matroska                mkv
 video/x-matroska-3d             mk3d
