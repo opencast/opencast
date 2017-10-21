@@ -109,6 +109,26 @@ public class WorkingFileRepositoryRestEndpointTest {
     }
   }
 
+
+  @Test
+  public void testExtractImageContentTypeFromCollection() throws Exception {
+    InputStream in = null;
+    InputStream responseIn = null;
+
+    try {
+      in = getClass().getResourceAsStream("/opencast_header.gif");
+      endpoint.putInCollection("collection-2", "opencast_header.gif", in);
+    } finally {
+      IOUtils.closeQuietly(in);
+    }
+
+    // execute gets, and ensure that the content types are correct
+    Response response = endpoint.restGetFromCollection("collection-2", "opencast_header.gif");
+
+    Assert.assertEquals("Gif content type", "image/gif", response.getMetadata().getFirst("Content-Type"));
+  }
+
+
   @Test
   public void testExtractXmlContentType() throws Exception {
     String mediaPackageId = "mp";

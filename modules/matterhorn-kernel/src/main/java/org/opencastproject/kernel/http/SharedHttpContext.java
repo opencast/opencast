@@ -22,7 +22,6 @@
 package org.opencastproject.kernel.http;
 
 import org.opencastproject.util.MimeTypes;
-import org.opencastproject.util.UnknownFileTypeException;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -70,11 +69,7 @@ public class SharedHttpContext implements HttpContext {
    */
   @Override
   public String getMimeType(String name) {
-    try {
-    return MimeTypes.fromString(name).toString();
-    } catch (UnknownFileTypeException e) {
-      return null;
-    }
+    return MimeTypes.getMimeType(name);
   }
 
   /**
