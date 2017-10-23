@@ -671,7 +671,7 @@ public final class IoSupport {
     } catch (FileNotFoundException e) {
       // this exception is thrown only if the directory path to the file isn't exist
       // make sure to create all parent directories before locking the file
-      throw new NotFoundException("Error aquiring lock for " + file.getAbsolutePath(), e);
+      throw new NotFoundException("Error acquiring lock for " + file.getAbsolutePath(), e);
     }
     final FileLock lock = raf.getChannel().lock();
     return new Effect0() {
