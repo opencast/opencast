@@ -28,11 +28,13 @@ import org.opencastproject.distribution.api.AbstractDistributionService;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.TrackImpl.StreamingProtocol;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -113,6 +115,12 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
 
   /** The attribute "video-bitrate" in the SMIL files */
   protected static final String SMIL_ATTR_VIDEO_BITRATE = "video-bitrate";
+
+  /** The attribute "video-width" in the SMIL files */
+  protected static final String SMIL_ATTR_VIDEO_WIDTH = "width";
+
+  /** The attribute "video-height" in the SMIL files */
+  protected static final String SMIL_ATTR_VIDEO_HEIGHT = "height";
 
   /** The attribute to return for Distribution Type */
   protected static final String DISTRIBUTION_TYPE = "streaming";
@@ -701,13 +709,43 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
     video.setAttribute("src", getAdaptiveDistributionName(channelId, mediapackage, element));
 
     float bitrate = 0;
-    for (int i = 0; i < track.getAudio().size(); i++) {
-      bitrate += track.getAudio().get(i).getBitRate();
+
+    // Add bitrate corresponding to the audio streams
+    for (AudioStream stream : track.getAudio()) {
+      bitrate += stream.getBitRate();
     }
-    for (int i = 0; i < track.getVideo().size(); i++) {
-      bitrate += track.getVideo().get(i).getBitRate();
+
+    // Add bitrate corresponding to the video streams
+    // Also, set the video width and height values:
+    // In the rare case where there is more than one video stream, the values of the first stream
+    // have priority, but always prefer the first stream with both "frameWidth" and "frameHeight"
+    // parameters defined
+    Integer width = null;
+    Integer height = null;
+    for (VideoStream stream : track.getVideo()) {
+      bitrate += stream.getBitRate();
+      // Update if both width and height are defined for a stream or if we have no values at all
+      if (((stream.getFrameWidth() != null) && (stream.getFrameHeight() != null))
+              || ((width == null) && (height == null))) {
+        width = stream.getFrameWidth();
+        height = stream.getFrameHeight();
+      }
     }
+
     video.setAttribute(SMIL_ATTR_VIDEO_BITRATE, Integer.toString((int) bitrate));
+
+    if (width != null) {
+      video.setAttribute(SMIL_ATTR_VIDEO_WIDTH, Integer.toString(width));
+    } else {
+      logger.debug("Could not set video width in the SMIL file for element {} of mediapackage {}. The value was null",
+              element.getIdentifier(), mediapackage.getIdentifier());
+    }
+    if (height != null) {
+      video.setAttribute(SMIL_ATTR_VIDEO_HEIGHT, Integer.toString(height));
+    } else {
+      logger.debug("Could not set video height in the SMIL file for element {} of mediapackage {}. The value was null",
+              element.getIdentifier(), mediapackage.getIdentifier());
+    }
 
     NodeList currentVideos = switchElement.getChildNodes();
     for (int i = 0; i < currentVideos.getLength(); i++) {
