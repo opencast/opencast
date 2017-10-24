@@ -53,6 +53,7 @@ import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.json.JValue;
+import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -210,9 +211,7 @@ public class TasksEndpoint {
       logger.debug("Can't start one or more tasks.");
       return Response.status(Status.BAD_REQUEST).build();
     }
-
-    return Response.status(Status.CREATED).entity(StringUtils.join($(instances).map(getWorkflowIds).toList(), ","))
-            .build();
+    return Response.status(Status.CREATED).entity(new Gson().toJson($(instances).map(getWorkflowIds).toList())).build();
   }
 
   private static <A, B> Fn2<Map<A, B>, Entry<A, B>, Map<A, B>> mapFold() {
@@ -225,10 +224,10 @@ public class TasksEndpoint {
     };
   }
 
-  private static final Fn<WorkflowInstance, String> getWorkflowIds = new Fn<WorkflowInstance, String>() {
+  private static final Fn<WorkflowInstance, Long> getWorkflowIds = new Fn<WorkflowInstance, Long>() {
     @Override
-    public String apply(WorkflowInstance a) {
-      return Long.toString(a.getId());
+    public Long apply(WorkflowInstance a) {
+      return a.getId();
     }
   };
 
