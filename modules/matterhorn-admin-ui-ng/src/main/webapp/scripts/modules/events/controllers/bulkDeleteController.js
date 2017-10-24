@@ -115,7 +115,7 @@ angular.module('adminNg.controllers')
             deleteIds = [],
             resource = Table.resource.indexOf('series') >= 0 ? 'series' : 'event',
             endpoint = Table.resource.indexOf('series') >= 0 ? 'deleteSeries' : 'deleteEvents',
-            sourceNotification = resource === 'series' ? 'SERIES' : 'EVENTS'; 
+            sourceNotification = resource === 'series' ? 'SERIES' : 'EVENTS';
 
             if (Table.resource.indexOf('series') >= 0) {
                 deleteIds = getSelectedSeriesIds();
@@ -149,7 +149,7 @@ angular.module('adminNg.controllers')
                 if (retractEventIds.length > 0) {
                     resetSubmitButton = false;
                     payload = {
-                        workflows: $scope.processing.ud.workflow.id,
+                        workflow: $scope.processing.ud.workflow.id,
                         configuration: $scope.processing.ud.workflow.selection.configuration,
                         eventIds: retractEventIds
                     };
@@ -160,7 +160,7 @@ angular.module('adminNg.controllers')
                 // in this case, no callback would ever set submitButton to false again
                 $scope.submitButton = false;
             }
-        } 
+        }
 
     };
 

@@ -34,7 +34,7 @@ function ($scope, Table, NewEventProcessing, TaskResource, Notifications, decora
     $scope.valid = function () {
         return $scope.getSelectedIds().length > 0;
     };
-    
+
     var onSuccess = function () {
         $scope.submitButton = false;
         $scope.close();
@@ -54,7 +54,7 @@ function ($scope, Table, NewEventProcessing, TaskResource, Notifications, decora
         if ($scope.valid()) {
             var eventIds = $scope.getSelectedIds(), payload;
             payload = {
-                workflows: $scope.processing.ud.workflow.id,
+                workflow: $scope.processing.ud.workflow.id,
                 configuration: $scope.processing.ud.workflow.selection.configuration,
                 eventIds: eventIds
             };
