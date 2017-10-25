@@ -60,7 +60,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -170,14 +171,15 @@ public class TasksEndpoint {
         return RestUtil.R.badRequest("No eventIds set");
 
     Map<String, String> configuration = (Map<String, String>) metadataJson.get("configuration");
-    {
-      List<String> configKeysToRemove = new LinkedList<>();
-      for (String key : configuration.keySet()) {
-        if (StringUtils.equalsIgnoreCase("eventIds", key))
-          configKeysToRemove.add(key);
-      }
-      for (String key : configKeysToRemove) {
-        configuration.remove(key);
+    if (configuration == null) {
+      configuration = new HashMap<>();
+    } else {
+      Iterator<String> confKeyIter = configuration.keySet().iterator();
+      while (confKeyIter.hasNext()) {
+        String confKey = confKeyIter.next();
+        if (StringUtils.equalsIgnoreCase("eventIds", confKey)) {
+          configuration.remove(confKey);
+        }
       }
     }
 
