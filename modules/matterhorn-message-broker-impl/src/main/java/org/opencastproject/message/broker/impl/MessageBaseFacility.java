@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Date;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -52,16 +52,11 @@ public class MessageBaseFacility {
   protected static final String ACTIVEMQ_BROKER_PASSWORD_KEY = "activemq.broker.password";
 
   /** Default Broker URL */
-  private static final String ACTIVEMQ_DEFAULT_URL = "failover://(tcp://localhost:61616)?initialReconnectDelay=2000&maxReconnectAttempts=2";
-
-  /** Minimum time in milliseconds between two connection attempts */
-  private static final long MIN_RECONNECT_TIME = 60000;
+  private static final String ACTIVEMQ_DEFAULT_URL
+    = "failover://(tcp://localhost:61616)?initialReconnectDelay=2000&maxReconnectDelay=60000";
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(MessageBaseFacility.class);
-
-  /** Create a ConnectionFactory for establishing connections to the Active MQ broker */
-  private ActiveMQConnectionFactory connectionFactory = null;
 
   /** The connection to the ActiveMQ broker */
   private Connection connection = null;
@@ -72,11 +67,8 @@ public class MessageBaseFacility {
   /** The message producer */
   private MessageProducer producer = null;
 
-  /** Time of last connection attempt */
-  private long lastConnection = 0;
-
-  /** Disabled state of the JMS connection. Used to ignore connection errors. */
-  protected boolean enabled = false;
+  /** Disabled state of the JMS connection. */
+  private final AtomicBoolean enabled = new AtomicBoolean(false);
 
   /** Connection details */
   private String url = ACTIVEMQ_DEFAULT_URL;
@@ -95,8 +87,7 @@ public class MessageBaseFacility {
     password = bc.getProperty(ACTIVEMQ_BROKER_PASSWORD_KEY);
 
     logger.info("{} is configured to connect with URL {}", name, url);
-    enable(true);
-    if (connectMessageBroker()) {
+    if (reconnect()) {
       logger.info("{} service successfully started", name);
     }
   }
@@ -104,33 +95,16 @@ public class MessageBaseFacility {
   /** OSGi component deactivate callback */
   public void deactivate() {
     logger.info("{} service is stopping...", this.getClass().getSimpleName());
-    enable(false);
     disconnectMessageBroker();
     logger.info("{} service successfully stopped", this.getClass().getSimpleName());
   }
 
   /** Opens new sessions and connections to the message broker */
-  protected synchronized boolean connectMessageBroker() {
-    if (!enabled) {
-      return false;
-    }
-    if (isConnected()) {
-      return true;
-    }
-
-    /* Wait between reconnection attempts */
-    long time = (new Date()).getTime();
-    if (time - lastConnection < MIN_RECONNECT_TIME) {
-      try {
-        Thread.sleep(MIN_RECONNECT_TIME - time + lastConnection);
-      } catch (Exception e) {
-      }
-    }
-    lastConnection = (new Date()).getTime();
-
+  public synchronized boolean reconnect() {
     disconnectMessageBroker(false);
     try {
-      connectionFactory = new ActiveMQConnectionFactory(url);
+      /* Create a ConnectionFactory for establishing connections to the Active MQ broker */
+      ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
       if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
         connectionFactory.setUserName(username);
         connectionFactory.setPassword(password);
@@ -184,7 +158,7 @@ public class MessageBaseFacility {
   }
 
   /** Closes all open sessions and connections to the message broker */
-  protected void disconnectMessageBroker(final boolean verbose) {
+  protected synchronized void disconnectMessageBroker(final boolean verbose) {
     if (producer != null || session != null || connection != null) {
       if (verbose) {
         logger.info("Stopping connection to ActiveMQ message broker...");
@@ -227,6 +201,7 @@ public class MessageBaseFacility {
         logger.info("Connection to ActiveMQ message broker successfully stopped");
       }
     }
+    enable(false);
   }
 
   /**
@@ -240,29 +215,14 @@ public class MessageBaseFacility {
    * Return if there is a connection to the message broker.
    */
   public boolean isConnected() {
-    try {
-      connection.getMetaData();
-      return enabled;
-    } catch (Exception e) {
-      return false;
-    }
-  }
-
-  /**
-   * Try reconnecting if there was no reconnection attempt in the last MIN_RECONNECT_TIME.
-   */
-  public boolean reconnect() {
-    if (isConnected()) {
-      return true;
-    }
-    if ((new Date()).getTime() - lastConnection >= MIN_RECONNECT_TIME) {
-      return connectMessageBroker();
-    }
-    return false;
+    return this.enabled.get();
   }
 
   public void enable(final boolean state) {
-    enabled = state;
+    synchronized (this.enabled) {
+      this.enabled.set(state);
+      this.enabled.notifyAll();
+    }
   }
 
   /**
@@ -274,4 +234,17 @@ public class MessageBaseFacility {
     return producer;
   }
 
+  /**
+   * Wait for a valid ActiveMQ connection (this could return immediately)
+   */
+  protected void waitForConnection() {
+    synchronized (this.enabled) {
+      while (!this.enabled.get()) {
+        try {
+          this.enabled.wait();
+        } catch (InterruptedException e) {
+        }
+      }
+    }
+  }
 }
