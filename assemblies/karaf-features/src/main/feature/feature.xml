@@ -231,7 +231,8 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-service-feeds/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-service-impl/${project.version}</bundle>
+    <!-- load search impl later than its optional index rebuilding resources to have maximium support during search index rebuild -->
+    <bundle start-level="84">mvn:org.opencastproject/matterhorn-search-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-series-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-silencedetection-api/${project.version}</bundle>
@@ -450,7 +451,8 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-service-feeds/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-service-impl/${project.version}</bundle>
+    <!-- load search impl later than its optional index rebuilding resources to have maximium support during search index rebuild -->
+    <bundle start-level="84">mvn:org.opencastproject/matterhorn-search-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-series-service-impl/${project.version}</bundle>
@@ -683,7 +685,8 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-runtime-info-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-service-feeds/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-search-service-impl/${project.version}</bundle>
+    <!-- load search impl later than its optional index rebuilding resources to have maximium support during search index rebuild -->
+    <bundle start-level="84">mvn:org.opencastproject/matterhorn-search-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-series-service-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-solr/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-usertracking-api/${project.version}</bundle>
