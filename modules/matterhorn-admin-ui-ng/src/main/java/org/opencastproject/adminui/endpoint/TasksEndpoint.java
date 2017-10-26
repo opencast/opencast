@@ -178,7 +178,7 @@ public class TasksEndpoint {
       while (confKeyIter.hasNext()) {
         String confKey = confKeyIter.next();
         if (StringUtils.equalsIgnoreCase("eventIds", confKey)) {
-          configuration.remove(confKey);
+          confKeyIter.remove();
         }
       }
     }
