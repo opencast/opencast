@@ -379,6 +379,12 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
         return;
       }
 
+      if (result.getItems().get(0).isDeleted()) {
+        logger.trace("This OAI-PMH record has been deleted {}. Skipping.",
+                snapshotItem.getMediapackage().getIdentifier());
+        return;
+      }
+
       SearchResultItem item = result.getItems().get(0);
       MediaPackage repoMp = item.getMediaPackage(); // This is the media package from OAI-PMH which has to be updated.
 
