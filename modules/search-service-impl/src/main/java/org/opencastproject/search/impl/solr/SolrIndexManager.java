@@ -77,6 +77,7 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
@@ -693,14 +694,18 @@ public class SolrIndexManager {
 
   private Mpeg7Catalog loadMpeg7Catalog(Catalog cat) throws IOException {
     InputStream in = null;
+    File f = null;
     try {
-      File f = workspace.get(cat.getURI());
+      f = workspace.get(cat.getURI(), true);
       in = new FileInputStream(f);
       return mpeg7CatalogService.load(in);
     } catch (NotFoundException e) {
       throw new IOException("Unable to load metadata from mpeg7 catalog " + cat);
     } finally {
       IOUtils.closeQuietly(in);
+      if (f != null) {
+        FileUtils.deleteQuietly(f);
+      }
     }
   }
 
