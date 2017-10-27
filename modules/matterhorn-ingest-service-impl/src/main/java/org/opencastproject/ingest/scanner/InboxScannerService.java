@@ -141,16 +141,16 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
         FileUtils.forceMkdir(inbox);
       } catch (IOException e) {
         throw new ConfigurationException(INBOX_PATH,
-            "%s does not exists and could not be created".format(inbox.getAbsolutePath()));
+            String.format("%s does not exists and could not be created", inbox.getAbsolutePath()));
       }
     }
     /* We need to be able to read from the inbox to get files from there */
     if (!inbox.canRead()) {
-      throw new ConfigurationException(INBOX_PATH, "Cannot read from %s".format(inbox.getAbsolutePath()));
+      throw new ConfigurationException(INBOX_PATH, String.format("Cannot read from %s", inbox.getAbsolutePath()));
     }
     /* We need to be able to write to the inbox to remove files after they have been ingested */
     if (!inbox.canWrite()) {
-      throw new ConfigurationException(INBOX_PATH, "Cannot write to %s".format(inbox.getAbsolutePath()));
+      throw new ConfigurationException(INBOX_PATH, String.format("Cannot write to %s", inbox.getAbsolutePath()));
     }
     final int maxthreads = option(cc.getBundleContext().getProperty("org.opencastproject.inbox.threads")).bind(
             Strings.toInt).getOrElse(1);
