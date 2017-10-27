@@ -20,6 +20,7 @@
  */
 package org.opencastproject.assetmanager.impl.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
@@ -27,6 +28,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 import static org.opencastproject.util.MimeTypeUtil.Fns.suffix;
 import static org.opencastproject.util.RestUtil.R.badRequest;
+import static org.opencastproject.util.RestUtil.R.forbidden;
 import static org.opencastproject.util.RestUtil.R.noContent;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
@@ -39,6 +41,7 @@ import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.mediapackage.MediaPackageImpl;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.MimeTypeUtil;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -104,6 +107,9 @@ public abstract class AbstractAssetManagerRestEndpoint {
               description = "The media package was added, no content to return.",
               responseCode = SC_NO_CONTENT),
           @RestResponse(
+              description = "Not allowed to add a media package.",
+              responseCode = SC_FORBIDDEN),
+          @RestResponse(
               description = "There has been an internal error and the media package could not be added",
               responseCode = SC_INTERNAL_SERVER_ERROR)},
       returnDescription = "No content is returned.")
@@ -131,6 +137,9 @@ public abstract class AbstractAssetManagerRestEndpoint {
           @RestResponse(
               description = "A snapshot of the media package has been taken, no content to return.",
               responseCode = SC_NO_CONTENT),
+          @RestResponse(
+              description = "Not allowed to take a snapshot.",
+              responseCode = SC_FORBIDDEN),
           @RestResponse(
               description = "There has been an internal error and no snapshot could be taken.",
               responseCode = SC_INTERNAL_SERVER_ERROR)},
@@ -162,6 +171,9 @@ public abstract class AbstractAssetManagerRestEndpoint {
           @RestResponse(
               description = "The episode does either not exist or no snapshots are owned by the default owner.",
               responseCode = SC_NOT_FOUND),
+          @RestResponse(
+              description = "Not allowed to delete this episode.",
+              responseCode = SC_FORBIDDEN),
           @RestResponse(
               description = "There has been an internal error and the episode could not be deleted.",
               responseCode = SC_INTERNAL_SERVER_ERROR)},
@@ -197,7 +209,9 @@ public abstract class AbstractAssetManagerRestEndpoint {
       },
       reponses = {
           @RestResponse(responseCode = SC_OK, description = "Media package returned"),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found")
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found"),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not allowed to read media package."),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "There has been an internal error.")
       })
   public Response getMediaPackage(@PathParam("mediaPackageID") final String mediaPackageId) {
     return handleException(new P1Lazy<Response>() {
@@ -249,7 +263,13 @@ public abstract class AbstractAssetManagerRestEndpoint {
               description = "File returned"),
           @RestResponse(
               responseCode = SC_NOT_FOUND,
-              description = "Not found")})
+              description = "Not found"),
+          @RestResponse(
+              description = "Not allowed to read assets of this snapshot.",
+              responseCode = SC_FORBIDDEN),
+          @RestResponse(
+              description = "There has been an internal error.",
+              responseCode = SC_INTERNAL_SERVER_ERROR)})
   public Response getAsset(@PathParam("mediaPackageID") final String mediaPackageID,
                            @PathParam("mediaPackageElementID") final String mediaPackageElementID,
                            @PathParam("version") final String version,
@@ -283,11 +303,19 @@ public abstract class AbstractAssetManagerRestEndpoint {
   }
 
   /** Unify exception handling. */
-  public static <A> A handleException(final P1<A> p) {
+  public static Response handleException(final P1<Response> p) {
     try {
       return p.get1();
     } catch (Exception e) {
-      logger.error("Error calling REST method", e);
+      logger.debug("Error calling REST method", e);
+      Throwable cause = e;
+      if (e instanceof RuntimeException && e.getCause() != null) {
+        cause = ((RuntimeException)e).getCause();
+      }
+      if (cause instanceof UnauthorizedException) {
+        return forbidden();
+      }
+
       throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
