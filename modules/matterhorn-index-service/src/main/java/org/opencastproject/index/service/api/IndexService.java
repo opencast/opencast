@@ -566,4 +566,11 @@ public interface IndexService {
    */
   boolean hasActiveTransaction(String eventId) throws NotFoundException, UnauthorizedException, IndexServiceException;
 
+  /**
+   * Checks if the given event has snapshots
+   * @param eventId the event to check
+   * @return <code>true</code> if the event has snapshots, <code>false</code> otherwise
+   */
+  boolean hasSnapshots(String eventId);
+
 }

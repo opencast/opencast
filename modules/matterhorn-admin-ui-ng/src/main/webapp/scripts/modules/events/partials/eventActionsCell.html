@@ -7,20 +7,8 @@
 	with-role="ROLE_UI_EVENTS_DETAILS_VIEW">
 </a>
 
-<!-- Remove button for non-published events. -->
-<a class="remove" ng-if="angular.isUndefined(row.publications) || row.publications.length <= 0"
-	data-confirmation-modal="confirm-modal"
-    data-callback="table.delete"
-    data-object="row"
-    with-role="ROLE_UI_EVENTS_DELETE"
-></a>
-
 <!-- Remove button for published events. -->
-<a class="remove" ng-if="row.publications.length > 0"
-    data-open-modal="retract-published-event-modal"
-    data-resource-id="{{row.id}}"
-    with-role="ROLE_UI_EVENTS_DELETE"
-></a>
+<a class="remove" ng-click="row.checkedDelete()" with-role="ROLE_UI_EVENTS_DELETE"></a>
 
 <a ng-if="row.has_preview && row.needs_cutting" href="#/events/events/{{row.id}}/tools/editor"
   class="fa fa-scissors"
