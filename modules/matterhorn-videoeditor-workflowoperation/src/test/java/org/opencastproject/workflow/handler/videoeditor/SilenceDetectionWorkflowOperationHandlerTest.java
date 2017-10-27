@@ -133,7 +133,7 @@ public class SilenceDetectionWorkflowOperationHandlerTest {
   public void testStartOperation() throws WorkflowOperationException, SilenceDetectionFailedException,
           NotFoundException, ServiceRegistryException, MediaPackageException, SmilException, MalformedURLException, JAXBException, SAXException, IOException {
 
-    Smil smil = smilService.fromXml(new File(smilURI.toURL().getFile())).getSmil();
+    Smil smil = smilService.fromXml(new File(smilURI)).getSmil();
     Job job = EasyMock.createNiceMock(Job.class);
     EasyMock.expect(job.getPayload()).andReturn(smil.toXML()).anyTimes();
     EasyMock.expect(job.getStatus()).andReturn(Job.Status.FINISHED);

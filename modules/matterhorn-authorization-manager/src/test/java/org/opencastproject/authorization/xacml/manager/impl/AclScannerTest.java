@@ -72,7 +72,7 @@ public class AclScannerTest {
     Organization org3 = new JpaOrganization("org3", "org3", new HashMap<String, Integer>(), "ADMIN", "ANONYMOUS",
             new HashMap<String, String>());
 
-    List<Organization> orgs = new ArrayList<Organization>();
+    List<Organization> orgs = new ArrayList<>();
     orgs.add(org1);
     orgs.add(org2);
     orgs.add(org3);
@@ -87,11 +87,10 @@ public class AclScannerTest {
             .createNiceMock(HttpMediaPackageElementProvider.class);
 
     final AclTransitionDb aclTransitionDb = EasyMock.createNiceMock(AclTransitionDb.class);
-    List<EpisodeACLTransition> episodeTransitions = new ArrayList<EpisodeACLTransition>();
-    List<SeriesACLTransition> seriesTransitions = new ArrayList<SeriesACLTransition>();
-    EasyMock.expect(
-            aclTransitionDb.getByQuery(EasyMock.anyObject(Organization.class),
-                    EasyMock.anyObject(TransitionQuery.class)))
+    List<EpisodeACLTransition> episodeTransitions = new ArrayList<>();
+    List<SeriesACLTransition> seriesTransitions = new ArrayList<>();
+    EasyMock.expect(aclTransitionDb.getByQuery(EasyMock.anyObject(Organization.class),
+            EasyMock.anyObject(TransitionQuery.class)))
             .andReturn(new TransitionResultImpl(episodeTransitions, seriesTransitions)).anyTimes();
 
     // EasyMock.replay(aclDb);
@@ -151,7 +150,7 @@ public class AclScannerTest {
 
   @Test
   public void testCorrectFileInstall() throws Exception {
-    File file = new File(AclScannerTest.class.getResource("/xacml_correct.xml").getFile());
+    File file = new File(AclScannerTest.class.getResource("/xacml_correct.xml").toURI());
 
     ManagedAcl acl = new ManagedAclImpl(1L, "TestAcl", "org", new AccessControlList());
     Option<ManagedAcl> managedAcl = Option.some(acl);
@@ -167,7 +166,7 @@ public class AclScannerTest {
 
   @Test
   public void testCorruptedFileInstall() throws Exception {
-    File file = new File(AclScannerTest.class.getResource("/xacml_errors.xml").getFile());
+    File file = new File(AclScannerTest.class.getResource("/xacml_errors.xml").toURI());
 
     try {
       aclScanner.install(file);
@@ -179,7 +178,7 @@ public class AclScannerTest {
 
   @Test
   public void testCorrectFileUpdate() throws Exception {
-    File file = new File(AclScannerTest.class.getResource("/xacml_correct.xml").getFile());
+    File file = new File(AclScannerTest.class.getResource("/xacml_correct.xml").toURI());
 
     ManagedAcl acl = new ManagedAclImpl(1L, "TestAcl", "org", new AccessControlList());
     Option<ManagedAcl> managedAcl = Option.some(acl);
@@ -199,8 +198,8 @@ public class AclScannerTest {
 
   @Test
   public void testMissingFileUpdate() throws Exception {
-    File file1 = new File(AclScannerTest.class.getResource("/xacml_correct.xml").getFile());
-    File file2 = new File(AclScannerTest.class.getResource("/xacml_correct2.xml").getFile());
+    File file1 = new File(AclScannerTest.class.getResource("/xacml_correct.xml").toURI());
+    File file2 = new File(AclScannerTest.class.getResource("/xacml_correct2.xml").toURI());
 
     ManagedAcl acl = new ManagedAclImpl(1L, "TestAcl", "org", new AccessControlList());
     Option<ManagedAcl> managedAcl = Option.some(acl);
@@ -218,7 +217,7 @@ public class AclScannerTest {
 
   @Test
   public void testCorruptedFileUpdate() throws Exception {
-    File file = new File(AclScannerTest.class.getResource("/xacml_errors.xml").getFile());
+    File file = new File(AclScannerTest.class.getResource("/xacml_errors.xml").toURI());
 
     try {
       aclScanner.update(file);
@@ -230,7 +229,7 @@ public class AclScannerTest {
 
   @Test
   public void testRemoveFile() throws Exception {
-    File file1 = new File(AclScannerTest.class.getResource("/xacml_correct.xml").getFile());
+    File file1 = new File(AclScannerTest.class.getResource("/xacml_correct.xml").toURI());
     Long id = 1L;
     String org = "org";
     ManagedAcl acl = new ManagedAclImpl(id, "TestAcl", org, new AccessControlList());
@@ -250,8 +249,8 @@ public class AclScannerTest {
 
   @Test
   public void testRemoveMissingFile() throws Exception {
-    File file1 = new File(AclScannerTest.class.getResource("/xacml_correct.xml").getFile());
-    File file2 = new File(AclScannerTest.class.getResource("/xacml_correct2.xml").getFile());
+    File file1 = new File(AclScannerTest.class.getResource("/xacml_correct.xml").toURI());
+    File file2 = new File(AclScannerTest.class.getResource("/xacml_correct2.xml").toURI());
     ManagedAcl acl = new ManagedAclImpl(1L, "TestAcl", "org", new AccessControlList());
     Option<ManagedAcl> managedAcl = Option.some(acl);
     EasyMock.expect(aclDb.createAcl(anyObject(Organization.class), anyObject(AccessControlList.class), anyString()))

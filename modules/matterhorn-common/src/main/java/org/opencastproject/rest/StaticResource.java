@@ -48,8 +48,8 @@ public class StaticResource extends HttpServlet {
   private static final Logger logger = LoggerFactory.getLogger(StaticResource.class);
 
   /** The mimetypes to use for delivering files */
-  private static final MimetypesFileTypeMap mimeMap = new MimetypesFileTypeMap(StaticResource.class.getClassLoader()
-          .getResourceAsStream("mimetypes"));
+  private static final MimetypesFileTypeMap mimeMap = new MimetypesFileTypeMap(
+          StaticResource.class.getClassLoader().getResourceAsStream("mimetypes"));
 
   /** The classpath to search for the static resources */
   protected String classpath = null;
@@ -99,8 +99,8 @@ public class StaticResource extends HttpServlet {
       alias = (String) componentProperties.get("alias");
     if (classpath == null)
       classpath = (String) componentProperties.get("classpath");
-    logger.info("registering classpath:{} at {} with welcome file {} {}", new Object[] { classpath, alias, welcomeFile,
-            welcomeFileSpecified ? "" : "(via default)" });
+    logger.info("registering classpath:{} at {} with welcome file {} {}",
+            new Object[] { classpath, alias, welcomeFile, welcomeFileSpecified ? "" : "(via default)" });
   }
 
   public String getDefaultUrl() {
@@ -168,7 +168,7 @@ public class StaticResource extends HttpServlet {
     } finally {
       IOUtils.closeQuietly(in);
     }
-    String contentType = mimeMap.getContentType(url.getFile());
+    String contentType = mimeMap.getContentType(url.getPath());
     if (!"application/octet-stream".equals(contentType)) {
       resp.setHeader("Content-Type", contentType);
     }
