@@ -188,6 +188,6 @@ Set the base URL of the server hosting the engage tools (usually the presentatio
 
 ### org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg
 
-To ensure that jobs are not dispatched by non-admin nodes you may also want to set:
+To ensure that jobs are not dispatched by non-admin nodes, on these you should also set:
 
     dispatchinterval=0

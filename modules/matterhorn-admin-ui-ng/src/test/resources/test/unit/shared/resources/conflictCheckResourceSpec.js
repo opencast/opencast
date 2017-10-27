@@ -56,7 +56,7 @@ describe('Conflict check API Resource', function () {
                 'start'    : startDate,
                 'end'      : endDate,
                 'duration' : '3600000',
-                'rrule'    : 'FREQ=WEEKLY;BYDAY=MO,WE,TH;BYHOUR=' + date.getUTCHours() + ';BYMINUTE=0',
+                'rrule'    : 'FREQ=WEEKLY;BYDAY=MO,WE,TH;BYHOUR=' + date.getUTCHours() + ';BYMINUTE=' + date.getUTCMinutes(),
                 'device'   : '•mock• agent4'
             };
         });

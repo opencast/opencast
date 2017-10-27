@@ -60,7 +60,7 @@ describe('New Event API Resource', function () {
                 'start'   : startDate,
                 'end'     : endDate,
                 'duration': '6300000',
-                'rrule'   : 'FREQ=WEEKLY;BYDAY=MO,TU,WE;BYHOUR=' + date.getUTCHours() + ';BYMINUTE=0',
+                'rrule'   : 'FREQ=WEEKLY;BYDAY=MO,TU,WE;BYHOUR=' + date.getUTCHours() + ';BYMINUTE=' + date.getUTCMinutes(),
                 'device'  : '•mock• agent3',
                 'inputs'  : 'TRANSLATION.PATH.VIDEO'
             }
@@ -75,7 +75,7 @@ describe('New Event API Resource', function () {
                 'start'   : startDateDST,
                 'end'     : endDateDST,
                 'duration': '600000',
-                'rrule'   : 'FREQ=WEEKLY;BYDAY=MO,TU,WE;BYHOUR=' + dateDST.hours() + ';BYMINUTE=0',
+                'rrule'   : 'FREQ=WEEKLY;BYDAY=MO,TU,WE;BYHOUR=' + dateDST.hours() + ';BYMINUTE=' + date.getUTCMinutes(),
                 'device'  : '•mock• agent3',
                 'inputs'  : 'TRANSLATION.PATH.VIDEO'
             }
