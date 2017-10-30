@@ -21,7 +21,6 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.Opt.nul;
 import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
@@ -35,6 +34,7 @@ import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.util.Workflows;
+import org.opencastproject.message.broker.api.eventstatuschange.EventStatusChangeItem;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.data.Option;
@@ -55,6 +55,7 @@ import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.json.simple.JSONObject;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +74,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 @Path("/")
 @RestService(name = "TasksService", title = "UI Tasks",
@@ -88,7 +88,7 @@ import javax.ws.rs.core.Response.Status;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
-public class TasksEndpoint {
+public class TasksEndpoint extends AsynchronousEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(TasksEndpoint.class);
 
@@ -113,8 +113,16 @@ public class TasksEndpoint {
     this.workspace = workspace;
   }
 
+  @Override
   protected void activate(BundleContext bundleContext) {
     logger.info("Activate tasks endpoint");
+    super.activate(bundleContext);
+  }
+
+  @Override
+  protected void deactivate(BundleContext bundleContext) {
+    logger.info("Deactivate tasks endpoint");
+    super.deactivate(bundleContext);
   }
 
   @GET
@@ -183,23 +191,9 @@ public class TasksEndpoint {
       }
     }
 
-    WorkflowDefinition wfd;
-    try {
-      wfd = workflowService.getWorkflowDefinitionById(workflowId);
-    } catch (WorkflowDatabaseException e) {
-      logger.error("Unable to get workflow definition {}: {}", workflowId, ExceptionUtils.getStackTrace(e));
-      return RestUtil.R.serverError();
-    }
+    submit(new WorkflowStartingRunnable(workflowId, new ArrayList<>(eventIds), configuration));
 
-    final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
-    final List<WorkflowInstance> instances = workflows.applyWorkflowToLatestVersion(eventIds,
-            workflow(wfd, configuration)).toList();
-
-    if (eventIds.size() != instances.size()) {
-      logger.debug("Can't start one or more tasks.");
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-    return Response.status(Status.CREATED).entity(gson.toJson($(instances).map(getWorkflowIds).toList())).build();
+    return Response.ok(new JSONObject().toJSONString()).build();
   }
 
   private static <A, B> Fn2<Map<A, B>, Entry<A, B>, Map<A, B>> mapFold() {
@@ -219,4 +213,46 @@ public class TasksEndpoint {
     }
   };
 
+  private final class WorkflowStartingRunnable extends WorkStartingRunnable {
+
+    private String workflowId;
+    private Map<String, String> configuration;
+
+    private WorkflowStartingRunnable(
+      String workflowId,
+      List<String> eventIds,
+      Map<String, String> configuration) {
+      super(eventIds);
+      this.workflowId = workflowId;
+      this.configuration = configuration;
+    }
+
+    @Override
+    protected void doWork() {
+      WorkflowDefinition wfd = null;
+      try {
+        wfd = workflowService.getWorkflowDefinitionById(workflowId);
+      } catch (WorkflowDatabaseException | NotFoundException e) {
+        logger.error("Unable to get workflow definition {}: {}", workflowId, ExceptionUtils.getStackTrace(e));
+        reportEventStatusChange(EventStatusChangeItem.Type.Failed, "Unable to get workflow definition for workflow id: " + workflowId,
+          eventIds);
+        return;
+      }
+
+      final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
+      final List<WorkflowInstance> instances = workflows.applyWorkflowToLatestVersion(eventIds, workflow(wfd, configuration))
+        .toList();
+
+      final List<String> failedEventIds = new ArrayList<>(eventIds);
+      for (WorkflowInstance wfi : instances) {
+        failedEventIds.remove(wfi.getMediaPackage().getIdentifier().toString());
+      }
+
+      if (!failedEventIds.isEmpty()) {
+        logger.debug("Can't start one or more tasks.");
+        reportEventStatusChange(EventStatusChangeItem.Type.Failed, "Unable to start workflow",
+          failedEventIds);
+      }
+    }
+  }
 }

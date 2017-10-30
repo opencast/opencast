@@ -42,7 +42,16 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.mediapackage.identifier.IdImpl;
+import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.security.api.AccessControlEntry;
+import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbOrganization;
+import org.opencastproject.security.api.JaxbRole;
+import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.Permissions;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
@@ -60,6 +69,7 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.FileUtils;
+import org.easymock.EasyMock;
 import org.junit.Ignore;
 
 import java.io.ByteArrayInputStream;
@@ -68,6 +78,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 
 import javax.persistence.EntityManagerFactory;
@@ -129,10 +140,30 @@ public class TestTasksEndpoint extends TasksEndpoint {
     assetManager.takeSnapshot(AssetManager.DEFAULT_OWNER, mp1);
     assetManager.takeSnapshot(AssetManager.DEFAULT_OWNER, mp2);
 
+    JaxbOrganization defaultOrganization = new DefaultOrganization();
+
+    User userWithoutPermissions = new JaxbUser("sample", null, "WithPermissions", "with@permissions.com", "test",
+      defaultOrganization, new HashSet<>(Arrays.asList(new JaxbRole("ROLE_ADMIN", defaultOrganization))));
+
+    // security service
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getUser()).andReturn(userWithoutPermissions).anyTimes();
+    EasyMock.expect(securityService.getOrganization()).andReturn(defaultOrganization).anyTimes();
+    EasyMock.replay(securityService);
+
+    // message sender
+    MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
+
+    String anonymousRole = securityService.getOrganization().getAnonymousRole();
+    final AccessControlList acl = new AccessControlList(
+      new AccessControlEntry(anonymousRole, Permissions.Action.READ.toString(), true));
+
     this.setWorkflowService(workflowService);
     this.setAssetManager(assetManager);
     this.setWorkspace(workspace);
     this.activate(null);
+    this.setSecurityService(securityService);
+    this.setMessageSender(messageSender);
   }
 
   AssetManager mkAssetManager(final Workspace workspace) throws Exception {

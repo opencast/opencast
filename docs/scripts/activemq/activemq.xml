@@ -95,6 +95,15 @@
           </virtualDestinationInterceptor>
           <virtualDestinationInterceptor>
             <virtualDestinations>
+              <compositeQueue name="EVENT_STATUS_CHANGE.QUEUE">
+                <forwardTo>
+                  <queue physicalName="EVENT_STATUS_CHANGE.Adminui" />
+                </forwardTo>
+              </compositeQueue>
+            </virtualDestinations>
+          </virtualDestinationInterceptor>
+          <virtualDestinationInterceptor>
+            <virtualDestinations>
               <compositeQueue name="GROUP.QUEUE">
                 <forwardTo>
                   <queue physicalName="GROUP.Adminui" />
