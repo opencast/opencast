@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.adminui.endpoint.OsgiEventEndpoint"
-               immediate="true" activate="activate">
+               immediate="true" activate="activate" deactivate="deactivate">
   <implementation class="org.opencastproject.adminui.endpoint.OsgiEventEndpoint" />
   <property name="service.description" value="Admin UI - Event facade Endpoint" />
   <property name="opencast.service.type" value="org.opencastproject.adminui.endpoint.event" />
   <property name="opencast.service.path" value="/admin-ng/event" />
-  
+
   <service>
     <!-- expose interface for MH REST publisher! -->
     <provide interface="org.opencastproject.adminui.endpoint.OsgiEventEndpoint" />
@@ -62,14 +62,19 @@
              cardinality="1..1"
              policy="static"
              bind="setIndexService" />
- <reference name="AdminUISearchIndex" 
+  <reference name="AdminUISearchIndex"
              interface="org.opencastproject.adminui.impl.index.AdminUISearchIndex"
-             cardinality="1..1" 
-             policy="static" 
+             cardinality="1..1"
+             policy="static"
              bind="setIndex" />
- <reference name="UrlSigningService" 
+  <reference name="UrlSigningService"
              interface="org.opencastproject.security.urlsigning.service.UrlSigningService"
-             cardinality="1..1" 
-             policy="static" 
+             cardinality="1..1"
+             policy="static"
              bind="setUrlSigningService" />
+  <reference name="messageSender"
+             interface="org.opencastproject.message.broker.api.MessageSender"
+             cardinality="1..1"
+             policy="static"
+             bind="setMessageSender" />
 </scr:component>

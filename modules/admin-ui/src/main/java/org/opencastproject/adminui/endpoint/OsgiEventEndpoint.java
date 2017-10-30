@@ -54,7 +54,6 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   private IndexService indexService;
   private JobEndpoint jobService;
   private SchedulerService schedulerService;
-  private SecurityService securityService;
   private UrlSigningService urlSigningService;
   private WorkflowService workflowService;
   private AdminUIConfiguration adminUIConfiguration;
@@ -115,11 +114,6 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   @Override
   public SecurityService getSecurityService() {
     return securityService;
-  }
-
-  /** OSGi DI. */
-  public void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
   }
 
   @Override
