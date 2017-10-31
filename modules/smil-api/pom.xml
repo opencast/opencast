@@ -23,7 +23,6 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>android-mms</artifactId>
-      <version>1.1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>

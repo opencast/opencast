@@ -113,10 +113,15 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
-              !org.apache.ws.commons.*,
+              !org.codehaus.plexus.*,
               *
             </Import-Package>
-            <Export-Package>org.opencastproject.composer.impl.*;version=${project.version}</Export-Package>
+            <Export-Package>
+              org.opencastproject.composer.impl.*;version=${project.version}
+            </Export-Package>
+            <Private-Package>
+              org.codehaus.plexus.util.cli
+            </Private-Package>
             <Service-Component>
               OSGI-INF/composer-service.xml,
               OSGI-INF/profile-scanner.xml
