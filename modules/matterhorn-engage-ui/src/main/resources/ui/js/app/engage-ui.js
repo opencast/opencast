@@ -665,8 +665,8 @@ function($, bootbox, _, alertify) {
                     };
                     tile = tile + "<div class=\"seriestitle\">" + seriestitle + "</div>";
 
-                    if (data.mediapackage.start) {
-                        date = new Date(data.mediapackage.start);
+                    if (data.dcCreated) {
+                        date = new Date(data.dcCreated);
                     };
                     tile = tile + "<div class=\"date\">" + date.toLocaleDateString() + "</div>";
 
