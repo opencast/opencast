@@ -250,6 +250,11 @@
     <Extensions>png</Extensions>
   </MimeType>
   <MimeType>
+    <Type>image/svg+xml</Type>
+    <Description>SVG image</Description>
+    <Extensions>svg,svgz</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>image/tiff</Type>
     <Description>TIFF image</Description>
     <Extensions>tif,tiff</Extensions>
