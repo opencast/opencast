@@ -334,7 +334,7 @@
         <ref bean="digestFilter" />
 
         <!-- Basic authentication  -->
-        <!-- <ref bean="basicAuthenticationFilter" /> -->
+        <ref bean="basicAuthenticationFilter" />
 
         <!-- 2-legged OAuth is used by trusted 3rd party applications, including LTI. -->
         <!-- Uncomment the line below to support LTI or other OAuth clients.          -->
@@ -385,11 +385,9 @@
     <property name="nonceValiditySeconds" value="300" />
   </bean>
 
-  <!-- Basic authentication
   <bean id="basicEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
     <property name="realmName" value="Opencast"/>
   </bean>
-  -->
 
   <bean id="authSuccessHandler" class="org.opencastproject.kernel.security.AuthenticationSuccessHandler">
     <property name="securityService" ref="securityService" />
@@ -426,12 +424,10 @@
   <!-- ############################### -->
 
   <!-- Handles the details of the basic authentication dance -->
-  <!-- Basic authentication
   <bean id="basicAuthenticationFilter" class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
     <property name="authenticationManager" ref="authenticationManager"/>
     <property name="authenticationEntryPoint" ref="basicEntryPoint"/>
   </bean>
-  -->
 
   <!-- ####################### -->
   <!-- # OAuth (LTI) Support # -->
@@ -549,3 +545,4 @@
   <!-- bean class="org.springframework.security.authentication.event.LoggerListener" / -->
 
 </beans>
+
