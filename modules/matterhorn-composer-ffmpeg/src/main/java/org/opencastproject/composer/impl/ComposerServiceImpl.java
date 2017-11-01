@@ -162,6 +162,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /** The load introduced on the system by creating a caption job */
   private float captionJobLoad = DEFAULT_CAPTION_JOB_LOAD;
 
+  /** The formatter for load values */
+  private static final DecimalFormat df = new DecimalFormat("#.#");
+
   /** List of available operations on jobs */
   private enum Operation {
     Caption, Encode, Image, ImageConversion, Mux, Trim, Watermark, Composite, Concat, ImageToVideo, ParallelEncode
@@ -223,8 +226,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   @Override
   public Job encode(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException {
     try {
+      final EncodingProfile profile = profileScanner.getProfile(profileId);
       return serviceRegistry.createJob(JOB_TYPE, Operation.Encode.toString(),
-              Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), profileId));
+              Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), profileId), profile.getJobLoad());
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
@@ -480,9 +484,10 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   @Override
   public Job parallelEncode(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException {
     try {
-      logger.info("Starting parallel encode with profile {} ", profileId);
+      final EncodingProfile profile = profileScanner.getProfile(profileId);
+      logger.info("Starting parallel encode with profile {} with job load {}", profileId, df.format(profile.getJobLoad()));
       return serviceRegistry.createJob(JOB_TYPE, Operation.ParallelEncode.toString(),
-              Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), profileId));
+              Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), profileId), profile.getJobLoad());
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
@@ -498,11 +503,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   public Job trim(final Track sourceTrack, final String profileId, final long start, final long duration)
           throws EncoderException, MediaPackageException {
     try {
+      final EncodingProfile profile = profileScanner.getProfile(profileId);
       return serviceRegistry.createJob(
               JOB_TYPE,
               Operation.Trim.toString(),
               Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), profileId, Long.toString(start),
-                      Long.toString(duration)));
+                      Long.toString(duration)), profile.getJobLoad());
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
@@ -598,11 +604,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   @Override
   public Job mux(Track videoTrack, Track audioTrack, String profileId) throws EncoderException, MediaPackageException {
     try {
+      final EncodingProfile profile = profileScanner.getProfile(profileId);
       return serviceRegistry.createJob(
               JOB_TYPE,
               Operation.Mux.toString(),
               Arrays.asList(MediaPackageElementParser.getAsXml(videoTrack),
-                      MediaPackageElementParser.getAsXml(audioTrack), profileId));
+                      MediaPackageElementParser.getAsXml(audioTrack), profileId), profile.getJobLoad());
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
@@ -656,7 +663,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       arguments.add(WATERMARK_LAYOUT_INDEX, Serializer.json(watermarkLaidOutElement.getLayout()).toJson());
     }
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Composite.toString(), arguments);
+      final EncodingProfile profile = profileScanner.getProfile(profileId);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Composite.toString(), arguments, profile.getJobLoad());
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create composite job", e);
     }
@@ -857,7 +865,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       arguments.add(i + 3, MediaPackageElementParser.getAsXml(tracks[i]));
     }
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Concat.toString(), arguments);
+      final EncodingProfile profile = profileScanner.getProfile(profileId);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Concat.toString(), arguments, profile.getJobLoad());
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create concat job", e);
     }
@@ -989,8 +998,10 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   public Job imageToVideo(Attachment sourceImageAttachment, String profileId, double time) throws EncoderException,
           MediaPackageException {
     try {
+      final EncodingProfile profile = profileScanner.getProfile(profileId);
       return serviceRegistry.createJob(JOB_TYPE, Operation.ImageToVideo.toString(), Arrays.asList(
-              MediaPackageElementParser.getAsXml(sourceImageAttachment), profileId, Double.toString(time)));
+              MediaPackageElementParser.getAsXml(sourceImageAttachment), profileId, Double.toString(time)),
+              profile.getJobLoad());
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create image to video job", e);
     }
@@ -1103,7 +1114,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     // TODO: This is unfortunate, since ffmpeg is slow on single images and it would be nice to be able to start a
     // separate job per image, so extraction can be spread over multiple machines in a cluster.
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Image.toString(), parameters);
+      final EncodingProfile profile = profileScanner.getProfile(profileId);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Image.toString(), parameters, profile.getJobLoad());
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
@@ -1122,7 +1134,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     arguments.add(getPropertiesAsString(properties));
 
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Image.toString(), arguments);
+      final EncodingProfile profile = profileScanner.getProfile(profileId);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Image.toString(), arguments, profile.getJobLoad());
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
@@ -1319,7 +1332,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     parameters[1] = profileId;
 
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.ImageConversion.toString(), Arrays.asList(parameters));
+      final EncodingProfile profile = profileScanner.getProfile(profileId);
+      return serviceRegistry.createJob(JOB_TYPE, Operation.ImageConversion.toString(), Arrays.asList(parameters),
+             profile.getJobLoad());
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
@@ -1572,8 +1587,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   public Job watermark(Track mediaTrack, String watermark, String profileId) throws EncoderException,
           MediaPackageException {
     try {
+      final EncodingProfile profile = profileScanner.getProfile(profileId);
       return serviceRegistry.createJob(JOB_TYPE, Operation.Watermark.toString(),
-              Arrays.asList(MediaPackageElementParser.getAsXml(mediaTrack), watermark, profileId));
+              Arrays.asList(MediaPackageElementParser.getAsXml(mediaTrack), watermark, profileId), profile.getJobLoad());
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
