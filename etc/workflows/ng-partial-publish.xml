@@ -73,7 +73,7 @@
 
     <operation
       id="image"
-      if="NOT ${uploadedSearchPreview}"
+      if="NOT (${uploadedSearchPreview})"
       exception-handler-workflow="ng-partial-error"
       description="Creating search result thumbnails">
       <configurations>

@@ -26,12 +26,6 @@ angular.module('adminNg.controllers')
     function ($scope, $route, $location, $window, ToolsResource, Notifications, EventHelperService) {
 
         $scope.navigateTo = function (path) {
-            var lastRoute, off;
-            lastRoute = $route.current;
-            off = $scope.$on('$locationChangeSuccess', function () {
-                $route.current = lastRoute;
-                off();
-            });
             $location.path(path).replace();
         };
 
@@ -61,7 +55,7 @@ angular.module('adminNg.controllers')
                 // Apply pause to the object
                 player.pause();
             });
-            $scope.navigateTo('events/' + $scope.resource + '/' +
+            $scope.navigateTo('/events/' + $scope.resource + '/' +
                 $scope.id + '/tools/' + tab);
         };
 

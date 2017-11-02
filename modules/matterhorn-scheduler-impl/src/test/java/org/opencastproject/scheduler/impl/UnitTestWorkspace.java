@@ -20,6 +20,7 @@
  */
 package org.opencastproject.scheduler.impl;
 
+import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
@@ -171,4 +172,8 @@ public class UnitTestWorkspace implements Workspace {
     return Option.none();
   }
 
+  @Override
+  public void cleanup(Id mediaPackageId) throws IOException {
+    // Nothing to do
+  }
 }

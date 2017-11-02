@@ -51,7 +51,7 @@ function ($scope, NewEventProcessing, TaskResource, Notifications) {
         var eventIds = [], payload;
         eventIds.push($scope.$parent.resourceId);
         payload = {
-            workflows: $scope.processing.ud.workflow.id,
+            workflow: $scope.processing.ud.workflow.id,
             configuration: $scope.processing.ud.workflow.selection.configuration,
             eventIds: eventIds
         };

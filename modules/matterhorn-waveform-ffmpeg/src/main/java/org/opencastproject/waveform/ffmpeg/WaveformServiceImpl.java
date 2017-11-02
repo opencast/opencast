@@ -59,6 +59,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -307,7 +308,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   public Job createWaveformImage(Track sourceTrack) throws MediaPackageException, WaveformServiceException {
     try {
       return serviceRegistry.createJob(jobType, Operation.Waveform.toString(),
-              Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack)), waveformJobLoad);
+              Collections.singletonList(MediaPackageElementParser.getAsXml(sourceTrack)), waveformJobLoad);
     } catch (ServiceRegistryException ex) {
       throw new WaveformServiceException("Unable to create waveform job", ex);
     }
@@ -331,10 +332,8 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
           Attachment waveformMpe = extractWaveform(track);
           return MediaPackageElementParser.getAsXml(waveformMpe);
         default:
-          throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
+          throw new ServiceRegistryException("This service can't handle operations of type '" + op + "'");
       }
-    } catch (IllegalArgumentException e) {
-      throw new ServiceRegistryException("This service can't handle operations of type '" + op + "'", e);
     } catch (IndexOutOfBoundsException e) {
       throw new ServiceRegistryException("This argument list for operation '" + op + "' does not meet expectations", e);
     } catch (MediaPackageException | WaveformServiceException e) {
@@ -355,7 +354,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     }
 
     // copy source file into workspace
-    File mediaFile = null;
+    File mediaFile;
     try {
       mediaFile = workspace.get(track.getURI());
     } catch (NotFoundException e) {
@@ -366,16 +365,17 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
           "Error reading the media file in the workspace", e);
     }
 
-    String waveformFilePath = FilenameUtils.removeExtension(mediaFile.getAbsolutePath()).concat("_waveform.png");
+    String waveformFilePath = FilenameUtils.removeExtension(mediaFile.getAbsolutePath())
+            .concat('-' + track.getIdentifier()).concat("-waveform.png");
 
     // create ffmpeg command
     String[] command = new String[] {
       binary,
       "-nostats",
-      "-i", mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
+      "-i", mediaFile.getAbsolutePath(),
       "-lavfi", createWaveformFilter(track),
       "-an", "-vn", "-sn", "-y",
-      waveformFilePath.replaceAll(" ", "\\ ")
+      waveformFilePath
     };
     logger.debug("Start waveform ffmpeg process: {}", StringUtils.join(command, " "));
     logger.info("Create waveform image file for track '{}' at {}", track.getIdentifier(), waveformFilePath);
@@ -418,12 +418,12 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
 
     // put waveform image into workspace
     FileInputStream waveformFileInputStream = null;
-    URI waveformFileUri = null;
+    URI waveformFileUri;
     try {
       waveformFileInputStream = new FileInputStream(waveformFilePath);
       waveformFileUri = workspace.putInCollection(COLLECTION_ID,
               FilenameUtils.getName(waveformFilePath), waveformFileInputStream);
-      logger.info("Copied the created waveform to the workspace {}", waveformFileUri.toString());
+      logger.info("Copied the created waveform to the workspace {}", waveformFileUri);
     } catch (FileNotFoundException ex) {
       throw new WaveformServiceException(String.format("Waveform image file '%s' not found", waveformFilePath), ex);
     } catch (IOException ex) {

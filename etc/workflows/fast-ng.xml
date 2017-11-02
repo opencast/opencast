@@ -138,7 +138,7 @@
     <!-- skip this when manually uploaded */search+preview -->
     <operation
       id="image"
-      if="(NOT ${uploadedSearchPreview}) AND (${publishToMediaModule} OR ${publishToOaiPmh})"
+      if="(NOT (${uploadedSearchPreview})) AND (${publishToMediaModule} OR ${publishToOaiPmh})"
       fail-on-error="true"
       exception-handler-workflow="ng-partial-error"
       description="Creating Engage search result thumbnails">

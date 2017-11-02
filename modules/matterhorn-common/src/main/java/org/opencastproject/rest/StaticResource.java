@@ -96,8 +96,8 @@ public class StaticResource extends HttpServlet {
       alias = (String) componentProperties.get("alias");
     if (classpath == null)
       classpath = (String) componentProperties.get("classpath");
-    logger.info("registering classpath:{} at {} with welcome file {} {}", new Object[] { classpath, alias, welcomeFile,
-            welcomeFileSpecified ? "" : "(via default)" });
+    logger.info("registering classpath:{} at {} with welcome file {} {}",
+            new Object[] { classpath, alias, welcomeFile, welcomeFileSpecified ? "" : "(via default)" });
   }
 
   public String getDefaultUrl() {
@@ -165,7 +165,7 @@ public class StaticResource extends HttpServlet {
     } finally {
       IOUtils.closeQuietly(in);
     }
-    String contentType = MimeTypes.getMimeType(url.getFile());
+    String contentType = MimeTypes.getMimeType(url.getPath());
     if (!MimeTypes.DEFAULT_TYPE.equals(contentType)) {
       resp.setHeader("Content-Type", contentType);
     }
