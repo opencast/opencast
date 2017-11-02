@@ -138,7 +138,7 @@ describe('JsHelper service', function () {
                 minute : '0'
             }));
             expect(JsHelper.assembleRrule(testData.source.SCHEDULE_MULTIPLE))
-                .toEqual('FREQ=WEEKLY;BYDAY=MO,TU,WE;BYHOUR=' + date.getUTCHours() + ';BYMINUTE=0');
+                .toEqual('FREQ=WEEKLY;BYDAY=MO,TU,WE;BYHOUR=' + date.getUTCHours() + ';BYMINUTE=' + date.getUTCMinutes());
         });
     });
 });

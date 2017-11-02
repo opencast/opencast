@@ -57,7 +57,9 @@ public final class JmxUtil {
   public static void unregisterMXBean(ObjectInstance bean) {
     logger.info("Unregistering {} with JMX", bean.getClassName());
     try {
-      ManagementFactory.getPlatformMBeanServer().unregisterMBean(bean.getObjectName());
+      if (ManagementFactory.getPlatformMBeanServer().isRegistered(bean.getObjectName())) {
+        ManagementFactory.getPlatformMBeanServer().unregisterMBean(bean.getObjectName());
+      }
     } catch (Exception e) {
       logger.warn("Unable to unregister mbean {}: {}", bean.getClassName(), e);
     }

@@ -639,8 +639,13 @@ public final class IoSupport {
    * Java processes cannot interfere with each other.
    * <p>
    * The implementation blocks until a lock can be acquired.
+   *
+   * @throws NotFoundException
+   *            if the path to the file, to create a lock for, does not exist
+   * @throws IOException
+   *            if the file lock can not be created due to access limitations
    */
-  public static synchronized <A> A locked(File file, Function<File, A> f) {
+  public static synchronized <A> A locked(File file, Function<File, A> f) throws NotFoundException, IOException {
     final Effect0 key = acquireLock(file);
     try {
       return f.apply(file);
@@ -649,24 +654,36 @@ public final class IoSupport {
     }
   }
 
-  /** Acquire a lock on a file. Return a key to release the lock. */
-  private static Effect0 acquireLock(File file) {
+  /**
+   * Acquire a lock on a file. Return a key to release the lock.
+   *
+   * @return a key to release the lock
+   *
+   * @throws NotFoundException
+   *            if the path to the file, to create a lock for, does not exist
+   * @throws IOException
+   *            if the file lock can not be created due to access limitations
+   */
+  private static Effect0 acquireLock(File file) throws NotFoundException, IOException {
+    final RandomAccessFile raf;
     try {
-      final RandomAccessFile raf = new RandomAccessFile(file, "rw");
-      final FileLock lock = raf.getChannel().lock();
-      return new Effect0() {
-        @Override
-        protected void run() {
-          try {
-            lock.release();
-          } catch (IOException ignore) {
-          }
-          IoSupport.closeQuietly(raf);
-        }
-      };
-    } catch (Exception e) {
-      throw new RuntimeException("Error aquiring lock for " + file.getAbsolutePath(), e);
+      raf = new RandomAccessFile(file, "rw");
+    } catch (FileNotFoundException e) {
+      // this exception is thrown only if the directory path to the file isn't exist
+      // make sure to create all parent directories before locking the file
+      throw new NotFoundException("Error acquiring lock for " + file.getAbsolutePath(), e);
     }
+    final FileLock lock = raf.getChannel().lock();
+    return new Effect0() {
+      @Override
+      protected void run() {
+        try {
+          lock.release();
+        } catch (IOException ignore) {
+        }
+        IoSupport.closeQuietly(raf);
+      }
+    };
   }
 
   /**

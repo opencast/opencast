@@ -32,7 +32,6 @@ import static org.opencastproject.util.data.functions.Options.sequenceOpt;
 import static org.opencastproject.util.data.functions.Options.toOption;
 
 import org.opencastproject.fun.juc.Immutables;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
@@ -45,7 +44,6 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -184,29 +182,6 @@ public final class MediaPackageSupport {
     } catch (IOException e) {
       return chuck(e);
     }
-  }
-
-  /**
-   * Creates a unique filename inside the root folder, based on the parameter <code>filename</code>.
-   *
-   * @param root
-   *          the root folder
-   * @param filename
-   *          the original filename
-   * @return the new and unique filename
-   */
-  public static File createElementFilename(File root, String filename) {
-    String baseName = PathSupport.removeFileExtension(filename);
-    String extension = PathSupport.getFileExtension(filename);
-    int count = 1;
-    StringBuffer name = null;
-    File f = new File(root, filename);
-    while (f.exists()) {
-      name = new StringBuffer(baseName).append("-").append(count).append(".").append(extension);
-      f = new File(root, name.toString());
-      count++;
-    }
-    return f;
   }
 
   /** Immutable modification of a media package. */

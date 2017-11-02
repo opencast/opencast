@@ -76,7 +76,7 @@ public final class MimeTypes {
   public static final String DEFINITION_FILE = "/org/opencastproject/util/MimeTypes.xml";
 
   /** The mime types */
-  private static final List<MimeType> mimeTypes = new ArrayList<MimeType>();
+  private static final List<MimeType> mimeTypes = new ArrayList<>();
 
   /** the logging facility provided by log4j */
   private static final Logger logger = LoggerFactory.getLogger(MimeType.class);
@@ -245,7 +245,7 @@ public final class MimeTypes {
   public static MimeType fromURL(URL url) throws UnknownFileTypeException {
     if (url == null)
       throw new IllegalArgumentException("Argument 'url' is null");
-    return fromString(url.getFile());
+    return fromString(url.getPath());
   }
 
   /**
@@ -370,14 +370,14 @@ public final class MimeTypes {
       super.endElement(uri, localName, name);
 
       if ("Type".equals(name)) {
-        this.type = getContent();
+        type = getContent();
         return;
       } else if ("Description".equals(name)) {
-        this.description = getContent();
+        description = getContent();
         return;
       }
       if ("Extensions".equals(name)) {
-        this.extensions = getContent();
+        extensions = getContent();
         return;
       } else if ("MimeType".equals(name)) {
         String[] t = type.split("/");
