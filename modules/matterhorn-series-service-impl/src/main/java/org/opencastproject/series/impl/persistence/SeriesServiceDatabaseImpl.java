@@ -193,8 +193,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#deleteSeriesProperty(java.lang.String)
    */
   @Override
-  public void deleteSeriesProperty(String seriesId, String propertyName) throws SeriesServiceDatabaseException,
-  NotFoundException {
+  public void deleteSeriesProperty(String seriesId, String propertyName)
+          throws SeriesServiceDatabaseException, NotFoundException {
     EntityManager em = emf.createEntityManager();
     EntityTransaction tx = em.getTransaction();
     try {
@@ -206,8 +206,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       Map<String, String> properties = entity.getProperties();
       String propertyValue = properties.get(propertyName);
       if (propertyValue == null) {
-        throw new NotFoundException("Series with ID " + seriesId + " doesn't have a property with name '"
-                + propertyName + "'");
+        throw new NotFoundException(
+                "Series with ID " + seriesId + " doesn't have a property with name '" + propertyName + "'");
       }
 
       if (!userHasWriteAccess(entity)) {
@@ -251,7 +251,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     } finally {
       em.close();
     }
-    List<Tuple<DublinCoreCatalog, String>> seriesList = new LinkedList<Tuple<DublinCoreCatalog, String>>();
+    List<Tuple<DublinCoreCatalog, String>> seriesList = new LinkedList<>();
     try {
       for (SeriesEntity entity : seriesEntities) {
         DublinCoreCatalog dc = parseDublinCore(entity.getDublinCoreXML());
@@ -270,8 +270,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#getAccessControlList(java.lang.String)
    */
   @Override
-  public AccessControlList getAccessControlList(String seriesId) throws NotFoundException,
-  SeriesServiceDatabaseException {
+  public AccessControlList getAccessControlList(String seriesId)
+          throws NotFoundException, SeriesServiceDatabaseException {
     EntityManager em = emf.createEntityManager();
     try {
       SeriesEntity entity = getSeriesEntity(seriesId, em);
@@ -300,8 +300,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    * DublinCoreCatalog)
    */
   @Override
-  public DublinCoreCatalog storeSeries(DublinCoreCatalog dc) throws SeriesServiceDatabaseException,
-  UnauthorizedException {
+  public DublinCoreCatalog storeSeries(DublinCoreCatalog dc)
+          throws SeriesServiceDatabaseException, UnauthorizedException {
     if (dc == null) {
       throw new SeriesServiceDatabaseException("Invalid value for Dublin core catalog: null");
     }
@@ -380,7 +380,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
         if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.READ.toString())
                 && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg,
                         Permissions.Action.CONTRIBUTE.toString())
-                        && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
+                && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
           throw new UnauthorizedException(currentUser + " is not authorized to see series " + seriesId);
         }
       }
@@ -404,8 +404,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#getSeriesProperties(java.lang.String)
    */
   @Override
-  public Map<String, String> getSeriesProperties(String seriesId) throws NotFoundException,
-  SeriesServiceDatabaseException {
+  public Map<String, String> getSeriesProperties(String seriesId)
+          throws NotFoundException, SeriesServiceDatabaseException {
     EntityManager em = emf.createEntityManager();
     EntityTransaction tx = em.getTransaction();
     try {
@@ -415,8 +415,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
         throw new NotFoundException("No series with id=" + seriesId + " exists");
       }
       if (!userHasReadAccess(entity)) {
-        throw new UnauthorizedException(securityService.getUser() + " is not authorized to see series " + seriesId
-                + " properties");
+        throw new UnauthorizedException(
+                securityService.getUser() + " is not authorized to see series " + seriesId + " properties");
       }
       return entity.getProperties();
     } catch (NotFoundException e) {
@@ -438,8 +438,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    * @see org.opencastproject.series.impl.SeriesServiceDatabase#getSeriesProperty(java.lang.String, java.lang.String)
    */
   @Override
-  public String getSeriesProperty(String seriesId, String propertyName) throws NotFoundException,
-  SeriesServiceDatabaseException {
+  public String getSeriesProperty(String seriesId, String propertyName)
+          throws NotFoundException, SeriesServiceDatabaseException {
     EntityManager em = emf.createEntityManager();
     EntityTransaction tx = em.getTransaction();
     try {
@@ -449,12 +449,12 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
         throw new NotFoundException("No series with id=" + seriesId + " exists");
       }
       if (!userHasReadAccess(entity)) {
-        throw new UnauthorizedException(securityService.getUser() + " is not authorized to see series " + seriesId
-                + " properties");
+        throw new UnauthorizedException(
+                securityService.getUser() + " is not authorized to see series " + seriesId + " properties");
       }
       if (entity.getProperties() == null || StringUtils.isBlank(entity.getProperties().get(propertyName))) {
-        throw new NotFoundException("No series property for series with id=" + seriesId + " and property name "
-                + propertyName);
+        throw new NotFoundException(
+                "No series property for series with id=" + seriesId + " and property name " + propertyName);
       }
       return entity.getProperties().get(propertyName);
     } catch (NotFoundException e) {
@@ -493,8 +493,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       Organization currentOrg = securityService.getOrganization();
       // There are several reasons a user may need to load a series: to read content, to edit it, or add content
       if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.READ.toString())
-              && !AccessControlUtil
-              .isAuthorized(acl, currentUser, currentOrg, Permissions.Action.CONTRIBUTE.toString())
+              && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.CONTRIBUTE.toString())
               && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
         return false;
       }
@@ -509,8 +508,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    * org.opencastproject.security.api.AccessControlList)
    */
   @Override
-  public boolean storeSeriesAccessControl(String seriesId, AccessControlList accessControl) throws NotFoundException,
-  SeriesServiceDatabaseException {
+  public boolean storeSeriesAccessControl(String seriesId, AccessControlList accessControl)
+          throws NotFoundException, SeriesServiceDatabaseException {
     if (accessControl == null) {
       logger.error("Access control parameter is <null> for series '{}'", seriesId);
       throw new IllegalArgumentException("Argument for updating ACL for series " + seriesId + " is null");
@@ -627,8 +626,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       if (tx.isActive()) {
         tx.rollback();
       }
-      logger.error("Couldn't update series {} with property: {}:{} because {}", new Object[] { seriesId, propertyName,
-              propertyValue, ExceptionUtils.getStackTrace(e) });
+      logger.error("Couldn't update series {} with property: {}:{} because {}", seriesId, propertyName, propertyValue,
+              ExceptionUtils.getStackTrace(e));
       throw new SeriesServiceDatabaseException(e);
     } finally {
       if (em != null)
@@ -645,8 +644,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    *          Whether to opt out this series or not.
    */
   @Override
-  public void updateOptOutStatus(String seriesId, boolean optOut) throws NotFoundException,
-  SeriesServiceDatabaseException {
+  public void updateOptOutStatus(String seriesId, boolean optOut)
+          throws NotFoundException, SeriesServiceDatabaseException {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {

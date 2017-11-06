@@ -38,7 +38,7 @@ public final class UrlSigningServiceOsgiUtil {
   /** The default time before a piece of signed content expires. 2 Hours. */
   public static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
 
-  /** The default for whether to use the client IP in the signature.*/
+  /** The default for whether to use the client IP in the signature. */
   public static final Boolean DEFAULT_SIGN_WITH_CLIENT_IP = false;
 
   private UrlSigningServiceOsgiUtil() {
@@ -55,11 +55,11 @@ public final class UrlSigningServiceOsgiUtil {
    *          The name of the class that is getting the expire duration for logging.
    * @return The duration that URLs expire from the properties if present, the default if it isn't.
    */
-  public static long getUpdatedSigningExpiration(@SuppressWarnings("rawtypes") Dictionary properties, String className) {
+  public static long getUpdatedSigningExpiration(@SuppressWarnings("rawtypes") Dictionary properties,
+          String className) {
     return getUpdatedSigningExpiration(properties, className, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY,
             DEFAULT_URL_SIGNING_EXPIRE_DURATION);
   }
-
 
   /**
    * Get the amount of seconds before a signed URL should expire from a {@link Dictionary}.
@@ -82,22 +82,20 @@ public final class UrlSigningServiceOsgiUtil {
       try {
         expireSeconds = Long.parseLong(dictionaryValue.toString());
         logger.info("For the class {} the property '{}' has been configured to expire signed URLs in {} seconds.",
-                new Object[] { className, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, expireSeconds });
+                className, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, expireSeconds);
       } catch (NumberFormatException e) {
         logger.warn(
                 "For the class {} unable to parse when a stream should expire from '{}' so using default '{}' because: {}",
-                new Object[] { className, dictionaryValue, defaultExpiry,
-                        ExceptionUtils.getStackTrace(e) });
+                className, dictionaryValue, defaultExpiry, ExceptionUtils.getStackTrace(e));
         expireSeconds = defaultExpiry;
       }
     } else {
       logger.debug(
               "For the class {} the property '{}' has not been configured, so the default is being used to expire signed URLs in {} seconds.",
-              new Object[] { className, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, expireSeconds });
+              className, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, expireSeconds);
     }
     return expireSeconds;
   }
-
 
   /**
    * Get whether a signed URL should contain the client's IP from a {@link Dictionary}. Uses the
@@ -109,7 +107,8 @@ public final class UrlSigningServiceOsgiUtil {
    *          The name of the class that is getting the value for logging.
    * @return Whether the URLs that are signed should contain the client's IP address
    */
-  public static boolean getUpdatedSignWithClientIP(@SuppressWarnings("rawtypes") Dictionary properties, String className) {
+  public static boolean getUpdatedSignWithClientIP(@SuppressWarnings("rawtypes") Dictionary properties,
+          String className) {
     return getUpdatedSignWithClientIP(properties, className, URL_SIGNING_USE_CLIENT_IP, DEFAULT_SIGN_WITH_CLIENT_IP);
   }
 
@@ -131,18 +130,18 @@ public final class UrlSigningServiceOsgiUtil {
     boolean signWithClientIP = defaultSignWithIP;
     Object dictionaryValue = properties.get(URL_SIGNING_USE_CLIENT_IP);
     if (dictionaryValue != null) {
-        signWithClientIP = Boolean.parseBoolean(dictionaryValue.toString());
-        if (signWithClientIP) {
-          logger.info("For the class {} the property '{}' has been configured to sign urls with the client IP.", className,
-                  URL_SIGNING_USE_CLIENT_IP);
-        } else {
-          logger.info("For the class {} the property '{}' has been configured to not sign urls with the client IP.",
-                  className, URL_SIGNING_USE_CLIENT_IP);
-        }
+      signWithClientIP = Boolean.parseBoolean(dictionaryValue.toString());
+      if (signWithClientIP) {
+        logger.info("For the class {} the property '{}' has been configured to sign urls with the client IP.",
+                className, URL_SIGNING_USE_CLIENT_IP);
+      } else {
+        logger.info("For the class {} the property '{}' has been configured to not sign urls with the client IP.",
+                className, URL_SIGNING_USE_CLIENT_IP);
+      }
     } else {
       logger.debug(
               "For the class {} the property '{}' has not been configured, so the default of signing urls with the client ip is {}.",
-              new Object[] { className, URL_SIGNING_USE_CLIENT_IP, signWithClientIP });
+              className, URL_SIGNING_USE_CLIENT_IP, signWithClientIP);
     }
     return signWithClientIP;
   }

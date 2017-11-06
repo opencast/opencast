@@ -671,7 +671,7 @@ public class IndexServiceImpl implements IndexService {
       for (WorkflowInstance wf : Arrays.asList(workflowSet.getItems())) {
         if (wf.isActive()) {
           logger.warn("Unable to start new workflow '{}' on archived media package '{}', existing workfow {} is running",
-                  new Object[] { workflowDefId, mediaPackage, wf.getId() });
+                  workflowDefId, mediaPackage, wf.getId());
           throw new IllegalArgumentException("A workflow is already active for mp " + mpId + ", cannot start this workflow.");
         }
       }
@@ -703,7 +703,7 @@ public class IndexServiceImpl implements IndexService {
 
     } catch (AssetManagerException e) {
       logger.warn("Unable to start workflow '{}' on archived media package '{}': {}",
-              new Object[] { workflowDefId, mediaPackage, getStackTrace(e) });
+              workflowDefId, mediaPackage, getStackTrace(e));
       throw new IndexServiceException("Unable to start workflow " + workflowDefId + " on " + mpId);
     } catch (WorkflowDatabaseException e) {
       logger.warn("Unable to load workflow '{}' from workflow service: {}", wfId, getStackTrace(e));
@@ -1289,7 +1289,7 @@ public class IndexServiceImpl implements IndexService {
           updateWorkflowInstance(instance);
         } catch (WorkflowException e) {
           logger.error("Unable to remove catalog with flavor {} by updating workflow event {} because {}",
-                  new Object[] { flavor, event.getIdentifier(), getStackTrace(e) });
+                  flavor, event.getIdentifier(), getStackTrace(e));
           throw new IndexServiceException("Unable to update workflow event " + event.getIdentifier());
         }
         break;
@@ -1303,7 +1303,7 @@ public class IndexServiceImpl implements IndexService {
                   Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
         } catch (SchedulerException e) {
           logger.error("Unable to remove catalog with flavor {} by updating scheduled event {} because {}",
-                  new Object[] { flavor, event.getIdentifier(), getStackTrace(e) });
+                  flavor, event.getIdentifier(), getStackTrace(e));
           throw new IndexServiceException("Unable to update scheduled event " + event.getIdentifier());
         }
         break;
@@ -1364,7 +1364,7 @@ public class IndexServiceImpl implements IndexService {
           updateWorkflowInstance(instance);
         } catch (WorkflowException e) {
           logger.error("Unable to update workflow event {} with metadata {} because {}",
-                  new Object[] { id, RestUtils.getJsonStringSilent(metadataList.toJSON()), getStackTrace(e) });
+                  id, RestUtils.getJsonStringSilent(metadataList.toJSON()), getStackTrace(e));
           throw new IndexServiceException("Unable to update workflow event " + id);
         }
         break;
@@ -1378,7 +1378,7 @@ public class IndexServiceImpl implements IndexService {
                   Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
         } catch (SchedulerException e) {
           logger.error("Unable to update scheduled event {} with metadata {} because {}",
-                  new Object[] { id, RestUtils.getJsonStringSilent(metadataList.toJSON()), getStackTrace(e) });
+                  id, RestUtils.getJsonStringSilent(metadataList.toJSON()), getStackTrace(e));
           throw new IndexServiceException("Unable to update scheduled event " + id);
         }
         break;

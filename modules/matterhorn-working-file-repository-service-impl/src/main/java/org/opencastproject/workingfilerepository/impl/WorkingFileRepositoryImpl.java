@@ -932,7 +932,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     for (File f : colDir.listFiles()) {
       long lastModified = f.lastModified();
       logger.trace("{} last modified: {}, reference date: {}",
-              new Object[] { f.getName(), new Date(lastModified), new Date(referenceTime) });
+              f.getName(), new Date(lastModified), new Date(referenceTime));
       if (lastModified <= referenceTime) {
         // Delete file
         deleteFromCollection(collectionId, f.getName());

@@ -183,12 +183,12 @@ public abstract class AbstractJobProducer implements JobProducer {
     }
 
     if (currentLoad > maxload.getLoadFactor()) {
-      logger.debug("Declining job {} of type {} because load of {} would exceed this node's limit of {}.",
-              new Object[] { job.getId(), job.getJobType(), currentLoad, maxload.getLoadFactor() });
+      logger.debug("Declining job {} of type {} because load of {} would exceed this node's limit of {}.", job.getId(),
+              job.getJobType(), currentLoad, maxload.getLoadFactor());
       return false;
     }
-    logger.debug("Accepting job {} of type {} because load of {} is within this node's limit of {}.",
-            new Object[] { job.getId(), job.getJobType(), currentLoad, maxload.getLoadFactor() });
+    logger.debug("Accepting job {} of type {} because load of {} is within this node's limit of {}.", job.getId(),
+            job.getJobType(), currentLoad, maxload.getLoadFactor());
     return true;
   }
 
@@ -254,9 +254,9 @@ public abstract class AbstractJobProducer implements JobProducer {
      *          the current running job
      */
     JobRunner(Job job, Job currentJob) {
-      this.jobId = job.getId();
+      jobId = job.getId();
       if (currentJob != null) {
-        this.currentJobId = some(currentJob.getId());
+        currentJobId = some(currentJob.getId());
       } else {
         currentJobId = none();
       }

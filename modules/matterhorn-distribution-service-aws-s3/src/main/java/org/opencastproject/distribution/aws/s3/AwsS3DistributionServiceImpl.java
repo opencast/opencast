@@ -84,8 +84,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
-public class AwsS3DistributionServiceImpl extends AbstractDistributionService implements AwsS3DistributionService,
-        DistributionService {
+public class AwsS3DistributionServiceImpl extends AbstractDistributionService
+        implements AwsS3DistributionService, DistributionService {
 
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(AwsS3DistributionServiceImpl.class);
@@ -141,6 +141,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
     }
   }
 
+  @Override
   public void activate(ComponentContext cc) {
 
     // Get the configuration
@@ -180,23 +181,21 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
                 new BasicAWSCredentials(accessKeyIdOpt.get(), accessKeySecretOpt.get()));
 
       // Create AWS client.
-      s3 = AmazonS3ClientBuilder.standard()
-              .withRegion(regionStr)
-              .withCredentials(provider)
-              .build();
+      s3 = AmazonS3ClientBuilder.standard().withRegion(regionStr).withCredentials(provider).build();
 
       s3TransferManager = new TransferManager(s3);
 
       // Create AWS S3 bucket if not there yet
       createAWSBucket();
-      this.distributionChannel = OsgiUtil.getComponentContextProperty(cc, CONFIG_KEY_STORE_TYPE);
+      distributionChannel = OsgiUtil.getComponentContextProperty(cc, CONFIG_KEY_STORE_TYPE);
 
       logger.info("AwsS3DistributionService activated!");
     }
   }
 
+  @Override
   public String getDistributionType() {
-    return this.distributionChannel;
+    return distributionChannel;
   }
 
   public void deactivate() {
@@ -221,17 +220,14 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
    *      org.opencastproject.mediapackage.MediaPackage, String, boolean)
    */
   @Override
-  public Job distribute(String channelId, MediaPackage mediaPackage,  Set<String> elementIds, boolean checkAvailability)
+  public Job distribute(String channelId, MediaPackage mediaPackage, Set<String> elementIds, boolean checkAvailability)
           throws DistributionException, MediaPackageException {
     notNull(mediaPackage, "mediapackage");
     notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
     try {
-      return serviceRegistry.createJob(
-              JOB_TYPE,
-              Operation.Distribute.toString(),
-              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediaPackage), gson.toJson(elementIds),
-                      Boolean.toString(checkAvailability)));
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Distribute.toString(), Arrays.asList(channelId,
+              MediaPackageParser.getAsXml(mediaPackage), gson.toJson(elementIds), Boolean.toString(checkAvailability)));
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
@@ -244,8 +240,8 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
    *      org.opencastproject.mediapackage.MediaPackage, String)
    */
   @Override
-  public Job distribute(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException,
-          MediaPackageException {
+  public Job distribute(String channelId, MediaPackage mediapackage, String elementId)
+          throws DistributionException, MediaPackageException {
     return distribute(channelId, mediapackage, elementId, true);
   }
 
@@ -258,7 +254,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
   @Override
   public Job distribute(String channelId, MediaPackage mediaPackage, String elementId, boolean checkAvailability)
           throws DistributionException, MediaPackageException {
-    Set<String> elementIds = new HashSet<String>();
+    Set<String> elementIds = new HashSet<>();
     elementIds.add(elementId);
     return distribute(channelId, mediaPackage, elementIds, checkAvailability);
   }
@@ -267,7 +263,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
    * Distribute Mediapackage elements to the download distribution service.
    *
    * @param channelId
-  #          The id of the publication channel to be distributed to.
+   *          # The id of the publication channel to be distributed to.
    * @param mediapackage
    *          The media package that contains the elements to be distributed.
    * @param elementIds
@@ -286,7 +282,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
     notNull(channelId, "channelId");
 
     final Set<MediaPackageElement> elements = getElements(mediapackage, elementIds);
-    List<MediaPackageElement> distributedElements = new ArrayList<MediaPackageElement>();
+    List<MediaPackageElement> distributedElements = new ArrayList<>();
 
     for (MediaPackageElement element : elements) {
       MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, element, checkAvailability);
@@ -297,13 +293,14 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
 
   private Set<MediaPackageElement> getElements(MediaPackage mediapackage, Set<String> elementIds)
           throws IllegalStateException {
-    final Set<MediaPackageElement> elements = new HashSet<MediaPackageElement>();
+    final Set<MediaPackageElement> elements = new HashSet<>();
     for (String elementId : elementIds) {
       MediaPackageElement element = mediapackage.getElementById(elementId);
       if (element != null) {
         elements.add(element);
       } else {
-        throw new IllegalStateException(format("No element %s found in mediapackage %s", elementId, mediapackage.getIdentifier()));
+        throw new IllegalStateException(
+                format("No element %s found in mediapackage %s", elementId, mediapackage.getIdentifier()));
       }
     }
     return elements;
@@ -321,8 +318,8 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
    * @return A reference to the MediaPackageElement that has been distributed.
    * @throws DistributionException
    */
-  public MediaPackageElement distributeElement(String channelId, final MediaPackage mediaPackage, MediaPackageElement element,
-          boolean checkAvailability) throws DistributionException {
+  public MediaPackageElement distributeElement(String channelId, final MediaPackage mediaPackage,
+          MediaPackageElement element, boolean checkAvailability) throws DistributionException {
     notNull(channelId, "channelId");
     notNull(mediaPackage, "mediapackage");
     notNull(element, "element");
@@ -347,8 +344,8 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
       try {
         // Block and wait for the upload to finish
         upload.waitForCompletion();
-        logger.info("Upload of {} to bucket {} completed in {} seconds",
-                new Object[] { objectName, bucketName, (System.currentTimeMillis() - start) / 1000 });
+        logger.info("Upload of {} to bucket {} completed in {} seconds", objectName, bucketName,
+                (System.currentTimeMillis() - start) / 1000);
       } catch (AmazonClientException e) {
         throw new DistributionException("AWS error: " + e.getMessage(), e);
       }
@@ -378,8 +375,8 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
               success = true;
               break; // Exit the loop, response is closed
             } else {
-              logger.debug("Http status code when checking distributed element {} is {}", objectName, response
-                      .getStatusLine().getStatusCode());
+              logger.debug("Http status code when checking distributed element {} is {}", objectName,
+                      response.getStatusLine().getStatusCode());
             }
           } catch (Exception e) {
             logger.info("Checking availability of {} threw exception {}. Trying again.", objectName, e.getMessage());
@@ -412,14 +409,13 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
 
   @Override
   public Job retract(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException {
-    Set<String> elementIds = new HashSet<String>();
+    Set<String> elementIds = new HashSet<>();
     elementIds.add(elementId);
     return retract(channelId, mediapackage, elementIds);
   }
 
   @Override
-  public Job retract(String channelId, MediaPackage mediapackage, Set<String> elementIds)
-          throws DistributionException {
+  public Job retract(String channelId, MediaPackage mediapackage, Set<String> elementIds) throws DistributionException {
     notNull(mediapackage, "mediapackage");
     notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
@@ -481,7 +477,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
     notNull(channelId, "channelId");
 
     Set<MediaPackageElement> elements = getElements(mediapackage, elementIds);
-    List<MediaPackageElement> retractedElements = new ArrayList<MediaPackageElement>();
+    List<MediaPackageElement> retractedElements = new ArrayList<>();
 
     for (MediaPackageElement element : elements) {
       MediaPackageElement retractedElement = retractElement(channelId, mediapackage, element);
@@ -490,6 +486,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
     return retractedElements.toArray(new MediaPackageElement[retractedElements.size()]);
   }
 
+  @Override
   public Job restore(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException {
     if (mediaPackage == null)
       throw new IllegalArgumentException("Media package must be specified");
@@ -506,7 +503,9 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
     }
   }
 
-  public Job restore(String channelId, MediaPackage mediaPackage, String elementId, String fileName) throws DistributionException {
+  @Override
+  public Job restore(String channelId, MediaPackage mediaPackage, String elementId, String fileName)
+          throws DistributionException {
     if (mediaPackage == null)
       throw new IllegalArgumentException("Media package must be specified");
     if (elementId == null)
@@ -524,40 +523,46 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
     }
   }
 
-  protected MediaPackageElement restoreElement(String channelId, MediaPackage mediaPackage, String elementId, String fileName)
-          throws DistributionException {
+  protected MediaPackageElement restoreElement(String channelId, MediaPackage mediaPackage, String elementId,
+          String fileName) throws DistributionException {
     String objectName = null;
     if (StringUtils.isNotBlank(fileName)) {
       objectName = buildObjectName(channelId, mediaPackage.getIdentifier().toString(), elementId, fileName);
     } else {
-      objectName = buildObjectName(channelId, mediaPackage.getIdentifier().toString(), mediaPackage.getElementById(elementId));
+      objectName = buildObjectName(channelId, mediaPackage.getIdentifier().toString(),
+              mediaPackage.getElementById(elementId));
     }
-    //Get the latest version of the file
-    //Note that this should be the delete marker for the file.  We'll check, but if there is more than one delete marker we'll have probs
-    ListVersionsRequest lv = new ListVersionsRequest().withBucketName(bucketName).withPrefix(objectName).withMaxResults(1);
+    // Get the latest version of the file
+    // Note that this should be the delete marker for the file. We'll check, but if there is more than one delete marker
+    // we'll have probs
+    ListVersionsRequest lv = new ListVersionsRequest().withBucketName(bucketName).withPrefix(objectName)
+            .withMaxResults(1);
     VersionListing listing = s3.listVersions(lv);
     if (listing.getVersionSummaries().size() < 1) {
       throw new DistributionException("Object not found: " + objectName);
     }
     String versionId = listing.getVersionSummaries().get(0).getVersionId();
-    //Verify that this is in fact a delete marker
+    // Verify that this is in fact a delete marker
     GetObjectMetadataRequest metadata = new GetObjectMetadataRequest(bucketName, objectName, versionId);
-    //Ok, so there's no way of asking AWS directly if the object is deleted in this version of the SDK
-    //So instead, we ask for its metadata
-    //If it's deleted, then there *isn't* any metadata and we get a 404, which throws the exception
-    //This, imo, is an incredibly boneheaded omission from the AWS SDK, and implies we should look for something which sucks less
-    //FIXME: This section should be refactored with a simple s3.doesObjectExist(bucketName, objectName) once we update the AWS SDK
+    // Ok, so there's no way of asking AWS directly if the object is deleted in this version of the SDK
+    // So instead, we ask for its metadata
+    // If it's deleted, then there *isn't* any metadata and we get a 404, which throws the exception
+    // This, imo, is an incredibly boneheaded omission from the AWS SDK, and implies we should look for something which
+    // sucks less
+    // FIXME: This section should be refactored with a simple s3.doesObjectExist(bucketName, objectName) once we update
+    // the AWS SDK
     boolean isDeleted = false;
     try {
       s3.getObjectMetadata(metadata);
     } catch (AmazonServiceException e) {
-      //Note: This exception is actually a 405, not a 404.
-      //This is expected, but very confusing if you're thinking it should be a 'file not found', rather than a 'method not allowed on stuff that's deleted'
-      //It's unclear what the expected behaviour is for things which have never existed...
+      // Note: This exception is actually a 405, not a 404.
+      // This is expected, but very confusing if you're thinking it should be a 'file not found', rather than a 'method
+      // not allowed on stuff that's deleted'
+      // It's unclear what the expected behaviour is for things which have never existed...
       isDeleted = true;
     }
     if (isDeleted) {
-      //Delete the delete marker
+      // Delete the delete marker
       DeleteVersionRequest delete = new DeleteVersionRequest(bucketName, objectName, versionId);
       s3.deleteVersion(delete);
     }
@@ -639,30 +644,35 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
       op = Operation.valueOf(operation);
       String channelId = arguments.get(0);
       MediaPackage mediaPackage = MediaPackageParser.getFromXml(arguments.get(1));
-      Set<String> elementIds = gson.fromJson(arguments.get(2), new TypeToken<Set<String>>() { }.getType());
+      Set<String> elementIds = gson.fromJson(arguments.get(2), new TypeToken<Set<String>>() {
+      }.getType());
       switch (op) {
         case Distribute:
           Boolean checkAvailability = Boolean.parseBoolean(arguments.get(3));
           MediaPackageElement[] distributedElements = distributeElements(channelId, mediaPackage, elementIds,
                   checkAvailability);
           return (distributedElements != null)
-                  ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(distributedElements)) : null;
+                  ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(distributedElements))
+                  : null;
         case Retract:
           MediaPackageElement[] retractedElements = retractElements(channelId, mediaPackage, elementIds);
           return (retractedElements != null) ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(retractedElements))
                   : null;
-        /* Commented out due to changes in the way the element IDs are passed (ie, a list rather than individual ones
-           per job).  This code is still useful long term, but I don't have time to write the necessary wrapper code
-           around it right now.
-        case Restore:
-          String fileName = arguments.get(3);
-          MediaPackageElement restoredElement = null;
-          if (StringUtils.isNotBlank(fileName)) {
-            restoredElement = restoreElement(channelId, mediaPackage, elementIds, fileName);
-          } else {
-            restoredElement = restoreElement(channelId, mediaPackage, elementIds, null);
-          }
-          return (restoredElement != null) ? MediaPackageElementParser.getAsXml(restoredElement) : null;*/
+        /*
+         * TODO
+         * Commented out due to changes in the way the element IDs are passed (ie, a list rather than individual ones
+         * per job). This code is still useful long term, but I don't have time to write the necessary wrapper code
+         * around it right now.
+         * case Restore:
+         * String fileName = arguments.get(3);
+         * MediaPackageElement restoredElement = null;
+         * if (StringUtils.isNotBlank(fileName)) {
+         * restoredElement = restoreElement(channelId, mediaPackage, elementIds, fileName);
+         * } else {
+         * restoredElement = restoreElement(channelId, mediaPackage, elementIds, null);
+         * }
+         * return (restoredElement != null) ? MediaPackageElementParser.getAsXml(restoredElement) : null;
+         */
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
       }
@@ -718,7 +728,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
   }
 
   protected void setOpencastDistributionUrl(String distributionUrl) {
-    this.opencastDistributionUrl = distributionUrl;
+    opencastDistributionUrl = distributionUrl;
   }
 
 }

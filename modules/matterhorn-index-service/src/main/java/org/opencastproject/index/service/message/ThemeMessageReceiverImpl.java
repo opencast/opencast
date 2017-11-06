@@ -52,9 +52,9 @@ public class ThemeMessageReceiverImpl extends BaseMessageReceiverImpl<ThemeItem>
       case Update:
         SerializableTheme serializableTheme = themeItem.getTheme();
 
-        logger.debug("Update the theme with id '{}', name '{}', description '{}', organization '{}'", new Object[] {
+        logger.debug("Update the theme with id '{}', name '{}', description '{}', organization '{}'",
                 serializableTheme.getId(), serializableTheme.getName(), serializableTheme.getDescription(),
-                organization });
+                organization);
         try {
           Theme theme = ThemeIndexUtils.getOrCreate(serializableTheme.getId(), organization, user, getSearchIndex());
           theme.setCreationDate(serializableTheme.getCreationDate());
@@ -88,7 +88,8 @@ public class ThemeMessageReceiverImpl extends BaseMessageReceiverImpl<ThemeItem>
         // Remove the theme from the search index
         try {
           getSearchIndex().delete(Theme.DOCUMENT_TYPE, Long.toString(themeItem.getThemeId()).concat(organization));
-          logger.debug("Theme {} removed from {} search index", themeItem.getThemeId(), getSearchIndex().getIndexName());
+          logger.debug("Theme {} removed from {} search index", themeItem.getThemeId(),
+                  getSearchIndex().getIndexName());
         } catch (SearchIndexException e) {
           logger.error("Error deleting the group {} from the search index: {}", themeItem.getThemeId(),
                   ExceptionUtils.getStackTrace(e));

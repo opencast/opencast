@@ -709,8 +709,7 @@ public final class WorkspaceImpl implements Workspace {
     String path = collectionURI.toString();
     String filename = FilenameUtils.getName(path);
     String collection = getCollection(collectionURI);
-    logger.debug("Moving {} from {} to {}/{}",
-            new String[] { filename, collection, toMediaPackage, toMediaPackageElement });
+    logger.debug("Moving {} from {} to {}/{}", filename, collection, toMediaPackage, toMediaPackageElement);
     // move locally
     File original = toWorkspaceFile(collectionURI);
     if (original.isFile()) {
