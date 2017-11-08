@@ -106,6 +106,7 @@ import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.FnX;
+import com.google.common.util.concurrent.Striped;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -142,6 +143,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -258,6 +260,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   /** List of initially delayed workflows */
   private final List<Long> delayedWorkflows = new ArrayList<Long>();
+
+  /** Striped lock to synchronize start() method per media package */
+  private final Striped<Lock> mediaPackageLocks = Striped.lazyWeakLock(100);
+
 
   /** Concurrent maps for lock objects */
   private final MultiResourceLock lock = new MultiResourceLock();
@@ -610,7 +616,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage sourceMediaPackage,
           Long parentWorkflowId, Map<String, String> properties) throws WorkflowDatabaseException,
           WorkflowParsingException, NotFoundException {
-
+    // We have to synchronize per media package to avoid starting multiple simultaneous workflows for one media package.
+    final Lock lock = mediaPackageLocks.get(sourceMediaPackage.getIdentifier().toString());
+    lock.lock();
     try {
       logger.startUnitOfWork();
       if (workflowDefinition == null)
@@ -694,6 +702,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       }
     } finally {
       logger.endUnitOfWork();
+      lock.unlock();
     }
   }
 
