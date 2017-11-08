@@ -2096,8 +2096,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    *
    * @param em
    *          the entity manager
-   * @param activeOnly
-   *          if true, the map will include only hosts that are online and have non-maintenance mode services
+   *
    * @return the map of hosts to job counts
    */
   SystemLoad getHostLoads(EntityManager em) {
@@ -2122,7 +2121,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       Status status = Status.values()[(int) resultArray[1]];
       float load = ((Number) resultArray[2]).floatValue();
 
-      // Only queued, running and dispatching jobs are adding to the load, so every other status is discarded
+      // Only queued, and running jobs are adding to the load, so every other status is discarded
       if (status == null || !JOB_STATUSES_INFLUENCING_LOAD_BALANCING.contains(status)) {
         load = 0.0f;
       }
@@ -2476,7 +2475,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     Query query = null;
     EntityManager em = null;
-    logger.debug("Try to get the number of jobs who failed on the service {}", serviceRegistration.toString());
+    logger.debug("Calculating count of jobs who failed due to service {}", serviceRegistration.toString());
     try {
       em = emf.createEntityManager();
       query = em.createNamedQuery("Job.count.history.failed");
@@ -2510,7 +2509,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     Query query = null;
     EntityManager em = null;
-    logger.debug("Try to get the services in WARNING state triggered by this job {} failed", job.toJob().getSignature());
+    logger.debug("Finding services put in WARNING state by job {}", job.toJob().getSignature());
     try {
       em = emf.createEntityManager();
       // TODO: modify the query to avoid to go through the list here
