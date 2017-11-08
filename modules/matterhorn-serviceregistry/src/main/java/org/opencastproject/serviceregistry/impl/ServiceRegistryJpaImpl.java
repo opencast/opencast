@@ -3031,18 +3031,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       boolean triedDispatching = false;
 
-      boolean onlyHighestMaxLoadHosts = false;
+      boolean jobLoadExceedsMaximumLoads = false;
       final Float highestMaxLoad = $(services).map(toHostRegistration).map(toMaxLoad).sort(sortFloatValuesDesc).head2();
       if (job.getJobLoad() > highestMaxLoad) {
-        // None of the available hosts is able to accept the job due to less host load
-        onlyHighestMaxLoadHosts = true;
+        // None of the available hosts is able to accept the job because the largest max load value is less than this job's load value
+        jobLoadExceedsMaximumLoads = true;
       }
 
       for (ServiceRegistration registration : services) {
         job.setProcessorServiceRegistration((ServiceRegistrationJpaImpl) registration);
 
         // Skip registration of host with less max load than highest available max load
-        if (onlyHighestMaxLoadHosts
+        // Note: This service registration may or may not live on a node which is set to accept jobs exceeding its max load
+        if (jobLoadExceedsMaximumLoads
                 && job.getProcessorServiceRegistration().getHostRegistration().getMaxLoad() != highestMaxLoad) {
           continue;
         }
