@@ -124,7 +124,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
 
     HttpPost post = new HttpPost("/");
     try {
-      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("series", dc.toXmlString()));
       post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
@@ -157,11 +157,11 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   }
 
   @Override
-  public boolean updateAccessControl(String seriesID, AccessControlList accessControl) throws NotFoundException,
-          SeriesException, UnauthorizedException {
+  public boolean updateAccessControl(String seriesID, AccessControlList accessControl)
+          throws NotFoundException, SeriesException, UnauthorizedException {
     HttpPost post = new HttpPost(seriesID + "/accesscontrol");
     try {
-      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("seriesID", seriesID));
       params.add(new BasicNameValuePair("acl", AccessControlParser.toXml(accessControl)));
       post.setEntity(new UrlEncodedFormEntity(params));
@@ -388,7 +388,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
           String seriesJSON = EntityUtils.toString(response.getEntity(), "UTF-8");
           Object resultContainer = new JSONParser().parse(seriesJSON);
           if (resultContainer instanceof JSONObject) {
-            Map <String, String> result = new HashMap<>();
+            Map<String, String> result = new HashMap<>();
             JSONObject resultContainerJsonObj = (JSONObject) resultContainer;
             JSONArray seriesJsonArr = resultContainerJsonObj.optJSONArray("series");
             if (seriesJsonArr != null) {
@@ -476,8 +476,8 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       if (bulkOperationResult.getNotFound().size() > 0) {
         throw new NotFoundException("Unable to find series with id " + seriesId);
       } else if (bulkOperationResult.getServerError().size() > 0) {
-        throw new SeriesException("Unable to update series " + seriesId
-                + " opt out status using the remote series services.");
+        throw new SeriesException(
+                "Unable to update series " + seriesId + " opt out status using the remote series services.");
       }
 
     } catch (Exception e) {
@@ -502,7 +502,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     StringBuilder url = new StringBuilder();
     url.append("/series.xml?");
 
-    List<NameValuePair> queryStringParams = new ArrayList<NameValuePair>();
+    List<NameValuePair> queryStringParams = new ArrayList<>();
     if (q.getText() != null)
       queryStringParams.add(new BasicNameValuePair("q", q.getText()));
     if (q.getSeriesId() != null)
@@ -547,8 +547,8 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   }
 
   @Override
-  public Map<String, String> getSeriesProperties(String seriesID) throws SeriesException, NotFoundException,
-          UnauthorizedException {
+  public Map<String, String> getSeriesProperties(String seriesID)
+          throws SeriesException, NotFoundException, UnauthorizedException {
     HttpGet get = new HttpGet(seriesID + "/properties.json");
     HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     JSONParser parser = new JSONParser();
@@ -563,7 +563,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
           StringWriter writer = new StringWriter();
           IOUtils.copy(response.getEntity().getContent(), writer, "UTF-8");
           JSONArray jsonProperties = (JSONArray) parser.parse(writer.toString());
-          Map<String, String> properties = new TreeMap<String, String>();
+          Map<String, String> properties = new TreeMap<>();
           for (int i = 0; i < jsonProperties.length(); i++) {
             JSONObject property = (JSONObject) jsonProperties.get(i);
             JSONArray names = property.names();
@@ -587,8 +587,8 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   }
 
   @Override
-  public String getSeriesProperty(String seriesID, String propertyName) throws SeriesException, NotFoundException,
-          UnauthorizedException {
+  public String getSeriesProperty(String seriesID, String propertyName)
+          throws SeriesException, NotFoundException, UnauthorizedException {
     HttpGet get = new HttpGet(seriesID + "/property/" + propertyName + ".json");
     HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
@@ -618,11 +618,11 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   }
 
   @Override
-  public void updateSeriesProperty(String seriesID, String propertyName, String propertyValue) throws SeriesException,
-          NotFoundException, UnauthorizedException {
+  public void updateSeriesProperty(String seriesID, String propertyName, String propertyValue)
+          throws SeriesException, NotFoundException, UnauthorizedException {
     HttpPost post = new HttpPost("/" + seriesID + "/property");
     try {
-      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("name", propertyName));
       params.add(new BasicNameValuePair("value", propertyValue));
       post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
@@ -637,7 +637,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
         int statusCode = response.getStatusLine().getStatusCode();
         if (SC_NO_CONTENT == statusCode) {
           logger.info("Successfully updated series {} with property name {} and value {} in the series service",
-                  new Object[] { seriesID, propertyName, propertyValue });
+                  seriesID, propertyName, propertyValue);
           return;
         } else if (SC_UNAUTHORIZED == statusCode) {
           throw new UnauthorizedException("Not authorized to update series " + seriesID);
@@ -655,8 +655,8 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   }
 
   @Override
-  public void deleteSeriesProperty(String seriesID, String propertyName) throws SeriesException, NotFoundException,
-          UnauthorizedException {
+  public void deleteSeriesProperty(String seriesID, String propertyName)
+          throws SeriesException, NotFoundException, UnauthorizedException {
     HttpDelete del = new HttpDelete("/" + seriesID + "/property/" + propertyName);
     HttpResponse response = getResponse(del, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
     try {
@@ -691,7 +691,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
         switch (statusCode) {
           case SC_OK:
             JSONArray elementArray = (JSONArray) parser.parse(IOUtils.toString(response.getEntity().getContent()));
-            Map<String, byte[]> elements = new HashMap<String, byte[]>();
+            Map<String, byte[]> elements = new HashMap<>();
             for (int i = 0; i < elementArray.length(); i++) {
               final String type = elementArray.getString(i);
               Opt<byte[]> optData = getSeriesElementData(seriesID, type);
@@ -735,8 +735,8 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
           case SC_NOT_FOUND:
             return Opt.none();
           case SC_INTERNAL_SERVER_ERROR:
-            throw new SeriesException(format("Error while retrieving element of type '%s' from series '%s'", type,
-                    seriesID));
+            throw new SeriesException(
+                    format("Error while retrieving element of type '%s' from series '%s'", type, seriesID));
           default:
             throw new SeriesException(format("Unexpected status code", statusCode));
         }
@@ -821,8 +821,8 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
           case SC_NOT_FOUND:
             return false;
           case SC_INTERNAL_SERVER_ERROR:
-            throw new SeriesException(format("Error while deleting element of type '%s' from series '%s'", type,
-                    seriesID));
+            throw new SeriesException(
+                    format("Error while deleting element of type '%s' from series '%s'", type, seriesID));
           default:
             throw new SeriesException(format("Unexpected status code", statusCode));
         }

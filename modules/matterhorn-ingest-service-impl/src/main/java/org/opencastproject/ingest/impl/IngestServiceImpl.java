@@ -283,7 +283,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     logger.info("Ingest Service started.");
     defaultWorkflowDefinionId = StringUtils.trimToNull(cc.getBundleContext().getProperty(WORKFLOW_DEFINITION_DEFAULT));
     if (defaultWorkflowDefinionId == null) {
-        defaultWorkflowDefinionId = "ng-schedule-and-upload";
+      defaultWorkflowDefinionId = "ng-schedule-and-upload";
     }
     registerMXBean = JmxUtil.registerMXBean(ingestStatistics, "IngestStatistics");
   }
@@ -299,7 +299,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * {@inheritDoc}
    *
    * @see org.osgi.service.cm.ManagedService#updated(java.util.Dictionary)
-   * Retrieve ManagedService configuration, including option to overwrite series
+   *      Retrieve ManagedService configuration, including option to overwrite series
    */
   @Override
   public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
@@ -369,8 +369,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @see org.opencastproject.ingest.api.IngestService#addZippedMediaPackage(java.io.InputStream)
    */
   @Override
-  public WorkflowInstance addZippedMediaPackage(InputStream zipStream) throws IngestException, IOException,
-          MediaPackageException {
+  public WorkflowInstance addZippedMediaPackage(InputStream zipStream)
+          throws IngestException, IOException, MediaPackageException {
     try {
       return addZippedMediaPackage(zipStream, null, null);
     } catch (NotFoundException e) {
@@ -384,8 +384,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @see org.opencastproject.ingest.api.IngestService#addZippedMediaPackage(java.io.InputStream, java.lang.String)
    */
   @Override
-  public WorkflowInstance addZippedMediaPackage(InputStream zipStream, String wd) throws MediaPackageException,
-          IOException, IngestException, NotFoundException {
+  public WorkflowInstance addZippedMediaPackage(InputStream zipStream, String wd)
+          throws MediaPackageException, IOException, IngestException, NotFoundException {
     return addZippedMediaPackage(zipStream, wd, null);
   }
 
@@ -412,8 +412,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   @Override
   public WorkflowInstance addZippedMediaPackage(InputStream zipStream, String workflowDefinitionId,
-          Map<String, String> workflowConfig, Long workflowInstanceId) throws MediaPackageException, IOException,
-          IngestException, NotFoundException, UnauthorizedException {
+          Map<String, String> workflowConfig, Long workflowInstanceId)
+          throws MediaPackageException, IOException, IngestException, NotFoundException, UnauthorizedException {
     // Start a job synchronously. We can't keep the open input stream waiting around.
     Job job = null;
 
@@ -423,7 +423,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       } catch (WorkflowDatabaseException e) {
         throw new IngestException(e);
       } catch (NotFoundException nfe) {
-        logger.warn("Workflow definition {} not found, using default workflow {} instead", workflowDefinitionId, defaultWorkflowDefinionId);
+        logger.warn("Workflow definition {} not found, using default workflow {} instead", workflowDefinitionId,
+                defaultWorkflowDefinionId);
         workflowDefinitionId = defaultWorkflowDefinionId;
       }
     }
@@ -467,20 +468,20 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             // Build the mediapackage
             mp = loadMediaPackageFromManifest(new ZipEntryInputStream(zis, entry.getSize()));
           } else {
-            logger.info("Storing zip entry {}/{} in working file repository collection '{}'",
-                    new Object[] { job.getId(), entry.getName(), wfrCollectionId });
+            logger.info("Storing zip entry {}/{} in working file repository collection '{}'", job.getId(),
+                    entry.getName(), wfrCollectionId);
             // Since the directory structure is not being mirrored, makes sure the file
             // name is different than the previous one(s) by adding a sequential number
             String fileName = FilenameUtils.getBaseName(entry.getName()) + "_" + seq++ + "."
                     + FilenameUtils.getExtension(entry.getName());
-            URI contentUri = workingFileRepository.putInCollection(wfrCollectionId, fileName, new ZipEntryInputStream(
-                    zis, entry.getSize()));
+            URI contentUri = workingFileRepository.putInCollection(wfrCollectionId, fileName,
+                    new ZipEntryInputStream(zis, entry.getSize()));
             collectionFilenames.add(fileName);
             // Key is the zip entry name as it is
             String key = entry.getName();
             uris.put(key, contentUri);
             ingestStatistics.add(entry.getSize());
-            logger.info("Zip entry {}/{} stored at {}", new Object[] { job.getId(), entry.getName(), contentUri });
+            logger.info("Zip entry {}/{} stored at {}", job.getId(), entry.getName(), contentUri);
             // Figures out if there's a root folder. Does entry name starts with a folder?
             int pos = entry.getName().indexOf('/');
             if (pos == -1) {
@@ -523,8 +524,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
         if (uri == null)
           throw new MediaPackageException("Unable to map element name '" + element.getURI() + "' to workspace uri");
-        logger.info("Ingested mediapackage element {}/{} is located at {}",
-                new Object[] { mediaPackageId, element.getIdentifier(), uri });
+        logger.info("Ingested mediapackage element {}/{} is located at {}", mediaPackageId, element.getIdentifier(),
+                uri);
         URI dest = workingFileRepository.moveTo(wfrCollectionId, FilenameUtils.getName(uri.toString()), mediaPackageId,
                 element.getIdentifier(), FilenameUtils.getName(element.getURI().toString()));
         element.setURI(dest);
@@ -560,8 +561,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
   }
 
-  private MediaPackage loadMediaPackageFromManifest(InputStream manifest) throws IOException, MediaPackageException,
-          IngestException {
+  private MediaPackage loadMediaPackageFromManifest(InputStream manifest)
+          throws IOException, MediaPackageException, IngestException {
     // TODO: Uncomment the following line and remove the patch when the compatibility with pre-1.4 MediaPackages is
     // discarded
     //
@@ -629,11 +630,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @see org.opencastproject.ingest.api.IngestService#createMediaPackage()
    */
   @Override
-  public MediaPackage createMediaPackage(String mediaPackageId) throws MediaPackageException, ConfigurationException,
-          HandleException {
+  public MediaPackage createMediaPackage(String mediaPackageId)
+          throws MediaPackageException, ConfigurationException, HandleException {
     MediaPackage mediaPackage;
     try {
-      mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew(new UUIDIdBuilderImpl().fromString(mediaPackageId));
+      mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
+              .createNew(new UUIDIdBuilderImpl().fromString(mediaPackageId));
     } catch (MediaPackageException e) {
       logger.error("INGEST:Failed to create media package " + e.getLocalizedMessage());
       throw e;
@@ -661,22 +663,23 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * {@inheritDoc}
    *
    * @see org.opencastproject.ingest.api.IngestService#addTrack(java.net.URI,
-   *      org.opencastproject.mediapackage.MediaPackageElementFlavor, String[] , org.opencastproject.mediapackage.MediaPackage)
+   *      org.opencastproject.mediapackage.MediaPackageElementFlavor, String[] ,
+   *      org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
   public MediaPackage addTrack(URI uri, MediaPackageElementFlavor flavor, String[] tags, MediaPackage mediaPackage)
           throws IOException, IngestException {
     Job job = null;
     try {
-      job = serviceRegistry.createJob(
-              JOB_TYPE,
-              INGEST_TRACK_FROM_URI,
-              Arrays.asList(uri.toString(), flavor == null ? null : flavor.toString(),
-                      MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
+      job = serviceRegistry
+              .createJob(
+                      JOB_TYPE, INGEST_TRACK_FROM_URI, Arrays.asList(uri.toString(),
+                              flavor == null ? null : flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)),
+                      null, false, ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
-      logger.info("Start adding track {} from URL {} on mediapackage {}", new Object[] { elementId, uri, mediaPackage });
+      logger.info("Start adding track {} from URL {} on mediapackage {}", elementId, uri, mediaPackage);
       URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
               flavor);
@@ -689,8 +692,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       }
 
       job.setStatus(Job.Status.FINISHED);
-      logger.info("Successful added track {} on mediapackage {} at URL {}", new Object[] { elementId, mediaPackage,
-              newUrl });
+      logger.info("Successful added track {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
     } catch (IOException e) {
       throw e;
@@ -731,8 +733,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job.setStatus(Status.RUNNING);
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
-      logger.info("Start adding track {} from input stream on mediapackage {}",
-              new Object[] { elementId, mediaPackage });
+      logger.info("Start adding track {} from input stream on mediapackage {}", elementId, mediaPackage);
       URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
               flavor);
@@ -745,8 +746,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       }
 
       job.setStatus(Job.Status.FINISHED);
-      logger.info("Successful added track {} on mediapackage {} at URL {}", new Object[] { elementId, mediaPackage,
-              newUrl });
+      logger.info("Successful added track {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
     } catch (IOException e) {
       throw e;
@@ -772,8 +772,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job.setStatus(Status.RUNNING);
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
-      logger.info("Start adding partial track {} from URL {} on mediapackage {}", new Object[] { elementId, uri,
-              mediaPackage });
+      logger.info("Start adding partial track {} from URL {} on mediapackage {}", elementId, uri, mediaPackage);
       URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
               flavor);
@@ -781,8 +780,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       // store startTime
       partialTrackStartTimes.put(elementId, startTime);
       logger.debug("Added start time {} for track {}", startTime, elementId);
-      logger.info("Successful added partial track {} on mediapackage {} at URL {}", new Object[] { elementId,
-              mediaPackage, newUrl });
+      logger.info("Successful added partial track {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
     } catch (IOException e) {
       throw e;
@@ -796,16 +794,15 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   }
 
   @Override
-  public MediaPackage addPartialTrack(InputStream in, String fileName, MediaPackageElementFlavor flavor,
-          long startTime, MediaPackage mediaPackage) throws IOException, IngestException {
+  public MediaPackage addPartialTrack(InputStream in, String fileName, MediaPackageElementFlavor flavor, long startTime,
+          MediaPackage mediaPackage) throws IOException, IngestException {
     Job job = null;
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_TRACK, null, null, false);
       job.setStatus(Status.RUNNING);
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
-      logger.info("Start adding partial track {} from input stream on mediapackage {}", new Object[] { elementId,
-              mediaPackage });
+      logger.info("Start adding partial track {} from input stream on mediapackage {}", elementId, mediaPackage);
       URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Track,
               flavor);
@@ -813,8 +810,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       // store startTime
       partialTrackStartTimes.put(elementId, startTime);
       logger.debug("Added start time {} for track {}", startTime, elementId);
-      logger.info("Successful added partial track {} on mediapackage {} at URL {}", new Object[] { elementId,
-              mediaPackage, newUrl });
+      logger.info("Successful added partial track {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
     } catch (IOException e) {
       throw e;
@@ -839,12 +835,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     Job job = null;
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_CATALOG_FROM_URI,
-              Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
+              Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false,
+              ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
-      logger.info("Start adding catalog {} from URL {} on mediapackage {}",
-              new Object[] { elementId, uri, mediaPackage });
+      logger.info("Start adding catalog {} from URL {} on mediapackage {}", elementId, uri, mediaPackage);
       URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
       if (MediaPackageElements.SERIES.equals(flavor)) {
         updateSeries(uri);
@@ -852,8 +848,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Catalog,
               flavor);
       job.setStatus(Job.Status.FINISHED);
-      logger.info("Successful added catalog {} on mediapackage {} at URL {}", new Object[] { elementId, mediaPackage,
-              newUrl });
+      logger.info("Successful added catalog {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
     } catch (IOException e) {
       throw e;
@@ -872,7 +867,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param uri
    *          the URI to the dublin core document containing series metadata.
    * @return
-   *          true, if the series is created or overwritten, false if the existing series remains intact.
+   *         true, if the series is created or overwritten, false if the existing series remains intact.
    */
   protected boolean updateSeries(URI uri) throws IOException, IngestException {
     HttpResponse response = null;
@@ -949,8 +944,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job.setStatus(Status.RUNNING);
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
-      logger.info("Start adding catalog {} from input stream on mediapackage {}", new Object[] { elementId,
-              mediaPackage });
+      logger.info("Start adding catalog {} from input stream on mediapackage {}", elementId, mediaPackage);
       URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
       if (MediaPackageElements.SERIES.equals(flavor)) {
         updateSeries(newUrl);
@@ -966,8 +960,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       }
 
       job.setStatus(Job.Status.FINISHED);
-      logger.info("Successful added catalog {} on mediapackage {} at URL {}", new Object[] { elementId, mediaPackage,
-              newUrl });
+      logger.info("Successful added catalog {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
     } catch (IOException e) {
       throw e;
@@ -992,18 +985,17 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     Job job = null;
     try {
       job = serviceRegistry.createJob(JOB_TYPE, INGEST_ATTACHMENT_FROM_URI,
-              Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false, ingestFileJobLoad);
+              Arrays.asList(uri.toString(), flavor.toString(), MediaPackageParser.getAsXml(mediaPackage)), null, false,
+              ingestFileJobLoad);
       job.setStatus(Status.RUNNING);
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
-      logger.info("Start adding attachment {} from URL {} on mediapackage {}", new Object[] { elementId, uri,
-              mediaPackage });
+      logger.info("Start adding attachment {} from URL {} on mediapackage {}", elementId, uri, mediaPackage);
       URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Attachment,
               flavor);
       job.setStatus(Job.Status.FINISHED);
-      logger.info("Successful added attachment {} on mediapackage {} at URL {}", new Object[] { elementId,
-              mediaPackage, newUrl });
+      logger.info("Successful added attachment {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
     } catch (IOException e) {
       throw e;
@@ -1031,8 +1023,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job.setStatus(Status.RUNNING);
       job = serviceRegistry.updateJob(job);
       String elementId = UUID.randomUUID().toString();
-      logger.info("Start adding attachment {} from input stream on mediapackage {}", new Object[] { elementId,
-              mediaPackage });
+      logger.info("Start adding attachment {} from input stream on mediapackage {}", elementId, mediaPackage);
       URI newUrl = addContentToRepo(mediaPackage, elementId, fileName, in);
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Attachment,
               flavor);
@@ -1044,8 +1035,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         }
       }
       job.setStatus(Job.Status.FINISHED);
-      logger.info("Successful added attachment {} on mediapackage {} at URL {}", new Object[] { elementId,
-              mediaPackage, newUrl });
+      logger.info("Successful added attachment {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
     } catch (IOException e) {
       throw e;
@@ -1111,8 +1101,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    *      java.lang.String, java.util.Map)
    */
   @Override
-  public WorkflowInstance ingest(MediaPackage mp, String wd, Map<String, String> properties) throws IngestException,
-          NotFoundException {
+  public WorkflowInstance ingest(MediaPackage mp, String wd, Map<String, String> properties)
+          throws IngestException, NotFoundException {
     try {
       return ingest(mp, wd, properties, null);
     } catch (UnauthorizedException e) {
@@ -1239,7 +1229,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     // Go through properties
     Map<String, String> agentProperties = new HashMap<>();
     Map<String, String> workflowProperties = new HashMap<>();
-    for (String key: properties.keySet()) {
+    for (String key : properties.keySet()) {
       if (key.startsWith("org.opencastproject.workflow.config.")) {
         workflowProperties.put(key, properties.get(key));
       } else {
@@ -1312,7 +1302,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     AccessControlList activeAcl = authorizationService.getActiveAcl(mp).getA();
     if (activeAcl.getEntries().size() == 0) {
       String anonymousRole = securityService.getOrganization().getAnonymousRole();
-      activeAcl = new AccessControlList(new AccessControlEntry(anonymousRole, Permissions.Action.READ.toString(), true));
+      activeAcl = new AccessControlList(
+              new AccessControlEntry(anonymousRole, Permissions.Action.READ.toString(), true));
       authorizationService.setAcl(mp, AclScope.Series, activeAcl);
     }
   }
@@ -1491,7 +1482,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       } catch (WorkflowDatabaseException e) {
         throw new IngestException(e);
       } catch (NotFoundException nfe) {
-        logger.warn("Workflow definition {} not found, using default workflow {} instead", workflowDefinitionID, defaultWorkflowDefinionId);
+        logger.warn("Workflow definition {} not found, using default workflow {} instead", workflowDefinitionID,
+                defaultWorkflowDefinionId);
         workflowDefinitionID = defaultWorkflowDefinionId;
       }
     }
@@ -1560,7 +1552,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     return contentDisposition.getParameter("filename");
   }
 
-  private URI addContentToRepo(MediaPackage mp, String elementId, String filename, InputStream file) throws IOException {
+  private URI addContentToRepo(MediaPackage mp, String elementId, String filename, InputStream file)
+          throws IOException {
     ProgressInputStream progressInputStream = new ProgressInputStream(file);
     progressInputStream.addPropertyChangeListener(new PropertyChangeListener() {
       @Override
@@ -1657,7 +1650,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    *          the organization directory
    */
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
-    this.organizationDirectoryService = organizationDirectory;
+    organizationDirectoryService = organizationDirectory;
   }
 
   /**
@@ -1737,8 +1730,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @throws IngestException
    *           if the SMIL catalog already exists
    */
-  private MediaPackage addSmilCatalog(org.w3c.dom.Document smilDocument, MediaPackage mediaPackage) throws IOException,
-          IngestException {
+  private MediaPackage addSmilCatalog(org.w3c.dom.Document smilDocument, MediaPackage mediaPackage)
+          throws IOException, IngestException {
     Option<org.w3c.dom.Document> optSmilDocument = loadSmilDocument(workingFileRepository, mediaPackage);
     if (optSmilDocument.isSome())
       throw new IngestException("SMIL already exists!");
@@ -1807,8 +1800,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               track.getDuration(), track.getURI(), track.getIdentifier());
     } else {
       logger.warn("Invalid partial flavor type {} of track {}", track.getFlavor(), track);
-      throw new IngestException("Invalid partial flavor type " + track.getFlavor().getType() + " of track "
-              + track.getURI().toString());
+      throw new IngestException(
+              "Invalid partial flavor type " + track.getFlavor().getType() + " of track " + track.getURI().toString());
     }
   }
 

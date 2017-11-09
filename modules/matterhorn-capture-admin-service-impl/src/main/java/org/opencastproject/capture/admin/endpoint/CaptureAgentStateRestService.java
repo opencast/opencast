@@ -189,8 +189,7 @@ public class CaptureAgentStateRestService {
     boolean agentUrlUpdated = service.setAgentUrl(agentName, address);
 
     if (!agentStateUpdated && !agentUrlUpdated) {
-      logger.debug("{}'s state '{}' and url '{}' has not changed, nothing has been updated", new String[] { agentName,
-              state, address });
+      logger.debug("{}'s state '{}' and url '{}' has not changed, nothing has been updated", agentName, state, address);
       return Response.ok().build();
     }
     logger.debug("{}'s state successfully set to {}", agentName, state);

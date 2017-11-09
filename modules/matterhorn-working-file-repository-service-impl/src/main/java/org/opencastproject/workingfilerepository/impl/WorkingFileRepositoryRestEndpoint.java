@@ -193,8 +193,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       else
         return Response.status(HttpStatus.SC_NOT_FOUND).build();
     } catch (Exception e) {
-      logger.error("Unable to delete element '{}' from mediapackage '{}': {}", new Object[] { mediaPackageElementID,
-              mediaPackageID, e });
+      logger.error("Unable to delete element '{}' from mediapackage '{}': {}", mediaPackageElementID,
+              mediaPackageID, e);
       return Response.serverError().entity(e.getMessage()).build();
     }
   }
@@ -214,7 +214,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       else
         return Response.status(SC_NOT_FOUND).build();
     } catch (Exception e) {
-      logger.error("Unable to delete element '{}' from collection '{}': {}", new Object[] { fileName, collectionId, e });
+      logger.error("Unable to delete element '{}' from collection '{}': {}", fileName, collectionId, e);
       return Response.serverError().entity(e.getMessage()).build();
     }
   }
@@ -235,7 +235,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
         return Response.status(SC_NOT_FOUND).build();
     } catch (Exception e) {
       logger.error("Unable to delete files older than '{}' days from collection '{}': {}",
-              new Object[] { days, collectionId, e });
+              days, collectionId, e);
       return Response.serverError().entity(e.getMessage()).build();
     }
   }
@@ -259,7 +259,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
         return Response.notModified(md5).build();
       }
     } catch (IOException e) {
-      logger.warn("Error reading digest of {}/{}", new Object[] { mediaPackageElementID, mediaPackageElementID });
+      logger.warn("Error reading digest of {}/{}", mediaPackageElementID, mediaPackageElementID);
     }
     try {
       return withFile(getFile(mediaPackageID, mediaPackageElementID), new Function2.X<InputStream, File, Response>() {
@@ -269,8 +269,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
         }
       }).orError(new NotFoundException()).get();
     } catch (IllegalStateException e) {
-      logger.error("Unable to provide element '{}' from mediapackage '{}': {}", new Object[] { mediaPackageElementID,
-              mediaPackageID, e });
+      logger.error("Unable to provide element '{}' from mediapackage '{}': {}", mediaPackageElementID,
+              mediaPackageID, e);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
@@ -317,8 +317,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
         return Response.notModified(md5).build();
       }
     } catch (IOException e) {
-      logger.warn("Error reading digest of {}/{}/{}", new Object[] { mediaPackageElementID, mediaPackageElementID,
-              fileName });
+      logger.warn("Error reading digest of {}/{}/{}", mediaPackageElementID, mediaPackageElementID,
+              fileName);
     }
 
     try {
@@ -333,8 +333,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
                 some(fileName)).tag(md5).build();
       }
     } catch (Exception e) {
-      logger.error("Unable to provide element '{}' from mediapackage '{}': {}", new Object[] { mediaPackageElementID,
-              mediaPackageID, e });
+      logger.error("Unable to provide element '{}' from mediapackage '{}': {}", mediaPackageElementID,
+              mediaPackageID, e);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
@@ -420,8 +420,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       URI uri = super.copyTo(fromCollection, fromFileName, toMediaPackage, toMediaPackageElement, toFileName);
       return Response.ok().entity(uri.toString()).build();
     } catch (IOException e) {
-      logger.error("Unable to copy file '{}' from collection '{}' to mediapackage {}/{}: {}", new Object[] {
-              fromFileName, fromCollection, toMediaPackage, toMediaPackageElement, e });
+      logger.error("Unable to copy file '{}' from collection '{}' to mediapackage {}/{}: {}",
+              fromFileName, fromCollection, toMediaPackage, toMediaPackageElement, e);
       return Response.serverError().entity(e.getMessage()).build();
     }
   }
@@ -444,8 +444,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       URI uri = super.moveTo(fromCollection, fromFileName, toMediaPackage, toMediaPackageElement, toFileName);
       return Response.ok().entity(uri.toString()).build();
     } catch (IOException e) {
-      logger.error("Unable to move file '{}' from collection '{}' to mediapackage {}/{}: {}", new Object[] {
-              fromFileName, fromCollection, toMediaPackage, toMediaPackageElement, e });
+      logger.error("Unable to move file '{}' from collection '{}' to mediapackage {}/{}: {}",
+              fromFileName, fromCollection, toMediaPackage, toMediaPackageElement, e);
       return Response.serverError().entity(e.getMessage()).build();
     }
   }

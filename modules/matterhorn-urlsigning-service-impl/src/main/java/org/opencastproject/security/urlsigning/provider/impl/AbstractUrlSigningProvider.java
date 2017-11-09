@@ -85,7 +85,7 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
   }
 
   /** The map to contain the list of keys, their ids and the urls they match. */
-  private Map<String, KeyEntry> keys = new TreeMap<String, KeyEntry>();
+  private Map<String, KeyEntry> keys = new TreeMap<>();
 
   /**
    * Add a new key entry to the collection of keys.
@@ -135,9 +135,9 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
   @SuppressWarnings("rawtypes")
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
-    getLogger().info("Updating {}", this.toString());
+    getLogger().info("Updating {}", toString());
     if (properties == null) {
-      getLogger().warn("{} is unconfigured", this.toString());
+      getLogger().warn("{} is unconfigured", toString());
       return;
     }
 
@@ -154,7 +154,7 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
       key = new StringBuilder(KEY_PREFIX).append(".").append(i).toString();
       keyId = new StringBuilder(ID_PREFIX).append(".").append(i).toString();
       url = new StringBuilder(URL_PREFIX).append(".").append(i).toString();
-      getLogger().debug("Looking for configuration of {}, {}, and {}", new Object[] { key, keyId, url });
+      getLogger().debug("Looking for configuration of {}, {}, and {}", key, keyId, url);
       // Read the key, keyId and url values
       String keyValue = StringUtils.trimToNull((String) properties.get(key));
       String keyIdValue = StringUtils.trimToNull((String) properties.get(keyId));
@@ -162,17 +162,17 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
 
       // Has the url signing provider been fully configured
       if (keyValue == null || keyIdValue == null || urlValue == null) {
-        getLogger()
-                .debug("Unable to configure key with id '{}' and url matcher '{}' because the id, key or url is missing. Stopping to look for new keys.",
-                        keyIdValue, urlValue);
+        getLogger().debug(
+                "Unable to configure key with id '{}' and url matcher '{}' because the id, key or url is missing. Stopping to look for new keys.",
+                keyIdValue, urlValue);
         break;
       }
 
       // Store the key
       try {
         addKeyEntry(keyIdValue, urlValue, keyValue);
-        getLogger().info("{} will handle uris that start with '{}' with the key id '{}'",
-                new Object[] { this.toString(), urlValue, keyIdValue });
+        getLogger().info("{} will handle uris that start with '{}' with the key id '{}'", toString(), urlValue,
+                keyIdValue);
       } catch (IllegalStateException e) {
         throw new ConfigurationException(urlValue, e.getMessage());
       }
@@ -182,7 +182,7 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
 
     // Has the rewriter been fully configured
     if (keys.size() == 0) {
-      getLogger().info("{} configured to not sign any urls.", this.toString());
+      getLogger().info("{} configured to not sign any urls.", toString());
       return;
     }
 
@@ -216,15 +216,15 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
 
     try {
       URI uri = new URI(policy.getBaseUrl());
-      List<NameValuePair> queryStringParameters = new ArrayList<NameValuePair>();
+      List<NameValuePair> queryStringParameters = new ArrayList<>();
       if (uri.getQuery() != null) {
         queryStringParameters = URLEncodedUtils.parse(new URI(policy.getBaseUrl()).getQuery(), StandardCharsets.UTF_8);
       }
       queryStringParameters.addAll(URLEncodedUtils.parse(
               ResourceRequestUtil.policyToResourceRequestQueryString(policy, keyEntry.getId(), keyEntry.getKey()),
               StandardCharsets.UTF_8));
-      return new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), uri.getPath(), URLEncodedUtils.format(
-              queryStringParameters, StandardCharsets.UTF_8), null).toString();
+      return new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), uri.getPath(),
+              URLEncodedUtils.format(queryStringParameters, StandardCharsets.UTF_8), null).toString();
     } catch (Exception e) {
       getLogger().error("Unable to create signed URL because {}", ExceptionUtils.getStackTrace(e));
       throw new UrlSigningException(e);

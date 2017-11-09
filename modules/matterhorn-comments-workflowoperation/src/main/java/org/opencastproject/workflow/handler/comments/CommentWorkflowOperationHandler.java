@@ -133,7 +133,7 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
       default:
         logger.warn(
                 "Unknown action '{}' for comment with description '{}' and reason '{}'. It should be one of the following: ",
-                new Object[] { inputAction, description, reason, StringUtils.join(Operation.values(), ",") });
+                inputAction, description, reason, StringUtils.join(Operation.values(), ","));
     }
     WorkflowOperationResult result = createResult(workflowInstance.getMediaPackage(), Action.CONTINUE,
             (new Date().getTime()) - date.getTime());
@@ -216,7 +216,7 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
         eventCommentService.deleteComment(optComment.get().getId().get());
       } catch (NotFoundException e) {
         logger.debug("Not deleting comment with '{}' text and '{}' reason and id '{}' as it doesn't exist.",
-                new Object[] { description, reason, optComment.get().getId() });
+                description, reason, optComment.get().getId());
       }
     } else {
       logger.debug("Not deleting comment with '{}' text and/or '{}' reason as it doesn't exist.", description, reason);

@@ -71,8 +71,8 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
   @Override
   public URI copyTo(String fromCollection, String fromFileName, String toMediaPackage, String toMediaPackageElement,
           String toFileName) throws IOException, NotFoundException {
-    String urlSuffix = UrlSupport.concat(new String[] { "copy", fromCollection, fromFileName, toMediaPackage,
-            toMediaPackageElement, toFileName });
+    String urlSuffix = UrlSupport.concat(
+            new String[] { "copy", fromCollection, fromFileName, toMediaPackage, toMediaPackageElement, toFileName });
     HttpPost post = new HttpPost(urlSuffix);
     HttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND);
     try {
@@ -81,7 +81,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
           throw new NotFoundException("File from collection to copy not found: " + fromCollection + "/" + fromFileName);
         } else {
           URI uri = new URI(EntityUtils.toString(response.getEntity(), "UTF-8"));
-          logger.info("Copied collection file {}/{} to {}", new Object[] { fromCollection, fromFileName, uri });
+          logger.info("Copied collection file {}/{} to {}", fromCollection, fromFileName, uri);
           return uri;
         }
       }
@@ -104,8 +104,8 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
   @Override
   public URI moveTo(String fromCollection, String fromFileName, String toMediaPackage, String toMediaPackageElement,
           String toFileName) throws IOException, NotFoundException {
-    String urlSuffix = UrlSupport.concat(new String[] { "move", fromCollection, fromFileName, toMediaPackage,
-            toMediaPackageElement, toFileName });
+    String urlSuffix = UrlSupport.concat(
+            new String[] { "move", fromCollection, fromFileName, toMediaPackage, toMediaPackageElement, toFileName });
     HttpPost post = new HttpPost(urlSuffix);
     HttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND);
     try {
@@ -114,7 +114,7 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
           throw new NotFoundException("File from collection to move not found: " + fromCollection + "/" + fromFileName);
         } else {
           URI uri = new URI(EntityUtils.toString(response.getEntity(), "UTF-8"));
-          logger.info("Moved collection file {}/{} to {}", new Object[] { fromCollection, fromFileName, uri });
+          logger.info("Moved collection file {}/{} to {}", fromCollection, fromFileName, uri);
           return uri;
         }
       }

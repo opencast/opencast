@@ -327,8 +327,8 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    * @return the {@link SerializableTheme}
    */
   private SerializableTheme toSerializableTheme(Theme theme) {
-    String creator = StringUtils.isNotBlank(theme.getCreator().getName()) ? theme.getCreator().getName() : theme
-            .getCreator().getUsername();
+    String creator = StringUtils.isNotBlank(theme.getCreator().getName()) ? theme.getCreator().getName()
+            : theme.getCreator().getUsername();
     return new SerializableTheme(theme.getId().getOrElse(org.apache.commons.lang3.math.NumberUtils.LONG_MINUS_ONE),
             theme.getCreationDate(), theme.isDefault(), creator, theme.getName(), theme.getDescription(),
             theme.isBumperActive(), theme.getBumperFile(), theme.isTrailerActive(), theme.getTrailerFile(),
@@ -350,7 +350,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
             int current = 1;
             logger.info(
                     "Re-populating '{}' index with themes from organization {}. There are {} theme(s) to add to the index.",
-                    new Object[] { indexName, securityService.getOrganization().getId(), total });
+                    indexName, securityService.getOrganization().getId(), total);
             for (Theme theme : themes) {
               messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                       ThemeItem.update(toSerializableTheme(theme)));

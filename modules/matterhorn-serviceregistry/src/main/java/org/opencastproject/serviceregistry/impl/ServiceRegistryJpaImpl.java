@@ -3096,7 +3096,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
             logger.debug("Service {} is not yet reachable", registration);
             continue;
           } else {
-            logger.warn("Service {} failed ({}) accepting {}", new Object[] { registration, responseStatusCode, job });
+            logger.warn("Service {} failed ({}) accepting {}", registration, responseStatusCode, job);
             continue;
           }
         } catch (UndispatchableJobException e) {
