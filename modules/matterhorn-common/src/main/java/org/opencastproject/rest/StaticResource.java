@@ -21,6 +21,8 @@
 
 package org.opencastproject.rest;
 
+import org.opencastproject.util.MimeTypes;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -31,7 +33,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,10 +47,6 @@ public class StaticResource extends HttpServlet {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(StaticResource.class);
-
-  /** The mimetypes to use for delivering files */
-  private static final MimetypesFileTypeMap mimeMap = new MimetypesFileTypeMap(
-          StaticResource.class.getClassLoader().getResourceAsStream("mimetypes"));
 
   /** The classpath to search for the static resources */
   protected String classpath = null;
@@ -168,8 +165,8 @@ public class StaticResource extends HttpServlet {
     } finally {
       IOUtils.closeQuietly(in);
     }
-    String contentType = mimeMap.getContentType(url.getPath());
-    if (!"application/octet-stream".equals(contentType)) {
+    String contentType = MimeTypes.getMimeType(url.getPath());
+    if (!MimeTypes.DEFAULT_TYPE.equals(contentType)) {
       resp.setHeader("Content-Type", contentType);
     }
     try {
