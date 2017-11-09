@@ -194,7 +194,7 @@ public class SchedulerMigrationService {
       logger.info("Scheduler transaction | start");
       tx = schedulerService.createTransaction("opencast");
       stm = connection.createStatement();
-      result = stm.executeQuery("SELECT * FROM mh_scheduled_event");
+      result = stm.executeQuery("SELECT id, access_control, blacklisted, capture_agent_metadata, dublin_core, mediapackage_id, opt_out, review_date, review_status FROM mh_scheduled_event");
       List<Event> events = transform(result);
       for (Event event : events) {
         // Outdated events have to be removed just before schedule time.
@@ -277,14 +277,14 @@ public class SchedulerMigrationService {
     try {
       List<Event> events = new ArrayList<>();
       while (resultSet.next()) {
-        DublinCoreCatalog dc = readDublinCoreSilent(resultSet.getString(4));
+        DublinCoreCatalog dc = readDublinCoreSilent(resultSet.getString(5));
         dc.setIdentifier(UUID.randomUUID().toString());
         dc.setFlavor(MediaPackageElements.EPISODE);
-        Properties properties = parseProperties(resultSet.getString(3));
-        AccessControlList acl = resultSet.getString(5) != null
-                ? AccessControlParser.parseAclSilent(resultSet.getString(5)) : null;
-        events.add(new Event(resultSet.getLong(1), resultSet.getString(2), dc, properties, acl, resultSet.getBoolean(6),
-                ReviewStatus.valueOf(resultSet.getString(8)), resultSet.getDate(9)));
+        Properties properties = parseProperties(resultSet.getString(4));
+        AccessControlList acl = resultSet.getString(2) != null
+                ? AccessControlParser.parseAclSilent(resultSet.getString(2)) : null;
+        events.add(new Event(resultSet.getLong(1), resultSet.getString(6), dc, properties, acl, resultSet.getBoolean(7),
+                ReviewStatus.valueOf(resultSet.getString(9)), resultSet.getDate(8)));
       }
       return events;
     } catch (Exception e) {
