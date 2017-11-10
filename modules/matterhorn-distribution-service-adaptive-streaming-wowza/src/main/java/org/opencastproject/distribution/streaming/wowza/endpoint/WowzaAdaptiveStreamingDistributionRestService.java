@@ -80,6 +80,9 @@ public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobPr
   /** The service registry */
   protected ServiceRegistry serviceRegistry = null;
 
+  private static final Gson gson = new Gson();
+
+
   /**
    * OSGi activation callback
    *
@@ -122,14 +125,14 @@ public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobPr
           throws Exception {
     Job job = null;
     try {
-      Gson gson = new Gson();
       Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() { }.getType());
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
       job = service.distribute(channelId, mediapackage, setElementIds);
-      if (job == null)
+      if (job == null) {
         return Response.noContent().build();
-
-      return Response.ok(new JaxbJob(job)).build();
+      } else {
+        return Response.ok(new JaxbJob(job)).build();
+      }
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to distribute element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();
@@ -154,14 +157,14 @@ public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobPr
           throws Exception {
     Job job = null;
     try {
-      Gson gson = new Gson();
       Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() { }.getType());
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
       job = service.retract(channelId, mediapackage, setElementIds);
-       if (job == null)
+       if (job == null) {
          return Response.noContent().build();
-
-       return Response.ok(new JaxbJob(job)).build();
+       } else {
+         return Response.ok(new JaxbJob(job)).build();
+       }
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to retract element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();

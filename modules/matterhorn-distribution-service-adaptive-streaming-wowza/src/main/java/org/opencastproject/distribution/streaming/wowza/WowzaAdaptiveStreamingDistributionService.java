@@ -162,10 +162,10 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   };
 
   /** The load on the system introduced by creating a distribute job */
-  public static final float DEFAULT_DISTRIBUTE_JOB_LOAD = 0.1f;
+  public static final float DEFAULT_DISTRIBUTE_JOB_LOAD = 1.0f;
 
   /** The load on the system introduced by creating a retract job */
-  public static final float DEFAULT_RETRACT_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_RETRACT_JOB_LOAD = 0.1f;
 
   /** The key to look for in the service configuration file to override the {@link DEFAULT_DISTRIBUTE_JOB_LOAD} */
   public static final String DISTRIBUTE_JOB_LOAD_KEY = "job.load.streaming.distribute";
@@ -197,7 +197,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   /** Whether or not RTMP is supported */
   private boolean isRTMPSupported = false;
 
-  private final Gson gson = new Gson();
+  private static final Gson gson = new Gson();
 
   /**
    * Creates a new instance of the streaming distribution service.
@@ -417,15 +417,14 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   public Job distribute(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException, MediaPackageException {
     Set<String> elmentIds = new HashSet();
     elmentIds.add(elementId);
-    return (distribute(channelId, mediapackage, elmentIds));
+    return distribute(channelId, mediapackage, elmentIds);
   }
 
   /**
    * Distribute Mediapackage elements to the download distribution service.
    *
-   * @param channelId # The id of the publication channel to be distributed to.
-   * @param mediapackage The media package that contains the elements to be
-   * distributed.
+   * @param channelId The id of the publication channel to be distributed to.
+   * @param mediapackage The media package that contains the elements to be distributed.
    * @param elementIds The ids of the elements that should be distributed
    * contained within the media package.
    * @return A reference to the MediaPackageElements that have been distributed.
@@ -974,7 +973,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
 
         // Get the relativized URL path
         String uriPath = relativeUri.getPath();
-        // Remove the last part (corresponds to the part of the "virtual" manifests
+        // Remove the last part (corresponds to the part of the "virtual" manifests)
         uriPath = uriPath.substring(0, uriPath.lastIndexOf('/'));
         // Remove the "smil:" tags, if any, and set the right extension if needed
         uriPath = uriPath.replace("smil:", "");
@@ -1126,8 +1125,10 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
           }
           ArrayList<MediaPackageElement> retractedElementsList = new ArrayList<MediaPackageElement>();
           if (retractedElements != null) {
-            for (int i = 0; i < retractedElements.length; i++) {
-              if (retractedElements[i] != null) retractedElementsList.add(retractedElements[i]);
+            for (MediaPackageElement element: retractedElements) {
+              if (element != null) {
+                retractedElementsList.add(element);
+              }
             }
           }
           return (! retractedElementsList.isEmpty())

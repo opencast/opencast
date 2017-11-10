@@ -109,7 +109,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
   private DownloadDistributionService downloadDistributionService = null;
 
   /** The streaming distribution service */
-  private StreamingDistributionService  streamingDistributionService = null;
+  private StreamingDistributionService streamingDistributionService = null;
 
   /** The OAI-PMH persistence */
   private OaiPmhDatabase persistence = null;
