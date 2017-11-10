@@ -273,7 +273,7 @@ public final class SeriesIndexUtils {
               .getByQuery(new SeriesSearchQuery(organization, user).withoutActions().withManagedAcl(currentManagedAcl));
     } catch (SearchIndexException e) {
       logger.error("Unable to find the series in org '{}' with current managed acl name '{}' because {}",
-              new Object[] { organization, currentManagedAcl, ExceptionUtils.getStackTrace(e) });
+              organization, currentManagedAcl, ExceptionUtils.getStackTrace(e));
     }
     if (result != null && result.getHitCount() > 0) {
       for (SearchResultItem<Series> seriesItem : result.getItems()) {
@@ -284,7 +284,7 @@ public final class SeriesIndexUtils {
         } catch (SearchIndexException e) {
           logger.warn(
                   "Unable to update event '{}' from current managed acl '{}' to new managed acl name '{}' because {}",
-                  new Object[] { series, currentManagedAcl, newManagedAcl, ExceptionUtils.getStackTrace(e) });
+                  series, currentManagedAcl, newManagedAcl, ExceptionUtils.getStackTrace(e));
         }
       }
     }
@@ -310,7 +310,7 @@ public final class SeriesIndexUtils {
               .getByQuery(new SeriesSearchQuery(organization, user).withoutActions().withManagedAcl(managedAcl));
     } catch (SearchIndexException e) {
       logger.error("Unable to find the series in org '{}' with current managed acl name '{}' because {}",
-              new Object[] { organization, managedAcl, ExceptionUtils.getStackTrace(e) });
+              organization, managedAcl, ExceptionUtils.getStackTrace(e));
     }
     if (result != null && result.getHitCount() > 0) {
       for (SearchResultItem<Series> seriesItem : result.getItems()) {
@@ -320,7 +320,7 @@ public final class SeriesIndexUtils {
           searchIndex.addOrUpdate(series);
         } catch (SearchIndexException e) {
           logger.warn("Unable to update series '{}' to remove managed acl '{}' because {}",
-                  new Object[] { series, managedAcl, ExceptionUtils.getStackTrace(e) });
+                  series, managedAcl, ExceptionUtils.getStackTrace(e));
         }
       }
     }

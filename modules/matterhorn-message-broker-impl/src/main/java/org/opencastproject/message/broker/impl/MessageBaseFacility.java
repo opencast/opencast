@@ -52,8 +52,7 @@ public class MessageBaseFacility {
   protected static final String ACTIVEMQ_BROKER_PASSWORD_KEY = "activemq.broker.password";
 
   /** Default Broker URL */
-  private static final String ACTIVEMQ_DEFAULT_URL
-    = "failover://(tcp://localhost:61616)?initialReconnectDelay=2000&maxReconnectAttempts=2";
+  private static final String ACTIVEMQ_DEFAULT_URL = "failover://(tcp://localhost:61616)?initialReconnectDelay=2000&maxReconnectAttempts=2";
 
   /** Minimum time in milliseconds between two connection attempts */
   private static final long MIN_RECONNECT_TIME = 60000;
@@ -112,7 +111,7 @@ public class MessageBaseFacility {
 
   /** Opens new sessions and connections to the message broker */
   protected synchronized boolean connectMessageBroker() {
-    if (!this.enabled) {
+    if (!enabled) {
       return false;
     }
     if (isConnected()) {
@@ -146,8 +145,7 @@ public class MessageBaseFacility {
         @Override
         public void transportInterupted() {
           enable(false);
-          logger.error("Connection to ActiveMQ message broker interrupted ({}, username: {})",
-              new Object[] {url, username});
+          logger.error("Connection to ActiveMQ message broker interrupted ({}, username: {})", url, username);
         }
 
         @Override
@@ -244,7 +242,7 @@ public class MessageBaseFacility {
   public boolean isConnected() {
     try {
       connection.getMetaData();
-      return this.enabled;
+      return enabled;
     } catch (Exception e) {
       return false;
     }
@@ -264,7 +262,7 @@ public class MessageBaseFacility {
   }
 
   public void enable(final boolean state) {
-    this.enabled = state;
+    enabled = state;
   }
 
   /**

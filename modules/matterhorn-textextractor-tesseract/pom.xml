@@ -21,10 +21,19 @@
       <artifactId>matterhorn-textanalyzer-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!--  Thirdparty dependencies -->
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.entwinemedia.common</groupId>
+      <artifactId>functional</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -33,11 +42,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -52,11 +56,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

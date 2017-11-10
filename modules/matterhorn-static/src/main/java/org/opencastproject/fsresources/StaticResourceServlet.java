@@ -22,24 +22,22 @@
 package org.opencastproject.fsresources;
 
 import org.opencastproject.util.ConfigurationException;
+import org.opencastproject.util.MimeTypes;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.zip.CRC32;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -56,15 +54,12 @@ public class StaticResourceServlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
   /** Full range marker. */
   private static final ArrayList<Range> FULL_RANGE;
-  /** The mime types map */
-  private static final MimetypesFileTypeMap MIME_TYPES_MAP;
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(StaticResourceServlet.class);
 
   /** static initializer */
   static {
     FULL_RANGE = new ArrayList<Range>();
-    MIME_TYPES_MAP = new MimetypesFileTypeMap();
   }
 
   /** The filesystem directory to serve files fro */
@@ -99,17 +94,6 @@ public class StaticResourceServlet extends HttpServlet {
       throw new ConfigurationException("Distribution directory not set");
     }
     logger.info("Serving static files from '{}'", distributionDirectory);
-
-    InputStream is = this.getClass().getResourceAsStream("/META-INF/mime.types");
-    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-    try {
-      String line;
-      while ((line = reader.readLine()) != null) {
-        MIME_TYPES_MAP.addMimeTypes(line);
-      }
-    } catch (IOException e) {
-      logger.error("Failed to read mime type map from JAR", e);
-    }
   }
 
   /**
@@ -142,8 +126,8 @@ public class StaticResourceServlet extends HttpServlet {
         return;
       }
       resp.setHeader("ETag", eTag);
-      String contentType = MIME_TYPES_MAP.getContentType(f);
-      if (!"application/octet-stream".equals(contentType)) {
+      String contentType = MimeTypes.getMimeType(normalized);
+      if (!MimeTypes.DEFAULT_TYPE.equals(contentType)) {
         resp.setContentType(contentType);
       }
       resp.setHeader("Content-Length", Long.toString(f.length()));

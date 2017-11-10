@@ -1,6 +1,94 @@
 Opencast 3.x
 ============
 
+Püencast 4.0
+------------
+
+- [[MH-12499]](https://opencast.jira.com/browse/MH-12499) - Admin UI event tools dialog can't be closed with the close button
+- [[MH-12492]](https://opencast.jira.com/browse/MH-12492) - AssetManager endpoint return server error on assets, which the user not allowed to read
+- [[MH-12488]](https://opencast.jira.com/browse/MH-12488) - Publish worklow always fail
+- [[MH-12480]](https://opencast.jira.com/browse/MH-12480) - Waveform Operation Should Have Tests
+- [[MH-12479]](https://opencast.jira.com/browse/MH-12479) - Waveform Operation Should Not leave Files In Workspace
+- [[MH-12470]](https://opencast.jira.com/browse/MH-12470) - Prematurely deleted scheduler properties lead to undeletable events
+- [[MH-12469]](https://opencast.jira.com/browse/MH-12469) - Auto Update OAIPMH republishes deleted Events
+- [[MH-12467]](https://opencast.jira.com/browse/MH-12467) - Scheduled event fails due to not finding a workflow definition to use
+- [[MH-12463]](https://opencast.jira.com/browse/MH-12463) - Hyphens in event/series search return no results
+- [[MH-12456]](https://opencast.jira.com/browse/MH-12456) - Clean Up PathSupport
+- [[MH-12455]](https://opencast.jira.com/browse/MH-12455) - FFmpeg does not terminate when Opencast is shut down
+- [[MH-12454]](https://opencast.jira.com/browse/MH-12454) - PathSupport.changeFileExtension does not properly handle files with no extension
+- [[MH-12453]](https://opencast.jira.com/browse/MH-12453) - TimelinePreview Path Handling
+- [[MH-12451]](https://opencast.jira.com/browse/MH-12451) - Lock file utility method should throw exceptions
+- [[MH-12450]](https://opencast.jira.com/browse/MH-12450) - Clean up \*EncoderEngine code
+- [[MH-12449]](https://opencast.jira.com/browse/MH-12449) - Ensure temporary files are deleted on composer failure
+- [[MH-12448]](https://opencast.jira.com/browse/MH-12448) - Remove unconfigured send-mail WOH
+- [[MH-12447]](https://opencast.jira.com/browse/MH-12447) - OAI-PMH autorepublish fails if series was deleted
+- [[MH-12446]](https://opencast.jira.com/browse/MH-12446) - Do not leave ZIP files in workspace when a Workflow fails
+- [[MH-12442]](https://opencast.jira.com/browse/MH-12442) - Maven site is broken
+- [[MH-12436]](https://opencast.jira.com/browse/MH-12436) - Add Christian Greweling to Comitters list
+- [[MH-12431]](https://opencast.jira.com/browse/MH-12431) - Update Crowdin translations for r/4.x
+- [[MH-12428]](https://opencast.jira.com/browse/MH-12428) - Performance Issue In Event Metadata
+- [[MH-12427]](https://opencast.jira.com/browse/MH-12427) - Submit button in Editor typo
+- [[MH-12423]](https://opencast.jira.com/browse/MH-12423) - Date Parse Error When Changing Certain Metadata
+- [[MH-12420]](https://opencast.jira.com/browse/MH-12420) - Update frontend-maven-plugin
+- [[MH-12417]](https://opencast.jira.com/browse/MH-12417) - Poor performace on scheduler /recordings/calendars
+- [[MH-12411]](https://opencast.jira.com/browse/MH-12411) - Database user requires additional permissions
+- [[MH-12409]](https://opencast.jira.com/browse/MH-12409) - Conductor logs ClassCastException when receiving DeleteSnapshot
+- [[MH-12407]](https://opencast.jira.com/browse/MH-12407) - "The task could not be created" message by starting task on multiple events
+- [[MH-12406]](https://opencast.jira.com/browse/MH-12406) - Splitting in the video editor while a video is playing causes time jump
+- [[MH-12401]](https://opencast.jira.com/browse/MH-12401) - Video editor segment times stay blank (timing)
+- [[MH-12396]](https://opencast.jira.com/browse/MH-12396) - Cannot select filter two times in a row from dropdown
+- [[MH-12395]](https://opencast.jira.com/browse/MH-12395) - REST: Handle Scheduling Conflict
+- [[MH-12390]](https://opencast.jira.com/browse/MH-12390) - Gracefully handle unregistration of non-existing host
+- [[MH-12385]](https://opencast.jira.com/browse/MH-12385) - Ingest Code Cleanup
+- [[MH-12382]](https://opencast.jira.com/browse/MH-12382) - As a system administrator, I want to see the capture agent configuration in the user interface, so that I don't need to look into the database directly
+- [[MH-12380]](https://opencast.jira.com/browse/MH-12380) - External API v1.0.0 Broken Due To StartDate Format Change
+- [[MH-12372]](https://opencast.jira.com/browse/MH-12372) - Make waveform service more flexible by allowing pre- and post-filters to be configured
+- [[MH-12366]](https://opencast.jira.com/browse/MH-12366) - authorization-manager depends on download-impl
+- [[MH-12365]](https://opencast.jira.com/browse/MH-12365) - Losing ActiveMQ connection spams the logs
+- [[MH-12356]](https://opencast.jira.com/browse/MH-12356) - As an administrator, I'd like to resolve or delete comments in workflows by comment reason only
+- [[MH-12355]](https://opencast.jira.com/browse/MH-12355) - Include Wowza Adaptive Streaming Module in Opencast
+- [[MH-12354]](https://opencast.jira.com/browse/MH-12354) - Admin UI Video Editor wont let you edit segements at the end
+- [[MH-12352]](https://opencast.jira.com/browse/MH-12352) - Include support for user Groups in LDAP
+- [[MH-12350]](https://opencast.jira.com/browse/MH-12350) - Recreate adminui-Index stops, if Asset of Event ist missing
+- [[MH-12349]](https://opencast.jira.com/browse/MH-12349) - Exception handler should not throw an IO exception on deleting temporary directory
+- [[MH-12348]](https://opencast.jira.com/browse/MH-12348) - As an administrator, I want to use the "send-email" WOH with multiple recipients and also use the CC and BCC fields
+- [[MH-12346]](https://opencast.jira.com/browse/MH-12346) - Publications are not shown in the admin interface
+- [[MH-12330]](https://opencast.jira.com/browse/MH-12330) - The series WOH only updates the series' title and ID on the episode's catalog, but sometimes more fields should be updated
+- [[MH-12328]](https://opencast.jira.com/browse/MH-12328) - Update AngularJS from 1.3.x to 1.4.x
+- [[MH-12325]](https://opencast.jira.com/browse/MH-12325) - Maven warning when building r/3.x
+- [[MH-12314]](https://opencast.jira.com/browse/MH-12314) - As a developer, I expect the Admin UI tests being skipped if I build Opencast using -DskipTests
+- [[MH-12312]](https://opencast.jira.com/browse/MH-12312) - Event Counter For "Today"
+- [[MH-12309]](https://opencast.jira.com/browse/MH-12309) - Use Matching FontAwesome Icons
+- [[MH-12304]](https://opencast.jira.com/browse/MH-12304) - Configurable Notification Durations
+- [[MH-12302]](https://opencast.jira.com/browse/MH-12302) - Do Not Warn About Default Configuration
+- [[MH-12289]](https://opencast.jira.com/browse/MH-12289) - Publish extended metadata to OAI-PMH
+- [[MH-12287]](https://opencast.jira.com/browse/MH-12287) - prevent reload of Admin UI when opening the editor
+- [[MH-12286]](https://opencast.jira.com/browse/MH-12286) - As an Opencast admin, I want to set workflow properties from an external script
+- [[MH-12283]](https://opencast.jira.com/browse/MH-12283) - Support MPEG DASH in Player
+- [[MH-12278]](https://opencast.jira.com/browse/MH-12278) - NullPointerException in CleanupWorkflowOperationHandler
+- [[MH-12274]](https://opencast.jira.com/browse/MH-12274) - Ingest service REST endpoint should be verbosable and expect input UTF-8 encoded
+- [[MH-12266]](https://opencast.jira.com/browse/MH-12266) - As a user, I expect metadata changes to be propagated to third-party applications
+- [[MH-12259]](https://opencast.jira.com/browse/MH-12259) - Ingest-download WOH fail on downloading publication elements
+- [[MH-12258]](https://opencast.jira.com/browse/MH-12258) - Update angular-translate to version 2.15.2
+- [[MH-12250]](https://opencast.jira.com/browse/MH-12250) - Synchronize Dublin Core date created and start date in DC temporal
+- [[MH-12242]](https://opencast.jira.com/browse/MH-12242) - Theodul: Quality selector does not display/load
+- [[MH-12234]](https://opencast.jira.com/browse/MH-12234) - Cleanup WOH does not remove all files as it should do
+- [[MH-12223]](https://opencast.jira.com/browse/MH-12223) - Oaipmh Publish is very slow
+- [[MH-12196]](https://opencast.jira.com/browse/MH-12196) - Use a date and time picker instead of separate inputs for date and time in admin UI
+- [[MH-12191]](https://opencast.jira.com/browse/MH-12191) - Add support for automated captions/transcripts (IBM Watson)
+- [[MH-12168]](https://opencast.jira.com/browse/MH-12168) - As a user, I need cross-page links that help me to work more efficiently
+- [[MH-12166]](https://opencast.jira.com/browse/MH-12166) - As a user, I'm not willing to perform that many clicks to actually use the filters
+- [[MH-12111]](https://opencast.jira.com/browse/MH-12111) - Require Java 8
+- [[MH-12104]](https://opencast.jira.com/browse/MH-12104) - As a producer, I want to access assets of my tenant while a workflow is running
+- [[MH-12082]](https://opencast.jira.com/browse/MH-12082) - Contribute Asset Manager/Scheduler work (ETH)
+- [[MH-12052]](https://opencast.jira.com/browse/MH-12052) - As an Administrator, I'd like to know that ActiveMQ is running properly
+- [[MH-11703]](https://opencast.jira.com/browse/MH-11703) - Service error states not immediately visible in admin UI
+- [[MH-11274]](https://opencast.jira.com/browse/MH-11274) - Workflow Operations of Scheduled Event are not editable
+- [[MH-11195]](https://opencast.jira.com/browse/MH-11195) - Ability to Search on part of a Series Identifier, instead of just exact match
+- [[MH-11042]](https://opencast.jira.com/browse/MH-11042) - Admin UI NG tests fail in +5:30 timezone
+- [[MH-10156]](https://opencast.jira.com/browse/MH-10156) - Misspelling in LtiLaunchAuthenticationHandler.java
+
+
 Opencast 3.3
 ------------
 *Released on September 21, 2017*

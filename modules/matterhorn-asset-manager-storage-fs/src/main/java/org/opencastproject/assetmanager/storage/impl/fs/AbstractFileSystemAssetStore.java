@@ -79,7 +79,7 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
       mkParent(destination);
       link(origin, destination);
     } catch (IOException e) {
-      logger.error("Error while linking/copying file {} to {}: {}", new Object[] { origin, destination, getMessage(e) });
+      logger.error("Error while linking/copying file {} to {}: {}", origin, destination, getMessage(e));
       throw new AssetStoreException(e);
     }
   }

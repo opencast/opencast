@@ -281,9 +281,9 @@ public class ServerEndpoint {
         ascending = SearchQuery.Order.Ascending == sortCriterion.getOrder()
                 || SearchQuery.Order.None == sortCriterion.getOrder();
       } catch (WebApplicationException ex) {
-        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", new Object[] { sort });
+        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", sort);
       } catch (IllegalArgumentException ex) {
-        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", new Object[] { sort });
+        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", sort);
       }
     }
 

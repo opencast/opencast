@@ -310,13 +310,13 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
       if (audioTrack != null && videoTrack != null)
         logger.info("Muxing audio track {} and video track {} into {}",
-                new Object[] { audioTrack.getIdentifier(), videoTrack.getIdentifier(), targetTrackId });
+                audioTrack.getIdentifier(), videoTrack.getIdentifier(), targetTrackId);
       else if (audioTrack == null)
         logger.info("Encoding video track {} to {} using profile '{}'",
-                new Object[] { videoTrack.getIdentifier(), targetTrackId, profileId });
+                videoTrack.getIdentifier(), targetTrackId, profileId);
       else if (videoTrack == null)
         logger.info("Encoding audio track {} to {} using profile '{}'",
-                new Object[] { audioTrack.getIdentifier(), targetTrackId, profileId });
+                audioTrack.getIdentifier(), targetTrackId, profileId);
 
       // Do the work
       Option<File> output;
@@ -774,29 +774,29 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         }
         if (upperLaidOutElement.isSome()) {
           logger.info("Composing lower video track {} {} and upper video track {} {} including watermark {} {} into {}",
-                  new Object[] { lowerLaidOutElement.getElement().getIdentifier(),
+                  lowerLaidOutElement.getElement().getIdentifier(),
                           lowerLaidOutElement.getElement().getURI(),
                           upperLaidOutElement.get().getElement().getIdentifier(),
                           upperLaidOutElement.get().getElement().getURI(),
                           watermarkOption.get().getElement().getIdentifier(),
-                          watermarkOption.get().getElement().getURI(), targetTrackId });
+                          watermarkOption.get().getElement().getURI(), targetTrackId);
         } else {
           logger.info("Composing video track {} {} including watermark {} {} into {}",
-                  new Object[] { lowerLaidOutElement.getElement().getIdentifier(),
+                  lowerLaidOutElement.getElement().getIdentifier(),
                           lowerLaidOutElement.getElement().getURI(), watermarkOption.get().getElement().getIdentifier(),
-                          watermarkOption.get().getElement().getURI(), targetTrackId });
+                          watermarkOption.get().getElement().getURI(), targetTrackId);
         }
       } else {
         if (upperLaidOutElement.isSome()) {
           logger.info("Composing lower video track {} {} and upper video track {} {} into {}",
-                  new Object[] { lowerLaidOutElement.getElement().getIdentifier(),
+                  lowerLaidOutElement.getElement().getIdentifier(),
                           lowerLaidOutElement.getElement().getURI(),
                           upperLaidOutElement.get().getElement().getIdentifier(),
-                          upperLaidOutElement.get().getElement().getURI(), targetTrackId });
+                          upperLaidOutElement.get().getElement().getURI(), targetTrackId);
         } else {
           logger.info("Composing video track {} {} into {}",
-                  new Object[] { lowerLaidOutElement.getElement().getIdentifier(),
-                          lowerLaidOutElement.getElement().getURI(), targetTrackId });
+                  lowerLaidOutElement.getElement().getIdentifier(),
+                          lowerLaidOutElement.getElement().getURI(), targetTrackId);
         }
       }
 
@@ -848,8 +848,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       return some(inspectedTrack);
     } catch (Exception e) {
       if (upperLaidOutElement.isSome()) {
-        logger.warn("Error composing {}  and {}: {}", new Object[] { lowerLaidOutElement.getElement(),
-                upperLaidOutElement.get().getElement(), getStackTrace(e) });
+        logger.warn("Error composing {}  and {}: {}", lowerLaidOutElement.getElement(),
+                upperLaidOutElement.get().getElement(), getStackTrace(e));
       } else {
         logger.warn("Error composing {}: {}", lowerLaidOutElement.getElement(), getStackTrace(e));
       }

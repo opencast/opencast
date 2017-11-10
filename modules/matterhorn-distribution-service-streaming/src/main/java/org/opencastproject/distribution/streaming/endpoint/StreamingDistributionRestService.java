@@ -151,7 +151,7 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
       logger.debug("Unable to distribute element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
-      logger.warn("Unable to retract mediapackage '{}' from streaming channel: {}", new Object[] { mediaPackageXml, e });
+      logger.warn("Unable to retract mediapackage '{}' from streaming channel: {}", mediaPackageXml, e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
   }

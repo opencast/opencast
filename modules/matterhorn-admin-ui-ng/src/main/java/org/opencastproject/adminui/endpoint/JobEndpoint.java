@@ -211,9 +211,9 @@ public class JobEndpoint {
         ascending = SearchQuery.Order.Ascending == sortCriterion.getOrder()
                 || SearchQuery.Order.None == sortCriterion.getOrder();
       } catch (WebApplicationException ex) {
-        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", new Object[] { sort });
+        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", sort);
       } catch (IllegalArgumentException ex) {
-        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", new Object[] { sort });
+        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", sort);
       }
     }
 
@@ -326,9 +326,9 @@ public class JobEndpoint {
 
         query.withSort(sortKey, ascending);
       } catch (WebApplicationException ex) {
-        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", new Object[] { sort });
+        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", sort);
       } catch (IllegalArgumentException ex) {
-        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", new Object[] { sort });
+        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", sort);
       }
     }
 
@@ -720,7 +720,7 @@ public class JobEndpoint {
         result = ((Comparable)value1).compareTo(value2);
       } catch (ClassCastException ex) {
         logger.debug("Can not compare \"{}\" with \"{}\": {}",
-                new Object[] { value1, value2, ex });
+                value1, value2, ex);
       }
 
       return ascending ? result : -1 * result;

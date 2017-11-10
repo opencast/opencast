@@ -533,7 +533,7 @@ public class SeriesEndpoint {
       updatedFields = RequestUtils.getKeyValueMap(metadataJSON);
     } catch (ParseException e) {
       logger.debug("Unable to update series '{}' with metadata type '{}' and content '{}' because: {}",
-              new Object[] { id, type, metadataJSON, ExceptionUtils.getStackTrace(e) });
+              id, type, metadataJSON, ExceptionUtils.getStackTrace(e));
       return RestUtil.R.badRequest(String.format("Unable to parse metadata fields as json from '%s' because '%s'",
               metadataJSON, ExceptionUtils.getStackTrace(e)));
     } catch (IllegalArgumentException e) {
@@ -723,11 +723,11 @@ public class SeriesEndpoint {
       return okJson(metadataList.toJSON());
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to update series '{}' with metadata '{}' because: {}",
-              new Object[] { seriesID, metadataJSON, ExceptionUtils.getStackTrace(e) });
+              seriesID, metadataJSON, ExceptionUtils.getStackTrace(e));
       return RestUtil.R.badRequest(e.getMessage());
     } catch (IndexServiceException e) {
       logger.error("Unable to update series '{}' with metadata '{}' because: {}",
-              new Object[] { seriesID, metadataJSON, ExceptionUtils.getStackTrace(e) });
+              seriesID, metadataJSON, ExceptionUtils.getStackTrace(e));
       return RestUtil.R.serverError();
     }
   }
@@ -790,7 +790,7 @@ public class SeriesEndpoint {
                                        obj(f("identifier", v(seriesId, BLANK))));
     } catch (IndexServiceException e) {
       logger.error("Unable to create series with metadata '{}', acl '{}', theme '{}' because: ",
-              new Object[] { metadataParam, aclParam, themeIdParam, ExceptionUtils.getStackTrace(e) });
+              metadataParam, aclParam, themeIdParam, ExceptionUtils.getStackTrace(e));
       throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
     }
   }
