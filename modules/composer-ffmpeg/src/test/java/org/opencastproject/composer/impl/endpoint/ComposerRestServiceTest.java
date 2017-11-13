@@ -91,9 +91,11 @@ public class ComposerRestServiceTest {
     EasyMock.expect(composer.listProfiles()).andReturn(list.toArray(new EncodingProfile[list.size()]));
     EasyMock.expect(composer.getProfile(profileId)).andReturn(profile);
     EasyMock.expect(composer.concat(EasyMock.eq(profileId), EasyMock.eq(new Dimension(640, 480)),
+            EasyMock.anyBoolean(),
             (Track) EasyMock.notNull(), (Track) EasyMock.notNull())).andReturn(job);
     EasyMock.expect(composer.concat(EasyMock.eq(profileId), EasyMock.eq(new Dimension(640, 480)),
-            EasyMock.gt(0.0f), (Track) EasyMock.notNull(), (Track) EasyMock.notNull())).andReturn(job);
+            EasyMock.gt(0.0f), EasyMock.anyBoolean(), (Track) EasyMock.notNull(), (Track) EasyMock.notNull()))
+            .andReturn(job);
     EasyMock.replay(composer);
 
     // Set up the rest endpoint
@@ -157,7 +159,7 @@ public class ComposerRestServiceTest {
     Dimension dimension = new Dimension(640, 480);
     Track videoTrack = (Track) MediaPackageElementParser.getFromXml(generateVideoTrack());
     String sourceTracks = MediaPackageElementParser.getArrayAsXml(Collections.list(videoTrack, videoTrack));
-    Response response = restService.concat(sourceTracks, profileId, Serializer.json(dimension).toJson(), "25");
+    Response response = restService.concat(sourceTracks, profileId, Serializer.json(dimension).toJson(), "25", "false");
     Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     Assert.assertNotNull("Concat rest endpoint should send a job in response", response.getEntity());
   }

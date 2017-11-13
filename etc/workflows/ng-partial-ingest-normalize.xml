@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>ng-partial-ingest-normalize</id>
+  <title>Convert multiparts and multitrack to presenter/presentation as needed </title>
+  <tags/>
+  <description/>
+
+  <configuration_panel/>
+
+  <operations>
+
+    <!-- create presenter source from multipart(chunked) media source all sharing the same codecs (optional) -->
+    <!-- The files must be named in lexicographical order, eg media01.mp4, media02.mp4 -->
+    <!-- This operation will only re-tag if only one medium is ingested as multipart/chunked+source -->  
+    <operation
+       id="concat"
+       fail-on-error="false"
+       exception-handler-workflow="ng-partial-error"
+       description="Concatenate files in alphabetical order">
+       <configurations>
+         <!-- 1+ files are numbered and sorted lexicographically  -->
+         <configuration key="source-flavor-numbered-files">multipart/chunked+source</configuration>
+         <configuration key="target-flavor">presenter/source</configuration>
+         <!-- same codec and size, no need to transcode first, just arrange them in order into a container -->
+         <configuration key="same-codec">true</configuration>
+         <!-- The concatenated source should be archived -->
+         <configuration key="target-tags">archive</configuration>
+         <!-- Do not transcode, keep this lossless for now -->
+         <configuration key="encoding-profile">concat-samecodec</configuration>
+       </configurations>
+    </operation>
+
+    <!-- Extract presenter and presentation sources from multi-track ingest, such as epiphan, order of the flavors matches order listed in encoding profile, -->
+    <operation
+      id="demux"
+       fail-on-error="false"
+      exception-handler-workflow="ng-partial-error"
+      description="Extract epiphan presenter and presentation video from multitrack source (target listed in the same order in encoding profile)">
+      <configurations>
+        <configuration key="source-flavors">multitrack/source</configuration>
+        <configuration key="target-flavors">presenter/source,presentation/source</configuration>
+        <configuration key="target-tags">archive</configuration>
+        <configuration key="encoding-profile">multitrack-demux</configuration>
+      </configurations>
+    </operation>
+  </operations>
+
+</definition>

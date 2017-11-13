@@ -14,7 +14,7 @@ Parameter Table
 
 |configuration keys         |description                                                                   |
 |---------------------------|------------------------------------------------------------------------------|
-|check-availability         |Check if the media if rechable                                                |
+|check-availability         |Check if the media if reachable                                                |
 |download-source-flavors    |Specifies which media should be published for download                        |
 |download-source-tags       |Specifies which media should be published for download                        |
 |download-target-subflavors |Subflavor to use for distributed material                                     |

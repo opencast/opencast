@@ -7,11 +7,13 @@
     <property name="service.pid" value="org.opencastproject.composer.impl.ComposerServiceImpl" />
     <service>
       <provide interface="org.opencastproject.composer.api.ComposerService" />
+      <provide interface="org.osgi.service.cm.ManagedService" />
     </service>
     <reference name="inspection-service" interface="org.opencastproject.inspection.api.MediaInspectionService"
       cardinality="1..1" policy="static" bind="setMediaInspectionService" />
     <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace" cardinality="1..1"
       policy="static" bind="setWorkspace" />
+    <reference name="smil-service" interface="org.opencastproject.smil.api.SmilService" policy="static" cardinality="1..1" bind="setSmilService" />
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
       cardinality="1..1" policy="static" bind="setServiceRegistry" />
     <reference name="profileScanner" policy="static" bind="setProfileScanner" cardinality="1..1"
@@ -39,5 +41,7 @@
       cardinality="1..1" policy="static" bind="setComposerService" />
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
       cardinality="1..1" policy="static" bind="setServiceRegistry" />
+    <reference name="smil-service" interface="org.opencastproject.smil.api.SmilService"
+                                policy="static" cardinality="1..1" bind="setSmilService" />
   </scr:component>
 </scr:components>
