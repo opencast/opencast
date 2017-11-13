@@ -72,6 +72,7 @@ The following table contains the workflow operations that are available in an ou
 |start-watson-transcription|Starts automated transcription provided by IBM Watson    |[Documentation](start-watson-transcription-woh.md)|
 |tag                 |Modify the tag sets of media package elements                  |[Documentation](tag-woh.md)|
 |tag-by-dcterm       |Modify the tags if dublincore term matches value               |[Documentation](tag-by-dcterm-woh.md)|
+|timelinepreviews    |Create a preview image stream from a given video track         |[Documentation](timelinepreviews-woh.md)|
 |theme               |Make settings of themes available to processing                |[Documentation](theme-woh.md)|
 |waveform            |Create a waveform image of the audio of the mediapackage       |[Documentation](waveform-woh.md)|
 |zip                 |Create zipped archive of the current state of the mediapackage |[Documentation](zip-woh.md)|
