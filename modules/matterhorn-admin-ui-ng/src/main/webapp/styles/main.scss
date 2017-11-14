@@ -242,6 +242,10 @@ textarea.editable {
   height: auto;
 }
 
+.editable-select {
+  margin-top: -26px;
+}
+
 button.red {
   @include btn(red);
 }

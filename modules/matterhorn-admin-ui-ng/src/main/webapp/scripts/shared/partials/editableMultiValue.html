@@ -1,5 +1,5 @@
 <div ng-click="enterEditMode()" ng-form="innerForm">
-    <ul ng-show="!editMode">
+    &nbsp;<ul ng-show="!editMode">
         <li ng-repeat="value in params.value">
             <span>{{ value | translate }}</span>
         </li>
@@ -8,7 +8,7 @@
     <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-focus="enterEditMode()" tabindex="{{ params.tabindex }}"></i>
     <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
 
-    <div ng-show="editMode">
+    <div class="editable-select" ng-show="editMode">
         <input type="text" ng-model="value"
             ng-required="params.required"
             name="{{ params.name }}"

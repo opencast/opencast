@@ -1,5 +1,5 @@
 <div ng-click="enterEditMode()" ng-form="innerForm">
-  <span ng-show="!editMode">{{ params.value | localizeDate:'dateTime'  }}</span>
+  &nbsp;<span ng-show="!editMode">{{ params.value | localizeDate:'dateTime'  }}</span>
     <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-focus="enterEditMode()" tabindex="{{ params.tabindex }}"></i>
     <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
 

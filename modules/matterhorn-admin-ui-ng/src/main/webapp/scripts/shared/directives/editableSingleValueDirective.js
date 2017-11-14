@@ -75,10 +75,20 @@ angular.module('adminNg.directives')
                   if ((scope.params.type === 'text_long') && (element.find('textarea'))) {
                     element.find('textarea').focus();
                   } else if (element.find('input')) {
-                    element.find('input').focus();
+                    // FIXME as on first load the input does not show up we make it visible here
+                    element.find('input').removeClass('ng-hide');
+                    $timeout(function () {
+                      element.find('input').focus();
+                    });
                   }
                 });
             };
+
+            scope.leaveEditMode = function () {
+              scope.editMode = false;
+              // FIXME if we removed ng-hide on our own we have to add it ourselfs too.
+              element.find('input').addClass('ng-hide');
+            }
 
             scope.keyUp = function (event) {
                 if (event.keyCode === 13) {
@@ -111,7 +121,7 @@ angular.module('adminNg.directives')
                 if (scope.params.value === scope.original) { return; }
 
                 scope.presentableValue = present(scope.params);
-                scope.editMode = false;
+                scope.leaveEditMode();
 
                 if (!_.isUndefined(scope.params)) {
                     scope.save(scope.params.id, function () {
@@ -124,7 +134,6 @@ angular.module('adminNg.directives')
             };
 
             scope.$on('$destroy', function () {
-                $timeout.cancel(scope.focusTimer);
             });
        }
     };
