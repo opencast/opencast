@@ -294,6 +294,64 @@
   </dependencies>
   <profiles>
     <profile>
+      <id>frontend-no-prebuilt</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>npm clean</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>pre-clean</phase>
+                <configuration>
+                  <executable>npm</executable>
+                  <arguments>
+                    <argument>cache</argument>
+                    <argument>verify</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>npm install</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>initialize</phase>
+                <configuration>
+                  <executable>npm</executable>
+                  <arguments>
+                    <argument>install</argument>
+                    <argument>--registry</argument>
+                    <argument>${nexus.npm}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>frontend build</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>compile</phase>
+                <configuration>
+                  <!-- bring PHANTOMJS_BIN into scope -->
+                  <environmentScript>phantomjs-path.sh</environmentScript>
+                  <executable>node_modules/grunt-cli/bin/grunt</executable>
+                  <arguments>
+                    <argument>build</argument>
+                    <argument>--skipTests=${skipTests}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>frontend</id>
       <activation>
         <activeByDefault>true</activeByDefault>
