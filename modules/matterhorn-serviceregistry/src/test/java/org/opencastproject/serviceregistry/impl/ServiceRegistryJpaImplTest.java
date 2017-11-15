@@ -66,6 +66,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyVetoException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.concurrent.Executors;
@@ -217,7 +218,7 @@ public class ServiceRegistryJpaImplTest {
   @Test(expected = NotFoundException.class)
   public void testDeleteJobInvalidJobId() throws Exception {
     serviceRegistryJpaImpl.activate(null);
-    serviceRegistryJpaImpl.removeJob(-1L);
+    serviceRegistryJpaImpl.removeJobs(Collections.singletonList(1L));
   }
 
   @Test

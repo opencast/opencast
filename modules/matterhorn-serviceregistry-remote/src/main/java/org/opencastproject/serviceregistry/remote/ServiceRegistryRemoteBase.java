@@ -49,18 +49,17 @@ import org.opencastproject.serviceregistry.api.SystemLoadParser;
 import org.opencastproject.util.HttpUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.QueryStringBuilder;
-import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -889,25 +888,33 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
   }
 
   @Override
-  public void removeJob(long id) throws NotFoundException, ServiceRegistryException {
-    HttpDelete delete = new HttpDelete(UrlSupport.concat(getServiceUrl(), "job", String.valueOf(id)));
+  public void removeJobs(List<Long> ids)throws NotFoundException, ServiceRegistryException {
+    HttpPost post = post("removejobs");
+
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      JSONArray json = new JSONArray();
+      json.addAll(ids);
+      params.add(new BasicNameValuePair("jobIds", json.toJSONString()));
+      post.setEntity(new UrlEncodedFormEntity(params));
+    } catch (UnsupportedEncodingException e) {
+      throw new IllegalStateException(e);
+    }
 
     HttpResponse response = null;
-    int responseStatusCode;
     try {
-      response = getHttpClient().execute(delete);
-      responseStatusCode = response.getStatusLine().getStatusCode();
+      response = getHttpClient().execute(post);
+      int responseStatusCode = response.getStatusLine().getStatusCode();
       if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
+        logger.info("Jobs successfully removed");
         return;
-      } else if (responseStatusCode == HttpStatus.SC_NOT_FOUND) {
-        throw new NotFoundException();
       }
     } catch (TrustedHttpClientException e) {
       throw new ServiceRegistryException(e);
     } finally {
       getHttpClient().close(response);
     }
-    throw new ServiceRegistryException("Unable to remove job with ID " + id + " (" + responseStatusCode + ")");
+    throw new ServiceRegistryException("Unable to remove jobs");
   }
 
   @Override

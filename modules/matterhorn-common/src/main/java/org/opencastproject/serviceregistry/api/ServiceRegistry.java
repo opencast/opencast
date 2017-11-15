@@ -439,12 +439,12 @@ public interface ServiceRegistry {
   Job getJob(long id) throws NotFoundException, ServiceRegistryException;
 
   /**
-   * Deletes a job from the service registry
+   * Deletes the given jobs from the service registry
    *
-   * @param id
-   *          the job id
+   * @param ids
+   *          the job ids
    */
-  void removeJob(long id) throws NotFoundException, ServiceRegistryException;
+  void removeJobs(List<Long> ids) throws NotFoundException, ServiceRegistryException;
 
   /**
    * Removes all jobs which do not have a parent job (except workflow instance jobs) and which have passed their

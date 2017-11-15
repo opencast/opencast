@@ -1081,26 +1081,28 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
         // Second, remove jobs related to a operation which belongs to the workflow instance
         List<WorkflowOperationInstance> operations = instance.getOperations();
+        List<Long> jobsToDelete = new ArrayList<>();
         for (WorkflowOperationInstance op : operations) {
           if (op.getId() != null) {
             long workflowOpId = op.getId();
             if (workflowOpId != workflowInstanceId) {
-              try {
-                serviceRegistry.removeJob(workflowOpId);
-              } catch (ServiceRegistryException e) {
-                logger.warn("Problems while removing jobs related to workflow operation '%d': %s", workflowOpId,
-                            e.getMessage());
-              } catch (NotFoundException e) {
-                logger.debug("No jobs related to the workflow operation '%d' found in the service registry",
-                             workflowOpId);
-              }
+              jobsToDelete.add(workflowOpId);
             }
           }
+        }
+        try {
+          serviceRegistry.removeJobs(jobsToDelete);
+        } catch (ServiceRegistryException e) {
+          logger.warn("Problems while removing jobs related to workflow operations '%s': %s", jobsToDelete,
+                  e.getMessage());
+        } catch (NotFoundException e) {
+          logger.debug("No jobs related to one of the workflow operations '%s' found in the service registry",
+                  jobsToDelete);
         }
 
         // Third, remove workflow instance job itself
         try {
-          serviceRegistry.removeJob(workflowInstanceId);
+          serviceRegistry.removeJobs(Collections.singletonList(workflowInstanceId));
           messageSender.sendObjectMessage(WorkflowItem.WORKFLOW_QUEUE, MessageSender.DestinationType.Queue,
                                           WorkflowItem.deleteInstance(workflowInstanceId, instance));
         } catch (ServiceRegistryException e) {
