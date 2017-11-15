@@ -276,7 +276,6 @@ public interface Workspace extends StorageUsage {
    *
    * @param mediaPackageId
    *          Id specifying the media package to remove files for.
-   * @return  If the operation was successful
    */
   void cleanup(Id mediaPackageId) throws IOException;
 
