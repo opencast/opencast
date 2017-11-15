@@ -21,6 +21,25 @@
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>
+            <id>copy-rest-docs</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/classes/ui/</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>../matterhorn-runtime-info-ui-ng/src/main/resources/ui/</directory>
+                  <includes>
+                    <include>rest_docs.html</include>
+                  </includes>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
             <id>copy-infusion</id>
             <phase>validate</phase>
             <goals>
