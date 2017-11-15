@@ -234,7 +234,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                       segment.end = nextSegment.start;
                     }
                     else {
-                      var startTime = Math.min(newTime, nextSegment.end - 3000);
+                      var startTime = Math.min(newTime, nextSegment.end - 1);
                       segment.end = nextSegment.start = startTime;
                     }
                     scope.$root.$broadcast("segmentTimesUpdated");
