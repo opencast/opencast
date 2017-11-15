@@ -531,7 +531,7 @@
                                             <tr ng-repeat="policy in policies track by $index">
                                                 <td ng-show="!transactions.read_only">
                                                     <select chosen pre-select-from="roles"
-                                                        ng-disabled="((tab == 'access') && !$root.userIs('ROLE_UI_EVENT_DETAILS_ACL_EDIT'))"
+                                                        ng-disabled="((tab == 'access') && !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT'))"
                                                         data-width="'360px'"
                                                         data-disable-search-threshold="8"
                                                         data-search_contains="true"
@@ -549,13 +549,13 @@
                                                 <td class="fit text-center"><input type="checkbox" ng-model="policy.read" ng-change="accessSave(policy)" ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"/></td>
                                                 <td class="fit text-center"><input type="checkbox" ng-model="policy.write" ng-change="accessSave(policy)" ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"/></td>
                                                 <td class="fit editable" ng-if="hasActions">
-                                                    <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked" save="accessSave" admin-ng-editable-multi-select mixed="false" params="policy.actions" collection="actions"></div>
-                                                    <div ng-if="((!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')) || aclLocked)" ng-repeat="customAction in policy.actions.value">{{ customAction }}</div>
+                                                    <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !transactions.read_only" save="accessSave" admin-ng-editable-multi-select mixed="false" params="policy.actions" collection="actions"></div>
+                                                    <div ng-if="((!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')) || transactions.read_only)" ng-repeat="customAction in policy.actions.value">{{ customAction }}</div>
                                                 </td>
-                                                <td ng-if="$root.userIs('ROLE_UI_EVENT_DETAILS_ACL_EDIT')" class="fit"><a ng-show="!transactions.read_only" ng-click="deletePolicy(policy)" class="remove"></a>
+                                                <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')" class="fit"><a ng-show="!transactions.read_only" ng-click="deletePolicy(policy)" class="remove"></a>
                                                 </td>
                                             </tr>
-                                            <tr ng-if="$root.userIs('ROLE_UI_EVENT_DETAILS_ACL_EDIT')" >
+                                            <tr ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')" >
                                                 <td colspan="5"><a ng-show="!transactions.read_only" ng-click="addPolicy()">+ {{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.NEW' | translate }}</a></td>
                                             <tr>
                                             </tr>
