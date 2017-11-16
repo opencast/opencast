@@ -94,6 +94,7 @@ pages:
    - Defaults: 'workflowoperationhandlers/defaults-woh.md'
    - Editor: 'workflowoperationhandlers/editor-woh.md'
    - Encode: 'workflowoperationhandlers/encode-woh.md'
+   - Error Resolution: 'workflowoperationhandlers/error-resolution-woh.md'   
    - Execute Once: 'workflowoperationhandlers/execute-once-woh.md'
    - Execute Many: 'workflowoperationhandlers/execute-many-woh.md'
    - Export Workflow Properties: 'workflowoperationhandlers/export-wf-properties-woh.md'
