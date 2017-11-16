@@ -116,7 +116,7 @@ public class StreamingDistributionServiceImpl extends AbstractDistributionServic
 
   private Option<Locations> locations = none();
 
-  private final Gson gson = new Gson();
+  private static final Gson gson = new Gson();
 
   /** Creates a new instance of the streaming distribution service. */
   public StreamingDistributionServiceImpl() {
@@ -172,7 +172,7 @@ public class StreamingDistributionServiceImpl extends AbstractDistributionServic
   public Job distribute(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException, MediaPackageException {
     Set<String> elmentIds = new HashSet();
     elmentIds.add(elementId);
-   return (distribute(channelId, mediapackage, elmentIds));
+   return (distribute(channelId, mediapackage, elmentIds);
     }
 
   @Override
@@ -195,9 +195,8 @@ public class StreamingDistributionServiceImpl extends AbstractDistributionServic
   /**
    * Distribute Mediapackage elements to the download distribution service.
    *
-   * @param channelId # The id of the publication channel to be distributed to.
-   * @param mediapackage The media package that contains the elements to be
-   * distributed.
+   * @param channelId The id of the publication channel to be distributed to.
+   * @param mediapackage The media package that contains the elements to be distributed.
    * @param elementIds The ids of the elements that should be distributed
    * contained within the media package.
    * @return A reference to the MediaPackageElements that have been distributed.

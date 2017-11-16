@@ -111,7 +111,7 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
   @RestQuery(name = "distribute", description = "Distribute a media package element to this distribution channel", returnDescription = "The job that can be used to track the distribution", restParameters = {
           @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
           @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
-          @RestParameter(name = "elementId", isRequired = true, description = "The elements to distribute as Json Array['IdOne','IdTwo']", type = Type.STRING) }, reponses = {
+          @RestParameter(name = "elementIds", isRequired = true, description = "The elements to distribute as Json Array['IdOne','IdTwo']", type = Type.STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution job"),
           @RestResponse(responseCode = SC_NO_CONTENT, description = "There is no streaming distribution service available") })
   public Response distribute(@FormParam("mediapackage") String mediaPackageXml,

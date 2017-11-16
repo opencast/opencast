@@ -50,7 +50,7 @@ import java.util.Set;
 /**
  * A remote distribution service invoker.
  */
-public class StreamingDistributionServiceRemoteImpl extends RemoteBase implements DistributionService, StreamingDistributionService {
+public class StreamingDistributionServiceRemoteImpl extends RemoteBase implements StreamingDistributionService {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(StreamingDistributionServiceRemoteImpl.class);
@@ -63,7 +63,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
   private static final String PARAM_MEDIAPACKAGE = "mediapackage";
   private static final String PARAM_ELEMENT_ID = "elementId";
 
-  private final Gson gson  = new Gson();
+  private static final Gson gson  = new Gson();
 
   public StreamingDistributionServiceRemoteImpl() {
     // the service type is not available at construction time. we need to wait for activation to set this value
