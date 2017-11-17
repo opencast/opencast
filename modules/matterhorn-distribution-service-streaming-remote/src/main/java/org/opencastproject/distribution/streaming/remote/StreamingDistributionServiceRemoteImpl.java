@@ -28,7 +28,6 @@ import static org.opencastproject.util.JobUtil.jobFromHttpResponse;
 import static org.opencastproject.util.data.functions.Options.join;
 
 import org.opencastproject.distribution.api.DistributionException;
-import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;

@@ -172,8 +172,8 @@ public class StreamingDistributionServiceImpl extends AbstractDistributionServic
   public Job distribute(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException, MediaPackageException {
     Set<String> elmentIds = new HashSet();
     elmentIds.add(elementId);
-   return (distribute(channelId, mediapackage, elmentIds);
-    }
+    return distribute(channelId, mediapackage, elmentIds);
+  }
 
   @Override
   public Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds)
