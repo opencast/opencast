@@ -104,6 +104,7 @@ pages:
    - Image to Video: 'workflowoperationhandlers/imagetovideo-woh.md'
    - Import Workflow Properties: 'workflowoperationhandlers/import-wf-properties-woh.md'
    - Incident: 'workflowoperationhandlers/incident-woh.md'
+   - Include: 'workflowoperationhandlers/include-woh.md'
    - Ingest-Download: 'workflowoperationhandlers/ingestdownload-woh.md'
    - Inspect: 'workflowoperationhandlers/inspect-woh.md'
    - Normalize Audio: 'workflowoperationhandlers/normalizeaudio-woh.md'

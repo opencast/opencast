@@ -48,6 +48,7 @@ The following table contains the workflow operations that are available in an ou
 |image-to-video      |Create a video track from a source image                       |[Documentation](imagetovideo-woh.md)|
 |import-wf-properties|Import workflow properties                                     |[Documentation](import-wf-properties-woh.md)|
 |incident            |Testing incidents on a dummy job                               |[Documentation](incident-woh.md)|
+|include             |Include workflow definition in current workflow                |[Documentation](include-woh.md)|
 |ingest-download     |Download files from external URL for ingest                    |[Documentation](ingestdownload-woh.md)|
 |inspect             |Inspect the media (check if it is valid)                       |[Documentation](inspect-woh.md)|
 |normalize-audio     |Normalize first audio stream                                   |[Documentation](normalizeaudio-woh.md)|
