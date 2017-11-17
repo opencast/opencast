@@ -172,6 +172,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
           case "es": return "es-ES";
           case "fr": return "fr-FR";
           case "gl": return "gl-ES";
+          case "he": return "he-IL";
           case "nl": return "nl-NL";
           case "fi": return "fi-FI";
           case "it": return "it-IT";
