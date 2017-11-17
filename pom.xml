@@ -73,8 +73,6 @@
     <module>modules/dictionary-hunspell</module>
     <module>modules/dictionary-none</module>
     <module>modules/dictionary-regexp</module>
-    <module>modules/distribution-service-acl</module>
-    <module>modules/distribution-service-acl-remote</module>
     <module>modules/distribution-service-api</module>
     <module>modules/distribution-service-aws-s3</module>
     <module>modules/distribution-service-aws-s3-api</module>
