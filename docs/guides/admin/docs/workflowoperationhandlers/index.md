@@ -43,6 +43,7 @@ The following table contains the workflow operations that are available in an ou
 |execute-once        |Execute a command for a MediaPackage                           |[Documentation](execute-once-woh.md)
 |export-wf-properties|Export workflow properties                                     |[Documentation](export-wf-properties-woh.md)|
 |extract-text        |Extracting text from presentation segments                     |[Documentation](extracttext-woh.md)|
+|failing             |Operations that always fails                                   |[Documentation](failing-woh.md)|
 |http-notify         |Notifies an HTTP endpoint about the process of the workflow    |[Documentation](httpnotify-woh.md)|
 |image               |Extract images from a video using FFmpeg                       |[Documentation](image-woh.md)|
 |image-to-video      |Create a video track from a source image                       |[Documentation](imagetovideo-woh.md)|
