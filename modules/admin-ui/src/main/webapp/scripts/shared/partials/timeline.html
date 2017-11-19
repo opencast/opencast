@@ -37,6 +37,10 @@
 
                 <div class="track-toolbar">
                     <label>{{ track.flavor }}</label>
+                    <div class="preview-toggle-control">
+                        <input type="checkbox" ng-model="previewMode" ng-change="togglePreviewMode()">
+                        <label translate>VIDEO_TOOL.PREVIEW_MODE</label>
+                    </div>
                     <!--
                     <div class="track-options">
                         <div class="track-options-button">

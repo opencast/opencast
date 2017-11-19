@@ -33,6 +33,8 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             scope.from = 0;
             scope.to = 0;
 
+            scope.previewMode = false; // in preview mode, deactivated segments are skipped while playing.
+
             scope.wrapperClass = ''; // list of border classes for the segment wrapper.
 
             scope.player.adapter.addListener(PlayerAdapter.EVENTS.DURATION_CHANGE, function () {
@@ -81,8 +83,8 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     replaySegment = segment;
                 }
 
-                // Skip deleted segments while playing
-                if (segment.deleted && scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
+                // When in preview mode, skip deleted segments while playing
+                if (scope.previewMode && segment.deleted && scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
                     scope.player.adapter.setCurrentTime(segment.end / 1000);
                 }
             });
@@ -986,6 +988,13 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 });
                 segment.selected = true;
                 scope.setWrapperClasses();
+            };
+
+            /**
+             * Toggles the preview mode. When preview mode is enabled, deactivated segments are skipped while playing.
+             */
+            scope.togglePreviewMode = function() {
+                scope.previewMode = !scope.previewMode;
             };
 
             /**
