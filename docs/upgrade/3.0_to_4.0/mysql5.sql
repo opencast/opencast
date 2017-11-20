@@ -15,7 +15,6 @@ SET FOREIGN_KEY_CHECKS = 0;
 ##
 
 # drop indices and constraints
-DROP INDEX IX_mh_archive_episode_mediapackage ON mh_archive_episode;
 DROP INDEX IX_mh_archive_episode_version ON mh_archive_episode;
 DROP INDEX IX_mh_archive_episode_deleted ON mh_archive_episode;
 ALTER TABLE mh_archive_episode DROP FOREIGN KEY FK_mh_archive_episode_organization;
