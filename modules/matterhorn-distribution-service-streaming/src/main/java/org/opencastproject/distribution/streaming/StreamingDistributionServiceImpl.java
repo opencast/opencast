@@ -24,13 +24,14 @@ package org.opencastproject.distribution.streaming;
 import static java.lang.String.format;
 import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 import static org.opencastproject.util.PathSupport.path;
+import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.UrlSupport.concat;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.distribution.api.AbstractDistributionService;
 import org.opencastproject.distribution.api.DistributionException;
-import org.opencastproject.distribution.api.DistributionService;
+import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -45,6 +46,9 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.data.Option;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -71,15 +75,18 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Distributes media to the local media delivery directory.
  */
-public class StreamingDistributionService extends AbstractDistributionService implements DistributionService, ManagedService {
+public class StreamingDistributionServiceImpl extends AbstractDistributionService
+  implements  ManagedService, StreamingDistributionService {
 
   /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(StreamingDistributionService.class);
+  private static final Logger logger = LoggerFactory.getLogger(StreamingDistributionServiceImpl.class);
 
   /** Receipt type */
   public static final String JOB_TYPE = "org.opencastproject.distribution.streaming";
@@ -109,8 +116,10 @@ public class StreamingDistributionService extends AbstractDistributionService im
 
   private Option<Locations> locations = none();
 
+  private static final Gson gson = new Gson();
+
   /** Creates a new instance of the streaming distribution service. */
-  public StreamingDistributionService() {
+  public StreamingDistributionServiceImpl() {
     super(JOB_TYPE);
   }
 
@@ -160,22 +169,57 @@ public class StreamingDistributionService extends AbstractDistributionService im
    *      org.opencastproject.mediapackage.MediaPackage, String)
    */
   @Override
-  public Job distribute(String channelId, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException {
-    if (locations.isNone())
-      return null;
+  public Job distribute(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException, MediaPackageException {
+    Set<String> elmentIds = new HashSet();
+    elmentIds.add(elementId);
+    return distribute(channelId, mediapackage, elmentIds);
+  }
 
-    RequireUtil.notNull(mediapackage, "mediapackage");
-    RequireUtil.notNull(elementId, "elementId");
-    RequireUtil.notNull(channelId, "channelId");
-    //
+  @Override
+  public Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds)
+          throws DistributionException, MediaPackageException {
+    notNull(mediapackage, "mediapackage");
+    notNull(elementIds, "elementIds");
+    notNull(channelId, "channelId");
     try {
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Distribute.toString(),
-              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), elementId), distributeJobLoad);
+      return serviceRegistry.createJob(
+              JOB_TYPE,
+              Operation.Distribute.toString(),
+              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediapackage), gson.toJson(elementIds)), distributeJobLoad);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
   }
+
+
+  /**
+   * Distribute Mediapackage elements to the download distribution service.
+   *
+   * @param channelId The id of the publication channel to be distributed to.
+   * @param mediapackage The media package that contains the elements to be distributed.
+   * @param elementIds The ids of the elements that should be distributed
+   * contained within the media package.
+   * @return A reference to the MediaPackageElements that have been distributed.
+   * @throws DistributionException Thrown if the parent directory of the
+   * MediaPackageElement cannot be created, if the MediaPackageElement cannot be
+   * copied or another unexpected exception occurs.
+   */
+  public MediaPackageElement[] distributeElements(String channelId, MediaPackage mediapackage, Set<String> elementIds)
+    throws DistributionException {
+    notNull(mediapackage, "mediapackage");
+    notNull(elementIds, "elementIds");
+    notNull(channelId, "channelId");
+
+    final Set<MediaPackageElement> elements = getElements(mediapackage, elementIds);
+    List<MediaPackageElement> distributedElements = new ArrayList<>();
+
+    for (MediaPackageElement element : elements) {
+      MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, element.getIdentifier());
+      distributedElements.add(distributedElement);
+    }
+    return distributedElements.toArray(new MediaPackageElement[distributedElements.size()]);
+  }
+
 
   /**
    * Distribute a Mediapackage element to the download distribution service.
@@ -260,6 +304,13 @@ public class StreamingDistributionService extends AbstractDistributionService im
     }
   }
 
+  @Override
+  public Job retract(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException {
+    Set<String> elementIds = new HashSet();
+    elementIds.add(elementId);
+    return retract(channelId, mediapackage, elementIds);
+  }
+
   /**
    * {@inheritDoc}
    *
@@ -267,21 +318,54 @@ public class StreamingDistributionService extends AbstractDistributionService im
    *      org.opencastproject.mediapackage.MediaPackage, String) java.lang.String)
    */
   @Override
-  public Job retract(String channelId, MediaPackage mediaPackage, String elementId) throws DistributionException {
+  public Job retract(String channelId, MediaPackage mediaPackage, Set<String> elementIds) throws DistributionException {
     if (locations.isNone())
       return null;
 
     RequireUtil.notNull(mediaPackage, "mediaPackage");
-    RequireUtil.notNull(elementId, "elementId");
+    RequireUtil.notNull(elementIds, "elementId");
     RequireUtil.notNull(channelId, "channelId");
     //
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(),
-              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediaPackage), elementId), retractJobLoad);
+              Arrays.asList(channelId, MediaPackageParser.getAsXml(mediaPackage), gson.toJson(elementIds)),
+              retractJobLoad);
     } catch (ServiceRegistryException e) {
       throw new DistributionException("Unable to create a job", e);
     }
   }
+
+   /**
+   * Retract a media package element from the distribution channel. The retracted element must not necessarily be the
+   * one given as parameter <code>elementId</code>. Instead, the element's distribution URI will be calculated. This way
+   * you are able to retract elements by providing the "original" element here.
+   *
+   * @param channelId
+   *          the channel id
+   * @param mediapackage
+   *          the mediapackage
+   * @param elementIds
+   *          the element identifiers
+   * @return the retracted element or <code>null</code> if the element was not retracted
+   * @throws org.opencastproject.distribution.api.DistributionException
+   *           in case of an error
+   */
+  protected MediaPackageElement[] retractElements(String channelId, MediaPackage mediapackage, Set<String> elementIds)
+          throws DistributionException {
+    notNull(mediapackage, "mediapackage");
+    notNull(elementIds, "elementIds");
+    notNull(channelId, "channelId");
+
+    Set<MediaPackageElement> elements = getElements(mediapackage, elementIds);
+    List<MediaPackageElement> retractedElements = new ArrayList<>();
+
+    for (MediaPackageElement element : elements) {
+      MediaPackageElement retractedElement = retractElement(channelId, mediapackage, element.getIdentifier());
+      retractedElements.add(retractedElement);
+    }
+    return retractedElements.toArray(new MediaPackageElement[retractedElements.size()]);
+  }
+
 
   /**
    * Retracts the mediapackage with the given identifier from the distribution channel.
@@ -350,14 +434,17 @@ public class StreamingDistributionService extends AbstractDistributionService im
       op = Operation.valueOf(operation);
       String channelId = arguments.get(0);
       MediaPackage mediapackage = MediaPackageParser.getFromXml(arguments.get(1));
-      String elementId = arguments.get(2);
+      Set<String> elementIds = gson.fromJson(arguments.get(2), new TypeToken<Set<String>>() {
+      }.getType());
       switch (op) {
         case Distribute:
-          MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, elementId);
-          return (distributedElement != null) ? MediaPackageElementParser.getAsXml(distributedElement) : null;
+          MediaPackageElement[] distributedElements = distributeElements(channelId, mediapackage, elementIds);
+          return (distributedElements != null)
+            ? MediaPackageElementParser.getArrayAsXml(Arrays.asList(distributedElements)) : null;
         case Retract:
-          return locations.isSome()
-                  ? MediaPackageElementParser.getAsXml(retractElement(channelId, mediapackage, elementId)) : null;
+          MediaPackageElement[] retractedElements = retractElements(channelId, mediapackage, elementIds);
+          return (retractedElements != null)
+            ?  MediaPackageElementParser.getArrayAsXml(Arrays.asList(retractedElements)) : null;
         default:
           throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
       }
@@ -368,6 +455,20 @@ public class StreamingDistributionService extends AbstractDistributionService im
     } catch (Exception e) {
       throw new ServiceRegistryException("Error handling operation '" + op + "'", e);
     }
+  }
+
+  private Set<MediaPackageElement> getElements(MediaPackage mediapackage, Set<String> elementIds)
+          throws IllegalStateException {
+    final Set<MediaPackageElement> elements = new HashSet<>();
+    for (String elementId : elementIds) {
+       MediaPackageElement element = mediapackage.getElementById(elementId);
+       if (element != null) {
+         elements.add(element);
+       } else {
+         logger.debug("No element " + elementId + " found in mediapackage " + mediapackage.getIdentifier());
+       }
+    }
+    return elements;
   }
 
   /**

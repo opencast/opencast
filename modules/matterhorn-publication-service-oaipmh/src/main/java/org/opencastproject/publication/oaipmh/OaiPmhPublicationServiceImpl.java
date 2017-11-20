@@ -27,8 +27,8 @@ import static org.opencastproject.util.data.Collections.set;
 import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.distribution.api.DistributionException;
-import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
+import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -38,7 +38,6 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.mediapackage.MediaPackageReferenceImpl;
-import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
@@ -58,9 +57,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.functions.Functions;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -73,6 +69,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -112,7 +109,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
   private DownloadDistributionService downloadDistributionService = null;
 
   /** The streaming distribution service */
-  private DistributionService streamingDistributionService = null;
+  private StreamingDistributionService streamingDistributionService = null;
 
   /** The OAI-PMH persistence */
   private OaiPmhDatabase persistence = null;
@@ -175,7 +172,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
    * @param distributionService
    *          the distribution service
    */
-  public void setStreamingDistributionService(DistributionService distributionService) {
+  public void setStreamingDistributionService(StreamingDistributionService distributionService) {
     this.streamingDistributionService = distributionService;
   }
 
@@ -311,13 +308,10 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     try {
         Job job = downloadDistributionService.distribute(pubChannelId, mediaPackage, downloadIds, checkAvailability, true);
         jobs.add(job);
-
-      for (String elementId : streamingIds) {
-        job = streamingDistributionService.distribute(pubChannelId, mediaPackage, elementId);
-        if (job == null)
-          continue;
-        jobs.add(job);
-      }
+        if (streamingIds.size() > 0) {
+          job = streamingDistributionService.distribute(pubChannelId, mediaPackage, streamingIds);
+          if (job != null) jobs.add(job);
+        }
     } catch (DistributionException e) {
       throw new PublicationException(e);
     }
@@ -345,7 +339,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
    *
    * @return the retracted element or <code>null</code> if the element was not retracted
    */
-  protected Publication retractInternal(Job job, MediaPackage mediapackage, String repository)
+  protected Publication retractInternal(Job parentJob, MediaPackage mediapackage, String repository)
           throws PublicationException {
     final String mediapackageId = mediapackage.getIdentifier().toString();
     logger.info("Trying to retract media package '{}' from OAI-PMH repository '{}'", mediapackageId, repository);
@@ -367,9 +361,24 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
                 mediapackageId, repository);
       }
       // retract all media package elements from their distribution location
-      final List<Job> jobs = mlist(mp.getElements()).filter(MediaPackageSupport.Filters.isNotPublication)
-              .bind(retractFromDistribution(pubChannelId, mp)).value();
-      if (!waitForJobs(job, serviceRegistry, jobs).isSuccess())
+      Set<String> retractElements = new HashSet<>();
+      for (MediaPackageElement element : mp.getElements()) {
+        retractElements.add(element.getIdentifier());
+      }
+      final List<Job> jobs = new ArrayList<>();
+      try {
+        Job job = downloadDistributionService.retract(pubChannelId, mp, retractElements);
+        if (job != null) {
+          jobs.add(job);
+        }
+        job = streamingDistributionService.retract(pubChannelId, mp, retractElements);
+        if (job != null) {
+          jobs.add(job);
+        }
+      } catch (DistributionException ex) {
+        throw new PublicationException(ex);
+      }
+       if (!waitForJobs(parentJob, serviceRegistry, jobs).isSuccess())
         throw new PublicationException(format("Unable to retract an element of mediapackage '%s' from the "
                 + "distribution for publication repository '%s'", mediapackageId, pubChannelId));
       // use the media package parameter to determine the publication element since
@@ -381,18 +390,6 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
               + " but it does not contain a matching publication element", mediapackageId, pubChannelId));
     }
     return null;
-  }
-
-  @SuppressWarnings("unchecked")
-  private Function<MediaPackageElement, List<Job>> retractFromDistribution(final String channelId, final MediaPackage mp) {
-    return new Function.X<MediaPackageElement, List<Job>>() {
-      @Override
-      public List<Job> xapply(MediaPackageElement mpe) throws Exception {
-        return mlist(Option.some(downloadDistributionService.retract(channelId, mp, mpe.getIdentifier())),
-                Option.option(streamingDistributionService.retract(channelId, mp, mpe.getIdentifier()))).flatMap(
-                Functions.<Option<Job>> identity()).value();
-      }
-    };
   }
 
   private static String publicationChannelId(String repository) {

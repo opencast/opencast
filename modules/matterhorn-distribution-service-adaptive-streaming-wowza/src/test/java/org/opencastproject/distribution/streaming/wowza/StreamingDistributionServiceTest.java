@@ -64,8 +64,8 @@ public class StreamingDistributionServiceTest {
     // Try all combinations
     for (String streamingUrl : inputStreamingUrls) {
       for (String adaptiveStreamingUrl : inputAdaptiveStreamingUrls) {
-        expect(bc.getProperty(StreamingDistributionService.STREAMING_URL_KEY)).andReturn(streamingUrl);
-        expect(bc.getProperty(StreamingDistributionService.ADAPTIVE_STREAMING_URL_KEY)).andReturn(adaptiveStreamingUrl);
+        expect(bc.getProperty(WowzaAdaptiveStreamingDistributionService.STREAMING_URL_KEY)).andReturn(streamingUrl);
+        expect(bc.getProperty(WowzaAdaptiveStreamingDistributionService.ADAPTIVE_STREAMING_URL_KEY)).andReturn(adaptiveStreamingUrl);
       }
     }
 
@@ -77,7 +77,7 @@ public class StreamingDistributionServiceTest {
     // Test service instance
     for (int i = 0; i < inputStreamingUrls.length; i++) {
       for (int j = 0; j < inputAdaptiveStreamingUrls.length; j++) {
-        StreamingDistributionService sds = new StreamingDistributionService();
+        WowzaAdaptiveStreamingDistributionService sds = new WowzaAdaptiveStreamingDistributionService();
         try {
           sds.activate(cc);
           fail(format(
@@ -111,8 +111,8 @@ public class StreamingDistributionServiceTest {
     ComponentContext cc = createNiceMock(ComponentContext.class);
 
     for (String url : inputStreamingUrls)
-      expect(bc.getProperty(StreamingDistributionService.STREAMING_URL_KEY)).andReturn(url);
-    expect(bc.getProperty(StreamingDistributionService.ADAPTIVE_STREAMING_URL_KEY)).andReturn("a/valid/url").anyTimes();
+      expect(bc.getProperty(WowzaAdaptiveStreamingDistributionService.STREAMING_URL_KEY)).andReturn(url);
+    expect(bc.getProperty(WowzaAdaptiveStreamingDistributionService.ADAPTIVE_STREAMING_URL_KEY)).andReturn("a/valid/url").anyTimes();
 
     expect(cc.getBundleContext()).andReturn(bc).anyTimes();
 
@@ -121,7 +121,7 @@ public class StreamingDistributionServiceTest {
 
     // Test service instance
     for (int i = 0; i < inputStreamingUrls.length; i++) {
-      StreamingDistributionService sds = new StreamingDistributionService();
+      WowzaAdaptiveStreamingDistributionService sds = new WowzaAdaptiveStreamingDistributionService();
       sds.activate(cc);
       if (outputStreamingUrls[i] == null)
         assertEquals(null, sds.streamingUri);
@@ -147,9 +147,9 @@ public class StreamingDistributionServiceTest {
     BundleContext bc = createNiceMock(BundleContext.class);
     ComponentContext cc = createNiceMock(ComponentContext.class);
 
-    expect(bc.getProperty(StreamingDistributionService.STREAMING_URL_KEY)).andReturn("a/valid/url").anyTimes();
+    expect(bc.getProperty(WowzaAdaptiveStreamingDistributionService.STREAMING_URL_KEY)).andReturn("a/valid/url").anyTimes();
     for (String url : inputStreamingUrls)
-      expect(bc.getProperty(StreamingDistributionService.ADAPTIVE_STREAMING_URL_KEY)).andReturn(url);
+      expect(bc.getProperty(WowzaAdaptiveStreamingDistributionService.ADAPTIVE_STREAMING_URL_KEY)).andReturn(url);
 
     expect(cc.getBundleContext()).andReturn(bc).anyTimes();
 
@@ -158,7 +158,7 @@ public class StreamingDistributionServiceTest {
 
     // Test service instance
     for (int i = 0; i < inputStreamingUrls.length; i++) {
-      StreamingDistributionService sds = new StreamingDistributionService();
+      WowzaAdaptiveStreamingDistributionService sds = new WowzaAdaptiveStreamingDistributionService();
       sds.activate(cc);
       if (outputAdaptiveStreamingUrls[i] == null)
         assertEquals(null, sds.adaptiveStreamingUri);
