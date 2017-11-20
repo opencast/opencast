@@ -15,11 +15,10 @@ SET FOREIGN_KEY_CHECKS = 0;
 ##
 
 # drop indices and constraints
-DROP INDEX IX_mh_archive_episode_mediapackage ON mh_archive_episode;
 DROP INDEX IX_mh_archive_episode_version ON mh_archive_episode;
 DROP INDEX IX_mh_archive_episode_deleted ON mh_archive_episode;
-DROP INDEX FK_mh_archive_episode_organization ON mh_archive_episode;
-ALTER TABLE mh_archive_episode DROP FOREIGN KEY mh_archive_episode_organization;
+ALTER TABLE mh_archive_episode DROP FOREIGN KEY FK_mh_archive_episode_organization;
+DROP INDEX IX_mh_archive_episode_organization ON mh_archive_episode;
 
 # rename table; rename/add/drop columns
 ALTER TABLE mh_archive_episode
@@ -33,6 +32,7 @@ MODIFY COLUMN version BIGINT(20) NOT NULL,
 ADD COLUMN id BIGINT(20) NOT NULL,
 ADD COLUMN availability VARCHAR(32) NOT NULL,
 ADD COLUMN series_id VARCHAR(128),
+ADD COLUMN owner VARCHAR(256) NOT NULL,
 DROP COLUMN access_control;
 
 UPDATE mh_assets_snapshot SET availability = 'ONLINE';
@@ -43,11 +43,11 @@ UPDATE mh_assets_snapshot SET availability = 'ONLINE';
 ##
 
 # drop indices and constraints
-DROP INDEX UNQ_mh_archive_asset_0 ON mh_archive_asset;
+DROP INDEX UNQ_mh_archive_asset ON mh_archive_asset;
 DROP INDEX IX_mh_archive_asset_mediapackage ON mh_archive_asset;
 DROP INDEX IX_mh_archive_asset_checksum ON mh_archive_asset;
 DROP INDEX IX_mh_archive_asset_uri ON mh_archive_asset;
-ALTER TABLE mh_archive_asset DROP FOREIGN KEY mh_archive_asset_organization;
+ALTER TABLE mh_archive_asset DROP FOREIGN KEY FK_mh_archive_asset_organization;
 
 # rename table; rename/add/drop columns
 ALTER TABLE mh_archive_asset
@@ -221,6 +221,7 @@ ADD PRIMARY KEY (id),
 ADD INDEX IX_mh_assets_snapshot_archival_date (archival_date),
 ADD INDEX IX_mh_assets_snapshot_mediapackage_id (mediapackage_id),
 ADD INDEX IX_mh_assets_snapshot_organization_id (organization_id),
+ADD INDEX IX_mh_assets_snapshot_owner (owner),
 ADD CONSTRAINT UNQ_mh_assets_snapshot UNIQUE (mediapackage_id, version);
 ALTER TABLE mh_assets_snapshot
 ADD CONSTRAINT FK_mh_assets_snapshot_organization FOREIGN KEY (organization_id) REFERENCES mh_organization (id);
