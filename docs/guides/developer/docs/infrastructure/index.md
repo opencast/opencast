@@ -27,16 +27,15 @@ SWITCH                     | 10.0.207.247 (intern)         | Lars Kiesow      | 
 Maven Repository (Nexus)
 ------------------------
 
-Institution                | Hostname                      | Admin (Software) | Admin (Hardware)    | Notes
----------------------------|-------------------------------|------------------|---------------------|---------------
-Harvard DCE                | nexus.dcex.harvard.edu        | Greg Logan       | DCE Devel group     | Amazon Cloud
-University of Osnabrück    | nexus.virtuos.uos.de          | Greg Logan       | Lars Kiesow         |
-University of Osnabrück    | nexus.opencast.org            | Greg Logan       | Lars Kiesow         | GeoIP Redirect
+Institution                | Hostname                      | Admin (Software) | Admin (Hardware)
+---------------------------|-------------------------------|------------------|-----------------
+Harvard DCE                | mvncache.opencast.org         | Greg Logan       | DCE Devel group
+University of Osnabrück    | nexus.opencast.org            | Greg Logan       | Lars Kiesow
 
 Nexus administration:
 
-- Lars Kiesow (uos, dce)
-- Michael Stypa (uos)
+- Lars Kiesow
+- Michael Stypa
 
 
 Other Hosted Services

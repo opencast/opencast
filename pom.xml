@@ -24,7 +24,8 @@
     <matterhorn.basedir>${basedir}</matterhorn.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <opencast.nexus.url>http://nexus.opencast.org</opencast.nexus.url>
+    <opencast.nexus.url>https://mvncache.opencast.org</opencast.nexus.url>
+    <opencast.nexus-backup.url>https://nexus.opencast.org</opencast.nexus-backup.url>
     <eclipselink.version>2.6.4</eclipselink.version>
     <commons-collection.version>3.2.2</commons-collection.version>
     <commons-compress.version>1.12</commons-compress.version>
@@ -1704,6 +1705,17 @@
         <enabled>true</enabled>
       </releases>
     </pluginRepository>
+    <pluginRepository>
+      <id>opencast-backup</id>
+      <name>Opencast Backup Repository</name>
+      <url>${opencast.nexus-backup.url}/nexus/content/groups/public</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </pluginRepository>
   </pluginRepositories>
 
   <repositories>
@@ -1711,6 +1723,17 @@
       <id>opencast</id>
       <name>Opencast Repo</name>
       <url>${opencast.nexus.url}/nexus/content/groups/public</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>opencast-backup</id>
+      <name>Opencast Backup Repo</name>
+      <url>${opencast.nexus-backup.url}/nexus/content/groups/public</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
