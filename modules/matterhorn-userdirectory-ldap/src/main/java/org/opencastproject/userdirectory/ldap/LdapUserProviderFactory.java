@@ -23,6 +23,7 @@ package org.opencastproject.userdirectory.ldap;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.util.NotFoundException;
 
@@ -85,7 +86,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
   private static final String ROLE_PREFIX_KEY = "org.opencastproject.userdirectory.ldap.roleprefix";
 
   /** A map of pid to ldap user provider instance */
-  private Map<String, ServiceRegistration> providerRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
+  private Map<String, ServiceRegistration> providerRegistrations = new ConcurrentHashMap<>();
 
   /** The OSGI bundle context */
   protected BundleContext bundleContext = null;
@@ -93,9 +94,17 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
   /** The organization directory service */
   private OrganizationDirectoryService orgDirectory;
 
+  /** A reference to Opencast's security service */
+  private SecurityService securityService;
+
   /** OSGi callback for setting the organization directory service. */
   public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
     this.orgDirectory = orgDirectory;
+  }
+
+  /** OSGi callback for setting the security service. */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /**
@@ -106,7 +115,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
    */
   public void activate(ComponentContext cc) {
     logger.debug("Activate LdapUserProviderFactory");
-    this.bundleContext = cc.getBundleContext();
+    bundleContext = cc.getBundleContext();
   }
 
   /**
@@ -183,7 +192,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
       throw new ConfigurationException(ORGANIZATION_KEY, "not found");
     }
     LdapUserProviderInstance provider = new LdapUserProviderInstance(pid, org, searchBase, searchFilter, url, userDn,
-            password, roleAttributesGlob, rolePrefix, cacheSize, cacheExpiration);
+            password, roleAttributesGlob, rolePrefix, cacheSize, cacheExpiration, securityService);
     providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
 
   }
