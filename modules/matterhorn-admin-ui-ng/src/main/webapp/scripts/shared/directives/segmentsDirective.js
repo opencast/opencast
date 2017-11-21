@@ -159,7 +159,17 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
              */
             scope.$root.$on("segmentTimesUpdated", function () {
               scope.setHumanReadableTimes();
+              scope.$parent.setChanges(scope.segmentsChanged());
             });
+
+            scope.segmentsChanged = function() {
+                if (scope.video.segments.length !== scope.originalSegments.length) return true;
+                return !scope.originalSegments.every(function(curr, idx) {
+                  return curr.start === scope.video.segments[idx].start
+                      && curr.end === scope.video.segments[idx].end
+                      && curr.selected === scope.video.segments[idx].selected;
+                });
+            };
 
             /**
              * Checks if a time is within the valid boundaries
@@ -281,6 +291,9 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             };
 
             scope.video.$promise.then(function () {
+              // Take a snapshot of the original segments to track if we have changes
+              scope.originalSegments = angular.copy(scope.video.segments);
+
               scope.$root.$broadcast("segmentTimesUpdated");
             });
         }
