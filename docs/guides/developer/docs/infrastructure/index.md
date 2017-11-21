@@ -29,11 +29,9 @@ Maven Repository (Nexus)
 
 Institution                | Hostname                      | Admin (Software) | Admin (Hardware)    | Notes
 ---------------------------|-------------------------------|------------------|---------------------|---------------
-ETH Zurich                 | opencast-nexus.ethz.ch        | Greg Logan       | Markus Borzechowski |
 Harvard DCE                | nexus.dcex.harvard.edu        | Greg Logan       | DCE Devel group     | Amazon Cloud
 University of Osnabrück    | nexus.virtuos.uos.de          | Greg Logan       | Lars Kiesow         |
 University of Osnabrück    | nexus.opencast.org            | Greg Logan       | Lars Kiesow         | GeoIP Redirect
-University of Saskatchewan | oc-cache.usask.ca             | Greg Logan       | Greg Logan          |
 
 Nexus administration:
 
