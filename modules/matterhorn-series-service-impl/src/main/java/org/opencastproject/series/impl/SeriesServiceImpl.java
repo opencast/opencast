@@ -68,6 +68,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -528,8 +529,10 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   @Override
   public boolean updateSeriesElement(String seriesID, String type, byte[] data) throws SeriesException {
     try {
-      if (persistence.existsSeriesElement(seriesID, type)) {
-        return persistence.storeSeriesElement(seriesID, type, data);
+      if (persistence.existsSeriesElement(seriesID, type) && persistence.storeSeriesElement(seriesID, type, data)) {
+        messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
+                SeriesItem.updateElement(seriesID, type, new String(data, StandardCharsets.UTF_8)));
+        return true;
       } else {
         return false;
       }
