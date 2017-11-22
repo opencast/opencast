@@ -592,8 +592,8 @@ public class AbstractEventEndpointTest {
     // post an acl update for an archived event
     given().formParam("acl", acl).expect().statusCode(HttpStatus.SC_OK).when().post(rt.host("archivedid/access"));
 
-    // post an acl update for an workflow event - forbidden
-    given().formParam("acl", acl).expect().statusCode(HttpStatus.SC_FORBIDDEN).when()
+    // post an acl update for an workflow event - conflict
+    given().formParam("acl", acl).expect().statusCode(HttpStatus.SC_CONFLICT).when()
             .post(rt.host("workflowid/access"));
   }
 
