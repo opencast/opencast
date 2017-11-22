@@ -111,6 +111,15 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   /** The key in the properties file that defines the adaptive streaming port. */
   protected static final String ADAPTIVE_STREAMING_PORT_KEY = "org.opencastproject.adaptive-streaming.port";
 
+  /** The key in the properties file that specifies in which order the videos in the SMIL file should be stored */
+  protected static final String SMIL_ORDER_KEY = "org.opencastproject.adaptive-streaming.smil.order";
+
+  /** One of the possible values for the order of the videos in the SMIL file */
+  protected static final String SMIL_ASCENDING_VALUE = "ascending";
+
+  /** One of the possible values for the order of the videos in the SMIL file */
+  protected static final String SMIL_DESCENDING_VALUE = "descending";
+
   /** The attribute "video-bitrate" in the SMIL files */
   protected static final String SMIL_ATTR_VIDEO_BITRATE = "video-bitrate";
 
@@ -197,6 +206,9 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   /** Whether or not RTMP is supported */
   private boolean isRTMPSupported = false;
 
+  /** Whether or not the video order in the SMIL files is descending */
+  private boolean isSmilOrderDescending = false;
+
   private static final Gson gson = new Gson();
 
   /**
@@ -275,17 +287,34 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
     Option<String> formats;
+    Option<String> smilOrder;
+
     if (properties == null) {
       formats = Option.none();
+      smilOrder = Option.none();
     } else {
       formats = OsgiUtil.getOptCfg(properties, STREAMING_FORMATS_KEY);
+      smilOrder = OsgiUtil.getOptCfg(properties, SMIL_ORDER_KEY);
     }
+
     if (formats.isSome()) {
       setSupportedFormats(formats.get());
     } else {
       setDefaultSupportedFormats();
     }
     logger.info("The supported streaming formats are: {}", StringUtils.join(supportedAdaptiveFormats, ","));
+
+    if (smilOrder.isNone() || SMIL_ASCENDING_VALUE.equals(smilOrder.get())) {
+      logger.info("The videos in the SMIL files will be sorted in ascending bitrate order");
+      isSmilOrderDescending = false;
+    } else if (SMIL_DESCENDING_VALUE.equals(smilOrder.get())) {
+      isSmilOrderDescending = true;
+      logger.info("The videos in the SMIL files will be sorted in descending bitrate order");
+    } else {
+      throw new ConfigurationException(SMIL_ORDER_KEY, format("Illegal value '%s'. Valid options are '%s' and '%s'",
+              smilOrder.get(), SMIL_ASCENDING_VALUE, SMIL_DESCENDING_VALUE));
+    }
+
     distributeJobLoad = LoadUtil.getConfiguredLoadValue(properties, DISTRIBUTE_JOB_LOAD_KEY,
             DEFAULT_DISTRIBUTE_JOB_LOAD, serviceRegistry);
     retractJobLoad = LoadUtil.getConfiguredLoadValue(properties, RETRACT_JOB_LOAD_KEY, DEFAULT_RETRACT_JOB_LOAD,
@@ -713,8 +742,10 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
     for (int i = 0; i < currentVideos.getLength(); i++) {
       Node current = currentVideos.item(i);
       if ("video".equals(current.getNodeName())) {
-        if (Float
-                .parseFloat(current.getAttributes().getNamedItem(SMIL_ATTR_VIDEO_BITRATE).getTextContent()) > bitrate) {
+        Float currentBitrate = Float
+                .parseFloat(current.getAttributes().getNamedItem(SMIL_ATTR_VIDEO_BITRATE).getTextContent());
+        if ((isSmilOrderDescending && (currentBitrate < bitrate))
+                || (!isSmilOrderDescending && (currentBitrate > bitrate))) {
           switchElement.insertBefore(video, current);
           return;
         }
