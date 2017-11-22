@@ -218,9 +218,8 @@ public final class RepublishOaiPmhWorkflowOperationHandler extends AbstractWorkf
     for (MediaPackageElement element : filteredMediaPackage.getElements()) {
 
       if (!keep.contains(element)) {
-        logger.info("Removing {} '{}' from media package '{}'",
-                new String[] { element.getElementType().toString().toLowerCase(), element.getIdentifier(),
-                        filteredMediaPackage.getIdentifier().toString() });
+        logger.info("Removing {} '{}' from media package '{}'", element.getElementType().toString().toLowerCase(),
+                element.getIdentifier(), filteredMediaPackage.getIdentifier().toString());
         filteredMediaPackage.remove(element);
         continue;
       }

@@ -32,6 +32,7 @@ describe('adminNg.directives.timelineDirective', function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         $rootScope.video = angular.copy(getJSONFixture('admin-ng/tools/40518/editor.json'));
         element = $compile('<div data-admin-ng-timeline="" data-video="video" data-player="player"/></div>')($rootScope);
+        element.find('.timeline-track').css({ width: '1000px' });
         $rootScope.$digest();
     });
 
@@ -72,7 +73,23 @@ describe('adminNg.directives.timelineDirective', function () {
 
     describe('#getSegmentWidth', function () {
 
+        describe('when no video duration is available', function () {
+            beforeEach(function () {
+                delete element.isolateScope().video.duration;
+            });
+
+            it('returns zero with no video duration', function () {
+                expect(element.isolateScope().getSegmentWidth($rootScope.video.segments[1]))
+                    .toEqual(0);
+            });
+        });
+
         it('returns zero without a segment', function () {
+            expect(element.isolateScope().getSegmentWidth())
+                .toEqual(0);
+        });
+
+        it('returns the width of a segment in percentage', function () {
             expect(element.isolateScope().getSegmentWidth($rootScope.video.segments[1]))
                 .toEqual('21.11462829736211%');
         });
@@ -190,9 +207,40 @@ describe('adminNg.directives.timelineDirective', function () {
                 expect($rootScope.video.segments[0].end).toEqual(17003);
             });
         });
+
+        describe('merging active segment when multipe active segments available', function () {
+
+            var someSegment = null;
+
+            beforeEach(function () {
+                $rootScope.video.segments = $rootScope.video.segments.map(function(segment) { segment.deleted = false; return segment });
+                someSegment = $rootScope.video.segments[0];
+            });
+
+            it('allows the merging of chosen active segment', function() {
+                expect($rootScope.video.segments.length).toBe(3);
+                element.isolateScope().mergeSegment(null, someSegment);
+                expect($rootScope.video.segments.length).toBe(2);
+            });
+        });
+
+        describe('merging active segment when it is the only active segment available', function () {
+
+            var onlyActiveSegment = null;
+
+            beforeEach(function () {
+                $rootScope.video.segments = $rootScope.video.segments.map(function(segment, i) { segment.deleted = i !== 1; return segment });
+                onlyActiveSegment = $rootScope.video.segments[1];
+            });
+
+            it('does not allow the removal of the only available active segment', function() {
+                expect($rootScope.video.segments.length).toBe(3);
+                element.isolateScope().mergeSegment(null, onlyActiveSegment);
+                expect($rootScope.video.segments.length).toBe(3);
+            });
+        });
     });
 
-    /*
     describe('#move', function () {
 
         beforeEach(function () {
@@ -203,19 +251,32 @@ describe('adminNg.directives.timelineDirective', function () {
         });
 
         it('does nothing by default', function () {
-            element.isolateScope().move($.Event(''));
+            element.isolateScope().moveSegment($.Event('mousemove'));
             expect($rootScope.player.adapter.setCurrentTime).not.toHaveBeenCalled();
         });
 
         describe('while the mouse button is pressed', function () {
 
+            var handle = null;
+
             beforeEach(function () {
                 element.isolateScope().canMove = true;
-                expect(element.isolateScope().positionStyle).toEqual(0);
-
-                var event = $.Event('');
-                event.clientX = 400;
-                element.isolateScope().move(event);
+                handle = element.find('#cursor')[0];
+                $document.triggerHandler({
+                  type: 'mousemove',
+                  pageX: 0,
+                  pageY: 0
+                });
+                $(handle).triggerHandler({
+                    type: 'mousedown',
+                    pageX: 0,
+                    pageY: 0
+                });
+                $document.triggerHandler({
+                  type: 'mousemove',
+                  pageX: 400,
+                  pageY: 0
+                });
             });
 
             it('sets the video cursor', function () {
@@ -232,17 +293,20 @@ describe('adminNg.directives.timelineDirective', function () {
 
     describe('#drag', function () {
 
+        var handle = null;
+
+        beforeEach(function () {
+            handle = element.find('#cursor')[0];
+        });
+
         it('allows the position marker to be moved', function () {
             expect(element.isolateScope().canMove).toBeFalsy();
-            expect($document).not.toHandle('mousemove');
-
-            element.isolateScope().drag($.Event(''));
-
+            $(handle).triggerHandler({
+                type: 'mousedown'
+            });
             expect(element.isolateScope().canMove).toBeTruthy();
-            expect($document).toHandle('mousemove');
         });
     });
-    */
 
     describe('#skipToSegment', function () {
 
@@ -263,6 +327,184 @@ describe('adminNg.directives.timelineDirective', function () {
             element.isolateScope().selectSegment($rootScope.video.segments[1]);
 
             expect($rootScope.video.segments[1].selected).toBeTruthy();
+        });
+    });
+
+    describe('adjust segment lengths using timeline', function () {
+
+        var separator = null;
+
+        beforeEach(function () {
+            element.find('.timeline-track .segments').css({ width: '1000px' });
+            element.find('.timeline-track div:nth-of-type(2)').css({ width: '1000px' });
+            separator = element.find('.segment-seperator')[1];
+            $document.triggerHandler({
+                type: 'mousemove',
+                pageX: 0,
+                pageY: 0
+            });
+        });
+
+        it('does nothing by default', function () {
+            expect(element.isolateScope().movingSegment).toBeFalsy();
+        });
+
+        describe('when mouse button is pressed', function () {
+
+            it('allows the segment to be resized', function () {
+                expect(element.isolateScope().movingSegment).toBeFalsy();
+                $(separator).triggerHandler({
+                    type: 'mousedown',
+                    currentTarget: separator,
+                });
+                expect(element.isolateScope().movingSegment).toBeTruthy();
+            });
+        });
+
+        describe('when segment is adjusted', function () {
+
+            it('sets segment durations as expected', function () {
+                expect($rootScope.video.segments[0].end).toBe(17003);
+                expect($rootScope.video.segments[1].start).toBe(17003);
+                var movePixels = 400;
+                $(separator).triggerHandler({
+                    type: 'mousedown',
+                    currentTarget: separator,
+                    pageX: 0,
+                    pageY: 0
+                });
+                $document.triggerHandler({
+                    type: 'mousemove',
+                    pageX: movePixels,
+                    pageY: 0
+                });
+                $document.triggerHandler({
+                    type: 'mouseup',
+                });
+
+                var timeFromPixels = $rootScope.video.duration * (movePixels + 3) / 1000 >> 0;
+                expect($rootScope.video.segments[0].end).toBe(timeFromPixels);
+                expect($rootScope.video.segments[1].start).toBe(timeFromPixels);
+            });
+        });
+
+        describe('when deactivated segment is adjusted to overlap singly available active segment', function() {
+
+            beforeEach(function () {
+                $rootScope.video.segments = $rootScope.video.segments.map(function(segment, i) { segment.deleted = i !== 1; return segment });
+                separator = element.find('.segment-seperator')[2];
+            });
+
+            it('does not remove only active segment', function () {
+                expect($rootScope.video.segments.length).toBe(3);
+                $(separator).triggerHandler({
+                    type: 'mousedown',
+                    currentTarget: separator,
+                    pageX: 0,
+                    pageY: 0
+                });
+                $document.triggerHandler({
+                    type: 'mousemove',
+                    pageX: -230,
+                    pageY: 0
+                });
+                $document.triggerHandler({
+                    type: 'mouseup',
+                });
+                expect($rootScope.video.segments.length).toEqual(3);
+                expect($rootScope.video.segments[1].end - $rootScope.video.segments[1].start).toEqual(1);
+            });
+        });
+
+        describe('when one of multiple active segments is overlapped', function () {
+
+            var lastSeparator = null;
+
+            beforeEach(function () {
+                $rootScope.video.segments = $rootScope.video.segments.map(function(segment, i) { segment.deleted = i === 0; return segment });
+                lastSeparator = element.find('.segment-seperator')[2];
+                $document.triggerHandler({
+                    type: 'mousemove',
+                    pageX: 300,
+                    pageY: 0
+                });
+            });
+
+            it('removes the overlapped active segment', function () {
+                expect($rootScope.video.segments.length).toBe(3);
+                $(lastSeparator).triggerHandler({
+                    type: 'mousedown',
+                    currentTarget: lastSeparator,
+                    pageX: 0,
+                    pageY: 0
+                });
+                $document.triggerHandler({
+                    type: 'mousemove',
+                    pageX: 0,
+                    pageY: 0
+                });
+                $document.triggerHandler({
+                    type: 'mouseup',
+                });
+                expect($rootScope.video.segments.length).toBe(2);
+            });
+        });
+    });
+
+    describe('toggle segment', function () {
+
+        var segmentEls = null, $scope = null;
+
+        beforeEach(function () {
+            segmentEls = element.find('.segment');
+            $scope = element.isolateScope();
+            $scope.video.segments = $scope.video.segments.map(function (segment) { segment.deleted = true; return segment; } );
+            spyOn($scope, 'toggleSegment').and.callThrough();
+            spyOn($scope, 'isRemovalAllowed').and.callThrough();
+        //    spyOn($scope, 'isRemovalAllowed');
+        });
+
+        it('activates a deactivated segment', function () {
+            $(segmentEls[1]).find('a:nth-of-type(2)').click();
+            expect($scope.toggleSegment).toHaveBeenCalledWith(jasmine.any(Object), $scope.video.segments[1]);
+            expect($scope.video.segments[1].deleted).toEqual(false);
+        });
+
+        describe('when clicking an activated segment', function () {
+
+            describe('when multiple active segments are available', function () {
+                beforeEach(function () {
+                    $scope.video.segments[0].deleted = false;
+                    $scope.video.segments[1].deleted = false;
+                });
+
+                it('deactivates an activated segment', function () {
+                    $(segmentEls[1]).find('a:nth-of-type(2)').click();
+                    expect($scope.toggleSegment).toHaveBeenCalledWith(jasmine.any(Object), $scope.video.segments[1]);
+                    expect($scope.isRemovalAllowed).toHaveBeenCalledWith($scope.video.segments[1]);
+                    expect($scope.video.segments[1].deleted).toEqual(true);
+                });
+            });
+
+            describe('when only one active segment is available', function () {
+                beforeEach(function () {
+                    $scope.video.segments[1].deleted = true;
+                });
+
+                it('does not deactivate the only active segment', function () {
+                    $(segmentEls[1]).find('a:nth-of-type(2)').click();
+                    expect($scope.toggleSegment).toHaveBeenCalledWith(jasmine.any(Object), $scope.video.segments[1]);
+                    expect($scope.isRemovalAllowed).toHaveBeenCalledWith($scope.video.segments[1]);
+                    expect($scope.video.segments[1].deleted).toEqual(false);
+                });
+            });
+        });
+    });
+
+    describe('checking the removal status of non-segment', function () {
+
+        it('does nothing', function () {
+            expect(element.isolateScope().isRemovalAllowed()).toBeFalsy();
         });
     });
 });

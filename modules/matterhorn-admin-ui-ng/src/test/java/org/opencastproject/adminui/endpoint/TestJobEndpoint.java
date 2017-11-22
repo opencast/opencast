@@ -21,7 +21,6 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -86,8 +85,8 @@ public class TestJobEndpoint extends JobEndpoint {
 
     workflowSet.setTotalCount(3);
 
-    List<Job> jobs = new ArrayList<Job>();
-    jobs.add(createJob(1, Status.RUNNING, ComposerService.JOB_TYPE, "test",
+    List<Job> jobs = new ArrayList<>();
+    jobs.add(createJob(1, Status.RUNNING, "org.opencastproject.composer", "test",
             "2014-06-05T09:10:00Z", "2014-06-05T09:10:00Z", "testuser1", "host1"));
     jobs.add(createJob(2, Status.RUNNING, WorkflowService.JOB_TYPE, "START_WORKFLOW",
             "2014-06-05T09:16:00Z", "2014-06-05T09:16:00Z", "testuser1", "host3"));
@@ -95,7 +94,7 @@ public class TestJobEndpoint extends JobEndpoint {
             "2014-06-05T09:11:11Z", "2014-06-05T09:11:11Z", "testuser2", "host3"));
     jobs.add(createJob(4, Status.RUNNING, MediaInspectionService.JOB_TYPE, "Inspect",
             "2014-06-05T09:16:00Z", "2014-06-05T09:16:00Z", "testuser1", "host2"));
-    jobs.add(createJob(5, Status.RUNNING, ComposerService.JOB_TYPE, "Encode",
+    jobs.add(createJob(5, Status.RUNNING, "org.opencastproject.composer", "Encode",
             "2014-06-05T09:05:00Z", "2014-06-05T09:05:00Z", "testuser3", "host1"));
 
 

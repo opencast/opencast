@@ -29,7 +29,6 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.mapped.Configuration;
@@ -1166,12 +1165,7 @@ public class Event implements IndexObject {
       return;
     }
 
-    if (StringUtils.isNotBlank(getSchedulingStatus()) && (this.archiveVersion == null || this.archiveVersion <= 0)) {
-      eventStatus = "EVENTS.EVENTS.STATUS.SCHEDULED";
-      return;
-    }
-
-    eventStatus = "EVENTS.EVENTS.STATUS.PROCESSED";
+    eventStatus = "EVENTS.EVENTS.STATUS.SCHEDULED";
   }
 
   public boolean hasRecordingStarted() {

@@ -17,23 +17,23 @@
           <ul>
             <li>
               <input id="flagQuality360p" name="flagQuality360p" type="checkbox" class="configField" value="false" />
-              <label for="flagMultiQuality">360p resolution</label>
+              <label for="flagQuality360p">360p resolution</label>
             </li>
             <li>
               <input id="flagQuality480p" name="flagQuality480p" type="checkbox" class="configField" value="false" />
-              <label for="flagMultiQuality">480p resolution</label>
+              <label for="flagQuality480p">480p resolution</label>
             </li>
             <li>
               <input id="flagQuality720p" name="flagQuality720p" type="checkbox" class="configField" value="true" checked="checked"/>
-              <label for="flagMultiQuality">720p resolution (HDready)</label>
+              <label for="flagQuality720p">720p resolution (HDready)</label>
             </li>
             <li>
               <input id="flagQuality1080p" name="flagQuality1080p" type="checkbox" class="configField" value="false" />
-              <label for="flagMultiQuality">1080p resolution (FullHD)</label>
+              <label for="flagQuality1080p">1080p resolution (FullHD)</label>
             </li>
             <li>
               <input id="flagQuality2160p" name="flagQuality2160p" type="checkbox" class="configField" value="false" />
-              <label for="flagMultiQuality">2160p resolution (UltraHD)</label>
+              <label for="flagQuality2160p">2160p resolution (UltraHD)</label>
             </li>
           </ul>
         </fieldset>

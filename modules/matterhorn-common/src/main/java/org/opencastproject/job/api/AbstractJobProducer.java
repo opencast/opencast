@@ -49,6 +49,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DecimalFormat;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -69,6 +70,9 @@ public abstract class AbstractJobProducer implements JobProducer {
    * The key to look for in the service configuration file to override the {@link DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING}
    */
   public static final String ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY = "org.opencastproject.job.load.acceptexceeding";
+
+  /** The formatter for load values */
+  private static final DecimalFormat df = new DecimalFormat("#.#");
 
   /** Whether to accept a job whose load exceeds the host’s max load */
   protected boolean acceptJobLoadsExeedingMaxLoad = DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING;
@@ -172,24 +176,23 @@ public abstract class AbstractJobProducer implements JobProducer {
     // get back from the service registry.
     float currentLoad = systemLoad.get(getServiceRegistry().getRegistryHostname()).getLoadFactor();
 
-    // Whether to accept a job whose load exceeds the host’s max load
-    if (acceptJobLoadsExeedingMaxLoad) {
-      // If the actual job load is greater the host's max load this job never get's processed. So decrease the current
-      // load by the difference of the job load and max load
-      if (job.getJobLoad() > maxload.getLoadFactor()) {
-        float decreaseLoad = job.getJobLoad() - maxload.getLoadFactor();
-        currentLoad -= decreaseLoad;
-      }
-    }
-
-    if (currentLoad > maxload.getLoadFactor()) {
-      logger.debug("Declining job {} of type {} because load of {} would exceed this node's limit of {}.",
-              new Object[] { job.getId(), job.getJobType(), currentLoad, maxload.getLoadFactor() });
+    /* Note that this first clause looks at the *job's*, the other two look at the *node's* load
+     * We're assuming that if this case is true, then we're also the most powerful node in the system for this service,
+     * per the current job dispatching code in ServiceRegistryJpaImpl */
+    if (job.getJobLoad() > maxload.getLoadFactor() && acceptJobLoadsExeedingMaxLoad) {
+      logger.warn("Accepting job {} of type {} with load {} even though load of {} is above this node's limit of {}.",
+              new Object[] { job.getId(), job.getJobType(), df.format(job.getJobLoad()), df.format(currentLoad), df.format(maxload.getLoadFactor()) });
+      logger.warn("This is a configuration issue that you should resolve in a production system!");
+      return true;
+    } else if (currentLoad > maxload.getLoadFactor()) {
+      logger.debug("Declining job {} of type {} with load {} because load of {} would exceed this node's limit of {}.",
+              new Object[] { job.getId(), job.getJobType(), df.format(job.getJobLoad()), df.format(currentLoad), df.format(maxload.getLoadFactor()) });
       return false;
+    } else  {
+      logger.debug("Accepting job {} of type {} with load {} because load of {} is within this node's limit of {}.",
+            new Object[] { job.getId(), job.getJobType(), df.format(job.getJobLoad()), df.format(currentLoad), df.format(maxload.getLoadFactor()) });
+      return true;
     }
-    logger.debug("Accepting job {} of type {} because load of {} is within this node's limit of {}.",
-            new Object[] { job.getId(), job.getJobType(), currentLoad, maxload.getLoadFactor() });
-    return true;
   }
 
   /** Shorthand for {@link #getServiceRegistry()}.incident() */
@@ -254,9 +257,9 @@ public abstract class AbstractJobProducer implements JobProducer {
      *          the current running job
      */
     JobRunner(Job job, Job currentJob) {
-      this.jobId = job.getId();
+      jobId = job.getId();
       if (currentJob != null) {
-        this.currentJobId = some(currentJob.getId());
+        currentJobId = some(currentJob.getId());
       } else {
         currentJobId = none();
       }

@@ -420,7 +420,7 @@ public class ToolsEndpoint implements ManagedService {
                   ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId))).run();
         } catch (AssetManagerException e) {
           logger.warn("Unable to start workflow '{}' on archived media package '{}': {}",
-                  new Object[] { workflowId, mediaPackage, getStackTrace(e) });
+                  workflowId, mediaPackage, getStackTrace(e));
           return R.serverError();
         } catch (WorkflowDatabaseException e) {
           logger.warn("Unable to load workflow '{}' from workflow service: {}", workflowId, getStackTrace(e));
@@ -759,7 +759,7 @@ public class ToolsEndpoint implements ManagedService {
               break;
             } catch (SmilException e) {
               logger.warn("Media element '{}' of SMIL catalog '{}' seems to be invalid: {}",
-                      new Object[] { videoElem, smil, e });
+                      videoElem, smil, e);
             }
           }
         }

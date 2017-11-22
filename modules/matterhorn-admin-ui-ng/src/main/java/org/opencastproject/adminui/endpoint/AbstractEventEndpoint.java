@@ -449,37 +449,37 @@ public abstract class AbstractEventEndpoint {
       if (schedulingJson.has(SCHEDULING_AGENT_ID_KEY)) {
         agentId = Opt.some(schedulingJson.getString(SCHEDULING_AGENT_ID_KEY));
         logger.trace("Updating agent id of event '{}' from '{}' to '{}'",
-                new Object[] { eventId, technicalMetadata.getAgentId(), agentId });
+                eventId, technicalMetadata.getAgentId(), agentId);
       }
 
       Opt<Date> start = Opt.none();
       if (schedulingJson.has(SCHEDULING_START_KEY)) {
         start = Opt.some(new Date(DateTimeSupport.fromUTC(schedulingJson.getString(SCHEDULING_START_KEY))));
         logger.trace("Updating start time of event '{}' id from '{}' to '{}'",
-                new Object[] { eventId, DateTimeSupport.toUTC(technicalMetadata.getStartDate().getTime()),
-                        DateTimeSupport.toUTC(start.get().getTime()) });
+                eventId, DateTimeSupport.toUTC(technicalMetadata.getStartDate().getTime()),
+                        DateTimeSupport.toUTC(start.get().getTime()));
       }
 
       Opt<Date> end = Opt.none();
       if (schedulingJson.has(SCHEDULING_END_KEY)) {
         end = Opt.some(new Date(DateTimeSupport.fromUTC(schedulingJson.getString(SCHEDULING_END_KEY))));
         logger.trace("Updating end time of event '{}' id from '{}' to '{}'",
-                new Object[] { eventId, DateTimeSupport.toUTC(technicalMetadata.getEndDate().getTime()),
-                        DateTimeSupport.toUTC(end.get().getTime()) });
+                eventId, DateTimeSupport.toUTC(technicalMetadata.getEndDate().getTime()),
+                        DateTimeSupport.toUTC(end.get().getTime()));
       }
 
       Opt<Map<String, String>> agentConfiguration = Opt.none();
       if (schedulingJson.has(SCHEDULING_AGENT_CONFIGURATION_KEY)) {
         agentConfiguration = Opt.some(JSONUtils.toMap(schedulingJson.getJSONObject(SCHEDULING_AGENT_CONFIGURATION_KEY)));
         logger.trace("Updating agent configuration of event '{}' id from '{}' to '{}'",
-                new Object[] { eventId, technicalMetadata.getCaptureAgentConfiguration(), agentConfiguration });
+                eventId, technicalMetadata.getCaptureAgentConfiguration(), agentConfiguration);
       }
 
       Opt<Opt<Boolean>> optOut = Opt.none();
       if (schedulingJson.has(SCHEDULING_OPT_OUT_KEY)) {
         optOut = Opt.some(Opt.some(schedulingJson.getBoolean(SCHEDULING_OPT_OUT_KEY)));
         logger.trace("Updating optout status of event '{}' id from '{}' to '{}'",
-                new Object[] { eventId, event.getOptedOut(), optOut });
+                eventId, event.getOptedOut(), optOut);
       }
 
       if (start.isNone() && end.isNone() && agentId.isNone() && agentConfiguration.isNone() && optOut.isNone())
@@ -688,7 +688,7 @@ public abstract class AbstractEventEndpoint {
       }
     } catch (AclServiceException e) {
       logger.error("Error applying acl '{}' to event '{}' because: {}",
-              new Object[] { accessControlList, eventId, ExceptionUtils.getStackTrace(e) });
+              accessControlList, eventId, ExceptionUtils.getStackTrace(e));
       return serverError();
     } catch (SchedulerException e) {
       logger.error("Error applying ACL to scheduled event {} because {}", eventId, ExceptionUtils.getStackTrace(e));

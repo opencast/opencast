@@ -143,22 +143,21 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
     }
 
     // make sure we have no useless plugin after all
-    if (plugin.getStaticResourceRegistration() == null
-            && plugin.getRestEndpointRegistration() == null) {
-      throw new IllegalStateException("Neither static resources nor a REST endpoint were registered, canceling plugin installation");
+    if (plugin.getStaticResourceRegistration() == null && plugin.getRestEndpointRegistration() == null) {
+      throw new IllegalStateException(
+              "Neither static resources nor a REST endpoint were registered, canceling plugin installation");
     }
 
     plugins.add(plugin);
 
     // construct and log success message
-    log.info("Installed Theodul plugin {} (static: {} REST: {})", new Object[] {
-        plugin.getName(),
-        (plugin.getStaticResourceRegistration() != null) ? plugin.getStaticResourcesPath() : "no",
-        (plugin.getRestEndpointRegistration() != null) ? plugin.getRestPath() : "no"
-    });
+    log.info("Installed Theodul plugin {} (static: {} REST: {})", plugin.getName(),
+            (plugin.getStaticResourceRegistration() != null) ? plugin.getStaticResourcesPath() : "no",
+            (plugin.getRestEndpointRegistration() != null) ? plugin.getRestPath() : "no");
   }
 
-  /** Registers a <code>StaticResource</code> that serves the contents of the
+  /**
+   * Registers a <code>StaticResource</code> that serves the contents of the
    * plugins /static resource directory.
    *
    * @return ServiceRegistration for the StaticResource
@@ -167,16 +166,18 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
     StaticResource staticResource = new StaticResource(
             new BundleDelegatingClassLoader(plugin.getServiceReference().getBundle()),
             EngagePlugin.STATIC_RESOURCES_PATH, plugin.getStaticResourcesPath(), null);
-    return OsgiUtil.registerServlet(getKernelBundleContext(), staticResource, PLUGIN_URL_PREFIX + plugin.getStaticResourcesPath());
+    return OsgiUtil.registerServlet(getKernelBundleContext(), staticResource,
+            PLUGIN_URL_PREFIX + plugin.getStaticResourcesPath());
   }
 
-  /** Publishes the REST endpoint implemented by the plugin bundle.
+  /**
+   * Publishes the REST endpoint implemented by the plugin bundle.
    *
    * @return ServiceRegistration for the REST endpoint
    */
   private ServiceRegistration installRestEndpoint(PluginData plugin) throws Exception {
     EngagePlugin service = (EngagePlugin) bundleContext.getService(plugin.getServiceReference());
-    Dictionary<String, String> props = new Hashtable<String, String>();
+    Dictionary<String, String> props = new Hashtable<>();
     props.put("service.description", plugin.getDescription());
     props.put("opencast.service.type", "org.opencast.engage.plugin." + Integer.toString(plugin.getPluginID()));
     props.put("opencast.service.path", PLUGIN_URL_PREFIX + plugin.getRestPath());
@@ -207,7 +208,8 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
 
       plugins.remove(plugin);
     } else {
-      throw new IllegalArgumentException("Unable to uninstall plugin. No plugin registered with the given ServiceReference.");
+      throw new IllegalArgumentException(
+              "Unable to uninstall plugin. No plugin registered with the given ServiceReference.");
     }
   }
 
@@ -220,11 +222,10 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
   @Override
   public List<EngagePluginRegistration> getAllRegisteredPlugins() {
     synchronized (plugins) {
-      List<EngagePluginRegistration> list = new ArrayList<EngagePluginRegistration>();
+      List<EngagePluginRegistration> list = new ArrayList<>();
       for (PluginData plugin : plugins.getAll()) {
-        EngagePluginRegistrationImpl reg = new EngagePluginRegistrationImpl(
-                plugin.getPluginID(), plugin.getName(), plugin.getDescription(),
-                plugin.providesStaticResources() ? plugin.getStaticResourcesPath() : null,
+        EngagePluginRegistrationImpl reg = new EngagePluginRegistrationImpl(plugin.getPluginID(), plugin.getName(),
+                plugin.getDescription(), plugin.providesStaticResources() ? plugin.getStaticResourcesPath() : null,
                 plugin.providesRestEndpoint() ? plugin.getRestPath() : null);
         list.add(reg);
       }
@@ -249,7 +250,7 @@ public class EngagePluginManagerImpl implements EngagePluginManager, ServiceList
 
   class PluginDataStore {
 
-    private final Set<PluginData> data = new HashSet<PluginData>();
+    private final Set<PluginData> data = new HashSet<>();
 
     public synchronized int size() {
       return data.size();

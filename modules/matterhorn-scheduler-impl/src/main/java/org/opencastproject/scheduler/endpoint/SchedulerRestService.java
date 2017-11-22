@@ -1022,7 +1022,7 @@ public class SchedulerRestService {
       throw e;
     } catch (Exception e) {
       logger.error("Unable to find conflicting events for {}, {}, {}, {}, {}: {}",
-              new Object[] { device, rrule, start, end, duration, getStackTrace(e) });
+              device, rrule, start, end, duration, getStackTrace(e));
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }

@@ -215,6 +215,11 @@
     <Extensions>wav,bwf</Extensions>
   </MimeType>
   <MimeType>
+    <Type>image/gif</Type>
+    <Description>GIF image</Description>
+    <Extensions>gif,GIF</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>image/jp2</Type>
     <Description>JPEG2000 image</Description>
     <Extensions>jp2</Extensions>
@@ -243,6 +248,11 @@
     <Type>image/png</Type>
     <Description>PNG image</Description>
     <Extensions>png</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>image/svg+xml</Type>
+    <Description>SVG image</Description>
+    <Extensions>svg,svgz</Extensions>
   </MimeType>
   <MimeType>
     <Type>image/tiff</Type>
@@ -298,6 +308,16 @@
     <Type>text/calendar</Type>
     <Description>iCalendar</Description>
     <Extensions>ical,ics,icalendar</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>text/css</Type>
+    <Description>CSS</Description>
+    <Extensions>css</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>text/html</Type>
+    <Description>HTML</Description>
+    <Extensions>htm,html</Extensions>
   </MimeType>
   <MimeType>
     <Type>text/plain</Type>

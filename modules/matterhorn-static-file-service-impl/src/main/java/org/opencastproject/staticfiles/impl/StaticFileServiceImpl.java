@@ -105,8 +105,8 @@ public class StaticFileServiceImpl implements StaticFileService {
       try {
         FileUtils.forceMkdir(rootFile);
       } catch (IOException e) {
-        throw new ComponentException(String.format("%s does not exists and could not be created",
-                rootFile.getAbsolutePath()));
+        throw new ComponentException(
+                String.format("%s does not exists and could not be created", rootFile.getAbsolutePath()));
       }
     }
     if (!rootFile.canRead())
@@ -140,7 +140,7 @@ public class StaticFileServiceImpl implements StaticFileService {
 
   /** OSGi DI */
   public void setOrganizationDirectoryService(OrganizationDirectoryService directoryService) {
-    this.orgDirectory = directoryService;
+    orgDirectory = directoryService;
   }
 
   @Override
@@ -164,8 +164,7 @@ public class StaticFileServiceImpl implements StaticFileService {
       Files.createDirectories(file.getParent());
       Files.copy(progressInputStream, file);
     } catch (IOException e) {
-      logger.error("Unable to save file '{}' to {} because: {}",
-              new Object[] { filename, file, ExceptionUtils.getStackTrace(e) });
+      logger.error("Unable to save file '{}' to {} because: {}", filename, file, ExceptionUtils.getStackTrace(e));
       throw e;
     }
 
@@ -258,8 +257,8 @@ public class StaticFileServiceImpl implements StaticFileService {
 
   private Path getFile(final String org, final String uuid) throws NotFoundException, IOException {
     // First check if the file is part of the durable storage section
-    try (DirectoryStream<Path> dirs = Files
-            .newDirectoryStream(getDurableStorageDir(org), getDirsEqualsUuidFilter(uuid))) {
+    try (DirectoryStream<Path> dirs = Files.newDirectoryStream(getDurableStorageDir(org),
+            getDirsEqualsUuidFilter(uuid))) {
       for (Path dir : dirs) {
         try (DirectoryStream<Path> files = Files.newDirectoryStream(dir)) {
           for (Path file : files) {

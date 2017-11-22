@@ -104,16 +104,21 @@ public class AbstractJobProducerTest extends EasyMockSupport {
   public void testIsReadyToAccept() throws Exception {
     expect(serviceRegistry.getRegistryHostname()).andReturn("test").anyTimes();
     expect(serviceRegistry.getMaxLoadOnNode("test")).andReturn(new NodeLoad("test", 4.0f)).anyTimes();
+    //Zero existing load + 1.0f
     SystemLoad systemLoad = new SystemLoad();
-    systemLoad.addNodeLoad(new NodeLoad("test", 3.0f));
+    systemLoad.addNodeLoad(new NodeLoad("test", 1.0f));
     expect(serviceRegistry.getCurrentHostLoads()).andReturn(systemLoad);
+    //4.0 existing load + 1.0f
     SystemLoad systemLoad2 = new SystemLoad();
-    systemLoad2.addNodeLoad(new NodeLoad("test", 12.0f));
+    systemLoad2.addNodeLoad(new NodeLoad("test", 5.0f));
     expect(serviceRegistry.getCurrentHostLoads()).andReturn(systemLoad2);
+    //Zero existing load + 10.0f
     SystemLoad systemLoad3 = new SystemLoad();
-    systemLoad3.addNodeLoad(new NodeLoad("test", 5.0f));
+    systemLoad3.addNodeLoad(new NodeLoad("test", 10.0f));
     expect(serviceRegistry.getCurrentHostLoads()).andReturn(systemLoad3);
     replayAll();
+
+    jobProducer.setAcceptOversizeJobs(false);
 
     Job job = new JobImpl(3);
     job.setJobType("test");
@@ -122,15 +127,51 @@ public class AbstractJobProducerTest extends EasyMockSupport {
 
     // Job load lower than max load and enough free load available
     job.setJobLoad(1.0f);
-    assertTrue(jobProducer.isReadyToAccept(job));
+    assertTrue("Job load + current load < max load, so accept job", jobProducer.isReadyToAccept(job));
+
+    job.setJobLoad(1.0f);
+    assertFalse("Job load + current load >= max load, so reject job", jobProducer.isReadyToAccept(job));
 
     // Job load higher than max load but some load on host
     job.setJobLoad(10.0f);
-    assertFalse(jobProducer.isReadyToAccept(job));
+    assertFalse("Job load >= max load, so reject job", jobProducer.isReadyToAccept(job));
+  }
 
-    // Job load higher than max load and no load on host
-    job.setJobLoad(5.0f);
-    assertTrue(jobProducer.isReadyToAccept(job));
+  @Test
+  public void testIsReadyToAcceptOversize() throws Exception {
+    expect(serviceRegistry.getRegistryHostname()).andReturn("test").anyTimes();
+    expect(serviceRegistry.getMaxLoadOnNode("test")).andReturn(new NodeLoad("test", 4.0f)).anyTimes();
+    //Zero existing load + 1.0f
+    SystemLoad systemLoad = new SystemLoad();
+    systemLoad.addNodeLoad(new NodeLoad("test", 1.0f));
+    expect(serviceRegistry.getCurrentHostLoads()).andReturn(systemLoad);
+    //4.0 existing load + 1.0f
+    SystemLoad systemLoad2 = new SystemLoad();
+    systemLoad2.addNodeLoad(new NodeLoad("test", 5.0f));
+    expect(serviceRegistry.getCurrentHostLoads()).andReturn(systemLoad2);
+    //Zero existing load + 10.0f
+    SystemLoad systemLoad3 = new SystemLoad();
+    systemLoad3.addNodeLoad(new NodeLoad("test", 10.0f));
+    expect(serviceRegistry.getCurrentHostLoads()).andReturn(systemLoad3);
+    replayAll();
+
+    jobProducer.setAcceptOversizeJobs(true);
+
+    Job job = new JobImpl(3);
+    job.setJobType("test");
+    job.setStatus(Status.DISPATCHING);
+    job.setProcessingHost("same");
+
+    // Job load lower than max load and enough free load available
+    job.setJobLoad(1.0f);
+    assertTrue("Job load + current load < max load, so accept job", jobProducer.isReadyToAccept(job));
+
+    job.setJobLoad(1.0f);
+    assertFalse("Job load + current load >= max load, so accept job", jobProducer.isReadyToAccept(job));
+
+    // Job load higher than max load but some load on host
+    job.setJobLoad(10.0f);
+    assertTrue("Job load >= max load, but accepting oversize jobs is true so accept job", jobProducer.isReadyToAccept(job));
   }
 
   private class JobProducerTest extends AbstractJobProducer {
@@ -149,6 +190,10 @@ public class AbstractJobProducerTest extends EasyMockSupport {
       this.securityService = securityService;
       this.userDirectoryService = userDirectoryService;
       this.organizationDirectoryService = organizationDirectoryService;
+    }
+
+    protected void setAcceptOversizeJobs(boolean acceptOversizeJobs) {
+      this.acceptJobLoadsExeedingMaxLoad = acceptOversizeJobs;
     }
 
     @Override

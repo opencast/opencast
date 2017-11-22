@@ -9,6 +9,17 @@ one allinone distribution to be created. It is already unpacked and ready to be 
 
     mvn clean install -Pdev
 
+The administrative user interface needs nodejs to build and phantomjs for testing purposes. These will be downloaded as
+prebuilt binaries during the maven build process. If there are no prebuilt binaries for your operating system, you can
+build the tools manually and then build opencast using the `frontend-no-prebuilt` maven profile:
+
+    mvn clean install -Pdev,frontend-no-prebuilt
+
+Logging During Builds
+---------------------
+
+While building Opencast, the default log level for Opencast modules is `WARN`. To increase logging for development,
+edit the log level configuration in `docs/log4j/log4j.properties`.
 
 Building single modules
 -----------------------

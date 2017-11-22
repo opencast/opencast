@@ -44,7 +44,7 @@
     </div><!-- modal-content -->
 
    <footer>
-        <a ng-click="submit()" ng-class="($valid && !submitButton) ? 'active' : 'disabled'" class="submit" translate="SUBMIT">
+        <a ng-click="submit()" class="submit {{getSubmitButtonState()}}" translate="SUBMIT">
             <!-- Submit -->
         </a>
         <a ng-click="close()" class="cancel" translate="CANCEL">

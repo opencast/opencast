@@ -75,8 +75,11 @@ public final class MimeTypes {
   /** Name of the mime type files */
   public static final String DEFINITION_FILE = "/org/opencastproject/util/MimeTypes.xml";
 
+  /** Name of the mime type files */
+  public static final String DEFAULT_TYPE = "application/octet-stream";
+
   /** The mime types */
-  private static final List<MimeType> mimeTypes = new ArrayList<MimeType>();
+  private static final List<MimeType> mimeTypes = new ArrayList<>();
 
   /** the logging facility provided by log4j */
   private static final Logger logger = LoggerFactory.getLogger(MimeType.class);
@@ -245,7 +248,7 @@ public final class MimeTypes {
   public static MimeType fromURL(URL url) throws UnknownFileTypeException {
     if (url == null)
       throw new IllegalArgumentException("Argument 'url' is null");
-    return fromString(url.getFile());
+    return fromString(url.getPath());
   }
 
   /**
@@ -271,9 +274,9 @@ public final class MimeTypes {
   /**
    * Returns a mime type for the provided file name.
    * <p>
-   * This method tries various ways to extract mime type information from the files name or its contents.
+   * This method tries to find the mime type from the file name suffix (extension).
    * <p>
-   * If no mime type can be derived from either the file name or its contents, a <code>UnknownFileTypeException</code>
+   * If no mime type can be derived from the file name, an <code>UnknownFileTypeException</code>
    * is thrown.
    *
    * @param name
@@ -307,15 +310,22 @@ public final class MimeTypes {
       throw e;
     }
 
-    // TODO
-    // Try to match according to file contents
-    // if (mimeType == null) {
-    // for (MimeType m : mimeTypes_.values()) {
-    // // TODO: Search file contents for mime type using magic bits
-    // }
-    // }
-
     throw new UnknownFileTypeException("File '" + name + "' cannot be matched to any mime type");
+  }
+
+  /**
+   * Convenience method to get a mime type as String from a filename extension
+   *
+   * @param name
+   *          the filename
+   * @return the corresponding mime type or DEFAULT_TYPE if no match
+   */
+  public static String getMimeType(String name) {
+    try {
+      return MimeTypes.fromString(name).toString();
+    } catch (UnknownFileTypeException e) {
+      return DEFAULT_TYPE;
+    }
   }
 
   /**
@@ -370,14 +380,14 @@ public final class MimeTypes {
       super.endElement(uri, localName, name);
 
       if ("Type".equals(name)) {
-        this.type = getContent();
+        type = getContent();
         return;
       } else if ("Description".equals(name)) {
-        this.description = getContent();
+        description = getContent();
         return;
       }
       if ("Extensions".equals(name)) {
-        this.extensions = getContent();
+        extensions = getContent();
         return;
       } else if ("MimeType".equals(name)) {
         String[] t = type.split("/");

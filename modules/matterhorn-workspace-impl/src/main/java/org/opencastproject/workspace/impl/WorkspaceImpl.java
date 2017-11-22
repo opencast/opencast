@@ -36,6 +36,7 @@ import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Prelude.sleep;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.HttpUtil;
@@ -708,8 +709,7 @@ public final class WorkspaceImpl implements Workspace {
     String path = collectionURI.toString();
     String filename = FilenameUtils.getName(path);
     String collection = getCollection(collectionURI);
-    logger.debug("Moving {} from {} to {}/{}",
-            new String[] { filename, collection, toMediaPackage, toMediaPackageElement });
+    logger.debug("Moving {} from {} to {}/{}", filename, collection, toMediaPackage, toMediaPackageElement);
     // move locally
     File original = toWorkspaceFile(collectionURI);
     if (original.isFile()) {
@@ -915,5 +915,12 @@ public final class WorkspaceImpl implements Workspace {
       }
     }
     logger.info("Finished cleanup of workspace");
+  }
+
+  @Override
+  public void cleanup(Id mediaPackageId) throws IOException {
+    final File f = workspaceFile(WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX, mediaPackageId.toString());
+    logger.debug("Clean workspace media package directory {}", f);
+    FileUtils.deleteDirectory(f);
   }
 }

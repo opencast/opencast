@@ -38,6 +38,7 @@ angular.module('adminNg.services')
             if (angular.isUndefined(me.storage[type])) {
                 me.storage[type] = {};
             }
+
             if (angular.isUndefined(me.storage[type][namespace])) {
                 me.storage[type][namespace] = {};
             }

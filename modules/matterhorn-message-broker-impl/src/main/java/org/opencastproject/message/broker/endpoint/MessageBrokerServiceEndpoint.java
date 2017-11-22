@@ -68,7 +68,7 @@ public class MessageBrokerServiceEndpoint {
         description = "Not connected to message broker")
     })
   public Response getStatus() {
-    if (messageReceiver.reconnect() && messageSender.reconnect()) {
+    if (messageReceiver.isConnected() && messageSender.isConnected()) {
       return Response.status(SC_NO_CONTENT).build();
     }
     return Response.status(SC_SERVICE_UNAVAILABLE).build();

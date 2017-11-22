@@ -238,8 +238,10 @@ public class EncodingProfileScanner implements ArtifactInstaller {
     df.setApplicableType(MediaType.parseString(StringUtils.trimToEmpty(applicableObj)));
 
     String jobLoad = getDefaultProperty(profile, PROP_JOBLOAD, properties, defaultProperties);
-    if (!StringUtils.isBlank(jobLoad))
+    if (!StringUtils.isBlank(jobLoad)) {
       df.setJobLoad(Float.valueOf(jobLoad));
+      logger.debug("Setting job load for profile {} to {}", profile, jobLoad);
+    }
 
     // Look for extensions
     String extensionKey = PROP_PREFIX + profile + ".";

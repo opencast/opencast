@@ -317,7 +317,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   @Override
   public void deleteSeries(final String seriesID) throws SeriesException, NotFoundException {
     try {
-      this.persistence.deleteSeries(seriesID);
+      persistence.deleteSeries(seriesID);
       messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
               SeriesItem.delete(seriesID));
     } catch (SeriesServiceDatabaseException e1) {
@@ -410,8 +410,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
-  public Map<String, String> getSeriesProperties(String seriesID) throws SeriesException, NotFoundException,
-          UnauthorizedException {
+  public Map<String, String> getSeriesProperties(String seriesID)
+          throws SeriesException, NotFoundException, UnauthorizedException {
     try {
       return persistence.getSeriesProperties(seriesID);
     } catch (SeriesServiceDatabaseException e) {
@@ -422,20 +422,20 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
-  public String getSeriesProperty(String seriesID, String propertyName) throws SeriesException, NotFoundException,
-          UnauthorizedException {
+  public String getSeriesProperty(String seriesID, String propertyName)
+          throws SeriesException, NotFoundException, UnauthorizedException {
     try {
       return persistence.getSeriesProperty(seriesID, propertyName);
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to get series property for series with series id '{}' and property name '{}': {}",
-              new Object[] { seriesID, propertyName, ExceptionUtils.getStackTrace(e) });
+      logger.error("Failed to get series property for series with series id '{}' and property name '{}': {}", seriesID,
+              propertyName, ExceptionUtils.getStackTrace(e));
       throw new SeriesException(e);
     }
   }
 
   @Override
-  public void updateSeriesProperty(String seriesID, String propertyName, String propertyValue) throws SeriesException,
-          NotFoundException, UnauthorizedException {
+  public void updateSeriesProperty(String seriesID, String propertyName, String propertyValue)
+          throws SeriesException, NotFoundException, UnauthorizedException {
     try {
       persistence.updateSeriesProperty(seriesID, propertyName, propertyValue);
       messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
@@ -443,21 +443,21 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     } catch (SeriesServiceDatabaseException e) {
       logger.error(
               "Failed to get series property for series with series id '{}' and property name '{}' and value '{}': {}",
-              new Object[] { seriesID, propertyName, propertyValue, ExceptionUtils.getStackTrace(e) });
+              seriesID, propertyName, propertyValue, ExceptionUtils.getStackTrace(e));
       throw new SeriesException(e);
     }
   }
 
   @Override
-  public void deleteSeriesProperty(String seriesID, String propertyName) throws SeriesException, NotFoundException,
-          UnauthorizedException {
+  public void deleteSeriesProperty(String seriesID, String propertyName)
+          throws SeriesException, NotFoundException, UnauthorizedException {
     try {
       persistence.deleteSeriesProperty(seriesID, propertyName);
       messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
               SeriesItem.updateProperty(seriesID, propertyName, null));
     } catch (SeriesServiceDatabaseException e) {
       logger.error("Failed to delete series property for series with series id '{}' and property name '{}': {}",
-              new Object[] { seriesID, propertyName, ExceptionUtils.getStackTrace(e) });
+              seriesID, propertyName, ExceptionUtils.getStackTrace(e));
       throw new SeriesException(e);
     }
   }
@@ -586,8 +586,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                     }
                     if (((current[0] % responseInterval) == 0) || (current[0] == total)) {
                       messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                            IndexRecreateObject
-                                    .update(indexName, IndexRecreateObject.Service.Series, total, current[0]));
+                              IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Series, total,
+                                      current[0]));
                     }
                     current[0] += 1;
                     return null;

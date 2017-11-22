@@ -332,7 +332,7 @@ public final class FileSupport {
         Files.copy(sourcePath, targetPath);
       } catch (IOException e) {
         logger.debug("Copy file because creating a hard-link at '{}' for existing file '{}' did not work: {}",
-                new Object[] { targetPath, sourcePath, ExceptionUtils.getStackTrace(e) });
+                targetPath, sourcePath, ExceptionUtils.getStackTrace(e));
         if (overwrite) {
           Files.copy(sourcePath, targetPath, REPLACE_EXISTING);
         } else {
@@ -369,7 +369,7 @@ public final class FileSupport {
       deleteIfExists(targetPath);
       createLink(targetPath, sourcePath);
     } catch (Exception e) {
-      logger.debug("Unable to create a link from {} to {}: {}", new Object[] { sourcePath, targetPath, e });
+      logger.debug("Unable to create a link from {} to {}: {}", sourcePath, targetPath, e);
       return false;
     }
 

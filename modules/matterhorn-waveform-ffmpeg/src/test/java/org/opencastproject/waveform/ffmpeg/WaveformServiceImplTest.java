@@ -67,7 +67,7 @@ public class WaveformServiceImplTest {
   @BeforeClass
   public static void setUpClass() throws Exception {
     audioTrack = readTrackFromResource("/audio-track.xml");
-    audioTrack.setURI(new URI(WaveformServiceImplTest.class.getResource("/test.mp3").getFile()));
+    audioTrack.setURI(WaveformServiceImplTest.class.getResource("/test.mp3").toURI());
     dummyTrack = readTrackFromResource("/dummy-track.xml");
   }
 
@@ -145,7 +145,7 @@ public class WaveformServiceImplTest {
   public void testProcess() throws Exception {
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get((URI) EasyMock.anyObject()))
-            .andReturn(new File(audioTrack.getURI().toString()));
+            .andReturn(new File(audioTrack.getURI()));
     Capture filenameCapture = new Capture();
     EasyMock.expect(workspace.putInCollection(
             EasyMock.anyString(), (String) EasyMock.capture(filenameCapture), (InputStream) EasyMock.anyObject()))

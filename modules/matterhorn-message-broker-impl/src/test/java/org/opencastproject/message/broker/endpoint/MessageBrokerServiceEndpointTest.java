@@ -37,11 +37,11 @@ public class MessageBrokerServiceEndpointTest {
   public void testGetStatus() {
     /* Mock message broker connections */
     MessageReceiverImpl receiver = EasyMock.createMock(MessageReceiverImpl.class);
-    EasyMock.expect(receiver.reconnect()).andReturn(true).once();
-    EasyMock.expect(receiver.reconnect()).andReturn(false).once();
+    EasyMock.expect(receiver.isConnected()).andReturn(true).once();
+    EasyMock.expect(receiver.isConnected()).andReturn(false).once();
     MessageSenderImpl sender = EasyMock.createMock(MessageSenderImpl.class);
-    EasyMock.expect(sender.reconnect()).andReturn(true).once();
-    EasyMock.expect(sender.reconnect()).andReturn(false).once();
+    EasyMock.expect(sender.isConnected()).andReturn(true).once();
+    EasyMock.expect(sender.isConnected()).andReturn(false).once();
     EasyMock.replay(sender, receiver);
 
     MessageBrokerServiceEndpoint endpoint = new MessageBrokerServiceEndpoint();
