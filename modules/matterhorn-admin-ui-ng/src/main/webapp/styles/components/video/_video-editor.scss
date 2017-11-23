@@ -39,12 +39,14 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
 .video-timeline {
     background: #fff;
     border: $thin-border-stroke $main-border-color;
-    margin-top: 5px;
+    margin-top: 12px;
+    border-radius: 4px;
 
     &>div {
         margin-top: 5px;
         background: #fff;
         padding: 5px 10px;
+        border-radius: 4px;
     }
 
     .tracks-wrapper {
@@ -531,10 +533,11 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
             .zoom-control {
                 float: right;
                 margin-top: -4px;
+                margin-bottom: 4px;
 
                 &>label {
                     float: left;
-                    padding-top: 2px;
+                    line-height: 22px;
                 }
 
                 &>label:after {
@@ -543,10 +546,13 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
 
                 input[type=range] {
                     width: 400px;
+                    height: 22px;
+                    margin: 0 5px;
                 }
 
                 .chosen-container {
-                    top: -7px;
+                    top: -10px;
+                    height: 22px;
                 }
             }
         }
@@ -641,10 +647,9 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
 // ----------------------------------------
 
 .editor-segments {
-    background: #fff;
-    border: $thin-border-stroke $main-border-color;
-    margin-top: 5px;
-    width: 50%;
+    padding: 4px 12px 4px 12px;
+    width: 25%;
+    min-width: 400px;
 
     $segment-list-element-height: 35px;
 
@@ -652,6 +657,7 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
 
       .segment-list-entry {
           margin: 8px auto;
+          margin-left: 0;
           width: 98%;
           height: $segment-list-element-height;
           color: $dark-prim-color;
@@ -739,4 +745,9 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
       }
 
     }
+}
+
+.segments-area {
+    border-radius: 4px;
+    border: $thin-border-stroke $main-border-color;
 }
