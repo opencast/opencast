@@ -1,5 +1,5 @@
 describe('adminNg.directives.segmentsDirective', function () {
-    var $compile, $rootScope, $document, element, spy;
+    var $httpBackend, $compile, $rootScope, $document, ToolsResource, element, spy;
 
     beforeEach(module('adminNg'));
     beforeEach(module('shared/partials/segments.html'));
@@ -10,14 +10,15 @@ describe('adminNg.directives.segmentsDirective', function () {
         });
     }));
 
-    beforeEach(inject(function (_$rootScope_, _$compile_, _$document_) {
+    beforeEach(inject(function (_$httpBackend_, _$rootScope_, _$compile_, _$document_, _ToolsResource_) {
+        $httpBackend  = _$httpBackend_;
         $compile = _$compile_;
         $rootScope = _$rootScope_;
         $document = _$document_;
+        ToolsResource = _ToolsResource_;
     }));
 
     beforeEach(function () {
-        $rootScope.video = {};
         $rootScope.player = {
             adapter: {
                 addListener: function (event, callback) {
@@ -30,7 +31,10 @@ describe('adminNg.directives.segmentsDirective', function () {
             }
         };
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
-        $rootScope.video = angular.copy(getJSONFixture('admin-ng/tools/40518/editor.json'));
+        $httpBackend.expectGET('/admin-ng/tools/40518/editor.json').respond(JSON.stringify(
+            getJSONFixture('admin-ng/tools/40518/editor.json')));
+        $rootScope.video =  ToolsResource.get({ id: 40518, tool: 'editor' });
+        $httpBackend.flush();
         element = $compile('<div data-admin-ng-segments="" data-video="video" data-player="player"/></div>')($rootScope);
         $rootScope.$digest();
     });
