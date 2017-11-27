@@ -36,11 +36,11 @@ describe('adminNg.directives.adminNgEditableSingleValue', function () {
     });
 
     it('becomes editable when clicked', function () {
-        expect(element.find('input')).toHaveClass('ng-hide');
+        expect(element.find('input')[0]).toBe(undefined);
         expect(element.find('span')).not.toHaveClass('ng-hide');
         element.click();
         $timeout.flush();
-        expect(element.find('input')).not.toHaveClass('ng-hide');
+        expect(element.find('input')[0]).not.toBe(undefined);
         expect(element.find('span')).toHaveClass('ng-hide');
     });
 
