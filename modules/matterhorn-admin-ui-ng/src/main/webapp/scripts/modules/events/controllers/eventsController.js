@@ -22,8 +22,8 @@
 
 // Controller for all event screens.
 angular.module('adminNg.controllers')
-.controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource', 'ResourcesListResource', 'Notifications',
-    function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications) {
+.controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource', 'ResourcesListResource', 'Notifications', 'ResourceModal', 'ConfirmationModal', 'EventHasSnapshotsResource',
+    function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications, ResourceModal, ConfirmationModal, EventHasSnapshotsResource) {
         // Configure the table service
         $scope.todayFilterValue = function() {
             var now = new Date();
@@ -125,6 +125,16 @@ angular.module('adminNg.controllers')
                         publication.label = publication.name;
                     }
                 });
+                row.checkedDelete = function() {
+                  EventHasSnapshotsResource.get({id: row.id},function(o) {
+                    if (angular.isUndefined(row.publications) || row.publications.length <= 0 || !o.hasSnapshots)
+                          // Works, opens simple modal
+                          ConfirmationModal.show('confirm-modal',Table.delete,row);
+                      else
+                          // works, opens retract
+                          ResourceModal.show('retract-published-event-modal',row.id);
+                  });
+                }
             }
         });
 
