@@ -117,9 +117,6 @@ describe('adminNg.directives.adminNgEditableSingleValue', function () {
         var callbackContext = {};
         beforeEach(function () {
             callbackContext.scope = element.find('span').scope();
-            $rootScope.save.and.callFake(function (id, callback) {
-                callback.apply(callbackContext);
-            });
         });
 
         it('saves the value', function () {
