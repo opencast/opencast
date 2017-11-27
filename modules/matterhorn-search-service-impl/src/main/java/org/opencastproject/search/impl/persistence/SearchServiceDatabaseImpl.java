@@ -281,6 +281,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         entity.setMediaPackageXML(mediaPackageXML);
         entity.setAccessControl(AccessControlParser.toXml(acl));
         entity.setModificationDate(now);
+        entity.setDeletionDate(null);
         entity.setSeriesId(mediaPackage.getSeries());
         em.merge(entity);
       }
