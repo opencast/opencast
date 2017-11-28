@@ -60,7 +60,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
     /** The property to look up and append to REMOTE_SERVICE_TYPE_PREFIX */
   private static final String PARAM_CHANNEL_ID = "channelId";
   private static final String PARAM_MEDIAPACKAGE = "mediapackage";
-  private static final String PARAM_ELEMENT_ID = "elementId";
+  private static final String PARAM_ELEMENT_IDS = "elementIds";
 
   private static final Gson gson  = new Gson();
 
@@ -94,7 +94,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
     logger.info(format("Distributing %s elements to %s@%s", elementIds.size(), channelId, distributionChannel));
     final HttpPost req = post(param(PARAM_CHANNEL_ID, channelId),
                               param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
-                              param(PARAM_ELEMENT_ID, gson.toJson(elementIds)));
+                              param(PARAM_ELEMENT_IDS, gson.toJson(elementIds)));
     for (Job job : join(runRequest(req, jobFromHttpResponse))) {
       return job;
     }
@@ -115,7 +115,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
     logger.info(format("Retracting %s elements from %s@%s", elementIds.size(), channelId, distributionChannel));
     final HttpPost req = post("/retract",
                               param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
-                              param(PARAM_ELEMENT_ID, gson.toJson(elementIds)),
+                              param(PARAM_ELEMENT_IDS, gson.toJson(elementIds)),
                               param(PARAM_CHANNEL_ID, channelId));
     for (Job job : join(runRequest(req, jobFromHttpResponse))) {
       return job;
