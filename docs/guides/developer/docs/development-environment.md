@@ -15,6 +15,12 @@ build the tools manually and then build opencast using the `frontend-no-prebuilt
 
     mvn clean install -Pdev,frontend-no-prebuilt
 
+Logging During Builds
+---------------------
+
+While building Opencast, the default log level for Opencast modules is `WARN`. To increase logging for development,
+edit the log level configuration in `docs/log4j/log4j.properties`.
+
 Building single modules
 -----------------------
 

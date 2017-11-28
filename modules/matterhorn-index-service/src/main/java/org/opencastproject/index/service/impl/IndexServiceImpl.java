@@ -1451,6 +1451,12 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
+  public boolean hasSnapshots(String eventId) {
+    AQueryBuilder q = assetManager.createQuery();
+    return !enrich(q.select(q.snapshot()).where(q.mediaPackageId(eventId).and(q.version().isLatest())).run()).getSnapshots().isEmpty();
+  }
+
+  @Override
   public SearchResult<Group> getGroups(String filter, Opt<Integer> optLimit, Opt<Integer> optOffset,
           Opt<String> optSort, AbstractSearchIndex index) throws SearchIndexException {
     GroupSearchQuery query = new GroupSearchQuery(securityService.getOrganization().getId(), securityService.getUser());

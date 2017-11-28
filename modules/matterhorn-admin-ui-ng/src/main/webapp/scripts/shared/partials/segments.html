@@ -24,8 +24,8 @@
             </div>
             <a title="{{'VIDEO_TOOL.SEGMENTS.REMOVE_SEGMENT' | translate}}" class="remove"
                ng-if="video.segments.length > 1"
-               ng-click="mergeSegment($event, segment)" translate> VIDEO_TOOL.SEGMENTS.REMOVE_SEGMENT
-            </a>
+               ng-class="{ disabled: !isRemovalAllowed(segment) }"
+               ng-click="mergeSegment($event, segment)"/>
 
         </div>
     </div>

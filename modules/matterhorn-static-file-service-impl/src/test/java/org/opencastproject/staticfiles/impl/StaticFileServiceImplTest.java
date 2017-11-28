@@ -69,8 +69,8 @@ public class StaticFileServiceImplTest {
   @BeforeClass
   public static void beforeClass() throws Exception {
     rootDir = Files.createTempDirectory("static-file-service-test").toFile();
-    imageFile = new File(StaticFileServiceImplTest.class.getResource("/" + imageFilename).getPath());
-    videoFile = new File(StaticFileServiceImplTest.class.getResource("/" + videoFilename).getPath());
+    imageFile = new File(StaticFileServiceImplTest.class.getResource("/" + imageFilename).toURI());
+    videoFile = new File(StaticFileServiceImplTest.class.getResource("/" + videoFilename).toURI());
   }
 
   @Before
@@ -91,8 +91,8 @@ public class StaticFileServiceImplTest {
   private static ComponentContext getComponentContext(String useWebserver) {
     // Create BundleContext
     BundleContext bundleContext = EasyMock.createMock(BundleContext.class);
-    EasyMock.expect(bundleContext.getProperty(StaticFileServiceImpl.STATICFILES_ROOT_DIRECTORY_KEY)).andReturn(
-            rootDir.getAbsolutePath());
+    EasyMock.expect(bundleContext.getProperty(StaticFileServiceImpl.STATICFILES_ROOT_DIRECTORY_KEY))
+            .andReturn(rootDir.getAbsolutePath());
     EasyMock.replay(bundleContext);
     // Create ComponentContext
     Dictionary properties = new Properties();

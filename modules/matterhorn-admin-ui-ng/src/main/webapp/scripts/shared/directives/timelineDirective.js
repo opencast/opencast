@@ -1,6 +1,7 @@
 angular.module('adminNg.directives')
 .directive('adminNgTimeline', ['PlayerAdapter', '$document', 'VideoService', '$timeout',
 function (PlayerAdapter, $document, VideoService, $timeout) {
+
     return {
         templateUrl: 'shared/partials/timeline.html',
         priority: 0,
@@ -153,9 +154,15 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
              * @param {Object} segment Segment object
              * @return {String} Width of the segment in percent
              */
-            scope.getSegmentWidth = function (segment) {
+            scope.getSegmentWidth = function (segment, dropPercent) {
+                if (angular.isUndefined(segment)) {
+                    return 0;
+                }
+
                 if (angular.isUndefined(scope.video.duration)) {
                     return 0;
+                } else{
+                    scope.video.duration = parseInt(scope.video.duration, 10);
                 }
 
                 var zoom = 1,
@@ -163,7 +170,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     relativeSize = absoluteSize / scope.video.duration,
                     scaledSize = relativeSize * zoom;
 
-                return (scaledSize * 100) + '%';
+                return (scaledSize * 100) + (!dropPercent ? '%' : 0);
             };
 
             /**
@@ -318,6 +325,13 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 return style;
             };
 
+            scope.getWaveformBg = function (track) {
+                return {
+                  'background-image': 'url(' + track.waveform + ')',
+                  'background-repeat': 'no-repeat',
+                };
+            };
+
             /**
              * Returns an object that describes the css classes for a given segment.
              *
@@ -325,7 +339,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
              * @return {Object} object with {class}: {boolean} values for CSS classes.
              */
             scope.getSegmentClass = function (segment) {
-                var result = { deleted: segment.deleted, selected: segment.selected, small: false, tiny: false };
+                var result = { deleted: segment.deleted, selected: segment.selected, small: false, tiny: false, sliver: false };
 
                 if (angular.isUndefined(scope.video.duration)) {
                     return result;
@@ -342,10 +356,14 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     if ( segment_width <= (total + 10)) {
 
                         if ( (single + 10) <= segment_width) {
-
                             // a single element can be shown
                             result.small = true;
-                        }   else {
+                        }
+                        else if (segment_width < 5) {
+                            //minimum segment width
+                            result.sliver = true;
+                        }
+                        else {
                             // smaller than a single element > show none
                             result.tiny = true;
                         }
@@ -443,6 +461,10 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     event.stopPropagation();
                 }
 
+                if (!scope.isRemovalAllowed(segment)) {
+                    return;
+                }
+
                 var index = scope.video.segments.indexOf(segment);
 
                 if (scope.video.segments[index - 1]) {
@@ -467,6 +489,10 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 if (event) {
                     event.preventDefault();
                     event.stopPropagation();
+                }
+
+                if (!scope.isRemovalAllowed(segment)) {
+                    return;
                 }
 
                 segment.deleted = !segment.deleted;
@@ -507,6 +533,17 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
               scope.$root.$broadcast("segmentTimesUpdated");
             };
 
+            scope.isRemovalAllowed = function(segment) {
+                if (!segment) {
+                    return false;
+                }
+
+                return (segment.deleted || scope.video.segments
+                                               .filter(function(seg) {
+                                                   return !seg.deleted;
+                                               }).length > 1);
+            }
+
             /**
              * Catch all method to track the mouse movement on the page,
              * to calculate the movement of elements properly.
@@ -537,7 +574,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 if (scope.canMove) {
                     scope.canMove = false;
 
-                    if (scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
+                    if (scope.player.adapter.getStatus && scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
 
                         var cursor = element.find('#cursor_fake'),
                         handle = element.find('#cursor_fake .handle');
@@ -593,6 +630,8 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                         segment.start = position;
                     }
 
+                    scope.movingSegment.css('background-position', (-pxPosition + 4) + 'px 0px');
+
                     // update the segments around the one that was changed
                     if (index - 1 >= 0) {
 
@@ -602,8 +641,13 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                         if (before.end - before.start <= 0) {
                             // empty segment
-                            segment.start = before.start;
-                            scope.video.segments.splice(index - 1, 1);
+                            if (!scope.isRemovalAllowed(before)) {
+                                before.end = segment.start = before.start + 1;
+                            }
+                            else {
+                                segment.start = before.start;
+                                scope.video.segments.splice(index - 1, 1);
+                            }
                         }
                     }
 
@@ -629,7 +673,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     scope.movingSegment.css('left', '-4px');
                     scope.movingSegment = null;
 
-                    if (segment.end - segment.start <= 4) {
+                    if (segment.end - segment.start <= 100) {
                         // i'm really small so should probably not exist anymore
                         scope.mergeSegment(null, segment);
                     }
@@ -768,7 +812,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 scope.doSplitSegment = target.hasClass('split');
 
                 // We are currently playing - use fake handle
-                if (scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
+                if (scope.player.adapter.getStatus && scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
 
                     var cursorFake = element.find('#cursor_fake'),
                         handle = element.find('#cursor_fake .handle');
@@ -874,7 +918,10 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 if (nx <= scope.movingSegment.data('track_left')) nx = scope.movingSegment.data('track_left');
                 if (nx >= scope.movingSegment.data('end')) nx = scope.movingSegment.data('end');
 
-                scope.movingSegment.css('left', nx);
+                scope.movingSegment.css({
+                    left: nx,
+                    'background-position': (-$document.mx + 37) + 'px'
+                });
             };
 
             /**
@@ -886,14 +933,15 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
              */
             scope.dragSegement = function (event, segment) {
               event.preventDefault();
+              event.stopImmediatePropagation();
 
               scope.movingSegment = true;
 
               var handle = $(event.currentTarget),
                   track = element.find('.segments').parent();
 
-              handle.data('dx', $document.mx - handle.offset().left);
-              handle.data('dy', $document.my - handle.offset().top);
+              handle.data('dx', ($document.mx || event.pageX) - handle.offset().left);
+              handle.data('dy', ($document.my || event.pageY) - handle.offset().top);
               handle.data('px', handle.parent().offset().left);
               handle.data('py', handle.parent().offset().top);
               handle.data('track_left', (handle.data('px') *-1) + track.offset().left - 4);
@@ -902,6 +950,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
               handle.data('end', track.width() + track.offset().left - handle.parent().offset().left);
               handle.data('segment', segment);
               handle.addClass('active');
+              handle.css('background-size', track.width() + 'px ' + handle.height() + 'px');
 
               scope.movingSegment = handle;
 
@@ -939,6 +988,9 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 scope.setWrapperClasses();
             };
 
+            /**
+             * Remove listeners and timer associated with this directive
+             */
             scope.$on('$destroy', function () {
                 $document.unbind('mouseup');
                 $document.unbind('mousemove');

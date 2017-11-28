@@ -19,16 +19,19 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-workflow-service-api</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-common</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-scheduler-api</artifactId>
-      <version>5-SNAPSHOT</version>
+      <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>

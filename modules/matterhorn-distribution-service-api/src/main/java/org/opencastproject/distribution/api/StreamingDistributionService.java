@@ -19,32 +19,22 @@
  *
  */
 
+package org.opencastproject.distribution.api;
 
-.main-video-details {
-    @extend .page-title;
-}
+import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageException;
 
-// Video Header Layout
-.video-header {
-    @include clearfix();
-    margin-bottom: 12px;
+import java.util.Set;
 
-    .main-video-details {
-        float: left;
-    }
+/**
+ * Distributes elements from MediaPackages to distribution channels.
+ */
+public interface StreamingDistributionService extends DistributionService {
 
-    .video-more-options {
-        float: right;
-    }
-}
+  Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds)
+          throws DistributionException, MediaPackageException;
 
-.video-more-options {
-
-    a:last-child {
-        margin-left: 5px;
-    }
-
-    $button-padding: 8px 18px;
-    $font-size: 14px;
-
+  Job retract(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
+          throws DistributionException;
 }

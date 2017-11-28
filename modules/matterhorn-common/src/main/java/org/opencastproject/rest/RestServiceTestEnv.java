@@ -26,7 +26,6 @@ import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
-import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
@@ -45,7 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Random;
@@ -142,14 +140,12 @@ public final class RestServiceTestEnv {
   public static URL localhostRandomPort() {
     for (int tries = 100; tries > 0; tries--) {
       final URL url = UrlSupport.url("http", "localhost", 8081 + new Random(System.currentTimeMillis()).nextInt(919));
-      InputStream in = null;
       try {
         final URLConnection con = url.openConnection();
         con.setConnectTimeout(1000);
         con.setReadTimeout(1000);
         con.getInputStream();
       } catch (IOException e) {
-        IoSupport.closeQuietly(in);
         return url;
       }
     }

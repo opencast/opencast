@@ -54,6 +54,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                 return millis + (seconds * 1000) + (minutes * 60000) + (hours * 3600000);
               }
+
             };
 
             /**
@@ -81,6 +82,10 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     event.stopPropagation();
                 }
 
+                if (!scope.isRemovalAllowed(segment)) {
+                    return;
+                }
+
                 var index = scope.video.segments.indexOf(segment);
 
                 if (scope.video.segments[index - 1]) {
@@ -105,7 +110,13 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     event.stopPropagation();
                 }
 
-                segment.deleted = !segment.deleted;
+                if (angular.isUndefined(segment) || scope.video.segments.indexOf(segment) === -1) {
+                    return;
+                }
+
+                if (scope.isRemovalAllowed(segment)) {
+                    segment.deleted = !segment.deleted;
+                }
             };
 
             /**
@@ -120,6 +131,17 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 if (!segment.selected) {
                     scope.player.adapter.setCurrentTime(segment.start / 1000);
                 }
+            };
+
+            scope.isRemovalAllowed = function(segment) {
+                if (!segment) {
+                    return false;
+                }
+
+                return (segment.deleted || scope.video.segments
+                                               .filter(function(seg) {
+                                                   return !seg.deleted;
+                                               }).length > 1);
             };
 
             /**
@@ -164,12 +186,24 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                   segment.startTime = scope.formatMilliseconds(segment.start);
                 } else {
                   var previousSegment = scope.getPreviousSegment(segment);
+                  var allow = scope.isRemovalAllowed(previousSegment);
                   segment.start = newTime;
-                  while (previousSegment &&previousSegment.start > newTime) {
+                  while (previousSegment && allow && previousSegment.start > newTime) {
                     scope.removeSegment(previousSegment);
                     previousSegment = scope.getPreviousSegment(segment);
+                    allow = scope.isRemovalAllowed(previousSegment);
                   }
-                  if (previousSegment) {
+                  if (!allow && previousSegment) {
+                    if (previousSegment.start > newTime) {
+                        segment.start = previousSegment.end;
+                    }
+                    else {
+                        var endTime = Math.max(newTime, previousSegment.start + 1);
+                        segment.start = previousSegment.end = endTime;
+                    }
+                    scope.$root.$broadcast("segmentTimesUpdated");
+                  }
+                  else if (previousSegment) {
                     previousSegment.end = newTime;
                     scope.$root.$broadcast("segmentTimesUpdated");
                   }
@@ -188,12 +222,24 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                   segment.endTime = scope.formatMilliseconds(segment.end);
                 } else {
                   var nextSegment = scope.getNextSegment(segment);
+                  var allow = scope.isRemovalAllowed(nextSegment);
                   segment.end = newTime;
-                  while (nextSegment && nextSegment.end < newTime) {
+                  while (nextSegment && allow && nextSegment.end < newTime) {
                     scope.removeSegment(nextSegment);
                     nextSegment = scope.getNextSegment(segment);
+                    allow = scope.isRemovalAllowed(nextSegment);
                   }
-                  if (nextSegment) {
+                  if (!allow && nextSegment) {
+                    if (nextSegment.end < newTime) {
+                      segment.end = nextSegment.start;
+                    }
+                    else {
+                      var startTime = Math.min(newTime, nextSegment.end - 1);
+                      segment.end = nextSegment.start = startTime;
+                    }
+                    scope.$root.$broadcast("segmentTimesUpdated");
+                  }
+                  else if (nextSegment) {
                     nextSegment.start = newTime;
                     scope.$root.$broadcast("segmentTimesUpdated");
                   }
@@ -237,7 +283,6 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             scope.video.$promise.then(function () {
               scope.$root.$broadcast("segmentTimesUpdated");
             });
-
         }
     };
 }]);

@@ -19,16 +19,25 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-common</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-common-jpa-impl</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>matterhorn-urlsigning-service-api</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>matterhorn-urlsigning-common</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -145,10 +154,6 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.googlecode.json-simple</groupId>
-      <artifactId>json-simple</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
     </dependency>
@@ -208,11 +213,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -269,8 +269,7 @@
             <Build-Number>${buildNumber}</Build-Number>
             <Embed-Dependency>
               spring-security-oauth;inline=true,
-              jboss-xacml;inline=true,
-              json-simple;inline=true,
+              jboss-xacml;inline=true
             </Embed-Dependency>
             <Private-Package>
               org.jboss.security.xacml.core,
@@ -282,7 +281,6 @@
               !org.springframework.security.core.codec.*,
               !org.w3c.dom.*,
               !sun.net.www.protocol.*,
-              !sun.security.util.*,
               javax.xml.datatype;version=0.0.0,
               javax.xml.namespace;version=0.0.0,
               javax.xml.parsers;version=0.0.0,

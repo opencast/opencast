@@ -21,10 +21,11 @@
 
 package org.opencastproject.distribution.streaming.wowza.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.ws.rs.core.Response.status;
 
-import org.opencastproject.distribution.api.DistributionService;
+import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
@@ -38,9 +39,14 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Set;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -63,16 +69,19 @@ import javax.ws.rs.core.Response.Status;
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
         + "other words, there is a bug! You should file an error report with your server logs from the time when the "
         + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
-public class StreamingDistributionRestService extends AbstractJobProducerEndpoint {
+public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(StreamingDistributionRestService.class);
+  private static final Logger logger = LoggerFactory.getLogger(WowzaAdaptiveStreamingDistributionRestService.class);
 
   /** The distribution service */
-  protected DistributionService service;
+  protected StreamingDistributionService service;
 
   /** The service registry */
   protected ServiceRegistry serviceRegistry = null;
+
+  private static final Gson gson = new Gson();
+
 
   /**
    * OSGi activation callback
@@ -97,7 +106,7 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
    * @param service
    *          the service to set
    */
-  public void setService(DistributionService service) {
+  public void setService(StreamingDistributionService service) {
     this.service = service;
   }
 
@@ -107,15 +116,23 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
   @RestQuery(name = "distribute", description = "Distribute a media package element to this distribution channel", returnDescription = "The job that can be used to track the distribution", restParameters = {
           @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
           @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
-          @RestParameter(name = "elementId", isRequired = true, description = "The element to distribute", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution job") })
+          @RestParameter(name = "elementIds", isRequired = true, description = "The elements to distribute as Json Array['IdOne','IdTwo']", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution job"),
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "There is no streaming distribution service available")})
   public Response distribute(@FormParam("mediapackage") String mediaPackageXml,
                              @FormParam("channelId") String channelId,
-                             @FormParam("elementId") String elementId)
+                             @FormParam("elementIds") String elementIds)
           throws Exception {
     Job job = null;
     try {
+      Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() { }.getType());
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
-      job = service.distribute(channelId, mediapackage, elementId);
+      job = service.distribute(channelId, mediapackage, setElementIds);
+      if (job == null) {
+        return Response.noContent().build();
+      } else {
+        return Response.ok(new JaxbJob(job)).build();
+      }
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to distribute element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();
@@ -123,7 +140,6 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
       logger.warn("Error distributing element", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
-    return Response.ok(new JaxbJob(job)).build();
   }
 
   @POST
@@ -132,23 +148,30 @@ public class StreamingDistributionRestService extends AbstractJobProducerEndpoin
   @RestQuery(name = "retract", description = "Retract a media package element from this distribution channel", returnDescription = "The job that can be used to track the retraction", restParameters = {
           @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
           @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
-          @RestParameter(name = "elementId", isRequired = true, description = "The element to retract", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job") })
+          @RestParameter(name = "elementIds", isRequired = true, description = "The elements to retract as Json Array['IdOne','IdTwo']", type = Type.STRING) }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job"),
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "There is no streaming distribution service available")})
   public Response retract(@FormParam("mediapackage") String mediaPackageXml,
                           @FormParam("channelId") String channelId,
-                          @FormParam("elementId") String elementId)
+                          @FormParam("elementIds") String elementIds)
           throws Exception {
     Job job = null;
     try {
+      Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() { }.getType());
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
-      job = service.retract(channelId, mediapackage, elementId);
+      job = service.retract(channelId, mediapackage, setElementIds);
+       if (job == null) {
+         return Response.noContent().build();
+       } else {
+         return Response.ok(new JaxbJob(job)).build();
+       }
     } catch (IllegalArgumentException e) {
-      logger.debug("Unable to distribute element: {}", e.getMessage());
+      logger.debug("Unable to retract element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
       logger.warn("Unable to retract mediapackage '{}' from streaming channel: {}", new Object[] { mediaPackageXml, e });
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
-    return Response.ok(new JaxbJob(job)).build();
   }
 
   /**
