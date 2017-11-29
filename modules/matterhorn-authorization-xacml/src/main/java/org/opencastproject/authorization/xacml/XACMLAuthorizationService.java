@@ -45,6 +45,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Role;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
@@ -98,6 +99,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
   public static final String XACML_FILENAME = "xacml.xml";
 
   public static final String READ_PERMISSION = "read";
+  public static final String WRITE_PERMISSION = "write";
 
   /** The workspace */
   protected Workspace workspace;
@@ -136,25 +138,28 @@ public class XACMLAuthorizationService implements AuthorizationService {
     return new Function0<Tuple<AccessControlList, AclScope>>() {
       @Override
       public Tuple<AccessControlList, AclScope> apply() {
-        logger.debug("No XACML attachment found in {}", mp);
+        logger.debug("Get default ACL for media package {}", mp.getIdentifier());
         if (StringUtils.isNotBlank(mp.getSeries())) {
-          logger.info("Falling back to using default acl from series {} for mediapackage {}", mp.getSeries(),
-                  mp.getIdentifier());
+          logger.debug("Falling back to acl from series {} for media package {}", mp.getSeries(), mp.getIdentifier());
           try {
             return tuple(seriesService.getSeriesAccessControl(mp.getSeries()), AclScope.Series);
           } catch (Exception e) {
-            logger.warn("Unable to get default acl from series '{}': {}", mp.getSeries(), e.getMessage());
+            logger.warn("Unable to get acl from series '{}'", mp.getSeries(), e);
           }
         }
-        logger.trace("Falling back to using default public acl for mediapackage '{}'", mp);
-        // TODO: We need a configuration option for open vs. closed by default
-        // Right now, rights management is based on series. Here we make sure that
-        // objects not belonging to a series are world readable
-        AccessControlList accessControlList = new AccessControlList();
-        List<AccessControlEntry> acl = accessControlList.getEntries();
-        String anonymousRole = securityService.getOrganization().getAnonymousRole();
-        acl.add(new AccessControlEntry(anonymousRole, READ_PERMISSION, true));
-        return tuple(accessControlList, AclScope.Series);
+        logger.trace("Falling back to global default acl for media package '{}'", mp.getIdentifier());
+        final AccessControlList accessControlList = new AccessControlList();
+        final List<AccessControlEntry> acl = accessControlList.getEntries();
+        final Organization org = securityService.getOrganization();
+        String adminRole = SecurityConstants.GLOBAL_ADMIN_ROLE;
+        acl.add(new AccessControlEntry(adminRole, READ_PERMISSION, true));
+        acl.add(new AccessControlEntry(adminRole, WRITE_PERMISSION, true));
+        // Also add the org admin role if an organization is present
+        if (org != null && !org.getAdminRole().equals(adminRole)) {
+          acl.add(new AccessControlEntry(org.getAdminRole(), READ_PERMISSION, true));
+          acl.add(new AccessControlEntry(org.getAdminRole(), WRITE_PERMISSION, true));
+        }
+        return tuple(accessControlList, AclScope.Global);
       }
     };
   }
