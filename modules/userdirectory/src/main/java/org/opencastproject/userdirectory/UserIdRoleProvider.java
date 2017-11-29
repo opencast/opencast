@@ -30,14 +30,20 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.api.UserProvider;
+import org.opencastproject.util.OsgiUtil;
+import org.opencastproject.util.data.Option;
 
 import com.google.common.base.CharMatcher;
 
+import org.apache.commons.lang3.BooleanUtils;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -46,10 +52,16 @@ import java.util.regex.Pattern;
 /**
  * The user id role provider assigns the user id role.
  */
-public class UserIdRoleProvider implements RoleProvider {
+public class UserIdRoleProvider implements RoleProvider, ManagedService {
 
-  private static final String ROLE_USER_PREFIX = "ROLE_USER_";
+
   private static final String ROLE_USER = "ROLE_USER";
+
+  private static final String ROLE_USER_PREFIX_KEY = "role.user.prefix";
+  private static final String DEFAULT_ROLE_USER_PREFIX = "ROLE_USER_";
+
+  private static final String SANITIZE_KEY = "sanitize";
+  private static final boolean DEFAULT_SANITIZE = true;
 
   private static final CharMatcher SAFE_USERNAME = CharMatcher.inRange('a', 'z').or(CharMatcher.inRange('A', 'Z'))
           .or(CharMatcher.inRange('0', '9')).negate().precomputed();
@@ -59,6 +71,9 @@ public class UserIdRoleProvider implements RoleProvider {
 
   /** The security service */
   protected SecurityService securityService = null;
+
+  private static String userRolePrefix = DEFAULT_ROLE_USER_PREFIX;
+  private static boolean sanitize = DEFAULT_SANITIZE;
 
   /** The user directory service */
   protected UserDirectoryService userDirectoryService = null;
@@ -82,8 +97,13 @@ public class UserIdRoleProvider implements RoleProvider {
   }
 
   public static final String getUserIdRole(String userName) {
-    String safeUserName = SAFE_USERNAME.replaceFrom(userName, "_");
-    return ROLE_USER_PREFIX.concat(safeUserName.toUpperCase());
+    String safeUserName;
+    if (sanitize) {
+      safeUserName = SAFE_USERNAME.replaceFrom(userName, "_").toUpperCase();
+    } else {
+      safeUserName = userName;
+    }
+    return userRolePrefix.concat(safeUserName);
   }
 
   /**
@@ -140,13 +160,13 @@ public class UserIdRoleProvider implements RoleProvider {
 
     // Include user id roles only if wildcard search or query matches user id role prefix
     // (iterating through users may be slow)
-    if (!"%".equals(query) && !query.startsWith(ROLE_USER_PREFIX)) {
+    if (!"%".equals(query) && !query.startsWith(userRolePrefix)) {
       return foundRoles.iterator();
     }
 
     String userQuery = "%";
-    if (query.startsWith(ROLE_USER_PREFIX)) {
-      userQuery = query.substring(ROLE_USER_PREFIX.length());
+    if (query.startsWith(userRolePrefix)) {
+      userQuery = query.substring(userRolePrefix.length());
     }
 
     Iterator<User> users = userDirectoryService.findUsers(userQuery, offset, limit);
@@ -165,6 +185,27 @@ public class UserIdRoleProvider implements RoleProvider {
     String regex = query.replace("_", ".").replace("%", ".*?");
     Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     return p.matcher(string).matches();
+  }
+
+  @Override
+  public void updated(Dictionary properties) throws ConfigurationException {
+    Option<String> userPrefixProperty = OsgiUtil.getOptCfg(properties, ROLE_USER_PREFIX_KEY);
+    if (userPrefixProperty.isSome()) {
+      userRolePrefix = userPrefixProperty.get();
+      logger.info("Using configured userRole prefix '{}'", userRolePrefix);
+    } else {
+      userRolePrefix = DEFAULT_ROLE_USER_PREFIX;
+      logger.info("Using default userRole prefix '{}'", userRolePrefix);
+    }
+
+    Option<String> sanitizeProperty = OsgiUtil.getOptCfg(properties, SANITIZE_KEY);
+    if (sanitizeProperty.isSome()) {
+      sanitize = BooleanUtils.toBoolean(sanitizeProperty.get());
+      logger.info("Using configured will sanitize user names '{}'", sanitize);
+    } else {
+      sanitize = DEFAULT_SANITIZE;
+      logger.info("Using default for sanitizing user names '{}'", sanitize);
+    }
   }
 
 }
