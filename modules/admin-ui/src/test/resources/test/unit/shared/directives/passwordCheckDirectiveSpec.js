@@ -24,7 +24,7 @@ describe('adminNg.directives.adminNgPwCheck', function () {
 
     beforeEach(function () {
         $rootScope.user = { password: 'foo' };
-        element = $compile('<input ng-model="user.password" admin-ng-pw-check="user.passwordConfirmation"/>')($rootScope);
+        element = $compile('<form><input ng-model="user.password" admin-ng-pw-check="user.passwordConfirmation"/></form>')($rootScope);
     });
 
     describe('when the passwords match', function () {
