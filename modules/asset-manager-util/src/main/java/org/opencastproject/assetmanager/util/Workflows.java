@@ -204,4 +204,9 @@ public class Workflows {
       return enrich(q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run()).getSnapshots();
     }
   };
+
+  public Iterable<Snapshot> getLatestVersion(String mpId) {
+    return $(mpId).bind(findLatest);
+  }
+
 }

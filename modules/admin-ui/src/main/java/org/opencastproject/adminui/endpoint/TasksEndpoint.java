@@ -21,7 +21,6 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.Opt.nul;
 import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
@@ -34,9 +33,13 @@ import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
 import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.util.Workflows;
+import org.opencastproject.index.service.util.JSONUtils;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
+import org.opencastproject.util.data.Arrays;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -45,23 +48,27 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Fn2;
+import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.json.JValue;
-import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.codehaus.jettison.json.JSONException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -97,6 +104,9 @@ public class TasksEndpoint {
   private AssetManager assetManager;
 
   private Workspace workspace;
+
+  /** A parser for handling JSON documents inside the body of a request. **/
+  private final JSONParser parser = new JSONParser();
 
   /** OSGi callback for the workflow service. */
   public void setWorkflowService(WorkflowService workflowService) {
@@ -144,19 +154,23 @@ public class TasksEndpoint {
 
   @POST
   @Path("/new")
-  @RestQuery(name = "createNewTask", description = "Creates a new task by the given metadata as JSON", returnDescription = "The task identifiers", restParameters = { @RestParameter(name = "metadata", isRequired = true, description = "The metadata as JSON", type = RestParameter.Type.TEXT) }, reponses = {
+  @RestQuery(name = "createNewTask", description = "Creates a new task by the given metadata as JSON",
+          returnDescription = "The task identifiers",
+          restParameters = { @RestParameter(name = "metadata", isRequired = true, description = "The metadata as JSON",
+                  type = RestParameter.Type.TEXT) }, reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Task sucessfully added"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "If the workflow definition is not found"),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "If the metadata is not set or couldn't be parsed") })
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "If the metadata is not set, "
+                  + "couldn't be parsed or at least one task couldn't be created") })
   public Response createNewTask(@FormParam("metadata") String metadata) throws NotFoundException {
     if (StringUtils.isBlank(metadata)) {
       logger.warn("No metadata set");
       return RestUtil.R.badRequest("No metadata set");
     }
-    Gson gson = new Gson();
-    Map metadataJson = null;
+
+    JSONObject metadataJson;
     try {
-      metadataJson = gson.fromJson(metadata, Map.class);
+      metadataJson = (JSONObject) parser.parse(metadata);
     } catch (Exception e) {
       logger.warn("Unable to parse metadata {}", metadata);
       return RestUtil.R.badRequest("Unable to parse metadata");
@@ -166,22 +180,28 @@ public class TasksEndpoint {
     if (StringUtils.isBlank(workflowId))
       return RestUtil.R.badRequest("No workflow set");
 
-    List eventIds = (List) metadataJson.get("eventIds");
+    JSONArray eventIds = (JSONArray) metadataJson.get("eventIds");
     if (eventIds == null)
-        return RestUtil.R.badRequest("No eventIds set");
+      return RestUtil.R.badRequest("No eventIds set");
 
-    Map<String, String> configuration = (Map<String, String>) metadataJson.get("configuration");
-    if (configuration == null) {
-      configuration = new HashMap<>();
-    } else {
-      Iterator<String> confKeyIter = configuration.keySet().iterator();
-      while (confKeyIter.hasNext()) {
-        String confKey = confKeyIter.next();
-        if (StringUtils.equalsIgnoreCase("eventIds", confKey)) {
-          confKeyIter.remove();
-        }
+    JSONObject configuration = (JSONObject) metadataJson.get("configuration");
+    Stream<Entry<String, String>> options = Stream.empty();
+    if (configuration != null) {
+      try {
+        options = options.append(JSONUtils.toMap(
+                new org.codehaus.jettison.json.JSONObject(configuration.toJSONString())).entrySet());
+      } catch (JSONException e) {
+        logger.warn("Unable to parse workflow options to map: {}", ExceptionUtils.getStackTrace(e));
+        return RestUtil.R.badRequest("Unable to parse workflow options to map");
       }
     }
+
+    Map<String, String> optionsMap = options.filter(new Fn<Map.Entry<String, String>, Boolean>() {
+      @Override
+      public Boolean apply(Entry<String, String> a) {
+        return !"eventIds".equalsIgnoreCase(a.getKey());
+      }
+    }).foldl(new HashMap<String, String>(), TasksEndpoint.<String, String> mapFold());
 
     WorkflowDefinition wfd;
     try {
@@ -191,15 +211,58 @@ public class TasksEndpoint {
       return RestUtil.R.serverError();
     }
 
-    final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
-    final List<WorkflowInstance> instances = workflows.applyWorkflowToLatestVersion(eventIds,
-            workflow(wfd, configuration)).toList();
+    JSONArray json = new JSONArray();
+    JSONArray workflows = new JSONArray();
+    JSONArray failedEvents = new JSONArray();
 
-    if (eventIds.size() != instances.size()) {
-      logger.debug("Can't start one or more tasks.");
-      return Response.status(Status.BAD_REQUEST).build();
+    final Workflows workflowsX = new Workflows(assetManager, workspace, workflowService);
+    for (Object eventId : eventIds) {
+      Iterable<Snapshot> snapshots = workflowsX.getLatestVersion((String)eventId);
+      for (Snapshot s : snapshots) {
+        MediaPackage mp = workflowsX.putInWorkspace(s);
+
+        try {
+          WorkflowInstance wfInstance = workflowService.start(
+                  workflow(wfd, optionsMap).getWorkflowDefinition(), mp, optionsMap);
+
+          workflows.add(wfInstance.getId());
+        } catch (WorkflowDatabaseException ex) {
+          logger.error("Starting workflow '{}' for event '{}' failed "
+                  + "because workflow instance could not be persisted: {}",
+                  Arrays.array(wfd.getTitle(), eventId, ExceptionUtils.getStackTrace(ex)));
+
+          JSONObject failedEvent = new JSONObject();
+          failedEvent.put("eventId", eventId);
+          failedEvent.put("message", "Unable make workflow persistent.");
+          failedEvents.add(failedEvent);
+        } catch (WorkflowParsingException ex) {
+          logger.error("Starting workflow '{}' for event '{}' failed  "
+                  + "because workflow could not be parsed: {}",
+                  Arrays.array(wfd.getTitle(), eventId, ExceptionUtils.getStackTrace(ex)));
+
+          JSONObject failedEvent = new JSONObject();
+          failedEvent.put("eventId", eventId);
+          failedEvent.put("message", "Workflow could not be parsed");
+          failedEvents.add(failedEvent);
+        } catch (IllegalStateException ex) {
+          logger.warn(ex.getMessage());
+
+          JSONObject failedEvent = new JSONObject();
+          failedEvent.put("eventId", eventId);
+          failedEvent.put("message", "Another workflow is currently active");
+          failedEvents.add(failedEvent);
+        }
+      }
     }
-    return Response.status(Status.CREATED).entity(gson.toJson($(instances).map(getWorkflowIds).toList())).build();
+    json.add(workflows);
+    if (failedEvents.size() > 0) {
+      json.add(failedEvents);
+      return Response.status(Status.BAD_REQUEST)
+              .entity(json.toJSONString()).build();
+    }
+
+    return Response.status(Status.CREATED)
+            .entity(json.toJSONString()).build();
   }
 
   private static <A, B> Fn2<Map<A, B>, Entry<A, B>, Map<A, B>> mapFold() {
@@ -212,10 +275,10 @@ public class TasksEndpoint {
     };
   }
 
-  private static final Fn<WorkflowInstance, Long> getWorkflowIds = new Fn<WorkflowInstance, Long>() {
+  private static final Fn<WorkflowInstance, String> getWorkflowIds = new Fn<WorkflowInstance, String>() {
     @Override
-    public Long apply(WorkflowInstance a) {
-      return a.getId();
+    public String apply(WorkflowInstance a) {
+      return Long.toString(a.getId());
     }
   };
 

@@ -79,7 +79,7 @@ public class TasksEndpointTest {
     String result = given()
             .formParam("metadata", "{\"workflow\":\"full\", \"configuration\":{}, \"eventIds\":[\"id1\",\"id2\"]}")
             .expect().statusCode(HttpStatus.SC_CREATED).when().post(rt.host("/new")).asString();
-    assertEquals("[5,10]", result);
+    assertEquals("[[5,10]]", result);
   }
 
   @Before
