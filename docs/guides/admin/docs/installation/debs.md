@@ -179,6 +179,36 @@ You can install all necessary 3rd-Party-Tools for Opencast like this:
         apt-get install ffmpeg-dist tesseract-ocr sox hunspell
 
 
+Upgrading Major Versions
+------------------------
+
+While these packages will automatically upgrade you to the latest point version in a release series, they do not
+automatically upgrade you to the latest major version. In other words, if you install `opencast3-admin` you get the
+latest 3.x release, not the latest 4.x release. To upgrade from one version to another you first stop Opencast:
+
+ - On a SysV-init based system
+
+        service opencast stop
+
+ - On a Systemd based system
+
+        systemctl stop opencast.service
+
+As a reminder, these instructions will change your Opencast installation, and files to a new version which is likely
+incompatible with older versions. If you are performing this on a production system, please ensure you have valid
+backups prior to taking the next steps.
+
+Uninstall your current Opencast packaging (using Opencast 3 as an example):
+
+    apt-get remove opencast-3-*
+
+Then install the new version (using Opencast 4 as an example):
+
+    apt-get install opencast-4-allinone
+
+At this point you must follow the relevant [upgrade](../upgrade.md) instructions, prior to starting Opencast again.
+
+
 Uninstall Opencast
 --------------------
 
