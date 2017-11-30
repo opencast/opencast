@@ -229,20 +229,19 @@ angular.module('adminNg.controllers')
             fetchChildResources = function (id) {
 
                 $scope.general = EventGeneralResource.get({ id: id }, function () {
-                    angular.forEach($scope.general.publications, function (publication) {
+                    angular.forEach($scope.general.publications, function (publication, index) {
                         publication.label = publication.name;
+                        publication.order = 999 + index;
                     });
-                    $scope.publicationChannelLabels = ResourcesListResource.get({ resource: 'PUBLICATION.CHANNEL.LABELS' }, function() {
+                    $scope.publicationChannels = ResourcesListResource.get({ resource: 'PUBLICATION.CHANNELS' }, function() {
                         angular.forEach($scope.general.publications, function (publication) {
-                            if(angular.isDefined($scope.publicationChannelLabels[publication.id])) {
-                                publication.label = $scope.publicationChannelLabels[publication.id];
-                            }
-                        });
-                    });
-                    $scope.publicationChannelIcons = ResourcesListResource.get({ resource: 'PUBLICATION.CHANNEL.ICONS' }, function() {
-                        angular.forEach($scope.general.publications, function (publication) {
-                            if(angular.isDefined($scope.publicationChannelIcons[publication.id])) {
-                                publication.icon = $scope.publicationChannelIcons[publication.id];
+                            if(angular.isDefined($scope.publicationChannels[publication.id])) {
+                                var record = JSON.parse($scope.publicationChannels[publication.id]);
+                                if (record.label) publication.label = record.label;
+                                if (record.icon) publication.icon = record.icon;
+                                if (record.hide) publication.hide = record.hide;
+                                if (record.description) publication.description = record.description;
+                                if (record.order) publication.order = record.order;
                             }
                         });
                     });

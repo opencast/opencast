@@ -496,8 +496,9 @@
            "COMMENTS":    "Comments"
          },
          "GENERAL": {
-           "PUBLICATION_STATUS":         "Publication status",
-           "NO_PUBLICATIONS_AVAILABLE":  "This event has no publications",
+           "PUBLICATION_STATUS":         "Publications",
+           "NO_PUBLICATIONS_AVAILABLE":  "This event has not been published",
+           "PUBLICATION_DESCRIPTION":    "This event has been published to the following publication channels:",
            "SCHEDULING_STATUS":          "Status",
            "READY_FOR_RECORDING":        "Ready for recording",
            "OPTED_OUT":                  "Opted-out",

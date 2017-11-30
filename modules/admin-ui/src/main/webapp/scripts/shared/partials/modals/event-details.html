@@ -50,17 +50,23 @@
                         <!-- Publication Status -->
                     </header>
                     <div class="obj-container">
-                        <p></p>
-                        <ul ng-repeat="publication in general.publications track by $index">
-
-                            <li>
-                            <div class="icon-container"><i custom-icon="{{ publication.icon }}" class="video-icon"></i></div>
-                                <span translate="{{ publication.label }}">{{ publication.label }}</span>
-                                <a href="{{ publication.url }}" class="play"></a>
+                        <p translate="EVENTS.EVENTS.DETAILS.GENERAL.PUBLICATION_DESCRIPTION" ng-show="general.publications.length">
+                          <!-- This event has been published to the following publication channels: -->
+                        </p>
+                        <ul>
+                            <li ng-repeat="publication in general.publications | orderBy:'order' track by $index" ng-if="!publication.hide">
+                                <div class="v-container">
+                                    <span class="icon-container"><i custom-icon="{{ publication.icon }}" class="video-icon"></i></span>
+                                    <div>
+                                      <span translate="{{ publication.label }}">{{ publication.label }}</span>
+                                      <p class="max-width" translate="{{ publication.description }}" ng-if="publication.description">{{ publication.description }}</p>
+                                    </div>
+                                    <a href="{{ publication.url }}" class="play"></a>
+                                </div>
                             </li>
                         </ul>
-                        <div ng-hide="general.publications.length" translate="EVENTS.EVENTS.DETAILS.GENERAL.NO_PUBLICATIONS_AVAILABLE">
-                        </div>
+                        <p ng-hide="general.publications.length" translate="EVENTS.EVENTS.DETAILS.GENERAL.NO_PUBLICATIONS_AVAILABLE">
+                        </p>
                     </div>
                 </div>
             </div>

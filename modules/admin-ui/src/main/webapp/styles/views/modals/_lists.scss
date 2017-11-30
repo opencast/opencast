@@ -39,6 +39,10 @@
             color: $medium-prim-color;
         }
 
+        .max-width {
+            width: 95%;
+        }
+
         > ul li {
             margin: 0;
             line-height: 16px;
@@ -48,13 +52,26 @@
 
     }
 
+    .v-container {
+        display: flex;
+        align-items: center;
+    }
+
     // Left side icons
     // ----------------------------------------
 
     .icon-container {
-        width: 50px;
-        display: inline-block;
-        vertical-align: middle;
+        width: 36px;
+        height: 36px;
+        margin-right: 20px;
+        display: inline-flex;
+        align-items: center;
+
+        i {
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
     }
 
     i {
@@ -63,7 +80,7 @@
     }
 
     .video-icon {
-        @include build-icon(auto, auto, video, 34px, 24px);
+        @include build-icon(auto, auto, video, 34px, 34px);
     }
 
     .engage {
@@ -83,6 +100,7 @@
     .play {
         display: inline-block;
         float: right;
+        margin-left: auto;
         @include fa-icon($fa-var-play-circle-o, before, inherit, 0, 0, $primary-color-green-light-2, 24px);
 
         &:active:before,
