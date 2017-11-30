@@ -40,12 +40,10 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Role;
-import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
@@ -98,9 +96,6 @@ public class XACMLAuthorizationService implements AuthorizationService {
   /** The default filename for XACML attachments */
   public static final String XACML_FILENAME = "xacml.xml";
 
-  public static final String READ_PERMISSION = "read";
-  public static final String WRITE_PERMISSION = "write";
-
   /** The workspace */
   protected Workspace workspace;
 
@@ -148,18 +143,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
           }
         }
         logger.trace("Falling back to global default acl for media package '{}'", mp.getIdentifier());
-        final AccessControlList accessControlList = new AccessControlList();
-        final List<AccessControlEntry> acl = accessControlList.getEntries();
-        final Organization org = securityService.getOrganization();
-        String adminRole = SecurityConstants.GLOBAL_ADMIN_ROLE;
-        acl.add(new AccessControlEntry(adminRole, READ_PERMISSION, true));
-        acl.add(new AccessControlEntry(adminRole, WRITE_PERMISSION, true));
-        // Also add the org admin role if an organization is present
-        if (org != null && !org.getAdminRole().equals(adminRole)) {
-          acl.add(new AccessControlEntry(org.getAdminRole(), READ_PERMISSION, true));
-          acl.add(new AccessControlEntry(org.getAdminRole(), WRITE_PERMISSION, true));
-        }
-        return tuple(accessControlList, AclScope.Global);
+        return tuple(new AccessControlList(), AclScope.Global);
       }
     };
   }
