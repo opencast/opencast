@@ -26,3 +26,12 @@ Capture Agent API Changes
   they are modified by the capture agent. Note that re-ingested media package elements will overwrite scheduled
   elements. Hence a capture agent may modify these data. If not required for the inner workings of the capture agent, we
   advise to not download, modify and upload any media package elements to avoid errors.
+
+
+Access Control Defaults
+-----------------------
+
+The new fallback access control list used by events for which no access control is specified has been changed to block
+all access except for admin user. While this scenario should seldom happen, this change was made to prevent accidental
+publication of non-public material. This option is certainly a safer choice than Opencast's previous default which was
+public access.
