@@ -22,6 +22,13 @@ Crowdin Managers
 Crowdin managers are persons with privileged access to Crowdin needed to upload new files to be translated to Crowdin.
 The rest of document should help future Crowdin managers to get familiar with Crowdin quickly.
 
+Accepting Translators
+---------------------
+
+We ask that Crowdin users who wish to help translate Opencast send a brief, understandable sentence regarding why they
+wish to help translate Opencast. Users who do not send this in should be asked via the Crowdin messaging system. Something
+as simple as 'I want to help translate $project into [language]' would more than suffice.
+
 Versioning
 ----------
 
