@@ -113,7 +113,6 @@
             <feature>transaction</feature>
             <feature>jndi</feature>
             <feature>eclipselink</feature>
-            <feature>wrap</feature>
             <!-- Opencast features -->
             <feature>opencast-migration</feature>
           </bootFeatures>
