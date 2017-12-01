@@ -61,11 +61,13 @@ Migrate Scheduler Service
 
 The migration of the scheduler service uses the data of the old scheduling database table which hasn't been deleted by the DB migration script.
 
-1. Configure the destination organization by adding the [migration configuration](#migration-configuration) to the `custom.properties`.
-2. Start Opencast using the interactive script in `bin/start-opencast`
-3. Log-in to the Karaf console on your node where the scheduler service is running (usually admin node) and install the opencast-migration feature by entering: `feature:install opencast-migration`
-4. Check the logs for errors!
-5. Restart Opencast service - you do not need to use the interactive start script.
+1. Ensure you have the `opencast-migration` profile installed, rather than your normal admin/adminworker/allinone profile
+ - Using the normal profiles will cause a large number of errors on startup, however it should not corrupt your data, and the rest of these steps should still work
+2. Configure the destination organization by adding the [migration configuration](#migration-configuration) to the `custom.properties`.
+3. Start Opencast using the interactive script in `bin/start-opencast`
+4. Log-in to the Karaf console on your node where the scheduler service is running (usually admin node) and install the opencast-migration feature by entering: `feature:install opencast-migration`
+5. Check the logs for errors!
+6. Restart Opencast service - you do not need to use the interactive start script.
 
 #### Migration Configuration
 ```
@@ -85,7 +87,7 @@ The introduction of the new scheduler service requires an update to the Elastics
 2. Restart Opencast and wait until the system is fully started.
 3. Use one of the following methods to recreate the index:
 
-    - Make an HTTP GET request to `/admin-ng/index/recreateIndex` using your browser or an alternative HTTP client.
+    - Make an HTTP POST request to `/admin-ng/index/recreateIndex` using your browser or an alternative HTTP client.
     - Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
       symbol at the top right corner). Then go to the “Admin UI - Index Endpoint” section and use the testing form on
       `/recreateIndex`.
