@@ -1,6 +1,17 @@
 Opencast 2.3.x
 ==============
 
+Opencast 2.3.5
+--------------
+*Released on December 04, 2017*
+
+- [[MH-12588]](https://opencast.jira.com/browse/MH-12588) - Stream Security Leaks Secrets
+- [[MH-12317]](https://opencast.jira.com/browse/MH-12317) - AdminUI create every 5 seconds stats request and may crash on heavy server load
+- [[MH-12269]](https://opencast.jira.com/browse/MH-12269) - Clarify in the documentation the recommendation of setting `dispatchinterval` to 0 applies to non-admin nodes only
+- [[MH-12190]](https://opencast.jira.com/browse/MH-12190) - Script injection in Media Module and Player
+- [[MH-12000]](https://opencast.jira.com/browse/MH-12000) - Cross-tenant URL signing
+- [[MH-11042]](https://opencast.jira.com/browse/MH-11042) - Admin UI NG tests fail in +5:30 timezone
+
 Opencast 2.3.4
 --------------
 *Released on August 03, 2017*

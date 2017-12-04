@@ -84,6 +84,13 @@ Opencast 2.3.4 is a bug fix release that fixes some issues of Opencast 2.3.3. Fo
 the [changelog](changelog.md).
 
 
+Additional Notes About 2.3.5
+----------------------------
+
+Opencast 2.3.5 is a bug fix release that fixes some issues of Opencast 2.3.4, including twosecurity issue related to
+stream security.  For more details, please have a look at the [changelog](changelog.md).
+
+
 Opencast 2.3 Release Schedule
 -----------------------------
 
