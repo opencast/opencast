@@ -30,9 +30,6 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
-import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.UploadJob;
-import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 
 import org.apache.commons.fileupload.MockHttpServletRequest;
@@ -41,7 +38,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.easymock.IAnswer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -394,23 +390,17 @@ public class IngestRestServiceTest {
     // Create a mock ingest service
     IngestService ingestService = EasyMock.createNiceMock(IngestService.class);
     try {
-      EasyMock.expect(ingestService.addZippedMediaPackage((InputStream) EasyMock.anyObject(),
-              (String) EasyMock.anyObject(), (Map<String, String>) EasyMock.anyObject(), EasyMock.anyLong()))
-              .andAnswer(new IAnswer<WorkflowInstance>() {
-                @Override
-                public WorkflowInstance answer() throws Throwable {
-                  limitVerifier.callback();
-                  return new WorkflowInstanceImpl();
-                }
+      EasyMock.expect(ingestService.addZippedMediaPackage(EasyMock.anyObject(InputStream.class), EasyMock.anyString(),
+              EasyMock.anyObject(Map.class), EasyMock.anyLong()))
+              .andAnswer(() -> {
+                limitVerifier.callback();
+                return new WorkflowInstanceImpl();
               }).anyTimes();
-      EasyMock.expect(ingestService.addZippedMediaPackage((InputStream) EasyMock.anyObject(),
-              (String) EasyMock.anyObject(), (Map<String, String>) EasyMock.anyObject()))
-              .andAnswer(new IAnswer<WorkflowInstance>() {
-                @Override
-                public WorkflowInstance answer() throws Throwable {
-                  limitVerifier.callback();
-                  return new WorkflowInstanceImpl();
-                }
+      EasyMock.expect(ingestService.addZippedMediaPackage(EasyMock.anyObject(InputStream.class), EasyMock.anyString(),
+              EasyMock.anyObject(Map.class)))
+              .andAnswer(() -> {
+                limitVerifier.callback();
+                return new WorkflowInstanceImpl();
               }).anyTimes();
     } catch (Exception e) {
       Assert.fail("Threw exception " + e.getMessage());
@@ -473,29 +463,6 @@ public class IngestRestServiceTest {
     // Upload the mediapackage with its new element
     Response postResponse = restService.addMediaPackageTrack(newMockRequest());
     Assert.assertEquals(Status.OK.getStatusCode(), postResponse.getStatus());
-  }
-
-  @Test
-  public void testUploadJobPersistence() throws Exception {
-    // Create the job (this is done in a browser on the initial page load)
-    UploadJob job = restService.createUploadJob();
-
-    // Upload the mediapackage with its new element
-    Response postResponse = restService.addElementMonitored(job.getId(), newMockRequest());
-    Assert.assertEquals(Status.OK.getStatusCode(), postResponse.getStatus());
-
-    // Check on the job status
-    Response progressResponse = restService.getProgress(job.getId());
-    Assert.assertEquals(Status.OK.getStatusCode(), progressResponse.getStatus());
-    Assert.assertTrue(progressResponse.getEntity().toString().startsWith("{\"total\":"));
-
-    // Check on a job that doesn't exist
-    try {
-      restService.getProgress("This ID does not exist");
-      Assert.fail("The rest service should throw");
-    } catch (NotFoundException e) {
-      // expected
-    }
   }
 
   @Test

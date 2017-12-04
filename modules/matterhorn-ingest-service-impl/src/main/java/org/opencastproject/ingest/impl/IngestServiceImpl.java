@@ -122,8 +122,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
@@ -184,9 +182,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   /** Methods that ingest catalogs from a URI create jobs with this operation type */
   public static final String INGEST_CATALOG_FROM_URI = "uri-catalog";
-
-  /** Ingest can only occur for a workflow currently in one of these operations. */
-  public static final String[] PRE_PROCESSING_OPERATIONS = new String[] { "schedule", "capture", "ingest" };
 
   /** The approximate load placed on the system by ingesting a file */
   public static final float DEFAULT_INGEST_FILE_JOB_LOAD = 1.0f;
@@ -267,9 +262,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   public IngestServiceImpl() {
     super(JOB_TYPE);
   }
-
-  /** The formatter for reading in dates provided by the rest wrapper around this service */
-  protected DateFormat formatter = new SimpleDateFormat(UTC_DATE_FORMAT);
 
   /**
    * OSGI callback for activating this component
@@ -524,8 +516,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
         if (uri == null)
           throw new MediaPackageException("Unable to map element name '" + element.getURI() + "' to workspace uri");
-        logger.info("Ingested mediapackage element {}/{} is located at {}", mediaPackageId, element.getIdentifier(),
-                uri);
+        logger.info("Ingested mediapackage element {}/{} located at {}", mediaPackageId, element.getIdentifier(), uri);
         URI dest = workingFileRepository.moveTo(wfrCollectionId, FilenameUtils.getName(uri.toString()), mediaPackageId,
                 element.getIdentifier(), FilenameUtils.getName(element.getURI().toString()));
         element.setURI(dest);
@@ -782,8 +773,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.debug("Added start time {} for track {}", startTime, elementId);
       logger.info("Successful added partial track {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
-    } catch (IOException e) {
-      throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
     } catch (NotFoundException e) {
@@ -812,8 +801,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.debug("Added start time {} for track {}", startTime, elementId);
       logger.info("Successful added partial track {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
-    } catch (IOException e) {
-      throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
     } catch (NotFoundException e) {
@@ -850,8 +837,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job.setStatus(Job.Status.FINISHED);
       logger.info("Successful added catalog {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
-    } catch (IOException e) {
-      throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
     } catch (NotFoundException e) {
@@ -925,8 +910,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   @Override
   public MediaPackage addCatalog(InputStream in, String fileName, MediaPackageElementFlavor flavor,
           MediaPackage mediaPackage) throws IOException, IngestException {
-    String[] tags = null;
-    return addCatalog(in, fileName, flavor, tags, mediaPackage);
+    return addCatalog(in, fileName, flavor, null, mediaPackage);
   }
 
   /**
@@ -962,8 +946,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job.setStatus(Job.Status.FINISHED);
       logger.info("Successful added catalog {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
-    } catch (IOException e) {
-      throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
     } catch (NotFoundException e) {
@@ -997,8 +979,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job.setStatus(Job.Status.FINISHED);
       logger.info("Successful added attachment {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
-    } catch (IOException e) {
-      throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
     } catch (NotFoundException e) {
@@ -1037,8 +1017,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       job.setStatus(Job.Status.FINISHED);
       logger.info("Successful added attachment {} on mediapackage {} at URL {}", elementId, mediaPackage, newUrl);
       return mp;
-    } catch (IOException e) {
-      throw e;
     } catch (ServiceRegistryException e) {
       throw new IngestException(e);
     } catch (NotFoundException e) {
