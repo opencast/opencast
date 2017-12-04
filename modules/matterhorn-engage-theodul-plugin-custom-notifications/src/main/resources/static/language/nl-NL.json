@@ -1,13 +1,13 @@
 {
-  "value_locale":"en",
-  "value_dateFormatFull":"MMMM Do YYYY, h:mm:ss a",
-  "error_videoLoading":"De video wordt geladen. Wacht een moment.",
-  "error_audioLoading":"De video wordt geladen. Wacht een moment.",
-  "msg_videoLoadedSuccessfully":"De video is geladen.",
-  "msg_audioLoadedSuccessfully":"De audio is met succes is geladen.",
-  "msg_videoBuffering":"De video is momenteel aan het bufferen. Wacht een moment.",
-  "msg_videoBufferedSuccessfullyAndAutoplaying":"De video is met succes gebufferd en is nu aan het afspelen.",
-  "msg_videoBufferedSuccessfully":"De video heeft met succes gebufferd.",
-  "error":"Fout",
-  "error_AudioCodecNotSupported":"Fout: De audio codec wordt niet ondersteund door deze browser"
+    "value_locale": "en",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "error_videoLoading": "De video wordt geladen. Wacht een moment.",
+    "error_audioLoading": "De video wordt geladen. Wacht een moment.",
+    "msg_videoLoadedSuccessfully": "De video is geladen.",
+    "msg_audioLoadedSuccessfully": "De audio is met succes is geladen.",
+    "msg_videoBuffering": "De video is momenteel aan het bufferen. Wacht een moment.",
+    "msg_videoBufferedSuccessfullyAndAutoplaying": "De video is met succes gebufferd en is nu aan het afspelen.",
+    "msg_videoBufferedSuccessfully": "De video heeft met succes gebufferd.",
+    "error": "Fout",
+    "error_AudioCodecNotSupported": "Fout: De audio codec wordt niet ondersteund door deze browser"
 }
