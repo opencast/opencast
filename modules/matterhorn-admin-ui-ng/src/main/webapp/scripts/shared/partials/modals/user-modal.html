@@ -142,7 +142,7 @@
     </form>
 
     <footer>
-        <a ng-click="submit()" ng-class="userForm.$valid && manageable ? 'active' : 'disabled'" class="submit" translate="SUBMIT">
+        <a ng-click="submit()" class="submit {{ getSubmitButtonState() }}" translate="SUBMIT">
             <!-- Submit -->
         </a>
         <a ng-click="close()" class="cancel" translate="CANCEL"><!-- Cancel --></a>

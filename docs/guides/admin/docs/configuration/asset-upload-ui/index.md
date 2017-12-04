@@ -25,11 +25,11 @@ Two source types are enabled by default for use in the Admin UI.
 
     EVENTS.EVENTS.NEW.SOURCE.UPLOAD.NON_SEGMENTABLE={
        "id":"track_presenter", "type":"track", "flavorType":"presenter",
-       "flavorSubType":"source", "multiple":false }
+       "flavorSubType":"source", "multiple":false, "displayOrder": 1}
 
     EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SEGMENTABLE={
        "id":"track_presentation", "type":"track", "flavorType":"presentation",
-       "flavorSubType":"source", "multiple":false }
+       "flavorSubType":"source", "multiple":false, "displayOrder": 2}
 
 Source upload options as displayed in the Admin UI Create event:
     ![assetUploadSource](assetUploadSource.png)
@@ -72,16 +72,16 @@ publish, and archive uploaded assets on existing events.
     # Attachments and catalogs upload options are for new and existing events.
     # Only one file can be uploaded for each of these options, the uploaded file replaces existing elements of the same
     # type and flavor in the mediapackage.
-    # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CLASS_HANDOUT_NOTES={"id": "attachment_class_handout_notes",
-    #  "type": "attachment", "flavorType": "attachment", "flavorSubType": "notes"}
     # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CAPTIONS_DFXP={"id":"catalog_captions_dfxp", "type": "catalog",
-    #     "flavorType": "captions", "flavorSubType": "timedtext"}
+    #     "flavorType": "captions", "flavorSubType": "timedtext", "displayOrder": 2}
     # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CAPTIONS_WEBVTT={"id":"attachment_captions_webvtt",
-    #     "type": "attachment", "flavorType": "text", "flavorSubType": "webvtt"}
-    # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.PREVIEW_IMAGE={"id":"attachment_preview_image",
-    #     "type":"attachment", "flavorType": "presenter","flavorSubType": "search+preview"}
+    #     "type": "attachment", "flavorType": "text", "flavorSubType": "webvtt", "displayOrder": 3}
+    # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CLASS_HANDOUT_NOTES={"id": "attachment_class_handout_notes",
+    #     "type": "attachment", "flavorType": "attachment", "flavorSubType": "notes", "displayOrder": 4}
     # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.SMIL={"id":"catalog_smil", "type":"catalog", "flavorType": "smil",
-    #      "flavorSubType": "smil"}
+    #      "flavorSubType": "smil", "displayOrder": 5}
+    # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.PREVIEW_IMAGE={"id":"attachment_preview_image",
+    #     "type":"attachment", "flavorType": "presenter","flavorSubType": "search+preview", "displayOrder": 6}
     EVENTS.EVENTS.NEW.UPLOAD_ASSET.WORKFLOWDEFID=ng-publish-uploaded-assets
 
     # The video source track upload options are only for new events.
@@ -89,13 +89,13 @@ publish, and archive uploaded assets on existing events.
     # The MULTIPLE_PARTS example shows how to enable choosing multiple source files for a single flavor. In this case,
     # a fictional "multipart/part+source".
     # EVENTS.EVENTS.NEW.SOURCE.UPLOAD.MULTIPLE_PARTS={"id": "track_parts","type":"track",
-    #    "flavorType": "multipart", "flavorSubType": "part+source", "multiple":true}
+    #    "flavorType": "multipart", "flavorSubType": "part+source", "multiple":true, "displayOrder": 10}
     # EVENTS.EVENTS.NEW.SOURCE.UPLOAD.AUDIO_ONLY={"id": "track_audio","type":"track",
-    #     "flavorType": "presenter-audio", "flavorSubType": "source", "multiple":false}
+    #     "flavorType": "presenter-audio", "flavorSubType": "source", "multiple":false, "displayOrder": 11}
     EVENTS.EVENTS.NEW.SOURCE.UPLOAD.NON_SEGMENTABLE={"id": "track_presenter","type":"track",
-         "flavorType":"presenter", "flavorSubType": "source", "multiple":false}
+         "flavorType":"presenter", "flavorSubType": "source", "multiple":false, "displayOrder": 12}
     EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SEGMENTABLE={"id": "track_presentation","type":"track",
-         "flavorType":"presentation", "flavorSubType": "source", "multiple":false}
+         "flavorType":"presentation", "flavorSubType": "source", "multiple":false, "displayOrder": 13}
 
 How to Upload Assets in the Admin UI
 ------------------------------------
@@ -165,7 +165,7 @@ type         | track           | One of "attachment" or "catalog" or "track" to 
 flavorType   | presentation    | The primary flavor type. Used to reference asset in workflows, player, and media module
 flavorSubType| source          | The sub flavor type. Used to identify the sub flavor of this flavor type
 multiple     | false           | true or false, used by the admin UI to enable single or multiple file input selection
-
+displayOrder | 32              | Integer number, used by the admin UI to sort the display of upload options in the UI
 
 The parameter key is internationalized as the display text in the admin UI
 ref: modules/matterhorn-admin-ui-ng/src/main/resources/public/org/opencastproject/adminui/languages/
