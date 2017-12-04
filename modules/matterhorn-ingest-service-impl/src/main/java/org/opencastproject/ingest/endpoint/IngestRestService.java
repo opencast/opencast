@@ -45,13 +45,10 @@ import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
-import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.UploadJob;
-import org.opencastproject.util.UploadProgressListener;
 import org.opencastproject.util.data.Function0.X;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -68,12 +65,10 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,7 +87,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -154,13 +148,10 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           "provenance", "publisher", "references", "relation", "replaces", "requires", "rights", "rightsHolder",
           "source", "spatial", "subject", "tableOfContents", "temporal", "title", "type", "valid");
 
-  private SchedulerService schedulerService = null;
   private MediaPackageBuilderFactory factory = null;
   private IngestService ingestService = null;
   private ServiceRegistry serviceRegistry = null;
   private DublinCoreCatalogService dublinCoreService;
-  // For the progress bar -1 bug workaround, keeping UploadJobs in memory rather than saving them using JPA
-  private HashMap<String, UploadJob> jobs;
   // The number of ingests this service can handle concurrently.
   private int ingestLimit = -1;
   /* Stores a map workflow ID and date to update the ingest start times post-hoc */
@@ -170,7 +161,6 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   public IngestRestService() {
     factory = MediaPackageBuilderFactory.newInstance();
-    jobs = new HashMap<>();
     startCache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.DAYS).build();
   }
 
@@ -1197,196 +1187,6 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     }
   }
 
-  protected UploadJob createUploadJob() {
-    UploadJob job = new UploadJob();
-    jobs.put(job.getId(), job);
-    return job;
-  }
-
-  /**
-   * Creates an upload job and returns an HTML form ready for uploading the file to the newly created upload job.
-   * Returns 500 if something goes wrong unexpectedly
-   *
-   * @return HTML form ready for uploading the file
-   */
-  @GET
-  @Path("filechooser-local.html")
-  @Produces(MediaType.TEXT_HTML)
-  public Response createUploadJobHtml(@QueryParam("elementType") String elementType) {
-    InputStream is = null;
-    elementType = (elementType == null) ? "track" : elementType;
-    try {
-      UploadJob job = createUploadJob();
-      is = getClass().getResourceAsStream("/templates/uploadform.html");
-      String html = IOUtils.toString(is, "UTF-8");
-      // String uploadURL = serverURL + "/ingest/addElementMonitored/" + job.getId();
-      String uploadURL = "addElementMonitored/" + job.getId();
-      html = html.replaceAll("\\{uploadURL\\}", uploadURL);
-      html = html.replaceAll("\\{jobId\\}", job.getId());
-      html = html.replaceAll("\\{elementType\\}", elementType);
-      logger.debug("New upload job created: " + job.getId());
-      jobs.put(job.getId(), job);
-      return Response.ok(html).build();
-    } catch (Exception ex) {
-      logger.warn(ex.getMessage(), ex);
-      return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
-  }
-
-  @GET
-  @Path("filechooser-inbox.html")
-  @Produces(MediaType.TEXT_HTML)
-  public Response createInboxHtml() {
-    InputStream is = null;
-    try {
-      is = getClass().getResourceAsStream("/templates/inboxform.html");
-      String html = IOUtils.toString(is, "UTF-8");
-      return Response.ok(html).build();
-    } catch (Exception ex) {
-      logger.warn(ex.getMessage(), ex);
-      return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
-  }
-
-  @GET
-  @Path("filechooser-archive.html")
-  @Produces(MediaType.TEXT_HTML)
-  public Response createArchiveHtml(@QueryParam("elementType") String elementType) {
-    InputStream is = null;
-    elementType = (elementType == null) ? "track" : elementType;
-    try {
-      UploadJob job = createUploadJob();
-      is = getClass().getResourceAsStream("/templates/uploadform.html");
-      String html = IOUtils.toString(is, "UTF-8");
-      // String uploadURL = serverURL + "/ingest/addElementMonitored/" + job.getId();
-      String uploadURL = "/ingest/addZippedMediaPackage";
-      html = html.replaceAll("\\{uploadURL\\}", uploadURL);
-      html = html.replaceAll("\\{jobId\\}", job.getId());
-      html = html.replaceAll("\\{elementType\\}", elementType);
-      logger.debug("New upload job created: " + job.getId());
-      jobs.put(job.getId(), job);
-      return Response.ok(html).build();
-    } catch (Exception ex) {
-      logger.warn(ex.getMessage(), ex);
-      return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
-  }
-
-  /**
-   * Add an elements to a MediaPackage and keeps track of the progress of the upload. Returns an HTML that triggers the
-   * host sites UploadListener.uploadComplete javascript event Returns an HTML that triggers the host sites
-   * UploadListener.uplaodFailed javascript event in case of error
-   *
-   * @param jobId
-   *          of the upload job
-   * @param request
-   *          containing the file, the flavor and the MediaPackage to which it should be added
-   * @return HTML that calls the UploadListener.uploadComplete javascript handler
-   */
-  @POST
-  @Path("addElementMonitored/{jobId}")
-  @Produces(MediaType.TEXT_HTML)
-  public Response addElementMonitored(@PathParam("jobId") String jobId, @Context HttpServletRequest request) {
-    UploadJob job = null;
-    MediaPackage mp = null;
-    String fileName = null;
-    MediaPackageElementFlavor flavor = null;
-    String elementType = "track";
-    try {
-      try {
-        // try to get UploadJob
-        if (jobs.containsKey(jobId)) {
-          job = jobs.get(jobId);
-        } else {
-          throw new NoResultException("Job not found");
-        }
-      } catch (NoResultException e) {
-        logger.warn("Upload job not found for Id: " + jobId);
-        return buildUploadFailedRepsonse(job);
-      }
-      if (ServletFileUpload.isMultipartContent(request)) {
-        ServletFileUpload upload = new ServletFileUpload();
-        UploadProgressListener listener = new UploadProgressListener(job);
-        upload.setProgressListener(listener);
-        for (FileItemIterator iter = upload.getItemIterator(request); iter.hasNext();) {
-          FileItemStream item = iter.next();
-          String fieldName = item.getFieldName();
-          if ("mediaPackage".equalsIgnoreCase(fieldName)) {
-            mp = factory.newMediaPackageBuilder().loadFromXml(item.openStream());
-          } else if ("flavor".equals(fieldName)) {
-            String flavorString = Streams.asString(item.openStream(), "UTF-8");
-            if (flavorString != null) {
-              flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
-            }
-          } else if ("elementType".equalsIgnoreCase(fieldName)) {
-            String typeString = Streams.asString(item.openStream(), "UTF-8");
-            if (typeString != null) {
-              elementType = typeString;
-            }
-          } else if ("file".equalsIgnoreCase(fieldName)) {
-            fileName = item.getName();
-            job.setFilename(fileName);
-            if (mp != null && flavor != null && fileName != null) {
-              // decide which element type to add
-              if ("TRACK".equalsIgnoreCase(elementType)) {
-                mp = ingestService.addTrack(item.openStream(), fileName, flavor, mp);
-              } else if ("CATALOG".equalsIgnoreCase(elementType)) {
-                logger.info("Adding Catalog: " + fileName + " - " + flavor);
-                mp = ingestService.addCatalog(item.openStream(), fileName, flavor, mp);
-              } else if ("ATTACHMENT".equalsIgnoreCase(elementType)) {
-                logger.info("Adding Attachment: " + fileName + " - " + flavor);
-                mp = ingestService.addAttachment(item.openStream(), fileName, flavor, mp);
-              }
-              InputStream is = null;
-              try {
-                is = getClass().getResourceAsStream("/templates/complete.html");
-                String html = IOUtils.toString(is, "UTF-8");
-                String mpEscaped = StringEscapeUtils.escapeXml10(MediaPackageParser.getAsXml(mp));
-                html = html.replaceAll("\\{mediaPackage\\}", mpEscaped);
-                html = html.replaceAll("\\{jobId\\}", job.getId());
-                return Response.ok(html).build();
-              } finally {
-                IOUtils.closeQuietly(is);
-              }
-            }
-          }
-        }
-      } else {
-        logger.warn("Job " + job.getId() + ": message is not multipart/form-data encoded");
-      }
-      return buildUploadFailedRepsonse(job);
-    } catch (Exception ex) {
-      logger.error(ex.getMessage());
-      return buildUploadFailedRepsonse(job);
-    }
-  }
-
-  /**
-   * Builds a Response containing an HTML that calls the UploadListener.uploadFailed javascript handler.
-   *
-   * @return HTML that calls the UploadListener.uploadFailed js function
-   */
-  private Response buildUploadFailedRepsonse(UploadJob job) {
-    InputStream is = null;
-    try {
-      is = getClass().getResourceAsStream("/templates/error.html");
-      String html = IOUtils.toString(is, "UTF-8");
-      html = html.replaceAll("\\{jobId\\}", job.getId());
-      return Response.ok(html).build();
-    } catch (IOException ex) {
-      logger.error("Unable to build upload failed Response");
-      return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
-  }
-
   /**
    * Adds a dublinCore metadata catalog to the MediaPackage and returns the grown mediaPackage. JQuery Ajax functions
    * doesn't support multipart/form-data encoding.
@@ -1451,38 +1251,6 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       IOUtils.closeQuietly(in);
     }
     return Response.ok(mediaPackage).build();
-  }
-
-  /**
-   * Returns information about the progress of a file upload as a JSON string. Returns 404 if upload job id doesn't
-   * exists Returns 500 if something goes wrong unexpectedly
-   *
-   * TODO cache UploadJobs because endpoint is asked periodically so that not each request yields a DB query operation
-   *
-   * @param jobId
-   * @return progress JSON string
-   */
-  @SuppressWarnings("unchecked")
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("getProgress/{jobId}")
-  public Response getProgress(@PathParam("jobId") String jobId) throws NotFoundException {
-    // try to get UploadJob, responde 404 if not successful
-    UploadJob job = null;
-    if (jobs.containsKey(jobId)) {
-      job = jobs.get(jobId);
-    } else {
-      throw new NotFoundException("Job not found");
-    }
-    /*
-     * String json = "{total:" + Long.toString(job.getBytesTotal()) + ", received:" +
-     * Long.toString(job.getBytesReceived()) + "}"; return Response.ok(json).build();
-     */
-    JSONObject out = new JSONObject();
-    out.put("filename", job.getFilename());
-    out.put("total", Long.toString(job.getBytesTotal()));
-    out.put("received", Long.toString(job.getBytesReceived()));
-    return Response.ok(out.toJSONString()).header("Content-Type", MediaType.APPLICATION_JSON).build();
   }
 
   @Override
