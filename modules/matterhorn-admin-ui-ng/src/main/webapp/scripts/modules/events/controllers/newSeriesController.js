@@ -102,7 +102,8 @@ angular.module('adminNg.controllers')
             userdata.theme = Number(theme);
         }
 
-
+        // Disable submit button to avoid multiple submits
+        $scope.states[$scope.states.length - 1].stateController.isDisabled = true;
         SeriesResource.create({}, userdata, function () {
             Table.fetch();
             Notifications.add('success', 'SERIES_ADDED');
@@ -115,8 +116,12 @@ angular.module('adminNg.controllers')
             });
 
             Modal.$scope.close();
+            // Ok, request is done. Enable submit button.
+            $scope.states[$scope.states.length - 1].stateController.isDisabled = false;
         }, function () {
             Notifications.add('error', 'SERIES_NOT_SAVED', 'series-form');
+            // Ok, request failed. Enable submit button.
+            $scope.states[$scope.states.length - 1].stateController.isDisabled = false;
         });
     };
 
