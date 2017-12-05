@@ -316,7 +316,7 @@ public class SeriesEndpoint {
       }
       return ApiResponses.Json.ok(VERSION_1_0_0, obj(
           f("identifier", v(s.getIdentifier())), f("title", v(s.getTitle())),
-          f("description", v(s.getDescription())), f("creator", v(s.getCreator())), f("subjects", subjects),
+          f("description", v(s.getDescription(), BLANK)), f("creator", v(s.getCreator())), f("subjects", subjects),
           f("organization", v(s.getOrganization())), f("created", v(toUTC(s.getCreatedDateTime().getTime()))),
           f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
           f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
@@ -680,7 +680,7 @@ public class SeriesEndpoint {
       return ApiResponses.Json.ok(VERSION_1_0_0, obj($(properties.entrySet()).map(new Fn<Entry<String, String>, Field>() {
                 @Override
                 public Field apply(Entry<String, String> a) {
-                  return f(a.getKey(), v(a.getValue(), Jsons.BLANK));
+                  return f(a.getKey(), v(a.getValue(), BLANK));
                 }
               }).toList()));
     } else {
