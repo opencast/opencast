@@ -85,15 +85,15 @@ documentation](../configuration/message-broker.md).
 Install Opencast
 ------------------
 
-For this guide, `opencast22-*` is used as placeholder for the package name. It will install the latest version of the
-Opencast 2.2.x branch. If you want to install another version, please change the name accordingly.
+For this guide, `opencast3-*` is used as placeholder for the package name. It will install the latest version of the
+Opencast 3.x branch. If you want to install another version, please change the name accordingly.
 
 
 ### Basic Installation
 
 For a basic installation (All-In-One) just run:
 
-    yum install opencast22-allinone
+    yum install opencast3-allinone
 
 This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.
 
@@ -124,12 +124,12 @@ This will list all available Opencast distributions in the form `opencast<versio
 
 Some available distributions are:
 
- - opencastXX-allinone
- - opencastXX-admin
- - opencastXX-presentation
- - opencastXX-worker
+ - opencastX-allinone
+ - opencastX-admin
+ - opencastX-presentation
+ - opencastX-worker
 
-…where `XX` stands for a specific Opencast version.
+…where `X` stands for a specific Opencast version.
 
 
 Install 3rd-party-tools
@@ -142,6 +142,35 @@ You can install all necessary 3rd-Party-Tools for Opencast like this:
 
     yum install ffmpeg tesseract hunspell sox
 
+
+Upgrading Major Versions
+------------------------
+
+While these packages will automatically upgrade you to the latest point version in a release series, they do not
+automatically upgrade you to the latest major version. In other words, if you install `opencast3-admin` you get the
+latest 3.x release, not the latest 4.x release. To upgrade from one version to another you first stop Opencast:
+
+ - On a SysV-init based system
+
+        service opencast stop
+
+ - On a Systemd based system
+
+        systemctl stop opencast.service
+
+As a reminder, these instructions will change your Opencast installation, and files to a new version which is likely
+incompatible with older versions. If you are performing this on a production system, please ensure you have valid
+backups prior to taking the next steps.
+
+Uninstall your current Opencast packaging (using Opencast 3 as an example):
+
+    yum remove opencast3-*
+
+Then install the new version (using Opencast 4 as an example):
+
+    yum install opencast4-allinone
+
+At this point you must follow the relevant [upgrade](../upgrade.md) instructions, prior to starting Opencast again.
 
 Uninstall Opencast
 --------------------

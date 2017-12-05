@@ -142,24 +142,24 @@ public class UrlSigningFilter implements Filter, ManagedService {
           logger.debug(
                   "Unable to process httpRequest '{}' because it was rejected as a Bad Request, usually a problem with query string: {}",
                   httpRequest.getRequestURL(), resourceRequest.getRejectionReason());
-          httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, resourceRequest.getRejectionReason());
+          httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST);
           return;
         case Forbidden:
           logger.debug(
                   "Unable to process httpRequest '{}' because is was rejected as Forbidden, usually a problem with making policy matching the signature: {}",
                   httpRequest.getRequestURL(), resourceRequest.getRejectionReason());
-          httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, resourceRequest.getRejectionReason());
+          httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
           return;
         case Gone:
           logger.debug("Unable to process httpRequest '{}' because is was rejected as Gone: {}",
                   httpRequest.getRequestURL(), resourceRequest.getRejectionReason());
-          httpResponse.sendError(HttpServletResponse.SC_GONE, resourceRequest.getRejectionReason());
+          httpResponse.sendError(HttpServletResponse.SC_GONE);
           return;
         default:
           logger.error(
                   "Unable to process httpRequest '{}' because is was rejected as status {} which is not a status we should be handling here. This must be due to a code change and is a bug.: {}",
                   httpRequest.getRequestURL(), resourceRequest.getStatus(), resourceRequest.getRejectionReason());
-          httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, resourceRequest.getRejectionReason());
+          httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
           return;
 
       }
